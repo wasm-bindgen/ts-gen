@@ -10,24 +10,24 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>;
+    pub fn new<T>(value: &T) -> Result<Holder<T>, JsValue>;
     #[wasm_bindgen(method)]
     pub fn get<T>(this: &Holder<T>) -> T;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get<T>(this: &Holder<T>) -> Result<T, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn set<T>(this: &Holder<T>, value: T);
+    pub fn set<T>(this: &Holder<T>, value: &T);
     #[wasm_bindgen(method, catch, js_name = "set")]
-    pub fn try_set<T>(this: &Holder<T>, value: T) -> Result<(), JsValue>;
+    pub fn try_set<T>(this: &Holder<T>, value: &T) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
 extern "C" {
-    pub fn identity<T>(value: T) -> T;
+    pub fn identity<T>(value: &T) -> T;
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "identity")]
-    pub fn try_identity<T>(value: T) -> Result<T, JsValue>;
+    pub fn try_identity<T>(value: &T) -> Result<T, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
 extern "C" {
@@ -43,7 +43,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &EvaluationDetails<T>) -> T;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &EvaluationDetails<T>, val: T);
+    pub fn set_value<T>(this: &EvaluationDetails<T>, val: &T);
     #[wasm_bindgen(method, getter)]
     pub fn variant<T>(this: &EvaluationDetails<T>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "variant")]
@@ -54,13 +54,16 @@ extern "C" {
         val: Option<impl ::wasm_bindgen::JsStringLike>,
     );
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetails<T> {
-    pub fn new(flag_key: impl ::wasm_bindgen::JsStringLike, value: T) -> EvaluationDetails<T> {
+impl<T> EvaluationDetails<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn new(flag_key: impl ::wasm_bindgen::JsStringLike, value: &T) -> EvaluationDetails<T> {
         Self::builder(flag_key, value).build()
     }
     pub fn builder(
         flag_key: impl ::wasm_bindgen::JsStringLike,
-        value: T,
+        value: &T,
     ) -> EvaluationDetailsBuilder<T> {
         let inner: EvaluationDetails<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_flag_key(flag_key);
@@ -71,7 +74,10 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetails<T> {
 pub struct EvaluationDetailsBuilder<T> {
     inner: EvaluationDetails<T>,
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> {
+impl<T> EvaluationDetailsBuilder<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn variant(self, val: Option<impl ::wasm_bindgen::JsStringLike>) -> Self {
         self.inner.set_variant(val);
         self
@@ -80,9 +86,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> {
         self.inner
     }
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<EvaluationDetails<T>>
-    for EvaluationDetailsBuilder<T>
-{
+impl<T> From<EvaluationDetails<T>> for EvaluationDetailsBuilder<T> {
     fn from(inner: EvaluationDetails<T>) -> Self {
         Self { inner }
     }
@@ -95,14 +99,18 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn first<A, B>(this: &Pair<A, B>) -> A;
     #[wasm_bindgen(method, setter)]
-    pub fn set_first<A, B>(this: &Pair<A, B>, val: A);
+    pub fn set_first<A, B>(this: &Pair<A, B>, val: &A);
     #[wasm_bindgen(method, getter)]
     pub fn second<A, B>(this: &Pair<A, B>) -> B;
     #[wasm_bindgen(method, setter)]
-    pub fn set_second<A, B>(this: &Pair<A, B>, val: B);
+    pub fn set_second<A, B>(this: &Pair<A, B>, val: &B);
 }
-impl<A: ::wasm_bindgen::convert::IntoWasmAbi, B: ::wasm_bindgen::convert::IntoWasmAbi> Pair<A, B> {
-    pub fn new(first: A, second: B) -> Pair<A, B> {
+impl<A, B> Pair<A, B>
+where
+    for<'__wbg> &'__wbg A: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg B: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn new(first: &A, second: &B) -> Pair<A, B> {
         let inner: Pair<A, B> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_first(first);
         inner.set_second(second);
@@ -178,7 +186,7 @@ extern "C" {
     pub fn get_string_value_promise(
         this: &Flags,
         default_value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<JsString>;
+    ) -> Promise<String>;
     #[wasm_bindgen(method, catch, js_name = "getStringDetails")]
     pub async fn get_string_details(
         this: &Flags,
@@ -228,7 +236,7 @@ extern "C" {
     pub fn get_nullable_string_promise(
         this: &Flags,
         default_value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<JsOption<JsString>>;
+    ) -> Promise<Option<String>>;
     #[wasm_bindgen(method, catch, js_name = "getStringPair")]
     pub async fn get_string_pair(
         this: &Flags,
@@ -249,17 +257,15 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "getStringArray")]
     pub async fn get_string_array_js_string(this: &Flags) -> Result<Array<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "getStringArray")]
-    pub fn get_string_array_promise(this: &Flags) -> Promise<Array<JsString>>;
+    pub fn get_string_array_promise(this: &Flags) -> Promise<Array<String>>;
     #[wasm_bindgen(method, catch, js_name = "getStringMap")]
-    pub async fn get_string_map(this: &Flags) -> Result<Map<JsString, JsString>, JsValue>;
+    pub async fn get_string_map(this: &Flags) -> Result<Map<String, String>, JsValue>;
     #[wasm_bindgen(method, js_name = "getStringMap")]
-    pub fn get_string_map_promise(this: &Flags) -> Promise<Map<JsString, JsString>>;
+    pub fn get_string_map_promise(this: &Flags) -> Promise<Map<String, String>>;
     #[wasm_bindgen(method, catch, js_name = "getStringTuple")]
-    pub async fn get_string_tuple(
-        this: &Flags,
-    ) -> Result<ArrayTuple<(JsString, JsString)>, JsValue>;
+    pub async fn get_string_tuple(this: &Flags) -> Result<ArrayTuple<(String, String)>, JsValue>;
     #[wasm_bindgen(method, js_name = "getStringTuple")]
-    pub fn get_string_tuple_promise(this: &Flags) -> Promise<ArrayTuple<(JsString, JsString)>>;
+    pub fn get_string_tuple_promise(this: &Flags) -> Promise<ArrayTuple<(String, String)>>;
     #[wasm_bindgen(method, catch, js_name = "getStringCallback")]
     pub async fn get_string_callback(
         this: &Flags,

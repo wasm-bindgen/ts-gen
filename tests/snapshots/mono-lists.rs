@@ -179,7 +179,7 @@ extern "C" {
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     pub fn lookup(
-        values: &Map<impl ::wasm_bindgen::JsStringLike, Number>,
+        values: &Map<impl ::wasm_bindgen::JsStringLike, f64>,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> f64;
 }
@@ -187,7 +187,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "lookup")]
     pub fn try_lookup(
-        values: &Map<impl ::wasm_bindgen::JsStringLike, Number>,
+        values: &Map<impl ::wasm_bindgen::JsStringLike, f64>,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<f64, JsValue>;
 }
@@ -286,7 +286,7 @@ extern "C" {
     ) -> Result<JsString, JsValue>;
 }
 #[allow(dead_code)]
-pub type Tags = Array<JsString>;
+pub type Tags = Array<String>;
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "getTags")]
@@ -350,7 +350,7 @@ extern "C" {
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "fetchTags")]
-    pub fn fetch_tags_promise() -> Promise<Array<JsString>>;
+    pub fn fetch_tags_promise() -> Promise<Array<String>>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {

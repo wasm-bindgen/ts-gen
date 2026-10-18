@@ -31,14 +31,18 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn a<A, B>(this: &Pair<A, B>) -> A;
     #[wasm_bindgen(method, setter)]
-    pub fn set_a<A, B>(this: &Pair<A, B>, val: A);
+    pub fn set_a<A, B>(this: &Pair<A, B>, val: &A);
     #[wasm_bindgen(method, getter)]
     pub fn b<A, B>(this: &Pair<A, B>) -> B;
     #[wasm_bindgen(method, setter)]
-    pub fn set_b<A, B>(this: &Pair<A, B>, val: B);
+    pub fn set_b<A, B>(this: &Pair<A, B>, val: &B);
 }
-impl<A: ::wasm_bindgen::convert::IntoWasmAbi, B: ::wasm_bindgen::convert::IntoWasmAbi> Pair<A, B> {
-    pub fn new(a: A, b: B) -> Pair<A, B> {
+impl<A, B> Pair<A, B>
+where
+    for<'__wbg> &'__wbg A: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg B: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn new(a: &A, b: &B) -> Pair<A, B> {
         let inner: Pair<A, B> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_a(a);
         inner.set_b(b);

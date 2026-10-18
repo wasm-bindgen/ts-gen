@@ -32,7 +32,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bag<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>() -> Result<Bag<T>, JsValue>;
+    pub fn new() -> Result<Bag, JsValue>;
     #[wasm_bindgen(method)]
     pub fn take<T>(this: &Bag<T>, #[wasm_bindgen(slice = "array")] values: &[T]) -> String;
     #[wasm_bindgen(method, js_name = "take")]

@@ -25,15 +25,15 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>;
+    pub fn new<T>(value: &T) -> Result<Holder<T>, JsValue>;
     #[wasm_bindgen(method)]
     pub fn get<T>(this: &Holder<T>) -> T;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get<T>(this: &Holder<T>) -> Result<T, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn set<T>(this: &Holder<T>, value: T);
+    pub fn set<T>(this: &Holder<T>, value: &T);
     #[wasm_bindgen(method, catch, js_name = "set")]
-    pub fn try_set<T>(this: &Holder<T>, value: T) -> Result<(), JsValue>;
+    pub fn try_set<T>(this: &Holder<T>, value: &T) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "enum-positions-mono", experimental_generic_mono)]
 extern "C" {
@@ -43,17 +43,20 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &Details<T>) -> T;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &Details<T>, val: T);
+    pub fn set_value<T>(this: &Details<T>, val: &T);
     #[wasm_bindgen(method, getter)]
     pub fn fallback<T>(this: &Details<T>) -> Option<T>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fallback<T>(this: &Details<T>, val: T);
+    pub fn set_fallback<T>(this: &Details<T>, val: &T);
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Details<T> {
-    pub fn new(value: T) -> Details<T> {
+impl<T> Details<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn new(value: &T) -> Details<T> {
         Self::builder(value).build()
     }
-    pub fn builder(value: T) -> DetailsBuilder<T> {
+    pub fn builder(value: &T) -> DetailsBuilder<T> {
         let inner: Details<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         DetailsBuilder { inner }
@@ -62,8 +65,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Details<T> {
 pub struct DetailsBuilder<T> {
     inner: Details<T>,
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> DetailsBuilder<T> {
-    pub fn fallback(self, val: T) -> Self {
+impl<T> DetailsBuilder<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn fallback(self, val: &T) -> Self {
         self.inner.set_fallback(val);
         self
     }
@@ -71,7 +77,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> DetailsBuilder<T> {
         self.inner
     }
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<Details<T>> for DetailsBuilder<T> {
+impl<T> From<Details<T>> for DetailsBuilder<T> {
     fn from(inner: Details<T>) -> Self {
         Self { inner }
     }
@@ -104,11 +110,11 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub async fn next_mode(this: &Probe) -> Result<Mode, JsValue>;
     #[wasm_bindgen(method, js_name = "nextMode")]
-    pub fn next_mode_promise(this: &Probe) -> Promise<JsString>;
+    pub fn next_mode_promise(this: &Probe) -> Promise<Mode>;
     #[wasm_bindgen(method, catch, js_name = "nextLevel")]
     pub async fn next_level(this: &Probe) -> Result<Option<Level>, JsValue>;
     #[wasm_bindgen(method, js_name = "nextLevel")]
-    pub fn next_level_promise(this: &Probe) -> Promise<JsOption<Number>>;
+    pub fn next_level_promise(this: &Probe) -> Promise<Option<Level>>;
     #[wasm_bindgen(method, catch, js_name = "nextDetails")]
     pub async fn next_details(this: &Probe) -> Result<Details<Mode>, JsValue>;
     #[wasm_bindgen(method, js_name = "nextDetails")]
@@ -138,15 +144,12 @@ extern "C" {
         ms: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<Array<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "modeArray")]
-    pub fn mode_array(
-        this: &Probe,
-        ms: &Array<impl ::wasm_bindgen::JsStringLike>,
-    ) -> Array<JsString>;
+    pub fn mode_array(this: &Probe, ms: &Array<impl ::wasm_bindgen::JsStringLike>) -> Array<Mode>;
     #[wasm_bindgen(method, catch, js_name = "modeArray")]
     pub fn try_mode_array(
         this: &Probe,
         ms: &Array<impl ::wasm_bindgen::JsStringLike>,
-    ) -> Result<Array<JsString>, JsValue>;
+    ) -> Result<Array<Mode>, JsValue>;
     #[wasm_bindgen(method, js_name = "onMode")]
     pub fn on_mode(this: &Probe, cb: &Function<fn(JsString) -> Number>);
     #[wasm_bindgen(method, catch, js_name = "onMode")]
