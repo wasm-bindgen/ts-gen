@@ -620,6 +620,27 @@ impl<'a> CodegenContext<'a> {
         }
     }
 
+    /// The type parameters of the locally declared generic class or
+    /// interface `name` when every one defaults to `any` / `unknown` (or
+    /// declares no default), as a bare reference then means no particular
+    /// instantiation.
+    pub(crate) fn any_defaulted_params(&self, name: &str, scope: ScopeId) -> Option<Vec<String>> {
+        let id = self.gctx.resolve_path(scope, name)?;
+        let type_params = match &self.gctx.get_type(id).kind {
+            ir::TypeKind::Class(c) => &c.type_params,
+            ir::TypeKind::Interface(i) => &i.type_params,
+            _ => return None,
+        };
+        let any = |tp: &ir::TypeParam| {
+            matches!(
+                tp.default,
+                None | Some(TypeRef::Any) | Some(TypeRef::Unknown)
+            )
+        };
+        (!type_params.is_empty() && type_params.iter().all(any))
+            .then(|| type_params.iter().map(|tp| tp.name.clone()).collect())
+    }
+
     /// The Rust target of a local type alias, lowered in the alias's own
     /// scope so its type parameters bind. An enum target has no inner form,
     /// so it is named directly. Per-mono, leaves are native as in a js-sys
@@ -2386,6 +2407,15 @@ fn with_generic_args(
     from_module: &ModuleContext,
 ) -> TokenStream {
     if generic_args.is_empty() {
+        // Per-mono a top-level argument naming a generic class bare, at its
+        // `any` defaults, takes any instantiation (`&ReadableStream<impl
+        // Sized>`), so a `ReadableStream<Uint8Array>` passes as it is.
+        if pos.is_argument() && !pos.inner && CodegenContext::generic_mono(ctx) {
+            if let Some(params) = ctx.and_then(|c| c.any_defaulted_params(name, scope)) {
+                let any = params.iter().map(|_| quote! { impl Sized });
+                return quote! { #base<#(#any),*> };
+            }
+        }
         return base;
     }
     let accepts_generics = ctx.is_some_and(|c| c.is_local_generic(name, scope));

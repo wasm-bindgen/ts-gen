@@ -107,11 +107,29 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Reader<R = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new(stream: &Stream) -> Result<Reader, JsValue>;
+    pub fn new(stream: &Stream<impl Sized>) -> Result<Reader, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Reader")]
-    pub fn new_typed<R>(stream: &Stream) -> Result<Reader<R>, JsValue>;
+    pub fn new_typed<R>(stream: &Stream<R>) -> Result<Reader<R>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn read<R>(this: &Reader<R>) -> Result<R, JsValue>;
     #[wasm_bindgen(method, js_name = "read")]
     pub fn read_promise<R>(this: &Reader<R>) -> Promise<R>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Transform < JsValue , Uint8Array > , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Identity;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Identity, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Transform , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Passthrough<T = JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Passthrough, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Passthrough")]
+    pub fn new_typed<T>() -> Result<Passthrough<T>, JsValue>;
 }
