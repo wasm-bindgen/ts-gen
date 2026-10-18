@@ -3719,6 +3719,13 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
 * `{@string mode}` replaces the input member's mode; one in a side
   declaration's doc is the default for every input member of it that no
   tag (input or side) sets.
+* `@retype` makes the side member's own type replace the input's: a
+  property getter's type, or the return of every overload of a method or
+  function. It is for an input type that erases what the API produces
+  (`get body(): ReadableStream | null`, a stream of bytes), so the side
+  file writes the type it wants:
+  `/** @retype */ readonly body: ReadableStream<Uint8Array> | null;`. A
+  property's setter keeps its own type.
 * A side member applies to every overload of the input method or
   function, and the `## Errors` section its `@throws` renders is
   appended to the input's doc once. The rest of the side doc is not
@@ -3732,12 +3739,13 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
   a binding; so does an invalid `@rust` tag, or one whose scalar the
   input's type cannot carry. Side members without tags are ignored,
   whatever their description; a `{@string}` tag alone counts as one.
-* Only classes, interfaces and functions can be annotated: a
-  `declare namespace`, `declare module`, variable, or alias that sets no
-  type-parameter default (see below) in the side file fails the run
-  rather than being skipped, as does a bare name
-  that the input declares more than once (globally and inside a
-  module), since names are matched without scope.
+* Only classes, interfaces and functions can be annotated, at the top
+  level or inside a `declare namespace` that re-declares the input's
+  (`declare namespace TailStream { /** {@string copy} */ interface Onset {} }`).
+  A `declare module`, variable, or alias that sets no type-parameter
+  default (see below) in the side file fails the run rather than being
+  skipped, as does a bare name that the input declares more than once
+  (globally and inside a module), since names are matched without scope.
 * A side declaration's type-parameter defaults replace the input's, by
   parameter name; a default for a parameter the input lacks fails the
   run. The output changes wherever a default is read: a class or

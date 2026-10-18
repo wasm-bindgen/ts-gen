@@ -67,6 +67,12 @@
   ;; makeName(): string
   (import "./bindings.wasm" "makeName" (func $makeName (result externref)))
 
+  ;; Tail.Onset
+  ;; {} as Tail.Onset
+  (import "./bindings.wasm" "Tail.Onset.new" (func $Tail.Onset.new (result externref)))
+  ;; name: string
+  (import "./bindings.wasm" "Tail.Onset.name" (func $Tail.Onset.name (param $this externref) (result externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 

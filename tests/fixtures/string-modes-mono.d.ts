@@ -41,3 +41,10 @@ interface Cookies {
 /** @returns {string} the id {@string copy} */
 declare function makeId(): string;
 declare function makeName(): string;
+
+// A side namespace reaches the input namespace's members.
+declare namespace Tail {
+  interface Onset {
+    readonly name: string;
+  }
+}

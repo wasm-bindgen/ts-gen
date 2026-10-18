@@ -19,3 +19,8 @@ interface Cookies {
   /** {@string both} */
   readonly second: string;
 }
+
+declare namespace Tail {
+  /** {@string copy} */
+  interface Onset {}
+}

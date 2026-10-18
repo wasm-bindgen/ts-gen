@@ -106,3 +106,24 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "makeName")]
     pub fn make_name_js_string() -> Result<JsString, JsValue>;
 }
+pub mod tail {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Onset;
+        #[wasm_bindgen(method, getter)]
+        pub fn name(this: &Onset) -> String;
+    }
+    impl Onset {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Onset {
+            #[allow(unused_unsafe)]
+            unsafe {
+                JsValue::from(js_sys::Object::new()).unchecked_into()
+            }
+        }
+    }
+}
