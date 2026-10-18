@@ -10,9 +10,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type UnderlyingSource<R = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn start<R>(this: &UnderlyingSource<R>) -> Option<Function<fn(JsValue) -> Undefined>>;
+    pub fn start<R>(this: &UnderlyingSource<R>) -> Option<Function<fn(JsValue)>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_start<R>(this: &UnderlyingSource<R>, val: &Function<fn(JsValue) -> Undefined>);
+    pub fn set_start<R>(this: &UnderlyingSource<R>, val: &Function<fn(JsValue)>);
 }
 impl<R> UnderlyingSource<R> {
     pub fn new() -> UnderlyingSource<R> {
@@ -28,7 +28,7 @@ pub struct UnderlyingSourceBuilder<R> {
     inner: UnderlyingSource<R>,
 }
 impl<R> UnderlyingSourceBuilder<R> {
-    pub fn start(self, val: &Function<fn(JsValue) -> Undefined>) -> Self {
+    pub fn start(self, val: &Function<fn(JsValue)>) -> Self {
         self.inner.set_start(val);
         self
     }

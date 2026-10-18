@@ -153,8 +153,10 @@ pub struct TypePosition {
     /// Nested inside a `js_sys` container (`Promise`, `Array`, `Map`, `Set`,
     /// the iterators, `Record`'s `Object`, a tuple's `ArrayTuple`) under
     /// per-mono lowering, whose element APIs are monomorphized: primitive
-    /// leaves keep their Rust types (`Promise<String>`, `Map<String, f64>`)
-    /// rather than their handles. Callbacks and other erased generics reset it.
+    /// leaves keep their Rust types (`Promise<String>`, `Map<String, f64>`,
+    /// `Promise<()>`) rather than their handles. Callback signatures
+    /// (`Function<fn(String)>`) count as containers; other erased generics
+    /// reset it.
     pub native_leaves: bool,
 }
 
@@ -1503,9 +1505,10 @@ pub fn to_syn_type(
             TypeRef::Boolean | TypeRef::BooleanLiteral(_) => return quote! { bool },
             TypeRef::Number | TypeRef::NumberLiteral(_) => return quote! { f64 },
             TypeRef::String | TypeRef::StringLiteral(_) => return quote! { String },
+            TypeRef::Void | TypeRef::Undefined => return quote! { () },
             TypeRef::Nullable(inner, _) => {
                 let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
-                return if is_jsvalue_arg(&inner_ty) {
+                return if is_jsvalue_arg(&inner_ty) || inner_ty.to_string() == "()" {
                     quote! { JsValue }
                 } else {
                     quote! { Option<#inner_ty> }
@@ -1665,11 +1668,11 @@ pub fn to_syn_type(
             // Argument position has to pick the JS value `None` crosses as,
             // since `Option<T>` only ever emits `undefined`: a `null` arm
             // goes through `JsNullable`, whose empty is `null`. A type
-            // parameter inner is taken by value, as the macro cannot
-            // borrow a generic (`Option<&T>`).
+            // parameter inner is taken by value, as only the per-mono macro
+            // can borrow a generic (`Option<&T>`).
             let generic = is_type_param(inner, ctx, scope);
             if !n.null {
-                let inner_ty = if generic {
+                let inner_ty = if generic && !CodegenContext::generic_mono(ctx) {
                     to_syn_type(inner, TypePosition::RETURN, ctx, scope, from_module)
                 } else {
                     to_syn_type(inner, pos, ctx, scope, from_module)
@@ -1732,7 +1735,14 @@ pub fn to_syn_type(
             maybe_ref(base, borrow)
         }
         TypeRef::Function(sig) => {
-            let inner_pos = pos.to_inner();
+            // Per-mono `Function<fn(A..) -> R>` takes any ABI type, so its
+            // leaves are native and a `void` return is `()`.
+            let mono = CodegenContext::generic_mono(ctx);
+            let inner_pos = if mono {
+                pos.to_container(ctx)
+            } else {
+                pos.to_inner()
+            };
             let params: Vec<TokenStream> = sig
                 .params
                 .iter()
@@ -1740,19 +1750,21 @@ pub fn to_syn_type(
                 .map(|p| to_syn_type(&p.type_ref, inner_pos, ctx, scope, from_module))
                 .collect();
             // `Function<fn() -> Promise<T>>` with a type parameter `T`
-            // does not satisfy wasm-bindgen's `JsFunction` (the nested
-            // `ErasableGeneric::Repr` projection fails to normalise), so
-            // the promised value erases inside callback signatures.
-            let promised_param = sig.return_type.as_promise_inner().is_some_and(|inner| {
-                inner.as_ident().is_some_and(|name| {
-                    ctx.is_some_and(|c| {
-                        matches!(
-                            c.gctx.scopes.resolve_binding(scope, name),
-                            Some(crate::parse::scope::Binding::TypeParam)
-                        )
+            // does not satisfy wasm-bindgen's erased `JsFunction` (the
+            // nested `ErasableGeneric::Repr` projection fails to
+            // normalise), so the promised value erases inside callback
+            // signatures.
+            let promised_param = !mono
+                && sig.return_type.as_promise_inner().is_some_and(|inner| {
+                    inner.as_ident().is_some_and(|name| {
+                        ctx.is_some_and(|c| {
+                            matches!(
+                                c.gctx.scopes.resolve_binding(scope, name),
+                                Some(crate::parse::scope::Binding::TypeParam)
+                            )
+                        })
                     })
-                })
-            });
+                });
             let ret = if promised_param {
                 quote! { Promise }
             } else {
@@ -1764,6 +1776,8 @@ pub fn to_syn_type(
             let variadic = sig.params.iter().any(|p| p.variadic);
             let base = if variadic || params.iter().all(is_jsvalue_arg) && is_jsvalue_arg(&ret) {
                 quote! { Function }
+            } else if ret.to_string() == "()" {
+                quote! { Function<fn(#(#params),*)> }
             } else {
                 quote! { Function<fn(#(#params),*) -> #ret> }
             };

@@ -9,7 +9,6 @@ pub mod enums;
 pub mod error_enum;
 pub mod functions;
 pub(crate) mod inline_wrappers;
-mod mono_bounds;
 pub(crate) mod primitive_unions;
 pub mod provides;
 pub mod signatures;
@@ -199,9 +198,6 @@ pub fn generate_with_options(
         anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
     })?;
     inline_wrappers::apply(&mut file);
-    if options.experimental_generic_mono {
-        mono_bounds::apply(&mut file);
-    }
     split_unshared_views(&mut file.items);
     let formatted = rustfmt(&quote::ToTokens::to_token_stream(&file).to_string())?;
     // Prepend a header comment. Line comments don't survive `quote!`

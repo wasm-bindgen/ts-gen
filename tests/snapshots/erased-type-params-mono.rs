@@ -75,10 +75,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_cursor<M>(this: &ListResult<M>, val: impl ::wasm_bindgen::JsStringLike);
 }
-impl<M> ListResult<M>
-where
-    Entry<M>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
-{
+impl<M> ListResult<M> {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `done: false`"]
@@ -111,10 +108,7 @@ where
 pub struct ListResultBuilder<M> {
     inner: ListResult<M>,
 }
-impl<M> ListResultBuilder<M>
-where
-    Entry<M>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
-{
+impl<M> ListResultBuilder<M> {
     pub fn cursor(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_cursor(val);
         self

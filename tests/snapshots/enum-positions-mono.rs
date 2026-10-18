@@ -153,9 +153,9 @@ extern "C" {
         ms: &Array<impl ::wasm_bindgen::JsStringLike>,
     ) -> Result<Array<Mode>, JsValue>;
     #[wasm_bindgen(method, js_name = "onMode")]
-    pub fn on_mode(this: &Probe, cb: &Function<fn(JsString) -> Number>);
+    pub fn on_mode(this: &Probe, cb: &Function<fn(Mode) -> Level>);
     #[wasm_bindgen(method, catch, js_name = "onMode")]
-    pub fn try_on_mode(this: &Probe, cb: &Function<fn(JsString) -> Number>) -> Result<(), JsValue>;
+    pub fn try_on_mode(this: &Probe, cb: &Function<fn(Mode) -> Level>) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "modeOrNumber")]
     pub fn mode_or_number(this: &Probe, x: Mode) -> ModeOrNumberReturnKind;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumber")]

@@ -1,12 +1,13 @@
 //! @ts-gen --experimental-generic-mono
 
-// Per-monomorphization type parameters are unbounded, except where the
-// output needs a bound: a parameter inside a callback's `Function<…>` stays
-// a JS handle, and a dictionary helper restates the ABI bound of each setter
-// argument shape it forwards (`&T`, `Option<T>`, `&[T]`).
+// Per-monomorphization type parameters are unbounded. A callback's
+// `Function<fn(..) -> R>` takes native leaves and any parameter (`void` is
+// `()`), and a dictionary helper restates the ABI bound of a setter argument
+// only where it names a parameter bare (`Option<&T>`, `&[T]`).
 
 interface Handler<Env = unknown> {
   fetch?: (request: string, env: Env) => void;
+  scheduled?: (env: Env) => void | Promise<void>;
   name?: string;
 }
 declare function serve(h: Handler): void;
@@ -18,4 +19,14 @@ interface Slot<T> {
   value: T | undefined;
   fallback?: T;
 }
-declare function fill(r: Rows<string>, s: Slot<number>): void;
+interface Step<T> {
+  done?: boolean;
+  value?: T | null;
+}
+declare function fill(r: Rows<string>, s: Slot<number>, t: Step<string>): void;
+
+interface Store {
+  blockConcurrencyWhile<T>(callback: () => Promise<T>): Promise<T>;
+  forEach(callback: (value: string, key: string, parent: Store) => void): void;
+  sync(): Promise<void>;
+}

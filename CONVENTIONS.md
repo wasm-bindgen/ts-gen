@@ -141,6 +141,7 @@ No coercion is assumed anywhere.
   take strings and numbers off their native ABI. `None` crosses as
   `undefined`, which a WebIDL nullable (`T?`) converts to `null`; a
   non-WebIDL callee that tests `=== null` needs the explicit form. A
+  type-parameter inner is borrowed like any other (`Option<&T>`). A
   dictionary builder's method for an optional nullable field takes the
   value bare and passes `Some(…)` to the setter, since not calling it is
   the field's empty: `.prefix("a")`, `.signal(&signal)`;
@@ -376,6 +377,12 @@ Two shapes lower to the untyped `Function` instead, which any
 * A signature with a rest parameter (`(...args: any[]) => void`,
   `(first: string, ...rest: number[]) => void`): a `fn` pointer type
   has fixed arity, so there is no typed spelling of it.
+
+Under `--experimental-generic-mono` `Function<fn(A..) -> R>` takes any
+ABI type, so the signature takes native leaves like a js-sys container
+and a `void` return is omitted: `Function<fn(f64, String) -> bool>`,
+`Function<fn(String, Env)>`, `void | Promise<void>` as
+`Option<Promise<()>>`, and `() => Promise<T>` keeps its `T`.
 
 Parameters beyond the eighth are dropped from the typed form.
 
@@ -1998,35 +2005,27 @@ extern "C" {
 ```
 
 Generated dictionary helpers call their extern setters from ordinary Rust, so
-their `impl` restates, for each argument shape that names a type parameter,
-the bound wasm-bindgen puts on the setter's import: `&T` needs `for<'a> &'a
-T: IntoWasmAbi`, `Option<T>` needs `Option<T>: IntoWasmAbi`, and `&[T]` needs
-`T: VectorRefIntoWasmAbi`. The extern declarations themselves remain
-unconstrained:
+their `impl` restates, for each argument shape that names a type parameter
+bare, the bound wasm-bindgen puts on the setter's import: `&T` needs `for<'a>
+&'a T: IntoWasmAbi`, `Option<&T>` needs `for<'a> Option<&'a T>: IntoWasmAbi`,
+and `&[T]` needs `T: VectorRefIntoWasmAbi`. A parameter inside another
+generic (`&Foo<T>`, `&Function<fn(String, Env)>`, `&[Foo<T>]`) needs nothing,
+since a handle's ABI holds for every instantiation. The extern declarations
+themselves remain unconstrained:
 
 ```rust
 impl<T> Slot<T>
 where
-    Option<T>: IntoWasmAbi + WasmDescribe,
+    for<'__wbg> Option<&'__wbg T>: IntoWasmAbi + WasmDescribe,
     for<'__wbg> &'__wbg T: IntoWasmAbi + WasmDescribe,
-{ /* new(value: Option<T>), builder(value: Option<T>) */ }
+{ /* new(value: Option<&T>), builder(value: Option<&T>) */ }
 impl<T> Rows<T> where T: VectorRefIntoWasmAbi { /* new(rows: &[T]) */ }
+impl<Env> Handler<Env> { /* fetch(val: &Function<fn(String, Env)>) */ }
 ```
 
 The bounds stay on helper `impl` blocks whose methods call generated setters.
 They are not attached to the builder struct itself, so merely storing or
 returning a builder does not constrain its type parameter.
-
-A callback's signature type is not monomorphized: `Function<fn(A) -> R>`
-needs every `A` and `R` to be a JS handle. A type parameter named inside a
-`Function<…>` therefore keeps `JsGeneric`, on each extern fn that mentions it
-and on the helper `impl`s of its type and builder:
-
-```rust
-pub fn fetch<Env: JsGeneric>(this: &Handler<Env>) -> Option<Function<fn(JsString, Env) -> Undefined>>;
-pub fn name<Env>(this: &Handler<Env>) -> Option<String>;
-impl<Env: JsGeneric> Handler<Env> { /* … */ }
-```
 
 Array-buffer-view helper parameters retain their `TypedArray` widening bound.
 In per-monomorphization mode the helper also repeats the reference ABI bound
@@ -2051,8 +2050,9 @@ stays a type parameter. Built-in JS containers, tuples and iterators take
 native leaves too (`Promise<String>`, `Map<String, f64>`, `Array<bool>`,
 `ArrayTuple<(String, String)>`, `Object<String>` for a `Record`), since
 `js_sys_unstable_apis` monomorphizes their element APIs, and an awaited
-`T | undefined` is `Option<T>`. Callbacks keep wrapper elements
-(`Function<fn(JsString)>`), as above.
+`T | undefined` is `Option<T>`; `Promise<void>` is `Promise<()>`. Callback
+signatures take native leaves the same way (see
+[Function types](#function-types)).
 
 Constructors bind only the class parameters their arguments mention; the rest
 take their declared defaults, as without per-monomorphization, so

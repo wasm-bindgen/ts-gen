@@ -104,11 +104,10 @@ impl Store {
     {
         self.get_json_js(key, "json").await
     }
-    pub fn get_json_promise<T>(&self, key: impl ::wasm_bindgen::JsStringLike) -> Promise<Option<T>>
-    where
-        Promise<Option<T>>:
-            ::wasm_bindgen::convert::FromWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    {
+    pub fn get_json_promise<T>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Option<T>> {
         self.get_json_promise_js(key, "json")
     }
     pub fn read_text(&self, key: impl ::wasm_bindgen::JsStringLike) -> String {
@@ -181,10 +180,7 @@ impl<V> Cell<V> {
     {
         self.take_later_js("later").await
     }
-    pub fn take_later_promise(&self) -> Promise<V>
-    where
-        Promise<V>: ::wasm_bindgen::convert::FromWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    {
+    pub fn take_later_promise(&self) -> Promise<V> {
         self.take_later_promise_js("later")
     }
 }

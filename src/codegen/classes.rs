@@ -1527,6 +1527,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // are intentionally absent — they're only settable through `builder`.
     // (Empty when `!emit_builder`, since there's nothing to chain.)
     let mut builder_methods: Vec<TokenStream> = Vec::new();
+    let mut bound_shapes: Vec<TokenStream> = Vec::new();
     for g in &optional_getters {
         let base = config.member_base(MemberKind::Property, &g.js_name);
         let setter_name = config.setter_name(MemberKind::Property, &g.js_name);
@@ -1573,14 +1574,29 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     }
                 })
                 .collect();
-            builder_methods.push(quote! {
+            let method = quote! {
                 pub fn #method_ident #generics (self, #params) -> Self
                 #helper_where_clause
                 {
                     self.inner.#setter_ident(#(#param_idents),*);
                     self
                 }
+            };
+            // A wrapped argument reaches the setter as `Some(…)`, so the
+            // setter's shape (`Option<&T>`) is what the impl must bound.
+            bound_shapes.push(if wrapped.iter().all(|w| matches!(w, Wrap::None)) {
+                method.clone()
+            } else {
+                let setter_params = generate_dictionary_params(
+                    &sig.params,
+                    config.cgctx,
+                    sig.body_scope,
+                    &config.from_module(),
+                )
+                .params;
+                quote! { fn setter(#setter_params) {} }
             });
+            builder_methods.push(method);
         }
     }
 
@@ -1588,7 +1604,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         new_variants
             .iter()
             .chain(&builder_variants)
-            .chain(&builder_methods),
+            .chain(&bound_shapes),
     );
     if emit_builder {
         quote! {
@@ -1637,9 +1653,7 @@ enum Wrap {
 /// of them the setter takes wrapped in `Some`. Under per-monomorphization
 /// the field's empty is not calling the method, so a nullable value is
 /// taken bare (`.prefix("a")`, `.signal(&signal)`) and passed on as
-/// `Some(…)`; `set_prefix(None)` still clears it. A type-parameter inner is
-/// left alone: the setter takes it by value (`Option<T>`), the builder by
-/// reference.
+/// `Some(…)`; `set_prefix(None)` still clears it.
 fn builder_value_params(
     config: &ClassConfig,
     sig: &FunctionSignature,
@@ -1650,11 +1664,7 @@ fn builder_value_params(
         .map(|p| {
             let ty = super::typemap::mono_argument_empty(&p.type_ref, config.cgctx);
             match ty.as_ref() {
-                TypeRef::Nullable(inner, _)
-                    if mono
-                        && !p.variadic
-                        && !super::typemap::is_type_param(inner, config.cgctx, sig.body_scope) =>
-                {
+                TypeRef::Nullable(inner, _) if mono && !p.variadic => {
                     let bare = ConcreteParam {
                         type_ref: (**inner).clone(),
                         ..p.clone()
