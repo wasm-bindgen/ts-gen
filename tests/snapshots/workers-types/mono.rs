@@ -172,6 +172,34 @@ extern "C" {
         handler: &EventListenerObject<FetchEvent>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     fn __add_event_listener_2(
         this: &WorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -182,6 +210,34 @@ extern "C" {
         this: &WorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<ScheduledEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     fn __add_event_listener_3(
@@ -196,6 +252,34 @@ extern "C" {
         handler: &EventListenerObject<QueueEvent>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     fn __add_event_listener_with_handler_function_2(
         this: &WorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -206,6 +290,34 @@ extern "C" {
         this: &WorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<PromiseRejectionEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_function_and_options_event_target_add_event_listener_options_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_function_and_options_bool_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_event_listener_object_and_options_bool_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener(
@@ -220,6 +332,34 @@ extern "C" {
         handler: &EventListenerObject<FetchEvent>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener_2(
         this: &WorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -230,6 +370,34 @@ extern "C" {
         this: &WorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<ScheduledEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener_3(
@@ -244,6 +412,34 @@ extern "C" {
         handler: &EventListenerObject<QueueEvent>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener_with_handler_function_2(
         this: &WorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -254,6 +450,34 @@ extern "C" {
         this: &WorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<PromiseRejectionEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_function_and_options_event_target_event_listener_options_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_event_listener_object_and_options_event_target_event_listener_options_2(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_function_and_options_bool_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_event_listener_object_and_options_bool_3(
+        this: &WorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
 }
 impl WorkerGlobalScope {
@@ -278,6 +502,46 @@ impl WorkerGlobalScope {
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_fetch_with_function_and_options(
+        &self,
+        handler: &Function<fn(FetchEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_options("fetch", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_fetch_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<FetchEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_options("fetch", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_fetch_with_function_and_bool(
+        &self,
+        handler: &Function<fn(FetchEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_bool("fetch", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_fetch_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<FetchEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_bool("fetch", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     pub fn add_event_listener_scheduled(
         &self,
         handler: &Function<fn(ScheduledEvent)>,
@@ -296,6 +560,54 @@ impl WorkerGlobalScope {
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_scheduled_with_function_and_options(
+        &self,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_options_2("scheduled", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_scheduled_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_options_2(
+            "scheduled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_scheduled_with_function_and_bool(
+        &self,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_bool_2("scheduled", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_scheduled_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_bool_2(
+            "scheduled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     pub fn add_event_listener_queue(
         &self,
         handler: &Function<fn(QueueEvent)>,
@@ -310,6 +622,48 @@ impl WorkerGlobalScope {
         handler: &EventListenerObject<QueueEvent>,
     ) -> Result<(), JsValue> {
         self.__add_event_listener_with_event_listener_object_3("queue", handler)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_queue_with_function_and_options(
+        &self,
+        handler: &Function<fn(QueueEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_options_3("queue", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_queue_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<QueueEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_options_3(
+            "queue", handler, options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_queue_with_function_and_bool(
+        &self,
+        handler: &Function<fn(QueueEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_bool_3("queue", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_queue_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<QueueEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_bool_3("queue", handler, options)
     }
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
@@ -350,6 +704,102 @@ impl WorkerGlobalScope {
     ) -> Result<(), JsValue> {
         self.__add_event_listener_with_handler_event_listener_object_3("rejectionhandled", handler)
     }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_unhandledrejection_with_handler_function_and_options_event_target_add_event_listener_options_2(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __add_event_listener_with_handler_function_and_options_event_target_add_event_listener_options_2 ("unhandledrejection" , handler , options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_rejectionhandled_with_handler_function_and_options_event_target_add_event_listener_options_2(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __add_event_listener_with_handler_function_and_options_event_target_add_event_listener_options_2 ("rejectionhandled" , handler , options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __add_event_listener_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2 ("unhandledrejection" , handler , options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __add_event_listener_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2 ("rejectionhandled" , handler , options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_unhandledrejection_with_handler_function_and_options_bool_3(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_handler_function_and_options_bool_3(
+            "unhandledrejection",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_rejectionhandled_with_handler_function_and_options_bool_3(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_handler_function_and_options_bool_3(
+            "rejectionhandled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_bool_3(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_handler_event_listener_object_and_options_bool_3(
+            "unhandledrejection",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_bool_3(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_handler_event_listener_object_and_options_bool_3(
+            "rejectionhandled",
+            handler,
+            options,
+        )
+    }
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
@@ -367,6 +817,48 @@ impl WorkerGlobalScope {
         handler: &EventListenerObject<FetchEvent>,
     ) -> Result<(), JsValue> {
         self.__remove_event_listener_with_event_listener_object("fetch", handler)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_fetch_with_function_and_options(
+        &self,
+        handler: &Function<fn(FetchEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_options("fetch", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_fetch_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<FetchEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_options(
+            "fetch", handler, options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_fetch_with_function_and_bool(
+        &self,
+        handler: &Function<fn(FetchEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_bool("fetch", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_fetch_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<FetchEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_bool("fetch", handler, options)
     }
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
@@ -389,6 +881,54 @@ impl WorkerGlobalScope {
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_scheduled_with_function_and_options(
+        &self,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_options_2("scheduled", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_scheduled_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_options_2(
+            "scheduled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_scheduled_with_function_and_bool(
+        &self,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_bool_2("scheduled", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_scheduled_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_bool_2(
+            "scheduled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     pub fn remove_event_listener_queue(
         &self,
         handler: &Function<fn(QueueEvent)>,
@@ -403,6 +943,50 @@ impl WorkerGlobalScope {
         handler: &EventListenerObject<QueueEvent>,
     ) -> Result<(), JsValue> {
         self.__remove_event_listener_with_event_listener_object_3("queue", handler)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_queue_with_function_and_options(
+        &self,
+        handler: &Function<fn(QueueEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_options_3("queue", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_queue_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<QueueEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_options_3(
+            "queue", handler, options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_queue_with_function_and_bool(
+        &self,
+        handler: &Function<fn(QueueEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_bool_3("queue", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_queue_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<QueueEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_bool_3(
+            "queue", handler, options,
+        )
     }
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
@@ -444,6 +1028,102 @@ impl WorkerGlobalScope {
         self.__remove_event_listener_with_handler_event_listener_object_3(
             "rejectionhandled",
             handler,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_unhandledrejection_with_handler_function_and_options_event_target_event_listener_options_2(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __remove_event_listener_with_handler_function_and_options_event_target_event_listener_options_2 ("unhandledrejection" , handler , options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_rejectionhandled_with_handler_function_and_options_event_target_event_listener_options_2(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __remove_event_listener_with_handler_function_and_options_event_target_event_listener_options_2 ("rejectionhandled" , handler , options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_event_target_event_listener_options_2(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __remove_event_listener_with_handler_event_listener_object_and_options_event_target_event_listener_options_2 ("unhandledrejection" , handler , options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_event_target_event_listener_options_2(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __remove_event_listener_with_handler_event_listener_object_and_options_event_target_event_listener_options_2 ("rejectionhandled" , handler , options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_unhandledrejection_with_handler_function_and_options_bool_3(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_handler_function_and_options_bool_3(
+            "unhandledrejection",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_rejectionhandled_with_handler_function_and_options_bool_3(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_handler_function_and_options_bool_3(
+            "rejectionhandled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_bool_3(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_handler_event_listener_object_and_options_bool_3(
+            "unhandledrejection",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_bool_3(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_handler_event_listener_object_and_options_bool_3(
+            "rejectionhandled",
+            handler,
+            options,
         )
     }
 }
@@ -1410,6 +2090,34 @@ extern "C" {
         handler: &EventListenerObject<FetchEvent>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     fn __add_event_listener_2(
         this: &ServiceWorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -1420,6 +2128,34 @@ extern "C" {
         this: &ServiceWorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<ScheduledEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     fn __add_event_listener_3(
@@ -1434,6 +2170,34 @@ extern "C" {
         handler: &EventListenerObject<QueueEvent>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     fn __add_event_listener_with_handler_function_2(
         this: &ServiceWorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -1444,6 +2208,34 @@ extern "C" {
         this: &ServiceWorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<PromiseRejectionEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_function_and_options_event_target_add_event_listener_options_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_function_and_options_bool_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_event_listener_object_and_options_bool_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener(
@@ -1458,6 +2250,34 @@ extern "C" {
         handler: &EventListenerObject<FetchEvent>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener_2(
         this: &ServiceWorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -1468,6 +2288,34 @@ extern "C" {
         this: &ServiceWorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<ScheduledEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener_3(
@@ -1482,6 +2330,34 @@ extern "C" {
         handler: &EventListenerObject<QueueEvent>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener_with_handler_function_2(
         this: &ServiceWorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -1492,6 +2368,34 @@ extern "C" {
         this: &ServiceWorkerGlobalScope,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<PromiseRejectionEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_function_and_options_event_target_event_listener_options_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_event_listener_object_and_options_event_target_event_listener_options_2(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_function_and_options_bool_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_event_listener_object_and_options_bool_3(
+        this: &ServiceWorkerGlobalScope,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
 }
 impl ServiceWorkerGlobalScope {
@@ -1524,6 +2428,46 @@ impl ServiceWorkerGlobalScope {
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_fetch_with_function_and_options(
+        &self,
+        handler: &Function<fn(FetchEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_options("fetch", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_fetch_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<FetchEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_options("fetch", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_fetch_with_function_and_bool(
+        &self,
+        handler: &Function<fn(FetchEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_bool("fetch", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_fetch_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<FetchEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_bool("fetch", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     pub fn add_event_listener_scheduled(
         &self,
         handler: &Function<fn(ScheduledEvent)>,
@@ -1542,6 +2486,54 @@ impl ServiceWorkerGlobalScope {
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_scheduled_with_function_and_options(
+        &self,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_options_2("scheduled", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_scheduled_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_options_2(
+            "scheduled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_scheduled_with_function_and_bool(
+        &self,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_bool_2("scheduled", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_scheduled_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_bool_2(
+            "scheduled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     pub fn add_event_listener_queue(
         &self,
         handler: &Function<fn(QueueEvent)>,
@@ -1556,6 +2548,48 @@ impl ServiceWorkerGlobalScope {
         handler: &EventListenerObject<QueueEvent>,
     ) -> Result<(), JsValue> {
         self.__add_event_listener_with_event_listener_object_3("queue", handler)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_queue_with_function_and_options(
+        &self,
+        handler: &Function<fn(QueueEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_options_3("queue", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_queue_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<QueueEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_options_3(
+            "queue", handler, options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_queue_with_function_and_bool(
+        &self,
+        handler: &Function<fn(QueueEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_bool_3("queue", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_queue_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<QueueEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_bool_3("queue", handler, options)
     }
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
@@ -1596,6 +2630,102 @@ impl ServiceWorkerGlobalScope {
     ) -> Result<(), JsValue> {
         self.__add_event_listener_with_handler_event_listener_object_3("rejectionhandled", handler)
     }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_unhandledrejection_with_handler_function_and_options_event_target_add_event_listener_options_2(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __add_event_listener_with_handler_function_and_options_event_target_add_event_listener_options_2 ("unhandledrejection" , handler , options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_rejectionhandled_with_handler_function_and_options_event_target_add_event_listener_options_2(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __add_event_listener_with_handler_function_and_options_event_target_add_event_listener_options_2 ("rejectionhandled" , handler , options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __add_event_listener_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2 ("unhandledrejection" , handler , options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __add_event_listener_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2 ("rejectionhandled" , handler , options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_unhandledrejection_with_handler_function_and_options_bool_3(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_handler_function_and_options_bool_3(
+            "unhandledrejection",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_rejectionhandled_with_handler_function_and_options_bool_3(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_handler_function_and_options_bool_3(
+            "rejectionhandled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_bool_3(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_handler_event_listener_object_and_options_bool_3(
+            "unhandledrejection",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_bool_3(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_handler_event_listener_object_and_options_bool_3(
+            "rejectionhandled",
+            handler,
+            options,
+        )
+    }
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
@@ -1613,6 +2743,48 @@ impl ServiceWorkerGlobalScope {
         handler: &EventListenerObject<FetchEvent>,
     ) -> Result<(), JsValue> {
         self.__remove_event_listener_with_event_listener_object("fetch", handler)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_fetch_with_function_and_options(
+        &self,
+        handler: &Function<fn(FetchEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_options("fetch", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_fetch_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<FetchEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_options(
+            "fetch", handler, options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_fetch_with_function_and_bool(
+        &self,
+        handler: &Function<fn(FetchEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_bool("fetch", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_fetch_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<FetchEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_bool("fetch", handler, options)
     }
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
@@ -1635,6 +2807,54 @@ impl ServiceWorkerGlobalScope {
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_scheduled_with_function_and_options(
+        &self,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_options_2("scheduled", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_scheduled_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_options_2(
+            "scheduled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_scheduled_with_function_and_bool(
+        &self,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_bool_2("scheduled", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_scheduled_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_bool_2(
+            "scheduled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     pub fn remove_event_listener_queue(
         &self,
         handler: &Function<fn(QueueEvent)>,
@@ -1649,6 +2869,50 @@ impl ServiceWorkerGlobalScope {
         handler: &EventListenerObject<QueueEvent>,
     ) -> Result<(), JsValue> {
         self.__remove_event_listener_with_event_listener_object_3("queue", handler)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_queue_with_function_and_options(
+        &self,
+        handler: &Function<fn(QueueEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_options_3("queue", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_queue_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<QueueEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_options_3(
+            "queue", handler, options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_queue_with_function_and_bool(
+        &self,
+        handler: &Function<fn(QueueEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_bool_3("queue", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_queue_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<QueueEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_bool_3(
+            "queue", handler, options,
+        )
     }
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
@@ -1690,6 +2954,102 @@ impl ServiceWorkerGlobalScope {
         self.__remove_event_listener_with_handler_event_listener_object_3(
             "rejectionhandled",
             handler,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_unhandledrejection_with_handler_function_and_options_event_target_event_listener_options_2(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __remove_event_listener_with_handler_function_and_options_event_target_event_listener_options_2 ("unhandledrejection" , handler , options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_rejectionhandled_with_handler_function_and_options_event_target_event_listener_options_2(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __remove_event_listener_with_handler_function_and_options_event_target_event_listener_options_2 ("rejectionhandled" , handler , options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_event_target_event_listener_options_2(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __remove_event_listener_with_handler_event_listener_object_and_options_event_target_event_listener_options_2 ("unhandledrejection" , handler , options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_event_target_event_listener_options_2(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self . __remove_event_listener_with_handler_event_listener_object_and_options_event_target_event_listener_options_2 ("rejectionhandled" , handler , options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_unhandledrejection_with_handler_function_and_options_bool_3(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_handler_function_and_options_bool_3(
+            "unhandledrejection",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_rejectionhandled_with_handler_function_and_options_bool_3(
+        &self,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_handler_function_and_options_bool_3(
+            "rejectionhandled",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_bool_3(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_handler_event_listener_object_and_options_bool_3(
+            "unhandledrejection",
+            handler,
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_bool_3(
+        &self,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_handler_event_listener_object_and_options_bool_3(
+            "rejectionhandled",
+            handler,
+            options,
         )
     }
 }
@@ -1772,6 +3132,66 @@ pub fn add_event_listener_fetch_with_event_listener_object(
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_fetch_with_function_and_options(
+    handler: &Function<fn(FetchEvent)>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_function_and_options("fetch", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_fetch_with_event_listener_object_and_options(
+    handler: &EventListenerObject<FetchEvent>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_event_listener_object_and_options("fetch", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_fetch_with_function_and_bool(
+    handler: &Function<fn(FetchEvent)>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_function_and_bool("fetch", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_fetch_with_event_listener_object_and_bool(
+    handler: &EventListenerObject<FetchEvent>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_event_listener_object_and_bool("fetch", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
     fn __add_event_listener_2(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(ScheduledEvent)>,
@@ -1796,6 +3216,66 @@ pub fn add_event_listener_scheduled_with_event_listener_object(
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_scheduled_with_function_and_options(
+    handler: &Function<fn(ScheduledEvent)>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_function_and_options_2("scheduled", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_scheduled_with_event_listener_object_and_options(
+    handler: &EventListenerObject<ScheduledEvent>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_event_listener_object_and_options_2("scheduled", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_scheduled_with_function_and_bool(
+    handler: &Function<fn(ScheduledEvent)>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_function_and_bool_2("scheduled", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_scheduled_with_event_listener_object_and_bool(
+    handler: &EventListenerObject<ScheduledEvent>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_event_listener_object_and_bool_2("scheduled", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
     fn __add_event_listener_3(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(QueueEvent)>,
@@ -1816,6 +3296,66 @@ pub fn add_event_listener_queue_with_event_listener_object(
     handler: &EventListenerObject<QueueEvent>,
 ) -> Result<(), JsValue> {
     __add_event_listener_with_event_listener_object_3("queue", handler)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_queue_with_function_and_options(
+    handler: &Function<fn(QueueEvent)>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_function_and_options_3("queue", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_queue_with_event_listener_object_and_options(
+    handler: &EventListenerObject<QueueEvent>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_event_listener_object_and_options_3("queue", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_queue_with_function_and_bool(
+    handler: &Function<fn(QueueEvent)>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_function_and_bool_3("queue", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_queue_with_event_listener_object_and_bool(
+    handler: &EventListenerObject<QueueEvent>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_event_listener_object_and_bool_3("queue", handler, options)
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -1852,6 +3392,114 @@ pub fn add_event_listener_rejectionhandled_with_handler_event_listener_object_3(
     handler: &EventListenerObject<PromiseRejectionEvent>,
 ) -> Result<(), JsValue> {
     __add_event_listener_with_handler_event_listener_object_3("rejectionhandled", handler)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_function_and_options_event_target_add_event_listener_options_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_unhandledrejection_with_handler_function_and_options_event_target_add_event_listener_options_2(
+    handler: &Function<fn(PromiseRejectionEvent)>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_handler_function_and_options_event_target_add_event_listener_options_2(
+        "unhandledrejection",
+        handler,
+        options,
+    )
+}
+pub fn add_event_listener_rejectionhandled_with_handler_function_and_options_event_target_add_event_listener_options_2(
+    handler: &Function<fn(PromiseRejectionEvent)>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_handler_function_and_options_event_target_add_event_listener_options_2(
+        "rejectionhandled",
+        handler,
+        options,
+    )
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2(
+    handler: &EventListenerObject<PromiseRejectionEvent>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2 ("unhandledrejection" , handler , options)
+}
+pub fn add_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2(
+    handler: &EventListenerObject<PromiseRejectionEvent>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_handler_event_listener_object_and_options_event_target_add_event_listener_options_2 ("rejectionhandled" , handler , options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_function_and_options_bool_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_unhandledrejection_with_handler_function_and_options_bool_3(
+    handler: &Function<fn(PromiseRejectionEvent)>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_handler_function_and_options_bool_3(
+        "unhandledrejection",
+        handler,
+        options,
+    )
+}
+pub fn add_event_listener_rejectionhandled_with_handler_function_and_options_bool_3(
+    handler: &Function<fn(PromiseRejectionEvent)>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_handler_function_and_options_bool_3(
+        "rejectionhandled",
+        handler,
+        options,
+    )
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_handler_event_listener_object_and_options_bool_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_bool_3(
+    handler: &EventListenerObject<PromiseRejectionEvent>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_handler_event_listener_object_and_options_bool_3(
+        "unhandledrejection",
+        handler,
+        options,
+    )
+}
+pub fn add_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_bool_3(
+    handler: &EventListenerObject<PromiseRejectionEvent>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __add_event_listener_with_handler_event_listener_object_and_options_bool_3(
+        "rejectionhandled",
+        handler,
+        options,
+    )
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -1932,6 +3580,66 @@ pub fn remove_event_listener_fetch_with_event_listener_object(
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_fetch_with_function_and_options(
+    handler: &Function<fn(FetchEvent)>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_function_and_options("fetch", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_fetch_with_event_listener_object_and_options(
+    handler: &EventListenerObject<FetchEvent>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_event_listener_object_and_options("fetch", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(FetchEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_fetch_with_function_and_bool(
+    handler: &Function<fn(FetchEvent)>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_function_and_bool("fetch", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<FetchEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_fetch_with_event_listener_object_and_bool(
+    handler: &EventListenerObject<FetchEvent>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_event_listener_object_and_bool("fetch", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
     fn __remove_event_listener_2(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(ScheduledEvent)>,
@@ -1958,6 +3666,66 @@ pub fn remove_event_listener_scheduled_with_event_listener_object(
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_scheduled_with_function_and_options(
+    handler: &Function<fn(ScheduledEvent)>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_function_and_options_2("scheduled", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_scheduled_with_event_listener_object_and_options(
+    handler: &EventListenerObject<ScheduledEvent>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_event_listener_object_and_options_2("scheduled", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ScheduledEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_scheduled_with_function_and_bool(
+    handler: &Function<fn(ScheduledEvent)>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_function_and_bool_2("scheduled", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ScheduledEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_scheduled_with_event_listener_object_and_bool(
+    handler: &EventListenerObject<ScheduledEvent>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_event_listener_object_and_bool_2("scheduled", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
     fn __remove_event_listener_3(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(QueueEvent)>,
@@ -1978,6 +3746,66 @@ pub fn remove_event_listener_queue_with_event_listener_object(
     handler: &EventListenerObject<QueueEvent>,
 ) -> Result<(), JsValue> {
     __remove_event_listener_with_event_listener_object_3("queue", handler)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_queue_with_function_and_options(
+    handler: &Function<fn(QueueEvent)>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_function_and_options_3("queue", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_queue_with_event_listener_object_and_options(
+    handler: &EventListenerObject<QueueEvent>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_event_listener_object_and_options_3("queue", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(QueueEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_queue_with_function_and_bool(
+    handler: &Function<fn(QueueEvent)>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_function_and_bool_3("queue", handler, options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<QueueEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_queue_with_event_listener_object_and_bool(
+    handler: &EventListenerObject<QueueEvent>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_event_listener_object_and_bool_3("queue", handler, options)
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -2014,6 +3842,114 @@ pub fn remove_event_listener_rejectionhandled_with_handler_event_listener_object
     handler: &EventListenerObject<PromiseRejectionEvent>,
 ) -> Result<(), JsValue> {
     __remove_event_listener_with_handler_event_listener_object_3("rejectionhandled", handler)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_function_and_options_event_target_event_listener_options_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_unhandledrejection_with_handler_function_and_options_event_target_event_listener_options_2(
+    handler: &Function<fn(PromiseRejectionEvent)>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_handler_function_and_options_event_target_event_listener_options_2(
+        "unhandledrejection",
+        handler,
+        options,
+    )
+}
+pub fn remove_event_listener_rejectionhandled_with_handler_function_and_options_event_target_event_listener_options_2(
+    handler: &Function<fn(PromiseRejectionEvent)>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_handler_function_and_options_event_target_event_listener_options_2(
+        "rejectionhandled",
+        handler,
+        options,
+    )
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_event_listener_object_and_options_event_target_event_listener_options_2(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_event_target_event_listener_options_2(
+    handler: &EventListenerObject<PromiseRejectionEvent>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_handler_event_listener_object_and_options_event_target_event_listener_options_2 ("unhandledrejection" , handler , options)
+}
+pub fn remove_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_event_target_event_listener_options_2(
+    handler: &EventListenerObject<PromiseRejectionEvent>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_handler_event_listener_object_and_options_event_target_event_listener_options_2 ("rejectionhandled" , handler , options)
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_function_and_options_bool_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(PromiseRejectionEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_unhandledrejection_with_handler_function_and_options_bool_3(
+    handler: &Function<fn(PromiseRejectionEvent)>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_handler_function_and_options_bool_3(
+        "unhandledrejection",
+        handler,
+        options,
+    )
+}
+pub fn remove_event_listener_rejectionhandled_with_handler_function_and_options_bool_3(
+    handler: &Function<fn(PromiseRejectionEvent)>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_handler_function_and_options_bool_3(
+        "rejectionhandled",
+        handler,
+        options,
+    )
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_handler_event_listener_object_and_options_bool_3(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<PromiseRejectionEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_unhandledrejection_with_handler_event_listener_object_and_options_bool_3(
+    handler: &EventListenerObject<PromiseRejectionEvent>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_handler_event_listener_object_and_options_bool_3(
+        "unhandledrejection",
+        handler,
+        options,
+    )
+}
+pub fn remove_event_listener_rejectionhandled_with_handler_event_listener_object_and_options_bool_3(
+    handler: &EventListenerObject<PromiseRejectionEvent>,
+    options: bool,
+) -> Result<(), JsValue> {
+    __remove_event_listener_with_handler_event_listener_object_and_options_bool_3(
+        "rejectionhandled",
+        handler,
+        options,
+    )
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -14599,6 +16535,34 @@ extern "C" {
         handler: &EventListenerObject<CloseEvent>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(CloseEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<CloseEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(CloseEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<CloseEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     fn __add_event_listener_2(
         this: &WebSocket,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -14609,6 +16573,34 @@ extern "C" {
         this: &WebSocket,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<MessageEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options_2(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(MessageEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options_2(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<MessageEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool_2(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(MessageEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool_2(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<MessageEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     fn __add_event_listener_3(
@@ -14623,6 +16615,34 @@ extern "C" {
         handler: &EventListenerObject,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options_3(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(Event)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options_3(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool_3(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(Event)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool_3(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     fn __add_event_listener_4(
         this: &WebSocket,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -14633,6 +16653,34 @@ extern "C" {
         this: &WebSocket,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<ErrorEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_options_4(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ErrorEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_options_4(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ErrorEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_function_and_bool_4(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ErrorEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn __add_event_listener_with_event_listener_object_and_bool_4(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ErrorEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener(
@@ -14647,6 +16695,34 @@ extern "C" {
         handler: &EventListenerObject<CloseEvent>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(CloseEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<CloseEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(CloseEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<CloseEvent>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener_2(
         this: &WebSocket,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -14657,6 +16733,34 @@ extern "C" {
         this: &WebSocket,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<MessageEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options_2(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(MessageEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options_2(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<MessageEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool_2(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(MessageEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool_2(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<MessageEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener_3(
@@ -14671,6 +16775,34 @@ extern "C" {
         handler: &EventListenerObject,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options_3(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(Event)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options_3(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool_3(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(Event)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool_3(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     fn __remove_event_listener_4(
         this: &WebSocket,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -14681,6 +16813,34 @@ extern "C" {
         this: &WebSocket,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject<ErrorEvent>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_options_4(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ErrorEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_options_4(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ErrorEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_function_and_bool_4(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(ErrorEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
+    fn __remove_event_listener_with_event_listener_object_and_bool_4(
+        this: &WebSocket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &EventListenerObject<ErrorEvent>,
+        options: bool,
     ) -> Result<(), JsValue>;
 }
 impl WebSocket {
@@ -14716,6 +16876,46 @@ impl WebSocket {
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_close_with_function_and_options(
+        &self,
+        handler: &Function<fn(CloseEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_options("close", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_close_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<CloseEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_options("close", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_close_with_function_and_bool(
+        &self,
+        handler: &Function<fn(CloseEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_bool("close", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_close_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<CloseEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_bool("close", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     pub fn add_event_listener_message(
         &self,
         handler: &Function<fn(MessageEvent)>,
@@ -14730,6 +16930,48 @@ impl WebSocket {
         handler: &EventListenerObject<MessageEvent>,
     ) -> Result<(), JsValue> {
         self.__add_event_listener_with_event_listener_object_2("message", handler)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_message_with_function_and_options(
+        &self,
+        handler: &Function<fn(MessageEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_options_2("message", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_message_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<MessageEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_options_2(
+            "message", handler, options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_message_with_function_and_bool(
+        &self,
+        handler: &Function<fn(MessageEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_bool_2("message", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_message_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<MessageEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_bool_2("message", handler, options)
     }
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
@@ -14749,6 +16991,46 @@ impl WebSocket {
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_open_with_function_and_options(
+        &self,
+        handler: &Function<fn(Event)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_options_3("open", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_open_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_options_3("open", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_open_with_function_and_bool(
+        &self,
+        handler: &Function<fn(Event)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_bool_3("open", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_open_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_bool_3("open", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     pub fn add_event_listener_error(
         &self,
         handler: &Function<fn(ErrorEvent)>,
@@ -14763,6 +17045,48 @@ impl WebSocket {
         handler: &EventListenerObject<ErrorEvent>,
     ) -> Result<(), JsValue> {
         self.__add_event_listener_with_event_listener_object_4("error", handler)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_error_with_function_and_options(
+        &self,
+        handler: &Function<fn(ErrorEvent)>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_options_4("error", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_error_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<ErrorEvent>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_options_4(
+            "error", handler, options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_error_with_function_and_bool(
+        &self,
+        handler: &Function<fn(ErrorEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_function_and_bool_4("error", handler, options)
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_error_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<ErrorEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__add_event_listener_with_event_listener_object_and_bool_4("error", handler, options)
     }
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
@@ -14785,6 +17109,48 @@ impl WebSocket {
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_close_with_function_and_options(
+        &self,
+        handler: &Function<fn(CloseEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_options("close", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_close_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<CloseEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_options(
+            "close", handler, options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_close_with_function_and_bool(
+        &self,
+        handler: &Function<fn(CloseEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_bool("close", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_close_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<CloseEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_bool("close", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     pub fn remove_event_listener_message(
         &self,
         handler: &Function<fn(MessageEvent)>,
@@ -14799,6 +17165,50 @@ impl WebSocket {
         handler: &EventListenerObject<MessageEvent>,
     ) -> Result<(), JsValue> {
         self.__remove_event_listener_with_event_listener_object_2("message", handler)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_message_with_function_and_options(
+        &self,
+        handler: &Function<fn(MessageEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_options_2("message", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_message_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<MessageEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_options_2(
+            "message", handler, options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_message_with_function_and_bool(
+        &self,
+        handler: &Function<fn(MessageEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_bool_2("message", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_message_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<MessageEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_bool_2(
+            "message", handler, options,
+        )
     }
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
@@ -14818,6 +17228,48 @@ impl WebSocket {
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_open_with_function_and_options(
+        &self,
+        handler: &Function<fn(Event)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_options_3("open", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_open_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_options_3(
+            "open", handler, options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_open_with_function_and_bool(
+        &self,
+        handler: &Function<fn(Event)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_bool_3("open", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_open_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_bool_3("open", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     pub fn remove_event_listener_error(
         &self,
         handler: &Function<fn(ErrorEvent)>,
@@ -14832,6 +17284,50 @@ impl WebSocket {
         handler: &EventListenerObject<ErrorEvent>,
     ) -> Result<(), JsValue> {
         self.__remove_event_listener_with_event_listener_object_4("error", handler)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_error_with_function_and_options(
+        &self,
+        handler: &Function<fn(ErrorEvent)>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_options_4("error", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_error_with_event_listener_object_and_options(
+        &self,
+        handler: &EventListenerObject<ErrorEvent>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_options_4(
+            "error", handler, options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_error_with_function_and_bool(
+        &self,
+        handler: &Function<fn(ErrorEvent)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_function_and_bool_4("error", handler, options)
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_error_with_event_listener_object_and_bool(
+        &self,
+        handler: &EventListenerObject<ErrorEvent>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.__remove_event_listener_with_event_listener_object_and_bool_4(
+            "error", handler, options,
+        )
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

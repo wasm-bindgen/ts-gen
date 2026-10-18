@@ -3356,13 +3356,14 @@ wrapper, and `M[K]` is the property's type:
 ```rust
 pub fn add_event_listener_message(&self, handler: &Function<fn(MessageEvent)>) -> Result<(), Error>;
 pub fn add_event_listener_close_with_event_listener_object(&self, handler: &EventListenerObject<CloseEvent>) -> Result<(), Error>;
+pub fn add_event_listener_message_with_options(&self, handler: &Function<fn(MessageEvent)>, options: &EventTargetAddEventListenerOptions) -> Result<(), Error>;
 ```
 
 * A subclass declares the per-key bindings of its first parent's methods
   itself; the generic ones stay on the parent through `Deref`.
-* Trailing optional parameters that do not mention the key
-  (`options?: AddEventListenerOptions | boolean`) are left to the generic
-  binding.
+* The other parameters expand as they do in the generic binding
+  (`options?: AddEventListenerOptions | boolean` gives `_with_options` and
+  `_with_bool` per key).
 * The key is the callable's one `string` parameter; with none or several
   there is no expansion.
 

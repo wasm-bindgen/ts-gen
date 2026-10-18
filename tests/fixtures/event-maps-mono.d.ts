@@ -1,8 +1,8 @@
 // Per-monomorphization, `M[K]` over a concrete `M` expands into one binding
 // per key: `K` is the key's literal and `M[K]` its property type, reached
-// through `extends EventTarget<SocketEventMap>` or declared directly, and
-// trailing optional parameters that do not mention the key stay with the
-// generic form. A lone literal arm keys its binding where another overload
+// through `extends EventTarget<SocketEventMap>` or declared directly, with
+// the other parameters expanding as in the generic form (`_with_options`,
+// `_with_bool`). A lone literal arm keys its binding where another overload
 // takes something else at its position (`on_alpha`, `on_beta`).
 
 interface Ev {
