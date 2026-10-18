@@ -41,10 +41,10 @@ extern "C" {
     pub fn has(this: &Headers, name: impl ::wasm_bindgen::JsStringLike) -> bool;
     #[doc = " Async — unchanged: already a single `Result` form."]
     #[wasm_bindgen(method, catch)]
-    pub fn text(this: &Headers) -> Promise<String>;
+    pub fn text(this: &Headers) -> Promise<String, crate::Error>;
     #[doc = " Async — unchanged: already a single `Result` form."]
     #[wasm_bindgen(method, catch, js_name = "text")]
-    pub fn text_js_string(this: &Headers) -> Promise<JsString>;
+    pub fn text_js_string(this: &Headers) -> Promise<JsString, crate::Error>;
     #[doc = " Getter — infallible by default."]
     #[wasm_bindgen(method, getter)]
     pub fn size(this: &Headers) -> f64;

@@ -80,7 +80,7 @@ extern "C" {
     #[doc = " * `QuotaError` — when over quota"]
     #[doc = " * `Error` — otherwise"]
     #[wasm_bindgen(method, catch)]
-    pub fn grow(this: &Store, bytes: f64) -> Promise<()>;
+    pub fn grow(this: &Store, bytes: f64) -> Promise<(), JsException>;
     #[doc = " A qualified name resolves through its namespace; the variant is named"]
     #[doc = " by its Rust path."]
     #[doc = ""]

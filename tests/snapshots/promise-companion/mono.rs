@@ -50,7 +50,8 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `TypeError` — on an invalid key"]
     #[wasm_bindgen(method, catch)]
-    pub fn delete(this: &State, key: impl ::wasm_bindgen::JsStringLike) -> Promise<bool>;
+    pub fn delete(this: &State, key: impl ::wasm_bindgen::JsStringLike)
+        -> Promise<bool, TypeError>;
     #[doc = " `@throws {never}` drops `catch` from the async form; the promise"]
     #[doc = " form is plain under every policy."]
     #[wasm_bindgen(method)]

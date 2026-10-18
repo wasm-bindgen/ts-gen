@@ -14,15 +14,15 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "uploadedAt")]
     fn __uploaded_at(this: &R2Object) -> Option<f64>;
     #[wasm_bindgen(method, catch, js_name = "list")]
-    fn __list(this: &R2Object, limit: f64) -> Promise<Vec<R2Object>>;
+    fn __list(this: &R2Object, limit: f64) -> Promise<Vec<R2Object>, ::js_sys::Error>;
     #[wasm_bindgen(method, catch, js_name = "list")]
     fn __list_with_prefix(
         this: &R2Object,
         limit: f64,
         prefix: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Vec<R2Object>>;
+    ) -> Promise<Vec<R2Object>, ::js_sys::Error>;
     #[wasm_bindgen(method, catch)]
-    pub fn count(this: &R2Object) -> Promise<f64>;
+    pub fn count(this: &R2Object) -> Promise<f64, ::js_sys::Error>;
     #[wasm_bindgen(method, catch, js_name = "sizes")]
     fn __sizes(this: &R2Object) -> Result<Vec<f64>, ::js_sys::Error>;
     #[wasm_bindgen(method, catch, js_name = "upload")]
@@ -40,14 +40,14 @@ impl R2Object {
     pub fn uploaded_at(&self) -> Option<u64> {
         self.__uploaded_at().map(|v| v as u64)
     }
-    pub fn list(&self, limit: u64) -> Promise<Vec<R2Object>> {
+    pub fn list(&self, limit: u64) -> Promise<Vec<R2Object>, ::js_sys::Error> {
         self.__list(limit as f64)
     }
     pub fn list_with_prefix(
         &self,
         limit: u64,
         prefix: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Vec<R2Object>> {
+    ) -> Promise<Vec<R2Object>, ::js_sys::Error> {
         self.__list_with_prefix(limit as f64, prefix)
     }
     pub fn sizes(&self) -> Result<Vec<u64>, ::js_sys::Error> {

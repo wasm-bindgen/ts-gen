@@ -24,7 +24,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `TypeError` — on a malformed key"]
     #[wasm_bindgen(catch)]
-    pub fn count(key: impl ::wasm_bindgen::JsStringLike) -> Promise<f64>;
+    pub fn count(key: impl ::wasm_bindgen::JsStringLike) -> Promise<f64, TypeError>;
 }
 #[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
 extern "C" {
@@ -86,7 +86,7 @@ extern "C" {
         this: &Cache,
         url: impl ::wasm_bindgen::JsStringLike,
         body: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<()>;
+    ) -> Promise<(), TypeError>;
     #[doc = " A global class's static: plain."]
     # [wasm_bindgen (static_method_of = Cache , catch)]
     pub fn open(name: impl ::wasm_bindgen::JsStringLike) -> Promise<Cache>;

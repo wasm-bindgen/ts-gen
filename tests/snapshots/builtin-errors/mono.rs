@@ -47,7 +47,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `URIError | TypeError`"]
     #[wasm_bindgen(method, catch)]
-    pub fn parse(this: &Codec, input: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
+    pub fn parse(this: &Codec, input: impl ::wasm_bindgen::JsStringLike) -> Promise<String, Error>;
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `URIError | TypeError`"]
@@ -55,7 +55,7 @@ extern "C" {
     pub fn parse_js_string(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<JsString>;
+    ) -> Promise<JsString, Error>;
 }
 #[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
 extern "C" {

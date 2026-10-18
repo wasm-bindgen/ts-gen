@@ -47920,7 +47920,7 @@ extern "C" {
     pub fn upload(
         this: &HostedImagesBinding,
         image: &ReadableStream<Uint8Array>,
-    ) -> Promise<ImageMetadata>;
+    ) -> Promise<ImageMetadata, ImagesError>;
     #[doc = " Upload a new hosted image"]
     #[doc = ""]
     #[doc = " * `image` - The image file to upload"]
@@ -47935,7 +47935,7 @@ extern "C" {
     pub fn upload_with_array_buffer(
         this: &HostedImagesBinding,
         image: &ArrayBuffer,
-    ) -> Promise<ImageMetadata>;
+    ) -> Promise<ImageMetadata, ImagesError>;
     #[doc = " Upload a new hosted image"]
     #[doc = ""]
     #[doc = " * `image` - The image file to upload"]
@@ -47951,7 +47951,7 @@ extern "C" {
         this: &HostedImagesBinding,
         image: &ReadableStream<Uint8Array>,
         options: &ImageUploadOptions,
-    ) -> Promise<ImageMetadata>;
+    ) -> Promise<ImageMetadata, ImagesError>;
     #[doc = " Upload a new hosted image"]
     #[doc = ""]
     #[doc = " * `image` - The image file to upload"]
@@ -47967,7 +47967,7 @@ extern "C" {
         this: &HostedImagesBinding,
         image: &ArrayBuffer,
         options: &ImageUploadOptions,
-    ) -> Promise<ImageMetadata>;
+    ) -> Promise<ImageMetadata, ImagesError>;
     #[doc = " Update hosted image metadata"]
     #[doc = ""]
     #[doc = " * `imageId` - The ID of the image"]
@@ -47983,7 +47983,7 @@ extern "C" {
         this: &HostedImagesBinding,
         image_id: impl ::wasm_bindgen::JsStringLike,
         options: &ImageUpdateOptions,
-    ) -> Promise<ImageMetadata>;
+    ) -> Promise<ImageMetadata, ImagesError>;
     #[doc = " Delete a hosted image"]
     #[doc = ""]
     #[doc = " * `imageId` - The ID of the image"]
@@ -48004,7 +48004,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `ImagesError` — if list fails"]
     #[wasm_bindgen(method, catch)]
-    pub fn list(this: &HostedImagesBinding) -> Promise<ImageList>;
+    pub fn list(this: &HostedImagesBinding) -> Promise<ImageList, ImagesError>;
     #[doc = " List hosted images with pagination"]
     #[doc = ""]
     #[doc = " * `options` - List configuration"]
@@ -48018,7 +48018,7 @@ extern "C" {
     pub fn list_with_options(
         this: &HostedImagesBinding,
         options: &ImageListOptions,
-    ) -> Promise<ImageList>;
+    ) -> Promise<ImageList, ImagesError>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -48036,7 +48036,7 @@ extern "C" {
     pub fn info(
         this: &ImagesBinding,
         stream: &ReadableStream<Uint8Array>,
-    ) -> Promise<ImageInfoResponse>;
+    ) -> Promise<ImageInfoResponse, ImagesError>;
     #[doc = " Get image metadata (type, width and height)"]
     #[doc = ""]
     #[doc = " * `stream` - The image bytes"]
@@ -48049,7 +48049,7 @@ extern "C" {
         this: &ImagesBinding,
         stream: &ReadableStream<Uint8Array>,
         options: &ImageInputOptions,
-    ) -> Promise<ImageInfoResponse>;
+    ) -> Promise<ImageInfoResponse, ImagesError>;
     #[doc = " Begin applying a series of transformations to an image"]
     #[doc = ""]
     #[doc = " * `stream` - The image bytes"]
@@ -49104,7 +49104,7 @@ extern "C" {
     #[doc = " * `RateLimitedError` — if the server received too many requests"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub fn upload(this: &StreamBinding, file: &File) -> Promise<StreamVideo>;
+    pub fn upload(this: &StreamBinding, file: &File) -> Promise<StreamVideo, StreamError>;
     #[doc = " Uploads a new video from a provided URL."]
     #[doc = ""]
     #[doc = " * `url` - The URL to upload from."]
@@ -49124,7 +49124,7 @@ extern "C" {
     pub fn upload_with_url(
         this: &StreamBinding,
         url: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<StreamVideo>;
+    ) -> Promise<StreamVideo, StreamError>;
     #[doc = " Uploads a new video from a provided URL."]
     #[doc = ""]
     #[doc = " * `url` - The URL to upload from."]
@@ -49145,7 +49145,7 @@ extern "C" {
         this: &StreamBinding,
         url: impl ::wasm_bindgen::JsStringLike,
         params: &StreamUrlUploadParams,
-    ) -> Promise<StreamVideo>;
+    ) -> Promise<StreamVideo, StreamError>;
     #[doc = " Creates a direct upload that allows video uploads without an API key."]
     #[doc = ""]
     #[doc = " * `params` - Parameters for the direct upload"]
@@ -49161,7 +49161,7 @@ extern "C" {
     pub fn create_direct_upload(
         this: &StreamBinding,
         params: &StreamDirectUploadCreateParams,
-    ) -> Promise<StreamDirectUpload>;
+    ) -> Promise<StreamDirectUpload, StreamError>;
     #[wasm_bindgen(method, getter)]
     pub fn videos(this: &StreamBinding) -> StreamVideos;
     #[wasm_bindgen(method, setter)]
@@ -49193,7 +49193,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub fn details(this: &StreamVideoHandle) -> Promise<StreamVideo>;
+    pub fn details(this: &StreamVideoHandle) -> Promise<StreamVideo, StreamError>;
     #[doc = " Update details for a single video."]
     #[doc = ""]
     #[doc = " * `params` - The fields to update for the video."]
@@ -49209,7 +49209,7 @@ extern "C" {
     pub fn update(
         this: &StreamVideoHandle,
         params: &StreamUpdateVideoParams,
-    ) -> Promise<StreamVideo>;
+    ) -> Promise<StreamVideo, StreamError>;
     #[doc = " Deletes a video and its copies from Cloudflare Stream."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves when deletion completes."]
@@ -49219,7 +49219,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub fn delete(this: &StreamVideoHandle) -> Promise<()>;
+    pub fn delete(this: &StreamVideoHandle) -> Promise<(), StreamError>;
     #[doc = " Creates a signed URL token for a video."]
     #[doc = ""]
     #[doc = " Returns: The signed token that was created."]
@@ -49228,7 +49228,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `InternalError` — if the signing key cannot be retrieved or the token cannot be signed"]
     #[wasm_bindgen(method, catch, js_name = "generateToken")]
-    pub fn generate_token(this: &StreamVideoHandle) -> Promise<String>;
+    pub fn generate_token(this: &StreamVideoHandle) -> Promise<String, InternalError>;
     #[doc = " Creates a signed URL token for a video."]
     #[doc = ""]
     #[doc = " Returns: The signed token that was created."]
@@ -49237,7 +49237,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `InternalError` — if the signing key cannot be retrieved or the token cannot be signed"]
     #[wasm_bindgen(method, catch, js_name = "generateToken")]
-    pub fn generate_token_js_string(this: &StreamVideoHandle) -> Promise<JsString>;
+    pub fn generate_token_js_string(this: &StreamVideoHandle) -> Promise<JsString, InternalError>;
     #[wasm_bindgen(method, getter)]
     pub fn downloads(this: &StreamVideoHandle) -> StreamScopedDownloads;
     #[wasm_bindgen(method, setter)]
@@ -50524,7 +50524,7 @@ extern "C" {
         this: &StreamScopedCaptions,
         language: impl ::wasm_bindgen::JsStringLike,
         file: &File,
-    ) -> Promise<StreamCaption>;
+    ) -> Promise<StreamCaption, StreamError>;
     #[doc = " Generate captions or subtitles for the provided language via AI."]
     #[doc = ""]
     #[doc = " * `language` - The BCP 47 language tag to generate."]
@@ -50544,7 +50544,7 @@ extern "C" {
     pub fn generate(
         this: &StreamScopedCaptions,
         language: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<StreamCaption>;
+    ) -> Promise<StreamCaption, StreamError>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
     #[doc = ""]
@@ -50557,7 +50557,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video or caption is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub fn list(this: &StreamScopedCaptions) -> Promise<Vec<StreamCaption>>;
+    pub fn list(this: &StreamScopedCaptions) -> Promise<Vec<StreamCaption>, StreamError>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
     #[doc = ""]
@@ -50573,7 +50573,7 @@ extern "C" {
     pub fn list_with_language(
         this: &StreamScopedCaptions,
         language: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Vec<StreamCaption>>;
+    ) -> Promise<Vec<StreamCaption>, StreamError>;
     #[doc = " Removes the captions or subtitles from a video."]
     #[doc = ""]
     #[doc = " * `language` - The BCP 47 language tag to remove."]
@@ -50588,7 +50588,7 @@ extern "C" {
     pub fn delete(
         this: &StreamScopedCaptions,
         language: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<()>;
+    ) -> Promise<(), StreamError>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -50610,7 +50610,9 @@ extern "C" {
     #[doc = " * `StreamError` — if the video is not ready to stream"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub fn generate(this: &StreamScopedDownloads) -> Promise<StreamDownloadGetResponse>;
+    pub fn generate(
+        this: &StreamScopedDownloads,
+    ) -> Promise<StreamDownloadGetResponse, StreamError>;
     #[doc = " Generates a download for a video when a video is ready to view. Available"]
     #[doc = " types are `default` and `audio`. Defaults to `default` when omitted."]
     #[doc = ""]
@@ -50629,7 +50631,7 @@ extern "C" {
     pub fn generate_with_download_type(
         this: &StreamScopedDownloads,
         download_type: StreamDownloadType,
-    ) -> Promise<StreamDownloadGetResponse>;
+    ) -> Promise<StreamDownloadGetResponse, StreamError>;
     #[doc = " Lists the downloads created for a video."]
     #[doc = ""]
     #[doc = " Returns: The current downloads for the video."]
@@ -50639,7 +50641,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video or downloads are not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub fn get(this: &StreamScopedDownloads) -> Promise<StreamDownloadGetResponse>;
+    pub fn get(this: &StreamScopedDownloads) -> Promise<StreamDownloadGetResponse, StreamError>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
     #[doc = ""]
@@ -50652,7 +50654,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video or downloads are not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub fn delete(this: &StreamScopedDownloads) -> Promise<()>;
+    pub fn delete(this: &StreamScopedDownloads) -> Promise<(), StreamError>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
     #[doc = ""]
@@ -50668,7 +50670,7 @@ extern "C" {
     pub fn delete_with_download_type(
         this: &StreamScopedDownloads,
         download_type: StreamDownloadType,
-    ) -> Promise<()>;
+    ) -> Promise<(), StreamError>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -50684,7 +50686,7 @@ extern "C" {
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub fn list(this: &StreamVideos) -> Promise<Vec<StreamVideo>>;
+    pub fn list(this: &StreamVideos) -> Promise<Vec<StreamVideo>, StreamError>;
     #[doc = " Lists all videos in a users account."]
     #[doc = ""]
     #[doc = " Returns: The list of videos."]
@@ -50697,7 +50699,7 @@ extern "C" {
     pub fn list_with_params(
         this: &StreamVideos,
         params: &StreamVideosListParams,
-    ) -> Promise<Vec<StreamVideo>>;
+    ) -> Promise<Vec<StreamVideo>, StreamError>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -50723,7 +50725,7 @@ extern "C" {
         this: &StreamWatermarks,
         file: &File,
         params: &StreamWatermarkCreateParams,
-    ) -> Promise<StreamWatermark>;
+    ) -> Promise<StreamWatermark, StreamError>;
     #[doc = " Generate a new watermark profile"]
     #[doc = ""]
     #[doc = " * `url` - The image url to upload"]
@@ -50743,7 +50745,7 @@ extern "C" {
         this: &StreamWatermarks,
         url: impl ::wasm_bindgen::JsStringLike,
         params: &StreamWatermarkCreateParams,
-    ) -> Promise<StreamWatermark>;
+    ) -> Promise<StreamWatermark, StreamError>;
     #[doc = " Lists all watermark profiles for an account."]
     #[doc = ""]
     #[doc = " Returns: The list of watermark profiles."]
@@ -50752,7 +50754,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub fn list(this: &StreamWatermarks) -> Promise<Vec<StreamWatermark>>;
+    pub fn list(this: &StreamWatermarks) -> Promise<Vec<StreamWatermark>, InternalError>;
     #[doc = " Retrieves details for a single watermark profile."]
     #[doc = ""]
     #[doc = " * `watermarkId` - The watermark profile identifier."]
@@ -50767,7 +50769,7 @@ extern "C" {
     pub fn get(
         this: &StreamWatermarks,
         watermark_id: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<StreamWatermark>;
+    ) -> Promise<StreamWatermark, StreamError>;
     #[doc = " Deletes a watermark profile."]
     #[doc = ""]
     #[doc = " * `watermarkId` - The watermark profile identifier."]
@@ -50782,7 +50784,7 @@ extern "C" {
     pub fn delete(
         this: &StreamWatermarks,
         watermark_id: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<()>;
+    ) -> Promise<(), StreamError>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
