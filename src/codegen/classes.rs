@@ -367,6 +367,16 @@ fn member_snake(js_name: &str) -> String {
 }
 
 impl ClassConfig<'_> {
+    /// Per-mono, whether the dictionary of body scope `body` is only ever
+    /// read, which drops its setters: it then has no write side at all.
+    pub(crate) fn output_only(&mut self, body: ScopeId) -> bool {
+        let output_only = self.cgctx.is_some_and(|c| c.output_only.contains(&body));
+        if output_only {
+            self.members.retain(|m| !matches!(m, Member::Setter(_)));
+        }
+        output_only
+    }
+
     /// The base a member is named from; see [`member_names`].
     fn member_base(&self, kind: MemberKind, js_name: &str) -> String {
         self.member_names
@@ -907,6 +917,9 @@ pub fn generate_dictionary_extern(
 ) -> TokenStream {
     let mut config = ClassConfig::from_interface(decl, ctx, cgctx, scope, true);
     config.js_namespace = js_namespace.to_vec();
+    if config.output_only(decl.body_scope) {
+        return generate_extern_block(&config);
+    }
 
     let extern_block = generate_extern_block(&config);
     let factory = generate_dictionary_factory(&config.with_first_parent_members(decl));

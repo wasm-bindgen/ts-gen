@@ -189,15 +189,6 @@ pub mod cf {
         pub fn e(this: &Env) -> String;
         #[wasm_bindgen(method, getter, js_name = "e")]
         pub fn e_js_string(this: &Env) -> JsString;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_e(this: &Env, val: impl ::wasm_bindgen::JsStringLike);
-    }
-    impl Env {
-        pub fn new(e: impl ::wasm_bindgen::JsStringLike) -> Env {
-            let inner: Env = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_e(e);
-            inner
-        }
     }
 }
 #[allow(dead_code)]

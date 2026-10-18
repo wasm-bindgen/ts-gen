@@ -3,7 +3,7 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
-use wasm_bindgen::convert::{FromWasmAbi, RefIntoWasmAbi};
+use wasm_bindgen::convert::FromWasmAbi;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -15,44 +15,10 @@ extern "C" {
     pub fn name<M>(this: &Entry<M>) -> String;
     #[wasm_bindgen(method, getter, js_name = "name")]
     pub fn name_js_string<M>(this: &Entry<M>) -> JsString;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_name<M>(this: &Entry<M>, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
     pub fn meta<M>(this: &Entry<M>) -> Option<M>
     where
         Option<M>: FromWasmAbi;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_meta<M: RefIntoWasmAbi>(this: &Entry<M>, val: &M);
-}
-impl<M> Entry<M> {
-    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Entry<M> {
-        Self::builder(name).build()
-    }
-    pub fn builder(name: impl ::wasm_bindgen::JsStringLike) -> EntryBuilder<M> {
-        let inner: Entry<M> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_name(name);
-        EntryBuilder { inner }
-    }
-}
-pub struct EntryBuilder<M> {
-    inner: Entry<M>,
-}
-impl<M> EntryBuilder<M> {
-    pub fn meta(self, val: &M) -> Self
-    where
-        M: RefIntoWasmAbi,
-    {
-        self.inner.set_meta(val);
-        self
-    }
-    pub fn build(self) -> Entry<M> {
-        self.inner
-    }
-}
-impl<M> From<Entry<M>> for EntryBuilder<M> {
-    fn from(inner: Entry<M>) -> Self {
-        Self { inner }
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -61,65 +27,12 @@ extern "C" {
     pub type ListResult<M = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn done<M>(this: &ListResult<M>) -> bool;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_done<M>(this: &ListResult<M>, val: bool);
     #[wasm_bindgen(method, getter)]
     pub fn keys<M>(this: &ListResult<M>) -> Vec<Entry<M>>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_keys<M>(this: &ListResult<M>, val: &[Entry<M>]);
     #[wasm_bindgen(method, getter)]
     pub fn cursor<M>(this: &ListResult<M>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "cursor")]
     pub fn cursor_js_string<M>(this: &ListResult<M>) -> Option<JsString>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_cursor<M>(this: &ListResult<M>, val: impl ::wasm_bindgen::JsStringLike);
-}
-impl<M> ListResult<M> {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `done: false`"]
-    pub fn new_false(
-        keys: &[Entry<M>],
-        cursor: impl ::wasm_bindgen::JsStringLike,
-    ) -> ListResult<M> {
-        let inner: ListResult<M> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_done(false);
-        inner.set_keys(keys);
-        inner.set_cursor(cursor);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `done: true`"]
-    pub fn new_true(keys: &[Entry<M>]) -> ListResult<M> {
-        Self::builder_true(keys).build()
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `done: true`"]
-    pub fn builder_true(keys: &[Entry<M>]) -> ListResultBuilder<M> {
-        let inner: ListResult<M> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_done(true);
-        inner.set_keys(keys);
-        ListResultBuilder { inner }
-    }
-}
-pub struct ListResultBuilder<M> {
-    inner: ListResult<M>,
-}
-impl<M> ListResultBuilder<M> {
-    pub fn cursor(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
-        self.inner.set_cursor(val);
-        self
-    }
-    pub fn build(self) -> ListResult<M> {
-        self.inner
-    }
-}
-impl<M> From<ListResult<M>> for ListResultBuilder<M> {
-    fn from(inner: ListResult<M>) -> Self {
-        Self { inner }
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

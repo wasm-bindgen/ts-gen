@@ -40,52 +40,12 @@ extern "C" {
     pub fn flag_key<T>(this: &EvaluationDetails<T>) -> String;
     #[wasm_bindgen(method, getter, js_name = "flagKey")]
     pub fn flag_key_js_string<T>(this: &EvaluationDetails<T>) -> JsString;
-    #[wasm_bindgen(method, setter, js_name = "flagKey")]
-    pub fn set_flag_key<T>(this: &EvaluationDetails<T>, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
     pub fn value<T: FromWasmAbi>(this: &EvaluationDetails<T>) -> T;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_value<T: RefIntoWasmAbi>(this: &EvaluationDetails<T>, val: &T);
     #[wasm_bindgen(method, getter)]
     pub fn variant<T>(this: &EvaluationDetails<T>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "variant")]
     pub fn variant_js_string<T>(this: &EvaluationDetails<T>) -> Option<JsString>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_variant<T>(
-        this: &EvaluationDetails<T>,
-        val: Option<impl ::wasm_bindgen::JsStringLike>,
-    );
-}
-impl<T: RefIntoWasmAbi> EvaluationDetails<T> {
-    pub fn new(flag_key: impl ::wasm_bindgen::JsStringLike, value: &T) -> EvaluationDetails<T> {
-        Self::builder(flag_key, value).build()
-    }
-    pub fn builder(
-        flag_key: impl ::wasm_bindgen::JsStringLike,
-        value: &T,
-    ) -> EvaluationDetailsBuilder<T> {
-        let inner: EvaluationDetails<T> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_flag_key(flag_key);
-        inner.set_value(value);
-        EvaluationDetailsBuilder { inner }
-    }
-}
-pub struct EvaluationDetailsBuilder<T> {
-    inner: EvaluationDetails<T>,
-}
-impl<T> EvaluationDetailsBuilder<T> {
-    pub fn variant(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
-        self.inner.set_variant(Some(val));
-        self
-    }
-    pub fn build(self) -> EvaluationDetails<T> {
-        self.inner
-    }
-}
-impl<T> From<EvaluationDetails<T>> for EvaluationDetailsBuilder<T> {
-    fn from(inner: EvaluationDetails<T>) -> Self {
-        Self { inner }
-    }
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
 extern "C" {
@@ -94,20 +54,8 @@ extern "C" {
     pub type Pair<A = JsValue, B = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn first<A: FromWasmAbi, B>(this: &Pair<A, B>) -> A;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_first<A: RefIntoWasmAbi, B>(this: &Pair<A, B>, val: &A);
     #[wasm_bindgen(method, getter)]
     pub fn second<A, B: FromWasmAbi>(this: &Pair<A, B>) -> B;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_second<A, B: RefIntoWasmAbi>(this: &Pair<A, B>, val: &B);
-}
-impl<A: RefIntoWasmAbi, B: RefIntoWasmAbi> Pair<A, B> {
-    pub fn new(first: &A, second: &B) -> Pair<A, B> {
-        let inner: Pair<A, B> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_first(first);
-        inner.set_second(second);
-        inner
-    }
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
 extern "C" {

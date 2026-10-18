@@ -288,6 +288,10 @@ pub struct CodegenContext<'a> {
     /// rather than emitting a `foo::` local-mod qualifier. The
     /// surface leaves out the corresponding `mod` block.
     pub externalised_modules: HashSet<String>,
+    /// Per-mono, the body scopes of the dictionaries and discriminated
+    /// unions only ever read, which have no write side (see
+    /// [`crate::codegen::surface::Surface::output_only`]).
+    pub output_only: HashSet<ScopeId>,
     /// Already-reported `(type_name, module_spec)` pairs for the
     /// unresolved-module-ref error. Emitting one diagnostic per
     /// offending pair keeps the output focused when many references
@@ -878,6 +882,7 @@ impl<'a> CodegenContext<'a> {
             experimental_generic_mono: options.experimental_generic_mono,
             exported_modules,
             externalised_modules,
+            output_only: surface.map(|s| s.output_only().clone()).unwrap_or_default(),
             unresolved_module_refs: RefCell::new(HashSet::new()),
             alias_params: RefCell::new(HashMap::new()),
             alias_param_mentions: RefCell::new(Vec::new()),
@@ -922,6 +927,7 @@ impl<'a> CodegenContext<'a> {
             experimental_generic_mono: false,
             exported_modules: HashSet::new(),
             externalised_modules: HashSet::new(),
+            output_only: HashSet::new(),
             unresolved_module_refs: RefCell::new(HashSet::new()),
             alias_params: RefCell::new(HashMap::new()),
             alias_param_mentions: RefCell::new(Vec::new()),

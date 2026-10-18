@@ -14,7 +14,10 @@ use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 
 use crate::context::{GlobalContext, TypeId};
-use crate::ir::{Member, Module, ModuleContext, Root, TypeDeclaration, TypeKind, TypeRef};
+use crate::ir::{
+    InterfaceClassification, Member, Module, ModuleContext, Root, TypeDeclaration, TypeKind,
+    TypeRef,
+};
 use crate::parse::scope::{Binding, ScopeId};
 
 use super::{ExportSpec, GenerateOptions};
@@ -26,6 +29,7 @@ pub struct Surface<'d> {
     names: HashMap<TypeId, Vec<String>>,
     mod_names: HashMap<TypeId, String>,
     type_names: HashMap<TypeId, String>,
+    output_only: HashSet<ScopeId>,
     /// Declaration roots no root exports.
     pub missing: Vec<String>,
 }
@@ -71,6 +75,11 @@ impl<'d> Surface<'d> {
             }
         }
         builder.close();
+        let output_only = if builder.mono {
+            builder.output_only()
+        } else {
+            HashSet::new()
+        };
         let mod_names = builder.name_namespaces();
         let type_names = builder.name_types();
         Surface {
@@ -78,6 +87,7 @@ impl<'d> Surface<'d> {
             names: builder.names,
             mod_names,
             type_names,
+            output_only,
             missing,
         }
     }
@@ -87,6 +97,12 @@ impl<'d> Surface<'d> {
     /// its name, as a namespace does (see [`Surface::mod_name`]).
     pub fn type_names(&self) -> &HashMap<TypeId, String> {
         &self.type_names
+    }
+
+    /// Per-mono, the body scopes of the dictionaries and discriminated
+    /// unions the bindings only ever read; see [`Builder::output_only`].
+    pub fn output_only(&self) -> &HashSet<ScopeId> {
+        &self.output_only
     }
 
     /// The forms `id` is emitted in, empty if it is not emitted.
@@ -592,6 +608,71 @@ impl<'d> Builder<'_, 'd> {
         }
     }
 
+    /// The dictionaries and discriminated unions reached as output (a
+    /// return, a getter, a callback's argument) and never as input (an
+    /// argument, a setter, a callback's return). A dictionary's own setters
+    /// only count as input once it is written itself, and one that no
+    /// position reaches keeps its write side.
+    fn output_only(&self) -> HashSet<ScopeId> {
+        let mut ids: Vec<TypeId> = self.items.keys().copied().collect();
+        ids.sort_by_key(|id| id.index());
+        let mut written = HashSet::new();
+        let mut read = HashSet::new();
+        let mut work: Vec<(TypeId, bool)> = Vec::new();
+        for &id in &ids {
+            for decl in &self.items[&id] {
+                if always_written(decl) {
+                    work.push((id, true));
+                }
+                self.polar_targets(decl, Part::Always, &mut work);
+            }
+        }
+        loop {
+            while let Some((id, input)) = work.pop() {
+                let seen = if input { &mut written } else { &mut read };
+                if !seen.insert(id) {
+                    continue;
+                }
+                let part = if input { Part::Written } else { Part::Read };
+                for decl in &self.items[&id] {
+                    self.polar_targets(decl, part, &mut work);
+                }
+            }
+            work.extend(
+                ids.iter()
+                    .filter(|id| !read.contains(*id) && !written.contains(*id))
+                    .map(|&id| (id, true)),
+            );
+            if work.is_empty() {
+                break;
+            }
+        }
+        ids.iter()
+            .filter(|id| read.contains(*id) && !written.contains(*id))
+            .filter_map(|&id| match &self.items[&id][0].kind {
+                TypeKind::Interface(i)
+                    if i.classification == InterfaceClassification::Dictionary =>
+                {
+                    Some(i.body_scope)
+                }
+                TypeKind::DiscriminatedUnion(d) => Some(d.body_scope),
+                _ => None,
+            })
+            .collect()
+    }
+
+    fn polar_targets(&self, decl: &TypeDeclaration, part: Part, work: &mut Vec<(TypeId, bool)>) {
+        let mut refs = Vec::new();
+        polar_declaration(decl, part, &mut refs);
+        for (name, scope, input) in refs {
+            if let Some(target) = self.resolve(&name, scope, &decl.module_context) {
+                if self.items.contains_key(&target) {
+                    work.push((target, input));
+                }
+            }
+        }
+    }
+
     /// Resolve a type name as codegen does: from its use site, then from
     /// the module's ambient blocks and the input files.
     fn resolve(&self, name: &str, scope: ScopeId, from: &ModuleContext) -> Option<TypeId> {
@@ -793,6 +874,167 @@ fn members(members: &[Member], walk: &mut impl FnMut(&TypeRef, ScopeId), omitted
                 }
             }
         }
+    }
+}
+
+/// Which of a declaration's positions [`Builder::output_only`] walks: those
+/// it always has, those it has once written, and those it has once read.
+#[derive(Clone, Copy, PartialEq)]
+enum Part {
+    Always,
+    Written,
+    Read,
+}
+
+/// A JS object the bindings mutate whatever reaches it: a class, or an
+/// interface with methods.
+fn always_written(decl: &TypeDeclaration) -> bool {
+    match &decl.kind {
+        TypeKind::Class(_) => true,
+        TypeKind::Interface(i) => i.classification != InterfaceClassification::Dictionary,
+        _ => false,
+    }
+}
+
+type PolarRefs = Vec<(String, ScopeId, bool)>;
+
+fn polar_declaration(decl: &TypeDeclaration, part: Part, out: &mut PolarRefs) {
+    let mut walk = |ty: &TypeRef, scope: ScopeId, input: bool| polar_refs(ty, scope, input, out);
+    match (&decl.kind, part) {
+        (TypeKind::Class(c), Part::Always) => polar_members(&c.members, true, &mut walk),
+        (TypeKind::Class(c), Part::Written) => {
+            if let Some(parent) = &c.extends {
+                walk(&parent.type_ref, parent.scope, true);
+            }
+            for ty in &c.implements {
+                walk(ty, c.body_scope, true);
+            }
+        }
+        (TypeKind::Interface(i), Part::Always) => {
+            let settable = i.classification != InterfaceClassification::Dictionary;
+            polar_members(&i.members, settable, &mut walk);
+            for c in &i.construct {
+                polar_params(&c.params, c.scope, &mut walk);
+            }
+        }
+        (TypeKind::Interface(i), Part::Written) => {
+            if i.classification == InterfaceClassification::Dictionary {
+                polar_setters(&i.members, &mut walk);
+            }
+            for parent in &i.extends {
+                walk(&parent.type_ref, parent.scope, true);
+            }
+        }
+        (TypeKind::DiscriminatedUnion(d), Part::Always) => {
+            for members in std::iter::once(&d.members).chain(&d.branches) {
+                polar_members(members, false, &mut walk);
+            }
+        }
+        (TypeKind::DiscriminatedUnion(d), Part::Written) => {
+            for members in std::iter::once(&d.members).chain(&d.branches) {
+                polar_setters(members, &mut walk);
+            }
+        }
+        (TypeKind::TypeAlias(a), Part::Written) => walk(&a.target, a.body_scope, true),
+        (TypeKind::TypeAlias(a), Part::Read) => walk(&a.target, a.body_scope, false),
+        (TypeKind::Function(f), Part::Always) => polar_function(f, &mut walk),
+        (TypeKind::Variable(v), Part::Always) => {
+            walk(&v.type_ref, decl.scope_id, false);
+            for f in &v.constructs {
+                polar_function(f, &mut walk);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn polar_function(f: &crate::ir::FunctionDecl, walk: &mut impl FnMut(&TypeRef, ScopeId, bool)) {
+    polar_params(&f.params, f.body_scope, walk);
+    walk(&f.return_type, f.body_scope, false);
+    for o in &f.overloads {
+        polar_params(&o.params, o.body_scope, walk);
+        walk(&o.return_type, o.body_scope, false);
+    }
+}
+
+fn polar_params(
+    params: &[crate::ir::Param],
+    scope: ScopeId,
+    walk: &mut impl FnMut(&TypeRef, ScopeId, bool),
+) {
+    for p in params {
+        walk(&p.type_ref, scope, true);
+    }
+}
+
+/// A member's positions, its setters' only when `settable`.
+fn polar_members(
+    members: &[Member],
+    settable: bool,
+    walk: &mut impl FnMut(&TypeRef, ScopeId, bool),
+) {
+    for m in members {
+        match m {
+            Member::Getter(g) => walk(&g.type_ref, g.scope, false),
+            Member::StaticGetter(g) => walk(&g.type_ref, g.scope, false),
+            Member::Setter(s) if settable => walk(&s.type_ref, s.scope, true),
+            Member::StaticSetter(s) => walk(&s.type_ref, s.scope, true),
+            Member::IndexSignature(i) => {
+                walk(&i.value_type, i.scope, false);
+                if settable {
+                    walk(&i.value_type, i.scope, true);
+                }
+            }
+            Member::Constructor(c) => polar_params(&c.params, c.scope, walk),
+            Member::Method(m) => {
+                polar_params(&m.params, m.body_scope, walk);
+                walk(&m.return_type, m.body_scope, false);
+            }
+            Member::StaticMethod(m) => {
+                polar_params(&m.params, m.body_scope, walk);
+                walk(&m.return_type, m.body_scope, false);
+            }
+            Member::Setter(_) => {}
+        }
+    }
+}
+
+fn polar_setters(members: &[Member], walk: &mut impl FnMut(&TypeRef, ScopeId, bool)) {
+    for m in members {
+        match m {
+            Member::Setter(s) => walk(&s.type_ref, s.scope, true),
+            Member::IndexSignature(i) => walk(&i.value_type, i.scope, true),
+            _ => {}
+        }
+    }
+}
+
+/// [`type_refs`] with each reference's direction: a function type's
+/// parameters flip it.
+fn polar_refs(ty: &TypeRef, scope: ScopeId, input: bool, out: &mut PolarRefs) {
+    match ty {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => {
+            out.push((segments.join("."), scope, input));
+            for arg in generic_args {
+                polar_refs(arg, scope, input, out);
+            }
+        }
+        TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => polar_refs(inner, scope, input, out),
+        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+            for m in members {
+                polar_refs(m, scope, input, out);
+            }
+        }
+        TypeRef::Function(sig) => {
+            for p in &sig.params {
+                polar_refs(&p.type_ref, scope, !input, out);
+            }
+            polar_refs(&sig.return_type, scope, input, out);
+        }
+        _ => {}
     }
 }
 
