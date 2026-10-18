@@ -20,11 +20,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_meta<M>(this: &Entry<M>, val: &M);
 }
-impl<M> Entry<M>
-where
-    for<'__wbg> &'__wbg M:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<M> Entry<M> {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Entry<M> {
         Self::builder(name).build()
     }
@@ -37,12 +33,12 @@ where
 pub struct EntryBuilder<M> {
     inner: Entry<M>,
 }
-impl<M> EntryBuilder<M>
-where
-    for<'__wbg> &'__wbg M:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn meta(self, val: &M) -> Self {
+impl<M> EntryBuilder<M> {
+    pub fn meta(self, val: &M) -> Self
+    where
+        for<'__wbg> &'__wbg M:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_meta(val);
         self
     }

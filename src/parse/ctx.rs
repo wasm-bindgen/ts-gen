@@ -50,4 +50,5 @@ pub struct ParseCtx<'arena, 'docs> {
     /// what a name *is* (class, interface, alias) consult.
     pub type_arena: &'arena [crate::ir::TypeDeclaration],
     pub options: crate::parse::ParseOptions,
+    pub partials: &'arena mut Vec<crate::parse::PendingPartial>,
 }

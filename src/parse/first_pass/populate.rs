@@ -58,6 +58,7 @@ struct PopulateCtx<'a, 'docs> {
     /// by scope and name.
     constructor_classes: Vec<(ScopeId, String)>,
     options: crate::parse::ParseOptions,
+    partials: Vec<crate::parse::PendingPartial>,
 }
 
 /// The static side of each constructor-shaped `var` with no instance
@@ -84,6 +85,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             synth: &mut self.synth,
             type_arena: self.type_arena,
             options: self.options,
+            partials: &mut self.partials,
         }
     }
 
@@ -140,6 +142,7 @@ pub fn populate_declarations<'a, 'docs>(
         static_sides: StaticSides::new(),
         constructor_classes: Vec::new(),
         options,
+        partials: Vec::new(),
     };
 
     if let ir::ModuleContext::Module(_) = file_ctx {
@@ -154,6 +157,7 @@ pub fn populate_declarations<'a, 'docs>(
         namespace_members: pcx.namespace_members,
         static_sides: pcx.static_sides,
         constructor_classes: pcx.constructor_classes,
+        partials: pcx.partials,
     }
 }
 
@@ -166,6 +170,7 @@ pub struct Populated {
     /// by scope and name: a value nothing refers to by its local name, so
     /// such a class takes the name its module exports it under.
     pub constructor_classes: Vec<(ScopeId, String)>,
+    pub partials: Vec<crate::parse::PendingPartial>,
 }
 
 /// The binding a module body's `export = <name>` assigns.

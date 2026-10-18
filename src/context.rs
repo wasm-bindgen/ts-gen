@@ -50,6 +50,10 @@ pub struct GlobalContext {
     pub scopes: ScopeArena,
     /// The options the input was parsed with.
     pub parse_options: crate::parse::ParseOptions,
+    pub pending_partials: Vec<crate::parse::PendingPartial>,
+    /// Per-mono, the synthesized `Partial` of each interface a parameter
+    /// names as `Partial<X>`.
+    pub partials: std::collections::HashMap<TypeId, TypeId>,
     pub diagnostics: DiagnosticCollector,
     pub external_map: ExternalMap,
     /// Pending imports that need to be resolved during import resolution.
@@ -191,6 +195,8 @@ impl GlobalContext {
         Self {
             scopes: ScopeArena::new(),
             parse_options: Default::default(),
+            pending_partials: Vec::new(),
+            partials: std::collections::HashMap::new(),
             diagnostics: DiagnosticCollector::new(),
             external_map: ExternalMap::new(),
             pending_imports: Vec::new(),

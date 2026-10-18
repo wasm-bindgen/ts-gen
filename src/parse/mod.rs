@@ -33,6 +33,19 @@ pub struct ParseOptions {
     pub experimental_generic_mono: bool,
 }
 
+/// A parameter's `Partial<X>` under per-mono, synthesized as `name` beside
+/// its declaration with no members until X is complete (see
+/// [`fill_partials`]).
+#[derive(Clone, Debug)]
+pub struct PendingPartial {
+    pub name: String,
+    pub target: String,
+    /// The declaration the parameter belongs to.
+    pub parent: String,
+    /// Where both names resolve.
+    pub scope: ScopeId,
+}
+
 /// Parse one or more `.d.ts` files and produce a `Module` + `GlobalContext`.
 pub fn parse_dts_files(
     paths: &[impl AsRef<Path>],
@@ -88,8 +101,78 @@ pub fn parse_dts_files_with(
     )?;
     bind_constructor_vars(&mut gctx, &mut module);
     enums::evaluate_ts_enums(&mut gctx, &mut module.types);
+    fill_partials(&mut gctx);
 
     Ok((module, gctx))
+}
+
+/// Bind each [`PendingPartial`] to its target and fill it in. One whose
+/// target is not an interface (a class, whose instances callers hold)
+/// aliases it instead.
+fn fill_partials(gctx: &mut GlobalContext) {
+    use crate::ir::{TypeAliasDecl, TypeKind, TypeRef};
+    for pending in std::mem::take(&mut gctx.pending_partials) {
+        let (Some(id), Some(target)) = (
+            gctx.resolve_path(pending.scope, &pending.name),
+            gctx.resolve_path(pending.scope, &pending.target),
+        ) else {
+            continue;
+        };
+        let (type_params, body_scope) = match &gctx.get_type(target).kind {
+            TypeKind::Interface(_) => {
+                gctx.partials.insert(target, id);
+                continue;
+            }
+            TypeKind::Class(c) => (c.type_params.clone(), c.body_scope),
+            _ => (Vec::new(), pending.scope),
+        };
+        let alias = TypeAliasDecl {
+            name: pending.name,
+            target: TypeRef::generic(
+                pending.target,
+                type_params
+                    .iter()
+                    .map(|tp| TypeRef::ident(tp.name.clone()))
+                    .collect(),
+            ),
+            type_params,
+            from_module: None,
+            body_scope,
+        };
+        gctx.get_type_mut(id).kind = TypeKind::TypeAlias(alias);
+    }
+    refresh_partials(gctx);
+}
+
+/// Copy each synthesized `Partial`'s target into it, every property
+/// optional: once every declaration has merged, and again after side-file
+/// annotations change the target.
+pub(crate) fn refresh_partials(gctx: &mut GlobalContext) {
+    use crate::ir::{Member, TypeKind};
+    let pairs: Vec<_> = gctx.partials.iter().map(|(&t, &p)| (t, p)).collect();
+    for (target, id) in pairs {
+        let TypeKind::Interface(source) = gctx.get_type(target).kind.clone() else {
+            continue;
+        };
+        let TypeKind::Interface(partial) = &mut gctx.get_type_mut(id).kind else {
+            continue;
+        };
+        partial.type_params = source.type_params;
+        partial.extends = source.extends;
+        partial.body_scope = source.body_scope;
+        partial.members = source
+            .members
+            .into_iter()
+            .map(|member| match member {
+                Member::Getter(mut g) => {
+                    g.optional = true;
+                    Member::Getter(g)
+                }
+                m => m,
+            })
+            .collect();
+        partial.classification = classify::classify_interface(&partial.members);
+    }
 }
 
 /// Parse a single `.d.ts` source string into a `Module` + `GlobalContext`.
@@ -105,6 +188,7 @@ pub fn parse_single_source(
     module.add_file(path.to_path_buf(), file_scope, parsed);
     bind_constructor_vars(&mut gctx, &mut module);
     enums::evaluate_ts_enums(&mut gctx, &mut module.types);
+    fill_partials(&mut gctx);
     Ok((module, gctx))
 }
 
@@ -283,6 +367,7 @@ fn parse_single_file(
         mut namespace_members,
         mut static_sides,
         constructor_classes,
+        partials,
     } = first_pass::populate_declarations(
         program,
         &registry,
@@ -296,6 +381,7 @@ fn parse_single_file(
     );
     gctx.scopes = scopes;
     gctx.diagnostics = diag;
+    gctx.pending_partials.extend(partials);
 
     let merged = merge_declarations(declarations, |decl| binding_scope(gctx, decl));
 

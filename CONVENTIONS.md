@@ -2101,9 +2101,21 @@ impl<T> Rows<T> where T: VectorRefIntoWasmAbi { /* new(rows: &[T]) */ }
 impl<Env> Handler<Env> { /* fetch(val: &Function<fn(String, Env)>) */ }
 ```
 
-The bounds stay on helper `impl` blocks whose methods call generated setters.
-They are not attached to the builder struct itself, so merely storing or
-returning a builder does not constrain its type parameter.
+The factories' bounds stay on their `impl` block; a builder method carries
+its own, so a builder whose type argument one field cannot take still has
+the others (`GetOptionsPartial::<()>::builder().cache_ttl(60)`, though
+`&()` has no ABI for `.type_(…)`). Nothing is attached to the builder struct
+itself, so merely storing or returning a builder does not constrain its
+type parameter:
+
+```rust
+impl<T> SlotBuilder<T> {
+    pub fn fallback(self, val: &T) -> Self
+    where
+        for<'__wbg> &'__wbg T: IntoWasmAbi + WasmDescribe,
+    { /* … */ }
+}
+```
 
 Array-buffer-view helper parameters retain their `TypedArray` widening bound.
 In per-monomorphization mode the helper also repeats the reference ABI bound
@@ -2128,9 +2140,26 @@ stays a type parameter. Built-in JS containers, tuples and iterators take
 native leaves too (`Promise<String>`, `Map<String, f64>`, `Array<bool>`,
 `ArrayTuple<(String, String)>`, `Object<String>` for a `Record`), since
 `js_sys_unstable_apis` monomorphizes their element APIs, and an awaited
-`T | undefined` is `Option<T>`; `Promise<void>` is `Promise<()>`. Callback
+`T | undefined` is `Option<T>`; `Promise<void>` is `Promise<()>`. An
+`undefined` type argument or default is `()` too
+(`KVNamespaceGetOptions<()>`, `DurableObjectStub<T = ()>`). Callback
 signatures take native leaves the same way (see
 [Function types](#function-types)).
+
+A parameter's `Partial<X>` names a synthesized `XPartial`, X with every
+property optional, so its builder requires none of X's fields. One is
+synthesized per X and declaration, beside the declaration; one of a class,
+whose instances callers already hold, is the class. Elsewhere `Partial<X>`
+is `X`:
+
+```ts
+get(key: string, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<string | null>;
+```
+
+```rust
+pub async fn get_with_options(this: &KVNamespace, key: impl JsStringLike, options: &KVNamespaceGetOptionsPartial<()>) -> …;
+// KVNamespaceGetOptionsPartial::builder().cache_ttl(60).build()
+```
 
 Constructors bind only the class parameters their arguments mention; the rest
 take their declared defaults, as without per-monomorphization, so

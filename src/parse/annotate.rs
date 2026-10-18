@@ -21,6 +21,7 @@ pub fn apply(
 ) -> Vec<String> {
     let mut errors = Vec::new();
     apply_in(gctx, &module.types, &annotations.types, agctx, &mut errors);
+    crate::parse::refresh_partials(gctx);
     errors
 }
 

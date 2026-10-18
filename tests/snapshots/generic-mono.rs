@@ -75,11 +75,7 @@ where
 pub struct EvaluationDetailsBuilder<T> {
     inner: EvaluationDetails<T>,
 }
-impl<T> EvaluationDetailsBuilder<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> EvaluationDetailsBuilder<T> {
     pub fn variant(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_variant(Some(val));
         self

@@ -399,16 +399,17 @@ pub(crate) fn convert_formal_params_with_synthesis(
             None => member_name.to_string(),
         };
         let type_ref = match param.type_annotation.as_ref() {
-            Some(ann) => match try_synthesize_inline_param(
-                &ann.type_annotation,
-                parent_name,
-                &segment,
-                scope,
-                ctx,
-            ) {
-                Some(synth) => synth,
-                None => convert_ts_type_scoped(&ann.type_annotation, scope, ctx),
-            },
+            Some(ann) => try_synthesize_partial(&ann.type_annotation, parent_name, scope, ctx)
+                .or_else(|| {
+                    try_synthesize_inline_param(
+                        &ann.type_annotation,
+                        parent_name,
+                        &segment,
+                        scope,
+                        ctx,
+                    )
+                })
+                .unwrap_or_else(|| convert_ts_type_scoped(&ann.type_annotation, scope, ctx)),
             None => TypeRef::Any,
         };
 
@@ -439,6 +440,78 @@ pub(crate) fn convert_formal_params_with_synthesis(
     }
 
     result_params
+}
+
+/// Per-mono, a parameter's `Partial<X<…>>` names `XPartial<…>`, X with
+/// every property optional, so a builder needs no field X requires
+/// (`KVNamespaceGetOptionsPartial::builder().cache_ttl(60)`). One is
+/// synthesized per X and declaration, filled in once X is complete; see
+/// [`crate::parse::PendingPartial`].
+fn try_synthesize_partial(
+    ts_type: &TSType<'_>,
+    parent_name: &str,
+    scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> Option<TypeRef> {
+    if !ctx.options.experimental_generic_mono {
+        return None;
+    }
+    let TSType::TSTypeReference(reference) = ts_type else {
+        return None;
+    };
+    match &reference.type_name {
+        TSTypeName::IdentifierReference(id) if id.name == "Partial" => {}
+        _ => return None,
+    }
+    let [arg] = reference.type_arguments.as_ref()?.params.as_slice() else {
+        return None;
+    };
+    let TypeRef::Reference {
+        segments,
+        generic_args,
+    } = convert_ts_type_scoped(arg, scope, ctx)
+    else {
+        return None;
+    };
+    let [target] = segments.as_slice() else {
+        return None;
+    };
+    let existing = ctx
+        .partials
+        .iter()
+        .find(|p| p.target == *target && p.parent == parent_name);
+    let name = match existing {
+        Some(p) => p.name.clone(),
+        None => {
+            let name = ctx
+                .used_type_names
+                .declare(&format!("{target}Partial"), Suffix::Pascal);
+            let mut type_params = Vec::new();
+            let body_scope = create_body_scope(&mut type_params, scope, ctx);
+            ctx.synth.push(InterfaceDecl {
+                name: name.clone(),
+                js_name: name.clone(),
+                type_params,
+                extends: Vec::new(),
+                members: Vec::new(),
+                construct: Vec::new(),
+                classification: InterfaceClassification::Dictionary,
+                body_scope,
+                string_mode: None,
+            });
+            ctx.partials.push(crate::parse::PendingPartial {
+                name: name.clone(),
+                target: target.clone(),
+                parent: parent_name.to_string(),
+                scope,
+            });
+            name
+        }
+    };
+    Some(TypeRef::Reference {
+        segments: vec![name],
+        generic_args,
+    })
 }
 
 /// Claim a type name for an anonymous interface hoisted from

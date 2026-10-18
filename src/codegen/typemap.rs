@@ -2702,6 +2702,7 @@ fn to_mono_user_generic_arg_impl(
 ) -> TokenStream {
     let peeled = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
+        TypeRef::Undefined | TypeRef::Void => quote! { () },
         t if is_mono_native_leaf(t, ctx, scope) => {
             to_syn_type(t, TypePosition::RETURN, Some(ctx), scope, from_module)
         }

@@ -169,11 +169,7 @@ where
 pub struct GetOptionsBuilder<Type> {
     inner: GetOptions<Type>,
 }
-impl<Type> GetOptionsBuilder<Type>
-where
-    for<'__wbg> &'__wbg Type:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Type> GetOptionsBuilder<Type> {
     pub fn cache_ttl(self, val: f64) -> Self {
         self.inner.set_cache_ttl(val);
         self
@@ -211,19 +207,19 @@ extern "C" {
     pub async fn get_with_options(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &GetOptions<Undefined>,
+        options: &GetOptionsPartial<()>,
     ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_options_js_string(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &GetOptions<Undefined>,
+        options: &GetOptionsPartial<()>,
     ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_options_promise(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &GetOptions<Undefined>,
+        options: &GetOptionsPartial<()>,
     ) -> Promise<Option<String>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_text_with_options(
@@ -318,6 +314,55 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type GetOptionsPartial<Type = JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "type")]
+    pub fn type_<Type>(this: &GetOptionsPartial<Type>) -> Type;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type<Type>(this: &GetOptionsPartial<Type>, val: &Type);
+    #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
+    pub fn cache_ttl<Type>(this: &GetOptionsPartial<Type>) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
+    pub fn set_cache_ttl<Type>(this: &GetOptionsPartial<Type>, val: f64);
+}
+impl<Type> GetOptionsPartial<Type> {
+    pub fn new() -> GetOptionsPartial<Type> {
+        Self::builder().build()
+    }
+    pub fn builder() -> GetOptionsPartialBuilder<Type> {
+        GetOptionsPartialBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct GetOptionsPartialBuilder<Type> {
+    inner: GetOptionsPartial<Type>,
+}
+impl<Type> GetOptionsPartialBuilder<Type> {
+    pub fn type_(self, val: &Type) -> Self
+    where
+        for<'__wbg> &'__wbg Type:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn cache_ttl(self, val: f64) -> Self {
+        self.inner.set_cache_ttl(val);
+        self
+    }
+    pub fn build(self) -> GetOptionsPartial<Type> {
+        self.inner
+    }
+}
+impl<Type> From<GetOptionsPartial<Type>> for GetOptionsPartialBuilder<Type> {
+    fn from(inner: GetOptionsPartial<Type>) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "literal-overloads-mono", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cell<V = JsValue>;
     #[wasm_bindgen(method, js_name = "take")]
     fn take_now_js<V>(this: &Cell<V>, mode: impl ::wasm_bindgen::JsStringLike) -> V;
@@ -360,6 +405,30 @@ impl<V> Cell<V> {
         self.take_later_promise_js("later")
     }
 }
+#[wasm_bindgen(module = "literal-overloads-mono", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Config;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &Config) -> String;
+    #[wasm_bindgen(method, getter, js_name = "name")]
+    pub fn name_js_string(this: &Config) -> JsString;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &Config, val: impl ::wasm_bindgen::JsStringLike);
+}
+#[wasm_bindgen(module = "literal-overloads-mono", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Admin;
+    #[wasm_bindgen(method)]
+    pub fn update(this: &Admin, config: &Config);
+    #[wasm_bindgen(method, catch, js_name = "update")]
+    pub fn try_update(this: &Admin, config: &Config) -> Result<(), JsValue>;
+}
+#[allow(dead_code)]
+pub type ConfigPartial = Config;
 #[wasm_bindgen(module = "literal-overloads-mono", experimental_generic_mono)]
 extern "C" {
     pub fn store() -> Store;

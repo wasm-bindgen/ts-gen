@@ -66,12 +66,12 @@ where
 pub struct DetailsBuilder<T> {
     inner: Details<T>,
 }
-impl<T> DetailsBuilder<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn fallback(self, val: &T) -> Self {
+impl<T> DetailsBuilder<T> {
+    pub fn fallback(self, val: &T) -> Self
+    where
+        for<'__wbg> &'__wbg T:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_fallback(val);
         self
     }

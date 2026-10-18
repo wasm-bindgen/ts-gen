@@ -3,7 +3,9 @@
 // are named off the twin (`get_text_js_string`), and a generic arm restates
 // the bounds the macro puts on its extern. Overloads keyed by a literal type
 // argument are bindings of their own, named by the literal and the
-// parameter (`get_json_with_options`).
+// parameter (`get_json_with_options`). A parameter's `Partial<GetOptions<…>>`
+// is a synthesized all-optional `GetOptionsPartial`; a `Partial` of a class
+// is the class.
 
 export interface Store {
   get(key: string, type: "text"): Promise<string | null>;
@@ -26,5 +28,11 @@ export interface Namespace {
 export interface Cell<V> {
   take(mode: "now"): V;
   take(mode: "later"): Promise<V>;
+}
+export declare class Config {
+  name: string;
+}
+export interface Admin {
+  update(config: Partial<Config>): void;
 }
 export declare function store(): Store;
