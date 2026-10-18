@@ -331,6 +331,8 @@ impl<'a> ClassConfig<'a> {
             ModuleContext::Global => None,
         };
 
+        let mut members = decl.members.clone();
+        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -338,11 +340,11 @@ impl<'a> ClassConfig<'a> {
             module,
             js_namespace: Vec::new(),
             is_abstract: decl.is_abstract,
-            members: decl.members.clone(),
             member_names: member_names(
-                &decl.members,
-                generated_names(&decl.members, decl.is_abstract, false),
+                &members,
+                generated_names(&members, decl.is_abstract, false),
             ),
+            members,
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
@@ -364,7 +366,8 @@ impl<'a> ClassConfig<'a> {
         };
 
         let inherited = inherited_members(&decl.extends, cgctx);
-        let members = inherit_into(inherited.beyond_first, &decl.members);
+        let mut members = inherit_into(inherited.beyond_first, &decl.members);
+        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
 
         ClassConfig {
             rust_name: decl.name.clone(),
@@ -419,6 +422,8 @@ impl<'a> ClassConfig<'a> {
             ModuleContext::Module(m) => Some(m.clone()),
             ModuleContext::Global => None,
         };
+        let mut members = decl.members.clone();
+        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -426,8 +431,8 @@ impl<'a> ClassConfig<'a> {
             module,
             js_namespace: Vec::new(),
             is_abstract: false,
-            members: decl.members.clone(),
-            member_names: member_names(&decl.members, generated_names(&decl.members, false, true)),
+            member_names: member_names(&members, generated_names(&members, false, true)),
+            members,
             type_params: decl.type_params.clone(),
             cgctx,
             scope,

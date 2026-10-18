@@ -607,6 +607,7 @@ fn merge_function_overloads(
             if let Some(&i) = first.get(&key) {
                 if let TypeKind::Function(base) = &mut result[i].kind {
                     base.overloads.push(FunctionOverload {
+                        type_params: f.type_params.clone(),
                         params: f.params.clone(),
                         return_type: f.return_type.clone(),
                         body_scope: f.body_scope,
