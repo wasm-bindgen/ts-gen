@@ -40,8 +40,7 @@ pub struct ListKeyBuilder<Metadata> {
 impl<Metadata> ListKeyBuilder<Metadata> {
     pub fn metadata(self, val: &Metadata) -> Self
     where
-        for<'__wbg> &'__wbg Metadata:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        Metadata: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_metadata(val);
         self
@@ -186,8 +185,7 @@ extern "C" {
 }
 impl<V> Slot<V>
 where
-    for<'__wbg> &'__wbg V:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    V: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(value: &V) -> Slot<V> {
         let inner: Slot<V> = JsCast::unchecked_into(js_sys::Object::new());

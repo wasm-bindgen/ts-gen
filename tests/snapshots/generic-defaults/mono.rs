@@ -129,8 +129,7 @@ pub struct OptionsBuilder<T> {
 impl<T> OptionsBuilder<T> {
     pub fn initial(self, val: &T) -> Self
     where
-        for<'__wbg> &'__wbg T:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_initial(val);
         self

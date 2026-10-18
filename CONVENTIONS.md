@@ -2741,21 +2741,16 @@ extern "C" {
 }
 ```
 
-Generated dictionary helpers call their extern setters from ordinary Rust, so
-their `impl` restates, for each argument shape that names a type parameter
-bare, the bound wasm-bindgen puts on the setter's import: `&T` needs `for<'a>
-&'a T: IntoWasmAbi`, `Option<&T>` needs `for<'a> Option<&'a T>: IntoWasmAbi`,
-and `&[T]` needs `T: VectorRefIntoWasmAbi`. A parameter inside another
-generic (`&Foo<T>`, `&Function<fn(String, Env)>`, `&[Foo<T>]`) needs nothing,
-since a handle's ABI holds for every instantiation. The extern declarations
-themselves remain unconstrained:
+Generated dictionary helpers and wrappers call these imports from ordinary
+Rust, so they restate the same first-order bounds (`T: RefIntoWasmAbi` for
+`&T` and `Option<&T>`, `T: VectorRefIntoWasmAbi` for `&[T]`, `T:
+IntoWasmAbi` for a bare `T`; any other shape naming a parameter, such as
+`Option<T>`, is bounded as a whole). A parameter inside another generic
+(`&Foo<T>`, `&Function<fn(String, Env)>`, `&[Foo<T>]`) needs nothing,
+since a handle's ABI holds for every instantiation:
 
 ```rust
-impl<T> Slot<T>
-where
-    for<'__wbg> Option<&'__wbg T>: IntoWasmAbi + WasmDescribe,
-    for<'__wbg> &'__wbg T: IntoWasmAbi + WasmDescribe,
-{ /* new(value: Option<&T>), builder(value: Option<&T>) */ }
+impl<T> Slot<T> where T: RefIntoWasmAbi { /* new(value: Option<&T>), builder(value: Option<&T>) */ }
 impl<T> Rows<T> where T: VectorRefIntoWasmAbi { /* new(rows: &[T]) */ }
 impl<Env> Handler<Env> { /* fetch(val: &Function<fn(String, Env)>) */ }
 ```
@@ -2763,15 +2758,16 @@ impl<Env> Handler<Env> { /* fetch(val: &Function<fn(String, Env)>) */ }
 The factories' bounds stay on their `impl` block; a builder method carries
 its own, so a builder whose type argument one field cannot take still has
 the others (`GetOptions::<()>::builder().cache_ttl(60)`, though
-`&()` has no ABI for `.type_(…)`). Nothing is attached to the builder struct
-itself, so merely storing or returning a builder does not constrain its
-type parameter:
+`&()` has no ABI for `.type_(…)`). A bound on the builder's own parameter
+is a method-level `where`, since that parameter is the `impl`'s. Nothing is
+attached to the builder struct itself, so merely storing or returning a
+builder does not constrain its type parameter:
 
 ```rust
 impl<T> SlotBuilder<T> {
     pub fn fallback(self, val: &T) -> Self
     where
-        for<'__wbg> &'__wbg T: IntoWasmAbi + WasmDescribe,
+        T: RefIntoWasmAbi,
     { /* … */ }
 }
 ```

@@ -722,8 +722,7 @@ extern "C" {
 }
 impl<Type> GetOptions<Type>
 where
-    for<'__wbg> &'__wbg Type:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    Type: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(r#type: &Type) -> GetOptions<Type> {
         Self::builder(r#type).build()

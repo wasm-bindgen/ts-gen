@@ -10182,8 +10182,7 @@ impl<Cf> RequestInitBuilder<Cf> {
     }
     pub fn cf(self, val: &Cf) -> Self
     where
-        for<'__wbg> &'__wbg Cf:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        Cf: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_cf(val);
         self
@@ -10321,8 +10320,7 @@ impl<Metadata> KVNamespaceListKeyBuilder<Metadata> {
     }
     pub fn metadata(self, val: &Metadata) -> Self
     where
-        for<'__wbg> &'__wbg Metadata:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        Metadata: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_metadata(val);
         self
@@ -11409,8 +11407,7 @@ extern "C" {
 }
 impl<Type> KVNamespaceGetOptions<Type>
 where
-    for<'__wbg> &'__wbg Type:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    Type: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(r#type: &Type) -> KVNamespaceGetOptions<Type> {
         Self::builder(r#type).build()
@@ -11567,10 +11564,8 @@ impl<Value, Metadata> KVNamespaceGetWithMetadataResult<Value, Metadata> {
 }
 impl<Value, Metadata> KVNamespaceGetWithMetadataResult<Value, Metadata>
 where
-    for<'__wbg> &'__wbg Value:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    for<'__wbg> &'__wbg Metadata:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    Value: ::wasm_bindgen::convert::RefIntoWasmAbi,
+    Metadata: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(
         value: &Value,
@@ -11814,8 +11809,7 @@ extern "C" {
 }
 impl<Body> MessageSendRequest<Body>
 where
-    for<'__wbg> &'__wbg Body:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    Body: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(body: &Body) -> MessageSendRequest<Body> {
         Self::builder(body).build()
@@ -14013,8 +14007,7 @@ extern "C" {
 }
 impl<R> ReadableStreamReadResult<R>
 where
-    for<'__wbg> &'__wbg R:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    R: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     #[doc = " Construct with `done: false`."]
     pub fn new_false(value: &R) -> ReadableStreamReadResult<R> {
@@ -14040,8 +14033,7 @@ pub struct ReadableStreamReadResultBuilder<R> {
 impl<R> ReadableStreamReadResultBuilder<R> {
     pub fn value(self, val: &R) -> Self
     where
-        for<'__wbg> &'__wbg R:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        R: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_value(val);
         self
@@ -17613,8 +17605,7 @@ impl<T> SqlStorageCursorNextReturnBuilder<T> {
     }
     pub fn value(self, val: &T) -> Self
     where
-        for<'__wbg> &'__wbg T:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_value(val);
         self
@@ -42441,8 +42432,7 @@ impl<HostMetadata> IncomingRequestCfPropertiesBuilder<HostMetadata> {
     }
     pub fn host_metadata(self, val: &HostMetadata) -> Self
     where
-        for<'__wbg> &'__wbg HostMetadata:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        HostMetadata: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_host_metadata(val);
         self
@@ -43504,8 +43494,7 @@ pub struct IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMet
 impl<HostMetadata> IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata> {
     pub fn host_metadata(self, val: &HostMetadata) -> Self
     where
-        for<'__wbg> &'__wbg HostMetadata:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        HostMetadata: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_host_metadata(val);
         self
@@ -46645,8 +46634,7 @@ pub mod cloudflare {
         }
         impl<T> WorkflowEvent<T>
         where
-            for<'__wbg> &'__wbg T:
-                ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+            T: ::wasm_bindgen::convert::RefIntoWasmAbi,
         {
             pub fn new(
                 payload: &T,
@@ -46686,8 +46674,7 @@ pub mod cloudflare {
         }
         impl<T> WorkflowStepEvent<T>
         where
-            for<'__wbg> &'__wbg T:
-                ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+            T: ::wasm_bindgen::convert::RefIntoWasmAbi,
         {
             pub fn new(
                 payload: &T,
@@ -48613,10 +48600,8 @@ extern "C" {
 }
 impl<Env, Data> EventContext<Env, Data>
 where
-    for<'__wbg> &'__wbg Env:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    for<'__wbg> &'__wbg Data:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    Env: ::wasm_bindgen::convert::RefIntoWasmAbi,
+    Data: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(
         request: &Request<JsValue, IncomingRequestCfProperties>,
@@ -48741,12 +48726,9 @@ extern "C" {
 }
 impl<Env, Data, PluginArgs> EventPluginContext<Env, Data, PluginArgs>
 where
-    for<'__wbg> &'__wbg Env:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    for<'__wbg> &'__wbg Data:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    for<'__wbg> &'__wbg PluginArgs:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    Env: ::wasm_bindgen::convert::RefIntoWasmAbi,
+    Data: ::wasm_bindgen::convert::RefIntoWasmAbi,
+    PluginArgs: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(
         request: &Request<JsValue, IncomingRequestCfProperties>,
@@ -54292,8 +54274,7 @@ impl<PARAMS> WorkflowInstanceCreateOptionsBuilder<PARAMS> {
     }
     pub fn params(self, val: &PARAMS) -> Self
     where
-        for<'__wbg> &'__wbg PARAMS:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        PARAMS: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_params(val);
         self

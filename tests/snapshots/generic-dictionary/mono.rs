@@ -38,8 +38,7 @@ extern "C" {
 }
 impl<T> EvaluationDetails<T>
 where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    T: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(flag_key: impl ::wasm_bindgen::JsStringLike, value: &T) -> EvaluationDetails<T> {
         Self::builder(flag_key, value).build()

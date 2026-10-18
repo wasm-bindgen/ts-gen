@@ -121,8 +121,7 @@ extern "C" {
 }
 impl<T> Slot<T>
 where
-    for<'__wbg> Option<&'__wbg T>:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    T: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(value: Option<&T>) -> Slot<T> {
         Self::builder(value).build()
@@ -141,8 +140,7 @@ pub struct SlotBuilder<T> {
 impl<T> SlotBuilder<T> {
     pub fn fallback(self, val: &T) -> Self
     where
-        for<'__wbg> &'__wbg T:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_fallback(val);
         self
@@ -206,8 +204,7 @@ impl<T> StepBuilder<T> {
     }
     pub fn value(self, val: &T) -> Self
     where
-        for<'__wbg> &'__wbg T:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_value(val);
         self

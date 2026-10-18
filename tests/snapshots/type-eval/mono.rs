@@ -322,8 +322,7 @@ extern "C" {
 }
 impl<T> Box_<T>
 where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    T: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(value: &T, label: impl ::wasm_bindgen::JsStringLike) -> Box_<T> {
         let inner: Box_<T> = JsCast::unchecked_into(js_sys::Object::new());
@@ -771,8 +770,7 @@ pub struct PartialBoxBuilder<T> {
 impl<T> PartialBoxBuilder<T> {
     pub fn value(self, val: &T) -> Self
     where
-        for<'__wbg> &'__wbg T:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_value(val);
         self

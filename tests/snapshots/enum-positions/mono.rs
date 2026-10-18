@@ -71,8 +71,7 @@ extern "C" {
 }
 impl<T> Details<T>
 where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    T: ::wasm_bindgen::convert::RefIntoWasmAbi,
 {
     pub fn new(value: &T) -> Details<T> {
         Self::builder(value).build()
@@ -89,8 +88,7 @@ pub struct DetailsBuilder<T> {
 impl<T> DetailsBuilder<T> {
     pub fn fallback(self, val: &T) -> Self
     where
-        for<'__wbg> &'__wbg T:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
     {
         self.inner.set_fallback(val);
         self

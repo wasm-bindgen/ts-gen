@@ -625,13 +625,42 @@ fn slice_elem(ty: &Type) -> Option<&Type> {
     }
 }
 
-/// One predicate per typed argument naming a type parameter bare, as
-/// `experimental_generic_mono` bounds the import. Receivers are skipped. A
-/// borrow nested in the type (`Option<&T>`) is bound for every lifetime.
+/// One predicate per typed argument naming a type parameter bare, the
+/// first-order bound the import states for that shape (see
+/// [`super::signatures::state_abi_bounds`]): `T: IntoWasmAbi` for a bare
+/// `T`, `T: RefIntoWasmAbi` for `&T` and `Option<&T>`, `T:
+/// VectorRefIntoWasmAbi` for `&[T]`. Any other shape (`Option<T>`, whose
+/// helper trait excludes types with an ABI of their own such as `f64`) is
+/// bounded as a whole. Receivers are skipped.
 pub(crate) fn mono_arg_bounds<'a>(
     inputs: impl Iterator<Item = &'a FnArg>,
     params: &[Ident],
 ) -> Vec<syn::WherePredicate> {
+    let bare = |ty: &Type| -> Option<Ident> {
+        let Type::Path(p) = ty else { return None };
+        let ident = p.path.get_ident()?;
+        params.contains(ident).then(|| ident.clone())
+    };
+    let option_inner = |ty: &Type| -> Option<Type> {
+        let Type::Path(p) = ty else { return None };
+        let seg = p.path.segments.last()?;
+        if seg.ident != "Option" || p.path.segments.len() != 1 {
+            return None;
+        }
+        match &seg.arguments {
+            PathArguments::AngleBracketed(args) => match args.args.first() {
+                Some(GenericArgument::Type(t)) => Some(t.clone()),
+                _ => None,
+            },
+            _ => None,
+        }
+    };
+    let borrowed = |ty: &Type| -> Option<Ident> {
+        match ty {
+            Type::Reference(r) if r.mutability.is_none() => bare(&r.elem),
+            _ => None,
+        }
+    };
     let mut out: Vec<syn::WherePredicate> = Vec::new();
     for arg in inputs {
         let FnArg::Typed(pat) = arg else { continue };
@@ -639,21 +668,20 @@ pub(crate) fn mono_arg_bounds<'a>(
         if !mentions_bare(ty, params) {
             continue;
         }
-        out.push(match (slice_elem(ty), ty) {
-            (Some(elem), _) => {
-                syn::parse_quote!(#elem: ::wasm_bindgen::convert::VectorRefIntoWasmAbi)
-            }
-            (None, Type::Reference(r)) if r.mutability.is_none() => {
-                let elem = &r.elem;
-                syn::parse_quote!(for<'__wbg> &'__wbg #elem: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
-            }
-            _ => {
-                let mut ty = ty.clone();
-                if name_elided_lifetimes(&mut ty) {
-                    syn::parse_quote!(for<'__wbg> #ty: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
-                } else {
-                    syn::parse_quote!(#ty: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
-                }
+        let elem = slice_elem(ty).and_then(bare);
+        let by_ref = borrowed(ty).or_else(|| option_inner(ty).and_then(|t| borrowed(&t)));
+        out.push(if let Some(elem) = elem {
+            syn::parse_quote!(#elem: ::wasm_bindgen::convert::VectorRefIntoWasmAbi)
+        } else if let Some(param) = by_ref {
+            syn::parse_quote!(#param: ::wasm_bindgen::convert::RefIntoWasmAbi)
+        } else if let Some(param) = bare(ty) {
+            syn::parse_quote!(#param: ::wasm_bindgen::convert::IntoWasmAbi)
+        } else {
+            let mut ty = ty.clone();
+            if name_elided_lifetimes(&mut ty) {
+                syn::parse_quote!(for<'__wbg> #ty: ::wasm_bindgen::convert::IntoWasmAbi)
+            } else {
+                syn::parse_quote!(#ty: ::wasm_bindgen::convert::IntoWasmAbi)
             }
         });
     }
