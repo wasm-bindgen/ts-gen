@@ -472,6 +472,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
             buf.push('?');
             buf.push_str(s);
         }
+        TypeRef::IndexedAccess(..) => buf.push_str("?indexed access type"),
     }
 }
 
@@ -1957,6 +1958,12 @@ pub fn to_syn_type(
         TypeRef::Unresolved(desc) => {
             if let Some(cgctx) = ctx {
                 cgctx.warn(format!("unresolved type `{desc}`, falling back to JsValue"));
+            }
+            maybe_ref(quote! { JsValue }, borrow)
+        }
+        TypeRef::IndexedAccess(..) => {
+            if let Some(cgctx) = ctx {
+                cgctx.warn("unresolved type `indexed access type`, falling back to JsValue");
             }
             maybe_ref(quote! { JsValue }, borrow)
         }

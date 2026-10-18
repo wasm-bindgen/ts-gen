@@ -9,6 +9,7 @@ pub mod enums;
 pub mod error_enum;
 pub mod functions;
 pub(crate) mod inline_wrappers;
+mod keyof;
 pub(crate) mod primitive_unions;
 pub mod provides;
 pub mod signatures;
@@ -578,7 +579,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
         T::Union(_) | T::PropertyKey => "JsValue".to_string(),
         T::Intersection(_) => "JsValue".to_string(),
         T::Function(_) => "Function".to_string(),
-        T::Unresolved(_) => "JsValue".to_string(),
+        T::Unresolved(_) | T::IndexedAccess(..) => "JsValue".to_string(),
     }
 }
 

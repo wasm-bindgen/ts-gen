@@ -186,6 +186,10 @@ pub enum TypeRef {
     /// For TS constructs we can't represent (conditional types, mapped types,
     /// template literals, `keyof`, etc.) — erased to `JsValue`.
     Unresolved(String),
+    /// `M[K]` over two type references (`EventMap[Type]`). Erased to
+    /// `JsValue` like [`TypeRef::Unresolved`] until a per-mono key
+    /// expansion substitutes `K` with a literal key of a concrete `M`.
+    IndexedAccess(Box<TypeRef>, Box<TypeRef>),
 }
 
 /// Whether a typed-array parameter accepts a view of shared memory. TS 5.7+
@@ -467,6 +471,9 @@ impl TypeRef {
             TypeRef::Union(ts) => TypeRef::Union(ts.iter().map(sub).collect()),
             TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
             TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
+            TypeRef::IndexedAccess(o, i) => {
+                TypeRef::IndexedAccess(Box::new(sub(o)), Box::new(sub(i)))
+            }
             TypeRef::Function(sig) => TypeRef::Function(FunctionSig {
                 params: sig
                     .params
@@ -588,6 +595,7 @@ impl TypeRef {
                 }
             }
             TypeRef::Unresolved(s) => s.clone(),
+            TypeRef::IndexedAccess(..) => "indexed access type".into(),
         }
     }
 }

@@ -150,9 +150,29 @@ pub(crate) fn convert_ts_type_with_arena(
             TypeRef::Unresolved("mapped type".to_string())
         }
         TSType::TSTemplateLiteralType(_) => TypeRef::String,
-        TSType::TSIndexedAccessType(_) => {
+        TSType::TSIndexedAccessType(access) => {
             diag.warn("Indexed access types are not supported, erasing to JsValue");
-            TypeRef::Unresolved("indexed access type".to_string())
+            // The index names the erased `K extends keyof M` itself, not the
+            // `string` it reads as.
+            match (&access.object_type, &access.index_type) {
+                (TSType::TSTypeReference(_), TSType::TSTypeReference(index)) => {
+                    match &index.type_name {
+                        TSTypeName::IdentifierReference(key) if index.type_arguments.is_none() => {
+                            TypeRef::IndexedAccess(
+                                Box::new(convert_ts_type_with_arena(
+                                    &access.object_type,
+                                    scope,
+                                    scopes,
+                                    diag,
+                                )),
+                                Box::new(TypeRef::ident(key.name.to_string())),
+                            )
+                        }
+                        _ => TypeRef::Unresolved("indexed access type".to_string()),
+                    }
+                }
+                _ => TypeRef::Unresolved("indexed access type".to_string()),
+            }
         }
         TSType::TSInferType(_) => {
             diag.warn("Infer types are not supported, erasing to JsValue");

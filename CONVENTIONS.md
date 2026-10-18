@@ -2520,6 +2520,31 @@ Under per-monomorphization, a [`_js_string` variant](#in-scope-generic-type-para
 sees the same arguments, so a string in an erased position is not a leaf:
 `list` above has no `list_js_string`, which would be `list` again.
 
+### Keyed expansion of `M[K]`
+
+`EventTarget<EventMap>`'s `addEventListener<Type extends keyof
+EventMap>(type: Type, handler: EventListenerOrEventListenerObject<EventMap[Type]>)`
+types the handler by the event name. `Type` erases to `string`, so the
+generic binding's handler is `Function<fn(JsValue)>`. Under
+`--experimental-generic-mono`, where `M` is a declared interface (reached
+through `WebSocket extends EventTarget<WebSocketEventMap>`, or named by the
+callable itself), the callable also gets one binding per property of `M`:
+the `string` parameter is that key's literal, baked in by an inline
+wrapper, and `M[K]` is the property's type:
+
+```rust
+pub fn add_event_listener_message(&self, handler: &Function<fn(MessageEvent)>) -> Result<(), Error>;
+pub fn add_event_listener_close_with_event_listener_object(&self, handler: &EventListenerObject<CloseEvent>) -> Result<(), Error>;
+```
+
+* A subclass declares the per-key bindings of its first parent's methods
+  itself; the generic ones stay on the parent through `Deref`.
+* Trailing optional parameters that do not mention the key
+  (`options?: AddEventListenerOptions | boolean`) are left to the generic
+  binding.
+* The key is the callable's one `string` parameter; with none or several
+  there is no expansion.
+
 ### Primitive union arguments
 
 In per-monomorphization mode, primitive union arguments use `js_sys`'s
@@ -2974,6 +2999,13 @@ impl CompressionStream {
   FromWasmAbi + 'static` for an awaited `T | null`), so a generic wrapper
   states the same `where` predicates.
 * Setters are exempt: `set_disposition("inline")` takes the value.
+* Under per-monomorphization a single literal arm keys its binding the
+  same way when another expansion takes something else at its position,
+  so overloads told apart by a literal whose other parameters differ
+  (`on(type: "alpha", handler: (e: A) => void)` beside `"beta"` with `B`)
+  are `on_alpha(&Function<fn(A)>)` and `on_beta(&Function<fn(B)>)`,
+  suffixed among the expansions with the same literal
+  (`on_beta_with_options`).
 * Under per-monomorphization, overloads that differ only in a string
   literal *type argument* of a parameter (`options?: GetOptions<"json">`,
   `GetOptions<"text">`) form a cohort too. The literal travels inside

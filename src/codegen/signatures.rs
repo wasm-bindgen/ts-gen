@@ -236,6 +236,9 @@ pub struct ExpandedSignature {
     /// Positions of [`Determined::Required`] dictionaries, which the
     /// binding builds itself; see [`FunctionSignature::determined`].
     pub determined: Vec<usize>,
+    /// The one literal arm keys the binding (`<base>_<literal>`), as two
+    /// arms would, because another expansion differs at its position.
+    pub discriminant: bool,
 }
 
 /// Per-mono, a dictionary whose every property is a literal type
@@ -507,7 +510,8 @@ pub fn collect_type_params(
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)
-        | TypeRef::Unresolved(_) => {}
+        | TypeRef::Unresolved(_)
+        | TypeRef::IndexedAccess(..) => {}
     }
 }
 
@@ -638,10 +642,32 @@ pub fn expand_signatures(
             },
         )
         .collect();
+    // Per-mono, a lone literal arm keys its binding too when another
+    // expansion takes something else at the literal's position: the
+    // literal discriminates overloads whose other parameters differ
+    // (`on(type: "close", h: (e: CloseEvent) => void)` beside `"message"`).
+    let discriminant: Vec<bool> = arms
+        .iter()
+        .enumerate()
+        .map(|(k, a)| match a.as_slice() {
+            [arm] if type_arg_arms && literal_cohorts && !arm.in_type_arg => {
+                arm.values.iter().any(|(p, _)| {
+                    deduped.iter().enumerate().any(|(j, other)| {
+                        j != k
+                            && other
+                                .get(*p)
+                                .is_some_and(|o| o.type_ref != deduped[k][*p].type_ref)
+                    })
+                })
+            }
+            _ => false,
+        })
+        .collect();
     let keyed: Vec<bool> = arms
         .iter()
         .zip(&determined)
-        .map(|(a, d)| a.len() > 1 || !d.is_empty())
+        .zip(&discriminant)
+        .map(|((a, d), s)| a.len() > 1 || !d.is_empty() || *s)
         .collect();
     let scope = overloads.first().map(|o| o.body_scope);
     let is_dictionary = |ty: &TypeRef| match (cgctx, scope) {
@@ -664,14 +690,44 @@ pub fn expand_signatures(
         .map(|(sig, _)| sig.clone())
         .collect();
     let mut plain_suffixes = compute_suffixes(&plain, rules).into_iter();
+    // A discriminant arm is suffixed among the expansions with its literals.
+    let strip = |sig: &[ConcreteParam], positions: &[usize]| -> Vec<ConcreteParam> {
+        sig.iter()
+            .enumerate()
+            .filter(|(i, _)| !positions.contains(i))
+            .map(|(_, p)| p.clone())
+            .collect()
+    };
+    let mut discriminant_suffixes: Vec<Option<String>> = vec![None; deduped.len()];
+    for k in 0..deduped.len() {
+        if !discriminant[k] || discriminant_suffixes[k].is_some() {
+            continue;
+        }
+        let values = &arms[k][0].values;
+        let positions: Vec<usize> = values.iter().map(|(i, _)| *i).collect();
+        let group: Vec<usize> = (k..deduped.len())
+            .filter(|&j| discriminant[j] && arms[j][0].values == *values)
+            .collect();
+        let stripped: Vec<Vec<ConcreteParam>> = group
+            .iter()
+            .map(|&j| strip(&deduped[j], &positions))
+            .collect();
+        for (j, suffix) in group.into_iter().zip(compute_suffixes(&stripped, rules)) {
+            discriminant_suffixes[j] = Some(suffix);
+        }
+    }
     let suffixes: Vec<String> = deduped
         .iter()
         .zip(&keyed)
         .zip(&arms)
         .zip(&determined)
-        .map(|(((sig, keyed), arms), determined)| {
+        .enumerate()
+        .map(|(k, (((sig, keyed), arms), determined))| {
             if !*keyed {
                 return plain_suffixes.next().unwrap_or_default();
+            }
+            if let Some(suffix) = &discriminant_suffixes[k] {
+                return suffix.clone();
             }
             // A determined dictionary is named by its literals, among
             // the plain expansions as if it were not there:
@@ -719,13 +775,17 @@ pub fn expand_signatures(
         .zip(origins)
         .zip(arms)
         .zip(determined)
+        .zip(discriminant)
         .map(
-            |((((name_suffix, params), overload), literal_arms), determined)| ExpandedSignature {
-                overload,
-                name_suffix,
-                params,
-                literal_arms,
-                determined: determined.into_iter().map(|(i, _)| i).collect(),
+            |(((((name_suffix, params), overload), literal_arms), determined), discriminant)| {
+                ExpandedSignature {
+                    overload,
+                    name_suffix,
+                    params,
+                    literal_arms,
+                    determined: determined.into_iter().map(|(i, _)| i).collect(),
+                    discriminant,
+                }
             },
         )
         .collect()
@@ -1085,7 +1145,7 @@ pub fn build_signatures_with_postfix(
             }
             continue;
         }
-        if exp.literal_arms.len() < 2 {
+        if exp.literal_arms.len() < 2 && !exp.discriminant {
             let primary_candidate =
                 public_rust_name(&format!("{base}{}{postfix}", exp.name_suffix));
             units.push(Unit {
