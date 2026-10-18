@@ -2,7 +2,10 @@
 // A constructor binds the class parameters its arguments mention and
 // defaults the rest, so `new()` needs no annotation; a `_typed` twin binds
 // every class parameter. A construct signature returning concrete arguments
-// returns them as written.
+// returns them as written. A bare `any`-defaulted class argument takes any
+// instantiation, and a `_typed` twin ties it to the class's own parameter.
+// A parent's concrete type arguments carry into `extends`; arguments naming
+// the child's own parameters are dropped.
 
 interface UnderlyingSource<R = any> {
   start?: (controller: any) => void;
@@ -27,4 +30,11 @@ declare class Transform<I = any, O = any> {
 declare class Reader<R = any> {
   constructor(stream: Stream);
   read(): Promise<R>;
+}
+
+declare class Identity extends Transform<ArrayBuffer | ArrayBufferView, Uint8Array> {
+  constructor();
+}
+declare class Passthrough<T = any> extends Transform<T, T> {
+  constructor();
 }

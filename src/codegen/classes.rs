@@ -2571,6 +2571,27 @@ fn typed_constructor(
         return quote! {};
     }
     let typed_ident = super::typemap::make_ident(&format!("{}_typed", sig.rust_name));
+    let mut bounds: Vec<TokenStream> = config
+        .type_params
+        .iter()
+        .map(|tp| CodegenContext::type_param_decl(config.cgctx, &tp.name))
+        .collect();
+    let tied = tie_bare_params(config, &sig.params, sig.body_scope);
+    let tied_params;
+    let params = match &tied {
+        Some(tied) => {
+            tied_params = generate_callable_params(
+                tied,
+                &[],
+                config.cgctx,
+                sig.body_scope,
+                &config.from_module(),
+                &mut bounds,
+            );
+            &tied_params
+        }
+        None => params,
+    };
     let typed_return = TypeRef::generic(
         config.rust_name.clone(),
         config
@@ -2601,11 +2622,6 @@ fn typed_constructor(
         .collect();
     let js_name = &config.js_name;
     wb_parts.push(quote! { js_name = #js_name });
-    let bounds: Vec<TokenStream> = config
-        .type_params
-        .iter()
-        .map(|tp| CodegenContext::type_param_decl(config.cgctx, &tp.name))
-        .collect();
     let generics = render_generic_bounds(&bounds);
     let doc = super::doc_tokens(&sig.doc);
     quote! {
@@ -2613,6 +2629,60 @@ fn typed_constructor(
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #typed_ident #generics (#params) -> #ret;
     }
+}
+
+/// A `_typed` constructor's arguments with each bare reference to a class
+/// at its `any` defaults (see `CodegenContext::any_defaulted_params`) bound
+/// to the constructed class's parameters of the same names:
+/// `ReadableStreamDefaultReader<R>(stream: ReadableStream)` takes
+/// `&ReadableStream<R>`. `None` when no argument changes.
+fn tie_bare_params(
+    config: &ClassConfig,
+    params: &[ConcreteParam],
+    scope: ScopeId,
+) -> Option<Vec<ConcreteParam>> {
+    fn tie(
+        ty: &TypeRef,
+        config: &ClassConfig,
+        cgctx: &CodegenContext<'_>,
+        scope: ScopeId,
+    ) -> Option<TypeRef> {
+        match ty {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } if segments.len() == 1 && generic_args.is_empty() => {
+                let names = cgctx.any_defaulted_params(&segments[0], scope)?;
+                let own = |n: &String| config.type_params.iter().any(|tp| tp.name == *n);
+                names.iter().all(own).then(|| {
+                    TypeRef::generic(
+                        segments[0].clone(),
+                        names.into_iter().map(TypeRef::ident).collect(),
+                    )
+                })
+            }
+            _ => {
+                let (core, n) = ty.split_empties()?;
+                Some(tie(&core, config, cgctx, scope)?.with_empties(n))
+            }
+        }
+    }
+    let cgctx = config.cgctx?;
+    let mut changed = false;
+    let tied = params
+        .iter()
+        .map(|p| match tie(&p.type_ref, config, cgctx, scope) {
+            Some(type_ref) => {
+                changed = true;
+                ConcreteParam {
+                    type_ref,
+                    ..p.clone()
+                }
+            }
+            None => p.clone(),
+        })
+        .collect();
+    changed.then_some(tied)
 }
 
 /// Generate an instance method binding from an expanded signature.
@@ -3346,7 +3416,11 @@ fn extends_list(
         scope,
     } in parents
     {
-        let TypeRef::Reference { segments, .. } = parent else {
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = parent
+        else {
             if let Some(ctx) = cgctx {
                 ctx.warn(format!(
                     "unsupported extends type `{}`, ignored",
@@ -3355,12 +3429,29 @@ fn extends_list(
             }
             continue;
         };
-        // The attribute takes a bare path, so a generic parent is named
-        // without its arguments.
+        // Per-mono the attribute takes the parent's concrete instantiation
+        // (`extends = TransformStream<JsValue, Uint8Array>`), so the deref
+        // reaches its typed members. Otherwise, or when an argument names
+        // the child's own parameters (which the attribute cannot bind), a
+        // generic parent is named without its arguments.
+        let concrete = cgctx
+            .filter(|c| c.experimental_generic_mono)
+            .is_some_and(|c| {
+                let mut named = Vec::new();
+                for a in generic_args {
+                    super::signatures::collect_type_params(a, c, *scope, &mut named);
+                }
+                named.is_empty()
+            });
+        let generic_args = if concrete {
+            generic_args.clone()
+        } else {
+            Vec::new()
+        };
         let tokens = super::typemap::to_syn_type(
             &TypeRef::Reference {
                 segments: segments.clone(),
-                generic_args: Vec::new(),
+                generic_args,
             },
             TypePosition::ARGUMENT.to_inner(),
             cgctx,

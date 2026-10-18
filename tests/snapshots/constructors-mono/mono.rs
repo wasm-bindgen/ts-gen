@@ -120,3 +120,21 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "read")]
     pub fn read_promise<R>(this: &Reader<R>) -> Promise<R>;
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Transform < JsValue , Uint8Array > , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Identity;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Identity, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Transform , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Passthrough<T = JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Passthrough, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Passthrough")]
+    pub fn new_typed<T>() -> Result<Passthrough<T>, JsValue>;
+}

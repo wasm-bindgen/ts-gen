@@ -71,7 +71,7 @@ impl<Env> From<Handler<Env>> for HandlerBuilder<Env> {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn serve(h: &Handler) -> Result<(), JsValue>;
+    pub fn serve(h: &Handler<impl Sized>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

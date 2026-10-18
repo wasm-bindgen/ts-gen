@@ -2735,6 +2735,19 @@ pub fn new_with_underlying_source<R>(source: &UnderlyingSource<R>) -> Result<Rea
 `let t: TransformStream<Uint8Array, Uint8Array> = TransformStream::new_typed()?`
 (or `TransformStream::<Uint8Array, Uint8Array>::new_typed()?`) is the typed form.
 
+A top-level argument naming a generic class bare, where every one of the
+class's parameters defaults to `any` / `unknown`, means no particular
+instantiation, so it takes any (`&ReadableStream<impl Sized>`): a
+`ReadableStream<Uint8Array>` passes without an upcast. In a `_typed`
+constructor such an argument is tied to the constructed class's
+parameters of the same names, so the typed form infers from it:
+
+```rust
+pub fn new(stream: &ReadableStream<impl Sized>) -> Result<ReadableStreamDefaultReader, JsValue>;
+pub fn new_typed<R>(stream: &ReadableStream<R>) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
+pub fn put_with_readable_stream(this: &KVNamespace, key: impl JsStringLike, value: &ReadableStream<impl Sized>) -> …;
+```
+
 Direct string arguments use argument-position `impl JsStringLike`, allowing
 `&str`, `String`, `&JsString`, and `JsString` without caller-side conversion.
 Each occurrence is an independent anonymous type parameter, so different
@@ -3009,6 +3022,13 @@ parameters thread through every site that mentions `Foo`:
   ```
 * `extends Foo<X>` lowers to `extends = Foo` — the attribute cannot
   carry generic arguments, and the defaults make the bare head valid.
+  Under `--experimental-generic-mono` the attribute takes concrete
+  arguments, so `IdentityTransformStream extends
+  TransformStream<ArrayBuffer | ArrayBufferView, Uint8Array>` is
+  `extends = TransformStream<JsValue, Uint8Array>` and its deref'd
+  `readable()` is `ReadableStream<Uint8Array>`. Arguments naming the
+  child's own parameters (`Passthrough<T> extends Transform<T, T>`)
+  are still dropped.
 * A generic type derives `PartialEq, Eq` like any other imported type.
   wasm-bindgen emits both as handle identity with no bound on the type
   parameters (wasm-bindgen#5383), so `Foo<JsValue>`, a subclass of

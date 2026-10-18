@@ -48,7 +48,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = EventTarget , extends = Object)]
+    # [wasm_bindgen (extends = EventTarget < Object > , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PingTarget;
 }

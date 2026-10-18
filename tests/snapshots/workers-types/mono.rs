@@ -123,7 +123,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn queue(this: &WorkerGlobalScopeEventMap) -> QueueEvent;
     #[wasm_bindgen(method, setter)]
-    pub fn set_queue(this: &WorkerGlobalScopeEventMap, val: &QueueEvent);
+    pub fn set_queue(this: &WorkerGlobalScopeEventMap, val: &QueueEvent<impl Sized>);
     #[wasm_bindgen(method, getter)]
     pub fn unhandledrejection(this: &WorkerGlobalScopeEventMap) -> PromiseRejectionEvent;
     #[wasm_bindgen(method, setter)]
@@ -137,7 +137,7 @@ impl WorkerGlobalScopeEventMap {
     pub fn new(
         fetch: &FetchEvent,
         scheduled: &ScheduledEvent,
-        queue: &QueueEvent,
+        queue: &QueueEvent<impl Sized>,
         unhandledrejection: &PromiseRejectionEvent,
         rejectionhandled: &PromiseRejectionEvent,
     ) -> WorkerGlobalScopeEventMap {
@@ -152,7 +152,7 @@ impl WorkerGlobalScopeEventMap {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = EventTarget , extends = Object)]
+    # [wasm_bindgen (extends = EventTarget < WorkerGlobalScopeEventMap > , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerGlobalScope;
     #[wasm_bindgen(method, getter, js_name = "EventTarget")]
@@ -14208,21 +14208,21 @@ extern "C" {
     pub fn new_typed<W>() -> Result<WritableStream<W>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_sink(
-        underlying_sink: &UnderlyingSink,
+        underlying_sink: &UnderlyingSink<impl Sized>,
     ) -> Result<WritableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "WritableStream")]
     pub fn new_with_underlying_sink_typed<W>(
-        underlying_sink: &UnderlyingSink,
+        underlying_sink: &UnderlyingSink<W>,
     ) -> Result<WritableStream<W>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_sink_and_queuing_strategy(
-        underlying_sink: &UnderlyingSink,
-        queuing_strategy: &QueuingStrategy,
+        underlying_sink: &UnderlyingSink<impl Sized>,
+        queuing_strategy: &QueuingStrategy<impl Sized>,
     ) -> Result<WritableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "WritableStream")]
     pub fn new_with_underlying_sink_and_queuing_strategy_typed<W>(
-        underlying_sink: &UnderlyingSink,
-        queuing_strategy: &QueuingStrategy,
+        underlying_sink: &UnderlyingSink<W>,
+        queuing_strategy: &QueuingStrategy<impl Sized>,
     ) -> Result<WritableStream<W>, JsValue>;
     #[doc = " The **`locked`** read-only property of the WritableStream interface returns a boolean indicating whether the `WritableStream` is locked to a writer."]
     #[doc = ""]
@@ -14425,7 +14425,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = TransformStream , extends = Object)]
+    # [wasm_bindgen (extends = TransformStream < JsValue , Uint8Array > , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IdentityTransformStream;
     #[wasm_bindgen(constructor, catch)]
@@ -14534,7 +14534,7 @@ impl From<ReadableStreamValuesOptions> for ReadableStreamValuesOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = TransformStream , extends = Object)]
+    # [wasm_bindgen (extends = TransformStream < JsValue , Uint8Array > , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CompressionStream;
     #[wasm_bindgen(constructor, catch)]
@@ -14553,7 +14553,7 @@ impl CompressionStream {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = TransformStream , extends = Object)]
+    # [wasm_bindgen (extends = TransformStream < JsValue , Uint8Array > , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DecompressionStream;
     #[wasm_bindgen(constructor, catch)]
@@ -14572,7 +14572,7 @@ impl DecompressionStream {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = TransformStream , extends = Object)]
+    # [wasm_bindgen (extends = TransformStream < String , Uint8Array > , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TextEncoderStream;
     #[wasm_bindgen(constructor, catch)]
@@ -14584,7 +14584,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = TransformStream , extends = Object)]
+    # [wasm_bindgen (extends = TransformStream < JsValue , String > , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TextDecoderStream;
     #[wasm_bindgen(constructor, catch)]
@@ -16175,7 +16175,7 @@ impl WebSocketEventMap {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = EventTarget , extends = Object)]
+    # [wasm_bindgen (extends = EventTarget < WebSocketEventMap > , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WebSocket;
     #[wasm_bindgen(constructor, catch)]
@@ -45526,7 +45526,7 @@ pub mod cloudflare {
             #[wasm_bindgen(method, setter)]
             pub fn set_ctx<Env, I, O>(
                 this: &PipelineTransformationEntrypoint<Env, I, O>,
-                val: &super::super::ExecutionContext,
+                val: &super::super::ExecutionContext<impl Sized>,
             );
             #[doc = " run receives an array of PipelineRecord which can be"]
             #[doc = " transformed and returned to the pipeline"]
@@ -46323,7 +46323,7 @@ pub mod cloudflare {
             #[wasm_bindgen(method, setter)]
             pub fn set_ctx<Env, T>(
                 this: &WorkflowEntrypoint<Env, T>,
-                val: &super::super::ExecutionContext,
+                val: &super::super::ExecutionContext<impl Sized>,
             );
             #[wasm_bindgen(method, getter)]
             pub fn env<Env, T>(this: &WorkflowEntrypoint<Env, T>) -> Env

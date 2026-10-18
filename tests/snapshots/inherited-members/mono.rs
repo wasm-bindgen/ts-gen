@@ -253,7 +253,7 @@ impl Tagged {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Tagged , extends = Box_ , extends = Object , is_type_of = JsValue :: is_object)]
+    # [wasm_bindgen (extends = Tagged , extends = Box_ < String > , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Named;
     #[wasm_bindgen(method, getter)]

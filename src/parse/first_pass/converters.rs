@@ -58,9 +58,27 @@ pub fn convert_class_decl(
         .iter()
         .flat_map(|elem| convert_class_element(elem, Some(&name), body_scope, ctx))
         .collect();
-    let extends = extends.map(|type_ref| ir::Heritage {
-        type_ref,
-        scope: body_scope,
+    // Per-mono the parent keeps its type arguments, which codegen carries
+    // into `extends`; they may name the class's own parameters.
+    let parent_args = class
+        .heritage
+        .as_ref()
+        .and_then(|h| h.type_arguments.as_ref())
+        .filter(|_| ctx.options.experimental_generic_mono);
+    let extends = extends.map(|mut type_ref| {
+        if let (Some(args), ir::TypeRef::Reference { generic_args, .. }) =
+            (parent_args, &mut type_ref)
+        {
+            *generic_args = args
+                .params
+                .iter()
+                .map(|t| convert_ts_type_scoped(t, body_scope, ctx))
+                .collect();
+        }
+        ir::Heritage {
+            type_ref,
+            scope: body_scope,
+        }
     });
 
     Some(ir::ClassDecl {

@@ -4,6 +4,8 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
+#[allow(dead_code)]
+use JsValue as Exclude;
 pub mod temporal {
     #[allow(unused_imports)]
     use super::*;
@@ -2223,7 +2225,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds , extends = Object , is_type_of = JsValue :: is_object)]
+        # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds < Exclude > , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainTimeToStringOptions;
     }
@@ -3657,7 +3659,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds , extends = Object , is_type_of = JsValue :: is_object)]
+        # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds < Exclude > , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurationToStringOptions;
     }

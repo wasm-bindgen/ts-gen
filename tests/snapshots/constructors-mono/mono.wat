@@ -58,6 +58,14 @@
   ;; read(): Promise<R>
   (import "./bindings.wasm" "Reader.read" (func $Reader.read (param $this externref) (result externref)))
 
+  ;; Identity
+  ;; constructor()
+  (import "./bindings.wasm" "Identity.new" (func $Identity.new (result externref)))
+
+  ;; Passthrough
+  ;; constructor()
+  (import "./bindings.wasm" "Passthrough.new" (func $Passthrough.new (result externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 
