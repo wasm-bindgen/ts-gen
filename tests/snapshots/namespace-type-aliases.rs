@@ -16,16 +16,104 @@ extern "C" {
 #[wasm_bindgen(module = "namespace-type-aliases")]
 extern "C" {
     #[wasm_bindgen(js_name = "onEvent")]
-    pub fn on_event(listener: &events::Listener<JsString>);
+    pub fn on_event(listener: &Function<fn(JsString) -> Undefined>);
 }
 #[wasm_bindgen(module = "namespace-type-aliases")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "onEvent")]
-    pub fn try_on_event(listener: &events::Listener<JsString>) -> Result<(), JsValue>;
+    pub fn try_on_event(listener: &Function<fn(JsString) -> Undefined>) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "namespace-type-aliases")]
+extern "C" {
+    #[wasm_bindgen(js_name = "outerPair")]
+    pub fn outer_pair(r: &ArrayTuple<(Number, JsString)>);
+}
+#[wasm_bindgen(module = "namespace-type-aliases")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "outerPair")]
+    pub fn try_outer_pair(r: &ArrayTuple<(Number, JsString)>) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "namespace-type-aliases")]
+extern "C" {
+    pub fn loose(x: &str);
+}
+#[wasm_bindgen(module = "namespace-type-aliases")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "loose")]
+    pub fn try_loose(x: &str) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "namespace-type-aliases")]
+extern "C" {
+    #[wasm_bindgen(js_name = "loose")]
+    pub fn loose_with_f64(x: f64);
+}
+#[wasm_bindgen(module = "namespace-type-aliases")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "loose")]
+    pub fn try_loose_with_f64(x: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "namespace-type-aliases")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Holder<T: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn on<T: ::wasm_bindgen::JsGeneric>(
+        this: &Holder<T>,
+        listener: &Function<fn(T) -> Undefined>,
+    );
+    #[wasm_bindgen(method, catch, js_name = "on")]
+    pub fn try_on<T: ::wasm_bindgen::JsGeneric>(
+        this: &Holder<T>,
+        listener: &Function<fn(T) -> Undefined>,
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "namespace-type-aliases")]
+extern "C" {
+    pub fn tagged(t: &ArrayTuple<(Number, events::Shadowed)>);
+}
+#[wasm_bindgen(module = "namespace-type-aliases")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "tagged")]
+    pub fn try_tagged(t: &ArrayTuple<(Number, events::Shadowed)>) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Shadowed;
+    #[wasm_bindgen(method, getter, js_name = "globalSide")]
+    pub fn global_side(this: &Shadowed) -> String;
+    #[wasm_bindgen(method, setter, js_name = "globalSide")]
+    pub fn set_global_side(this: &Shadowed, val: &str);
+}
+impl Shadowed {
+    pub fn new(global_side: &str) -> Shadowed {
+        let inner: Shadowed = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_global_side(global_side);
+        inner
+    }
 }
 pub mod events {
     #[allow(unused_imports)]
     use super::*;
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "Events")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Shadowed;
+        #[wasm_bindgen(method, getter, js_name = "eventsSide")]
+        pub fn events_side(this: &Shadowed) -> f64;
+        #[wasm_bindgen(method, setter, js_name = "eventsSide")]
+        pub fn set_events_side(this: &Shadowed, val: f64);
+    }
+    impl Shadowed {
+        pub fn new(events_side: f64) -> Shadowed {
+            let inner: Shadowed = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_events_side(events_side);
+            inner
+        }
+    }
     #[allow(dead_code)]
     pub type Name = JsString;
     #[allow(dead_code)]
@@ -54,7 +142,9 @@ pub mod events {
     #[allow(dead_code)]
     pub type Pair<A, B> = ArrayTuple<(A, B)>;
     #[allow(dead_code)]
-    pub type Result_<T> = Pair<T, JsString>;
+    pub type Loose = JsValue;
+    #[allow(dead_code)]
+    pub type Result_<T> = ArrayTuple<(T, JsString)>;
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(js_namespace = "Events")]
@@ -68,18 +158,22 @@ pub mod events {
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(js_namespace = "Events")]
-        pub fn pair(p: &Pair<JsString, Number>) -> Result_<Number>;
+        pub fn pair(p: &ArrayTuple<(JsString, Number)>) -> ArrayTuple<(Number, JsString)>;
     }
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "pair", js_namespace = "Events")]
-        pub fn try_pair(p: &Pair<JsString, Number>) -> Result<Result_<Number>, JsValue>;
+        pub fn try_pair(
+            p: &ArrayTuple<(JsString, Number)>,
+        ) -> Result<ArrayTuple<(Number, JsString)>, JsValue>;
     }
     pub mod inner {
         #[allow(unused_imports)]
         use super::*;
         #[allow(dead_code)]
         pub type Id = JsString;
+        #[allow(dead_code)]
+        pub type Tagged<T> = ArrayTuple<(T, super::Shadowed)>;
         #[wasm_bindgen]
         extern "C" {
             # [wasm_bindgen (js_namespace = ["Events" , "Inner"])]

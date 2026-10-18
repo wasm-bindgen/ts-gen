@@ -107,7 +107,9 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Request) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn json<T: ::wasm_bindgen::JsGeneric>(this: &Request) -> Result<T, JsValue>;
+    pub async fn json<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+        this: &Request,
+    ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "json")]
     pub fn json_promise<T: ::wasm_bindgen::JsGeneric>(this: &Request) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
@@ -324,7 +326,9 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Response) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "json")]
-    pub async fn json_2<T: ::wasm_bindgen::JsGeneric>(this: &Response) -> Result<T, JsValue>;
+    pub async fn json_2<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+        this: &Response,
+    ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "json")]
     pub fn json_2_promise<T: ::wasm_bindgen::JsGeneric>(this: &Response) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
@@ -420,7 +424,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ExportedHandler<E: ::wasm_bindgen::JsGeneric>;
+    pub type ExportedHandler<E: ::wasm_bindgen::JsGeneric = Env>;
     #[wasm_bindgen(method, catch)]
     pub async fn fetch<E: ::wasm_bindgen::JsGeneric>(
         this: &ExportedHandler<E>,

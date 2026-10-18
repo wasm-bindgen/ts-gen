@@ -981,7 +981,8 @@ type, or a name that never resolves and is reported) is dropped from
 `extends` rather than replaced, so the first real parent stays the
 `Deref` target; the literal's own members survive either way. A generic first parent is
 spelled bare in `extends`, which wasm-bindgen reads as
-`Parent<JsValue>`, so such a type derives `PartialEq` without `Eq`.
+`Parent<JsValue>`; the type still derives `Eq` (see
+[Type-level generics](#type-level-generics-propagate-to-every-binding-site)).
 
 In parameter position an intersection of named types alone
 (`refine(value: Derived & Base)`) is not hoisted: a fresh subtype would
@@ -1222,6 +1223,14 @@ new (): Widget }`, or an inline `{ new (): T }` parameter type) is the
 type of a constructor *value*, not a constructor of that type. It is
 dropped with a warning rather than emitted as
 `#[wasm_bindgen(constructor)]` on the wrong class.
+
+A construct signature may declare its own parameters —
+`new <T>(initial: T): MyClass<T>` — which bind the class parameter of
+the same name, so the constructor lowers as
+`new<T: JsGeneric>(initial: &T) -> Result<MyClass<T>, JsValue>` (see
+[Type-level generics](#type-level-generics-propagate-to-every-binding-site)
+for the mentioned-only rule). The interface's type parameters and body
+scope carry over to the merged class.
 
 ## Module-scoped constructor variables
 
@@ -1844,12 +1853,51 @@ When the surrounding *type* declares parameters
 parameters thread through every site that mentions `Foo`:
 
 * The `pub type` declaration in the extern block —
-  `pub type Foo<T: ::wasm_bindgen::JsGeneric>;`.
+  `pub type Foo<T: ::wasm_bindgen::JsGeneric = JsValue>;`. Every
+  parameter carries a Rust default: the lowered TS default when one is
+  declared (`EventTarget<EventMap = Record<string, Event>>` →
+  `= Object<Event>`), otherwise `JsValue`. Upstream declarations use
+  type parameters mostly as phantom refinements
+  (`Request<CfHostMetadata, Cf>`, `ReadableStream<R>`), and the
+  defaults keep the bare name usable everywhere the parameter is
+  irrelevant: in `extends = Foo`, in return types of other bindings,
+  and in user code. A default lowers like an inner type argument
+  (`string` → `JsString`, named types by reference, earlier parameters
+  by name); when its target erases to `JsValue` (an unresolved name,
+  an alias of an erased union) the whole default is `JsValue`, type
+  arguments included. Rust accepts defaults only on the type
+  definition, so dictionary builders and helper `impl`s keep the plain
+  form and a builder for a defaulted dictionary is named with explicit
+  arguments (`Options::<Box<JsString>>::builder()`).
 * Every getter / setter / method `fn` — redeclares
   `<T: ::wasm_bindgen::JsGeneric>` on the `fn` and uses
   `this: &Foo<T>`. The redeclaration is mandatory because each
   `extern "C"` `pub fn` is independent — the bound on `pub type`
   doesn't propagate to its sibling functions.
+* Constructors and static methods have no `this`, so they declare
+  only the type-level parameters their own signature mentions. A
+  constructor that mentions some returns `Foo<…>` with the mentioned
+  parameters by name and the rest at their defaults; one that
+  mentions none returns the bare `Foo`, so `Foo::new()` never needs a
+  turbofish:
+  ```rust
+  pub fn new() -> Result<TransformStream, JsValue>;
+  pub fn new_with_transformer<I: JsGeneric, O: JsGeneric>(
+      transformer: &Transformer<I, O>,
+  ) -> Result<TransformStream<I, O>, JsValue>;
+  ```
+* `extends Foo<X>` lowers to `extends = Foo` — the attribute cannot
+  carry generic arguments, and the defaults make the bare head valid.
+* A generic type derives `PartialEq, Eq` like any other imported type.
+  wasm-bindgen emits both as handle identity with no bound on the type
+  parameters (wasm-bindgen#5383), so `Foo<JsValue>`, a subclass of
+  `Foo<{…}>` and a child of `Record<string, unknown>` all compare.
+* An `async fn` whose resolved value is a bare type parameter bounds
+  it `T: JsGeneric + FromWasmAbi` — `JsFuture<T>` converts the
+  settled value through `FromWasmAbi`. Inside a callback type
+  (`Function<fn() -> Promise<T>>`) a promised type parameter erases to
+  `Promise`, since wasm-bindgen's `JsFunction` cannot normalise the
+  nested projection.
 * For dictionaries: the factory `impl<T: ::wasm_bindgen::JsGeneric>
   Foo<T>` block, the wrapper struct
   `pub struct FooBuilder<T: ::wasm_bindgen::JsGeneric>`, and the
@@ -2823,8 +2871,8 @@ namespace exported under its own name as well keeps it.
 * `type Foo = Bar;` → `pub type Foo = Bar;` if `Bar` is a recognised
   type, or chases the alias chain to its terminal during codegen. An
   alias inside a namespace is emitted in the namespace's `pub mod`.
-  A plain reference to an alias lowers to its target, so only a generic
-  instantiation names the alias, qualified like any namespace member:
+  A reference to an alias, qualified or not, lowers to its target, a
+  generic instantiation with its arguments substituted (below):
 
   ```ts
   declare namespace Events {
@@ -2839,46 +2887,50 @@ namespace exported under its own name as well keeps it.
       pub type Name = JsString;
       pub type Listener<E> = Function<fn(E) -> Undefined>;
   }
-  pub fn on_event(name: &str, listener: &events::Listener<JsString>);
+  pub fn on_event(name: &str, listener: &Function<fn(JsString) -> Undefined>);
   ```
+* A generic alias instantiation `Foo<A, B>` chases to the target with
+  the parameters substituted, so `type Info<M> = Request<M> | string`
+  used as `send(input: Info<Meta>)` fans out exactly like the written
+  union. A bare `Info` substitutes the parameter defaults (`any` when
+  none is declared), in order, so a default can name an earlier
+  parameter. A qualified instantiation (`Events.Result<number>` for
+  `type Result<T> = Pair<T, string>` in `Events`) lowers where it is
+  written, so the arguments keep their meaning. Each name in the target,
+  or in a default standing in for an omitted argument, that would bind
+  differently there is qualified through the path's namespaces:
+  `Events.Pair`, or `Events.X` for an `X` that an alias in
+  `Events.Inner` takes from `Events` while a global `X` exists. Each
+  namespace's export map is read forward, so a name exported under
+  several public names is reached by any of them, its own first. A
+  target naming something no such path reaches is not chased; the
+  reference then names the alias.
 
-  A Rust alias can't declare a type parameter its target doesn't use
-  (E0091), so a parameter the lowered target doesn't mention is dropped
-  from the alias and from every instantiation. This covers a target that
-  never names it as well as one lowering erases:
+  The alias itself is still emitted. A Rust alias can't declare a type
+  parameter its target doesn't use (E0091), so a parameter the lowered
+  target doesn't mention is dropped from the alias. This covers a target
+  that never names it as well as one lowering erases; the trailing kept
+  parameters keep their lowered defaults, unless one names a dropped
+  parameter:
 
   ```ts
   type Branded<T, B> = T & { __brand: B };
   type Erased<T> = T extends string ? Local : never;
   type Skip<A, B, C> = Pair<A, C>;
+  type WithDefault<T, U = string> = Pair<T, U>;
+  type Chained<T, U = T> = Pair<U, U>;
   declare function skip(value: Skip<string, number, boolean>): Erased<string>;
+  declare function defaults(a: WithDefault<number>, b: Chained<number>): void;
   ```
 
   ```rust
   pub type Branded<T> = T;
   pub type Erased = JsValue;
   pub type Skip<A, C> = Pair<A, C>;
-  pub fn skip(value: &Skip<JsString, Boolean>) -> Erased;
-  ```
-
-  The trailing kept parameters keep their lowered defaults, unless one
-  names a dropped parameter. An instantiation leaves an omitted argument to
-  that default, which resolves where the alias is declared; the use site
-  fills in the others with TS's defaults (`U = T` with `T` dropped). An
-  alias named bare is its target with the defaults substituted:
-
-  ```ts
-  type WithDefault<T, U = string> = Pair<T, U>;
-  type Chained<T, U = T> = Pair<U, U>;
-  type Fetcher<T = undefined, Reserved = never> = Pair<T, T>;
-  declare function defaults(a: WithDefault<number>, b: Chained<number>, c: Fetcher): void;
-  ```
-
-  ```rust
   pub type WithDefault<T, U = JsString> = Pair<T, U>;
   pub type Chained<U> = Pair<U, U>;
-  pub type Fetcher<T = Undefined> = Pair<T, T>;
-  pub fn defaults(a: &WithDefault<Number>, b: &Chained<Number>, c: &Pair<Undefined, Undefined>);
+  pub fn skip(value: &Pair<JsString, Boolean>) -> JsValue;
+  pub fn defaults(a: &Pair<Number, JsString>, b: &Pair<Number, Number>);
   ```
 * `export { Local as Public };` (sourceless) → exports what the binding
   `Local` declares in the exporting block under the public name, as an

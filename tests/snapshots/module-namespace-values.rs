@@ -53,7 +53,7 @@ pub mod inspect {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "inspect")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type Formatter<T: ::wasm_bindgen::JsGeneric>;
+        pub type Formatter<T: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method)]
         pub fn format<T: ::wasm_bindgen::JsGeneric>(this: &Formatter<T>, value: &T) -> String;
         #[wasm_bindgen(method, catch, js_name = "format")]

@@ -10,7 +10,8 @@ use wasm_bindgen::JsValue;
 
 // This fixture has no backing JavaScript module, so it provides compile-only
 // coverage that aliases drop the type parameters their targets don't use,
-// at the declaration and at every instantiation.
+// and that the chased signatures match the aliases spelled with the
+// parameters they keep.
 #[allow(dead_code)]
 fn alias_unused_params_compile(holder: &Holder<JsString>, local: Local) {
     let _: fn(&Branded<Local>) = brand;

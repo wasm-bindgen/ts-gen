@@ -334,6 +334,44 @@ impl TypeRef {
         args.first()
     }
 
+    /// `self` with each bare single-segment reference to a name in `map`
+    /// (type parameter names) replaced by its substitute, recursively.
+    pub fn substitute<K>(&self, map: &HashMap<K, TypeRef>) -> TypeRef
+    where
+        K: std::borrow::Borrow<str> + Eq + std::hash::Hash,
+    {
+        let sub = |t: &TypeRef| t.substitute(map);
+        match self {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => match (segments.as_slice(), map.get(segments[0].as_str())) {
+                ([_], Some(arg)) if generic_args.is_empty() => arg.clone(),
+                _ => TypeRef::Reference {
+                    segments: segments.clone(),
+                    generic_args: generic_args.iter().map(sub).collect(),
+                },
+            },
+            TypeRef::Array(t) => TypeRef::Array(Box::new(sub(t))),
+            TypeRef::Nullable(t, n) => TypeRef::Nullable(Box::new(sub(t)), *n),
+            TypeRef::Union(ts) => TypeRef::Union(ts.iter().map(sub).collect()),
+            TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
+            TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
+            TypeRef::Function(sig) => TypeRef::Function(FunctionSig {
+                params: sig
+                    .params
+                    .iter()
+                    .map(|p| Param {
+                        type_ref: sub(&p.type_ref),
+                        ..p.clone()
+                    })
+                    .collect(),
+                return_type: Box::new(sub(&sig.return_type)),
+            }),
+            other => other.clone(),
+        }
+    }
+
     /// Members of the `string | number | symbol` union that
     /// [`TypeRef::PropertyKey`] abbreviates, in `lib.es5.d.ts` order.
     pub fn property_key_members() -> Vec<TypeRef> {
@@ -981,8 +1019,12 @@ pub struct MethodMember {
 pub struct ConstructorMember {
     /// The scope its types resolve in: the body scope of the declaration it
     /// is written in, which a merged declaration's other members needn't
-    /// share.
+    /// share, or a construct signature's own scope holding `type_params`.
     pub scope: crate::parse::scope::ScopeId,
+    /// Own type parameters of a construct signature (`new <T>(…)`),
+    /// as in the `declare var Foo: { new <T>(…): Foo<T> }` pattern.
+    /// Class `constructor(…)` members have none.
+    pub type_params: Vec<TypeParam>,
     pub params: Vec<Param>,
     pub doc: Option<String>,
     /// Failure-mode info from `@throws` — see [`Throws`].

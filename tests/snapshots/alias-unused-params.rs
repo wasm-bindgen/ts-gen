@@ -25,7 +25,7 @@ impl Local {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Pair<A: ::wasm_bindgen::JsGeneric, B: ::wasm_bindgen::JsGeneric>;
+    pub type Pair<A: ::wasm_bindgen::JsGeneric = JsValue, B: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn a<A: ::wasm_bindgen::JsGeneric, B: ::wasm_bindgen::JsGeneric>(this: &Pair<A, B>) -> A;
     #[wasm_bindgen(method, setter)]
@@ -59,30 +59,30 @@ pub type Partly = Local;
 pub type Skip<A, C> = Pair<A, C>;
 #[wasm_bindgen]
 extern "C" {
-    pub fn brand(value: &Branded<Local>);
+    pub fn brand(value: &Local);
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "brand")]
-    pub fn try_brand(value: &Branded<Local>) -> Result<(), JsValue>;
+    pub fn try_brand(value: &Local) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
-    pub fn erase(value: &Erased) -> Partly;
+    pub fn erase(value: &JsValue) -> Local;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "erase")]
-    pub fn try_erase(value: &Erased) -> Result<Partly, JsValue>;
+    pub fn try_erase(value: &JsValue) -> Result<Local, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
-    pub fn skip(value: &Skip<JsString, Boolean>);
+    pub fn skip(value: &Pair<JsString, Boolean>);
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "skip")]
-    pub fn try_skip(value: &Skip<JsString, Boolean>) -> Result<(), JsValue>;
+    pub fn try_skip(value: &Pair<JsString, Boolean>) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type WithDefault<T, U = JsString> = Pair<T, U>;
@@ -137,11 +137,11 @@ pub mod ns {
 #[wasm_bindgen]
 extern "C" {
     pub fn defaults(
-        a: &WithDefault<Number>,
-        b: &Chained<Number>,
+        a: &Pair<Number, JsString>,
+        b: &Pair<Number, Number>,
         c: &Pair<Undefined, Undefined>,
-        d: &Fetcher<JsString>,
-        e: &ns::WithInner<JsString>,
+        d: &Pair<JsString, JsString>,
+        e: &Pair<JsString, ns::Inner>,
         f: &Pair<Undefined, Undefined>,
     );
 }
@@ -149,33 +149,33 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "defaults")]
     pub fn try_defaults(
-        a: &WithDefault<Number>,
-        b: &Chained<Number>,
+        a: &Pair<Number, JsString>,
+        b: &Pair<Number, Number>,
         c: &Pair<Undefined, Undefined>,
-        d: &Fetcher<JsString>,
-        e: &ns::WithInner<JsString>,
+        d: &Pair<JsString, JsString>,
+        e: &Pair<JsString, ns::Inner>,
         f: &Pair<Undefined, Undefined>,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "defaultReturn")]
-    pub fn default_return() -> WithDefault<Number>;
+    pub fn default_return() -> Pair<Number, JsString>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "defaultReturn")]
-    pub fn try_default_return() -> Result<WithDefault<Number>, JsValue>;
+    pub fn try_default_return() -> Result<Pair<Number, JsString>, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "skipReturn")]
-    pub fn skip_return() -> Skip<Number, Boolean>;
+    pub fn skip_return() -> Pair<Number, Boolean>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "skipReturn")]
-    pub fn try_skip_return() -> Result<Skip<Number, Boolean>, JsValue>;
+    pub fn try_skip_return() -> Result<Pair<Number, Boolean>, JsValue>;
 }
 pub mod cf {
     #[allow(unused_imports)]
@@ -213,56 +213,56 @@ pub type Chosen<T = JsString> = T;
 #[wasm_bindgen]
 extern "C" {
     pub fn misc(
-        handler: &Handler,
-        color: ColorAlias,
-        qualified: ns::ColorOf,
+        handler: &Function<fn(cf::Env) -> Undefined>,
+        color: Color,
+        qualified: Color,
         chosen: Color,
-        given: &Pair<Chosen<Number>, JsString>,
+        given: &Pair<Number, JsString>,
     );
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "misc")]
     pub fn try_misc(
-        handler: &Handler,
-        color: ColorAlias,
-        qualified: ns::ColorOf,
+        handler: &Function<fn(cf::Env) -> Undefined>,
+        color: Color,
+        qualified: Color,
         chosen: Color,
-        given: &Pair<Chosen<Number>, JsString>,
+        given: &Pair<Number, JsString>,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "qualifiedReturn")]
-    pub fn qualified_return() -> ns::WithInner<JsString>;
+    pub fn qualified_return() -> Pair<JsString, ns::Inner>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "qualifiedReturn")]
-    pub fn try_qualified_return() -> Result<ns::WithInner<JsString>, JsValue>;
+    pub fn try_qualified_return() -> Result<Pair<JsString, ns::Inner>, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T: ::wasm_bindgen::JsGeneric>;
+    pub type Holder<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method)]
-    pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> Erased;
+    pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> JsValue;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> Result<Erased, JsValue>;
+    pub fn try_get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn take<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>, value: &Skip<T, JsString>);
+    pub fn take<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>, value: &Pair<T, JsString>);
     #[wasm_bindgen(method, catch, js_name = "take")]
     pub fn try_take<T: ::wasm_bindgen::JsGeneric>(
         this: &Holder<T>,
-        value: &Skip<T, JsString>,
+        value: &Pair<T, JsString>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
     pub fn entry<T: ::wasm_bindgen::JsGeneric, U: ::wasm_bindgen::JsGeneric>(
         this: &Holder<T>,
-    ) -> Erased;
+    ) -> JsValue;
     #[wasm_bindgen(method, catch, js_name = "entry")]
     pub fn try_entry<T: ::wasm_bindgen::JsGeneric, U: ::wasm_bindgen::JsGeneric>(
         this: &Holder<T>,
-    ) -> Result<Erased, JsValue>;
+    ) -> Result<JsValue, JsValue>;
 }
