@@ -45,9 +45,37 @@
   (import "./bindings.wasm" "ListOptions.signal" (func $ListOptions.signal (param $this externref) (result externref)))
   ;; set signal(value: Signal | null)
   (import "./bindings.wasm" "ListOptions.set_signal" (func $ListOptions.set_signal (param $this externref) (param $value externref)))
+  ;; body?: string | Signal | null
+  (import "./bindings.wasm" "ListOptions.body" (func $ListOptions.body (param $this externref) (result externref)))
+  ;; set body(value: string | null)
+  (import "./bindings.wasm" "ListOptions.set_body" (func $ListOptions.set_body (param $this externref) (param $value externref)))
+  ;; set body(value: Signal | null)
+  (import "./bindings.wasm" "ListOptions.set_body_with_signal" (func $ListOptions.set_body_with_signal (param $this externref) (param $value externref)))
 
   ;; clearTimeout(id: number | null): void
   (import "./bindings.wasm" "clearTimeout" (func $clearTimeout (param $id externref)))
+
+  ;; ResponseInit
+  ;; {} as ResponseInit
+  (import "./bindings.wasm" "ResponseInit.new" (func $ResponseInit.new (result externref)))
+  ;; status?: number
+  (import "./bindings.wasm" "ResponseInit.status" (func $ResponseInit.status (param $this externref) (result externref)))
+  ;; set status(value: number)
+  (import "./bindings.wasm" "ResponseInit.set_status" (func $ResponseInit.set_status (param $this externref) (param $value f64)))
+
+  ;; Reply
+  ;; constructor()
+  (import "./bindings.wasm" "Reply.new" (func $Reply.new (result externref)))
+  ;; constructor(body: BodyInit | null)
+  (import "./bindings.wasm" "Reply.new_with_body" (func $Reply.new_with_body (param $body externref) (result externref)))
+  ;; constructor(body: BodyInit | null, init: ResponseInit)
+  (import "./bindings.wasm" "Reply.new_with_body_and_init" (func $Reply.new_with_body_and_init (param $body externref) (param $init externref) (result externref)))
+
+  ;; Bucket
+  ;; put(key: string, value: ArrayBuffer | null): Promise<void>
+  (import "./bindings.wasm" "Bucket.put" (func $Bucket.put (param $this externref) (param $key externref) (param $value externref) (result externref)))
+  ;; put(key: string, value: string | null): Promise<void>
+  (import "./bindings.wasm" "Bucket.put_with_str" (func $Bucket.put_with_str (param $this externref) (param $key externref) (param $value externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

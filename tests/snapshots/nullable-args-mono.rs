@@ -65,6 +65,19 @@ extern "C" {
     pub fn signal(this: &ListOptions) -> Option<Signal>;
     #[wasm_bindgen(method, setter)]
     pub fn set_signal(this: &ListOptions, val: Option<&Signal>);
+    #[wasm_bindgen(method, getter)]
+    pub fn body(this: &ListOptions) -> Option<BodyKind>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_body(this: &ListOptions, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "body")]
+    pub fn set_body_with_signal(this: &ListOptions, val: &Signal);
+    #[wasm_bindgen(method, setter, js_name = "body")]
+    fn set_body_with_null_js(this: &ListOptions, val: &JsValue);
+}
+impl ListOptions {
+    pub fn set_body_with_null(&self) {
+        self.set_body_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
 }
 impl ListOptions {
     pub fn new() -> ListOptions {
@@ -92,6 +105,14 @@ impl ListOptionsBuilder {
         self.inner.set_signal(Some(val));
         self
     }
+    pub fn body(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_body(val);
+        self
+    }
+    pub fn body_with_signal(self, val: &Signal) -> Self {
+        self.inner.set_body_with_signal(val);
+        self
+    }
     pub fn build(self) -> ListOptions {
         self.inner
     }
@@ -110,4 +131,140 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "clearTimeout")]
     pub fn try_clear_timeout(id: Option<f64>) -> Result<(), JsValue>;
+}
+#[allow(dead_code)]
+pub type BodyInit = JsValue;
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseInit;
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &ResponseInit) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &ResponseInit, val: f64);
+}
+impl ResponseInit {
+    pub fn new() -> ResponseInit {
+        Self::builder().build()
+    }
+    pub fn builder() -> ResponseInitBuilder {
+        ResponseInitBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct ResponseInitBuilder {
+    inner: ResponseInit,
+}
+impl ResponseInitBuilder {
+    pub fn status(self, val: f64) -> Self {
+        self.inner.set_status(val);
+        self
+    }
+    pub fn build(self) -> ResponseInit {
+        self.inner
+    }
+}
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Reply;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Reply, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Reply")]
+    pub fn new_with_str(body: impl ::wasm_bindgen::JsStringLike) -> Result<Reply, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Reply")]
+    pub fn new_with_array_buffer(body: &ArrayBuffer) -> Result<Reply, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Reply")]
+    pub fn new_with_signal(body: &Signal) -> Result<Reply, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Reply")]
+    fn new_with_null_js(body: &JsValue) -> Result<Reply, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Reply")]
+    pub fn new_with_str_and_init(
+        body: impl ::wasm_bindgen::JsStringLike,
+        init: &ResponseInit,
+    ) -> Result<Reply, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Reply")]
+    pub fn new_with_array_buffer_and_init(
+        body: &ArrayBuffer,
+        init: &ResponseInit,
+    ) -> Result<Reply, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Reply")]
+    pub fn new_with_signal_and_init(body: &Signal, init: &ResponseInit) -> Result<Reply, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Reply")]
+    fn new_with_null_and_init_js(body: &JsValue, init: &ResponseInit) -> Result<Reply, JsValue>;
+}
+impl Reply {
+    pub fn new_with_null() -> Result<Reply, JsValue> {
+        Self::new_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn new_with_null_and_init(init: &ResponseInit) -> Result<Reply, JsValue> {
+        Self::new_with_null_and_init_js(&::wasm_bindgen::JsValue::NULL, init)
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Bucket;
+    #[wasm_bindgen(method, catch)]
+    pub async fn put(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: &ArrayBuffer,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_promise(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: &ArrayBuffer,
+    ) -> Promise<()>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub async fn put_with_str(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_str_promise(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<()>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    async fn put_with_null_js(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: &JsValue,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    fn put_with_null_promise_js(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: &JsValue,
+    ) -> Promise<()>;
+}
+impl Bucket {
+    pub async fn put_with_null(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue> {
+        self.put_with_null_js(key, &::wasm_bindgen::JsValue::NULL)
+            .await
+    }
+    pub fn put_with_null_promise(&self, key: impl ::wasm_bindgen::JsStringLike) -> Promise<()> {
+        self.put_with_null_promise_js(key, &::wasm_bindgen::JsValue::NULL)
+    }
+}
+#[wasm_bindgen(private)]
+pub enum BodyKind {
+    String(String),
+    Signal(Signal),
 }

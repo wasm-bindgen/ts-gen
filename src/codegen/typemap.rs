@@ -1552,6 +1552,12 @@ pub fn to_syn_type(
         TypeRef::BigInt => maybe_ref(quote! { BigInt }, borrow),
         TypeRef::Void => quote! { () },
         TypeRef::Undefined => maybe_ref(quote! { Undefined }, borrow),
+        // A per-mono argument that can only be `null` (a split-off union
+        // arm) is a marker the inline-wrapper pass drops and passes `null` for.
+        TypeRef::Null if borrow && CodegenContext::generic_mono(ctx) => {
+            let marker = super::inline_wrappers::null_marker_tokens();
+            quote! { &#marker }
+        }
         TypeRef::Null => maybe_ref(quote! { Null }, borrow),
         TypeRef::Any => maybe_ref(quote! { JsValue }, borrow),
         TypeRef::Unknown => maybe_ref(quote! { JsValue }, borrow),

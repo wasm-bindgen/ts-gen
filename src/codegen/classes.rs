@@ -1532,6 +1532,14 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         let base = config.member_base(MemberKind::Property, &g.js_name);
         let setter_name = config.setter_name(MemberKind::Property, &g.js_name);
         for sig in resolve_setter_sigs(g) {
+            // Not calling the builder method already leaves the field unset.
+            if sig
+                .params
+                .iter()
+                .any(|p| matches!(p.type_ref, TypeRef::Null))
+            {
+                continue;
+            }
             // The builder has no methods of its own to avoid, so it follows
             // the getter's name, with the setter's expansion suffix.
             let suffix = sig.rust_name.strip_prefix(&setter_name).unwrap_or_default();

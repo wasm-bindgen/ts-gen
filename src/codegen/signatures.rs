@@ -1160,7 +1160,7 @@ fn flatten_type_with(
     if flatten_into(ty, cgctx, scope, &mut out) {
         pair_typed_array_slice(&mut out, cgctx, scope);
         if cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) {
-            return primitive_unions::group_alternatives(out, keep_literals);
+            return split_null_arm(primitive_unions::group_alternatives(out, keep_literals));
         }
         return out;
     }
@@ -1174,6 +1174,27 @@ fn flatten_type_with(
         ));
     }
     vec![flatten_collapse_to_lub(ty, cgctx, scope)]
+}
+
+/// Per-mono, a `null`-admitting union that fans out into overloads takes
+/// each alternative bare and gives `null` an arm of its own
+/// (`new_with_str(body)`, `new_with_null()`), rather than an `Option` on
+/// every arm. The `null` arm's parameter is dropped from its signature and
+/// passed as `null` (see [`typemap::to_syn_type`]'s `TypeRef::Null`).
+fn split_null_arm(alts: Vec<TypeRef>) -> Vec<TypeRef> {
+    let nullable = |t: &TypeRef| matches!(t, TypeRef::Nullable(_, n) if n.null);
+    if alts.len() < 2 || !alts.iter().any(nullable) {
+        return alts;
+    }
+    let mut out: Vec<TypeRef> = alts
+        .into_iter()
+        .map(|t| match t {
+            TypeRef::Nullable(inner, n) if n.null => *inner,
+            t => t,
+        })
+        .collect();
+    out.push(TypeRef::Null);
+    out
 }
 
 /// Pair a typed array with the `number[]` (or `bigint[]` for a 64-bit

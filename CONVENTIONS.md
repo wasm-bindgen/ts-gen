@@ -141,7 +141,13 @@ No coercion is assumed anywhere.
   take strings and numbers off their native ABI. `None` crosses as
   `undefined`, which a WebIDL nullable (`T?`) converts to `null`; a
   non-WebIDL callee that tests `=== null` needs the explicit form. A
-  type-parameter inner is borrowed like any other (`Option<&T>`). A
+  type-parameter inner is borrowed like any other (`Option<&T>`). A union
+  that fans out into overloads instead takes each arm bare and gives
+  `null` an arm of its own, which passes `null` itself and drops the
+  parameter: `Response(body?: BodyInit | null, init?)` gives
+  `new_with_str(body)`, `new_with_readable_stream(&stream)`, …,
+  `new_with_null()` and `new_with_null_and_init(&init)`; a setter's
+  `null` arm clears the property (`set_body_with_null()`). A
   dictionary builder's method for an optional nullable field takes the
   value bare and passes `Some(…)` to the setter, since not calling it is
   the field's empty: `.prefix("a")`, `.signal(&signal)`;

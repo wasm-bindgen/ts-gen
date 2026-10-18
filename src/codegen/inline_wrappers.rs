@@ -30,6 +30,7 @@ use crate::ir::RustScalar;
 
 const MARKER_PREFIX: &str = "__TsGenWide";
 const LITERAL_ATTR: &str = "ts_gen_literal";
+const NULL_MARKER: &str = "__TsGenNull";
 
 /// The attribute the signature layer puts on a literal-keyed extern fn:
 /// `#[ts_gen_literal(positions(1), arm("text", get_text), arm("json", get_json))]`.
@@ -113,6 +114,21 @@ pub(crate) fn marker_tokens(scalar: RustScalar) -> TokenStream {
     quote! { #ident }
 }
 
+/// The placeholder type of an argument that can only be `null`: the extern
+/// takes `&JsValue` and the wrapper drops the parameter, passing `null`.
+pub(crate) fn null_marker_tokens() -> TokenStream {
+    let ident = format_ident!("{NULL_MARKER}");
+    quote! { #ident }
+}
+
+fn is_null_marker(ty: &Type) -> bool {
+    let ty = match ty {
+        Type::Reference(r) => &*r.elem,
+        ty => ty,
+    };
+    matches!(ty, Type::Path(p) if p.path.is_ident(NULL_MARKER))
+}
+
 fn marker_scalar(ty: &Type) -> Option<RustScalar> {
     let Type::Path(p) = ty else { return None };
     let seg = p.path.segments.last()?;
@@ -136,6 +152,8 @@ enum Shape {
     /// `&[T]` in parameter position.
     Slice(Box<Shape>),
     Result(Box<Shape>),
+    /// A parameter that can only be `null`, dropped from the wrapper.
+    Null,
     /// No convertible marker inside; any marker is just `f64`.
     Plain,
 }
@@ -149,6 +167,9 @@ impl Shape {
 fn shape(ty: &Type) -> Shape {
     if let Some(s) = marker_scalar(ty) {
         return Shape::Marker(s);
+    }
+    if is_null_marker(ty) {
+        return Shape::Null;
     }
     match ty {
         Type::Reference(r) => {
@@ -207,6 +228,7 @@ fn to_extern(expr: TokenStream, shape: &Shape) -> TokenStream {
             let body = to_extern(quote! { *v }, inner);
             quote! { &#expr.iter().map(|v| #body).collect::<Vec<_>>() }
         }
+        Shape::Null => quote! { &::wasm_bindgen::JsValue::NULL },
         Shape::Result(_) | Shape::Plain => expr,
     }
 }
@@ -226,7 +248,7 @@ fn from_extern(expr: TokenStream, shape: &Shape) -> TokenStream {
             let body = from_extern(quote! { v }, inner);
             quote! { #expr.into_iter().map(|v| #body).collect::<Vec<_>>() }
         }
-        Shape::Slice(_) | Shape::Plain => expr,
+        Shape::Slice(_) | Shape::Null | Shape::Plain => expr,
     }
 }
 
@@ -236,6 +258,10 @@ struct Resolve {
 
 impl VisitMut for Resolve {
     fn visit_type_mut(&mut self, ty: &mut Type) {
+        if matches!(ty, Type::Path(p) if p.path.is_ident(NULL_MARKER)) {
+            *ty = syn::parse_quote!(JsValue);
+            return;
+        }
         if let Some(s) = marker_scalar(ty) {
             let ident = if self.to_f64 {
                 Ident::new("f64", Span::call_site())
@@ -250,7 +276,8 @@ impl VisitMut for Resolve {
 }
 
 fn mentions_marker(tokens: &impl ToTokens) -> bool {
-    tokens.to_token_stream().to_string().contains(MARKER_PREFIX)
+    let s = tokens.to_token_stream().to_string();
+    s.contains(MARKER_PREFIX) || s.contains(NULL_MARKER)
 }
 
 /// Whether the block's `#[wasm_bindgen(...)]` sets `experimental_generic_mono`.
@@ -792,7 +819,10 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
                     typed_inputs
                         .iter()
                         .enumerate()
-                        .filter(|(i, _)| !values.iter().any(|(pos, _)| pos == i))
+                        .filter(|(i, _)| {
+                            !values.iter().any(|(pos, _)| pos == i)
+                                && !matches!(param_shapes.get(*i), Some((_, Shape::Null)))
+                        })
                         .map(|(_, a)| a.clone()),
                 )
                 .collect();
@@ -878,7 +908,10 @@ fn render_wrappers(wrappers: Vec<Wrapper>) -> Vec<Item> {
 /// carry one in a convertible position.
 pub(crate) fn apply(file: &mut syn::File) {
     let text = file.to_token_stream().to_string();
-    if !text.contains(MARKER_PREFIX) && !text.contains(LITERAL_ATTR) {
+    if ![MARKER_PREFIX, NULL_MARKER, LITERAL_ATTR]
+        .iter()
+        .any(|m| text.contains(m))
+    {
         return;
     }
     process_items(&mut file.items);
