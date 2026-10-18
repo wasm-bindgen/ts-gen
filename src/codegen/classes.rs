@@ -1458,7 +1458,6 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
             let DictionaryParams {
                 bounds: abv_bounds,
-                helper_where_clause,
                 params: params_tokens,
                 ..
             } = super::signatures::generate_dictionary_params_in(
@@ -1541,17 +1540,13 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
                 builder_variants.push(quote! {
                     #doc_attr
-                    pub fn #builder_ident #generics (#params_tokens) -> #builder_name
-                    #helper_where_clause
-                    {
+                    pub fn #builder_ident #generics (#params_tokens) -> #builder_name {
                         #builder_body
                     }
                 });
                 new_variants.push(quote! {
                     #doc_attr
-                    pub fn #new_ident #generics (#params_tokens) -> #rust_type
-                    #helper_where_clause
-                    {
+                    pub fn #new_ident #generics (#params_tokens) -> #rust_type {
                         Self::#builder_ident(#(#arg_idents),*).build()
                     }
                 });
@@ -1575,9 +1570,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 };
                 new_variants.push(quote! {
                     #doc_attr
-                    pub fn #new_ident #generics (#params_tokens) -> #rust_type
-                    #helper_where_clause
-                    {
+                    pub fn #new_ident #generics (#params_tokens) -> #rust_type {
                         #body
                     }
                 });
@@ -1618,7 +1611,6 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // method that forwards to it must carry the same bound.
             let DictionaryParams {
                 bounds: abv_bounds,
-                helper_where_clause,
                 params,
                 ..
             } = generate_dictionary_params(
@@ -1662,11 +1654,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let preds = config.helper_where_preds(std::iter::once(&quote! {
                 fn setter(#shape_params) {}
             }));
-            let where_clause = match (helper_where_clause.is_empty(), preds.is_empty()) {
-                (_, true) => helper_where_clause,
-                (true, false) => quote! { where #(#preds),* },
-                (false, false) => quote! { #helper_where_clause, #(#preds),* },
-            };
+            let where_clause = (!preds.is_empty()).then(|| quote! { where #(#preds),* });
             builder_methods.push(quote! {
                 pub fn #method_ident #generics (self, #params) -> Self
                 #where_clause
@@ -3273,21 +3261,11 @@ fn extends_list(
             }
             continue;
         };
-        // Per-mono the attribute takes the parent's concrete instantiation
-        // (`extends = TransformStream<JsValue, Uint8Array>`), so the deref
-        // reaches its typed members. Otherwise, or when an argument names
-        // the child's own parameters (which the attribute cannot bind), a
-        // generic parent is named without its arguments.
-        let concrete = cgctx
-            .filter(|c| c.experimental_generic_mono)
-            .is_some_and(|c| {
-                let mut named = Vec::new();
-                for a in generic_args {
-                    super::signatures::collect_type_params(a, c, *scope, &mut named);
-                }
-                named.is_empty()
-            });
-        let generic_args = if concrete {
+        // Per-mono the attribute takes the parent's instantiation
+        // (`extends = TransformStream<JsValue, Uint8Array>`, `Par<T, T>`),
+        // so the deref reaches its typed members; otherwise a generic
+        // parent is named without its arguments.
+        let generic_args = if CodegenContext::generic_mono(cgctx) {
             generic_args.clone()
         } else {
             Vec::new()

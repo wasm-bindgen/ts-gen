@@ -127,7 +127,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Transform , extends = Object)]
+    # [wasm_bindgen (extends = Transform < T , T > , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Passthrough<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]

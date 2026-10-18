@@ -2117,16 +2117,9 @@ impl<T> SlotBuilder<T> {
 }
 ```
 
-Array-buffer-view helper parameters retain their `TypedArray` widening bound.
-In per-monomorphization mode the helper also repeats the reference ABI bound
-that wasm-bindgen places on the generated import shim:
-
-```rust
-pub fn new<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptions
-where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
-{ /* … */ }
-```
+Array-buffer-view helper parameters retain their `TypedArray` widening bound,
+which already gives `&T` its ABI (`TypedArray: JsGeneric`), so they need no
+`where` clause: `pub fn new<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptions`.
 
 Concrete primitive arguments to locally declared generic types use native Rust
 ABIs in this mode: `Details<boolean>`, `Details<number>`, and `Details<string>`
@@ -2371,9 +2364,8 @@ parameters thread through every site that mentions `Foo`:
   arguments, so `IdentityTransformStream extends
   TransformStream<ArrayBuffer | ArrayBufferView, Uint8Array>` is
   `extends = TransformStream<JsValue, Uint8Array>` and its deref'd
-  `readable()` is `ReadableStream<Uint8Array>`. Arguments naming the
-  child's own parameters (`Passthrough<T> extends Transform<T, T>`)
-  are still dropped.
+  `readable()` is `ReadableStream<Uint8Array>`, and
+  `Passthrough<T> extends Transform<T, T>` is `extends = Transform<T, T>`.
 * A generic type derives `PartialEq, Eq` like any other imported type.
   wasm-bindgen emits both as handle identity with no bound on the type
   parameters (wasm-bindgen#5383), so `Foo<JsValue>`, a subclass of

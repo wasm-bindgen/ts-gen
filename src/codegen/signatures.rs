@@ -2196,9 +2196,6 @@ fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
 pub struct DictionaryParams {
     /// One `Tn: ::js_sys::TypedArray` bound per `ArrayBufferView` param.
     pub bounds: Vec<TokenStream>,
-    /// Extra `where` clause for Rust helper bodies. Extern declarations must
-    /// not use it; see [`generate_dictionary_params`].
-    pub helper_where_clause: TokenStream,
     /// The rendered `name: Type, …` list for Rust helper bodies.
     pub params: TokenStream,
     /// The same list for extern declarations, with per-argument
@@ -2219,11 +2216,6 @@ pub struct DictionaryParams {
 /// `T: ::js_sys::TypedArray`). Callers compose the declarations with type-level generic bounds
 /// (`T: ::wasm_bindgen::JsGeneric`) via [`render_generic_bounds`] so a single
 /// `<...>` declaration carries every bound the `fn` needs.
-///
-/// Under per-monomorphization codegen, ordinary Rust helpers that call an
-/// imported `&T` parameter must repeat the macro-generated reference ABI bound.
-/// Extern declarations ignore the returned clause because wasm-bindgen adds
-/// that requirement to their generated call shim itself.
 pub fn generate_dictionary_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
@@ -2281,20 +2273,8 @@ pub fn generate_dictionary_params_in(
         .map(|g| quote! { #g: ::js_sys::TypedArray })
         .collect::<Vec<_>>();
 
-    // This must mirror wasm-bindgen's macro-generated import-shim bound: the
-    // ordinary Rust dictionary helper calls that shim with `&T` directly.
-    let helper_where_clause = if CodegenContext::generic_mono(cgctx) && !generic_idents.is_empty() {
-        quote! {
-            where
-                #(for<'__wbg> &'__wbg #generic_idents: ::wasm_bindgen::convert::IntoWasmAbi),*
-        }
-    } else {
-        quote! {}
-    };
-
     DictionaryParams {
         bounds,
-        helper_where_clause,
         params: quote! { #(#items),* },
         extern_params: quote! { #(#extern_items),* },
     }
@@ -2590,7 +2570,7 @@ mod tests {
     }
 
     #[test]
-    fn dictionary_params_helper_where_clause_only_in_mono_mode() {
+    fn dictionary_params_bound_typed_arrays() {
         let (gctx, scope) = test_ctx();
         let mut cgctx = CodegenContext::empty(&gctx, scope);
         let params = [
@@ -2609,15 +2589,10 @@ mod tests {
         let default = render(&cgctx);
         assert_eq!(default.bounds.len(), 1);
         assert_eq!(default.bounds[0].to_string(), "T : :: js_sys :: TypedArray");
-        assert!(default.helper_where_clause.is_empty());
         assert_eq!(default.params.to_string(), "view : & T , label : & str");
 
         cgctx.experimental_generic_mono = true;
         let mono = render(&cgctx);
-        assert_eq!(
-            mono.helper_where_clause.to_string(),
-            "where for < '__wbg > & '__wbg T : :: wasm_bindgen :: convert :: IntoWasmAbi"
-        );
         assert_eq!(
             mono.params.to_string(),
             "view : & T , label : impl :: wasm_bindgen :: JsStringLike"
