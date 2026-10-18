@@ -9,29 +9,35 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Queue;
-    #[wasm_bindgen(method, catch, slice = "copy")]
-    pub fn enqueue(this: &Queue, chunk: impl ::js_sys::BufferSourceLike) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn enqueue(
+        this: &Queue,
+        #[wasm_bindgen(slice = "copy")] chunk: impl ::js_sys::BufferSourceLike,
+    ) -> Result<(), JsValue>;
     #[doc = " * `data` - the queue copies the data before returning"]
-    #[wasm_bindgen(method, catch, slice = "view")]
-    pub fn write(this: &Queue, data: impl ::js_sys::BufferSourceLike) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn write(
+        this: &Queue,
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<(), JsValue>;
     #[doc = " * `data` - the queue copies the data before returning"]
-    #[wasm_bindgen(method, catch, js_name = "write", slice = "view")]
+    #[wasm_bindgen(method, catch, js_name = "write")]
     pub fn write_with_offset(
         this: &Queue,
-        data: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
         offset: f64,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, catch, slice = "copy")]
+    #[wasm_bindgen(method, catch)]
     pub fn verify(
         this: &Queue,
-        signature: impl ::js_sys::BufferSourceLike,
-        data: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "view")] signature: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Result<bool, JsValue>;
     #[doc = " * `plainText`"]
-    #[wasm_bindgen(method, catch, slice = "view")]
+    #[wasm_bindgen(method, catch)]
     pub fn encrypt(
         this: &Queue,
-        plain_text: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "view")] plain_text: impl ::js_sys::BufferSourceLike,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "respondWithNewView")]
     pub fn respond_with_new_view(
@@ -40,17 +46,19 @@ extern "C" {
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn put(this: &Queue, key: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "put", slice = "view")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_value(
         this: &Queue,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "view")] value: impl ::js_sys::BufferSourceLike,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, slice = "view")]
-    pub fn digest(data: impl ::js_sys::BufferSourceLike) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn digest(
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -59,8 +67,11 @@ extern "C" {
     pub type Options;
     #[wasm_bindgen(method, getter)]
     pub fn md5(this: &Options) -> Option<Md5Kind>;
-    #[wasm_bindgen(method, setter, slice = "copy")]
-    pub fn set_md5(this: &Options, val: impl ::js_sys::BufferSourceLike);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_md5(
+        this: &Options,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
 }
 impl Options {
     pub fn new() -> Options {

@@ -388,13 +388,16 @@ the copy shape instead:
   non-numeric `T`, which reaches JS as a fresh `Array` anyway.
 * A typed slice from a [typed-array union](#typed-array-unions) gets
   `slice = "copy"`.
-* Under per-monomorphization, a function taking a
+* Under per-monomorphization, a
   [buffer source](#primitive-union-arguments) (`impl BufferSourceLike`)
-  gets `slice = "copy"` on the function, as below.
+  gets `slice = "copy"`. wasm-bindgen applies a mode on a generic
+  argument to the instantiations it fits, so the `&[u8]` instantiation
+  is copied while handles and `Vec<u8>` cross as they are.
 
 ```rs
 pub fn set_weights(#[wasm_bindgen(slice = "array")] weights: &[f64]);
 pub fn generic<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> String; // per-mono
+pub fn enqueue(this: &ReadableByteStreamController, #[wasm_bindgen(slice = "copy")] chunk: impl BufferSourceLike); // per-mono
 ```
 
 Every other slice takes no mode, as the modes only act on numeric
@@ -409,22 +412,6 @@ The user-facing Rust signature is unchanged — only the JS-side wire
 format changes. The mode goes on the argument rather than the
 function, so a typed copy sharing a signature with a `T[]` stays a
 copy, and no inherited mode reaches a parameter it can't act on.
-
-The exception is `impl BufferSourceLike`, whose instantiations are
-handles as well as `&[u8]`: a mode written on the argument must fit
-every instantiation, and `slice` doesn't fit a handle. wasm-bindgen
-applies an inherited mode only where it fits, so the function carries
-it, copying the `&[u8]` instantiation and leaving handles and `Vec<u8>`
-as they are. One mode covers every buffer source on the function: the
-view only when each asks for it with `{@slice view}`, the copy
-otherwise. Other slice parameters on it keep their own, written modes.
-
-```rs
-#[wasm_bindgen(method, slice = "copy")]
-pub fn enqueue(this: &ReadableByteStreamController, chunk: impl BufferSourceLike);
-#[wasm_bindgen(method, setter, slice = "copy")]
-pub fn set_md5(this: &R2PutOptions, val: impl BufferSourceLike);
-```
 
 ### `{@slice}` JSDoc hints
 
@@ -479,8 +466,8 @@ The split is on the whole function because wasm-bindgen doesn't evaluate
 a `cfg_attr` on a parameter.
 
 On a [buffer source](#primitive-union-arguments), `view` makes the
-function's `&[u8]` instantiation a view, for callees that copy the
-bytes before returning (a `Response` body, WebCrypto). `handle` is for
+`&[u8]` instantiation a view, for callees that copy the bytes before
+returning (a `Response` body, WebCrypto). `handle` is for
 a callee that needs the caller's own buffer (a BYOB request's
 `respondWithNewView` must hand back the buffer it lent), which no
 `&[u8]` can be: the parameter takes handles only, owned or borrowed.
@@ -493,9 +480,7 @@ respondWithNewView(view: ArrayBuffer | ArrayBufferView): void;
 ```
 
 ```rs
-#[wasm_bindgen(method, slice = "view")]
-pub fn write(this: &Writer, chunk: impl BufferSourceLike);
-#[wasm_bindgen(method, js_name = "respondWithNewView")]
+pub fn write(this: &Writer, #[wasm_bindgen(slice = "view")] chunk: impl BufferSourceLike);
 pub fn respond_with_new_view(this: &ReadableStreamBYOBRequest, view: impl BufferSourceLike + AsRef<JsValue>);
 ```
 

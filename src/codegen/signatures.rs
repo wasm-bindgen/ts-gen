@@ -2792,13 +2792,14 @@ fn param_attr(
     // The string-literal spelling rather than the bare ident: rustfmt
     // only normalises `name = <literal>` attribute arms, leaving
     // `slice = array` token-spaced verbatim.
+    // wasm-bindgen applies a mode on a generic argument to the
+    // instantiations it fits: here `&[u8]`, leaving handles and `Vec<u8>`.
     if is_buffer_source_param(p, cgctx) {
-        let marker = match p.slice_mode {
-            Some(crate::ir::SliceModeHint::Handle) => return quote! {},
-            Some(crate::ir::SliceModeHint::View) => super::BUFFER_SOURCE_VIEW,
-            _ => super::BUFFER_SOURCE_COPY,
+        return match p.slice_mode {
+            Some(crate::ir::SliceModeHint::Handle) => quote! {},
+            Some(crate::ir::SliceModeHint::View) => quote! { #[wasm_bindgen(slice = "view")] },
+            _ => quote! { #[wasm_bindgen(slice = "copy")] },
         };
-        return quote! { #[wasm_bindgen(slice = #marker)] };
     }
     match typemap::param_slice_mode(p, cgctx, scope) {
         Some(typemap::SliceMode::View) => quote! { #[wasm_bindgen(slice = "view")] },
