@@ -49,10 +49,7 @@ impl SendOptionsBuilder {
         self.inner.set_kind(val);
         self
     }
-    pub fn payload<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
+    pub fn payload<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_payload(val);
         self
     }

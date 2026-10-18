@@ -56,16 +56,10 @@ extern "C" {
     pub fn set_bytes(this: &Frame, val: &BigUint64Array);
 }
 impl Frame {
-    pub fn new<T: ::js_sys::TypedArray>(payload: &T) -> Frame
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
+    pub fn new<T: ::js_sys::TypedArray>(payload: &T) -> Frame {
         Self::builder(payload).build()
     }
-    pub fn builder<T: ::js_sys::TypedArray>(payload: &T) -> FrameBuilder
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
+    pub fn builder<T: ::js_sys::TypedArray>(payload: &T) -> FrameBuilder {
         let inner: Frame = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_payload(payload);
         FrameBuilder { inner }

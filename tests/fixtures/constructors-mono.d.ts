@@ -4,8 +4,8 @@
 // every class parameter. A construct signature returning concrete arguments
 // returns them as written. A bare `any`-defaulted class argument takes any
 // instantiation, and a `_typed` twin ties it to the class's own parameter.
-// A parent's concrete type arguments carry into `extends`; arguments naming
-// the child's own parameters are dropped.
+// A parent's type arguments carry into `extends`, the child's own
+// parameters included.
 
 interface UnderlyingSource<R = any> {
   start?: (controller: any) => void;

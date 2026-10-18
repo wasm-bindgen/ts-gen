@@ -1604,7 +1604,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = RoundingOptions , extends = Object , is_type_of = JsValue :: is_object)]
+        # [wasm_bindgen (extends = RoundingOptions < Units > , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type RoundingOptionsWithLargestUnit<Units = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
@@ -1721,7 +1721,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = ToStringRoundingOptions , extends = Object , is_type_of = JsValue :: is_object)]
+        # [wasm_bindgen (extends = ToStringRoundingOptions < Units > , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ToStringRoundingOptionsWithFractionalSeconds<Units = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "fractionalSecondDigits")]

@@ -409,7 +409,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Provider , extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
+    # [wasm_bindgen (extends = Provider < T > , extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GenericStub<T = JsValue>;
     #[wasm_bindgen(method, catch)]

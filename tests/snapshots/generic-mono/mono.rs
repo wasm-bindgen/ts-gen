@@ -170,16 +170,10 @@ extern "C" {
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 impl TypedArrayOptions {
-    pub fn new<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptions
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
+    pub fn new<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptions {
         Self::builder(value).build()
     }
-    pub fn builder<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptionsBuilder
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
+    pub fn builder<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptionsBuilder {
         let inner: TypedArrayOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         TypedArrayOptionsBuilder { inner }
@@ -189,10 +183,7 @@ pub struct TypedArrayOptionsBuilder {
     inner: TypedArrayOptions,
 }
 impl TypedArrayOptionsBuilder {
-    pub fn extra<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
+    pub fn extra<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_extra(val);
         self
     }

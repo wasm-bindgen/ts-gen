@@ -70,10 +70,7 @@ impl<T> GenAbvBuilder<T> {
         self.inner.set_value(val);
         self
     }
-    pub fn data<V: ::js_sys::TypedArray>(self, val: &V) -> Self
-    where
-        V: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
+    pub fn data<V: ::js_sys::TypedArray>(self, val: &V) -> Self {
         self.inner.set_data(val);
         self
     }
@@ -126,11 +123,7 @@ where
         data: &V,
         other: &W,
         owner: &U,
-    ) -> ReqAbv<T>
-    where
-        V: ::wasm_bindgen::convert::RefIntoWasmAbi,
-        W: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
+    ) -> ReqAbv<T> {
         let inner: ReqAbv<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         inner.set_data(data);
