@@ -44871,10 +44871,10 @@ pub mod cloudflare {
                 this: &PipelineTransformationEntrypoint<Env, I, O>,
                 #[wasm_bindgen(slice = "array")] records: &[I],
                 metadata: &PipelineBatchMetadata,
-            ) -> Result<Array<O>, JsValue>
+            ) -> Result<Vec<O>, JsValue>
             where
                 I: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
-                O: 'static;
+                Vec<O>: ::wasm_bindgen::convert::FromWasmAbi + 'static;
             #[doc = " run receives an array of PipelineRecord which can be"]
             #[doc = " transformed and returned to the pipeline"]
             #[doc = ""]
