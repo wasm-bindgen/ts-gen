@@ -1975,29 +1975,48 @@ pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> f64;
 Passing `--experimental-generic-mono` selects wasm-bindgen's experimental
 per-monomorphization path. Every generated extern block receives
 `experimental_generic_mono`, type parameters omit the `JsGeneric` bound, and
-bare type-parameter arguments are passed by value so each concrete Rust type
-uses its native ABI representation:
+each concrete Rust type uses its native ABI representation. A bare
+type-parameter argument is lent like any other argument (`&T`), which
+wasm-bindgen marshals through `for<'a> &'a T: IntoWasmAbi`, so `&x` keeps
+`T = X` and a handle is not moved:
 
 ```rust
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn identity<T>(value: T) -> T;
+    pub fn identity<T>(value: &T) -> T;
 }
 ```
 
 Generated dictionary helpers call their extern setters from ordinary Rust, so
-their type parameters carry the narrower ABI bound required at those call
-sites. The extern declarations themselves remain unconstrained:
+their `impl` restates, for each argument shape that names a type parameter,
+the bound wasm-bindgen puts on the setter's import: `&T` needs `for<'a> &'a
+T: IntoWasmAbi`, `Option<T>` needs `Option<T>: IntoWasmAbi`, and `&[T]` needs
+`T: VectorRefIntoWasmAbi`. The extern declarations themselves remain
+unconstrained:
 
 ```rust
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetails<T> { /* … */ }
-pub struct EvaluationDetailsBuilder<T> { /* … */ }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> { /* … */ }
+impl<T> Slot<T>
+where
+    Option<T>: IntoWasmAbi + WasmDescribe,
+    for<'__wbg> &'__wbg T: IntoWasmAbi + WasmDescribe,
+{ /* new(value: Option<T>), builder(value: Option<T>) */ }
+impl<T> Rows<T> where T: VectorRefIntoWasmAbi { /* new(rows: &[T]) */ }
 ```
 
-The ABI bound stays on helper `impl` blocks whose methods call generated
-setters. It is not attached to the builder struct itself, so merely storing or
+The bounds stay on helper `impl` blocks whose methods call generated setters.
+They are not attached to the builder struct itself, so merely storing or
 returning a builder does not constrain its type parameter.
+
+A callback's signature type is not monomorphized: `Function<fn(A) -> R>`
+needs every `A` and `R` to be a JS handle. A type parameter named inside a
+`Function<…>` therefore keeps `JsGeneric`, on each extern fn that mentions it
+and on the helper `impl`s of its type and builder:
+
+```rust
+pub fn fetch<Env: JsGeneric>(this: &Handler<Env>) -> Option<Function<fn(JsString, Env) -> Undefined>>;
+pub fn name<Env>(this: &Handler<Env>) -> Option<String>;
+impl<Env: JsGeneric> Handler<Env> { /* … */ }
+```
 
 Array-buffer-view helper parameters retain their `TypedArray` widening bound.
 In per-monomorphization mode the helper also repeats the reference ABI bound
@@ -2018,11 +2037,16 @@ a union with a single common type lowers as that type (`Details<"a" | "b">` is
 `Details<String>`). [Enums](#string-and-numeric-enums) are native leaves too,
 so they stay named (`Details<Mode>`, `Details<Level>`), and an awaited
 `Promise<Mode>` resolves to `Mode`. A type parameter that shadows an alias
-stays a type parameter. This native-leaf rule is deliberately limited to user
-declarations. Built-in JS containers, tuples, iterators, and callbacks retain
-their established wrapper elements (`Array<JsString>`,
-`Map<JsString, JsString>`, and so on), except for the string leaves of an
-argument, below.
+stays a type parameter. Built-in JS containers, tuples and iterators take
+native leaves too (`Promise<String>`, `Map<String, f64>`, `Array<bool>`,
+`ArrayTuple<(String, String)>`, `Object<String>` for a `Record`), since
+`js_sys_unstable_apis` monomorphizes their element APIs, and an awaited
+`T | undefined` is `Option<T>`. Callbacks keep wrapper elements
+(`Function<fn(JsString)>`), as above.
+
+Constructors bind only the class parameters their arguments mention; the rest
+take their declared defaults, as without per-monomorphization, so
+`TransformStream::new()` needs no annotation.
 
 Direct string arguments use argument-position `impl JsStringLike`, allowing
 `&str`, `String`, `&JsString`, and `JsString` without caller-side conversion.

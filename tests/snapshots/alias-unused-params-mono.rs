@@ -39,8 +39,10 @@ extern "C" {
 }
 impl<A, B> Pair<A, B>
 where
-    for<'__wbg> &'__wbg A: ::wasm_bindgen::convert::IntoWasmAbi,
-    for<'__wbg> &'__wbg B: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg A:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    for<'__wbg> &'__wbg B:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(a: &A, b: &B) -> Pair<A, B> {
         let inner: Pair<A, B> = JsCast::unchecked_into(js_sys::Object::new());

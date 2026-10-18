@@ -56,7 +56,8 @@ extern "C" {
 }
 impl<T> EvaluationDetails<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(flag_key: impl ::wasm_bindgen::JsStringLike, value: &T) -> EvaluationDetails<T> {
         Self::builder(flag_key, value).build()
@@ -76,7 +77,8 @@ pub struct EvaluationDetailsBuilder<T> {
 }
 impl<T> EvaluationDetailsBuilder<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn variant(self, val: Option<impl ::wasm_bindgen::JsStringLike>) -> Self {
         self.inner.set_variant(val);
@@ -107,8 +109,10 @@ extern "C" {
 }
 impl<A, B> Pair<A, B>
 where
-    for<'__wbg> &'__wbg A: ::wasm_bindgen::convert::IntoWasmAbi,
-    for<'__wbg> &'__wbg B: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg A:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    for<'__wbg> &'__wbg B:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(first: &A, second: &B) -> Pair<A, B> {
         let inner: Pair<A, B> = JsCast::unchecked_into(js_sys::Object::new());

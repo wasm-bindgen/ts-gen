@@ -22,7 +22,8 @@ extern "C" {
 }
 impl<M> Entry<M>
 where
-    for<'__wbg> &'__wbg M: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg M:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Entry<M> {
         Self::builder(name).build()
@@ -38,7 +39,8 @@ pub struct EntryBuilder<M> {
 }
 impl<M> EntryBuilder<M>
 where
-    for<'__wbg> &'__wbg M: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg M:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn meta(self, val: &M) -> Self {
         self.inner.set_meta(val);
@@ -75,7 +77,7 @@ extern "C" {
 }
 impl<M> ListResult<M>
 where
-    for<'__wbg> &'__wbg M: ::wasm_bindgen::convert::IntoWasmAbi,
+    Entry<M>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
 {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -111,7 +113,7 @@ pub struct ListResultBuilder<M> {
 }
 impl<M> ListResultBuilder<M>
 where
-    for<'__wbg> &'__wbg M: ::wasm_bindgen::convert::IntoWasmAbi,
+    Entry<M>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
 {
     pub fn cursor(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_cursor(val);

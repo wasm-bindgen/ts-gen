@@ -492,8 +492,29 @@ fn slice_elem(ty: &Type) -> Option<&Type> {
 /// wrapper calls it with those parameters, so it must state them too. The
 /// receiver (`skip`) holds for every instantiation.
 fn mono_bounds(sig: &syn::Signature, skip: usize, params: &[Ident]) -> Vec<syn::WherePredicate> {
+    let mut out = mono_arg_bounds(sig.inputs.iter().skip(skip), params);
+    if let ReturnType::Type(_, ty) = &sig.output {
+        let ok = result_ok(ty);
+        if mentions(ok, params) {
+            out.push(if sig.asyncness.is_some() {
+                syn::parse_quote!(#ok: ::wasm_bindgen::convert::FromWasmAbi + 'static)
+            } else {
+                syn::parse_quote!(#ok: ::wasm_bindgen::convert::FromWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
+            });
+        }
+    }
+    out
+}
+
+/// The argument half of [`mono_bounds`]: one predicate per typed argument
+/// naming a type parameter. Receivers are skipped. A borrow nested in the
+/// type (`Option<&T>`) is bound for every lifetime.
+pub(crate) fn mono_arg_bounds<'a>(
+    inputs: impl Iterator<Item = &'a FnArg>,
+    params: &[Ident],
+) -> Vec<syn::WherePredicate> {
     let mut out: Vec<syn::WherePredicate> = Vec::new();
-    for arg in sig.inputs.iter().skip(skip) {
+    for arg in inputs {
         let FnArg::Typed(pat) = arg else { continue };
         let ty = &*pat.ty;
         if !mentions(ty, params) {
@@ -507,20 +528,37 @@ fn mono_bounds(sig: &syn::Signature, skip: usize, params: &[Ident]) -> Vec<syn::
                 let elem = &r.elem;
                 syn::parse_quote!(for<'__wbg> &'__wbg #elem: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
             }
-            _ => syn::parse_quote!(#ty: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe),
+            _ => {
+                let mut ty = ty.clone();
+                if name_elided_lifetimes(&mut ty) {
+                    syn::parse_quote!(for<'__wbg> #ty: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
+                } else {
+                    syn::parse_quote!(#ty: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
+                }
+            }
         });
     }
-    if let ReturnType::Type(_, ty) = &sig.output {
-        let ok = result_ok(ty);
-        if mentions(ok, params) {
-            out.push(if sig.asyncness.is_some() {
-                syn::parse_quote!(#ok: ::wasm_bindgen::convert::FromWasmAbi + 'static)
-            } else {
-                syn::parse_quote!(#ok: ::wasm_bindgen::convert::FromWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
-            });
+    let mut seen = std::collections::HashSet::new();
+    out.retain(|p| seen.insert(p.to_token_stream().to_string()));
+    out
+}
+
+/// Gives every elided borrow in `ty` the lifetime `'__wbg`; whether any
+/// was found.
+fn name_elided_lifetimes(ty: &mut Type) -> bool {
+    struct Name(bool);
+    impl VisitMut for Name {
+        fn visit_type_reference_mut(&mut self, r: &mut syn::TypeReference) {
+            if r.lifetime.is_none() {
+                r.lifetime = Some(syn::Lifetime::new("'__wbg", Span::call_site()));
+                self.0 = true;
+            }
+            syn::visit_mut::visit_type_reference_mut(self, r);
         }
     }
-    out
+    let mut v = Name(false);
+    v.visit_type_mut(ty);
+    v.0
 }
 
 fn type_param_idents(generics: &Generics) -> impl Iterator<Item = Ident> + '_ {
