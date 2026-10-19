@@ -1146,6 +1146,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             /// The scope the field's type resolves in.
             scope: ScopeId,
             setter_ident: syn::Ident,
+            /// How the argument reaches a setter typed wider than the field.
+            wrap: Wrap,
         },
     }
     struct FieldDim {
@@ -1335,7 +1337,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 let setter_ident = setter
                     .map(|sig| super::typemap::make_ident(&sig.rust_name))
                     .unwrap_or_else(|| default_setter.clone());
-                let param = ConcreteParam {
+                let mut param = ConcreteParam {
                     name: param_name.clone(),
                     type_ref: setter
                         .and_then(param_type)
@@ -1344,11 +1346,27 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     variadic: false,
                     slice_mode: None,
                 };
+                // Per-mono a branch that requires a field the merged setter
+                // takes optionally (`contentId: string` beside
+                // `contentId?: undefined`) takes it bare, as builders do.
+                let mut wrap = Wrap::None;
+                if !matches!(g.type_ref, TypeRef::Nullable(..)) {
+                    if let Some(sig) = setter {
+                        let (bare, wrapped) = builder_value_params(config, sig);
+                        if let ([bare], [w @ (Wrap::Some | Wrap::SomeObject)]) =
+                            (bare.as_slice(), wrapped.as_slice())
+                        {
+                            param.type_ref = bare.type_ref.clone();
+                            wrap = *w;
+                        }
+                    }
+                }
                 options.push(FieldOption::Value {
                     field_doc: g.doc.clone(),
                     param,
                     scope: g.scope,
                     setter_ident,
+                    wrap,
                 });
             }
             if options.is_empty() {
@@ -1534,11 +1552,13 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                         param,
                         scope,
                         setter_ident,
+                        wrap,
                     } => {
                         let arg_ident =
                             super::signatures::dictionary_param_ident(&param.name, config.cgctx);
                         arg_idents.push(arg_ident.clone());
-                        init_calls.push(quote! { inner.#setter_ident(#arg_ident); });
+                        let arg = wrap.apply(&arg_ident);
+                        init_calls.push(quote! { inner.#setter_ident(#arg); });
                         value_params.push(param.clone());
                         value_scopes.push(*scope);
                         if let Some(doc) = field_doc {
@@ -1768,14 +1788,10 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 .iter()
                 .zip(&wrapped)
                 .map(|(p, &wrap)| {
-                    let ident = super::signatures::dictionary_param_ident(&p.name, config.cgctx);
-                    match wrap {
-                        Wrap::None => quote! { #ident },
-                        Wrap::Some => quote! { Some(#ident) },
-                        Wrap::SomeObject => {
-                            quote! { Some(::wasm_bindgen::JsCast::unchecked_ref(#ident)) }
-                        }
-                    }
+                    wrap.apply(&super::signatures::dictionary_param_ident(
+                        &p.name,
+                        config.cgctx,
+                    ))
                 })
                 .collect();
             // A wrapped argument reaches the setter as `Some(…)`, so the
@@ -1851,6 +1867,16 @@ enum Wrap {
     None,
     Some,
     SomeObject,
+}
+
+impl Wrap {
+    fn apply(self, ident: &syn::Ident) -> TokenStream {
+        match self {
+            Wrap::None => quote! { #ident },
+            Wrap::Some => quote! { Some(#ident) },
+            Wrap::SomeObject => quote! { Some(::wasm_bindgen::JsCast::unchecked_ref(#ident)) },
+        }
+    }
 }
 
 /// A builder method's parameters for an optional field's setter, and which

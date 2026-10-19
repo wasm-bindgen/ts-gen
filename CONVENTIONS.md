@@ -1345,6 +1345,14 @@ Likewise a field a branch narrows to one member of the merged union
 (`data: ArrayBuffer` of `string | ArrayBuffer`) calls that member's
 overload, `inner.set_data_with_array_buffer(data)`, not the first one.
 
+A field the branch requires but another branch makes optional
+(`contentId?: undefined`) has an `Option` setter. Without
+`--experimental-generic-mono` the factory takes that setter's
+`Option<&str>`; per-mono it takes the value bare and passes it on as
+`Some(…)`, as builder methods take optional values (the shape shown
+above): `new_inline(content_id: impl JsStringLike, …)` calls
+`inner.set_content_id(Some(content_id))`.
+
 ### Wrapper builder remains merged
 
 The wrapper struct (`EmailAttachmentBuilder`) and its fluent setters
