@@ -194,6 +194,66 @@ impl From<Unused> for UnusedBuilder {
         Self { inner }
     }
 }
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Meta;
+    #[wasm_bindgen(method, getter)]
+    pub fn duration(this: &Meta) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_duration(this: &Meta, val: f64);
+}
+impl Meta {
+    pub fn new(duration: f64) -> Meta {
+        let inner: Meta = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_duration(duration);
+        inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Response;
+    #[wasm_bindgen(method, getter)]
+    pub fn success(this: &Response) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_success(this: &Response, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn meta(this: &Response) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_meta(this: &Response, val: &JsValue);
+}
+impl Response {
+    #[doc = " Construct with `success: true`."]
+    pub fn new(meta: &JsValue) -> Response {
+        let inner: Response = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_success(true);
+        inner.set_meta(meta);
+        inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Response , extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Result_<T: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn results<T: ::wasm_bindgen::JsGeneric>(this: &Result_<T>) -> Vec<T>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_results<T: ::wasm_bindgen::JsGeneric>(this: &Result_<T>, val: &[T]);
+}
+impl<T: ::wasm_bindgen::JsGeneric> Result_<T> {
+    #[doc = " Construct with `success: true`."]
+    pub fn new(meta: &JsValue, results: &[T]) -> Result_<T> {
+        let inner: Result_<T> = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_success(true);
+        inner.set_meta(meta);
+        inner.set_results(results);
+        inner
+    }
+}
 #[allow(dead_code)]
 pub type Listener = Function<fn(Event) -> Reply>;
 #[wasm_bindgen]
@@ -217,4 +277,8 @@ extern "C" {
     pub fn put(this: &Store, value: &Shared);
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn try_put(this: &Store, value: &Shared) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn query(this: &Store) -> Result<Result_, JsValue>;
+    #[wasm_bindgen(method, js_name = "query")]
+    pub fn query_promise(this: &Store) -> Promise<Result_>;
 }

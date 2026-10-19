@@ -915,6 +915,13 @@ fn polar_declaration(decl: &TypeDeclaration, part: Part, out: &mut PolarRefs) {
                 walk(&parent.type_ref, parent.scope, true);
             }
         }
+        // A parent's members are the child's, so a child only ever read
+        // makes its parent read (`D1Result`'s `D1Response`).
+        (TypeKind::Interface(i), Part::Read) => {
+            for parent in &i.extends {
+                walk(&parent.type_ref, parent.scope, false);
+            }
+        }
         (TypeKind::DiscriminatedUnion(d), Part::Always) => {
             for members in std::iter::once(&d.members).chain(&d.branches) {
                 polar_members(members, false, &mut walk);

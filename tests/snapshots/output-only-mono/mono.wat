@@ -64,6 +64,34 @@
   ;; set label(value: string)
   (import "./bindings.wasm" "Unused.set_label" (func $Unused.set_label (param $this externref) (param $value externref)))
 
+  ;; Meta
+  ;; {} as Meta
+  (import "./bindings.wasm" "Meta.new" (func $Meta.new (result externref)))
+  ;; duration: number
+  (import "./bindings.wasm" "Meta.duration" (func $Meta.duration (param $this externref) (result f64)))
+  ;; set duration(value: number)
+  (import "./bindings.wasm" "Meta.set_duration" (func $Meta.set_duration (param $this externref) (param $value f64)))
+
+  ;; Response
+  ;; {} as Response
+  (import "./bindings.wasm" "Response.new" (func $Response.new (result externref)))
+  ;; success: true
+  (import "./bindings.wasm" "Response.success" (func $Response.success (param $this externref) (result i32)))
+  ;; set success(value: true)
+  (import "./bindings.wasm" "Response.set_success" (func $Response.set_success (param $this externref) (param $value i32)))
+  ;; meta: Meta & Record<string, unknown>
+  (import "./bindings.wasm" "Response.meta" (func $Response.meta (param $this externref) (result externref)))
+  ;; set meta(value: Meta & Record<string, unknown>)
+  (import "./bindings.wasm" "Response.set_meta" (func $Response.set_meta (param $this externref) (param $value externref)))
+
+  ;; Result
+  ;; {} as Result
+  (import "./bindings.wasm" "Result.new" (func $Result.new (result externref)))
+  ;; results: T[]
+  (import "./bindings.wasm" "Result.results" (func $Result.results (param $this externref) (result externref)))
+  ;; set results(value: T[])
+  (import "./bindings.wasm" "Result.set_results" (func $Result.set_results (param $this externref) (param $value externref)))
+
   ;; Store
   ;; list(): Promise<ListResult<M>>
   (import "./bindings.wasm" "Store.list" (func $Store.list (param $this externref) (result externref)))
@@ -73,6 +101,8 @@
   (import "./bindings.wasm" "Store.get" (func $Store.get (param $this externref) (result externref)))
   ;; put(value: Shared): void
   (import "./bindings.wasm" "Store.put" (func $Store.put (param $this externref) (param $value externref)))
+  ;; query(): Promise<Result<T>>
+  (import "./bindings.wasm" "Store.query" (func $Store.query (param $this externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
