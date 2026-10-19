@@ -8273,7 +8273,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/PromiseRejectionEvent/promise)"]
     #[wasm_bindgen(method, getter)]
-    pub fn promise(this: &PromiseRejectionEvent) -> Promise;
+    pub fn promise(this: &PromiseRejectionEvent) -> Promise<JsValue>;
     #[doc = " The PromiseRejectionEvent **`reason`** read-only property is any JavaScript value or Object which provides the reason passed into Promise.reject()."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/PromiseRejectionEvent/reason)"]

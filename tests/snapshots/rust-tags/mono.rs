@@ -43,9 +43,9 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "statusText")]
     pub fn status_text_js_string(this: &Response) -> JsString;
     #[wasm_bindgen(method, getter)]
-    pub fn closed(this: &Response) -> Promise<Number>;
+    pub fn closed(this: &Response) -> Promise<u32>;
     #[wasm_bindgen(method, getter)]
-    pub fn total(this: &Response) -> Promise<BigInt>;
+    pub fn total(this: &Response) -> Promise<u64>;
     #[wasm_bindgen(method, catch, js_name = "whenReady")]
     pub fn when_ready(this: &Response, ready: &Promise<Number>) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]

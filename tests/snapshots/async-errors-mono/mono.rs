@@ -43,4 +43,12 @@ extern "C" {
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>, crate::Error>;
+    #[wasm_bindgen(method, getter)]
+    pub fn closed(this: &Store) -> Promise<(), crate::Error>;
+    #[wasm_bindgen(method, getter)]
+    pub fn opened(this: &Store) -> Promise<Option<String>, crate::Error>;
+    #[wasm_bindgen(method, getter)]
+    pub fn settled(this: &Store) -> Promise<f64>;
+    # [wasm_bindgen (static_method_of = Store , getter)]
+    pub fn ready() -> Promise<bool, crate::Error>;
 }

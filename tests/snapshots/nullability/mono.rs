@@ -274,9 +274,9 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Registry , setter , js_name = "last")]
     fn __set_last_with_null(val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn pending(this: &Registry) -> Promise<Option<JsString>>;
+    pub fn pending(this: &Registry) -> Promise<Option<String>>;
     #[wasm_bindgen(method, getter)]
-    pub fn settled(this: &Registry) -> Promise<Option<Number>>;
+    pub fn settled(this: &Registry) -> Promise<Option<f64>>;
 }
 impl Registry {
     pub fn set_fallback_with_null() {

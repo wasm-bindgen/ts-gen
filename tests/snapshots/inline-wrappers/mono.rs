@@ -49,7 +49,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "seek")]
     fn __seek(this: &R2Object, offset: f64) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn settled(this: &R2Object) -> Promise<Number>;
+    pub fn settled(this: &R2Object) -> Promise<f64>;
     #[wasm_bindgen(method, catch)]
     pub fn matrix(this: &R2Object) -> Result<Vec<Array<Number>>, JsValue>;
 }

@@ -48,4 +48,12 @@ extern "C" {
     pub async fn get(this: &Store, key: &str) -> Result<Option<String>, crate::Error>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &Store, key: &str) -> Promise<JsNullable<JsString>>;
+    #[wasm_bindgen(method, getter)]
+    pub fn closed(this: &Store) -> Promise<Undefined>;
+    #[wasm_bindgen(method, getter)]
+    pub fn opened(this: &Store) -> Promise<JsNullable<JsString>>;
+    #[wasm_bindgen(method, getter)]
+    pub fn settled(this: &Store) -> Promise<Number>;
+    # [wasm_bindgen (static_method_of = Store , getter)]
+    pub fn ready() -> Promise<Boolean>;
 }
