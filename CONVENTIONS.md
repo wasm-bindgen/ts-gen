@@ -938,6 +938,15 @@ each pin one literal, but across branches the field is the choice, so
 it still names each branch's factory (`new_inline` / `new_attachment`
 above).
 
+Per-mono, a field offering several literals within one shape (not a
+discriminated union's branch) is a choice of value rather than of
+factory, so the factory takes it as its setter does instead of
+multiplying: `level: 0 | 1 | 2` is `Level::new(level: LevelKind, ..)`,
+and an aliased number union (`edgeRequestKeepAliveStatus:
+IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus`, setter `f64`)
+is `new(.., edge_request_keep_alive_status: f64, ..)` rather than
+`new_0` … `new_5`. Branch discriminants keep naming factories.
+
 A number literal is baked in as a float literal matching the `f64`
 setter, and names its factory with `.` and a leading `-` spelled out
 (`scale: -1 | 0.5` → `new_neg_1()` setting `-1.0`, `new_0_5()` setting

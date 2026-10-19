@@ -1306,6 +1306,39 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // only synthesised one setter for the whole union).
             let default_setter = super::typemap::make_ident(&setters[0].rust_name);
 
+            // Per-mono, several literals within one shape are a choice of
+            // value rather than of factory, so the field is passed as its
+            // setter takes it (`CertRevokedKind`, or an aliased number
+            // union's `f64`) and does not multiply the factories.
+            if CodegenContext::generic_mono(config.cgctx)
+                && value_members.is_empty()
+                && members.len() > 1
+            {
+                let setter = match &setter_enum {
+                    Some(e) => find_setter(&crate::ir::TypeRef::ident(e.name.clone())),
+                    None => match setters.as_slice() {
+                        [sig] => Some(sig),
+                        _ => None,
+                    },
+                };
+                if let Some(sig) = setter.filter(|sig| sig.params.len() == 1) {
+                    options.push(FieldOption::Value {
+                        field_doc: g.doc.clone(),
+                        param: ConcreteParam {
+                            name: param_name.clone(),
+                            type_ref: sig.params[0].type_ref.clone(),
+                            variadic: false,
+                            slice_mode: None,
+                        },
+                        scope: g.scope,
+                        setter_ident: super::typemap::make_ident(&sig.rust_name),
+                        wrap: Wrap::None,
+                    });
+                    field_dims.push(FieldDim { options });
+                    continue;
+                }
+            }
+
             // A literal the setter routes through its enum is passed as
             // that enum's variant.
             let enum_literal = |m: &crate::ir::TypeRef| {
