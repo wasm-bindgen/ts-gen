@@ -29,10 +29,22 @@
   (import "./bindings.wasm" "Response.ok" (func $Response.ok (param $this externref) (result i32)))
   ;; body: ReadableStream<Uint8Array> | null
   (import "./bindings.wasm" "Response.body" (func $Response.body (param $this externref) (result externref)))
+  ;; url: string
+  (import "./bindings.wasm" "Response.url" (func $Response.url (param $this externref) (result externref)))
+  ;; type: string
+  (import "./bindings.wasm" "Response.type" (func $Response.type (param $this externref) (result externref)))
   ;; clone(): Response
   (import "./bindings.wasm" "Response.clone" (func $Response.clone (param $this externref) (result externref)))
   ;; bytes(): Promise<Uint8Array>
   (import "./bindings.wasm" "Response.bytes" (func $Response.bytes (param $this externref) (result externref)))
+
+  ;; ResponsePair
+  ;; constructor()
+  (import "./bindings.wasm" "ResponsePair.new" (func $ResponsePair.new (result externref)))
+  ;; 0: Response
+  (import "./bindings.wasm" "ResponsePair.0" (func $ResponsePair.0 (param $this externref) (result externref)))
+  ;; 1: Response
+  (import "./bindings.wasm" "ResponsePair.1" (func $ResponsePair.1 (param $this externref) (result externref)))
 
   ;; ReadableStream
   ;; locked: boolean

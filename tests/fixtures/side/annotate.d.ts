@@ -21,6 +21,14 @@ interface Response {
    * @retype
    */
   bytes(): Promise<Uint8Array>;
+  // A property with no setter here is read-only in the input too.
+  readonly url: string;
+  get type(): string;
+}
+
+interface ResponsePair {
+  readonly 0: Response;
+  readonly 1: Response;
 }
 
 interface ResponseInit {

@@ -4017,6 +4017,12 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
   file writes the type it wants:
   `/** @retype */ readonly body: ReadableStream<Uint8Array> | null;`. A
   property's setter keeps its own type.
+* A side property with no setter (`readonly url: string`, `get url()`)
+  makes the input's read-only: its setter is not emitted. Upstream drops
+  `readonly` on properties the runtime defines read-only (workers-types'
+  `Response.status`, `WebSocket.url`), whose setters throw a `TypeError`.
+  Such a member counts as tagged; a side file that tags a writable
+  property declares it writable (`/** @rust u16 */ status: number;`).
 * A side member applies to every overload of the input method or
   function, and the `## Errors` section its `@throws` renders is
   appended to the input's doc once. The rest of the side doc is not
