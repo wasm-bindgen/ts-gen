@@ -1,5 +1,5 @@
 //! `--annotate`: layer `@rust`, `@throws`, `{@string}` and `@retype`
-//! tags from a side `.d.ts` onto declarations of the main input, matched
+//! tags and `readonly` from a side `.d.ts` onto declarations of the main input, matched
 //! by declaration and member name. Upstream declaration files carry no
 //! such tags, and editing a vendored copy does not survive an upgrade; a
 //! side file that re-declares only the annotated members does.
@@ -479,6 +479,21 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
     })
 }
 
+/// A side property with no setter (`readonly x: T`, `get x()`) makes the
+/// input's read-only. Upstream declarations drop `readonly` on runtime
+/// read-only properties, whose setters then throw.
+fn side_readonly(annotated: &[Member], key: &Key<'_>) -> bool {
+    match key {
+        Key::Property(n) => !annotated
+            .iter()
+            .any(|m| matches!(m, Member::Setter(s) if s.js_name == *n)),
+        Key::StaticProperty(n) => !annotated
+            .iter()
+            .any(|m| matches!(m, Member::StaticSetter(s) if s.js_name == *n)),
+        _ => false,
+    }
+}
+
 fn apply_members(
     gctx: &mut GlobalContext,
     targets: &[TypeId],
@@ -506,8 +521,16 @@ fn apply_members(
     // appended once per member.
     let mut seen: Vec<Key<'_>> = Vec::new();
     for (key, mut overlay) in annotated.iter().filter_map(side_member) {
-        if overlay.is_empty() {
+        let readonly = side_readonly(annotated, &key);
+        if overlay.is_empty() && !readonly {
             continue;
+        }
+        if readonly {
+            members.retain(|m| match (m, &key) {
+                (Member::Setter(s), Key::Property(n)) => s.js_name != *n,
+                (Member::StaticSetter(s), Key::StaticProperty(n)) => s.js_name != *n,
+                _ => true,
+            });
         }
         if seen.contains(&key) {
             overlay.doc = None;

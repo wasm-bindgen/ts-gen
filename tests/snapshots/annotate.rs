@@ -15,6 +15,10 @@ extern "C" {
     pub fn ok(this: &Response) -> bool;
     #[wasm_bindgen(method, getter)]
     pub fn body(this: &Response) -> Option<ReadableStream<Uint8Array>>;
+    #[wasm_bindgen(method, getter)]
+    pub fn url(this: &Response) -> String;
+    #[wasm_bindgen(method, getter, js_name = "type")]
+    pub fn type_(this: &Response) -> String;
     #[doc = " Creates a clone of the response."]
     #[doc = ""]
     #[doc = " ## Errors"]
@@ -35,6 +39,18 @@ extern "C" {
     #[doc = " The body as bytes."]
     #[wasm_bindgen(method, js_name = "bytes")]
     pub fn bytes_promise(this: &Response) -> Promise<Uint8Array>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponsePair;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<ResponsePair, JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "0")]
+    pub fn _0(this: &ResponsePair) -> Response;
+    #[wasm_bindgen(method, getter, js_name = "1")]
+    pub fn _1(this: &ResponsePair) -> Response;
 }
 #[wasm_bindgen]
 extern "C" {
