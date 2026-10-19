@@ -442,6 +442,7 @@ impl ClassConfig<'_> {
             &self.from_module(),
             super::typemap::ReturnAnchor {
                 base: js_name,
+                js_name,
                 kind: super::typemap::ReturnAnchorKind::Getter,
                 parent: Some(&self.rust_name),
             },
@@ -2360,6 +2361,7 @@ fn typed_twins(
                 &config.from_module(),
                 super::typemap::ReturnAnchor {
                     base: &erased_name,
+                    js_name: &sig.js_name,
                     kind: super::typemap::ReturnAnchorKind::Callable,
                     parent: Some(&config.rust_name),
                 },
@@ -2649,6 +2651,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         &config.from_module(),
         super::typemap::ReturnAnchor {
             base: &sig.rust_name,
+            js_name: &sig.js_name,
             kind: super::typemap::ReturnAnchorKind::Callable,
             parent: Some(&config.rust_name),
         },
@@ -2755,6 +2758,7 @@ fn typed_constructor(
         &config.from_module(),
         super::typemap::ReturnAnchor {
             base: &sig.rust_name,
+            js_name: &sig.js_name,
             kind: super::typemap::ReturnAnchorKind::Callable,
             parent: Some(&config.rust_name),
         },
@@ -2872,6 +2876,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         &config.from_module(),
         super::typemap::ReturnAnchor {
             base: &sig.rust_name,
+            js_name: &sig.js_name,
             kind: super::typemap::ReturnAnchorKind::Callable,
             parent: Some(&config.rust_name),
         },
@@ -2956,6 +2961,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         &config.from_module(),
         super::typemap::ReturnAnchor {
             base: &sig.rust_name,
+            js_name: &sig.js_name,
             kind: super::typemap::ReturnAnchorKind::Callable,
             parent: Some(&config.rust_name),
         },
@@ -3003,6 +3009,7 @@ fn generate_getter(
     // property name itself — no `Return` infix.
     let anchor = super::typemap::ReturnAnchor {
         base: &getter.js_name,
+        js_name: &getter.js_name,
         kind: super::typemap::ReturnAnchorKind::Getter,
         parent: Some(&config.rust_name),
     };
@@ -3266,6 +3273,7 @@ fn generate_static_getter(
     let lowered_ty = read_type(&getter.type_ref, getter.optional);
     let anchor = super::typemap::ReturnAnchor {
         base: &getter.js_name,
+        js_name: &getter.js_name,
         kind: super::typemap::ReturnAnchorKind::Getter,
         parent: Some(&config.rust_name),
     };

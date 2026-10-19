@@ -58,9 +58,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequiredDigits;
     #[wasm_bindgen(method, getter)]
-    pub fn digits(this: &RequiredDigits) -> FractionalSecondDigitsKind;
+    pub fn digits(this: &RequiredDigits) -> DigitsKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_digits(this: &RequiredDigits, val: FractionalSecondDigitsKind);
+    pub fn set_digits(this: &RequiredDigits, val: DigitsKind);
     #[wasm_bindgen(method, setter, js_name = "digits")]
     pub fn set_digits_with_f64(this: &RequiredDigits, val: f64);
 }
@@ -84,7 +84,7 @@ impl RequiredDigits {
     #[doc = " Start a builder with `digits: \"auto\"`."]
     pub fn builder_auto() -> RequiredDigitsBuilder {
         let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_digits(FractionalSecondDigitsKind::Auto);
+        inner.set_digits(DigitsKind::Auto);
         RequiredDigitsBuilder { inner }
     }
     #[doc = " Start a builder with `digits: 0`."]
@@ -110,7 +110,7 @@ pub struct RequiredDigitsBuilder {
     inner: RequiredDigits,
 }
 impl RequiredDigitsBuilder {
-    pub fn digits(self, val: FractionalSecondDigitsKind) -> Self {
+    pub fn digits(self, val: DigitsKind) -> Self {
         self.inner.set_digits(val);
         self
     }
@@ -194,6 +194,11 @@ impl From<Toggle> for ToggleBuilder {
 }
 #[wasm_bindgen(private)]
 pub enum FractionalSecondDigitsKind {
+    Auto = "auto",
+    F64(f64),
+}
+#[wasm_bindgen(private)]
+pub enum DigitsKind {
     Auto = "auto",
     F64(f64),
 }

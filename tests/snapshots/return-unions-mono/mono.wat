@@ -31,12 +31,39 @@
   (import "./bindings.wasm" "FormData.first" (func $FormData.first (param $this externref) (result externref)))
   ;; next(): Promise<File | string | null>
   (import "./bindings.wasm" "FormData.next" (func $FormData.next (param $this externref) (result externref)))
+  ;; pick(index: number): File | string
+  (import "./bindings.wasm" "FormData.pick" (func $FormData.pick (param $this externref) (param $index f64) (result externref)))
+  ;; pick(name: string): File | string
+  (import "./bindings.wasm" "FormData.pick_with_name" (func $FormData.pick_with_name (param $this externref) (param $name externref) (result externref)))
 
   ;; MessageEvent
   ;; data: string | ArrayBuffer
   (import "./bindings.wasm" "MessageEvent.data" (func $MessageEvent.data (param $this externref) (result externref)))
   ;; previous?: string | ArrayBuffer
   (import "./bindings.wasm" "MessageEvent.previous" (func $MessageEvent.previous (param $this externref) (result externref)))
+
+  ;; GetOptions
+  ;; {} as GetOptions
+  (import "./bindings.wasm" "GetOptions.new" (func $GetOptions.new (result externref)))
+  ;; ssecKey?: ArrayBuffer | string
+  (import "./bindings.wasm" "GetOptions.ssec_key" (func $GetOptions.ssec_key (param $this externref) (result externref)))
+  ;; set ssecKey(value: ArrayBuffer)
+  (import "./bindings.wasm" "GetOptions.set_ssec_key" (func $GetOptions.set_ssec_key (param $this externref) (param $value externref)))
+  ;; set ssecKey(value: string)
+  (import "./bindings.wasm" "GetOptions.set_ssec_key_with_str" (func $GetOptions.set_ssec_key_with_str (param $this externref) (param $value externref)))
+
+  ;; PutOptions
+  ;; {} as PutOptions
+  (import "./bindings.wasm" "PutOptions.new" (func $PutOptions.new (result externref)))
+  ;; ssecKey?: ArrayBuffer | string
+  (import "./bindings.wasm" "PutOptions.ssec_key" (func $PutOptions.ssec_key (param $this externref) (result externref)))
+  ;; set ssecKey(value: ArrayBuffer)
+  (import "./bindings.wasm" "PutOptions.set_ssec_key" (func $PutOptions.set_ssec_key (param $this externref) (param $value externref)))
+  ;; set ssecKey(value: string)
+  (import "./bindings.wasm" "PutOptions.set_ssec_key_with_str" (func $PutOptions.set_ssec_key_with_str (param $this externref) (param $value externref)))
+
+  ;; options(): GetOptions | PutOptions
+  (import "./bindings.wasm" "options" (func $options (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

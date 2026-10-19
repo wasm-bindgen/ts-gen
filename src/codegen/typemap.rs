@@ -1305,6 +1305,7 @@ impl<'a> CodegenContext<'a> {
         &self,
         arms: &ReadArms,
         anchor: &str,
+        js_name: Option<&str>,
         parent: Option<&str>,
         scope: ScopeId,
         from_module: &ModuleContext,
@@ -1313,6 +1314,13 @@ impl<'a> CodegenContext<'a> {
         let mut key: Vec<String> = members.iter().map(format_type_ref_key).collect();
         if arms.fallback {
             key.push("fallback".to_string());
+        }
+        // Per-mono the enum is shared only by sites of one JS name (a
+        // method's overloads, a property on several dictionaries), so an
+        // unrelated member of the same shape doesn't return another's enum
+        // (R2's `ssec_key()` vs `MessageEventInit.data`).
+        if let Some(js_name) = js_name.filter(|_| self.experimental_generic_mono) {
+            key.push(format!("@{js_name}"));
         }
         let key = DynamicUnionKey(key);
         let mut reg = self.dynamic_unions.borrow_mut();
@@ -3836,6 +3844,9 @@ pub struct ReturnAnchor<'a> {
     /// (`bar`), function name (`fetch`). Will be PascalCased before
     /// being used as the enum-name base.
     pub base: &'a str,
+    /// The JS member name. Per-mono only sites of one name share an enum
+    /// (see [`CodegenContext::synthesise_dynamic_union`]).
+    pub js_name: &'a str,
     /// Whether the anchor refers to a getter (where the base is used
     /// as-is) or a callable return (where `Return` is appended before
     /// `Kind`).
@@ -3913,6 +3924,7 @@ fn maybe_synthesise_return_union(
     let name = cgctx.synthesise_dynamic_union(
         &arms,
         &anchor.enum_anchor(),
+        Some(anchor.js_name),
         anchor.parent,
         scope,
         from_module,
@@ -4013,6 +4025,7 @@ pub(crate) fn setter_enum(
     let name = cgctx.synthesise_dynamic_union(
         &arms,
         &anchor.enum_anchor(),
+        Some(anchor.js_name),
         anchor.parent,
         scope,
         from_module,
@@ -5072,6 +5085,7 @@ mod tests {
             &ModuleContext::Global,
             ReturnAnchor {
                 base: "test",
+                js_name: "test",
                 kind: ReturnAnchorKind::Callable,
                 parent: None,
             },
@@ -6011,6 +6025,7 @@ mod tests {
         let scope = *module.file_scopes.first().expect("file scope");
         let anchor = ReturnAnchor {
             base: "x",
+            js_name: "x",
             kind: ReturnAnchorKind::Getter,
             parent: None,
         };
@@ -6087,6 +6102,7 @@ mod tests {
         let tokens = |t: TokenStream| t.to_string();
         let anchor = ReturnAnchor {
             base: "value",
+            js_name: "value",
             kind: ReturnAnchorKind::Getter,
             parent: None,
         };
@@ -6163,6 +6179,7 @@ mod tests {
             &ModuleContext::Global,
             ReturnAnchor {
                 base: "dayLike",
+                js_name: "dayLike",
                 kind: ReturnAnchorKind::Getter,
                 parent: Some("Options"),
             },

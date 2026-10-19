@@ -170,12 +170,12 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "nextDetails")]
     pub fn next_details(this: &Probe) -> Promise<Details<Mode>>;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberArg")]
-    pub fn mode_or_number_arg(this: &Probe, x: Mode) -> Result<ModeOrNumberReturnKind, JsValue>;
+    pub fn mode_or_number_arg(this: &Probe, x: Mode) -> Result<ModeOrNumberArgReturnKind, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberArg")]
     pub fn mode_or_number_arg_with_f64(
         this: &Probe,
         x: f64,
-    ) -> Result<ModeOrNumberReturnKind, JsValue>;
+    ) -> Result<ModeOrNumberArgReturnKind, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberOrString")]
     pub fn mode_or_number_or_string(this: &Probe, x: Mode) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberOrString")]
@@ -205,4 +205,9 @@ pub enum ModeOrRegionReturnKind {
 pub enum LevelOrStringReturnKind {
     Level(Level),
     String(String),
+}
+#[wasm_bindgen(private)]
+pub enum ModeOrNumberArgReturnKind {
+    Mode(Mode),
+    F64(f64),
 }

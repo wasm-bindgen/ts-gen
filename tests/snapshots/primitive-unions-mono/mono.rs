@@ -273,7 +273,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "level")]
     pub fn set_level_with_f64(this: &Settings, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn id(this: &Settings) -> CurrentReturnKind;
+    pub fn id(this: &Settings) -> SettingsIdKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &Settings, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "id")]
@@ -644,7 +644,7 @@ extern "C" {
         #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn iv(this: &Hashes) -> Option<SaltKind>;
+    pub fn iv(this: &Hashes) -> Option<IvKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_iv(
         this: &Hashes,
@@ -698,6 +698,11 @@ pub enum LevelKind {
     F64(f64),
 }
 #[wasm_bindgen(private)]
+pub enum SettingsIdKind {
+    String(String),
+    F64(f64),
+}
+#[wasm_bindgen(private)]
 pub enum LabelKind {
     String(String),
     Bool(bool),
@@ -716,6 +721,11 @@ pub enum Md5Kind {
 }
 #[wasm_bindgen(private)]
 pub enum SaltKind {
+    Uint8Array(Uint8Array),
+    ArrayBuffer(ArrayBuffer),
+}
+#[wasm_bindgen(private)]
+pub enum IvKind {
     Uint8Array(Uint8Array),
     ArrayBuffer(ArrayBuffer),
 }

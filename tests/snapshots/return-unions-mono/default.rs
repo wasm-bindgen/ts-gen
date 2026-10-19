@@ -29,6 +29,14 @@ extern "C" {
     pub async fn next(this: &FormData) -> Result<Option<JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "next")]
     pub fn next_promise(this: &FormData) -> Promise;
+    #[wasm_bindgen(method)]
+    pub fn pick(this: &FormData, index: f64) -> FirstReturnKind;
+    #[wasm_bindgen(method, catch, js_name = "pick")]
+    pub fn try_pick(this: &FormData, index: f64) -> Result<FirstReturnKind, JsValue>;
+    #[wasm_bindgen(method, js_name = "pick")]
+    pub fn pick_with_name(this: &FormData, name: &str) -> FirstReturnKind;
+    #[wasm_bindgen(method, catch, js_name = "pick")]
+    pub fn try_pick_with_name(this: &FormData, name: &str) -> Result<FirstReturnKind, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -40,6 +48,111 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn previous(this: &MessageEvent) -> Option<DataKind>;
 }
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type GetOptions;
+    #[wasm_bindgen(method, getter, js_name = "ssecKey")]
+    pub fn ssec_key(this: &GetOptions) -> Option<SsecKeyKind>;
+    #[wasm_bindgen(method, setter, js_name = "ssecKey")]
+    pub fn set_ssec_key(this: &GetOptions, val: &ArrayBuffer);
+    #[wasm_bindgen(method, setter, js_name = "ssecKey")]
+    pub fn set_ssec_key_with_str(this: &GetOptions, val: &str);
+}
+impl GetOptions {
+    pub fn new() -> GetOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> GetOptionsBuilder {
+        GetOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for GetOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct GetOptionsBuilder {
+    inner: GetOptions,
+}
+impl GetOptionsBuilder {
+    pub fn ssec_key(self, val: &ArrayBuffer) -> Self {
+        self.inner.set_ssec_key(val);
+        self
+    }
+    pub fn ssec_key_with_str(self, val: &str) -> Self {
+        self.inner.set_ssec_key_with_str(val);
+        self
+    }
+    pub fn build(self) -> GetOptions {
+        self.inner
+    }
+}
+impl From<GetOptions> for GetOptionsBuilder {
+    fn from(inner: GetOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PutOptions;
+    #[wasm_bindgen(method, getter, js_name = "ssecKey")]
+    pub fn ssec_key(this: &PutOptions) -> Option<SsecKeyKind>;
+    #[wasm_bindgen(method, setter, js_name = "ssecKey")]
+    pub fn set_ssec_key(this: &PutOptions, val: &ArrayBuffer);
+    #[wasm_bindgen(method, setter, js_name = "ssecKey")]
+    pub fn set_ssec_key_with_str(this: &PutOptions, val: &str);
+}
+impl PutOptions {
+    pub fn new() -> PutOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> PutOptionsBuilder {
+        PutOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for PutOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct PutOptionsBuilder {
+    inner: PutOptions,
+}
+impl PutOptionsBuilder {
+    pub fn ssec_key(self, val: &ArrayBuffer) -> Self {
+        self.inner.set_ssec_key(val);
+        self
+    }
+    pub fn ssec_key_with_str(self, val: &str) -> Self {
+        self.inner.set_ssec_key_with_str(val);
+        self
+    }
+    pub fn build(self) -> PutOptions {
+        self.inner
+    }
+}
+impl From<PutOptions> for PutOptionsBuilder {
+    fn from(inner: PutOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    pub fn options() -> JsValue;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "options")]
+    pub fn try_options() -> Result<JsValue, JsValue>;
+}
 #[wasm_bindgen(private)]
 pub enum FirstReturnKind {
     File(File),
@@ -49,4 +162,9 @@ pub enum FirstReturnKind {
 pub enum DataKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
+}
+#[wasm_bindgen(private)]
+pub enum SsecKeyKind {
+    ArrayBuffer(ArrayBuffer),
+    String(String),
 }

@@ -25,9 +25,16 @@ extern "C" {
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<GetReturnKind>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn first(this: &FormData) -> Result<GetReturnKind, JsValue>;
+    pub fn first(this: &FormData) -> Result<FirstReturnKind, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn next(this: &FormData) -> Promise<Option<GetReturnKind>>;
+    pub fn next(this: &FormData) -> Promise<Option<NextReturnKind>>;
+    #[wasm_bindgen(method, catch)]
+    pub fn pick(this: &FormData, index: f64) -> Result<PickReturnKind, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "pick")]
+    pub fn pick_with_name(
+        this: &FormData,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<PickReturnKind, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -37,7 +44,28 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn data(this: &MessageEvent) -> DataKind;
     #[wasm_bindgen(method, getter)]
-    pub fn previous(this: &MessageEvent) -> Option<DataKind>;
+    pub fn previous(this: &MessageEvent) -> Option<PreviousKind>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type GetOptions;
+    #[wasm_bindgen(method, getter, js_name = "ssecKey")]
+    pub fn ssec_key(this: &GetOptions) -> Option<SsecKeyKind>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PutOptions;
+    #[wasm_bindgen(method, getter, js_name = "ssecKey")]
+    pub fn ssec_key(this: &PutOptions) -> Option<SsecKeyKind>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn options() -> Result<JsValue, JsValue>;
 }
 #[wasm_bindgen(private)]
 pub enum GetReturnKind {
@@ -45,7 +73,32 @@ pub enum GetReturnKind {
     String(String),
 }
 #[wasm_bindgen(private)]
+pub enum FirstReturnKind {
+    File(File),
+    String(String),
+}
+#[wasm_bindgen(private)]
+pub enum NextReturnKind {
+    File(File),
+    String(String),
+}
+#[wasm_bindgen(private)]
+pub enum PickReturnKind {
+    File(File),
+    String(String),
+}
+#[wasm_bindgen(private)]
 pub enum DataKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
+}
+#[wasm_bindgen(private)]
+pub enum PreviousKind {
+    String(String),
+    ArrayBuffer(ArrayBuffer),
+}
+#[wasm_bindgen(private)]
+pub enum SsecKeyKind {
+    ArrayBuffer(ArrayBuffer),
+    String(String),
 }
