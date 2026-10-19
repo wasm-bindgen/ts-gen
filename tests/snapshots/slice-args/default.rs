@@ -504,3 +504,64 @@ impl<T: ::wasm_bindgen::JsGeneric> Queue<T> {
         self.__try_tag_with_null(names, &::wasm_bindgen::JsValue::NULL)
     }
 }
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Blob;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_bits(bits: &[JsValue]) -> Result<Blob, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type DataPoint;
+    #[wasm_bindgen(method, getter)]
+    pub fn blobs(this: &DataPoint) -> Option<Vec<JsValue>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_blobs(this: &DataPoint, val: &[JsValue]);
+}
+impl DataPoint {
+    pub fn new() -> DataPoint {
+        Self::builder().build()
+    }
+    pub fn builder() -> DataPointBuilder {
+        DataPointBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for DataPoint {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct DataPointBuilder {
+    inner: DataPoint,
+}
+impl DataPointBuilder {
+    pub fn blobs(self, val: &[JsValue]) -> Self {
+        self.inner.set_blobs(val);
+        self
+    }
+    pub fn build(self) -> DataPoint {
+        self.inner
+    }
+}
+impl From<DataPoint> for DataPointBuilder {
+    fn from(inner: DataPoint) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn write(point: &DataPoint);
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "write")]
+    pub fn try_write(point: &DataPoint) -> Result<(), JsValue>;
+}

@@ -25,3 +25,10 @@ export interface PutOptions {
   ssecKey?: ArrayBuffer | string;
 }
 export declare function options(): GetOptions | PutOptions;
+
+// A list of such a union reads as a `Vec` of its enum, string literals
+// included.
+export declare class Entries {
+  getAll(name: string): (File | string)[];
+  readonly include?: ("httpMetadata" | "customMetadata")[];
+}

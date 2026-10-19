@@ -153,6 +153,18 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "options")]
     pub fn try_options() -> Result<JsValue, JsValue>;
 }
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Entries;
+    #[wasm_bindgen(method, js_name = "getAll")]
+    pub fn get_all(this: &Entries, name: &str) -> Vec<JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getAll")]
+    pub fn try_get_all(this: &Entries, name: &str) -> Result<Vec<JsValue>, JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn include(this: &Entries) -> Option<Vec<String>>;
+}
 #[wasm_bindgen(private)]
 pub enum FirstReturnKind {
     File(File),

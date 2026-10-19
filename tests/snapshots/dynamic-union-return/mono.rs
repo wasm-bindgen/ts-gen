@@ -14,7 +14,7 @@ extern "C" {
     pub fn content(this: &Erased) -> ContentKind;
     #[doc = " Inner-erased generic — outer Array stays as `Vec<JsValue>`."]
     #[wasm_bindgen(method, getter)]
-    pub fn tags(this: &Erased) -> Vec<JsValue>;
+    pub fn tags(this: &Erased) -> Vec<TagsKind>;
 }
 impl Erased {
     #[allow(clippy::new_without_default)]
@@ -60,6 +60,11 @@ pub enum ContentKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
+}
+#[wasm_bindgen(private)]
+pub enum TagsKind {
+    F64(f64),
+    Foo = "foo",
 }
 #[wasm_bindgen(private)]
 pub enum VariantKind {

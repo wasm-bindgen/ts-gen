@@ -85,6 +85,13 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "nullableStrings")]
     pub fn nullable_strings(
+        values: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Vec<Option<String>>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "nullableStrings")]
+    pub fn nullable_strings_with_js_value_slice(
         values: &[JsNullable<JsString>],
     ) -> Result<Vec<Option<String>>, JsValue>;
 }
@@ -115,7 +122,9 @@ extern "C" {
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn modes(values: &[impl ::wasm_bindgen::JsStringLike]) -> Result<Vec<String>, JsValue>;
+    pub fn modes(
+        values: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Vec<ModesReturnKind>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
@@ -127,7 +136,9 @@ extern "C" {
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn counts(#[wasm_bindgen(slice = "array")] values: &[f64]) -> Result<Vec<f64>, JsValue>;
+    pub fn counts(
+        #[wasm_bindgen(slice = "array")] values: &[f64],
+    ) -> Result<Vec<CountsReturnKind>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
@@ -138,4 +149,14 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch)]
     pub fn grids(values: &[Grid]) -> Result<Vec<Grid>, JsValue>;
+}
+#[wasm_bindgen(private)]
+pub enum ModesReturnKind {
+    A = "a",
+    B = "b",
+}
+#[wasm_bindgen(private)]
+pub enum CountsReturnKind {
+    N1 = 1,
+    N2 = 2,
 }

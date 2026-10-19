@@ -67,6 +67,21 @@ extern "C" {
     #[wasm_bindgen(catch)]
     pub fn options() -> Result<JsValue, JsValue>;
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Entries;
+    #[wasm_bindgen(method, catch, js_name = "getAll")]
+    pub fn get_all(
+        this: &Entries,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Vec<GetAllReturnKind>, JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn include(this: &Entries) -> Option<Vec<IncludeKind>>;
+    #[wasm_bindgen(method, getter, js_name = "include")]
+    pub fn include_js_string(this: &Entries) -> Option<Array<JsString>>;
+}
 #[wasm_bindgen(private)]
 pub enum GetReturnKind {
     File(File),
@@ -101,4 +116,14 @@ pub enum PreviousKind {
 pub enum SsecKeyKind {
     ArrayBuffer(ArrayBuffer),
     String(String),
+}
+#[wasm_bindgen(private)]
+pub enum GetAllReturnKind {
+    File(File),
+    String(String),
+}
+#[wasm_bindgen(private)]
+pub enum IncludeKind {
+    HttpMetadata = "httpMetadata",
+    CustomMetadata = "customMetadata",
 }

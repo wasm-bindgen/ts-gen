@@ -578,3 +578,80 @@ impl<T> Queue<T> {
         self.__tag_with_null(names, &::wasm_bindgen::JsValue::NULL)
     }
 }
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Blob;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_buffer_source_slice(
+        bits: &[impl ::js_sys::BufferSourceLike],
+    ) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_blob_slice(bits: &[Blob]) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_str_slice(bits: &[impl ::wasm_bindgen::JsStringLike]) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_js_value_slice(bits: &[JsValue]) -> Result<Blob, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type DataPoint;
+    #[wasm_bindgen(method, getter)]
+    pub fn blobs(this: &DataPoint) -> Option<Vec<JsValue>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_blobs(this: &DataPoint, val: &[ArrayBuffer]);
+    #[wasm_bindgen(method, setter, js_name = "blobs")]
+    pub fn set_blobs_with_str_slice(this: &DataPoint, val: &[impl ::wasm_bindgen::JsStringLike]);
+    #[wasm_bindgen(method, setter, js_name = "blobs")]
+    pub fn set_blobs_with_js_value_slice(this: &DataPoint, val: &[JsValue]);
+}
+impl DataPoint {
+    pub fn new() -> DataPoint {
+        Self::builder().build()
+    }
+    pub fn builder() -> DataPointBuilder {
+        DataPointBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for DataPoint {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct DataPointBuilder {
+    inner: DataPoint,
+}
+impl DataPointBuilder {
+    pub fn blobs(self, val: &[ArrayBuffer]) -> Self {
+        self.inner.set_blobs(val);
+        self
+    }
+    pub fn blobs_with_str_slice(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+        self.inner.set_blobs_with_str_slice(val);
+        self
+    }
+    pub fn blobs_with_js_value_slice(self, val: &[JsValue]) -> Self {
+        self.inner.set_blobs_with_js_value_slice(val);
+        self
+    }
+    pub fn build(self) -> DataPoint {
+        self.inner
+    }
+}
+impl From<DataPoint> for DataPointBuilder {
+    fn from(inner: DataPoint) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn write(point: &DataPoint) -> Result<(), JsValue>;
+}

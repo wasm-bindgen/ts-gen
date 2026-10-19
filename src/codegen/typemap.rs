@@ -3328,17 +3328,8 @@ pub fn to_return_type(
         let read = resolve_union_aliases(ty, ctx, scope);
         match maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor) {
             Some(tokens) => tokens,
-            // Per-mono `(File | string) | null` is the enum in its empties'
-            // carrier, as an optional getter's is.
-            None => match read.split_empties() {
-                Some((inner, n)) if CodegenContext::generic_mono(ctx) => {
-                    match maybe_synthesise_return_union(&inner, ctx, scope, from_module, anchor) {
-                        Some(tokens) => read_carrier(tokens, n, ctx),
-                        None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
-                    }
-                }
-                _ => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
-            },
+            None => mono_union_container(&read, ctx, scope, from_module, anchor)
+                .unwrap_or_else(|| to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)),
         }
     };
 
@@ -3356,6 +3347,37 @@ pub fn to_return_type(
         quote! { Result<#inner, #err> }
     } else {
         inner
+    }
+}
+
+/// Per-mono a dynamic-union enum also reads through its empties' read
+/// carrier and `Vec`: `(File | string) | null` is `Option<…Kind>`, as an
+/// optional getter's is, and `(File | string)[]` is `Vec<…Kind>`
+/// (`FormData::get_all`).
+fn mono_union_container(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+    anchor: ReturnAnchor<'_>,
+) -> Option<TokenStream> {
+    if !CodegenContext::generic_mono(ctx) {
+        return None;
+    }
+    if let Some((core, n)) = ty.split_empties() {
+        let tokens = maybe_synthesise_return_union(&core, ctx, scope, from_module, anchor)
+            .or_else(|| match core {
+                TypeRef::Array(_) => mono_union_container(&core, ctx, scope, from_module, anchor),
+                _ => None,
+            })?;
+        return Some(read_carrier(tokens, n, ctx));
+    }
+    match ty {
+        TypeRef::Array(element) => {
+            let tokens = maybe_synthesise_return_union(element, ctx, scope, from_module, anchor)?;
+            Some(quote! { Vec<#tokens> })
+        }
+        _ => None,
     }
 }
 
@@ -3726,6 +3748,9 @@ pub fn to_getter_return_type(
     }
     let read = resolve_union_aliases(ty, ctx, scope);
     if let Some(tokens) = maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor) {
+        return tokens;
+    }
+    if let Some(tokens) = mono_union_container(ty, ctx, scope, from_module, anchor) {
         return tokens;
     }
     // A union admitting empties still synthesises the enum for its other

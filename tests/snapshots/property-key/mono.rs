@@ -27,7 +27,7 @@ extern "C" {
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn keys() -> Result<Vec<JsValue>, JsValue>;
+    pub fn keys() -> Result<Vec<KeysReturnKind>, JsValue>;
 }
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
@@ -41,6 +41,12 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 pub enum FirstKeyReturnKind {
+    String(String),
+    F64(f64),
+    Symbol(Symbol),
+}
+#[wasm_bindgen(private)]
+pub enum KeysReturnKind {
     String(String),
     F64(f64),
     Symbol(Symbol),

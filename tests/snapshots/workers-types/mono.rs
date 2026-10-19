@@ -4443,7 +4443,7 @@ extern "C" {
     pub fn send_beacon_with_slice(
         this: &Navigator,
         url: impl ::wasm_bindgen::JsStringLike,
-        body: &[JsValue],
+        body: &[impl ::js_sys::BufferSourceLike],
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
     pub fn send_beacon_with_async_iterable(
@@ -5541,7 +5541,14 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn indexes(this: &AnalyticsEngineDataPoint) -> Option<Vec<JsValue>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &[JsValue]);
+    pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &[ArrayBuffer]);
+    #[wasm_bindgen(method, setter, js_name = "indexes")]
+    pub fn set_indexes_with_str_slice(
+        this: &AnalyticsEngineDataPoint,
+        val: &[impl ::wasm_bindgen::JsStringLike],
+    );
+    #[wasm_bindgen(method, setter, js_name = "indexes")]
+    pub fn set_indexes_with_js_value_slice(this: &AnalyticsEngineDataPoint, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn doubles(this: &AnalyticsEngineDataPoint) -> Option<Vec<f64>>;
     #[wasm_bindgen(method, setter)]
@@ -5552,7 +5559,14 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn blobs(this: &AnalyticsEngineDataPoint) -> Option<Vec<JsValue>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &[JsValue]);
+    pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &[ArrayBuffer]);
+    #[wasm_bindgen(method, setter, js_name = "blobs")]
+    pub fn set_blobs_with_str_slice(
+        this: &AnalyticsEngineDataPoint,
+        val: &[impl ::wasm_bindgen::JsStringLike],
+    );
+    #[wasm_bindgen(method, setter, js_name = "blobs")]
+    pub fn set_blobs_with_js_value_slice(this: &AnalyticsEngineDataPoint, val: &[JsValue]);
 }
 impl AnalyticsEngineDataPoint {
     pub fn new() -> AnalyticsEngineDataPoint {
@@ -5573,16 +5587,32 @@ pub struct AnalyticsEngineDataPointBuilder {
     inner: AnalyticsEngineDataPoint,
 }
 impl AnalyticsEngineDataPointBuilder {
-    pub fn indexes(self, val: &[JsValue]) -> Self {
+    pub fn indexes(self, val: &[ArrayBuffer]) -> Self {
         self.inner.set_indexes(val);
+        self
+    }
+    pub fn indexes_with_str_slice(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+        self.inner.set_indexes_with_str_slice(val);
+        self
+    }
+    pub fn indexes_with_js_value_slice(self, val: &[JsValue]) -> Self {
+        self.inner.set_indexes_with_js_value_slice(val);
         self
     }
     pub fn doubles(self, val: &[f64]) -> Self {
         self.inner.set_doubles(val);
         self
     }
-    pub fn blobs(self, val: &[JsValue]) -> Self {
+    pub fn blobs(self, val: &[ArrayBuffer]) -> Self {
         self.inner.set_blobs(val);
+        self
+    }
+    pub fn blobs_with_str_slice(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+        self.inner.set_blobs_with_str_slice(val);
+        self
+    }
+    pub fn blobs_with_js_value_slice(self, val: &[JsValue]) -> Self {
+        self.inner.set_blobs_with_js_value_slice(val);
         self
     }
     pub fn build(self) -> AnalyticsEngineDataPoint {
@@ -6286,9 +6316,34 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_type(r#type: &[JsValue]) -> Result<Blob, JsValue>;
+    pub fn new_with_buffer_source_slice(
+        r#type: &[impl ::js_sys::BufferSourceLike],
+    ) -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_type_and_options(
+    pub fn new_with_str_slice(
+        r#type: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_blob_slice(r#type: &[Blob]) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_js_value_slice(r#type: &[JsValue]) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_buffer_source_slice_and_options(
+        r#type: &[impl ::js_sys::BufferSourceLike],
+        options: &BlobOptions,
+    ) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_str_slice_and_options(
+        r#type: &[impl ::wasm_bindgen::JsStringLike],
+        options: &BlobOptions,
+    ) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_blob_slice_and_options(
+        r#type: &[Blob],
+        options: &BlobOptions,
+    ) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_js_value_slice_and_options(
         r#type: &[JsValue],
         options: &BlobOptions,
     ) -> Result<Blob, JsValue>;
@@ -6409,11 +6464,44 @@ extern "C" {
     pub type File;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(
+        bits: Option<&[impl ::js_sys::BufferSourceLike]>,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<File, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_str_slice(
+        bits: Option<&[String]>,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<File, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_blob_slice(
+        bits: Option<&[Blob]>,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<File, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_js_value_slice(
         bits: Option<&[JsValue]>,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<File, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_options(
+        bits: Option<&[impl ::js_sys::BufferSourceLike]>,
+        name: impl ::wasm_bindgen::JsStringLike,
+        options: &FileOptions,
+    ) -> Result<File, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_str_slice_and_options(
+        bits: Option<&[String]>,
+        name: impl ::wasm_bindgen::JsStringLike,
+        options: &FileOptions,
+    ) -> Result<File, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_blob_slice_and_options(
+        bits: Option<&[Blob]>,
+        name: impl ::wasm_bindgen::JsStringLike,
+        options: &FileOptions,
+    ) -> Result<File, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_js_value_slice_and_options(
         bits: Option<&[JsValue]>,
         name: impl ::wasm_bindgen::JsStringLike,
         options: &FileOptions,
@@ -8335,7 +8423,7 @@ extern "C" {
     pub fn get_all(
         this: &FormData,
         name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Vec<JsValue>, JsValue>;
+    ) -> Result<Vec<GetAllReturnKind>, JsValue>;
     #[doc = " The **`has()`** method of the FormData interface returns whether a `FormData` object contains a certain key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/has)"]
@@ -9193,7 +9281,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_slice(body: &[JsValue]) -> Result<Response, JsValue>;
+    pub fn new_with_slice(body: &[impl ::js_sys::BufferSourceLike]) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_async_iterable(body: &JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -9227,7 +9315,7 @@ extern "C" {
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_slice_and_init(
-        body: &[JsValue],
+        body: &[impl ::js_sys::BufferSourceLike],
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -9659,7 +9747,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_form_data<Cf>(this: &RequestInit<Cf>, val: &FormData);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_slice<Cf>(this: &RequestInit<Cf>, val: &[JsValue]);
+    pub fn set_body_with_slice<Cf>(this: &RequestInit<Cf>, val: &[impl ::js_sys::BufferSourceLike]);
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_async_iterable<Cf>(this: &RequestInit<Cf>, val: &JsValue);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -9775,7 +9863,7 @@ impl<Cf> RequestInitBuilder<Cf> {
         self.inner.set_body_with_form_data(val);
         self
     }
-    pub fn body_with_slice(self, val: &[JsValue]) -> Self {
+    pub fn body_with_slice(self, val: &[impl ::js_sys::BufferSourceLike]) -> Self {
         self.inner.set_body_with_slice(val);
         self
     }
@@ -11356,7 +11444,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "startAfter")]
     pub fn set_start_after(this: &R2ListOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn include(this: &R2ListOptions) -> Option<Vec<String>>;
+    pub fn include(this: &R2ListOptions) -> Option<Vec<IncludeKind>>;
     #[wasm_bindgen(method, getter, js_name = "include")]
     pub fn include_js_string(this: &R2ListOptions) -> Option<Array<JsString>>;
     #[wasm_bindgen(method, setter)]
@@ -15133,7 +15221,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type URLPatternResult;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &URLPatternResult) -> Vec<JsValue>;
+    pub fn inputs(this: &URLPatternResult) -> Vec<InputsKind>;
     #[wasm_bindgen(method, getter)]
     pub fn protocol(this: &URLPatternResult) -> URLPatternComponentResult;
     #[wasm_bindgen(method, getter)]
@@ -19030,7 +19118,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &AiTextGenerationInput, val: &[AiTextGenerationToolInput]);
     #[wasm_bindgen(method, setter, js_name = "tools")]
-    pub fn set_tools_with_slice(
+    pub fn set_tools_with_ai_text_generation_tool_legacy_input_slice(
         this: &AiTextGenerationInput,
         val: &[AiTextGenerationToolLegacyInput],
     );
@@ -19116,8 +19204,12 @@ impl AiTextGenerationInputBuilder {
         self.inner.set_tools(val);
         self
     }
-    pub fn tools_with_slice(self, val: &[AiTextGenerationToolLegacyInput]) -> Self {
-        self.inner.set_tools_with_slice(val);
+    pub fn tools_with_ai_text_generation_tool_legacy_input_slice(
+        self,
+        val: &[AiTextGenerationToolLegacyInput],
+    ) -> Self {
+        self.inner
+            .set_tools_with_ai_text_generation_tool_legacy_input_slice(val);
         self
     }
     pub fn tools_with_object(self, val: &Object) -> Self {
@@ -20990,7 +21082,17 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseCustomToolCallOutput, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_slice(this: &ResponseCustomToolCallOutput, val: &[JsValue]);
+    pub fn set_output_with_response_input_text_slice(
+        this: &ResponseCustomToolCallOutput,
+        val: &[ResponseInputText],
+    );
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_response_input_image_slice(
+        this: &ResponseCustomToolCallOutput,
+        val: &[ResponseInputImage],
+    );
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_js_value_slice(this: &ResponseCustomToolCallOutput, val: &[JsValue]);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseCustomToolCallOutput) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -21015,9 +21117,23 @@ impl ResponseCustomToolCallOutput {
     #[doc = " Construct with `type: \"custom_tool_call_output\"`."]
     pub fn new_with_slice(
         call_id: impl ::wasm_bindgen::JsStringLike,
-        output: &[JsValue],
+        output: &[ResponseInputText],
     ) -> ResponseCustomToolCallOutput {
         Self::builder_with_slice(call_id, output).build()
+    }
+    #[doc = " Construct with `type: \"custom_tool_call_output\"`."]
+    pub fn new_with_output_slice(
+        call_id: impl ::wasm_bindgen::JsStringLike,
+        output: &[ResponseInputImage],
+    ) -> ResponseCustomToolCallOutput {
+        Self::builder_with_output_slice(call_id, output).build()
+    }
+    #[doc = " Construct with `type: \"custom_tool_call_output\"`."]
+    pub fn new_with_output_slice_2(
+        call_id: impl ::wasm_bindgen::JsStringLike,
+        output: &[JsValue],
+    ) -> ResponseCustomToolCallOutput {
+        Self::builder_with_output_slice_2(call_id, output).build()
     }
     #[doc = " Start a builder with `type: \"custom_tool_call_output\"`."]
     pub fn builder(
@@ -21033,11 +21149,33 @@ impl ResponseCustomToolCallOutput {
     #[doc = " Start a builder with `type: \"custom_tool_call_output\"`."]
     pub fn builder_with_slice(
         call_id: impl ::wasm_bindgen::JsStringLike,
+        output: &[ResponseInputText],
+    ) -> ResponseCustomToolCallOutputBuilder {
+        let inner: ResponseCustomToolCallOutput = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_call_id(call_id);
+        inner.set_output_with_response_input_text_slice(output);
+        inner.set_type("custom_tool_call_output");
+        ResponseCustomToolCallOutputBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"custom_tool_call_output\"`."]
+    pub fn builder_with_output_slice(
+        call_id: impl ::wasm_bindgen::JsStringLike,
+        output: &[ResponseInputImage],
+    ) -> ResponseCustomToolCallOutputBuilder {
+        let inner: ResponseCustomToolCallOutput = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_call_id(call_id);
+        inner.set_output_with_response_input_image_slice(output);
+        inner.set_type("custom_tool_call_output");
+        ResponseCustomToolCallOutputBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"custom_tool_call_output\"`."]
+    pub fn builder_with_output_slice_2(
+        call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
     ) -> ResponseCustomToolCallOutputBuilder {
         let inner: ResponseCustomToolCallOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
-        inner.set_output_with_slice(output);
+        inner.set_output_with_js_value_slice(output);
         inner.set_type("custom_tool_call_output");
         ResponseCustomToolCallOutputBuilder { inner }
     }
@@ -21743,7 +21881,20 @@ extern "C" {
         val: impl ::wasm_bindgen::JsStringLike,
     );
     #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_slice(this: &ResponseFunctionToolCallOutputItem, val: &[JsValue]);
+    pub fn set_output_with_response_input_text_slice(
+        this: &ResponseFunctionToolCallOutputItem,
+        val: &[ResponseInputText],
+    );
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_response_input_image_slice(
+        this: &ResponseFunctionToolCallOutputItem,
+        val: &[ResponseInputImage],
+    );
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_js_value_slice(
+        this: &ResponseFunctionToolCallOutputItem,
+        val: &[JsValue],
+    );
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFunctionToolCallOutputItem) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -21771,9 +21922,25 @@ impl ResponseFunctionToolCallOutputItem {
     pub fn new_with_slice(
         id: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
-        output: &[JsValue],
+        output: &[ResponseInputText],
     ) -> ResponseFunctionToolCallOutputItem {
         Self::builder_with_slice(id, call_id, output).build()
+    }
+    #[doc = " Construct with `type: \"function_call_output\"`."]
+    pub fn new_with_output_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        call_id: impl ::wasm_bindgen::JsStringLike,
+        output: &[ResponseInputImage],
+    ) -> ResponseFunctionToolCallOutputItem {
+        Self::builder_with_output_slice(id, call_id, output).build()
+    }
+    #[doc = " Construct with `type: \"function_call_output\"`."]
+    pub fn new_with_output_slice_2(
+        id: impl ::wasm_bindgen::JsStringLike,
+        call_id: impl ::wasm_bindgen::JsStringLike,
+        output: &[JsValue],
+    ) -> ResponseFunctionToolCallOutputItem {
+        Self::builder_with_output_slice_2(id, call_id, output).build()
     }
     #[doc = " Start a builder with `type: \"function_call_output\"`."]
     pub fn builder(
@@ -21793,13 +21960,41 @@ impl ResponseFunctionToolCallOutputItem {
     pub fn builder_with_slice(
         id: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
+        output: &[ResponseInputText],
+    ) -> ResponseFunctionToolCallOutputItemBuilder {
+        let inner: ResponseFunctionToolCallOutputItem =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_call_id(call_id);
+        inner.set_output_with_response_input_text_slice(output);
+        inner.set_type("function_call_output");
+        ResponseFunctionToolCallOutputItemBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"function_call_output\"`."]
+    pub fn builder_with_output_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        call_id: impl ::wasm_bindgen::JsStringLike,
+        output: &[ResponseInputImage],
+    ) -> ResponseFunctionToolCallOutputItemBuilder {
+        let inner: ResponseFunctionToolCallOutputItem =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_call_id(call_id);
+        inner.set_output_with_response_input_image_slice(output);
+        inner.set_type("function_call_output");
+        ResponseFunctionToolCallOutputItemBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"function_call_output\"`."]
+    pub fn builder_with_output_slice_2(
+        id: impl ::wasm_bindgen::JsStringLike,
+        call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
     ) -> ResponseFunctionToolCallOutputItemBuilder {
         let inner: ResponseFunctionToolCallOutputItem =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_call_id(call_id);
-        inner.set_output_with_slice(output);
+        inner.set_output_with_js_value_slice(output);
         inner.set_type("function_call_output");
         ResponseFunctionToolCallOutputItemBuilder { inner }
     }
@@ -22728,7 +22923,14 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &ResponseOutputMessage) -> Vec<JsValue>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_content(this: &ResponseOutputMessage, val: &[JsValue]);
+    pub fn set_content(this: &ResponseOutputMessage, val: &[ResponseOutputText]);
+    #[wasm_bindgen(method, setter, js_name = "content")]
+    pub fn set_content_with_response_output_refusal_slice(
+        this: &ResponseOutputMessage,
+        val: &[ResponseOutputRefusal],
+    );
+    #[wasm_bindgen(method, setter, js_name = "content")]
+    pub fn set_content_with_js_value_slice(this: &ResponseOutputMessage, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseOutputMessage) -> String;
     #[wasm_bindgen(method, getter, js_name = "role")]
@@ -22750,28 +22952,70 @@ impl ResponseOutputMessage {
     #[doc = " Construct with `role: \"assistant\"`, `status: \"in_progress\"` and `type: \"message\"`."]
     pub fn new_in_progress(
         id: impl ::wasm_bindgen::JsStringLike,
-        content: &[JsValue],
+        content: &[ResponseOutputText],
     ) -> ResponseOutputMessage {
         Self::builder_in_progress(id, content).build()
     }
     #[doc = " Construct with `role: \"assistant\"`, `status: \"completed\"` and `type: \"message\"`."]
     pub fn new_completed(
         id: impl ::wasm_bindgen::JsStringLike,
-        content: &[JsValue],
+        content: &[ResponseOutputText],
     ) -> ResponseOutputMessage {
         Self::builder_completed(id, content).build()
     }
     #[doc = " Construct with `role: \"assistant\"`, `status: \"incomplete\"` and `type: \"message\"`."]
     pub fn new_incomplete(
         id: impl ::wasm_bindgen::JsStringLike,
-        content: &[JsValue],
+        content: &[ResponseOutputText],
     ) -> ResponseOutputMessage {
         Self::builder_incomplete(id, content).build()
+    }
+    #[doc = " Construct with `role: \"assistant\"`, `status: \"in_progress\"` and `type: \"message\"`."]
+    pub fn new_in_progress_with_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[ResponseOutputRefusal],
+    ) -> ResponseOutputMessage {
+        Self::builder_in_progress_with_slice(id, content).build()
+    }
+    #[doc = " Construct with `role: \"assistant\"`, `status: \"completed\"` and `type: \"message\"`."]
+    pub fn new_completed_with_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[ResponseOutputRefusal],
+    ) -> ResponseOutputMessage {
+        Self::builder_completed_with_slice(id, content).build()
+    }
+    #[doc = " Construct with `role: \"assistant\"`, `status: \"incomplete\"` and `type: \"message\"`."]
+    pub fn new_incomplete_with_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[ResponseOutputRefusal],
+    ) -> ResponseOutputMessage {
+        Self::builder_incomplete_with_slice(id, content).build()
+    }
+    #[doc = " Construct with `role: \"assistant\"`, `status: \"in_progress\"` and `type: \"message\"`."]
+    pub fn new_in_progress_with_content_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[JsValue],
+    ) -> ResponseOutputMessage {
+        Self::builder_in_progress_with_content_slice(id, content).build()
+    }
+    #[doc = " Construct with `role: \"assistant\"`, `status: \"completed\"` and `type: \"message\"`."]
+    pub fn new_completed_with_content_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[JsValue],
+    ) -> ResponseOutputMessage {
+        Self::builder_completed_with_content_slice(id, content).build()
+    }
+    #[doc = " Construct with `role: \"assistant\"`, `status: \"incomplete\"` and `type: \"message\"`."]
+    pub fn new_incomplete_with_content_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[JsValue],
+    ) -> ResponseOutputMessage {
+        Self::builder_incomplete_with_content_slice(id, content).build()
     }
     #[doc = " Start a builder with `role: \"assistant\"`, `status: \"in_progress\"` and `type: \"message\"`."]
     pub fn builder_in_progress(
         id: impl ::wasm_bindgen::JsStringLike,
-        content: &[JsValue],
+        content: &[ResponseOutputText],
     ) -> ResponseOutputMessageBuilder {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
@@ -22784,7 +23028,7 @@ impl ResponseOutputMessage {
     #[doc = " Start a builder with `role: \"assistant\"`, `status: \"completed\"` and `type: \"message\"`."]
     pub fn builder_completed(
         id: impl ::wasm_bindgen::JsStringLike,
-        content: &[JsValue],
+        content: &[ResponseOutputText],
     ) -> ResponseOutputMessageBuilder {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
@@ -22797,11 +23041,89 @@ impl ResponseOutputMessage {
     #[doc = " Start a builder with `role: \"assistant\"`, `status: \"incomplete\"` and `type: \"message\"`."]
     pub fn builder_incomplete(
         id: impl ::wasm_bindgen::JsStringLike,
-        content: &[JsValue],
+        content: &[ResponseOutputText],
     ) -> ResponseOutputMessageBuilder {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
+        inner.set_role("assistant");
+        inner.set_status(StatusKind::Incomplete);
+        inner.set_type("message");
+        ResponseOutputMessageBuilder { inner }
+    }
+    #[doc = " Start a builder with `role: \"assistant\"`, `status: \"in_progress\"` and `type: \"message\"`."]
+    pub fn builder_in_progress_with_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[ResponseOutputRefusal],
+    ) -> ResponseOutputMessageBuilder {
+        let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_content_with_response_output_refusal_slice(content);
+        inner.set_role("assistant");
+        inner.set_status(StatusKind::InProgress);
+        inner.set_type("message");
+        ResponseOutputMessageBuilder { inner }
+    }
+    #[doc = " Start a builder with `role: \"assistant\"`, `status: \"completed\"` and `type: \"message\"`."]
+    pub fn builder_completed_with_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[ResponseOutputRefusal],
+    ) -> ResponseOutputMessageBuilder {
+        let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_content_with_response_output_refusal_slice(content);
+        inner.set_role("assistant");
+        inner.set_status(StatusKind::Completed);
+        inner.set_type("message");
+        ResponseOutputMessageBuilder { inner }
+    }
+    #[doc = " Start a builder with `role: \"assistant\"`, `status: \"incomplete\"` and `type: \"message\"`."]
+    pub fn builder_incomplete_with_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[ResponseOutputRefusal],
+    ) -> ResponseOutputMessageBuilder {
+        let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_content_with_response_output_refusal_slice(content);
+        inner.set_role("assistant");
+        inner.set_status(StatusKind::Incomplete);
+        inner.set_type("message");
+        ResponseOutputMessageBuilder { inner }
+    }
+    #[doc = " Start a builder with `role: \"assistant\"`, `status: \"in_progress\"` and `type: \"message\"`."]
+    pub fn builder_in_progress_with_content_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[JsValue],
+    ) -> ResponseOutputMessageBuilder {
+        let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_content_with_js_value_slice(content);
+        inner.set_role("assistant");
+        inner.set_status(StatusKind::InProgress);
+        inner.set_type("message");
+        ResponseOutputMessageBuilder { inner }
+    }
+    #[doc = " Start a builder with `role: \"assistant\"`, `status: \"completed\"` and `type: \"message\"`."]
+    pub fn builder_completed_with_content_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[JsValue],
+    ) -> ResponseOutputMessageBuilder {
+        let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_content_with_js_value_slice(content);
+        inner.set_role("assistant");
+        inner.set_status(StatusKind::Completed);
+        inner.set_type("message");
+        ResponseOutputMessageBuilder { inner }
+    }
+    #[doc = " Start a builder with `role: \"assistant\"`, `status: \"incomplete\"` and `type: \"message\"`."]
+    pub fn builder_incomplete_with_content_slice(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[JsValue],
+    ) -> ResponseOutputMessageBuilder {
+        let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_content_with_js_value_slice(content);
         inner.set_role("assistant");
         inner.set_status(StatusKind::Incomplete);
         inner.set_type("message");
@@ -29941,14 +30263,44 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_requests(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch,
+        val: &[Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner],
+    );
+    #[wasm_bindgen(method, setter, js_name = "requests")]
+    pub fn set_requests_with_ai_cf_meta_llama4_scout17_b16_e_instruct_messages_inner_slice(
+        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch,
+        val: &[Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner],
+    );
+    #[wasm_bindgen(method, setter, js_name = "requests")]
+    pub fn set_requests_with_js_value_slice(
+        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch,
         val: &[JsValue],
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
-    pub fn new(requests: &[JsValue]) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
+    pub fn new(
+        requests: &[Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner],
+    ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
         let inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_requests(requests);
+        inner
+    }
+    pub fn new_with_slice(
+        requests: &[Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner],
+    ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
+        let inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_requests_with_ai_cf_meta_llama4_scout17_b16_e_instruct_messages_inner_slice(
+            requests,
+        );
+        inner
+    }
+    pub fn new_with_requests_slice(
+        requests: &[JsValue],
+    ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
+        let inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_requests_with_js_value_slice(requests);
         inner
     }
 }
@@ -30952,13 +31304,44 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch) -> Vec<JsValue>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_requests(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch, val: &[JsValue]);
+    pub fn set_requests(
+        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch,
+        val: &[Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1],
+    );
+    #[wasm_bindgen(method, setter, js_name = "requests")]
+    pub fn set_requests_with_ai_cf_qwen_qwen3_30_b_a3_b_fp8_messages1_slice(
+        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch,
+        val: &[Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1],
+    );
+    #[wasm_bindgen(method, setter, js_name = "requests")]
+    pub fn set_requests_with_js_value_slice(
+        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch,
+        val: &[JsValue],
+    );
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
-    pub fn new(requests: &[JsValue]) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
+    pub fn new(
+        requests: &[Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1],
+    ) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
         let inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_requests(requests);
+        inner
+    }
+    pub fn new_with_slice(
+        requests: &[Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1],
+    ) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
+        let inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_requests_with_ai_cf_qwen_qwen3_30_b_a3_b_fp8_messages1_slice(requests);
+        inner
+    }
+    pub fn new_with_requests_slice(
+        requests: &[JsValue],
+    ) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
+        let inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_requests_with_js_value_slice(requests);
         inner
     }
 }
@@ -33752,14 +34135,44 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_requests(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch,
+        val: &[Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1],
+    );
+    #[wasm_bindgen(method, setter, js_name = "requests")]
+    pub fn set_requests_with_ai_cf_aisingapore_gemma_sea_lion_v4_27_b_it_messages1_slice(
+        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch,
+        val: &[Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1],
+    );
+    #[wasm_bindgen(method, setter, js_name = "requests")]
+    pub fn set_requests_with_js_value_slice(
+        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch,
         val: &[JsValue],
     );
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
-    pub fn new(requests: &[JsValue]) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
+    pub fn new(
+        requests: &[Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1],
+    ) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
         let inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_requests(requests);
+        inner
+    }
+    pub fn new_with_slice(
+        requests: &[Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1],
+    ) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
+        let inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_requests_with_ai_cf_aisingapore_gemma_sea_lion_v4_27_b_it_messages1_slice(
+            requests,
+        );
+        inner
+    }
+    pub fn new_with_requests_slice(
+        requests: &[JsValue],
+    ) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
+        let inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_requests_with_js_value_slice(requests);
         inner
     }
 }
@@ -50191,7 +50604,7 @@ extern "C" {
     pub fn score(this: &VectorizeMatch) -> f64;
     #[doc = " The vector values"]
     #[wasm_bindgen(method, getter)]
-    pub fn values(this: &VectorizeMatch) -> Option<ValuesKind>;
+    pub fn values(this: &VectorizeMatch) -> Option<VectorizeMatchValuesKind>;
     #[doc = " The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &VectorizeMatch) -> String;
@@ -51561,11 +51974,28 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "$in")]
     pub fn in_(this: &VectorizeVectorMetadataFilter3) -> Option<Vec<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$in")]
-    pub fn set_in(this: &VectorizeVectorMetadataFilter3, val: &[JsValue]);
+    pub fn set_in(this: &VectorizeVectorMetadataFilter3, val: &[impl ::wasm_bindgen::JsStringLike]);
+    #[wasm_bindgen(method, setter, js_name = "$in")]
+    pub fn set_in_with_f64_slice(
+        this: &VectorizeVectorMetadataFilter3,
+        #[wasm_bindgen(slice = "array")] val: &[f64],
+    );
+    #[wasm_bindgen(method, setter, js_name = "$in")]
+    pub fn set_in_with_js_value_slice(this: &VectorizeVectorMetadataFilter3, val: &[JsValue]);
     #[wasm_bindgen(method, getter, js_name = "$nin")]
     pub fn nin(this: &VectorizeVectorMetadataFilter3) -> Option<Vec<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$nin")]
-    pub fn set_nin(this: &VectorizeVectorMetadataFilter3, val: &[JsValue]);
+    pub fn set_nin(
+        this: &VectorizeVectorMetadataFilter3,
+        val: &[impl ::wasm_bindgen::JsStringLike],
+    );
+    #[wasm_bindgen(method, setter, js_name = "$nin")]
+    pub fn set_nin_with_f64_slice(
+        this: &VectorizeVectorMetadataFilter3,
+        #[wasm_bindgen(slice = "array")] val: &[f64],
+    );
+    #[wasm_bindgen(method, setter, js_name = "$nin")]
+    pub fn set_nin_with_js_value_slice(this: &VectorizeVectorMetadataFilter3, val: &[JsValue]);
 }
 impl VectorizeVectorMetadataFilter3 {
     pub fn new() -> VectorizeVectorMetadataFilter3 {
@@ -51586,12 +52016,28 @@ pub struct VectorizeVectorMetadataFilter3Builder {
     inner: VectorizeVectorMetadataFilter3,
 }
 impl VectorizeVectorMetadataFilter3Builder {
-    pub fn in_(self, val: &[JsValue]) -> Self {
+    pub fn in_(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
         self.inner.set_in(val);
         self
     }
-    pub fn nin(self, val: &[JsValue]) -> Self {
+    pub fn in_with_f64_slice(self, val: &[f64]) -> Self {
+        self.inner.set_in_with_f64_slice(val);
+        self
+    }
+    pub fn in_with_js_value_slice(self, val: &[JsValue]) -> Self {
+        self.inner.set_in_with_js_value_slice(val);
+        self
+    }
+    pub fn nin(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
         self.inner.set_nin(val);
+        self
+    }
+    pub fn nin_with_f64_slice(self, val: &[f64]) -> Self {
+        self.inner.set_nin_with_f64_slice(val);
+        self
+    }
+    pub fn nin_with_js_value_slice(self, val: &[JsValue]) -> Self {
+        self.inner.set_nin_with_js_value_slice(val);
         self
     }
     pub fn build(self) -> VectorizeVectorMetadataFilter3 {
@@ -51674,6 +52120,11 @@ pub enum GetReturnKind {
     String(String),
 }
 #[wasm_bindgen(private)]
+pub enum GetAllReturnKind {
+    File(File),
+    String(String),
+}
+#[wasm_bindgen(private)]
 pub enum TypeKind {
     Default = "default",
     Error = "error",
@@ -51709,6 +52160,11 @@ pub enum BodyKind {
 pub enum EncodeResponseBodyKind {
     Automatic = "automatic",
     Manual = "manual",
+}
+#[wasm_bindgen(private)]
+pub enum IncludeKind {
+    HttpMetadata = "httpMetadata",
+    CustomMetadata = "customMetadata",
 }
 #[wasm_bindgen(private, fallback)]
 pub enum OnlyIfKind {
@@ -51769,6 +52225,11 @@ pub enum HighWaterMarkKind {
 pub enum ExpectedLengthKind {
     F64(f64),
     BigInt(BigInt),
+}
+#[wasm_bindgen(private, fallback)]
+pub enum InputsKind {
+    String(String),
+    UrlPatternInit(URLPatternInit),
 }
 #[wasm_bindgen(private)]
 pub enum BinaryTypeKind {
@@ -52382,8 +52843,8 @@ pub enum TailStreamReturnKind {
 }
 #[wasm_bindgen(private)]
 pub enum TimeoutKind {
-    String(String),
     F64(f64),
+    JsValue(JsValue),
 }
 #[wasm_bindgen(private)]
 pub enum ImageInfoResponseFormatKind {
@@ -52511,6 +52972,11 @@ pub enum ValuesKind {
     Float32Array(Float32Array),
     Float64Array(Float64Array),
     VecOfF64(Vec<f64>),
+}
+#[wasm_bindgen(private)]
+pub enum VectorizeMatchValuesKind {
+    VecOfF64(Vec<f64>),
+    JsValue(JsValue),
 }
 #[wasm_bindgen(private)]
 pub enum InstanceStatusStatusKind {

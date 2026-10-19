@@ -122,6 +122,23 @@
   ;; tag(names: Iterable<string>, scores: null): void
   (import "slice-args" "Queue.tag_with_null" (func $slice-args:Queue.tag_with_null (param $this externref) (param $names externref) (param $scores externref)))
 
+  ;; Blob
+  ;; constructor()
+  (import "slice-args" "Blob.new" (func $slice-args:Blob.new (result externref)))
+  ;; constructor(bits: (ArrayBuffer | ArrayBufferView | Blob | string)[])
+  (import "slice-args" "Blob.new_with_bits" (func $slice-args:Blob.new_with_bits (param $bits externref) (result externref)))
+
+  ;; DataPoint
+  ;; {} as DataPoint
+  (import "slice-args" "DataPoint.new" (func $slice-args:DataPoint.new (result externref)))
+  ;; blobs?: (ArrayBuffer | string | null)[]
+  (import "slice-args" "DataPoint.blobs" (func $slice-args:DataPoint.blobs (param $this externref) (result externref)))
+  ;; set blobs(value: (ArrayBuffer | string | null)[])
+  (import "slice-args" "DataPoint.set_blobs" (func $slice-args:DataPoint.set_blobs (param $this externref) (param $value externref)))
+
+  ;; write(point: DataPoint): void
+  (import "slice-args" "write" (func $slice-args:write (param $point externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 
