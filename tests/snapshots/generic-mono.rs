@@ -227,3 +227,46 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "roundtripNumber")]
     pub fn try_roundtrip_number(value: f64) -> Result<f64, JsValue>;
 }
+#[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type RandomSource;
+    #[wasm_bindgen(method, js_name = "getRandomValues")]
+    pub fn get_random_values<T: ::js_sys::TypedArray + RefIntoWasmAbi + FromWasmAbi>(
+        this: &RandomSource,
+        buffer: &T,
+    ) -> T;
+    #[wasm_bindgen(method, catch, js_name = "getRandomValues")]
+    pub fn try_get_random_values<T: ::js_sys::TypedArray + RefIntoWasmAbi + FromWasmAbi>(
+        this: &RandomSource,
+        buffer: &T,
+    ) -> Result<T, JsValue>;
+    #[wasm_bindgen(method, js_name = "fillBytes")]
+    pub fn fill_bytes<T: ::js_sys::TypedArray + RefIntoWasmAbi + FromWasmAbi>(
+        this: &RandomSource,
+        buffer: &T,
+    ) -> T;
+    #[wasm_bindgen(method, catch, js_name = "fillBytes")]
+    pub fn try_fill_bytes<T: ::js_sys::TypedArray + RefIntoWasmAbi + FromWasmAbi>(
+        this: &RandomSource,
+        buffer: &T,
+    ) -> Result<T, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn echo(this: &RandomSource, value: impl ::wasm_bindgen::JsStringLike) -> String;
+    #[wasm_bindgen(method, js_name = "echo")]
+    pub fn echo_js_string(
+        this: &RandomSource,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> JsString;
+    #[wasm_bindgen(method, catch, js_name = "echo")]
+    pub fn try_echo(
+        this: &RandomSource,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "echo")]
+    pub fn try_echo_js_string(
+        this: &RandomSource,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+}

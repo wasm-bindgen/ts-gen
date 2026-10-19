@@ -151,6 +151,17 @@ pub(crate) fn argument_bounds<'a>(
     dedup(out)
 }
 
+/// The bounds reading each of `tys` from JS needs for `params`.
+pub(crate) fn return_bounds<'a>(
+    tys: impl Iterator<Item = &'a Type>,
+    params: &[Ident],
+) -> Vec<WherePredicate> {
+    dedup(
+        tys.filter_map(|ty| shape_bound(ty, params, Position::Return))
+            .collect(),
+    )
+}
+
 #[derive(Clone, Copy, PartialEq)]
 enum Position {
     Argument,

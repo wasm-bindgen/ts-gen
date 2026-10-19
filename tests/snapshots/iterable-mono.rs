@@ -71,10 +71,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(this: &Cursor<T>) -> Iterator<T>;
 }
-impl<'a, T> ::core::iter::IntoIterator for &'a Cursor<T>
-where
-    Iterator<T>: ::core::iter::IntoIterator<Item = T>,
-{
+impl<'a, T: FromWasmAbi> ::core::iter::IntoIterator for &'a Cursor<T> {
     type Item = T;
     type IntoIter = <Iterator<T> as ::core::iter::IntoIterator>::IntoIter;
     fn into_iter(self) -> Self::IntoIter {

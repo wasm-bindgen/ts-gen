@@ -826,8 +826,47 @@ impl<'a> ClassConfig<'a> {
         names
             .into_iter()
             .filter(|n| !type_level.contains(n.as_str()))
-            .map(|n| CodegenContext::type_param_decl(Some(cgctx), &n))
+            .map(|n| match self.typed_array_param(scope, &n) {
+                true => {
+                    let ident = super::typemap::make_ident(&n);
+                    quote! { #ident: ::js_sys::TypedArray }
+                }
+                false => CodegenContext::type_param_decl(Some(cgctx), &n),
+            })
             .collect()
+    }
+
+    /// Per-mono, a method type parameter constrained to typed arrays
+    /// (`T extends ArrayBufferView`, `T extends Int8Array | Uint8Array`) is
+    /// bounded by `js_sys::TypedArray` (every typed array and `DataView`),
+    /// so its ABI bound is not the only contract.
+    fn typed_array_param(&self, scope: ScopeId, name: &str) -> bool {
+        if !CodegenContext::generic_mono(self.cgctx) {
+            return false;
+        }
+        let constraint = self.members.iter().find_map(|m| {
+            let (body_scope, params) = match m {
+                Member::Method(m) => (m.body_scope, &m.type_params),
+                Member::StaticMethod(m) => (m.body_scope, &m.type_params),
+                _ => return None,
+            };
+            (body_scope == scope)
+                .then(|| params.iter().find(|tp| tp.name == name))
+                .flatten()
+                .and_then(|tp| tp.constraint.as_ref())
+        });
+        fn typed(ty: &TypeRef) -> bool {
+            match ty {
+                TypeRef::ArrayBufferView => true,
+                TypeRef::Union(members) => members.iter().all(typed),
+                TypeRef::Reference { segments, .. } if segments.len() == 1 => {
+                    segments[0] == "DataView"
+                        || crate::ir::TypedArrayElement::of_typed_array(&segments[0]).is_some()
+                }
+                _ => false,
+            }
+        }
+        constraint.is_some_and(typed)
     }
 
     /// Rust name to use everywhere the class identifier appears in generated
@@ -2306,7 +2345,7 @@ fn generate_into_iterator(
             &from_module,
         )
     };
-    let (iter_ty, item_ty, into_iter, body, bound) = match item {
+    let (iter_ty, item_ty, into_iter, body, elems) = match item {
         TypeRef::Tuple(elems) if elems.len() == 2 => {
             let (k, v) = (lower(&elems[0]), lower(&elems[1]));
             (
@@ -2314,7 +2353,7 @@ fn generate_into_iterator(
                 quote! { (#k, #v) },
                 quote! { ::js_sys::Entries<#k, #v> },
                 quote! { ::js_sys::Entries::from(self.#ident()) },
-                quote! { ::js_sys::Entries<#k, #v>: ::core::iter::Iterator<Item = (#k, #v)> },
+                vec![k, v],
             )
         }
         _ => {
@@ -2324,15 +2363,23 @@ fn generate_into_iterator(
                 quote! { #t },
                 quote! { <Iterator<#t> as ::core::iter::IntoIterator>::IntoIter },
                 quote! { ::core::iter::IntoIterator::into_iter(self.#ident()) },
-                quote! { Iterator<#t>: ::core::iter::IntoIterator<Item = #t> },
+                vec![t],
             )
         }
     };
-    let where_clause = if config.type_params.is_empty() {
-        quote! {}
-    } else {
-        quote! { where #bound }
-    };
+    // js-sys iterates any item it can read (`T: FromWasmAbi`), so the impl
+    // bounds the item, not the iterator.
+    let params: Vec<syn::Ident> = config
+        .type_params
+        .iter()
+        .map(|tp| super::typemap::make_ident(&tp.name))
+        .collect();
+    let elem_tys: Vec<syn::Type> = elems
+        .iter()
+        .filter_map(|t| syn::parse2(t.clone()).ok())
+        .collect();
+    let preds = super::abi_bounds::return_bounds(elem_tys.iter(), &params);
+    let where_clause = (!preds.is_empty()).then(|| quote! { where #(#preds),* });
     let method = quote! {
         #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
         pub fn #ident #generics (this: &#this_type #args) -> #iter_ty;
