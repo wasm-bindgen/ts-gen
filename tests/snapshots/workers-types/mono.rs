@@ -6727,7 +6727,10 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/getRandomValues)"]
     #[wasm_bindgen(method, catch, js_name = "getRandomValues")]
-    pub fn get_random_values<T>(this: &Crypto, buffer: &T) -> Result<T, JsValue>
+    pub fn get_random_values<T: ::js_sys::TypedArray>(
+        this: &Crypto,
+        buffer: &T,
+    ) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
     #[doc = " The **`randomUUID()`** method of the Crypto interface is used to generate a v4 UUID using a cryptographically secure random number generator."]
@@ -13457,7 +13460,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/read)"]
     #[wasm_bindgen(method, catch)]
-    pub fn read<T>(
+    pub fn read<T: ::js_sys::TypedArray>(
         this: &ReadableStreamBYOBReader,
         view: &T,
     ) -> Promise<ReadableStreamReadResult<T>>
@@ -13469,7 +13472,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "releaseLock")]
     pub fn release_lock(this: &ReadableStreamBYOBReader) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "readAtLeast")]
-    pub fn read_at_least<T>(
+    pub fn read_at_least<T: ::js_sys::TypedArray>(
         this: &ReadableStreamBYOBReader,
         min_elements: f64,
         view: &T,
@@ -16551,7 +16554,7 @@ extern "C" {
 }
 impl<'a, T> ::core::iter::IntoIterator for &'a SqlStorageCursor<T>
 where
-    Iterator<T>: ::core::iter::IntoIterator<Item = T>,
+    T: ::wasm_bindgen::convert::FromWasmAbi,
 {
     type Item = T;
     type IntoIter = <Iterator<T> as ::core::iter::IntoIterator>::IntoIter;

@@ -2734,6 +2734,10 @@ impl<'a> IntoIterator for &'a Headers {
 // for (name, value) in &headers { … }
 ```
 
+js-sys iterates any item it can read, so a generic class's impl bounds the
+item rather than the iterator: `impl<'a, T: FromWasmAbi> IntoIterator for
+&'a Cursor<T>`.
+
 Under `--experimental-generic-mono` an `Iterable<T>` argument (a union
 arm included) is taken like `T[]`, as a slice reaching JS as an `Array`,
 which is itself iterable: `sendBatch(messages: Iterable<Message>)` is
@@ -2828,6 +2832,12 @@ impl<T> SlotBuilder<T> {
 Array-buffer-view helper parameters retain their `TypedArray` widening bound,
 which already gives `&T` its ABI (`TypedArray: JsGeneric`), so they need no
 `where` clause: `pub fn new<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptions`.
+
+A method's own type parameter constrained to typed arrays (`T extends
+ArrayBufferView`, `DataView`, or a union of typed arrays) is bounded by
+`TypedArray` too, with its ABI bounds in the `where` clause, so only a view
+reaches JS: `get_random_values<T: TypedArray>(buffer: &T) -> T where T:
+RefIntoWasmAbi + FromWasmAbi`.
 
 Concrete primitive arguments to locally declared generic types use native Rust
 ABIs in this mode: `Details<boolean>`, `Details<number>`, and `Details<string>`

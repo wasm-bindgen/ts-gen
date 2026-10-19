@@ -220,3 +220,33 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "roundtripNumber")]
     pub fn roundtrip_number(value: f64) -> Result<f64, JsValue>;
 }
+#[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type RandomSource;
+    #[wasm_bindgen(method, catch, js_name = "getRandomValues")]
+    pub fn get_random_values<T: ::js_sys::TypedArray>(
+        this: &RandomSource,
+        buffer: &T,
+    ) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, catch, js_name = "fillBytes")]
+    pub fn fill_bytes<T: ::js_sys::TypedArray>(
+        this: &RandomSource,
+        buffer: &T,
+    ) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, catch)]
+    pub fn echo(
+        this: &RandomSource,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "echo")]
+    pub fn echo_js_string(
+        this: &RandomSource,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+}

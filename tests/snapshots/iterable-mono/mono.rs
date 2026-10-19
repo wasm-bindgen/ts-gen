@@ -60,7 +60,7 @@ extern "C" {
 }
 impl<'a, T> ::core::iter::IntoIterator for &'a Cursor<T>
 where
-    Iterator<T>: ::core::iter::IntoIterator<Item = T>,
+    T: ::wasm_bindgen::convert::FromWasmAbi,
 {
     type Item = T;
     type IntoIter = <Iterator<T> as ::core::iter::IntoIterator>::IntoIter;

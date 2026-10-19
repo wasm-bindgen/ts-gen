@@ -690,6 +690,38 @@ pub(crate) fn mono_arg_bounds<'a>(
     out
 }
 
+/// One predicate per type naming a type parameter bare, the first-order
+/// bound reading that shape from JS states: `T: FromWasmAbi` for a bare
+/// `T`, the whole type otherwise.
+pub(crate) fn mono_return_bounds<'a>(
+    tys: impl Iterator<Item = &'a Type>,
+    params: &[Ident],
+) -> Vec<syn::WherePredicate> {
+    let mut out: Vec<syn::WherePredicate> = Vec::new();
+    for ty in tys {
+        if !mentions_bare(ty, params) {
+            continue;
+        }
+        let bare = match ty {
+            Type::Path(p) => p.path.get_ident().filter(|i| params.contains(i)),
+            _ => None,
+        };
+        out.push(if let Some(param) = bare {
+            syn::parse_quote!(#param: ::wasm_bindgen::convert::FromWasmAbi)
+        } else {
+            let mut ty = ty.clone();
+            if name_elided_lifetimes(&mut ty) {
+                syn::parse_quote!(for<'__wbg> #ty: ::wasm_bindgen::convert::FromWasmAbi)
+            } else {
+                syn::parse_quote!(#ty: ::wasm_bindgen::convert::FromWasmAbi)
+            }
+        });
+    }
+    let mut seen = std::collections::HashSet::new();
+    out.retain(|p| seen.insert(p.to_token_stream().to_string()));
+    out
+}
+
 /// Gives every elided borrow in `ty` the lifetime `'__wbg`; whether any
 /// was found.
 fn name_elided_lifetimes(ty: &mut Type) -> bool {

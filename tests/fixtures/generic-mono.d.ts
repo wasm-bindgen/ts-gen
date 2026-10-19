@@ -49,3 +49,9 @@ export declare function parseString(value: string): string;
 
 export declare function roundtripBoolean(value: boolean): boolean;
 export declare function roundtripNumber(value: number): number;
+
+export declare class RandomSource {
+  getRandomValues<T extends ArrayBufferView>(buffer: T): T;
+  fillBytes<T extends Int8Array | Uint8Array>(buffer: T): T;
+  echo<T extends string>(value: T): T;
+}

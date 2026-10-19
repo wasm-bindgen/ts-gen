@@ -112,6 +112,14 @@
   ;; roundtripNumber(value: number): number
   (import "generic-mono" "roundtripNumber" (func $generic-mono:roundtripNumber (param $value f64) (result f64)))
 
+  ;; RandomSource
+  ;; getRandomValues(buffer: T): T
+  (import "generic-mono" "RandomSource.get_random_values" (func $generic-mono:RandomSource.get_random_values (param $this externref) (param $buffer externref) (result externref)))
+  ;; fillBytes(buffer: T): T
+  (import "generic-mono" "RandomSource.fill_bytes" (func $generic-mono:RandomSource.fill_bytes (param $this externref) (param $buffer externref) (result externref)))
+  ;; echo(value: string): string
+  (import "generic-mono" "RandomSource.echo" (func $generic-mono:RandomSource.echo (param $this externref) (param $value externref) (result externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 
