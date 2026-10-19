@@ -119,6 +119,34 @@ impl From<Unused> for UnusedBuilder {
         Self { inner }
     }
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Meta;
+    #[wasm_bindgen(method, getter)]
+    pub fn duration(this: &Meta) -> f64;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Response;
+    #[wasm_bindgen(method, getter)]
+    pub fn success(this: &Response) -> bool;
+    #[wasm_bindgen(method, getter)]
+    pub fn meta(this: &Response) -> Meta;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Response , extends = Object , js_name = "Result")]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Result_<T = JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn results<T>(this: &Result_<T>) -> Vec<T>
+    where
+        Vec<T>: FromWasmAbi;
+}
 #[allow(dead_code)]
 pub type Listener = Function<fn(Event) -> Reply>;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -142,4 +170,8 @@ extern "C" {
     pub fn put(this: &Store, value: &Shared);
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn try_put(this: &Store, value: &Shared) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn query(this: &Store) -> Promise<Result_<JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "query")]
+    pub fn query_typed<T>(this: &Store) -> Promise<Result_<T>>;
 }

@@ -246,10 +246,23 @@ pub fn glb_intersection(
     scope: ScopeId,
 ) -> Option<TypeRef> {
     let cgctx = ctx?;
+    // Per-mono, `Record<string, unknown>` only admits extra keys, which a
+    // binding of the other members never reads (`D1Meta & Record<…>`).
+    let open_record = |m: &&TypeRef| {
+        cgctx.experimental_generic_mono
+            && matches!(m, TypeRef::Reference { segments, generic_args }
+                if segments.len() == 1 && segments[0] == "Record"
+                    && matches!(generic_args.as_slice(),
+                        [TypeRef::String, TypeRef::Unknown | TypeRef::Any]))
+    };
     let names: Vec<&str> = members
         .iter()
+        .filter(|m| !open_record(m))
         .map(|m| m.as_ident())
         .collect::<Option<_>>()?;
+    if let [name] = names.as_slice() {
+        return Some(TypeRef::ident(*name));
+    }
     let chains: Vec<Vec<String>> = names
         .iter()
         .map(|n| ancestor_chain(n, cgctx, scope))

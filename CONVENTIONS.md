@@ -978,9 +978,13 @@ argument, and written where it is an argument, a setter's type or a
 callback's return; type arguments take their position's direction, and
 a function type's parameters flip it. A dictionary's own fields count as
 written only once it is written itself, while a class's or class-like
-interface's setters always do. A type reached as input anywhere keeps its
-write side, and so does one no position reaches (a declaration root used
-on its own):
+interface's setters always do. A parent takes its children's directions
+(D1's `D1Response`, parent of the only-read `D1Result`, has getters only),
+and an intersection with an open `Record<string, unknown>` (or `any`)
+lowers to, and takes the direction of, its other member
+(`meta: D1Meta & Record<string, unknown>` is `meta() -> D1Meta`). A type
+reached as input anywhere keeps its write side, and so does one no
+position reaches (a declaration root used on its own):
 
 ```ts
 type ListResult<M> = { complete: false; keys: ListKey<M>[]; cursor: string } | { complete: true; keys: ListKey<M>[] };
@@ -3260,7 +3264,10 @@ Two or more surviving members reach codegen as an `Intersection` and
 are lowered to a bound. `A & B` is a subtype of every member, so each
 member is a sound upper bound and the only question is which is most
 specific: a named member whose ancestor chain contains all the others.
-Unrelated or unnamed members erase to `JsValue` with a diagnostic:
+Unrelated or unnamed members erase to `JsValue` with a diagnostic.
+Per-mono, an open `Record<string, unknown>` / `Record<string, any>`
+member is dropped first: it only admits keys the other members' bindings
+never read (`D1Meta & Record<string, unknown>` → `D1Meta`):
 
 ```text
 Options & { onlyIf: Conditional }    -> Options     (literal refines Options)
