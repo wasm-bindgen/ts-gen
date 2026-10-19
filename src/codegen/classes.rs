@@ -2889,6 +2889,7 @@ fn generate_getter(
         parent: Some(&config.rust_name),
     };
     let getter_type = getter_string_ref_type(config, &lowered_ty, getter.scope, getter.string_mode)
+        .or_else(|| promise_getter_type(config, &lowered_ty, getter.scope, &getter.throws, anchor))
         .unwrap_or_else(|| {
             super::typemap::to_getter_return_type(
                 &lowered_ty,
@@ -2945,6 +2946,43 @@ fn generate_getter(
         pub fn #rust_ident #fn_generics (this: &#this_type #this_generics) -> #getter_type;
         #js_string_variant
     }
+}
+
+/// Per-mono a `Promise`-typed property awaits as an async method's return
+/// does: `Promise<T, E>`, `E` the error type a `@throws`-alike method would
+/// take (`--error-type` / `--error-enum`), plain `Promise<T>` under
+/// `@throws {never}`.
+fn promise_getter_type(
+    config: &ClassConfig,
+    ty: &TypeRef,
+    scope: ScopeId,
+    throws: &crate::ir::Throws,
+    anchor: super::typemap::ReturnAnchor<'_>,
+) -> Option<TokenStream> {
+    if !CodegenContext::generic_mono(config.cgctx) {
+        return None;
+    }
+    let (promise, optional) = match ty {
+        TypeRef::Nullable(inner, _) => (&**inner, true),
+        ty => (ty, false),
+    };
+    let awaited = promise.as_promise_inner()?;
+    let tokens = to_return_type(
+        awaited,
+        !throws.is_never(),
+        true,
+        false,
+        throws.as_type(),
+        config.cgctx,
+        scope,
+        &config.from_module(),
+        anchor,
+    );
+    Some(if optional {
+        quote! { Option<#tokens> }
+    } else {
+        tokens
+    })
 }
 
 /// A getter annotated `@throws {X}` is the one accessor form that
@@ -3106,19 +3144,29 @@ fn generate_static_getter(
     let rust_name = names.declare(&candidate, Suffix::Snake);
     let rust_ident = super::typemap::make_ident(&rust_name);
 
+    let anchor = super::typemap::ReturnAnchor {
+        base: &getter.js_name,
+        kind: super::typemap::ReturnAnchorKind::Getter,
+        parent: Some(&config.rust_name),
+    };
     let getter_type =
         getter_string_ref_type(config, &getter.type_ref, getter.scope, getter.string_mode)
+            .or_else(|| {
+                promise_getter_type(
+                    config,
+                    &getter.type_ref,
+                    getter.scope,
+                    &getter.throws,
+                    anchor,
+                )
+            })
             .unwrap_or_else(|| {
                 super::typemap::to_getter_return_type(
                     &getter.type_ref,
                     config.cgctx,
                     getter.scope,
                     &config.from_module(),
-                    super::typemap::ReturnAnchor {
-                        base: &getter.js_name,
-                        kind: super::typemap::ReturnAnchorKind::Getter,
-                        parent: Some(&config.rust_name),
-                    },
+                    anchor,
                 )
             });
 

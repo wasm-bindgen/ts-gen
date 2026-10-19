@@ -1978,6 +1978,10 @@ pub fn get(this: &KVNamespace, key: impl JsStringLike) -> Promise<Option<String>
 * The import keeps `catch`, where wasm-bindgen returns a synchronous
   throw as the rejected promise (`Promise::reject_typed`), so it too
   arrives at `.await` as `Err`.
+* A `Promise`-typed property's getter returns the same `Promise<T, E>`
+  (`closed() -> Promise<(), crate::Error>`, `opened() ->
+  Promise<SocketInfo, crate::Error>`); a getter has no `catch`, and
+  `@throws {never}` keeps `E` unwritten.
 
 ### Awaited values lower like sync returns
 

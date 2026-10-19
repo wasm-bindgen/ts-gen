@@ -30,6 +30,14 @@
   ;; Store
   ;; get(key: string): Promise<string | null>
   (import "./bindings.wasm" "Store.get" (func $Store.get (param $this externref) (param $key externref) (result externref)))
+  ;; closed: Promise<void>
+  (import "./bindings.wasm" "Store.closed" (func $Store.closed (param $this externref) (result externref)))
+  ;; opened: Promise<string | null>
+  (import "./bindings.wasm" "Store.opened" (func $Store.opened (param $this externref) (result externref)))
+  ;; settled: Promise<number>
+  (import "./bindings.wasm" "Store.settled" (func $Store.settled (param $this externref) (result externref)))
+  ;; static ready: Promise<boolean>
+  (import "./bindings.wasm" "Store.ready" (func $Store.ready (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
