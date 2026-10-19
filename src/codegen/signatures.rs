@@ -473,7 +473,10 @@ pub fn collect_type_params(
         TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => {
             collect_type_params(inner, cgctx, scope, out);
         }
-        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+        TypeRef::Union(members)
+        | TypeRef::Intersection(members)
+        | TypeRef::Tuple(members)
+        | TypeRef::HeadRest(members) => {
             for m in members {
                 collect_type_params(m, cgctx, scope, out);
             }

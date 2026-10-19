@@ -11156,7 +11156,7 @@
   (import "./bindings.wasm" "D1PreparedStatement.all" (func $D1PreparedStatement.all (param $this externref) (result externref)))
   ;; raw(): Promise<T[]>
   (import "./bindings.wasm" "D1PreparedStatement.raw" (func $D1PreparedStatement.raw (param $this externref) (result externref)))
-  ;; raw(options: D1PreparedStatementOptions): Promise<any[]>
+  ;; raw(options: D1PreparedStatementOptions): Promise<[string[], ...T[]]>
   (import "./bindings.wasm" "D1PreparedStatement.raw_with_options" (func $D1PreparedStatement.raw_with_options (param $this externref) (param $options externref) (result externref)))
 
   ;; D1PreparedStatementOptions

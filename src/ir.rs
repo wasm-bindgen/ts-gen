@@ -146,6 +146,10 @@ pub enum TypeRef {
     Union(Vec<TypeRef>),
     Intersection(Vec<TypeRef>),
     Tuple(Vec<TypeRef>),
+    /// `[H, ...R[]]` with `H` not `R`, as `[H, R]`. Per-mono it is
+    /// `ArrayHeadRest<H, R>`; otherwise, like any rest tuple with no common
+    /// element type, an array of `any` ([`TypeRef::rest_array`]).
+    HeadRest(Vec<TypeRef>),
     /// `(args) => ret` — function type literal.
     Function(FunctionSig),
 
@@ -385,11 +389,17 @@ impl TypeRef {
             TypeRef::Reference { generic_args, .. } => {
                 generic_args.iter().any(TypeRef::has_rust_scalar)
             }
-            TypeRef::Union(items) | TypeRef::Intersection(items) | TypeRef::Tuple(items) => {
-                items.iter().any(TypeRef::has_rust_scalar)
-            }
+            TypeRef::Union(items)
+            | TypeRef::Intersection(items)
+            | TypeRef::Tuple(items)
+            | TypeRef::HeadRest(items) => items.iter().any(TypeRef::has_rust_scalar),
             _ => false,
         }
+    }
+
+    /// The array of `any` a [`TypeRef::HeadRest`] is outside per-mono.
+    pub fn rest_array() -> Self {
+        TypeRef::Array(Box::new(TypeRef::Any))
     }
 
     /// Construct a single-segment, non-generic reference: `Foo`.
@@ -471,6 +481,7 @@ impl TypeRef {
             TypeRef::Union(ts) => TypeRef::Union(ts.iter().map(sub).collect()),
             TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
             TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
+            TypeRef::HeadRest(ts) => TypeRef::HeadRest(ts.iter().map(sub).collect()),
             TypeRef::IndexedAccess(o, i) => {
                 TypeRef::IndexedAccess(Box::new(sub(o)), Box::new(sub(i)))
             }
@@ -554,6 +565,9 @@ impl TypeRef {
                 .map(Self::format_ts)
                 .collect::<Vec<_>>()
                 .join(" & "),
+            TypeRef::HeadRest(elems) => {
+                format!("[{}, ...{}[]]", elems[0].format_ts(), elems[1].format_ts())
+            }
             TypeRef::Tuple(elems) => format!(
                 "[{}]",
                 elems

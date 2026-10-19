@@ -223,7 +223,10 @@ fn collect_in_scope_type_params(
         TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => {
             collect_in_scope_type_params(inner, scope, scopes, out);
         }
-        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+        TypeRef::Union(members)
+        | TypeRef::Intersection(members)
+        | TypeRef::Tuple(members)
+        | TypeRef::HeadRest(members) => {
             for m in members {
                 collect_in_scope_type_params(m, scope, scopes, out);
             }

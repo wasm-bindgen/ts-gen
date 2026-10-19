@@ -125,9 +125,10 @@ fn visit(ty: &TypeRef, f: &mut impl FnMut(&TypeRef)) {
     match ty {
         TypeRef::Reference { generic_args, .. } => generic_args.iter().for_each(|t| visit(t, f)),
         TypeRef::Array(t) | TypeRef::Nullable(t, _) => visit(t, f),
-        TypeRef::Union(ts) | TypeRef::Intersection(ts) | TypeRef::Tuple(ts) => {
-            ts.iter().for_each(|t| visit(t, f))
-        }
+        TypeRef::Union(ts)
+        | TypeRef::Intersection(ts)
+        | TypeRef::Tuple(ts)
+        | TypeRef::HeadRest(ts) => ts.iter().for_each(|t| visit(t, f)),
         TypeRef::Function(sig) => {
             sig.params.iter().for_each(|p| visit(&p.type_ref, f));
             visit(&sig.return_type, f);
@@ -166,6 +167,7 @@ fn substitute_indexed(ty: &TypeRef, key_param: &str, map: &TypeRef, value: &Type
         TypeRef::Union(ts) => TypeRef::Union(ts.iter().map(sub).collect()),
         TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
         TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
+        TypeRef::HeadRest(ts) => TypeRef::HeadRest(ts.iter().map(sub).collect()),
         TypeRef::Function(sig) => TypeRef::Function(crate::ir::FunctionSig {
             params: sig
                 .params

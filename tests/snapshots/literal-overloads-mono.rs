@@ -459,8 +459,10 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub fn raw(this: &Stream) -> Promise<Vec<JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
-    fn raw_with_column_names_js(this: &Stream, options: &StreamRawOptions)
-        -> Promise<Vec<JsValue>>;
+    fn raw_with_column_names_js(
+        this: &Stream,
+        options: &StreamRawOptions,
+    ) -> Promise<ArrayHeadRest<Array<String>, JsValue>>;
 }
 impl Stream {
     pub fn get_reader_byob(&self) -> f64 {
@@ -469,7 +471,7 @@ impl Stream {
     pub fn try_get_reader_byob(&self) -> Result<f64, JsValue> {
         self.try_get_reader_byob_js(&<ReaderOptions>::new())
     }
-    pub fn raw_with_column_names(&self) -> Promise<Vec<JsValue>> {
+    pub fn raw_with_column_names(&self) -> Promise<ArrayHeadRest<Array<String>, JsValue>> {
         self.raw_with_column_names_js(&<StreamRawOptions>::new())
     }
 }

@@ -154,11 +154,12 @@ fn owning_type_default(
         TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => {
             owning_type_default(inner, name, cgctx, scope)
         }
-        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
-            members
-                .iter()
-                .find_map(|m| owning_type_default(m, name, cgctx, scope))
-        }
+        TypeRef::Union(members)
+        | TypeRef::Intersection(members)
+        | TypeRef::Tuple(members)
+        | TypeRef::HeadRest(members) => members
+            .iter()
+            .find_map(|m| owning_type_default(m, name, cgctx, scope)),
         _ => None,
     }
 }
@@ -211,7 +212,10 @@ fn surviving_type_params(
         TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => {
             surviving_type_params(inner, cgctx, scope, out);
         }
-        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+        TypeRef::Union(members)
+        | TypeRef::Intersection(members)
+        | TypeRef::Tuple(members)
+        | TypeRef::HeadRest(members) => {
             for m in members {
                 surviving_type_params(m, cgctx, scope, out);
             }

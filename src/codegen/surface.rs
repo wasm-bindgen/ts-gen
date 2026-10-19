@@ -1030,7 +1030,10 @@ fn polar_refs(ty: &TypeRef, scope: ScopeId, input: bool, out: &mut PolarRefs) {
             }
         }
         TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => polar_refs(inner, scope, input, out),
-        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+        TypeRef::Union(members)
+        | TypeRef::Intersection(members)
+        | TypeRef::Tuple(members)
+        | TypeRef::HeadRest(members) => {
             for m in members {
                 polar_refs(m, scope, input, out);
             }
@@ -1057,7 +1060,10 @@ fn type_refs(ty: &TypeRef, scope: ScopeId, out: &mut Vec<(String, ScopeId)>) {
             }
         }
         TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => type_refs(inner, scope, out),
-        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+        TypeRef::Union(members)
+        | TypeRef::Intersection(members)
+        | TypeRef::Tuple(members)
+        | TypeRef::HeadRest(members) => {
             for m in members {
                 type_refs(m, scope, out);
             }

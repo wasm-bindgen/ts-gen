@@ -347,8 +347,21 @@ fn collect_type_name_path(type_name: &TSTypeName<'_>) -> (String, Vec<String>) {
 }
 
 /// A tuple with a rest element (`[string[], ...T[]]`) has no fixed
-/// length, so it is the array of its elements' common type, or of `any`.
+/// length, so it is the array of its elements' common type. With none,
+/// a single head and an array rest stay [`TypeRef::HeadRest`]; any other
+/// shape is an array of `any`.
 fn rest_tuple_array(tuple: &TSTupleType<'_>, types: Vec<TypeRef>) -> TypeRef {
+    if let ([head, TSTupleElement::TSRestType(_)], [h, TypeRef::Array(rest)]) =
+        (tuple.element_types.as_slice(), types.as_slice())
+    {
+        if !matches!(
+            head,
+            TSTupleElement::TSRestType(_) | TSTupleElement::TSOptionalType(_)
+        ) && h != rest.as_ref()
+        {
+            return TypeRef::HeadRest(vec![h.clone(), (**rest).clone()]);
+        }
+    }
     let mut elements = Vec::new();
     for (elem, ty) in tuple.element_types.iter().zip(types) {
         match (elem, ty) {
