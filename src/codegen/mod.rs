@@ -595,6 +595,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
             to_pascal_case(segments.last().map(|s| s.as_str()).unwrap_or("Unknown"))
         }
         T::Tuple(_) => "Tuple".to_string(),
+        T::HeadRest(_) => dynamic_union_variant_name(&TypeRef::rest_array()),
         T::Union(_) | T::PropertyKey => "JsValue".to_string(),
         T::Intersection(_) => "JsValue".to_string(),
         T::Function(_) => "Function".to_string(),

@@ -20,7 +20,7 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
-  ;; columnsAndRows(): Promise<any[]>
+  ;; columnsAndRows(): Promise<[string[], ...T[]]>
   (import "./bindings.wasm" "columnsAndRows" (func $columnsAndRows (result externref)))
   ;; names(): string[]
   (import "./bindings.wasm" "names" (func $names (result externref)))

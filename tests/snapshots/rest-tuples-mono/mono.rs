@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "columnsAndRows")]
-    pub fn columns_and_rows() -> Promise<Vec<JsValue>>;
+    pub fn columns_and_rows() -> Promise<ArrayHeadRest<Array<String>, JsValue>>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -33,4 +33,65 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "takeNames")]
     pub fn take_names(names: &[impl ::wasm_bindgen::JsStringLike]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn header() -> Result<ArrayHeadRest<String, f64>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "takeHeader")]
+    pub fn take_header(row: &ArrayHeadRest<String, f64>) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "twoHeads")]
+    pub fn two_heads() -> Result<Vec<JsValue>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Statement;
+    #[wasm_bindgen(method, catch)]
+    pub fn raw(this: &Statement) -> Promise<Vec<Array>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    fn __raw_with_column_names(
+        this: &Statement,
+        options: &StatementRawOptions,
+    ) -> Promise<ArrayHeadRest<Array<String>, Array>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub fn raw_typed<T>(this: &Statement) -> Promise<Vec<T>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    fn __raw_with_column_names_typed<T>(
+        this: &Statement,
+        options: &StatementRawOptions,
+    ) -> Promise<ArrayHeadRest<Array<String>, T>>;
+}
+impl Statement {
+    pub fn raw_with_column_names(&self) -> Promise<ArrayHeadRest<Array<String>, Array>> {
+        self.__raw_with_column_names(&<StatementRawOptions>::new())
+    }
+    pub fn raw_with_column_names_typed<T>(&self) -> Promise<ArrayHeadRest<Array<String>, T>> {
+        self.__raw_with_column_names_typed(&<StatementRawOptions>::new())
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StatementRawOptions;
+    #[wasm_bindgen(method, getter, js_name = "columnNames")]
+    pub fn column_names(this: &StatementRawOptions) -> bool;
+    #[wasm_bindgen(method, setter, js_name = "columnNames")]
+    pub fn set_column_names(this: &StatementRawOptions, val: bool);
+}
+impl StatementRawOptions {
+    #[doc = " Construct with `columnNames: true`."]
+    pub fn new() -> StatementRawOptions {
+        let inner: StatementRawOptions = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_column_names(true);
+        inner
+    }
 }

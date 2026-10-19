@@ -155,9 +155,11 @@ fn owning_type_default(
             .members()
             .iter()
             .find_map(|m| owning_type_default(m, name, cgctx, scope)),
-        TypeRef::Intersection(members) | TypeRef::Tuple(members) => members
-            .iter()
-            .find_map(|m| owning_type_default(m, name, cgctx, scope)),
+        TypeRef::Intersection(members) | TypeRef::Tuple(members) | TypeRef::HeadRest(members) => {
+            members
+                .iter()
+                .find_map(|m| owning_type_default(m, name, cgctx, scope))
+        }
         _ => None,
     }
 }
@@ -176,7 +178,7 @@ fn mentions_any(ty: &TypeRef, params: &[TypeParam]) -> bool {
         TypeRef::Array(inner) | TypeRef::KeyOf(inner) => mentions_any(inner, params),
         TypeRef::IndexedAccess(obj, key) => mentions_any(obj, params) || mentions_any(key, params),
         TypeRef::Union(u) => any(u.members()),
-        TypeRef::Intersection(ts) | TypeRef::Tuple(ts) => any(ts),
+        TypeRef::Intersection(ts) | TypeRef::Tuple(ts) | TypeRef::HeadRest(ts) => any(ts),
         TypeRef::Function(sig) => {
             sig.params.iter().any(|p| mentions_any(&p.type_ref, params))
                 || mentions_any(&sig.return_type, params)
@@ -240,7 +242,7 @@ fn surviving_type_params(
                 surviving_type_params(m, cgctx, scope, out);
             }
         }
-        TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+        TypeRef::Intersection(members) | TypeRef::Tuple(members) | TypeRef::HeadRest(members) => {
             for m in members {
                 surviving_type_params(m, cgctx, scope, out);
             }

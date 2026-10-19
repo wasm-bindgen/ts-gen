@@ -20,7 +20,7 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
-  ;; columnsAndRows(): Promise<any[]>
+  ;; columnsAndRows(): Promise<[string[], ...T[]]>
   (import "./bindings.wasm" "columnsAndRows" (func $columnsAndRows (result externref)))
   ;; names(): string[]
   (import "./bindings.wasm" "names" (func $names (result externref)))
@@ -30,6 +30,34 @@
   (import "./bindings.wasm" "pair" (func $pair (result externref)))
   ;; takeNames(names: string[]): void
   (import "./bindings.wasm" "takeNames" (func $takeNames (param $names externref)))
+  ;; header(): [string, ...number[]]
+  (import "./bindings.wasm" "header" (func $header (result externref)))
+  ;; takeHeader(row: [string, ...number[]]): void
+  (import "./bindings.wasm" "takeHeader" (func $takeHeader (param $row externref)))
+  ;; twoHeads(): any[]
+  (import "./bindings.wasm" "twoHeads" (func $twoHeads (result externref)))
+
+  ;; Statement
+  ;; raw(): Promise<T[]>
+  (import "./bindings.wasm" "Statement.raw" (func $Statement.raw (param $this externref) (result externref)))
+  ;; raw(options: StatementOptions): Promise<[string[], ...T[]]>
+  (import "./bindings.wasm" "Statement.raw_with_options" (func $Statement.raw_with_options (param $this externref) (param $options externref) (result externref)))
+
+  ;; StatementOptions
+  ;; {} as StatementOptions
+  (import "./bindings.wasm" "StatementOptions.new" (func $StatementOptions.new (result externref)))
+  ;; columnNames: true
+  (import "./bindings.wasm" "StatementOptions.column_names" (func $StatementOptions.column_names (param $this externref) (result i32)))
+  ;; set columnNames(value: true)
+  (import "./bindings.wasm" "StatementOptions.set_column_names" (func $StatementOptions.set_column_names (param $this externref) (param $value i32)))
+
+  ;; StatementOptions2
+  ;; {} as StatementOptions2
+  (import "./bindings.wasm" "StatementOptions2.new" (func $StatementOptions2.new (result externref)))
+  ;; columnNames?: false
+  (import "./bindings.wasm" "StatementOptions2.column_names" (func $StatementOptions2.column_names (param $this externref) (result externref)))
+  ;; set columnNames(value: false)
+  (import "./bindings.wasm" "StatementOptions2.set_column_names" (func $StatementOptions2.set_column_names (param $this externref) (param $value i32)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

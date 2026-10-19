@@ -494,7 +494,7 @@ pub fn collect_type_params(
                 collect_type_params(m, cgctx, scope, out);
             }
         }
-        TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+        TypeRef::Intersection(members) | TypeRef::Tuple(members) | TypeRef::HeadRest(members) => {
             for m in members {
                 collect_type_params(m, cgctx, scope, out);
             }

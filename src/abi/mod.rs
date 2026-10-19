@@ -285,6 +285,7 @@ fn substitute(ty: &TypeRef, subst: &HashMap<&str, &TypeRef>) -> TypeRef {
         TypeRef::Union(ms) => TypeRef::union(ms.members().iter().map(go)),
         TypeRef::Intersection(ms) => TypeRef::Intersection(ms.iter().map(go).collect()),
         TypeRef::Tuple(ms) => TypeRef::Tuple(ms.iter().map(go).collect()),
+        TypeRef::HeadRest(ms) => TypeRef::HeadRest(ms.iter().map(go).collect()),
         other => other.clone(),
     }
 }

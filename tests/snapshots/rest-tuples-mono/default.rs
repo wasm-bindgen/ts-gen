@@ -51,3 +51,122 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "takeNames")]
     pub fn try_take_names(names: &[String]) -> Result<(), JsValue>;
 }
+#[wasm_bindgen]
+extern "C" {
+    pub fn header() -> Vec<JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "header")]
+    pub fn try_header() -> Result<Vec<JsValue>, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "takeHeader")]
+    pub fn take_header(row: &[JsValue]);
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "takeHeader")]
+    pub fn try_take_header(row: &[JsValue]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "twoHeads")]
+    pub fn two_heads() -> Vec<JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "twoHeads")]
+    pub fn try_two_heads() -> Result<Vec<JsValue>, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Statement;
+    #[wasm_bindgen(method, catch)]
+    pub async fn raw(this: &Statement) -> Result<Vec<Array>, JsValue>;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_promise(this: &Statement) -> Promise<Array<Array>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_with_statement_options(
+        this: &Statement,
+        options: &StatementOptions,
+    ) -> Result<Vec<JsValue>, JsValue>;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_with_statement_options_promise(
+        this: &Statement,
+        options: &StatementOptions,
+    ) -> Promise<Array>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_with_statement_options2(
+        this: &Statement,
+        options: &StatementOptions2,
+    ) -> Result<Vec<Array>, JsValue>;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_with_statement_options2_promise(
+        this: &Statement,
+        options: &StatementOptions2,
+    ) -> Promise<Array<Array>>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StatementOptions;
+    #[wasm_bindgen(method, getter, js_name = "columnNames")]
+    pub fn column_names(this: &StatementOptions) -> bool;
+    #[wasm_bindgen(method, setter, js_name = "columnNames")]
+    pub fn set_column_names(this: &StatementOptions, val: bool);
+}
+impl StatementOptions {
+    #[doc = " Construct with `columnNames: true`."]
+    pub fn new() -> StatementOptions {
+        let inner: StatementOptions = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_column_names(true);
+        inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StatementOptions2;
+    #[wasm_bindgen(method, getter, js_name = "columnNames")]
+    pub fn column_names(this: &StatementOptions2) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "columnNames")]
+    pub fn set_column_names(this: &StatementOptions2, val: bool);
+}
+impl StatementOptions2 {
+    pub fn new() -> StatementOptions2 {
+        Self::builder().build()
+    }
+    pub fn builder() -> StatementOptions2Builder {
+        StatementOptions2Builder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for StatementOptions2 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct StatementOptions2Builder {
+    inner: StatementOptions2,
+}
+impl StatementOptions2Builder {
+    pub fn column_names(self, val: bool) -> Self {
+        self.inner.set_column_names(val);
+        self
+    }
+    pub fn build(self) -> StatementOptions2 {
+        self.inner
+    }
+}
+impl From<StatementOptions2> for StatementOptions2Builder {
+    fn from(inner: StatementOptions2) -> Self {
+        Self { inner }
+    }
+}

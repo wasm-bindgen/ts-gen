@@ -228,7 +228,7 @@ fn collect_in_scope_type_params(
                 collect_in_scope_type_params(m, scope, scopes, out);
             }
         }
-        TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+        TypeRef::Intersection(members) | TypeRef::Tuple(members) | TypeRef::HeadRest(members) => {
             for m in members {
                 collect_in_scope_type_params(m, scope, scopes, out);
             }

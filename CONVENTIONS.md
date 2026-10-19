@@ -378,7 +378,21 @@ A tuple with a rest element has no fixed length, so it is not an
 `ArrayTuple`: it lowers as the array of its elements' common type, or
 of `any` when they differ. `[string, ...string[]]` is `Vec<String>`;
 D1's `raw<T>(): Promise<[string[], ...T[]]>` (column names, then rows)
-is `Promise<Array>` (`Promise<Vec<JsValue>>` per-mono).
+is `Promise<Array>`.
+
+Per-mono, a single head and an array rest with no common type are
+js-sys's `ArrayHeadRest<H, R>`, the leaves as in any type argument, so
+the head and the rows keep their types:
+
+```rust
+pub fn raw_with_column_names(&self) -> Promise<ArrayHeadRest<Array<String>, Array>, Error>;
+pub fn raw_with_column_names_typed<T>(&self) -> Promise<ArrayHeadRest<Array<String>, T>, Error>;
+// let (columns, rows) = stmt.raw_with_column_names().await?.into_parts();
+```
+
+A common element type keeps the array (`[string, ...string[]]` is
+`Vec<String>`), and more than one head (`[A, B, ...C[]]`) is still an
+array of `any`.
 
 Inside a built-in container (`Promise<Array<T>>`, `Map<K, Array<V>>`,
 …) the element stays the `Array<T'>` handle, which type-checks against

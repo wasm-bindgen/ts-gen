@@ -51,6 +51,7 @@ pub const JS_SYS_RESERVED: &[&str] = &[
     "AggregateError",
     "Array",
     "ArrayBuffer",
+    "ArrayHeadRest",
     "ArrayTuple",
     "AsyncGenerator",
     "AsyncIterator",
@@ -495,8 +496,11 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
             write_type_ref_key(buf, inner);
             buf.push('>');
         }
-        TypeRef::Tuple(parts) => {
-            buf.push_str("Tuple<");
+        TypeRef::Tuple(parts) | TypeRef::HeadRest(parts) => {
+            buf.push_str(match ty {
+                TypeRef::Tuple(_) => "Tuple<",
+                _ => "HeadRest<",
+            });
             for (i, p) in parts.iter().enumerate() {
                 if i > 0 {
                     buf.push(',');
@@ -613,6 +617,7 @@ fn qualify_references(
         ir::TypeRef::Union(u) => ir::TypeRef::union(all(u.members())?),
         ir::TypeRef::Intersection(items) => ir::TypeRef::Intersection(all(items)?),
         ir::TypeRef::Tuple(items) => ir::TypeRef::Tuple(all(items)?),
+        ir::TypeRef::HeadRest(items) => ir::TypeRef::HeadRest(all(items)?),
         ir::TypeRef::Function(sig) => ir::TypeRef::Function(ir::FunctionSig {
             params: sig
                 .params
@@ -1446,7 +1451,9 @@ impl<'a> CodegenContext<'a> {
             }
             TypeRef::Array(t) => alike(t),
             TypeRef::Union(u) => u.members().iter().all(alike),
-            TypeRef::Intersection(ts) | TypeRef::Tuple(ts) => ts.iter().all(alike),
+            TypeRef::Intersection(ts) | TypeRef::Tuple(ts) | TypeRef::HeadRest(ts) => {
+                ts.iter().all(alike)
+            }
             TypeRef::Function(sig) => {
                 sig.params.iter().all(|p| alike(&p.type_ref)) && alike(&sig.return_type)
             }
@@ -2383,6 +2390,13 @@ pub fn to_syn_type(
             };
             maybe_ref(base, borrow)
         }
+        TypeRef::HeadRest(parts) if CodegenContext::generic_mono(ctx) => {
+            let inner_pos = pos.to_container(ctx);
+            let head = to_syn_type(&parts[0], inner_pos, ctx, scope, from_module);
+            let rest = to_syn_type(&parts[1], inner_pos, ctx, scope, from_module);
+            maybe_ref(quote! { ArrayHeadRest<#head, #rest> }, borrow)
+        }
+        TypeRef::HeadRest(_) => to_syn_type(&TypeRef::rest_array(), pos, ctx, scope, from_module),
         TypeRef::Function(sig) => {
             // Per-mono `Function<fn(A..) -> R>` takes any ABI type, so its
             // leaves are native and a `void` return is `()`.

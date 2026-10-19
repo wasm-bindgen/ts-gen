@@ -188,6 +188,7 @@ impl Pass<'_> {
             TypeRef::Union(u) => TypeRef::union(u.members().iter().map(sub)),
             TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
             TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
+            TypeRef::HeadRest(ts) => TypeRef::HeadRest(ts.iter().map(sub).collect()),
             TypeRef::Function(sig) => TypeRef::Function(FunctionSig {
                 params: sig
                     .params

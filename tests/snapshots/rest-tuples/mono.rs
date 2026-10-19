@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "columnsAndRows")]
-    pub fn columns_and_rows() -> Promise<Vec<JsValue>>;
+    pub fn columns_and_rows() -> Promise<ArrayHeadRest<Array<String>, JsValue>>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
