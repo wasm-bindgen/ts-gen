@@ -82,6 +82,26 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "options")]
     pub fn try_options() -> Result<OptionsReturnKind, JsValue>;
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Entries;
+    #[wasm_bindgen(method, js_name = "getAll")]
+    pub fn get_all(
+        this: &Entries,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Vec<GetAllReturnKind>;
+    #[wasm_bindgen(method, catch, js_name = "getAll")]
+    pub fn try_get_all(
+        this: &Entries,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Vec<GetAllReturnKind>, JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn include(this: &Entries) -> Option<Vec<IncludeKind>>;
+    #[wasm_bindgen(method, getter, js_name = "include")]
+    pub fn include_js_string(this: &Entries) -> Option<Array<JsString>>;
+}
 #[wasm_bindgen(private)]
 pub enum GetReturnKind {
     File(File),
@@ -121,4 +141,14 @@ pub enum SsecKeyKind {
 pub enum OptionsReturnKind {
     GetOptions(GetOptions),
     PutOptions(PutOptions),
+}
+#[wasm_bindgen(private)]
+pub enum GetAllReturnKind {
+    File(File),
+    String(String),
+}
+#[wasm_bindgen(private)]
+pub enum IncludeKind {
+    HttpMetadata = "httpMetadata",
+    CustomMetadata = "customMetadata",
 }

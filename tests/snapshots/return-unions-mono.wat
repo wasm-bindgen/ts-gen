@@ -65,6 +65,12 @@
   ;; options(): GetOptions | PutOptions
   (import "./bindings.wasm" "options" (func $options (result externref)))
 
+  ;; Entries
+  ;; getAll(name: string): (File | string)[]
+  (import "./bindings.wasm" "Entries.get_all" (func $Entries.get_all (param $this externref) (param $name externref) (result externref)))
+  ;; include?: ("httpMetadata" | "customMetadata")[]
+  (import "./bindings.wasm" "Entries.include" (func $Entries.include (param $this externref) (result externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 

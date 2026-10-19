@@ -200,6 +200,27 @@ classes stay unborrowed (`&[EmailAttachment]`, not
 as `None`: `(string | null)[]` is `Vec<Option<String>>`, `(Log |
 null)[]` is `Vec<Option<Log>>`, and `(any | null)[]` stays `Vec<JsValue>`.
 
+Per-mono, a list of a union keeps its element types where wasm-bindgen
+has a form for them:
+
+* A returned list of a [dynamic-union](#erased-return-position-unions-become-dynamic-union-enums)
+  element is a `Vec` of its enum (wasm-bindgen's per-enum vector ABI):
+  `FormData.getAll(): (File | string)[]` is `get_all() -> Vec<GetAllReturnKind>`,
+  `include?: ("httpMetadata" | "customMetadata")[]` is
+  `Option<Vec<IncludeKind>>`.
+* A written list expands like a union argument: each element arm with a
+  typed slice (strings `&[impl JsStringLike]`, numbers, buffer sources
+  `&[impl BufferSourceLike]`, handles `&[Blob]`) is its own binding, and
+  the erased `&[JsValue]` follows for mixed lists. List arms are named for
+  their element: `Blob::new_with_buffer_source_slice`, `_with_blob_slice`,
+  `_with_str_slice`, `_with_js_value_slice`; AnalyticsEngine's
+  `blobs?: ((ArrayBuffer | string) | null)[]` is `blobs(&[ArrayBuffer])`,
+  `blobs_with_str_slice(&["a", &s])`, `blobs_with_js_value_slice(..)`. A
+  lone list arm keeps the plain `slice` suffix (`get_with_slice`), and a
+  list of buffer sources is `&[impl BufferSourceLike]` wherever it
+  appears (`Response::new_with_slice`), each byte slice crossing as a
+  copy.
+
 A tuple with a rest element has no fixed length, so it is not an
 `ArrayTuple`: it lowers as the array of its elements' common type, or
 of `any` when they differ. `[string, ...string[]]` is `Vec<String>`;

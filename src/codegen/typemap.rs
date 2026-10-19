@@ -2603,17 +2603,8 @@ pub fn to_return_type(
     } else {
         match maybe_synthesise_return_union(ty, ctx, scope, from_module, anchor) {
             Some(tokens) => tokens,
-            // Per-mono `(File | string) | null` is `Option` of the enum, as
-            // an optional getter's is.
-            None => match ty {
-                TypeRef::Nullable(inner, _) if CodegenContext::generic_mono(ctx) => {
-                    match maybe_synthesise_return_union(inner, ctx, scope, from_module, anchor) {
-                        Some(tokens) => quote! { Option<#tokens> },
-                        None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
-                    }
-                }
-                _ => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
-            },
+            None => mono_union_container(ty, ctx, scope, from_module, anchor)
+                .unwrap_or_else(|| to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)),
         }
     };
 
@@ -2631,6 +2622,38 @@ pub fn to_return_type(
         quote! { Result<#inner, #err> }
     } else {
         inner
+    }
+}
+
+/// Per-mono a dynamic-union enum also reads through `Option` and `Vec`:
+/// `(File | string) | null` is `Option<…Kind>`, as an optional getter's
+/// is, and `(File | string)[]` is `Vec<…Kind>` (`FormData::get_all`).
+fn mono_union_container(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+    anchor: ReturnAnchor<'_>,
+) -> Option<TokenStream> {
+    if !CodegenContext::generic_mono(ctx) {
+        return None;
+    }
+    match ty {
+        TypeRef::Nullable(inner, _) => {
+            let tokens = maybe_synthesise_return_union(inner, ctx, scope, from_module, anchor)
+                .or_else(|| match &**inner {
+                    TypeRef::Array(_) => {
+                        mono_union_container(inner, ctx, scope, from_module, anchor)
+                    }
+                    _ => None,
+                })?;
+            Some(quote! { Option<#tokens> })
+        }
+        TypeRef::Array(element) => {
+            let tokens = maybe_synthesise_return_union(element, ctx, scope, from_module, anchor)?;
+            Some(quote! { Vec<#tokens> })
+        }
+        _ => None,
     }
 }
 
@@ -2947,6 +2970,9 @@ pub fn to_getter_return_type(
     anchor: ReturnAnchor<'_>,
 ) -> TokenStream {
     if let Some(tokens) = maybe_synthesise_return_union(ty, ctx, scope, from_module, anchor) {
+        return tokens;
+    }
+    if let Some(tokens) = mono_union_container(ty, ctx, scope, from_module, anchor) {
         return tokens;
     }
     // For optional getters the IR widens to `Nullable<T>`. If the

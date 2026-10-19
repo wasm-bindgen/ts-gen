@@ -17,3 +17,14 @@ export declare class Queue<T> {
   sendBatch(messages: Iterable<T>): void;
   tag(names: Iterable<string>, scores: Iterable<number> | null): void;
 }
+
+// A written list of a union takes each element arm with a typed slice
+// (strings, numbers, buffer sources, handles) as its own binding, named for
+// the element, before the erased mixed list.
+export declare class Blob {
+  constructor(bits?: (ArrayBuffer | ArrayBufferView | Blob | string)[]);
+}
+export interface DataPoint {
+  blobs?: ((ArrayBuffer | string) | null)[];
+}
+export declare function write(point: DataPoint): void;

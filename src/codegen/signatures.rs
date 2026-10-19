@@ -675,9 +675,14 @@ pub fn expand_signatures(
         (Some(c), Some(scope)) => type_extends(child, parent, c, scope),
         _ => false,
     };
+    let type_name = |ty: &TypeRef| match scope {
+        Some(scope) => mono_type_snake_name(ty, cgctx, scope),
+        None => type_snake_name(ty),
+    };
     let mono = MonoSuffixes {
         is_dictionary: &is_dictionary,
         extends: &extends,
+        type_name: &type_name,
     };
     let rules: SuffixRules<'_> = type_arg_arms.then_some(&mono);
     let plain: Vec<Vec<ConcreteParam>> = deduped
@@ -812,6 +817,8 @@ struct MonoSuffixes<'a> {
     is_dictionary: &'a dyn Fn(&TypeRef) -> bool,
     /// Whether the first type declares the second among its ancestors.
     extends: &'a dyn Fn(&TypeRef, &TypeRef) -> bool,
+    /// A union arm's suffix part.
+    type_name: &'a dyn Fn(&TypeRef) -> String,
 }
 
 fn type_extends(
@@ -1897,6 +1904,22 @@ fn flatten_into(
             true
         }
 
+        // Per-mono, a written list of a union takes each element arm that
+        // has a typed slice as its own alternative, before the erased
+        // mixed list: `blobs(&[impl JsStringLike])`, `blobs_with_…(&[JsValue])`.
+        TypeRef::Array(elem) if cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) => {
+            let alts = flatten_type(elem, cgctx, scope);
+            if alts.len() > 1 {
+                out.extend(
+                    alts.into_iter()
+                        .filter(|alt| typed_slice_element(alt, cgctx, scope))
+                        .map(|alt| TypeRef::Array(Box::new(alt))),
+                );
+            }
+            out.push(ty.clone());
+            out.len() <= FLATTEN_ALTERNATIVE_LIMIT
+        }
+
         // `PropertyKey` stays whole for per-mono grouping so it keeps
         // the `js_sys::PropertyKey` spelling; otherwise it fans out like
         // the union it abbreviates.
@@ -1918,6 +1941,36 @@ fn flatten_into(
             out.push(ty.clone());
             true
         }
+    }
+}
+
+/// Whether a list of `alt` has a typed slice argument: strings
+/// (`&[impl JsStringLike]`), numbers, buffer sources
+/// (`&[impl BufferSourceLike]`) and handles (`&[Blob]`).
+fn typed_slice_element(alt: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
+    match alt {
+        TypeRef::String | TypeRef::Number => true,
+        _ if is_buffer_source(alt) => true,
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1 && generic_args.is_empty() => {
+            !crate::codegen::subtyping::builtin_parents(&segments[0]).is_empty()
+                || cgctx.is_some_and(|c| {
+                    c.gctx
+                        .scopes
+                        .resolve(scope, &segments[0])
+                        .is_some_and(|id| {
+                            matches!(
+                                c.gctx.get_type(id).kind,
+                                crate::ir::TypeKind::Class(_)
+                                    | crate::ir::TypeKind::Interface(_)
+                                    | crate::ir::TypeKind::DiscriminatedUnion(_)
+                            )
+                        })
+                })
+        }
+        _ => false,
     }
 }
 
@@ -2002,6 +2055,21 @@ fn compute_rust_names(
             .map(|p| &p.type_ref)
             .filter(|t| *t != ty && (rules.is_dictionary)(t))
             .all(|t| (rules.extends)(t, ty))
+    };
+    // Per-mono, list arms that differ by element (a written `(A | B)[]`)
+    // are named for it.
+    let list_arms = |abs_idx: usize, param: &ConcreteParam| {
+        let list = |t: &TypeRef| match t {
+            TypeRef::Nullable(inner, _) => matches!(**inner, TypeRef::Array(_)),
+            t => matches!(t, TypeRef::Array(_)),
+        };
+        let mut arms: Vec<&TypeRef> = Vec::new();
+        for p in signatures.iter().filter_map(|s| s.get(abs_idx)) {
+            if p.name == param.name && list(&p.type_ref) && !arms.contains(&&p.type_ref) {
+                arms.push(&p.type_ref);
+            }
+        }
+        arms.len() > 1
     };
     // Per-mono, a parameter named for its arms (`measureOptionsOrStartMark`
     // over `PerformanceMeasureOptions | string`) names each arm by its part:
@@ -2143,6 +2211,8 @@ fn compute_rust_names(
                                 && by_parameter(abs_idx, &param.type_ref)
                         {
                             mono_param_snake(&param.name)
+                        } else if list_arms(abs_idx, param) {
+                            (mono.type_name)(&param.type_ref)
                         } else {
                             text.clone()
                         },
@@ -2340,6 +2410,26 @@ fn mono_param_snake(name: &str) -> String {
     match snake.strip_prefix("maybe_") {
         Some(rest) if !rest.is_empty() => rest.to_string(),
         _ => snake,
+    }
+}
+
+/// Per-mono, a list of a typed slice element is named for it
+/// (`str_slice`, `blob_slice`, `buffer_source_slice`), and the erased list
+/// beside such arms is `js_value_slice`.
+fn mono_type_snake_name(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> String {
+    match ty {
+        TypeRef::Nullable(inner, _) => mono_type_snake_name(inner, cgctx, scope),
+        TypeRef::Array(elem) if typed_slice_element(elem, cgctx, scope) => {
+            format!("{}_slice", type_snake_name(elem))
+        }
+        TypeRef::Array(elem) if flatten_type(elem, cgctx, scope).len() > 1 => {
+            "js_value_slice".to_string()
+        }
+        _ => type_snake_name(ty),
     }
 }
 
@@ -2553,13 +2643,26 @@ fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
         ty if is_buffer_source(ty) => Some(quote! { ::js_sys::BufferSourceLike }),
         _ => primitive_unions::PrimitiveUnion::classify(ty).map(|u| u.trait_path()),
     };
+    // A list of buffer sources takes each element as itself (J's
+    // `BufferSourceLike: VectorRefIntoWasmAbi`); a byte slice element
+    // crosses as a copy.
+    let buffer_list = |ty: &TypeRef| match ty {
+        TypeRef::Array(elem) if is_buffer_source(elem) => {
+            Some(quote! { &[impl ::js_sys::BufferSourceLike] })
+        }
+        _ => None,
+    };
     match ty {
         // `Option<impl Bound>` crosses `None` as `undefined`, so it is only
         // the right shape when `undefined` is the sole empty; a `null`
         // arm goes through the regular `JsNullable` lowering.
-        TypeRef::Nullable(inner, n) if !n.null => bound(inner).map(|b| quote! { Option<impl #b> }),
+        TypeRef::Nullable(inner, n) if !n.null => bound(inner)
+            .map(|b| quote! { Option<impl #b> })
+            .or_else(|| buffer_list(inner).map(|t| quote! { Option<#t> })),
         TypeRef::Nullable(..) => None,
-        _ => bound(ty).map(|b| quote! { impl #b }),
+        _ => bound(ty)
+            .map(|b| quote! { impl #b })
+            .or_else(|| buffer_list(ty)),
     }
 }
 

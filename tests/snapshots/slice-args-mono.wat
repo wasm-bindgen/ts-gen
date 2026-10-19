@@ -42,6 +42,23 @@
   ;; tag(names: Iterable<string>, scores: Iterable<number> | null): void
   (import "slice-args-mono" "Queue.tag" (func $slice-args-mono:Queue.tag (param $this externref) (param $names externref) (param $scores externref)))
 
+  ;; Blob
+  ;; constructor()
+  (import "slice-args-mono" "Blob.new" (func $slice-args-mono:Blob.new (result externref)))
+  ;; constructor(bits: (ArrayBuffer | ArrayBufferView | Blob | string)[])
+  (import "slice-args-mono" "Blob.new_with_bits" (func $slice-args-mono:Blob.new_with_bits (param $bits externref) (result externref)))
+
+  ;; DataPoint
+  ;; {} as DataPoint
+  (import "slice-args-mono" "DataPoint.new" (func $slice-args-mono:DataPoint.new (result externref)))
+  ;; blobs?: (ArrayBuffer | string | null)[]
+  (import "slice-args-mono" "DataPoint.blobs" (func $slice-args-mono:DataPoint.blobs (param $this externref) (result externref)))
+  ;; set blobs(value: (ArrayBuffer | string | null)[])
+  (import "slice-args-mono" "DataPoint.set_blobs" (func $slice-args-mono:DataPoint.set_blobs (param $this externref) (param $value externref)))
+
+  ;; write(point: DataPoint): void
+  (import "slice-args-mono" "write" (func $slice-args-mono:write (param $point externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 
