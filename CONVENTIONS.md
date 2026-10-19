@@ -3353,6 +3353,13 @@ enum (and hence a single name). Order matters at runtime — the
 wasm-bindgen dispatch tries variants in source order, so two unions
 that differ in order are distinct types.
 
+Under `--experimental-generic-mono` identity also includes the member's
+JS name, so an enum is shared only by sites of one name: a method's
+overloads, or one property on several declarations (R2's four
+`ssecKey`s share `SsecKeyKind`). An unrelated member of the same shape
+gets its own enum rather than another's name (`ssec_key()` no longer
+returns `MessageEventInitDataKind`, nor `sha1()` `Md5Kind`).
+
 Collisions resolve in three steps, most-simple to most-qualified:
 
 1. Bare anchor (`ContentKind`).

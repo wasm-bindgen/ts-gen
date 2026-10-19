@@ -177,6 +177,7 @@ fn generate_expanded_free_function(
         ctx,
         super::typemap::ReturnAnchor {
             base: &sig.rust_name,
+            js_name: &sig.js_name,
             kind: super::typemap::ReturnAnchorKind::Callable,
             parent: None,
         },
@@ -530,6 +531,7 @@ fn generate_constructs(
                 ctx,
                 super::typemap::ReturnAnchor {
                     base: &sig.rust_name,
+                    js_name: &sig.js_name,
                     kind: super::typemap::ReturnAnchorKind::Callable,
                     parent: None,
                 },

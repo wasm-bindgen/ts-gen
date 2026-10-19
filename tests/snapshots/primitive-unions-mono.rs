@@ -252,7 +252,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "level")]
     pub fn set_level_with_f64(this: &Settings, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn id(this: &Settings) -> CurrentReturnKind;
+    pub fn id(this: &Settings) -> IdKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &Settings, val: impl ::js_sys::JsNumberOrStringLike);
     #[wasm_bindgen(method, getter)]
@@ -549,6 +549,11 @@ pub enum CurrentReturnKind {
 pub enum LevelKind {
     Low = "low",
     High = "high",
+    F64(f64),
+}
+#[wasm_bindgen(private)]
+pub enum IdKind {
+    String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]

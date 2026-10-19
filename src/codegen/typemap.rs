@@ -980,11 +980,19 @@ impl<'a> CodegenContext<'a> {
         &self,
         members: &[TypeRef],
         anchor: &str,
+        js_name: Option<&str>,
         parent: Option<&str>,
         scope: ScopeId,
         from_module: &ModuleContext,
     ) -> String {
-        let key = DynamicUnionKey(members.iter().map(format_type_ref_key).collect());
+        let mut key = DynamicUnionKey(members.iter().map(format_type_ref_key).collect());
+        // Per-mono the enum is shared only by sites of one JS name (a
+        // method's overloads, a property on several dictionaries), so an
+        // unrelated member of the same shape doesn't return another's enum
+        // (R2's `ssec_key()` vs `MessageEventInit.data`).
+        if let Some(js_name) = js_name.filter(|_| self.experimental_generic_mono) {
+            key.0.push(format!("@{js_name}"));
+        }
         if let Some(info) = self.dynamic_unions.borrow().by_key.get(&key) {
             return info.rust_name.clone();
         }
@@ -2967,6 +2975,9 @@ pub struct ReturnAnchor<'a> {
     /// (`bar`), function name (`fetch`). Will be PascalCased before
     /// being used as the enum-name base.
     pub base: &'a str,
+    /// The JS member name. Per-mono only sites of one name share an enum
+    /// (see [`CodegenContext::synthesise_dynamic_union`]).
+    pub js_name: &'a str,
     /// Whether the anchor refers to a getter (where the base is used
     /// as-is) or a callable return (where `Return` is appended before
     /// `Kind`).
@@ -3034,6 +3045,7 @@ fn maybe_synthesise_return_union(
     let name = cgctx.synthesise_dynamic_union(
         &members,
         &anchor.enum_anchor(),
+        Some(anchor.js_name),
         anchor.parent,
         scope,
         from_module,
@@ -3125,6 +3137,7 @@ pub(crate) fn setter_enum(
     let name = cgctx.synthesise_dynamic_union(
         &members,
         &anchor.enum_anchor(),
+        Some(anchor.js_name),
         anchor.parent,
         scope,
         from_module,
@@ -4066,6 +4079,7 @@ mod tests {
             &ModuleContext::Global,
             ReturnAnchor {
                 base: "test",
+                js_name: "test",
                 kind: ReturnAnchorKind::Callable,
                 parent: None,
             },
