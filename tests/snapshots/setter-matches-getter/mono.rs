@@ -65,66 +65,10 @@ extern "C" {
     pub fn set_digits_with_f64(this: &RequiredDigits, val: f64);
 }
 impl RequiredDigits {
-    #[doc = " Construct with `digits: \"auto\"`."]
-    pub fn new_auto() -> RequiredDigits {
-        Self::builder_auto().build()
-    }
-    #[doc = " Construct with `digits: 0`."]
-    pub fn new_0() -> RequiredDigits {
-        Self::builder_0().build()
-    }
-    #[doc = " Construct with `digits: 1`."]
-    pub fn new_1() -> RequiredDigits {
-        Self::builder_1().build()
-    }
-    #[doc = " Construct with `digits: 2`."]
-    pub fn new_2() -> RequiredDigits {
-        Self::builder_2().build()
-    }
-    #[doc = " Start a builder with `digits: \"auto\"`."]
-    pub fn builder_auto() -> RequiredDigitsBuilder {
+    pub fn new(digits: DigitsKind) -> RequiredDigits {
         let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_digits(DigitsKind::Auto);
-        RequiredDigitsBuilder { inner }
-    }
-    #[doc = " Start a builder with `digits: 0`."]
-    pub fn builder_0() -> RequiredDigitsBuilder {
-        let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_digits_with_f64(0.0);
-        RequiredDigitsBuilder { inner }
-    }
-    #[doc = " Start a builder with `digits: 1`."]
-    pub fn builder_1() -> RequiredDigitsBuilder {
-        let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_digits_with_f64(1.0);
-        RequiredDigitsBuilder { inner }
-    }
-    #[doc = " Start a builder with `digits: 2`."]
-    pub fn builder_2() -> RequiredDigitsBuilder {
-        let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_digits_with_f64(2.0);
-        RequiredDigitsBuilder { inner }
-    }
-}
-pub struct RequiredDigitsBuilder {
-    inner: RequiredDigits,
-}
-impl RequiredDigitsBuilder {
-    pub fn digits(self, val: DigitsKind) -> Self {
-        self.inner.set_digits(val);
-        self
-    }
-    pub fn digits_with_f64(self, val: f64) -> Self {
-        self.inner.set_digits_with_f64(val);
-        self
-    }
-    pub fn build(self) -> RequiredDigits {
-        self.inner
-    }
-}
-impl From<RequiredDigits> for RequiredDigitsBuilder {
-    fn from(inner: RequiredDigits) -> Self {
-        Self { inner }
+        inner.set_digits(digits);
+        inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -140,56 +84,10 @@ extern "C" {
     pub fn set_mode_with_bool(this: &Toggle, val: bool);
 }
 impl Toggle {
-    #[doc = " Construct with `mode: true`."]
-    pub fn new_true() -> Toggle {
-        Self::builder_true().build()
-    }
-    #[doc = " Construct with `mode: \"x\"`."]
-    pub fn new_x() -> Toggle {
-        Self::builder_x().build()
-    }
-    #[doc = " Construct with `mode: \"y\"`."]
-    pub fn new_y() -> Toggle {
-        Self::builder_y().build()
-    }
-    #[doc = " Start a builder with `mode: true`."]
-    pub fn builder_true() -> ToggleBuilder {
+    pub fn new(mode: ModeKind) -> Toggle {
         let inner: Toggle = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_bool(true);
-        ToggleBuilder { inner }
-    }
-    #[doc = " Start a builder with `mode: \"x\"`."]
-    pub fn builder_x() -> ToggleBuilder {
-        let inner: Toggle = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(ModeKind::X);
-        ToggleBuilder { inner }
-    }
-    #[doc = " Start a builder with `mode: \"y\"`."]
-    pub fn builder_y() -> ToggleBuilder {
-        let inner: Toggle = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(ModeKind::Y);
-        ToggleBuilder { inner }
-    }
-}
-pub struct ToggleBuilder {
-    inner: Toggle,
-}
-impl ToggleBuilder {
-    pub fn mode(self, val: ModeKind) -> Self {
-        self.inner.set_mode(val);
-        self
-    }
-    pub fn mode_with_bool(self, val: bool) -> Self {
-        self.inner.set_mode_with_bool(val);
-        self
-    }
-    pub fn build(self) -> Toggle {
-        self.inner
-    }
-}
-impl From<Toggle> for ToggleBuilder {
-    fn from(inner: Toggle) -> Self {
-        Self { inner }
+        inner.set_mode(mode);
+        inner
     }
 }
 #[wasm_bindgen(private)]

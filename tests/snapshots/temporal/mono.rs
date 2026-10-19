@@ -1506,42 +1506,10 @@ pub mod temporal {
         pub fn set_direction(this: &TransitionOptions, val: DirectionKind);
     }
     impl TransitionOptions {
-        #[doc = " Construct with `direction: \"next\"`."]
-        pub fn new_next() -> TransitionOptions {
-            Self::builder_next().build()
-        }
-        #[doc = " Construct with `direction: \"previous\"`."]
-        pub fn new_previous() -> TransitionOptions {
-            Self::builder_previous().build()
-        }
-        #[doc = " Start a builder with `direction: \"next\"`."]
-        pub fn builder_next() -> TransitionOptionsBuilder {
+        pub fn new(direction: DirectionKind) -> TransitionOptions {
             let inner: TransitionOptions = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_direction(DirectionKind::Next);
-            TransitionOptionsBuilder { inner }
-        }
-        #[doc = " Start a builder with `direction: \"previous\"`."]
-        pub fn builder_previous() -> TransitionOptionsBuilder {
-            let inner: TransitionOptions = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_direction(DirectionKind::Previous);
-            TransitionOptionsBuilder { inner }
-        }
-    }
-    pub struct TransitionOptionsBuilder {
-        inner: TransitionOptions,
-    }
-    impl TransitionOptionsBuilder {
-        pub fn direction(self, val: DirectionKind) -> Self {
-            self.inner.set_direction(val);
-            self
-        }
-        pub fn build(self) -> TransitionOptions {
-            self.inner
-        }
-    }
-    impl From<TransitionOptions> for TransitionOptionsBuilder {
-        fn from(inner: TransitionOptions) -> Self {
-            Self { inner }
+            inner.set_direction(direction);
+            inner
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]

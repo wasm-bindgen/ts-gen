@@ -23,34 +23,12 @@ extern "C" {
     pub fn set_label(this: &Options, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl Options {
-    #[doc = " Construct with `keepAlive: 0`."]
-    pub fn new_0() -> Options {
-        Self::builder_0().build()
+    pub fn new(keep_alive: KeepAliveKind) -> Options {
+        Self::builder(keep_alive).build()
     }
-    #[doc = " Construct with `keepAlive: 1`."]
-    pub fn new_1() -> Options {
-        Self::builder_1().build()
-    }
-    #[doc = " Construct with `keepAlive: 2`."]
-    pub fn new_2() -> Options {
-        Self::builder_2().build()
-    }
-    #[doc = " Start a builder with `keepAlive: 0`."]
-    pub fn builder_0() -> OptionsBuilder {
+    pub fn builder(keep_alive: KeepAliveKind) -> OptionsBuilder {
         let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_keep_alive(KeepAliveKind::N0);
-        OptionsBuilder { inner }
-    }
-    #[doc = " Start a builder with `keepAlive: 1`."]
-    pub fn builder_1() -> OptionsBuilder {
-        let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_keep_alive(KeepAliveKind::N1);
-        OptionsBuilder { inner }
-    }
-    #[doc = " Start a builder with `keepAlive: 2`."]
-    pub fn builder_2() -> OptionsBuilder {
-        let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_keep_alive(KeepAliveKind::N2);
+        inner.set_keep_alive(keep_alive);
         OptionsBuilder { inner }
     }
 }
@@ -82,42 +60,10 @@ extern "C" {
     pub fn set_scale(this: &Scaled, val: f64);
 }
 impl Scaled {
-    #[doc = " Construct with `scale: -1`."]
-    pub fn new_neg_1() -> Scaled {
-        Self::builder_neg_1().build()
-    }
-    #[doc = " Construct with `scale: 0.5`."]
-    pub fn new_0_5() -> Scaled {
-        Self::builder_0_5().build()
-    }
-    #[doc = " Start a builder with `scale: -1`."]
-    pub fn builder_neg_1() -> ScaledBuilder {
+    pub fn new(scale: f64) -> Scaled {
         let inner: Scaled = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_scale(-1.0);
-        ScaledBuilder { inner }
-    }
-    #[doc = " Start a builder with `scale: 0.5`."]
-    pub fn builder_0_5() -> ScaledBuilder {
-        let inner: Scaled = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_scale(0.5);
-        ScaledBuilder { inner }
-    }
-}
-pub struct ScaledBuilder {
-    inner: Scaled,
-}
-impl ScaledBuilder {
-    pub fn scale(self, val: f64) -> Self {
-        self.inner.set_scale(val);
-        self
-    }
-    pub fn build(self) -> Scaled {
-        self.inner
-    }
-}
-impl From<Scaled> for ScaledBuilder {
-    fn from(inner: Scaled) -> Self {
-        Self { inner }
+        inner.set_scale(scale);
+        inner
     }
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]

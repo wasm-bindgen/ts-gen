@@ -86,46 +86,16 @@ extern "C" {
     pub fn set_filename(this: &Attachment, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl Attachment {
-    #[doc = " Construct with `kind: \"attachment\"` and `disposition: \"inline\"`."]
-    pub fn new_inline(filename: impl ::wasm_bindgen::JsStringLike) -> Attachment {
-        Self::builder_inline(filename).build()
-    }
-    #[doc = " Construct with `kind: \"attachment\"` and `disposition: \"attachment\"`."]
-    pub fn new_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> Attachment {
-        Self::builder_attachment(filename).build()
-    }
-    #[doc = " Start a builder with `kind: \"attachment\"` and `disposition: \"inline\"`."]
-    pub fn builder_inline(filename: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
+    #[doc = " Construct with `kind: \"attachment\"`."]
+    pub fn new(
+        disposition: DispositionKind,
+        filename: impl ::wasm_bindgen::JsStringLike,
+    ) -> Attachment {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind("attachment");
-        inner.set_disposition(DispositionKind::Inline);
+        inner.set_disposition(disposition);
         inner.set_filename(filename);
-        AttachmentBuilder { inner }
-    }
-    #[doc = " Start a builder with `kind: \"attachment\"` and `disposition: \"attachment\"`."]
-    pub fn builder_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
-        let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind("attachment");
-        inner.set_disposition(DispositionKind::Attachment);
-        inner.set_filename(filename);
-        AttachmentBuilder { inner }
-    }
-}
-pub struct AttachmentBuilder {
-    inner: Attachment,
-}
-impl AttachmentBuilder {
-    pub fn disposition(self, val: DispositionKind) -> Self {
-        self.inner.set_disposition(val);
-        self
-    }
-    pub fn build(self) -> Attachment {
-        self.inner
-    }
-}
-impl From<Attachment> for AttachmentBuilder {
-    fn from(inner: Attachment) -> Self {
-        Self { inner }
+        inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -238,8 +208,8 @@ extern "C" {
     pub fn set_f_with_f64(this: &CappedAttachment, val: f64);
 }
 impl CappedAttachment {
-    #[doc = " Construct with `disposition: \"inline\"`."]
-    pub fn new_inline(
+    pub fn new(
+        disposition: DispositionKind,
         a: impl ::wasm_bindgen::JsStringLike,
         b: impl ::wasm_bindgen::JsStringLike,
         c: impl ::wasm_bindgen::JsStringLike,
@@ -247,43 +217,1212 @@ impl CappedAttachment {
         e: impl ::wasm_bindgen::JsStringLike,
         f: impl ::wasm_bindgen::JsStringLike,
     ) -> CappedAttachment {
-        Self::builder_inline(a, b, c, d, e, f).build()
-    }
-    #[doc = " Start a builder with `disposition: \"inline\"`."]
-    pub fn builder_inline(
-        a: impl ::wasm_bindgen::JsStringLike,
-        b: impl ::wasm_bindgen::JsStringLike,
-        c: impl ::wasm_bindgen::JsStringLike,
-        d: impl ::wasm_bindgen::JsStringLike,
-        e: impl ::wasm_bindgen::JsStringLike,
-        f: impl ::wasm_bindgen::JsStringLike,
-    ) -> CappedAttachmentBuilder {
         let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(DispositionKind::Inline);
+        inner.set_disposition(disposition);
         inner.set_a(a);
         inner.set_b(b);
         inner.set_c(c);
         inner.set_d(d);
         inner.set_e(e);
         inner.set_f(f);
-        CappedAttachmentBuilder { inner }
+        inner
     }
-}
-pub struct CappedAttachmentBuilder {
-    inner: CappedAttachment,
-}
-impl CappedAttachmentBuilder {
-    pub fn disposition(self, val: DispositionKind) -> Self {
-        self.inner.set_disposition(val);
-        self
+    pub fn new_with_str_and_str_and_str_and_str_and_str_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
     }
-    pub fn build(self) -> CappedAttachment {
-        self.inner
+    pub fn new_with_str_and_str_and_str_and_str_and_f64_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
     }
-}
-impl From<CappedAttachment> for CappedAttachmentBuilder {
-    fn from(inner: CappedAttachment) -> Self {
-        Self { inner }
+    pub fn new_with_str_and_str_and_str_and_str_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_str_and_f64_and_str_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_str_and_f64_and_str_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_str_and_f64_and_f64_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_str_and_f64_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_f64_and_str_and_str_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_f64_and_str_and_str_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_f64_and_str_and_f64_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_f64_and_str_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_f64_and_f64_and_str_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_f64_and_f64_and_str_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_f64_and_f64_and_f64_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: f64,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_str_and_f64_and_f64_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: f64,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_str_and_str_and_str_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_str_and_str_and_str_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_str_and_str_and_f64_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_str_and_str_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_str_and_f64_and_str_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_str_and_f64_and_str_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_str_and_f64_and_f64_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_str_and_f64_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_f64_and_str_and_str_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_f64_and_str_and_str_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_f64_and_str_and_f64_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_f64_and_str_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_f64_and_f64_and_str_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: f64,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_f64_and_f64_and_str_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: f64,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_f64_and_f64_and_f64_and_str(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: f64,
+        d: f64,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_str_and_f64_and_f64_and_f64_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: f64,
+        c: f64,
+        d: f64,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_str_and_str_and_str_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_str_and_str_and_str_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_str_and_str_and_f64_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_str_and_str_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_str_and_f64_and_str_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_str_and_f64_and_str_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_str_and_f64_and_f64_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_str_and_f64_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_f64_and_str_and_str_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_f64_and_str_and_str_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_f64_and_str_and_f64_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_f64_and_str_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_f64_and_f64_and_str_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_f64_and_f64_and_str_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_f64_and_f64_and_f64_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: f64,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_str_and_f64_and_f64_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: f64,
+        d: f64,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_str_and_str_and_str_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_str_and_str_and_str_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_str_and_str_and_f64_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_str_and_str_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_str_and_f64_and_str_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_str_and_f64_and_str_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_str_and_f64_and_f64_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_str_and_f64_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: f64,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_f64_and_str_and_str_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_f64_and_str_and_str_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_f64_and_str_and_f64_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_f64_and_str_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: f64,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_f64_and_f64_and_str_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: f64,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_f64_and_f64_and_str_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: f64,
+        d: f64,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e(e);
+        inner.set_f_with_f64(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_f64_and_f64_and_f64_and_str(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: f64,
+        d: f64,
+        e: f64,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f(f);
+        inner
+    }
+    pub fn new_with_f64_and_f64_and_f64_and_f64_and_f64_and_f64(
+        disposition: DispositionKind,
+        a: f64,
+        b: f64,
+        c: f64,
+        d: f64,
+        e: f64,
+        f: f64,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(disposition);
+        inner.set_a_with_f64(a);
+        inner.set_b_with_f64(b);
+        inner.set_c_with_f64(c);
+        inner.set_d_with_f64(d);
+        inner.set_e_with_f64(e);
+        inner.set_f_with_f64(f);
+        inner
     }
 }
 #[wasm_bindgen(private)]

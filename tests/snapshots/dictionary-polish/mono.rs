@@ -251,42 +251,10 @@ pub mod polish {
         pub fn set_direction(this: &Transition, val: DirectionKind);
     }
     impl Transition {
-        #[doc = " Construct with `direction: \"next\"`."]
-        pub fn new_next() -> Transition {
-            Self::builder_next().build()
-        }
-        #[doc = " Construct with `direction: \"previous\"`."]
-        pub fn new_previous() -> Transition {
-            Self::builder_previous().build()
-        }
-        #[doc = " Start a builder with `direction: \"next\"`."]
-        pub fn builder_next() -> TransitionBuilder {
+        pub fn new(direction: DirectionKind) -> Transition {
             let inner: Transition = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_direction(DirectionKind::Next);
-            TransitionBuilder { inner }
-        }
-        #[doc = " Start a builder with `direction: \"previous\"`."]
-        pub fn builder_previous() -> TransitionBuilder {
-            let inner: Transition = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_direction(DirectionKind::Previous);
-            TransitionBuilder { inner }
-        }
-    }
-    pub struct TransitionBuilder {
-        inner: Transition,
-    }
-    impl TransitionBuilder {
-        pub fn direction(self, val: DirectionKind) -> Self {
-            self.inner.set_direction(val);
-            self
-        }
-        pub fn build(self) -> Transition {
-            self.inner
-        }
-    }
-    impl From<Transition> for TransitionBuilder {
-        fn from(inner: Transition) -> Self {
-            Self { inner }
+            inner.set_direction(direction);
+            inner
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
