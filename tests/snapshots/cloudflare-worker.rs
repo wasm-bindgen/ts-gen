@@ -484,6 +484,26 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
+    #[wasm_bindgen(variadic, js_name = "restLog")]
+    pub fn rest_log(rest: &[JsValue]);
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "restLog")]
+    pub fn try_rest_log(rest: &[JsValue]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(variadic, js_name = "arrLog")]
+    pub fn arr_log(arr: &str, args: &[JsValue]);
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "arrLog")]
+    pub fn try_arr_log(arr: &str, args: &[JsValue]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Flags;

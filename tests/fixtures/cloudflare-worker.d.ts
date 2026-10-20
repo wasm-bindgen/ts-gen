@@ -108,6 +108,10 @@ declare var console: Console;
 // === Variadic with fixed args ===
 declare function joinAll(sep: string, ...parts: string[]): string;
 
+// === Variadic parameters named like the bindings' locals ===
+declare function restLog(...rest: string[]): void;
+declare function arrLog(arr: string, ...args: string[]): void;
+
 // === Boolean writes (dictionary field and call argument) ===
 interface Flags {
   verbose?: boolean;
@@ -122,4 +126,13 @@ declare module "cloudflare:sockets" {
     readonly closed: Promise<void>;
     startTls(): Socket;
   }
+}
+
+// === Scalar module exports, and a module function's `this` ===
+declare module "embed:values" {
+  const count: number;
+  const enabled: boolean;
+  const disabled: boolean;
+  const big: bigint;
+  function receiver(): string;
 }
