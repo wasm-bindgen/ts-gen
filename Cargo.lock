@@ -369,7 +369,7 @@ checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 [[package]]
 name = "js-sys"
 version = "0.3.106"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=acd92eadc9bb1629d590fe25c9b40620aae258ea#acd92eadc9bb1629d590fe25c9b40620aae258ea"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=6513d6b118f4aa934b3ef553bb2e3ce8280791f2#6513d6b118f4aa934b3ef553bb2e3ce8280791f2"
 dependencies = [
  "cfg-if",
  "futures-util",
@@ -1189,7 +1189,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen"
 version = "0.2.129"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=acd92eadc9bb1629d590fe25c9b40620aae258ea#acd92eadc9bb1629d590fe25c9b40620aae258ea"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=6513d6b118f4aa934b3ef553bb2e3ce8280791f2#6513d6b118f4aa934b3ef553bb2e3ce8280791f2"
 dependencies = [
  "cfg-if",
  "rustversion",
@@ -1200,7 +1200,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-futures"
 version = "0.4.79"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=acd92eadc9bb1629d590fe25c9b40620aae258ea#acd92eadc9bb1629d590fe25c9b40620aae258ea"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=6513d6b118f4aa934b3ef553bb2e3ce8280791f2#6513d6b118f4aa934b3ef553bb2e3ce8280791f2"
 dependencies = [
  "js-sys",
  "tokio",
@@ -1210,7 +1210,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-macro"
 version = "0.2.129"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=acd92eadc9bb1629d590fe25c9b40620aae258ea#acd92eadc9bb1629d590fe25c9b40620aae258ea"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=6513d6b118f4aa934b3ef553bb2e3ce8280791f2#6513d6b118f4aa934b3ef553bb2e3ce8280791f2"
 dependencies = [
  "quote",
  "wasm-bindgen-macro-support",
@@ -1219,7 +1219,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-macro-support"
 version = "0.2.129"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=acd92eadc9bb1629d590fe25c9b40620aae258ea#acd92eadc9bb1629d590fe25c9b40620aae258ea"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=6513d6b118f4aa934b3ef553bb2e3ce8280791f2#6513d6b118f4aa934b3ef553bb2e3ce8280791f2"
 dependencies = [
  "bumpalo",
  "proc-macro2",
@@ -1231,7 +1231,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-shared"
 version = "0.2.129"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=acd92eadc9bb1629d590fe25c9b40620aae258ea#acd92eadc9bb1629d590fe25c9b40620aae258ea"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=6513d6b118f4aa934b3ef553bb2e3ce8280791f2#6513d6b118f4aa934b3ef553bb2e3ce8280791f2"
 dependencies = [
  "unicode-ident",
 ]
@@ -1239,7 +1239,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-test"
 version = "0.3.79"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=acd92eadc9bb1629d590fe25c9b40620aae258ea#acd92eadc9bb1629d590fe25c9b40620aae258ea"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=6513d6b118f4aa934b3ef553bb2e3ce8280791f2#6513d6b118f4aa934b3ef553bb2e3ce8280791f2"
 dependencies = [
  "cast",
  "js-sys",
@@ -1259,7 +1259,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-test-macro"
 version = "0.3.79"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=acd92eadc9bb1629d590fe25c9b40620aae258ea#acd92eadc9bb1629d590fe25c9b40620aae258ea"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=6513d6b118f4aa934b3ef553bb2e3ce8280791f2#6513d6b118f4aa934b3ef553bb2e3ce8280791f2"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1269,7 +1269,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-test-shared"
 version = "0.2.129"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=acd92eadc9bb1629d590fe25c9b40620aae258ea#acd92eadc9bb1629d590fe25c9b40620aae258ea"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=6513d6b118f4aa934b3ef553bb2e3ce8280791f2#6513d6b118f4aa934b3ef553bb2e3ce8280791f2"
 
 [[package]]
 name = "winapi-util"
