@@ -61,12 +61,5 @@ jobs:
       with:
         node-version: '20'
     - uses: extractions/setup-just@v2
-    # `just test-integration` invokes the wasm-bindgen-test-runner that
-    # ships with `wasm-bindgen-cli`. Install from the same revision as the
-    # patched workspace dependencies so their binary schemas match.
-    - run: >-
-        cargo install wasm-bindgen-cli
-        --git https://github.com/wasm-bindgen/wasm-bindgen
-        --rev 69d72955b2ee1cbf9cad77b47908c29fef532588
-        --locked
+    - run: just install-wasm-bindgen-cli
     - run: just test-integration
