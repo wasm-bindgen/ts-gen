@@ -88,9 +88,6 @@ impl WasmType {
 /// otherwise let a module take it as `(ref extern)` and trap.
 struct Lower<'a> {
     gctx: &'a GlobalContext,
-    /// Dotted JS path of every declared type (`WebAssembly.Module`), for
-    /// heads that match the owner names whatever a reference spells.
-    paths: HashMap<crate::context::TypeId, String>,
     /// Aliases declared inside namespaces: the arena entry a namespace
     /// member resolves to is a placeholder, the body lives in the
     /// namespace's declaration list.
@@ -123,36 +120,10 @@ impl Lower<'_> {
         }
     }
 
-    /// The declared type a reference position names, through aliases and
-    /// ignoring empty arms: `Headers | null`, `type H = Headers` and
-    /// `type Gen<T> = T | null; Gen<Headers>` all give `Headers`. A type
-    /// in a namespace is its dotted path (`WebAssembly.Module`), matching
-    /// the owner names. Unions of different heads and non-references give
-    /// `None`.
-    fn head(&self, ty: &TypeRef, scope: ScopeId) -> Option<String> {
-        match ty {
-            TypeRef::Union(union) => {
-                let mut heads = union.values().iter().map(|m| self.head(m, scope));
-                let first = heads.next()??;
-                heads.all(|h| h.as_deref() == Some(&first)).then_some(first)
-            }
-            TypeRef::Reference {
-                segments,
-                generic_args,
-            } => match self.resolve(segments, generic_args, scope)? {
-                Resolved::Alias(target, alias_scope) => self.head(&target, alias_scope),
-                Resolved::Bound(ty, from) => self.head(&ty, from),
-                Resolved::Declared(path) => Some(path),
-                Resolved::TypeParam => None,
-            },
-            _ => None,
-        }
-    }
-
     /// Follow a (possibly qualified) reference to what it names. Type
-    /// arguments are substituted into an alias body so `Gen<Headers>`
-    /// keeps its head; the body then resolves in the alias's own scope,
-    /// where the substituted arguments are already concrete.
+    /// arguments are substituted into an alias body; the body then
+    /// resolves in the alias's own scope, where the substituted arguments
+    /// are already concrete.
     fn resolve(&self, segments: &[String], args: &[TypeRef], scope: ScopeId) -> Option<Resolved> {
         let (head, rest) = segments.split_first()?;
         if rest.is_empty() {
@@ -164,23 +135,17 @@ impl Lower<'_> {
                 Binding::TypeParam => Some(Resolved::TypeParam),
                 // A constrained type parameter reads as its primitive.
                 Binding::Erased(erasure) => Some(Resolved::Alias(erasure.type_ref(), scope)),
-                Binding::Declared(id) => Some(self.declared(id, segments, args, scope)),
+                Binding::Declared(id) => Some(self.declared(id, args, scope)),
             };
         }
         let id = self.gctx.resolve_path(scope, &segments.join("."))?;
-        Some(self.declared(id, segments, args, scope))
+        Some(self.declared(id, args, scope))
     }
 
     /// What a declared name is. Arguments to an alias are recorded with
     /// the scope they were written in and stand in the body as
     /// placeholders, since they must not resolve in the alias's scope.
-    fn declared(
-        &self,
-        id: crate::context::TypeId,
-        segments: &[String],
-        args: &[TypeRef],
-        scope: ScopeId,
-    ) -> Resolved {
+    fn declared(&self, id: crate::context::TypeId, args: &[TypeRef], scope: ScopeId) -> Resolved {
         let kind = &self.gctx.get_type(id).kind;
         let alias = match (self.aliases.get(&id), kind) {
             (Some(a), _) => Some(*a),
@@ -205,12 +170,7 @@ impl Lower<'_> {
                     .collect();
                 Resolved::Alias(substitute(&alias.target, &subst), alias.body_scope)
             }
-            (None, _) => Resolved::Declared(
-                self.paths
-                    .get(&id)
-                    .cloned()
-                    .unwrap_or_else(|| segments.join(".")),
-            ),
+            (None, _) => Resolved::Declared,
         }
     }
 
@@ -218,7 +178,6 @@ impl Lower<'_> {
         AbiParam {
             name: name.into(),
             ty: self.of(ty, scope),
-            head: self.head(ty, scope),
             ts: ty.format_ts(),
         }
     }
@@ -258,7 +217,7 @@ impl Lower<'_> {
                     self.admits_empty(&target, alias_scope)
                 }
                 Some(Resolved::Bound(ty, from)) => self.admits_empty(&ty, from),
-                Some(Resolved::Declared(_)) => None,
+                Some(Resolved::Declared) => None,
                 Some(Resolved::TypeParam) | None => Some(Nullability::Both),
             },
             _ => None,
@@ -296,55 +255,27 @@ fn substitute(ty: &TypeRef, subst: &HashMap<&str, &TypeRef>) -> TypeRef {
     }
 }
 
-type DeclaredIndex<'a> = (
-    HashMap<crate::context::TypeId, String>,
-    HashMap<crate::context::TypeId, &'a crate::ir::TypeAliasDecl>,
-);
+type DeclaredIndex<'a> = HashMap<crate::context::TypeId, &'a crate::ir::TypeAliasDecl>;
 
-/// Dotted JS paths of the input's declared types and the aliases nested in
-/// namespaces, walking namespaces.
-fn declared_index<'a>(
-    module: &Module,
-    gctx: &'a GlobalContext,
-    surface: &Surface,
-) -> DeclaredIndex<'a> {
-    let mut paths = HashMap::new();
+/// The aliases nested in the input's namespaces, walking namespaces.
+fn declared_index<'a>(module: &Module, gctx: &'a GlobalContext) -> DeclaredIndex<'a> {
     let mut aliases = HashMap::new();
     for &id in &module.types {
-        match &gctx.get_type(id).kind {
-            TypeKind::Class(c) => {
-                paths.insert(id, surface.js_name(id, &c.js_name).to_string());
-            }
-            TypeKind::Interface(i) => {
-                paths.insert(id, i.js_name.clone());
-            }
-            TypeKind::Namespace(ns) => namespace_index(
-                ns,
-                &[surface.js_name(id, &ns.name).to_string()],
-                gctx,
-                surface,
-                &mut paths,
-                &mut aliases,
-            ),
-            _ => {}
+        if let TypeKind::Namespace(ns) = &gctx.get_type(id).kind {
+            namespace_index(ns, gctx, &mut aliases);
         }
     }
-    (paths, aliases)
+    aliases
 }
 
 /// Member types of a namespace are reached by name in its child scope.
 fn namespace_index<'a>(
     ns: &'a crate::ir::NamespaceDecl,
-    prefix: &[String],
     gctx: &'a GlobalContext,
-    surface: &Surface,
-    paths: &mut HashMap<crate::context::TypeId, String>,
-    aliases: &mut HashMap<crate::context::TypeId, &'a crate::ir::TypeAliasDecl>,
+    aliases: &mut DeclaredIndex<'a>,
 ) {
     for &inner in &ns.declarations {
-        let (name, js_name) = match &gctx.get_type(inner).kind {
-            TypeKind::Class(c) => (&c.js_name, surface.js_name(inner, &c.js_name)),
-            TypeKind::Interface(i) => (&i.js_name, i.js_name.as_str()),
+        match &gctx.get_type(inner).kind {
             TypeKind::TypeAlias(a) => {
                 // Only the alias's own placeholder: a re-export stub's name
                 // may resolve straight to the declaration it re-exports.
@@ -354,20 +285,9 @@ fn namespace_index<'a>(
                         aliases.insert(id, a);
                     }
                 }
-                continue;
             }
-            TypeKind::Namespace(child) => {
-                let mut p = prefix.to_vec();
-                p.push(surface.js_name(inner, &child.name).to_string());
-                namespace_index(child, &p, gctx, surface, paths, aliases);
-                continue;
-            }
-            _ => continue,
-        };
-        if let Some(id) = gctx.scopes.resolve(ns.child_scope, name) {
-            let mut p = prefix.to_vec();
-            p.push(js_name.to_string());
-            paths.insert(id, p.join("."));
+            TypeKind::Namespace(child) => namespace_index(child, gctx, aliases),
+            _ => {}
         }
     }
 }
@@ -378,8 +298,8 @@ enum Resolved {
     Alias(TypeRef, ScopeId),
     /// A substituted type argument and the scope it was written in.
     Bound(TypeRef, ScopeId),
-    /// A class, interface or enum, as its dotted path.
-    Declared(String),
+    /// A class, interface or enum.
+    Declared,
     TypeParam,
 }
 
@@ -387,9 +307,6 @@ enum Resolved {
 pub struct AbiParam {
     pub name: String,
     pub ty: WasmType,
-    /// The declared type a reference names, through aliases and ignoring
-    /// empty arms (`Headers` for `Headers | null`); a target can wrap it.
-    pub head: Option<String>,
     /// TS spelling, for the template's comments.
     pub ts: String,
 }
@@ -433,8 +350,6 @@ pub struct AbiFunction {
     /// Includes the receiver as the first parameter for instance ops.
     pub params: Vec<AbiParam>,
     pub result: Option<WasmType>,
-    /// As [`AbiParam::head`], for the result.
-    pub result_head: Option<String>,
     /// TS declaration this came from, for the template's comments.
     pub ts: String,
     /// Trailing parameter is a JS array spread into the call.
@@ -469,7 +384,6 @@ pub struct AbiHandler {
     /// Wasm type of the result; for a `Promise<T>` result this is `T`'s,
     /// a nullable reference when `T` is `void`.
     pub result: Option<WasmType>,
-    pub result_head: Option<String>,
     /// The TS result was `Promise<T>`: under JSPI the module returns `T`
     /// and the wrapper's `promising` supplies the promise; otherwise the
     /// module returns the promise itself.
@@ -525,11 +439,9 @@ fn sys_functions() -> Vec<AbiFunction> {
         params: vec![AbiParam {
             name: "x".into(),
             ty: param,
-            head: None,
             ts: ts.into(),
         }],
         result: Some(result),
-        result_head: None,
         ts: ts.into(),
         variadic: false,
         module: None,
@@ -563,10 +475,9 @@ pub fn build(
         ..Default::default()
     };
     let surface = Surface::build(module, gctx, options);
-    let (paths, aliases) = declared_index(module, gctx, &surface);
+    let aliases = declared_index(module, gctx);
     let lower = Lower {
         gctx,
-        paths,
         aliases,
         surface,
         bound: Default::default(),
@@ -689,7 +600,6 @@ fn build_declaration(
                 },
                 params: vec![],
                 result: Some(lower.of(&var.type_ref, decl.scope_id)),
-                result_head: lower.head(&var.type_ref, decl.scope_id),
                 ts: format!(
                     "{} {}: {}",
                     if var.is_const { "const" } else { "var" },
@@ -806,7 +716,6 @@ fn build_handler(e: &ProvidedFn, lower: &Lower, top_level: &HashSet<String>) -> 
             (true, None) => Some(WasmType::JS),
             (_, r) => r,
         },
-        result_head: lower.head(result_ty, e.scope),
         promise,
         ts: format_method_ts(e.leaf(), &e.params, &names, &e.return_type),
         doc: e.doc.clone(),
@@ -829,7 +738,6 @@ fn build_members(
     let this = AbiParam {
         name: "this".into(),
         ty: WasmType::JS_NON_NULL,
-        head: Some(type_name.to_string()),
         ts: type_name.to_string(),
     };
 
@@ -840,7 +748,6 @@ fn build_members(
             op: AbiOp::NewObject,
             params: vec![],
             result: Some(WasmType::JS_NON_NULL),
-            result_head: Some(type_name.to_string()),
             ts: format!("{{}} as {type_name}"),
             variadic: false,
             module: None,
@@ -915,7 +822,6 @@ fn build_members(
                     },
                     params: vec![this.clone()],
                     result: Some(lower.of(&read, g.scope)),
-                    result_head: lower.head(&read, g.scope),
                     ts: format!(
                         "{}{}: {}",
                         g.js_name,
@@ -1008,7 +914,6 @@ fn build_members(
                     },
                     params: vec![],
                     result: Some(lower.of(&g.type_ref, g.scope)),
-                    result_head: lower.head(&g.type_ref, g.scope),
                     ts: format!("static {}: {}", g.js_name, g.type_ref.format_ts()),
                     variadic: false,
                     module: None,
@@ -1117,7 +1022,6 @@ fn push_callable(
                 AbiParam {
                     name: name.clone(),
                     ty: WasmType::JS,
-                    head: None,
                     ts: format!("...{}", p.type_ref.format_ts()),
                 }
             } else {
@@ -1152,12 +1056,6 @@ fn push_callable(
                 SignatureKind::Setter | SignatureKind::StaticSetter => None,
                 SignatureKind::Constructor => Some(WasmType::JS_NON_NULL),
                 _ => lower.result(return_type, scope),
-            },
-            result_head: match kind {
-                SignatureKind::Setter | SignatureKind::StaticSetter => None,
-                // A constructor's result is the owner itself.
-                SignatureKind::Constructor => owner.map(str::to_string),
-                _ => lower.head(return_type, scope),
             },
             ts,
             variadic,
@@ -1299,13 +1197,6 @@ mod tests {
                 "WebAssembly.Module.exports"
             ]
         );
-        let ctor = abi.function("WebAssembly.Module.new").unwrap();
-        assert_eq!(ctor.result_head.as_deref(), Some("WebAssembly.Module"));
-        let exports = abi.function("WebAssembly.Module.exports").unwrap();
-        assert_eq!(
-            exports.params[0].head.as_deref(),
-            Some("WebAssembly.Module")
-        );
     }
 
     #[test]
@@ -1366,23 +1257,15 @@ mod tests {
         assert_eq!(f("Gen.plain_t").result, Some(WasmType::JS));
         // Qualified alias resolves through the namespace scope.
         assert!(f("Uses.qualified").result.unwrap().admits_null());
-        assert_eq!(f("Uses.qualified").result_head.as_deref(), Some("Headers"));
         assert_eq!(
             f("Uses.qualified_class").result,
             Some(WasmType::JS_NON_NULL)
         );
-        assert_eq!(
-            f("Uses.qualified_class").result_head.as_deref(),
-            Some("NS.K")
-        );
-        // Generic alias keeps the head once the argument is substituted.
+        // Generic alias, once the argument is substituted.
         assert!(f("Uses.via_gen").result.unwrap().admits_null());
-        assert_eq!(f("Uses.via_gen").result_head.as_deref(), Some("Headers"));
         assert_eq!(f("Uses.via_id").result, Some(WasmType::JS_NON_NULL));
-        assert_eq!(f("Uses.via_id").result_head.as_deref(), Some("Headers"));
-        // An un-instantiated alias parameter is a type parameter: BOTH, no head.
+        // An un-instantiated alias parameter is a type parameter: BOTH.
         assert_eq!(f("Uses.partial").result, Some(WasmType::JS));
-        assert_eq!(f("Uses.partial").result_head, None);
     }
 
     #[test]
@@ -1441,7 +1324,6 @@ mod tests {
         "#);
         let ctor = abi.function("Foo.new").unwrap();
         assert_eq!(ctor.result, Some(WasmType::JS_NON_NULL));
-        assert_eq!(ctor.result_head.as_deref(), Some("Foo"));
         assert!(abi.function("N.f").is_some());
     }
 
@@ -1460,7 +1342,7 @@ mod tests {
     }
 
     #[test]
-    fn null_and_undefined_bits_and_heads() {
+    fn null_and_undefined_bits() {
         let abi = abi(r#"
             declare class Headers { constructor(); }
             type MaybeHeaders = Headers | null;
@@ -1484,10 +1366,8 @@ mod tests {
         assert_eq!(f("Init.headers").result, Some(und));
         assert_eq!(f("Init.nullable").result, Some(nul));
         assert_eq!(f("Init.both").result, Some(both));
-        assert_eq!(f("Init.nullable").result_head.as_deref(), Some("Headers"));
-        assert_eq!(f("f").params[0].head.as_deref(), Some("Headers"));
-        assert_eq!(f("f").result_head.as_deref(), Some("Headers"));
-        assert_eq!(f("Headers.new").result_head.as_deref(), Some("Headers"));
+        assert_eq!(f("f").params[0].ty, nul);
+        assert_eq!(f("f").result, Some(WasmType::JS_NON_NULL));
     }
 
     #[test]
