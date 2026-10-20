@@ -8,7 +8,9 @@ pub mod wat;
 
 use std::collections::{HashMap, HashSet};
 
-use crate::codegen::signatures::{base_rust_name, expand_signatures, Overload, SignatureKind};
+use crate::codegen::signatures::{
+    base_rust_name, expand_signatures, param_names, Overload, SignatureKind,
+};
 use crate::codegen::surface::Surface;
 use crate::codegen::GenerateOptions;
 use crate::context::GlobalContext;
@@ -764,6 +766,14 @@ fn build_interface(iface: &InterfaceDecl, path: &[String], lower: &Lower, abi: &
     );
 }
 
+/// A parameter name with non-ASCII characters as `_`, since only ASCII
+/// is legal in a WAT identifier.
+fn ascii(name: &str) -> String {
+    name.chars()
+        .map(|c| if c.is_ascii() { c } else { '_' })
+        .collect()
+}
+
 fn build_handler(e: &ProvidedFn, lower: &Lower, top_level: &HashSet<String>) -> AbiHandler {
     let (promise, result_ty) = match e.promise_inner() {
         Some(inner) => (true, inner),
@@ -777,13 +787,15 @@ fn build_handler(e: &ProvidedFn, lower: &Lower, top_level: &HashSet<String>) -> 
         }
         path => path.join("."),
     };
+    let names = param_names(e.params.iter().map(|p| ascii(&p.name)), &[], None);
     AbiHandler {
         name,
         path: e.path.clone(),
         params: e
             .params
             .iter()
-            .map(|p| lower.param(&p.name, &p.type_ref, e.scope))
+            .zip(&names)
+            .map(|(p, name)| lower.param(name, &p.type_ref, e.scope))
             .collect(),
         // A promise handler always has a result slot: the promise itself
         // without JSPI, the settled value (`undefined` for `Promise<void>`)
@@ -794,7 +806,7 @@ fn build_handler(e: &ProvidedFn, lower: &Lower, top_level: &HashSet<String>) -> 
         },
         result_head: lower.head(result_ty, e.scope),
         promise,
-        ts: format_method_ts(e.leaf(), &e.params, &e.return_type),
+        ts: format_method_ts(e.leaf(), &e.params, &names, &e.return_type),
         doc: e.doc.clone(),
     }
 }
@@ -1083,27 +1095,29 @@ fn push_callable(
             None => variant,
         };
         let variadic = sig.params.last().is_some_and(|p| p.variadic);
+        let reserved: Vec<&str> = leading.iter().map(|p| p.name.as_str()).collect();
+        let names = param_names(sig.params.iter().map(|p| ascii(&p.name)), &reserved, None);
         let mut params = leading.to_vec();
-        params.extend(sig.params.iter().map(|p| {
+        params.extend(sig.params.iter().zip(&names).map(|(p, name)| {
             if p.variadic {
                 AbiParam {
-                    name: p.name.clone(),
+                    name: name.clone(),
                     ty: WasmType::JS,
                     head: None,
                     ts: format!("...{}", p.type_ref.format_ts()),
                 }
             } else {
-                lower.param(&p.name, &p.type_ref, scope)
+                lower.param(name, &p.type_ref, scope)
             }
         }));
         let ts_params = sig
             .params
             .iter()
-            .map(|p| {
+            .zip(&names)
+            .map(|(p, name)| {
                 format!(
-                    "{}{}: {}",
+                    "{}{name}: {}",
                     if p.variadic { "..." } else { "" },
-                    p.name,
                     p.type_ref.format_ts()
                 )
             })
@@ -1138,14 +1152,15 @@ fn push_callable(
     }
 }
 
-fn format_method_ts(name: &str, params: &[Param], ret: &TypeRef) -> String {
+fn format_method_ts(name: &str, params: &[Param], names: &[String], ret: &TypeRef) -> String {
     let ps = params
         .iter()
-        .map(|p| {
+        .zip(names)
+        .map(|(p, param)| {
             format!(
                 "{}{}{}: {}",
                 if p.variadic { "..." } else { "" },
-                p.name,
+                param,
                 if p.optional { "?" } else { "" },
                 p.type_ref.format_ts()
             )
@@ -1486,5 +1501,57 @@ mod tests {
                 }
             );
         }
+    }
+
+    #[test]
+    fn param_names_are_numbered_where_they_collide_once_sanitised() {
+        let abi = abi(
+            "declare function collideArgs(a: string, $a: number, fooBar: string, foo_bar: number): void;",
+        );
+        let names: Vec<&str> = abi
+            .function("collideArgs")
+            .unwrap()
+            .params
+            .iter()
+            .map(|p| p.name.as_str())
+            .collect();
+        assert_eq!(names, ["a", "a2", "foo_bar", "foo_bar2"]);
+    }
+
+    fn param_names_of(params: &[AbiParam]) -> Vec<&str> {
+        params.iter().map(|p| p.name.as_str()).collect()
+    }
+
+    #[test]
+    fn receiver_name_is_reserved() {
+        let abi = abi("declare class Thing { method(_this: string, value: number): void; }");
+        let method = abi.function("Thing.method").unwrap();
+        assert_eq!(param_names_of(&method.params), ["this", "this2", "value"]);
+    }
+
+    #[test]
+    fn non_ascii_param_names_are_legal_wat_identifiers() {
+        let abi = abi("declare function uni(café: string, cafè: number): void;");
+        let uni = abi.function("uni").unwrap();
+        assert_eq!(param_names_of(&uni.params), ["caf_", "caf_2"]);
+    }
+
+    #[test]
+    fn handler_params_are_numbered_where_they_collide_once_sanitised() {
+        let (module, mut gctx) = crate::parse_source(
+            "interface Handler { handle(fooBar: string, foo_bar: number, café: string): void; }",
+            None,
+        )
+        .unwrap();
+        let provided = crate::provides::resolve("Handler.handle", &module, &mut gctx).unwrap();
+        let abi = build(&module, &gctx, &GenerateOptions::new(), &provided);
+        assert_eq!(
+            param_names_of(&abi.handlers[0].params),
+            ["foo_bar", "foo_bar2", "caf_"]
+        );
+        assert_eq!(
+            abi.handlers[0].ts,
+            "handle(foo_bar: string, foo_bar2: number, caf_: string): void"
+        );
     }
 }

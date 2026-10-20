@@ -102,7 +102,7 @@ fn generate_expanded_free_function(
     // directly so `T` references lower to a bare ident.
     let scope = sig.body_scope;
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
-    let params = generate_concrete_params_with_mono_bounds(&sig.params, cgctx, scope, ctx);
+    let params = generate_concrete_params_with_mono_bounds(&sig.params, &[], cgctx, scope, ctx);
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
@@ -451,8 +451,13 @@ fn generate_constructs(
         for sig in &sigs {
             let scope = sig.body_scope;
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
-            let params =
-                generate_concrete_params_with_mono_bounds(&sig.params, Some(cgctx), scope, ctx);
+            let params = generate_concrete_params_with_mono_bounds(
+                &sig.params,
+                &[],
+                Some(cgctx),
+                scope,
+                ctx,
+            );
             let ret = to_return_type(
                 &sig.return_type,
                 sig.catch,

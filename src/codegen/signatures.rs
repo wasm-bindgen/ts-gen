@@ -1361,15 +1361,17 @@ fn type_snake_name(ty: &TypeRef) -> String {
 /// Handles variadic params with `&[JsValue]`. The output is for extern
 /// declarations: a parameter with a non-default slice mode carries
 /// `#[wasm_bindgen(slice = ..)]` (see [`typemap::param_slice_mode`]).
+/// No parameter takes a `reserved` name, such as a method's `this`.
 pub fn generate_concrete_params(
     params: &[ConcreteParam],
+    reserved: &[&str],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
     let items: Vec<_> = params
         .iter()
-        .zip(param_idents(params, cgctx))
+        .zip(param_idents(params, reserved, cgctx))
         .map(|(p, name)| {
             let attr = param_attr(p, cgctx, scope);
             let ty = if p.variadic {
@@ -1390,18 +1392,34 @@ pub fn generate_concrete_params(
     quote! { #(#items),* }
 }
 
-/// One ident per parameter, numbered where names collide once sanitised
-/// (`a` / `$a` → `a` / `a2`).
-fn param_idents(params: &[ConcreteParam], cgctx: Option<&CodegenContext<'_>>) -> Vec<syn::Ident> {
+/// One name per parameter, sanitised and numbered where names collide
+/// once sanitised (`a` / `$a` → `a` / `a2`) or with a `reserved` name.
+pub(crate) fn param_names<S: AsRef<str>>(
+    names: impl IntoIterator<Item = S>,
+    reserved: &[&str],
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<String> {
     use syn::ext::IdentExt;
-    let mut names = LocalScope::default();
-    params
-        .iter()
-        .map(|p| {
-            let ident = typemap::make_ident(&p.name).unraw().to_string();
+    let mut scope = LocalScope::with_claimed(reserved.iter().copied());
+    names
+        .into_iter()
+        .map(|name| {
+            let ident = typemap::make_ident(name.as_ref()).unraw().to_string();
             let ident = CodegenContext::param_name(cgctx, &ident);
-            typemap::make_ident(&names.declare(&ident, Suffix::Param))
+            scope.declare(&ident, Suffix::Param)
         })
+        .collect()
+}
+
+/// One ident per parameter, from [`param_names`].
+fn param_idents(
+    params: &[ConcreteParam],
+    reserved: &[&str],
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<syn::Ident> {
+    param_names(params.iter().map(|p| &p.name), reserved, cgctx)
+        .iter()
+        .map(|n| typemap::make_ident(n))
         .collect()
 }
 
@@ -1441,18 +1459,19 @@ fn param_attr(
 /// [`mono_argument_type`]).
 pub(crate) fn generate_concrete_params_with_mono_bounds(
     params: &[ConcreteParam],
+    reserved: &[&str],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
     let per_mono = CodegenContext::generic_mono(cgctx);
     if !per_mono {
-        return generate_concrete_params(params, cgctx, scope, from_module);
+        return generate_concrete_params(params, reserved, cgctx, scope, from_module);
     }
 
     let items = params
         .iter()
-        .zip(param_idents(params, cgctx))
+        .zip(param_idents(params, reserved, cgctx))
         .map(|(param, name)| {
             let attr = param_attr(param, cgctx, scope);
             let ty = render_param_type(param, cgctx, scope, from_module);
@@ -1707,11 +1726,17 @@ mod tests {
     #[test]
     fn param_idents_number_sanitised_collisions_without_underscores() {
         let params = ["a", "$a", "type", "type", "a2"].map(|n| concrete(n, TypeRef::Any, false));
-        let idents: Vec<String> = param_idents(&params, None)
+        let idents: Vec<String> = param_idents(&params, &[], None)
             .iter()
             .map(|i| i.to_string())
             .collect();
         assert_eq!(idents, ["a", "a2", "r#type", "type2", "a22"]);
+    }
+
+    #[test]
+    fn param_names_skip_reserved_names() {
+        let names = param_names(["this", "this", "value"], &["this"], None);
+        assert_eq!(names, ["this2", "this3", "value"]);
     }
 
     fn string_param(name: &str) -> Param {
@@ -1815,6 +1840,7 @@ mod tests {
         let render = |cgctx: &CodegenContext<'_>| {
             generate_concrete_params_with_mono_bounds(
                 &params,
+                &[],
                 Some(cgctx),
                 scope,
                 &crate::ir::ModuleContext::Global,

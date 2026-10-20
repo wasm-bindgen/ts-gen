@@ -83,6 +83,10 @@ export declare function ajax(url: string): void;
 export declare function $ajax(url: string): void;
 export declare function dollar(): void;
 export declare function collideArgs(a: string, $a: number, fooBar: string, foo_bar: number): void;
+// A method's receiver is `this`, so a parameter named like it is numbered.
+export declare class Receiver {
+  method(_this: string, value: number): void;
+}
 // A property named like a dictionary's generated `new`, `builder` or `build`
 // takes a trailing underscore, as does a constructor's `new` on a class. A
 // method's derived names can clash more than once, so it's numbered. The
