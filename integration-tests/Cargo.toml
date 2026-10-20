@@ -10,6 +10,7 @@ doctest = false
 test = false
 
 [build-dependencies]
+syn = { version = "2", features = ["full"] }
 ts-gen = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
