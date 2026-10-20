@@ -658,6 +658,19 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "restLog")]
+    pub fn rest_log(rest: &[impl ::wasm_bindgen::JsStringLike]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "arrLog")]
+    pub fn arr_log(
+        arr: impl ::wasm_bindgen::JsStringLike,
+        args: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Flags;
