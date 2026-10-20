@@ -14,6 +14,9 @@ const [fixture, wasmPath, builtinsPath] = process.argv.slice(2);
 const logged = [];
 globalThis.console = { log: (...args) => logged.push(args) };
 globalThis.joinAll = (sep, ...parts) => parts.join(sep);
+const restCalls = [];
+globalThis.restLog = (...rest) => restCalls.push(['rest', ...rest]);
+globalThis.arrLog = (arr, ...args) => restCalls.push(['arr', arr, ...args]);
 globalThis.describeFlags = (flags, strict) =>
   `${typeof flags.verbose}:${flags.verbose}:${typeof strict}:${strict}`;
 
@@ -88,6 +91,7 @@ switch (fixture) {
   case 'variadic': {
     assert.equal(fetch(get), 'Hello, World');
     assert.deepEqual(logged, [['Hello', 'World']]);
+    assert.deepEqual(restCalls, [['rest', 'Hello', 'World'], ['arr', ', ', 'Hello', 'World']]);
     break;
   }
   case 'module_imports': {
