@@ -20,11 +20,14 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn variant<T: ::wasm_bindgen::JsGeneric>(this: &EvaluationDetails<T>) -> Option<String>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_variant<T: ::wasm_bindgen::JsGeneric>(this: &EvaluationDetails<T>, val: &str);
+    pub fn set_variant<T: ::wasm_bindgen::JsGeneric>(
+        this: &EvaluationDetails<T>,
+        val: Option<&str>,
+    );
     #[wasm_bindgen(method, getter)]
     pub fn reason<T: ::wasm_bindgen::JsGeneric>(this: &EvaluationDetails<T>) -> Option<String>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_reason<T: ::wasm_bindgen::JsGeneric>(this: &EvaluationDetails<T>, val: &str);
+    pub fn set_reason<T: ::wasm_bindgen::JsGeneric>(this: &EvaluationDetails<T>, val: Option<&str>);
 }
 impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetails<T> {
     pub fn new(flag_key: &str, value: &T) -> EvaluationDetails<T> {
@@ -41,11 +44,11 @@ pub struct EvaluationDetailsBuilder<T: ::wasm_bindgen::JsGeneric> {
     inner: EvaluationDetails<T>,
 }
 impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
-    pub fn variant(self, val: &str) -> Self {
+    pub fn variant(self, val: Option<&str>) -> Self {
         self.inner.set_variant(val);
         self
     }
-    pub fn reason(self, val: &str) -> Self {
+    pub fn reason(self, val: Option<&str>) -> Self {
         self.inner.set_reason(val);
         self
     }

@@ -1126,6 +1126,7 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-bindgen-test",
+ "web-sys",
 ]
 
 [[package]]
@@ -1270,6 +1271,15 @@ dependencies = [
 name = "wasm-bindgen-test-shared"
 version = "0.2.129"
 source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=69d72955b2ee1cbf9cad77b47908c29fef532588#69d72955b2ee1cbf9cad77b47908c29fef532588"
+
+[[package]]
+name = "web-sys"
+version = "0.3.106"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?rev=69d72955b2ee1cbf9cad77b47908c29fef532588#69d72955b2ee1cbf9cad77b47908c29fef532588"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+]
 
 [[package]]
 name = "winapi-util"

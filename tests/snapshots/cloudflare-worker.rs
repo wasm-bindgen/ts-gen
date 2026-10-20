@@ -131,17 +131,17 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn body(this: &RequestInit) -> JsValue;
     #[wasm_bindgen(method, setter)]
-    pub fn set_body(this: &RequestInit, val: &ReadableStream);
+    pub fn set_body(this: &RequestInit, val: &JsNullable<ReadableStream>);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_str(this: &RequestInit, val: &str);
+    pub fn set_body_with_str(this: &RequestInit, val: &JsNullable<JsString>);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_array_buffer(this: &RequestInit, val: &ArrayBuffer);
+    pub fn set_body_with_array_buffer(this: &RequestInit, val: &JsNullable<ArrayBuffer>);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_blob(this: &RequestInit, val: &Blob);
+    pub fn set_body_with_blob(this: &RequestInit, val: &JsNullable<Blob>);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_url_search_params(this: &RequestInit, val: &URLSearchParams);
+    pub fn set_body_with_url_search_params(this: &RequestInit, val: &JsNullable<URLSearchParams>);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_form_data(this: &RequestInit, val: &FormData);
+    pub fn set_body_with_form_data(this: &RequestInit, val: &JsNullable<FormData>);
     #[wasm_bindgen(method, getter)]
     pub fn redirect(this: &RequestInit) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -181,27 +181,27 @@ impl RequestInitBuilder {
         self.inner.set_headers_with_slice(val);
         self
     }
-    pub fn body(self, val: &ReadableStream) -> Self {
+    pub fn body(self, val: &JsNullable<ReadableStream>) -> Self {
         self.inner.set_body(val);
         self
     }
-    pub fn body_with_str(self, val: &str) -> Self {
+    pub fn body_with_str(self, val: &JsNullable<JsString>) -> Self {
         self.inner.set_body_with_str(val);
         self
     }
-    pub fn body_with_array_buffer(self, val: &ArrayBuffer) -> Self {
+    pub fn body_with_array_buffer(self, val: &JsNullable<ArrayBuffer>) -> Self {
         self.inner.set_body_with_array_buffer(val);
         self
     }
-    pub fn body_with_blob(self, val: &Blob) -> Self {
+    pub fn body_with_blob(self, val: &JsNullable<Blob>) -> Self {
         self.inner.set_body_with_blob(val);
         self
     }
-    pub fn body_with_url_search_params(self, val: &URLSearchParams) -> Self {
+    pub fn body_with_url_search_params(self, val: &JsNullable<URLSearchParams>) -> Self {
         self.inner.set_body_with_url_search_params(val);
         self
     }
-    pub fn body_with_form_data(self, val: &FormData) -> Self {
+    pub fn body_with_form_data(self, val: &JsNullable<FormData>) -> Self {
         self.inner.set_body_with_form_data(val);
         self
     }
@@ -227,39 +227,48 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_readable_stream(body: &ReadableStream) -> Result<Response, JsValue>;
+    pub fn new_with_readable_stream(body: &JsNullable<ReadableStream>)
+        -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_str(body: &str) -> Result<Response, JsValue>;
+    pub fn new_with_str(body: &JsNullable<JsString>) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_array_buffer(body: &ArrayBuffer) -> Result<Response, JsValue>;
+    pub fn new_with_array_buffer(body: &JsNullable<ArrayBuffer>) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_blob(body: &Blob) -> Result<Response, JsValue>;
+    pub fn new_with_blob(body: &JsNullable<Blob>) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_url_search_params(body: &URLSearchParams) -> Result<Response, JsValue>;
+    pub fn new_with_url_search_params(
+        body: &JsNullable<URLSearchParams>,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
+    pub fn new_with_form_data(body: &JsNullable<FormData>) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_readable_stream_and_init(
-        body: &ReadableStream,
+        body: &JsNullable<ReadableStream>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_str_and_init(body: &str, init: &ResponseInit) -> Result<Response, JsValue>;
+    pub fn new_with_str_and_init(
+        body: &JsNullable<JsString>,
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_array_buffer_and_init(
-        body: &ArrayBuffer,
+        body: &JsNullable<ArrayBuffer>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_blob_and_init(body: &Blob, init: &ResponseInit) -> Result<Response, JsValue>;
+    pub fn new_with_blob_and_init(
+        body: &JsNullable<Blob>,
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_url_search_params_and_init(
-        body: &URLSearchParams,
+        body: &JsNullable<URLSearchParams>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_form_data_and_init(
-        body: &FormData,
+        body: &JsNullable<FormData>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response)]
@@ -446,4 +455,72 @@ extern "C" {
         input: &str,
         init: &RequestInit,
     ) -> Result<Response, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Console;
+    #[wasm_bindgen(method, variadic)]
+    pub fn log(this: &Console, args: &[JsValue]);
+    #[wasm_bindgen(method, variadic, catch, js_name = "log")]
+    pub fn try_log(this: &Console, args: &[JsValue]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[allow(non_upper_case_globals)]
+    #[wasm_bindgen(thread_local_v2)]
+    pub static console: Console;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(variadic, js_name = "joinAll")]
+    pub fn join_all(sep: &str, parts: &[JsValue]) -> String;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "joinAll")]
+    pub fn try_join_all(sep: &str, parts: &[JsValue]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Flags;
+    #[wasm_bindgen(method, getter)]
+    pub fn verbose(this: &Flags) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_verbose(this: &Flags, val: bool);
+}
+impl Flags {
+    pub fn new() -> Flags {
+        Self::builder().build()
+    }
+    pub fn builder() -> FlagsBuilder {
+        FlagsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct FlagsBuilder {
+    inner: Flags,
+}
+impl FlagsBuilder {
+    pub fn verbose(self, val: bool) -> Self {
+        self.inner.set_verbose(val);
+        self
+    }
+    pub fn build(self) -> Flags {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "describeFlags")]
+    pub fn describe_flags(flags: &Flags, strict: bool) -> String;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeFlags")]
+    pub fn try_describe_flags(flags: &Flags, strict: bool) -> Result<String, JsValue>;
 }

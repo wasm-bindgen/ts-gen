@@ -1,6 +1,7 @@
 #![cfg(target_arch = "wasm32")]
 
 use js_sys::{BigInt, JsString, Symbol};
+use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::primitive_unions_mono::{
     has_key, has_key_explicit, lookup, send, send_with_number_or_string, set_any,
@@ -35,7 +36,10 @@ fn primitive_union_signatures_compile(js_string: &JsString, symbol: &Symbol, big
 
     set_level(1i32);
     set_level("auto");
-    set_nullable(3.0f32);
+    // `string | number | null`: no marker trait carries `null`, so the
+    // argument is a `JsValue` that may be `JsValue::NULL`.
+    set_nullable(&JsValue::from(3.0f32));
+    set_nullable(&JsValue::NULL);
     set_maybe_with_value("value");
     lookup(7usize);
 
