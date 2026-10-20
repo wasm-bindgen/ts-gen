@@ -892,7 +892,7 @@ fn pair_typed_array_slice(
     };
     let pairs = |inner: &TypeRef| {
         let inner = match cgctx {
-            Some(c) => typemap::peel_mono(inner, c, scope, &mut Default::default()),
+            Some(c) => typemap::peel_mono(inner, c, scope, &mut Default::default()).0,
             None => std::borrow::Cow::Borrowed(inner),
         };
         match inner.as_ref() {
@@ -944,11 +944,28 @@ fn flatten_into(
         // Bare references: resolve through aliases, then re-flatten.
         // Generic instantiations and qualified paths don't follow
         // aliases (they're already concrete at this level).
+        //
+        // The target flattens in the alias's own scope, but its
+        // alternatives lower from the use site's. Where the use site
+        // reads one of their names differently (a namespace shadowing
+        // it), the alias stays whole instead, and lowers from its own
+        // scope.
         TypeRef::Reference { .. } if ty.as_ident().is_some() => {
             let head = ty.as_ident().unwrap();
             if let Some(c) = cgctx {
-                if let Some(target) = c.resolve_alias(head, scope) {
-                    return flatten_into(&target, cgctx, scope, out);
+                if let Some((target, alias_scope)) = c.resolve_alias(head, scope) {
+                    let start = out.len();
+                    if !flatten_into(&target, cgctx, alias_scope, out) {
+                        return false;
+                    }
+                    if !out[start..]
+                        .iter()
+                        .all(|alt| c.resolves_alike(alt, alias_scope, scope))
+                    {
+                        out.truncate(start);
+                        out.push(ty.clone());
+                    }
+                    return true;
                 }
             }
             out.push(ty.clone());
@@ -1007,8 +1024,14 @@ fn flatten_collapse_to_lub(
         TypeRef::PropertyKey => TypeRef::Any,
         TypeRef::Reference { .. } if ty.as_ident().is_some() => {
             if let Some(c) = cgctx {
-                if let Some(target) = c.resolve_alias(ty.as_ident().unwrap(), scope) {
-                    return flatten_collapse_to_lub(&target, cgctx, scope);
+                if let Some((target, alias_scope)) = c.resolve_alias(ty.as_ident().unwrap(), scope)
+                {
+                    // As in `flatten_into`, the alias stays whole where its
+                    // LUB would read differently from the use site.
+                    let lub = flatten_collapse_to_lub(&target, cgctx, alias_scope);
+                    if c.resolves_alike(&lub, alias_scope, scope) {
+                        return lub;
+                    }
                 }
             }
             ty.clone()
@@ -2716,6 +2739,36 @@ mod tests {
         let (gctx, scope) = test_ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
         flatten_type(ty, Some(&cgctx), scope)
+    }
+
+    #[test]
+    fn alias_alternatives_fan_out_only_where_they_read_alike() {
+        let src = r#"
+            interface Inner { top: string; }
+            type InnerOrName = Inner | string;
+            type Names = string | number;
+            declare namespace Shadow {
+                interface Inner { shadow: boolean; }
+            }
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let cgctx = CodegenContext::from_module(&module, &gctx);
+        let file = module.file_scopes[0];
+        let shadow = gctx.scopes.resolve_namespace(file, "Shadow").unwrap();
+        let flat = |name: &str, scope| flatten_type(&TypeRef::ident(name), Some(&cgctx), scope);
+        assert_eq!(
+            flat("InnerOrName", file),
+            vec![TypeRef::ident("Inner"), TypeRef::String]
+        );
+        assert_eq!(
+            flat("Names", shadow),
+            vec![TypeRef::String, TypeRef::Number]
+        );
+        // `Shadow` reads `Inner` as its own, so the alias stays whole.
+        assert_eq!(
+            flat("InnerOrName", shadow),
+            vec![TypeRef::ident("InnerOrName")]
+        );
     }
 
     #[test]

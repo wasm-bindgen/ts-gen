@@ -843,9 +843,13 @@ impl<'a> CodegenContext<'a> {
     /// Resolve a named type through the scope chain, chasing the full alias chain
     /// until a non-alias terminal type is reached.
     ///
-    /// Returns the final `TypeRef` target if the name resolves to a type alias
-    /// (or a chain of aliases). Returns `None` if the name resolves to a
-    /// non-alias declaration (Class, Interface, Enum, etc.) or is not found.
+    /// Returns the final target if the name resolves to a type alias (or a
+    /// chain of aliases), along with the scope its names resolve in: the
+    /// body scope of the last alias in the chain. Each alias's target is
+    /// read in that alias's own scope, never the use site's, so a name the
+    /// use site shadows still means what the alias declared. Returns `None`
+    /// if the name resolves to a non-alias declaration (Class, Interface,
+    /// Enum, etc.) or is not found.
     ///
     /// Uses a visited set to detect and break circular alias chains.
     ///
@@ -855,9 +859,63 @@ impl<'a> CodegenContext<'a> {
         &self,
         name: &str,
         scope: ScopeId,
-    ) -> Option<std::borrow::Cow<'_, ir::TypeRef>> {
+    ) -> Option<(std::borrow::Cow<'_, ir::TypeRef>, ScopeId)> {
         let mut visited = HashSet::new();
         self.resolve_alias_impl(name, scope, &mut visited)
+    }
+
+    /// Whether every name in `ty` resolves to the same declaration from
+    /// `a` as from `b`, so `ty` lowers alike from either scope.
+    pub(crate) fn resolves_alike(&self, ty: &ir::TypeRef, a: ScopeId, b: ScopeId) -> bool {
+        if a == b {
+            return true;
+        }
+        let alike = |t: &ir::TypeRef| self.resolves_alike(t, a, b);
+        match ty {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => {
+                let head_alike = match segments.as_slice() {
+                    [name] => {
+                        self.gctx.scopes.resolve_binding(a, name)
+                            == self.gctx.scopes.resolve_binding(b, name)
+                    }
+                    _ => {
+                        let path = segments.join(".");
+                        self.gctx.scopes.resolve_namespace(a, &segments[0])
+                            == self.gctx.scopes.resolve_namespace(b, &segments[0])
+                            && self.gctx.resolve_path(a, &path) == self.gctx.resolve_path(b, &path)
+                    }
+                };
+                head_alike && generic_args.iter().all(alike)
+            }
+            TypeRef::Array(t) | TypeRef::Nullable(t) => alike(t),
+            TypeRef::Union(ts) | TypeRef::Intersection(ts) | TypeRef::Tuple(ts) => {
+                ts.iter().all(alike)
+            }
+            TypeRef::Function(sig) => {
+                sig.params.iter().all(|p| alike(&p.type_ref)) && alike(&sig.return_type)
+            }
+            TypeRef::Boolean
+            | TypeRef::Number
+            | TypeRef::String
+            | TypeRef::BigInt
+            | TypeRef::Void
+            | TypeRef::Undefined
+            | TypeRef::Null
+            | TypeRef::Any
+            | TypeRef::Unknown
+            | TypeRef::Object
+            | TypeRef::Symbol
+            | TypeRef::ArrayBufferView
+            | TypeRef::PropertyKey
+            | TypeRef::TypedSlice(..)
+            | TypeRef::StringLiteral(_)
+            | TypeRef::NumberLiteral(_)
+            | TypeRef::BooleanLiteral(_)
+            | TypeRef::Unresolved(_) => true,
+        }
     }
 
     /// The string or numeric enum declaration `ty` names, through aliases
@@ -923,12 +981,12 @@ impl<'a> CodegenContext<'a> {
         &'b self,
         name: &str,
         scope: ScopeId,
-        visited: &mut HashSet<String>,
-    ) -> Option<std::borrow::Cow<'b, ir::TypeRef>> {
-        if !visited.insert(name.to_string()) {
+        visited: &mut HashSet<TypeId>,
+    ) -> Option<(std::borrow::Cow<'b, ir::TypeRef>, ScopeId)> {
+        let type_id = self.gctx.scopes.resolve(scope, name)?;
+        if !visited.insert(type_id) {
             return None; // circular alias chain
         }
-        let type_id = self.gctx.scopes.resolve(scope, name)?;
         let TypeKind::TypeAlias(ref alias) = self.gctx.get_type(type_id).kind else {
             return None;
         };
@@ -936,11 +994,11 @@ impl<'a> CodegenContext<'a> {
         // If the target is itself a single-segment path, keep resolving.
         // Generic instantiations and qualified paths stop here.
         if let Some(inner_name) = target.as_ident() {
-            if let Some(resolved) = self.resolve_alias_impl(inner_name, scope, visited) {
+            if let Some(resolved) = self.resolve_alias_impl(inner_name, alias.body_scope, visited) {
                 return Some(resolved);
             }
         }
-        Some(target)
+        Some((target, alias.body_scope))
     }
 
     /// Emit an error diagnostic during code generation.
@@ -1432,9 +1490,11 @@ pub fn to_syn_type(
                             from_module,
                         );
                     }
-                    if let Some(target) = c.resolve_alias(&segments[0], scope) {
+                    // The target lowers from the alias's own scope, where
+                    // its names are declared.
+                    if let Some((target, alias_scope)) = c.resolve_alias(&segments[0], scope) {
                         let target = target.into_owned();
-                        return to_syn_type(&target, pos, ctx, scope, from_module);
+                        return to_syn_type(&target, pos, ctx, alias_scope, from_module);
                     }
                     // Synthesised enum names never collide with declared
                     // types. wasm-bindgen enums cross the boundary by value.
@@ -2090,7 +2150,8 @@ pub fn to_return_type(
 /// that reduce to one common type. The walkers then only match on primitive
 /// leaves, `Nullable`, and locally declared generic instantiations, so
 /// `Holder<Id>`, `Holder<"a" | "b">` and `Holder<string>` all get the same
-/// answer from every walker.
+/// answer from every walker. The peeled type comes with the scope its names
+/// resolve in, which is the last alias's own scope once one is chased.
 ///
 /// `visited` holds the aliases already resolved on the current path, so a
 /// self-referential alias ends the walk. When a walker descends into several
@@ -2100,33 +2161,39 @@ pub(crate) fn peel_mono<'t>(
     ty: &'t TypeRef,
     ctx: &CodegenContext<'_>,
     scope: ScopeId,
-    visited: &mut HashSet<String>,
-) -> std::borrow::Cow<'t, TypeRef> {
+    visited: &mut HashSet<TypeId>,
+) -> (std::borrow::Cow<'t, TypeRef>, ScopeId) {
     let mut current = std::borrow::Cow::Borrowed(ty);
+    let mut scope = scope;
     loop {
         let next = match current.as_ref() {
             TypeRef::Reference {
                 segments,
                 generic_args,
             } if segments.len() == 1 && generic_args.is_empty() => {
-                if !visited.insert(segments[0].clone()) {
-                    break;
+                match ctx.gctx.scopes.resolve(scope, &segments[0]) {
+                    Some(id) if !visited.insert(id) => break,
+                    _ => {}
                 }
                 ctx.resolve_alias(&segments[0], scope)
-                    .map(std::borrow::Cow::into_owned)
+                    .map(|(target, alias_scope)| (target.into_owned(), alias_scope))
             }
             TypeRef::Union(members) => {
                 crate::codegen::subtyping::lub_union(members, Some(ctx), scope)
                     .filter(|lub| !matches!(lub, TypeRef::Union(_)))
+                    .map(|lub| (lub, scope))
             }
             _ => None,
         };
         match next {
-            Some(next) => current = std::borrow::Cow::Owned(next),
+            Some((next, next_scope)) => {
+                current = std::borrow::Cow::Owned(next);
+                scope = next_scope;
+            }
             None => break,
         }
     }
-    current
+    (current, scope)
 }
 
 /// Leaves that cross the ABI natively rather than as a JS handle: primitives
@@ -2188,20 +2255,29 @@ fn to_mono_user_generic_arg_impl(
     ctx: &CodegenContext<'_>,
     scope: ScopeId,
     from_module: &ModuleContext,
-    visited: &mut HashSet<String>,
+    visited: &mut HashSet<TypeId>,
 ) -> TokenStream {
-    let peeled = peel_mono(ty, ctx, scope, visited);
+    let (peeled, peeled_scope) = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
-        t if is_mono_native_leaf(t, ctx, scope) => {
-            to_syn_type(t, TypePosition::RETURN, Some(ctx), scope, from_module)
-        }
+        t if is_mono_native_leaf(t, ctx, peeled_scope) => to_syn_type(
+            t,
+            TypePosition::RETURN,
+            Some(ctx),
+            peeled_scope,
+            from_module,
+        ),
         TypeRef::Nullable(inner) => {
-            let inner = to_mono_user_generic_arg_impl(inner, ctx, scope, from_module, visited);
+            let inner =
+                to_mono_user_generic_arg_impl(inner, ctx, peeled_scope, from_module, visited);
             quote! { Option<#inner> }
         }
-        t if local_generic_args(t, ctx, scope).is_some() => {
-            to_syn_type(t, TypePosition::RETURN, Some(ctx), scope, from_module)
-        }
+        t if local_generic_args(t, ctx, peeled_scope).is_some() => to_syn_type(
+            t,
+            TypePosition::RETURN,
+            Some(ctx),
+            peeled_scope,
+            from_module,
+        ),
         // Lower the original type, not the peeled one, so aliases that are
         // emitted under their own name stay named.
         _ => to_syn_type(
@@ -2225,13 +2301,15 @@ fn is_mono_native_return_shape_impl(
     ty: &TypeRef,
     ctx: &CodegenContext<'_>,
     scope: ScopeId,
-    visited: &mut HashSet<String>,
+    visited: &mut HashSet<TypeId>,
 ) -> bool {
-    let peeled = peel_mono(ty, ctx, scope, visited);
+    let (peeled, peeled_scope) = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
-        t if is_mono_native_leaf(t, ctx, scope) => true,
-        TypeRef::Nullable(inner) => is_mono_native_return_shape_impl(inner, ctx, scope, visited),
-        t => local_generic_args(t, ctx, scope).is_some(),
+        t if is_mono_native_leaf(t, ctx, peeled_scope) => true,
+        TypeRef::Nullable(inner) => {
+            is_mono_native_return_shape_impl(inner, ctx, peeled_scope, visited)
+        }
+        t => local_generic_args(t, ctx, peeled_scope).is_some(),
     }
 }
 
@@ -2263,15 +2341,18 @@ fn has_mono_js_string_return_impl(
     ty: &TypeRef,
     ctx: &CodegenContext<'_>,
     scope: ScopeId,
-    visited: &mut HashSet<String>,
+    visited: &mut HashSet<TypeId>,
 ) -> bool {
-    let peeled = peel_mono(ty, ctx, scope, visited);
+    let (peeled, peeled_scope) = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
         TypeRef::String | TypeRef::StringLiteral(_) => true,
-        TypeRef::Nullable(inner) => has_mono_js_string_return_impl(inner, ctx, scope, visited),
-        t => local_generic_args(t, ctx, scope).is_some_and(|args| {
-            args.iter()
-                .any(|arg| has_mono_js_string_return_impl(arg, ctx, scope, &mut visited.clone()))
+        TypeRef::Nullable(inner) => {
+            has_mono_js_string_return_impl(inner, ctx, peeled_scope, visited)
+        }
+        t => local_generic_args(t, ctx, peeled_scope).is_some_and(|args| {
+            args.iter().any(|arg| {
+                has_mono_js_string_return_impl(arg, ctx, peeled_scope, &mut visited.clone())
+            })
         }),
     }
 }
@@ -2296,18 +2377,22 @@ fn to_mono_js_string_return_type_impl(
     ctx: &CodegenContext<'_>,
     scope: ScopeId,
     from_module: &ModuleContext,
-    visited: &mut HashSet<String>,
+    visited: &mut HashSet<TypeId>,
 ) -> TokenStream {
-    let peeled = peel_mono(ty, ctx, scope, visited);
+    let (peeled, peeled_scope) = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
         TypeRef::String | TypeRef::StringLiteral(_) => quote! { JsString },
         TypeRef::Nullable(inner) => {
-            let inner = to_mono_js_string_return_type_impl(inner, ctx, scope, from_module, visited);
+            let inner =
+                to_mono_js_string_return_type_impl(inner, ctx, peeled_scope, from_module, visited);
             quote! { Option<#inner> }
         }
-        t @ TypeRef::Reference { segments, .. } if local_generic_args(t, ctx, scope).is_some() => {
-            let base = named_type_to_rust(&segments.join("."), Some(ctx), scope, from_module);
-            let args = local_generic_args(t, ctx, scope).unwrap_or_default();
+        t @ TypeRef::Reference { segments, .. }
+            if local_generic_args(t, ctx, peeled_scope).is_some() =>
+        {
+            let base =
+                named_type_to_rust(&segments.join("."), Some(ctx), peeled_scope, from_module);
+            let args = local_generic_args(t, ctx, peeled_scope).unwrap_or_default();
             if args.is_empty() {
                 return base;
             }
@@ -2315,16 +2400,23 @@ fn to_mono_js_string_return_type_impl(
                 .iter()
                 .map(|arg| {
                     let mut visited = visited.clone();
-                    if has_mono_js_string_return_impl(arg, ctx, scope, &mut visited.clone()) {
+                    if has_mono_js_string_return_impl(arg, ctx, peeled_scope, &mut visited.clone())
+                    {
                         to_mono_js_string_return_type_impl(
                             arg,
                             ctx,
-                            scope,
+                            peeled_scope,
                             from_module,
                             &mut visited,
                         )
                     } else {
-                        to_mono_user_generic_arg_impl(arg, ctx, scope, from_module, &mut visited)
+                        to_mono_user_generic_arg_impl(
+                            arg,
+                            ctx,
+                            peeled_scope,
+                            from_module,
+                            &mut visited,
+                        )
                     }
                 })
                 .collect::<Vec<_>>();
@@ -2762,7 +2854,7 @@ fn native_array_leaf<'t>(
     match ctx {
         Some(c) => match c.enum_repr(elem, scope) {
             Some(repr) => std::borrow::Cow::Owned(repr),
-            None => peel_mono(elem, c, scope, &mut HashSet::new()),
+            None => peel_mono(elem, c, scope, &mut HashSet::new()).0,
         },
         None => std::borrow::Cow::Borrowed(elem),
     }
@@ -3616,7 +3708,11 @@ mod tests {
     #[test]
     fn peel_mono_resolves_aliases_and_reducible_unions() {
         with_mono_ctx(MONO_SRC, |ctx, scope| {
-            let peel = |ty: &TypeRef| peel_mono(ty, ctx, scope, &mut HashSet::new()).into_owned();
+            let peel = |ty: &TypeRef| {
+                peel_mono(ty, ctx, scope, &mut HashSet::new())
+                    .0
+                    .into_owned()
+            };
             assert_eq!(peel(&TypeRef::ident("IdChain")), TypeRef::String);
             assert_eq!(peel(&lits(&["a", "b"])), TypeRef::String);
             assert!(matches!(
@@ -3636,8 +3732,120 @@ mod tests {
     fn peel_mono_terminates_on_alias_cycles() {
         with_mono_ctx(MONO_SRC, |ctx, scope| {
             let ty = TypeRef::ident("Loop");
-            let peeled = peel_mono(&ty, ctx, scope, &mut HashSet::new());
+            let (peeled, _) = peel_mono(&ty, ctx, scope, &mut HashSet::new());
             assert!(matches!(peeled.as_ref(), TypeRef::Reference { .. }));
+        });
+    }
+
+    const SHADOW_SRC: &str = r#"
+        interface Pair<A, B> { a: A; b: B; }
+        interface Inner { top: string; }
+        type TopX = Pair<Inner, Inner>;
+        type TopChain = TopX;
+        type Mode = "fast" | "slow";
+        type TopMode = Mode;
+        declare namespace Shadow {
+            interface Inner { shadow: boolean; }
+            interface Mode { shadow: boolean; }
+            type Local = Inner;
+        }
+    "#;
+
+    const REEXPORT_SRC: &str = r#"
+        declare class Position { lineNumber: number; }
+        type editor_main_Position = Position;
+        declare namespace editor_main {
+            export { editor_main_Position as Position };
+        }
+        export { editor_main as m };
+    "#;
+
+    fn namespace_scope(ctx: &CodegenContext<'_>, file: ScopeId, name: &str) -> ScopeId {
+        ctx.gctx
+            .scopes
+            .resolve_namespace(file, name)
+            .expect("namespace scope")
+    }
+
+    /// Whether `name` means the same declaration from `a` as from `b`.
+    fn same_decl(ctx: &CodegenContext<'_>, name: &str, a: ScopeId, b: ScopeId) -> bool {
+        let id = ctx.gctx.scopes.resolve(a, name);
+        id.is_some() && id == ctx.gctx.scopes.resolve(b, name)
+    }
+
+    #[test]
+    fn resolve_alias_reads_the_target_in_the_alias_scope() {
+        with_mono_ctx(SHADOW_SRC, |ctx, file| {
+            let shadow = namespace_scope(ctx, file, "Shadow");
+            let pair = TypeRef::generic("Pair", vec![TypeRef::ident("Inner"); 2]);
+            // A top-level alias used in `Shadow` reads its target at the top
+            // level, through every link of the chain.
+            for name in ["TopX", "TopChain"] {
+                let (target, scope) = ctx.resolve_alias(name, shadow).unwrap();
+                assert_eq!(*target, pair);
+                assert!(same_decl(ctx, "Inner", scope, file));
+            }
+            // The namespace's own alias reads it in the namespace.
+            let (target, scope) = ctx.resolve_alias("Local", shadow).unwrap();
+            assert_eq!(*target, TypeRef::ident("Inner"));
+            assert!(same_decl(ctx, "Inner", scope, shadow));
+        });
+    }
+
+    #[test]
+    fn resolve_alias_follows_a_reexport_under_the_target_name() {
+        let (module, gctx) = crate::parse_source(REEXPORT_SRC, Some("lib")).unwrap();
+        let ctx = CodegenContext::from_module(&module, &gctx);
+        let file = *module.file_scopes.first().expect("file scope");
+        // The namespace's body, where the re-export binds `Position`.
+        let ns = gctx
+            .iter_types()
+            .find_map(|(_, decl)| match &decl.kind {
+                TypeKind::TypeAlias(a) if a.name == "Position" => Some(a.body_scope),
+                _ => None,
+            })
+            .expect("re-export alias");
+        // `Position` in the namespace is the re-export, whose alias's target
+        // is the top-level class rather than the re-export again.
+        let (target, scope) = ctx.resolve_alias("Position", ns).unwrap();
+        assert_eq!(*target, TypeRef::ident("Position"));
+        assert!(same_decl(&ctx, "Position", scope, file));
+        assert!(ctx.resolve_alias("Position", scope).is_none());
+    }
+
+    #[test]
+    fn resolves_alike_compares_every_name() {
+        with_mono_ctx(SHADOW_SRC, |ctx, file| {
+            let shadow = namespace_scope(ctx, file, "Shadow");
+            let alike = |ty: &TypeRef| ctx.resolves_alike(ty, file, shadow);
+            assert!(alike(&TypeRef::String));
+            assert!(alike(&TypeRef::ident("Pair")));
+            assert!(alike(&TypeRef::ident("Undeclared")));
+            assert!(!alike(&TypeRef::ident("Inner")));
+            assert!(!alike(&TypeRef::generic(
+                "Pair",
+                vec![TypeRef::ident("Inner")]
+            )));
+            assert!(!alike(&TypeRef::Array(Box::new(TypeRef::ident("Inner")))));
+            assert!(!alike(&TypeRef::Union(vec![
+                TypeRef::String,
+                TypeRef::ident("Inner"),
+            ])));
+        });
+    }
+
+    #[test]
+    fn peel_mono_keeps_the_alias_scope() {
+        with_mono_ctx(SHADOW_SRC, |ctx, file| {
+            let shadow = namespace_scope(ctx, file, "Shadow");
+            let ty = TypeRef::ident("TopMode");
+            let (peeled, scope) = peel_mono(&ty, ctx, shadow, &mut HashSet::new());
+            assert_eq!(*peeled, TypeRef::ident("Mode"));
+            assert!(same_decl(ctx, "Mode", scope, file));
+            // `Mode` is the enum where the alias reads it, not the
+            // namespace's interface.
+            assert!(is_mono_native_leaf(&peeled, ctx, scope));
+            assert!(!is_mono_native_leaf(&peeled, ctx, shadow));
         });
     }
 

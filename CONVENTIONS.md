@@ -2652,6 +2652,32 @@ namespace exported under its own name as well keeps it.
   pub type Fetcher<T = Undefined> = Pair<T, T>;
   pub fn defaults(a: &WithDefault<Number>, b: &Chained<Number>, c: &Pair<Undefined, Undefined>);
   ```
+
+  An alias's target, defaults included, resolves where the alias is
+  declared, through every link of an alias chain, and is qualified from
+  where it is used. A namespace that shadows one of its names still gets
+  the alias's meaning, and a bundler's re-export of a renamed declaration
+  under its original name (`export { ns_Position as Position }` inside
+  `ns`) reaches the declaration instead of naming itself again. A union
+  alias fans out into overloads only when every alternative means the same
+  at the use site; otherwise the parameter keeps the alias whole:
+
+  ```ts
+  interface Inner { top: string; }
+  type TopX = Pair<Inner, Inner>;
+  type InnerOrName = Inner | string;
+  declare namespace Shadow {
+    interface Inner { shadow: boolean; }
+    function use(a: TopX, b: InnerOrName): void;
+  }
+  ```
+
+  ```rust
+  pub mod shadow {
+      pub type Inner;
+      pub fn use_(a: &super::Pair<super::Inner, super::Inner>, b: &JsValue);
+  }
+  ```
 * `export { Local as Public };` (sourceless) → exports what the binding
   `Local` declares in the exporting block under the public name, as an
   entry in its [export map](#the-export-map). A declaration of the block
