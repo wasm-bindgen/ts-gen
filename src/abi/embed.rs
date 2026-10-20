@@ -1281,7 +1281,7 @@ fn function_body_inner(
             let class = body.path(module, path);
             if f.variadic || args.len() > MAX_ARITY {
                 let (locals, stmts) = collect_args(body, args, f);
-                let value = body.construct_apply(&class, "(local.get $arr)", result);
+                let value = body.construct_apply(&class, "(local.get $.arr)", result);
                 return Ok(FuncBody {
                     locals,
                     stmts,
@@ -1353,7 +1353,7 @@ fn invoke(
 ) -> Result<FuncBody> {
     if f.variadic || args.len() > MAX_ARITY {
         let (locals, stmts) = collect_args(body, args, f);
-        let value = body.apply(func, this, "(local.get $arr)", result);
+        let value = body.apply(func, this, "(local.get $.arr)", result);
         Ok(FuncBody {
             locals,
             stmts,
@@ -1368,10 +1368,11 @@ fn invoke(
     }
 }
 
-/// Gather `args` into a JS array in `$arr` for `Reflect.apply` /
+/// Gather `args` into a JS array in `$.arr` for `Reflect.apply` /
 /// `Reflect.construct`: the fixed arguments one `push` each, then the
 /// elements of the GC rest array when the function is variadic. Returns
-/// the locals and setup statements.
+/// the locals and setup statements. The locals are dotted, which no ABI
+/// parameter name is.
 fn collect_args(body: &mut Body, args: &[(String, WasmType)], f: &AbiFunction) -> (String, String) {
     let (fixed, rest) = if f.variadic {
         let rest = f.params.last().expect("variadic function has a rest param");
@@ -1379,16 +1380,16 @@ fn collect_args(body: &mut Body, args: &[(String, WasmType)], f: &AbiFunction) -
     } else {
         (args, None)
     };
-    let mut locals = String::from(" (local $arr externref) (local $push externref)");
+    let mut locals = String::from(" (local $.arr externref) (local $.push externref)");
     let mut stmts = String::new();
     let new_arr = body.new_array();
-    let _ = writeln!(stmts, "(local.set $arr {new_arr})");
-    let push_fn = body.get(("(local.get $arr)", R), "push", R);
-    let _ = writeln!(stmts, "    (local.set $push {push_fn})");
+    let _ = writeln!(stmts, "(local.set $.arr {new_arr})");
+    let push_fn = body.get(("(local.get $.arr)", R), "push", R);
+    let _ = writeln!(stmts, "    (local.set $.push {push_fn})");
     for (val, ty) in fixed {
         let push = body.call(
-            "(local.get $push)",
-            ("(local.get $arr)", R),
+            "(local.get $.push)",
+            ("(local.get $.arr)", R),
             &[(val.clone(), *ty)],
             None,
         );
@@ -1396,19 +1397,19 @@ fn collect_args(body: &mut Body, args: &[(String, WasmType)], f: &AbiFunction) -
     }
     if let Some(rest) = rest {
         body.imports.anyrefs_type = true;
-        locals.push_str(" (local $rest (ref null $anyrefs)) (local $i i32) (local $len i32)");
+        locals.push_str(" (local $.rest (ref null $anyrefs)) (local $.i i32) (local $.len i32)");
         let push_rest = body.call(
-            "(local.get $push)",
-            ("(local.get $arr)", R),
+            "(local.get $.push)",
+            ("(local.get $.arr)", R),
             &[(
-                "(array.get $anyrefs (local.get $rest) (local.get $i))".into(),
+                "(array.get $anyrefs (local.get $.rest) (local.get $.i))".into(),
                 ANY,
             )],
             None,
         );
         let _ = writeln!(
             stmts,
-            "    (local.set $rest (local.get ${rest}))\n    (if (ref.is_null (local.get $rest)) (then) (else\n      (local.set $len (array.len (local.get $rest)))\n      (block $break (loop $continue\n        (br_if $break (i32.ge_u (local.get $i) (local.get $len)))\n        {push_rest}\n        (local.set $i (i32.add (local.get $i) (i32.const 1)))\n        (br $continue)))))"
+            "    (local.set $.rest (local.get ${rest}))\n    (if (ref.is_null (local.get $.rest)) (then) (else\n      (local.set $.len (array.len (local.get $.rest)))\n      (block $break (loop $continue\n        (br_if $break (i32.ge_u (local.get $.i) (local.get $.len)))\n        {push_rest}\n        (local.set $.i (i32.add (local.get $.i) (i32.const 1)))\n        (br $continue)))))"
         );
     }
     stmts.push_str("    ");

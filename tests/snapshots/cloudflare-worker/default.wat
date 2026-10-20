@@ -191,6 +191,10 @@
   (import "./bindings.wasm" "console" (func $console (result externref)))
   ;; joinAll(sep: string, ...parts: string[]): string
   (import "./bindings.wasm" "joinAll" (func $joinAll (param $sep externref) (param $parts (ref null $anyrefs)) (result externref)))
+  ;; restLog(...rest: string[]): void
+  (import "./bindings.wasm" "restLog" (func $restLog (param $rest (ref null $anyrefs))))
+  ;; arrLog(arr: string, ...args: string[]): void
+  (import "./bindings.wasm" "arrLog" (func $arrLog (param $arr externref) (param $args (ref null $anyrefs))))
 
   ;; Flags
   ;; {} as Flags
