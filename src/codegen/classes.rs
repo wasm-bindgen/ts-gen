@@ -1730,6 +1730,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     let scope = sig.body_scope;
     let params = generate_concrete_params_with_mono_bounds(
         &sig.params,
+        &[],
         config.cgctx,
         scope,
         &config.from_module(),
@@ -1790,6 +1791,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     let method_scope = sig.body_scope;
     let params = generate_concrete_params_with_mono_bounds(
         &sig.params,
+        &["this"],
         config.cgctx,
         method_scope,
         &config.from_module(),
@@ -1853,6 +1855,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     let scope = sig.body_scope;
     let params = generate_concrete_params_with_mono_bounds(
         &sig.params,
+        &[],
         config.cgctx,
         scope,
         &config.from_module(),
