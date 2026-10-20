@@ -126,7 +126,7 @@ fn generate_expanded_free_function(
     let scope = sig.body_scope;
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let mut bounds = generic_bounds_for_function(sig, cgctx);
-    let params = generate_callable_params(&sig.params, cgctx, scope, ctx, &mut bounds);
+    let params = generate_callable_params(&sig.params, &[], cgctx, scope, ctx, &mut bounds);
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
@@ -482,7 +482,7 @@ fn generate_constructs(
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
             let mut bounds = generic_bounds_for_function(sig, Some(cgctx));
             let params =
-                generate_callable_params(&sig.params, Some(cgctx), scope, ctx, &mut bounds);
+                generate_callable_params(&sig.params, &[], Some(cgctx), scope, ctx, &mut bounds);
             let ret = to_return_type(
                 &sig.return_type,
                 sig.catch,

@@ -664,7 +664,8 @@ the setter is named `set_<snake_case>`.
     (`val_`, with `js_name = "val"`).
   * A parameter list numbers without the underscore (`a` and `$a` give
     `a` and `a2`), since wasm-bindgen's generated code names the ABI
-    parts of a parameter `a` `a_1` to `a_4`.
+    parts of a parameter `a` `a_1` to `a_4`. A method's parameters skip
+    its receiver's `this` (`method(_this)` gives `this2`).
 * Reserved Rust keywords in fn, method, and accessor names get a trailing
   underscore (`type()` → `type_`). Elsewhere (parameters, variables) they
   are emitted as raw identifiers (`r#type`, `r#loop`), except `self`,
@@ -5131,6 +5132,13 @@ declare module "db" {
 (import "db" "Conn.get" (func $db:Conn.get (param $this externref) (result externref)))
 (import "db" "Connection.get" (func $db:Connection.get (param $this externref) (result externref)))
 ```
+
+Parameters, a provided function's included, are named as in a Rust
+parameter list: sanitised, and numbered where they collide with each
+other or with the receiver `this`, so `collideArgs(a, $a, fooBar, foo_bar)`
+has parameters `a`, `a2`, `foo_bar` and `foo_bar2`, and `method(_this)`
+has `this` and `this2`. A non-ASCII character becomes `_`, since WAT
+identifiers are ASCII (`café` → `caf_`).
 
 ### Member types
 

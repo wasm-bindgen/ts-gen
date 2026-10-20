@@ -344,6 +344,16 @@ extern "C" {
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Receiver;
+    #[wasm_bindgen(method)]
+    pub fn method(this: &Receiver, this2: &str, value: f64);
+    #[wasm_bindgen(method, catch, js_name = "method")]
+    pub fn try_method(this: &Receiver, this2: &str, value: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReservedInit;

@@ -136,8 +136,8 @@
   (import "sanitised-keys" "MethodCollide.call" (func $sanitised-keys:MethodCollide.call (param $this externref)))
   ;; call(a: string): void
   (import "sanitised-keys" "MethodCollide.call_with_a" (func $sanitised-keys:MethodCollide.call_with_a (param $this externref) (param $a externref)))
-  ;; call($a: number): void
-  (import "sanitised-keys" "MethodCollide.call_with_a_2" (func $sanitised-keys:MethodCollide.call_with_a_2 (param $this externref) (param $$a f64)))
+  ;; call(a: number): void
+  (import "sanitised-keys" "MethodCollide.call_with_a_2" (func $sanitised-keys:MethodCollide.call_with_a_2 (param $this externref) (param $a f64)))
 
   ;; SetterCollide
   ;; {} as SetterCollide
@@ -179,8 +179,12 @@
   (import "sanitised-keys" "$ajax" (func $sanitised-keys:$ajax (param $url externref)))
   ;; dollar(): void
   (import "sanitised-keys" "dollar" (func $sanitised-keys:dollar))
-  ;; collideArgs(a: string, $a: number, foo_bar: string, foo_bar: number): void
-  (import "sanitised-keys" "collideArgs" (func $sanitised-keys:collideArgs (param $a externref) (param $$a f64) (param $foo_bar externref) (param $foo_bar f64)))
+  ;; collideArgs(a: string, a2: number, foo_bar: string, foo_bar2: number): void
+  (import "sanitised-keys" "collideArgs" (func $sanitised-keys:collideArgs (param $a externref) (param $a2 f64) (param $foo_bar externref) (param $foo_bar2 f64)))
+
+  ;; Receiver
+  ;; method(this2: string, value: number): void
+  (import "sanitised-keys" "Receiver.method" (func $sanitised-keys:Receiver.method (param $this externref) (param $this2 externref) (param $value f64)))
 
   ;; ReservedInit
   ;; {} as ReservedInit

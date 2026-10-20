@@ -2198,6 +2198,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     };
     let params = generate_callable_params(
         &sig.params,
+        &[],
         config.cgctx,
         scope,
         &config.from_module(),
@@ -2225,6 +2226,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     let mut bounds = generic_bounds_for_method(config, sig);
     let params = generate_callable_params(
         &sig.params,
+        &["this"],
         config.cgctx,
         method_scope,
         &config.from_module(),
@@ -2306,6 +2308,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     let mut bounds = widen_async_return_param(bounds, config.cgctx, sig);
     let params = generate_callable_params(
         &sig.params,
+        &[],
         config.cgctx,
         scope,
         &config.from_module(),
