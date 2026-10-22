@@ -25,18 +25,25 @@ pub use populate::{populate_declarations, NamespaceMembers, Populated, StaticSid
 /// Script files have all top-level declarations in global scope.
 /// Module files have declarations local to the file — only `declare global {}`
 /// blocks affect the global scope.
+///
+/// Of the `import x = …` forms only `import x = require("m")` counts, as in
+/// TypeScript: `import x = N.M` aliases an entity and is a module indicator
+/// only with an `export` modifier, which oxc parses as an
+/// `ExportNamedDeclaration`.
 pub fn is_module(program: &ast::Program<'_>) -> bool {
-    program.body.iter().any(|stmt| {
-        matches!(
-            stmt,
-            ast::Statement::ImportDeclaration(_)
-                | ast::Statement::ExportAllDeclaration(_)
-                | ast::Statement::ExportDefaultDeclaration(_)
-                | ast::Statement::ExportDeclaration(_)
-                | ast::Statement::ExportNamedDeclaration(_)
-                | ast::Statement::ExportFromDeclaration(_)
-                | ast::Statement::TSExportAssignment(_)
-        )
+    program.body.iter().any(|stmt| match stmt {
+        ast::Statement::ImportDeclaration(_)
+        | ast::Statement::ExportAllDeclaration(_)
+        | ast::Statement::ExportDefaultDeclaration(_)
+        | ast::Statement::ExportDeclaration(_)
+        | ast::Statement::ExportNamedDeclaration(_)
+        | ast::Statement::ExportFromDeclaration(_)
+        | ast::Statement::TSExportAssignment(_) => true,
+        ast::Statement::TSImportEqualsDeclaration(import) => matches!(
+            import.module_reference,
+            ast::TSModuleReference::ExternalModuleReference(_)
+        ),
+        _ => false,
     })
 }
 
@@ -365,4 +372,57 @@ fn register_import(
             from_module: from_module.to_string(),
             original_name: original_name.to_string(),
         });
+}
+
+#[cfg(test)]
+mod tests {
+    use oxc_allocator::Allocator;
+    use oxc_parser::Parser;
+    use oxc_span::SourceType;
+
+    use super::*;
+
+    fn parses_as_module(source: &str) -> bool {
+        let allocator = Allocator::default();
+        let parsed = Parser::new(&allocator, source, SourceType::d_ts()).parse();
+        assert!(
+            parsed.diagnostics.is_empty(),
+            "{source}: {:?}",
+            parsed.diagnostics
+        );
+        is_module(&parsed.program)
+    }
+
+    #[test]
+    fn module_indicators() {
+        for source in [
+            r#"import { A } from "m";"#,
+            r#"import "m";"#,
+            r#"import dep = require("m");"#,
+            r#"import type dep = require("m");"#,
+            r#"export import dep = require("m");"#,
+            "declare namespace N { interface M {} } export import M = N.M;",
+            "export declare function f(): void;",
+            "export interface I {}",
+            "interface I {} export { I };",
+            "export {};",
+            r#"export * from "m";"#,
+            "declare const x: number; export = x;",
+            "export default interface I {}",
+        ] {
+            assert!(parses_as_module(source), "{source}");
+        }
+    }
+
+    #[test]
+    fn scripts() {
+        for source in [
+            "declare function f(): void;",
+            "declare namespace N { interface M {} } import M = N.M;",
+            "declare namespace N { const v: number; } import v = N;",
+            r#"declare module "m" { export function f(): void; }"#,
+        ] {
+            assert!(!parses_as_module(source), "{source}");
+        }
+    }
 }
