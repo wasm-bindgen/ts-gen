@@ -147,12 +147,9 @@ pub struct CodegenContext<'a> {
     /// Read-only access to the global context (scopes, modules, external map).
     pub gctx: &'a GlobalContext,
     /// Names of types defined in this codegen unit, used to detect
-    /// collisions with the `js_sys` glob and as a fallback when a use
-    /// site bypasses scope-chain resolution (tests / direct entry
-    /// points). Same-named types from different module contexts collapse
-    /// here, which is fine because the value is only used as a fallback —
-    /// `local_type_ids` is the authoritative "is this ours to emit?" set.
-    pub local_types: HashMap<String, ModuleContext>,
+    /// collisions with the `js_sys` glob. Never used to resolve a
+    /// reference: same-named types from different scopes collapse here.
+    pub local_types: HashSet<String>,
     /// `TypeId`s of declarations this codegen unit will emit. The
     /// authoritative source for "local" — same-name distinct
     /// declarations have distinct `TypeId`s, so this is the lookup key
@@ -170,10 +167,6 @@ pub struct CodegenContext<'a> {
     /// Types a constructor-shaped variable already binds `new` on, which
     /// a second such variable would redefine.
     pub constructed: RefCell<HashSet<TypeId>>,
-    /// How many type parameters each *locally emitted* type accepts, by
-    /// name. `is_local_generic` reads arity from the resolved declaration
-    /// and only falls back to this for references it cannot resolve.
-    pub local_type_param_counts: HashMap<String, usize>,
     /// Member scope of each namespace and declared module → the path of
     /// the `pub mod` it is emitted as.
     pub namespace_paths: HashMap<ScopeId, Vec<String>>,
@@ -190,8 +183,6 @@ pub struct CodegenContext<'a> {
     pub statics_in_scope: RefCell<HashSet<String>>,
     /// Builtin (root) scope id.
     pub root_scope: ScopeId,
-    /// Per-file scopes (children of root, contain imports + local types).
-    pub file_scopes: Vec<ScopeId>,
     /// External type use aliases collected during codegen: (local_name, rust_path).
     pub external_uses: RefCell<HashMap<String, String>>,
     /// Diagnostics collected during code generation.
@@ -456,19 +447,12 @@ impl<'a> CodegenContext<'a> {
     /// with at least one type parameter, i.e. one whose generic arguments
     /// survive into the output. Resolution goes through the scope chain so
     /// a namespace member and a same-named top-level type each answer for
-    /// themselves; the by-name arity table is only the fallback for use
-    /// sites without a scope chain.
+    /// themselves.
     pub(crate) fn is_local_generic(&self, name: &str, scope: ScopeId) -> bool {
-        match self.gctx.resolve_path(scope, name) {
-            Some(id) => {
-                self.local_type_ids.contains(&id)
-                    && declared_arity(&self.gctx.get_type(id).kind).is_some_and(|n| n > 0)
-            }
-            None => self
-                .local_type_param_counts
-                .get(name)
-                .is_some_and(|count| *count > 0),
-        }
+        self.gctx.resolve_path(scope, name).is_some_and(|id| {
+            self.local_type_ids.contains(&id)
+                && declared_arity(&self.gctx.get_type(id).kind).is_some_and(|n| n > 0)
+        })
     }
 
     /// The Rust target of a local type alias, lowered in the alias's own
@@ -676,19 +660,17 @@ impl<'a> CodegenContext<'a> {
 
         let mut ctx = CodegenContext {
             gctx,
-            local_types: HashMap::new(),
+            local_types: HashSet::new(),
             local_type_ids: HashSet::new(),
             names: RefCell::new(LocalScope::with_claimed(reserved_names())),
             renamed_locals: HashMap::new(),
             renamed_types: surface.map(|s| s.type_names().clone()).unwrap_or_default(),
             constructed: RefCell::default(),
-            local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
             lib_name: module.lib_name.clone(),
             emit_path: RefCell::new(Vec::new()),
             statics_in_scope: RefCell::new(HashSet::new()),
             root_scope: module.global_scope,
-            file_scopes: module.file_scopes.clone(),
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
@@ -718,19 +700,17 @@ impl<'a> CodegenContext<'a> {
     pub fn empty(gctx: &'a GlobalContext, root_scope: ScopeId) -> Self {
         CodegenContext {
             gctx,
-            local_types: HashMap::new(),
+            local_types: HashSet::new(),
             local_type_ids: HashSet::new(),
             names: RefCell::new(LocalScope::with_claimed(reserved_names())),
             renamed_locals: HashMap::new(),
             renamed_types: HashMap::new(),
             constructed: RefCell::default(),
-            local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
             lib_name: None,
             emit_path: RefCell::new(Vec::new()),
             statics_in_scope: RefCell::new(HashSet::new()),
             root_scope,
-            file_scopes: vec![],
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
@@ -1021,11 +1001,11 @@ impl<'a> CodegenContext<'a> {
     /// underscore.
     fn resolve_collisions(&mut self) {
         let names = self.names.get_mut();
-        for name in self.local_types.keys() {
+        for name in &self.local_types {
             names.claim(name.clone());
         }
         for name in reserved_names() {
-            if self.local_types.contains_key(name) {
+            if self.local_types.contains(name) {
                 let renamed = names.declare(name, Suffix::Trailing);
                 self.renamed_locals.insert(name.to_string(), renamed);
             }
@@ -1042,17 +1022,14 @@ impl<'a> CodegenContext<'a> {
     ) {
         let gctx = self.gctx;
         let decl = gctx.get_type(type_id);
-        let mctx = &decl.module_context;
-        let (name, arity) = match &decl.kind {
-            ir::TypeKind::Class(c) => (&c.name, Some(c.type_params.len())),
-            ir::TypeKind::Interface(i) => (&i.name, Some(i.type_params.len())),
-            ir::TypeKind::DiscriminatedUnion(d) => (&d.name, Some(d.type_params.len())),
-            ir::TypeKind::StringEnum(e) => (&e.name, None),
-            ir::TypeKind::NumericEnum(e) => (&e.name, None),
-            ir::TypeKind::TsEnum(e) => (&e.name, None),
-            // Plain references to an alias lower to its target, so only a
-            // generic instantiation names the emitted alias.
-            ir::TypeKind::TypeAlias(a) => (&a.name, Some(a.type_params.len())),
+        let name = match &decl.kind {
+            ir::TypeKind::Class(c) => &c.name,
+            ir::TypeKind::Interface(i) => &i.name,
+            ir::TypeKind::DiscriminatedUnion(d) => &d.name,
+            ir::TypeKind::StringEnum(e) => &e.name,
+            ir::TypeKind::NumericEnum(e) => &e.name,
+            ir::TypeKind::TsEnum(e) => &e.name,
+            ir::TypeKind::TypeAlias(a) => &a.name,
             ir::TypeKind::Namespace(ns) => {
                 let mut path = mod_path.to_vec();
                 path.push(match surface {
@@ -1068,21 +1045,8 @@ impl<'a> CodegenContext<'a> {
             ir::TypeKind::Function(_) | ir::TypeKind::Variable(_) => return,
         };
         let name = self.renamed_types.get(&type_id).unwrap_or(name);
-        self.local_types.insert(name.clone(), mctx.clone());
+        self.local_types.insert(name.clone());
         self.local_type_ids.insert(type_id);
-        if let Some(arity) = arity {
-            // Fallback for use sites without a scope chain; resolved
-            // references take their arity from the declaration itself, so a
-            // top-level declaration keeps this entry over a same-named
-            // namespace member.
-            if mod_path.is_empty() {
-                self.local_type_param_counts.insert(name.clone(), arity);
-            } else {
-                self.local_type_param_counts
-                    .entry(name.clone())
-                    .or_insert(arity);
-            }
-        }
     }
 
     /// The `pub mod` path declarations of `module` are emitted in: the top
@@ -1595,44 +1559,19 @@ fn is_jsvalue_arg(tokens: &TokenStream) -> bool {
 /// 5. Unresolved → js_sys glob → name directly.
 /// 6. Otherwise → error + `use JsValue as Foo;`.
 ///
-/// `use_scope` is the scope the reference appears in, and `from_module` the
-/// [`ModuleContext`] of the extern block this name is being emitted into.
+/// `use_scope` is the scope the reference appears in, and the only one it
+/// is resolved from. As in TypeScript, a name not visible there is not
+/// found, even if another file or module declares it: a module's locals
+/// are reachable only through an import, and a script's top-level
+/// declarations are already in the global scope every chain ends in.
 ///
 /// Going through the scope-resolved `TypeId` (rather than a flat name →
 /// module map) keeps name collisions like a global `interface Foo` and a
 /// namespace member `Foo` correctly distinguished: scope-chain resolution
 /// from the use site picks the visible declaration, and that declaration's
 /// scope drives qualification.
-fn emit_type_name(
-    name: &str,
-    use_scope: Option<ScopeId>,
-    ctx: &CodegenContext<'_>,
-    from_module: &ModuleContext,
-) -> TokenStream {
-    // A use site inside an ambient module also sees that module's private
-    // declarations, which live in its body scopes rather than a file scope.
-    let module_scopes = match from_module {
-        ModuleContext::Module(m) => ctx.gctx.ambient_module_scopes.get(m.as_ref()),
-        ModuleContext::Global => None,
-    };
-    // Names resolve from the use site first: a namespace member sees its
-    // siblings over same-named globals, and a qualified path can name a
-    // namespace only visible there.
-    let resolved = use_scope
-        .and_then(|scope| ctx.gctx.resolve_path(scope, name))
-        .or_else(|| {
-            module_scopes
-                .into_iter()
-                .flatten()
-                .chain(&ctx.file_scopes)
-                .find_map(|&scope| {
-                    if name.contains('.') {
-                        ctx.gctx.resolve_path(scope, name)
-                    } else {
-                        ctx.gctx.scopes.resolve(scope, name)
-                    }
-                })
-        });
+fn emit_type_name(name: &str, use_scope: ScopeId, ctx: &CodegenContext<'_>) -> TokenStream {
+    let resolved = ctx.gctx.resolve_path(use_scope, name);
 
     // Canonical ident name (last segment for dotted paths)
     let ident_name = name.rsplit('.').next().unwrap_or(name);
@@ -1678,23 +1617,11 @@ fn emit_type_name(
     // EmailMessage` and a module-scoped `class EmailMessage`), the
     // scope-chain resolution picks the visible one at the use site, and
     // its `module_context` drives qualification across module boundaries.
-    let target_module = resolved
-        .filter(|id| ctx.local_type_ids.contains(id))
-        .map(|type_id| ctx.gctx.get_type(type_id).module_context.clone())
-        .or_else(|| {
-            // Fallback: tests and entry points that don't construct a
-            // full scope chain populate `local_types` by name.
-            if resolved.is_none() && !name.contains('.') {
-                ctx.local_types.get(ident_name).cloned()
-            } else {
-                None
-            }
-        });
-
-    if let Some(target_module) = target_module {
+    if let Some(type_id) = resolved.filter(|id| ctx.local_type_ids.contains(id)) {
+        let target_module = &ctx.gctx.get_type(type_id).module_context;
         // Externalised module: references resolve through the external
         // map to the user-supplied crate path.
-        if let ModuleContext::Module(m) = &target_module {
+        if let ModuleContext::Module(m) = target_module {
             let m_str: &str = m.as_ref();
             if ctx.externalised_modules.contains(m_str) {
                 if let Some(rust_path) = ctx.gctx.external_map.resolve(ident_name, m_str) {
@@ -1710,7 +1637,7 @@ fn emit_type_name(
         // compile against any emitted declaration, so we error and
         // fall back to a `use JsValue as Name;` alias to keep the
         // output buildable.
-        if let ModuleContext::Module(m) = &target_module {
+        if let ModuleContext::Module(m) = target_module {
             let m_str: &str = m.as_ref();
             let not_exported = !ctx.exported_modules.contains(m_str);
             let no_external = ctx.gctx.external_map.resolve(ident_name, m_str).is_none();
@@ -1732,13 +1659,11 @@ fn emit_type_name(
         // The Rust ident is the declaration's own name: an import bound
         // through `export { _Foo as Foo }` is referred to as `Foo` but
         // emitted as `_Foo`.
-        let declared = resolved
-            .and_then(|id| {
-                ctx.renamed_types
-                    .get(&id)
-                    .map(String::as_str)
-                    .or_else(|| type_decl_name(&ctx.gctx.get_type(id).kind))
-            })
+        let declared = ctx
+            .renamed_types
+            .get(&type_id)
+            .map(String::as_str)
+            .or_else(|| type_decl_name(&ctx.gctx.get_type(type_id).kind))
             .unwrap_or(ident_name);
         let rust_name = ctx
             .renamed_locals
@@ -1746,11 +1671,7 @@ fn emit_type_name(
             .map(String::as_str)
             .unwrap_or(declared);
         let ident = make_ident(rust_name);
-        let qualifier = match resolved {
-            Some(id) => ctx.namespace_qualifier(id),
-            None => ctx.path_qualifier(&ctx.module_path(&target_module)),
-        };
-        return match qualifier {
+        return match ctx.namespace_qualifier(type_id) {
             Some(prefix) => quote! { #prefix #ident },
             None => quote! { #ident },
         };
@@ -1789,14 +1710,9 @@ fn emit_type_name(
 }
 
 /// Backward-compatible wrapper: calls `emit_type_name` when ctx is available.
-fn named_type_to_rust(
-    name: &str,
-    ctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
-    from_module: &ModuleContext,
-) -> TokenStream {
+fn named_type_to_rust(name: &str, ctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> TokenStream {
     match ctx {
-        Some(ctx) => emit_type_name(name, Some(scope), ctx, from_module),
+        Some(ctx) => emit_type_name(name, scope, ctx),
         // Without a codegen context (e.g. unit tests that exercise
         // type lowering directly) we can still resolve names that
         // appear in the `js_sys::*` glob — emit them as a bare ident.
@@ -1845,7 +1761,7 @@ fn lower_reference(
     if segments.len() > 1 {
         let dotted = segments.join(".");
         let base = match ctx {
-            Some(c) => emit_type_name(&dotted, Some(scope), c, from_module),
+            Some(c) => emit_type_name(&dotted, scope, c),
             None => quote! { JsValue },
         };
         return with_generic_args(base, &dotted, generic_args, pos, ctx, scope, from_module);
@@ -1933,7 +1849,7 @@ fn lower_reference(
         }
     }
 
-    let base = named_type_to_rust(head, ctx, scope, from_module);
+    let base = named_type_to_rust(head, ctx, scope);
     with_generic_args(base, head, generic_args, pos, ctx, scope, from_module)
 }
 
@@ -2390,8 +2306,7 @@ fn to_mono_js_string_return_type_impl(
         t @ TypeRef::Reference { segments, .. }
             if local_generic_args(t, ctx, peeled_scope).is_some() =>
         {
-            let base =
-                named_type_to_rust(&segments.join("."), Some(ctx), peeled_scope, from_module);
+            let base = named_type_to_rust(&segments.join("."), Some(ctx), peeled_scope);
             let args = local_generic_args(t, ctx, peeled_scope).unwrap_or_default();
             if args.is_empty() {
                 return base;
@@ -3409,22 +3324,48 @@ mod tests {
         (gctx, scope)
     }
 
-    #[test]
-    fn test_local_type_overrides_web_sys() {
-        let (gctx, scope) = test_gctx();
-        let mut ctx = CodegenContext::empty(&gctx, scope);
-        ctx.local_types
-            .insert("Response".into(), ModuleContext::Global);
-        let ty = TypeRef::ident("Response");
-        let result = to_syn_type(
-            &ty,
-            TypePosition::RETURN,
-            Some(&ctx),
+    /// Lower `name` as a reference written in `scope`, at the top level of
+    /// the output, returning the tokens and the use aliases registered.
+    fn lower_name(
+        ctx: &CodegenContext<'_>,
+        name: &str,
+        pos: TypePosition,
+        scope: ScopeId,
+    ) -> (String, HashMap<String, String>) {
+        let tokens = to_syn_type(
+            &TypeRef::ident(name),
+            pos,
+            Some(ctx),
             scope,
             &ModuleContext::Global,
         )
         .to_string();
-        assert_eq!(result, "Response");
+        (tokens, ctx.external_uses.borrow().clone())
+    }
+
+    /// The scope the members of the interface named `name` resolve from.
+    fn body_scope(gctx: &GlobalContext, name: &str) -> ScopeId {
+        gctx.iter_types()
+            .find_map(|(_, d)| match &d.kind {
+                TypeKind::Interface(i) if i.name == name => Some(i.body_scope),
+                _ => None,
+            })
+            .unwrap_or_else(|| panic!("no interface {name}"))
+    }
+
+    #[test]
+    fn test_local_type_overrides_web_sys() {
+        let (module, gctx) =
+            crate::parse_source("interface Response { ok: boolean; }", None).unwrap();
+        let ctx = CodegenContext::from_module(&module, &gctx);
+        let (tokens, uses) = lower_name(
+            &ctx,
+            "Response",
+            TypePosition::RETURN,
+            module.file_scopes[0],
+        );
+        assert_eq!(tokens, "Response");
+        assert!(uses.is_empty(), "{uses:?}");
     }
 
     #[test]
@@ -3505,71 +3446,171 @@ mod tests {
 
     #[test]
     fn test_local_type_in_promise() {
-        let (gctx, scope) = test_gctx();
-        let mut ctx = CodegenContext::empty(&gctx, scope);
-        ctx.local_types
-            .insert("MyThing".into(), ModuleContext::Global);
+        let (module, gctx) = crate::parse_source("interface MyThing { a: number; }", None).unwrap();
+        let ctx = CodegenContext::from_module(&module, &gctx);
         let ty = TypeRef::generic("Promise", vec![TypeRef::ident("MyThing")]);
         let result = to_syn_type(
             &ty,
             TypePosition::RETURN,
             Some(&ctx),
-            scope,
+            module.file_scopes[0],
             &ModuleContext::Global,
         )
         .to_string();
         assert_eq!(result, "Promise < MyThing >");
+        assert!(ctx.external_uses.borrow().is_empty());
     }
+
+    /// Parse `files` as separate inputs, which, unlike a single source,
+    /// also resolves their imports.
+    fn parse_files(
+        tag: &str,
+        files: &[(&str, &str)],
+        lib_name: Option<&str>,
+    ) -> (crate::ir::Module, GlobalContext) {
+        let dir = std::env::temp_dir().join(format!("ts-gen-{tag}-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let paths: Vec<_> = files
+            .iter()
+            .map(|(name, src)| {
+                let path = dir.join(name);
+                std::fs::write(&path, src).unwrap();
+                path
+            })
+            .collect();
+        let result = crate::parse::parse_dts_files(&paths, lib_name);
+        std::fs::remove_dir_all(&dir).unwrap();
+        result.unwrap()
+    }
+
+    const EMAIL_SRC: &str = r#"
+        declare module "cloudflare:email" {
+            export class EmailMessage {}
+        }
+        declare module "user" {
+            import { EmailMessage } from "cloudflare:email";
+            export interface User { message: EmailMessage; }
+        }
+    "#;
 
     #[test]
     fn test_declared_module_is_qualified_from_global() {
         // A declared module is emitted under its specifier's `pub mod`
-        // path, so a global reference to one of its types is qualified.
-        let (gctx, scope) = test_gctx();
-        let mut ctx = CodegenContext::empty(&gctx, scope);
+        // path, so a reference emitted at the top level is qualified.
+        let (module, gctx) = parse_files("email", &[("email.d.ts", EMAIL_SRC)], None);
+        let mut ctx = CodegenContext::from_module(&module, &gctx);
         ctx.exported_modules.insert("cloudflare:email".to_string());
-        let module = ModuleContext::Module("cloudflare:email".into());
-        ctx.local_types
-            .insert("EmailMessage".into(), module.clone());
-
-        let lower = |ctx: &CodegenContext| {
-            to_syn_type(
-                &TypeRef::ident("EmailMessage"),
-                TypePosition::ARGUMENT,
-                Some(ctx),
-                scope,
-                &ModuleContext::Global,
-            )
-            .to_string()
-        };
-        assert_eq!(lower(&ctx), "& cloudflare :: email :: EmailMessage");
+        let scope = body_scope(&gctx, "User");
+        let (tokens, _) = lower_name(&ctx, "EmailMessage", TypePosition::ARGUMENT, scope);
+        assert_eq!(tokens, "& cloudflare :: email :: EmailMessage");
 
         // The `--lib-name` module is the output's own, at the top level.
-        ctx.lib_name = Some("cloudflare:email".to_string());
-        assert_eq!(lower(&ctx), "& EmailMessage");
+        let (module, gctx) = parse_files(
+            "email-lib",
+            &[("email.d.ts", EMAIL_SRC)],
+            Some("cloudflare:email"),
+        );
+        let ctx = CodegenContext::from_module(&module, &gctx);
+        let scope = body_scope(&gctx, "User");
+        let (tokens, _) = lower_name(&ctx, "EmailMessage", TypePosition::ARGUMENT, scope);
+        assert_eq!(tokens, "& EmailMessage");
     }
 
     #[test]
     fn test_global_to_global_is_bare() {
-        // Trivial: same-scope references are bare.
-        let (gctx, scope) = test_gctx();
-        let mut ctx = CodegenContext::empty(&gctx, scope);
-        ctx.local_types
-            .insert("EmailSendResult".into(), ModuleContext::Global);
-
-        let ty = TypeRef::ident("EmailSendResult");
-        let result = to_syn_type(
-            &ty,
+        let (module, gctx) =
+            crate::parse_source("interface EmailSendResult { id: string; }", None).unwrap();
+        let ctx = CodegenContext::from_module(&module, &gctx);
+        let (tokens, uses) = lower_name(
+            &ctx,
+            "EmailSendResult",
             TypePosition::RETURN,
-            Some(&ctx),
-            scope,
-            &ModuleContext::Global,
-        )
-        .to_string();
-        assert_eq!(result, "EmailSendResult");
+            module.file_scopes[0],
+        );
+        assert_eq!(tokens, "EmailSendResult");
+        assert!(uses.is_empty(), "{uses:?}");
     }
 
-    // === New tests for the unified approach ===
+    fn assert_unresolved(ctx: &CodegenContext<'_>, name: &str, scope: ScopeId) {
+        let (tokens, uses) = lower_name(ctx, name, TypePosition::RETURN, scope);
+        assert_eq!(tokens, name);
+        assert_eq!(uses.get(name).map(String::as_str), Some("JsValue"));
+        let unresolved = format!("Unresolved type `{name}`");
+        assert!(
+            ctx.diagnostics
+                .borrow()
+                .diagnostics
+                .iter()
+                .any(|d| d.message.starts_with(&unresolved)),
+            "no `{unresolved}` error"
+        );
+    }
+
+    #[test]
+    fn names_resolve_only_from_the_use_site() {
+        // A name another file or module declares but the use site neither
+        // sees nor imports is not found, as TypeScript's "Cannot find
+        // name": a block's unexported declaration from the module's other
+        // block, a module's locals from another module, and a module's
+        // exports from another module or a script.
+        let src = r#"
+            declare module "a" {
+                interface Secret { a: number; }
+                export {};
+            }
+            declare module "a" {
+                export interface InA { s: Secret; }
+            }
+            declare module "b" {
+                export interface InB { s: Secret; e: Exported; }
+            }
+            declare module "c" {
+                export interface Exported { c: number; }
+            }
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let ctx = CodegenContext::from_module(&module, &gctx);
+        assert_unresolved(&ctx, "Secret", body_scope(&gctx, "InA"));
+        assert_unresolved(&ctx, "Secret", body_scope(&gctx, "InB"));
+        assert_unresolved(&ctx, "Exported", body_scope(&gctx, "InB"));
+        assert_unresolved(&ctx, "Exported", module.file_scopes[0]);
+        assert!(!ctx.is_local_generic("Secret", module.file_scopes[0]));
+    }
+
+    #[test]
+    fn module_file_locals_stay_in_their_file() {
+        // Every module file of the `--lib-name` library is its own module:
+        // its unexported declarations are visible to no other file, even
+        // one that declares a local of the same name.
+        let (module, gctx) = parse_files(
+            "module-file-locals",
+            &[
+                ("main.d.ts", "export declare function f(): void;"),
+                (
+                    "a.d.ts",
+                    "interface Secret<T> { a: T; } interface Shared { a: number; } \
+                     export declare function a(s: Shared): Secret<string>;",
+                ),
+                (
+                    "b.d.ts",
+                    "interface Shared { b: number; } export declare function b(s: Shared): void;",
+                ),
+            ],
+            Some("lib"),
+        );
+        let ctx = CodegenContext::from_module(&module, &gctx);
+        let (main, a, b) = (
+            module.file_scopes[0],
+            module.file_scopes[1],
+            module.file_scopes[2],
+        );
+        assert!(ctx.is_local_generic("Secret", a));
+        assert!(!ctx.is_local_generic("Secret", main));
+        assert_unresolved(&ctx, "Secret", main);
+        assert_unresolved(&ctx, "Shared", main);
+        let shared = |scope| gctx.resolve_path(scope, "Shared").unwrap();
+        assert_ne!(shared(a), shared(b));
+    }
 
     #[test]
     fn test_to_inner_preserves_direction() {

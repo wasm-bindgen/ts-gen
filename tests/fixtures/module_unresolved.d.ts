@@ -1,7 +1,6 @@
-// Resolution-only module reference: `x:foo` is in the type universe so
-// `Bar` resolves at parse time, but it's neither `--export`ed nor
-// `--external`ised. The reference from the global `UsesBar` is a
-// codegen error — ts-gen emits the diagnostic at the next CLI run and
+// A module's exports are reachable only through an import: the global
+// `UsesBar` doesn't import `Bar`, so as in TypeScript ("Cannot find name")
+// it doesn't see `x:foo`'s `Bar`. The reference is a codegen error and
 // falls back to a `use JsValue as Bar;` alias so the output still
 // compiles. No `mod foo` block is ever generated.
 

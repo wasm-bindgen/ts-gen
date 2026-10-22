@@ -6,13 +6,21 @@ use ::other::foo::Bar;
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[wasm_bindgen]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type UsesBar;
-    #[wasm_bindgen(method)]
-    pub fn method(this: &UsesBar, b: &Bar);
-    #[wasm_bindgen(method, catch, js_name = "method")]
-    pub fn try_method(this: &UsesBar, b: &Bar) -> Result<(), JsValue>;
+pub mod x {
+    #[allow(unused_imports)]
+    use super::*;
+    pub mod uses {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "x:uses")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type UsesBar;
+            #[wasm_bindgen(method)]
+            pub fn method(this: &UsesBar, b: &Bar);
+            #[wasm_bindgen(method, catch, js_name = "method")]
+            pub fn try_method(this: &UsesBar, b: &Bar) -> Result<(), JsValue>;
+        }
+    }
 }
