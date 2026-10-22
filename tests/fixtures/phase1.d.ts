@@ -19,8 +19,8 @@ declare enum UnsignedEnum {
   C = 2,
 }
 
-// 1.1: Numeric enum with auto-increment from negative
-declare enum AutoIncrement {
+// 1.1: Const enum auto-incrementing from negative
+declare const enum AutoIncrement {
   Start = -2,
   // auto-incremented to -1
   Next,

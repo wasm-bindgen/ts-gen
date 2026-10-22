@@ -2801,10 +2801,30 @@ and references to another enum's members through its path
 (`Base.Default`, `Ns.Inner.Value`, `Base["Other"]`), including one in
 another file. A reference into the member's own declaration can only reach
 an earlier member, but one into another declaration of the enum can reach
-any. A member without an initialiser continues from the previous
-member's evaluated value, or is 0 as the first member of its declaration.
-An enum is numeric when any member evaluates to a number, so
+any. An enum is numeric when any member evaluates to a number, so
 `Read = 1 << 0` alone is enough, and a string enum otherwise.
+
+A member without an initialiser is numbered only in a `const enum`, as
+TypeScript does: 0 as the first member of its declaration, otherwise one
+more than the previous member's value when that is a number, and no value
+after a string member or one without a value. Every enum in a `.d.ts` is
+ambient, and TypeScript treats a member without an initialiser of an
+ambient non-`const` enum as computed rather than auto-incremented: its
+value is only known at runtime, so it has no value here either, and is
+skipped as below. (tsc's own declaration emit always writes the
+initialisers out, `A = 0`.)
+
+```ts
+declare enum Computed { A, B }
+declare enum Mixed { A = 1, B, C = 4 }
+declare const enum Numbered { A, B, C = 10, D }
+```
+
+```rust
+pub type Computed = JsValue;
+pub enum Mixed { A = 1, C = 4 }
+pub enum Numbered { A = 0, B = 1, C = 10, D = 11 }
+```
 
 The declarations of a merged enum, those of one name in the same namespace
 path of one scope, are evaluated in order as one enum, whose members can
@@ -2815,7 +2835,7 @@ same-named enum in an imported module file stays a separate enum:
 
 ```ts
 declare enum Base { Default = 2 }
-declare enum Mode { A = Base.Default, B, C = A | 8 }
+declare const enum Mode { A = Base.Default, B, C = A | 8 }
 declare enum Merged { A = 1 }
 declare enum Merged { B = A + 1 }
 ```
@@ -2826,11 +2846,12 @@ pub enum Mode { A = 2, B = 3, C = 10 }
 pub enum Merged { A = 1, B = 2 }
 ```
 
-A member whose value can't be evaluated, such as `B = Undeclared.X` or
-one in a reference cycle, or one continuing from it, is skipped with a
-diagnostic. Its value is only known at runtime, and a guessed discriminant
-could repeat a real member's value and turn that member into an alias of
-it. wasm-bindgen can't export an enum without variants, so an enum left
+A member whose value can't be evaluated, such as `B = Undeclared.X`, one
+in a reference cycle, a member without an initialiser of a non-`const`
+enum, or a `const enum` member continuing from one of these, is skipped
+with a diagnostic. Its value is only known at runtime, and a guessed
+discriminant could repeat a real member's value and turn that member into
+an alias of it. wasm-bindgen can't export an enum without variants, so an enum left
 with none is erased to `JsValue` with a diagnostic.
 
 A member whose value repeats an earlier member's is an alias, not a

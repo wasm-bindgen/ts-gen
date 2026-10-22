@@ -701,6 +701,10 @@ pub struct TsEnumDecl {
     /// `declare global` block, so it merges with the global declarations of
     /// other files.
     pub global: bool,
+    /// A `const enum`, whose members without an initialiser are numbered.
+    /// In any other ambient enum, which every `.d.ts` enum is, they're
+    /// computed: TypeScript gives them no value.
+    pub is_const: bool,
     /// The enum's name, in the file its scope is declared in.
     pub span: Span,
 }
@@ -708,7 +712,7 @@ pub struct TsEnumDecl {
 #[derive(Clone, Debug)]
 pub struct TsEnumMember {
     pub name: String,
-    /// `None` when the member continues from the previous one.
+    /// `None` when the member has no initialiser.
     pub init: Option<EnumInit>,
     pub doc: Option<String>,
     pub span: Span,
