@@ -2,8 +2,8 @@
 
 // Every enum in a .d.ts is ambient, and TypeScript gives a member of an
 // ambient non-const enum without an initialiser no value: it's computed, not
-// auto-incremented. Such a member is skipped, and an enum left without a
-// constant member is erased to JsValue.
+// auto-incremented. Such a member is skipped. It's still a number, so an
+// enum left with only such members is erased to number.
 export declare enum Computed {
   A,
   B,

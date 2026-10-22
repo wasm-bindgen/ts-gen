@@ -5,7 +5,7 @@ use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
-pub type Computed = JsValue;
+pub type Computed = Number;
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
@@ -30,13 +30,13 @@ pub enum AfterString {
 #[wasm_bindgen(module = "ambient-enum-members")]
 extern "C" {
     #[wasm_bindgen(js_name = "useAll")]
-    pub fn use_all(computed: &JsValue, mixed: Mixed, numbered: Numbered, after_string: AfterString);
+    pub fn use_all(computed: f64, mixed: Mixed, numbered: Numbered, after_string: AfterString);
 }
 #[wasm_bindgen(module = "ambient-enum-members")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "useAll")]
     pub fn try_use_all(
-        computed: &JsValue,
+        computed: f64,
         mixed: Mixed,
         numbered: Numbered,
         after_string: AfterString,

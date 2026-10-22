@@ -2821,7 +2821,7 @@ declare const enum Numbered { A, B, C = 10, D }
 ```
 
 ```rust
-pub type Computed = JsValue;
+pub type Computed = Number; // `f64` in signatures
 pub enum Mixed { A = 1, C = 4 }
 pub enum Numbered { A = 0, B = 1, C = 10, D = 11 }
 ```
@@ -2851,8 +2851,13 @@ in a reference cycle, a member without an initialiser of a non-`const`
 enum, or a `const enum` member continuing from one of these, is skipped
 with a diagnostic. Its value is only known at runtime, and a guessed
 discriminant could repeat a real member's value and turn that member into
-an alias of it. wasm-bindgen can't export an enum without variants, so an enum left
-with none is erased to `JsValue` with a diagnostic.
+an alias of it. wasm-bindgen can't export an enum without variants, so an
+enum left with none is erased with a diagnostic. When no member has an
+initialiser it's erased to `number`, like `type Computed = number`, so it
+crosses as `f64`: TypeScript requires a computed member to be a number and
+accepts any number where the enum is expected. Otherwise it's erased to
+`JsValue`, since an initialiser that didn't evaluate, like `Undeclared.X`,
+could be a string.
 
 A member whose value repeats an earlier member's is an alias, not a
 second variant: wasm-bindgen rejects duplicate discriminants, and two

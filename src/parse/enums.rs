@@ -326,7 +326,8 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
 /// doesn't fit the kind is skipped with a warning: a guessed discriminant
 /// could repeat a real member's value and make that member an alias of it.
 /// wasm-bindgen can't export an enum without variants, so one left with
-/// none is erased to `JsValue`.
+/// none is erased: to `number` when no member has an initialiser, as every
+/// such member is a number, and to `JsValue` otherwise.
 fn finish(
     name: &str,
     file: Option<FileId>,
@@ -361,9 +362,18 @@ fn finish(
     crate::util::naming::dedup_names(&mut rust_names);
     let name = name.to_string();
     if kept.is_empty() {
+        // A member without an initialiser is numeric even when its value is
+        // only known at runtime: TypeScript requires a computed member to be
+        // a number, and accepts any number where the enum is expected. One
+        // with an initialiser that didn't evaluate could be a string.
+        let (target, erased) = if !members.is_empty() && members.iter().all(|m| m.init.is_none()) {
+            (TypeRef::Number, "a number")
+        } else {
+            (TypeRef::Any, "JsValue")
+        };
         diag.warn_span_in(
             file,
-            format!("Enum `{name}` has no member with a constant value, erasing it to JsValue"),
+            format!("Enum `{name}` has no member with a constant value, erasing it to {erased}"),
             span,
             None,
             None,
@@ -371,7 +381,7 @@ fn finish(
         return TypeKind::TypeAlias(TypeAliasDecl {
             name,
             type_params: vec![],
-            target: TypeRef::Any,
+            target,
             from_module: None,
             body_scope: scope,
         });
@@ -669,13 +679,21 @@ mod tests {
     #[test]
     fn ambient_members_without_an_initialiser_are_computed() {
         let src = "declare enum Amb { A, B } \
+                   declare enum Unresolved { A, B = Other.X } \
                    declare enum Mixed { A = 1, B } \
                    declare namespace N { enum Inner { A } }";
         let (module, gctx) = crate::parse::parse_single_source(src, None).unwrap();
-        let kind = &gctx.get_type(module.types[0]).kind;
-        assert!(
-            matches!(kind, TypeKind::TypeAlias(a) if a.target == crate::ir::TypeRef::Any),
-            "{kind:?}"
+        // Every member of `Amb` is a number; `Other.X` could be a string.
+        let targets: Vec<_> = module.types[..2]
+            .iter()
+            .map(|&id| match &gctx.get_type(id).kind {
+                TypeKind::TypeAlias(a) => a.target.clone(),
+                kind => panic!("{kind:?}"),
+            })
+            .collect();
+        assert_eq!(
+            targets,
+            [crate::ir::TypeRef::Number, crate::ir::TypeRef::Any]
         );
         assert_eq!(numeric(src, "Mixed"), pairs(&[("A", 1)]));
         assert_eq!(
@@ -683,10 +701,13 @@ mod tests {
             [
                 "Enum `Amb::A` has no constant value, skipping it",
                 "Enum `Amb::B` has no constant value, skipping it",
-                "Enum `Amb` has no member with a constant value, erasing it to JsValue",
+                "Enum `Amb` has no member with a constant value, erasing it to a number",
+                "Enum `Unresolved::A` has no constant value, skipping it",
+                "Enum `Unresolved::B` has no constant value, skipping it",
+                "Enum `Unresolved` has no member with a constant value, erasing it to JsValue",
                 "Enum `Mixed::B` has no constant value, skipping it",
                 "Enum `Inner::A` has no constant value, skipping it",
-                "Enum `Inner` has no member with a constant value, erasing it to JsValue",
+                "Enum `Inner` has no member with a constant value, erasing it to a number",
             ]
         );
     }
