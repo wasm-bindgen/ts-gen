@@ -39,7 +39,7 @@ declare class Widget {
 type Widget = { a: number };
 
 declare enum Color {
-  Red,
+  Red = 0,
 }
 interface Color {
   x: number;
@@ -49,7 +49,7 @@ interface Later {
   x: number;
 }
 declare enum Later {
-  A,
+  A = 0,
 }
 
 declare namespace N {
@@ -92,7 +92,7 @@ declare namespace Opts {
 }
 
 declare enum Level {
-  Low,
+  Low = 0,
 }
 declare enum Level {
   High = 1,
