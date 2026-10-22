@@ -207,11 +207,19 @@ impl ScopeArena {
     /// The file `scope` is declared in. The global scope and the built-in
     /// types belong to no file.
     pub fn file_of(&self, scope: ScopeId) -> Option<FileId> {
+        self.file_scope(scope).and_then(|s| self.get(s).file)
+    }
+
+    /// The scope of the file `scope` is declared in: `scope` itself for a
+    /// file's scope, else the nearest ancestor that is one. A `declare
+    /// module` block's shared exports hang off the global scope, so they
+    /// belong to no file.
+    pub fn file_scope(&self, scope: ScopeId) -> Option<ScopeId> {
         let mut at = Some(scope);
         while let Some(id) = at {
             let s = self.get(id);
             if s.file.is_some() {
-                return s.file;
+                return Some(id);
             }
             at = s.parent;
         }
@@ -342,6 +350,25 @@ mod tests {
         gctx.scopes.insert(parent, "Foo".to_string(), id);
 
         assert_eq!(gctx.scopes.resolve(child, "Foo"), Some(id));
+    }
+
+    #[test]
+    fn file_scope_is_the_nearest_scope_with_a_file() {
+        let mut gctx = GlobalContext::new();
+        let global = gctx.create_root_scope();
+        let file = gctx.scopes.create_child(global);
+        let block = gctx.scopes.create_child(file);
+        let nested = gctx.scopes.create_child(block);
+        let id = gctx
+            .diagnostics
+            .set_file(std::path::Path::new("a.d.ts"), "");
+        gctx.scopes.get_mut(file).file = Some(id);
+
+        for scope in [file, block, nested] {
+            assert_eq!(gctx.scopes.file_scope(scope), Some(file));
+            assert_eq!(gctx.scopes.file_of(scope), Some(id));
+        }
+        assert_eq!(gctx.scopes.file_scope(global), None);
     }
 
     /// Type-parameter bindings shadow outer declarations: the closest

@@ -671,9 +671,12 @@ fn resolve_imports(
                 continue;
             }
 
-            // Try to resolve the module specifier to a file.
-            let base_dir = scope_dirs
-                .get(&import.scope)
+            // As in TypeScript, a module name resolves from the file the
+            // import is written in, also inside a `declare module` block.
+            let base_dir = gctx
+                .scopes
+                .file_scope(import.scope)
+                .and_then(|file| scope_dirs.get(&file))
                 .cloned()
                 .unwrap_or_else(|| PathBuf::from("."));
             let resolved_path = resolve::resolve_module(&import.from_module, &base_dir);
@@ -1854,6 +1857,71 @@ mod tests {
             assert!(declared.is_some());
             assert_eq!(gctx.scopes.resolve(user_scope, name), declared);
         }
+    }
+
+    #[test]
+    fn ambient_module_imports_resolve_from_their_file() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-ambient-dir-{}", std::process::id()));
+        let pkg = dir.join("sub/node_modules/pkg");
+        std::fs::create_dir_all(&pkg).unwrap();
+        std::fs::write(pkg.join("index.d.ts"), "export type P = string;").unwrap();
+        std::fs::write(dir.join("sub/rel.d.ts"), "export type R = number;").unwrap();
+        let script = dir.join("sub/script.d.ts");
+        std::fs::write(
+            &script,
+            r#"
+                declare module "s" {
+                    import { P } from "pkg";
+                    import { R } from "./rel";
+                    export * from "./rel";
+                }
+            "#,
+        )
+        .unwrap();
+        let aug = dir.join("sub/aug.d.ts");
+        std::fs::write(
+            &aug,
+            r#"
+                export {};
+                declare module "s" {
+                    import { P as AugP } from "pkg";
+                    import R2 = require("pkg");
+                    export { P as AugP2 } from "pkg";
+                }
+            "#,
+        )
+        .unwrap();
+        let result = parse_dts_files(&[&script, &aug], None);
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (_, gctx) = result.unwrap();
+
+        let [script_block, aug_block] = gctx.ambient_module_scopes["s"][1..] else {
+            panic!("{:?}", gctx.ambient_module_scopes["s"]);
+        };
+        let p = gctx.scopes.get(script_block).get("P").unwrap();
+        assert!(matches!(gctx.get_type(p).kind, TypeKind::TypeAlias(_)));
+        assert!(gctx.scopes.get(script_block).get("R").is_none());
+        for name in ["AugP", "R2"] {
+            assert!(gctx.scopes.get(aug_block).get(name).is_none(), "{name}");
+        }
+        // The re-export is still declared, as an alias of its own rather
+        // than "pkg"'s binding.
+        let aug_p2 = gctx.scopes.get(aug_block).get("AugP2").unwrap();
+        assert_ne!(aug_p2, p);
+
+        let warnings: Vec<_> = gctx
+            .diagnostics
+            .diagnostics
+            .iter()
+            .map(|d| d.message.as_str())
+            .filter(|m| m.contains("not permitted") || m.contains("relative module name"))
+            .collect();
+        let relative = "Import or export declaration in an ambient module declaration cannot \
+                        reference module through relative module name.";
+        let import = "Imports are not permitted in module augmentations. Consider moving them \
+                      to the enclosing external module.";
+        let export = "Exports and export assignments are not permitted in module augmentations.";
+        assert_eq!(warnings, [relative, relative, import, import, export]);
     }
 
     #[test]

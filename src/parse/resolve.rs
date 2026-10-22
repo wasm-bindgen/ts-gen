@@ -46,3 +46,43 @@ pub fn resolve_module(specifier: &str, base_dir: &Path) -> Option<PathBuf> {
 pub fn resolve(specifier: &str, from_dir: &Path) -> Option<PathBuf> {
     resolve_module(specifier, from_dir)
 }
+
+/// TypeScript's `isExternalModuleNameRelative`: `.`, `..`, a name starting
+/// `./` or `../` (either slash), or a rooted path, which never names an
+/// ambient module or a package.
+pub(crate) fn is_relative_module_name(specifier: &str) -> bool {
+    let relative = ["./", "../", ".\\", "..\\"]
+        .iter()
+        .any(|prefix| specifier.starts_with(prefix))
+        || specifier == "."
+        || specifier == "..";
+    let bytes = specifier.as_bytes();
+    let rooted = matches!(bytes.first(), Some(b'/' | b'\\'))
+        || (bytes.len() >= 2 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':');
+    relative || rooted
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_relative_module_name;
+
+    #[test]
+    fn relative_module_names() {
+        for name in [
+            ".", "..", "./a", "../a", ".\\a", "/abs/a", "\\a", "c:/a", "C:\\a",
+        ] {
+            assert!(is_relative_module_name(name), "{name}");
+        }
+        for name in [
+            "a",
+            "node:fs",
+            "@types/node",
+            ".a",
+            "..a",
+            "a/./b",
+            "cloudflare:email",
+        ] {
+            assert!(!is_relative_module_name(name), "{name}");
+        }
+    }
+}

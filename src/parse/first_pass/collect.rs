@@ -8,6 +8,7 @@ use crate::ir;
 use crate::parse::merge::{
     has_constructor_shape, is_class_constructor_var, named_constructor_ref, var_declarator_name,
 };
+use crate::parse::resolve::is_relative_module_name;
 use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
 
@@ -24,6 +25,10 @@ struct CollectCtx<'a> {
     /// Whether the file is read as a script, whose top-level declarations
     /// are globals visible to later files.
     is_script: bool,
+    /// Whether the file is a module in TypeScript's sense, with a top-level
+    /// import or export, which makes each of its `declare module` blocks an
+    /// augmentation, `--lib-name` or not.
+    augments: bool,
     /// Key of the export map listing the globals this file declares: the
     /// file scope for a file read as a script, else a scope of its own,
     /// created at the first `declare global`.
@@ -69,6 +74,7 @@ pub fn collect_type_names(
         diag,
         file_scope: root_scope,
         is_script: is_global,
+        augments: super::is_module(program),
         globals: is_global.then_some(root_scope),
         file_start,
         outer_assignments: Vec::new(),
@@ -188,6 +194,7 @@ impl<'a> CollectCtx<'a> {
                 self.collect_declaration(&export.declaration, &export_ctx, scope, true);
             }
             ast::Statement::ExportFromDeclaration(export) => {
+                let resolves = self.resolves_module(scope, &export.source, true);
                 let source = export.source.value.to_string();
                 for spec in &export.specifiers {
                     let exported_name = spec.exported.name().to_string();
@@ -197,7 +204,9 @@ impl<'a> CollectCtx<'a> {
                     self.gctx
                         .exports
                         .insert(scope, &exported_name, &exported_name);
-                    self.register_import(&exported_name, &imported, &source, scope);
+                    if resolves {
+                        self.register_import(&exported_name, &imported, &source, scope);
+                    }
                 }
             }
             ast::Statement::ExportNamedDeclaration(export) => {
@@ -262,6 +271,9 @@ impl<'a> CollectCtx<'a> {
             ast::Statement::TSNamespaceExportDeclaration(_) => {}
 
             ast::Statement::ExportAllDeclaration(export_all) => {
+                if !self.resolves_module(scope, &export_all.source, true) {
+                    return;
+                }
                 let source = export_all.source.value.to_string();
                 self.register_import("*", "*", &source, scope);
                 self.diag.info(format!(
@@ -270,6 +282,9 @@ impl<'a> CollectCtx<'a> {
             }
 
             ast::Statement::ImportDeclaration(import) => {
+                if !self.resolves_module(scope, &import.source, false) {
+                    return;
+                }
                 let source = import.source.value.to_string();
                 if let Some(ref specifiers) = import.specifiers {
                     for spec in specifiers {
@@ -297,7 +312,9 @@ impl<'a> CollectCtx<'a> {
                 let local = decl.id.name.to_string();
                 match &decl.module_reference {
                     ast::TSModuleReference::ExternalModuleReference(ext) => {
-                        self.register_import(&local, "*", &ext.expression.value, scope);
+                        if self.resolves_module(scope, &ext.expression, false) {
+                            self.register_import(&local, "*", &ext.expression.value, scope);
+                        }
                     }
                     ast::TSModuleReference::IdentifierReference(_)
                     | ast::TSModuleReference::QualifiedName(_) => {}
@@ -835,6 +852,48 @@ impl<'a> CollectCtx<'a> {
             exported,
             (!earlier).then_some(binds),
         );
+    }
+
+    /// Whether the module an import or re-export written directly in
+    /// `scope` names is resolved. As in TypeScript's program, which loads
+    /// neither, a relative name in a script's `declare module` block
+    /// (TS2439) and any import or re-export in a module augmentation
+    /// (TS2667 and TS2666; its imports belong to the enclosing module) are
+    /// not.
+    fn resolves_module(
+        &mut self,
+        scope: ScopeId,
+        specifier: &ast::StringLiteral<'_>,
+        export: bool,
+    ) -> bool {
+        let in_block = self
+            .registry
+            .module_blocks
+            .values()
+            .any(|&(_, block)| block == scope);
+        let message = match (in_block, self.augments, export) {
+            (false, ..) => return true,
+            (true, true, false) => {
+                "Imports are not permitted in module augmentations. Consider moving them to \
+                 the enclosing external module."
+            }
+            (true, true, true) => {
+                "Exports and export assignments are not permitted in module augmentations."
+            }
+            (true, false, _) if is_relative_module_name(&specifier.value) => {
+                "Import or export declaration in an ambient module declaration cannot \
+                 reference module through relative module name."
+            }
+            (true, false, _) => return true,
+        };
+        self.diag.warn_span(
+            message,
+            specifier.span.start,
+            specifier.span.end,
+            None,
+            Some(format!("\"{}\" is not resolved", specifier.value)),
+        );
+        false
     }
 
     fn register_import(
