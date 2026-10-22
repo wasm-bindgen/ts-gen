@@ -1138,9 +1138,10 @@ enum Declared {
 /// Merge the members of another declaration of the same symbol into `base`,
 /// as TypeScript merges member tables. Methods, static methods and
 /// constructors are overloads: TypeScript takes a member's signatures from
-/// all of its declarations, so they accumulate, the earlier declaration's
-/// before the later's. Any other member is one entry per (kind, name), which
-/// `incoming` replaces in place, as merged properties must agree in type.
+/// all of its declarations, and overload resolution tries the later
+/// declaration's before the earlier's, so they accumulate in that order.
+/// Any other member is one entry per (kind, name), which `incoming` replaces
+/// in place, as merged properties must agree in type.
 fn merge_members(
     base: &mut Vec<crate::ir::Member>,
     incoming: Vec<crate::ir::Member>,
@@ -1154,14 +1155,14 @@ fn merge_members(
         by_key.entry(member_key(m)).or_insert(i);
     }
 
-    // An earlier declaration's overloads go before the first of `base`'s
-    // own same-keyed ones, keeping their order.
-    let mut earlier: HashMap<MemberKey, Vec<crate::ir::Member>> = HashMap::new();
+    // A later declaration's overloads go before the first of `base`'s own
+    // same-keyed ones, keeping their order.
+    let mut later: HashMap<MemberKey, Vec<crate::ir::Member>> = HashMap::new();
     for m in incoming {
         let key = member_key(&m);
         match by_key.get(&key) {
-            Some(&idx) if is_overload(&m) && declared == Declared::Earlier && idx < own => {
-                earlier.entry(key).or_default().push(m);
+            Some(&idx) if is_overload(&m) && declared == Declared::Later && idx < own => {
+                later.entry(key).or_default().push(m);
             }
             Some(_) if is_overload(&m) => base.push(m),
             Some(&idx) => base[idx] = m,
@@ -1171,11 +1172,11 @@ fn merge_members(
             }
         }
     }
-    if earlier.is_empty() {
+    if later.is_empty() {
         return;
     }
     for m in std::mem::take(base) {
-        if let Some(overloads) = earlier.remove(&member_key(&m)) {
+        if let Some(overloads) = later.remove(&member_key(&m)) {
             base.extend(overloads);
         }
         base.push(m);
@@ -1330,9 +1331,10 @@ fn merge_class_pairs(
                             iface_decl.members.clone(),
                             Declared::Later,
                         );
+                        // Construct signatures are overloads too.
                         existing
                             .construct
-                            .extend(iface_decl.construct.iter().cloned());
+                            .splice(0..0, iface_decl.construct.iter().cloned());
                         // Merge extends
                         for ext in &iface_decl.extends {
                             if !existing.extends.contains(ext) {
@@ -1486,17 +1488,17 @@ mod tests {
         assert_eq!(
             param_types(&base),
             vec![
+                ("m", &TypeRef::Boolean),
                 ("m", &TypeRef::String),
                 ("m", &TypeRef::Number),
-                ("n", &TypeRef::String),
-                ("m", &TypeRef::Boolean),
                 ("n", &TypeRef::Number),
+                ("n", &TypeRef::String),
             ]
         );
     }
 
     #[test]
-    fn test_merge_members_earlier_overloads_go_first() {
+    fn test_merge_members_earlier_overloads_go_last() {
         let mut base = vec![
             overload("a", TypeRef::String),
             overload("m", TypeRef::String),
@@ -1512,9 +1514,9 @@ mod tests {
             param_types(&base),
             vec![
                 ("a", &TypeRef::String),
+                ("m", &TypeRef::String),
                 ("m", &TypeRef::Number),
                 ("m", &TypeRef::Boolean),
-                ("m", &TypeRef::String),
                 ("z", &TypeRef::Number),
                 ("z", &TypeRef::Boolean),
             ]
@@ -1550,8 +1552,8 @@ mod tests {
             base.iter().map(member_key).collect::<Vec<_>>(),
             vec![
                 MemberKey::Constructor,
-                MemberKey::StaticMethod("from".into()),
                 MemberKey::Constructor,
+                MemberKey::StaticMethod("from".into()),
                 MemberKey::StaticMethod("from".into()),
             ]
         );
@@ -1622,7 +1624,7 @@ mod tests {
     }
 
     #[test]
-    fn test_merge_class_pairs_keeps_overloads_in_declaration_order() {
+    fn test_merge_class_pairs_puts_later_declarations_overloads_first() {
         let iface_decl = |ty| {
             decl(
                 TypeKind::Interface(iface("Widget", vec![overload("m", ty)])),
@@ -1661,15 +1663,15 @@ mod tests {
             iface_decl(Number),
             iface_decl(Boolean),
         ]);
-        assert_eq!(order(&merged), vec![String, Number, Boolean]);
+        assert_eq!(order(&merged), vec![Boolean, Number, String]);
         let merged = members(vec![
             iface_decl(String),
             class_decl(Number),
             iface_decl(Boolean),
         ]);
-        assert_eq!(order(&merged), vec![String, Number, Boolean]);
+        assert_eq!(order(&merged), vec![Boolean, Number, String]);
         let merged = members(vec![class_decl(String), iface_decl(Number)]);
-        assert_eq!(order(&merged), vec![String, Number]);
+        assert_eq!(order(&merged), vec![Number, String]);
     }
 
     #[test]
@@ -1821,9 +1823,9 @@ mod tests {
             declare var Arr: ArrConstructor;";
         let added = "interface ArrConstructor { new (n: number): Arr; from(x: any): Arr; }
             interface Arr { b(): void; }";
-        // Every file's construct signatures are overloads, in file order, as
-        // a later block's follow an earlier one's within one file.
-        for (i, (sources, ctor_params)) in [([class, added], [0, 1]), ([added, class], [1, 0])]
+        // Every file's construct signatures are overloads, the later file's
+        // first, as a later block's precede an earlier one's within one file.
+        for (i, (sources, ctor_params)) in [([class, added], [1, 0]), ([added, class], [0, 1])]
             .iter()
             .enumerate()
         {
