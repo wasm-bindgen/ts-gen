@@ -947,7 +947,11 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
             }
             None => continue,
         };
-        merge_members(&mut members, std::mem::take(&mut class.members));
+        merge_members(
+            &mut members,
+            std::mem::take(&mut class.members),
+            Declared::Later,
+        );
         class.members = members;
         let target = gctx.get_type_mut(class_id);
         target.kind = TypeKind::Class(class);
@@ -1123,27 +1127,69 @@ fn declaration_name(kind: &crate::ir::TypeKind) -> Option<String> {
     }
 }
 
-/// Merge two member lists, deduplicating by (kind, name).
-/// Members from `incoming` override same-named members in `base`.
-fn merge_members(base: &mut Vec<crate::ir::Member>, incoming: Vec<crate::ir::Member>) {
+/// Which of two merging declarations a member list being merged in came
+/// from, relative to the one it merges into.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Declared {
+    Earlier,
+    Later,
+}
+
+/// Merge the members of another declaration of the same symbol into `base`,
+/// as TypeScript merges member tables. Methods, static methods and
+/// constructors are overloads: TypeScript takes a member's signatures from
+/// all of its declarations, so they accumulate, the earlier declaration's
+/// before the later's. Any other member is one entry per (kind, name), which
+/// `incoming` replaces in place, as merged properties must agree in type.
+fn merge_members(
+    base: &mut Vec<crate::ir::Member>,
+    incoming: Vec<crate::ir::Member>,
+    declared: Declared,
+) {
     use std::collections::HashMap;
 
-    // Build a map of existing members by key
+    let own = base.len();
     let mut by_key: HashMap<MemberKey, usize> = HashMap::new();
     for (i, m) in base.iter().enumerate() {
-        by_key.insert(member_key(m), i);
+        by_key.entry(member_key(m)).or_insert(i);
     }
 
+    // An earlier declaration's overloads go before the first of `base`'s
+    // own same-keyed ones, keeping their order.
+    let mut earlier: HashMap<MemberKey, Vec<crate::ir::Member>> = HashMap::new();
     for m in incoming {
         let key = member_key(&m);
-        if let Some(&idx) = by_key.get(&key) {
-            // Override existing
-            base[idx] = m;
-        } else {
-            by_key.insert(key, base.len());
-            base.push(m);
+        match by_key.get(&key) {
+            Some(&idx) if is_overload(&m) && declared == Declared::Earlier && idx < own => {
+                earlier.entry(key).or_default().push(m);
+            }
+            Some(_) if is_overload(&m) => base.push(m),
+            Some(&idx) => base[idx] = m,
+            None => {
+                by_key.insert(key, base.len());
+                base.push(m);
+            }
         }
     }
+    if earlier.is_empty() {
+        return;
+    }
+    for m in std::mem::take(base) {
+        if let Some(overloads) = earlier.remove(&member_key(&m)) {
+            base.extend(overloads);
+        }
+        base.push(m);
+    }
+}
+
+/// Whether a member is one of possibly several overloads of its key.
+fn is_overload(member: &crate::ir::Member) -> bool {
+    matches!(
+        member,
+        crate::ir::Member::Method(_)
+            | crate::ir::Member::StaticMethod(_)
+            | crate::ir::Member::Constructor(_)
+    )
 }
 
 /// A lightweight key for member deduplication.
@@ -1210,7 +1256,11 @@ fn merge_class_pairs(
                 // Merge into existing class
                 if let Some(&existing_idx) = class_map.get(&key) {
                     if let TypeKind::Class(ref mut existing) = result[existing_idx].kind {
-                        merge_members(&mut existing.members, class_decl.members.clone());
+                        merge_members(
+                            &mut existing.members,
+                            class_decl.members.clone(),
+                            Declared::Later,
+                        );
                     }
                     continue;
                 }
@@ -1220,7 +1270,11 @@ fn merge_class_pairs(
                     // Replace the interface with this class, merging members
                     let mut new_class = class_decl.clone();
                     if let TypeKind::Interface(ref iface) = result[iface_idx].kind {
-                        merge_members(&mut new_class.members, iface.members.clone());
+                        merge_members(
+                            &mut new_class.members,
+                            iface.members.clone(),
+                            Declared::Earlier,
+                        );
                         if new_class.extends.is_none() {
                             new_class.extends = iface.extends.first().cloned();
                         }
@@ -1253,7 +1307,11 @@ fn merge_class_pairs(
                 // Merge into existing class
                 if let Some(&class_idx) = class_map.get(&key) {
                     if let TypeKind::Class(ref mut class) = result[class_idx].kind {
-                        merge_members(&mut class.members, iface_decl.members.clone());
+                        merge_members(
+                            &mut class.members,
+                            iface_decl.members.clone(),
+                            Declared::Later,
+                        );
                         if class.extends.is_none() {
                             class.extends = iface_decl.extends.first().cloned();
                         }
@@ -1267,7 +1325,11 @@ fn merge_class_pairs(
                 // Merge into existing interface
                 if let Some(&existing_idx) = iface_map.get(&key) {
                     if let TypeKind::Interface(ref mut existing) = result[existing_idx].kind {
-                        merge_members(&mut existing.members, iface_decl.members.clone());
+                        merge_members(
+                            &mut existing.members,
+                            iface_decl.members.clone(),
+                            Declared::Later,
+                        );
                         existing
                             .construct
                             .extend(iface_decl.construct.iter().cloned());
@@ -1371,13 +1433,37 @@ mod tests {
         ModuleContext::Module(Rc::from(spec))
     }
 
+    fn overload(name: &str, ty: TypeRef) -> Member {
+        let Member::Method(mut m) = method(name) else {
+            unreachable!()
+        };
+        m.params = vec![crate::ir::Param {
+            name: "x".to_string(),
+            type_ref: ty,
+            optional: false,
+            variadic: false,
+            slice_mode: None,
+        }];
+        Member::Method(m)
+    }
+
+    fn param_types(members: &[Member]) -> Vec<(&str, &TypeRef)> {
+        members
+            .iter()
+            .filter_map(|m| match m {
+                Member::Method(m) => Some((m.name.as_str(), &m.params[0].type_ref)),
+                _ => None,
+            })
+            .collect()
+    }
+
     #[test]
     fn test_merge_members_dedup() {
         let mut base = vec![method("read"), method("write"), getter("name")];
-        let incoming = vec![method("write"), method("end")];
-        merge_members(&mut base, incoming);
+        let incoming = vec![getter("name"), method("end")];
+        merge_members(&mut base, incoming, Declared::Later);
 
-        // write is overridden (not duplicated), end is appended
+        // The getter is replaced in place, end is appended
         assert_eq!(base.len(), 4);
         assert!(matches!(&base[0], Member::Method(m) if m.name == "read"));
         assert!(matches!(&base[1], Member::Method(m) if m.name == "write"));
@@ -1386,10 +1472,96 @@ mod tests {
     }
 
     #[test]
+    fn test_merge_members_later_overloads_accumulate() {
+        let mut base = vec![
+            overload("m", TypeRef::String),
+            overload("m", TypeRef::Number),
+            overload("n", TypeRef::String),
+        ];
+        let incoming = vec![
+            overload("m", TypeRef::Boolean),
+            overload("n", TypeRef::Number),
+        ];
+        merge_members(&mut base, incoming, Declared::Later);
+        assert_eq!(
+            param_types(&base),
+            vec![
+                ("m", &TypeRef::String),
+                ("m", &TypeRef::Number),
+                ("n", &TypeRef::String),
+                ("m", &TypeRef::Boolean),
+                ("n", &TypeRef::Number),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_merge_members_earlier_overloads_go_first() {
+        let mut base = vec![
+            overload("a", TypeRef::String),
+            overload("m", TypeRef::String),
+        ];
+        let incoming = vec![
+            overload("m", TypeRef::Number),
+            overload("m", TypeRef::Boolean),
+            overload("z", TypeRef::Number),
+            overload("z", TypeRef::Boolean),
+        ];
+        merge_members(&mut base, incoming, Declared::Earlier);
+        assert_eq!(
+            param_types(&base),
+            vec![
+                ("a", &TypeRef::String),
+                ("m", &TypeRef::Number),
+                ("m", &TypeRef::Boolean),
+                ("m", &TypeRef::String),
+                ("z", &TypeRef::Number),
+                ("z", &TypeRef::Boolean),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_merge_members_constructors_and_statics_accumulate() {
+        let ctor = |ty: TypeRef| {
+            Member::Constructor(crate::ir::ConstructorMember {
+                params: vec![crate::ir::Param {
+                    name: "x".to_string(),
+                    type_ref: ty,
+                    optional: false,
+                    variadic: false,
+                    slice_mode: None,
+                }],
+                scope: ScopeId::DUMMY,
+                doc: None,
+                throws: crate::ir::Throws::None,
+            })
+        };
+        let mut base = vec![
+            ctor(TypeRef::String),
+            static_members(&[method("from")])[0].clone(),
+        ];
+        let incoming = vec![
+            ctor(TypeRef::Number),
+            static_members(&[method("from")])[0].clone(),
+        ];
+        merge_members(&mut base, incoming, Declared::Later);
+        assert_eq!(
+            base.iter().map(member_key).collect::<Vec<_>>(),
+            vec![
+                MemberKey::Constructor,
+                MemberKey::StaticMethod("from".into()),
+                MemberKey::Constructor,
+                MemberKey::StaticMethod("from".into()),
+            ]
+        );
+    }
+
+    #[test]
     fn test_merge_members_no_overlap() {
         let mut base = vec![method("foo")];
         let incoming = vec![method("bar")];
-        merge_members(&mut base, incoming);
+        merge_members(&mut base, incoming, Declared::Later);
         assert_eq!(base.len(), 2);
     }
 
@@ -1398,7 +1570,7 @@ mod tests {
         // ProtoGetter and Proto are different keys — both survive
         let mut base = vec![getter("data")];
         let incoming = vec![method("data")];
-        merge_members(&mut base, incoming);
+        merge_members(&mut base, incoming, Declared::Later);
         assert_eq!(base.len(), 2);
         assert!(matches!(&base[0], Member::Getter(g) if g.js_name == "data"));
         assert!(matches!(&base[1], Member::Method(m) if m.name == "data"));
@@ -1447,6 +1619,57 @@ mod tests {
             panic!("expected merged class");
         };
         assert_eq!(merged_class.members.len(), 2);
+    }
+
+    #[test]
+    fn test_merge_class_pairs_keeps_overloads_in_declaration_order() {
+        let iface_decl = |ty| {
+            decl(
+                TypeKind::Interface(iface("Widget", vec![overload("m", ty)])),
+                ModuleContext::Global,
+            )
+        };
+        let class_decl = |ty| {
+            decl(
+                TypeKind::Class(class(
+                    "Widget",
+                    vec![overload("m", ty)],
+                    ModuleContext::Global,
+                )),
+                ModuleContext::Global,
+            )
+        };
+        let members = |decls| {
+            let merged = merge_class_pairs(decls, |d| d.scope_id);
+            assert_eq!(merged.len(), 1);
+            match &merged[0].kind {
+                TypeKind::Class(c) => c.members.clone(),
+                TypeKind::Interface(i) => i.members.clone(),
+                _ => panic!("expected a class or interface"),
+            }
+        };
+        let order = |members: &[Member]| -> Vec<TypeRef> {
+            param_types(members)
+                .into_iter()
+                .map(|(_, ty)| ty.clone())
+                .collect()
+        };
+        use TypeRef::{Boolean, Number, String};
+
+        let merged = members(vec![
+            iface_decl(String),
+            iface_decl(Number),
+            iface_decl(Boolean),
+        ]);
+        assert_eq!(order(&merged), vec![String, Number, Boolean]);
+        let merged = members(vec![
+            iface_decl(String),
+            class_decl(Number),
+            iface_decl(Boolean),
+        ]);
+        assert_eq!(order(&merged), vec![String, Number, Boolean]);
+        let merged = members(vec![class_decl(String), iface_decl(Number)]);
+        assert_eq!(order(&merged), vec![String, Number]);
     }
 
     #[test]

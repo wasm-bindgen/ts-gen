@@ -118,9 +118,13 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "read")]
     pub fn try_read(this: &Duplex) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn write(this: &Duplex, data: &ArrayBuffer) -> bool;
+    pub fn write(this: &Duplex, data: &str) -> bool;
     #[wasm_bindgen(method, catch, js_name = "write")]
-    pub fn try_write(this: &Duplex, data: &ArrayBuffer) -> Result<bool, JsValue>;
+    pub fn try_write(this: &Duplex, data: &str) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, js_name = "write")]
+    pub fn write_with_array_buffer(this: &Duplex, data: &ArrayBuffer) -> bool;
+    #[wasm_bindgen(method, catch, js_name = "write")]
+    pub fn try_write_with_array_buffer(this: &Duplex, data: &ArrayBuffer) -> Result<bool, JsValue>;
     #[wasm_bindgen(method)]
     pub fn end(this: &Duplex);
     #[wasm_bindgen(method, catch, js_name = "end")]

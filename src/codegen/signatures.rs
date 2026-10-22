@@ -3005,6 +3005,27 @@ mod tests {
     }
 
     #[test]
+    fn test_identical_overloads_deduped() {
+        // Merged declarations can each declare the same overload.
+        let mut used = no_used();
+        let overload = [typed_param("x", TypeRef::String)];
+        let other = [typed_param("x", TypeRef::Number)];
+        let sigs = expand_overloads(
+            "foo",
+            &[&overload, &other, &overload],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+
+        let non_try: Vec<_> = sigs.iter().filter(|s| !s.catch).collect();
+        assert_eq!(non_try.len(), 2);
+        assert_eq!(non_try[0].rust_name, "foo");
+        assert_eq!(non_try[1].rust_name, "foo_with_f64");
+    }
+
+    #[test]
     fn test_overloads_shared_truncation_deduped() {
         // Two overloads that share a truncation: both truncate to (a)
         //   overload 1: (a: any, b?: any)

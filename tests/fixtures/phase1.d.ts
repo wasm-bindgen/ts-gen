@@ -61,14 +61,14 @@ declare class Counter {
   reset(): void;
 }
 
-// 1.5: Member dedup — two interface blocks with overlapping members
+// 1.5: Member merge — two interface blocks with overlapping members
 interface Duplex {
   read(): any;
   write(data: string): boolean;
 }
 
 interface Duplex {
-  // Override write with different signature
+  // A further overload of write, alongside the first block's
   write(data: ArrayBuffer): boolean;
   end(): void;
 }
