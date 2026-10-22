@@ -2247,7 +2247,9 @@ with or without an `export` prefix. An unexported `interface Options`
 or `declare var _Foo` is still exported by name through
 `export { _Foo as Foo }`, or referred to by the exported declarations,
 and either way it merges and resolves with them rather than being a
-global the output never emits.
+global the output never emits. As in TypeScript, `import x =
+require("m")` is such an import, but `import x = N.M`, which aliases an
+entity, makes a file a module only as `export import x = N.M`.
 
 ### The export map
 
