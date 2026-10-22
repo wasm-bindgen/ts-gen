@@ -2283,6 +2283,30 @@ are not visible to the file or to other modules, and repeated
 file or module reaches them with `import { Foo } from "<spec>"`, which
 resolves against the module's scopes before looking for a file.
 
+A file is looked for from the directory of the file the import is
+written in, also for an import in a `declare module` block, so the
+output does not depend on where ts-gen runs: `import { P } from "pkg"`
+in a block finds the `pkg` in the `node_modules` beside its file. As in
+TypeScript, two kinds of import are not resolved, each reported with
+TypeScript's message: a relative name such as `"./dep"` in a script's
+`declare module` block (TS2439), and any import or re-export in a module
+augmentation (TS2667, TS2666), whose imports belong at the top of its
+file. A
+name such an import would bind resolves as if it were absent.
+
+```ts
+// a.d.ts, a script
+declare module "lib" {
+  import { P } from "pkg";   // a's directory's node_modules/pkg
+  import { R } from "./rel"; // warning, not resolved
+}
+// b.d.ts, a module
+import { R } from "./rel";   // b's directory's rel.d.ts, seen by the block
+declare module "lib" {
+  import { Q } from "pkg";   // warning, not resolved
+}
+```
+
 ### Global scope
 
 As in TypeScript, there is one global scope. A script file's top-level

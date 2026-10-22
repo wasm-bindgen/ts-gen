@@ -263,3 +263,44 @@ fn typed_array_buffer_arguments_drop_without_a_warning() {
     assert!(output.status.success(), "{stderr}");
     assert!(!stderr.contains("warning"), "{stderr}");
 }
+
+/// The snapshot run is from the crate root; run from elsewhere, imports in
+/// `declare module` blocks still resolve from their own file, and the
+/// imports TypeScript rejects are reported.
+#[test]
+fn ambient_module_imports_resolve_independently_of_cwd() {
+    let dir = crate_root().join("tests/fixtures/ambient-module-import-base-dir");
+    let out_dir = TempDir::new("ambient-module-import-base-dir");
+    let out_file = out_dir.0.join("bindings.rs");
+    let output = Command::new(ts_gen_bin())
+        .current_dir(&out_dir.0)
+        .arg("--input")
+        .arg(dir.with_extension("d.ts"))
+        .arg("--input")
+        .arg(dir.join("script.d.ts"))
+        .arg("--input")
+        .arg(dir.join("aug.d.ts"))
+        .args(["--lib-name", "ambient-module-import-base-dir-aug"])
+        .args(["--export", "lib"])
+        .arg("--output")
+        .arg(&out_file)
+        .output()
+        .expect("Failed to execute ts-gen binary");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(output.status.success(), "{stderr}");
+    for expected in [
+        "script.d.ts:3:23: Import or export declaration in an ambient module declaration \
+         cannot reference module through relative module name.",
+        "aug.d.ts:4:23: Imports are not permitted in module augmentations.",
+    ] {
+        assert!(stderr.contains(expected), "{stderr}");
+    }
+    assert!(!stderr.contains("Could not resolve import"), "{stderr}");
+
+    let actual = std::fs::read_to_string(&out_file).unwrap();
+    let expected = std::fs::read_to_string(
+        crate_root().join("tests/snapshots/ambient-module-import-base-dir.rs"),
+    )
+    .unwrap();
+    assert_eq!(actual, expected);
+}
