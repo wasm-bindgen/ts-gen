@@ -1174,7 +1174,11 @@ fn member_key(member: &crate::ir::Member) -> MemberKey {
 /// Merge declarations with the same name AND the same module context:
 /// - Interface + Interface → merge members (TypeScript declaration merging)
 /// - Interface + Class → merge interface members into class (var+interface pattern)
-/// - Class + Class → merge members
+/// - Class + Class → merge members, for a redeclared constructor `var`
+///
+/// Pairs TypeScript rejects as duplicates, such as two `class` declarations
+/// or a type alias promoted to an interface beside an interface, never get
+/// here: phase 1 skips the later one (`CollectCtx::declare_type`).
 ///
 /// Types in different module contexts (e.g. a global `interface EmailMessage`
 /// and a `cloudflare:email`-scoped `class EmailMessage`) intentionally do NOT
@@ -2352,6 +2356,187 @@ mod tests {
             let constructs = constructs.unwrap_or_else(|| panic!("{name} has a variable"));
             assert_eq!(constructs.len(), 1, "{name}");
         }
+    }
+
+    fn duplicate_warnings(gctx: &GlobalContext) -> Vec<String> {
+        gctx.diagnostics
+            .diagnostics
+            .iter()
+            .filter(|d| d.message.starts_with("Duplicate identifier"))
+            .map(|d| match &d.location {
+                Some(loc) => format!("{loc}: {}", d.message),
+                None => d.message.clone(),
+            })
+            .collect()
+    }
+
+    /// The members of the one declaration of `name` among `module.types`.
+    fn member_names(module: &Module, gctx: &GlobalContext, name: &str) -> Vec<String> {
+        let decls: Vec<_> = module
+            .types
+            .iter()
+            .map(|&id| &gctx.get_type(id).kind)
+            .filter(|kind| declaration_name(kind).as_deref() == Some(name))
+            .collect();
+        assert_eq!(decls.len(), 1, "one declaration of {name}: {decls:?}");
+        let members = match decls[0] {
+            TypeKind::Interface(i) => &i.members,
+            TypeKind::Class(c) => &c.members,
+            other => panic!("{name} is not an interface or class: {other:?}"),
+        };
+        members
+            .iter()
+            .filter_map(|m| match m {
+                Member::Getter(g) => Some(g.js_name.clone()),
+                Member::Method(m) => Some(m.js_name.clone()),
+                _ => None,
+            })
+            .collect()
+    }
+
+    #[test]
+    fn duplicate_type_declarations_keep_the_first() {
+        let src = "type Dup = { a: number };\n\
+                   interface Dup { b: string }\n\
+                   interface First { b: string }\n\
+                   type First = { a: { x: number } };\n\
+                   declare class Two { a(): void }\n\
+                   declare class Two { b(): void }\n\
+                   type Prim = string;\n\
+                   interface Prim { b: string }\n\
+                   declare enum Color { Red }\n\
+                   interface Color { x: number }\n\
+                   declare var Ctor: { new (): Ctor };\n\
+                   interface Ctor { i(): void }\n\
+                   type Ctor = { a: number };\n";
+        let (module, gctx) = parse_single_source(src, None).unwrap();
+        assert_eq!(
+            duplicate_warnings(&gctx),
+            [
+                "<input>:2:11: Duplicate identifier `Dup`: interface conflicts with the type \
+                 alias `Dup` declared earlier, skipping it",
+                "<input>:4:6: Duplicate identifier `First`: type alias conflicts with the \
+                 interface `First` declared earlier, skipping it",
+                "<input>:6:15: Duplicate identifier `Two`: class conflicts with the class \
+                 `Two` declared earlier, skipping it",
+                "<input>:8:11: Duplicate identifier `Prim`: interface conflicts with the type \
+                 alias `Prim` declared earlier, skipping it",
+                "<input>:10:11: Duplicate identifier `Color`: interface conflicts with the enum \
+                 `Color` declared earlier, skipping it",
+                "<input>:13:6: Duplicate identifier `Ctor`: type alias conflicts with the \
+                 interface `Ctor` declared earlier, skipping it",
+            ]
+        );
+        assert_eq!(member_names(&module, &gctx, "Dup"), ["a"]);
+        assert_eq!(member_names(&module, &gctx, "First"), ["b"]);
+        assert_eq!(member_names(&module, &gctx, "Two"), ["a"]);
+        // The interface still makes the `var` a class, as the skipped alias
+        // never took the name.
+        assert_eq!(member_names(&module, &gctx, "Ctor"), ["i"]);
+        // Nothing is hoisted out of the skipped alias.
+        let names: Vec<_> = module
+            .types
+            .iter()
+            .filter_map(|&id| declaration_name(&gctx.get_type(id).kind))
+            .collect();
+        assert_eq!(names, ["Dup", "First", "Two", "Prim", "Color", "Ctor"]);
+        let scope = module.file_scopes[0];
+        let resolved = |name| &gctx.get_type(gctx.resolve_path(scope, name).unwrap()).kind;
+        assert!(matches!(resolved("Prim"), TypeKind::TypeAlias(_)));
+        assert!(matches!(resolved("Color"), TypeKind::NumericEnum(_)));
+    }
+
+    #[test]
+    fn allowed_merges_report_no_duplicates() {
+        let src = r#"
+            interface I { a: number }
+            interface I { b: string }
+            interface C1 { i(): void }
+            declare class C1 { c(): void }
+            declare class C2 { c(): void }
+            interface C2 { i(): void }
+            declare var V: { prototype: V; new (): V };
+            interface V { v(): void }
+            type A = { a: number };
+            declare namespace A { function make(): A; }
+            declare enum E { X }
+            declare enum E { Y = 1 }
+            declare namespace E { function parse(s: string): E; }
+            declare class K {}
+            declare namespace K { const k: number; }
+            declare function f(): void;
+            declare function f(n: number): void;
+            declare namespace f { const g: number; }
+            export type Stub = I;
+            export declare const Stub: { new (): I };
+        "#;
+        let (module, gctx) = parse_single_source(src, Some("m")).unwrap();
+        assert_eq!(duplicate_warnings(&gctx), Vec::<String>::new());
+        assert_eq!(member_names(&module, &gctx, "I"), ["a", "b"]);
+        assert_eq!(member_names(&module, &gctx, "C1"), ["c", "i"]);
+        assert_eq!(member_names(&module, &gctx, "C2"), ["c", "i"]);
+    }
+
+    #[test]
+    fn duplicate_type_declarations_across_files_keep_the_earlier() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-duplicates-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let a = dir.join("a.d.ts");
+        let b = dir.join("b.d.ts");
+        std::fs::write(
+            &a,
+            r#"
+                type Dup = { a: number };
+                interface Open { a: number }
+                declare class Two { a(): void }
+                declare module "m" {
+                    export type Opts = { a: number };
+                }
+            "#,
+        )
+        .unwrap();
+        std::fs::write(
+            &b,
+            r#"
+                interface Dup { b: string }
+                interface Open { b: string }
+                declare class Two { b(): void }
+                declare function use(d: Dup): void;
+                declare module "m" {
+                    export interface Opts { b: string }
+                    export function make(): Opts;
+                }
+            "#,
+        )
+        .unwrap();
+        let result = parse_dts_files(&[&a, &b], None);
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (module, gctx) = result.unwrap();
+
+        let warnings = duplicate_warnings(&gctx);
+        assert_eq!(warnings.len(), 3, "{warnings:?}");
+        for (warning, name) in warnings.iter().zip(["Dup", "Two", "Opts"]) {
+            assert!(warning.contains("b.d.ts:"), "{warning}");
+            assert!(warning.contains(&format!("`{name}`")), "{warning}");
+        }
+        assert_eq!(member_names(&module, &gctx, "Dup"), ["a"]);
+        assert_eq!(member_names(&module, &gctx, "Open"), ["a", "b"]);
+        assert_eq!(member_names(&module, &gctx, "Two"), ["a"]);
+
+        // The later file's references reach the earlier declaration, not a
+        // placeholder of the skipped one.
+        let file_b = module.file_scopes[1];
+        let dup = gctx.resolve_path(file_b, "Dup").unwrap();
+        assert_eq!(gctx.declarations(module.global_scope, "Dup"), [dup]);
+        let opts = gctx.declarations(gctx.ambient_modules["m"], "Opts");
+        assert_eq!(opts.len(), 1);
+        let TypeKind::Interface(i) = &gctx.get_type(opts[0]).kind else {
+            panic!("expected the alias's interface");
+        };
+        assert!(!i
+            .members
+            .iter()
+            .any(|m| matches!(m, Member::Getter(g) if g.js_name == "b")));
     }
 
     #[test]

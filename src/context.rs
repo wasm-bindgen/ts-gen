@@ -91,6 +91,10 @@ pub struct GlobalContext {
     /// whose type `bind_constructor_vars` resolves once every file is
     /// inserted.
     pub(crate) ctor_vars: Vec<(TypeId, ScopeId)>,
+    /// The kinds of type declaration each name has, by the scope its
+    /// declarations merge in, over every file collected so far: what a
+    /// later declaration of the name may merge with.
+    pub(crate) declared: std::collections::HashMap<(ScopeId, String), crate::ir::DeclFlags>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -196,6 +200,7 @@ impl GlobalContext {
             declarations: std::collections::HashMap::new(),
             static_sides: std::collections::HashMap::new(),
             ctor_vars: Vec::new(),
+            declared: std::collections::HashMap::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),

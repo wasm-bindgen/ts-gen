@@ -1034,6 +1034,10 @@ pub struct TypeRegistry {
     /// Key of the export map listing the globals the file declares, if it
     /// declares any (see [`Module::file_roots`]).
     pub globals: Option<crate::parse::scope::ScopeId>,
+    /// Type declarations TypeScript rejects as duplicates of an earlier
+    /// declaration of their name, by the span start of the name. Phase 2
+    /// doesn't populate them.
+    pub duplicates: std::collections::HashSet<u32>,
 }
 
 impl TypeRegistry {
@@ -1080,9 +1084,121 @@ pub enum RegisteredKind {
     Namespace,
 }
 
+/// The kinds of type declaration a name has in the container its
+/// declarations merge in, as TypeScript's binder records them in a symbol's
+/// flags. A declaration whose kind excludes one the name already has is a
+/// duplicate (TS's `SymbolFlags*Excludes`). Values and namespaces merge with
+/// any type declaration, so only these four are tracked.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct DeclFlags(u8);
+
+impl DeclFlags {
+    pub const CLASS: Self = Self(1);
+    pub const INTERFACE: Self = Self(1 << 1);
+    pub const ENUM: Self = Self(1 << 2);
+    pub const TYPE_ALIAS: Self = Self(1 << 3);
+
+    const KINDS: [(Self, &'static str); 4] = [
+        (Self::CLASS, "class"),
+        (Self::INTERFACE, "interface"),
+        (Self::ENUM, "enum"),
+        (Self::TYPE_ALIAS, "type alias"),
+    ];
+
+    /// What a declaration of each kind in `self` can't merge with: a class
+    /// merges only with interfaces, an interface with interfaces and
+    /// classes, an enum with enums, and a type alias with none of them.
+    fn excludes(self) -> Self {
+        let mut excludes = 0;
+        for (kind, _) in Self::KINDS {
+            if self.0 & kind.0 != 0 {
+                excludes |= match kind {
+                    Self::CLASS => Self::CLASS.0 | Self::ENUM.0 | Self::TYPE_ALIAS.0,
+                    Self::INTERFACE => Self::ENUM.0 | Self::TYPE_ALIAS.0,
+                    Self::ENUM => Self::CLASS.0 | Self::INTERFACE.0 | Self::TYPE_ALIAS.0,
+                    _ => u8::MAX,
+                };
+            }
+        }
+        Self(excludes)
+    }
+
+    /// The kinds among `existing` a declaration of this kind is a duplicate
+    /// of; empty when it merges with them.
+    pub fn conflicts(self, existing: Self) -> Self {
+        Self(self.excludes().0 & existing.0)
+    }
+
+    pub fn is_empty(self) -> bool {
+        self.0 == 0
+    }
+
+    pub fn insert(&mut self, other: Self) {
+        self.0 |= other.0;
+    }
+
+    /// The kinds by keyword, `"class and interface"`.
+    pub fn describe(self) -> String {
+        Self::KINDS
+            .iter()
+            .filter(|(kind, _)| self.0 & kind.0 != 0)
+            .map(|&(_, name)| name)
+            .collect::<Vec<_>>()
+            .join(" and ")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn decl_flags_follow_typescript_excludes() {
+        use DeclFlags as F;
+        let allowed = [
+            (F::INTERFACE, F::INTERFACE),
+            (F::INTERFACE, F::CLASS),
+            (F::CLASS, F::INTERFACE),
+            (F::ENUM, F::ENUM),
+        ];
+        for (new, existing) in allowed {
+            assert!(
+                new.conflicts(existing).is_empty(),
+                "{new:?} after {existing:?}"
+            );
+        }
+        let rejected = [
+            (F::TYPE_ALIAS, F::TYPE_ALIAS),
+            (F::TYPE_ALIAS, F::INTERFACE),
+            (F::INTERFACE, F::TYPE_ALIAS),
+            (F::TYPE_ALIAS, F::CLASS),
+            (F::CLASS, F::TYPE_ALIAS),
+            (F::TYPE_ALIAS, F::ENUM),
+            (F::ENUM, F::TYPE_ALIAS),
+            (F::CLASS, F::CLASS),
+            (F::CLASS, F::ENUM),
+            (F::ENUM, F::CLASS),
+            (F::INTERFACE, F::ENUM),
+            (F::ENUM, F::INTERFACE),
+        ];
+        for (new, existing) in rejected {
+            assert_eq!(
+                new.conflicts(existing),
+                existing,
+                "{new:?} after {existing:?}"
+            );
+        }
+        // A second class conflicts with the earlier class, not with the
+        // interface it merged with.
+        let mut merged = F::INTERFACE;
+        merged.insert(F::CLASS);
+        assert_eq!(F::CLASS.conflicts(merged), F::CLASS);
+        assert!(F::INTERFACE.conflicts(merged).is_empty());
+        assert_eq!(
+            F::TYPE_ALIAS.conflicts(merged).describe(),
+            "class and interface"
+        );
+    }
 
     #[test]
     fn format_ts_primitives_use_lowercase_keywords() {

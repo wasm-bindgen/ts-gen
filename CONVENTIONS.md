@@ -38,6 +38,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-)
 * [String and numeric enums](#string-and-numeric-enums)
 * [Multiple-context name resolution](#multiple-context-name-resolution)
+* [Duplicate identifiers](#duplicate-identifiers)
 * [External type mapping and web platform defaults](#external-type-mapping-and-web-platform-defaults)
 
 ---
@@ -495,7 +496,9 @@ Interfaces are classified by shape (see `parse/classify.rs`):
   bindings, the builder just calls them. See [Dictionary builders](#dictionary-builders).
 
 Multiple interface declarations with the same name + module context merge:
-their members union, their `extends` lists merge.
+their members union, their `extends` lists merge. An interface also merges
+into a same-named class; two classes, or an interface and a type alias or
+enum, don't (see [Duplicate identifiers](#duplicate-identifiers)).
 
 ## Dictionary builders
 
@@ -835,7 +838,9 @@ the alias's type parameters become the interface's. Type aliases whose
 target is a single inline literal, a union of inline literals, or an
 intersection (see below) promote directly to interfaces; aliases to
 anything else (named types, primitives, function types, generics,
-`Record<…>`, etc.) keep their existing alias semantics.
+`Record<…>`, etc.) keep their existing alias semantics. The promoted
+interface is still an alias to TypeScript, so a same-named `interface`
+doesn't merge into it (see [Duplicate identifiers](#duplicate-identifiers)).
 
 ### Union of inline literals
 
@@ -2920,7 +2925,48 @@ When the same name appears in different `ModuleContext`s (e.g. a global
 `interface EmailMessage` and a `cloudflare:email`-scoped class
 `EmailMessage`), they remain distinct types. `merge_class_pairs` keys on
 `(name, ModuleContext)` to keep them separate. Same-context same-name
-still merges as expected.
+still merges as expected, as long as TypeScript allows the pair (see
+[Duplicate identifiers](#duplicate-identifiers)).
+
+## Duplicate identifiers
+
+Declarations of one name in one container (a file's top level, a
+namespace, a `declare module` body, or the global scope across files)
+merge only as TypeScript merges them. TypeScript reports "Duplicate
+identifier" for a declaration whose keyword can't merge with one the
+name already has:
+
+| Later declaration | Conflicts with an earlier                 |
+| ----------------- | ----------------------------------------- |
+| `type`            | `type`, `interface`, `class`, `enum`      |
+| `class`           | `type`, `class`, `enum`                   |
+| `interface`       | `type`, `enum`                            |
+| `enum`            | `type`, `interface`, `class`              |
+
+What a `type` alias becomes doesn't matter: one [promoted to an
+interface](#type-alias-position), a discriminated union or a string enum
+is still an alias, so it merges with no interface. As in TypeScript's
+binder, the first declaration keeps the name. The later one is skipped
+with a warning pointing at its name, and nothing of it is emitted, not
+even the interfaces its inline literals would hoist:
+
+```ts
+type Dup = { a: number };
+interface Dup { b: string }   // warning: Duplicate identifier `Dup`: interface conflicts with the type alias `Dup` declared earlier, skipping it
+```
+
+```rust
+pub type Dup;
+pub fn a(this: &Dup) -> f64;   // no `b`
+```
+
+Everything else still merges: interfaces with interfaces and with a
+class, enums with enums, a namespace with a class, function, enum or
+alias, an alias with a constructor `var` (see [Constructor variables
+named by a type alias](#constructor-variables-named-by-a-type-alias)),
+an interface with a constructor `var`, and a function's overloads. Only
+these four keywords are checked: a value TypeScript also rejects, such as
+a `var` beside a `class` or an `enum`, merges as before.
 
 ## External type mapping and web platform defaults
 
