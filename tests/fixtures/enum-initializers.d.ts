@@ -12,7 +12,7 @@ export declare enum Later {
   X = 16,
 }
 
-export declare enum Mode {
+export declare const enum Mode {
   A = Base.Default,
   B,
   C = A | 8,
@@ -31,21 +31,21 @@ export declare enum Label {
   Joined = Ns.Inner.Value + "-label",
 }
 
-export declare enum Merged {
+export declare const enum Merged {
   A = 1,
 }
 
-export declare enum Merged {
+export declare const enum Merged {
   B = A + 1,
   C,
 }
 
-// Each declaration's first member counts from 0 without an initialiser.
-export declare enum Restart {
+// Each declaration of a const enum counts from 0 without an initialiser.
+export declare const enum Restart {
   A = 5,
 }
 
-export declare enum Restart {
+export declare const enum Restart {
   B,
   C,
 }

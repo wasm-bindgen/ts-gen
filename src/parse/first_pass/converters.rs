@@ -261,6 +261,7 @@ pub fn convert_ts_enum(
         name: enum_decl.id.name.to_string(),
         members,
         global: false,
+        is_const: enum_decl.r#const,
         span: Span {
             start: enum_decl.id.span.start,
             end: enum_decl.id.span.end,

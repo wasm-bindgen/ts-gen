@@ -12,7 +12,7 @@ export declare enum Version {
   Latest = 2,
   Current = V2,
   Qualified = Version.V1,
-  Next,
+  Next = 2,
 }
 
 export declare enum Flags {

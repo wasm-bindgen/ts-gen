@@ -40,6 +40,8 @@ struct Member<'g> {
     scope: ScopeId,
     /// The index of its declaration among the enum's.
     decl: usize,
+    /// Its declaration is a `const enum`.
+    is_const: bool,
     state: State,
 }
 
@@ -62,11 +64,16 @@ impl<'g> Enums<'g> {
             State::InProgress => return None,
             State::Pending => member.state = State::InProgress,
         }
-        let (init, scope, decl) = (member.init, member.scope, member.decl);
+        let (init, scope, decl, is_const) =
+            (member.init, member.scope, member.decl, member.is_const);
         // Each declaration's first member starts from 0.
         let first = index == 0 || self.members[&key][index - 1].decl != decl;
         let value = match init {
             Some(init) => self.eval(init, key, index, scope),
+            // Every enum in a `.d.ts` is ambient, and TypeScript treats an
+            // ambient non-const enum's member without an initialiser as
+            // computed rather than auto-incremented.
+            None if !is_const => None,
             None if first => Some(EnumValue::Num(0.0)),
             None => match self.value(key, index - 1) {
                 Some(EnumValue::Num(prev)) => Some(EnumValue::Num(prev + 1.0)),
@@ -268,6 +275,7 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
                     span: m.span,
                     scope: decl.scope_id,
                     decl: index,
+                    is_const: e.is_const,
                     state: State::Pending,
                 }));
             }
@@ -318,7 +326,8 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
 /// doesn't fit the kind is skipped with a warning: a guessed discriminant
 /// could repeat a real member's value and make that member an alias of it.
 /// wasm-bindgen can't export an enum without variants, so one left with
-/// none is erased to `JsValue`.
+/// none is erased: to `number` when no member has an initialiser, as every
+/// such member is a number, and to `JsValue` otherwise.
 fn finish(
     name: &str,
     file: Option<FileId>,
@@ -353,9 +362,18 @@ fn finish(
     crate::util::naming::dedup_names(&mut rust_names);
     let name = name.to_string();
     if kept.is_empty() {
+        // A member without an initialiser is numeric even when its value is
+        // only known at runtime: TypeScript requires a computed member to be
+        // a number, and accepts any number where the enum is expected. One
+        // with an initialiser that didn't evaluate could be a string.
+        let (target, erased) = if !members.is_empty() && members.iter().all(|m| m.init.is_none()) {
+            (TypeRef::Number, "a number")
+        } else {
+            (TypeRef::Any, "JsValue")
+        };
         diag.warn_span_in(
             file,
-            format!("Enum `{name}` has no member with a constant value, erasing it to JsValue"),
+            format!("Enum `{name}` has no member with a constant value, erasing it to {erased}"),
             span,
             None,
             None,
@@ -363,7 +381,7 @@ fn finish(
         return TypeKind::TypeAlias(TypeAliasDecl {
             name,
             type_params: vec![],
-            target: TypeRef::Any,
+            target,
             from_module: None,
             body_scope: scope,
         });
@@ -523,7 +541,10 @@ mod tests {
 
     #[test]
     fn member_references_take_the_referenced_value() {
-        let values = numeric("declare enum E { A = 1, B = 2, C = B, D = E.A, F }", "E");
+        let values = numeric(
+            "declare const enum E { A = 1, B = 2, C = B, D = E.A, F }",
+            "E",
+        );
         assert_eq!(
             values,
             pairs(&[("A", 1), ("B", 2), ("C", 2), ("D", 1), ("F", 2)])
@@ -557,7 +578,7 @@ mod tests {
     #[test]
     fn members_without_a_constant_value_are_skipped() {
         let values = numeric(
-            "declare enum E { A = 1, B = Other.X, C = 2, D = B, F }",
+            "declare const enum E { A = 1, B = Other.X, C = 2, D = B, F }",
             "E",
         );
         assert_eq!(values, pairs(&[("A", 1), ("C", 2)]));
@@ -590,7 +611,7 @@ mod tests {
         let (kinds, _) = parse(
             "declare enum F { R = 1 << 0, W = 1 << 1, RW = R | W } \
              declare enum K { A = \"a\" + \"b\", B = A } \
-             declare enum E { A, B } \
+             declare const enum E { A, B } \
              declare enum S { A = Other.A, B = K.A }",
         );
         assert!(matches!(find(&kinds, "F"), TypeKind::NumericEnum(_)));
@@ -620,7 +641,7 @@ mod tests {
     #[test]
     fn references_reach_other_enums() {
         let src = "declare enum Base { Default = 2, Other = 4 } \
-                   declare enum Mode { A = Base.Default, B, C = A | 8, D = Later.X + Mode.B, \
+                   declare const enum Mode { A = Base.Default, B, C = A | 8, D = Later.X + Mode.B, \
                    E = Base[\"Other\"] } \
                    declare enum Later { X = 16 } \
                    declare namespace Ns { enum Inner { Value = \"inner\" } } \
@@ -637,7 +658,8 @@ mod tests {
 
     #[test]
     fn merged_declarations_evaluate_as_one() {
-        let src = "/** Merged. */ declare enum E { A = 1 } declare enum E { B = A + 1, C }";
+        let src =
+            "/** Merged. */ declare const enum E { A = 1 } declare const enum E { B = A + 1, C }";
         let (kinds, warnings) = parse(src);
         assert_eq!(kinds.len(), 1);
         assert!(warnings.is_empty(), "{warnings:?}");
@@ -646,11 +668,66 @@ mod tests {
 
     #[test]
     fn each_declaration_counts_from_zero() {
-        let src = "declare enum M { A = 5 } declare enum M { B, C } declare enum M { D = A + C }";
+        let src = "declare const enum M { A = 5 } declare const enum M { B, C } \
+                   declare const enum M { D = A + C }";
         assert_eq!(
             numeric(src, "M"),
             pairs(&[("A", 5), ("B", 0), ("C", 1), ("D", 6)])
         );
+    }
+
+    #[test]
+    fn ambient_members_without_an_initialiser_are_computed() {
+        let src = "declare enum Amb { A, B } \
+                   declare enum Unresolved { A, B = Other.X } \
+                   declare enum Mixed { A = 1, B } \
+                   declare namespace N { enum Inner { A } }";
+        let (module, gctx) = crate::parse::parse_single_source(src, None).unwrap();
+        // Every member of `Amb` is a number; `Other.X` could be a string.
+        let targets: Vec<_> = module.types[..2]
+            .iter()
+            .map(|&id| match &gctx.get_type(id).kind {
+                TypeKind::TypeAlias(a) => a.target.clone(),
+                kind => panic!("{kind:?}"),
+            })
+            .collect();
+        assert_eq!(
+            targets,
+            [crate::ir::TypeRef::Number, crate::ir::TypeRef::Any]
+        );
+        assert_eq!(numeric(src, "Mixed"), pairs(&[("A", 1)]));
+        assert_eq!(
+            parse(src).1,
+            [
+                "Enum `Amb::A` has no constant value, skipping it",
+                "Enum `Amb::B` has no constant value, skipping it",
+                "Enum `Amb` has no member with a constant value, erasing it to a number",
+                "Enum `Unresolved::A` has no constant value, skipping it",
+                "Enum `Unresolved::B` has no constant value, skipping it",
+                "Enum `Unresolved` has no member with a constant value, erasing it to JsValue",
+                "Enum `Mixed::B` has no constant value, skipping it",
+                "Enum `Inner::A` has no constant value, skipping it",
+                "Enum `Inner` has no member with a constant value, erasing it to a number",
+            ]
+        );
+    }
+
+    #[test]
+    fn const_enum_members_continue_from_the_previous_number() {
+        let src = "declare const enum C { A, B, C = 10, D, E = \"e\", F }";
+        assert_eq!(
+            numeric(src, "C"),
+            pairs(&[("A", 0), ("B", 1), ("C", 10), ("D", 11)])
+        );
+        assert_eq!(
+            parse(src).1,
+            [
+                "Enum `C::E` is a string in a numeric enum, skipping it",
+                "Enum `C::F` has no constant value, skipping it",
+            ]
+        );
+        let values = string("declare const enum S { A = \"a\", B }", "S");
+        assert_eq!(values, pairs(&[("A", "a".to_string())]));
     }
 
     #[test]
