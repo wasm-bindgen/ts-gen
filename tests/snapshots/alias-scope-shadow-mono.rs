@@ -18,11 +18,17 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>;
+    pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method)]
-    pub fn get<T>(this: &Holder<T>) -> T;
+    pub fn get<T>(this: &Holder<T>) -> T
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get<T>(this: &Holder<T>) -> Result<T, JsValue>;
+    pub fn try_get<T>(this: &Holder<T>) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi;
 }
 pub mod shadow {
     #[allow(unused_imports)]

@@ -1577,12 +1577,22 @@ Passing `--experimental-generic-mono` selects wasm-bindgen's experimental
 per-monomorphization path. Every generated extern block receives
 `experimental_generic_mono`, type parameters omit the `JsGeneric` bound, and
 bare type-parameter arguments are passed by value so each concrete Rust type
-uses its native ABI representation:
+uses its native ABI representation. Each import states the ABI bounds it
+needs, so a generic caller can read them off the declaration: `IntoWasmAbi`
+for an argument (`T: RefIntoWasmAbi` for a borrowed `&T`, and
+`T: VectorRefIntoWasmAbi` for a borrowed `&[T]`), `FromWasmAbi` for a return,
+`OptionIntoWasmAbi`/`OptionFromWasmAbi` for `Option<T>`, and `'static` when
+awaited. Imported types such as `Holder<T>` need only `'static`:
 
 ```rust
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn identity<T>(value: T) -> T;
+    pub fn identity<T>(value: T) -> T
+    where
+        T: IntoWasmAbi + FromWasmAbi;
+    pub async fn load_holder<T>(this: &Store<T>) -> Result<Holder<T>, JsValue>
+    where
+        T: 'static;
 }
 ```
 
@@ -1602,12 +1612,12 @@ returning a builder does not constrain its type parameter.
 
 Array-buffer-view helper parameters retain their `TypedArray` widening bound.
 In per-monomorphization mode the helper also repeats the reference ABI bound
-that wasm-bindgen places on the generated import shim:
+that the import it calls states:
 
 ```rust
 pub fn new<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptions
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    T: ::wasm_bindgen::convert::RefIntoWasmAbi,
 { /* … */ }
 ```
 

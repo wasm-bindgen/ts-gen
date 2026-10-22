@@ -18,16 +18,16 @@ wasm-bindgen = "0.2.128"
 wasm-bindgen-futures = "0.4.78"
 wasm-bindgen-test = "0.3.78"
 
-# Temporarily track wasm-bindgen/wasm-bindgen#5384 (`slice = view | array |
-# copy` import argument modes, element-wise borrowed slices) on top of main,
-# which includes #5383 (unbounded `PartialEq`/`Eq` on imported types), #5381,
-# #5376, #5377 and #5341, until these ship in a release. All four crates must
-# come from the same source.
+# Temporarily track wasm-bindgen/wasm-bindgen main, which includes #5385
+# (explicit ABI bounds on experimental_generic_mono imports), #5384 (`slice =
+# view | array | copy` import argument modes), #5383, #5381, #5376, #5377 and
+# #5341, until these ship in a release. All four crates must come from the
+# same source.
 [patch.crates-io]
-js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "69d72955b2ee1cbf9cad77b47908c29fef532588" }
-wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "69d72955b2ee1cbf9cad77b47908c29fef532588" }
-wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "69d72955b2ee1cbf9cad77b47908c29fef532588" }
-wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "69d72955b2ee1cbf9cad77b47908c29fef532588" }
+js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "6513d6b118f4aa934b3ef553bb2e3ce8280791f2" }
+wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "6513d6b118f4aa934b3ef553bb2e3ce8280791f2" }
+wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "6513d6b118f4aa934b3ef553bb2e3ce8280791f2" }
+wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "6513d6b118f4aa934b3ef553bb2e3ce8280791f2" }
 
 [package]
 categories = ["wasm", "development-tools::ffi"]
