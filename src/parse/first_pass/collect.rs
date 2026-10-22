@@ -145,7 +145,7 @@ impl<'a> CollectCtx<'a> {
             // Declaration variants
             ast::Statement::ClassDeclaration(class) => {
                 if let Some(ref id) = class.id {
-                    self.register_type(&id.name, ir::RegisteredKind::Class, ctx, scope, exported);
+                    self.collect_class_name(id, ctx, scope, exported);
                 }
             }
             ast::Statement::TSInterfaceDeclaration(iface) => {
@@ -175,8 +175,7 @@ impl<'a> CollectCtx<'a> {
                 self.collect_namespace_names(ns, ctx, scope, exported);
             }
             ast::Statement::TSEnumDeclaration(enum_decl) => {
-                let name = enum_decl.id.name.to_string();
-                self.register_type(&name, ir::RegisteredKind::TsEnum, ctx, scope, exported);
+                self.collect_enum_name(enum_decl, ctx, scope, exported);
             }
             ast::Statement::TSGlobalDeclaration(global) => {
                 self.collect_global(&global.body.body);
@@ -223,6 +222,9 @@ impl<'a> CollectCtx<'a> {
             ast::Statement::ExportDefaultDeclaration(export) => match &export.declaration {
                 ast::ExportDefaultDeclarationKind::ClassDeclaration(class) => {
                     if let Some(ref id) = class.id {
+                        if !self.declare_type(id, ir::DeclFlags::CLASS, ctx, scope) {
+                            return;
+                        }
                         self.register_type(&id.name, ir::RegisteredKind::Class, ctx, scope, false);
                         if matches!(ctx, ir::ModuleContext::Module(_)) {
                             self.export_default(scope, &id.name);
@@ -336,7 +338,7 @@ impl<'a> CollectCtx<'a> {
         match decl {
             ast::Declaration::ClassDeclaration(class) => {
                 if let Some(ref id) = class.id {
-                    self.register_type(&id.name, ir::RegisteredKind::Class, ctx, scope, exported);
+                    self.collect_class_name(id, ctx, scope, exported);
                 }
             }
             ast::Declaration::TSInterfaceDeclaration(iface) => {
@@ -366,8 +368,7 @@ impl<'a> CollectCtx<'a> {
                 self.collect_namespace_names(ns, ctx, scope, exported);
             }
             ast::Declaration::TSEnumDeclaration(enum_decl) => {
-                let name = enum_decl.id.name.to_string();
-                self.register_type(&name, ir::RegisteredKind::TsEnum, ctx, scope, exported);
+                self.collect_enum_name(enum_decl, ctx, scope, exported);
             }
             ast::Declaration::TSGlobalDeclaration(global) => {
                 self.collect_global(&global.body.body);
@@ -394,6 +395,78 @@ impl<'a> CollectCtx<'a> {
 
     // ─── Per-type helpers ────────────────────────────────────────────
 
+    /// Record a type declaration of `id` in the container its declarations
+    /// merge in, as `InsertCtx::insert` binds it: the global scope for a
+    /// global, else the exports its blocks share, else its own block.
+    ///
+    /// Returns `false`, with a warning, for a declaration TypeScript rejects
+    /// as a duplicate of an earlier one there, in this file or an earlier
+    /// one. TS gives such a declaration a symbol of its own, so the earlier
+    /// declaration keeps the name and this one is left unregistered and
+    /// unpopulated.
+    fn declare_type(
+        &mut self,
+        id: &ast::BindingIdentifier<'_>,
+        kind: ir::DeclFlags,
+        ctx: &ir::ModuleContext,
+        scope: ScopeId,
+    ) -> bool {
+        let name = id.name.as_str();
+        let global = (*ctx == ir::ModuleContext::Global && scope == self.file_scope)
+            .then(|| self.gctx.scopes.get(scope).parent)
+            .flatten();
+        let container = global.unwrap_or_else(|| self.gctx.binding_scope(scope, name));
+        let declared = self
+            .gctx
+            .declared
+            .entry((container, name.to_string()))
+            .or_default();
+        let conflicts = kind.conflicts(*declared);
+        if conflicts.is_empty() {
+            declared.insert(kind);
+            return true;
+        }
+        self.diag.warn_span(
+            format!(
+                "Duplicate identifier `{name}`: {} conflicts with the {} `{name}` declared \
+                 earlier, skipping it",
+                kind.describe(),
+                conflicts.describe()
+            ),
+            id.span.start,
+            id.span.end,
+            None,
+            None,
+        );
+        self.registry.duplicates.insert(id.span.start);
+        false
+    }
+
+    fn collect_class_name(
+        &mut self,
+        id: &ast::BindingIdentifier<'_>,
+        ctx: &ir::ModuleContext,
+        scope: ScopeId,
+        exported: bool,
+    ) {
+        if self.declare_type(id, ir::DeclFlags::CLASS, ctx, scope) {
+            self.register_type(&id.name, ir::RegisteredKind::Class, ctx, scope, exported);
+        }
+    }
+
+    fn collect_enum_name(
+        &mut self,
+        enum_decl: &ast::TSEnumDeclaration<'_>,
+        ctx: &ir::ModuleContext,
+        scope: ScopeId,
+        exported: bool,
+    ) {
+        if self.declare_type(&enum_decl.id, ir::DeclFlags::ENUM, ctx, scope) {
+            let name = enum_decl.id.name.as_str();
+            self.register_type(name, ir::RegisteredKind::TsEnum, ctx, scope, exported);
+        }
+    }
+
     fn collect_interface_name(
         &mut self,
         iface: &ast::TSInterfaceDeclaration<'_>,
@@ -401,6 +474,9 @@ impl<'a> CollectCtx<'a> {
         scope: ScopeId,
         exported: bool,
     ) {
+        if !self.declare_type(&iface.id, ir::DeclFlags::INTERFACE, ctx, scope) {
+            return;
+        }
         let name = iface.id.name.as_str();
         if has_constructor_shape(&iface.body.body) {
             self.constructor_shaped.insert((scope, name.to_string()));
@@ -421,6 +497,9 @@ impl<'a> CollectCtx<'a> {
         scope: ScopeId,
         exported: bool,
     ) {
+        if !self.declare_type(&alias.id, ir::DeclFlags::TYPE_ALIAS, ctx, scope) {
+            return;
+        }
         let name = alias.id.name.to_string();
         // Phase 2 reads a parent's placeholder when deciding whether an
         // intersection may `extends` it, so the placeholder says what can

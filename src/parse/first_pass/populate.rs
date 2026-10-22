@@ -289,6 +289,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             }
             ast::Statement::ExportDefaultDeclaration(export) => match &export.declaration {
                 ast::ExportDefaultDeclarationKind::ClassDeclaration(class) => {
+                    if self.is_duplicate(class.id.as_ref()) {
+                        return;
+                    }
                     let doc = self
                         .docs
                         .for_span(export.span.start)
@@ -451,6 +454,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         dcx: &DeclCtx<'_>,
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
+        if self.is_duplicate(class.id.as_ref()) {
+            return;
+        }
         let doc = self.lookup_doc(dcx.export_span_start, class.span.start);
         let module_context = dcx.module_context.clone();
         let scope = dcx.scope;
@@ -467,6 +473,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         dcx: &DeclCtx<'_>,
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
+        if self.is_duplicate(Some(&iface.id)) {
+            return;
+        }
         let doc = self.lookup_doc(dcx.export_span_start, iface.span.start);
         let module_context = dcx.module_context.clone();
         let scope = dcx.scope;
@@ -481,6 +490,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         dcx: &DeclCtx<'_>,
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
+        if self.is_duplicate(Some(&alias.id)) {
+            return;
+        }
         let name = alias.id.name.to_string();
         let doc = self.lookup_doc(dcx.export_span_start, alias.span.start);
 
@@ -918,6 +930,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         dcx: &DeclCtx<'_>,
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
+        if self.is_duplicate(Some(&enum_decl.id)) {
+            return;
+        }
         let doc = self.docs.for_span(enum_decl.span.start);
         let mut decl = convert_ts_enum(enum_decl, self.docs);
         decl.global = self.global_scope && matches!(dcx.module_context, ir::ModuleContext::Global);
@@ -925,6 +940,11 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────
+
+    /// Whether phase 1 skipped the declaration named `id` as a duplicate.
+    fn is_duplicate(&self, id: Option<&ast::BindingIdentifier<'_>>) -> bool {
+        id.is_some_and(|id| self.registry.duplicates.contains(&id.span.start))
+    }
 
     fn lookup_doc(&self, export_span_start: Option<u32>, inner_span_start: u32) -> Option<String> {
         export_span_start
