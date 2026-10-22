@@ -263,3 +263,27 @@ fn typed_array_buffer_arguments_drop_without_a_warning() {
     assert!(output.status.success(), "{stderr}");
     assert!(!stderr.contains("warning"), "{stderr}");
 }
+
+/// An `export *` binds no name, so resolving its module leaves only the
+/// warning that the re-export is skipped.
+#[test]
+fn export_star_warns_only_that_it_is_skipped() {
+    let fixture = crate_root().join("tests/fixtures/export-star.d.ts");
+    let out_dir = TempDir::new("export-star");
+    let output = Command::new(ts_gen_bin())
+        .arg("--input")
+        .arg(&fixture)
+        .arg("--output")
+        .arg(out_dir.0.join("bindings.rs"))
+        .args(collect_directive_args(&fixture))
+        .output()
+        .expect("Failed to execute ts-gen binary");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(output.status.success(), "{stderr}");
+    let warnings: Vec<_> = stderr.lines().filter(|l| l.contains("warning")).collect();
+    assert_eq!(
+        warnings,
+        ["[ts-gen warning]: Re-export (`export * from \"./export-star/dep\"`) is not yet supported, skipping"],
+        "{stderr}"
+    );
+}

@@ -282,6 +282,14 @@ pub struct PendingImport {
     pub original_name: String,
 }
 
+impl PendingImport {
+    /// Whether this entry is an `export * from "m"`, which binds no name and
+    /// is registered only so the module gets parsed.
+    pub fn is_export_star(&self) -> bool {
+        self.local_name == "*" && self.original_name == "*"
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

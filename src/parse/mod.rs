@@ -520,10 +520,11 @@ fn bind_import(
     own_only: bool,
 ) -> bool {
     // `import * as A` makes `A` a namespace whose members are the module's
-    // own scope. `export *` also registers as `*` but binds no local name.
+    // own scope. `export *` binds no local name, so finding the module is
+    // all it needs.
     if import.original_name == "*" {
-        if import.local_name == "*" {
-            return false;
+        if import.is_export_star() {
+            return true;
         }
         gctx.scopes
             .insert_namespace(import.scope, import.local_name.clone(), target);
@@ -732,8 +733,9 @@ fn resolve_imports(
                             failed_modules.insert(import.from_module.clone());
                         }
                     }
-                } else {
-                    // File already parsed but module wasn't found — retry next iteration
+                } else if !import.is_export_star() {
+                    // File already parsed but module wasn't found — retry next
+                    // iteration. An `export *` needs nothing beyond the parse.
                     still_pending.push(import);
                 }
             } else {
@@ -2431,6 +2433,126 @@ mod tests {
             kind("D.Foo.Options"),
             Some(TypeKind::Interface(_))
         ));
+    }
+
+    /// Parse `files` (name, source) written to a fresh directory, with the
+    /// first `inputs` of them as inputs, and return the warnings.
+    fn export_star_warnings(case: &str, files: &[(&str, &str)], inputs: usize) -> Vec<String> {
+        let dir =
+            std::env::temp_dir().join(format!("ts-gen-export-star-{case}-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let paths: Vec<_> = files
+            .iter()
+            .map(|(name, src)| {
+                let path = dir.join(name);
+                std::fs::write(&path, src).unwrap();
+                path
+            })
+            .collect();
+        let result = parse_dts_files(&paths[..inputs], Some("main"));
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (module, gctx) = result.unwrap();
+        assert!(
+            !gctx.pending_imports.iter().any(|p| p.is_export_star()),
+            "{case}"
+        );
+        if let Some(scope) = module.file_scopes.first() {
+            for path in ["Thing", "D.Thing"] {
+                if files[0].1.contains(path) {
+                    assert!(gctx.resolve_path(*scope, path).is_some(), "{case}: {path}");
+                }
+            }
+        }
+        gctx.diagnostics
+            .diagnostics
+            .iter()
+            .filter(|d| d.level == crate::util::diagnostics::DiagnosticLevel::Warning)
+            .map(|d| d.message.clone())
+            .collect()
+    }
+
+    #[test]
+    fn export_star_is_not_an_unbound_import() {
+        let dep = ("dep.d.ts", "export interface Thing { t: number }");
+        let skipped = |source: &str| {
+            format!("Re-export (`export * from \"{source}\"`) is not yet supported, skipping")
+        };
+        let cases: &[(&str, &[(&str, &str)], usize)] = &[
+            (
+                "alone",
+                &[("main.d.ts", r#"export * from "./dep";"#), dep],
+                1,
+            ),
+            (
+                "import-first",
+                &[
+                    (
+                        "main.d.ts",
+                        r#"import { Thing } from "./dep"; export * from "./dep";"#,
+                    ),
+                    dep,
+                ],
+                1,
+            ),
+            (
+                "star-first",
+                &[
+                    (
+                        "main.d.ts",
+                        r#"export * from "./dep"; import { Thing } from "./dep";"#,
+                    ),
+                    dep,
+                ],
+                1,
+            ),
+            (
+                "namespaces",
+                &[
+                    (
+                        "main.d.ts",
+                        r#"export * as ns from "./dep"; import * as D from "./dep";"#,
+                    ),
+                    dep,
+                ],
+                1,
+            ),
+            // The dependency is an input, so it is parsed but not registered
+            // under the specifier.
+            (
+                "dep-is-input",
+                &[("main.d.ts", r#"export * from "./dep";"#), dep],
+                2,
+            ),
+            (
+                "ambient",
+                &[(
+                    "main.d.ts",
+                    r#"declare module "amb" { export interface A {} } export * from "amb";"#,
+                )],
+                1,
+            ),
+        ];
+        for &(case, files, inputs) in cases {
+            let source = if case == "ambient" { "amb" } else { "./dep" };
+            assert_eq!(
+                export_star_warnings(case, files, inputs),
+                vec![skipped(source)],
+                "{case}"
+            );
+        }
+
+        assert_eq!(
+            export_star_warnings(
+                "missing",
+                &[("main.d.ts", r#"export * from "./missing";"#)],
+                1
+            ),
+            vec![
+                skipped("./missing"),
+                "Could not resolve import \"./missing\" — use --external to map this type"
+                    .to_string(),
+            ]
+        );
     }
 
     #[test]
