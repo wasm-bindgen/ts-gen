@@ -2215,20 +2215,9 @@ A module-context declaration has exactly three possible states:
 3. **Resolution-only** — `<spec>` is in the type universe but listed
    in neither `--export` nor `--external`. Its exports are not emitted,
    but a type an emitted signature reaches through an import is, as a
-   type only (see [Global scope](#global-scope)). A reference to a
-   module's declaration that is not in scope at the use site, which
-   codegen finds by name, produces a codegen **error**:
-
-   ```text
-   error: type `Bar` from module "x:foo" is referenced by exported
-     declarations but module "x:foo" is not in --export and not in
-     --external. Add `--export x:foo` to emit it, or
-     `--external x:foo=...` to point at a separately-generated crate.
-   ```
-
-   The reference itself still emits as a bare ident plus a
-   `use JsValue as Bar;` alias so the output compiles — the error
-   surfaces at the next ts-gen run, not at `cargo build`.
+   type only (see [Global scope](#global-scope)). A reference that
+   doesn't import the module's declaration doesn't see it at all (see
+   [The export map](#the-export-map)).
 
 `--external` always wins over `--export`: a module in both is
 externalised, not emitted.
@@ -2279,9 +2268,41 @@ not the textual name, so a global `interface Foo` and a module-scoped
 site picks the visible one. Each module body is a child scope of its
 file, as in TypeScript: its declarations see the file's globals, but
 are not visible to the file or to other modules, and repeated
-`declare module "<spec>"` blocks in one file share a scope. Another
-file or module reaches them with `import { Foo } from "<spec>"`, which
-resolves against the module's scopes before looking for a file.
+`declare module "<spec>"` blocks share only what the module exports.
+Another file or module reaches them with `import { Foo } from
+"<spec>"`, which resolves against the module's scopes before looking
+for a file.
+
+A name resolves only from where it is written, as in TypeScript: through
+the enclosing declarations, blocks and file, then the global scope. A
+declaration the use site neither sees nor imports is not found, even
+when nothing else has its name and another file or module declares it:
+a module file's or `declare module` block's unexported declarations, or
+a module's exports from a script. TypeScript reports "Cannot find name";
+ts-gen reports an error and binds the name like any other unknown one,
+through the external map or a `use JsValue as Name;` alias, so the output
+still compiles:
+
+```ts
+// a.d.ts, a module file with --lib-name
+interface Shared { fromA(): void; }
+export declare function a(): void;
+export {};
+// main.d.ts
+export declare function useShared(s: Shared): void;
+```
+
+```text
+error: Unresolved type `Shared`. Use --external to map this type.
+```
+
+```rust
+use JsValue as Shared;
+pub fn use_shared(s: &Shared);
+```
+
+So a second file's `interface Shared` doesn't make the reference depend
+on which file comes first.
 
 ### Global scope
 
@@ -2383,14 +2404,16 @@ declare module "cloudflare:email" {
   export class EmailMessage { /* ... */ }
 }
 
-declare class ForwardableEmailMessage extends EmailMessage { /* ... */ }
-
-interface SendEmail {
-  send(message: EmailMessage): Promise<EmailSendResult>;
+declare module "cloudflare:workers" {
+  import { EmailMessage } from "cloudflare:email";
+  export class ForwardableEmailMessage extends EmailMessage { /* ... */ }
+  export interface SendEmail {
+    send(message: EmailMessage): Promise<void>;
+  }
 }
 ```
 
-With `--export types/email.d.ts --export cloudflare:email`:
+With `--export cloudflare:email --export cloudflare:workers`:
 
 ```rust
 pub mod cloudflare {
@@ -2400,17 +2423,20 @@ pub mod cloudflare {
             pub type EmailMessage;
         }
     }
-}
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(extends = cloudflare::email::EmailMessage)]
-    pub type ForwardableEmailMessage;
-}
-#[wasm_bindgen]
-extern "C" {
-    pub type SendEmail;
-    pub fn send(this: &SendEmail, message: &cloudflare::email::EmailMessage)
-        -> Promise<EmailSendResult>;
+    pub mod workers {
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[wasm_bindgen(extends = super::email::EmailMessage, extends = Object)]
+            pub type ForwardableEmailMessage;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            pub type SendEmail;
+            #[wasm_bindgen(method, catch)]
+            pub async fn send(this: &SendEmail, message: &super::email::EmailMessage)
+                -> Result<Undefined, JsValue>;
+        }
+    }
 }
 ```
 

@@ -497,16 +497,15 @@ impl<'d> Builder<'_, 'd> {
             let mut refs = Vec::new();
             declaration_refs(&decl, &mut refs);
             for (name, scope) in refs {
-                if let Some(target) = self.resolve(&name, scope, &decl.module_context) {
+                if let Some(target) = self.resolve(&name, scope) {
                     self.reach(target);
                 }
             }
         }
     }
 
-    /// Resolve a type name as codegen does: from its use site, then from
-    /// the module's ambient blocks and the input files.
-    fn resolve(&self, name: &str, scope: ScopeId, from: &ModuleContext) -> Option<TypeId> {
+    /// Resolve a type name as codegen does, from its use site only.
+    fn resolve(&self, name: &str, scope: ScopeId) -> Option<TypeId> {
         let gctx = self.gctx;
         let head = name.split('.').next().unwrap_or(name);
         if matches!(
@@ -515,15 +514,7 @@ impl<'d> Builder<'_, 'd> {
         ) {
             return None;
         }
-        let module_scopes = from
-            .specifier()
-            .and_then(|m| gctx.ambient_module_scopes.get(m))
-            .into_iter()
-            .flatten();
-        std::iter::once(&scope)
-            .chain(module_scopes)
-            .chain(&self.module.file_scopes)
-            .find_map(|&s| gctx.resolve_path(s, name))
+        gctx.resolve_path(scope, name)
     }
 }
 

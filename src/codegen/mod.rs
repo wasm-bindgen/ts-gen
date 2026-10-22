@@ -622,7 +622,6 @@ fn generate_type_alias(
             .is_some_and(|id| cgctx.local_type_ids.contains(&id));
         if !is_type_param
             && !resolves_local
-            && !cgctx.local_types.contains_key(target_name)
             && !crate::codegen::typemap::JS_SYS_RESERVED.contains(&target_name)
         {
             cgctx.warn(format!(

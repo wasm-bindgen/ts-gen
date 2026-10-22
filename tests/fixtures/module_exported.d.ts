@@ -1,9 +1,9 @@
-//! @ts-gen --export tests/fixtures/module_exported.d.ts --export x:foo
+//! @ts-gen --export x:uses --export x:foo
 
-// Same shape as `module_private.d.ts`, but the module is emitted via
-// `--export x:foo`, in `pub mod x { pub mod foo }` with its
-// `#[wasm_bindgen(module = "x:foo")]` attribute, and `UsesBar` references
-// it as `x::foo::Bar`.
+// `x:foo` is emitted via `--export x:foo`, in `pub mod x { pub mod foo }`
+// with its `#[wasm_bindgen(module = "x:foo")]` attribute, and `UsesBar`,
+// which imports `Bar`, references it relative to its own `pub mod` as
+// `super::foo::Bar`.
 
 declare module "x:foo" {
   export class Bar {
@@ -12,6 +12,9 @@ declare module "x:foo" {
   }
 }
 
-interface UsesBar {
-  method(b: Bar): void;
+declare module "x:uses" {
+  import { Bar } from "x:foo";
+  export interface UsesBar {
+    method(b: Bar): void;
+  }
 }

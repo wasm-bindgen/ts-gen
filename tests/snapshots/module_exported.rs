@@ -23,14 +23,18 @@ pub mod x {
             pub fn try_name(this: &Bar) -> Result<String, JsValue>;
         }
     }
-}
-#[wasm_bindgen]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type UsesBar;
-    #[wasm_bindgen(method)]
-    pub fn method(this: &UsesBar, b: &x::foo::Bar);
-    #[wasm_bindgen(method, catch, js_name = "method")]
-    pub fn try_method(this: &UsesBar, b: &x::foo::Bar) -> Result<(), JsValue>;
+    pub mod uses {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "x:uses")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type UsesBar;
+            #[wasm_bindgen(method)]
+            pub fn method(this: &UsesBar, b: &super::foo::Bar);
+            #[wasm_bindgen(method, catch, js_name = "method")]
+            pub fn try_method(this: &UsesBar, b: &super::foo::Bar) -> Result<(), JsValue>;
+        }
+    }
 }
