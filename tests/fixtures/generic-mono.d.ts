@@ -1,4 +1,4 @@
-//! @ts-gen --experimental-generic-mono --lib-name generic-mono --export generic-mono
+//! @ts-gen --lib-name generic-mono --export generic-mono
 
 export declare class Holder<T> {
   constructor(value: T);

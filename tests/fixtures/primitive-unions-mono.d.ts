@@ -1,4 +1,4 @@
-//! @ts-gen --experimental-generic-mono --lib-name primitive-unions-mono --export primitive-unions-mono
+//! @ts-gen --lib-name primitive-unions-mono --export primitive-unions-mono
 
 // Primitive unions spanning two or more categories become one parameter
 // bounded by the matching `js_sys` marker trait.
