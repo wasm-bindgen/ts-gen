@@ -1712,6 +1712,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         &config.from_module(),
     );
     let doc = super::doc_tokens(&sig.doc);
+    let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
 
     // Constructors always return the constructed type, wrapped in Result
     // when `catch` (which is always-true here per `SignatureKind::Constructor`).
@@ -1734,6 +1735,9 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
 
     let mut wb_parts = vec![quote! { constructor }];
     wb_parts.extend(config.js_class_parts());
+    if has_variadic {
+        wb_parts.push(quote! { variadic });
+    }
     if sig.catch {
         wb_parts.push(quote! { catch });
     }
@@ -1980,7 +1984,9 @@ fn getter_js_string_variant(
     names: &mut LocalScope,
 ) -> Option<(syn::Ident, TokenStream)> {
     let ctx = config.cgctx.filter(|ctx| {
-        ctx.experimental_generic_mono && super::typemap::has_mono_js_string_return(ty, ctx, scope)
+        ctx.experimental_generic_mono
+            && (super::typemap::has_mono_js_string_return(ty, ctx, scope)
+                || super::typemap::is_mono_string_list_return(ty, ctx, scope))
     })?;
     let js_name = names.declare(&format!("{rust_name}_js_string"), Suffix::Snake);
     let js_type =

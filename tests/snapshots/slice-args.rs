@@ -71,12 +71,12 @@ extern "C" {
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    pub fn flags(values: &[Boolean]) -> String;
+    pub fn flags(values: &[bool]) -> String;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "flags")]
-    pub fn try_flags(values: &[Boolean]) -> Result<String, JsValue>;
+    pub fn try_flags(values: &[bool]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {

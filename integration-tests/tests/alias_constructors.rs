@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{JsString, Reflect};
+use js_sys::{JsString, Object, Reflect};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::alias_constructors::{
@@ -25,6 +25,7 @@ fn alias_constructors_construct_the_aliased_type() {
 fn colliding_alias_constructors_bind_as_values() {
     let _: Point = Point::new();
     let _: Stub<JsString> = Stub::new(&JsString::from("x")).unwrap();
-    assert!(Reflect::get(&pt.with(Clone::clone), &"name".into()).unwrap() == "Pt");
-    assert!(Reflect::get(&wrap2.with(Clone::clone), &"name".into()).unwrap() == "Wrap");
+    let name = |ctor: &Object| Reflect::get_str(ctor, &"name".into()).unwrap().unwrap();
+    assert!(pt.with(name) == "Pt");
+    assert!(wrap2.with(name) == "Wrap");
 }
