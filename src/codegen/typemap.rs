@@ -2298,7 +2298,7 @@ fn to_mono_js_string_return_type_impl(
     let (peeled, peeled_scope) = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
         TypeRef::String | TypeRef::StringLiteral(_) => quote! { JsString },
-        TypeRef::Array(elem) if is_string_array_element(elem, ctx, scope) => {
+        TypeRef::Array(elem) if is_string_array_element(elem, ctx, peeled_scope) => {
             quote! { Array<JsString> }
         }
         TypeRef::Nullable(inner) => {
