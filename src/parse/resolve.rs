@@ -49,16 +49,19 @@ pub fn resolve(specifier: &str, from_dir: &Path) -> Option<PathBuf> {
 
 /// TypeScript's `isExternalModuleNameRelative`: `.`, `..`, a name starting
 /// `./` or `../` (either slash), or a rooted path, which never names an
-/// ambient module or a package.
+/// ambient module or a package. A drive letter only roots a path as `c:`,
+/// `c:/` or `c:\`, so a scheme-like name such as `x:foo` is not relative.
 pub(crate) fn is_relative_module_name(specifier: &str) -> bool {
     let relative = ["./", "../", ".\\", "..\\"]
         .iter()
         .any(|prefix| specifier.starts_with(prefix))
         || specifier == "."
         || specifier == "..";
-    let bytes = specifier.as_bytes();
-    let rooted = matches!(bytes.first(), Some(b'/' | b'\\'))
-        || (bytes.len() >= 2 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':');
+    let rooted = match specifier.as_bytes() {
+        [b'/' | b'\\', ..] => true,
+        [drive, b':'] | [drive, b':', b'/' | b'\\', ..] => drive.is_ascii_alphabetic(),
+        _ => false,
+    };
     relative || rooted
 }
 
@@ -69,7 +72,7 @@ mod tests {
     #[test]
     fn relative_module_names() {
         for name in [
-            ".", "..", "./a", "../a", ".\\a", "/abs/a", "\\a", "c:/a", "C:\\a",
+            ".", "..", "./a", "../a", ".\\a", "/abs/a", "\\a", "c:", "c:/a", "C:\\a",
         ] {
             assert!(is_relative_module_name(name), "{name}");
         }
@@ -81,6 +84,8 @@ mod tests {
             "..a",
             "a/./b",
             "cloudflare:email",
+            "x:foo",
+            "c:d",
         ] {
             assert!(!is_relative_module_name(name), "{name}");
         }

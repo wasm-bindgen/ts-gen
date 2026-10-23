@@ -2697,7 +2697,7 @@ mod tests {
                    declare class Two { b(): void }\n\
                    type Prim = string;\n\
                    interface Prim { b: string }\n\
-                   declare enum Color { Red }\n\
+                   declare enum Color { Red = 0 }\n\
                    interface Color { x: number }\n\
                    declare var Ctor: { new (): Ctor };\n\
                    interface Ctor { i(): void }\n\
