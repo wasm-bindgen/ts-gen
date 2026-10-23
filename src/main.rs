@@ -83,6 +83,19 @@ struct Cli {
     #[arg(long = "errors-as-error")]
     errors_as_error: bool,
 
+    /// Emit one `Result` form per sync method and function instead of a
+    /// trapping primary plus a `try_<name>` companion.
+    ///
+    /// TypeScript carries no throw information, so by default every sync
+    /// callable is bound twice. With this flag the primary name catches
+    /// and returns `Result<T, E>`; `E` follows the usual rules
+    /// (`@throws {T}`, else `JsValue`, or `js_sys::Error` under
+    /// `--errors-as-error`). `@throws {never}` keeps a binding
+    /// infallible. Async callables, constructors and setters are
+    /// unchanged.
+    #[arg(long = "fallible")]
+    fallible: bool,
+
     /// Use wasm-bindgen's experimental per-monomorphization codegen for
     /// generic imports instead of erasing their type parameters to JsValue.
     #[arg(long = "experimental-generic-mono")]
@@ -151,6 +164,7 @@ fn main() -> Result<()> {
 
     let options = ts_gen::codegen::GenerateOptions::new()
         .errors_as_error(cli.errors_as_error)
+        .fallible(cli.fallible)
         .experimental_generic_mono(cli.experimental_generic_mono)
         .exports(exports);
     let rust_source = ts_gen::codegen::generate_with_options(&module, &gctx, &options)?;

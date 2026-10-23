@@ -11,14 +11,10 @@ extern "C" {
     pub type _Foo;
     #[wasm_bindgen(constructor, js_class = "Foo", catch)]
     pub fn new() -> Result<_Foo, JsValue>;
-    # [wasm_bindgen (static_method_of = _Foo , js_class = "Foo")]
-    pub fn from(n: f64) -> _Foo;
-    # [wasm_bindgen (static_method_of = _Foo , js_class = "Foo" , catch , js_name = "from")]
-    pub fn try_from(n: f64) -> Result<_Foo, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn bar(this: &_Foo);
-    #[wasm_bindgen(method, catch, js_name = "bar")]
-    pub fn try_bar(this: &_Foo) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = _Foo , js_class = "Foo" , catch)]
+    pub fn from(n: f64) -> Result<_Foo, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn bar(this: &_Foo) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type Foo = _Foo;
@@ -33,14 +29,10 @@ extern "C" {
     pub fn version() -> String;
     # [wasm_bindgen (static_method_of = _Bar , js_class = "Bar" , getter , js_name = "VERSION")]
     pub fn version_js_string() -> JsString;
-    #[wasm_bindgen(method)]
-    pub fn baz(this: &_Bar) -> String;
-    #[wasm_bindgen(method, js_name = "baz")]
-    pub fn baz_js_string(this: &_Bar) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn baz(this: &_Bar) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "baz")]
-    pub fn try_baz(this: &_Bar) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "baz")]
-    pub fn try_baz_js_string(this: &_Bar) -> Result<JsString, JsValue>;
+    pub fn baz_js_string(this: &_Bar) -> Result<JsString, JsValue>;
 }
 #[allow(dead_code)]
 pub type Bar = _Bar;
@@ -51,10 +43,8 @@ extern "C" {
     pub type _Late;
     #[wasm_bindgen(constructor, js_class = "Late", catch)]
     pub fn new() -> Result<_Late, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn go(this: &_Late);
-    #[wasm_bindgen(method, catch, js_name = "go")]
-    pub fn try_go(this: &_Late) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn go(this: &_Late) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type Late = _Late;

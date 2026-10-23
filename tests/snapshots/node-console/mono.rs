@@ -117,382 +117,201 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `condition` - The condition to test"]
     #[doc = " * `data` - Optional message or data"]
-    #[wasm_bindgen(method, variadic)]
-    pub fn assert(this: &Console, data: &[JsValue]);
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn assert(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " A simple assertion test. If `condition` is falsy, an `AssertionError` is"]
     #[doc = " written with an optional message."]
     #[doc = ""]
     #[doc = " * `condition` - The condition to test"]
     #[doc = " * `data` - Optional message or data"]
     #[wasm_bindgen(method, variadic, catch, js_name = "assert")]
-    pub fn try_assert(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
-    #[doc = " A simple assertion test. If `condition` is falsy, an `AssertionError` is"]
-    #[doc = " written with an optional message."]
-    #[doc = ""]
-    #[doc = " * `condition` - The condition to test"]
-    #[doc = " * `data` - Optional message or data"]
-    #[wasm_bindgen(method, variadic, js_name = "assert")]
-    pub fn assert_with_condition(this: &Console, condition: bool, data: &[JsValue]);
-    #[doc = " A simple assertion test. If `condition` is falsy, an `AssertionError` is"]
-    #[doc = " written with an optional message."]
-    #[doc = ""]
-    #[doc = " * `condition` - The condition to test"]
-    #[doc = " * `data` - Optional message or data"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "assert")]
-    pub fn try_assert_with_condition(
+    pub fn assert_with_condition(
         this: &Console,
         condition: bool,
         data: &[JsValue],
     ) -> Result<(), JsValue>;
     #[doc = " Clears the console when possible."]
-    #[wasm_bindgen(method)]
-    pub fn clear(this: &Console);
-    #[doc = " Clears the console when possible."]
-    #[wasm_bindgen(method, catch, js_name = "clear")]
-    pub fn try_clear(this: &Console) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn clear(this: &Console) -> Result<(), JsValue>;
     #[doc = " Maintains an internal counter and outputs to `stdout` the number of"]
     #[doc = " times `count()` has been called with the given `label`."]
     #[doc = ""]
     #[doc = " * `label` - The counter label"]
-    #[wasm_bindgen(method)]
-    pub fn count(this: &Console);
-    #[doc = " Maintains an internal counter and outputs to `stdout` the number of"]
-    #[doc = " times `count()` has been called with the given `label`."]
-    #[doc = ""]
-    #[doc = " * `label` - The counter label"]
-    #[wasm_bindgen(method, catch, js_name = "count")]
-    pub fn try_count(this: &Console) -> Result<(), JsValue>;
-    #[doc = " Maintains an internal counter and outputs to `stdout` the number of"]
-    #[doc = " times `count()` has been called with the given `label`."]
-    #[doc = ""]
-    #[doc = " * `label` - The counter label"]
-    #[wasm_bindgen(method, js_name = "count")]
-    pub fn count_with_label(this: &Console, label: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, catch)]
+    pub fn count(this: &Console) -> Result<(), JsValue>;
     #[doc = " Maintains an internal counter and outputs to `stdout` the number of"]
     #[doc = " times `count()` has been called with the given `label`."]
     #[doc = ""]
     #[doc = " * `label` - The counter label"]
     #[wasm_bindgen(method, catch, js_name = "count")]
-    pub fn try_count_with_label(
+    pub fn count_with_label(
         this: &Console,
         label: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     #[doc = " Resets the internal counter for the given `label`."]
     #[doc = ""]
     #[doc = " * `label` - The counter label to reset"]
-    #[wasm_bindgen(method, js_name = "countReset")]
-    pub fn count_reset(this: &Console);
+    #[wasm_bindgen(method, catch, js_name = "countReset")]
+    pub fn count_reset(this: &Console) -> Result<(), JsValue>;
     #[doc = " Resets the internal counter for the given `label`."]
     #[doc = ""]
     #[doc = " * `label` - The counter label to reset"]
     #[wasm_bindgen(method, catch, js_name = "countReset")]
-    pub fn try_count_reset(this: &Console) -> Result<(), JsValue>;
-    #[doc = " Resets the internal counter for the given `label`."]
-    #[doc = ""]
-    #[doc = " * `label` - The counter label to reset"]
-    #[wasm_bindgen(method, js_name = "countReset")]
-    pub fn count_reset_with_label(this: &Console, label: impl ::wasm_bindgen::JsStringLike);
-    #[doc = " Resets the internal counter for the given `label`."]
-    #[doc = ""]
-    #[doc = " * `label` - The counter label to reset"]
-    #[wasm_bindgen(method, catch, js_name = "countReset")]
-    pub fn try_count_reset_with_label(
+    pub fn count_reset_with_label(
         this: &Console,
         label: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
     #[doc = ""]
     #[doc = " * `data` - Values to output"]
-    #[wasm_bindgen(method, variadic)]
-    pub fn debug(this: &Console, data: &[JsValue]);
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn debug(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
     #[doc = ""]
     #[doc = " * `data` - Values to output"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "debug")]
-    pub fn try_debug(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
-    #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
-    #[doc = ""]
-    #[doc = " * `data` - Values to output"]
-    #[wasm_bindgen(method, variadic)]
-    pub fn error(this: &Console, data: &[JsValue]);
-    #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
-    #[doc = ""]
-    #[doc = " * `data` - Values to output"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "error")]
-    pub fn try_error(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn error(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " Increases indentation of subsequent lines by spaces for `groupIndentation` length."]
     #[doc = ""]
     #[doc = " * `data` - Optional label for the group"]
-    #[wasm_bindgen(method, variadic)]
-    pub fn group(this: &Console, data: &[JsValue]);
-    #[doc = " Increases indentation of subsequent lines by spaces for `groupIndentation` length."]
-    #[doc = ""]
-    #[doc = " * `data` - Optional label for the group"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "group")]
-    pub fn try_group(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
-    #[doc = " An alias for `group()`."]
-    #[doc = ""]
-    #[doc = " * `data` - Optional label for the group"]
-    #[wasm_bindgen(method, variadic, js_name = "groupCollapsed")]
-    pub fn group_collapsed(this: &Console, data: &[JsValue]);
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn group(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " An alias for `group()`."]
     #[doc = ""]
     #[doc = " * `data` - Optional label for the group"]
     #[wasm_bindgen(method, variadic, catch, js_name = "groupCollapsed")]
-    pub fn try_group_collapsed(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
-    #[doc = " Decreases indentation of subsequent lines."]
-    #[wasm_bindgen(method, js_name = "groupEnd")]
-    pub fn group_end(this: &Console);
+    pub fn group_collapsed(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " Decreases indentation of subsequent lines."]
     #[wasm_bindgen(method, catch, js_name = "groupEnd")]
-    pub fn try_group_end(this: &Console) -> Result<(), JsValue>;
+    pub fn group_end(this: &Console) -> Result<(), JsValue>;
     #[doc = " Prints to `stdout` with newline. Multiple arguments can be passed."]
     #[doc = ""]
     #[doc = " * `data` - Values to output"]
-    #[wasm_bindgen(method, variadic)]
-    pub fn info(this: &Console, data: &[JsValue]);
-    #[doc = " Prints to `stdout` with newline. Multiple arguments can be passed."]
-    #[doc = ""]
-    #[doc = " * `data` - Values to output"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "info")]
-    pub fn try_info(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn info(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " Prints to `stdout` with newline. Multiple arguments can be passed."]
     #[doc = " First argument is used as the primary message and additional arguments"]
     #[doc = " are used as substitution values similar to `printf(3)`."]
     #[doc = ""]
     #[doc = " * `data` - Values to output"]
-    #[wasm_bindgen(method, variadic)]
-    pub fn log(this: &Console, data: &[JsValue]);
-    #[doc = " Prints to `stdout` with newline. Multiple arguments can be passed."]
-    #[doc = " First argument is used as the primary message and additional arguments"]
-    #[doc = " are used as substitution values similar to `printf(3)`."]
-    #[doc = ""]
-    #[doc = " * `data` - Values to output"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "log")]
-    pub fn try_log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " Try to construct a table with the columns of the properties of"]
     #[doc = " `tabularData` (or use `properties`) and rows of `tabularData`."]
     #[doc = ""]
     #[doc = " * `tabularData` - Data to display as a table"]
     #[doc = " * `properties` - Column headers to display"]
-    #[wasm_bindgen(method)]
-    pub fn table(this: &Console);
+    #[wasm_bindgen(method, catch)]
+    pub fn table(this: &Console) -> Result<(), JsValue>;
     #[doc = " Try to construct a table with the columns of the properties of"]
     #[doc = " `tabularData` (or use `properties`) and rows of `tabularData`."]
     #[doc = ""]
     #[doc = " * `tabularData` - Data to display as a table"]
     #[doc = " * `properties` - Column headers to display"]
     #[wasm_bindgen(method, catch, js_name = "table")]
-    pub fn try_table(this: &Console) -> Result<(), JsValue>;
-    #[doc = " Try to construct a table with the columns of the properties of"]
-    #[doc = " `tabularData` (or use `properties`) and rows of `tabularData`."]
-    #[doc = ""]
-    #[doc = " * `tabularData` - Data to display as a table"]
-    #[doc = " * `properties` - Column headers to display"]
-    #[wasm_bindgen(method, js_name = "table")]
-    pub fn table_with_tabular_data(this: &Console, tabular_data: &JsValue);
+    pub fn table_with_tabular_data(this: &Console, tabular_data: &JsValue) -> Result<(), JsValue>;
     #[doc = " Try to construct a table with the columns of the properties of"]
     #[doc = " `tabularData` (or use `properties`) and rows of `tabularData`."]
     #[doc = ""]
     #[doc = " * `tabularData` - Data to display as a table"]
     #[doc = " * `properties` - Column headers to display"]
     #[wasm_bindgen(method, catch, js_name = "table")]
-    pub fn try_table_with_tabular_data(
-        this: &Console,
-        tabular_data: &JsValue,
-    ) -> Result<(), JsValue>;
-    #[doc = " Try to construct a table with the columns of the properties of"]
-    #[doc = " `tabularData` (or use `properties`) and rows of `tabularData`."]
-    #[doc = ""]
-    #[doc = " * `tabularData` - Data to display as a table"]
-    #[doc = " * `properties` - Column headers to display"]
-    #[wasm_bindgen(method, js_name = "table")]
     pub fn table_with_tabular_data_and_properties(
         this: &Console,
         tabular_data: &JsValue,
         properties: &[impl ::wasm_bindgen::JsStringLike],
-    );
-    #[doc = " Try to construct a table with the columns of the properties of"]
-    #[doc = " `tabularData` (or use `properties`) and rows of `tabularData`."]
-    #[doc = ""]
-    #[doc = " * `tabularData` - Data to display as a table"]
-    #[doc = " * `properties` - Column headers to display"]
-    #[wasm_bindgen(method, catch, js_name = "table")]
-    pub fn try_table_with_tabular_data_and_properties(
-        this: &Console,
-        tabular_data: &JsValue,
-        properties: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<(), JsValue>;
     #[doc = " Starts a timer identified by the given `label`."]
     #[doc = ""]
     #[doc = " * `label` - The timer label"]
-    #[wasm_bindgen(method)]
-    pub fn time(this: &Console);
+    #[wasm_bindgen(method, catch)]
+    pub fn time(this: &Console) -> Result<(), JsValue>;
     #[doc = " Starts a timer identified by the given `label`."]
     #[doc = ""]
     #[doc = " * `label` - The timer label"]
     #[wasm_bindgen(method, catch, js_name = "time")]
-    pub fn try_time(this: &Console) -> Result<(), JsValue>;
-    #[doc = " Starts a timer identified by the given `label`."]
-    #[doc = ""]
-    #[doc = " * `label` - The timer label"]
-    #[wasm_bindgen(method, js_name = "time")]
-    pub fn time_with_label(this: &Console, label: impl ::wasm_bindgen::JsStringLike);
-    #[doc = " Starts a timer identified by the given `label`."]
-    #[doc = ""]
-    #[doc = " * `label` - The timer label"]
-    #[wasm_bindgen(method, catch, js_name = "time")]
-    pub fn try_time_with_label(
+    pub fn time_with_label(
         this: &Console,
         label: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     #[doc = " Stops a timer previously started with `time()` and prints the result."]
     #[doc = ""]
     #[doc = " * `label` - The timer label"]
-    #[wasm_bindgen(method, js_name = "timeEnd")]
-    pub fn time_end(this: &Console);
+    #[wasm_bindgen(method, catch, js_name = "timeEnd")]
+    pub fn time_end(this: &Console) -> Result<(), JsValue>;
     #[doc = " Stops a timer previously started with `time()` and prints the result."]
     #[doc = ""]
     #[doc = " * `label` - The timer label"]
     #[wasm_bindgen(method, catch, js_name = "timeEnd")]
-    pub fn try_time_end(this: &Console) -> Result<(), JsValue>;
-    #[doc = " Stops a timer previously started with `time()` and prints the result."]
-    #[doc = ""]
-    #[doc = " * `label` - The timer label"]
-    #[wasm_bindgen(method, js_name = "timeEnd")]
-    pub fn time_end_with_label(this: &Console, label: impl ::wasm_bindgen::JsStringLike);
-    #[doc = " Stops a timer previously started with `time()` and prints the result."]
-    #[doc = ""]
-    #[doc = " * `label` - The timer label"]
-    #[wasm_bindgen(method, catch, js_name = "timeEnd")]
-    pub fn try_time_end_with_label(
+    pub fn time_end_with_label(
         this: &Console,
         label: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
-    #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
-    #[doc = " and other `data` arguments."]
-    #[doc = ""]
-    #[doc = " * `label` - The timer label"]
-    #[doc = " * `data` - Additional values to output"]
-    #[wasm_bindgen(method, variadic, js_name = "timeLog")]
-    pub fn time_log(this: &Console, data: &[JsValue]);
     #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
     #[doc = " and other `data` arguments."]
     #[doc = ""]
     #[doc = " * `label` - The timer label"]
     #[doc = " * `data` - Additional values to output"]
     #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
-    pub fn try_time_log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
+    pub fn time_log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
     #[doc = " and other `data` arguments."]
     #[doc = ""]
     #[doc = " * `label` - The timer label"]
     #[doc = " * `data` - Additional values to output"]
-    #[wasm_bindgen(method, variadic, js_name = "timeLog")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
     pub fn time_log_with_label(
         this: &Console,
         label: impl ::wasm_bindgen::JsStringLike,
         data: &[JsValue],
-    );
-    #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
-    #[doc = " and other `data` arguments."]
-    #[doc = ""]
-    #[doc = " * `label` - The timer label"]
-    #[doc = " * `data` - Additional values to output"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
-    pub fn try_time_log_with_label(
-        this: &Console,
-        label: impl ::wasm_bindgen::JsStringLike,
-        data: &[JsValue],
     ) -> Result<(), JsValue>;
     #[doc = " Prints to `stderr` the string `'Trace: '`, followed by `util.format()`"]
     #[doc = " output of the message and current stack trace."]
     #[doc = ""]
     #[doc = " * `data` - Values to output alongside the trace"]
-    #[wasm_bindgen(method, variadic)]
-    pub fn trace(this: &Console, data: &[JsValue]);
-    #[doc = " Prints to `stderr` the string `'Trace: '`, followed by `util.format()`"]
-    #[doc = " output of the message and current stack trace."]
-    #[doc = ""]
-    #[doc = " * `data` - Values to output alongside the trace"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "trace")]
-    pub fn try_trace(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn trace(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
     #[doc = ""]
     #[doc = " * `data` - Values to output"]
-    #[wasm_bindgen(method, variadic)]
-    pub fn warn(this: &Console, data: &[JsValue]);
-    #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
-    #[doc = ""]
-    #[doc = " * `data` - Values to output"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "warn")]
-    pub fn try_warn(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn warn(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " Starts a JavaScript CPU profile with an optional label."]
     #[doc = ""]
     #[doc = " * `label` - The profile label"]
-    #[wasm_bindgen(method)]
-    pub fn profile(this: &Console);
+    #[wasm_bindgen(method, catch)]
+    pub fn profile(this: &Console) -> Result<(), JsValue>;
     #[doc = " Starts a JavaScript CPU profile with an optional label."]
     #[doc = ""]
     #[doc = " * `label` - The profile label"]
     #[wasm_bindgen(method, catch, js_name = "profile")]
-    pub fn try_profile(this: &Console) -> Result<(), JsValue>;
-    #[doc = " Starts a JavaScript CPU profile with an optional label."]
-    #[doc = ""]
-    #[doc = " * `label` - The profile label"]
-    #[wasm_bindgen(method, js_name = "profile")]
-    pub fn profile_with_label(this: &Console, label: impl ::wasm_bindgen::JsStringLike);
-    #[doc = " Starts a JavaScript CPU profile with an optional label."]
-    #[doc = ""]
-    #[doc = " * `label` - The profile label"]
-    #[wasm_bindgen(method, catch, js_name = "profile")]
-    pub fn try_profile_with_label(
+    pub fn profile_with_label(
         this: &Console,
         label: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     #[doc = " Stops the current JavaScript CPU profiling session."]
     #[doc = ""]
     #[doc = " * `label` - The profile label to stop"]
-    #[wasm_bindgen(method, js_name = "profileEnd")]
-    pub fn profile_end(this: &Console);
+    #[wasm_bindgen(method, catch, js_name = "profileEnd")]
+    pub fn profile_end(this: &Console) -> Result<(), JsValue>;
     #[doc = " Stops the current JavaScript CPU profiling session."]
     #[doc = ""]
     #[doc = " * `label` - The profile label to stop"]
     #[wasm_bindgen(method, catch, js_name = "profileEnd")]
-    pub fn try_profile_end(this: &Console) -> Result<(), JsValue>;
-    #[doc = " Stops the current JavaScript CPU profiling session."]
-    #[doc = ""]
-    #[doc = " * `label` - The profile label to stop"]
-    #[wasm_bindgen(method, js_name = "profileEnd")]
-    pub fn profile_end_with_label(this: &Console, label: impl ::wasm_bindgen::JsStringLike);
-    #[doc = " Stops the current JavaScript CPU profiling session."]
-    #[doc = ""]
-    #[doc = " * `label` - The profile label to stop"]
-    #[wasm_bindgen(method, catch, js_name = "profileEnd")]
-    pub fn try_profile_end_with_label(
+    pub fn profile_end_with_label(
         this: &Console,
         label: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     #[doc = " Adds an event with the label to the Timeline panel of the inspector."]
     #[doc = ""]
     #[doc = " * `label` - The timestamp label"]
-    #[wasm_bindgen(method, js_name = "timeStamp")]
-    pub fn time_stamp(this: &Console);
+    #[wasm_bindgen(method, catch, js_name = "timeStamp")]
+    pub fn time_stamp(this: &Console) -> Result<(), JsValue>;
     #[doc = " Adds an event with the label to the Timeline panel of the inspector."]
     #[doc = ""]
     #[doc = " * `label` - The timestamp label"]
     #[wasm_bindgen(method, catch, js_name = "timeStamp")]
-    pub fn try_time_stamp(this: &Console) -> Result<(), JsValue>;
-    #[doc = " Adds an event with the label to the Timeline panel of the inspector."]
-    #[doc = ""]
-    #[doc = " * `label` - The timestamp label"]
-    #[wasm_bindgen(method, js_name = "timeStamp")]
-    pub fn time_stamp_with_label(this: &Console, label: impl ::wasm_bindgen::JsStringLike);
-    #[doc = " Adds an event with the label to the Timeline panel of the inspector."]
-    #[doc = ""]
-    #[doc = " * `label` - The timestamp label"]
-    #[wasm_bindgen(method, catch, js_name = "timeStamp")]
-    pub fn try_time_stamp_with_label(
+    pub fn time_stamp_with_label(
         this: &Console,
         label: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;

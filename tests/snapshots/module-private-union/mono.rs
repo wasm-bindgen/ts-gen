@@ -17,39 +17,29 @@ pub mod x {
             # [wasm_bindgen (extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type Base;
-            #[wasm_bindgen(method)]
-            pub fn base(this: &Base);
-            #[wasm_bindgen(method, catch, js_name = "base")]
-            pub fn try_base(this: &Base) -> Result<(), JsValue>;
+            #[wasm_bindgen(method, catch)]
+            pub fn base(this: &Base) -> Result<(), JsValue>;
         }
         #[wasm_bindgen(module = "x:shapes", experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (extends = Base , extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type A;
-            #[wasm_bindgen(method)]
-            pub fn a(this: &A);
-            #[wasm_bindgen(method, catch, js_name = "a")]
-            pub fn try_a(this: &A) -> Result<(), JsValue>;
+            #[wasm_bindgen(method, catch)]
+            pub fn a(this: &A) -> Result<(), JsValue>;
         }
         #[wasm_bindgen(module = "x:shapes", experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (extends = Base , extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type B;
-            #[wasm_bindgen(method)]
-            pub fn b(this: &B);
-            #[wasm_bindgen(method, catch, js_name = "b")]
-            pub fn try_b(this: &B) -> Result<(), JsValue>;
+            #[wasm_bindgen(method, catch)]
+            pub fn b(this: &B) -> Result<(), JsValue>;
         }
         #[wasm_bindgen(module = "x:shapes", experimental_generic_mono)]
         extern "C" {
-            pub fn list() -> ListReturnKind;
-        }
-        #[wasm_bindgen(module = "x:shapes", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "list")]
-            pub fn try_list() -> Result<ListReturnKind, JsValue>;
+            #[wasm_bindgen(catch)]
+            pub fn list() -> Result<ListReturnKind, JsValue>;
         }
     }
 }

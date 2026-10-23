@@ -13,41 +13,22 @@ pub mod lib {
     use super::*;
     #[wasm_bindgen(module = "lib", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "fromPackage")]
-        pub fn from_package(p: impl ::wasm_bindgen::JsStringLike);
-    }
-    #[wasm_bindgen(module = "lib", experimental_generic_mono)]
-    extern "C" {
         #[wasm_bindgen(catch, js_name = "fromPackage")]
-        pub fn try_from_package(p: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen(module = "lib", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(js_name = "fromRelative")]
-        pub fn from_relative(r: &Rel);
+        pub fn from_package(p: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "lib", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "fromRelative")]
-        pub fn try_from_relative(r: &Rel) -> Result<(), JsValue>;
+        pub fn from_relative(r: &Rel) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "lib", experimental_generic_mono)]
     extern "C" {
-        pub fn augmented(r: f64);
-    }
-    #[wasm_bindgen(module = "lib", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "augmented")]
-        pub fn try_augmented(r: f64) -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen(module = "lib", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(js_name = "augmentedPkg")]
-        pub fn augmented_pkg(p: &Pkg);
+        #[wasm_bindgen(catch)]
+        pub fn augmented(r: f64) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "lib", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "augmentedPkg")]
-        pub fn try_augmented_pkg(p: &Pkg) -> Result<(), JsValue>;
+        pub fn augmented_pkg(p: &Pkg) -> Result<(), JsValue>;
     }
 }

@@ -412,3 +412,54 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "array_like")]
     pub fn try_array_like(values: &Array<JsString>) -> Result<String, JsValue>;
 }
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Bag<T: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Bag, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn take<T: ::wasm_bindgen::JsGeneric>(this: &Bag<T>, values: &[T]) -> String;
+    #[wasm_bindgen(method, catch, js_name = "take")]
+    pub fn try_take<T: ::wasm_bindgen::JsGeneric>(
+        this: &Bag<T>,
+        values: &[T],
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "mixedGeneric")]
+    pub fn mixed_generic<T: ::wasm_bindgen::JsGeneric>(
+        values: &[T],
+        #[wasm_bindgen(slice = "array")] weights: &[f64],
+        #[wasm_bindgen(slice = "copy")] data: &[f64],
+    ) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "mixedGeneric")]
+    pub fn try_mixed_generic<T: ::wasm_bindgen::JsGeneric>(
+        values: &[T],
+        #[wasm_bindgen(slice = "array")] weights: &[f64],
+        #[wasm_bindgen(slice = "copy")] data: &[f64],
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "mixedGeneric")]
+    pub fn mixed_generic_with_float64_array<T: ::wasm_bindgen::JsGeneric>(
+        values: &[T],
+        #[wasm_bindgen(slice = "array")] weights: &[f64],
+        data: &Float64Array,
+    ) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "mixedGeneric")]
+    pub fn try_mixed_generic_with_float64_array<T: ::wasm_bindgen::JsGeneric>(
+        values: &[T],
+        #[wasm_bindgen(slice = "array")] weights: &[f64],
+        data: &Float64Array,
+    ) -> Result<String, JsValue>;
+}

@@ -6,22 +6,13 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
-    pub fn emit(name: &str, options: &events::Options) -> String;
-}
-#[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "emit")]
-    pub fn try_emit(name: &str, options: &events::Options) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "onEvent")]
-    pub fn on_event(listener: &events::Listener<String>);
+    #[wasm_bindgen(catch)]
+    pub fn emit(name: &str, options: &events::Options) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "onEvent")]
-    pub fn try_on_event(listener: &events::Listener<String>) -> Result<(), JsValue>;
+    pub fn on_event(listener: &events::Listener<String>) -> Result<(), JsValue>;
 }
 pub mod events {
     #[allow(unused_imports)]
@@ -59,21 +50,8 @@ pub mod events {
     pub type Result_<T> = Pair<T, String>;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Events")]
-        pub fn listen(name: impl ::wasm_bindgen::JsStringLike, options: &Options) -> String;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(js_name = "listen", js_namespace = "Events")]
-        pub fn listen_js_string(
-            name: impl ::wasm_bindgen::JsStringLike,
-            options: &Options,
-        ) -> JsString;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "listen", js_namespace = "Events")]
-        pub fn try_listen(
+        #[wasm_bindgen(catch, js_namespace = "Events")]
+        pub fn listen(
             name: impl ::wasm_bindgen::JsStringLike,
             options: &Options,
         ) -> Result<String, JsValue>;
@@ -81,20 +59,15 @@ pub mod events {
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "listen", js_namespace = "Events")]
-        pub fn try_listen_js_string(
+        pub fn listen_js_string(
             name: impl ::wasm_bindgen::JsStringLike,
             options: &Options,
         ) -> Result<JsString, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Events")]
-        pub fn pair(p: &Pair<String, f64>) -> Result_<f64>;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "pair", js_namespace = "Events")]
-        pub fn try_pair(p: &Pair<String, f64>) -> Result<Result_<f64>, JsValue>;
+        #[wasm_bindgen(catch, js_namespace = "Events")]
+        pub fn pair(p: &Pair<String, f64>) -> Result<Result_<f64>, JsValue>;
     }
     pub mod inner {
         #[allow(unused_imports)]
@@ -103,15 +76,8 @@ pub mod events {
         pub type Id = JsString;
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_namespace = ["Events" , "Inner"])]
-            pub fn find(id: impl ::wasm_bindgen::JsStringLike) -> super::Options;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "find" , js_namespace = ["Events" , "Inner"])]
-            pub fn try_find(
-                id: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<super::Options, JsValue>;
+            # [wasm_bindgen (catch , js_namespace = ["Events" , "Inner"])]
+            pub fn find(id: impl ::wasm_bindgen::JsStringLike) -> Result<super::Options, JsValue>;
         }
     }
 }

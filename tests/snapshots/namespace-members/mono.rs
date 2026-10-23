@@ -6,35 +6,21 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "namespace-members", experimental_generic_mono)]
 extern "C" {
-    pub fn make() -> events::Emitter;
-}
-#[wasm_bindgen(module = "namespace-members", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "make")]
-    pub fn try_make() -> Result<events::Emitter, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn make() -> Result<events::Emitter, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Emitter;
-    #[wasm_bindgen(method)]
-    pub fn emit(this: &Emitter, event: impl ::wasm_bindgen::JsStringLike) -> bool;
-    #[wasm_bindgen(method, catch, js_name = "emit")]
-    pub fn try_emit(
-        this: &Emitter,
-        event: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "globalEmitter")]
-    pub fn global_emitter() -> Emitter;
+    #[wasm_bindgen(method, catch)]
+    pub fn emit(this: &Emitter, event: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "globalEmitter")]
-    pub fn try_global_emitter() -> Result<Emitter, JsValue>;
+    pub fn global_emitter() -> Result<Emitter, JsValue>;
 }
 pub mod events {
     #[allow(unused_imports)]
@@ -46,13 +32,8 @@ pub mod events {
         # [wasm_bindgen (extends = Object , js_namespace = "Events")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Emitter;
-        #[wasm_bindgen(method)]
-        pub fn on(this: &Emitter, event: impl ::wasm_bindgen::JsStringLike);
-        #[wasm_bindgen(method, catch, js_name = "on")]
-        pub fn try_on(
-            this: &Emitter,
-            event: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn on(this: &Emitter, event: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -73,13 +54,8 @@ pub mod events {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Events")]
-        pub fn listen(name: impl ::wasm_bindgen::JsStringLike, options: &Options) -> Emitter;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "listen", js_namespace = "Events")]
-        pub fn try_listen(
+        #[wasm_bindgen(catch, js_namespace = "Events")]
+        pub fn listen(
             name: impl ::wasm_bindgen::JsStringLike,
             options: &Options,
         ) -> Result<Emitter, JsValue>;
@@ -116,10 +92,8 @@ extern "C" {
     # [wasm_bindgen (extends = events :: Emitter , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stream;
-    #[wasm_bindgen(method)]
-    pub fn pipe(this: &Stream);
-    #[wasm_bindgen(method, catch, js_name = "pipe")]
-    pub fn try_pipe(this: &Stream) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn pipe(this: &Stream) -> Result<(), JsValue>;
 }
 pub mod wasm {
     #[allow(unused_imports)]
@@ -137,12 +111,7 @@ pub mod wasm {
     pub use Global_ as Global;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Wasm")]
-        pub fn current() -> Global_;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "current", js_namespace = "Wasm")]
-        pub fn try_current() -> Result<Global_, JsValue>;
+        #[wasm_bindgen(catch, js_namespace = "Wasm")]
+        pub fn current() -> Result<Global_, JsValue>;
     }
 }

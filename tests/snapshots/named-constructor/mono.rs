@@ -14,18 +14,14 @@ extern "C" {
     #[doc = " Wire format version."]
     # [wasm_bindgen (static_method_of = Codec , getter)]
     pub fn version() -> f64;
-    # [wasm_bindgen (static_method_of = Codec , js_name = "isCodec")]
-    pub fn is_codec(value: &JsValue) -> bool;
     # [wasm_bindgen (static_method_of = Codec , catch , js_name = "isCodec")]
-    pub fn try_is_codec(value: &JsValue) -> Result<bool, JsValue>;
+    pub fn is_codec(value: &JsValue) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &Codec) -> String;
     #[wasm_bindgen(method, getter, js_name = "name")]
     pub fn name_js_string(this: &Codec) -> JsString;
-    #[wasm_bindgen(method)]
-    pub fn encode(this: &Codec, input: impl ::wasm_bindgen::JsStringLike) -> Uint8Array;
-    #[wasm_bindgen(method, catch, js_name = "encode")]
-    pub fn try_encode(
+    #[wasm_bindgen(method, catch)]
+    pub fn encode(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Uint8Array, JsValue>;
@@ -37,10 +33,8 @@ extern "C" {
     pub type Registry;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Registry, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn lookup(this: &Registry, name: impl ::wasm_bindgen::JsStringLike) -> Option<Codec>;
-    #[wasm_bindgen(method, catch, js_name = "lookup")]
-    pub fn try_lookup(
+    #[wasm_bindgen(method, catch)]
+    pub fn lookup(
         this: &Registry,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<Codec>, JsValue>;

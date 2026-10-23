@@ -14,10 +14,8 @@ pub mod dep {
         pub type _Foo;
         #[wasm_bindgen(constructor, js_class = "Foo", catch)]
         pub fn new() -> Result<_Foo, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn bar(this: &_Foo);
-        #[wasm_bindgen(method, catch, js_name = "bar")]
-        pub fn try_bar(this: &_Foo) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn bar(this: &_Foo) -> Result<(), JsValue>;
     }
     #[allow(dead_code)]
     pub type Foo = _Foo;
@@ -32,26 +30,16 @@ pub mod dep {
         }
         #[wasm_bindgen(module = "dep", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_namespace = "Foo")]
-            pub fn helper();
-        }
-        #[wasm_bindgen(module = "dep", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "helper", js_namespace = "Foo")]
-            pub fn try_helper() -> Result<(), JsValue>;
+            #[wasm_bindgen(catch, js_namespace = "Foo")]
+            pub fn helper() -> Result<(), JsValue>;
         }
     }
     #[allow(dead_code)]
     pub type Alias = _Foo;
     #[wasm_bindgen(module = "dep", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "makeFoo")]
-        pub fn make_foo() -> _Foo;
-    }
-    #[wasm_bindgen(module = "dep", experimental_generic_mono)]
-    extern "C" {
         #[wasm_bindgen(catch, js_name = "makeFoo")]
-        pub fn try_make_foo() -> Result<_Foo, JsValue>;
+        pub fn make_foo() -> Result<_Foo, JsValue>;
     }
     #[wasm_bindgen(module = "dep", experimental_generic_mono)]
     extern "C" {
@@ -81,19 +69,8 @@ pub mod main {
     use super::*;
     #[wasm_bindgen(module = "main", experimental_generic_mono)]
     extern "C" {
+        #[wasm_bindgen(catch)]
         pub fn take(
-            f: &super::dep::_Foo,
-            a: &super::dep::_Foo,
-            h: &super::dep::Holder,
-            d: &super::dep::_Foo,
-            da: &super::dep::_Foo,
-            m: super::dep::foo::Mode,
-        ) -> super::dep::_Foo;
-    }
-    #[wasm_bindgen(module = "main", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "take")]
-        pub fn try_take(
             f: &super::dep::_Foo,
             a: &super::dep::_Foo,
             h: &super::dep::Holder,

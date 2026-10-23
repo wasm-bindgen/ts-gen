@@ -21,7 +21,9 @@ use std::path::{Path, PathBuf};
 /// The snapshot tests render every fixture under each codegen configuration,
 /// so a configuration flag belongs to the test file rather than the fixture:
 /// a `//! @ts-gen --experimental-generic-mono` header on the test `.rs`
-/// compiles it against the per-monomorphization bindings.
+/// compiles it against the per-monomorphization bindings, and
+/// `//! @ts-gen --fallible` against the single `Result` forms. A
+/// `<name>_mono.rs` test may share `<name>.d.ts` with `<name>.rs`.
 fn main() {
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let crate_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -71,6 +73,8 @@ struct Entry {
     externals: Vec<String>,
     /// Whether the test file opts into per-monomorphization generic imports.
     experimental_generic_mono: bool,
+    /// Whether the test file opts into single `Result` forms for sync callables.
+    fallible: bool,
     /// Whether the fixture declares its own `--lib-name` (module mode).
     /// Script-mode fixtures parse without one and export by `--export`.
     module_mode: bool,
@@ -102,8 +106,19 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
 
         // Conventionally test stems are snake_case; the matching fixture is
         // the kebab-case form. (Stems without underscores are unchanged.)
-        let kebab = stem.replace('_', "-");
-        let dts_path = fixtures_dir.join(format!("{kebab}.d.ts"));
+        // A `<name>_mono` test without a fixture of its own compiles the
+        // `<name>` fixture under the flags its directive sets.
+        let mut kebab = stem.replace('_', "-");
+        let mut dts_path = fixtures_dir.join(format!("{kebab}.d.ts"));
+        if !dts_path.is_file() {
+            if let Some(base) = kebab.strip_suffix("-mono") {
+                let base_path = fixtures_dir.join(format!("{base}.d.ts"));
+                if base_path.is_file() {
+                    kebab = base.to_string();
+                    dts_path = base_path;
+                }
+            }
+        }
         if !dts_path.is_file() {
             panic!(
                 "test file {} has no matching fixture at {}",
@@ -113,6 +128,7 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
         }
 
         let directive = parse_directive(&dts_path);
+        let test_directive = parse_directive(&path);
         let workspace_dir = fixtures_dir.parent().unwrap().parent().unwrap();
 
         entries.push(Entry {
@@ -123,7 +139,8 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
             lib_name: directive.lib_name.unwrap_or(kebab),
             dts_path,
             externals: directive.externals,
-            experimental_generic_mono: parse_directive(&path).experimental_generic_mono,
+            experimental_generic_mono: test_directive.experimental_generic_mono,
+            fallible: test_directive.fallible,
             export_specs: directive.export_specs,
             inputs: directive
                 .inputs
@@ -144,6 +161,8 @@ struct Directive {
     externals: Vec<String>,
     /// Whether `--experimental-generic-mono` is present.
     experimental_generic_mono: bool,
+    /// Whether `--fallible` is present.
+    fallible: bool,
     /// All `--export <spec>` (or `-E <spec>`) values.
     export_specs: Vec<String>,
     /// All `--input <path>` (or `-i <path>`) values.
@@ -157,6 +176,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let mut lib_name = None;
     let mut externals = Vec::new();
     let mut experimental_generic_mono = false;
+    let mut fallible = false;
     let mut export_specs = Vec::new();
     let mut inputs = Vec::new();
 
@@ -179,6 +199,10 @@ fn parse_directive(dts_path: &Path) -> Directive {
                         experimental_generic_mono = true;
                         i += 1;
                     }
+                    "--fallible" => {
+                        fallible = true;
+                        i += 1;
+                    }
                     "--export" | "-E" if i + 1 < args.len() => {
                         export_specs.push(args[i + 1].clone());
                         i += 2;
@@ -199,6 +223,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
         lib_name,
         externals,
         experimental_generic_mono,
+        fallible,
         export_specs,
         inputs,
     }
@@ -288,6 +313,7 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
     }
     let options = ts_gen::codegen::GenerateOptions::new()
         .experimental_generic_mono(entry.experimental_generic_mono)
+        .fallible(entry.fallible)
         .exports(exports);
     let rust_code = ts_gen::codegen::generate_with_options(&module, &gctx, &options)
         .unwrap_or_else(|e| panic!("codegen failed for {}: {e}", entry.mod_name));

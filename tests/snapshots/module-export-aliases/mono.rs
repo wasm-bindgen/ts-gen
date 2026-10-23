@@ -9,10 +9,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type _Foo;
-    #[wasm_bindgen(method)]
-    pub fn bar(this: &_Foo);
-    #[wasm_bindgen(method, catch, js_name = "bar")]
-    pub fn try_bar(this: &_Foo) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn bar(this: &_Foo) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type Foo = _Foo;
@@ -20,19 +18,11 @@ pub type Foo = _Foo;
 pub type Bar = _Foo;
 #[wasm_bindgen(module = "module-export-aliases", experimental_generic_mono)]
 extern "C" {
-    pub fn a();
+    #[wasm_bindgen(catch)]
+    pub fn a() -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "module-export-aliases", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "a")]
-    pub fn try_a() -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "module-export-aliases", experimental_generic_mono)]
-extern "C" {
-    pub fn b();
-}
-#[wasm_bindgen(module = "module-export-aliases", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "b")]
-    pub fn try_b() -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn b() -> Result<(), JsValue>;
 }

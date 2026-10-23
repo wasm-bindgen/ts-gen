@@ -30,12 +30,8 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn foo_bar();
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "foo_bar")]
-    pub fn try_foo_bar() -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn foo_bar() -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

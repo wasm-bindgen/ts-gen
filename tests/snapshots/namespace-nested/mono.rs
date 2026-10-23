@@ -15,20 +15,13 @@ pub mod outer {
             # [wasm_bindgen (extends = Object , js_namespace = ["Outer" , "Inner"])]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type Thing;
-            # [wasm_bindgen (static_method_of = Thing , js_namespace = ["Outer" , "Inner"])]
-            pub fn make() -> Thing;
-            # [wasm_bindgen (static_method_of = Thing , js_namespace = ["Outer" , "Inner"] , catch , js_name = "make")]
-            pub fn try_make() -> Result<Thing, JsValue>;
+            # [wasm_bindgen (static_method_of = Thing , js_namespace = ["Outer" , "Inner"] , catch)]
+            pub fn make() -> Result<Thing, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_namespace = ["Outer" , "Inner"])]
-            pub fn run();
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "run" , js_namespace = ["Outer" , "Inner"])]
-            pub fn try_run() -> Result<(), JsValue>;
+            # [wasm_bindgen (catch , js_namespace = ["Outer" , "Inner"])]
+            pub fn run() -> Result<(), JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {

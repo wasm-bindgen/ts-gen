@@ -11,19 +11,13 @@ extern "C" {
     pub type Walker;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(o: &dep::Options) -> Result<Walker, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn walk(this: &Walker);
-    #[wasm_bindgen(method, catch, js_name = "walk")]
-    pub fn try_walk(this: &Walker) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn walk(this: &Walker) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "import-require-module", experimental_generic_mono)]
 extern "C" {
-    pub fn walk(o: &dep::Options) -> Walker;
-}
-#[wasm_bindgen(module = "import-require-module", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "walk")]
-    pub fn try_walk(o: &dep::Options) -> Result<Walker, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn walk(o: &dep::Options) -> Result<Walker, JsValue>;
 }
 pub mod dep {
     #[allow(unused_imports)]

@@ -85,74 +85,87 @@ pub mod shadow {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "use", js_namespace = "Shadow")]
-        pub fn use_(
-            a: &super::Pair<super::Inner, super::Inner>,
-            b: &super::Pair<super::Inner, super::Inner>,
-        );
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
         #[wasm_bindgen(catch, js_name = "use", js_namespace = "Shadow")]
-        pub fn try_use_(
+        pub fn use_(
             a: &super::Pair<super::Inner, super::Inner>,
             b: &super::Pair<super::Inner, super::Inner>,
         ) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Shadow")]
+        #[wasm_bindgen(catch, js_namespace = "Shadow")]
         pub fn wrapped(
-            a: &[super::Pair<super::Inner, super::Inner>],
-            b: &Promise<super::Pair<super::Inner, super::Inner>>,
-        ) -> Nullable<super::Pair<super::Inner, super::Inner>>;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "wrapped", js_namespace = "Shadow")]
-        pub fn try_wrapped(
             a: &[super::Pair<super::Inner, super::Inner>],
             b: &Promise<super::Pair<super::Inner, super::Inner>>,
         ) -> Result<Nullable<super::Pair<super::Inner, super::Inner>>, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Shadow")]
-        pub fn either(a: &JsValue, b: &JsValue) -> JsValue;
+        #[wasm_bindgen(catch, js_namespace = "Shadow")]
+        pub fn either(a: &JsValue, b: &JsValue) -> Result<JsValue, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(catch, js_name = "either", js_namespace = "Shadow")]
-        pub fn try_either(a: &JsValue, b: &JsValue) -> Result<JsValue, JsValue>;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(js_namespace = "Shadow")]
-        pub fn name(n: impl ::wasm_bindgen::JsStringLike);
+        #[wasm_bindgen(catch, js_namespace = "Shadow")]
+        pub fn name(n: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "name", js_namespace = "Shadow")]
-        pub fn try_name(n: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+        pub fn name_with_f64(n: f64) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "name", js_namespace = "Shadow")]
-        pub fn name_with_f64(n: f64);
+        #[wasm_bindgen(catch, js_namespace = "Shadow")]
+        pub fn own(i: &Inner) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(catch, js_name = "name", js_namespace = "Shadow")]
-        pub fn try_name_with_f64(n: f64) -> Result<(), JsValue>;
+        # [wasm_bindgen (extends = Object , js_namespace = "Shadow")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Mode;
+        #[wasm_bindgen(method, getter)]
+        pub fn shadow(this: &Mode) -> bool;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_shadow(this: &Mode, val: bool);
+    }
+    impl Mode {
+        pub fn new(shadow: bool) -> Mode {
+            let inner: Mode = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_shadow(shadow);
+            inner
+        }
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Shadow")]
-        pub fn own(i: &Inner);
+        #[wasm_bindgen(catch, js_namespace = "Shadow")]
+        pub fn hold(h: &super::Holder<super::Mode>) -> Result<super::Holder<super::Mode>, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(catch, js_name = "own", js_namespace = "Shadow")]
-        pub fn try_own(i: &Inner) -> Result<(), JsValue>;
+        #[wasm_bindgen(catch, js_namespace = "Shadow")]
+        pub async fn next() -> Result<super::Mode, JsValue>;
     }
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Mode {
+    Fast = "fast",
+    Slow = "slow",
+}
+#[allow(dead_code)]
+pub type TopMode = Mode;
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Holder<T>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch)]
+    pub fn get<T>(this: &Holder<T>) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi;
 }

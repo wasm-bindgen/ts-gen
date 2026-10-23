@@ -104,7 +104,8 @@ Three layers:
 2. **Snapshot tests** (`cargo test --test snapshot`) — fixture-driven.
    Every fixture under `tests/fixtures/` is rendered under each CLI
    configuration in `tests/snapshot.rs` (`default`, and `mono` for
-   `--experimental-generic-mono`) into `tests/snapshots/<name>/`. Re-bless
+   `--experimental-generic-mono --fallible`) into `tests/snapshots/<name>/`.
+   Re-bless
    with `BLESS=1 cargo test`. Snapshot
    diffs in PRs should match documented convention changes — silently
    diff-only PRs are a smell.

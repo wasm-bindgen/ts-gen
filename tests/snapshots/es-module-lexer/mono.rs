@@ -323,26 +323,8 @@ extern "C" {
     #[doc = " * `name` - Optional sourcename"]
     #[doc = ""]
     #[doc = " Returns: Tuple contaning imports list and exports list."]
+    #[wasm_bindgen(catch)]
     pub fn parse(
-        source: impl ::wasm_bindgen::JsStringLike,
-    ) -> ArrayTuple<(
-        Array<ImportSpecifier>,
-        Array<ExportSpecifier>,
-        Boolean,
-        Boolean,
-    )>;
-}
-#[wasm_bindgen(module = "es-module-lexer", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Outputs the list of exports and locations of import specifiers,"]
-    #[doc = " including dynamic import and import meta handling."]
-    #[doc = ""]
-    #[doc = " * `source` - Source code to parser"]
-    #[doc = " * `name` - Optional sourcename"]
-    #[doc = ""]
-    #[doc = " Returns: Tuple contaning imports list and exports list."]
-    #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn try_parse(
         source: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<
         ArrayTuple<(
@@ -363,28 +345,8 @@ extern "C" {
     #[doc = " * `name` - Optional sourcename"]
     #[doc = ""]
     #[doc = " Returns: Tuple contaning imports list and exports list."]
-    #[wasm_bindgen(js_name = "parse")]
-    pub fn parse_with_name(
-        source: impl ::wasm_bindgen::JsStringLike,
-        name: impl ::wasm_bindgen::JsStringLike,
-    ) -> ArrayTuple<(
-        Array<ImportSpecifier>,
-        Array<ExportSpecifier>,
-        Boolean,
-        Boolean,
-    )>;
-}
-#[wasm_bindgen(module = "es-module-lexer", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Outputs the list of exports and locations of import specifiers,"]
-    #[doc = " including dynamic import and import meta handling."]
-    #[doc = ""]
-    #[doc = " * `source` - Source code to parser"]
-    #[doc = " * `name` - Optional sourcename"]
-    #[doc = ""]
-    #[doc = " Returns: Tuple contaning imports list and exports list."]
     #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn try_parse_with_name(
+    pub fn parse_with_name(
         source: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<
@@ -406,11 +368,6 @@ extern "C" {
 }
 #[wasm_bindgen(module = "es-module-lexer", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "initSync")]
-    pub fn init_sync();
-}
-#[wasm_bindgen(module = "es-module-lexer", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "initSync")]
-    pub fn try_init_sync() -> Result<(), JsValue>;
+    pub fn init_sync() -> Result<(), JsValue>;
 }

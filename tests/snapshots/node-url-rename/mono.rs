@@ -15,32 +15,20 @@ extern "C" {
     pub fn href(this: &_URL) -> String;
     #[wasm_bindgen(method, getter, js_name = "href")]
     pub fn href_js_string(this: &_URL) -> JsString;
-    # [wasm_bindgen (static_method_of = _URL , js_class = "URL" , js_name = "canParse")]
-    pub fn can_parse(input: impl ::wasm_bindgen::JsStringLike) -> bool;
     # [wasm_bindgen (static_method_of = _URL , js_class = "URL" , catch , js_name = "canParse")]
-    pub fn try_can_parse(input: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
+    pub fn can_parse(input: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
 }
 #[allow(dead_code)]
 pub type URL = _URL;
 #[wasm_bindgen(module = "node:url", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fileURLToPath")]
-    pub fn file_url_to_path(url: impl ::wasm_bindgen::JsStringLike) -> String;
-}
-#[wasm_bindgen(module = "node:url", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "fileURLToPath")]
-    pub fn file_url_to_path_js_string(url: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    #[wasm_bindgen(catch, js_name = "fileURLToPath")]
+    pub fn file_url_to_path(url: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node:url", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fileURLToPath")]
-    pub fn try_file_url_to_path(url: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "node:url", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "fileURLToPath")]
-    pub fn try_file_url_to_path_js_string(
+    pub fn file_url_to_path_js_string(
         url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
 }

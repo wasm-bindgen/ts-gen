@@ -14,13 +14,8 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `DOMException` — when the codec is closed"]
-    #[wasm_bindgen(method)]
-    pub fn encode(this: &Codec, input: impl ::wasm_bindgen::JsStringLike) -> Uint8Array;
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `DOMException` — when the codec is closed"]
-    #[wasm_bindgen(method, catch, js_name = "encode")]
-    pub fn try_encode(
+    #[wasm_bindgen(method, catch)]
+    pub fn encode(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Uint8Array, DOMException>;

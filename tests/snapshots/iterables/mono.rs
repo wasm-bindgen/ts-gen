@@ -9,52 +9,31 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KeyValueStore;
-    #[wasm_bindgen(method)]
-    pub fn list<T>(this: &KeyValueStore) -> KeyValueStoreList<T>;
-    #[wasm_bindgen(method, catch, js_name = "list")]
-    pub fn try_list<T>(this: &KeyValueStore) -> Result<KeyValueStoreList<T>, JsValue>;
-    #[wasm_bindgen(method, js_name = "listAsync")]
-    pub fn list_async<T>(this: &KeyValueStore) -> KeyValueStoreListAsync<T>;
+    #[wasm_bindgen(method, catch)]
+    pub fn list<T>(this: &KeyValueStore) -> Result<KeyValueStoreList<T>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "listAsync")]
-    pub fn try_list_async<T>(this: &KeyValueStore) -> Result<KeyValueStoreListAsync<T>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn entries<T>(this: &KeyValueStore) -> Iterator<ArrayTuple<(JsString, T)>>;
-    #[wasm_bindgen(method, catch, js_name = "entries")]
-    pub fn try_entries<T>(
-        this: &KeyValueStore,
-    ) -> Result<Iterator<ArrayTuple<(JsString, T)>>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn keys(this: &KeyValueStore) -> Iterator<JsString>;
-    #[wasm_bindgen(method, catch, js_name = "keys")]
-    pub fn try_keys(this: &KeyValueStore) -> Result<Iterator<JsString>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn pages<T>(this: &KeyValueStore) -> AsyncIterator<T>;
-    #[wasm_bindgen(method, catch, js_name = "pages")]
-    pub fn try_pages<T>(this: &KeyValueStore) -> Result<AsyncIterator<T>, JsValue>;
-    #[wasm_bindgen(method, js_name = "asyncEntries")]
-    pub fn async_entries<T>(this: &KeyValueStore) -> AsyncIterator<ArrayTuple<(JsString, T)>>;
+    pub fn list_async<T>(this: &KeyValueStore) -> Result<KeyValueStoreListAsync<T>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn entries<T>(this: &KeyValueStore)
+        -> Result<Iterator<ArrayTuple<(JsString, T)>>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn keys(this: &KeyValueStore) -> Result<Iterator<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn pages<T>(this: &KeyValueStore) -> Result<AsyncIterator<T>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "asyncEntries")]
-    pub fn try_async_entries<T>(
+    pub fn async_entries<T>(
         this: &KeyValueStore,
     ) -> Result<AsyncIterator<ArrayTuple<(JsString, T)>>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn put<T>(this: &KeyValueStore, key: impl ::wasm_bindgen::JsStringLike, value: T)
-    where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub fn try_put<T>(
+    #[wasm_bindgen(method, catch)]
+    pub fn put<T>(
         this: &KeyValueStore,
         key: impl ::wasm_bindgen::JsStringLike,
         value: T,
     ) -> Result<(), JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
-    #[wasm_bindgen(method)]
-    pub fn get<T>(this: &KeyValueStore, key: impl ::wasm_bindgen::JsStringLike) -> Option<T>
-    where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get<T>(
+    #[wasm_bindgen(method, catch)]
+    pub fn get<T>(
         this: &KeyValueStore,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<T>, JsValue>
@@ -67,11 +46,8 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KeyValueStoreList<T>;
     #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
-    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
-    pub fn iterator<T>(this: &KeyValueStoreList<T>) -> Iterator<ArrayTuple<(JsString, T)>>;
-    #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
-    pub fn try_iterator<T>(
+    pub fn iterator<T>(
         this: &KeyValueStoreList<T>,
     ) -> Result<Iterator<ArrayTuple<(JsString, T)>>, JsValue>;
 }
@@ -81,13 +57,8 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KeyValueStoreListAsync<T>;
     #[doc = " Conformance to the JS async iteration protocol — returns the underlying iterator."]
-    #[wasm_bindgen(method, js_name = "[Symbol.asyncIterator]")]
-    pub fn async_iterator<T>(
-        this: &KeyValueStoreListAsync<T>,
-    ) -> AsyncIterator<ArrayTuple<(JsString, T)>>;
-    #[doc = " Conformance to the JS async iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, catch, js_name = "[Symbol.asyncIterator]")]
-    pub fn try_async_iterator<T>(
+    pub fn async_iterator<T>(
         this: &KeyValueStoreListAsync<T>,
     ) -> Result<AsyncIterator<ArrayTuple<(JsString, T)>>, JsValue>;
 }
@@ -96,10 +67,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cursor;
-    #[wasm_bindgen(method)]
-    pub fn walk<T>(this: &Cursor) -> CursorWalk<T>;
-    #[wasm_bindgen(method, catch, js_name = "walk")]
-    pub fn try_walk<T>(this: &Cursor) -> Result<CursorWalk<T>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn walk<T>(this: &Cursor) -> Result<CursorWalk<T>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -107,9 +76,6 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CursorWalk<T>;
     #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
-    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
-    pub fn iterator<T>(this: &CursorWalk<T>) -> Iterator<T>;
-    #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
-    pub fn try_iterator<T>(this: &CursorWalk<T>) -> Result<Iterator<T>, JsValue>;
+    pub fn iterator<T>(this: &CursorWalk<T>) -> Result<Iterator<T>, JsValue>;
 }

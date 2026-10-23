@@ -23,22 +23,13 @@ impl InspectOptions {
 }
 #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
 extern "C" {
-    pub fn inspect(value: &JsValue) -> String;
-}
-#[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "inspect")]
-    pub fn inspect_js_string(value: &JsValue) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn inspect(value: &JsValue) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "inspect")]
-    pub fn try_inspect(value: &JsValue) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "inspect")]
-    pub fn try_inspect_js_string(value: &JsValue) -> Result<JsString, JsValue>;
+    pub fn inspect_js_string(value: &JsValue) -> Result<JsString, JsValue>;
 }
 pub mod inspect {
     #[allow(unused_imports)]
@@ -51,43 +42,25 @@ pub mod inspect {
     }
     #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "withDepth", js_namespace = "inspect")]
-        pub fn with_depth(depth: f64) -> Formatter<String>;
-    }
-    #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(js_name = "withDepth", js_namespace = "inspect")]
-        pub fn with_depth_js_string(depth: f64) -> Formatter<JsString>;
+        #[wasm_bindgen(catch, js_name = "withDepth", js_namespace = "inspect")]
+        pub fn with_depth(depth: f64) -> Result<Formatter<String>, JsValue>;
     }
     #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "withDepth", js_namespace = "inspect")]
-        pub fn try_with_depth(depth: f64) -> Result<Formatter<String>, JsValue>;
-    }
-    #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "withDepth", js_namespace = "inspect")]
-        pub fn try_with_depth_js_string(depth: f64) -> Result<Formatter<JsString>, JsValue>;
+        pub fn with_depth_js_string(depth: f64) -> Result<Formatter<JsString>, JsValue>;
     }
     #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "inspect")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Formatter<T>;
-        #[wasm_bindgen(method)]
-        pub fn format<T>(this: &Formatter<T>, value: T) -> String
-        where
-            T: ::wasm_bindgen::convert::IntoWasmAbi;
-        #[wasm_bindgen(method, js_name = "format")]
-        pub fn format_js_string<T>(this: &Formatter<T>, value: T) -> JsString
+        #[wasm_bindgen(method, catch)]
+        pub fn format<T>(this: &Formatter<T>, value: T) -> Result<String, JsValue>
         where
             T: ::wasm_bindgen::convert::IntoWasmAbi;
         #[wasm_bindgen(method, catch, js_name = "format")]
-        pub fn try_format<T>(this: &Formatter<T>, value: T) -> Result<String, JsValue>
-        where
-            T: ::wasm_bindgen::convert::IntoWasmAbi;
-        #[wasm_bindgen(method, catch, js_name = "format")]
-        pub fn try_format_js_string<T>(this: &Formatter<T>, value: T) -> Result<JsString, JsValue>
+        pub fn format_js_string<T>(this: &Formatter<T>, value: T) -> Result<JsString, JsValue>
         where
             T: ::wasm_bindgen::convert::IntoWasmAbi;
     }
@@ -112,25 +85,13 @@ pub mod outer {
         }
         #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_namespace = ["outer" , "inner"])]
-            pub fn run(style: super::super::inspect::Style) -> String;
-        }
-        #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (js_name = "run" , js_namespace = ["outer" , "inner"])]
-            pub fn run_js_string(style: super::super::inspect::Style) -> JsString;
+            # [wasm_bindgen (catch , js_namespace = ["outer" , "inner"])]
+            pub fn run(style: super::super::inspect::Style) -> Result<String, JsValue>;
         }
         #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (catch , js_name = "run" , js_namespace = ["outer" , "inner"])]
-            pub fn try_run(style: super::super::inspect::Style) -> Result<String, JsValue>;
-        }
-        #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "run" , js_namespace = ["outer" , "inner"])]
-            pub fn try_run_js_string(
-                style: super::super::inspect::Style,
-            ) -> Result<JsString, JsValue>;
+            pub fn run_js_string(style: super::super::inspect::Style) -> Result<JsString, JsValue>;
         }
     }
 }

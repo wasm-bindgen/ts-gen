@@ -532,7 +532,12 @@ pub fn build_signatures(
             (Some(inner), true) => (true, inner.clone()),
             _ => (false, overload.return_type.clone()),
         };
-        let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
+        // A sync callable that can throw gets a catching form: as the
+        // `try_` companion by default, or as the primary itself under
+        // `--fallible`.
+        let sync_fallible = !is_async && !nothrow && spec.kind.allows_try_variant();
+        let fallible = cgctx.is_some_and(|ctx| ctx.fallible);
+        let allow_try = sync_fallible && !fallible;
         out.reserve(match (allow_try, per_mono) {
             (true, true) => 4,
             (true, false) | (false, true) => 2,
@@ -543,8 +548,10 @@ pub fn build_signatures(
 
         // Primary variant catches when:
         // * the kind always catches (constructors), OR
-        // * it's async — *unless* `Throws::Never` opts out.
-        let primary_catches = spec.kind.always_catches() || (is_async && !nothrow);
+        // * it's async — *unless* `Throws::Never` opts out, OR
+        // * it's sync and can throw, under `--fallible`.
+        let primary_catches =
+            spec.kind.always_catches() || (is_async && !nothrow) || (sync_fallible && fallible);
         let primary = FunctionSignature {
             rust_name: primary_name.clone(),
             js_name: spec.js_name.to_string(),
@@ -2354,6 +2361,36 @@ mod tests {
         )
     }
 
+    /// Like [`expand_throws`] under `--fallible`.
+    fn expand_fallible(
+        js: &str,
+        params: &[Param],
+        ret: &TypeRef,
+        kind: SignatureKind,
+        throws: &Throws,
+        used: &mut LocalScope,
+    ) -> Vec<FunctionSignature> {
+        let (gctx, scope) = test_ctx();
+        let mut cgctx = CodegenContext::empty(&gctx, scope);
+        cgctx.fallible = true;
+        build_signatures(
+            &CallableSpec {
+                js_name: js,
+                rust_name: None,
+                kind,
+                overloads: &[Overload {
+                    params,
+                    return_type: ret,
+                    body_scope: scope,
+                    throws,
+                    doc: &None,
+                }],
+            },
+            used,
+            Some(&cgctx),
+        )
+    }
+
     /// Shorthand: build signatures for multiple overloads.
     fn expand_overloads(
         js: &str,
@@ -3004,6 +3041,106 @@ mod tests {
         assert_eq!(sigs[1].rust_name, "try_upload");
         assert!(sigs[1].catch);
         assert_eq!(sigs[1].error_type.as_ref(), Some(&err));
+    }
+
+    #[test]
+    fn test_fallible_sync_method_is_single_result_form() {
+        // Under `--fallible` the primary itself catches; no `try_` sibling.
+        let mut used = no_used();
+        let sigs = expand_fallible(
+            "compute",
+            &[param("x")],
+            &TypeRef::Number,
+            SignatureKind::Method,
+            &Throws::None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].rust_name, "compute");
+        assert!(sigs[0].catch);
+        assert!(!sigs[0].is_async);
+        assert!(sigs[0].error_type.is_none(), "untyped error defaults later");
+    }
+
+    #[test]
+    fn test_fallible_optional_params_expand_without_try() {
+        let mut used = no_used();
+        let sigs = expand_fallible(
+            "count",
+            &[opt_param("label")],
+            &TypeRef::Void,
+            SignatureKind::Function,
+            &Throws::None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 2);
+        assert_eq!(sigs[0].rust_name, "count");
+        assert_eq!(sigs[1].rust_name, "count_with_label");
+        assert!(sigs.iter().all(|s| s.catch));
+    }
+
+    #[test]
+    fn test_fallible_throws_never_stays_infallible() {
+        let mut used = no_used();
+        let sigs = expand_fallible(
+            "count",
+            &[],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &Throws::Never,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].rust_name, "count");
+        assert!(!sigs[0].catch);
+    }
+
+    #[test]
+    fn test_fallible_typed_throws_on_primary() {
+        let err = TypeRef::ident("RangeError");
+        let mut used = no_used();
+        let sigs = expand_fallible(
+            "upload",
+            &[param("file")],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &Throws::Type(err.clone()),
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].rust_name, "upload");
+        assert!(sigs[0].catch);
+        assert_eq!(sigs[0].error_type.as_ref(), Some(&err));
+    }
+
+    #[test]
+    fn test_fallible_leaves_async_constructor_setter_unchanged() {
+        let cases: [(&str, &[Param], TypeRef, SignatureKind); 3] = [
+            (
+                "load",
+                &[],
+                TypeRef::generic("Promise", vec![TypeRef::String]),
+                SignatureKind::Method,
+            ),
+            (
+                "Foo",
+                &[param("x")],
+                TypeRef::ident("Foo"),
+                SignatureKind::Constructor,
+            ),
+            ("value", &[param("v")], TypeRef::Void, SignatureKind::Setter),
+        ];
+        for (js, params, ret, kind) in cases {
+            let plain = expand_throws(js, params, &ret, kind, &Throws::None, &None, &mut no_used());
+            let fallible = expand_fallible(js, params, &ret, kind, &Throws::None, &mut no_used());
+            assert_eq!(plain.len(), fallible.len(), "{js}");
+            for (a, b) in plain.iter().zip(&fallible) {
+                assert_eq!(a.rust_name, b.rust_name, "{js}");
+                assert_eq!(a.catch, b.catch, "{js}");
+                assert_eq!(a.is_async, b.is_async, "{js}");
+                assert_eq!(a.error_type, b.error_type, "{js}");
+            }
+        }
     }
 
     #[test]

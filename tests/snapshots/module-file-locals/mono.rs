@@ -11,10 +11,8 @@ extern "C" {
     pub type _Foo;
     #[wasm_bindgen(constructor, js_class = "Foo", catch)]
     pub fn new() -> Result<_Foo, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn bar(this: &_Foo);
-    #[wasm_bindgen(method, catch, js_name = "bar")]
-    pub fn try_bar(this: &_Foo) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn bar(this: &_Foo) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type Foo = _Foo;
@@ -23,10 +21,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object , js_name = "Server")]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type _Server;
-    #[wasm_bindgen(method)]
-    pub fn listen(this: &_Server);
-    #[wasm_bindgen(method, catch, js_name = "listen")]
-    pub fn try_listen(this: &_Server) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn listen(this: &_Server) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type Server = _Server;
@@ -49,40 +45,26 @@ impl Options {
 }
 #[wasm_bindgen(module = "module-file-locals", experimental_generic_mono)]
 extern "C" {
-    pub fn configure(o: &Options) -> _Foo;
-}
-#[wasm_bindgen(module = "module-file-locals", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "configure")]
-    pub fn try_configure(o: &Options) -> Result<_Foo, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn configure(o: &Options) -> Result<_Foo, JsValue>;
 }
 #[allow(dead_code)]
 pub type Alias = _Foo;
 #[wasm_bindgen(module = "module-file-locals", experimental_generic_mono)]
 extern "C" {
-    pub fn ren();
-}
-#[wasm_bindgen(module = "module-file-locals", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "ren")]
-    pub fn try_ren() -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn ren() -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "module-file-locals", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Hidden;
-    #[wasm_bindgen(method)]
-    pub fn m(this: &Hidden);
-    #[wasm_bindgen(method, catch, js_name = "m")]
-    pub fn try_m(this: &Hidden) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn m(this: &Hidden) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "module-file-locals", experimental_generic_mono)]
 extern "C" {
-    pub fn reveal() -> Hidden;
-}
-#[wasm_bindgen(module = "module-file-locals", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "reveal")]
-    pub fn try_reveal() -> Result<Hidden, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn reveal() -> Result<Hidden, JsValue>;
 }

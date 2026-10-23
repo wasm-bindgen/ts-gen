@@ -11,8 +11,6 @@ extern "C" {
     pub type Widget;
     #[wasm_bindgen(constructor, js_class = "default", catch)]
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Result<Widget, JsValue>;
-    # [wasm_bindgen (static_method_of = Widget , js_class = "default")]
-    pub fn create() -> Widget;
-    # [wasm_bindgen (static_method_of = Widget , js_class = "default" , catch , js_name = "create")]
-    pub fn try_create() -> Result<Widget, JsValue>;
+    # [wasm_bindgen (static_method_of = Widget , js_class = "default" , catch)]
+    pub fn create() -> Result<Widget, JsValue>;
 }

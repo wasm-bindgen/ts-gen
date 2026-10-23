@@ -12,42 +12,25 @@ pub mod node {
         use super::*;
         #[wasm_bindgen(module = "node:thing", experimental_generic_mono)]
         extern "C" {
-            pub fn connect(address: impl ::wasm_bindgen::JsStringLike) -> super::super::Socket;
-        }
-        #[wasm_bindgen(module = "node:thing", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "connect")]
-            pub fn try_connect(
+            #[wasm_bindgen(catch)]
+            pub fn connect(
                 address: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<super::super::Socket, JsValue>;
         }
         #[wasm_bindgen(module = "node:thing", experimental_generic_mono)]
         extern "C" {
-            pub fn serve(port: f64);
-        }
-        #[wasm_bindgen(module = "node:thing", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "serve")]
-            pub fn try_serve(port: f64) -> Result<(), JsValue>;
-        }
-        #[wasm_bindgen(module = "node:thing", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(js_name = "listenOn")]
-            pub fn listen_on(port: f64);
+            #[wasm_bindgen(catch)]
+            pub fn serve(port: f64) -> Result<(), JsValue>;
         }
         #[wasm_bindgen(module = "node:thing", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "listenOn")]
-            pub fn try_listen_on(port: f64) -> Result<(), JsValue>;
+            pub fn listen_on(port: f64) -> Result<(), JsValue>;
         }
         #[wasm_bindgen(module = "node:thing", experimental_generic_mono)]
         extern "C" {
-            pub fn shutdown();
-        }
-        #[wasm_bindgen(module = "node:thing", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "shutdown")]
-            pub fn try_shutdown() -> Result<(), JsValue>;
+            #[wasm_bindgen(catch)]
+            pub fn shutdown() -> Result<(), JsValue>;
         }
         #[wasm_bindgen(module = "node:thing", experimental_generic_mono)]
         extern "C" {
@@ -62,10 +45,8 @@ pub mod node {
             pub type _Server;
             #[wasm_bindgen(constructor, js_class = "Server", catch)]
             pub fn new(port: f64) -> Result<_Server, JsValue>;
-            #[wasm_bindgen(method)]
-            pub fn stop(this: &_Server);
-            #[wasm_bindgen(method, catch, js_name = "stop")]
-            pub fn try_stop(this: &_Server) -> Result<(), JsValue>;
+            #[wasm_bindgen(method, catch)]
+            pub fn stop(this: &_Server) -> Result<(), JsValue>;
         }
         #[allow(dead_code)]
         pub type Server = _Server;
@@ -75,25 +56,15 @@ pub mod node {
         use super::*;
         #[wasm_bindgen(module = "node:other", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_name = "_close")]
-            pub fn close() -> bool;
-        }
-        #[wasm_bindgen(module = "node:other", experimental_generic_mono)]
-        extern "C" {
             #[wasm_bindgen(catch, js_name = "_close")]
-            pub fn try_close() -> Result<bool, JsValue>;
+            pub fn close() -> Result<bool, JsValue>;
         }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "_listen")]
-    pub fn listen(host: impl ::wasm_bindgen::JsStringLike);
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "_listen")]
-    pub fn try_listen(host: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+    pub fn listen(host: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

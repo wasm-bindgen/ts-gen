@@ -6,67 +6,38 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn digest(data: &Uint8Array) -> Uint8Array;
+    #[wasm_bindgen(catch)]
+    pub fn digest(data: &Uint8Array) -> Result<Uint8Array, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "digest")]
-    pub fn try_digest(data: &Uint8Array) -> Result<Uint8Array, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn samples() -> Result<Float64Array, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn samples() -> Float64Array;
+    #[wasm_bindgen(catch)]
+    pub fn clamped(data: &Uint8ClampedArray) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "samples")]
-    pub fn try_samples() -> Result<Float64Array, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn view(data: &DataView) -> Result<DataView, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn clamped(data: &Uint8ClampedArray);
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "clamped")]
-    pub fn try_clamped(data: &Uint8ClampedArray) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    pub fn view(data: &DataView) -> DataView;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "view")]
-    pub fn try_view(data: &DataView) -> Result<DataView, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    pub fn pair(#[wasm_bindgen(slice = "copy")] data: &[u8]);
+    #[wasm_bindgen(catch)]
+    pub fn pair(#[wasm_bindgen(slice = "copy")] data: &[u8]) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "pair")]
-    pub fn try_pair(#[wasm_bindgen(slice = "copy")] data: &[u8]) -> Result<(), JsValue>;
+    pub fn pair_with_uint8_array(data: &Uint8Array) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "pair")]
-    pub fn pair_with_uint8_array(data: &Uint8Array);
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "pair")]
-    pub fn try_pair_with_uint8_array(data: &Uint8Array) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    pub fn chunks() -> Vec<Uint8Array>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "chunks")]
-    pub fn try_chunks() -> Result<Vec<Uint8Array>, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn chunks() -> Result<Vec<Uint8Array>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

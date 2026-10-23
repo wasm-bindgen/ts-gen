@@ -34,3 +34,10 @@ export const mixed = (nums, bytes) => `${describe(nums)}|${describe(bytes)}`;
 export const spelled = describe;
 export const spelled_readonly = describe;
 export const array_like = describe;
+export class Bag {
+  take(values) {
+    return describe(values);
+  }
+}
+export const mixedGeneric = (values, weights, data) =>
+  [describe(values), describe(weights), describe(data)].join(" ");

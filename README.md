@@ -63,6 +63,13 @@ codegen:
 ts-gen --input types.d.ts --output src/bindings.rs --experimental-generic-mono
 ```
 
+Emit one `Result` form per sync method and function instead of a trapping
+primary plus a `try_<name>` companion:
+
+```sh
+ts-gen --input types.d.ts --output src/bindings.rs --fallible
+```
+
 ### Library API
 
 ```rust

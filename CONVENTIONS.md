@@ -31,6 +31,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Module-scoped constructor variables](#module-scoped-constructor-variables)
 * [Signature flattening](#signature-flattening)
 * [Methods + the `try_<name>` companion](#methods--the-try_name-companion)
+  * [`--fallible` — single `Result` form](#--fallible--single-result-form)
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
@@ -1620,6 +1621,36 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 The non-`try_` form panics on JS throw; the `try_` form returns `Result`.
 Setters and constructors don't get a `try_` companion (setters never
 catch; constructors always catch).
+
+### `--fallible` — single `Result` form
+
+TypeScript carries no throw information, so the pair above is emitted for
+every sync method and function. A surface that wants the `Result` form
+everywhere pays double the API, and the trapping primary is a footgun.
+`--fallible` (`GenerateOptions::fallible(true)`) folds the pair into one
+binding under the primary name:
+
+```rust
+// default
+#[wasm_bindgen(method)]
+pub fn frobnicate(this: &Foo) -> String;
+#[wasm_bindgen(method, catch, js_name = "frobnicate")]
+pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
+
+// --fallible
+#[wasm_bindgen(method, catch)]
+pub fn frobnicate(this: &Foo) -> Result<String, JsValue>;
+```
+
+Every expansion that would have had a `try_` companion (flattened
+overloads, `_with_` forms, the `_js_string` return variant) becomes a
+single catching form; no `try_` name is declared. The error type is
+unchanged: `@throws {T}` → `T`, otherwise `JsValue`, or `js_sys::Error`
+under `--errors-as-error`, so the two flags compose. `@throws {never}`
+keeps a sync binding infallible (no `catch`, plain `T`) and is the only
+way to get one under the flag. Async callables, constructors (always
+catch), setters (never catch) and property getters are not affected.
+Without the flag, output is identical to the default.
 
 ## `Promise<T>` returns become `async fn`
 

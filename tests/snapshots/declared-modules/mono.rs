@@ -23,12 +23,8 @@ impl Options {
 }
 #[wasm_bindgen(module = "declared-modules", experimental_generic_mono)]
 extern "C" {
-    pub fn options() -> Options;
-}
-#[wasm_bindgen(module = "declared-modules", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "options")]
-    pub fn try_options() -> Result<Options, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn options() -> Result<Options, JsValue>;
 }
 pub mod declared_modules {
     #[allow(unused_imports)]
@@ -48,12 +44,8 @@ pub mod declared_modules {
         }
         #[wasm_bindgen(module = "declared-modules/fs", experimental_generic_mono)]
         extern "C" {
-            pub fn open(path: impl ::wasm_bindgen::JsStringLike) -> super::super::Handle;
-        }
-        #[wasm_bindgen(module = "declared-modules/fs", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "open")]
-            pub fn try_open(
+            #[wasm_bindgen(catch)]
+            pub fn open(
                 path: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<super::super::Handle, JsValue>;
         }
@@ -83,22 +75,13 @@ pub mod declared_modules {
         }
         #[wasm_bindgen(module = "declared-modules/os", experimental_generic_mono)]
         extern "C" {
-            pub fn hostname() -> String;
-        }
-        #[wasm_bindgen(module = "declared-modules/os", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(js_name = "hostname")]
-            pub fn hostname_js_string() -> JsString;
+            #[wasm_bindgen(catch)]
+            pub fn hostname() -> Result<String, JsValue>;
         }
         #[wasm_bindgen(module = "declared-modules/os", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "hostname")]
-            pub fn try_hostname() -> Result<String, JsValue>;
-        }
-        #[wasm_bindgen(module = "declared-modules/os", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "hostname")]
-            pub fn try_hostname_js_string() -> Result<JsString, JsValue>;
+            pub fn hostname_js_string() -> Result<JsString, JsValue>;
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]

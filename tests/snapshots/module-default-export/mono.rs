@@ -6,11 +6,6 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "module-default-export", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "default")]
-    pub fn f();
-}
-#[wasm_bindgen(module = "module-default-export", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "default")]
-    pub fn try_f() -> Result<(), JsValue>;
+    pub fn f() -> Result<(), JsValue>;
 }

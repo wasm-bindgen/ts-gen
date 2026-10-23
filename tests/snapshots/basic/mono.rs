@@ -111,46 +111,27 @@ extern "C" {
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[doc = " Returns a new Response with a network error."]
-    # [wasm_bindgen (static_method_of = Response)]
-    pub fn error() -> Response;
-    #[doc = " Returns a new Response with a network error."]
-    # [wasm_bindgen (static_method_of = Response , catch , js_name = "error")]
-    pub fn try_error() -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response)]
-    pub fn redirect(url: impl ::wasm_bindgen::JsStringLike) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch)]
+    pub fn error() -> Result<Response, JsValue>;
+    # [wasm_bindgen (static_method_of = Response , catch)]
+    pub fn redirect(url: impl ::wasm_bindgen::JsStringLike) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "redirect")]
-    pub fn try_redirect(url: impl ::wasm_bindgen::JsStringLike) -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response , js_name = "redirect")]
-    pub fn redirect_with_status(url: impl ::wasm_bindgen::JsStringLike, status: f64) -> Response;
-    # [wasm_bindgen (static_method_of = Response , catch , js_name = "redirect")]
-    pub fn try_redirect_with_status(
+    pub fn redirect_with_status(
         url: impl ::wasm_bindgen::JsStringLike,
         status: f64,
     ) -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response)]
-    pub fn json(any: &JsValue) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch)]
+    pub fn json(any: &JsValue) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn try_json(any: &JsValue) -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response , js_name = "json")]
-    pub fn json_with_response_init(any: &JsValue, maybe_init: &ResponseInit) -> Response;
-    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn try_json_with_response_init(
+    pub fn json_with_response_init(
         any: &JsValue,
         maybe_init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response , js_name = "json")]
-    pub fn json_with_response(any: &JsValue, maybe_init: &Response) -> Response;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn try_json_with_response(
-        any: &JsValue,
-        maybe_init: &Response,
-    ) -> Result<Response, JsValue>;
+    pub fn json_with_response(any: &JsValue, maybe_init: &Response) -> Result<Response, JsValue>;
     #[doc = " Creates a clone of this response."]
-    #[wasm_bindgen(method)]
-    pub fn clone(this: &Response) -> Response;
-    #[doc = " Creates a clone of this response."]
-    #[wasm_bindgen(method, catch, js_name = "clone")]
-    pub fn try_clone(this: &Response) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn clone(this: &Response) -> Result<Response, JsValue>;
     #[doc = " The HTTP status code."]
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &Response) -> f64;
@@ -287,27 +268,13 @@ pub mod cloudflare {
         use super::*;
         #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
         extern "C" {
-            pub fn connect(address: impl ::wasm_bindgen::JsStringLike) -> Socket;
+            #[wasm_bindgen(catch)]
+            pub fn connect(address: impl ::wasm_bindgen::JsStringLike) -> Result<Socket, JsValue>;
         }
         #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "connect")]
-            pub fn try_connect(
-                address: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<Socket, JsValue>;
-        }
-        #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(js_name = "connect")]
             pub fn connect_with_options(
-                address: impl ::wasm_bindgen::JsStringLike,
-                options: &SocketOptions,
-            ) -> Socket;
-        }
-        #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "connect")]
-            pub fn try_connect_with_options(
                 address: impl ::wasm_bindgen::JsStringLike,
                 options: &SocketOptions,
             ) -> Result<Socket, JsValue>;
@@ -327,10 +294,8 @@ pub mod cloudflare {
             pub fn readable(this: &Socket) -> ReadableStream;
             #[wasm_bindgen(method, getter)]
             pub fn writable(this: &Socket) -> WritableStream;
-            #[wasm_bindgen(method, js_name = "startTls")]
-            pub fn start_tls(this: &Socket) -> Socket;
             #[wasm_bindgen(method, catch, js_name = "startTls")]
-            pub fn try_start_tls(this: &Socket) -> Result<Socket, JsValue>;
+            pub fn start_tls(this: &Socket) -> Result<Socket, JsValue>;
         }
         #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
         extern "C" {
@@ -464,43 +429,23 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn atob(data: impl ::wasm_bindgen::JsStringLike) -> String;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "atob")]
-    pub fn atob_js_string(data: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn atob(data: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "atob")]
-    pub fn try_atob(data: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    pub fn atob_js_string(data: impl ::wasm_bindgen::JsStringLike) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "atob")]
-    pub fn try_atob_js_string(data: impl ::wasm_bindgen::JsStringLike)
-        -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    pub fn btoa(data: impl ::wasm_bindgen::JsStringLike) -> String;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "btoa")]
-    pub fn btoa_js_string(data: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn btoa(data: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "btoa")]
-    pub fn try_btoa(data: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "btoa")]
-    pub fn try_btoa_js_string(data: impl ::wasm_bindgen::JsStringLike)
-        -> Result<JsString, JsValue>;
+    pub fn btoa_js_string(data: impl ::wasm_bindgen::JsStringLike) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

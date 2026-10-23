@@ -29,13 +29,8 @@ pub enum AfterString {
 }
 #[wasm_bindgen(module = "ambient-enum-members", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "useAll")]
-    pub fn use_all(computed: f64, mixed: Mixed, numbered: Numbered, after_string: AfterString);
-}
-#[wasm_bindgen(module = "ambient-enum-members", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "useAll")]
-    pub fn try_use_all(
+    pub fn use_all(
         computed: f64,
         mixed: Mixed,
         numbered: Numbered,
