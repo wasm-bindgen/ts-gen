@@ -1,3 +1,5 @@
+//! @ts-gen --experimental-generic-mono
+
 #![cfg(target_arch = "wasm32")]
 
 use js_sys::{BigInt, JsString, Symbol};
