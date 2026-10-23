@@ -418,7 +418,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bag<T: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new() -> Result<Bag, JsValue>;
+    pub fn new<T: ::wasm_bindgen::JsGeneric>() -> Result<Bag<T>, JsValue>;
     #[wasm_bindgen(method)]
     pub fn take<T: ::wasm_bindgen::JsGeneric>(this: &Bag<T>, values: &[T]) -> String;
     #[wasm_bindgen(method, catch, js_name = "take")]

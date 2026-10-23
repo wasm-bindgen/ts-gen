@@ -1496,8 +1496,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 }
                 expanded_constructors = true;
 
-                let per_mono = CodegenContext::generic_mono(config.cgctx);
-                let return_type = if per_mono && !config.type_params.is_empty() {
+                let return_type = if !config.type_params.is_empty() {
                     TypeRef::generic(
                         config.rust_name.clone(),
                         config
@@ -1797,11 +1796,9 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         wb_parts.push(quote! { js_name = #js_name });
     }
 
-    let generics = if CodegenContext::generic_mono(config.cgctx) {
-        render_generic_bounds(&generic_bounds_for_method(config, sig))
-    } else {
-        quote! {}
-    };
+    // Like a method, a constructor redeclares the class's type parameters,
+    // which its arguments may mention and its return instantiates.
+    let generics = render_generic_bounds(&generic_bounds_for_method(config, sig));
 
     quote! {
         #doc

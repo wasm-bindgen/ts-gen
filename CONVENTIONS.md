@@ -1941,11 +1941,12 @@ parameters thread through every site that mentions `Foo`:
 
 * The `pub type` declaration in the extern block —
   `pub type Foo<T: ::wasm_bindgen::JsGeneric>;`.
-* Every getter / setter / method `fn` — redeclares
+* Every constructor / getter / setter / method `fn` — redeclares
   `<T: ::wasm_bindgen::JsGeneric>` on the `fn` and uses
-  `this: &Foo<T>`. The redeclaration is mandatory because each
-  `extern "C"` `pub fn` is independent — the bound on `pub type`
-  doesn't propagate to its sibling functions.
+  `this: &Foo<T>`, or returns `Foo<T>` from a constructor. The
+  redeclaration is mandatory because each `extern "C"` `pub fn` is
+  independent — the bound on `pub type` doesn't propagate to its
+  sibling functions.
 * For dictionaries: the factory `impl<T: ::wasm_bindgen::JsGeneric>
   Foo<T>` block, the wrapper struct
   `pub struct FooBuilder<T: ::wasm_bindgen::JsGeneric>`, and the
