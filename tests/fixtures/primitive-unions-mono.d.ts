@@ -1,4 +1,4 @@
-//! @ts-gen --experimental-generic-mono --lib-name primitive-unions-mono --export primitive-unions-mono
+//! @ts-gen --lib-name primitive-unions-mono --export primitive-unions-mono
 
 // Primitive unions expand per member under per-monomorphization exactly as
 // without it, with the same names; only a string argument differs

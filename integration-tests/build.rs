@@ -16,8 +16,12 @@ use std::path::{Path, PathBuf};
 ///     string. When absent, the kebab-case fixture stem is used.
 ///     The Rust `pub mod` name is always derived (snake_case) from the
 ///     `--lib-name` value (after stripping protocol prefixes like `node:`).
-///   - `--experimental-generic-mono` enables per-monomorphization imports.
 ///   - `--input <path>` adds a workspace-relative input beside the fixture.
+///
+/// The snapshot tests render every fixture under each codegen configuration,
+/// so a configuration flag belongs to the test file rather than the fixture:
+/// a `//! @ts-gen --experimental-generic-mono` header on the test `.rs`
+/// compiles it against the per-monomorphization bindings.
 fn main() {
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let crate_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -65,7 +69,7 @@ struct Entry {
     /// External type mappings parsed from `//! @ts-gen --external ...`
     /// directives in the fixture, if any.
     externals: Vec<String>,
-    /// Whether this fixture opts into per-monomorphization generic imports.
+    /// Whether the test file opts into per-monomorphization generic imports.
     experimental_generic_mono: bool,
     /// Whether the fixture declares its own `--lib-name` (module mode).
     /// Script-mode fixtures parse without one and export by `--export`.
@@ -119,7 +123,7 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
             lib_name: directive.lib_name.unwrap_or(kebab),
             dts_path,
             externals: directive.externals,
-            experimental_generic_mono: directive.experimental_generic_mono,
+            experimental_generic_mono: parse_directive(&path).experimental_generic_mono,
             export_specs: directive.export_specs,
             inputs: directive
                 .inputs

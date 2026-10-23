@@ -7,7 +7,7 @@ patterns we handle, what they emit, and the rules behind each translation.
 Conventions are listed roughly from simplest to most complex. New
 conventions belong here first; tests and codegen come second. Keep the file
 in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
-`tests/snapshots/*.rs`).
+`tests/snapshots/<name>/{default,mono}.rs`).
 
 > **Maintenance**: when changing a convention or adding a new one, update
 > this file in the same PR. Diff-only snapshot changes that aren't

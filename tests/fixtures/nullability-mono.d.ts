@@ -1,4 +1,4 @@
-//! @ts-gen --lib-name nullability --export nullability --experimental-generic-mono
+//! @ts-gen --lib-name nullability --export nullability
 
 // Every combination of `null` and `undefined` a declaration can admit, at
 // top-level and inner positions. Reads keep exact carriers; writes take
