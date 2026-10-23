@@ -498,7 +498,10 @@ Interfaces are classified by shape (see `parse/classify.rs`):
 Multiple interface declarations with the same name + module context merge:
 their members union, their `extends` lists merge. An interface also merges
 into a same-named class; two classes, or an interface and a type alias or
-enum, don't (see [Duplicate identifiers](#duplicate-identifiers)).
+enum, don't (see [Duplicate identifiers](#duplicate-identifiers)). As in
+TypeScript, a method's overloads accumulate across the merged declarations
+(see [signature flattening](#signature-flattening)), while a property,
+getter or setter declared again stays one binding.
 
 ## Dictionary builders
 
@@ -1302,6 +1305,29 @@ pub fn parse(input: &str) -> Object;
 pub fn parse_with_array_buffer(input: &ArrayBuffer) -> Object;
 #[wasm_bindgen(js_name = "parse")]
 pub fn parse_with_str_and_reviver(input: &str, reviver: &Function) -> Object;
+```
+
+Methods, static methods and constructors are the same: every merged
+declaration of a class or interface contributes its overloads, whether
+the declarations are interfaces, an interface and a class, or
+constructor interfaces supplying a class's static side. As in
+TypeScript's overload resolution, the later declaration's overloads come
+first, each declaration's in its own order, so the later one gets the
+bare name. An overload declared identically twice is one binding, and
+when two declare the same parameters, the later one's return type wins.
+
+```ts
+interface Stream { write(data: string): void; now(): number; }
+interface Stream { write(data: number): void; write(data: string): void; now(): Date; }
+```
+
+```rust
+#[wasm_bindgen(method)]
+pub fn write(this: &Stream, data: f64);
+#[wasm_bindgen(method, js_name = "write")]
+pub fn write_with_str(this: &Stream, data: &str);
+#[wasm_bindgen(method)]
+pub fn now(this: &Stream) -> Date;
 ```
 
 ### The pipeline
