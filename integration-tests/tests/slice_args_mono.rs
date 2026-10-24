@@ -17,7 +17,7 @@ fn generic_slices_arrive_as_arrays() {
 
 #[wasm_bindgen_test]
 fn class_generic_slices_arrive_as_arrays() {
-    let bag = Bag::<f64>::new().unwrap();
+    let bag = Bag::<f64>::new_typed().unwrap();
     assert_eq!(bag.take(&[1.5]), "Array(1.5)");
 }
 

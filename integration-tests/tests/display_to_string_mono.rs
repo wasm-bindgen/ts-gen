@@ -60,7 +60,7 @@ fn display_calls_to_string() {
     assert_eq!(format!("[{moment}]"), "[moment]");
 
     assert_eq!(Pure::new("pure").unwrap().to_string(), "pure");
-    let boxed = Boxed::new(JsString::from("v")).unwrap();
+    let boxed = Boxed::new(&JsString::from("v")).unwrap();
     assert_eq!(format!("{boxed}"), "Boxed(v)");
     assert_eq!(format!("{}", labelled("l").unwrap()), "l");
 }

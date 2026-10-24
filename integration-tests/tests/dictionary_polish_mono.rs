@@ -38,13 +38,11 @@ fn short_and_deduplicated_instantiations() {
 }
 
 #[wasm_bindgen_test]
-fn literal_factories_keep_a_builder() {
-    assert!(matches!(
-        Transition::new_next().direction(),
-        DirectionKind::Next
-    ));
-    let transition = Transition::builder_next()
-        .direction(DirectionKind::Previous)
-        .build();
+fn literal_choice_is_a_factory_argument() {
+    // Per-mono a same-shape literal choice is the factory's argument, with
+    // no `new_<literal>` / `builder_<literal>` pair.
+    let transition = Transition::new(DirectionKind::Next);
+    assert!(matches!(transition.direction(), DirectionKind::Next));
+    transition.set_direction(DirectionKind::Previous);
     assert!(matches!(transition.direction(), DirectionKind::Previous));
 }

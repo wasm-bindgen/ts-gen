@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, JsString, Map, Number, Set};
+use js_sys::{Array, JsString, Map, Promise, Set};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::mono_lists::*;
@@ -43,8 +43,8 @@ fn container_string_leaves_accept_any_string_shape() {
     let set: Set<JsString> = Set::new_typed();
     set.add(&JsString::from("s"));
     assert_eq!(unique(&set), "Array(string:s)");
-    let map: Map<JsString, Number> = Map::new_typed();
-    map.set(&JsString::from("k"), &Number::from(2.0));
+    let map: Map<JsString, f64> = Map::new_typed();
+    map.set(&JsString::from("k"), &2.0);
     assert_eq!(lookup(&map, "k"), 2.0);
 }
 
@@ -73,8 +73,8 @@ async fn awaited_string_lists_have_a_handle_variant() {
     assert_eq!(fetch_tags().await.unwrap(), ["x"]);
     let handle: Array<JsString> = fetch_tags_js_string().await.unwrap();
     assert_eq!(handle.length(), 1);
-    let handle: Array<JsString> = fetch_tags_promise().await.unwrap();
-    assert_eq!(handle.length(), 1);
+    let promise: Promise<Array<JsString>> = fetch_tags_js_string();
+    assert_eq!(promise.await.unwrap().length(), 1);
     let maybe: Option<Vec<String>> = fetch_maybe_tags().await.unwrap();
     assert_eq!(maybe, Some(vec!["y".to_string(), "z".to_string()]));
     let maybe: Option<Array<JsString>> = fetch_maybe_tags_js_string().await.unwrap();

@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{JsNullable, JsOption, JsString, Nullable, Number, Object, Promise};
+use js_sys::{JsNullable, JsString, Nullable, Number, Object, Promise};
 
 use ts_gen_integration_tests::nullability_mono::*;
 
@@ -50,10 +50,10 @@ fn nullability_mono_signatures_compile(
     scalar_null("x");
     scalar_optional_with_str(js_string);
     scalar_optional_with_null();
-    let _: Option<JsString> = generic(js_string.clone());
-    let _: Option<f64> = generic(1.0);
+    let _: Option<JsString> = generic(js_string);
+    let _: Option<f64> = generic(&1.0);
     let _: Option<f64> = generic_with_null();
-    let _: Option<String> = generic_both_with_x(String::from("x"));
+    let _: Option<String> = generic_both_with_x(&String::from("x"));
     let _: Option<String> = generic_both_with_null();
 
     pair(js_string);
@@ -68,32 +68,31 @@ fn nullability_mono_signatures_compile(
     let _: Cover = Cover::new_blank();
     let _: Attachment = Attachment::new_inline(js_string, "name");
 
-    // Inner positions: a received `Promise` takes the read carrier and a
-    // generic user type the exact one; `js_sys` containers and callbacks
-    // keep the `JsGeneric` handles their `T: JsGeneric` APIs need.
-    let _: Promise<Option<JsString>> = registry_value.pending();
-    let _: Promise<Option<Number>> = registry_value.settled();
+    // Inner positions: a `Promise` getter carries the awaited read form, and
+    // a type argument keeps the exact carrier of its union.
+    let _: Promise<Option<String>> = registry_value.pending();
+    let _: Promise<Option<f64>> = registry_value.settled();
     let _: Nullable<String> = holder_value.get();
     let _: Holder<Option<f64>> = holder(holder_value);
     let _: Option<f64> = holder(holder_value).get();
-    let _: Object<JsOption<Number>> = record(&Object::new_typed());
+    let _: Object<Option<f64>> = record(&Object::new_typed());
     let _: Nullable<String> = Nullable::Null;
     let _: MaybeStr = Nullable::Value(String::from("x"));
     let _: JsNullable<JsString> = JsNullable::new();
 }
 
-// The awaited value of an async binding, and of a received `Promise`, takes
-// its read carrier.
+// An async binding is its `Promise<T>`, whose awaited value takes the read
+// carrier, as does a received `Promise` getter's.
 #[allow(dead_code)]
 async fn nullability_mono_async_compile(registry_value: &Registry) {
     let _: Result<Option<Registry>, _> = fetch_null().await;
     let _: Result<Option<f64>, _> = fetch_optional().await;
     let _: Result<Option<String>, _> = fetch_both().await;
-    let _: Result<Option<f64>, _> = fetch_generic::<f64>().await;
-    let _: Result<Option<JsString>, _> =
+    let _: Result<Option<Number>, _> = fetch_generic::<Number>().await;
+    let _: Result<Option<String>, _> =
         wasm_bindgen_futures::JsFuture::from(registry_value.pending()).await;
-    let _: Result<Option<Registry>, _> = fetch_null_promise().await;
-    let _: Promise<Option<Number>> = fetch_optional_promise();
-    let _: Promise<Option<JsString>> = fetch_both_promise();
-    let _: Promise<Option<JsString>> = fetch_generic_promise::<JsString>();
+    let _: Promise<Option<Registry>> = fetch_null();
+    let _: Promise<Option<f64>> = fetch_optional();
+    let _: Promise<Option<JsString>> = fetch_both_js_string();
+    let _: Promise<Option<JsString>> = fetch_generic::<JsString>();
 }

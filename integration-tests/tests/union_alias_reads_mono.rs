@@ -48,19 +48,15 @@ fn alias_reads_its_kind_enum() {
 
 #[wasm_bindgen_test]
 fn read_passes_straight_back() {
-    let target = options("string");
-    target.set_zone(options("zoned").zone());
-    assert!(matches!(target.zone(), ZoneKind::Zoned(z) if z.zone() == "UTC"));
-    target.set_zoned(options("zonedFields").zoned().unwrap());
-    assert!(matches!(
-        target.zoned(),
-        Some(ZonedLikeKind::ZonedFields(_))
-    ));
-
+    // `RelativeOptions` is only ever read, so per-mono it has no setters;
+    // `Span` is written too, and a read of it passes back to its writes.
     let span = Span::new(&Day::new(10.0).unwrap());
     assert_eq!(describe(span.start()), "day:10");
+    span.set_relative_to(span.start());
+    assert!(matches!(span.relative_to(), Some(DayLikeKind::Day(d)) if d.day() == 10.0));
     span.set_relative_to("1");
     assert!(matches!(span.relative_to(), Some(DayLikeKind::String(s)) if s == "1"));
+    assert!(matches!(options("zoned").zone(), ZoneKind::Zoned(z) if z.zone() == "UTC"));
 }
 
 #[wasm_bindgen_test]

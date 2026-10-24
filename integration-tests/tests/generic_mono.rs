@@ -3,7 +3,7 @@
 #![cfg(target_arch = "wasm32")]
 
 use js_sys::{Array, ArrayTuple, Function, JsString, Map, Uint8Array};
-use wasm_bindgen::convert::{FromWasmAbi, IntoWasmAbi, OptionFromWasmAbi};
+use wasm_bindgen::convert::{FromWasmAbi, RefIntoWasmAbi};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::generic_mono::{
@@ -16,16 +16,15 @@ use ts_gen_integration_tests::generic_mono::{
 // signature coverage rather than runtime `wasm_bindgen_test` cases.
 #[allow(dead_code)]
 async fn generic_mono_signatures_compile(flags: &Flags, js_string: &JsString) {
-    let holder: Holder<f64> = Holder::new(1.0).unwrap();
+    let holder: Holder<f64> = Holder::new(&1.0).unwrap();
     let _: f64 = holder.get();
-    holder.set(2.0);
-    let holder: Holder<String> = Holder::new(String::from("value")).unwrap();
+    holder.set(&2.0);
+    let holder: Holder<String> = Holder::new(&String::from("value")).unwrap();
     let _: String = holder.get();
 
-    let _: f64 = identity(1.0);
-    let _: JsString = identity(js_string.clone());
-    let _: JsValue = identity(JsValue::NULL);
-    let _: Pair<f64, bool> = Pair::new(1.0, true);
+    let _: f64 = identity(&1.0);
+    let _: JsString = identity(js_string);
+    let _: JsValue = identity(&JsValue::NULL);
 
     let _: Result<String, JsValue> = flags.get_string_value("borrowed").await;
     let _: Result<String, JsValue> = flags.get_string_value(String::from("owned")).await;
@@ -36,19 +35,29 @@ async fn generic_mono_signatures_compile(flags: &Flags, js_string: &JsString) {
     let _: Result<EvaluationDetails<String>, JsValue> = flags.get_string_details("default").await;
     let _: Result<EvaluationDetails<JsString>, JsValue> =
         flags.get_string_details_js_string("default").await;
-    let _: Result<EvaluationDetails<bool>, JsValue> = flags.get_boolean_details(false).await;
     let _: Result<EvaluationDetails<f64>, JsValue> = flags.get_number_details(0.0).await;
     let _: Result<Option<String>, JsValue> = flags.get_nullable_string("default").await;
     let _: Result<Option<JsString>, JsValue> = flags.get_nullable_string_js_string("default").await;
-    let _: Result<Pair<String, String>, JsValue> = flags.get_string_pair("default").await;
     let _: Result<Pair<JsString, JsString>, JsValue> =
         flags.get_string_pair_js_string("default").await;
 
+    // `EvaluationDetails` and `Pair` are only ever read, so they have getters
+    // and no factory.
+    let details: EvaluationDetails<bool> = flags.get_boolean_details(false).await.unwrap();
+    let _: String = details.flag_key();
+    let _: JsString = details.flag_key_js_string();
+    let _: bool = details.value();
+    let _: Option<String> = details.variant();
+    let _: Option<JsString> = details.variant_js_string();
+    let pair: Pair<String, String> = flags.get_string_pair("default").await.unwrap();
+    let _: String = pair.first();
+    let _: String = pair.second();
+
     let _: Result<Vec<String>, JsValue> = flags.get_string_array().await;
     let _: Result<Array<JsString>, JsValue> = flags.get_string_array_js_string().await;
-    let _: Result<Map<JsString, JsString>, JsValue> = flags.get_string_map().await;
-    let _: Result<ArrayTuple<(JsString, JsString)>, JsValue> = flags.get_string_tuple().await;
-    let _: Result<Function<fn(JsString) -> JsString>, JsValue> = flags.get_string_callback().await;
+    let _: Result<Map<String, String>, JsValue> = flags.get_string_map().await;
+    let _: Result<ArrayTuple<(String, String)>, JsValue> = flags.get_string_tuple().await;
+    let _: Result<Function<fn(String) -> String>, JsValue> = flags.get_string_callback().await;
     let _: bool = flags.compare_strings("left", js_string.clone());
 
     let _: String = parse_string("borrowed");
@@ -65,11 +74,6 @@ async fn generic_mono_signatures_compile(flags: &Flags, js_string: &JsString) {
     let _: bool = roundtrip_boolean(false);
     let _: f64 = roundtrip_number(0.0);
 
-    let _ = EvaluationDetails::<bool>::new("flag", false);
-    let _ = EvaluationDetails::<bool>::new(String::from("flag"), false);
-    let _ = EvaluationDetails::<bool>::new(js_string, false);
-    let _ = EvaluationDetails::<bool>::new(js_string.clone(), false);
-
     let bytes = Uint8Array::new_with_length(1);
     let _ = TypedArrayOptions::new(&bytes);
     let _ = TypedArrayOptions::builder(&bytes).extra(&bytes).build();
@@ -77,9 +81,10 @@ async fn generic_mono_signatures_compile(flags: &Flags, js_string: &JsString) {
 
 // A generic caller needs exactly the bounds the declarations state.
 #[allow(dead_code)]
-async fn generic_mono_bounds_are_declared<T>(holder: &Holder<T>, store: &Store<T>, value: T)
+async fn generic_mono_bounds_are_declared<T>(holder: &Holder<T>, store: &Store<T>, value: &T)
 where
-    T: FromWasmAbi + IntoWasmAbi + OptionFromWasmAbi + 'static,
+    T: FromWasmAbi + RefIntoWasmAbi + 'static,
+    Option<T>: FromWasmAbi,
 {
     holder.set(value);
     let _: T = holder.get();

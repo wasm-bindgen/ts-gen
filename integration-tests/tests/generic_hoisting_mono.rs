@@ -12,16 +12,16 @@ use ts_gen_integration_tests::generic_hoisting_mono::{post, post_async, relay, C
 #[wasm_bindgen_test]
 fn free_functions_take_any_instantiation() {
     let plain: Envelope = Envelope::new("plain").unwrap();
-    let typed: Envelope<String, f64> = Envelope::new("typed").unwrap();
+    let typed: Envelope<String, f64> = Envelope::new_typed("typed").unwrap();
     assert_eq!(post(&plain), "post:plain");
     assert_eq!(post(&typed), "post:typed");
-    assert_eq!(relay(&typed, 1.5), "relay:typed:1.5");
+    assert_eq!(relay(&typed, &1.5), "relay:typed:1.5");
 }
 
 #[wasm_bindgen_test]
 async fn async_functions_take_any_instantiation() {
     let plain: Envelope = Envelope::new("plain").unwrap();
-    let typed: Envelope<JsString, bool> = Envelope::new("typed").unwrap();
+    let typed: Envelope<JsString, bool> = Envelope::new_typed("typed").unwrap();
     assert_eq!(post_async(&plain).await.unwrap(), "post-async:plain");
     assert_eq!(post_async(&typed).await.unwrap(), "post-async:typed");
 }
@@ -29,7 +29,7 @@ async fn async_functions_take_any_instantiation() {
 #[wasm_bindgen_test]
 async fn methods_take_any_instantiation() {
     let plain: Envelope = Envelope::new("plain").unwrap();
-    let typed: Envelope<String, f64> = Envelope::new("typed").unwrap();
+    let typed: Envelope<String, f64> = Envelope::new_typed("typed").unwrap();
     let courier = Courier::new(&typed).unwrap();
     assert_eq!(
         Courier::new(&plain).unwrap().send(&typed),
@@ -40,9 +40,7 @@ async fn methods_take_any_instantiation() {
     assert_eq!(courier.send_either(&typed), "env:typed");
     assert_eq!(courier.send_either_with_str("s"), "str:s");
     assert_eq!(courier.send_async(&typed).await.unwrap(), "async:typed");
-    let promised = JsFuture::from(courier.send_async_promise(&plain))
-        .await
-        .unwrap();
+    let promised: String = JsFuture::from(courier.send_async(&plain)).await.unwrap();
     assert_eq!(promised, "async:plain");
     assert_eq!(Courier::check(&typed), "check:typed");
     assert_eq!(typed.forward(&plain), "typed->plain");

@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{JsString, Undefined};
+use js_sys::JsString;
 use ts_gen_integration_tests::alias_unused_params_mono::{
     brand, default_return, defaults, erase, misc, ns, qualified_return, qualified_return_js_string,
     skip, skip_return, Branded, Chained, Chosen, Color, ColorAlias, Erased, Fetcher, Handler,
@@ -20,10 +20,10 @@ fn alias_unused_params_mono_compile() {
     let _: fn(
         &WithDefault<f64>,
         &Chained<f64>,
-        &Pair<Undefined, Undefined>,
+        &Pair<(), ()>,
         &Fetcher<String>,
         &ns::WithInner<String>,
-        &Pair<Undefined, Undefined>,
+        &Pair<(), ()>,
     ) = defaults;
     let _: fn() -> WithDefault<f64> = default_return;
     let _: fn() -> Skip<f64, bool> = skip_return;

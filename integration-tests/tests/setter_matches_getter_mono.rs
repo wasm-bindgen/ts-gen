@@ -5,7 +5,7 @@
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::setter_matches_getter_mono::{
-    DigitsOptions, FractionalSecondDigitsKind, ModeKind, RequiredDigits, Toggle,
+    DigitsKind, DigitsOptions, FractionalSecondDigitsKind, ModeKind, RequiredDigits, Toggle,
 };
 
 fn is_f64(kind: Option<FractionalSecondDigitsKind>, expected: f64) -> bool {
@@ -33,13 +33,18 @@ fn mixed_literal_enum_round_trips() {
     copy.set_fractional_second_digits(read);
     assert!(is_f64(copy.fractional_second_digits(), 9.0));
 
+    // Per-mono a required field's literal choice is the factory's argument
+    // rather than one factory per literal.
     assert!(matches!(
-        RequiredDigits::new_auto().digits(),
-        FractionalSecondDigitsKind::Auto
+        RequiredDigits::new(DigitsKind::Auto).digits(),
+        DigitsKind::Auto
     ));
-    assert!(is_f64(Some(RequiredDigits::new_2().digits()), 2.0));
+    assert!(matches!(
+        RequiredDigits::new(DigitsKind::F64(2.0)).digits(),
+        DigitsKind::F64(n) if n == 2.0
+    ));
 
-    let toggle = Toggle::new_true();
+    let toggle = Toggle::new(ModeKind::Bool(true));
     assert!(matches!(toggle.mode(), ModeKind::Bool(true)));
     toggle.set_mode(ModeKind::Y);
     toggle.set_mode(toggle.mode());

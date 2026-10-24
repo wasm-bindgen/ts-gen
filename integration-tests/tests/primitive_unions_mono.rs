@@ -8,7 +8,7 @@ use ts_gen_integration_tests::primitive_unions_mono::{
     has_key, has_key_explicit_with_symbol, has_key_with_f64, lookup, send, send_with_f64,
     send_with_str, set_any, set_any_with_bool, set_any_with_f64, set_any_with_str,
     set_any_with_symbol, set_flag, set_flag_with_big_int, set_keyed, set_keyed_with_symbol,
-    set_level, set_level_with_str, set_maybe, set_maybe_with_f64, set_maybe_with_str, set_nullable,
+    set_level, set_level_auto, set_maybe, set_maybe_with_f64, set_maybe_with_str, set_nullable,
     set_nullable_with_f64, set_nullable_with_null, set_value, set_value_with_f64, LevelKind,
     Settings, Store, Target,
 };
@@ -36,7 +36,8 @@ fn primitive_union_signatures_compile(js_string: &JsString, symbol: &Symbol, big
     set_keyed_with_symbol(symbol);
 
     set_level(1.0);
-    set_level_with_str("auto");
+    // `number | "auto"`: the lone literal arm is keyed by its literal.
+    set_level_auto();
     // `string | number | null`: `null` is its own arm.
     set_nullable("s");
     set_nullable(js_string);
