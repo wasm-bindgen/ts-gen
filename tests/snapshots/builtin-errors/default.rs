@@ -52,7 +52,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(locales: &str) -> Result<Formatter, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_slice(locales: &[JsString]) -> Result<Formatter, JsValue>;
+    pub fn new_with_slice(locales: &[String]) -> Result<Formatter, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_options(
         locales: &str,
@@ -60,7 +60,7 @@ extern "C" {
     ) -> Result<Formatter, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_slice_and_options(
-        locales: &[JsString],
+        locales: &[String],
         options: &::js_sys::Intl::DateTimeFormatOptions,
     ) -> Result<Formatter, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -74,10 +74,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "format")]
     pub fn try_format_with_str(this: &Formatter, locales: &str) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "format")]
-    pub fn format_with_slice(this: &Formatter, locales: &[JsString]) -> String;
+    pub fn format_with_slice(this: &Formatter, locales: &[String]) -> String;
     #[wasm_bindgen(method, catch, js_name = "format")]
-    pub fn try_format_with_slice(this: &Formatter, locales: &[JsString])
-        -> Result<String, JsValue>;
+    pub fn try_format_with_slice(this: &Formatter, locales: &[String]) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "format")]
     pub fn format_with_str_and_options(
         this: &Formatter,
@@ -93,13 +92,13 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "format")]
     pub fn format_with_slice_and_options(
         this: &Formatter,
-        locales: &[JsString],
+        locales: &[String],
         options: &::js_sys::Object,
     ) -> String;
     #[wasm_bindgen(method, catch, js_name = "format")]
     pub fn try_format_with_slice_and_options(
         this: &Formatter,
-        locales: &[JsString],
+        locales: &[String],
         options: &::js_sys::Object,
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method)]
@@ -129,12 +128,12 @@ extern "C" {
 #[wasm_bindgen(module = "builtin-errors")]
 extern "C" {
     #[wasm_bindgen(js_name = "describe")]
-    pub fn describe_with_slice(locales: &[JsString]) -> String;
+    pub fn describe_with_slice(locales: &[String]) -> String;
 }
 #[wasm_bindgen(module = "builtin-errors")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describe")]
-    pub fn try_describe_with_slice(locales: &[JsString]) -> Result<String, JsValue>;
+    pub fn try_describe_with_slice(locales: &[String]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "builtin-errors")]
 extern "C" {
@@ -156,7 +155,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(js_name = "describe")]
     pub fn describe_with_slice_and_options(
-        locales: &[JsString],
+        locales: &[String],
         options: &::js_sys::Intl::DateTimeFormatOptions,
     ) -> String;
 }
@@ -164,7 +163,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describe")]
     pub fn try_describe_with_slice_and_options(
-        locales: &[JsString],
+        locales: &[String],
         options: &::js_sys::Intl::DateTimeFormatOptions,
     ) -> Result<String, JsValue>;
 }
@@ -178,7 +177,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_locales(this: &FormatSettings, val: &str);
     #[wasm_bindgen(method, setter, js_name = "locales")]
-    pub fn set_locales_with_slice(this: &FormatSettings, val: &[JsString]);
+    pub fn set_locales_with_slice(this: &FormatSettings, val: &[String]);
     #[wasm_bindgen(method, getter, js_name = "dateTime")]
     pub fn date_time(this: &FormatSettings) -> Option<::js_sys::Intl::DateTimeFormatOptions>;
     #[wasm_bindgen(method, setter, js_name = "dateTime")]
@@ -202,7 +201,7 @@ impl FormatSettingsBuilder {
         self.inner.set_locales(val);
         self
     }
-    pub fn locales_with_slice(self, val: &[JsString]) -> Self {
+    pub fn locales_with_slice(self, val: &[String]) -> Self {
         self.inner.set_locales_with_slice(val);
         self
     }

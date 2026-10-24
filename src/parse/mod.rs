@@ -817,9 +817,8 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
 ///
 /// `LocalesArgument` is the lib's `UnicodeBCP47LocaleIdentifier | Locale |
 /// readonly (UnicodeBCP47LocaleIdentifier | Locale)[] | undefined` without
-/// its `Locale` arms, and its list takes `JsString` handles, which is how
-/// js-sys's own bindings take locales (`&str` or `&[JsString]`). An
-/// `Intl::Locale` is passed by its `to_string()`. The aliases are builtins,
+/// its `Locale` arms, so its list is a `string[]` and lowers like any other.
+/// An `Intl::Locale` is passed by its `to_string()`. The aliases are builtins,
 /// so an `--external` mapping of their path replaces them (see
 /// [`GlobalContext::resolve_path`]); `LocalesArgument` names its locale by
 /// path for a mapping of `Intl.UnicodeBCP47LocaleIdentifier` to reach it.
@@ -840,7 +839,7 @@ fn populate_intl_namespace(gctx: &mut GlobalContext, global: ScopeId) {
                     ],
                     generic_args: vec![],
                 },
-                TypeRef::Array(Box::new(TypeRef::ident("JsString"))),
+                TypeRef::Array(Box::new(TypeRef::String)),
                 TypeRef::Undefined,
             ]),
         ),

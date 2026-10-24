@@ -4438,10 +4438,10 @@ use without declaring (`toLocaleString(locales?: Intl.LocalesArgument,
 options?: Intl.DateTimeFormatOptions)`), aren't defaults of the map but
 built-in aliases, and lower like any other alias. `Intl.UnicodeBCP47LocaleIdentifier` is `string`, and
 `Intl.LocalesArgument` is `Intl.UnicodeBCP47LocaleIdentifier | readonly
-JsString[] | undefined`, so a locales parameter fans out into a single
-locale and a list of `JsString` handles, the shapes js-sys's own bindings
-take (`Date::to_locale_string(locale: &str, …)`,
-`Temporal::PlainDate::to_locale_string(locales: &[JsString], …)`). The
+string[] | undefined`, so a locales parameter fans out into a single
+locale and a list of strings, each lowering like any other string
+parameter (`&str` and `&[String]`, or `impl JsStringLike` and
+`&[impl JsStringLike]` under mono). The
 lib's `Intl.Locale` arms are left out: one would add a `_with_locale`
 overload to every locales parameter, doubling the overloads with the
 trailing options, and in the list it would make the element a union that

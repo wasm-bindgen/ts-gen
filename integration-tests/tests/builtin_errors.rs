@@ -1,7 +1,7 @@
 #![cfg(target_arch = "wasm32")]
 
 use js_sys::Intl::{DateTimeFormatOptions, NumberFormatOptions, NumberFormatStyle, YearFormat};
-use js_sys::{AggregateError, Error, JsString, Object, UriError};
+use js_sys::{AggregateError, Error, Object, UriError};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::builtin_errors::*;
@@ -28,7 +28,7 @@ const DATE_OPTIONS: &str = r#"Object{"timeZone":"UTC","year":"numeric"}"#;
 fn functions_take_a_locale_or_a_list() {
     assert_eq!(describe(), "none none");
     assert_eq!(describe_with_str("en-GB"), "string(en-GB) none");
-    let locales = [JsString::from("en-GB"), JsString::from("fr")];
+    let locales = ["en-GB".to_string(), "fr".to_string()];
     assert_eq!(describe_with_slice(&locales), "list(en-GB,fr) none");
     assert_eq!(
         describe_with_str_and_options("de", &date_options()),
@@ -48,7 +48,7 @@ fn constructors_take_intl_options() {
         "string(ja) none"
     );
     let formatter =
-        Formatter::new_with_slice_and_options(&[JsString::from("es")], &date_options()).unwrap();
+        Formatter::new_with_slice_and_options(&["es".to_string()], &date_options()).unwrap();
     assert_eq!(formatter.received(), format!("list(es) {DATE_OPTIONS}"));
 }
 
@@ -66,7 +66,7 @@ fn methods_take_intl_options_and_return_intl_types() {
         r#"string(fr) Object{"style":"currency","currency":"EUR"}"#
     );
     assert_eq!(
-        formatter.format_with_slice(&[JsString::from("it")]),
+        formatter.format_with_slice(&["it".to_string()]),
         "list(it) none"
     );
     let locale: js_sys::Intl::Locale = formatter.locale("en-Latn-US");
@@ -81,7 +81,7 @@ fn dictionaries_set_locales_either_way() {
         .build();
     assert_eq!(settings(&single), format!("string(pt) {DATE_OPTIONS}"));
     let list = FormatSettings::builder()
-        .locales_with_slice(&[JsString::from("pt"), JsString::from("en")])
+        .locales_with_slice(&["pt".to_string(), "en".to_string()])
         .build();
     assert_eq!(settings(&list), "list(pt,en) none");
 }

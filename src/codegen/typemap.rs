@@ -4796,7 +4796,7 @@ mod tests {
                 u.members(),
                 [
                     intl("UnicodeBCP47LocaleIdentifier"),
-                    TypeRef::Array(Box::new(TypeRef::ident("JsString"))),
+                    TypeRef::Array(Box::new(TypeRef::String)),
                     TypeRef::Undefined,
                 ]
             );

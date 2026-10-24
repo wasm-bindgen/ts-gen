@@ -1994,11 +1994,11 @@ pub mod temporal {
             locales: &str,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_slice(this: &PlainDate, locales: &[JsString]) -> String;
+        pub fn to_locale_string_with_slice(this: &PlainDate, locales: &[String]) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &PlainDate,
-            locales: &[JsString],
+            locales: &[String],
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
@@ -2015,13 +2015,13 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainDate,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &PlainDate,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toJSON")]
@@ -2712,11 +2712,11 @@ pub mod temporal {
             locales: &str,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_slice(this: &PlainTime, locales: &[JsString]) -> String;
+        pub fn to_locale_string_with_slice(this: &PlainTime, locales: &[String]) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &PlainTime,
-            locales: &[JsString],
+            locales: &[String],
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
@@ -2733,13 +2733,13 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainTime,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &PlainTime,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toJSON")]
@@ -3719,11 +3719,11 @@ pub mod temporal {
             locales: &str,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_slice(this: &PlainDateTime, locales: &[JsString]) -> String;
+        pub fn to_locale_string_with_slice(this: &PlainDateTime, locales: &[String]) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &PlainDateTime,
-            locales: &[JsString],
+            locales: &[String],
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
@@ -3740,13 +3740,13 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainDateTime,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &PlainDateTime,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toJSON")]
@@ -4523,11 +4523,11 @@ pub mod temporal {
             locales: &str,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_slice(this: &ZonedDateTime, locales: &[JsString]) -> String;
+        pub fn to_locale_string_with_slice(this: &ZonedDateTime, locales: &[String]) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &ZonedDateTime,
-            locales: &[JsString],
+            locales: &[String],
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
@@ -4544,13 +4544,13 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &ZonedDateTime,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &ZonedDateTime,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toJSON")]
@@ -5285,11 +5285,11 @@ pub mod temporal {
             locales: &str,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_slice(this: &Duration, locales: &[JsString]) -> String;
+        pub fn to_locale_string_with_slice(this: &Duration, locales: &[String]) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &Duration,
-            locales: &[JsString],
+            locales: &[String],
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
@@ -5306,13 +5306,13 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &Duration,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DurationFormatOptions,
         ) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &Duration,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DurationFormatOptions,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toJSON")]
@@ -5653,11 +5653,11 @@ pub mod temporal {
             locales: &str,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_slice(this: &Instant, locales: &[JsString]) -> String;
+        pub fn to_locale_string_with_slice(this: &Instant, locales: &[String]) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &Instant,
-            locales: &[JsString],
+            locales: &[String],
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
@@ -5674,13 +5674,13 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &Instant,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &Instant,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toJSON")]
@@ -6178,11 +6178,11 @@ pub mod temporal {
             locales: &str,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_slice(this: &PlainYearMonth, locales: &[JsString]) -> String;
+        pub fn to_locale_string_with_slice(this: &PlainYearMonth, locales: &[String]) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &PlainYearMonth,
-            locales: &[JsString],
+            locales: &[String],
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
@@ -6199,13 +6199,13 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainYearMonth,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &PlainYearMonth,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toJSON")]
@@ -6406,11 +6406,11 @@ pub mod temporal {
             locales: &str,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_slice(this: &PlainMonthDay, locales: &[JsString]) -> String;
+        pub fn to_locale_string_with_slice(this: &PlainMonthDay, locales: &[String]) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &PlainMonthDay,
-            locales: &[JsString],
+            locales: &[String],
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
@@ -6427,13 +6427,13 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainMonthDay,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &PlainMonthDay,
-            locales: &[JsString],
+            locales: &[String],
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toJSON")]

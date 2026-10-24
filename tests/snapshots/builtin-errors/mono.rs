@@ -78,7 +78,9 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(locales: impl ::wasm_bindgen::JsStringLike) -> Result<Formatter, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_slice(locales: &[JsString]) -> Result<Formatter, JsValue>;
+    pub fn new_with_slice(
+        locales: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Formatter, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_options(
         locales: impl ::wasm_bindgen::JsStringLike,
@@ -86,7 +88,7 @@ extern "C" {
     ) -> Result<Formatter, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_slice_and_options(
-        locales: &[JsString],
+        locales: &[impl ::wasm_bindgen::JsStringLike],
         options: &::js_sys::Intl::DateTimeFormatOptions,
     ) -> Result<Formatter, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -108,11 +110,14 @@ extern "C" {
         locales: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "format")]
-    pub fn format_with_slice(this: &Formatter, locales: &[JsString]) -> Result<String, JsValue>;
+    pub fn format_with_slice(
+        this: &Formatter,
+        locales: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "format")]
     pub fn format_with_slice_js_string(
         this: &Formatter,
-        locales: &[JsString],
+        locales: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "format")]
     pub fn format_with_str_and_options(
@@ -129,13 +134,13 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "format")]
     pub fn format_with_slice_and_options(
         this: &Formatter,
-        locales: &[JsString],
+        locales: &[impl ::wasm_bindgen::JsStringLike],
         options: &::js_sys::Object,
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "format")]
     pub fn format_with_slice_and_options_js_string(
         this: &Formatter,
-        locales: &[JsString],
+        locales: &[impl ::wasm_bindgen::JsStringLike],
         options: &::js_sys::Object,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -170,12 +175,16 @@ extern "C" {
 #[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describe")]
-    pub fn describe_with_slice(locales: &[JsString]) -> Result<String, JsValue>;
+    pub fn describe_with_slice(
+        locales: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describe")]
-    pub fn describe_with_slice_js_string(locales: &[JsString]) -> Result<JsString, JsValue>;
+    pub fn describe_with_slice_js_string(
+        locales: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
 extern "C" {
@@ -197,7 +206,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describe")]
     pub fn describe_with_slice_and_options(
-        locales: &[JsString],
+        locales: &[impl ::wasm_bindgen::JsStringLike],
         options: &::js_sys::Intl::DateTimeFormatOptions,
     ) -> Result<String, JsValue>;
 }
@@ -205,7 +214,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describe")]
     pub fn describe_with_slice_and_options_js_string(
-        locales: &[JsString],
+        locales: &[impl ::wasm_bindgen::JsStringLike],
         options: &::js_sys::Intl::DateTimeFormatOptions,
     ) -> Result<JsString, JsValue>;
 }
@@ -219,7 +228,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_locales(this: &FormatSettings, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "locales")]
-    pub fn set_locales_with_slice(this: &FormatSettings, val: &[JsString]);
+    pub fn set_locales_with_slice(this: &FormatSettings, val: &[impl ::wasm_bindgen::JsStringLike]);
     #[wasm_bindgen(method, getter, js_name = "dateTime")]
     pub fn date_time(this: &FormatSettings) -> Option<::js_sys::Intl::DateTimeFormatOptions>;
     #[wasm_bindgen(method, setter, js_name = "dateTime")]
@@ -243,7 +252,7 @@ impl FormatSettingsBuilder {
         self.inner.set_locales(val);
         self
     }
-    pub fn locales_with_slice(self, val: &[JsString]) -> Self {
+    pub fn locales_with_slice(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
         self.inner.set_locales_with_slice(val);
         self
     }
