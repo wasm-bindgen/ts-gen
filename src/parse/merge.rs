@@ -104,7 +104,10 @@ pub fn extract_var_members(
                 if js_name == "prototype" {
                     continue;
                 }
-                let doc = ctx.docs.for_span(prop.span.start);
+                let (doc, info) = match ctx.docs.info_for_span(prop.span.start) {
+                    Some((d, i)) => (Some(d), i),
+                    None => (None, crate::parse::docs::JsDocInfo::default()),
+                };
                 let type_ref = prop
                     .type_annotation
                     .as_ref()
@@ -116,6 +119,7 @@ pub fn extract_var_members(
                     type_ref: type_ref.clone(),
                     optional: prop.optional,
                     doc,
+                    throws: info.throws(),
                 }));
                 if !prop.readonly {
                     static_members.push(Member::StaticSetter(StaticSetterMember {

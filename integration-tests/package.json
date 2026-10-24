@@ -3,6 +3,7 @@
   "dependencies": {
     "alias-constructors": "file:./js/alias-constructors",
     "declared-modules": "file:./js/declared-modules",
+    "error-enum-node": "file:./js/error-enum-node",
     "es-module-lexer": "^1.6.0",
     "export-default": "file:./js/export-default",
     "fallible": "file:./js/fallible",

@@ -1010,6 +1010,7 @@ fn static_members(members: &[crate::ir::Member]) -> Vec<crate::ir::Member> {
                     type_ref: g.type_ref.clone(),
                     optional: g.optional,
                     doc: g.doc.clone(),
+                    throws: g.throws.clone(),
                 }))
             }
             Member::Setter(s) if s.js_name != "prototype" => {
@@ -1390,6 +1391,7 @@ mod tests {
             type_ref: TypeRef::String,
             optional: false,
             doc: None,
+            throws: crate::ir::Throws::None,
         })
     }
 

@@ -55,6 +55,7 @@ mod tests {
             type_ref: TypeRef::Any,
             optional,
             doc: None,
+            throws: crate::ir::Throws::None,
         })
     }
 
@@ -65,6 +66,7 @@ mod tests {
             type_ref: TypeRef::Any,
             optional: false,
             doc: None,
+            throws: crate::ir::Throws::None,
         })
     }
 

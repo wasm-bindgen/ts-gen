@@ -1,0 +1,6 @@
+{
+  "name": "error-enum-node",
+  "private": true,
+  "type": "module",
+  "exports": "./index.js"
+}

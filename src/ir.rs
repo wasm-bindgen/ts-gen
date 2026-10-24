@@ -1035,6 +1035,9 @@ pub struct GetterMember {
     /// admits `undefined` whatever the type says.
     pub optional: bool,
     pub doc: Option<String>,
+    /// `@throws {X}` makes the getter fallible (`Result<R, X>`); getters
+    /// are otherwise infallible under every policy. See [`Throws`].
+    pub throws: Throws,
 }
 
 /// Instance property setter binding.
@@ -1120,6 +1123,8 @@ pub struct StaticGetterMember {
     /// Whether declared with `?:`; see [`GetterMember::optional`].
     pub optional: bool,
     pub doc: Option<String>,
+    /// See [`GetterMember::throws`].
+    pub throws: Throws,
 }
 
 /// Static property setter binding.

@@ -71,15 +71,34 @@ struct Cli {
     #[arg(short, long)]
     verbose: bool,
 
-    /// Use `js_sys::Error` as the default error type for fallible
-    /// bindings instead of `JsValue`.
+    /// Rust path of the default error type for fallible bindings,
+    /// replacing `JsValue` (e.g. `crate::Error`).
     ///
-    /// Applies only when a binding has no `@throws` annotation;
-    /// `@throws {SomeError}` still emits the typed error. Useful in
-    /// environments that prefer the typed `Error` API (`message`,
-    /// `name`, `cause`, …). Note: JS code that throws a non-Error
-    /// value (e.g. `throw "oops"`) will produce a runtime conversion
-    /// error rather than passing through silently.
+    /// The type must implement `From<JsValue>`: wasm-bindgen's `catch`
+    /// converts the caught exception with `?`. Applies only when a
+    /// binding has no `@throws` annotation; `@throws {SomeError}`
+    /// still emits the typed error.
+    #[arg(
+        long = "error-type",
+        value_name = "PATH",
+        conflicts_with = "errors_as_error"
+    )]
+    error_type: Option<String>,
+
+    /// Generate an enum (default name `JsException`) with one variant per
+    /// type named in any `@throws`, plus `Other(JsValue)`. Every
+    /// `@throws`-typed binding returns `Result<T, JsException>`, so a
+    /// `@throws {TypeError | RangeError}` keeps both classes instead
+    /// of collapsing to `Error`. `From<JsValue>` dispatches with
+    /// `instanceof`, most derived class first.
+    #[arg(long = "error-enum", value_name = "NAME", num_args = 0..=1, default_missing_value = "JsException")]
+    error_enum: Option<String>,
+
+    /// Shorthand for `--error-type ::js_sys::Error`.
+    ///
+    /// Useful in environments that prefer the typed `Error` API
+    /// (`message`, `name`, `cause`, …). Note: JS code that throws a
+    /// non-Error value (e.g. `throw "oops"`) is cast unchecked.
     #[arg(long = "errors-as-error")]
     errors_as_error: bool,
 
@@ -162,11 +181,17 @@ fn main() -> Result<()> {
         }
     }
 
-    let options = ts_gen::codegen::GenerateOptions::new()
+    let mut options = ts_gen::codegen::GenerateOptions::new()
         .errors_as_error(cli.errors_as_error)
         .fallible(cli.fallible)
         .experimental_generic_mono(cli.experimental_generic_mono)
         .exports(exports);
+    if let Some(path) = &cli.error_type {
+        options = options.error_type(path);
+    }
+    if let Some(name) = &cli.error_enum {
+        options = options.error_enum(name);
+    }
     let rust_source = ts_gen::codegen::generate_with_options(&module, &gctx, &options)?;
 
     // Write output file, creating parent directories if needed

@@ -679,6 +679,7 @@ fn convert_property_signature(
         type_ref: type_ref.clone(),
         optional: prop.optional,
         doc,
+        throws: info.throws(),
     })];
 
     if !prop.readonly {
@@ -750,6 +751,7 @@ fn convert_method_signature(
             type_ref: return_type,
             optional: method.optional,
             doc,
+            throws: info.throws(),
         })],
         TSMethodSignatureKind::Set => {
             let type_ref = params
@@ -880,6 +882,7 @@ fn convert_class_method(
                     type_ref: return_type,
                     optional: false,
                     doc,
+                    throws: info.throws(),
                 })]
             } else {
                 vec![Member::Getter(GetterMember {
@@ -888,6 +891,7 @@ fn convert_class_method(
                     type_ref: return_type,
                     optional: method.optional,
                     doc,
+                    throws: info.throws(),
                 })]
             }
         }
@@ -968,6 +972,7 @@ fn convert_class_property(
             type_ref: type_ref.clone(),
             optional: prop.optional,
             doc,
+            throws: info.throws(),
         })];
         if !prop.readonly {
             members.push(Member::StaticSetter(StaticSetterMember {
@@ -985,6 +990,7 @@ fn convert_class_property(
             type_ref: type_ref.clone(),
             optional: prop.optional,
             doc,
+            throws: info.throws(),
         })];
         if !prop.readonly {
             members.push(Member::Setter(SetterMember {
@@ -1008,7 +1014,7 @@ fn convert_accessor_property(
         Some(n) => n,
         None => return vec![],
     };
-    let doc = ctx.docs.for_span(acc.span.start);
+    let (doc, info) = split_info(ctx.docs.info_for_span(acc.span.start));
 
     let type_ref = acc
         .type_annotation
@@ -1024,6 +1030,7 @@ fn convert_accessor_property(
                 type_ref: type_ref.clone(),
                 optional: false,
                 doc,
+                throws: info.throws(),
             }),
             Member::StaticSetter(StaticSetterMember {
                 scope: parent_scope,
@@ -1040,6 +1047,7 @@ fn convert_accessor_property(
                 type_ref: type_ref.clone(),
                 optional: false,
                 doc,
+                throws: info.throws(),
             }),
             Member::Setter(SetterMember {
                 scope: parent_scope,
