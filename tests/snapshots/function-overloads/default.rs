@@ -26,15 +26,12 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "parse")]
-    pub fn parse_with_str_and_reviver(input: &str, reviver: &Function) -> Object;
+    pub fn parse_with_reviver(input: &str, reviver: &Function) -> Object;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn try_parse_with_str_and_reviver(
-        input: &str,
-        reviver: &Function,
-    ) -> Result<Object, JsValue>;
+    pub fn try_parse_with_reviver(input: &str, reviver: &Function) -> Result<Object, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {

@@ -4,6 +4,10 @@
 // `first()` owns `first`. `put(entries)` has different leading names and
 // `find(key: number)` a different leading type, so the first overload
 // keeps the base name.
+//
+// A variant is named for what it adds to the bare form: `put_with_options`,
+// `until_with_options` beside `until(other: Store)`, and `with` continues
+// with `_and_` (`with_and_options`).
 
 interface GetOptions {
   range?: string;
@@ -20,4 +24,6 @@ interface Store {
   put(entries: Record<string, string>, options?: GetOptions): Promise<void>;
   find(key: string, options: GetOptions): Promise<string>;
   find(key: number): Promise<string>;
+  until(other: Store | string, options?: GetOptions): number;
+  with(fields: Conditional, options?: GetOptions): Store;
 }

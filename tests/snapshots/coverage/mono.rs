@@ -366,7 +366,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn parse_with_str_and_reviver(
+    pub fn parse_with_reviver(
         input: impl ::wasm_bindgen::JsStringLike,
         reviver: &Function,
     ) -> Result<Object, JsValue>;

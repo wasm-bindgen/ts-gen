@@ -64,7 +64,7 @@ fn primitive_union_signatures_compile(js_string: &JsString, symbol: &Symbol, big
 
     let _: Settings = Settings::new_low("id", &target);
     let _: Settings = Settings::new_with_f64_and_bool(2.0, 1.0, false);
-    let _: Settings = Settings::builder_high_with_str_and_str("id", js_string)
+    let _: Settings = Settings::builder_high_with_str("id", js_string)
         .label_with_bool(true)
         .build();
     let settings = Settings::new(2.0, "id", &target);

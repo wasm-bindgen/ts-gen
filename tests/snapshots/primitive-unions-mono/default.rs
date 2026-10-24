@@ -410,16 +410,16 @@ impl Settings {
         Self::builder_low(id, from).build()
     }
     #[doc = " Construct with `level: \"low\"`."]
-    pub fn new_low_with_str_and_str(id: &str, from: &str) -> Settings {
-        Self::builder_low_with_str_and_str(id, from).build()
+    pub fn new_low_with_str(id: &str, from: &str) -> Settings {
+        Self::builder_low_with_str(id, from).build()
     }
     #[doc = " Construct with `level: \"low\"`."]
-    pub fn new_low_with_str_and_bool(id: &str, from: bool) -> Settings {
-        Self::builder_low_with_str_and_bool(id, from).build()
+    pub fn new_low_with_bool(id: &str, from: bool) -> Settings {
+        Self::builder_low_with_bool(id, from).build()
     }
     #[doc = " Construct with `level: \"low\"`."]
-    pub fn new_low_with_f64_and_target(id: f64, from: &Target) -> Settings {
-        Self::builder_low_with_f64_and_target(id, from).build()
+    pub fn new_low_with_f64(id: f64, from: &Target) -> Settings {
+        Self::builder_low_with_f64(id, from).build()
     }
     #[doc = " Construct with `level: \"low\"`."]
     pub fn new_low_with_f64_and_str(id: f64, from: &str) -> Settings {
@@ -434,16 +434,16 @@ impl Settings {
         Self::builder_high(id, from).build()
     }
     #[doc = " Construct with `level: \"high\"`."]
-    pub fn new_high_with_str_and_str(id: &str, from: &str) -> Settings {
-        Self::builder_high_with_str_and_str(id, from).build()
+    pub fn new_high_with_str(id: &str, from: &str) -> Settings {
+        Self::builder_high_with_str(id, from).build()
     }
     #[doc = " Construct with `level: \"high\"`."]
-    pub fn new_high_with_str_and_bool(id: &str, from: bool) -> Settings {
-        Self::builder_high_with_str_and_bool(id, from).build()
+    pub fn new_high_with_bool(id: &str, from: bool) -> Settings {
+        Self::builder_high_with_bool(id, from).build()
     }
     #[doc = " Construct with `level: \"high\"`."]
-    pub fn new_high_with_f64_and_target(id: f64, from: &Target) -> Settings {
-        Self::builder_high_with_f64_and_target(id, from).build()
+    pub fn new_high_with_f64(id: f64, from: &Target) -> Settings {
+        Self::builder_high_with_f64(id, from).build()
     }
     #[doc = " Construct with `level: \"high\"`."]
     pub fn new_high_with_f64_and_str(id: f64, from: &str) -> Settings {
@@ -456,14 +456,14 @@ impl Settings {
     pub fn new(level: f64, id: &str, from: &Target) -> Settings {
         Self::builder(level, id, from).build()
     }
-    pub fn new_with_str_and_str(level: f64, id: &str, from: &str) -> Settings {
-        Self::builder_with_str_and_str(level, id, from).build()
+    pub fn new_with_str(level: f64, id: &str, from: &str) -> Settings {
+        Self::builder_with_str(level, id, from).build()
     }
-    pub fn new_with_str_and_bool(level: f64, id: &str, from: bool) -> Settings {
-        Self::builder_with_str_and_bool(level, id, from).build()
+    pub fn new_with_bool(level: f64, id: &str, from: bool) -> Settings {
+        Self::builder_with_bool(level, id, from).build()
     }
-    pub fn new_with_f64_and_target(level: f64, id: f64, from: &Target) -> Settings {
-        Self::builder_with_f64_and_target(level, id, from).build()
+    pub fn new_with_f64(level: f64, id: f64, from: &Target) -> Settings {
+        Self::builder_with_f64(level, id, from).build()
     }
     pub fn new_with_f64_and_str(level: f64, id: f64, from: &str) -> Settings {
         Self::builder_with_f64_and_str(level, id, from).build()
@@ -480,7 +480,7 @@ impl Settings {
         SettingsBuilder { inner }
     }
     #[doc = " Start a builder with `level: \"low\"`."]
-    pub fn builder_low_with_str_and_str(id: &str, from: &str) -> SettingsBuilder {
+    pub fn builder_low_with_str(id: &str, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
         inner.set_id(id);
@@ -488,7 +488,7 @@ impl Settings {
         SettingsBuilder { inner }
     }
     #[doc = " Start a builder with `level: \"low\"`."]
-    pub fn builder_low_with_str_and_bool(id: &str, from: bool) -> SettingsBuilder {
+    pub fn builder_low_with_bool(id: &str, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
         inner.set_id(id);
@@ -496,7 +496,7 @@ impl Settings {
         SettingsBuilder { inner }
     }
     #[doc = " Start a builder with `level: \"low\"`."]
-    pub fn builder_low_with_f64_and_target(id: f64, from: &Target) -> SettingsBuilder {
+    pub fn builder_low_with_f64(id: f64, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
         inner.set_id_with_f64(id);
@@ -528,7 +528,7 @@ impl Settings {
         SettingsBuilder { inner }
     }
     #[doc = " Start a builder with `level: \"high\"`."]
-    pub fn builder_high_with_str_and_str(id: &str, from: &str) -> SettingsBuilder {
+    pub fn builder_high_with_str(id: &str, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);
         inner.set_id(id);
@@ -536,7 +536,7 @@ impl Settings {
         SettingsBuilder { inner }
     }
     #[doc = " Start a builder with `level: \"high\"`."]
-    pub fn builder_high_with_str_and_bool(id: &str, from: bool) -> SettingsBuilder {
+    pub fn builder_high_with_bool(id: &str, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);
         inner.set_id(id);
@@ -544,7 +544,7 @@ impl Settings {
         SettingsBuilder { inner }
     }
     #[doc = " Start a builder with `level: \"high\"`."]
-    pub fn builder_high_with_f64_and_target(id: f64, from: &Target) -> SettingsBuilder {
+    pub fn builder_high_with_f64(id: f64, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);
         inner.set_id_with_f64(id);
@@ -574,21 +574,21 @@ impl Settings {
         inner.set_from(from);
         SettingsBuilder { inner }
     }
-    pub fn builder_with_str_and_str(level: f64, id: &str, from: &str) -> SettingsBuilder {
+    pub fn builder_with_str(level: f64, id: &str, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level_with_f64(level);
         inner.set_id(id);
         inner.set_from_with_str(from);
         SettingsBuilder { inner }
     }
-    pub fn builder_with_str_and_bool(level: f64, id: &str, from: bool) -> SettingsBuilder {
+    pub fn builder_with_bool(level: f64, id: &str, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level_with_f64(level);
         inner.set_id(id);
         inner.set_from_with_bool(from);
         SettingsBuilder { inner }
     }
-    pub fn builder_with_f64_and_target(level: f64, id: f64, from: &Target) -> SettingsBuilder {
+    pub fn builder_with_f64(level: f64, id: f64, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level_with_f64(level);
         inner.set_id_with_f64(id);

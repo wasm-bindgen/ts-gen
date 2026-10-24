@@ -1226,7 +1226,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_date_and_options(
+        pub fn from_with_options(
             item: &PlainDate,
             options: &OverflowOptions,
         ) -> Result<PlainDate, Error>;
@@ -1443,7 +1443,7 @@ pub mod temporal {
             duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_and_options(
+        pub fn add_with_options(
             this: &PlainDate,
             duration: &Duration,
             options: &OverflowOptions,
@@ -1473,7 +1473,7 @@ pub mod temporal {
             duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_and_options(
+        pub fn subtract_with_options(
             this: &PlainDate,
             duration: &Duration,
             options: &OverflowOptions,
@@ -1504,7 +1504,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[doc = " * `TypeError` — if the object has no recognised fields"]
         #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn with_with_options(
+        pub fn with_and_options(
             this: &PlainDate,
             date_like: &PartialDateLikeObject,
             options: &OverflowOptions,
@@ -1586,7 +1586,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_plain_date_and_options(
+        pub fn until_with_options(
             this: &PlainDate,
             other: &PlainDate,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
@@ -1678,7 +1678,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_plain_date_and_options(
+        pub fn since_with_options(
             this: &PlainDate,
             other: &PlainDate,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
@@ -2043,7 +2043,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_time_and_options(
+        pub fn from_with_options(
             item: &PlainTime,
             options: &OverflowOptions,
         ) -> Result<PlainTime, Error>;
@@ -2252,7 +2252,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[doc = " * `TypeError` — if the object has no recognised fields"]
         #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn with_with_options(
+        pub fn with_and_options(
             this: &PlainTime,
             time_like: &TimeLikeObject,
             options: &OverflowOptions,
@@ -2304,7 +2304,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the options are invalid"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_plain_time_and_options(
+        pub fn until_with_options(
             this: &PlainTime,
             other: &PlainTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
@@ -2396,7 +2396,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the options are invalid"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_plain_time_and_options(
+        pub fn since_with_options(
             this: &PlainTime,
             other: &PlainTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
@@ -2805,7 +2805,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_date_time_and_options(
+        pub fn from_with_options(
             item: &PlainDateTime,
             options: &OverflowOptions,
         ) -> Result<PlainDateTime, Error>;
@@ -3031,7 +3031,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[doc = " * `TypeError` — if the object has no recognised fields"]
         #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn with_with_options(
+        pub fn with_and_options(
             this: &PlainDateTime,
             date_time_like: &PartialDateTimeLikeObject,
             options: &OverflowOptions,
@@ -3106,7 +3106,7 @@ pub mod temporal {
             duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_and_options(
+        pub fn add_with_options(
             this: &PlainDateTime,
             duration: &Duration,
             options: &OverflowOptions,
@@ -3139,7 +3139,7 @@ pub mod temporal {
             duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_and_options(
+        pub fn subtract_with_options(
             this: &PlainDateTime,
             duration: &Duration,
             options: &OverflowOptions,
@@ -3203,7 +3203,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_plain_date_time_and_options(
+        pub fn until_with_options(
             this: &PlainDateTime,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit,
@@ -3295,7 +3295,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_plain_date_time_and_options(
+        pub fn since_with_options(
             this: &PlainDateTime,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit,
@@ -3497,7 +3497,7 @@ pub mod temporal {
             time_zone: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn to_zoned_date_time_with_zoned_date_time_and_options(
+        pub fn to_zoned_date_time_with_options(
             this: &PlainDateTime,
             time_zone: &ZonedDateTime,
             options: &DisambiguationOptions,
@@ -3683,7 +3683,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_zoned_date_time_and_options(
+        pub fn from_with_options(
             item: &ZonedDateTime,
             options: &ZonedDateTimeFromOptions,
         ) -> Result<ZonedDateTime, Error>;
@@ -3830,7 +3830,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[doc = " * `TypeError` — if the object has no recognised fields"]
         #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn with_with_options(
+        pub fn with_and_options(
             this: &ZonedDateTime,
             zoned_date_time_like: &PartialZonedDateTimeLikeObject,
             options: &ZonedDateTimeFromOptions,
@@ -3915,7 +3915,7 @@ pub mod temporal {
             duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_and_options(
+        pub fn add_with_options(
             this: &ZonedDateTime,
             duration: &Duration,
             options: &OverflowOptions,
@@ -3948,7 +3948,7 @@ pub mod temporal {
             duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_and_options(
+        pub fn subtract_with_options(
             this: &ZonedDateTime,
             duration: &Duration,
             options: &OverflowOptions,
@@ -3994,7 +3994,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time_and_options(
+        pub fn until_with_options(
             this: &ZonedDateTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit,
@@ -4048,7 +4048,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time_and_options(
+        pub fn since_with_options(
             this: &ZonedDateTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit,
@@ -4740,7 +4740,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_and_duration_and_options(
+        pub fn compare_with_options(
             one: &Duration,
             two: &Duration,
             options: &DurationRelativeToOptions,
@@ -5272,7 +5272,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_instant_and_options(
+        pub fn until_with_options(
             this: &Instant,
             other: &Instant,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
@@ -5320,7 +5320,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_instant_and_options(
+        pub fn since_with_options(
             this: &Instant,
             other: &Instant,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
@@ -5566,7 +5566,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_year_month_and_options(
+        pub fn from_with_options(
             item: &PlainYearMonth,
             options: &OverflowOptions,
         ) -> Result<PlainYearMonth, Error>;
@@ -5670,7 +5670,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[doc = " * `TypeError` — if the object has no recognised fields"]
         #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn with_with_options(
+        pub fn with_and_options(
             this: &PlainYearMonth,
             year_month_like: &PartialYearMonthLikeObject,
             options: &OverflowOptions,
@@ -5688,7 +5688,7 @@ pub mod temporal {
             duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_and_options(
+        pub fn add_with_options(
             this: &PlainYearMonth,
             duration: &Duration,
             options: &OverflowOptions,
@@ -5721,7 +5721,7 @@ pub mod temporal {
             duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_and_options(
+        pub fn subtract_with_options(
             this: &PlainYearMonth,
             duration: &Duration,
             options: &OverflowOptions,
@@ -5767,7 +5767,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_plain_year_month_and_options(
+        pub fn until_with_options(
             this: &PlainYearMonth,
             other: &PlainYearMonth,
             options: &RoundingOptionsWithLargestUnit<String>,
@@ -5821,7 +5821,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_plain_year_month_and_options(
+        pub fn since_with_options(
             this: &PlainYearMonth,
             other: &PlainYearMonth,
             options: &RoundingOptionsWithLargestUnit<String>,
@@ -6089,7 +6089,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_month_day_and_options(
+        pub fn from_with_options(
             item: &PlainMonthDay,
             options: &OverflowOptions,
         ) -> Result<PlainMonthDay, Error>;
@@ -6135,7 +6135,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[doc = " * `TypeError` — if the object has no recognised fields"]
         #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn with_with_options(
+        pub fn with_and_options(
             this: &PlainMonthDay,
             month_day_like: &PartialDateLikeObject,
             options: &OverflowOptions,

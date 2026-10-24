@@ -878,13 +878,13 @@ extern "C" {
         callback: &Function,
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, js_name = "setTimeout")]
-    pub fn set_timeout_with_function_and_ms_delay(
+    pub fn set_timeout_with_ms_delay(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         ms_delay: f64,
     ) -> f64;
     #[wasm_bindgen(method, catch, js_name = "setTimeout")]
-    pub fn try_set_timeout_with_function_and_ms_delay(
+    pub fn try_set_timeout_with_ms_delay(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         ms_delay: f64,
@@ -940,13 +940,13 @@ extern "C" {
         callback: &Function,
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, js_name = "setInterval")]
-    pub fn set_interval_with_function_and_ms_delay(
+    pub fn set_interval_with_ms_delay(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         ms_delay: f64,
     ) -> f64;
     #[wasm_bindgen(method, catch, js_name = "setInterval")]
-    pub fn try_set_interval_with_function_and_ms_delay(
+    pub fn try_set_interval_with_ms_delay(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         ms_delay: f64,
@@ -1061,7 +1061,7 @@ extern "C" {
         input: &URL,
     ) -> Promise<Response>;
     #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub async fn fetch_with_request_and_init<
+    pub async fn fetch_with_init<
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf: ::wasm_bindgen::JsGeneric,
     >(
@@ -1070,7 +1070,7 @@ extern "C" {
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, js_name = "fetch")]
-    pub fn fetch_with_request_and_init_promise<
+    pub fn fetch_with_init_promise<
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf: ::wasm_bindgen::JsGeneric,
     >(
@@ -1407,7 +1407,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "addEventListener")]
-    pub fn add_event_listener_with_function_and_event_target_add_event_listener_options(
+    pub fn add_event_listener_with_event_target_add_event_listener_options(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
@@ -1416,7 +1416,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_function_and_event_target_add_event_listener_options(
+    pub fn try_add_event_listener_with_event_target_add_event_listener_options(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
@@ -1447,7 +1447,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "addEventListener")]
-    pub fn add_event_listener_with_function_and_bool(
+    pub fn add_event_listener_with_bool(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: bool,
@@ -1456,7 +1456,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_function_and_bool(
+    pub fn try_add_event_listener_with_bool(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: bool,
@@ -1518,7 +1518,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_function_and_event_target_event_listener_options(
+    pub fn remove_event_listener_with_event_target_event_listener_options(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: &EventTargetEventListenerOptions,
@@ -1527,7 +1527,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_function_and_event_target_event_listener_options(
+    pub fn try_remove_event_listener_with_event_target_event_listener_options(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: &EventTargetEventListenerOptions,
@@ -1558,7 +1558,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_function_and_bool(
+    pub fn remove_event_listener_with_bool(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: bool,
@@ -1567,7 +1567,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_function_and_bool(
+    pub fn try_remove_event_listener_with_bool(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: bool,
@@ -1697,12 +1697,12 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "setTimeout")]
-    pub fn set_timeout_with_function_and_ms_delay(callback: &Function, ms_delay: f64) -> f64;
+    pub fn set_timeout_with_ms_delay(callback: &Function, ms_delay: f64) -> f64;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setTimeout")]
-    pub fn try_set_timeout_with_function_and_ms_delay(
+    pub fn try_set_timeout_with_ms_delay(
         callback: &Function,
         ms_delay: f64,
     ) -> Result<f64, JsValue>;
@@ -1780,12 +1780,12 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "setInterval")]
-    pub fn set_interval_with_function_and_ms_delay(callback: &Function, ms_delay: f64) -> f64;
+    pub fn set_interval_with_ms_delay(callback: &Function, ms_delay: f64) -> f64;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setInterval")]
-    pub fn try_set_interval_with_function_and_ms_delay(
+    pub fn try_set_interval_with_ms_delay(
         callback: &Function,
         ms_delay: f64,
     ) -> Result<f64, JsValue>;
@@ -1933,7 +1933,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
-    pub async fn fetch_with_request_and_init<
+    pub async fn fetch_with_init<
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf: ::wasm_bindgen::JsGeneric,
     >(
@@ -1944,7 +1944,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "fetch")]
-    pub fn fetch_with_request_and_init_promise<
+    pub fn fetch_with_init_promise<
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf: ::wasm_bindgen::JsGeneric,
     >(
@@ -3174,7 +3174,7 @@ extern "C" {
         key: &str,
     ) -> Promise<JsOption<T>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_options<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_options<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
         key: &str,
         options: &DurableObjectGetOptions,
@@ -3182,7 +3182,7 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::OptionFromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_key_and_options_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_options_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
         key: &str,
         options: &DurableObjectGetOptions,
@@ -3240,14 +3240,14 @@ extern "C" {
         value: &T,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_key_and_value_and_options<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn put_with_options<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
         key: &str,
         value: &T,
         options: &DurableObjectPutOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_key_and_value_and_options_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn put_with_options_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
         key: &str,
         value: &T,
@@ -3280,13 +3280,13 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_promise(this: &DurableObjectTransaction, key: &str) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_key_and_options(
+    pub async fn delete_with_options(
         this: &DurableObjectTransaction,
         key: &str,
         options: &DurableObjectPutOptions,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_with_key_and_options_promise(
+    pub fn delete_with_options_promise(
         this: &DurableObjectTransaction,
         key: &str,
         options: &DurableObjectPutOptions,
@@ -3352,13 +3352,13 @@ extern "C" {
         scheduled_time: &Date,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "setAlarm")]
-    pub async fn set_alarm_with_f64_and_options(
+    pub async fn set_alarm_with_options(
         this: &DurableObjectTransaction,
         scheduled_time: f64,
         options: &DurableObjectSetAlarmOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setAlarm")]
-    pub fn set_alarm_with_f64_and_options_promise(
+    pub fn set_alarm_with_options_promise(
         this: &DurableObjectTransaction,
         scheduled_time: f64,
         options: &DurableObjectSetAlarmOptions,
@@ -3408,7 +3408,7 @@ extern "C" {
         key: &str,
     ) -> Promise<JsOption<T>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_options<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_options<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
         key: &str,
         options: &DurableObjectGetOptions,
@@ -3416,7 +3416,7 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::OptionFromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_key_and_options_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_options_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
         key: &str,
         options: &DurableObjectGetOptions,
@@ -3474,14 +3474,14 @@ extern "C" {
         value: &T,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_key_and_value_and_options<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn put_with_options<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
         key: &str,
         value: &T,
         options: &DurableObjectPutOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_key_and_value_and_options_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn put_with_options_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
         key: &str,
         value: &T,
@@ -3514,13 +3514,13 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_promise(this: &DurableObjectStorage, key: &str) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_key_and_options(
+    pub async fn delete_with_options(
         this: &DurableObjectStorage,
         key: &str,
         options: &DurableObjectPutOptions,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_with_key_and_options_promise(
+    pub fn delete_with_options_promise(
         this: &DurableObjectStorage,
         key: &str,
         options: &DurableObjectPutOptions,
@@ -3604,13 +3604,13 @@ extern "C" {
         scheduled_time: &Date,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "setAlarm")]
-    pub async fn set_alarm_with_f64_and_options(
+    pub async fn set_alarm_with_options(
         this: &DurableObjectStorage,
         scheduled_time: f64,
         options: &DurableObjectSetAlarmOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setAlarm")]
-    pub fn set_alarm_with_f64_and_options_promise(
+    pub fn set_alarm_with_options_promise(
         this: &DurableObjectStorage,
         scheduled_time: f64,
         options: &DurableObjectSetAlarmOptions,
@@ -4317,7 +4317,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, js_name = "addEventListener")]
-    pub fn add_event_listener_with_function_and_event_target_add_event_listener_options<
+    pub fn add_event_listener_with_event_target_add_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
@@ -4329,7 +4329,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_function_and_event_target_add_event_listener_options<
+    pub fn try_add_event_listener_with_event_target_add_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
@@ -4367,7 +4367,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, js_name = "addEventListener")]
-    pub fn add_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
+    pub fn add_event_listener_with_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -4377,7 +4377,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
+    pub fn try_add_event_listener_with_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -4455,7 +4455,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_function_and_event_target_event_listener_options<
+    pub fn remove_event_listener_with_event_target_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
@@ -4467,7 +4467,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_function_and_event_target_event_listener_options<
+    pub fn try_remove_event_listener_with_event_target_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
@@ -4505,7 +4505,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
+    pub fn remove_event_listener_with_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -4515,7 +4515,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
+    pub fn try_remove_event_listener_with_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -5203,7 +5203,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_url_promise(this: &Cache, request: &URL) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_request_and_options<
+    pub async fn delete_with_options<
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf: ::wasm_bindgen::JsGeneric,
     >(
@@ -5212,7 +5212,7 @@ extern "C" {
         options: &CacheQueryOptions,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_with_request_and_options_promise<
+    pub fn delete_with_options_promise<
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf: ::wasm_bindgen::JsGeneric,
     >(
@@ -5266,7 +5266,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "match")]
     pub fn match_with_url_promise(this: &Cache, request: &URL) -> Promise<JsOption<Response>>;
     #[wasm_bindgen(method, catch, js_name = "match")]
-    pub async fn match_with_request_and_options<
+    pub async fn match_with_options<
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf: ::wasm_bindgen::JsGeneric,
     >(
@@ -5275,7 +5275,7 @@ extern "C" {
         options: &CacheQueryOptions,
     ) -> Result<Option<Response>, JsValue>;
     #[wasm_bindgen(method, js_name = "match")]
-    pub fn match_with_request_and_options_promise<
+    pub fn match_with_options_promise<
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf: ::wasm_bindgen::JsGeneric,
     >(
@@ -5451,7 +5451,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, catch, js_name = "encrypt")]
-    pub async fn encrypt_with_subtle_crypto_encrypt_algorithm_and_array_buffer(
+    pub async fn encrypt_with_subtle_crypto_encrypt_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -5461,7 +5461,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, js_name = "encrypt")]
-    pub fn encrypt_with_subtle_crypto_encrypt_algorithm_and_array_buffer_promise(
+    pub fn encrypt_with_subtle_crypto_encrypt_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -5471,7 +5471,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, catch, js_name = "encrypt")]
-    pub async fn encrypt_with_str_and_typed_array(
+    pub async fn encrypt_with_typed_array(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
@@ -5481,7 +5481,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, js_name = "encrypt")]
-    pub fn encrypt_with_str_and_typed_array_promise(
+    pub fn encrypt_with_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
@@ -5531,7 +5531,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, catch, js_name = "decrypt")]
-    pub async fn decrypt_with_subtle_crypto_encrypt_algorithm_and_array_buffer(
+    pub async fn decrypt_with_subtle_crypto_encrypt_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -5541,7 +5541,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, js_name = "decrypt")]
-    pub fn decrypt_with_subtle_crypto_encrypt_algorithm_and_array_buffer_promise(
+    pub fn decrypt_with_subtle_crypto_encrypt_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -5551,7 +5551,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, catch, js_name = "decrypt")]
-    pub async fn decrypt_with_str_and_typed_array(
+    pub async fn decrypt_with_typed_array(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
@@ -5561,7 +5561,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, js_name = "decrypt")]
-    pub fn decrypt_with_str_and_typed_array_promise(
+    pub fn decrypt_with_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
@@ -5611,7 +5611,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, catch, js_name = "sign")]
-    pub async fn sign_with_subtle_crypto_sign_algorithm_and_array_buffer(
+    pub async fn sign_with_subtle_crypto_sign_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5621,7 +5621,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, js_name = "sign")]
-    pub fn sign_with_subtle_crypto_sign_algorithm_and_array_buffer_promise(
+    pub fn sign_with_subtle_crypto_sign_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5631,7 +5631,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, catch, js_name = "sign")]
-    pub async fn sign_with_str_and_typed_array(
+    pub async fn sign_with_typed_array(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
@@ -5641,7 +5641,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, js_name = "sign")]
-    pub fn sign_with_str_and_typed_array_promise(
+    pub fn sign_with_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
@@ -5693,7 +5693,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_array_buffer(
+    pub async fn verify_with_subtle_crypto_sign_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5704,7 +5704,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_array_buffer_promise(
+    pub fn verify_with_subtle_crypto_sign_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5803,7 +5803,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_str_and_typed_array_and_typed_array(
+    pub async fn verify_with_typed_array_and_typed_array(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
@@ -5814,7 +5814,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_str_and_typed_array_and_typed_array_promise(
+    pub fn verify_with_typed_array_and_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
@@ -5865,7 +5865,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, catch, js_name = "digest")]
-    pub async fn digest_with_subtle_crypto_hash_algorithm_and_array_buffer(
+    pub async fn digest_with_subtle_crypto_hash_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
         data: &ArrayBuffer,
@@ -5874,7 +5874,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, js_name = "digest")]
-    pub fn digest_with_subtle_crypto_hash_algorithm_and_array_buffer_promise(
+    pub fn digest_with_subtle_crypto_hash_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
         data: &ArrayBuffer,
@@ -5883,7 +5883,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, catch, js_name = "digest")]
-    pub async fn digest_with_str_and_typed_array(
+    pub async fn digest_with_typed_array(
         this: &SubtleCrypto,
         algorithm: &str,
         data: &Object,
@@ -5892,7 +5892,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, js_name = "digest")]
-    pub fn digest_with_str_and_typed_array_promise(
+    pub fn digest_with_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &str,
         data: &Object,
@@ -5983,7 +5983,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
-    pub async fn derive_key_with_subtle_crypto_derive_key_algorithm_and_str(
+    pub async fn derive_key_with_subtle_crypto_derive_key_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5995,7 +5995,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, js_name = "deriveKey")]
-    pub fn derive_key_with_subtle_crypto_derive_key_algorithm_and_str_promise(
+    pub fn derive_key_with_subtle_crypto_derive_key_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -6007,7 +6007,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
-    pub async fn derive_key_with_str_and_subtle_crypto_import_key_algorithm(
+    pub async fn derive_key_with_subtle_crypto_import_key_algorithm(
         this: &SubtleCrypto,
         algorithm: &str,
         base_key: &CryptoKey,
@@ -6019,7 +6019,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, js_name = "deriveKey")]
-    pub fn derive_key_with_str_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn derive_key_with_subtle_crypto_import_key_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &str,
         base_key: &CryptoKey,
@@ -6091,7 +6091,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
-    pub async fn derive_bits_with_str_and_length(
+    pub async fn derive_bits_with_length(
         this: &SubtleCrypto,
         algorithm: &str,
         base_key: &CryptoKey,
@@ -6101,7 +6101,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, js_name = "deriveBits")]
-    pub fn derive_bits_with_str_and_length_promise(
+    pub fn derive_bits_with_length_promise(
         this: &SubtleCrypto,
         algorithm: &str,
         base_key: &CryptoKey,
@@ -6128,14 +6128,14 @@ extern "C" {
         length: f64,
     ) -> Promise<ArrayBuffer>;
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
-    async fn __derive_bits_with_str_and_null(
+    async fn __derive_bits_with_null(
         this: &SubtleCrypto,
         algorithm: &str,
         base_key: &CryptoKey,
         length: &::wasm_bindgen::JsValue,
     ) -> Result<ArrayBuffer, JsValue>;
     #[wasm_bindgen(method, js_name = "deriveBits")]
-    fn __derive_bits_with_str_and_null_promise(
+    fn __derive_bits_with_null_promise(
         this: &SubtleCrypto,
         algorithm: &str,
         base_key: &CryptoKey,
@@ -6183,7 +6183,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_typed_array_and_str(
+    pub async fn import_key_with_typed_array(
         this: &SubtleCrypto,
         format: &str,
         key_data: &Object,
@@ -6195,7 +6195,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_typed_array_and_str_promise(
+    pub fn import_key_with_typed_array_promise(
         this: &SubtleCrypto,
         format: &str,
         key_data: &Object,
@@ -6207,7 +6207,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_json_web_key_and_str(
+    pub async fn import_key_with_json_web_key(
         this: &SubtleCrypto,
         format: &str,
         key_data: &JsonWebKey,
@@ -6219,7 +6219,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_json_web_key_and_str_promise(
+    pub fn import_key_with_json_web_key_promise(
         this: &SubtleCrypto,
         format: &str,
         key_data: &JsonWebKey,
@@ -6231,7 +6231,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_array_buffer_and_subtle_crypto_import_key_algorithm(
+    pub async fn import_key_with_subtle_crypto_import_key_algorithm(
         this: &SubtleCrypto,
         format: &str,
         key_data: &ArrayBuffer,
@@ -6243,7 +6243,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_array_buffer_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn import_key_with_subtle_crypto_import_key_algorithm_promise(
         this: &SubtleCrypto,
         format: &str,
         key_data: &ArrayBuffer,
@@ -6389,7 +6389,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_str_and_str(
+    pub async fn unwrap_key_with_typed_array(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &Object,
@@ -6403,7 +6403,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_str_and_str_promise(
+    pub fn unwrap_key_with_typed_array_promise(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &Object,
@@ -6417,7 +6417,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_array_buffer_and_subtle_crypto_encrypt_algorithm_and_str(
+    pub async fn unwrap_key_with_subtle_crypto_encrypt_algorithm(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &ArrayBuffer,
@@ -6431,7 +6431,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_array_buffer_and_subtle_crypto_encrypt_algorithm_and_str_promise(
+    pub fn unwrap_key_with_subtle_crypto_encrypt_algorithm_promise(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &ArrayBuffer,
@@ -6445,7 +6445,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm_and_str(
+    pub async fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &Object,
@@ -6459,7 +6459,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm_and_str_promise(
+    pub fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm_promise(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &Object,
@@ -6473,7 +6473,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_array_buffer_and_str_and_subtle_crypto_import_key_algorithm(
+    pub async fn unwrap_key_with_subtle_crypto_import_key_algorithm(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &ArrayBuffer,
@@ -6487,7 +6487,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_array_buffer_and_str_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn unwrap_key_with_subtle_crypto_import_key_algorithm_promise(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &ArrayBuffer,
@@ -6501,7 +6501,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_str_and_subtle_crypto_import_key_algorithm(
+    pub async fn unwrap_key_with_typed_array_and_subtle_crypto_import_key_algorithm(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &Object,
@@ -6515,7 +6515,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_str_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn unwrap_key_with_typed_array_and_subtle_crypto_import_key_algorithm_promise(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &Object,
@@ -6529,7 +6529,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_array_buffer_and_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm(
+    pub async fn unwrap_key_with_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &ArrayBuffer,
@@ -6543,7 +6543,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_array_buffer_and_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn unwrap_key_with_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm_promise(
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &ArrayBuffer,
@@ -6630,27 +6630,23 @@ impl SubtleCrypto {
     #[doc = " The **`deriveBits()`** method of the key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
-    pub async fn derive_bits_with_str_and_null(
+    pub async fn derive_bits_with_null(
         &self,
         algorithm: &str,
         base_key: &CryptoKey,
     ) -> Result<ArrayBuffer, JsValue> {
-        self.__derive_bits_with_str_and_null(algorithm, base_key, &::wasm_bindgen::JsValue::NULL)
+        self.__derive_bits_with_null(algorithm, base_key, &::wasm_bindgen::JsValue::NULL)
             .await
     }
     #[doc = " The **`deriveBits()`** method of the key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
-    pub fn derive_bits_with_str_and_null_promise(
+    pub fn derive_bits_with_null_promise(
         &self,
         algorithm: &str,
         base_key: &CryptoKey,
     ) -> Promise<ArrayBuffer> {
-        self.__derive_bits_with_str_and_null_promise(
-            algorithm,
-            base_key,
-            &::wasm_bindgen::JsValue::NULL,
-        )
+        self.__derive_bits_with_null_promise(algorithm, base_key, &::wasm_bindgen::JsValue::NULL)
     }
     #[doc = " The **`deriveBits()`** method of the key."]
     #[doc = ""]
@@ -8381,13 +8377,9 @@ extern "C" {
     pub fn try_before_with_response(this: &Element, content: &Response)
         -> Result<Element, JsValue>;
     #[wasm_bindgen(method, js_name = "before")]
-    pub fn before_with_str_and_options(
-        this: &Element,
-        content: &str,
-        options: &ContentOptions,
-    ) -> Element;
+    pub fn before_with_options(this: &Element, content: &str, options: &ContentOptions) -> Element;
     #[wasm_bindgen(method, catch, js_name = "before")]
-    pub fn try_before_with_str_and_options(
+    pub fn try_before_with_options(
         this: &Element,
         content: &str,
         options: &ContentOptions,
@@ -8435,13 +8427,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "after")]
     pub fn try_after_with_response(this: &Element, content: &Response) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, js_name = "after")]
-    pub fn after_with_str_and_options(
-        this: &Element,
-        content: &str,
-        options: &ContentOptions,
-    ) -> Element;
+    pub fn after_with_options(this: &Element, content: &str, options: &ContentOptions) -> Element;
     #[wasm_bindgen(method, catch, js_name = "after")]
-    pub fn try_after_with_str_and_options(
+    pub fn try_after_with_options(
         this: &Element,
         content: &str,
         options: &ContentOptions,
@@ -8492,13 +8480,10 @@ extern "C" {
         content: &Response,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, js_name = "prepend")]
-    pub fn prepend_with_str_and_options(
-        this: &Element,
-        content: &str,
-        options: &ContentOptions,
-    ) -> Element;
+    pub fn prepend_with_options(this: &Element, content: &str, options: &ContentOptions)
+        -> Element;
     #[wasm_bindgen(method, catch, js_name = "prepend")]
-    pub fn try_prepend_with_str_and_options(
+    pub fn try_prepend_with_options(
         this: &Element,
         content: &str,
         options: &ContentOptions,
@@ -8547,13 +8532,9 @@ extern "C" {
     pub fn try_append_with_response(this: &Element, content: &Response)
         -> Result<Element, JsValue>;
     #[wasm_bindgen(method, js_name = "append")]
-    pub fn append_with_str_and_options(
-        this: &Element,
-        content: &str,
-        options: &ContentOptions,
-    ) -> Element;
+    pub fn append_with_options(this: &Element, content: &str, options: &ContentOptions) -> Element;
     #[wasm_bindgen(method, catch, js_name = "append")]
-    pub fn try_append_with_str_and_options(
+    pub fn try_append_with_options(
         this: &Element,
         content: &str,
         options: &ContentOptions,
@@ -8604,13 +8585,10 @@ extern "C" {
         content: &Response,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, js_name = "replace")]
-    pub fn replace_with_str_and_options(
-        this: &Element,
-        content: &str,
-        options: &ContentOptions,
-    ) -> Element;
+    pub fn replace_with_options(this: &Element, content: &str, options: &ContentOptions)
+        -> Element;
     #[wasm_bindgen(method, catch, js_name = "replace")]
-    pub fn try_replace_with_str_and_options(
+    pub fn try_replace_with_options(
         this: &Element,
         content: &str,
         options: &ContentOptions,
@@ -8669,13 +8647,13 @@ extern "C" {
         content: &Response,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, js_name = "setInnerContent")]
-    pub fn set_inner_content_with_str_and_options(
+    pub fn set_inner_content_with_options(
         this: &Element,
         content: &str,
         options: &ContentOptions,
     ) -> Element;
     #[wasm_bindgen(method, catch, js_name = "setInnerContent")]
-    pub fn try_set_inner_content_with_str_and_options(
+    pub fn try_set_inner_content_with_options(
         this: &Element,
         content: &str,
         options: &ContentOptions,
@@ -8743,13 +8721,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "before")]
     pub fn try_before_with_response(this: &EndTag, content: &Response) -> Result<EndTag, JsValue>;
     #[wasm_bindgen(method, js_name = "before")]
-    pub fn before_with_str_and_options(
-        this: &EndTag,
-        content: &str,
-        options: &ContentOptions,
-    ) -> EndTag;
+    pub fn before_with_options(this: &EndTag, content: &str, options: &ContentOptions) -> EndTag;
     #[wasm_bindgen(method, catch, js_name = "before")]
-    pub fn try_before_with_str_and_options(
+    pub fn try_before_with_options(
         this: &EndTag,
         content: &str,
         options: &ContentOptions,
@@ -8797,13 +8771,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "after")]
     pub fn try_after_with_response(this: &EndTag, content: &Response) -> Result<EndTag, JsValue>;
     #[wasm_bindgen(method, js_name = "after")]
-    pub fn after_with_str_and_options(
-        this: &EndTag,
-        content: &str,
-        options: &ContentOptions,
-    ) -> EndTag;
+    pub fn after_with_options(this: &EndTag, content: &str, options: &ContentOptions) -> EndTag;
     #[wasm_bindgen(method, catch, js_name = "after")]
-    pub fn try_after_with_str_and_options(
+    pub fn try_after_with_options(
         this: &EndTag,
         content: &str,
         options: &ContentOptions,
@@ -8920,13 +8890,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "before")]
     pub fn try_before_with_response(this: &Text, content: &Response) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, js_name = "before")]
-    pub fn before_with_str_and_options(
-        this: &Text,
-        content: &str,
-        options: &ContentOptions,
-    ) -> Text;
+    pub fn before_with_options(this: &Text, content: &str, options: &ContentOptions) -> Text;
     #[wasm_bindgen(method, catch, js_name = "before")]
-    pub fn try_before_with_str_and_options(
+    pub fn try_before_with_options(
         this: &Text,
         content: &str,
         options: &ContentOptions,
@@ -8974,10 +8940,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "after")]
     pub fn try_after_with_response(this: &Text, content: &Response) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, js_name = "after")]
-    pub fn after_with_str_and_options(this: &Text, content: &str, options: &ContentOptions)
-        -> Text;
+    pub fn after_with_options(this: &Text, content: &str, options: &ContentOptions) -> Text;
     #[wasm_bindgen(method, catch, js_name = "after")]
-    pub fn try_after_with_str_and_options(
+    pub fn try_after_with_options(
         this: &Text,
         content: &str,
         options: &ContentOptions,
@@ -9025,13 +8990,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "replace")]
     pub fn try_replace_with_response(this: &Text, content: &Response) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, js_name = "replace")]
-    pub fn replace_with_str_and_options(
-        this: &Text,
-        content: &str,
-        options: &ContentOptions,
-    ) -> Text;
+    pub fn replace_with_options(this: &Text, content: &str, options: &ContentOptions) -> Text;
     #[wasm_bindgen(method, catch, js_name = "replace")]
-    pub fn try_replace_with_str_and_options(
+    pub fn try_replace_with_options(
         this: &Text,
         content: &str,
         options: &ContentOptions,
@@ -9111,12 +9072,12 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/respondWith)"]
     #[wasm_bindgen(method, js_name = "respondWith")]
-    pub fn respond_with_with_promise(this: &FetchEvent, promise: &Promise<Response>);
+    pub fn respond_with_and_promise(this: &FetchEvent, promise: &Promise<Response>);
     #[doc = " The **`respondWith()`** method of allows you to provide a promise for a Response yourself."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/respondWith)"]
     #[wasm_bindgen(method, catch, js_name = "respondWith")]
-    pub fn try_respond_with_with_promise(
+    pub fn try_respond_with_and_promise(
         this: &FetchEvent,
         promise: &Promise<Response>,
     ) -> Result<(), JsValue>;
@@ -9570,7 +9531,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url(input: &URL) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_request_and_init<
+    pub fn new_with_init<
         Cf: ::wasm_bindgen::JsGeneric,
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf2: ::wasm_bindgen::JsGeneric,
@@ -10014,7 +9975,7 @@ extern "C" {
         input: &URL,
     ) -> Promise<Response>;
     #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub async fn fetch_with_request_and_init<
+    pub async fn fetch_with_init<
         T: ::wasm_bindgen::JsGeneric,
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf: ::wasm_bindgen::JsGeneric,
@@ -10024,7 +9985,7 @@ extern "C" {
         init: &RequestInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, js_name = "fetch")]
-    pub fn fetch_with_request_and_init_promise<
+    pub fn fetch_with_init_promise<
         T: ::wasm_bindgen::JsGeneric,
         CfHostMetadata: ::wasm_bindgen::JsGeneric,
         Cf: ::wasm_bindgen::JsGeneric,
@@ -10078,13 +10039,13 @@ extern "C" {
         address: &str,
     ) -> Result<Socket, JsValue>;
     #[wasm_bindgen(method, js_name = "connect")]
-    pub fn connect_with_socket_address_and_options<T: ::wasm_bindgen::JsGeneric>(
+    pub fn connect_with_options<T: ::wasm_bindgen::JsGeneric>(
         this: &Fetcher<T>,
         address: &SocketAddress,
         options: &SocketOptions,
     ) -> Socket;
     #[wasm_bindgen(method, catch, js_name = "connect")]
-    pub fn try_connect_with_socket_address_and_options<T: ::wasm_bindgen::JsGeneric>(
+    pub fn try_connect_with_options<T: ::wasm_bindgen::JsGeneric>(
         this: &Fetcher<T>,
         address: &SocketAddress,
         options: &SocketOptions,
@@ -10295,13 +10256,13 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &KVNamespace, key: &str) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_str_and_partial_kv_namespace_get_options_undefined(
+    pub async fn get_with_partial_kv_namespace_get_options_undefined(
         this: &KVNamespace,
         key: &str,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_str_and_partial_kv_namespace_get_options_undefined_promise(
+    pub fn get_with_partial_kv_namespace_get_options_undefined_promise(
         this: &KVNamespace,
         key: &str,
         options: &PartialKvNamespaceGetOptionsUndefined,
@@ -10357,13 +10318,13 @@ extern "C" {
         r#type: &str,
     ) -> Promise<JsNullable<ReadableStream>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_str_and_kv_namespace_get_options(
+    pub async fn get_with_kv_namespace_get_options(
         this: &KVNamespace,
         key: &str,
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_str_and_kv_namespace_get_options_promise(
+    pub fn get_with_kv_namespace_get_options_promise(
         this: &KVNamespace,
         key: &str,
         options: &KVNamespaceGetOptions<JsString>,
@@ -10485,14 +10446,14 @@ extern "C" {
         value: &ReadableStream<R>,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_str_and_options(
+    pub async fn put_with_options(
         this: &KVNamespace,
         key: &str,
         value: &str,
         options: &KVNamespacePutOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_str_and_options_promise(
+    pub fn put_with_options_promise(
         this: &KVNamespace,
         key: &str,
         value: &str,
@@ -10551,7 +10512,7 @@ extern "C" {
         key: &str,
     ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined<
+    pub async fn get_with_metadata_with_partial_kv_namespace_get_options_undefined<
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace,
@@ -10559,7 +10520,7 @@ extern "C" {
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined_promise<
+    pub fn get_with_metadata_with_partial_kv_namespace_get_options_undefined_promise<
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace,
@@ -10621,7 +10582,7 @@ extern "C" {
         r#type: &str,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_str_and_kv_namespace_get_options<
+    pub async fn get_with_metadata_with_kv_namespace_get_options<
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace,
@@ -10629,7 +10590,7 @@ extern "C" {
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_str_and_kv_namespace_get_options_promise<
+    pub fn get_with_metadata_with_kv_namespace_get_options_promise<
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace,
@@ -11731,14 +11692,14 @@ extern "C" {
         value: &::wasm_bindgen::JsValue,
     ) -> Promise<JsNullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_readable_stream_and_r2_bucket_options2<R: ::wasm_bindgen::JsGeneric>(
+    pub async fn put_with_r2_bucket_options2<R: ::wasm_bindgen::JsGeneric>(
         this: &R2Bucket,
         key: &str,
         value: &ReadableStream<R>,
         options: &R2BucketOptions2,
     ) -> Result<Nullable<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_readable_stream_and_r2_bucket_options2_promise<R: ::wasm_bindgen::JsGeneric>(
+    pub fn put_with_r2_bucket_options2_promise<R: ::wasm_bindgen::JsGeneric>(
         this: &R2Bucket,
         key: &str,
         value: &ReadableStream<R>,
@@ -11815,14 +11776,14 @@ extern "C" {
         options: &R2BucketOptions2,
     ) -> Promise<JsNullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_readable_stream_and_r2_put_options<R: ::wasm_bindgen::JsGeneric>(
+    pub async fn put_with_r2_put_options<R: ::wasm_bindgen::JsGeneric>(
         this: &R2Bucket,
         key: &str,
         value: &ReadableStream<R>,
         options: &R2PutOptions,
     ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_readable_stream_and_r2_put_options_promise<R: ::wasm_bindgen::JsGeneric>(
+    pub fn put_with_r2_put_options_promise<R: ::wasm_bindgen::JsGeneric>(
         this: &R2Bucket,
         key: &str,
         value: &ReadableStream<R>,
@@ -12248,14 +12209,14 @@ extern "C" {
         value: &Blob,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part_with_readable_stream_and_options<R: ::wasm_bindgen::JsGeneric>(
+    pub async fn upload_part_with_options<R: ::wasm_bindgen::JsGeneric>(
         this: &R2MultipartUpload,
         part_number: f64,
         value: &ReadableStream<R>,
         options: &R2UploadPartOptions,
     ) -> Result<R2UploadedPart, JsValue>;
     #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_with_readable_stream_and_options_promise<R: ::wasm_bindgen::JsGeneric>(
+    pub fn upload_part_with_options_promise<R: ::wasm_bindgen::JsGeneric>(
         this: &R2MultipartUpload,
         part_number: f64,
         value: &ReadableStream<R>,
@@ -14723,7 +14684,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_big_int(expected_length: &BigInt) -> Result<FixedLengthStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_f64_and_queuing_strategy(
+    pub fn new_with_queuing_strategy(
         expected_length: f64,
         queuing_strategy: &IdentityTransformStreamQueuingStrategy,
     ) -> Result<FixedLengthStream, JsValue>;
@@ -15475,7 +15436,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url(url: &URL) -> Result<URL, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str_and_str(url: &str, base: &str) -> Result<URL, JsValue>;
+    pub fn new_with_str(url: &str, base: &str) -> Result<URL, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_and_str(url: &URL, base: &str) -> Result<URL, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -33965,13 +33926,13 @@ extern "C" {
         data: &[AIGatewayUniversalRequest],
     ) -> Promise<Response>;
     #[wasm_bindgen(method, catch, js_name = "run")]
-    pub async fn run_with_ai_gateway_universal_request_and_options(
+    pub async fn run_with_options(
         this: &AiGateway,
         data: &AIGatewayUniversalRequest,
         options: &AiGatewayOptions,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, js_name = "run")]
-    pub fn run_with_ai_gateway_universal_request_and_options_promise(
+    pub fn run_with_options_promise(
         this: &AiGateway,
         data: &AIGatewayUniversalRequest,
         options: &AiGatewayOptions,
@@ -40805,15 +40766,15 @@ impl SendEmailBuilder {
     pub fn new(from: &str, to: &str, subject: &str) -> SendEmailBuilder {
         Self::builder(from, to, subject).build()
     }
-    pub fn new_with_str_and_slice(from: &str, to: &[String], subject: &str) -> SendEmailBuilder {
-        Self::builder_with_str_and_slice(from, to, subject).build()
+    pub fn new_with_slice(from: &str, to: &[String], subject: &str) -> SendEmailBuilder {
+        Self::builder_with_slice(from, to, subject).build()
     }
-    pub fn new_with_email_address_and_str(
+    pub fn new_with_email_address(
         from: &EmailAddress,
         to: &str,
         subject: &str,
     ) -> SendEmailBuilder {
-        Self::builder_with_email_address_and_str(from, to, subject).build()
+        Self::builder_with_email_address(from, to, subject).build()
     }
     pub fn new_with_email_address_and_slice(
         from: &EmailAddress,
@@ -40829,18 +40790,14 @@ impl SendEmailBuilder {
         inner.set_subject(subject);
         SendEmailBuilderBuilder { inner }
     }
-    pub fn builder_with_str_and_slice(
-        from: &str,
-        to: &[String],
-        subject: &str,
-    ) -> SendEmailBuilderBuilder {
+    pub fn builder_with_slice(from: &str, to: &[String], subject: &str) -> SendEmailBuilderBuilder {
         let inner: SendEmailBuilder = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_from(from);
         inner.set_to_with_slice(to);
         inner.set_subject(subject);
         SendEmailBuilderBuilder { inner }
     }
-    pub fn builder_with_email_address_and_str(
+    pub fn builder_with_email_address(
         from: &EmailAddress,
         to: &str,
         subject: &str,
@@ -41898,7 +41855,7 @@ pub mod cloudflare {
         #[wasm_bindgen(module = "cloudflare:sockets")]
         extern "C" {
             #[wasm_bindgen(js_name = "connect")]
-            pub fn connect_with_str_and_options(
+            pub fn connect_with_options(
                 address: &str,
                 options: &super::super::SocketOptions,
             ) -> super::super::Socket;
@@ -41906,7 +41863,7 @@ pub mod cloudflare {
         #[wasm_bindgen(module = "cloudflare:sockets")]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "connect")]
-            pub fn try_connect_with_str_and_options(
+            pub fn try_connect_with_options(
                 address: &str,
                 options: &super::super::SocketOptions,
             ) -> Result<super::super::Socket, JsValue>;
@@ -42899,7 +42856,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `ImagesError` — if upload fails"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
-    pub async fn upload_with_readable_stream_and_options(
+    pub async fn upload_with_options(
         this: &HostedImagesBinding,
         image: &ReadableStream<Uint8Array>,
         options: &ImageUploadOptions,
@@ -42915,7 +42872,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `ImagesError` — if upload fails"]
     #[wasm_bindgen(method, js_name = "upload")]
-    pub fn upload_with_readable_stream_and_options_promise(
+    pub fn upload_with_options_promise(
         this: &HostedImagesBinding,
         image: &ReadableStream<Uint8Array>,
         options: &ImageUploadOptions,
@@ -43210,7 +43167,7 @@ extern "C" {
     #[doc = " * `image` - The image (or transformer that will give the image) to draw"]
     #[doc = " * `options` - The options configuring how to draw the image"]
     #[wasm_bindgen(method, js_name = "draw")]
-    pub fn draw_with_readable_stream_and_options(
+    pub fn draw_with_options(
         this: &ImageTransformer,
         image: &ReadableStream<Uint8Array>,
         options: &ImageDrawOptions,
@@ -43221,7 +43178,7 @@ extern "C" {
     #[doc = " * `image` - The image (or transformer that will give the image) to draw"]
     #[doc = " * `options` - The options configuring how to draw the image"]
     #[wasm_bindgen(method, catch, js_name = "draw")]
-    pub fn try_draw_with_readable_stream_and_options(
+    pub fn try_draw_with_options(
         this: &ImageTransformer,
         image: &ReadableStream<Uint8Array>,
         options: &ImageDrawOptions,
@@ -47390,13 +47347,13 @@ extern "C" {
         files: &[MarkdownDocument],
     ) -> Promise<Array<ConversionResponse>>;
     #[wasm_bindgen(method, catch, js_name = "transform")]
-    pub async fn transform_with_slice_and_options(
+    pub async fn transform_with_options(
         this: &ToMarkdownService,
         files: &[MarkdownDocument],
         options: &ConversionRequestOptions,
     ) -> Result<Vec<ConversionResponse>, JsValue>;
     #[wasm_bindgen(method, js_name = "transform")]
-    pub fn transform_with_slice_and_options_promise(
+    pub fn transform_with_options_promise(
         this: &ToMarkdownService,
         files: &[MarkdownDocument],
         options: &ConversionRequestOptions,
@@ -48818,7 +48775,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
-    pub async fn query_with_float32_array_and_options(
+    pub async fn query_with_options(
         this: &VectorizeIndex,
         vector: &Float32Array,
         options: &VectorizeQueryOptions,
@@ -48830,7 +48787,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, js_name = "query")]
-    pub fn query_with_float32_array_and_options_promise(
+    pub fn query_with_options_promise(
         this: &VectorizeIndex,
         vector: &Float32Array,
         options: &VectorizeQueryOptions,
@@ -49049,7 +49006,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
-    pub async fn query_with_float32_array_and_options(
+    pub async fn query_with_options(
         this: &Vectorize,
         vector: &Float32Array,
         options: &VectorizeQueryOptions,
@@ -49061,7 +49018,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, js_name = "query")]
-    pub fn query_with_float32_array_and_options_promise(
+    pub fn query_with_options_promise(
         this: &Vectorize,
         vector: &Float32Array,
         options: &VectorizeQueryOptions,

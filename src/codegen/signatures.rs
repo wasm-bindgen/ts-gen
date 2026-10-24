@@ -770,7 +770,7 @@ pub fn build_signatures(
     let mut units: Vec<Unit> = Vec::new();
     for exp in expansions {
         if exp.literal_arms.len() < 2 {
-            let primary_candidate = public_rust_name(&format!("{base}{}", exp.name_suffix));
+            let primary_candidate = public_rust_name(&join_suffix(&base, &exp.name_suffix));
             units.push(Unit {
                 params: exp.params,
                 overload: exp.overload,
@@ -804,7 +804,7 @@ pub fn build_signatures(
         let shared = groups.len() == 1;
         for (_, overload, arms) in groups {
             let stem = if shared {
-                public_rust_name(&format!("{base}{}", exp.name_suffix))
+                public_rust_name(&join_suffix(&base, &exp.name_suffix))
             } else {
                 arms[0].1.clone()
             };
@@ -981,6 +981,17 @@ fn awaiting_void(promise: &TypeRef) -> TypeRef {
             generic_args: vec![TypeRef::Void],
         },
         other => other.clone(),
+    }
+}
+
+/// `base` with an expansion's `_with_…` suffix. A base that already reads
+/// `with` (`with`, `set_with`) continues with `_and_` instead, so
+/// `with(fields, options?)` gives `with_and_options` rather than
+/// `with_with_options`.
+pub(crate) fn join_suffix(base: &str, suffix: &str) -> String {
+    match suffix.strip_prefix("_with_") {
+        Some(rest) if base == "with" || base.ends_with("_with") => format!("{base}_and_{rest}"),
+        _ => format!("{base}{suffix}"),
     }
 }
 
@@ -1594,21 +1605,27 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
         .map(|(i, _)| i)
         .collect();
 
-    for (sig_idx, sig) in signatures.iter().enumerate() {
-        // The first signature gets the base name without any suffix;
-        // `expand_signatures` has already moved the primary to the front.
-        if sig_idx == 0 {
-            names.push(base_name.to_string());
-            used.claim(base_name);
-            continue;
-        }
+    // The first signature gets the base name without any suffix;
+    // `expand_signatures` has already moved the primary to the front.
+    names.push(base_name.to_string());
+    used.claim(base_name);
 
+    let plan = |sig_idx: usize, sig: &[ConcreteParam]| -> (Vec<SuffixPart>, Vec<SuffixPart>) {
         // Compute per-position suffix parts, each tagged with whether
         // the suffix used the type-name (which is collision-prone) or
         // the param-name (uniquely identifying). On collision the
         // type-name-tagged parts get rewritten to param-name during
         // the post-collision retry.
+        //
+        // `added` keeps only the positions where this signature departs
+        // from the bare form, so a variant is named for what it adds:
+        // `until_with_options` beside `until(other)`, not
+        // `until_with_plain_date_and_options`. `parts` keeps every
+        // position that differs from some sibling, the fallback when the
+        // shorter name is taken.
         let mut parts: Vec<SuffixPart> = Vec::new();
+        let mut added: Vec<SuffixPart> = Vec::new();
+        let primary = &signatures[0];
 
         let end = if sig.len() >= trim_end {
             sig.len() - trim_end
@@ -1661,13 +1678,41 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
             } else {
                 (param_snake.clone(), false)
             };
-            parts.push(SuffixPart {
+            let part = SuffixPart {
                 text,
                 from_type,
                 param_snake,
+            };
+            let adds = primary.get(abs_idx).is_none_or(|p| {
+                p.name != param.name || p.type_ref != param.type_ref || p.variadic != param.variadic
             });
+            if adds {
+                added.push(part.clone());
+            }
+            parts.push(part);
         }
+        (added, parts)
+    };
+    let plans: Vec<(Vec<SuffixPart>, Vec<SuffixPart>)> = signatures
+        .iter()
+        .enumerate()
+        .skip(1)
+        .map(|(i, sig)| plan(i, sig))
+        .collect();
+    // A name for what a variant adds is only kept where no sibling adds
+    // the same: `compare(one, two)` over two unions gives
+    // `compare_with_str_and_plain_date` and `compare_with_plain_date_and_str`,
+    // not one `compare_with_str` and a longer other.
+    let mut added_names: std::collections::HashMap<String, usize> = Default::default();
+    for (added, _) in &plans {
+        if !added.is_empty() {
+            *added_names
+                .entry(compose_name(base_name, added, NamingStrategy::Greedy))
+                .or_default() += 1;
+        }
+    }
 
+    for (added, parts) in plans {
         // Assemble the candidate name. If it collides with a sibling
         // already in `used`, retry the type-name parts by prepending
         // the param name. The retry runs at most twice — once
@@ -1675,7 +1720,10 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
         // upgrading param-name to param-name + flavor. Anything past
         // that returns to numeric dedup as the last-resort safety
         // net.
-        let mut name = compose_name(base_name, &parts, NamingStrategy::Greedy);
+        let mut name = compose_name(base_name, &added, NamingStrategy::Greedy);
+        if added.is_empty() || added_names[&name] > 1 || used.contains(&name) {
+            name = compose_name(base_name, &parts, NamingStrategy::Greedy);
+        }
         if used.contains(&name) {
             // Strategy 1: every type-name part adopts its param-name
             // prefix. The fanned side keeps its flavor as a suffix.
@@ -1730,6 +1778,7 @@ fn compose_name(
 /// One position's contribution to a `_with_<…>_and_<…>` suffix.
 /// Created by [`compute_rust_names`] and consumed by [`compose_name`]
 /// for greedy-then-retry naming.
+#[derive(Clone)]
 struct SuffixPart {
     /// The greedy first-pass token (`record`, `context`, `flag_key`,
     /// …). Comes from `type_snake_name` for union differences, from
@@ -4072,6 +4121,89 @@ mod tests {
         );
         assert_eq!(sigs1[0].rust_name, "foo");
         assert_eq!(sigs2[0].rust_name, "foo_2");
+    }
+
+    fn names(js: &str, overloads: &[&[Param]]) -> Vec<String> {
+        let mut used = no_used();
+        expand_overloads(
+            js,
+            overloads,
+            &TypeRef::Void,
+            SignatureKind::Function,
+            &None,
+            &mut used,
+        )
+        .into_iter()
+        .filter(|s| !s.catch)
+        .map(|s| s.rust_name)
+        .collect()
+    }
+
+    #[test]
+    fn variants_are_named_for_what_they_add_to_the_bare_form() {
+        let other = TypeRef::union([TypeRef::ident("PlainDate"), TypeRef::String]);
+        let until = [
+            typed_param("other", other.clone()),
+            opt_typed_param("options", TypeRef::ident("Options")),
+        ];
+        assert_eq!(
+            names("until", &[&until]),
+            [
+                "until",
+                "until_with_str",
+                "until_with_options",
+                "until_with_str_and_options"
+            ]
+        );
+        // Two variants adding the same at different positions are named in
+        // full.
+        let ab = TypeRef::union([TypeRef::ident("A"), TypeRef::ident("B")]);
+        let compare = [typed_param("one", ab.clone()), typed_param("two", ab)];
+        assert_eq!(
+            names("compare", &[&compare]),
+            [
+                "compare",
+                "compare_with_b_and_a",
+                "compare_with_a_and_b",
+                "compare_with_b_and_b"
+            ]
+        );
+    }
+
+    #[test]
+    fn overload_variants_are_named_for_what_they_add() {
+        // Across overloads the variant that only adds `options` is named
+        // for it; the other overload keeps its parameter name.
+        let put = [
+            typed_param("key", TypeRef::String),
+            typed_param("value", TypeRef::String),
+            opt_typed_param("options", TypeRef::ident("PutOptions")),
+        ];
+        let entries = [
+            typed_param("entries", TypeRef::ident("Entries")),
+            opt_typed_param("options", TypeRef::ident("PutOptions")),
+        ];
+        assert_eq!(
+            names("put", &[&put, &entries]),
+            [
+                "put",
+                "put_with_options",
+                "put_with_entries",
+                "put_with_entries_and_options"
+            ]
+        );
+    }
+
+    #[test]
+    fn a_with_base_continues_with_and() {
+        let with = [
+            typed_param("fields", TypeRef::ident("Fields")),
+            opt_typed_param("options", TypeRef::ident("Options")),
+        ];
+        assert_eq!(names("with", &[&with]), ["with", "with_and_options"]);
+        assert_eq!(join_suffix("set_with", "_with_str"), "set_with_and_str");
+        assert_eq!(join_suffix("without", "_with_str"), "without_with_str");
+        assert_eq!(join_suffix("with", "_2"), "with_2");
     }
 
     #[test]

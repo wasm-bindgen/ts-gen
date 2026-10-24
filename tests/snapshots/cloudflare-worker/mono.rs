@@ -70,10 +70,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_request_and_init(
-        input: &Request,
-        init: &RequestInit,
-    ) -> Result<Request, JsValue>;
+    pub fn new_with_init(input: &Request, init: &RequestInit) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_init(
         input: impl ::wasm_bindgen::JsStringLike,
@@ -533,18 +530,12 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
-    pub async fn fetch_with_request_and_init(
-        input: &Request,
-        init: &RequestInit,
-    ) -> Result<Response, JsValue>;
+    pub async fn fetch_with_init(input: &Request, init: &RequestInit) -> Result<Response, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "fetch")]
-    pub fn fetch_with_request_and_init_promise(
-        input: &Request,
-        init: &RequestInit,
-    ) -> Promise<Response>;
+    pub fn fetch_with_init_promise(input: &Request, init: &RequestInit) -> Promise<Response>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
