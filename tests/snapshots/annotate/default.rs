@@ -115,7 +115,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_keys(this: &Storage, keys: &[String]) -> Result<u32, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_with_keys_promise(this: &Storage, keys: &[String]) -> Promise<u32>;
+    pub fn delete_with_keys_promise(this: &Storage, keys: &[String]) -> Promise<Number>;
 }
 #[wasm_bindgen]
 extern "C" {

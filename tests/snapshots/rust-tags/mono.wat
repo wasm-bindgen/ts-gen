@@ -31,6 +31,8 @@
   (import "./bindings.wasm" "Response.with_status_with_reason" (func $Response.with_status_with_reason (param $this externref) (param $status externref) (param $reason externref) (result externref)))
   ;; count(): Promise<u32>
   (import "./bindings.wasm" "Response.count" (func $Response.count (param $this externref) (result externref)))
+  ;; maybeCount(): Promise<u32 | null>
+  (import "./bindings.wasm" "Response.maybe_count" (func $Response.maybe_count (param $this externref) (result externref)))
   ;; uploadPart(part_number: u16): void
   (import "./bindings.wasm" "Response.upload_part" (func $Response.upload_part (param $this externref) (param $part_number externref)))
   ;; bytes(): u8[]
@@ -43,6 +45,20 @@
   (import "./bindings.wasm" "Response.size" (func $Response.size (param $this externref) (result f64)))
   ;; statusText: string
   (import "./bindings.wasm" "Response.status_text" (func $Response.status_text (param $this externref) (result externref)))
+  ;; closed: Promise<u32>
+  (import "./bindings.wasm" "Response.closed" (func $Response.closed (param $this externref) (result externref)))
+  ;; total: Promise<u64>
+  (import "./bindings.wasm" "Response.total" (func $Response.total (param $this externref) (result externref)))
+  ;; whenReady(ready: Promise<u32>): void
+  (import "./bindings.wasm" "Response.when_ready" (func $Response.when_ready (param $this externref) (param $ready externref)))
+  ;; matrix(): u8[][]
+  (import "./bindings.wasm" "Response.matrix" (func $Response.matrix (param $this externref) (result externref)))
+  ;; setMatrix(rows: u8[][]): void
+  (import "./bindings.wasm" "Response.set_matrix" (func $Response.set_matrix (param $this externref) (param $rows externref)))
+  ;; codes(): (u16 | null)[]
+  (import "./bindings.wasm" "Response.codes" (func $Response.codes (param $this externref) (result externref)))
+  ;; setCodes(codes: (u16 | null)[]): void
+  (import "./bindings.wasm" "Response.set_codes" (func $Response.set_codes (param $this externref) (param $codes externref)))
 
   ;; ResponseInit
   ;; {} as ResponseInit
