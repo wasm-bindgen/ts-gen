@@ -12,9 +12,9 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn mode(this: &BoolOrStrings) -> ModeKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(this: &BoolOrStrings, val: bool);
+    pub fn set_mode(this: &BoolOrStrings, val: ModeKind);
     #[wasm_bindgen(method, setter, js_name = "mode")]
-    pub fn set_mode_with_mode_kind(this: &BoolOrStrings, val: ModeKind);
+    pub fn set_mode_with_bool(this: &BoolOrStrings, val: bool);
 }
 impl BoolOrStrings {
     #[doc = " ## Inlined fields"]
@@ -22,7 +22,7 @@ impl BoolOrStrings {
     #[doc = " * `mode: true`"]
     pub fn new_true() -> BoolOrStrings {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(true);
+        inner.set_mode_with_bool(true);
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -30,7 +30,7 @@ impl BoolOrStrings {
     #[doc = " * `mode: \"x\"`"]
     pub fn new_x() -> BoolOrStrings {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_mode_kind(ModeKind::X);
+        inner.set_mode(ModeKind::X);
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -38,7 +38,7 @@ impl BoolOrStrings {
     #[doc = " * `mode: \"y\"`"]
     pub fn new_y() -> BoolOrStrings {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_mode_kind(ModeKind::Y);
+        inner.set_mode(ModeKind::Y);
         inner
     }
 }
@@ -50,12 +50,9 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn mode(this: &NumberOrStrings) -> NumberOrStringsModeKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(this: &NumberOrStrings, val: f64);
+    pub fn set_mode(this: &NumberOrStrings, val: NumberOrStringsModeKind);
     #[wasm_bindgen(method, setter, js_name = "mode")]
-    pub fn set_mode_with_number_or_strings_mode_kind(
-        this: &NumberOrStrings,
-        val: NumberOrStringsModeKind,
-    );
+    pub fn set_mode_with_f64(this: &NumberOrStrings, val: f64);
 }
 impl NumberOrStrings {
     #[doc = " ## Inlined fields"]
@@ -63,7 +60,7 @@ impl NumberOrStrings {
     #[doc = " * `mode: 0`"]
     pub fn new_0() -> NumberOrStrings {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(0.0);
+        inner.set_mode_with_f64(0.0);
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -71,7 +68,7 @@ impl NumberOrStrings {
     #[doc = " * `mode: \"x\"`"]
     pub fn new_x() -> NumberOrStrings {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_number_or_strings_mode_kind(NumberOrStringsModeKind::X);
+        inner.set_mode(NumberOrStringsModeKind::X);
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -79,7 +76,7 @@ impl NumberOrStrings {
     #[doc = " * `mode: \"y\"`"]
     pub fn new_y() -> NumberOrStrings {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_number_or_strings_mode_kind(NumberOrStringsModeKind::Y);
+        inner.set_mode(NumberOrStringsModeKind::Y);
         inner
     }
 }

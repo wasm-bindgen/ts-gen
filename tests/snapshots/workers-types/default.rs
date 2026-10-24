@@ -34769,9 +34769,9 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn repeat(this: &RequestInitCfPropertiesImageDraw) -> Option<RepeatKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_repeat(this: &RequestInitCfPropertiesImageDraw, val: bool);
+    pub fn set_repeat(this: &RequestInitCfPropertiesImageDraw, val: RepeatKind);
     #[wasm_bindgen(method, setter, js_name = "repeat")]
-    pub fn set_repeat_with_repeat_kind(this: &RequestInitCfPropertiesImageDraw, val: RepeatKind);
+    pub fn set_repeat_with_bool(this: &RequestInitCfPropertiesImageDraw, val: bool);
     #[doc = " Position of the overlay image relative to a given edge. Each property is"]
     #[doc = " an offset in pixels. 0 aligns exactly to the edge. For example, left: 10"]
     #[doc = " positions left side of the overlay 10 pixels from the left edge of the"]
@@ -34858,12 +34858,12 @@ impl RequestInitCfPropertiesImageDrawBuilder {
         self.inner.set_opacity(val);
         self
     }
-    pub fn repeat(self, val: bool) -> Self {
+    pub fn repeat(self, val: RepeatKind) -> Self {
         self.inner.set_repeat(val);
         self
     }
-    pub fn repeat_with_repeat_kind(self, val: RepeatKind) -> Self {
-        self.inner.set_repeat_with_repeat_kind(val);
+    pub fn repeat_with_bool(self, val: bool) -> Self {
+        self.inner.set_repeat_with_bool(val);
         self
     }
     pub fn top(self, val: f64) -> Self {
@@ -34922,9 +34922,9 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn quality(this: &RequestInitCfPropertiesImage) -> Option<QualityKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_quality(this: &RequestInitCfPropertiesImage, val: f64);
+    pub fn set_quality(this: &RequestInitCfPropertiesImage, val: QualityKind);
     #[wasm_bindgen(method, setter, js_name = "quality")]
-    pub fn set_quality_with_quality_kind(this: &RequestInitCfPropertiesImage, val: QualityKind);
+    pub fn set_quality_with_f64(this: &RequestInitCfPropertiesImage, val: f64);
     #[doc = " Output format to generate. It can be:"]
     #[doc = "  - avif: generate images in AVIF format."]
     #[doc = "  - webp: generate images in Google WebP format. Set quality to 100 to get"]
@@ -35105,12 +35105,12 @@ impl RequestInitCfPropertiesImageBuilder {
         self.inner.set_trim_with_object(val);
         self
     }
-    pub fn quality(self, val: f64) -> Self {
+    pub fn quality(self, val: QualityKind) -> Self {
         self.inner.set_quality(val);
         self
     }
-    pub fn quality_with_quality_kind(self, val: QualityKind) -> Self {
-        self.inner.set_quality_with_quality_kind(val);
+    pub fn quality_with_f64(self, val: f64) -> Self {
+        self.inner.set_quality_with_f64(val);
         self
     }
     pub fn format(self, val: FormatKind) -> Self {
@@ -35310,12 +35310,12 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_country<HostMetadata: ::wasm_bindgen::JsGeneric>(
         this: &IncomingRequestCfProperties<HostMetadata>,
-        val: Iso3166Alpha2Code,
+        val: CountryKind,
     );
     #[wasm_bindgen(method, setter, js_name = "country")]
-    pub fn set_country_with_country_kind<HostMetadata: ::wasm_bindgen::JsGeneric>(
+    pub fn set_country_with_iso3166_alpha2_code<HostMetadata: ::wasm_bindgen::JsGeneric>(
         this: &IncomingRequestCfProperties<HostMetadata>,
-        val: CountryKind,
+        val: Iso3166Alpha2Code,
     );
     #[doc = " If present, this property indicates that the request originated in the EU"]
     #[doc = ""]
@@ -37181,12 +37181,12 @@ impl<HostMetadata: ::wasm_bindgen::JsGeneric> IncomingRequestCfPropertiesBuilder
         self.inner.set_host_metadata(val);
         self
     }
-    pub fn country(self, val: Iso3166Alpha2Code) -> Self {
+    pub fn country(self, val: CountryKind) -> Self {
         self.inner.set_country(val);
         self
     }
-    pub fn country_with_country_kind(self, val: CountryKind) -> Self {
-        self.inner.set_country_with_country_kind(val);
+    pub fn country_with_iso3166_alpha2_code(self, val: Iso3166Alpha2Code) -> Self {
+        self.inner.set_country_with_iso3166_alpha2_code(val);
         self
     }
     pub fn is_eu_country(self, val: &str) -> Self {
@@ -38291,14 +38291,11 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn country(this: &IncomingRequestCfPropertiesGeographicInformation) -> Option<CountryKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_country(
+    pub fn set_country(this: &IncomingRequestCfPropertiesGeographicInformation, val: CountryKind);
+    #[wasm_bindgen(method, setter, js_name = "country")]
+    pub fn set_country_with_iso3166_alpha2_code(
         this: &IncomingRequestCfPropertiesGeographicInformation,
         val: Iso3166Alpha2Code,
-    );
-    #[wasm_bindgen(method, setter, js_name = "country")]
-    pub fn set_country_with_country_kind(
-        this: &IncomingRequestCfPropertiesGeographicInformation,
-        val: CountryKind,
     );
     #[doc = " If present, this property indicates that the request originated in the EU"]
     #[doc = ""]
@@ -38393,12 +38390,12 @@ pub struct IncomingRequestCfPropertiesGeographicInformationBuilder {
     inner: IncomingRequestCfPropertiesGeographicInformation,
 }
 impl IncomingRequestCfPropertiesGeographicInformationBuilder {
-    pub fn country(self, val: Iso3166Alpha2Code) -> Self {
+    pub fn country(self, val: CountryKind) -> Self {
         self.inner.set_country(val);
         self
     }
-    pub fn country_with_country_kind(self, val: CountryKind) -> Self {
-        self.inner.set_country_with_country_kind(val);
+    pub fn country_with_iso3166_alpha2_code(self, val: Iso3166Alpha2Code) -> Self {
+        self.inner.set_country_with_iso3166_alpha2_code(val);
         self
     }
     pub fn is_eu_country(self, val: &str) -> Self {
