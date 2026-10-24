@@ -15587,6 +15587,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SqlStorageStatement;
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `SqlStorageValue`",
+    label = "expected ArrayBuffer, string or number"
+)]
 pub trait SqlStorageValue: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl SqlStorageValue for ArrayBuffer {}
 impl SqlStorageValue for &ArrayBuffer {}
@@ -18571,6 +18575,10 @@ impl AiTextToSpeechInputBuilder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `AiTextToSpeechOutput`",
+    label = "expected Uint8Array or Object"
+)]
 pub trait AiTextToSpeechOutput: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl AiTextToSpeechOutput for Uint8Array {}
 impl AiTextToSpeechOutput for &Uint8Array {}
@@ -20007,6 +20015,10 @@ impl ReasoningBuilder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `ResponseContent`",
+    label = "expected ResponseInputText, ResponseInputImage, ResponseOutputText, ResponseOutputRefusal or ResponseContentReasoningText"
+)]
 pub trait ResponseContent: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl ResponseContent for ResponseInputText {}
 impl ResponseContent for &ResponseInputText {}
@@ -20435,6 +20447,10 @@ impl ResponseFormatJSONObject {
         inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `ResponseFormatTextConfig`",
+    label = "expected ResponseFormatText, ResponseFormatTextJsonSchemaConfig or ResponseFormatJsonObject"
+)]
 pub trait ResponseFormatTextConfig: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl ResponseFormatTextConfig for ResponseFormatText {}
 impl ResponseFormatTextConfig for &ResponseFormatText {}
@@ -20701,6 +20717,10 @@ impl ResponseFunctionCallArgumentsDoneEvent {
         inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `ResponseFunctionCallOutputItem`",
+    label = "expected ResponseInputTextContent or ResponseInputImageContent"
+)]
 pub trait ResponseFunctionCallOutputItem: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl ResponseFunctionCallOutputItem for ResponseInputTextContent {}
 impl ResponseFunctionCallOutputItem for &ResponseInputTextContent {}
@@ -21006,6 +21026,10 @@ impl ResponseIncompleteEvent {
 }
 #[allow(dead_code)]
 pub type ResponseInput = Array;
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `ResponseInputContent`",
+    label = "expected ResponseInputText or ResponseInputImage"
+)]
 pub trait ResponseInputContent: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl ResponseInputContent for ResponseInputText {}
 impl ResponseInputContent for &ResponseInputText {}
@@ -21192,6 +21216,10 @@ impl ResponseInputImageContentBuilder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `ResponseInputItem`",
+    label = "expected EasyInputMessage, ResponseInputItemMessage, ResponseOutputMessage, ResponseFunctionToolCall, ResponseInputItemFunctionCallOutput or ResponseReasoningItem"
+)]
 pub trait ResponseInputItem: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl ResponseInputItem for EasyInputMessage {}
 impl ResponseInputItem for &EasyInputMessage {}
@@ -21639,6 +21667,10 @@ impl ResponseInputTextContent {
         inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `ResponseItem`",
+    label = "expected ResponseInputMessageItem, ResponseOutputMessage, ResponseFunctionToolCallItem or ResponseFunctionToolCallOutputItem"
+)]
 pub trait ResponseItem: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl ResponseItem for ResponseInputMessageItem {}
 impl ResponseItem for &ResponseInputMessageItem {}
@@ -21697,6 +21729,10 @@ impl ::core::convert::From<&ResponseFunctionToolCallOutputItem> for ResponseItem
         Self::ResponseFunctionToolCallOutputItem(value.clone())
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `ResponseOutputItem`",
+    label = "expected ResponseOutputMessage, ResponseFunctionToolCall or ResponseReasoningItem"
+)]
 pub trait ResponseOutputItem: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl ResponseOutputItem for ResponseOutputMessage {}
 impl ResponseOutputItem for &ResponseOutputMessage {}
@@ -22851,6 +22887,10 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Baai_Bge_Base_En_V1_5_Output`",
+    label = "expected Object or AiCfBaaiBgeBaseEnV15AsyncResponse"
+)]
 pub trait Ai_Cf_Baai_Bge_Base_En_V1_5_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Baai_Bge_Base_En_V1_5_Output for Object {}
 impl Ai_Cf_Baai_Bge_Base_En_V1_5_Output for &Object {}
@@ -22953,6 +22993,10 @@ extern "C" {
         val: impl Ai_Cf_Baai_Bge_Base_En_V1_5_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Openai_Whisper_Input`",
+    label = "expected string or Object"
+)]
 pub trait Ai_Cf_Openai_Whisper_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Openai_Whisper_Input for &str {}
 impl Ai_Cf_Openai_Whisper_Input for ::std::string::String {}
@@ -23162,6 +23206,10 @@ impl Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Meta_M2M100_1_2B_Output`",
+    label = "expected Object or AiCfMetaM2M10012BAsyncResponse"
+)]
 pub trait Ai_Cf_Meta_M2M100_1_2B_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Meta_M2M100_1_2B_Output for Object {}
 impl Ai_Cf_Meta_M2M100_1_2B_Output for &Object {}
@@ -23326,6 +23374,10 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Baai_Bge_Small_En_V1_5_Output`",
+    label = "expected Object or AiCfBaaiBgeSmallEnV15AsyncResponse"
+)]
 pub trait Ai_Cf_Baai_Bge_Small_En_V1_5_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Baai_Bge_Small_En_V1_5_Output for Object {}
 impl Ai_Cf_Baai_Bge_Small_En_V1_5_Output for &Object {}
@@ -23495,6 +23547,10 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Baai_Bge_Large_En_V1_5_Output`",
+    label = "expected Object or AiCfBaaiBgeLargeEnV15AsyncResponse"
+)]
 pub trait Ai_Cf_Baai_Bge_Large_En_V1_5_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Baai_Bge_Large_En_V1_5_Output for Object {}
 impl Ai_Cf_Baai_Bge_Large_En_V1_5_Output for &Object {}
@@ -23597,6 +23653,10 @@ extern "C" {
         val: impl Ai_Cf_Baai_Bge_Large_En_V1_5_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input`",
+    label = "expected string or Object"
+)]
 pub trait Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for &str {}
 impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for ::std::string::String {}
@@ -23716,6 +23776,10 @@ extern "C" {
         val: &Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Openai_Whisper_Tiny_En_Input`",
+    label = "expected string or Object"
+)]
 pub trait Ai_Cf_Openai_Whisper_Tiny_En_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Openai_Whisper_Tiny_En_Input for &str {}
 impl Ai_Cf_Openai_Whisper_Tiny_En_Input for ::std::string::String {}
@@ -24081,6 +24145,10 @@ extern "C" {
         val: &Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Baai_Bge_M3_Input`",
+    label = "expected AiCfBaaiBgeM3InputQueryAndContexts, AiCfBaaiBgeM3InputEmbedding or Object"
+)]
 pub trait Ai_Cf_Baai_Bge_M3_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Baai_Bge_M3_Input for Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts {}
 impl Ai_Cf_Baai_Bge_M3_Input for &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts {}
@@ -24364,6 +24432,10 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Baai_Bge_M3_Output`",
+    label = "expected AiCfBaaiBgeM3OuputQuery, AiCfBaaiBgeM3OutputEmbeddingForContexts, AiCfBaaiBgeM3OuputEmbedding or AiCfBaaiBgeM3AsyncResponse"
+)]
 pub trait Ai_Cf_Baai_Bge_M3_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Baai_Bge_M3_Output for Ai_Cf_Baai_Bge_M3_Ouput_Query {}
 impl Ai_Cf_Baai_Bge_M3_Output for &Ai_Cf_Baai_Bge_M3_Ouput_Query {}
@@ -24765,6 +24837,10 @@ extern "C" {
         val: &Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input`",
+    label = "expected AiCfMetaLlama3211BVisionInstructPrompt or AiCfMetaLlama3211BVisionInstructMessages"
+)]
 pub trait Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
 {
@@ -25240,6 +25316,10 @@ extern "C" {
         val: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input`",
+    label = "expected AiCfMetaLlama3370BInstructFp8FastPrompt, AiCfMetaLlama3370BInstructFp8FastMessages or AiCfMetaLlama3370BInstructFp8FastAsyncBatch"
+)]
 pub trait Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
 {
@@ -25879,6 +25959,10 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output`",
+    label = "expected Object, string or AiCfMetaLlama3370BInstructFp8FastAsyncResponse"
+)]
 pub trait Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output:
     ::wasm_bindgen::convert::IntoWasmAbi
 {
@@ -26276,6 +26360,10 @@ extern "C" {
         val: &Ai_Cf_Baai_Bge_Reranker_Base_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input`",
+    label = "expected AiCfQwenQwen25Coder32BInstructPrompt or AiCfQwenQwen25Coder32BInstructMessages"
+)]
 pub trait Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
 {
@@ -26823,6 +26911,10 @@ extern "C" {
         val: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Qwen_Qwq_32B_Input`",
+    label = "expected AiCfQwenQwq32BPrompt or AiCfQwenQwq32BMessages"
+)]
 pub trait Ai_Cf_Qwen_Qwq_32B_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Qwen_Qwq_32B_Input for Ai_Cf_Qwen_Qwq_32B_Prompt {}
 impl Ai_Cf_Qwen_Qwq_32B_Input for &Ai_Cf_Qwen_Qwq_32B_Prompt {}
@@ -27206,6 +27298,10 @@ extern "C" {
         val: &Ai_Cf_Qwen_Qwq_32B_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input`",
+    label = "expected AiCfMistralaiMistralSmall3124BInstructPrompt or AiCfMistralaiMistralSmall3124BInstructMessages"
+)]
 pub trait Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
 {
@@ -27711,6 +27807,10 @@ extern "C" {
         val: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Google_Gemma_3_12B_It_Input`",
+    label = "expected AiCfGoogleGemma312BItPrompt or AiCfGoogleGemma312BItMessages"
+)]
 pub trait Ai_Cf_Google_Gemma_3_12B_It_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Google_Gemma_3_12B_It_Input for Ai_Cf_Google_Gemma_3_12B_It_Prompt {}
 impl Ai_Cf_Google_Gemma_3_12B_It_Input for &Ai_Cf_Google_Gemma_3_12B_It_Prompt {}
@@ -28118,6 +28218,10 @@ extern "C" {
         val: &Ai_Cf_Google_Gemma_3_12B_It_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input`",
+    label = "expected AiCfMetaLlama4Scout17B16EInstructPrompt, AiCfMetaLlama4Scout17B16EInstructMessages or AiCfMetaLlama4Scout17B16EInstructAsyncBatch"
+)]
 pub trait Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
 {
@@ -29100,6 +29204,10 @@ extern "C" {
         val: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input`",
+    label = "expected AiCfQwenQwen330BA3BFp8Prompt, AiCfQwenQwen330BA3BFp8Messages or AiCfQwenQwen330BA3BFp8AsyncBatch"
+)]
 pub trait Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt {}
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input for &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt {}
@@ -29995,6 +30103,10 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output`",
+    label = "expected AiCfQwenQwen330BA3BFp8ChatCompletionResponse, AiCfQwenQwen330BA3BFp8TextCompletionResponse, string or AiCfQwenQwen330BA3BFp8AsyncResponse"
+)]
 pub trait Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response {}
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output
@@ -31686,6 +31798,10 @@ extern "C" {
         val: &Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output,
     );
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input`",
+    label = "expected AiCfAisingaporeGemmaSeaLionV427BItPrompt, AiCfAisingaporeGemmaSeaLionV427BItMessages or AiCfAisingaporeGemmaSeaLionV427BItAsyncBatch"
+)]
 pub trait Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
 {
@@ -32721,6 +32837,10 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output`",
+    label = "expected AiCfAisingaporeGemmaSeaLionV427BItChatCompletionResponse, AiCfAisingaporeGemmaSeaLionV427BItTextCompletionResponse, string or AiCfAisingaporeGemmaSeaLionV427BItAsyncResponse"
+)]
 pub trait Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output:
     ::wasm_bindgen::convert::IntoWasmAbi
 {
@@ -43781,6 +43901,10 @@ pub mod cloudflare {
             Month = "month",
             Year = "year",
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` is not a `WorkflowSleepDuration`",
+            label = "expected string or number"
+        )]
         pub trait WorkflowSleepDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
         impl WorkflowSleepDuration for &str {}
         impl WorkflowSleepDuration for ::std::string::String {}
@@ -43827,6 +43951,10 @@ pub mod cloudflare {
                 Self::F64(value)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` is not a `WorkflowDelayDuration`",
+            label = "expected string or number"
+        )]
         pub trait WorkflowDelayDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
         impl WorkflowDelayDuration for &str {}
         impl WorkflowDelayDuration for ::std::string::String {}
@@ -43873,6 +44001,10 @@ pub mod cloudflare {
                 Self::F64(value)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` is not a `WorkflowTimeoutDuration`",
+            label = "expected string or number"
+        )]
         pub trait WorkflowTimeoutDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
         impl WorkflowTimeoutDuration for &str {}
         impl WorkflowTimeoutDuration for ::std::string::String {}
@@ -43919,6 +44051,10 @@ pub mod cloudflare {
                 Self::F64(value)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` is not a `WorkflowRetentionDuration`",
+            label = "expected string or number"
+        )]
         pub trait WorkflowRetentionDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
         impl WorkflowRetentionDuration for &str {}
         impl WorkflowRetentionDuration for ::std::string::String {}
@@ -46525,6 +46661,10 @@ pub mod rpc {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkflowEntrypointBranded;
     }
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `EntrypointBranded`",
+        label = "expected WorkerEntrypointBranded, DurableObjectBranded or WorkflowEntrypointBranded"
+    )]
     pub trait EntrypointBranded: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl EntrypointBranded for WorkerEntrypointBranded {}
     impl EntrypointBranded for &WorkerEntrypointBranded {}
@@ -50947,6 +51087,10 @@ pub mod tail_stream {
         }
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `VectorFloatArray`",
+    label = "expected Float32Array or Float64Array"
+)]
 pub trait VectorFloatArray: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl VectorFloatArray for Float32Array {}
 impl VectorFloatArray for &Float32Array {}
@@ -52242,6 +52386,10 @@ pub enum WorkflowDurationLabel {
     Month = "month",
     Year = "year",
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `WorkflowSleepDuration`",
+    label = "expected string or number"
+)]
 pub trait WorkflowSleepDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl WorkflowSleepDuration for &str {}
 impl WorkflowSleepDuration for ::std::string::String {}
@@ -52288,6 +52436,10 @@ impl ::core::convert::From<f64> for WorkflowSleepDurationKind2 {
         Self::F64(value)
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `WorkflowRetentionDuration`",
+    label = "expected string or number"
+)]
 pub trait WorkflowRetentionDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl WorkflowRetentionDuration for &str {}
 impl WorkflowRetentionDuration for ::std::string::String {}

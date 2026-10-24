@@ -20,6 +20,10 @@ extern "C" {
         for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
         T: ::wasm_bindgen::convert::IntoWasmAbi;
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Loose`",
+    label = "expected number or string"
+)]
 pub trait Loose: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Loose for f64 {}
 impl Loose for &str {}

@@ -240,6 +240,10 @@ pub enum QueueContentType {
     Json = "json",
     V8 = "v8",
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `BodyInit`",
+    label = "expected ReadableStream, string, ArrayBuffer, Blob, UrlSearchParams or FormData"
+)]
 pub trait BodyInit: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl BodyInit for ReadableStream {}
 impl BodyInit for &ReadableStream {}

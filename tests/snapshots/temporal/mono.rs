@@ -7,6 +7,10 @@ use wasm_bindgen::prelude::*;
 pub mod temporal {
     #[allow(unused_imports)]
     use super::*;
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `CalendarLike`",
+        label = "expected PlainDate, PlainDateTime, PlainMonthDay, PlainYearMonth, ZonedDateTime or string"
+    )]
     pub trait CalendarLike: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl CalendarLike for PlainDate {}
     impl CalendarLike for &PlainDate {}
@@ -111,6 +115,10 @@ pub mod temporal {
             Self::String(::std::string::String::from(value))
         }
     }
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `DurationLike`",
+        label = "expected Duration, string or DurationLikeObject"
+    )]
     pub trait DurationLike: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl DurationLike for Duration {}
     impl DurationLike for &Duration {}
@@ -176,6 +184,10 @@ pub mod temporal {
             Self::DurationLikeObject(value.clone())
         }
     }
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `InstantLike`",
+        label = "expected Instant, ZonedDateTime or string"
+    )]
     pub trait InstantLike: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl InstantLike for Instant {}
     impl InstantLike for &Instant {}
@@ -241,6 +253,10 @@ pub mod temporal {
             Self::String(::std::string::String::from(value))
         }
     }
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `PlainDateLike`",
+        label = "expected PlainDate, ZonedDateTime, PlainDateTime, string or DateLikeObject"
+    )]
     pub trait PlainDateLike: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl PlainDateLike for PlainDate {}
     impl PlainDateLike for &PlainDate {}
@@ -332,6 +348,10 @@ pub mod temporal {
             Self::DateLikeObject(value.clone())
         }
     }
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `PlainDateTimeLike`",
+        label = "expected PlainDateTime, ZonedDateTime, PlainDate, string or DateTimeLikeObject"
+    )]
     pub trait PlainDateTimeLike: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl PlainDateTimeLike for PlainDateTime {}
     impl PlainDateTimeLike for &PlainDateTime {}
@@ -423,6 +443,10 @@ pub mod temporal {
             Self::DateTimeLikeObject(value.clone())
         }
     }
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `PlainMonthDayLike`",
+        label = "expected PlainMonthDay, string or DateLikeObject"
+    )]
     pub trait PlainMonthDayLike: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl PlainMonthDayLike for PlainMonthDay {}
     impl PlainMonthDayLike for &PlainMonthDay {}
@@ -488,6 +512,10 @@ pub mod temporal {
             Self::DateLikeObject(value.clone())
         }
     }
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `PlainTimeLike`",
+        label = "expected PlainTime, PlainDateTime, ZonedDateTime, string or TimeLikeObject"
+    )]
     pub trait PlainTimeLike: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl PlainTimeLike for PlainTime {}
     impl PlainTimeLike for &PlainTime {}
@@ -579,6 +607,10 @@ pub mod temporal {
             Self::TimeLikeObject(value.clone())
         }
     }
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `PlainYearMonthLike`",
+        label = "expected PlainYearMonth, string or YearMonthLikeObject"
+    )]
     pub trait PlainYearMonthLike: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl PlainYearMonthLike for PlainYearMonth {}
     impl PlainYearMonthLike for &PlainYearMonth {}
@@ -644,6 +676,10 @@ pub mod temporal {
             Self::YearMonthLikeObject(value.clone())
         }
     }
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `TimeZoneLike`",
+        label = "expected ZonedDateTime or string"
+    )]
     pub trait TimeZoneLike: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl TimeZoneLike for ZonedDateTime {}
     impl TimeZoneLike for &ZonedDateTime {}
@@ -696,6 +732,10 @@ pub mod temporal {
             Self::String(::std::string::String::from(value))
         }
     }
+    #[diagnostic::on_unimplemented(
+        message = "`{Self}` is not a `ZonedDateTimeLike`",
+        label = "expected ZonedDateTime, string or ZonedDateTimeLikeObject"
+    )]
     pub trait ZonedDateTimeLike: ::wasm_bindgen::convert::IntoWasmAbi {}
     impl ZonedDateTimeLike for ZonedDateTime {}
     impl ZonedDateTimeLike for &ZonedDateTime {}

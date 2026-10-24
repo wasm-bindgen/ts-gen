@@ -102,6 +102,10 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "setMaybe")]
     pub fn set_maybe_with_f64(value: f64) -> Result<(), JsValue>;
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Id`",
+    label = "expected string or number"
+)]
 pub trait Id: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Id for &str {}
 impl Id for ::std::string::String {}

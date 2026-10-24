@@ -31,6 +31,10 @@ pub enum Priority {
     Normal = 0i32,
     High = 1i32,
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `StringOrNumber`",
+    label = "expected string or number"
+)]
 pub trait StringOrNumber: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl StringOrNumber for &str {}
 impl StringOrNumber for ::std::string::String {}
@@ -77,6 +81,10 @@ impl ::core::convert::From<f64> for StringOrNumberKind {
         Self::F64(value)
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `BodyInit`",
+    label = "expected ReadableStream, string, ArrayBuffer or Blob"
+)]
 pub trait BodyInit: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl BodyInit for ReadableStream {}
 impl BodyInit for &ReadableStream {}
@@ -160,6 +168,10 @@ extern "C" {
     #[wasm_bindgen(catch)]
     pub fn send(body: impl BodyInit) -> Result<(), JsValue>;
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `RequestInfo`",
+    label = "expected string or Request"
+)]
 pub trait RequestInfo: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl RequestInfo for &str {}
 impl RequestInfo for ::std::string::String {}

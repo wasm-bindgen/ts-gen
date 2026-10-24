@@ -185,6 +185,10 @@ impl FromOptionsBuilder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `ZonedLike`",
+    label = "expected Zoned, string or ZonedFields"
+)]
 pub trait ZonedLike: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl ZonedLike for Zoned {}
 impl ZonedLike for &Zoned {}
@@ -250,6 +254,10 @@ impl ::core::convert::From<&ZonedFields> for ZonedLikeKind {
         Self::ZonedFields(value.clone())
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `DayLike`",
+    label = "expected Day, Zoned, string or DayFields"
+)]
 pub trait DayLike: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl DayLike for Day {}
 impl DayLike for &Day {}
@@ -328,6 +336,10 @@ impl ::core::convert::From<&DayFields> for DayLikeKind {
         Self::DayFields(value.clone())
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Zone`",
+    label = "expected Zoned or string"
+)]
 pub trait Zone: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Zone for Zoned {}
 impl Zone for &Zoned {}
@@ -380,6 +392,10 @@ impl ::core::convert::From<&::js_sys::JsString> for ZoneKind {
         Self::String(::std::string::String::from(value))
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Fields`",
+    label = "expected ZonedFields or DayFields"
+)]
 pub trait Fields: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Fields for ZonedFields {}
 impl Fields for &ZonedFields {}
@@ -412,6 +428,10 @@ impl ::core::convert::From<&DayFields> for FieldsKind {
         Self::DayFields(value.clone())
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Offset`",
+    label = "expected number, string or boolean"
+)]
 pub trait Offset: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Offset for f64 {}
 impl Offset for &str {}
@@ -465,6 +485,10 @@ impl ::core::convert::From<bool> for OffsetKind {
         Self::Bool(value)
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `MaybeDay`",
+    label = "expected Day, Zoned, string or DayFields"
+)]
 pub trait MaybeDay: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl MaybeDay for Day {}
 impl MaybeDay for &Day {}

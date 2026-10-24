@@ -4,6 +4,10 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Loose`",
+    label = "expected number or string"
+)]
 pub trait Loose: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Loose for f64 {}
 impl Loose for &str {}

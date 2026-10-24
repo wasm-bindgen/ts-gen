@@ -876,11 +876,19 @@ fn generate_union_alias_enum(
     let arms: Vec<TypeRef> = arms.into_iter().cloned().collect();
     let mut variants = Vec::new();
     let mut conversions = Vec::new();
-    for ((variant_name, payload), from) in dynamic_union_variant_names(&arms)
+    let mut expected = Vec::new();
+    for (((variant_name, payload), from), arm) in dynamic_union_variant_names(&arms)
         .into_iter()
         .zip(&payloads)
         .zip(sources)
+        .zip(&arms)
     {
+        expected.push(match arm {
+            TypeRef::String => "string".to_string(),
+            TypeRef::Number => "number".to_string(),
+            TypeRef::Boolean => "boolean".to_string(),
+            _ => variant_name.clone(),
+        });
         let variant = typemap::make_ident(&variant_name);
         variants.push(quote! { #variant(#payload) });
         for (source, expr) in from {
@@ -905,7 +913,16 @@ fn generate_union_alias_enum(
     if union.kind.is_none() {
         return item;
     }
+    // rustc lists only a few implementors, and a string arm alone brings
+    // seven, so the error names the alias's arms instead.
+    let message = format!("`{{Self}}` is not a `{name}`");
+    let label = match expected.split_last() {
+        Some((last, [])) => format!("expected {last}"),
+        Some((last, rest)) => format!("expected {} or {last}", rest.join(", ")),
+        None => String::new(),
+    };
     quote! {
+        #[diagnostic::on_unimplemented(message = #message, label = #label)]
         pub trait #name: ::wasm_bindgen::convert::IntoWasmAbi {}
         #(impl #name for #arguments {})*
         impl #name for #enum_name {}

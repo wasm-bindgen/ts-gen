@@ -57,6 +57,10 @@ impl Inner {
 pub type TopX = Pair<Inner, Inner>;
 #[allow(dead_code)]
 pub type TopAll<T = Inner> = Pair<T, T>;
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `InnerOrName`",
+    label = "expected string or Inner"
+)]
 pub trait InnerOrName: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl InnerOrName for &str {}
 impl InnerOrName for ::std::string::String {}
@@ -109,6 +113,10 @@ impl ::core::convert::From<&Inner> for InnerOrNameKind {
         Self::Inner(value.clone())
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Chained`",
+    label = "expected string or Inner"
+)]
 pub trait Chained: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Chained for &str {}
 impl Chained for ::std::string::String {}
@@ -161,6 +169,10 @@ impl ::core::convert::From<&Inner> for ChainedKind {
         Self::Inner(value.clone())
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Names`",
+    label = "expected string or number"
+)]
 pub trait Names: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Names for &str {}
 impl Names for ::std::string::String {}

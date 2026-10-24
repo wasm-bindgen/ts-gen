@@ -116,6 +116,10 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "formData")]
     pub fn form_data_promise(this: &Request) -> Promise<FormData>;
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `RequestInfo`",
+    label = "expected Request or string"
+)]
 pub trait RequestInfo: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl RequestInfo for Request {}
 impl RequestInfo for &Request {}
@@ -264,6 +268,10 @@ impl RequestInitBuilder {
         self.inner
     }
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `BodyInit`",
+    label = "expected ReadableStream, string, ArrayBuffer, Blob, UrlSearchParams or FormData"
+)]
 pub trait BodyInit: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl BodyInit for ReadableStream {}
 impl BodyInit for &ReadableStream {}

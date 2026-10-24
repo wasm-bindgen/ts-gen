@@ -2020,9 +2020,16 @@ which each arm's own argument types implement, so an argument takes
 ABI, with no conversion and no wrapper. The enum is `<Alias>Kind`,
 emitted for every such alias, readable or not, with the same variants
 and `From` conversions, and it implements the trait too, so a read, or
-an enum built explicitly, is accepted wherever the alias is:
+an enum built explicitly, is accepted wherever the alias is. rustc lists
+only a few implementors in an unsatisfied-bound error, and a string arm
+alone has seven, so the trait's `on_unimplemented` names the alias's arms
+instead:
 
 ```rust
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `PlainDateLike`",
+    label = "expected PlainDate, ZonedDateTime, PlainDateTime, string or DateLikeObject"
+)]
 pub trait PlainDateLike: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl PlainDateLike for PlainDate {}
 impl PlainDateLike for &PlainDate {}
