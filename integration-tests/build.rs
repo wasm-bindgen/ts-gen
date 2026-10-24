@@ -17,6 +17,10 @@ use std::path::{Path, PathBuf};
 ///     The Rust `pub mod` name is always derived (snake_case) from the
 ///     `--lib-name` value (after stripping protocol prefixes like `node:`).
 ///   - `--input <path>` adds a workspace-relative input beside the fixture.
+///   - `--error-enum [NAME]` generates the `@throws` error enum
+///     (`JsException` when no name follows).
+///   - `--error-type <path>` sets the default error type of untyped
+///     fallible bindings.
 ///
 /// The snapshot tests render every fixture under each codegen configuration,
 /// so a configuration flag belongs to the test file rather than the fixture:
@@ -82,6 +86,10 @@ struct Entry {
     export_specs: Vec<String>,
     /// Further `--input` files, resolved against the workspace.
     inputs: Vec<PathBuf>,
+    /// `--error-enum` name from the fixture directive, if any.
+    error_enum: Option<String>,
+    /// `--error-type` path from the fixture directive, if any.
+    error_type: Option<String>,
 }
 
 /// Pair every `integration-tests/tests/<name>.rs` with the fixture
@@ -147,6 +155,8 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
                 .iter()
                 .map(|input| workspace_dir.join(input))
                 .collect(),
+            error_enum: directive.error_enum,
+            error_type: directive.error_type,
         });
     }
 
@@ -167,6 +177,10 @@ struct Directive {
     export_specs: Vec<String>,
     /// All `--input <path>` (or `-i <path>`) values.
     inputs: Vec<String>,
+    /// `--error-enum [NAME]`, defaulting the name as the CLI does.
+    error_enum: Option<String>,
+    /// Value of `--error-type <path>` if specified.
+    error_type: Option<String>,
 }
 
 /// Parse the `//! @ts-gen ...` directive lines at the top of the fixture
@@ -179,6 +193,8 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let mut fallible = false;
     let mut export_specs = Vec::new();
     let mut inputs = Vec::new();
+    let mut error_enum = None;
+    let mut error_type = None;
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -211,6 +227,21 @@ fn parse_directive(dts_path: &Path) -> Directive {
                         inputs.push(args[i + 1].clone());
                         i += 2;
                     }
+                    // The name is optional, as in the CLI.
+                    "--error-enum" => match args.get(i + 1).filter(|a| !a.starts_with('-')) {
+                        Some(name) => {
+                            error_enum = Some(name.clone());
+                            i += 2;
+                        }
+                        None => {
+                            error_enum = Some("JsException".to_string());
+                            i += 1;
+                        }
+                    },
+                    "--error-type" if i + 1 < args.len() => {
+                        error_type = Some(args[i + 1].clone());
+                        i += 2;
+                    }
                     _ => i += 1,
                 }
             }
@@ -226,6 +257,8 @@ fn parse_directive(dts_path: &Path) -> Directive {
         fallible,
         export_specs,
         inputs,
+        error_enum,
+        error_type,
     }
 }
 
@@ -311,10 +344,16 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
             exports.insert(ts_gen::codegen::ExportSpec::Module(spec.clone()));
         }
     }
-    let options = ts_gen::codegen::GenerateOptions::new()
+    let mut options = ts_gen::codegen::GenerateOptions::new()
         .experimental_generic_mono(entry.experimental_generic_mono)
         .fallible(entry.fallible)
         .exports(exports);
+    if let Some(name) = &entry.error_enum {
+        options = options.error_enum(name);
+    }
+    if let Some(path) = &entry.error_type {
+        options = options.error_type(path);
+    }
     let rust_code = ts_gen::codegen::generate_with_options(&module, &gctx, &options)
         .unwrap_or_else(|e| panic!("codegen failed for {}: {e}", entry.mod_name));
 
