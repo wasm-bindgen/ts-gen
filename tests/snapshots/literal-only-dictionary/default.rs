@@ -175,31 +175,31 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "a")]
     pub fn set_a_with_f64(this: &CappedAttachment, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn b(this: &CappedAttachment) -> AKind;
+    pub fn b(this: &CappedAttachment) -> BKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_b(this: &CappedAttachment, val: &str);
     #[wasm_bindgen(method, setter, js_name = "b")]
     pub fn set_b_with_f64(this: &CappedAttachment, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn c(this: &CappedAttachment) -> AKind;
+    pub fn c(this: &CappedAttachment) -> CKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_c(this: &CappedAttachment, val: &str);
     #[wasm_bindgen(method, setter, js_name = "c")]
     pub fn set_c_with_f64(this: &CappedAttachment, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn d(this: &CappedAttachment) -> AKind;
+    pub fn d(this: &CappedAttachment) -> DKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_d(this: &CappedAttachment, val: &str);
     #[wasm_bindgen(method, setter, js_name = "d")]
     pub fn set_d_with_f64(this: &CappedAttachment, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn e(this: &CappedAttachment) -> AKind;
+    pub fn e(this: &CappedAttachment) -> EKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_e(this: &CappedAttachment, val: &str);
     #[wasm_bindgen(method, setter, js_name = "e")]
     pub fn set_e_with_f64(this: &CappedAttachment, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn f(this: &CappedAttachment) -> AKind;
+    pub fn f(this: &CappedAttachment) -> FKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_f(this: &CappedAttachment, val: &str);
     #[wasm_bindgen(method, setter, js_name = "f")]
@@ -251,6 +251,31 @@ pub enum DispositionKind {
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum AKind {
+    String(String),
+    F64(f64),
+}
+#[wasm_bindgen(private)]
+pub enum BKind {
+    String(String),
+    F64(f64),
+}
+#[wasm_bindgen(private)]
+pub enum CKind {
+    String(String),
+    F64(f64),
+}
+#[wasm_bindgen(private)]
+pub enum DKind {
+    String(String),
+    F64(f64),
+}
+#[wasm_bindgen(private)]
+pub enum EKind {
+    String(String),
+    F64(f64),
+}
+#[wasm_bindgen(private)]
+pub enum FKind {
     String(String),
     F64(f64),
 }

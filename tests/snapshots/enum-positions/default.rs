@@ -185,17 +185,19 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "nextDetails")]
     pub fn next_details_promise(this: &Probe) -> Promise<Details<JsString>>;
     #[wasm_bindgen(method, js_name = "modeOrNumberArg")]
-    pub fn mode_or_number_arg(this: &Probe, x: Mode) -> ModeOrNumberReturnKind;
+    pub fn mode_or_number_arg(this: &Probe, x: Mode) -> ModeOrNumberArgReturnKind;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberArg")]
-    pub fn try_mode_or_number_arg(this: &Probe, x: Mode)
-        -> Result<ModeOrNumberReturnKind, JsValue>;
+    pub fn try_mode_or_number_arg(
+        this: &Probe,
+        x: Mode,
+    ) -> Result<ModeOrNumberArgReturnKind, JsValue>;
     #[wasm_bindgen(method, js_name = "modeOrNumberArg")]
-    pub fn mode_or_number_arg_with_f64(this: &Probe, x: f64) -> ModeOrNumberReturnKind;
+    pub fn mode_or_number_arg_with_f64(this: &Probe, x: f64) -> ModeOrNumberArgReturnKind;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberArg")]
     pub fn try_mode_or_number_arg_with_f64(
         this: &Probe,
         x: f64,
-    ) -> Result<ModeOrNumberReturnKind, JsValue>;
+    ) -> Result<ModeOrNumberArgReturnKind, JsValue>;
     #[wasm_bindgen(method, js_name = "modeOrNumberOrString")]
     pub fn mode_or_number_or_string(this: &Probe, x: Mode);
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberOrString")]
@@ -232,4 +234,9 @@ pub enum ModeOrRegionReturnKind {
 pub enum LevelOrStringReturnKind {
     Level(Level),
     String(String),
+}
+#[wasm_bindgen(private)]
+pub enum ModeOrNumberArgReturnKind {
+    Mode(Mode),
+    F64(f64),
 }

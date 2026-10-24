@@ -38,10 +38,15 @@ fn nested_aliases_read_as_one_union() {
     assert_eq!(read("missing"), None);
 }
 
+// A union with payloads is one enum per member, so the function return has
+// its own, with the same arms.
 #[wasm_bindgen_test]
-fn function_return_shares_the_enum() {
-    assert_eq!(show(relative_to("day")), "day:3");
-    assert_eq!(show(relative_to("dayFields")), "object:day");
+fn function_return_reads_the_same_arms() {
+    assert!(matches!(relative_to("day"), RelativeToReturnKind::Day(d) if d.day() == 3.0));
+    assert!(matches!(
+        relative_to("dayFields"),
+        RelativeToReturnKind::Object(o) if keys(&o) == "day"
+    ));
 }
 
 #[wasm_bindgen_test]

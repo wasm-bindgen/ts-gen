@@ -615,6 +615,8 @@ pub mod temporal {
             Self::ZonedDateTimeLikeObject(value.clone())
         }
     }
+    #[allow(dead_code)]
+    pub type PartialTemporalLike = JsValue;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -645,14 +647,9 @@ pub mod temporal {
         #[wasm_bindgen(method, setter)]
         pub fn set_day(this: &DateLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn calendar(this: &DateLikeObject) -> Option<CalendarLike>;
-        #[wasm_bindgen(method, setter, js_name = "calendar")]
-        fn __set_calendar(this: &DateLikeObject, val: CalendarLike);
-    }
-    impl DateLikeObject {
-        pub fn set_calendar(&self, val: impl ::core::convert::Into<CalendarLike>) {
-            self.__set_calendar(val.into())
-        }
+        pub fn calendar(this: &DateLikeObject) -> Option<String>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_calendar(this: &DateLikeObject, val: &str);
     }
     impl DateLikeObject {
         pub fn new(day: f64) -> DateLikeObject {
@@ -688,7 +685,7 @@ pub mod temporal {
             self.inner.set_month_code(val);
             self
         }
-        pub fn calendar(self, val: impl ::core::convert::Into<CalendarLike>) -> Self {
+        pub fn calendar(self, val: &str) -> Self {
             self.inner.set_calendar(val);
             self
         }
@@ -760,7 +757,7 @@ pub mod temporal {
             self.inner.set_month_code(val);
             self
         }
-        pub fn calendar(self, val: impl ::core::convert::Into<CalendarLike>) -> Self {
+        pub fn calendar(self, val: &str) -> Self {
             self.inner.set_calendar(val);
             self
         }
@@ -1004,14 +1001,9 @@ pub mod temporal {
         #[wasm_bindgen(method, setter, js_name = "monthCode")]
         pub fn set_month_code(this: &YearMonthLikeObject, val: &str);
         #[wasm_bindgen(method, getter)]
-        pub fn calendar(this: &YearMonthLikeObject) -> Option<CalendarLike>;
-        #[wasm_bindgen(method, setter, js_name = "calendar")]
-        fn __set_calendar(this: &YearMonthLikeObject, val: CalendarLike);
-    }
-    impl YearMonthLikeObject {
-        pub fn set_calendar(&self, val: impl ::core::convert::Into<CalendarLike>) {
-            self.__set_calendar(val.into())
-        }
+        pub fn calendar(this: &YearMonthLikeObject) -> Option<String>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_calendar(this: &YearMonthLikeObject, val: &str);
     }
     impl YearMonthLikeObject {
         pub fn new() -> YearMonthLikeObject {
@@ -1052,7 +1044,7 @@ pub mod temporal {
             self.inner.set_month_code(val);
             self
         }
-        pub fn calendar(self, val: impl ::core::convert::Into<CalendarLike>) -> Self {
+        pub fn calendar(self, val: &str) -> Self {
             self.inner.set_calendar(val);
             self
         }
@@ -1120,7 +1112,7 @@ pub mod temporal {
             self.inner.set_month_code(val);
             self
         }
-        pub fn calendar(self, val: impl ::core::convert::Into<CalendarLike>) -> Self {
+        pub fn calendar(self, val: &str) -> Self {
             self.inner.set_calendar(val);
             self
         }
@@ -1388,47 +1380,6 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = RoundingOptions , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundToOptions<Units: ::wasm_bindgen::JsGeneric = JsValue>;
-        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit<Units: ::wasm_bindgen::JsGeneric>(
-            this: &RoundToOptions<Units>,
-        ) -> PluralizeUnit;
-        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit<Units: ::wasm_bindgen::JsGeneric>(
-            this: &RoundToOptions<Units>,
-            val: PluralizeUnit,
-        );
-    }
-    impl<Units: ::wasm_bindgen::JsGeneric> RoundToOptions<Units> {
-        pub fn new(smallest_unit: PluralizeUnit) -> RoundToOptions<Units> {
-            Self::builder(smallest_unit).build()
-        }
-        pub fn builder(smallest_unit: PluralizeUnit) -> RoundToOptionsBuilder<Units> {
-            let inner: RoundToOptions<Units> = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_smallest_unit(smallest_unit);
-            RoundToOptionsBuilder { inner }
-        }
-    }
-    pub struct RoundToOptionsBuilder<Units: ::wasm_bindgen::JsGeneric> {
-        inner: RoundToOptions<Units>,
-    }
-    impl<Units: ::wasm_bindgen::JsGeneric> RoundToOptionsBuilder<Units> {
-        pub fn rounding_increment(self, val: f64) -> Self {
-            self.inner.set_rounding_increment(val);
-            self
-        }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
-            self.inner.set_rounding_mode(val);
-            self
-        }
-        pub fn build(self) -> RoundToOptions<Units> {
-            self.inner
-        }
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = RoundingOptions , extends = Object , is_type_of = JsValue :: is_object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
         pub type RoundingOptionsWithLargestUnit<Units: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
         pub fn largest_unit<Units: ::wasm_bindgen::JsGeneric>(
@@ -1637,9 +1588,6 @@ pub mod temporal {
                 time_zone: super::TimeZoneLike,
             ) -> super::PlainDateTime;
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn plain_date_time_iso_with_time_zone(
             time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
         ) -> super::PlainDateTime {
@@ -1650,14 +1598,11 @@ pub mod temporal {
             # [wasm_bindgen (catch , js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
             fn __try_plain_date_time_iso_with_time_zone(
                 time_zone: super::TimeZoneLike,
-            ) -> Result<super::PlainDateTime, RangeError>;
+            ) -> Result<super::PlainDateTime, JsValue>;
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn try_plain_date_time_iso_with_time_zone(
             time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
-        ) -> Result<super::PlainDateTime, RangeError> {
+        ) -> Result<super::PlainDateTime, JsValue> {
             __try_plain_date_time_iso_with_time_zone(time_zone.into())
         }
         #[wasm_bindgen]
@@ -1677,9 +1622,6 @@ pub mod temporal {
                 time_zone: super::TimeZoneLike,
             ) -> super::ZonedDateTime;
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn zoned_date_time_iso_with_time_zone(
             time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
         ) -> super::ZonedDateTime {
@@ -1690,14 +1632,11 @@ pub mod temporal {
             # [wasm_bindgen (catch , js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
             fn __try_zoned_date_time_iso_with_time_zone(
                 time_zone: super::TimeZoneLike,
-            ) -> Result<super::ZonedDateTime, RangeError>;
+            ) -> Result<super::ZonedDateTime, JsValue>;
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn try_zoned_date_time_iso_with_time_zone(
             time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
-        ) -> Result<super::ZonedDateTime, RangeError> {
+        ) -> Result<super::ZonedDateTime, JsValue> {
             __try_zoned_date_time_iso_with_time_zone(time_zone.into())
         }
         #[wasm_bindgen]
@@ -1715,9 +1654,6 @@ pub mod temporal {
             # [wasm_bindgen (js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
             fn __plain_date_iso_with_time_zone(time_zone: super::TimeZoneLike) -> super::PlainDate;
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn plain_date_iso_with_time_zone(
             time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
         ) -> super::PlainDate {
@@ -1728,14 +1664,11 @@ pub mod temporal {
             # [wasm_bindgen (catch , js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
             fn __try_plain_date_iso_with_time_zone(
                 time_zone: super::TimeZoneLike,
-            ) -> Result<super::PlainDate, RangeError>;
+            ) -> Result<super::PlainDate, JsValue>;
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn try_plain_date_iso_with_time_zone(
             time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
-        ) -> Result<super::PlainDate, RangeError> {
+        ) -> Result<super::PlainDate, JsValue> {
             __try_plain_date_iso_with_time_zone(time_zone.into())
         }
         #[wasm_bindgen]
@@ -1753,9 +1686,6 @@ pub mod temporal {
             # [wasm_bindgen (js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
             fn __plain_time_iso_with_time_zone(time_zone: super::TimeZoneLike) -> super::PlainTime;
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn plain_time_iso_with_time_zone(
             time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
         ) -> super::PlainTime {
@@ -1766,14 +1696,11 @@ pub mod temporal {
             # [wasm_bindgen (catch , js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
             fn __try_plain_time_iso_with_time_zone(
                 time_zone: super::TimeZoneLike,
-            ) -> Result<super::PlainTime, RangeError>;
+            ) -> Result<super::PlainTime, JsValue>;
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn try_plain_time_iso_with_time_zone(
             time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
-        ) -> Result<super::PlainTime, RangeError> {
+        ) -> Result<super::PlainTime, JsValue> {
             __try_plain_time_iso_with_time_zone(time_zone.into())
         }
     }
@@ -1897,7 +1824,7 @@ pub mod temporal {
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
         fn __compare(one: PlainDateLike, two: PlainDateLike) -> f64;
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        fn __try_compare(one: PlainDateLike, two: PlainDateLike) -> Result<f64, Error>;
+        fn __try_compare(one: PlainDateLike, two: PlainDateLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
         pub fn calendar_id(this: &PlainDate) -> String;
         #[wasm_bindgen(method, getter)]
@@ -1941,7 +1868,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "add")]
         fn __add(this: &PlainDate, duration: DurationLike) -> PlainDate;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        fn __try_add(this: &PlainDate, duration: DurationLike) -> Result<PlainDate, Error>;
+        fn __try_add(this: &PlainDate, duration: DurationLike) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, js_name = "add")]
         fn __add_with_options(
             this: &PlainDate,
@@ -1953,11 +1880,11 @@ pub mod temporal {
             this: &PlainDate,
             duration: DurationLike,
             options: &OverflowOptions,
-        ) -> Result<PlainDate, Error>;
+        ) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, js_name = "subtract")]
         fn __subtract(this: &PlainDate, duration: DurationLike) -> PlainDate;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        fn __try_subtract(this: &PlainDate, duration: DurationLike) -> Result<PlainDate, Error>;
+        fn __try_subtract(this: &PlainDate, duration: DurationLike) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, js_name = "subtract")]
         fn __subtract_with_options(
             this: &PlainDate,
@@ -1969,7 +1896,7 @@ pub mod temporal {
             this: &PlainDate,
             duration: DurationLike,
             options: &OverflowOptions,
-        ) -> Result<PlainDate, Error>;
+        ) -> Result<PlainDate, JsValue>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
@@ -2011,7 +1938,7 @@ pub mod temporal {
         fn __try_with_calendar(
             this: &PlainDate,
             calendar_like: CalendarLike,
-        ) -> Result<PlainDate, RangeError>;
+        ) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, js_name = "until")]
         fn __until(this: &PlainDate, other: PlainDateLike) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
@@ -2047,49 +1974,35 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "equals")]
         fn __equals(this: &PlainDate, other: PlainDateLike) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        fn __try_equals(this: &PlainDate, other: PlainDateLike) -> Result<bool, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the result is out of range"]
+        fn __try_equals(this: &PlainDate, other: PlainDateLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, js_name = "toPlainDateTime")]
         pub fn to_plain_date_time(this: &PlainDate) -> PlainDateTime;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn try_to_plain_date_time(this: &PlainDate) -> Result<PlainDateTime, RangeError>;
+        pub fn try_to_plain_date_time(this: &PlainDate) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "toPlainDateTime")]
         fn __to_plain_date_time_with_time(this: &PlainDate, time: PlainTimeLike) -> PlainDateTime;
         #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
         fn __try_to_plain_date_time_with_time(
             this: &PlainDate,
             time: PlainTimeLike,
-        ) -> Result<PlainDateTime, Error>;
+        ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "toZonedDateTime")]
         fn __to_zoned_date_time(this: &PlainDate, time_zone: TimeZoneLike) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
         fn __try_to_zoned_date_time(
             this: &PlainDate,
             time_zone: TimeZoneLike,
-        ) -> Result<ZonedDateTime, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown, a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "toZonedDateTime")]
         pub fn to_zoned_date_time_with_item(
             this: &PlainDate,
             item: &PlainDateToZonedDateTimeOptions,
         ) -> ZonedDateTime;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown, a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
         pub fn try_to_zoned_date_time_with_item(
             this: &PlainDate,
             item: &PlainDateToZonedDateTimeOptions,
-        ) -> Result<ZonedDateTime, Error>;
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainDate) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -2151,7 +2064,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainDate,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[doc = " ## Errors"]
@@ -2161,7 +2074,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &PlainDate,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -2228,47 +2141,27 @@ pub mod temporal {
         ) -> Result<PlainDate, Error> {
             Self::__try_from_with_options(item.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn compare(
             one: impl ::core::convert::Into<PlainDateLike>,
             two: impl ::core::convert::Into<PlainDateLike>,
         ) -> f64 {
             Self::__compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_compare(
             one: impl ::core::convert::Into<PlainDateLike>,
             two: impl ::core::convert::Into<PlainDateLike>,
-        ) -> Result<f64, Error> {
+        ) -> Result<f64, JsValue> {
             Self::__try_compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn add(&self, duration: impl ::core::convert::Into<DurationLike>) -> PlainDate {
             self.__add(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_add(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
-        ) -> Result<PlainDate, Error> {
+        ) -> Result<PlainDate, JsValue> {
             self.__try_add(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn add_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
@@ -2276,38 +2169,22 @@ pub mod temporal {
         ) -> PlainDate {
             self.__add_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_add_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
             options: &OverflowOptions,
-        ) -> Result<PlainDate, Error> {
+        ) -> Result<PlainDate, JsValue> {
             self.__try_add_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn subtract(&self, duration: impl ::core::convert::Into<DurationLike>) -> PlainDate {
             self.__subtract(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_subtract(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
-        ) -> Result<PlainDate, Error> {
+        ) -> Result<PlainDate, JsValue> {
             self.__try_subtract(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn subtract_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
@@ -2315,33 +2192,23 @@ pub mod temporal {
         ) -> PlainDate {
             self.__subtract_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_subtract_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
             options: &OverflowOptions,
-        ) -> Result<PlainDate, Error> {
+        ) -> Result<PlainDate, JsValue> {
             self.__try_subtract_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendar is unknown"]
         pub fn with_calendar(
             &self,
             calendar_like: impl ::core::convert::Into<CalendarLike>,
         ) -> PlainDate {
             self.__with_calendar(calendar_like.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendar is unknown"]
         pub fn try_with_calendar(
             &self,
             calendar_like: impl ::core::convert::Into<CalendarLike>,
-        ) -> Result<PlainDate, RangeError> {
+        ) -> Result<PlainDate, JsValue> {
             self.__try_with_calendar(calendar_like.into())
         }
         #[doc = " ## Errors"]
@@ -2422,59 +2289,37 @@ pub mod temporal {
         ) -> Result<Duration, Error> {
             self.__try_since_with_options(other.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn equals(&self, other: impl ::core::convert::Into<PlainDateLike>) -> bool {
             self.__equals(other.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_equals(
             &self,
             other: impl ::core::convert::Into<PlainDateLike>,
-        ) -> Result<bool, Error> {
+        ) -> Result<bool, JsValue> {
             self.__try_equals(other.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn to_plain_date_time_with_time(
             &self,
             time: impl ::core::convert::Into<PlainTimeLike>,
         ) -> PlainDateTime {
             self.__to_plain_date_time_with_time(time.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_to_plain_date_time_with_time(
             &self,
             time: impl ::core::convert::Into<PlainTimeLike>,
-        ) -> Result<PlainDateTime, Error> {
+        ) -> Result<PlainDateTime, JsValue> {
             self.__try_to_plain_date_time_with_time(time.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown, or the result is out of range"]
         pub fn to_zoned_date_time(
             &self,
             time_zone: impl ::core::convert::Into<TimeZoneLike>,
         ) -> ZonedDateTime {
             self.__to_zoned_date_time(time_zone.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown, or the result is out of range"]
         pub fn try_to_zoned_date_time(
             &self,
             time_zone: impl ::core::convert::Into<TimeZoneLike>,
-        ) -> Result<ZonedDateTime, RangeError> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_to_zoned_date_time(time_zone.into())
         }
     }
@@ -2547,17 +2392,14 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
-        pub fn new_with_hour_and_minute(
-            hour: Option<f64>,
-            minute: f64,
-        ) -> Result<PlainTime, RangeError>;
+        pub fn new_with_hour_and_minute(hour: f64, minute: f64) -> Result<PlainTime, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second(
-            hour: Option<f64>,
-            minute: Option<f64>,
+            hour: f64,
+            minute: f64,
             second: f64,
         ) -> Result<PlainTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2565,9 +2407,9 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond(
-            hour: Option<f64>,
-            minute: Option<f64>,
-            second: Option<f64>,
+            hour: f64,
+            minute: f64,
+            second: f64,
             millisecond: f64,
         ) -> Result<PlainTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2575,10 +2417,10 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond_and_microsecond(
-            hour: Option<f64>,
-            minute: Option<f64>,
-            second: Option<f64>,
-            millisecond: Option<f64>,
+            hour: f64,
+            minute: f64,
+            second: f64,
+            millisecond: f64,
             microsecond: f64,
         ) -> Result<PlainTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2586,11 +2428,11 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond(
-            hour: Option<f64>,
-            minute: Option<f64>,
-            second: Option<f64>,
-            millisecond: Option<f64>,
-            microsecond: Option<f64>,
+            hour: f64,
+            minute: f64,
+            second: f64,
+            millisecond: f64,
+            microsecond: f64,
             nanosecond: f64,
         ) -> Result<PlainTime, RangeError>;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "from")]
@@ -2607,7 +2449,7 @@ pub mod temporal {
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
         fn __compare(one: PlainTimeLike, two: PlainTimeLike) -> f64;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        fn __try_compare(one: PlainTimeLike, two: PlainTimeLike) -> Result<f64, Error>;
+        fn __try_compare(one: PlainTimeLike, two: PlainTimeLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter)]
         pub fn hour(this: &PlainTime) -> f64;
         #[wasm_bindgen(method, getter)]
@@ -2623,11 +2465,11 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "add")]
         fn __add(this: &PlainTime, duration: DurationLike) -> PlainTime;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        fn __try_add(this: &PlainTime, duration: DurationLike) -> Result<PlainTime, Error>;
+        fn __try_add(this: &PlainTime, duration: DurationLike) -> Result<PlainTime, JsValue>;
         #[wasm_bindgen(method, js_name = "subtract")]
         fn __subtract(this: &PlainTime, duration: DurationLike) -> PlainTime;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        fn __try_subtract(this: &PlainTime, duration: DurationLike) -> Result<PlainTime, Error>;
+        fn __try_subtract(this: &PlainTime, duration: DurationLike) -> Result<PlainTime, JsValue>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
@@ -2695,7 +2537,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "equals")]
         fn __equals(this: &PlainTime, other: PlainTimeLike) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        fn __try_equals(this: &PlainTime, other: PlainTimeLike) -> Result<bool, Error>;
+        fn __try_equals(this: &PlainTime, other: PlainTimeLike) -> Result<bool, JsValue>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
@@ -2713,36 +2555,30 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_rounding_options(
             this: &PlainTime,
-            round_to: &RoundToOptions<JsString>,
+            round_to: &RoundingOptions<JsString>,
         ) -> PlainTime;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_round_to_options(
+        pub fn try_round_with_rounding_options(
             this: &PlainTime,
-            round_to: &RoundToOptions<JsString>,
+            round_to: &RoundingOptions<JsString>,
         ) -> Result<PlainTime, RangeError>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainTime) -> Result<String, JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
         #[wasm_bindgen(method, js_name = "toString")]
         pub fn to_string_with_options(
             this: &PlainTime,
             options: &PlainTimeToStringOptions,
         ) -> String;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string_with_options(
             this: &PlainTime,
             options: &PlainTimeToStringOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, JsValue>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
@@ -2792,7 +2628,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainTime,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[doc = " ## Errors"]
@@ -2802,7 +2638,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &PlainTime,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -2869,58 +2705,34 @@ pub mod temporal {
         ) -> Result<PlainTime, Error> {
             Self::__try_from_with_options(item.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn compare(
             one: impl ::core::convert::Into<PlainTimeLike>,
             two: impl ::core::convert::Into<PlainTimeLike>,
         ) -> f64 {
             Self::__compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_compare(
             one: impl ::core::convert::Into<PlainTimeLike>,
             two: impl ::core::convert::Into<PlainTimeLike>,
-        ) -> Result<f64, Error> {
+        ) -> Result<f64, JsValue> {
             Self::__try_compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn add(&self, duration: impl ::core::convert::Into<DurationLike>) -> PlainTime {
             self.__add(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_add(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
-        ) -> Result<PlainTime, Error> {
+        ) -> Result<PlainTime, JsValue> {
             self.__try_add(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn subtract(&self, duration: impl ::core::convert::Into<DurationLike>) -> PlainTime {
             self.__subtract(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_subtract(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
-        ) -> Result<PlainTime, Error> {
+        ) -> Result<PlainTime, JsValue> {
             self.__try_subtract(duration.into())
         }
         #[doc = " ## Errors"]
@@ -3001,21 +2813,13 @@ pub mod temporal {
         ) -> Result<Duration, Error> {
             self.__try_since_with_options(other.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn equals(&self, other: impl ::core::convert::Into<PlainTimeLike>) -> bool {
             self.__equals(other.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_equals(
             &self,
             other: impl ::core::convert::Into<PlainTimeLike>,
-        ) -> Result<bool, Error> {
+        ) -> Result<bool, JsValue> {
             self.__try_equals(other.into())
         }
     }
@@ -3124,7 +2928,7 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: Option<f64>,
+            hour: f64,
             minute: f64,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -3135,8 +2939,8 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: Option<f64>,
-            minute: Option<f64>,
+            hour: f64,
+            minute: f64,
             second: f64,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -3147,9 +2951,9 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: Option<f64>,
-            minute: Option<f64>,
-            second: Option<f64>,
+            hour: f64,
+            minute: f64,
+            second: f64,
             millisecond: f64,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -3160,10 +2964,10 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: Option<f64>,
-            minute: Option<f64>,
-            second: Option<f64>,
-            millisecond: Option<f64>,
+            hour: f64,
+            minute: f64,
+            second: f64,
+            millisecond: f64,
             microsecond: f64,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -3174,11 +2978,11 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: Option<f64>,
-            minute: Option<f64>,
-            second: Option<f64>,
-            millisecond: Option<f64>,
-            microsecond: Option<f64>,
+            hour: f64,
+            minute: f64,
+            second: f64,
+            millisecond: f64,
+            microsecond: f64,
             nanosecond: f64,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -3189,12 +2993,12 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: Option<f64>,
-            minute: Option<f64>,
-            second: Option<f64>,
-            millisecond: Option<f64>,
-            microsecond: Option<f64>,
-            nanosecond: Option<f64>,
+            hour: f64,
+            minute: f64,
+            second: f64,
+            millisecond: f64,
+            microsecond: f64,
+            nanosecond: f64,
             calendar: &str,
         ) -> Result<PlainDateTime, RangeError>;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "from")]
@@ -3212,7 +3016,7 @@ pub mod temporal {
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
         fn __compare(one: PlainDateTimeLike, two: PlainDateTimeLike) -> f64;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        fn __try_compare(one: PlainDateTimeLike, two: PlainDateTimeLike) -> Result<f64, Error>;
+        fn __try_compare(one: PlainDateTimeLike, two: PlainDateTimeLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
         pub fn calendar_id(this: &PlainDateTime) -> String;
         #[wasm_bindgen(method, getter)]
@@ -3295,16 +3099,10 @@ pub mod temporal {
             date_time_like: &PartialDateTimeLikeObject,
             options: &OverflowOptions,
         ) -> Result<PlainDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, js_name = "withPlainTime")]
         pub fn with_plain_time(this: &PlainDateTime) -> PlainDateTime;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time(this: &PlainDateTime) -> Result<PlainDateTime, RangeError>;
+        pub fn try_with_plain_time(this: &PlainDateTime) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "withPlainTime")]
         fn __with_plain_time_with_plain_time(
             this: &PlainDateTime,
@@ -3314,18 +3112,21 @@ pub mod temporal {
         fn __try_with_plain_time_with_plain_time(
             this: &PlainDateTime,
             plain_time: PlainTimeLike,
-        ) -> Result<PlainDateTime, Error>;
+        ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "withCalendar")]
         fn __with_calendar(this: &PlainDateTime, calendar: CalendarLike) -> PlainDateTime;
         #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         fn __try_with_calendar(
             this: &PlainDateTime,
             calendar: CalendarLike,
-        ) -> Result<PlainDateTime, RangeError>;
+        ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "add")]
         fn __add(this: &PlainDateTime, duration: DurationLike) -> PlainDateTime;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        fn __try_add(this: &PlainDateTime, duration: DurationLike) -> Result<PlainDateTime, Error>;
+        fn __try_add(
+            this: &PlainDateTime,
+            duration: DurationLike,
+        ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "add")]
         fn __add_with_options(
             this: &PlainDateTime,
@@ -3337,14 +3138,14 @@ pub mod temporal {
             this: &PlainDateTime,
             duration: DurationLike,
             options: &OverflowOptions,
-        ) -> Result<PlainDateTime, Error>;
+        ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "subtract")]
         fn __subtract(this: &PlainDateTime, duration: DurationLike) -> PlainDateTime;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
         fn __try_subtract(
             this: &PlainDateTime,
             duration: DurationLike,
-        ) -> Result<PlainDateTime, Error>;
+        ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "subtract")]
         fn __subtract_with_options(
             this: &PlainDateTime,
@@ -3356,7 +3157,7 @@ pub mod temporal {
             this: &PlainDateTime,
             duration: DurationLike,
             options: &OverflowOptions,
-        ) -> Result<PlainDateTime, Error>;
+        ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "until")]
         fn __until(this: &PlainDateTime, other: PlainDateTimeLike) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
@@ -3406,40 +3207,34 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_rounding_options(
             this: &PlainDateTime,
-            round_to: &RoundToOptions,
+            round_to: &RoundingOptions,
         ) -> PlainDateTime;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_round_to_options(
+        pub fn try_round_with_rounding_options(
             this: &PlainDateTime,
-            round_to: &RoundToOptions,
+            round_to: &RoundingOptions,
         ) -> Result<PlainDateTime, RangeError>;
         #[wasm_bindgen(method, js_name = "equals")]
         fn __equals(this: &PlainDateTime, other: PlainDateTimeLike) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        fn __try_equals(this: &PlainDateTime, other: PlainDateTimeLike) -> Result<bool, Error>;
+        fn __try_equals(this: &PlainDateTime, other: PlainDateTimeLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainDateTime) -> Result<String, JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid, or the rounded result is out of range"]
         #[wasm_bindgen(method, js_name = "toString")]
         pub fn to_string_with_options(
             this: &PlainDateTime,
             options: &PlainDateTimeToStringOptions,
         ) -> String;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid, or the rounded result is out of range"]
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string_with_options(
             this: &PlainDateTime,
             options: &PlainDateTimeToStringOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, JsValue>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
@@ -3489,7 +3284,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainDateTime,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[doc = " ## Errors"]
@@ -3499,7 +3294,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &PlainDateTime,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -3534,7 +3329,7 @@ pub mod temporal {
         fn __try_to_zoned_date_time(
             this: &PlainDateTime,
             time_zone: TimeZoneLike,
-        ) -> Result<ZonedDateTime, RangeError>;
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "toZonedDateTime")]
         fn __to_zoned_date_time_with_options(
             this: &PlainDateTime,
@@ -3546,7 +3341,7 @@ pub mod temporal {
             this: &PlainDateTime,
             time_zone: TimeZoneLike,
             options: &DisambiguationOptions,
-        ) -> Result<ZonedDateTime, RangeError>;
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "toPlainDate")]
         pub fn to_plain_date(this: &PlainDateTime) -> PlainDate;
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
@@ -3593,85 +3388,51 @@ pub mod temporal {
         ) -> Result<PlainDateTime, Error> {
             Self::__try_from_with_options(item.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn compare(
             one: impl ::core::convert::Into<PlainDateTimeLike>,
             two: impl ::core::convert::Into<PlainDateTimeLike>,
         ) -> f64 {
             Self::__compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_compare(
             one: impl ::core::convert::Into<PlainDateTimeLike>,
             two: impl ::core::convert::Into<PlainDateTimeLike>,
-        ) -> Result<f64, Error> {
+        ) -> Result<f64, JsValue> {
             Self::__try_compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn with_plain_time_with_plain_time(
             &self,
             plain_time: impl ::core::convert::Into<PlainTimeLike>,
         ) -> PlainDateTime {
             self.__with_plain_time_with_plain_time(plain_time.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_with_plain_time_with_plain_time(
             &self,
             plain_time: impl ::core::convert::Into<PlainTimeLike>,
-        ) -> Result<PlainDateTime, Error> {
+        ) -> Result<PlainDateTime, JsValue> {
             self.__try_with_plain_time_with_plain_time(plain_time.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendar is unknown"]
         pub fn with_calendar(
             &self,
             calendar: impl ::core::convert::Into<CalendarLike>,
         ) -> PlainDateTime {
             self.__with_calendar(calendar.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendar is unknown"]
         pub fn try_with_calendar(
             &self,
             calendar: impl ::core::convert::Into<CalendarLike>,
-        ) -> Result<PlainDateTime, RangeError> {
+        ) -> Result<PlainDateTime, JsValue> {
             self.__try_with_calendar(calendar.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn add(&self, duration: impl ::core::convert::Into<DurationLike>) -> PlainDateTime {
             self.__add(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_add(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
-        ) -> Result<PlainDateTime, Error> {
+        ) -> Result<PlainDateTime, JsValue> {
             self.__try_add(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn add_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
@@ -3679,41 +3440,25 @@ pub mod temporal {
         ) -> PlainDateTime {
             self.__add_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_add_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
             options: &OverflowOptions,
-        ) -> Result<PlainDateTime, Error> {
+        ) -> Result<PlainDateTime, JsValue> {
             self.__try_add_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn subtract(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
         ) -> PlainDateTime {
             self.__subtract(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_subtract(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
-        ) -> Result<PlainDateTime, Error> {
+        ) -> Result<PlainDateTime, JsValue> {
             self.__try_subtract(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn subtract_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
@@ -3721,15 +3466,11 @@ pub mod temporal {
         ) -> PlainDateTime {
             self.__subtract_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_subtract_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
             options: &OverflowOptions,
-        ) -> Result<PlainDateTime, Error> {
+        ) -> Result<PlainDateTime, JsValue> {
             self.__try_subtract_with_options(duration.into(), options)
         }
         #[doc = " ## Errors"]
@@ -3810,44 +3551,27 @@ pub mod temporal {
         ) -> Result<Duration, Error> {
             self.__try_since_with_options(other.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn equals(&self, other: impl ::core::convert::Into<PlainDateTimeLike>) -> bool {
             self.__equals(other.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_equals(
             &self,
             other: impl ::core::convert::Into<PlainDateTimeLike>,
-        ) -> Result<bool, Error> {
+        ) -> Result<bool, JsValue> {
             self.__try_equals(other.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown, the wall-clock time is ambiguous or skipped under `disambiguation: 'reject'`, or the result is out of range"]
         pub fn to_zoned_date_time(
             &self,
             time_zone: impl ::core::convert::Into<TimeZoneLike>,
         ) -> ZonedDateTime {
             self.__to_zoned_date_time(time_zone.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown, the wall-clock time is ambiguous or skipped under `disambiguation: 'reject'`, or the result is out of range"]
         pub fn try_to_zoned_date_time(
             &self,
             time_zone: impl ::core::convert::Into<TimeZoneLike>,
-        ) -> Result<ZonedDateTime, RangeError> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_to_zoned_date_time(time_zone.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown, the wall-clock time is ambiguous or skipped under `disambiguation: 'reject'`, or the result is out of range"]
         pub fn to_zoned_date_time_with_options(
             &self,
             time_zone: impl ::core::convert::Into<TimeZoneLike>,
@@ -3855,14 +3579,11 @@ pub mod temporal {
         ) -> ZonedDateTime {
             self.__to_zoned_date_time_with_options(time_zone.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown, the wall-clock time is ambiguous or skipped under `disambiguation: 'reject'`, or the result is out of range"]
         pub fn try_to_zoned_date_time_with_options(
             &self,
             time_zone: impl ::core::convert::Into<TimeZoneLike>,
             options: &DisambiguationOptions,
-        ) -> Result<ZonedDateTime, RangeError> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_to_zoned_date_time_with_options(time_zone.into(), options)
         }
     }
@@ -3946,11 +3667,9 @@ pub mod temporal {
         #[wasm_bindgen(method, setter)]
         pub fn set_disambiguation(this: &ZonedDateTimeFromOptions, val: DisambiguationKind);
         #[wasm_bindgen(method, getter)]
-        pub fn offset(
-            this: &ZonedDateTimeFromOptions,
-        ) -> Option<ZonedDateTimeFromOptionsOffsetKind>;
+        pub fn offset(this: &ZonedDateTimeFromOptions) -> Option<OffsetKind2>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_offset(this: &ZonedDateTimeFromOptions, val: ZonedDateTimeFromOptionsOffsetKind);
+        pub fn set_offset(this: &ZonedDateTimeFromOptions, val: OffsetKind2);
     }
     impl ZonedDateTimeFromOptions {
         pub fn new() -> ZonedDateTimeFromOptions {
@@ -3979,7 +3698,7 @@ pub mod temporal {
             self.inner.set_disambiguation(val);
             self
         }
-        pub fn offset(self, val: ZonedDateTimeFromOptionsOffsetKind) -> Self {
+        pub fn offset(self, val: OffsetKind2) -> Self {
             self.inner.set_offset(val);
             self
         }
@@ -4026,7 +3745,7 @@ pub mod temporal {
         # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "compare")]
         fn __compare(one: ZonedDateTimeLike, two: ZonedDateTimeLike) -> f64;
         # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        fn __try_compare(one: ZonedDateTimeLike, two: ZonedDateTimeLike) -> Result<f64, Error>;
+        fn __try_compare(one: ZonedDateTimeLike, two: ZonedDateTimeLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
         pub fn calendar_id(this: &ZonedDateTime) -> String;
         #[wasm_bindgen(method, getter, js_name = "timeZoneId")]
@@ -4124,16 +3843,10 @@ pub mod temporal {
             zoned_date_time_like: &PartialZonedDateTimeLikeObject,
             options: &ZonedDateTimeFromOptions,
         ) -> Result<ZonedDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, js_name = "withPlainTime")]
         pub fn with_plain_time(this: &ZonedDateTime) -> ZonedDateTime;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time(this: &ZonedDateTime) -> Result<ZonedDateTime, RangeError>;
+        pub fn try_with_plain_time(this: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "withPlainTime")]
         fn __with_plain_time_with_plain_time(
             this: &ZonedDateTime,
@@ -4143,25 +3856,28 @@ pub mod temporal {
         fn __try_with_plain_time_with_plain_time(
             this: &ZonedDateTime,
             plain_time: PlainTimeLike,
-        ) -> Result<ZonedDateTime, Error>;
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "withTimeZone")]
         fn __with_time_zone(this: &ZonedDateTime, time_zone: TimeZoneLike) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "withTimeZone")]
         fn __try_with_time_zone(
             this: &ZonedDateTime,
             time_zone: TimeZoneLike,
-        ) -> Result<ZonedDateTime, RangeError>;
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "withCalendar")]
         fn __with_calendar(this: &ZonedDateTime, calendar: CalendarLike) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         fn __try_with_calendar(
             this: &ZonedDateTime,
             calendar: CalendarLike,
-        ) -> Result<ZonedDateTime, RangeError>;
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "add")]
         fn __add(this: &ZonedDateTime, duration: DurationLike) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        fn __try_add(this: &ZonedDateTime, duration: DurationLike) -> Result<ZonedDateTime, Error>;
+        fn __try_add(
+            this: &ZonedDateTime,
+            duration: DurationLike,
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "add")]
         fn __add_with_options(
             this: &ZonedDateTime,
@@ -4173,14 +3889,14 @@ pub mod temporal {
             this: &ZonedDateTime,
             duration: DurationLike,
             options: &OverflowOptions,
-        ) -> Result<ZonedDateTime, Error>;
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "subtract")]
         fn __subtract(this: &ZonedDateTime, duration: DurationLike) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
         fn __try_subtract(
             this: &ZonedDateTime,
             duration: DurationLike,
-        ) -> Result<ZonedDateTime, Error>;
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "subtract")]
         fn __subtract_with_options(
             this: &ZonedDateTime,
@@ -4192,7 +3908,7 @@ pub mod temporal {
             this: &ZonedDateTime,
             duration: DurationLike,
             options: &OverflowOptions,
-        ) -> Result<ZonedDateTime, Error>;
+        ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "until")]
         fn __until(this: &ZonedDateTime, other: ZonedDateTimeLike) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
@@ -4242,40 +3958,34 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_rounding_options(
             this: &ZonedDateTime,
-            round_to: &RoundToOptions,
+            round_to: &RoundingOptions,
         ) -> ZonedDateTime;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_round_to_options(
+        pub fn try_round_with_rounding_options(
             this: &ZonedDateTime,
-            round_to: &RoundToOptions,
+            round_to: &RoundingOptions,
         ) -> Result<ZonedDateTime, RangeError>;
         #[wasm_bindgen(method, js_name = "equals")]
         fn __equals(this: &ZonedDateTime, other: ZonedDateTimeLike) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        fn __try_equals(this: &ZonedDateTime, other: ZonedDateTimeLike) -> Result<bool, Error>;
+        fn __try_equals(this: &ZonedDateTime, other: ZonedDateTimeLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &ZonedDateTime) -> Result<String, JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
         #[wasm_bindgen(method, js_name = "toString")]
         pub fn to_string_with_options(
             this: &ZonedDateTime,
             options: &ZonedDateTimeToStringOptions,
         ) -> String;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string_with_options(
             this: &ZonedDateTime,
             options: &ZonedDateTimeToStringOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, JsValue>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
@@ -4325,7 +4035,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &ZonedDateTime,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[doc = " ## Errors"]
@@ -4335,7 +4045,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &ZonedDateTime,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -4364,16 +4074,10 @@ pub mod temporal {
         pub fn try_to_json(this: &ZonedDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &ZonedDateTime) -> Result<(), JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the day starts outside the representable range"]
         #[wasm_bindgen(method, js_name = "startOfDay")]
         pub fn start_of_day(this: &ZonedDateTime) -> ZonedDateTime;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the day starts outside the representable range"]
         #[wasm_bindgen(method, catch, js_name = "startOfDay")]
-        pub fn try_start_of_day(this: &ZonedDateTime) -> Result<ZonedDateTime, RangeError>;
+        pub fn try_start_of_day(this: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
         fn __get_time_zone_transition(
             this: &ZonedDateTime,
@@ -4448,103 +4152,63 @@ pub mod temporal {
         ) -> Result<ZonedDateTime, Error> {
             Self::__try_from_with_options(item.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the offset does not match the time zone, or the time zone or calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn compare(
             one: impl ::core::convert::Into<ZonedDateTimeLike>,
             two: impl ::core::convert::Into<ZonedDateTimeLike>,
         ) -> f64 {
             Self::__compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the offset does not match the time zone, or the time zone or calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_compare(
             one: impl ::core::convert::Into<ZonedDateTimeLike>,
             two: impl ::core::convert::Into<ZonedDateTimeLike>,
-        ) -> Result<f64, Error> {
+        ) -> Result<f64, JsValue> {
             Self::__try_compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn with_plain_time_with_plain_time(
             &self,
             plain_time: impl ::core::convert::Into<PlainTimeLike>,
         ) -> ZonedDateTime {
             self.__with_plain_time_with_plain_time(plain_time.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_with_plain_time_with_plain_time(
             &self,
             plain_time: impl ::core::convert::Into<PlainTimeLike>,
-        ) -> Result<ZonedDateTime, Error> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_with_plain_time_with_plain_time(plain_time.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn with_time_zone(
             &self,
             time_zone: impl ::core::convert::Into<TimeZoneLike>,
         ) -> ZonedDateTime {
             self.__with_time_zone(time_zone.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn try_with_time_zone(
             &self,
             time_zone: impl ::core::convert::Into<TimeZoneLike>,
-        ) -> Result<ZonedDateTime, RangeError> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_with_time_zone(time_zone.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendar is unknown"]
         pub fn with_calendar(
             &self,
             calendar: impl ::core::convert::Into<CalendarLike>,
         ) -> ZonedDateTime {
             self.__with_calendar(calendar.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendar is unknown"]
         pub fn try_with_calendar(
             &self,
             calendar: impl ::core::convert::Into<CalendarLike>,
-        ) -> Result<ZonedDateTime, RangeError> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_with_calendar(calendar.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn add(&self, duration: impl ::core::convert::Into<DurationLike>) -> ZonedDateTime {
             self.__add(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_add(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
-        ) -> Result<ZonedDateTime, Error> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_add(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn add_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
@@ -4552,41 +4216,25 @@ pub mod temporal {
         ) -> ZonedDateTime {
             self.__add_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_add_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
             options: &OverflowOptions,
-        ) -> Result<ZonedDateTime, Error> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_add_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn subtract(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
         ) -> ZonedDateTime {
             self.__subtract(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_subtract(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
-        ) -> Result<ZonedDateTime, Error> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_subtract(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn subtract_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
@@ -4594,15 +4242,11 @@ pub mod temporal {
         ) -> ZonedDateTime {
             self.__subtract_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_subtract_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
             options: &OverflowOptions,
-        ) -> Result<ZonedDateTime, Error> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_subtract_with_options(duration.into(), options)
         }
         #[doc = " ## Errors"]
@@ -4683,21 +4327,13 @@ pub mod temporal {
         ) -> Result<Duration, Error> {
             self.__try_since_with_options(other.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the offset does not match the time zone, or the time zone or calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn equals(&self, other: impl ::core::convert::Into<ZonedDateTimeLike>) -> bool {
             self.__equals(other.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the offset does not match the time zone, or the time zone or calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_equals(
             &self,
             other: impl ::core::convert::Into<ZonedDateTimeLike>,
-        ) -> Result<bool, Error> {
+        ) -> Result<bool, JsValue> {
             self.__try_equals(other.into())
         }
     }
@@ -4959,17 +4595,14 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
-        pub fn new_with_years_and_months(
-            years: Option<f64>,
-            months: f64,
-        ) -> Result<Duration, RangeError>;
+        pub fn new_with_years_and_months(years: f64, months: f64) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks(
-            years: Option<f64>,
-            months: Option<f64>,
+            years: f64,
+            months: f64,
             weeks: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -4977,9 +4610,9 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days(
-            years: Option<f64>,
-            months: Option<f64>,
-            weeks: Option<f64>,
+            years: f64,
+            months: f64,
+            weeks: f64,
             days: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -4987,10 +4620,10 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours(
-            years: Option<f64>,
-            months: Option<f64>,
-            weeks: Option<f64>,
-            days: Option<f64>,
+            years: f64,
+            months: f64,
+            weeks: f64,
+            days: f64,
             hours: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -4998,11 +4631,11 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes(
-            years: Option<f64>,
-            months: Option<f64>,
-            weeks: Option<f64>,
-            days: Option<f64>,
-            hours: Option<f64>,
+            years: f64,
+            months: f64,
+            weeks: f64,
+            days: f64,
+            hours: f64,
             minutes: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -5010,12 +4643,12 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds(
-            years: Option<f64>,
-            months: Option<f64>,
-            weeks: Option<f64>,
-            days: Option<f64>,
-            hours: Option<f64>,
-            minutes: Option<f64>,
+            years: f64,
+            months: f64,
+            weeks: f64,
+            days: f64,
+            hours: f64,
+            minutes: f64,
             seconds: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -5023,13 +4656,13 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds(
-            years: Option<f64>,
-            months: Option<f64>,
-            weeks: Option<f64>,
-            days: Option<f64>,
-            hours: Option<f64>,
-            minutes: Option<f64>,
-            seconds: Option<f64>,
+            years: f64,
+            months: f64,
+            weeks: f64,
+            days: f64,
+            hours: f64,
+            minutes: f64,
+            seconds: f64,
             milliseconds: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -5037,14 +4670,14 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds(
-            years: Option<f64>,
-            months: Option<f64>,
-            weeks: Option<f64>,
-            days: Option<f64>,
-            hours: Option<f64>,
-            minutes: Option<f64>,
-            seconds: Option<f64>,
-            milliseconds: Option<f64>,
+            years: f64,
+            months: f64,
+            weeks: f64,
+            days: f64,
+            hours: f64,
+            minutes: f64,
+            seconds: f64,
+            milliseconds: f64,
             microseconds: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -5052,15 +4685,15 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds_and_nanoseconds(
-            years: Option<f64>,
-            months: Option<f64>,
-            weeks: Option<f64>,
-            days: Option<f64>,
-            hours: Option<f64>,
-            minutes: Option<f64>,
-            seconds: Option<f64>,
-            milliseconds: Option<f64>,
-            microseconds: Option<f64>,
+            years: f64,
+            months: f64,
+            weeks: f64,
+            days: f64,
+            hours: f64,
+            minutes: f64,
+            seconds: f64,
+            milliseconds: f64,
+            microseconds: f64,
             nanoseconds: f64,
         ) -> Result<Duration, RangeError>;
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "from")]
@@ -5202,20 +4835,14 @@ pub mod temporal {
         ) -> Result<f64, Error>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &Duration) -> Result<String, JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid, or the rounded result is out of range"]
         #[wasm_bindgen(method, js_name = "toString")]
         pub fn to_string_with_options(this: &Duration, options: &DurationToStringOptions)
             -> String;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid, or the rounded result is out of range"]
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string_with_options(
             this: &Duration,
             options: &DurationToStringOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, JsValue>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
@@ -5258,7 +4885,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &Duration,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DurationFormatOptions,
         ) -> String;
         #[doc = " ## Errors"]
@@ -5267,7 +4894,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &Duration,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DurationFormatOptions,
         ) -> Result<String, RangeError>;
         #[doc = " ## Errors"]
@@ -5312,7 +4939,7 @@ pub mod temporal {
         }
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn compare(
             one: impl ::core::convert::Into<DurationLike>,
@@ -5322,7 +4949,7 @@ pub mod temporal {
         }
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_compare(
             one: impl ::core::convert::Into<DurationLike>,
@@ -5332,7 +4959,7 @@ pub mod temporal {
         }
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn compare_with_options(
             one: impl ::core::convert::Into<DurationLike>,
@@ -5343,7 +4970,7 @@ pub mod temporal {
         }
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
         #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_compare_with_options(
             one: impl ::core::convert::Into<DurationLike>,
@@ -5489,7 +5116,7 @@ pub mod temporal {
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "compare")]
         fn __compare(one: InstantLike, two: InstantLike) -> f64;
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        fn __try_compare(one: InstantLike, two: InstantLike) -> Result<f64, RangeError>;
+        fn __try_compare(one: InstantLike, two: InstantLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter, js_name = "epochMilliseconds")]
         pub fn epoch_milliseconds(this: &Instant) -> f64;
         #[wasm_bindgen(method, getter, js_name = "epochNanoseconds")]
@@ -5551,37 +5178,31 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_rounding_options(
             this: &Instant,
-            round_to: &RoundToOptions<JsString>,
+            round_to: &RoundingOptions<JsString>,
         ) -> Instant;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_round_to_options(
+        pub fn try_round_with_rounding_options(
             this: &Instant,
-            round_to: &RoundToOptions<JsString>,
+            round_to: &RoundingOptions<JsString>,
         ) -> Result<Instant, RangeError>;
         #[wasm_bindgen(method, js_name = "equals")]
         fn __equals(this: &Instant, other: InstantLike) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        fn __try_equals(this: &Instant, other: InstantLike) -> Result<bool, RangeError>;
+        fn __try_equals(this: &Instant, other: InstantLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &Instant) -> Result<String, JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid, or the time zone is unknown"]
         #[wasm_bindgen(method, js_name = "toString")]
         pub fn to_string_with_options(this: &Instant, options: &InstantToStringOptions) -> String;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid, or the time zone is unknown"]
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string_with_options(
             this: &Instant,
             options: &InstantToStringOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, JsValue>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
@@ -5631,7 +5252,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &Instant,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[doc = " ## Errors"]
@@ -5641,7 +5262,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &Instant,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -5676,7 +5297,7 @@ pub mod temporal {
         fn __try_to_zoned_date_time_iso(
             this: &Instant,
             time_zone: TimeZoneLike,
-        ) -> Result<ZonedDateTime, RangeError>;
+        ) -> Result<ZonedDateTime, JsValue>;
     }
     impl Instant {
         #[doc = " ## Errors"]
@@ -5693,22 +5314,16 @@ pub mod temporal {
         ) -> Result<Instant, RangeError> {
             Self::__try_from(item.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or an instant is out of range"]
         pub fn compare(
             one: impl ::core::convert::Into<InstantLike>,
             two: impl ::core::convert::Into<InstantLike>,
         ) -> f64 {
             Self::__compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or an instant is out of range"]
         pub fn try_compare(
             one: impl ::core::convert::Into<InstantLike>,
             two: impl ::core::convert::Into<InstantLike>,
-        ) -> Result<f64, RangeError> {
+        ) -> Result<f64, JsValue> {
             Self::__try_compare(one.into(), two.into())
         }
         #[doc = " ## Errors"]
@@ -5815,37 +5430,25 @@ pub mod temporal {
         ) -> Result<Duration, RangeError> {
             self.__try_since_with_options(other.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
         pub fn equals(&self, other: impl ::core::convert::Into<InstantLike>) -> bool {
             self.__equals(other.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
         pub fn try_equals(
             &self,
             other: impl ::core::convert::Into<InstantLike>,
-        ) -> Result<bool, RangeError> {
+        ) -> Result<bool, JsValue> {
             self.__try_equals(other.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn to_zoned_date_time_iso(
             &self,
             time_zone: impl ::core::convert::Into<TimeZoneLike>,
         ) -> ZonedDateTime {
             self.__to_zoned_date_time_iso(time_zone.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the time zone is unknown"]
         pub fn try_to_zoned_date_time_iso(
             &self,
             time_zone: impl ::core::convert::Into<TimeZoneLike>,
-        ) -> Result<ZonedDateTime, RangeError> {
+        ) -> Result<ZonedDateTime, JsValue> {
             self.__try_to_zoned_date_time_iso(time_zone.into())
         }
     }
@@ -5898,7 +5501,7 @@ pub mod temporal {
         pub fn new_with_calendar_and_reference_iso_day(
             iso_year: f64,
             iso_month: f64,
-            calendar: Option<&str>,
+            calendar: &str,
             reference_iso_day: f64,
         ) -> Result<PlainYearMonth, RangeError>;
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "from")]
@@ -5918,7 +5521,7 @@ pub mod temporal {
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "compare")]
         fn __compare(one: PlainYearMonthLike, two: PlainYearMonthLike) -> f64;
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        fn __try_compare(one: PlainYearMonthLike, two: PlainYearMonthLike) -> Result<f64, Error>;
+        fn __try_compare(one: PlainYearMonthLike, two: PlainYearMonthLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
         pub fn calendar_id(this: &PlainYearMonth) -> String;
         #[wasm_bindgen(method, getter)]
@@ -5983,7 +5586,7 @@ pub mod temporal {
         fn __try_add(
             this: &PlainYearMonth,
             duration: DurationLike,
-        ) -> Result<PlainYearMonth, Error>;
+        ) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, js_name = "add")]
         fn __add_with_options(
             this: &PlainYearMonth,
@@ -5995,14 +5598,14 @@ pub mod temporal {
             this: &PlainYearMonth,
             duration: DurationLike,
             options: &OverflowOptions,
-        ) -> Result<PlainYearMonth, Error>;
+        ) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, js_name = "subtract")]
         fn __subtract(this: &PlainYearMonth, duration: DurationLike) -> PlainYearMonth;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
         fn __try_subtract(
             this: &PlainYearMonth,
             duration: DurationLike,
-        ) -> Result<PlainYearMonth, Error>;
+        ) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, js_name = "subtract")]
         fn __subtract_with_options(
             this: &PlainYearMonth,
@@ -6014,7 +5617,7 @@ pub mod temporal {
             this: &PlainYearMonth,
             duration: DurationLike,
             options: &OverflowOptions,
-        ) -> Result<PlainYearMonth, Error>;
+        ) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, js_name = "until")]
         fn __until(this: &PlainYearMonth, other: PlainYearMonthLike) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
@@ -6052,7 +5655,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "equals")]
         fn __equals(this: &PlainYearMonth, other: PlainYearMonthLike) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        fn __try_equals(this: &PlainYearMonth, other: PlainYearMonthLike) -> Result<bool, Error>;
+        fn __try_equals(this: &PlainYearMonth, other: PlainYearMonthLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainYearMonth) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -6114,7 +5717,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainYearMonth,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[doc = " ## Errors"]
@@ -6124,7 +5727,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &PlainYearMonth,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -6153,22 +5756,16 @@ pub mod temporal {
         pub fn try_to_json(this: &PlainYearMonth) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &PlainYearMonth) -> Result<(), JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the day is not finite, or the date is out of range"]
         #[wasm_bindgen(method, js_name = "toPlainDate")]
         pub fn to_plain_date(
             this: &PlainYearMonth,
             item: &PlainYearMonthToPlainDateOptions,
         ) -> PlainDate;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the day is not finite, or the date is out of range"]
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
         pub fn try_to_plain_date(
             this: &PlainYearMonth,
             item: &PlainYearMonthToPlainDateOptions,
-        ) -> Result<PlainDate, RangeError>;
+        ) -> Result<PlainDate, JsValue>;
     }
     impl PlainYearMonth {
         #[doc = " ## Errors"]
@@ -6207,47 +5804,27 @@ pub mod temporal {
         ) -> Result<PlainYearMonth, Error> {
             Self::__try_from_with_options(item.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn compare(
             one: impl ::core::convert::Into<PlainYearMonthLike>,
             two: impl ::core::convert::Into<PlainYearMonthLike>,
         ) -> f64 {
             Self::__compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_compare(
             one: impl ::core::convert::Into<PlainYearMonthLike>,
             two: impl ::core::convert::Into<PlainYearMonthLike>,
-        ) -> Result<f64, Error> {
+        ) -> Result<f64, JsValue> {
             Self::__try_compare(one.into(), two.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn add(&self, duration: impl ::core::convert::Into<DurationLike>) -> PlainYearMonth {
             self.__add(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_add(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
-        ) -> Result<PlainYearMonth, Error> {
+        ) -> Result<PlainYearMonth, JsValue> {
             self.__try_add(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn add_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
@@ -6255,41 +5832,25 @@ pub mod temporal {
         ) -> PlainYearMonth {
             self.__add_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_add_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
             options: &OverflowOptions,
-        ) -> Result<PlainYearMonth, Error> {
+        ) -> Result<PlainYearMonth, JsValue> {
             self.__try_add_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn subtract(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
         ) -> PlainYearMonth {
             self.__subtract(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_subtract(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
-        ) -> Result<PlainYearMonth, Error> {
+        ) -> Result<PlainYearMonth, JsValue> {
             self.__try_subtract(duration.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn subtract_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
@@ -6297,15 +5858,11 @@ pub mod temporal {
         ) -> PlainYearMonth {
             self.__subtract_with_options(duration.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_subtract_with_options(
             &self,
             duration: impl ::core::convert::Into<DurationLike>,
             options: &OverflowOptions,
-        ) -> Result<PlainYearMonth, Error> {
+        ) -> Result<PlainYearMonth, JsValue> {
             self.__try_subtract_with_options(duration.into(), options)
         }
         #[doc = " ## Errors"]
@@ -6386,21 +5943,13 @@ pub mod temporal {
         ) -> Result<Duration, Error> {
             self.__try_since_with_options(other.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn equals(&self, other: impl ::core::convert::Into<PlainYearMonthLike>) -> bool {
             self.__equals(other.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_equals(
             &self,
             other: impl ::core::convert::Into<PlainYearMonthLike>,
-        ) -> Result<bool, Error> {
+        ) -> Result<bool, JsValue> {
             self.__try_equals(other.into())
         }
     }
@@ -6488,7 +6037,7 @@ pub mod temporal {
         pub fn new_with_calendar_and_reference_iso_year(
             iso_month: f64,
             iso_day: f64,
-            calendar: Option<&str>,
+            calendar: &str,
             reference_iso_year: f64,
         ) -> Result<PlainMonthDay, RangeError>;
         # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , js_name = "from")]
@@ -6547,7 +6096,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "equals")]
         fn __equals(this: &PlainMonthDay, other: PlainMonthDayLike) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        fn __try_equals(this: &PlainMonthDay, other: PlainMonthDayLike) -> Result<bool, Error>;
+        fn __try_equals(this: &PlainMonthDay, other: PlainMonthDayLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainMonthDay) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -6609,7 +6158,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainMonthDay,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> String;
         #[doc = " ## Errors"]
@@ -6619,7 +6168,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &PlainMonthDay,
-            locales: Option<&str>,
+            locales: &str,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -6648,24 +6197,16 @@ pub mod temporal {
         pub fn try_to_json(this: &PlainMonthDay) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &PlainMonthDay) -> Result<(), JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a field is out of range, or the date is out of range"]
-        #[doc = " * `TypeError` — if the object has no year for the calendar"]
         #[wasm_bindgen(method, js_name = "toPlainDate")]
         pub fn to_plain_date(
             this: &PlainMonthDay,
             item: &PlainMonthDayToPlainDateOptions,
         ) -> PlainDate;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a field is out of range, or the date is out of range"]
-        #[doc = " * `TypeError` — if the object has no year for the calendar"]
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
         pub fn try_to_plain_date(
             this: &PlainMonthDay,
             item: &PlainMonthDayToPlainDateOptions,
-        ) -> Result<PlainDate, Error>;
+        ) -> Result<PlainDate, JsValue>;
     }
     impl PlainMonthDay {
         #[doc = " ## Errors"]
@@ -6704,21 +6245,13 @@ pub mod temporal {
         ) -> Result<PlainMonthDay, Error> {
             Self::__try_from_with_options(item.into(), options)
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn equals(&self, other: impl ::core::convert::Into<PlainMonthDayLike>) -> bool {
             self.__equals(other.into())
         }
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         pub fn try_equals(
             &self,
             other: impl ::core::convert::Into<PlainMonthDayLike>,
-        ) -> Result<bool, Error> {
+        ) -> Result<bool, JsValue> {
             self.__try_equals(other.into())
         }
     }
@@ -7165,106 +6698,95 @@ pub mod temporal {
             self.inner
         }
     }
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DisambiguationKind {
-    Compatible = "compatible",
-    Earlier = "earlier",
-    Later = "later",
-    Reject = "reject",
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OverflowKind {
-    Constrain = "constrain",
-    Reject = "reject",
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DirectionKind {
-    Next = "next",
-    Previous = "previous",
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RoundingModeKind {
-    Ceil = "ceil",
-    Floor = "floor",
-    Expand = "expand",
-    Trunc = "trunc",
-    HalfCeil = "halfCeil",
-    HalfFloor = "halfFloor",
-    HalfExpand = "halfExpand",
-    HalfTrunc = "halfTrunc",
-    HalfEven = "halfEven",
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LargestUnitKind {
-    Auto = "auto",
-    Year = "year",
-    Month = "month",
-    Week = "week",
-    Day = "day",
-    Hour = "hour",
-    Minute = "minute",
-    Second = "second",
-    Millisecond = "millisecond",
-    Microsecond = "microsecond",
-    Nanosecond = "nanosecond",
-    Years = "years",
-    Months = "months",
-    Weeks = "weeks",
-    Days = "days",
-    Hours = "hours",
-    Minutes = "minutes",
-    Seconds = "seconds",
-    Milliseconds = "milliseconds",
-    Microseconds = "microseconds",
-    Nanoseconds = "nanoseconds",
-}
-#[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
-pub enum FractionalSecondDigitsKind {
-    Auto = "auto",
-    F64(f64),
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CalendarNameKind {
-    Auto = "auto",
-    Always = "always",
-    Never = "never",
-    Critical = "critical",
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OffsetKind {
-    Auto = "auto",
-    Never = "never",
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TimeZoneNameKind {
-    Auto = "auto",
-    Never = "never",
-    Critical = "critical",
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ZonedDateTimeFromOptionsOffsetKind {
-    Use = "use",
-    Ignore = "ignore",
-    Prefer = "prefer",
-    Reject = "reject",
-}
-#[wasm_bindgen(private, fallback)]
-#[derive(Clone, Debug)]
-pub enum RelativeToKind {
-    ZonedDateTime(temporal::ZonedDateTime),
-    String(String),
-    PlainDate(temporal::PlainDate),
-    PlainDateTime(temporal::PlainDateTime),
-    Object(Object),
+    #[wasm_bindgen(private)]
+    pub enum DisambiguationKind {
+        Compatible = "compatible",
+        Earlier = "earlier",
+        Later = "later",
+        Reject = "reject",
+    }
+    #[wasm_bindgen(private)]
+    pub enum OverflowKind {
+        Constrain = "constrain",
+        Reject = "reject",
+    }
+    #[wasm_bindgen(private)]
+    pub enum DirectionKind {
+        Next = "next",
+        Previous = "previous",
+    }
+    #[wasm_bindgen(private)]
+    pub enum RoundingModeKind {
+        Ceil = "ceil",
+        Floor = "floor",
+        Expand = "expand",
+        Trunc = "trunc",
+        HalfCeil = "halfCeil",
+        HalfFloor = "halfFloor",
+        HalfExpand = "halfExpand",
+        HalfTrunc = "halfTrunc",
+        HalfEven = "halfEven",
+    }
+    #[wasm_bindgen(private)]
+    pub enum LargestUnitKind {
+        Auto = "auto",
+        Year = "year",
+        Month = "month",
+        Week = "week",
+        Day = "day",
+        Hour = "hour",
+        Minute = "minute",
+        Second = "second",
+        Millisecond = "millisecond",
+        Microsecond = "microsecond",
+        Nanosecond = "nanosecond",
+        Years = "years",
+        Months = "months",
+        Weeks = "weeks",
+        Days = "days",
+        Hours = "hours",
+        Minutes = "minutes",
+        Seconds = "seconds",
+        Milliseconds = "milliseconds",
+        Microseconds = "microseconds",
+        Nanoseconds = "nanoseconds",
+    }
+    #[wasm_bindgen(private)]
+    pub enum FractionalSecondDigitsKind {
+        Auto = "auto",
+        F64(f64),
+    }
+    #[wasm_bindgen(private)]
+    pub enum CalendarNameKind {
+        Auto = "auto",
+        Always = "always",
+        Never = "never",
+        Critical = "critical",
+    }
+    #[wasm_bindgen(private)]
+    pub enum OffsetKind {
+        Auto = "auto",
+        Never = "never",
+    }
+    #[wasm_bindgen(private)]
+    pub enum TimeZoneNameKind {
+        Auto = "auto",
+        Never = "never",
+        Critical = "critical",
+    }
+    #[wasm_bindgen(private)]
+    pub enum OffsetKind2 {
+        Use = "use",
+        Ignore = "ignore",
+        Prefer = "prefer",
+        Reject = "reject",
+    }
+    #[wasm_bindgen(private, fallback)]
+    pub enum RelativeToKind {
+        ZonedDateTime(ZonedDateTime),
+        String(String),
+        PlainDate(PlainDate),
+        PlainDateTime(PlainDateTime),
+        Object(Object),
+    }
 }

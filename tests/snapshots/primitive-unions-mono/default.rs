@@ -417,7 +417,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "level")]
     pub fn set_level_with_f64(this: &Settings, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn id(this: &Settings) -> CurrentReturnKind;
+    pub fn id(this: &Settings) -> IdKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &Settings, val: &str);
     #[wasm_bindgen(method, setter, js_name = "id")]
@@ -660,26 +660,27 @@ impl SettingsBuilder {
     }
 }
 #[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
 pub enum CurrentReturnKind {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
 pub enum LevelKind {
     Low = "low",
     High = "high",
     F64(f64),
 }
 #[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
+pub enum IdKind {
+    String(String),
+    F64(f64),
+}
+#[wasm_bindgen(private)]
 pub enum LabelKind {
     String(String),
     Bool(bool),
 }
 #[wasm_bindgen(private, fallback)]
-#[derive(Clone, Debug)]
 pub enum FromKind {
     String(String),
     Bool(bool),

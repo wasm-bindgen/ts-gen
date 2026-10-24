@@ -7,6 +7,10 @@ use wasm_bindgen::prelude::*;
 pub mod polish {
     #[allow(unused_imports)]
     use super::*;
+    #[allow(dead_code)]
+    pub type PartialShapeLike = JsValue;
+    #[allow(dead_code)]
+    pub type PartialOmitLike = JsValue;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -349,10 +353,9 @@ pub mod polish {
         Hours = "hours",
         Minutes = "minutes",
     }
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DirectionKind {
-    Next = "next",
-    Previous = "previous",
+    #[wasm_bindgen(private)]
+    pub enum DirectionKind {
+        Next = "next",
+        Previous = "previous",
+    }
 }

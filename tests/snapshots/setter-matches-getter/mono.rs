@@ -15,10 +15,6 @@ extern "C" {
     pub fn set_fractional_second_digits(this: &DigitsOptions, val: FractionalSecondDigitsKind);
     #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
     pub fn set_fractional_second_digits_with_f64(this: &DigitsOptions, val: f64);
-    #[wasm_bindgen(method, getter, js_name = "roundingMode")]
-    pub fn rounding_mode(this: &DigitsOptions) -> Option<RoundingModeKind>;
-    #[wasm_bindgen(method, setter, js_name = "roundingMode")]
-    pub fn set_rounding_mode(this: &DigitsOptions, val: RoundingModeKind);
 }
 impl DigitsOptions {
     pub fn new() -> DigitsOptions {
@@ -47,10 +43,6 @@ impl DigitsOptionsBuilder {
         self.inner.set_fractional_second_digits_with_f64(val);
         self
     }
-    pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
-        self.inner.set_rounding_mode(val);
-        self
-    }
     pub fn build(self) -> DigitsOptions {
         self.inner
     }
@@ -61,9 +53,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequiredDigits;
     #[wasm_bindgen(method, getter)]
-    pub fn digits(this: &RequiredDigits) -> FractionalSecondDigitsKind;
+    pub fn digits(this: &RequiredDigits) -> DigitsKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_digits(this: &RequiredDigits, val: FractionalSecondDigitsKind);
+    pub fn set_digits(this: &RequiredDigits, val: DigitsKind);
     #[wasm_bindgen(method, setter, js_name = "digits")]
     pub fn set_digits_with_f64(this: &RequiredDigits, val: f64);
 }
@@ -87,7 +79,7 @@ impl RequiredDigits {
     #[doc = " Start a builder with `digits: \"auto\"`."]
     pub fn builder_auto() -> RequiredDigitsBuilder {
         let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_digits(FractionalSecondDigitsKind::Auto);
+        inner.set_digits(DigitsKind::Auto);
         RequiredDigitsBuilder { inner }
     }
     #[doc = " Start a builder with `digits: 0`."]
@@ -113,7 +105,7 @@ pub struct RequiredDigitsBuilder {
     inner: RequiredDigits,
 }
 impl RequiredDigitsBuilder {
-    pub fn digits(self, val: FractionalSecondDigitsKind) -> Self {
+    pub fn digits(self, val: DigitsKind) -> Self {
         self.inner.set_digits(val);
         self
     }
@@ -186,19 +178,16 @@ impl ToggleBuilder {
     }
 }
 #[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
 pub enum FractionalSecondDigitsKind {
     Auto = "auto",
     F64(f64),
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RoundingModeKind {
-    Ceil = "ceil",
-    Floor = "floor",
+pub enum DigitsKind {
+    Auto = "auto",
+    F64(f64),
 }
 #[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
 pub enum ModeKind {
     Bool(bool),
     X = "x",
