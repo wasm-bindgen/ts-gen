@@ -24,7 +24,11 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn count(this: &Response) -> Result<u32, JsValue>;
     #[wasm_bindgen(method, js_name = "count")]
-    pub fn count_promise(this: &Response) -> Promise<u32>;
+    pub fn count_promise(this: &Response) -> Promise<Number>;
+    #[wasm_bindgen(method, catch, js_name = "maybeCount")]
+    pub async fn maybe_count(this: &Response) -> Result<Nullable<u32>, JsValue>;
+    #[wasm_bindgen(method, js_name = "maybeCount")]
+    pub fn maybe_count_promise(this: &Response) -> Promise<Nullable<Number>>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part(this: &Response, part_number: u16) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -42,6 +46,20 @@ extern "C" {
     pub fn status_text(this: &Response) -> String;
     #[wasm_bindgen(method, getter, js_name = "statusText")]
     pub fn status_text_js_string(this: &Response) -> JsString;
+    #[wasm_bindgen(method, getter)]
+    pub fn closed(this: &Response) -> Promise<Number>;
+    #[wasm_bindgen(method, getter)]
+    pub fn total(this: &Response) -> Promise<BigInt>;
+    #[wasm_bindgen(method, catch, js_name = "whenReady")]
+    pub fn when_ready(this: &Response, ready: &Promise<Number>) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn matrix(this: &Response) -> Result<Vec<Array<Number>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "setMatrix")]
+    pub fn set_matrix(this: &Response, rows: &[Array<Number>]) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn codes(this: &Response) -> Result<Vec<JsNullable<Number>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "setCodes")]
+    pub fn set_codes(this: &Response, codes: &[JsNullable<Number>]) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

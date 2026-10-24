@@ -2036,6 +2036,11 @@ pub fn to_syn_type(
         match ty {
             TypeRef::Boolean | TypeRef::BooleanLiteral(_) => return quote! { Boolean },
             TypeRef::Number | TypeRef::NumberLiteral(_) => return quote! { Number },
+            // A generic argument must be a JS type, so a `@rust` scalar
+            // inside a handle (`Promise<…>` that is not an async return,
+            // `Array<…>`, `JsNullable<…>`) keeps the JS number it narrows.
+            TypeRef::RustScalar(s) if s.is_bigint() => return quote! { BigInt },
+            TypeRef::RustScalar(_) => return quote! { Number },
             TypeRef::String | TypeRef::StringLiteral(_) => return quote! { JsString },
             TypeRef::Void | TypeRef::Undefined => return quote! { Undefined },
             _ => {}
@@ -3240,6 +3245,7 @@ fn is_mono_native_leaf(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -
             | TypeRef::BooleanLiteral(_)
             | TypeRef::Number
             | TypeRef::NumberLiteral(_)
+            | TypeRef::RustScalar(_)
             | TypeRef::String
             | TypeRef::StringLiteral(_)
     ) || ctx.enum_kind(ty, scope).is_some()

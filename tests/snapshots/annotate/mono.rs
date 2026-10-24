@@ -130,7 +130,7 @@ extern "C" {
     pub fn delete_with_keys_promise(
         this: &Storage,
         keys: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<u32>;
+    ) -> Promise<Number>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

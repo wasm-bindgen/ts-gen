@@ -3424,7 +3424,14 @@ pub async fn count(this: &Response) -> Result<u32, JsValue>;
   constructor or function; several tags may be stacked.
 * The scalar replaces the leaf through `| null` / `| undefined` and an
   optional declaration (read as `Nullable<u16>` / `Option<u16>`), `T[]`
-  (`Vec<u8>` / `&[u8]`) and `Promise<…>` (`Result<u32, _>`).
+  (`Vec<u8>` / `&[u8]`) and an async return's `Promise<…>`
+  (`Result<u32, _>`).
+* A generic handle's argument must be a JS type, so inside one the
+  tagged leaf keeps the JS number it narrows: `Number`, or `BigInt` for
+  `u64`/`i64`. A `Promise<number>` getter or argument is
+  `Promise<Number>`, `number[][]` is `Vec<Array<Number>>` and
+  `(number | null)[]` is `Vec<JsNullable<Number>>`; the tag still
+  applies where the leaf reaches a Rust position.
 * Accepted scalars: `u8 u16 u32 u64 i8 i16 i32 i64 f32 f64 usize`.
   wasm-bindgen crosses `u64`/`i64` as a JS `BigInt`, so they apply only
   to a `bigint` leaf; every other scalar applies only to a `number`
