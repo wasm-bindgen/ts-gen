@@ -701,9 +701,21 @@ fn generate_type_alias(
         }
     }
 
-    let target = cgctx.alias_target(alias, from_module);
     let renamed = cgctx.renamed_locals.get(&alias.name);
     let name = typemap::make_ident(renamed.map_or(alias.name.as_str(), String::as_str));
+    let public_alias = if renamed.is_some() && !typemap::is_prelude_reserved(&alias.name) {
+        let public = typemap::make_ident(&alias.name);
+        quote! { pub use #name as #public; }
+    } else {
+        quote! {}
+    };
+
+    if let Some(union) = cgctx.union_alias_of(alias) {
+        let item = generate_union_alias_enum(&name, &union, cgctx, from_module);
+        return quote! { #item #public_alias };
+    }
+
+    let target = cgctx.alias_target(alias, from_module);
 
     // Identity — skip.
     if target.to_string() == alias.name {
@@ -726,13 +738,6 @@ fn generate_type_alias(
     {
         return quote! {};
     }
-
-    let public_alias = if renamed.is_some() && !typemap::is_prelude_reserved(&alias.name) {
-        let public = typemap::make_ident(&alias.name);
-        quote! { pub use #name as #public; }
-    } else {
-        quote! {}
-    };
 
     // Type-parameter declaration so aliases that mention generics
     // survive codegen: `pub type Handler<Env, Props> = …;` rather
@@ -772,6 +777,161 @@ fn generate_type_alias(
         #[allow(dead_code)]
         pub type #name #generics = #target;
         #public_alias
+    }
+}
+
+/// The enum of a named union alias (see [`CodegenContext::union_alias`]):
+/// a wasm-bindgen enum with one tuple variant per arm, which crosses the
+/// ABI as the arm's value, and `From` conversions from each arm's natural
+/// Rust argument, so a parameter taking `impl Into<Alias>` accepts any of
+/// them. Its payloads and variant names are a read enum's, and where a read
+/// can tell the arms apart it is the alias's read type too, the shape arm
+/// last as its `fallback`.
+///
+/// Under per-monomorphization the alias's name is a trait instead, which
+/// each arm's argument types implement, so an argument taking `impl Alias`
+/// crosses the ABI as the arm's own type; the enum is `<Alias>Kind` and
+/// implements the trait too, so a read can be passed straight back.
+fn generate_union_alias_enum(
+    name: &syn::Ident,
+    union: &typemap::UnionAlias,
+    cgctx: &CodegenContext,
+    from_module: &crate::ir::ModuleContext,
+) -> TokenStream {
+    use crate::ir::TypeRef;
+    let enum_name = union
+        .kind
+        .as_deref()
+        .map_or_else(|| name.clone(), typemap::make_ident);
+    // A handle converts by value and by reference (a clone of the handle).
+    let handle = |ty: &TokenStream| {
+        vec![
+            (ty.clone(), quote! { value }),
+            (quote! { &#ty }, quote! { value.clone() }),
+        ]
+    };
+    let mut arms: Vec<&TypeRef> = Vec::new();
+    let mut payloads: Vec<TokenStream> = Vec::new();
+    let mut sources: Vec<Vec<(TokenStream, TokenStream)>> = Vec::new();
+    let mut arguments: Vec<TokenStream> = Vec::new();
+    for arm in &union.arms {
+        let payload = typemap::to_syn_type(
+            arm,
+            typemap::TypePosition::RETURN,
+            Some(cgctx),
+            union.scope,
+            from_module,
+        );
+        // Two arms lowering alike are one variant.
+        if payloads
+            .iter()
+            .any(|p| p.to_string() == payload.to_string())
+        {
+            continue;
+        }
+        // Each source type with the expression turning `value` into the
+        // payload, and the argument types the trait takes for the arm.
+        let (from, args) = match arm {
+            TypeRef::String => {
+                let string = quote! { ::std::string::String };
+                let js = quote! { ::js_sys::JsString };
+                (
+                    vec![
+                        (quote! { &str }, quote! { #string::from(value) }),
+                        (string.clone(), quote! { value }),
+                        (quote! { &#string }, quote! { value.clone() }),
+                        (js.clone(), quote! { #string::from(value) }),
+                        (quote! { &#js }, quote! { #string::from(value) }),
+                    ],
+                    // As `JsStringLike` takes.
+                    vec![
+                        quote! { &str },
+                        string.clone(),
+                        quote! { &#string },
+                        quote! { &::std::boxed::Box<str> },
+                        quote! { &::std::borrow::Cow<'_, str> },
+                        js.clone(),
+                        quote! { &#js },
+                    ],
+                )
+            }
+            TypeRef::Number | TypeRef::Boolean => (
+                vec![(payload.clone(), quote! { value })],
+                vec![payload.clone()],
+            ),
+            _ => (
+                handle(&payload),
+                vec![payload.clone(), quote! { &#payload }],
+            ),
+        };
+        arms.push(arm);
+        payloads.push(payload);
+        sources.push(from);
+        for arg in args {
+            if !arguments.iter().any(|a| a.to_string() == arg.to_string()) {
+                arguments.push(arg);
+            }
+        }
+    }
+    let arms: Vec<TypeRef> = arms.into_iter().cloned().collect();
+    let mut variants = Vec::new();
+    let mut conversions = Vec::new();
+    let mut expected = Vec::new();
+    for (((variant_name, payload), from), arm) in dynamic_union_variant_names(&arms)
+        .into_iter()
+        .zip(&payloads)
+        .zip(sources)
+        .zip(&arms)
+    {
+        expected.push(match arm {
+            TypeRef::String => "string".to_string(),
+            TypeRef::Number => "number".to_string(),
+            TypeRef::Boolean => "boolean".to_string(),
+            // The arm's own type name, which the impl is for and a user can
+            // search for, rather than the PascalCased variant name.
+            _ => {
+                let path = payload.to_string().replace(' ', "");
+                path.rsplit("::").next().unwrap_or(&path).to_string()
+            }
+        });
+        let variant = typemap::make_ident(&variant_name);
+        variants.push(quote! { #variant(#payload) });
+        for (source, expr) in from {
+            conversions.push(quote! {
+                impl ::core::convert::From<#source> for #enum_name {
+                    fn from(value: #source) -> Self {
+                        Self::#variant(#expr)
+                    }
+                }
+            });
+        }
+    }
+    let fallback = union.fallback.then(|| quote! { , fallback });
+    let item = quote! {
+        #[wasm_bindgen(private #fallback)]
+        #[derive(Clone, Debug)]
+        pub enum #enum_name {
+            #(#variants),*
+        }
+        #(#conversions)*
+    };
+    if union.kind.is_none() {
+        return item;
+    }
+    // rustc lists only a few implementors, and a string arm alone brings
+    // seven, so the error names the alias's arms instead.
+    let message = format!("`{{Self}}` is not a `{name}`");
+    let label = match expected.split_last() {
+        Some((last, [])) => format!("expected {last}"),
+        Some((last, rest)) => format!("expected {} or {last}", rest.join(", ")),
+        None => String::new(),
+    };
+    quote! {
+        #[diagnostic::on_unimplemented(message = #message, label = #label)]
+        pub trait #name: ::wasm_bindgen::convert::IntoWasmAbi {}
+        #(impl #name for #arguments {})*
+        impl #name for #enum_name {}
+        #item
     }
 }
 

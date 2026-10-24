@@ -5,8 +5,8 @@
 use js_sys::{BigInt, JsString, Symbol};
 
 use ts_gen_integration_tests::primitive_unions_mono::{
-    has_key, has_key_explicit_with_symbol, has_key_with_f64, lookup, lookup_with_f64, send,
-    send_with_f64, send_with_str, set_any, set_any_with_bool, set_any_with_f64, set_any_with_str,
+    has_key, has_key_explicit_with_symbol, has_key_with_f64, lookup, send, send_with_f64,
+    send_with_str, set_any, set_any_with_bool, set_any_with_f64, set_any_with_str,
     set_any_with_symbol, set_flag, set_flag_with_big_int, set_keyed, set_keyed_with_symbol,
     set_level, set_level_with_str, set_maybe, set_maybe_with_f64, set_maybe_with_str, set_nullable,
     set_nullable_with_f64, set_nullable_with_null, set_value, set_value_with_f64, LevelKind,
@@ -47,7 +47,7 @@ fn primitive_union_signatures_compile(js_string: &JsString, symbol: &Symbol, big
     set_maybe_with_str("value");
     set_maybe_with_f64(1.0);
     lookup("id");
-    lookup_with_f64(7.0);
+    lookup(7.0);
 
     let _: bool = has_key("key");
     let _: bool = has_key_with_f64(0.0);

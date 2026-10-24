@@ -16,6 +16,42 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "set")]
     pub fn try_set<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, value: &T) -> Result<(), JsValue>;
 }
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Loose {
+    F64(f64),
+    String(String),
+}
+impl ::core::convert::From<f64> for Loose {
+    fn from(value: f64) -> Self {
+        Self::F64(value)
+    }
+}
+impl ::core::convert::From<&str> for Loose {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for Loose {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for Loose {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for Loose {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for Loose {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
 #[wasm_bindgen(module = "generic-defaults")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

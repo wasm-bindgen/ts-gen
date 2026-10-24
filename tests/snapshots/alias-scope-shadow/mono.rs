@@ -57,6 +57,168 @@ impl Inner {
 pub type TopX = Pair<Inner, Inner>;
 #[allow(dead_code)]
 pub type TopAll<T = Inner> = Pair<T, T>;
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `InnerOrName`",
+    label = "expected string or Inner"
+)]
+pub trait InnerOrName: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl InnerOrName for &str {}
+impl InnerOrName for ::std::string::String {}
+impl InnerOrName for &::std::string::String {}
+impl InnerOrName for &::std::boxed::Box<str> {}
+impl InnerOrName for &::std::borrow::Cow<'_, str> {}
+impl InnerOrName for ::js_sys::JsString {}
+impl InnerOrName for &::js_sys::JsString {}
+impl InnerOrName for Inner {}
+impl InnerOrName for &Inner {}
+impl InnerOrName for InnerOrNameKind {}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum InnerOrNameKind {
+    String(String),
+    Inner(Inner),
+}
+impl ::core::convert::From<&str> for InnerOrNameKind {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for InnerOrNameKind {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for InnerOrNameKind {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for InnerOrNameKind {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for InnerOrNameKind {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<Inner> for InnerOrNameKind {
+    fn from(value: Inner) -> Self {
+        Self::Inner(value)
+    }
+}
+impl ::core::convert::From<&Inner> for InnerOrNameKind {
+    fn from(value: &Inner) -> Self {
+        Self::Inner(value.clone())
+    }
+}
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Chained`",
+    label = "expected string or Inner"
+)]
+pub trait Chained: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Chained for &str {}
+impl Chained for ::std::string::String {}
+impl Chained for &::std::string::String {}
+impl Chained for &::std::boxed::Box<str> {}
+impl Chained for &::std::borrow::Cow<'_, str> {}
+impl Chained for ::js_sys::JsString {}
+impl Chained for &::js_sys::JsString {}
+impl Chained for Inner {}
+impl Chained for &Inner {}
+impl Chained for ChainedKind {}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum ChainedKind {
+    String(String),
+    Inner(Inner),
+}
+impl ::core::convert::From<&str> for ChainedKind {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for ChainedKind {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for ChainedKind {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for ChainedKind {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for ChainedKind {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<Inner> for ChainedKind {
+    fn from(value: Inner) -> Self {
+        Self::Inner(value)
+    }
+}
+impl ::core::convert::From<&Inner> for ChainedKind {
+    fn from(value: &Inner) -> Self {
+        Self::Inner(value.clone())
+    }
+}
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Names`",
+    label = "expected string or number"
+)]
+pub trait Names: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Names for &str {}
+impl Names for ::std::string::String {}
+impl Names for &::std::string::String {}
+impl Names for &::std::boxed::Box<str> {}
+impl Names for &::std::borrow::Cow<'_, str> {}
+impl Names for ::js_sys::JsString {}
+impl Names for &::js_sys::JsString {}
+impl Names for f64 {}
+impl Names for NamesKind {}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum NamesKind {
+    String(String),
+    F64(f64),
+}
+impl ::core::convert::From<&str> for NamesKind {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for NamesKind {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for NamesKind {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for NamesKind {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for NamesKind {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<f64> for NamesKind {
+    fn from(value: f64) -> Self {
+        Self::F64(value)
+    }
+}
 pub mod shadow {
     #[allow(unused_imports)]
     use super::*;
@@ -96,17 +258,15 @@ pub mod shadow {
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "Shadow")]
-        pub fn either(a: &JsValue, b: &JsValue) -> Result<JsValue, JsValue>;
+        pub fn either(
+            a: impl super::InnerOrName,
+            b: impl super::Chained,
+        ) -> Result<super::InnerOrNameKind, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "Shadow")]
-        pub fn name(n: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "name", js_namespace = "Shadow")]
-        pub fn name_with_f64(n: f64) -> Result<(), JsValue>;
+        pub fn name(n: impl super::Names) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {

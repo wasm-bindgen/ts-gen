@@ -6,7 +6,12 @@
 //! The signature emitters render such a parameter as a placeholder type
 //! (see [`marker`]); this pass runs on the finished `syn::File`, rewrites
 //! each extern fn carrying one and emits its wrapper beside the block.
+//!
+//! A parameter taking a named union alias whole, `impl Into<Alias>` (see
+//! [`into_target`]), is wrapped the same way: the extern binds the alias's
+//! enum by value and the wrapper converts.
 
+use super::inline_wrappers::{bind_into_targets, into_target};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, ToTokens};
 use syn::ext::IdentExt;
@@ -30,7 +35,8 @@ pub(crate) fn is_marker(ty: &Type) -> bool {
     }
 }
 
-/// Rewrite every extern fn with a `null` arm, emitting its wrapper.
+/// Rewrite every extern fn with a `null` arm or a union alias argument,
+/// emitting its wrapper.
 pub(crate) fn apply(items: &mut Vec<Item>) {
     let mut out = Vec::with_capacity(items.len());
     for mut item in items.drain(..) {
@@ -235,7 +241,8 @@ pub(crate) fn drop_unused_params(sig: &mut syn::Signature) {
 
 fn wrap(item: &mut ForeignItemFn) -> Option<Wrapper> {
     let is_null_arm = |arg: &FnArg| matches!(arg, FnArg::Typed(pat) if is_marker(&pat.ty));
-    if !item.sig.inputs.iter().any(is_null_arm) {
+    let is_into = |arg: &FnArg| matches!(arg, FnArg::Typed(pat) if into_target(&pat.ty).is_some());
+    if !item.sig.inputs.iter().any(|a| is_null_arm(a) || is_into(a)) {
         return None;
     }
     let (attr_idx, binding) = read_binding(item);
@@ -250,6 +257,10 @@ fn wrap(item: &mut ForeignItemFn) -> Option<Wrapper> {
         .skip(skip)
         .map(|arg| match arg {
             FnArg::Typed(pat) if is_marker(&pat.ty) => quote! { &::wasm_bindgen::JsValue::NULL },
+            FnArg::Typed(pat) if into_target(&pat.ty).is_some() => {
+                let name = pat.pat.to_token_stream();
+                quote! { #name.into() }
+            }
             FnArg::Typed(pat) => match &*pat.pat {
                 Pat::Ident(id) => id.ident.to_token_stream(),
                 other => other.to_token_stream(),
@@ -274,8 +285,9 @@ fn wrap(item: &mut ForeignItemFn) -> Option<Wrapper> {
         .collect();
     drop_unused_params(&mut public_sig);
 
-    // Extern binding: `&JsValue`, private name, explicit JS name since
-    // wasm-bindgen would otherwise infer it from the new ident.
+    // Extern binding: `&JsValue` for `null`, the enum for a union
+    // alias, private name, explicit JS name since wasm-bindgen would
+    // otherwise infer it from the new ident.
     for arg in item.sig.inputs.iter_mut() {
         if let FnArg::Typed(pat) = arg {
             if is_marker(&pat.ty) {
@@ -283,6 +295,7 @@ fn wrap(item: &mut ForeignItemFn) -> Option<Wrapper> {
             }
         }
     }
+    bind_into_targets(&mut item.sig);
     item.sig.generics = public_sig.generics.clone();
     item.sig.ident = extern_name.clone();
     item.vis = syn::Visibility::Inherited;
@@ -427,5 +440,34 @@ mod tests {
         assert!(out.contains("impl<T> Holder<T> {"));
         assert!(out.contains("pub fn new_with_null() -> Result<Holder<T>, JsValue> {"));
         assert!(!out.contains(MARKER));
+    }
+
+    #[test]
+    fn union_alias_arguments_bind_the_enum_and_wrap_with_into() {
+        let out = run("#[wasm_bindgen] extern \"C\" {
+                pub type Day;
+                #[wasm_bindgen(static_method_of = Day, js_name = \"compare\")]
+                pub fn compare(one: impl ::core::convert::Into<DayLike>, two: impl ::core::convert::Into<DayLike>) -> f64;
+                #[wasm_bindgen(method, setter, js_name = \"start\")]
+                pub fn set_start(this: &Day, val: impl ::core::convert::Into<DayLike>);
+                #[wasm_bindgen(method, js_name = \"pick\")]
+                pub async fn pick(this: &Day, other: impl ::core::convert::Into<DayLike>, n: f64) -> JsValue;
+            }");
+        assert!(
+            out.contains("fn __compare(one: DayLike, two: DayLike) -> f64;"),
+            "{out}"
+        );
+        assert!(
+            out.contains("Self::__compare(one.into(), two.into())"),
+            "{out}"
+        );
+        assert!(
+            out.contains("fn __set_start(this: &Day, val: DayLike);"),
+            "{out}"
+        );
+        assert!(out.contains(
+            "pub fn set_start(&self, val: impl ::core::convert::Into<DayLike>) {\n        self.__set_start(val.into())"
+        ), "{out}");
+        assert!(out.contains("self.__pick(other.into(), n).await"), "{out}");
     }
 }

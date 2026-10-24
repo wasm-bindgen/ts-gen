@@ -960,7 +960,11 @@ pub fn build_signatures(
     // one: `f(x: T | null)` beside `f(kind: "a" | "b", x: T | null)`
     // would otherwise bind `__f_with_null` twice.
     for sig in &out {
-        if sig.literal.is_none() && sig.params.iter().any(|p| p.type_ref == TypeRef::Null) {
+        let wrapped = sig.params.iter().any(|p| {
+            p.type_ref == TypeRef::Null
+                || cgctx.is_some_and(|c| takes_union_alias(p, c, sig.body_scope))
+        });
+        if sig.literal.is_none() && wrapped {
             names.claim(format!("__{}", sig.rust_name));
         }
     }
@@ -993,6 +997,17 @@ pub(crate) fn join_suffix(base: &str, suffix: &str) -> String {
         Some(rest) if base == "with" || base.ends_with("_with") => format!("{base}_and_{rest}"),
         _ => format!("{base}{suffix}"),
     }
+}
+
+/// Whether `param` takes a named union alias whole, as `impl Into<Alias>`,
+/// which an inline wrapper converts (see [`super::null_arms`]). Under
+/// per-monomorphization the extern takes the alias's trait itself.
+fn takes_union_alias(param: &ConcreteParam, cgctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    !param.variadic
+        && param.type_ref.split_empties().is_none()
+        && cgctx
+            .union_alias(&param.type_ref, scope)
+            .is_some_and(|alias| alias.kind.is_none())
 }
 
 fn push_with_js_string_return(
@@ -1290,7 +1305,7 @@ const CARTESIAN_PRODUCT_LIMIT: usize = 64;
 /// the rendered argument types differ (`impl JsStringLike` for `&str`).
 fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> Vec<TypeRef> {
     let mut out: Vec<TypeRef> = Vec::new();
-    if flatten_into(ty, cgctx, scope, &mut out) {
+    if flatten_into(ty, cgctx, scope, true, &mut out) {
         pair_typed_array_slice(&mut out, cgctx, scope);
         return split_null_arm(out);
     }
@@ -1304,6 +1319,19 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
         ));
     }
     split_null_arm(vec![flatten_collapse_to_lub(ty, cgctx, scope)])
+}
+
+/// The alternatives a union alias's target fans out into, nested union
+/// aliases included, each with the empties it admits; `None` above
+/// [`FLATTEN_ALTERNATIVE_LIMIT`]. [`CodegenContext::union_alias`] builds
+/// the alias's enum from these.
+pub(crate) fn union_alias_alternatives(
+    target: &TypeRef,
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> Option<Vec<TypeRef>> {
+    let mut out = Vec::new();
+    flatten_into(target, Some(cgctx), scope, false, &mut out).then_some(out)
 }
 
 /// A written `null` is an ordinary union arm: each alternative is taken
@@ -1415,10 +1443,20 @@ fn flatten_into(
     ty: &TypeRef,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
+    whole_aliases: bool,
     out: &mut Vec<TypeRef>,
 ) -> bool {
     if out.len() > FLATTEN_ALTERNATIVE_LIMIT {
         return false;
+    }
+    // A named union alias is one alternative, its enum, rather than
+    // one per arm. Its empties stay beside it, so `null` still gets an arm
+    // of its own and `undefined` still omits.
+    if whole_aliases {
+        if let Some(alias) = cgctx.and_then(|c| c.union_alias(ty, scope)) {
+            out.push(alias.admitting(ty));
+            return true;
+        }
     }
     match ty {
         // A union admitting empties fans out the rest and keeps the empties
@@ -1427,7 +1465,7 @@ fn flatten_into(
         // (through an alias) merges them in.
         TypeRef::Union(_) if let Some((core, n)) = ty.split_empties() => {
             let mut alts = Vec::new();
-            if !flatten_into(&core, cgctx, scope, &mut alts) {
+            if !flatten_into(&core, cgctx, scope, whole_aliases, &mut alts) {
                 return false;
             }
             out.extend(alts.into_iter().map(|alt| alt.with_empties(n)));
@@ -1439,7 +1477,7 @@ fn flatten_into(
         // members beyond the cap.
         TypeRef::Union(u) => {
             for m in u.members() {
-                if !flatten_into(m, cgctx, scope, out) {
+                if !flatten_into(m, cgctx, scope, whole_aliases, out) {
                     return false;
                 }
             }
@@ -1461,7 +1499,7 @@ fn flatten_into(
             if let Some(c) = cgctx {
                 if let Some((target, alias_scope)) = c.resolve_alias(&segments.join("."), scope) {
                     let start = out.len();
-                    if !flatten_into(&target, cgctx, alias_scope, out) {
+                    if !flatten_into(&target, cgctx, alias_scope, whole_aliases, out) {
                         return false;
                     }
                     if !out[start..]
@@ -1483,7 +1521,7 @@ fn flatten_into(
         TypeRef::Reference { .. } => {
             if let Some(c) = cgctx {
                 if let Some(target) = c.resolve_alias_instance(ty, scope) {
-                    return flatten_into(&target, cgctx, scope, out);
+                    return flatten_into(&target, cgctx, scope, whole_aliases, out);
                 }
             }
             out.push(ty.clone());
@@ -1495,6 +1533,7 @@ fn flatten_into(
             &TypeRef::union(TypeRef::property_key_members()),
             cgctx,
             scope,
+            whole_aliases,
             out,
         ),
 
@@ -1522,6 +1561,10 @@ fn flatten_collapse_to_lub(
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> TypeRef {
+    // A named union alias already is one alternative.
+    if let Some(alias) = cgctx.and_then(|c| c.union_alias(ty, scope)) {
+        return alias.admitting(ty);
+    }
     match ty {
         TypeRef::Union(_) if let Some((core, n)) = ty.split_empties() => {
             flatten_collapse_to_lub(&core, cgctx, scope).with_empties(n)
@@ -2112,6 +2155,11 @@ pub(crate) fn render_param_type(
     }
     if matches!(param.type_ref, TypeRef::Null) {
         return super::null_arms::marker();
+    }
+    if let Some(ty) =
+        cgctx.and_then(|ctx| typemap::union_alias_argument(&param.type_ref, ctx, scope))
+    {
+        return ty;
     }
     mono.and_then(|ctx| {
         mono_argument_type(&param.type_ref).or_else(|| {
@@ -4779,7 +4827,10 @@ mod tests {
         let cgctx = CodegenContext::from_module(&module, &gctx);
         let file = module.file_scopes[0];
         let shadow = gctx.scopes.resolve_namespace(file, "Shadow").unwrap();
-        let flat = |name: &str, scope| flatten_type(&TypeRef::ident(name), Some(&cgctx), scope);
+        // Fanning out through every alias, as a union alias's own arms do.
+        let flat = |name: &str, scope| {
+            union_alias_alternatives(&TypeRef::ident(name), &cgctx, scope).unwrap()
+        };
         assert_eq!(
             flat("InnerOrName", file),
             vec![TypeRef::ident("Inner"), TypeRef::String]
@@ -4793,6 +4844,57 @@ mod tests {
             flat("InnerOrName", shadow),
             vec![TypeRef::ident("InnerOrName")]
         );
+    }
+
+    #[test]
+    fn named_union_aliases_stay_whole_as_arguments() {
+        let src = r#"
+            interface Day { n: number; }
+            interface Week { n: number; }
+            type DayLike = Day | Week | string;
+            type MaybeDay = DayLike | null | undefined;
+            type Only = Day;
+            type Kind = "a" | "b";
+            type Loose<T> = T | string;
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let cgctx = CodegenContext::from_module(&module, &gctx);
+        let file = module.file_scopes[0];
+        let flat = |ty: TypeRef| flatten_type(&ty, Some(&cgctx), file);
+        let day_like = TypeRef::ident("DayLike");
+        assert_eq!(flat(day_like.clone()), vec![day_like.clone()]);
+        // An alias of a union alias is one of its own; its empties keep
+        // their arms: `null` its own, `undefined` beside the enum.
+        assert_eq!(
+            flat(TypeRef::ident("MaybeDay")),
+            vec![
+                TypeRef::ident("MaybeDay").with_empties(Nullability::Undefined),
+                TypeRef::Null
+            ]
+        );
+        let alias = cgctx
+            .union_alias(&TypeRef::ident("MaybeDay"), file)
+            .unwrap();
+        assert_eq!(
+            alias.arms,
+            vec![
+                TypeRef::ident("Day"),
+                TypeRef::ident("Week"),
+                TypeRef::String
+            ]
+        );
+        assert_eq!(alias.nullability, Some(Nullability::Both));
+        // An anonymous union, a single-arm alias, a literal-only union and
+        // a generic alias still fan out.
+        assert_eq!(
+            flat(TypeRef::union([day_like.clone(), TypeRef::Number])),
+            vec![day_like, TypeRef::Number]
+        );
+        assert_eq!(flat(TypeRef::ident("Only")), vec![TypeRef::ident("Day")]);
+        assert!(cgctx.union_alias(&TypeRef::ident("Kind"), file).is_none());
+        assert!(cgctx
+            .union_alias(&TypeRef::generic("Loose", vec![TypeRef::Number]), file)
+            .is_none());
     }
 
     #[test]

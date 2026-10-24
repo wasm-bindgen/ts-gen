@@ -31,43 +31,206 @@ pub enum Priority {
     Normal = 0i32,
     High = 1i32,
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `StringOrNumber`",
+    label = "expected string or number"
+)]
+pub trait StringOrNumber: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl StringOrNumber for &str {}
+impl StringOrNumber for ::std::string::String {}
+impl StringOrNumber for &::std::string::String {}
+impl StringOrNumber for &::std::boxed::Box<str> {}
+impl StringOrNumber for &::std::borrow::Cow<'_, str> {}
+impl StringOrNumber for ::js_sys::JsString {}
+impl StringOrNumber for &::js_sys::JsString {}
+impl StringOrNumber for f64 {}
+impl StringOrNumber for StringOrNumberKind {}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum StringOrNumberKind {
+    String(String),
+    F64(f64),
+}
+impl ::core::convert::From<&str> for StringOrNumberKind {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for StringOrNumberKind {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for StringOrNumberKind {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for StringOrNumberKind {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for StringOrNumberKind {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<f64> for StringOrNumberKind {
+    fn from(value: f64) -> Self {
+        Self::F64(value)
+    }
+}
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `BodyInit`",
+    label = "expected ReadableStream, string, ArrayBuffer or Blob"
+)]
+pub trait BodyInit: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl BodyInit for ReadableStream {}
+impl BodyInit for &ReadableStream {}
+impl BodyInit for &str {}
+impl BodyInit for ::std::string::String {}
+impl BodyInit for &::std::string::String {}
+impl BodyInit for &::std::boxed::Box<str> {}
+impl BodyInit for &::std::borrow::Cow<'_, str> {}
+impl BodyInit for ::js_sys::JsString {}
+impl BodyInit for &::js_sys::JsString {}
+impl BodyInit for ArrayBuffer {}
+impl BodyInit for &ArrayBuffer {}
+impl BodyInit for Blob {}
+impl BodyInit for &Blob {}
+impl BodyInit for BodyInitKind {}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum BodyInitKind {
+    ReadableStream(ReadableStream),
+    String(String),
+    ArrayBuffer(ArrayBuffer),
+    Blob(Blob),
+}
+impl ::core::convert::From<ReadableStream> for BodyInitKind {
+    fn from(value: ReadableStream) -> Self {
+        Self::ReadableStream(value)
+    }
+}
+impl ::core::convert::From<&ReadableStream> for BodyInitKind {
+    fn from(value: &ReadableStream) -> Self {
+        Self::ReadableStream(value.clone())
+    }
+}
+impl ::core::convert::From<&str> for BodyInitKind {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for BodyInitKind {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for BodyInitKind {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for BodyInitKind {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for BodyInitKind {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<ArrayBuffer> for BodyInitKind {
+    fn from(value: ArrayBuffer) -> Self {
+        Self::ArrayBuffer(value)
+    }
+}
+impl ::core::convert::From<&ArrayBuffer> for BodyInitKind {
+    fn from(value: &ArrayBuffer) -> Self {
+        Self::ArrayBuffer(value.clone())
+    }
+}
+impl ::core::convert::From<Blob> for BodyInitKind {
+    fn from(value: Blob) -> Self {
+        Self::Blob(value)
+    }
+}
+impl ::core::convert::From<&Blob> for BodyInitKind {
+    fn from(value: &Blob) -> Self {
+        Self::Blob(value.clone())
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn send(body: &ReadableStream) -> Result<(), JsValue>;
+    pub fn send(body: impl BodyInit) -> Result<(), JsValue>;
 }
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "send")]
-    pub fn send_with_str(body: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `RequestInfo`",
+    label = "expected string or Request"
+)]
+pub trait RequestInfo: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl RequestInfo for &str {}
+impl RequestInfo for ::std::string::String {}
+impl RequestInfo for &::std::string::String {}
+impl RequestInfo for &::std::boxed::Box<str> {}
+impl RequestInfo for &::std::borrow::Cow<'_, str> {}
+impl RequestInfo for ::js_sys::JsString {}
+impl RequestInfo for &::js_sys::JsString {}
+impl RequestInfo for Request {}
+impl RequestInfo for &Request {}
+impl RequestInfo for RequestInfoKind {}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum RequestInfoKind {
+    String(String),
+    Request(Request),
 }
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "send")]
-    pub fn send_with_array_buffer(body: &ArrayBuffer) -> Result<(), JsValue>;
+impl ::core::convert::From<&str> for RequestInfoKind {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
 }
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "send")]
-    pub fn send_with_blob(body: &Blob) -> Result<(), JsValue>;
+impl ::core::convert::From<::std::string::String> for RequestInfoKind {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for RequestInfoKind {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for RequestInfoKind {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for RequestInfoKind {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<Request> for RequestInfoKind {
+    fn from(value: Request) -> Self {
+        Self::Request(value)
+    }
+}
+impl ::core::convert::From<&Request> for RequestInfoKind {
+    fn from(value: &Request) -> Self {
+        Self::Request(value.clone())
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub async fn fetch(input: impl ::wasm_bindgen::JsStringLike) -> Result<Response, JsValue>;
+    pub async fn fetch(input: impl RequestInfo) -> Result<Response, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "fetch")]
-    pub fn fetch_promise(input: impl ::wasm_bindgen::JsStringLike) -> Promise<Response>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetch")]
-    pub async fn fetch_with_request(input: &Request) -> Result<Response, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "fetch")]
-    pub fn fetch_with_request_promise(input: &Request) -> Promise<Response>;
+    pub fn fetch_promise(input: impl RequestInfo) -> Promise<Response>;
 }

@@ -200,24 +200,57 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "setMaybe")]
     pub fn try_set_maybe_with_f64(value: f64) -> Result<(), JsValue>;
 }
-#[wasm_bindgen(module = "primitive-unions-mono")]
-extern "C" {
-    pub fn lookup(id: &str);
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Id {
+    String(String),
+    F64(f64),
 }
-#[wasm_bindgen(module = "primitive-unions-mono")]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "lookup")]
-    pub fn try_lookup(id: &str) -> Result<(), JsValue>;
+impl ::core::convert::From<&str> for Id {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for Id {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for Id {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for Id {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for Id {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<f64> for Id {
+    fn from(value: f64) -> Self {
+        Self::F64(value)
+    }
 }
 #[wasm_bindgen(module = "primitive-unions-mono")]
 extern "C" {
     #[wasm_bindgen(js_name = "lookup")]
-    pub fn lookup_with_f64(id: f64);
+    fn __lookup(id: Id);
+}
+pub fn lookup(id: impl ::core::convert::Into<Id>) {
+    __lookup(id.into())
 }
 #[wasm_bindgen(module = "primitive-unions-mono")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "lookup")]
-    pub fn try_lookup_with_f64(id: f64) -> Result<(), JsValue>;
+    fn __try_lookup(id: Id) -> Result<(), JsValue>;
+}
+pub fn try_lookup(id: impl ::core::convert::Into<Id>) -> Result<(), JsValue> {
+    __try_lookup(id.into())
 }
 #[wasm_bindgen(module = "primitive-unions-mono")]
 extern "C" {
