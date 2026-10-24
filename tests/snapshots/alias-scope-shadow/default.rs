@@ -53,6 +53,124 @@ impl Inner {
 pub type TopX = Pair<Inner, Inner>;
 #[allow(dead_code)]
 pub type TopAll<T = Inner> = Pair<T, T>;
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum InnerOrName {
+    String(String),
+    Inner(Inner),
+}
+impl ::core::convert::From<&str> for InnerOrName {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for InnerOrName {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for InnerOrName {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for InnerOrName {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for InnerOrName {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<Inner> for InnerOrName {
+    fn from(value: Inner) -> Self {
+        Self::Inner(value)
+    }
+}
+impl ::core::convert::From<&Inner> for InnerOrName {
+    fn from(value: &Inner) -> Self {
+        Self::Inner(value.clone())
+    }
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum Chained {
+    String(String),
+    Inner(Inner),
+}
+impl ::core::convert::From<&str> for Chained {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for Chained {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for Chained {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for Chained {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for Chained {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<Inner> for Chained {
+    fn from(value: Inner) -> Self {
+        Self::Inner(value)
+    }
+}
+impl ::core::convert::From<&Inner> for Chained {
+    fn from(value: &Inner) -> Self {
+        Self::Inner(value.clone())
+    }
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Names {
+    String(String),
+    F64(f64),
+}
+impl ::core::convert::From<&str> for Names {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for Names {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for Names {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for Names {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for Names {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<f64> for Names {
+    fn from(value: f64) -> Self {
+        Self::F64(value)
+    }
+}
 pub mod shadow {
     #[allow(unused_imports)]
     use super::*;
@@ -107,33 +225,44 @@ pub mod shadow {
     }
     #[wasm_bindgen]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Shadow")]
-        pub fn either(a: &JsValue, b: &JsValue) -> JsValue;
+        #[wasm_bindgen(js_namespace = "Shadow", js_name = "either")]
+        fn __either(a: super::InnerOrName, b: super::Chained) -> super::InnerOrName;
+    }
+    pub fn either(
+        a: impl ::core::convert::Into<super::InnerOrName>,
+        b: impl ::core::convert::Into<super::Chained>,
+    ) -> super::InnerOrName {
+        __either(a.into(), b.into())
     }
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "either", js_namespace = "Shadow")]
-        pub fn try_either(a: &JsValue, b: &JsValue) -> Result<JsValue, JsValue>;
+        fn __try_either(
+            a: super::InnerOrName,
+            b: super::Chained,
+        ) -> Result<super::InnerOrName, JsValue>;
+    }
+    pub fn try_either(
+        a: impl ::core::convert::Into<super::InnerOrName>,
+        b: impl ::core::convert::Into<super::Chained>,
+    ) -> Result<super::InnerOrName, JsValue> {
+        __try_either(a.into(), b.into())
     }
     #[wasm_bindgen]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Shadow")]
-        pub fn name(n: &str);
+        #[wasm_bindgen(js_namespace = "Shadow", js_name = "name")]
+        fn __name(n: super::Names);
+    }
+    pub fn name(n: impl ::core::convert::Into<super::Names>) {
+        __name(n.into())
     }
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "name", js_namespace = "Shadow")]
-        pub fn try_name(n: &str) -> Result<(), JsValue>;
+        fn __try_name(n: super::Names) -> Result<(), JsValue>;
     }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(js_name = "name", js_namespace = "Shadow")]
-        pub fn name_with_f64(n: f64);
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "name", js_namespace = "Shadow")]
-        pub fn try_name_with_f64(n: f64) -> Result<(), JsValue>;
+    pub fn try_name(n: impl ::core::convert::Into<super::Names>) -> Result<(), JsValue> {
+        __try_name(n.into())
     }
     #[wasm_bindgen]
     extern "C" {

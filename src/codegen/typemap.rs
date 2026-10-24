@@ -260,6 +260,37 @@ pub struct CodegenContext<'a> {
     /// against them: the scope declaring the parameters, and each one's
     /// argument tokens. Innermost last.
     param_args: RefCell<Vec<(ScopeId, HashMap<String, TokenStream>)>>,
+    /// [`Self::union_alias_of`], by the address of the alias declaration.
+    union_aliases: RefCell<HashMap<usize, Option<std::rc::Rc<UnionAlias>>>>,
+}
+
+/// A named union alias that an argument takes whole, as one enum of its
+/// value arms (see [`CodegenContext::union_alias`]).
+#[derive(Debug)]
+pub(crate) struct UnionAlias {
+    /// The value arms, nested aliases flattened, the empties removed and
+    /// each arm once. In dispatch order when [`Self::readable`] (the shape
+    /// arm last), source order otherwise.
+    pub arms: Vec<TypeRef>,
+    /// The empties the alias admits besides its arms.
+    pub nullability: Option<ir::Nullability>,
+    /// The alias's body scope, where the arms resolve.
+    pub scope: ScopeId,
+    /// Whether a read can tell the arms apart (see [`discriminable_arms`]),
+    /// so the enum is the alias's read type as well as its write type.
+    pub readable: bool,
+    /// Whether the last arm is the shape arm, the read's fallback.
+    pub fallback: bool,
+}
+
+impl UnionAlias {
+    /// `reference`, the alias, admitting the empties the alias does.
+    pub(crate) fn admitting(&self, reference: &TypeRef) -> TypeRef {
+        match self.nullability {
+            Some(n) => reference.clone().with_empties(n),
+            None => reference.clone(),
+        }
+    }
 }
 
 /// How a local generic alias's type parameters carry over to the Rust
@@ -1054,6 +1085,7 @@ impl<'a> CodegenContext<'a> {
             recursive_aliases: RefCell::new(HashMap::new()),
             trimming: RefCell::new(HashSet::new()),
             param_args: RefCell::new(Vec::new()),
+            union_aliases: RefCell::new(HashMap::new()),
         };
         for (spec, scopes) in &gctx.ambient_module_scopes {
             let path = ctx.specifier_path(spec);
@@ -1099,6 +1131,7 @@ impl<'a> CodegenContext<'a> {
             recursive_aliases: RefCell::new(HashMap::new()),
             trimming: RefCell::new(HashSet::new()),
             param_args: RefCell::new(Vec::new()),
+            union_aliases: RefCell::new(HashMap::new()),
         }
     }
 
@@ -1291,6 +1324,149 @@ impl<'a> CodegenContext<'a> {
             | TypeRef::Mapped(_)
             | TypeRef::ObjectLiteral(_)
             | TypeRef::Unresolved(_) => true,
+        }
+    }
+
+    /// The named union alias `ty` refers to, when an argument of that type
+    /// takes it whole as its enum rather than fanning out per arm.
+    /// Only a local, non-generic alias whose target is a union of two or
+    /// more value arms qualifies, each arm a primitive or a class or
+    /// interface without type parameters; see [`Self::union_alias_of`].
+    pub(crate) fn union_alias(
+        &self,
+        ty: &ir::TypeRef,
+        scope: ScopeId,
+    ) -> Option<std::rc::Rc<UnionAlias>> {
+        let ir::TypeRef::Reference {
+            segments,
+            generic_args,
+        } = ty
+        else {
+            return None;
+        };
+        if !generic_args.is_empty() {
+            return None;
+        }
+        if let [name] = segments.as_slice() {
+            if matches!(
+                self.gctx.scopes.resolve_binding(scope, name),
+                Some(crate::parse::scope::Binding::TypeParam)
+            ) {
+                return None;
+            }
+        }
+        let id = self.gctx.resolve_path(scope, &segments.join("."))?;
+        if !self.local_type_ids.contains(&id) || self.is_recursive_alias(id) {
+            return None;
+        }
+        let TypeKind::TypeAlias(alias) = &self.gctx.get_type(id).kind else {
+            return None;
+        };
+        self.union_alias_of(alias)
+    }
+
+    /// The enum of a local alias declaration, if it qualifies (see
+    /// [`Self::union_alias`]). Anonymous unions, generic aliases and
+    /// string-literal-only unions (which are enums of their own) do not.
+    pub(crate) fn union_alias_of(
+        &self,
+        alias: &ir::TypeAliasDecl,
+    ) -> Option<std::rc::Rc<UnionAlias>> {
+        let key = alias as *const ir::TypeAliasDecl as usize;
+        if let Some(hit) = self.union_aliases.borrow().get(&key) {
+            return hit.clone();
+        }
+        // Claimed first, so an alias reaching itself reads as not qualifying.
+        self.union_aliases.borrow_mut().insert(key, None);
+        let computed = self.compute_union_alias(alias).map(std::rc::Rc::new);
+        self.union_aliases
+            .borrow_mut()
+            .insert(key, computed.clone());
+        computed
+    }
+
+    fn compute_union_alias(&self, alias: &ir::TypeAliasDecl) -> Option<UnionAlias> {
+        if !alias.type_params.is_empty() || alias.from_module.is_some() {
+            return None;
+        }
+        let scope = alias.body_scope;
+        let alternatives =
+            crate::codegen::signatures::union_alias_alternatives(&alias.target, self, scope)?;
+        let mut arms: Vec<TypeRef> = Vec::new();
+        let mut nullability: Option<ir::Nullability> = None;
+        let mut admit = |n: ir::Nullability| {
+            nullability = Some(nullability.map_or(n, |m| m.with(n)));
+        };
+        for alt in alternatives {
+            let core = match alt.split_empties() {
+                Some((core, n)) => {
+                    admit(n);
+                    core
+                }
+                None => alt,
+            };
+            match core {
+                TypeRef::Null => admit(ir::Nullability::Null),
+                TypeRef::Undefined | TypeRef::Void => admit(ir::Nullability::Undefined),
+                core if !arms.contains(&core) => arms.push(core),
+                _ => {}
+            }
+        }
+        if arms.len() < 2 || !arms.iter().all(|arm| self.is_write_arm(arm, scope)) {
+            return None;
+        }
+        // A read tells the arms apart as it would the union written out,
+        // with at most one shape arm, last; several shapes, or a named
+        // upper bound the read keeps instead, leave the enum write-only.
+        let read = dynamic_union_members(&arms, Some(self), scope, &ModuleContext::Global)
+            .filter(|read| read.merged_shapes.is_empty() && !read.members.contains(&TypeRef::Any));
+        let (arms, readable, fallback) = match read {
+            Some(read) => (read.members, true, read.fallback),
+            None => (arms, false, false),
+        };
+        Some(UnionAlias {
+            arms,
+            nullability,
+            scope,
+            readable,
+            fallback,
+        })
+    }
+
+    /// Whether the enum can carry `arm` as a variant with a natural
+    /// `From` conversion: a primitive, or a named class or interface
+    /// without type parameters that this output binds.
+    fn is_write_arm(&self, arm: &ir::TypeRef, scope: ScopeId) -> bool {
+        match arm {
+            TypeRef::String
+            | TypeRef::Number
+            | TypeRef::Boolean
+            | TypeRef::BigInt
+            | TypeRef::Symbol
+            | TypeRef::Object => true,
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } if generic_args.is_empty() => {
+                let path = segments.join(".");
+                let Some(id) = self.gctx.resolve_path(scope, &path) else {
+                    return false;
+                };
+                let generic = match &self.gctx.get_type(id).kind {
+                    TypeKind::Class(c) => !c.type_params.is_empty(),
+                    TypeKind::Interface(i) => !i.type_params.is_empty(),
+                    _ => return false,
+                };
+                let bound = if self.gctx.builtin_type_ids.contains(&id) {
+                    let name = segments.last().map(String::as_str).unwrap_or_default();
+                    JS_SYS_RESERVED.contains(&name)
+                        || self.gctx.external_map.resolve_type(name).is_some()
+                } else {
+                    self.local_type_ids.contains(&id)
+                };
+                bound && !generic
+            }
+            _ => false,
         }
     }
 
@@ -2222,6 +2398,62 @@ pub(crate) fn split_empties_in(
     Some((core, n, scope))
 }
 
+/// The argument type of a parameter taking a named union alias whole (see
+/// [`CodegenContext::union_alias`]): `impl Into<Alias>`, which an inline
+/// wrapper converts for the extern taking the alias's enum by value.
+/// Where the parameter also admits `undefined` it cannot be omitted, so it
+/// takes the enum in its carrier (`Option<Alias>`), whose `None` would
+/// leave an `impl Into` nothing to infer from.
+pub(crate) fn union_alias_argument(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> Option<TokenStream> {
+    let (core, n) = match ty.split_empties() {
+        Some((core, n)) => (core, Some(n)),
+        None => (ty.clone(), None),
+    };
+    ctx.union_alias(&core, scope)?;
+    let TypeRef::Reference { segments, .. } = &core else {
+        return None;
+    };
+    let path = emit_type_name(&segments.join("."), scope, ctx);
+    Some(match n {
+        None => quote! { impl ::core::convert::Into<#path> },
+        Some(n) => nullable_carrier(path, n),
+    })
+}
+
+/// A read of a named union alias whose arms a read can tell apart: the
+/// alias's own enum (see [`CodegenContext::union_alias`]), in the carrier
+/// for the empties the use site and the alias admit.
+fn union_alias_read(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Option<TokenStream> {
+    let ctx = ctx?;
+    let (core, n) = match ty.split_empties() {
+        Some((core, n)) => (core, Some(n)),
+        None => (ty.clone(), None),
+    };
+    let alias = ctx.union_alias(&core, scope).filter(|a| a.readable)?;
+    let TypeRef::Reference { segments, .. } = &core else {
+        return None;
+    };
+    let path = emit_type_name(&segments.join("."), scope, ctx);
+    Some(
+        match n
+            .into_iter()
+            .chain(alias.nullability)
+            .reduce(|a, b| a.with(b))
+        {
+            Some(n) => nullable_carrier(path, n),
+            None => path,
+        },
+    )
+}
+
 /// The read carrier: `Option<T>` is `T | undefined`, `Nullable<T>` is
 /// `T | null`, and `Option<Nullable<T>>` admits both.
 pub(crate) fn nullable_carrier(inner: TokenStream, n: ir::Nullability) -> TokenStream {
@@ -2774,6 +3006,8 @@ pub fn to_return_type(
             ),
             None => to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module),
         }
+    } else if let Some(tokens) = union_alias_read(ty, ctx, scope) {
+        tokens
     } else {
         let read = resolve_union_aliases(ty, ctx, scope);
         match maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor) {
@@ -3124,6 +3358,9 @@ pub fn to_getter_return_type(
     from_module: &ModuleContext,
     anchor: ReturnAnchor<'_>,
 ) -> TokenStream {
+    if let Some(tokens) = union_alias_read(ty, ctx, scope) {
+        return tokens;
+    }
     let read = resolve_union_aliases(ty, ctx, scope);
     if let Some(tokens) = maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor) {
         return tokens;
@@ -5390,6 +5627,75 @@ mod tests {
             read(vec![TypeRef::ident("Foo"), TypeRef::Undefined]),
             "Option < Foo >"
         );
+    }
+
+    #[test]
+    fn union_alias_enum_reads_where_its_arms_can_be_told_apart() {
+        let src = r#"
+            declare class Day {}
+            interface DayFields { day: number; }
+            interface WeekFields { week: number; }
+            type DayLike = Day | DayFields | string;
+            type MaybeDay = DayLike | undefined;
+            type Fields = DayFields | WeekFields;
+            type Errors = TypeError | RangeError;
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let scope = *module.file_scopes.first().expect("file scope");
+        let id = TypeRef::ident;
+        let tokens = |t: TokenStream| t.to_string();
+        let anchor = ReturnAnchor {
+            base: "value",
+            kind: ReturnAnchorKind::Getter,
+            parent: None,
+        };
+        {
+            let ctx =
+                CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
+                    .unwrap();
+            let read = |ty: TypeRef| {
+                tokens(to_getter_return_type(
+                    &ty,
+                    Some(&ctx),
+                    scope,
+                    &ModuleContext::Global,
+                    anchor,
+                ))
+            };
+            let arg = |ty: TypeRef| tokens(union_alias_argument(&ty, &ctx, scope).unwrap());
+
+            // Classes and primitives, with one dictionary, last: the read's
+            // fallback.
+            let day_like = ctx.union_alias(&id("DayLike"), scope).unwrap();
+            assert_eq!(
+                day_like.arms,
+                vec![id("Day"), TypeRef::String, id("DayFields")]
+            );
+            assert!(day_like.readable && day_like.fallback);
+            let (enum_name, argument) = ("DayLike", "impl :: core :: convert :: Into < DayLike >");
+            assert_eq!(read(id("DayLike")), enum_name);
+            assert_eq!(arg(id("DayLike")), argument);
+            // The use site's empties and the alias's own take the carrier,
+            // as does an argument that can't omit `undefined`.
+            let carried = format!("Option < {enum_name} >");
+            assert_eq!(
+                read(id("DayLike").with_empties(Nullability::Undefined)),
+                carried
+            );
+            assert_eq!(read(id("MaybeDay")), carried.replace("DayLike", "MaybeDay"));
+            assert_eq!(
+                arg(id("DayLike").with_empties(Nullability::Undefined)),
+                carried
+            );
+
+            // Two dictionaries, or a named upper bound, leave the enum to
+            // the arguments, and the read resolves the alias as before.
+            let fields = ctx.union_alias(&id("Fields"), scope).unwrap();
+            assert!(!fields.readable && !fields.fallback);
+            assert_eq!(read(id("Fields")), "JsValue");
+            assert!(!ctx.union_alias(&id("Errors"), scope).unwrap().readable);
+            assert_eq!(read(id("Errors")), "Error");
+        }
     }
 
     #[test]

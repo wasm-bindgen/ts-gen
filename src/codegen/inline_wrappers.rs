@@ -11,7 +11,8 @@
 //! extern takes `&str` and the signature layer tags it (see
 //! [`literal_attr`]) with one wrapper per literal, each baking its value in.
 //! A cohort of `null` arms (`f(kind: "a" | "b", x: T | null)`) also drops
-//! the `null` parameter here, since the arm wrappers are already the public
+//! the `null` parameter here, and its union alias arguments convert here
+//! (see [`into_target`]), since the arm wrappers are already the public
 //! face of the extern.
 
 use super::null_arms;
@@ -102,6 +103,49 @@ impl syn::parse::Parse for LiteralArms {
             arms,
         })
     }
+}
+
+/// The enum a parameter typed `impl ::core::convert::Into<Alias>`
+/// converts to: the signature layer's spelling of a named union alias
+/// argument (see [`union_alias_argument`]). The extern binding takes
+/// `Alias` by value, as a wasm-bindgen enum crosses the ABI, and the
+/// wrapper over it keeps the `impl Into` and converts.
+///
+/// [`union_alias_argument`]: super::typemap::union_alias_argument
+pub(crate) fn into_target(ty: &Type) -> Option<Type> {
+    let Type::ImplTrait(imp) = ty else {
+        return None;
+    };
+    let [syn::TypeParamBound::Trait(bound)] = imp.bounds.iter().collect::<Vec<_>>()[..] else {
+        return None;
+    };
+    let path = &bound.path;
+    let names: Vec<String> = path.segments.iter().map(|s| s.ident.to_string()).collect();
+    if path.leading_colon.is_none() || names != ["core", "convert", "Into"] {
+        return None;
+    }
+    match &path.segments.last()?.arguments {
+        PathArguments::AngleBracketed(a) => match a.args.first()? {
+            GenericArgument::Type(t) if a.args.len() == 1 => Some(t.clone()),
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
+/// Rewrites every `impl Into<Alias>` parameter of an extern binding to
+/// `Alias`, returning whether there was one.
+pub(crate) fn bind_into_targets(sig: &mut Signature) -> bool {
+    let mut any = false;
+    for arg in sig.inputs.iter_mut() {
+        if let FnArg::Typed(pat) = arg {
+            if let Some(target) = into_target(&pat.ty) {
+                *pat.ty = target;
+                any = true;
+            }
+        }
+    }
+    any
 }
 
 fn is_literal_keyed(item: &ForeignItemFn) -> bool {
@@ -287,6 +331,16 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
         .filter(|(_, arg)| is_null_arm(arg))
         .map(|(i, _)| i)
         .collect();
+    // Parameters taking a union alias whole, converted by every arm.
+    let into_positions: Vec<usize> = item
+        .sig
+        .inputs
+        .iter()
+        .skip(skip)
+        .enumerate()
+        .filter(|(_, arg)| matches!(arg, FnArg::Typed(pat) if into_target(&pat.ty).is_some()))
+        .map(|(i, _)| i)
+        .collect();
     let param_names: Vec<Ident> = item
         .sig
         .inputs
@@ -337,6 +391,8 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
         }
         item.sig.generics = public_sig.generics.clone();
     }
+
+    bind_into_targets(&mut item.sig);
 
     // Extern binding: private name, explicit JS name since wasm-bindgen
     // would otherwise infer it from the new ident.
@@ -447,6 +503,7 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
                     None if null_positions.contains(&i) => {
                         quote! { &::wasm_bindgen::JsValue::NULL }
                     }
+                    None if into_positions.contains(&i) => quote! { #pname.into() },
                     None => quote! { #pname },
                 }
             });
@@ -672,6 +729,39 @@ mod tests {
         let mut file: syn::File = syn::parse_str(&out).unwrap();
         crate::codegen::null_arms::apply(&mut file.items);
         assert_eq!(prettyplease::unparse(&file), out);
+    }
+
+    #[test]
+    fn literal_arms_convert_union_alias_arguments() {
+        let out = run("#[wasm_bindgen] extern \"C\" {
+                pub type Day;
+                #[ts_gen_literal(binding(__step), positions(0), arm(\"next\", step_next), arm(\"previous\", step_previous))]
+                #[wasm_bindgen(method, js_name = \"step\")]
+                pub fn step_next(this: &Day, direction: &str, other: impl ::core::convert::Into<DayLike>) -> f64;
+            }");
+        assert!(
+            out.contains("fn __step(this: &Day, direction: &str, other: DayLike) -> f64;"),
+            "{out}"
+        );
+        assert!(out.contains("pub fn step_previous(&self, other: impl ::core::convert::Into<DayLike>) -> f64 {\n        self.__step(\"previous\", other.into())"), "{out}");
+        // Nothing is left for `null_arms` to wrap again.
+        let mut file: syn::File = syn::parse_str(&out).unwrap();
+        crate::codegen::null_arms::apply(&mut file.items);
+        assert_eq!(prettyplease::unparse(&file), out);
+    }
+
+    #[test]
+    fn into_target_reads_only_the_core_into_bound() {
+        let target = |ty: &str| {
+            into_target(&syn::parse_str(ty).unwrap()).map(|t| t.to_token_stream().to_string())
+        };
+        assert_eq!(
+            target("impl ::core::convert::Into<a::DayLike>").as_deref(),
+            Some("a :: DayLike")
+        );
+        assert_eq!(target("impl Into<DayLike>"), None);
+        assert_eq!(target("impl ::wasm_bindgen::JsStringLike"), None);
+        assert_eq!(target("&DayLike"), None);
     }
 
     #[test]

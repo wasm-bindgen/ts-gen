@@ -7,6 +7,614 @@ use wasm_bindgen::prelude::*;
 pub mod temporal {
     #[allow(unused_imports)]
     use super::*;
+    #[wasm_bindgen(private)]
+    #[derive(Clone, Debug)]
+    pub enum CalendarLike {
+        PlainDate(PlainDate),
+        PlainDateTime(PlainDateTime),
+        PlainMonthDay(PlainMonthDay),
+        PlainYearMonth(PlainYearMonth),
+        ZonedDateTime(ZonedDateTime),
+        String(String),
+    }
+    impl ::core::convert::From<PlainDate> for CalendarLike {
+        fn from(value: PlainDate) -> Self {
+            Self::PlainDate(value)
+        }
+    }
+    impl ::core::convert::From<&PlainDate> for CalendarLike {
+        fn from(value: &PlainDate) -> Self {
+            Self::PlainDate(value.clone())
+        }
+    }
+    impl ::core::convert::From<PlainDateTime> for CalendarLike {
+        fn from(value: PlainDateTime) -> Self {
+            Self::PlainDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&PlainDateTime> for CalendarLike {
+        fn from(value: &PlainDateTime) -> Self {
+            Self::PlainDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<PlainMonthDay> for CalendarLike {
+        fn from(value: PlainMonthDay) -> Self {
+            Self::PlainMonthDay(value)
+        }
+    }
+    impl ::core::convert::From<&PlainMonthDay> for CalendarLike {
+        fn from(value: &PlainMonthDay) -> Self {
+            Self::PlainMonthDay(value.clone())
+        }
+    }
+    impl ::core::convert::From<PlainYearMonth> for CalendarLike {
+        fn from(value: PlainYearMonth) -> Self {
+            Self::PlainYearMonth(value)
+        }
+    }
+    impl ::core::convert::From<&PlainYearMonth> for CalendarLike {
+        fn from(value: &PlainYearMonth) -> Self {
+            Self::PlainYearMonth(value.clone())
+        }
+    }
+    impl ::core::convert::From<ZonedDateTime> for CalendarLike {
+        fn from(value: ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&ZonedDateTime> for CalendarLike {
+        fn from(value: &ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<&str> for CalendarLike {
+        fn from(value: &str) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<::std::string::String> for CalendarLike {
+        fn from(value: ::std::string::String) -> Self {
+            Self::String(value)
+        }
+    }
+    impl ::core::convert::From<&::std::string::String> for CalendarLike {
+        fn from(value: &::std::string::String) -> Self {
+            Self::String(value.clone())
+        }
+    }
+    impl ::core::convert::From<::js_sys::JsString> for CalendarLike {
+        fn from(value: ::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<&::js_sys::JsString> for CalendarLike {
+        fn from(value: &::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum DurationLike {
+        Duration(Duration),
+        String(String),
+        DurationLikeObject(DurationLikeObject),
+    }
+    impl ::core::convert::From<Duration> for DurationLike {
+        fn from(value: Duration) -> Self {
+            Self::Duration(value)
+        }
+    }
+    impl ::core::convert::From<&Duration> for DurationLike {
+        fn from(value: &Duration) -> Self {
+            Self::Duration(value.clone())
+        }
+    }
+    impl ::core::convert::From<&str> for DurationLike {
+        fn from(value: &str) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<::std::string::String> for DurationLike {
+        fn from(value: ::std::string::String) -> Self {
+            Self::String(value)
+        }
+    }
+    impl ::core::convert::From<&::std::string::String> for DurationLike {
+        fn from(value: &::std::string::String) -> Self {
+            Self::String(value.clone())
+        }
+    }
+    impl ::core::convert::From<::js_sys::JsString> for DurationLike {
+        fn from(value: ::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<&::js_sys::JsString> for DurationLike {
+        fn from(value: &::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<DurationLikeObject> for DurationLike {
+        fn from(value: DurationLikeObject) -> Self {
+            Self::DurationLikeObject(value)
+        }
+    }
+    impl ::core::convert::From<&DurationLikeObject> for DurationLike {
+        fn from(value: &DurationLikeObject) -> Self {
+            Self::DurationLikeObject(value.clone())
+        }
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Clone, Debug)]
+    pub enum InstantLike {
+        Instant(Instant),
+        ZonedDateTime(ZonedDateTime),
+        String(String),
+    }
+    impl ::core::convert::From<Instant> for InstantLike {
+        fn from(value: Instant) -> Self {
+            Self::Instant(value)
+        }
+    }
+    impl ::core::convert::From<&Instant> for InstantLike {
+        fn from(value: &Instant) -> Self {
+            Self::Instant(value.clone())
+        }
+    }
+    impl ::core::convert::From<ZonedDateTime> for InstantLike {
+        fn from(value: ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&ZonedDateTime> for InstantLike {
+        fn from(value: &ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<&str> for InstantLike {
+        fn from(value: &str) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<::std::string::String> for InstantLike {
+        fn from(value: ::std::string::String) -> Self {
+            Self::String(value)
+        }
+    }
+    impl ::core::convert::From<&::std::string::String> for InstantLike {
+        fn from(value: &::std::string::String) -> Self {
+            Self::String(value.clone())
+        }
+    }
+    impl ::core::convert::From<::js_sys::JsString> for InstantLike {
+        fn from(value: ::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<&::js_sys::JsString> for InstantLike {
+        fn from(value: &::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum PlainDateLike {
+        PlainDate(PlainDate),
+        ZonedDateTime(ZonedDateTime),
+        PlainDateTime(PlainDateTime),
+        String(String),
+        DateLikeObject(DateLikeObject),
+    }
+    impl ::core::convert::From<PlainDate> for PlainDateLike {
+        fn from(value: PlainDate) -> Self {
+            Self::PlainDate(value)
+        }
+    }
+    impl ::core::convert::From<&PlainDate> for PlainDateLike {
+        fn from(value: &PlainDate) -> Self {
+            Self::PlainDate(value.clone())
+        }
+    }
+    impl ::core::convert::From<ZonedDateTime> for PlainDateLike {
+        fn from(value: ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&ZonedDateTime> for PlainDateLike {
+        fn from(value: &ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<PlainDateTime> for PlainDateLike {
+        fn from(value: PlainDateTime) -> Self {
+            Self::PlainDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&PlainDateTime> for PlainDateLike {
+        fn from(value: &PlainDateTime) -> Self {
+            Self::PlainDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<&str> for PlainDateLike {
+        fn from(value: &str) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<::std::string::String> for PlainDateLike {
+        fn from(value: ::std::string::String) -> Self {
+            Self::String(value)
+        }
+    }
+    impl ::core::convert::From<&::std::string::String> for PlainDateLike {
+        fn from(value: &::std::string::String) -> Self {
+            Self::String(value.clone())
+        }
+    }
+    impl ::core::convert::From<::js_sys::JsString> for PlainDateLike {
+        fn from(value: ::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<&::js_sys::JsString> for PlainDateLike {
+        fn from(value: &::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<DateLikeObject> for PlainDateLike {
+        fn from(value: DateLikeObject) -> Self {
+            Self::DateLikeObject(value)
+        }
+    }
+    impl ::core::convert::From<&DateLikeObject> for PlainDateLike {
+        fn from(value: &DateLikeObject) -> Self {
+            Self::DateLikeObject(value.clone())
+        }
+    }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum PlainDateTimeLike {
+        PlainDateTime(PlainDateTime),
+        ZonedDateTime(ZonedDateTime),
+        PlainDate(PlainDate),
+        String(String),
+        DateTimeLikeObject(DateTimeLikeObject),
+    }
+    impl ::core::convert::From<PlainDateTime> for PlainDateTimeLike {
+        fn from(value: PlainDateTime) -> Self {
+            Self::PlainDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&PlainDateTime> for PlainDateTimeLike {
+        fn from(value: &PlainDateTime) -> Self {
+            Self::PlainDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<ZonedDateTime> for PlainDateTimeLike {
+        fn from(value: ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&ZonedDateTime> for PlainDateTimeLike {
+        fn from(value: &ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<PlainDate> for PlainDateTimeLike {
+        fn from(value: PlainDate) -> Self {
+            Self::PlainDate(value)
+        }
+    }
+    impl ::core::convert::From<&PlainDate> for PlainDateTimeLike {
+        fn from(value: &PlainDate) -> Self {
+            Self::PlainDate(value.clone())
+        }
+    }
+    impl ::core::convert::From<&str> for PlainDateTimeLike {
+        fn from(value: &str) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<::std::string::String> for PlainDateTimeLike {
+        fn from(value: ::std::string::String) -> Self {
+            Self::String(value)
+        }
+    }
+    impl ::core::convert::From<&::std::string::String> for PlainDateTimeLike {
+        fn from(value: &::std::string::String) -> Self {
+            Self::String(value.clone())
+        }
+    }
+    impl ::core::convert::From<::js_sys::JsString> for PlainDateTimeLike {
+        fn from(value: ::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<&::js_sys::JsString> for PlainDateTimeLike {
+        fn from(value: &::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<DateTimeLikeObject> for PlainDateTimeLike {
+        fn from(value: DateTimeLikeObject) -> Self {
+            Self::DateTimeLikeObject(value)
+        }
+    }
+    impl ::core::convert::From<&DateTimeLikeObject> for PlainDateTimeLike {
+        fn from(value: &DateTimeLikeObject) -> Self {
+            Self::DateTimeLikeObject(value.clone())
+        }
+    }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum PlainMonthDayLike {
+        PlainMonthDay(PlainMonthDay),
+        String(String),
+        DateLikeObject(DateLikeObject),
+    }
+    impl ::core::convert::From<PlainMonthDay> for PlainMonthDayLike {
+        fn from(value: PlainMonthDay) -> Self {
+            Self::PlainMonthDay(value)
+        }
+    }
+    impl ::core::convert::From<&PlainMonthDay> for PlainMonthDayLike {
+        fn from(value: &PlainMonthDay) -> Self {
+            Self::PlainMonthDay(value.clone())
+        }
+    }
+    impl ::core::convert::From<&str> for PlainMonthDayLike {
+        fn from(value: &str) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<::std::string::String> for PlainMonthDayLike {
+        fn from(value: ::std::string::String) -> Self {
+            Self::String(value)
+        }
+    }
+    impl ::core::convert::From<&::std::string::String> for PlainMonthDayLike {
+        fn from(value: &::std::string::String) -> Self {
+            Self::String(value.clone())
+        }
+    }
+    impl ::core::convert::From<::js_sys::JsString> for PlainMonthDayLike {
+        fn from(value: ::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<&::js_sys::JsString> for PlainMonthDayLike {
+        fn from(value: &::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<DateLikeObject> for PlainMonthDayLike {
+        fn from(value: DateLikeObject) -> Self {
+            Self::DateLikeObject(value)
+        }
+    }
+    impl ::core::convert::From<&DateLikeObject> for PlainMonthDayLike {
+        fn from(value: &DateLikeObject) -> Self {
+            Self::DateLikeObject(value.clone())
+        }
+    }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum PlainTimeLike {
+        PlainTime(PlainTime),
+        PlainDateTime(PlainDateTime),
+        ZonedDateTime(ZonedDateTime),
+        String(String),
+        TimeLikeObject(TimeLikeObject),
+    }
+    impl ::core::convert::From<PlainTime> for PlainTimeLike {
+        fn from(value: PlainTime) -> Self {
+            Self::PlainTime(value)
+        }
+    }
+    impl ::core::convert::From<&PlainTime> for PlainTimeLike {
+        fn from(value: &PlainTime) -> Self {
+            Self::PlainTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<PlainDateTime> for PlainTimeLike {
+        fn from(value: PlainDateTime) -> Self {
+            Self::PlainDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&PlainDateTime> for PlainTimeLike {
+        fn from(value: &PlainDateTime) -> Self {
+            Self::PlainDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<ZonedDateTime> for PlainTimeLike {
+        fn from(value: ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&ZonedDateTime> for PlainTimeLike {
+        fn from(value: &ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<&str> for PlainTimeLike {
+        fn from(value: &str) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<::std::string::String> for PlainTimeLike {
+        fn from(value: ::std::string::String) -> Self {
+            Self::String(value)
+        }
+    }
+    impl ::core::convert::From<&::std::string::String> for PlainTimeLike {
+        fn from(value: &::std::string::String) -> Self {
+            Self::String(value.clone())
+        }
+    }
+    impl ::core::convert::From<::js_sys::JsString> for PlainTimeLike {
+        fn from(value: ::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<&::js_sys::JsString> for PlainTimeLike {
+        fn from(value: &::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<TimeLikeObject> for PlainTimeLike {
+        fn from(value: TimeLikeObject) -> Self {
+            Self::TimeLikeObject(value)
+        }
+    }
+    impl ::core::convert::From<&TimeLikeObject> for PlainTimeLike {
+        fn from(value: &TimeLikeObject) -> Self {
+            Self::TimeLikeObject(value.clone())
+        }
+    }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum PlainYearMonthLike {
+        PlainYearMonth(PlainYearMonth),
+        String(String),
+        YearMonthLikeObject(YearMonthLikeObject),
+    }
+    impl ::core::convert::From<PlainYearMonth> for PlainYearMonthLike {
+        fn from(value: PlainYearMonth) -> Self {
+            Self::PlainYearMonth(value)
+        }
+    }
+    impl ::core::convert::From<&PlainYearMonth> for PlainYearMonthLike {
+        fn from(value: &PlainYearMonth) -> Self {
+            Self::PlainYearMonth(value.clone())
+        }
+    }
+    impl ::core::convert::From<&str> for PlainYearMonthLike {
+        fn from(value: &str) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<::std::string::String> for PlainYearMonthLike {
+        fn from(value: ::std::string::String) -> Self {
+            Self::String(value)
+        }
+    }
+    impl ::core::convert::From<&::std::string::String> for PlainYearMonthLike {
+        fn from(value: &::std::string::String) -> Self {
+            Self::String(value.clone())
+        }
+    }
+    impl ::core::convert::From<::js_sys::JsString> for PlainYearMonthLike {
+        fn from(value: ::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<&::js_sys::JsString> for PlainYearMonthLike {
+        fn from(value: &::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<YearMonthLikeObject> for PlainYearMonthLike {
+        fn from(value: YearMonthLikeObject) -> Self {
+            Self::YearMonthLikeObject(value)
+        }
+    }
+    impl ::core::convert::From<&YearMonthLikeObject> for PlainYearMonthLike {
+        fn from(value: &YearMonthLikeObject) -> Self {
+            Self::YearMonthLikeObject(value.clone())
+        }
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Clone, Debug)]
+    pub enum TimeZoneLike {
+        ZonedDateTime(ZonedDateTime),
+        String(String),
+    }
+    impl ::core::convert::From<ZonedDateTime> for TimeZoneLike {
+        fn from(value: ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&ZonedDateTime> for TimeZoneLike {
+        fn from(value: &ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<&str> for TimeZoneLike {
+        fn from(value: &str) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<::std::string::String> for TimeZoneLike {
+        fn from(value: ::std::string::String) -> Self {
+            Self::String(value)
+        }
+    }
+    impl ::core::convert::From<&::std::string::String> for TimeZoneLike {
+        fn from(value: &::std::string::String) -> Self {
+            Self::String(value.clone())
+        }
+    }
+    impl ::core::convert::From<::js_sys::JsString> for TimeZoneLike {
+        fn from(value: ::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<&::js_sys::JsString> for TimeZoneLike {
+        fn from(value: &::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum ZonedDateTimeLike {
+        ZonedDateTime(ZonedDateTime),
+        String(String),
+        ZonedDateTimeLikeObject(ZonedDateTimeLikeObject),
+    }
+    impl ::core::convert::From<ZonedDateTime> for ZonedDateTimeLike {
+        fn from(value: ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value)
+        }
+    }
+    impl ::core::convert::From<&ZonedDateTime> for ZonedDateTimeLike {
+        fn from(value: &ZonedDateTime) -> Self {
+            Self::ZonedDateTime(value.clone())
+        }
+    }
+    impl ::core::convert::From<&str> for ZonedDateTimeLike {
+        fn from(value: &str) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<::std::string::String> for ZonedDateTimeLike {
+        fn from(value: ::std::string::String) -> Self {
+            Self::String(value)
+        }
+    }
+    impl ::core::convert::From<&::std::string::String> for ZonedDateTimeLike {
+        fn from(value: &::std::string::String) -> Self {
+            Self::String(value.clone())
+        }
+    }
+    impl ::core::convert::From<::js_sys::JsString> for ZonedDateTimeLike {
+        fn from(value: ::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<&::js_sys::JsString> for ZonedDateTimeLike {
+        fn from(value: &::js_sys::JsString) -> Self {
+            Self::String(::std::string::String::from(value))
+        }
+    }
+    impl ::core::convert::From<ZonedDateTimeLikeObject> for ZonedDateTimeLike {
+        fn from(value: ZonedDateTimeLikeObject) -> Self {
+            Self::ZonedDateTimeLikeObject(value)
+        }
+    }
+    impl ::core::convert::From<&ZonedDateTimeLikeObject> for ZonedDateTimeLike {
+        fn from(value: &ZonedDateTimeLikeObject) -> Self {
+            Self::ZonedDateTimeLikeObject(value.clone())
+        }
+    }
     #[allow(dead_code)]
     pub type PartialTemporalLike = JsValue;
     #[wasm_bindgen(experimental_generic_mono)]
@@ -462,14 +1070,9 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ZonedDateTimeLikeObject;
         #[wasm_bindgen(method, getter, js_name = "timeZone")]
-        pub fn time_zone(this: &ZonedDateTimeLikeObject) -> TimeZoneKind;
+        pub fn time_zone(this: &ZonedDateTimeLikeObject) -> TimeZoneLike;
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
-        pub fn set_time_zone(this: &ZonedDateTimeLikeObject, val: &ZonedDateTime);
-        #[wasm_bindgen(method, setter, js_name = "timeZone")]
-        pub fn set_time_zone_with_str(
-            this: &ZonedDateTimeLikeObject,
-            val: impl ::wasm_bindgen::JsStringLike,
-        );
+        fn __set_time_zone(this: &ZonedDateTimeLikeObject, val: TimeZoneLike);
         #[wasm_bindgen(method, getter)]
         pub fn offset(this: &ZonedDateTimeLikeObject) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "offset")]
@@ -478,28 +1081,24 @@ pub mod temporal {
         pub fn set_offset(this: &ZonedDateTimeLikeObject, val: impl ::wasm_bindgen::JsStringLike);
     }
     impl ZonedDateTimeLikeObject {
-        pub fn new(day: f64, time_zone: &ZonedDateTime) -> ZonedDateTimeLikeObject {
+        pub fn set_time_zone(&self, val: impl ::core::convert::Into<TimeZoneLike>) {
+            self.__set_time_zone(val.into())
+        }
+    }
+    impl ZonedDateTimeLikeObject {
+        pub fn new(
+            day: f64,
+            time_zone: impl ::core::convert::Into<TimeZoneLike>,
+        ) -> ZonedDateTimeLikeObject {
             Self::builder(day, time_zone).build()
         }
-        pub fn new_with_str(
+        pub fn builder(
             day: f64,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
-        ) -> ZonedDateTimeLikeObject {
-            Self::builder_with_str(day, time_zone).build()
-        }
-        pub fn builder(day: f64, time_zone: &ZonedDateTime) -> ZonedDateTimeLikeObjectBuilder {
-            let inner: ZonedDateTimeLikeObject = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_day(day);
-            inner.set_time_zone(time_zone);
-            ZonedDateTimeLikeObjectBuilder { inner }
-        }
-        pub fn builder_with_str(
-            day: f64,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
+            time_zone: impl ::core::convert::Into<TimeZoneLike>,
         ) -> ZonedDateTimeLikeObjectBuilder {
             let inner: ZonedDateTimeLikeObject = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_day(day);
-            inner.set_time_zone_with_str(time_zone);
+            inner.set_time_zone(time_zone);
             ZonedDateTimeLikeObjectBuilder { inner }
         }
     }
@@ -974,16 +1573,14 @@ pub mod temporal {
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (catch , js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn plain_date_time_iso_with_zoned_date_time(
-                time_zone: &super::ZonedDateTime,
+            fn __plain_date_time_iso_with_time_zone(
+                time_zone: super::TimeZoneLike,
             ) -> Result<super::PlainDateTime, JsValue>;
         }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn plain_date_time_iso_with_str(
-                time_zone: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<super::PlainDateTime, JsValue>;
+        pub fn plain_date_time_iso_with_time_zone(
+            time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
+        ) -> Result<super::PlainDateTime, JsValue> {
+            __plain_date_time_iso_with_time_zone(time_zone.into())
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
@@ -993,16 +1590,14 @@ pub mod temporal {
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (catch , js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn zoned_date_time_iso_with_zoned_date_time(
-                time_zone: &super::ZonedDateTime,
+            fn __zoned_date_time_iso_with_time_zone(
+                time_zone: super::TimeZoneLike,
             ) -> Result<super::ZonedDateTime, JsValue>;
         }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn zoned_date_time_iso_with_str(
-                time_zone: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<super::ZonedDateTime, JsValue>;
+        pub fn zoned_date_time_iso_with_time_zone(
+            time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
+        ) -> Result<super::ZonedDateTime, JsValue> {
+            __zoned_date_time_iso_with_time_zone(time_zone.into())
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
@@ -1012,16 +1607,14 @@ pub mod temporal {
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (catch , js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn plain_date_iso_with_zoned_date_time(
-                time_zone: &super::ZonedDateTime,
+            fn __plain_date_iso_with_time_zone(
+                time_zone: super::TimeZoneLike,
             ) -> Result<super::PlainDate, JsValue>;
         }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn plain_date_iso_with_str(
-                time_zone: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<super::PlainDate, JsValue>;
+        pub fn plain_date_iso_with_time_zone(
+            time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
+        ) -> Result<super::PlainDate, JsValue> {
+            __plain_date_iso_with_time_zone(time_zone.into())
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
@@ -1031,16 +1624,14 @@ pub mod temporal {
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (catch , js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn plain_time_iso_with_zoned_date_time(
-                time_zone: &super::ZonedDateTime,
+            fn __plain_time_iso_with_time_zone(
+                time_zone: super::TimeZoneLike,
             ) -> Result<super::PlainTime, JsValue>;
         }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn plain_time_iso_with_str(
-                time_zone: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<super::PlainTime, JsValue>;
+        pub fn plain_time_iso_with_time_zone(
+            time_zone: impl ::core::convert::Into<super::TimeZoneLike>,
+        ) -> Result<super::PlainTime, JsValue> {
+            __plain_time_iso_with_time_zone(time_zone.into())
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -1086,60 +1677,34 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainDateToZonedDateTimeOptions;
         #[wasm_bindgen(method, getter, js_name = "plainTime")]
-        pub fn plain_time(this: &PlainDateToZonedDateTimeOptions) -> Option<PlainTimeKind>;
+        pub fn plain_time(this: &PlainDateToZonedDateTimeOptions) -> Option<PlainTimeLike>;
         #[wasm_bindgen(method, setter, js_name = "plainTime")]
-        pub fn set_plain_time(this: &PlainDateToZonedDateTimeOptions, val: &PlainTime);
-        #[wasm_bindgen(method, setter, js_name = "plainTime")]
-        pub fn set_plain_time_with_plain_date_time(
-            this: &PlainDateToZonedDateTimeOptions,
-            val: &PlainDateTime,
-        );
-        #[wasm_bindgen(method, setter, js_name = "plainTime")]
-        pub fn set_plain_time_with_zoned_date_time(
-            this: &PlainDateToZonedDateTimeOptions,
-            val: &ZonedDateTime,
-        );
-        #[wasm_bindgen(method, setter, js_name = "plainTime")]
-        pub fn set_plain_time_with_time_like_object(
-            this: &PlainDateToZonedDateTimeOptions,
-            val: &TimeLikeObject,
-        );
-        #[wasm_bindgen(method, setter, js_name = "plainTime")]
-        pub fn set_plain_time_with_str(
-            this: &PlainDateToZonedDateTimeOptions,
-            val: impl ::wasm_bindgen::JsStringLike,
-        );
+        fn __set_plain_time(this: &PlainDateToZonedDateTimeOptions, val: PlainTimeLike);
         #[wasm_bindgen(method, getter, js_name = "timeZone")]
-        pub fn time_zone(this: &PlainDateToZonedDateTimeOptions) -> TimeZoneKind;
+        pub fn time_zone(this: &PlainDateToZonedDateTimeOptions) -> TimeZoneLike;
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
-        pub fn set_time_zone(this: &PlainDateToZonedDateTimeOptions, val: &ZonedDateTime);
-        #[wasm_bindgen(method, setter, js_name = "timeZone")]
-        pub fn set_time_zone_with_str(
-            this: &PlainDateToZonedDateTimeOptions,
-            val: impl ::wasm_bindgen::JsStringLike,
-        );
+        fn __set_time_zone(this: &PlainDateToZonedDateTimeOptions, val: TimeZoneLike);
     }
     impl PlainDateToZonedDateTimeOptions {
-        pub fn new(time_zone: &ZonedDateTime) -> PlainDateToZonedDateTimeOptions {
+        pub fn set_plain_time(&self, val: impl ::core::convert::Into<PlainTimeLike>) {
+            self.__set_plain_time(val.into())
+        }
+        pub fn set_time_zone(&self, val: impl ::core::convert::Into<TimeZoneLike>) {
+            self.__set_time_zone(val.into())
+        }
+    }
+    impl PlainDateToZonedDateTimeOptions {
+        pub fn new(
+            time_zone: impl ::core::convert::Into<TimeZoneLike>,
+        ) -> PlainDateToZonedDateTimeOptions {
             Self::builder(time_zone).build()
         }
-        pub fn new_with_str(
-            time_zone: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainDateToZonedDateTimeOptions {
-            Self::builder_with_str(time_zone).build()
-        }
-        pub fn builder(time_zone: &ZonedDateTime) -> PlainDateToZonedDateTimeOptionsBuilder {
-            let inner: PlainDateToZonedDateTimeOptions =
-                JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_time_zone(time_zone);
-            PlainDateToZonedDateTimeOptionsBuilder { inner }
-        }
-        pub fn builder_with_str(
-            time_zone: impl ::wasm_bindgen::JsStringLike,
+        pub fn builder(
+            time_zone: impl ::core::convert::Into<TimeZoneLike>,
         ) -> PlainDateToZonedDateTimeOptionsBuilder {
             let inner: PlainDateToZonedDateTimeOptions =
                 JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_time_zone_with_str(time_zone);
+            inner.set_time_zone(time_zone);
             PlainDateToZonedDateTimeOptionsBuilder { inner }
         }
     }
@@ -1147,24 +1712,8 @@ pub mod temporal {
         inner: PlainDateToZonedDateTimeOptions,
     }
     impl PlainDateToZonedDateTimeOptionsBuilder {
-        pub fn plain_time(self, val: &PlainTime) -> Self {
+        pub fn plain_time(self, val: impl ::core::convert::Into<PlainTimeLike>) -> Self {
             self.inner.set_plain_time(val);
-            self
-        }
-        pub fn plain_time_with_plain_date_time(self, val: &PlainDateTime) -> Self {
-            self.inner.set_plain_time_with_plain_date_time(val);
-            self
-        }
-        pub fn plain_time_with_zoned_date_time(self, val: &ZonedDateTime) -> Self {
-            self.inner.set_plain_time_with_zoned_date_time(val);
-            self
-        }
-        pub fn plain_time_with_time_like_object(self, val: &TimeLikeObject) -> Self {
-            self.inner.set_plain_time_with_time_like_object(val);
-            self
-        }
-        pub fn plain_time_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
-            self.inner.set_plain_time_with_str(val);
             self
         }
         pub fn build(self) -> PlainDateToZonedDateTimeOptions {
@@ -1191,203 +1740,15 @@ pub mod temporal {
             iso_day: f64,
             calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDate, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch)]
-        pub fn from(item: &PlainDate) -> Result<PlainDate, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> Result<PlainDate, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __from(item: PlainDateLike) -> Result<PlainDate, Error>;
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_date_time(item: &PlainDateTime) -> Result<PlainDate, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_date_like_object(item: &DateLikeObject) -> Result<PlainDate, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> Result<PlainDate, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_options(
-            item: &PlainDate,
+        fn __from_with_options(
+            item: PlainDateLike,
             options: &OverflowOptions,
         ) -> Result<PlainDate, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_zoned_date_time_and_options(
-            item: &ZonedDateTime,
-            options: &OverflowOptions,
-        ) -> Result<PlainDate, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_date_time_and_options(
-            item: &PlainDateTime,
-            options: &OverflowOptions,
-        ) -> Result<PlainDate, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_date_like_object_and_options(
-            item: &DateLikeObject,
-            options: &OverflowOptions,
-        ) -> Result<PlainDate, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
-        ) -> Result<PlainDate, Error>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch)]
-        pub fn compare(one: &PlainDate, two: &PlainDate) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_plain_date(
-            one: &ZonedDateTime,
-            two: &PlainDate,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_plain_date(
-            one: &PlainDateTime,
-            two: &PlainDate,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_date_like_object_and_plain_date(
-            one: &DateLikeObject,
-            two: &PlainDate,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_plain_date(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainDate,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_and_zoned_date_time(
-            one: &PlainDate,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_zoned_date_time(
-            one: &ZonedDateTime,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_zoned_date_time(
-            one: &PlainDateTime,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_date_like_object_and_zoned_date_time(
-            one: &DateLikeObject,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_zoned_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_and_plain_date_time(
-            one: &PlainDate,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_plain_date_time(
-            one: &ZonedDateTime,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_plain_date_time(
-            one: &PlainDateTime,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_date_like_object_and_plain_date_time(
-            one: &DateLikeObject,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_plain_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_and_date_like_object(
-            one: &PlainDate,
-            two: &DateLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_date_like_object(
-            one: &ZonedDateTime,
-            two: &DateLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_date_like_object(
-            one: &PlainDateTime,
-            two: &DateLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_date_like_object_and_date_like_object(
-            one: &DateLikeObject,
-            two: &DateLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_date_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &DateLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_and_str(
-            one: &PlainDate,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_str(
-            one: &ZonedDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_str(
-            one: &PlainDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_date_like_object_and_str(
-            one: &DateLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
+        fn __compare(one: PlainDateLike, two: PlainDateLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
         pub fn calendar_id(this: &PlainDate) -> String;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
@@ -1430,64 +1791,20 @@ pub mod temporal {
         pub fn to_plain_year_month(this: &PlainDate) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainMonthDay")]
         pub fn to_plain_month_day(this: &PlainDate) -> Result<PlainMonthDay, JsValue>;
-        #[wasm_bindgen(method, catch)]
-        pub fn add(this: &PlainDate, duration: &Duration) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object(
-            this: &PlainDate,
-            duration: &DurationLikeObject,
-        ) -> Result<PlainDate, JsValue>;
+        fn __add(this: &PlainDate, duration: DurationLike) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str(
+        fn __add_with_options(
             this: &PlainDate,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_options(
-            this: &PlainDate,
-            duration: &Duration,
-            options: &OverflowOptions,
-        ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object_and_options(
-            this: &PlainDate,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
-        ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str_and_options(
-            this: &PlainDate,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
-        ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch)]
-        pub fn subtract(this: &PlainDate, duration: &Duration) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object(
-            this: &PlainDate,
-            duration: &DurationLikeObject,
-        ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str(
-            this: &PlainDate,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_options(
-            this: &PlainDate,
-            duration: &Duration,
+            duration: DurationLike,
             options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object_and_options(
-            this: &PlainDate,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
-        ) -> Result<PlainDate, JsValue>;
+        fn __subtract(this: &PlainDate, duration: DurationLike) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str_and_options(
+        fn __subtract_with_options(
             this: &PlainDate,
-            duration: impl ::wasm_bindgen::JsStringLike,
+            duration: DurationLike,
             options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
         #[doc = " ## Errors"]
@@ -1510,277 +1827,39 @@ pub mod temporal {
             options: &OverflowOptions,
         ) -> Result<PlainDate, Error>;
         #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar(
+        fn __with_calendar(
             this: &PlainDate,
-            calendar_like: &PlainDate,
+            calendar_like: CalendarLike,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_plain_date_time(
-            this: &PlainDate,
-            calendar_like: &PlainDateTime,
-        ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_plain_month_day(
-            this: &PlainDate,
-            calendar_like: &PlainMonthDay,
-        ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_plain_year_month(
-            this: &PlainDate,
-            calendar_like: &PlainYearMonth,
-        ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_zoned_date_time(
-            this: &PlainDate,
-            calendar_like: &ZonedDateTime,
-        ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_str(
-            this: &PlainDate,
-            calendar_like: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainDate, JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn until(this: &PlainDate, other: &PlainDate) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time(
-            this: &PlainDate,
-            other: &ZonedDateTime,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __until(this: &PlainDate, other: PlainDateLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_plain_date_time(
+        fn __until_with_options(
             this: &PlainDate,
-            other: &PlainDateTime,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_date_like_object(
-            this: &PlainDate,
-            other: &DateLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str(
-            this: &PlainDate,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_options(
-            this: &PlainDate,
-            other: &PlainDate,
+            other: PlainDateLike,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time_and_options(
-            this: &PlainDate,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_plain_date_time_and_options(
-            this: &PlainDate,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_date_like_object_and_options(
-            this: &PlainDate,
-            other: &DateLikeObject,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str_and_options(
-            this: &PlainDate,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn since(this: &PlainDate, other: &PlainDate) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time(
-            this: &PlainDate,
-            other: &ZonedDateTime,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __since(this: &PlainDate, other: PlainDateLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_plain_date_time(
+        fn __since_with_options(
             this: &PlainDate,
-            other: &PlainDateTime,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_date_like_object(
-            this: &PlainDate,
-            other: &DateLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str(
-            this: &PlainDate,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_options(
-            this: &PlainDate,
-            other: &PlainDate,
+            other: PlainDateLike,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time_and_options(
-            this: &PlainDate,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_plain_date_time_and_options(
-            this: &PlainDate,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_date_like_object_and_options(
-            this: &PlainDate,
-            other: &DateLikeObject,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str_and_options(
-            this: &PlainDate,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, Error>;
-        #[wasm_bindgen(method, catch)]
-        pub fn equals(this: &PlainDate, other: &PlainDate) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_zoned_date_time(
-            this: &PlainDate,
-            other: &ZonedDateTime,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_plain_date_time(
-            this: &PlainDate,
-            other: &PlainDateTime,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_date_like_object(
-            this: &PlainDate,
-            other: &DateLikeObject,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_str(
-            this: &PlainDate,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<bool, JsValue>;
+        fn __equals(this: &PlainDate, other: PlainDateLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
         pub fn to_plain_date_time(this: &PlainDate) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn to_plain_date_time_with_plain_time(
+        fn __to_plain_date_time_with_time(
             this: &PlainDate,
-            time: &PlainTime,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn to_plain_date_time_with_plain_date_time(
-            this: &PlainDate,
-            time: &PlainDateTime,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn to_plain_date_time_with_zoned_date_time(
-            this: &PlainDate,
-            time: &ZonedDateTime,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn to_plain_date_time_with_time_like_object(
-            this: &PlainDate,
-            time: &TimeLikeObject,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn to_plain_date_time_with_str(
-            this: &PlainDate,
-            time: impl ::wasm_bindgen::JsStringLike,
+            time: PlainTimeLike,
         ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn to_zoned_date_time(
+        fn __to_zoned_date_time(
             this: &PlainDate,
-            time_zone: &ZonedDateTime,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn to_zoned_date_time_with_str(
-            this: &PlainDate,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
+            time_zone: TimeZoneLike,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
         pub fn to_zoned_date_time_with_item(
@@ -1896,6 +1975,123 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &PlainDate) -> Result<(), JsValue>;
     }
+    impl PlainDate {
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from(item: impl ::core::convert::Into<PlainDateLike>) -> Result<PlainDate, Error> {
+            Self::__from(item.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from_with_options(
+            item: impl ::core::convert::Into<PlainDateLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainDate, Error> {
+            Self::__from_with_options(item.into(), options)
+        }
+        pub fn compare(
+            one: impl ::core::convert::Into<PlainDateLike>,
+            two: impl ::core::convert::Into<PlainDateLike>,
+        ) -> Result<f64, JsValue> {
+            Self::__compare(one.into(), two.into())
+        }
+        pub fn add(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<PlainDate, JsValue> {
+            self.__add(duration.into())
+        }
+        pub fn add_with_options(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainDate, JsValue> {
+            self.__add_with_options(duration.into(), options)
+        }
+        pub fn subtract(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<PlainDate, JsValue> {
+            self.__subtract(duration.into())
+        }
+        pub fn subtract_with_options(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainDate, JsValue> {
+            self.__subtract_with_options(duration.into(), options)
+        }
+        pub fn with_calendar(
+            &self,
+            calendar_like: impl ::core::convert::Into<CalendarLike>,
+        ) -> Result<PlainDate, JsValue> {
+            self.__with_calendar(calendar_like.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn until(
+            &self,
+            other: impl ::core::convert::Into<PlainDateLike>,
+        ) -> Result<Duration, Error> {
+            self.__until(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn until_with_options(
+            &self,
+            other: impl ::core::convert::Into<PlainDateLike>,
+            options: &RoundingOptionsWithLargestUnit<DateUnit>,
+        ) -> Result<Duration, Error> {
+            self.__until_with_options(other.into(), options)
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn since(
+            &self,
+            other: impl ::core::convert::Into<PlainDateLike>,
+        ) -> Result<Duration, Error> {
+            self.__since(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn since_with_options(
+            &self,
+            other: impl ::core::convert::Into<PlainDateLike>,
+            options: &RoundingOptionsWithLargestUnit<DateUnit>,
+        ) -> Result<Duration, Error> {
+            self.__since_with_options(other.into(), options)
+        }
+        pub fn equals(
+            &self,
+            other: impl ::core::convert::Into<PlainDateLike>,
+        ) -> Result<bool, JsValue> {
+            self.__equals(other.into())
+        }
+        pub fn to_plain_date_time_with_time(
+            &self,
+            time: impl ::core::convert::Into<PlainTimeLike>,
+        ) -> Result<PlainDateTime, JsValue> {
+            self.__to_plain_date_time_with_time(time.into())
+        }
+        pub fn to_zoned_date_time(
+            &self,
+            time_zone: impl ::core::convert::Into<TimeZoneLike>,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__to_zoned_date_time(time_zone.into())
+        }
+    }
     impl core::fmt::Display for PlainDate {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
             f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
@@ -2008,203 +2204,15 @@ pub mod temporal {
             microsecond: f64,
             nanosecond: f64,
         ) -> Result<PlainTime, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch)]
-        pub fn from(item: &PlainTime) -> Result<PlainTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_date_time(item: &PlainDateTime) -> Result<PlainTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __from(item: PlainTimeLike) -> Result<PlainTime, Error>;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> Result<PlainTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_time_like_object(item: &TimeLikeObject) -> Result<PlainTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> Result<PlainTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_options(
-            item: &PlainTime,
+        fn __from_with_options(
+            item: PlainTimeLike,
             options: &OverflowOptions,
         ) -> Result<PlainTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_date_time_and_options(
-            item: &PlainDateTime,
-            options: &OverflowOptions,
-        ) -> Result<PlainTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_zoned_date_time_and_options(
-            item: &ZonedDateTime,
-            options: &OverflowOptions,
-        ) -> Result<PlainTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_time_like_object_and_options(
-            item: &TimeLikeObject,
-            options: &OverflowOptions,
-        ) -> Result<PlainTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
-        ) -> Result<PlainTime, Error>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch)]
-        pub fn compare(one: &PlainTime, two: &PlainTime) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_plain_time(
-            one: &PlainDateTime,
-            two: &PlainTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_plain_time(
-            one: &ZonedDateTime,
-            two: &PlainTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_time_like_object_and_plain_time(
-            one: &TimeLikeObject,
-            two: &PlainTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_plain_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_time_and_plain_date_time(
-            one: &PlainTime,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_plain_date_time(
-            one: &PlainDateTime,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_plain_date_time(
-            one: &ZonedDateTime,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_time_like_object_and_plain_date_time(
-            one: &TimeLikeObject,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_plain_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_time_and_zoned_date_time(
-            one: &PlainTime,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_zoned_date_time(
-            one: &PlainDateTime,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_zoned_date_time(
-            one: &ZonedDateTime,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_time_like_object_and_zoned_date_time(
-            one: &TimeLikeObject,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_zoned_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_time_and_time_like_object(
-            one: &PlainTime,
-            two: &TimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_time_like_object(
-            one: &PlainDateTime,
-            two: &TimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_time_like_object(
-            one: &ZonedDateTime,
-            two: &TimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_time_like_object_and_time_like_object(
-            one: &TimeLikeObject,
-            two: &TimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_time_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &TimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_time_and_str(
-            one: &PlainTime,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_str(
-            one: &PlainDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_str(
-            one: &ZonedDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_time_like_object_and_str(
-            one: &TimeLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
+        fn __compare(one: PlainTimeLike, two: PlainTimeLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter)]
         pub fn hour(this: &PlainTime) -> f64;
         #[wasm_bindgen(method, getter)]
@@ -2217,30 +2225,10 @@ pub mod temporal {
         pub fn microsecond(this: &PlainTime) -> f64;
         #[wasm_bindgen(method, getter)]
         pub fn nanosecond(this: &PlainTime) -> f64;
-        #[wasm_bindgen(method, catch)]
-        pub fn add(this: &PlainTime, duration: &Duration) -> Result<PlainTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object(
-            this: &PlainTime,
-            duration: &DurationLikeObject,
-        ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str(
-            this: &PlainTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, catch)]
-        pub fn subtract(this: &PlainTime, duration: &Duration) -> Result<PlainTime, JsValue>;
+        fn __add(this: &PlainTime, duration: DurationLike) -> Result<PlainTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object(
-            this: &PlainTime,
-            duration: &DurationLikeObject,
-        ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str(
-            this: &PlainTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainTime, JsValue>;
+        fn __subtract(this: &PlainTime, duration: DurationLike) -> Result<PlainTime, JsValue>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
@@ -2257,212 +2245,24 @@ pub mod temporal {
             time_like: &TimeLikeObject,
             options: &OverflowOptions,
         ) -> Result<PlainTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn until(this: &PlainTime, other: &PlainTime) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_plain_date_time(
-            this: &PlainTime,
-            other: &PlainDateTime,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __until(this: &PlainTime, other: PlainTimeLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time(
+        fn __until_with_options(
             this: &PlainTime,
-            other: &ZonedDateTime,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_time_like_object(
-            this: &PlainTime,
-            other: &TimeLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str(
-            this: &PlainTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_options(
-            this: &PlainTime,
-            other: &PlainTime,
+            other: PlainTimeLike,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_plain_date_time_and_options(
-            this: &PlainTime,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time_and_options(
-            this: &PlainTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_time_like_object_and_options(
-            this: &PlainTime,
-            other: &TimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str_and_options(
-            this: &PlainTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn since(this: &PlainTime, other: &PlainTime) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_plain_date_time(
-            this: &PlainTime,
-            other: &PlainDateTime,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __since(this: &PlainTime, other: PlainTimeLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time(
+        fn __since_with_options(
             this: &PlainTime,
-            other: &ZonedDateTime,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_time_like_object(
-            this: &PlainTime,
-            other: &TimeLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str(
-            this: &PlainTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_options(
-            this: &PlainTime,
-            other: &PlainTime,
+            other: PlainTimeLike,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_plain_date_time_and_options(
-            this: &PlainTime,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time_and_options(
-            this: &PlainTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_time_like_object_and_options(
-            this: &PlainTime,
-            other: &TimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str_and_options(
-            this: &PlainTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, Error>;
-        #[wasm_bindgen(method, catch)]
-        pub fn equals(this: &PlainTime, other: &PlainTime) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_plain_date_time(
-            this: &PlainTime,
-            other: &PlainDateTime,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_zoned_date_time(
-            this: &PlainTime,
-            other: &ZonedDateTime,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_time_like_object(
-            this: &PlainTime,
-            other: &TimeLikeObject,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_str(
-            this: &PlainTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<bool, JsValue>;
+        fn __equals(this: &PlainTime, other: PlainTimeLike) -> Result<bool, JsValue>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
@@ -2587,6 +2387,91 @@ pub mod temporal {
         pub fn to_json_js_string(this: &PlainTime) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &PlainTime) -> Result<(), JsValue>;
+    }
+    impl PlainTime {
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from(item: impl ::core::convert::Into<PlainTimeLike>) -> Result<PlainTime, Error> {
+            Self::__from(item.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from_with_options(
+            item: impl ::core::convert::Into<PlainTimeLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainTime, Error> {
+            Self::__from_with_options(item.into(), options)
+        }
+        pub fn compare(
+            one: impl ::core::convert::Into<PlainTimeLike>,
+            two: impl ::core::convert::Into<PlainTimeLike>,
+        ) -> Result<f64, JsValue> {
+            Self::__compare(one.into(), two.into())
+        }
+        pub fn add(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<PlainTime, JsValue> {
+            self.__add(duration.into())
+        }
+        pub fn subtract(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<PlainTime, JsValue> {
+            self.__subtract(duration.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn until(
+            &self,
+            other: impl ::core::convert::Into<PlainTimeLike>,
+        ) -> Result<Duration, Error> {
+            self.__until(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn until_with_options(
+            &self,
+            other: impl ::core::convert::Into<PlainTimeLike>,
+            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
+        ) -> Result<Duration, Error> {
+            self.__until_with_options(other.into(), options)
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn since(
+            &self,
+            other: impl ::core::convert::Into<PlainTimeLike>,
+        ) -> Result<Duration, Error> {
+            self.__since(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn since_with_options(
+            &self,
+            other: impl ::core::convert::Into<PlainTimeLike>,
+            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
+        ) -> Result<Duration, Error> {
+            self.__since_with_options(other.into(), options)
+        }
+        pub fn equals(
+            &self,
+            other: impl ::core::convert::Into<PlainTimeLike>,
+        ) -> Result<bool, JsValue> {
+            self.__equals(other.into())
+        }
     }
     impl core::fmt::Display for PlainTime {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -2766,207 +2651,15 @@ pub mod temporal {
             nanosecond: f64,
             calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch)]
-        pub fn from(item: &PlainDateTime) -> Result<PlainDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> Result<PlainDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __from(item: PlainDateTimeLike) -> Result<PlainDateTime, Error>;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_date(item: &PlainDate) -> Result<PlainDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_date_time_like_object(
-            item: &DateTimeLikeObject,
-        ) -> Result<PlainDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str(
-            item: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_options(
-            item: &PlainDateTime,
+        fn __from_with_options(
+            item: PlainDateTimeLike,
             options: &OverflowOptions,
         ) -> Result<PlainDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_zoned_date_time_and_options(
-            item: &ZonedDateTime,
-            options: &OverflowOptions,
-        ) -> Result<PlainDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_plain_date_and_options(
-            item: &PlainDate,
-            options: &OverflowOptions,
-        ) -> Result<PlainDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_date_time_like_object_and_options(
-            item: &DateTimeLikeObject,
-            options: &OverflowOptions,
-        ) -> Result<PlainDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
-        ) -> Result<PlainDateTime, Error>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch)]
-        pub fn compare(one: &PlainDateTime, two: &PlainDateTime) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_plain_date_time(
-            one: &ZonedDateTime,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_and_plain_date_time(
-            one: &PlainDate,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_date_time_like_object_and_plain_date_time(
-            one: &DateTimeLikeObject,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_plain_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_zoned_date_time(
-            one: &PlainDateTime,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_zoned_date_time(
-            one: &ZonedDateTime,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_and_zoned_date_time(
-            one: &PlainDate,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_date_time_like_object_and_zoned_date_time(
-            one: &DateTimeLikeObject,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_zoned_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_plain_date(
-            one: &PlainDateTime,
-            two: &PlainDate,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_plain_date(
-            one: &ZonedDateTime,
-            two: &PlainDate,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_and_plain_date(
-            one: &PlainDate,
-            two: &PlainDate,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_date_time_like_object_and_plain_date(
-            one: &DateTimeLikeObject,
-            two: &PlainDate,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_plain_date(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainDate,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_date_time_like_object(
-            one: &PlainDateTime,
-            two: &DateTimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_date_time_like_object(
-            one: &ZonedDateTime,
-            two: &DateTimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_and_date_time_like_object(
-            one: &PlainDate,
-            two: &DateTimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_date_time_like_object_and_date_time_like_object(
-            one: &DateTimeLikeObject,
-            two: &DateTimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_date_time_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &DateTimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_time_and_str(
-            one: &PlainDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_str(
-            one: &ZonedDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_date_and_str(
-            one: &PlainDate,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_date_time_like_object_and_str(
-            one: &DateTimeLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
+        fn __compare(one: PlainDateTimeLike, two: PlainDateTimeLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
         pub fn calendar_id(this: &PlainDateTime) -> String;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
@@ -3039,305 +2732,48 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time(this: &PlainDateTime) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn with_plain_time_with_plain_time(
+        fn __with_plain_time_with_plain_time(
             this: &PlainDateTime,
-            plain_time: &PlainTime,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn with_plain_time_with_plain_date_time(
-            this: &PlainDateTime,
-            plain_time: &PlainDateTime,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn with_plain_time_with_zoned_date_time(
-            this: &PlainDateTime,
-            plain_time: &ZonedDateTime,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn with_plain_time_with_time_like_object(
-            this: &PlainDateTime,
-            plain_time: &TimeLikeObject,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn with_plain_time_with_str(
-            this: &PlainDateTime,
-            plain_time: impl ::wasm_bindgen::JsStringLike,
+            plain_time: PlainTimeLike,
         ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar(
+        fn __with_calendar(
             this: &PlainDateTime,
-            calendar: &PlainDate,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_plain_date_time(
-            this: &PlainDateTime,
-            calendar: &PlainDateTime,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_plain_month_day(
-            this: &PlainDateTime,
-            calendar: &PlainMonthDay,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_plain_year_month(
-            this: &PlainDateTime,
-            calendar: &PlainYearMonth,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_zoned_date_time(
-            this: &PlainDateTime,
-            calendar: &ZonedDateTime,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_str(
-            this: &PlainDateTime,
-            calendar: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch)]
-        pub fn add(this: &PlainDateTime, duration: &Duration) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object(
-            this: &PlainDateTime,
-            duration: &DurationLikeObject,
+            calendar: CalendarLike,
         ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str(
-            this: &PlainDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainDateTime, JsValue>;
+        fn __add(this: &PlainDateTime, duration: DurationLike) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_options(
+        fn __add_with_options(
             this: &PlainDateTime,
-            duration: &Duration,
-            options: &OverflowOptions,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object_and_options(
-            this: &PlainDateTime,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str_and_options(
-            this: &PlainDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch)]
-        pub fn subtract(
-            this: &PlainDateTime,
-            duration: &Duration,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object(
-            this: &PlainDateTime,
-            duration: &DurationLikeObject,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str(
-            this: &PlainDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_options(
-            this: &PlainDateTime,
-            duration: &Duration,
+            duration: DurationLike,
             options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object_and_options(
+        fn __subtract(
             this: &PlainDateTime,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
+            duration: DurationLike,
         ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str_and_options(
+        fn __subtract_with_options(
             this: &PlainDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
+            duration: DurationLike,
             options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn until(this: &PlainDateTime, other: &PlainDateTime) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time(
-            this: &PlainDateTime,
-            other: &ZonedDateTime,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __until(this: &PlainDateTime, other: PlainDateTimeLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_plain_date(
+        fn __until_with_options(
             this: &PlainDateTime,
-            other: &PlainDate,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_date_time_like_object(
-            this: &PlainDateTime,
-            other: &DateTimeLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str(
-            this: &PlainDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_options(
-            this: &PlainDateTime,
-            other: &PlainDateTime,
+            other: PlainDateTimeLike,
             options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time_and_options(
-            this: &PlainDateTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_plain_date_and_options(
-            this: &PlainDateTime,
-            other: &PlainDate,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_date_time_like_object_and_options(
-            this: &PlainDateTime,
-            other: &DateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str_and_options(
-            this: &PlainDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn since(this: &PlainDateTime, other: &PlainDateTime) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time(
-            this: &PlainDateTime,
-            other: &ZonedDateTime,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __since(this: &PlainDateTime, other: PlainDateTimeLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_plain_date(
+        fn __since_with_options(
             this: &PlainDateTime,
-            other: &PlainDate,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_date_time_like_object(
-            this: &PlainDateTime,
-            other: &DateTimeLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str(
-            this: &PlainDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_options(
-            this: &PlainDateTime,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time_and_options(
-            this: &PlainDateTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_plain_date_and_options(
-            this: &PlainDateTime,
-            other: &PlainDate,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_date_time_like_object_and_options(
-            this: &PlainDateTime,
-            other: &DateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str_and_options(
-            this: &PlainDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
+            other: PlainDateTimeLike,
             options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
@@ -3356,28 +2792,8 @@ pub mod temporal {
             this: &PlainDateTime,
             round_to: &RoundingOptions,
         ) -> Result<PlainDateTime, RangeError>;
-        #[wasm_bindgen(method, catch)]
-        pub fn equals(this: &PlainDateTime, other: &PlainDateTime) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_zoned_date_time(
-            this: &PlainDateTime,
-            other: &ZonedDateTime,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_plain_date(
-            this: &PlainDateTime,
-            other: &PlainDate,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_date_time_like_object(
-            this: &PlainDateTime,
-            other: &DateTimeLikeObject,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_str(
-            this: &PlainDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<bool, JsValue>;
+        fn __equals(this: &PlainDateTime, other: PlainDateTimeLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
@@ -3487,31 +2903,146 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &PlainDateTime) -> Result<(), JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn to_zoned_date_time(
+        fn __to_zoned_date_time(
             this: &PlainDateTime,
-            time_zone: &ZonedDateTime,
+            time_zone: TimeZoneLike,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn to_zoned_date_time_with_str(
+        fn __to_zoned_date_time_with_options(
             this: &PlainDateTime,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn to_zoned_date_time_with_options(
-            this: &PlainDateTime,
-            time_zone: &ZonedDateTime,
-            options: &DisambiguationOptions,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn to_zoned_date_time_with_str_and_options(
-            this: &PlainDateTime,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
+            time_zone: TimeZoneLike,
             options: &DisambiguationOptions,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
         pub fn to_plain_date(this: &PlainDateTime) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainTime")]
         pub fn to_plain_time(this: &PlainDateTime) -> Result<PlainTime, JsValue>;
+    }
+    impl PlainDateTime {
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from(
+            item: impl ::core::convert::Into<PlainDateTimeLike>,
+        ) -> Result<PlainDateTime, Error> {
+            Self::__from(item.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from_with_options(
+            item: impl ::core::convert::Into<PlainDateTimeLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainDateTime, Error> {
+            Self::__from_with_options(item.into(), options)
+        }
+        pub fn compare(
+            one: impl ::core::convert::Into<PlainDateTimeLike>,
+            two: impl ::core::convert::Into<PlainDateTimeLike>,
+        ) -> Result<f64, JsValue> {
+            Self::__compare(one.into(), two.into())
+        }
+        pub fn with_plain_time_with_plain_time(
+            &self,
+            plain_time: impl ::core::convert::Into<PlainTimeLike>,
+        ) -> Result<PlainDateTime, JsValue> {
+            self.__with_plain_time_with_plain_time(plain_time.into())
+        }
+        pub fn with_calendar(
+            &self,
+            calendar: impl ::core::convert::Into<CalendarLike>,
+        ) -> Result<PlainDateTime, JsValue> {
+            self.__with_calendar(calendar.into())
+        }
+        pub fn add(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<PlainDateTime, JsValue> {
+            self.__add(duration.into())
+        }
+        pub fn add_with_options(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainDateTime, JsValue> {
+            self.__add_with_options(duration.into(), options)
+        }
+        pub fn subtract(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<PlainDateTime, JsValue> {
+            self.__subtract(duration.into())
+        }
+        pub fn subtract_with_options(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainDateTime, JsValue> {
+            self.__subtract_with_options(duration.into(), options)
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn until(
+            &self,
+            other: impl ::core::convert::Into<PlainDateTimeLike>,
+        ) -> Result<Duration, Error> {
+            self.__until(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn until_with_options(
+            &self,
+            other: impl ::core::convert::Into<PlainDateTimeLike>,
+            options: &RoundingOptionsWithLargestUnit,
+        ) -> Result<Duration, Error> {
+            self.__until_with_options(other.into(), options)
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn since(
+            &self,
+            other: impl ::core::convert::Into<PlainDateTimeLike>,
+        ) -> Result<Duration, Error> {
+            self.__since(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn since_with_options(
+            &self,
+            other: impl ::core::convert::Into<PlainDateTimeLike>,
+            options: &RoundingOptionsWithLargestUnit,
+        ) -> Result<Duration, Error> {
+            self.__since_with_options(other.into(), options)
+        }
+        pub fn equals(
+            &self,
+            other: impl ::core::convert::Into<PlainDateTimeLike>,
+        ) -> Result<bool, JsValue> {
+            self.__equals(other.into())
+        }
+        pub fn to_zoned_date_time(
+            &self,
+            time_zone: impl ::core::convert::Into<TimeZoneLike>,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__to_zoned_date_time(time_zone.into())
+        }
+        pub fn to_zoned_date_time_with_options(
+            &self,
+            time_zone: impl ::core::convert::Into<TimeZoneLike>,
+            options: &DisambiguationOptions,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__to_zoned_date_time_with_options(time_zone.into(), options)
+        }
     }
     impl core::fmt::Display for PlainDateTime {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -3656,97 +3187,15 @@ pub mod temporal {
             time_zone: impl ::wasm_bindgen::JsStringLike,
             calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch)]
-        pub fn from(item: &ZonedDateTime) -> Result<ZonedDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_zoned_date_time_like_object(
-            item: &ZonedDateTimeLikeObject,
-        ) -> Result<ZonedDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __from(item: ZonedDateTimeLike) -> Result<ZonedDateTime, Error>;
         # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str(
-            item: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<ZonedDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_options(
-            item: &ZonedDateTime,
+        fn __from_with_options(
+            item: ZonedDateTimeLike,
             options: &ZonedDateTimeFromOptions,
         ) -> Result<ZonedDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_zoned_date_time_like_object_and_options(
-            item: &ZonedDateTimeLikeObject,
-            options: &ZonedDateTimeFromOptions,
-        ) -> Result<ZonedDateTime, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &ZonedDateTimeFromOptions,
-        ) -> Result<ZonedDateTime, Error>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch)]
-        pub fn compare(one: &ZonedDateTime, two: &ZonedDateTime) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_like_object_and_zoned_date_time(
-            one: &ZonedDateTimeLikeObject,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_zoned_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_zoned_date_time_like_object(
-            one: &ZonedDateTime,
-            two: &ZonedDateTimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_like_object_and_zoned_date_time_like_object(
-            one: &ZonedDateTimeLikeObject,
-            two: &ZonedDateTimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_zoned_date_time_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTimeLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_str(
-            one: &ZonedDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_like_object_and_str(
-            one: &ZonedDateTimeLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
+        fn __compare(one: ZonedDateTimeLike, two: ZonedDateTimeLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
         pub fn calendar_id(this: &ZonedDateTime) -> String;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
@@ -3838,239 +3287,53 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time(this: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn with_plain_time_with_plain_time(
+        fn __with_plain_time_with_plain_time(
             this: &ZonedDateTime,
-            plain_time: &PlainTime,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn with_plain_time_with_plain_date_time(
-            this: &ZonedDateTime,
-            plain_time: &PlainDateTime,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn with_plain_time_with_zoned_date_time(
-            this: &ZonedDateTime,
-            plain_time: &ZonedDateTime,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn with_plain_time_with_time_like_object(
-            this: &ZonedDateTime,
-            plain_time: &TimeLikeObject,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn with_plain_time_with_str(
-            this: &ZonedDateTime,
-            plain_time: impl ::wasm_bindgen::JsStringLike,
+            plain_time: PlainTimeLike,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "withTimeZone")]
-        pub fn with_time_zone(
+        fn __with_time_zone(
             this: &ZonedDateTime,
-            time_zone: &ZonedDateTime,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withTimeZone")]
-        pub fn with_time_zone_with_str(
-            this: &ZonedDateTime,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
+            time_zone: TimeZoneLike,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar(
+        fn __with_calendar(
             this: &ZonedDateTime,
-            calendar: &PlainDate,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_plain_date_time(
-            this: &ZonedDateTime,
-            calendar: &PlainDateTime,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_plain_month_day(
-            this: &ZonedDateTime,
-            calendar: &PlainMonthDay,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_plain_year_month(
-            this: &ZonedDateTime,
-            calendar: &PlainYearMonth,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_zoned_date_time(
-            this: &ZonedDateTime,
-            calendar: &ZonedDateTime,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn with_calendar_with_str(
-            this: &ZonedDateTime,
-            calendar: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch)]
-        pub fn add(this: &ZonedDateTime, duration: &Duration) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object(
-            this: &ZonedDateTime,
-            duration: &DurationLikeObject,
+            calendar: CalendarLike,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str(
-            this: &ZonedDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<ZonedDateTime, JsValue>;
+        fn __add(this: &ZonedDateTime, duration: DurationLike) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_options(
+        fn __add_with_options(
             this: &ZonedDateTime,
-            duration: &Duration,
-            options: &OverflowOptions,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object_and_options(
-            this: &ZonedDateTime,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str_and_options(
-            this: &ZonedDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch)]
-        pub fn subtract(
-            this: &ZonedDateTime,
-            duration: &Duration,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object(
-            this: &ZonedDateTime,
-            duration: &DurationLikeObject,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str(
-            this: &ZonedDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_options(
-            this: &ZonedDateTime,
-            duration: &Duration,
+            duration: DurationLike,
             options: &OverflowOptions,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object_and_options(
+        fn __subtract(
             this: &ZonedDateTime,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
+            duration: DurationLike,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str_and_options(
+        fn __subtract_with_options(
             this: &ZonedDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
+            duration: DurationLike,
             options: &OverflowOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn until(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time_like_object(
-            this: &ZonedDateTime,
-            other: &ZonedDateTimeLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __until(this: &ZonedDateTime, other: ZonedDateTimeLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str(
+        fn __until_with_options(
             this: &ZonedDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_options(
-            this: &ZonedDateTime,
-            other: &ZonedDateTime,
+            other: ZonedDateTimeLike,
             options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time_like_object_and_options(
-            this: &ZonedDateTime,
-            other: &ZonedDateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str_and_options(
-            this: &ZonedDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn since(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time_like_object(
-            this: &ZonedDateTime,
-            other: &ZonedDateTimeLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __since(this: &ZonedDateTime, other: ZonedDateTimeLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str(
+        fn __since_with_options(
             this: &ZonedDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_options(
-            this: &ZonedDateTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time_like_object_and_options(
-            this: &ZonedDateTime,
-            other: &ZonedDateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str_and_options(
-            this: &ZonedDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
+            other: ZonedDateTimeLike,
             options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
@@ -4089,18 +3352,8 @@ pub mod temporal {
             this: &ZonedDateTime,
             round_to: &RoundingOptions,
         ) -> Result<ZonedDateTime, RangeError>;
-        #[wasm_bindgen(method, catch)]
-        pub fn equals(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_zoned_date_time_like_object(
-            this: &ZonedDateTime,
-            other: &ZonedDateTimeLikeObject,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_str(
-            this: &ZonedDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<bool, JsValue>;
+        fn __equals(this: &ZonedDateTime, other: ZonedDateTimeLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &ZonedDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
@@ -4231,6 +3484,125 @@ pub mod temporal {
         pub fn to_plain_date_time(this: &ZonedDateTime) -> Result<PlainDateTime, JsValue>;
     }
     impl ZonedDateTime {
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from(
+            item: impl ::core::convert::Into<ZonedDateTimeLike>,
+        ) -> Result<ZonedDateTime, Error> {
+            Self::__from(item.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from_with_options(
+            item: impl ::core::convert::Into<ZonedDateTimeLike>,
+            options: &ZonedDateTimeFromOptions,
+        ) -> Result<ZonedDateTime, Error> {
+            Self::__from_with_options(item.into(), options)
+        }
+        pub fn compare(
+            one: impl ::core::convert::Into<ZonedDateTimeLike>,
+            two: impl ::core::convert::Into<ZonedDateTimeLike>,
+        ) -> Result<f64, JsValue> {
+            Self::__compare(one.into(), two.into())
+        }
+        pub fn with_plain_time_with_plain_time(
+            &self,
+            plain_time: impl ::core::convert::Into<PlainTimeLike>,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__with_plain_time_with_plain_time(plain_time.into())
+        }
+        pub fn with_time_zone(
+            &self,
+            time_zone: impl ::core::convert::Into<TimeZoneLike>,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__with_time_zone(time_zone.into())
+        }
+        pub fn with_calendar(
+            &self,
+            calendar: impl ::core::convert::Into<CalendarLike>,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__with_calendar(calendar.into())
+        }
+        pub fn add(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__add(duration.into())
+        }
+        pub fn add_with_options(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+            options: &OverflowOptions,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__add_with_options(duration.into(), options)
+        }
+        pub fn subtract(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__subtract(duration.into())
+        }
+        pub fn subtract_with_options(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+            options: &OverflowOptions,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__subtract_with_options(duration.into(), options)
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn until(
+            &self,
+            other: impl ::core::convert::Into<ZonedDateTimeLike>,
+        ) -> Result<Duration, Error> {
+            self.__until(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn until_with_options(
+            &self,
+            other: impl ::core::convert::Into<ZonedDateTimeLike>,
+            options: &RoundingOptionsWithLargestUnit,
+        ) -> Result<Duration, Error> {
+            self.__until_with_options(other.into(), options)
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn since(
+            &self,
+            other: impl ::core::convert::Into<ZonedDateTimeLike>,
+        ) -> Result<Duration, Error> {
+            self.__since(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn since_with_options(
+            &self,
+            other: impl ::core::convert::Into<ZonedDateTimeLike>,
+            options: &RoundingOptionsWithLargestUnit,
+        ) -> Result<Duration, Error> {
+            self.__since_with_options(other.into(), options)
+        }
+        pub fn equals(
+            &self,
+            other: impl ::core::convert::Into<ZonedDateTimeLike>,
+        ) -> Result<bool, JsValue> {
+            self.__equals(other.into())
+        }
+    }
+    impl ZonedDateTime {
         pub fn get_time_zone_transition_next(&self) -> Result<Nullable<ZonedDateTime>, JsValue> {
             self.__get_time_zone_transition("next")
         }
@@ -4253,29 +3625,23 @@ pub mod temporal {
         #[wasm_bindgen(method, getter, js_name = "relativeTo")]
         pub fn relative_to(this: &DurationRelativeToOptions) -> Option<RelativeToKind>;
         #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-        pub fn set_relative_to(this: &DurationRelativeToOptions, val: &ZonedDateTime);
+        fn __set_relative_to(this: &DurationRelativeToOptions, val: ZonedDateTimeLike);
         #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-        pub fn set_relative_to_with_zoned_date_time_like_object(
+        fn __set_relative_to_with_plain_date_like(
             this: &DurationRelativeToOptions,
-            val: &ZonedDateTimeLikeObject,
+            val: PlainDateLike,
         );
-        #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-        pub fn set_relative_to_with_str(
-            this: &DurationRelativeToOptions,
-            val: impl ::wasm_bindgen::JsStringLike,
-        );
-        #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-        pub fn set_relative_to_with_plain_date(this: &DurationRelativeToOptions, val: &PlainDate);
-        #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-        pub fn set_relative_to_with_plain_date_time(
-            this: &DurationRelativeToOptions,
-            val: &PlainDateTime,
-        );
-        #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-        pub fn set_relative_to_with_date_like_object(
-            this: &DurationRelativeToOptions,
-            val: &DateLikeObject,
-        );
+    }
+    impl DurationRelativeToOptions {
+        pub fn set_relative_to(&self, val: impl ::core::convert::Into<ZonedDateTimeLike>) {
+            self.__set_relative_to(val.into())
+        }
+        pub fn set_relative_to_with_plain_date_like(
+            &self,
+            val: impl ::core::convert::Into<PlainDateLike>,
+        ) {
+            self.__set_relative_to_with_plain_date_like(val.into())
+        }
     }
     impl DurationRelativeToOptions {
         pub fn new() -> DurationRelativeToOptions {
@@ -4296,32 +3662,15 @@ pub mod temporal {
         inner: DurationRelativeToOptions,
     }
     impl DurationRelativeToOptionsBuilder {
-        pub fn relative_to(self, val: &ZonedDateTime) -> Self {
+        pub fn relative_to(self, val: impl ::core::convert::Into<ZonedDateTimeLike>) -> Self {
             self.inner.set_relative_to(val);
             self
         }
-        pub fn relative_to_with_zoned_date_time_like_object(
+        pub fn relative_to_with_plain_date_like(
             self,
-            val: &ZonedDateTimeLikeObject,
+            val: impl ::core::convert::Into<PlainDateLike>,
         ) -> Self {
-            self.inner
-                .set_relative_to_with_zoned_date_time_like_object(val);
-            self
-        }
-        pub fn relative_to_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
-            self.inner.set_relative_to_with_str(val);
-            self
-        }
-        pub fn relative_to_with_plain_date(self, val: &PlainDate) -> Self {
-            self.inner.set_relative_to_with_plain_date(val);
-            self
-        }
-        pub fn relative_to_with_plain_date_time(self, val: &PlainDateTime) -> Self {
-            self.inner.set_relative_to_with_plain_date_time(val);
-            self
-        }
-        pub fn relative_to_with_date_like_object(self, val: &DateLikeObject) -> Self {
-            self.inner.set_relative_to_with_date_like_object(val);
+            self.inner.set_relative_to_with_plain_date_like(val);
             self
         }
         pub fn build(self) -> DurationRelativeToOptions {
@@ -4369,32 +3718,15 @@ pub mod temporal {
         inner: DurationRoundingOptions,
     }
     impl DurationRoundingOptionsBuilder {
-        pub fn relative_to(self, val: &ZonedDateTime) -> Self {
+        pub fn relative_to(self, val: impl ::core::convert::Into<ZonedDateTimeLike>) -> Self {
             self.inner.set_relative_to(val);
             self
         }
-        pub fn relative_to_with_zoned_date_time_like_object(
+        pub fn relative_to_with_plain_date_like(
             self,
-            val: &ZonedDateTimeLikeObject,
+            val: impl ::core::convert::Into<PlainDateLike>,
         ) -> Self {
-            self.inner
-                .set_relative_to_with_zoned_date_time_like_object(val);
-            self
-        }
-        pub fn relative_to_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
-            self.inner.set_relative_to_with_str(val);
-            self
-        }
-        pub fn relative_to_with_plain_date(self, val: &PlainDate) -> Self {
-            self.inner.set_relative_to_with_plain_date(val);
-            self
-        }
-        pub fn relative_to_with_plain_date_time(self, val: &PlainDateTime) -> Self {
-            self.inner.set_relative_to_with_plain_date_time(val);
-            self
-        }
-        pub fn relative_to_with_date_like_object(self, val: &DateLikeObject) -> Self {
-            self.inner.set_relative_to_with_date_like_object(val);
+            self.inner.set_relative_to_with_plain_date_like(val);
             self
         }
         pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
@@ -4486,32 +3818,15 @@ pub mod temporal {
         inner: DurationTotalOptions,
     }
     impl DurationTotalOptionsBuilder {
-        pub fn relative_to(self, val: &ZonedDateTime) -> Self {
+        pub fn relative_to(self, val: impl ::core::convert::Into<ZonedDateTimeLike>) -> Self {
             self.inner.set_relative_to(val);
             self
         }
-        pub fn relative_to_with_zoned_date_time_like_object(
+        pub fn relative_to_with_plain_date_like(
             self,
-            val: &ZonedDateTimeLikeObject,
+            val: impl ::core::convert::Into<PlainDateLike>,
         ) -> Self {
-            self.inner
-                .set_relative_to_with_zoned_date_time_like_object(val);
-            self
-        }
-        pub fn relative_to_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
-            self.inner.set_relative_to_with_str(val);
-            self
-        }
-        pub fn relative_to_with_plain_date(self, val: &PlainDate) -> Self {
-            self.inner.set_relative_to_with_plain_date(val);
-            self
-        }
-        pub fn relative_to_with_plain_date_time(self, val: &PlainDateTime) -> Self {
-            self.inner.set_relative_to_with_plain_date_time(val);
-            self
-        }
-        pub fn relative_to_with_date_like_object(self, val: &DateLikeObject) -> Self {
-            self.inner.set_relative_to_with_date_like_object(val);
+            self.inner.set_relative_to_with_plain_date_like(val);
             self
         }
         pub fn build(self) -> DurationTotalOptions {
@@ -4638,191 +3953,14 @@ pub mod temporal {
             microseconds: f64,
             nanoseconds: f64,
         ) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch)]
-        pub fn from(item: &Duration) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_duration_like_object(item: &DurationLikeObject)
-            -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch)]
-        pub fn compare(one: &Duration, two: &Duration) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __from(item: DurationLike) -> Result<Duration, Error>;
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_like_object_and_duration(
-            one: &DurationLikeObject,
-            two: &Duration,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __compare(one: DurationLike, two: DurationLike) -> Result<f64, Error>;
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_duration(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &Duration,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_and_duration_like_object(
-            one: &Duration,
-            two: &DurationLikeObject,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_like_object_and_duration_like_object(
-            one: &DurationLikeObject,
-            two: &DurationLikeObject,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_duration_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &DurationLikeObject,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_and_str(
-            one: &Duration,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_like_object_and_str(
-            one: &DurationLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_options(
-            one: &Duration,
-            two: &Duration,
-            options: &DurationRelativeToOptions,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_like_object_and_duration_and_options(
-            one: &DurationLikeObject,
-            two: &Duration,
-            options: &DurationRelativeToOptions,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_duration_and_options(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &Duration,
-            options: &DurationRelativeToOptions,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_and_duration_like_object_and_options(
-            one: &Duration,
-            two: &DurationLikeObject,
-            options: &DurationRelativeToOptions,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_like_object_and_duration_like_object_and_options(
-            one: &DurationLikeObject,
-            two: &DurationLikeObject,
-            options: &DurationRelativeToOptions,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_duration_like_object_and_options(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &DurationLikeObject,
-            options: &DurationRelativeToOptions,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_and_str_and_options(
-            one: &Duration,
-            two: impl ::wasm_bindgen::JsStringLike,
-            options: &DurationRelativeToOptions,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_duration_like_object_and_str_and_options(
-            one: &DurationLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
-            options: &DurationRelativeToOptions,
-        ) -> Result<f64, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_str_and_options(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
+        fn __compare_with_options(
+            one: DurationLike,
+            two: DurationLike,
             options: &DurationRelativeToOptions,
         ) -> Result<f64, Error>;
         #[wasm_bindgen(method, getter)]
@@ -4860,54 +3998,10 @@ pub mod temporal {
         pub fn negated(this: &Duration) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch)]
         pub fn abs(this: &Duration) -> Result<Duration, JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn add(this: &Duration, other: &Duration) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object(
-            this: &Duration,
-            other: &DurationLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str(
-            this: &Duration,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn subtract(this: &Duration, other: &Duration) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __add(this: &Duration, other: DurationLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object(
-            this: &Duration,
-            other: &DurationLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str(
-            this: &Duration,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
+        fn __subtract(this: &Duration, other: DurationLike) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid, or calendar units need `relativeTo`"]
@@ -5038,6 +4132,56 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &Duration) -> Result<(), JsValue>;
     }
+    impl Duration {
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from(item: impl ::core::convert::Into<DurationLike>) -> Result<Duration, Error> {
+            Self::__from(item.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn compare(
+            one: impl ::core::convert::Into<DurationLike>,
+            two: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<f64, Error> {
+            Self::__compare(one.into(), two.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn compare_with_options(
+            one: impl ::core::convert::Into<DurationLike>,
+            two: impl ::core::convert::Into<DurationLike>,
+            options: &DurationRelativeToOptions,
+        ) -> Result<f64, Error> {
+            Self::__compare_with_options(one.into(), two.into(), options)
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn add(
+            &self,
+            other: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<Duration, Error> {
+            self.__add(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn subtract(
+            &self,
+            other: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<Duration, Error> {
+            self.__subtract(other.into())
+        }
+    }
     impl core::fmt::Display for Duration {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
             f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
@@ -5049,14 +4193,14 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type InstantToStringOptions;
         #[wasm_bindgen(method, getter, js_name = "timeZone")]
-        pub fn time_zone(this: &InstantToStringOptions) -> Option<TimeZoneKind>;
+        pub fn time_zone(this: &InstantToStringOptions) -> Option<TimeZoneLike>;
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
-        pub fn set_time_zone(this: &InstantToStringOptions, val: &ZonedDateTime);
-        #[wasm_bindgen(method, setter, js_name = "timeZone")]
-        pub fn set_time_zone_with_str(
-            this: &InstantToStringOptions,
-            val: impl ::wasm_bindgen::JsStringLike,
-        );
+        fn __set_time_zone(this: &InstantToStringOptions, val: TimeZoneLike);
+    }
+    impl InstantToStringOptions {
+        pub fn set_time_zone(&self, val: impl ::core::convert::Into<TimeZoneLike>) {
+            self.__set_time_zone(val.into())
+        }
     }
     impl InstantToStringOptions {
         pub fn new() -> InstantToStringOptions {
@@ -5093,12 +4237,8 @@ pub mod temporal {
             self.inner.set_fractional_second_digits_with_f64(val);
             self
         }
-        pub fn time_zone(self, val: &ZonedDateTime) -> Self {
+        pub fn time_zone(self, val: impl ::core::convert::Into<TimeZoneLike>) -> Self {
             self.inner.set_time_zone(val);
-            self
-        }
-        pub fn time_zone_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
-            self.inner.set_time_zone_with_str(val);
             self
         }
         pub fn build(self) -> InstantToStringOptions {
@@ -5115,23 +4255,8 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new(epoch_nanoseconds: &BigInt) -> Result<Instant, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch)]
-        pub fn from(item: &Instant) -> Result<Instant, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> Result<Instant, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str(
-            item: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Instant, RangeError>;
+        fn __from(item: InstantLike) -> Result<Instant, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the instant is outside the representable range"]
@@ -5142,194 +4267,30 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the instant is outside the representable range"]
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "fromEpochNanoseconds")]
         pub fn from_epoch_nanoseconds(epoch_nanoseconds: &BigInt) -> Result<Instant, RangeError>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch)]
-        pub fn compare(one: &Instant, two: &Instant) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_instant(
-            one: &ZonedDateTime,
-            two: &Instant,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_instant(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &Instant,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_instant_and_zoned_date_time(
-            one: &Instant,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_zoned_date_time(
-            one: &ZonedDateTime,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_zoned_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTime,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_instant_and_str(
-            one: &Instant,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_str(
-            one: &ZonedDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
+        fn __compare(one: InstantLike, two: InstantLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter, js_name = "epochMilliseconds")]
         pub fn epoch_milliseconds(this: &Instant) -> f64;
         #[wasm_bindgen(method, getter, js_name = "epochNanoseconds")]
         pub fn epoch_nanoseconds(this: &Instant) -> BigInt;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn add(this: &Instant, duration: &Duration) -> Result<Instant, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object(
-            this: &Instant,
-            duration: &DurationLikeObject,
-        ) -> Result<Instant, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str(
-            this: &Instant,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Instant, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn subtract(this: &Instant, duration: &Duration) -> Result<Instant, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __add(this: &Instant, duration: DurationLike) -> Result<Instant, Error>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object(
-            this: &Instant,
-            duration: &DurationLikeObject,
-        ) -> Result<Instant, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str(
-            this: &Instant,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Instant, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[wasm_bindgen(method, catch)]
-        pub fn until(this: &Instant, other: &Instant) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
+        fn __subtract(this: &Instant, duration: DurationLike) -> Result<Instant, Error>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time(
-            this: &Instant,
-            other: &ZonedDateTime,
-        ) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
+        fn __until(this: &Instant, other: InstantLike) -> Result<Duration, RangeError>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str(
+        fn __until_with_options(
             this: &Instant,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_options(
-            this: &Instant,
-            other: &Instant,
+            other: InstantLike,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_zoned_date_time_and_options(
-            this: &Instant,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str_and_options(
-            this: &Instant,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[wasm_bindgen(method, catch)]
-        pub fn since(this: &Instant, other: &Instant) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time(
-            this: &Instant,
-            other: &ZonedDateTime,
-        ) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
+        fn __since(this: &Instant, other: InstantLike) -> Result<Duration, RangeError>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str(
+        fn __since_with_options(
             this: &Instant,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_options(
-            this: &Instant,
-            other: &Instant,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_zoned_date_time_and_options(
-            this: &Instant,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the options are invalid"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str_and_options(
-            this: &Instant,
-            other: impl ::wasm_bindgen::JsStringLike,
+            other: InstantLike,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -5345,18 +4306,8 @@ pub mod temporal {
             this: &Instant,
             round_to: &RoundingOptions<TimeUnit>,
         ) -> Result<Instant, RangeError>;
-        #[wasm_bindgen(method, catch)]
-        pub fn equals(this: &Instant, other: &Instant) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_zoned_date_time(
-            this: &Instant,
-            other: &ZonedDateTime,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_str(
-            this: &Instant,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<bool, JsValue>;
+        fn __equals(this: &Instant, other: InstantLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &Instant) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
@@ -5466,15 +4417,94 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &Instant) -> Result<(), JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTimeISO")]
+        fn __to_zoned_date_time_iso(
+            this: &Instant,
+            time_zone: TimeZoneLike,
+        ) -> Result<ZonedDateTime, JsValue>;
+    }
+    impl Instant {
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
+        pub fn from(item: impl ::core::convert::Into<InstantLike>) -> Result<Instant, RangeError> {
+            Self::__from(item.into())
+        }
+        pub fn compare(
+            one: impl ::core::convert::Into<InstantLike>,
+            two: impl ::core::convert::Into<InstantLike>,
+        ) -> Result<f64, JsValue> {
+            Self::__compare(one.into(), two.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn add(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<Instant, Error> {
+            self.__add(duration.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn subtract(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<Instant, Error> {
+            self.__subtract(duration.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the options are invalid"]
+        pub fn until(
+            &self,
+            other: impl ::core::convert::Into<InstantLike>,
+        ) -> Result<Duration, RangeError> {
+            self.__until(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the options are invalid"]
+        pub fn until_with_options(
+            &self,
+            other: impl ::core::convert::Into<InstantLike>,
+            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
+        ) -> Result<Duration, RangeError> {
+            self.__until_with_options(other.into(), options)
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the options are invalid"]
+        pub fn since(
+            &self,
+            other: impl ::core::convert::Into<InstantLike>,
+        ) -> Result<Duration, RangeError> {
+            self.__since(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the options are invalid"]
+        pub fn since_with_options(
+            &self,
+            other: impl ::core::convert::Into<InstantLike>,
+            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
+        ) -> Result<Duration, RangeError> {
+            self.__since_with_options(other.into(), options)
+        }
+        pub fn equals(
+            &self,
+            other: impl ::core::convert::Into<InstantLike>,
+        ) -> Result<bool, JsValue> {
+            self.__equals(other.into())
+        }
         pub fn to_zoned_date_time_iso(
-            this: &Instant,
-            time_zone: &ZonedDateTime,
-        ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toZonedDateTimeISO")]
-        pub fn to_zoned_date_time_iso_with_str(
-            this: &Instant,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<ZonedDateTime, JsValue>;
+            &self,
+            time_zone: impl ::core::convert::Into<TimeZoneLike>,
+        ) -> Result<ZonedDateTime, JsValue> {
+            self.__to_zoned_date_time_iso(time_zone.into())
+        }
     }
     impl core::fmt::Display for Instant {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -5528,97 +4558,15 @@ pub mod temporal {
             calendar: impl ::wasm_bindgen::JsStringLike,
             reference_iso_day: f64,
         ) -> Result<PlainYearMonth, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch)]
-        pub fn from(item: &PlainYearMonth) -> Result<PlainYearMonth, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_year_month_like_object(
-            item: &YearMonthLikeObject,
-        ) -> Result<PlainYearMonth, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __from(item: PlainYearMonthLike) -> Result<PlainYearMonth, Error>;
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str(
-            item: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainYearMonth, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_options(
-            item: &PlainYearMonth,
+        fn __from_with_options(
+            item: PlainYearMonthLike,
             options: &OverflowOptions,
         ) -> Result<PlainYearMonth, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_year_month_like_object_and_options(
-            item: &YearMonthLikeObject,
-            options: &OverflowOptions,
-        ) -> Result<PlainYearMonth, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
-        ) -> Result<PlainYearMonth, Error>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch)]
-        pub fn compare(one: &PlainYearMonth, two: &PlainYearMonth) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_year_month_like_object_and_plain_year_month(
-            one: &YearMonthLikeObject,
-            two: &PlainYearMonth,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_plain_year_month(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainYearMonth,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_year_month_and_year_month_like_object(
-            one: &PlainYearMonth,
-            two: &YearMonthLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_year_month_like_object_and_year_month_like_object(
-            one: &YearMonthLikeObject,
-            two: &YearMonthLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_year_month_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &YearMonthLikeObject,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_plain_year_month_and_str(
-            one: &PlainYearMonth,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_year_month_like_object_and_str(
-            one: &YearMonthLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, JsValue>;
+        fn __compare(one: PlainYearMonthLike, two: PlainYearMonthLike) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
         pub fn calendar_id(this: &PlainYearMonth) -> String;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
@@ -5664,189 +4612,43 @@ pub mod temporal {
             year_month_like: &PartialYearMonthLikeObject,
             options: &OverflowOptions,
         ) -> Result<PlainYearMonth, Error>;
-        #[wasm_bindgen(method, catch)]
-        pub fn add(this: &PlainYearMonth, duration: &Duration) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object(
-            this: &PlainYearMonth,
-            duration: &DurationLikeObject,
-        ) -> Result<PlainYearMonth, JsValue>;
+        fn __add(this: &PlainYearMonth, duration: DurationLike) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str(
+        fn __add_with_options(
             this: &PlainYearMonth,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_options(
-            this: &PlainYearMonth,
-            duration: &Duration,
-            options: &OverflowOptions,
-        ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_duration_like_object_and_options(
-            this: &PlainYearMonth,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
-        ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn add_with_str_and_options(
-            this: &PlainYearMonth,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
-        ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, catch)]
-        pub fn subtract(
-            this: &PlainYearMonth,
-            duration: &Duration,
-        ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object(
-            this: &PlainYearMonth,
-            duration: &DurationLikeObject,
-        ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str(
-            this: &PlainYearMonth,
-            duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_options(
-            this: &PlainYearMonth,
-            duration: &Duration,
+            duration: DurationLike,
             options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_duration_like_object_and_options(
+        fn __subtract(
             this: &PlainYearMonth,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
+            duration: DurationLike,
         ) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn subtract_with_str_and_options(
+        fn __subtract_with_options(
             this: &PlainYearMonth,
-            duration: impl ::wasm_bindgen::JsStringLike,
+            duration: DurationLike,
             options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn until(this: &PlainYearMonth, other: &PlainYearMonth) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_year_month_like_object(
-            this: &PlainYearMonth,
-            other: &YearMonthLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __until(this: &PlainYearMonth, other: PlainYearMonthLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str(
+        fn __until_with_options(
             this: &PlainYearMonth,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_options(
-            this: &PlainYearMonth,
-            other: &PlainYearMonth,
+            other: PlainYearMonthLike,
             options: &RoundingOptionsWithLargestUnit<String>,
         ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_year_month_like_object_and_options(
-            this: &PlainYearMonth,
-            other: &YearMonthLikeObject,
-            options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn until_with_str_and_options(
-            this: &PlainYearMonth,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch)]
-        pub fn since(this: &PlainYearMonth, other: &PlainYearMonth) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_year_month_like_object(
-            this: &PlainYearMonth,
-            other: &YearMonthLikeObject,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __since(this: &PlainYearMonth, other: PlainYearMonthLike) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str(
+        fn __since_with_options(
             this: &PlainYearMonth,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_options(
-            this: &PlainYearMonth,
-            other: &PlainYearMonth,
+            other: PlainYearMonthLike,
             options: &RoundingOptionsWithLargestUnit<String>,
         ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_year_month_like_object_and_options(
-            this: &PlainYearMonth,
-            other: &YearMonthLikeObject,
-            options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Result<Duration, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn since_with_str_and_options(
-            this: &PlainYearMonth,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Result<Duration, Error>;
-        #[wasm_bindgen(method, catch)]
-        pub fn equals(this: &PlainYearMonth, other: &PlainYearMonth) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_year_month_like_object(
-            this: &PlainYearMonth,
-            other: &YearMonthLikeObject,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_str(
-            this: &PlainYearMonth,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<bool, JsValue>;
+        fn __equals(this: &PlainYearMonth, other: PlainYearMonthLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainYearMonth) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
@@ -5961,6 +4763,107 @@ pub mod temporal {
             item: &PlainYearMonthToPlainDateOptions,
         ) -> Result<PlainDate, JsValue>;
     }
+    impl PlainYearMonth {
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from(
+            item: impl ::core::convert::Into<PlainYearMonthLike>,
+        ) -> Result<PlainYearMonth, Error> {
+            Self::__from(item.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from_with_options(
+            item: impl ::core::convert::Into<PlainYearMonthLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainYearMonth, Error> {
+            Self::__from_with_options(item.into(), options)
+        }
+        pub fn compare(
+            one: impl ::core::convert::Into<PlainYearMonthLike>,
+            two: impl ::core::convert::Into<PlainYearMonthLike>,
+        ) -> Result<f64, JsValue> {
+            Self::__compare(one.into(), two.into())
+        }
+        pub fn add(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<PlainYearMonth, JsValue> {
+            self.__add(duration.into())
+        }
+        pub fn add_with_options(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainYearMonth, JsValue> {
+            self.__add_with_options(duration.into(), options)
+        }
+        pub fn subtract(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+        ) -> Result<PlainYearMonth, JsValue> {
+            self.__subtract(duration.into())
+        }
+        pub fn subtract_with_options(
+            &self,
+            duration: impl ::core::convert::Into<DurationLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainYearMonth, JsValue> {
+            self.__subtract_with_options(duration.into(), options)
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn until(
+            &self,
+            other: impl ::core::convert::Into<PlainYearMonthLike>,
+        ) -> Result<Duration, Error> {
+            self.__until(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn until_with_options(
+            &self,
+            other: impl ::core::convert::Into<PlainYearMonthLike>,
+            options: &RoundingOptionsWithLargestUnit<String>,
+        ) -> Result<Duration, Error> {
+            self.__until_with_options(other.into(), options)
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn since(
+            &self,
+            other: impl ::core::convert::Into<PlainYearMonthLike>,
+        ) -> Result<Duration, Error> {
+            self.__since(other.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn since_with_options(
+            &self,
+            other: impl ::core::convert::Into<PlainYearMonthLike>,
+            options: &RoundingOptionsWithLargestUnit<String>,
+        ) -> Result<Duration, Error> {
+            self.__since_with_options(other.into(), options)
+        }
+        pub fn equals(
+            &self,
+            other: impl ::core::convert::Into<PlainYearMonthLike>,
+        ) -> Result<bool, JsValue> {
+            self.__equals(other.into())
+        }
+    }
     impl core::fmt::Display for PlainYearMonth {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
             f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
@@ -6053,51 +4956,11 @@ pub mod temporal {
             calendar: impl ::wasm_bindgen::JsStringLike,
             reference_iso_year: f64,
         ) -> Result<PlainMonthDay, RangeError>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch)]
-        pub fn from(item: &PlainMonthDay) -> Result<PlainMonthDay, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_date_like_object(item: &DateLikeObject) -> Result<PlainMonthDay, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        fn __from(item: PlainMonthDayLike) -> Result<PlainMonthDay, Error>;
         # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str(
-            item: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainMonthDay, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_options(
-            item: &PlainMonthDay,
-            options: &OverflowOptions,
-        ) -> Result<PlainMonthDay, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_date_like_object_and_options(
-            item: &DateLikeObject,
-            options: &OverflowOptions,
-        ) -> Result<PlainMonthDay, Error>;
-        #[doc = " ## Errors"]
-        #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
+        fn __from_with_options(
+            item: PlainMonthDayLike,
             options: &OverflowOptions,
         ) -> Result<PlainMonthDay, Error>;
         #[wasm_bindgen(method, getter, js_name = "calendarId")]
@@ -6129,18 +4992,8 @@ pub mod temporal {
             month_day_like: &PartialDateLikeObject,
             options: &OverflowOptions,
         ) -> Result<PlainMonthDay, Error>;
-        #[wasm_bindgen(method, catch)]
-        pub fn equals(this: &PlainMonthDay, other: &PlainMonthDay) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_date_like_object(
-            this: &PlainMonthDay,
-            other: &DateLikeObject,
-        ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn equals_with_str(
-            this: &PlainMonthDay,
-            other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<bool, JsValue>;
+        fn __equals(this: &PlainMonthDay, other: PlainMonthDayLike) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainMonthDay) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
@@ -6254,6 +5107,33 @@ pub mod temporal {
             this: &PlainMonthDay,
             item: &PlainMonthDayToPlainDateOptions,
         ) -> Result<PlainDate, JsValue>;
+    }
+    impl PlainMonthDay {
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from(
+            item: impl ::core::convert::Into<PlainMonthDayLike>,
+        ) -> Result<PlainMonthDay, Error> {
+            Self::__from(item.into())
+        }
+        #[doc = " ## Errors"]
+        #[doc = ""]
+        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        pub fn from_with_options(
+            item: impl ::core::convert::Into<PlainMonthDayLike>,
+            options: &OverflowOptions,
+        ) -> Result<PlainMonthDay, Error> {
+            Self::__from_with_options(item.into(), options)
+        }
+        pub fn equals(
+            &self,
+            other: impl ::core::convert::Into<PlainMonthDayLike>,
+        ) -> Result<bool, JsValue> {
+            self.__equals(other.into())
+        }
     }
     impl core::fmt::Display for PlainMonthDay {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -6733,11 +5613,6 @@ pub mod temporal {
     }
 }
 #[wasm_bindgen(private)]
-pub enum TimeZoneKind {
-    ZonedDateTime(temporal::ZonedDateTime),
-    String(String),
-}
-#[wasm_bindgen(private)]
 pub enum DisambiguationKind {
     Compatible = "compatible",
     Earlier = "earlier",
@@ -6801,14 +5676,6 @@ pub enum CalendarNameKind {
     Always = "always",
     Never = "never",
     Critical = "critical",
-}
-#[wasm_bindgen(private, fallback)]
-pub enum PlainTimeKind {
-    PlainTime(temporal::PlainTime),
-    PlainDateTime(temporal::PlainDateTime),
-    ZonedDateTime(temporal::ZonedDateTime),
-    String(String),
-    TimeLikeObject(temporal::TimeLikeObject),
 }
 #[wasm_bindgen(private)]
 pub enum OffsetKind {

@@ -23,6 +23,185 @@ extern "C" {
     pub fn new(day: f64) -> Result<Day, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn day(this: &Day) -> f64;
+    # [wasm_bindgen (static_method_of = Day , js_name = "from")]
+    fn __from(item: DayLike) -> Day;
+    # [wasm_bindgen (static_method_of = Day , catch , js_name = "from")]
+    fn __try_from(item: DayLike) -> Result<Day, JsValue>;
+    # [wasm_bindgen (static_method_of = Day , js_name = "from")]
+    fn __from_with_options(item: DayLike, options: &FromOptions) -> Day;
+    # [wasm_bindgen (static_method_of = Day , catch , js_name = "from")]
+    fn __try_from_with_options(item: DayLike, options: &FromOptions) -> Result<Day, JsValue>;
+    # [wasm_bindgen (static_method_of = Day , js_name = "compare")]
+    fn __compare(one: DayLike, two: DayLike) -> f64;
+    # [wasm_bindgen (static_method_of = Day , catch , js_name = "compare")]
+    fn __try_compare(one: DayLike, two: DayLike) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, js_name = "equals")]
+    fn __equals(this: &Day, other: DayLike) -> bool;
+    #[wasm_bindgen(method, catch, js_name = "equals")]
+    fn __try_equals(this: &Day, other: DayLike) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, js_name = "until")]
+    fn __until(this: &Day, other: DayLike) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "until")]
+    fn __try_until(this: &Day, other: DayLike) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, js_name = "until")]
+    fn __until_with_options(this: &Day, other: DayLike, options: &FromOptions) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "until")]
+    fn __try_until_with_options(
+        this: &Day,
+        other: DayLike,
+        options: &FromOptions,
+    ) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, js_name = "shift")]
+    fn __shift(this: &Day, offset: Offset) -> Day;
+    #[wasm_bindgen(method, catch, js_name = "shift")]
+    fn __try_shift(this: &Day, offset: Offset) -> Result<Day, JsValue>;
+    #[wasm_bindgen(method, js_name = "step")]
+    fn __step(this: &Day, direction: &str, other: DayLike) -> String;
+    #[wasm_bindgen(method, catch, js_name = "step")]
+    fn __try_step(this: &Day, direction: &str, other: DayLike) -> Result<String, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn pick(this: &Day) -> String;
+    #[wasm_bindgen(method, catch, js_name = "pick")]
+    pub fn try_pick(this: &Day) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "pick")]
+    fn __pick_with_other(this: &Day, other: MaybeDay) -> String;
+    #[wasm_bindgen(method, catch, js_name = "pick")]
+    fn __try_pick_with_other(this: &Day, other: MaybeDay) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "pick")]
+    fn __pick_with_null(this: &Day, other: &::wasm_bindgen::JsValue) -> String;
+    #[wasm_bindgen(method, catch, js_name = "pick")]
+    fn __try_pick_with_null(this: &Day, other: &::wasm_bindgen::JsValue)
+        -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "between")]
+    fn __between(this: &Day, start: Option<DayLike>, end: DayLike) -> String;
+    #[wasm_bindgen(method, catch, js_name = "between")]
+    fn __try_between(this: &Day, start: Option<DayLike>, end: DayLike) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "later")]
+    async fn __later(this: &Day, other: DayLike) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "later")]
+    fn __later_promise(this: &Day, other: DayLike) -> Promise<JsString>;
+}
+impl Day {
+    pub fn from(item: impl ::core::convert::Into<DayLike>) -> Day {
+        Self::__from(item.into())
+    }
+    pub fn try_from(item: impl ::core::convert::Into<DayLike>) -> Result<Day, JsValue> {
+        Self::__try_from(item.into())
+    }
+    pub fn from_with_options(
+        item: impl ::core::convert::Into<DayLike>,
+        options: &FromOptions,
+    ) -> Day {
+        Self::__from_with_options(item.into(), options)
+    }
+    pub fn try_from_with_options(
+        item: impl ::core::convert::Into<DayLike>,
+        options: &FromOptions,
+    ) -> Result<Day, JsValue> {
+        Self::__try_from_with_options(item.into(), options)
+    }
+    pub fn compare(
+        one: impl ::core::convert::Into<DayLike>,
+        two: impl ::core::convert::Into<DayLike>,
+    ) -> f64 {
+        Self::__compare(one.into(), two.into())
+    }
+    pub fn try_compare(
+        one: impl ::core::convert::Into<DayLike>,
+        two: impl ::core::convert::Into<DayLike>,
+    ) -> Result<f64, JsValue> {
+        Self::__try_compare(one.into(), two.into())
+    }
+    pub fn equals(&self, other: impl ::core::convert::Into<DayLike>) -> bool {
+        self.__equals(other.into())
+    }
+    pub fn try_equals(&self, other: impl ::core::convert::Into<DayLike>) -> Result<bool, JsValue> {
+        self.__try_equals(other.into())
+    }
+    pub fn until(&self, other: impl ::core::convert::Into<DayLike>) -> f64 {
+        self.__until(other.into())
+    }
+    pub fn try_until(&self, other: impl ::core::convert::Into<DayLike>) -> Result<f64, JsValue> {
+        self.__try_until(other.into())
+    }
+    pub fn until_with_options(
+        &self,
+        other: impl ::core::convert::Into<DayLike>,
+        options: &FromOptions,
+    ) -> f64 {
+        self.__until_with_options(other.into(), options)
+    }
+    pub fn try_until_with_options(
+        &self,
+        other: impl ::core::convert::Into<DayLike>,
+        options: &FromOptions,
+    ) -> Result<f64, JsValue> {
+        self.__try_until_with_options(other.into(), options)
+    }
+    pub fn shift(&self, offset: impl ::core::convert::Into<Offset>) -> Day {
+        self.__shift(offset.into())
+    }
+    pub fn try_shift(&self, offset: impl ::core::convert::Into<Offset>) -> Result<Day, JsValue> {
+        self.__try_shift(offset.into())
+    }
+    pub fn pick_with_other(&self, other: impl ::core::convert::Into<MaybeDay>) -> String {
+        self.__pick_with_other(other.into())
+    }
+    pub fn try_pick_with_other(
+        &self,
+        other: impl ::core::convert::Into<MaybeDay>,
+    ) -> Result<String, JsValue> {
+        self.__try_pick_with_other(other.into())
+    }
+    pub fn pick_with_null(&self) -> String {
+        self.__pick_with_null(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_pick_with_null(&self) -> Result<String, JsValue> {
+        self.__try_pick_with_null(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn between(
+        &self,
+        start: Option<DayLike>,
+        end: impl ::core::convert::Into<DayLike>,
+    ) -> String {
+        self.__between(start, end.into())
+    }
+    pub fn try_between(
+        &self,
+        start: Option<DayLike>,
+        end: impl ::core::convert::Into<DayLike>,
+    ) -> Result<String, JsValue> {
+        self.__try_between(start, end.into())
+    }
+    pub async fn later(
+        &self,
+        other: impl ::core::convert::Into<DayLike>,
+    ) -> Result<String, JsValue> {
+        self.__later(other.into()).await
+    }
+    pub fn later_promise(&self, other: impl ::core::convert::Into<DayLike>) -> Promise<JsString> {
+        self.__later_promise(other.into())
+    }
+}
+impl Day {
+    pub fn step_next(&self, other: impl ::core::convert::Into<DayLike>) -> String {
+        self.__step("next", other.into())
+    }
+    pub fn step_previous(&self, other: impl ::core::convert::Into<DayLike>) -> String {
+        self.__step("previous", other.into())
+    }
+    pub fn try_step_next(
+        &self,
+        other: impl ::core::convert::Into<DayLike>,
+    ) -> Result<String, JsValue> {
+        self.__try_step("next", other.into())
+    }
+    pub fn try_step_previous(
+        &self,
+        other: impl ::core::convert::Into<DayLike>,
+    ) -> Result<String, JsValue> {
+        self.__try_step("previous", other.into())
+    }
 }
 #[wasm_bindgen(module = "union-alias-reads")]
 extern "C" {
@@ -62,98 +241,389 @@ impl DayFields {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type FromOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn overflow(this: &FromOptions) -> Option<OverflowKind>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_overflow(this: &FromOptions, val: OverflowKind);
+}
+impl FromOptions {
+    pub fn new() -> FromOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> FromOptionsBuilder {
+        FromOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for FromOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct FromOptionsBuilder {
+    inner: FromOptions,
+}
+impl FromOptionsBuilder {
+    pub fn overflow(self, val: OverflowKind) -> Self {
+        self.inner.set_overflow(val);
+        self
+    }
+    pub fn build(self) -> FromOptions {
+        self.inner
+    }
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum ZonedLike {
+    Zoned(Zoned),
+    String(String),
+    ZonedFields(ZonedFields),
+}
+impl ::core::convert::From<Zoned> for ZonedLike {
+    fn from(value: Zoned) -> Self {
+        Self::Zoned(value)
+    }
+}
+impl ::core::convert::From<&Zoned> for ZonedLike {
+    fn from(value: &Zoned) -> Self {
+        Self::Zoned(value.clone())
+    }
+}
+impl ::core::convert::From<&str> for ZonedLike {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for ZonedLike {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for ZonedLike {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for ZonedLike {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for ZonedLike {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<ZonedFields> for ZonedLike {
+    fn from(value: ZonedFields) -> Self {
+        Self::ZonedFields(value)
+    }
+}
+impl ::core::convert::From<&ZonedFields> for ZonedLike {
+    fn from(value: &ZonedFields) -> Self {
+        Self::ZonedFields(value.clone())
+    }
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum DayLike {
+    Day(Day),
+    Zoned(Zoned),
+    String(String),
+    DayFields(DayFields),
+}
+impl ::core::convert::From<Day> for DayLike {
+    fn from(value: Day) -> Self {
+        Self::Day(value)
+    }
+}
+impl ::core::convert::From<&Day> for DayLike {
+    fn from(value: &Day) -> Self {
+        Self::Day(value.clone())
+    }
+}
+impl ::core::convert::From<Zoned> for DayLike {
+    fn from(value: Zoned) -> Self {
+        Self::Zoned(value)
+    }
+}
+impl ::core::convert::From<&Zoned> for DayLike {
+    fn from(value: &Zoned) -> Self {
+        Self::Zoned(value.clone())
+    }
+}
+impl ::core::convert::From<&str> for DayLike {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for DayLike {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for DayLike {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for DayLike {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for DayLike {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<DayFields> for DayLike {
+    fn from(value: DayFields) -> Self {
+        Self::DayFields(value)
+    }
+}
+impl ::core::convert::From<&DayFields> for DayLike {
+    fn from(value: &DayFields) -> Self {
+        Self::DayFields(value.clone())
+    }
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Zone {
+    Zoned(Zoned),
+    String(String),
+}
+impl ::core::convert::From<Zoned> for Zone {
+    fn from(value: Zoned) -> Self {
+        Self::Zoned(value)
+    }
+}
+impl ::core::convert::From<&Zoned> for Zone {
+    fn from(value: &Zoned) -> Self {
+        Self::Zoned(value.clone())
+    }
+}
+impl ::core::convert::From<&str> for Zone {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for Zone {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for Zone {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for Zone {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for Zone {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Fields {
+    ZonedFields(ZonedFields),
+    DayFields(DayFields),
+}
+impl ::core::convert::From<ZonedFields> for Fields {
+    fn from(value: ZonedFields) -> Self {
+        Self::ZonedFields(value)
+    }
+}
+impl ::core::convert::From<&ZonedFields> for Fields {
+    fn from(value: &ZonedFields) -> Self {
+        Self::ZonedFields(value.clone())
+    }
+}
+impl ::core::convert::From<DayFields> for Fields {
+    fn from(value: DayFields) -> Self {
+        Self::DayFields(value)
+    }
+}
+impl ::core::convert::From<&DayFields> for Fields {
+    fn from(value: &DayFields) -> Self {
+        Self::DayFields(value.clone())
+    }
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Offset {
+    F64(f64),
+    String(String),
+    Bool(bool),
+}
+impl ::core::convert::From<f64> for Offset {
+    fn from(value: f64) -> Self {
+        Self::F64(value)
+    }
+}
+impl ::core::convert::From<&str> for Offset {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for Offset {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for Offset {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for Offset {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for Offset {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<bool> for Offset {
+    fn from(value: bool) -> Self {
+        Self::Bool(value)
+    }
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum MaybeDay {
+    Day(Day),
+    Zoned(Zoned),
+    String(String),
+    DayFields(DayFields),
+}
+impl ::core::convert::From<Day> for MaybeDay {
+    fn from(value: Day) -> Self {
+        Self::Day(value)
+    }
+}
+impl ::core::convert::From<&Day> for MaybeDay {
+    fn from(value: &Day) -> Self {
+        Self::Day(value.clone())
+    }
+}
+impl ::core::convert::From<Zoned> for MaybeDay {
+    fn from(value: Zoned) -> Self {
+        Self::Zoned(value)
+    }
+}
+impl ::core::convert::From<&Zoned> for MaybeDay {
+    fn from(value: &Zoned) -> Self {
+        Self::Zoned(value.clone())
+    }
+}
+impl ::core::convert::From<&str> for MaybeDay {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for MaybeDay {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for MaybeDay {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for MaybeDay {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for MaybeDay {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<DayFields> for MaybeDay {
+    fn from(value: DayFields) -> Self {
+        Self::DayFields(value)
+    }
+}
+impl ::core::convert::From<&DayFields> for MaybeDay {
+    fn from(value: &DayFields) -> Self {
+        Self::DayFields(value.clone())
+    }
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RelativeOptions;
     #[doc = " Two aliases sharing `Zoned` and `string`, with a dictionary each."]
     #[wasm_bindgen(method, getter, js_name = "relativeTo")]
     pub fn relative_to(this: &RelativeOptions) -> Option<RelativeToKind>;
     #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-    pub fn set_relative_to(this: &RelativeOptions, val: &Zoned);
+    fn __set_relative_to(this: &RelativeOptions, val: ZonedLike);
     #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-    pub fn set_relative_to_with_zoned_fields(this: &RelativeOptions, val: &ZonedFields);
-    #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-    pub fn set_relative_to_with_str(this: &RelativeOptions, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-    pub fn set_relative_to_with_day(this: &RelativeOptions, val: &Day);
-    #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-    pub fn set_relative_to_with_day_fields(this: &RelativeOptions, val: &DayFields);
+    fn __set_relative_to_with_day_like(this: &RelativeOptions, val: DayLike);
     #[doc = " A union alias read whole."]
     #[wasm_bindgen(method, getter)]
-    pub fn zone(this: &RelativeOptions) -> ZoneKind;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_zone(this: &RelativeOptions, val: &Zoned);
+    pub fn zone(this: &RelativeOptions) -> Zone;
     #[wasm_bindgen(method, setter, js_name = "zone")]
-    pub fn set_zone_with_str(this: &RelativeOptions, val: &str);
-    #[doc = " A lone dictionary keeps its own type."]
+    fn __set_zone(this: &RelativeOptions, val: Zone);
+    #[doc = " Its dictionary arm is the read's fallback."]
     #[wasm_bindgen(method, getter)]
-    pub fn zoned(this: &RelativeOptions) -> Option<ZonedKind>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_zoned(this: &RelativeOptions, val: &Zoned);
+    pub fn zoned(this: &RelativeOptions) -> Option<ZonedLike>;
     #[wasm_bindgen(method, setter, js_name = "zoned")]
-    pub fn set_zoned_with_zoned_fields(this: &RelativeOptions, val: &ZonedFields);
-    #[wasm_bindgen(method, setter, js_name = "zoned")]
-    pub fn set_zoned_with_str(this: &RelativeOptions, val: &str);
+    fn __set_zoned(this: &RelativeOptions, val: ZonedLike);
     #[doc = " Only dictionaries."]
     #[wasm_bindgen(method, getter)]
     pub fn fields(this: &RelativeOptions) -> JsValue;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_fields(this: &RelativeOptions, val: &ZonedFields);
     #[wasm_bindgen(method, setter, js_name = "fields")]
-    pub fn set_fields_with_day_fields(this: &RelativeOptions, val: &DayFields);
+    fn __set_fields(this: &RelativeOptions, val: Fields);
+}
+impl RelativeOptions {
+    pub fn set_relative_to(&self, val: impl ::core::convert::Into<ZonedLike>) {
+        self.__set_relative_to(val.into())
+    }
+    pub fn set_relative_to_with_day_like(&self, val: impl ::core::convert::Into<DayLike>) {
+        self.__set_relative_to_with_day_like(val.into())
+    }
+    pub fn set_zone(&self, val: impl ::core::convert::Into<Zone>) {
+        self.__set_zone(val.into())
+    }
+    pub fn set_zoned(&self, val: impl ::core::convert::Into<ZonedLike>) {
+        self.__set_zoned(val.into())
+    }
+    pub fn set_fields(&self, val: impl ::core::convert::Into<Fields>) {
+        self.__set_fields(val.into())
+    }
 }
 impl RelativeOptions {
     #[doc = " * `zone` - A union alias read whole."]
     #[doc = " * `fields` - Only dictionaries."]
-    pub fn new(zone: &Zoned, fields: &ZonedFields) -> RelativeOptions {
+    pub fn new(
+        zone: impl ::core::convert::Into<Zone>,
+        fields: impl ::core::convert::Into<Fields>,
+    ) -> RelativeOptions {
         Self::builder(zone, fields).build()
     }
     #[doc = " * `zone` - A union alias read whole."]
     #[doc = " * `fields` - Only dictionaries."]
-    pub fn new_with_day_fields(zone: &Zoned, fields: &DayFields) -> RelativeOptions {
-        Self::builder_with_day_fields(zone, fields).build()
-    }
-    #[doc = " * `zone` - A union alias read whole."]
-    #[doc = " * `fields` - Only dictionaries."]
-    pub fn new_with_str(zone: &str, fields: &ZonedFields) -> RelativeOptions {
-        Self::builder_with_str(zone, fields).build()
-    }
-    #[doc = " * `zone` - A union alias read whole."]
-    #[doc = " * `fields` - Only dictionaries."]
-    pub fn new_with_str_and_day_fields(zone: &str, fields: &DayFields) -> RelativeOptions {
-        Self::builder_with_str_and_day_fields(zone, fields).build()
-    }
-    #[doc = " * `zone` - A union alias read whole."]
-    #[doc = " * `fields` - Only dictionaries."]
-    pub fn builder(zone: &Zoned, fields: &ZonedFields) -> RelativeOptionsBuilder {
-        let inner: RelativeOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_zone(zone);
-        inner.set_fields(fields);
-        RelativeOptionsBuilder { inner }
-    }
-    #[doc = " * `zone` - A union alias read whole."]
-    #[doc = " * `fields` - Only dictionaries."]
-    pub fn builder_with_day_fields(zone: &Zoned, fields: &DayFields) -> RelativeOptionsBuilder {
-        let inner: RelativeOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_zone(zone);
-        inner.set_fields_with_day_fields(fields);
-        RelativeOptionsBuilder { inner }
-    }
-    #[doc = " * `zone` - A union alias read whole."]
-    #[doc = " * `fields` - Only dictionaries."]
-    pub fn builder_with_str(zone: &str, fields: &ZonedFields) -> RelativeOptionsBuilder {
-        let inner: RelativeOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_zone_with_str(zone);
-        inner.set_fields(fields);
-        RelativeOptionsBuilder { inner }
-    }
-    #[doc = " * `zone` - A union alias read whole."]
-    #[doc = " * `fields` - Only dictionaries."]
-    pub fn builder_with_str_and_day_fields(
-        zone: &str,
-        fields: &DayFields,
+    pub fn builder(
+        zone: impl ::core::convert::Into<Zone>,
+        fields: impl ::core::convert::Into<Fields>,
     ) -> RelativeOptionsBuilder {
         let inner: RelativeOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_zone_with_str(zone);
-        inner.set_fields_with_day_fields(fields);
+        inner.set_zone(zone);
+        inner.set_fields(fields);
         RelativeOptionsBuilder { inner }
     }
 }
@@ -161,39 +631,63 @@ pub struct RelativeOptionsBuilder {
     inner: RelativeOptions,
 }
 impl RelativeOptionsBuilder {
-    pub fn relative_to(self, val: &Zoned) -> Self {
+    pub fn relative_to(self, val: impl ::core::convert::Into<ZonedLike>) -> Self {
         self.inner.set_relative_to(val);
         self
     }
-    pub fn relative_to_with_zoned_fields(self, val: &ZonedFields) -> Self {
-        self.inner.set_relative_to_with_zoned_fields(val);
+    pub fn relative_to_with_day_like(self, val: impl ::core::convert::Into<DayLike>) -> Self {
+        self.inner.set_relative_to_with_day_like(val);
         self
     }
-    pub fn relative_to_with_str(self, val: &str) -> Self {
-        self.inner.set_relative_to_with_str(val);
-        self
-    }
-    pub fn relative_to_with_day(self, val: &Day) -> Self {
-        self.inner.set_relative_to_with_day(val);
-        self
-    }
-    pub fn relative_to_with_day_fields(self, val: &DayFields) -> Self {
-        self.inner.set_relative_to_with_day_fields(val);
-        self
-    }
-    pub fn zoned(self, val: &Zoned) -> Self {
+    pub fn zoned(self, val: impl ::core::convert::Into<ZonedLike>) -> Self {
         self.inner.set_zoned(val);
         self
     }
-    pub fn zoned_with_zoned_fields(self, val: &ZonedFields) -> Self {
-        self.inner.set_zoned_with_zoned_fields(val);
-        self
-    }
-    pub fn zoned_with_str(self, val: &str) -> Self {
-        self.inner.set_zoned_with_str(val);
-        self
-    }
     pub fn build(self) -> RelativeOptions {
+        self.inner
+    }
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Span;
+    #[wasm_bindgen(method, getter)]
+    pub fn start(this: &Span) -> DayLike;
+    #[wasm_bindgen(method, setter, js_name = "start")]
+    fn __set_start(this: &Span, val: DayLike);
+    #[wasm_bindgen(method, getter, js_name = "relativeTo")]
+    pub fn relative_to(this: &Span) -> Option<DayLike>;
+    #[wasm_bindgen(method, setter, js_name = "relativeTo")]
+    fn __set_relative_to(this: &Span, val: DayLike);
+}
+impl Span {
+    pub fn set_start(&self, val: impl ::core::convert::Into<DayLike>) {
+        self.__set_start(val.into())
+    }
+    pub fn set_relative_to(&self, val: impl ::core::convert::Into<DayLike>) {
+        self.__set_relative_to(val.into())
+    }
+}
+impl Span {
+    pub fn new(start: impl ::core::convert::Into<DayLike>) -> Span {
+        Self::builder(start).build()
+    }
+    pub fn builder(start: impl ::core::convert::Into<DayLike>) -> SpanBuilder {
+        let inner: Span = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_start(start);
+        SpanBuilder { inner }
+    }
+}
+pub struct SpanBuilder {
+    inner: Span,
+}
+impl SpanBuilder {
+    pub fn relative_to(self, val: impl ::core::convert::Into<DayLike>) -> Self {
+        self.inner.set_relative_to(val);
+        self
+    }
+    pub fn build(self) -> Span {
         self.inner
     }
 }
@@ -220,21 +714,78 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "relativeTo")]
     pub fn try_relative_to(kind: &str) -> Result<RelativeToKind, JsValue>;
 }
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    #[wasm_bindgen(js_name = "describe")]
+    fn __describe(item: DayLike) -> String;
+}
+#[doc = " The arm the item reached JS as, and its day."]
+pub fn describe(item: impl ::core::convert::Into<DayLike>) -> String {
+    __describe(item.into())
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describe")]
+    fn __try_describe(item: DayLike) -> Result<String, JsValue>;
+}
+#[doc = " The arm the item reached JS as, and its day."]
+pub fn try_describe(item: impl ::core::convert::Into<DayLike>) -> Result<String, JsValue> {
+    __try_describe(item.into())
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    #[wasm_bindgen(js_name = "describeSpan")]
+    pub fn describe_span(span: &Span) -> String;
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeSpan")]
+    pub fn try_describe_span(span: &Span) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    #[wasm_bindgen(js_name = "describeFields")]
+    fn __describe_fields(fields: Fields) -> String;
+}
+pub fn describe_fields(fields: impl ::core::convert::Into<Fields>) -> String {
+    __describe_fields(fields.into())
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeFields")]
+    fn __try_describe_fields(fields: Fields) -> Result<String, JsValue>;
+}
+pub fn try_describe_fields(fields: impl ::core::convert::Into<Fields>) -> Result<String, JsValue> {
+    __try_describe_fields(fields.into())
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    pub fn either(item: &Day) -> String;
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "either")]
+    pub fn try_either(item: &Day) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    #[wasm_bindgen(js_name = "either")]
+    pub fn either_with_str(item: &str) -> String;
+}
+#[wasm_bindgen(module = "union-alias-reads")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "either")]
+    pub fn try_either_with_str(item: &str) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(private)]
+pub enum OverflowKind {
+    Constrain = "constrain",
+    Reject = "reject",
+}
 #[wasm_bindgen(private, fallback)]
 pub enum RelativeToKind {
     Zoned(Zoned),
     String(String),
     Day(Day),
     Object(Object),
-}
-#[wasm_bindgen(private)]
-pub enum ZoneKind {
-    Zoned(Zoned),
-    String(String),
-}
-#[wasm_bindgen(private, fallback)]
-pub enum ZonedKind {
-    Zoned(Zoned),
-    String(String),
-    ZonedFields(ZonedFields),
 }

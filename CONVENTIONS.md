@@ -1762,7 +1762,10 @@ For every JS callable, `ts-gen`:
    `Array<A | B>` and `Record<K, A | B>` are each one parameter shape,
    not `Array<A> | Array<B>` or `Record<K, A> | Record<K, B>`.
    A trailing parameter admitting `undefined` truncates like an
-   optional one. The expansion is the same under
+   optional one. A parameter typed by a named union alias does not
+   expand: it takes the alias's enum (see
+   [named union aliases](#named-union-aliases)). The
+   expansion is the same under
    `--experimental-generic-mono` (see
    [primitive union arguments](#primitive-union-arguments)).
 2. **Cross-overload dedup**: When multiple overloads expand to the same
@@ -1886,6 +1889,132 @@ the second, which departs from the primary in its parameter names.
 A base name that already reads `with` (`with`, `set_with`) continues the
 suffix with `_and_`: `with(fields, options?)` gives `with` and
 `with_and_options`, not `with_with_options`.
+
+### Named union aliases
+
+A named alias of a union is one Rust type, not one binding per arm. The
+alias becomes a wasm-bindgen enum with a tuple variant per arm, which
+crosses the ABI as the arm's own value, with `From` conversions from
+each arm's natural Rust argument, and a parameter of the alias's type
+takes `impl Into<Alias>`. Where a read can tell the arms apart, the same
+enum is what a read of the alias returns, so a value read can be passed
+straight back:
+
+```ts
+declare namespace Temporal {
+  type PlainDateLike = PlainDate | ZonedDateTime | PlainDateTime | DateLikeObject | string;
+  type TimeZoneLike = ZonedDateTime | string;
+  interface PlainDateConstructor {
+    from(item: PlainDateLike, options?: OverflowOptions): PlainDate;
+    compare(one: PlainDateLike, two: PlainDateLike): number;
+  }
+  interface InstantToStringOptions {
+    timeZone?: TimeZoneLike | undefined;
+  }
+}
+```
+
+```rust
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum PlainDateLike {
+    PlainDate(PlainDate),
+    ZonedDateTime(ZonedDateTime),
+    PlainDateTime(PlainDateTime),
+    String(String),
+    DateLikeObject(DateLikeObject),
+}
+impl From<PlainDate> for PlainDateLike { /* … */ }
+impl From<&PlainDate> for PlainDateLike { /* a clone of the handle */ }
+// … each class and dictionary arm likewise
+impl From<&str> for PlainDateLike { /* … */ }
+impl From<String> for PlainDateLike { /* … */ }
+impl From<&String> for PlainDateLike { /* … */ }
+impl From<JsString> for PlainDateLike { /* … */ }
+impl From<&JsString> for PlainDateLike { /* … */ }
+
+extern "C" {
+    #[wasm_bindgen(static_method_of = PlainDate, js_name = "compare")]
+    fn __compare(one: PlainDateLike, two: PlainDateLike) -> f64;
+    // …
+    #[wasm_bindgen(method, getter, js_name = "timeZone")]
+    pub fn time_zone(this: &InstantToStringOptions) -> Option<TimeZoneLike>;
+    #[wasm_bindgen(method, setter, js_name = "timeZone")]
+    fn __set_time_zone(this: &InstantToStringOptions, val: TimeZoneLike);
+}
+impl PlainDate {
+    pub fn from(item: impl Into<PlainDateLike>) -> PlainDate { Self::__from(item.into()) }
+    pub fn from_with_options(item: impl Into<PlainDateLike>, options: &OverflowOptions) -> PlainDate;
+    pub fn compare(one: impl Into<PlainDateLike>, two: impl Into<PlainDateLike>) -> f64 {
+        Self::__compare(one.into(), two.into())
+    }
+}
+impl InstantToStringOptions {
+    pub fn set_time_zone(&self, val: impl Into<TimeZoneLike>) {
+        self.__set_time_zone(val.into())
+    }
+}
+```
+
+`PlainDate::compare(&date, "2024-01-01")` and
+`PlainDate::compare(DateLikeObject::new(1.0), &zoned)` both call the one
+binding, where the expansion used to emit 25 (and as many `try_`
+companions), each named for its two arm types, and
+`options.set_time_zone(other.time_zone().unwrap())` passes a read back.
+
+* **Which aliases.** A local, non-generic alias whose target, through
+  nested aliases, is a union of two or more value arms once `null` and
+  `undefined` are set aside, each arm a string, number, boolean,
+  `bigint`, `symbol`, `object`, or a class or interface without type
+  parameters that the output binds. Anything else lowers as before: an
+  anonymous union (`f(x: Foo | string)`), a single-arm alias, a generic
+  alias (`type Info<M> = Request<M> | string`, see
+  [type aliases](#type-aliases-and-export--x-as-y-)), a union of string
+  literals (an enum), or an alias with a literal, array or function arm.
+* **Shared or argument-only.** The enum is the alias's read type too
+  when a read would [tell its arms apart](#arms-a-read-can-tell-apart)
+  as it would the union written out: classes by `instanceof`, primitives
+  by `typeof`, and at most one shape arm (a dictionary, `object`), which
+  goes last and makes the enum `#[wasm_bindgen(fallback)]`. An alias
+  with several shape arms (`type Fields = ZonedFields | DayFields`), or
+  whose arms share a named upper bound a read keeps instead
+  (`TypeError | RangeError` reads as `Error`), is an argument enum only,
+  and its reads resolve it to its members as before. An alias that is
+  only ever read still uses its enum; there is no separate read enum.
+* **Variants and conversions.** Variants and payloads are a
+  [dynamic union](#variant-kinds-and-naming)'s: a string arm is
+  `String(String)`, `number` and `boolean` are `F64(f64)` and
+  `Bool(bool)`, and two arms with the same payload are one variant. A
+  class, interface, `bigint`, `symbol` or `object` arm converts from the
+  handle and from a reference to it; a string arm from `&str`, `String`,
+  `&String`, `JsString` and `&JsString`; `number` and `boolean` from
+  `f64` and `bool`. The enum replaces the `pub type Alias = JsValue` the
+  alias used to emit.
+* **Nullability.** The alias's empties follow the
+  [nullability model](#writes): `null` is a `_with_null` arm of its own,
+  and `undefined` omits a trailing parameter. A parameter that admits
+  `undefined` but cannot be omitted takes `Option<Alias>`, since `None`
+  would give an `impl Into` nothing to infer from. A read takes the
+  carrier for the empties of the use site and of the alias
+  (`Option<TimeZoneLike>`).
+* **Positions.** Every write position: function, method, static and
+  constructor parameters, setters, and the dictionary factories and
+  builders over them (`Span::new(start: impl Into<DayLike>)`). The
+  extern binding is private (`__<name>`) and takes the enum by value; a
+  [wrapper](#inline-wrappers) of the public name converts. Getters and
+  returns of the alias itself read its enum; the alias inside a generic
+  container (`Array<PlainDateLike>`) keeps its lowering.
+* **Anonymous unions of aliases.** `relativeTo?: ZonedDateTimeLike |
+  PlainDateLike` has no name of its own: its read is the
+  [flattened](#union-aliases-flatten-into-the-read) getter-named
+  `RelativeToKind`, and its setter expands per alias, each alias one
+  arm, `set_relative_to(impl Into<ZonedDateTimeLike>)` and
+  `set_relative_to_with_plain_date_like(impl Into<PlainDateLike>)`. The
+  read enum can't stand in for them: its two dictionaries share one
+  untyped `Object` arm, which would take any object.
+
+The enum, its conversions and the bindings over it are the same under
+`--experimental-generic-mono`.
 
 ### `_with_<type>` suffix vocabulary
 
@@ -2755,8 +2884,11 @@ pub fn send_with_str(to: impl ::wasm_bindgen::JsStringLike);
 pub fn send_with_f64(to: f64);
 ```
 
-The `js_sys` primitive-union marker traits (`JsNumberOrStringLike` and
-the rest) are not emitted. Return positions are unchanged: an erased
+A named alias of the union (`type Id = string | number`) is one
+binding instead, taking the alias's enum (`lookup(id: impl Into<Id>)`,
+see [named union aliases](#named-union-aliases)). The `js_sys`
+primitive-union marker traits (`JsNumberOrStringLike` and the rest) are
+not emitted. Return positions are unchanged: an erased
 union still becomes a
 [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums).
 
@@ -2999,11 +3131,16 @@ is emitted under a private name and a non-extern `pub fn` of the public
 name converts over it. The rule is narrow on purpose: a wrapper is
 never emitted for ergonomics, only where no extern signature can carry
 the type, and the extern form stays reachable (within the module) under
-a `__`-prefixed name (`__<name>`). Two constructs qualify today:
+a `__`-prefixed name (`__<name>`). Three constructs qualify today:
 
 * **`null` arms.** The extern ABI has no type that only admits `null`,
   so `f(x: T | null)`'s `f_with_null()` binds `__f_with_null(x:
   &JsValue)` and passes `&JsValue::NULL` (see [Writes](#writes)).
+* **Named union alias arguments.** An extern argument cannot be
+  `impl Into<T>`, so `f(x: PlainDateLike)` binds `__f(x: PlainDateLike)`
+  and the wrapper converts its `impl Into<PlainDateLike>` argument (see
+  [named union aliases](#named-union-aliases)). A literal or `null`
+  arm's wrapper converts the same way.
 * **Overloads keyed by a string literal**, below.
 
 **Overloads distinguished only by a string literal.** Rust has no
@@ -3127,7 +3264,9 @@ impl CompressionStream {
   }
   ```
 * Doc comments move to the wrappers; the extern binding is not `pub`.
-* Setters are exempt: `set_disposition("inline")` takes the value.
+* Setters are exempt: `set_disposition("inline")` takes the value. A
+  setter taking a named union alias is wrapped like any binding
+  (`set_relative_to(&self, val: impl Into<ZonedDateTimeLike>)`).
 
 ## Subtyping LUB across unions
 
@@ -3318,9 +3457,11 @@ does synthesise (`fetchValue(): Promise<32 | "foo">` →
 
 #### Union aliases flatten into the read
 
-A read resolves each union alias it names, at the top level or as a
-union member, to the alias's members, so nested aliases are one union in
-normal form, each member once. An alias whose members would read
+A read of a [named union alias](#named-union-aliases) whose arms it can
+tell apart is the alias's own enum. Otherwise a read resolves each union
+alias it names, at the top level or as a union member, to the alias's
+members, so nested aliases are one union in normal form, each member
+once. An alias whose members would read
 differently at the use site (a namespace shadowing one of them) stays
 whole, as it does for [writes](#type-aliases-and-export--x-as-y-). A
 read of `x: Mode | Foo` with `type Mode = 0 | 1` is the same read as
@@ -3361,7 +3502,8 @@ declare namespace Temporal {
 
 ```rust
 pub fn relative_to(this: &DurationRelativeToOptions) -> Option<RelativeToKind>;
-pub fn time_zone(this: &InstantToStringOptions) -> Option<TimeZoneKind>;
+// The alias read whole is its own enum.
+pub fn time_zone(this: &InstantToStringOptions) -> Option<TimeZoneLike>;
 
 #[wasm_bindgen(private, fallback)]
 pub enum RelativeToKind {
@@ -3370,11 +3512,6 @@ pub enum RelativeToKind {
     PlainDate(temporal::PlainDate),
     PlainDateTime(temporal::PlainDateTime),
     Object(Object),
-}
-#[wasm_bindgen(private)]
-pub enum TimeZoneKind {
-    ZonedDateTime(temporal::ZonedDateTime),
-    String(String),
 }
 ```
 
@@ -4007,7 +4144,9 @@ namespace exported under its own name as well keeps it.
   target naming something no such path reaches is not chased; the
   reference then names the alias.
 
-  The alias itself is still emitted, except a union alias without type
+  The alias itself is still emitted, as its
+  [enum](#named-union-aliases) when it names a union of value arms,
+  except a union alias without type
   parameters that erases to `JsValue`: every use lowers through it to its
   members, so `pub type Like = JsValue;` would name nothing. One that
   reaches itself (below) is named by its uses and stays, and so does a

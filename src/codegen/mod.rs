@@ -701,9 +701,21 @@ fn generate_type_alias(
         }
     }
 
-    let target = cgctx.alias_target(alias, from_module);
     let renamed = cgctx.renamed_locals.get(&alias.name);
     let name = typemap::make_ident(renamed.map_or(alias.name.as_str(), String::as_str));
+    let public_alias = if renamed.is_some() && !typemap::is_prelude_reserved(&alias.name) {
+        let public = typemap::make_ident(&alias.name);
+        quote! { pub use #name as #public; }
+    } else {
+        quote! {}
+    };
+
+    if let Some(union) = cgctx.union_alias_of(alias) {
+        let item = generate_union_alias_enum(&name, &union, cgctx, from_module);
+        return quote! { #item #public_alias };
+    }
+
+    let target = cgctx.alias_target(alias, from_module);
 
     // Identity — skip.
     if target.to_string() == alias.name {
@@ -726,13 +738,6 @@ fn generate_type_alias(
     {
         return quote! {};
     }
-
-    let public_alias = if renamed.is_some() && !typemap::is_prelude_reserved(&alias.name) {
-        let public = typemap::make_ident(&alias.name);
-        quote! { pub use #name as #public; }
-    } else {
-        quote! {}
-    };
 
     // Type-parameter declaration so aliases that mention generics
     // survive codegen: `pub type Handler<Env, Props> = …;` rather
@@ -772,6 +777,96 @@ fn generate_type_alias(
         #[allow(dead_code)]
         pub type #name #generics = #target;
         #public_alias
+    }
+}
+
+/// The enum of a named union alias (see [`CodegenContext::union_alias`]):
+/// a wasm-bindgen enum with one tuple variant per arm, which crosses the
+/// ABI as the arm's value, and `From` conversions from each arm's natural
+/// Rust argument, so a parameter taking `impl Into<Alias>` accepts any of
+/// them. Its payloads and variant names are a read enum's, and where a read
+/// can tell the arms apart it is the alias's read type too, the shape arm
+/// last as its `fallback`.
+fn generate_union_alias_enum(
+    name: &syn::Ident,
+    union: &typemap::UnionAlias,
+    cgctx: &CodegenContext,
+    from_module: &crate::ir::ModuleContext,
+) -> TokenStream {
+    use crate::ir::TypeRef;
+    // A handle converts by value and by reference (a clone of the handle).
+    let handle = |ty: &TokenStream| {
+        vec![
+            (ty.clone(), quote! { value }),
+            (quote! { &#ty }, quote! { value.clone() }),
+        ]
+    };
+    let mut arms: Vec<TypeRef> = Vec::new();
+    let mut payloads: Vec<TokenStream> = Vec::new();
+    let mut sources: Vec<Vec<(TokenStream, TokenStream)>> = Vec::new();
+    for arm in &union.arms {
+        let payload = typemap::to_syn_type(
+            arm,
+            typemap::TypePosition::RETURN,
+            Some(cgctx),
+            union.scope,
+            from_module,
+        );
+        // Two arms lowering alike are one variant.
+        if payloads
+            .iter()
+            .any(|p| p.to_string() == payload.to_string())
+        {
+            continue;
+        }
+        // Each source type with the expression turning `value` into the
+        // payload.
+        let from = match arm {
+            TypeRef::String => {
+                let string = quote! { ::std::string::String };
+                let js = quote! { ::js_sys::JsString };
+                vec![
+                    (quote! { &str }, quote! { #string::from(value) }),
+                    (string.clone(), quote! { value }),
+                    (quote! { &#string }, quote! { value.clone() }),
+                    (js.clone(), quote! { #string::from(value) }),
+                    (quote! { &#js }, quote! { #string::from(value) }),
+                ]
+            }
+            TypeRef::Number | TypeRef::Boolean => vec![(payload.clone(), quote! { value })],
+            _ => handle(&payload),
+        };
+        arms.push(arm.clone());
+        payloads.push(payload);
+        sources.push(from);
+    }
+    let mut variants = Vec::new();
+    let mut conversions = Vec::new();
+    for ((variant_name, payload), from) in dynamic_union_variant_names(&arms)
+        .into_iter()
+        .zip(&payloads)
+        .zip(sources)
+    {
+        let variant = typemap::make_ident(&variant_name);
+        variants.push(quote! { #variant(#payload) });
+        for (source, expr) in from {
+            conversions.push(quote! {
+                impl ::core::convert::From<#source> for #name {
+                    fn from(value: #source) -> Self {
+                        Self::#variant(#expr)
+                    }
+                }
+            });
+        }
+    }
+    let fallback = union.fallback.then(|| quote! { , fallback });
+    quote! {
+        #[wasm_bindgen(private #fallback)]
+        #[derive(Clone, Debug)]
+        pub enum #name {
+            #(#variants),*
+        }
+        #(#conversions)*
     }
 }
 
