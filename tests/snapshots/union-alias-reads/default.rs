@@ -706,13 +706,13 @@ extern "C" {
 extern "C" {
     #[doc = " The kind of value named, as a function return."]
     #[wasm_bindgen(js_name = "relativeTo")]
-    pub fn relative_to(kind: &str) -> RelativeToKind;
+    pub fn relative_to(kind: &str) -> RelativeToReturnKind;
 }
 #[wasm_bindgen(module = "union-alias-reads")]
 extern "C" {
     #[doc = " The kind of value named, as a function return."]
     #[wasm_bindgen(catch, js_name = "relativeTo")]
-    pub fn try_relative_to(kind: &str) -> Result<RelativeToKind, JsValue>;
+    pub fn try_relative_to(kind: &str) -> Result<RelativeToReturnKind, JsValue>;
 }
 #[wasm_bindgen(module = "union-alias-reads")]
 extern "C" {
@@ -784,6 +784,13 @@ pub enum OverflowKind {
 }
 #[wasm_bindgen(private, fallback)]
 pub enum RelativeToKind {
+    Zoned(Zoned),
+    String(String),
+    Day(Day),
+    Object(Object),
+}
+#[wasm_bindgen(private, fallback)]
+pub enum RelativeToReturnKind {
     Zoned(Zoned),
     String(String),
     Day(Day),

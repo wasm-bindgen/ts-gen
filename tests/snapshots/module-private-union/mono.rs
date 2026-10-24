@@ -41,10 +41,10 @@ pub mod x {
             #[wasm_bindgen(catch)]
             pub fn list() -> Result<ListReturnKind, JsValue>;
         }
+        #[wasm_bindgen(private)]
+        pub enum ListReturnKind {
+            VecOfId(Vec<String>),
+            Promise(Promise<Base>),
+        }
     }
-}
-#[wasm_bindgen(private)]
-pub enum ListReturnKind {
-    VecOfId(Vec<String>),
-    Promise(Promise<x::shapes::Base>),
 }

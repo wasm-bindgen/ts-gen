@@ -2068,7 +2068,7 @@ extern "C" {
   `Option<AliasKind>`: the trait asks only `IntoWasmAbi` of its
   implementations, since `f64` has no `OptionIntoWasmAbi`.
 * `<Alias>Kind` claims its name before any read enum is named, so a
-  getter-named enum that would collide is the one prefixed.
+  getter-named enum that would collide is the one numbered.
 
 ### `_with_<type>` suffix vocabulary
 
@@ -3478,14 +3478,14 @@ emits:
 
 ```rust
 #[wasm_bindgen(private)]
-pub enum EmailAttachmentContentKind {
+pub enum ContentKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
     ArrayBufferView(Uint8Array),
 }
 
 // inside the extern block:
-pub fn content(this: &EmailAttachment) -> EmailAttachmentContentKind;
+pub fn content(this: &EmailAttachment) -> ContentKind;
 ```
 
 #### Shape arms go last
@@ -3529,22 +3529,51 @@ types). The base name is built from:
   `FetchReturnKind` (the `Return` infix disambiguates from the
   callable's own name).
 
-Identity is the **ordered member list**, so two erasing unions with
-the same member set in the same order share a single synthesised
-enum (and hence a single name). Order matters at runtime — the
-wasm-bindgen dispatch tries variants in source order, so two unions
-that differ in order are distinct types.
+Identity depends on the members:
 
-Collisions resolve in three steps, most-simple to most-qualified:
+* **A set of literals**, string literals (`"auto" | "never"`) or the
+  integer literals of a C-style enum (`0 | 1 | 2`), is keyed by its
+  values, in any order, so every use of the same values shares a single
+  synthesised enum (and hence a single name), wherever it is used: a
+  `keepAlive: KeepAlive` field and a `level(): 0 | 1 | 2` return are one
+  enum. Matching a value against the variants is exact, so order carries
+  no meaning at runtime; the enum takes the order of its first use in
+  source order. Variant names that collide are numbered in that order
+  (`"foo_bar" | "foo-bar"` is `FooBar = "foo_bar", FooBar2 = "foo-bar"`),
+  and every getter, setter, builder and literal factory using the set
+  names its values by those variants, so a value is never sent as
+  another's variant.
+* **Any other union**, one with a class, dictionary or primitive arm
+  (`number | "auto"`, `string | string[]`, `true | "x"`), is keyed by
+  its ordered member list *and* the member declaring it (owner and JS
+  name). Two such unions only share an enum when they are the same
+  member reached twice: a getter, its setter and its builder method.
+  Structural matches on unrelated members stay apart, since a payload
+  union named after one of them misleads at every other use.
 
-1. Bare anchor (`ContentKind`).
-2. Parent-prefixed (`EmailAttachmentContentKind`) — when a different
-   identity already claimed the bare anchor.
-3. Numeric suffix (`ContentKind2`, `EmailAttachmentContentKind2`) —
-   when both bare and parent-prefixed are taken.
+A new enum is named from its first use, in source order:
 
-First-seen wins on the bare anchor; subsequent distinct unions get
-parent-prefixed (or numeric-suffixed if that also collides).
+1. **Bare anchor** (`ContentKind`).
+2. **Numeric suffix** (`ContentKind2`, `ContentKind3`) when the bare
+   anchor is taken: by a declaration, by a
+   [union alias's](#named-union-aliases) `<Alias>Kind`, or by an earlier
+   synthesised enum. `offset?: "auto" | "never"` and, later,
+   `offset?: "use" | "ignore" | "prefer" | "reject"` are `OffsetKind`
+   and `OffsetKind2`.
+
+Synthesised names are unique across the whole output, not only within
+their module: a nested `pub mod` glob-imports its parent, so a nested
+`OffsetKind` would shadow an outer one.
+
+#### Placement
+
+An enum is emitted in the `pub mod` of its first use, after that
+module's declarations, so an enum first used inside `namespace Temporal`
+is `temporal::OverflowKind`. A use in any other module names it by path
+(`super::clock::UnitKind` from `calendar`). A structural union's uses
+are all on one member, so it sits with its owner (or the first type
+inheriting the member, when that is emitted first); a literal set may be
+shared across modules.
 
 #### When synthesis fires
 
