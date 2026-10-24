@@ -8,6 +8,7 @@
     "export-default": "file:./js/export-default",
     "fallible": "file:./js/fallible",
     "generic-hoisting": "file:./js/generic-hoisting",
+    "intl-types": "file:./js/intl-types",
     "module-export-assignment": "file:./js/module-export-assignment",
     "module-file-locals": "file:./js/module-file-locals",
     "module-namespace-values": "file:./js/module-namespace-values",

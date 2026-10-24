@@ -45,6 +45,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Multiple-context name resolution](#multiple-context-name-resolution)
 * [Duplicate identifiers](#duplicate-identifiers)
 * [External type mapping and web platform defaults](#external-type-mapping-and-web-platform-defaults)
+  * [The lib's `Intl` namespace](#the-libs-intl-namespace)
 
 ---
 
@@ -4403,3 +4404,62 @@ generated file's `use js_sys::*;` prelude. The one `js_sys` class whose
 Rust spelling differs from TS, `URIError`, is aliased from
 `::js_sys::UriError` through the same default-mapping path
 (`external_map::JS_SYS_RENAMES`) and likewise survives `--no-web-sys`.
+
+### The lib's `Intl` namespace
+
+TypeScript's lib declares the global `Intl` namespace, which inputs use
+without declaring (`toLocaleString(locales?: Intl.LocalesArgument, options?:
+Intl.DateTimeFormatOptions)`). ts-gen knows it as it knows the other
+builtins:
+
+* `Intl.<Name>` lowers to `::js_sys::Intl::<Name>` for each type js-sys has
+  there (`typemap::JS_SYS_INTL`): the `Collator`, `DateTimeFormat`,
+  `DisplayNames`, `DurationFormat`, `ListFormat`, `Locale`, `NumberFormat`,
+  `PluralRules`, `RelativeTimeFormat` and `Segmenter` classes, their
+  `…Options`, `Resolved…Options` and `…Part` types, and the few records
+  around them (`SegmentData`, `Segments`, `WeekInfo`, `TextInfo`,
+  `Duration`, `LocaleMatcherOptions`). The path is spelled in full, since a
+  local type named `Intl` would shadow the glob's module. Any other member
+  stays unresolved, erasing to `JsValue` with an error. js-sys's string
+  enums (`Intl::LocaleMatcher`, …) aren't mapped: TypeScript spells those
+  as literal unions, which lower on their own.
+* The lib aliases js-sys has no type for are built in, and lower like any
+  other alias. `Intl.UnicodeBCP47LocaleIdentifier` is `string`, and
+  `Intl.LocalesArgument` is `UnicodeBCP47LocaleIdentifier | readonly
+  JsString[] | undefined`, so a locales parameter fans out into a single
+  locale and a list of `JsString` handles, the shapes js-sys's own bindings
+  take (`Date::to_locale_string(locale: &str, …)`,
+  `Temporal::PlainDate::to_locale_string(locales: &[JsString], …)`). The
+  lib's `Intl.Locale` arms are left out: one would add a `_with_locale`
+  overload to every locales parameter, doubling the overloads with the
+  trailing options, and in the list it would make the element a union that
+  erases to `JsValue`. An `Intl::Locale` is passed as its `to_string()`.
+* A global `declare namespace Intl` in an input merges with the lib's, as
+  in TypeScript: its members are emitted in its `pub mod` and shadow the
+  lib's of the same name, and the rest still lower onto `js_sys::Intl`.
+
+```ts
+declare class PlainDate {
+  toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
+}
+```
+
+```rust
+pub fn to_locale_string(this: &PlainDate) -> String;
+pub fn to_locale_string_with_str(this: &PlainDate, locales: &str) -> String;
+pub fn to_locale_string_with_slice(this: &PlainDate, locales: &[JsString]) -> String;
+pub fn to_locale_string_with_str_and_options(
+    this: &PlainDate,
+    locales: &str,
+    options: &::js_sys::Intl::DateTimeFormatOptions,
+) -> String;
+pub fn to_locale_string_with_slice_and_options(
+    this: &PlainDate,
+    locales: &[JsString],
+    options: &::js_sys::Intl::DateTimeFormatOptions,
+) -> String;
+```
+
+Under [per-monomorphization](#in-scope-generic-type-parameters) the single
+locale takes `impl JsStringLike`, as every `string` argument does, while
+the list stays `&[JsString]`, a list of handles rather than of strings.
