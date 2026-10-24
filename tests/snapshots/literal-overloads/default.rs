@@ -569,13 +569,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Clash;
     #[wasm_bindgen(method, js_name = "mode")]
-    fn __mode_2(this: &Clash, kind: &str);
+    fn __mode(this: &Clash, kind: &str);
     #[wasm_bindgen(method, catch, js_name = "mode")]
-    fn __try_mode_2(this: &Clash, kind: &str) -> Result<(), JsValue>;
+    fn __try_mode(this: &Clash, kind: &str) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "mode")]
-    fn __mode(this: &Clash, kind: &::wasm_bindgen::JsValue);
+    fn __mode_with_null(this: &Clash, kind: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, catch, js_name = "mode")]
-    fn __try_mode(this: &Clash, kind: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __try_mode_with_null(this: &Clash, kind: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
     pub fn f(this: &Clash, x: &ArrayBuffer);
     #[wasm_bindgen(method, catch, js_name = "f")]
@@ -598,11 +598,11 @@ extern "C" {
     ) -> Result<(), JsValue>;
 }
 impl Clash {
-    pub fn mode(&self) {
-        self.__mode(&::wasm_bindgen::JsValue::NULL)
+    pub fn mode_with_null(&self) {
+        self.__mode_with_null(&::wasm_bindgen::JsValue::NULL)
     }
-    pub fn try_mode(&self) -> Result<(), JsValue> {
-        self.__try_mode(&::wasm_bindgen::JsValue::NULL)
+    pub fn try_mode_with_null(&self) -> Result<(), JsValue> {
+        self.__try_mode_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn f_with_null(&self) {
         self.__f_with_null(&::wasm_bindgen::JsValue::NULL)
@@ -613,16 +613,16 @@ impl Clash {
 }
 impl Clash {
     pub fn mode_x(&self) {
-        self.__mode_2("x")
+        self.__mode("x")
     }
     pub fn mode_y(&self) {
-        self.__mode_2("y")
+        self.__mode("y")
     }
     pub fn try_mode_x(&self) -> Result<(), JsValue> {
-        self.__try_mode_2("x")
+        self.__try_mode("x")
     }
     pub fn try_mode_y(&self) -> Result<(), JsValue> {
-        self.__try_mode_2("y")
+        self.__try_mode("y")
     }
     pub fn f_a(&self, x: &ArrayBuffer) {
         self.__f("a", x)

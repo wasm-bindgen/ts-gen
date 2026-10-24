@@ -105,7 +105,7 @@ async fn null_arm_forms_compile(
     store.put_b_with_null(JsString::from("k"));
     let _: Boxed<Object> = Boxed::from_a(obj.clone());
     let _: Boxed<Object> = Boxed::from_b_with_null();
-    clash.mode();
+    clash.mode_with_null();
     clash.mode_x();
     clash.f(buf);
     clash.f_with_null();

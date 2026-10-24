@@ -552,12 +552,18 @@ pub fn expand_signatures(
         .zip(origins)
         .zip(arms)
         .map(|(((mut name_suffix, params), overload), literal_arms)| {
-            // A setter admitting only `null` still names its arm.
-            if setter
-                && name_suffix.is_empty()
-                && matches!(&params[..], [p] if p.type_ref == TypeRef::Null)
+            // An expansion passing only `null` never takes the bare name,
+            // which reads as omitting the arguments: it is named as it
+            // would be beside the empty call (`f_with_null()` for
+            // `f(x: null)`, `mode_with_null()` beside a literal cohort's
+            // `mode_x()`, `set_x_with_null()` for a setter).
+            if name_suffix.is_empty()
+                && !params.is_empty()
+                && params.iter().all(|p| p.type_ref == TypeRef::Null)
             {
-                name_suffix = "_with_null".to_string();
+                name_suffix = compute_suffixes(&[Vec::new(), params.clone()])
+                    .pop()
+                    .unwrap_or_default();
             }
             ExpandedSignature {
                 overload,
@@ -4164,6 +4170,59 @@ mod tests {
         assert_eq!(
             bindings,
             ["__f", "__try_f", "__f_with_null_2", "__try_f_with_null_2"]
+        );
+    }
+
+    #[test]
+    fn null_only_expansion_is_named_with_null() {
+        // A bare name reads as omission; an expansion passing only `null`
+        // is named as it would be beside the empty call.
+        let names = |js: &str, overloads: &[&[Param]], kind| {
+            let mut used = no_used();
+            expand_overloads(js, overloads, &TypeRef::Void, kind, &None, &mut used)
+                .into_iter()
+                .map(|s| s.rust_name)
+                .collect::<Vec<_>>()
+        };
+        let null = |n: &str| typed_param(n, TypeRef::Null);
+        assert_eq!(
+            names("f", &[&[null("x")]], SignatureKind::Function),
+            ["f_with_null", "try_f_with_null"]
+        );
+        assert_eq!(
+            names("f", &[&[null("a"), null("b")]], SignatureKind::Method),
+            ["f_with_a_null_and_b_null", "try_f_with_a_null_and_b_null"]
+        );
+        assert_eq!(
+            names("x", &[&[null("val")]], SignatureKind::Setter),
+            ["set_x_with_null"]
+        );
+        // Beside a literal cohort, which takes the remaining names.
+        let kind = typed_param(
+            "kind",
+            TypeRef::union([
+                TypeRef::StringLiteral("x".into()),
+                TypeRef::StringLiteral("y".into()),
+                TypeRef::Null,
+            ]),
+        );
+        assert_eq!(
+            names("mode", &[&[kind]], SignatureKind::Method),
+            [
+                "mode_x",
+                "try_mode_x",
+                "mode_with_null",
+                "try_mode_with_null"
+            ]
+        );
+        // Not when another parameter is passed alongside the `null`.
+        assert_eq!(
+            names(
+                "g",
+                &[&[typed_param("x", TypeRef::String), null("y")]],
+                SignatureKind::Function
+            ),
+            ["g", "try_g"]
         );
     }
 

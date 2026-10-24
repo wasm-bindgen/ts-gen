@@ -139,7 +139,10 @@ Function, method and constructor arguments, setters, builder methods and
 factories expand the union instead: each empty is an arm.
 
 * `null` gets a variant of its own with no argument for that position:
-  `f(x: T | null)` gives `f(x: &T)` and `f_with_null()`.
+  `f(x: T | null)` gives `f(x: &T)` and `f_with_null()`. A variant
+  passing only `null` never takes the bare name, which would read as
+  omitting the argument: `f(x: null)` gives `f_with_null()` alone, and
+  `f(a: null, b: null)` `f_with_a_null_and_b_null()`.
 * `undefined` is absence. A parameter is omittable when it is optional,
   or when it is trailing and its type admits `undefined` (so a required
   trailing `x: T | undefined` expands like `x?: T`). Trailing-ness
@@ -149,7 +152,8 @@ factories expand the union instead: each empty is an arm.
   cannot be omitted keeps `Option<T>`.
 * A setter or builder method expresses `undefined` by not being called,
   so `x?: T`, `x?: T | undefined` and `x: T | undefined` all give
-  `set_x(&T)`. A setter whose only arm is `null` is `set_x_with_null()`.
+  `set_x(&T)`. A setter whose only arm is `null` is `set_x_with_null()`,
+  by the rule above.
 
 | TS                                  | Write variants                                                       |
 | ----------------------------------- | -------------------------------------------------------------------- |
@@ -162,6 +166,7 @@ factories expand the union instead: each empty is an arm.
 | `f(a?: T, b?: U \| null, c?: V)`    | `f()`, `f_with_a`, `f_with_a_and_b`, `f_with_a_and_null`, `f_with_a_and_b_and_c`, `f_with_a_and_null_and_c` |
 | `x?: T \| null` (setter)            | `set_x(&T)`, `set_x_with_null()`                                     |
 | `x?: T \| null` (builder)           | `.x(&T)`, `.x_with_null()`                                           |
+| `f(x: null)`                        | `f_with_null()`                                                      |
 | `x?: null` (setter)                 | `set_x_with_null()`                                                  |
 
 * **Argument position**: after the `null` arm is split off, an
@@ -2845,9 +2850,12 @@ impl CompressionStream {
   (`describe_raw_js_string` over `__describe_js_string`). The prefix,
   rather than a suffix, keeps a private binding from reading as one of
   these public variants. A cohort's binding steps aside for a plain
-  `null` arm's (`__<name>_2`): `mode(kind: "x" | "y" | null)` gives
-  `mode()` over `__mode`, the literal-free form, and `mode_x` /
-  `mode_y` over `__mode_2`.
+  `null` arm's (`__<name>_2`): `f(x: T | null)` beside `f(kind: "a" |
+  "b", x: T | null)` gives `f_with_null()` over `__f_with_null` and
+  `f_a_with_null()` over `__f_with_null_2`.
+* A plain `null` arm the literal arms leave alone keeps `_with_null`
+  (see [Writes](#writes)): `mode(kind: "x" | "y" | null)` gives `mode_x()`,
+  `mode_y()` and `mode_with_null()`, not a bare `mode()`.
 * A generic receiver (`KVStore<Key>`) gives `impl<Key: JsGeneric>
   KVStore<Key>`; the method's own type parameters stay on the wrapper
   fn. A static's wrappers go where wasm-bindgen puts the static: one

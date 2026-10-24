@@ -352,3 +352,23 @@ extern "C" {
         b: f64,
     ) -> Result<JsString, JsValue>;
 }
+#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "onlyNull")]
+    fn __only_null_with_null(value: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
+}
+#[doc = " Reports how many arguments arrived and the first."]
+pub fn only_null_with_null() -> Result<String, JsValue> {
+    __only_null_with_null(&::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "onlyNull")]
+    fn __only_null_with_null_js_string(
+        value: &::wasm_bindgen::JsValue,
+    ) -> Result<JsString, JsValue>;
+}
+#[doc = " Reports how many arguments arrived and the first."]
+pub fn only_null_with_null_js_string() -> Result<JsString, JsValue> {
+    __only_null_with_null_js_string(&::wasm_bindgen::JsValue::NULL)
+}

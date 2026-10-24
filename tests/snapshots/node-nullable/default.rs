@@ -302,3 +302,21 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "pick")]
     pub fn try_pick(a: Option<&str>, b: f64) -> Result<String, JsValue>;
 }
+#[wasm_bindgen(module = "node-nullable")]
+extern "C" {
+    #[wasm_bindgen(js_name = "onlyNull")]
+    fn __only_null_with_null(value: &::wasm_bindgen::JsValue) -> String;
+}
+#[doc = " Reports how many arguments arrived and the first."]
+pub fn only_null_with_null() -> String {
+    __only_null_with_null(&::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "node-nullable")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "onlyNull")]
+    fn __try_only_null_with_null(value: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
+}
+#[doc = " Reports how many arguments arrived and the first."]
+pub fn try_only_null_with_null() -> Result<String, JsValue> {
+    __try_only_null_with_null(&::wasm_bindgen::JsValue::NULL)
+}

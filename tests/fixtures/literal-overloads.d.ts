@@ -56,9 +56,10 @@ export declare class Picker {
   load(kind: "a" | "b", x: ArrayBuffer | null): Promise<string | null>;
 }
 
-// A plain `null` arm's private binding is claimed before the cohort's, so
-// the two never share a name: `mode()` binds `__mode` and the cohort
-// `__mode_2`; `f_with_null()` binds `__f_with_null` and the `null` cohort
+// A plain `null` arm beside a cohort: `mode`'s, left alone by the literal
+// arms, is still `mode_with_null()`, never a bare `mode()`. Its private
+// binding is claimed before the cohort's, so the two never share a name:
+// `f_with_null()` binds `__f_with_null` and the `null` cohort
 // `__f_with_null_2`.
 export interface Clash {
   mode(kind: "x" | "y" | null): void;
