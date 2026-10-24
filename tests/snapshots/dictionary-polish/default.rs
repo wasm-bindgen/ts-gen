@@ -537,6 +537,30 @@ pub mod polish {
         #[wasm_bindgen(method, catch, js_name = "level")]
         pub fn try_level(this: &Gauge) -> Result<LevelReturnKind, JsValue>;
     }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Approximate;
+        #[wasm_bindgen(method)]
+        pub fn fuzzy(this: &Approximate, options: &Rounding);
+        #[wasm_bindgen(method, catch, js_name = "fuzzy")]
+        pub fn try_fuzzy(this: &Approximate, options: &Rounding) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, js_name = "fuzzy")]
+        pub fn fuzzy_with_js_value(this: &Approximate, options: &JsValue);
+        #[wasm_bindgen(method, catch, js_name = "fuzzy")]
+        pub fn try_fuzzy_with_js_value(
+            this: &Approximate,
+            options: &JsValue,
+        ) -> Result<(), JsValue>;
+    }
+    #[allow(dead_code)]
+    pub type Maker = Approximate;
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(constructor, js_class = "Maker", js_namespace = "Polish", catch)]
+        pub fn new(options: &Rounding) -> Result<Approximate, JsValue>;
+    }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PluralizeUnitHour {

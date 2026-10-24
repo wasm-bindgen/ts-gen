@@ -129,3 +129,10 @@ fn use_sites_take_their_specialisation(rounder: &Rounder) {
 fn merged_classes_erase_literal_only_parameters(gauge: &Gauge) {
     let _: LevelReturnKind = gauge.level();
 }
+
+// Compile-only: a reference evaluation leaves as written takes the base.
+#[allow(dead_code)]
+fn literal_only_arguments_drop_where_evaluation_leaves_them(approx: &Approximate) {
+    let _ = approx.fuzzy(&Rounding::new());
+    let _: Result<Approximate, wasm_bindgen::JsValue> = Maker::new(&Rounding::new());
+}

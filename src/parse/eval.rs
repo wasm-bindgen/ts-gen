@@ -105,6 +105,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
 
     let diag = std::mem::take(&mut gctx.diagnostics);
     let gctx_type_level_only;
+    let literal_params;
     let (rewritten, synths, diag) = {
         let mut eval = Eval {
             gctx,
@@ -152,6 +153,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             }
         }
         gctx_type_level_only = std::mem::take(&mut eval.type_level_only);
+        literal_params = std::mem::take(&mut eval.literal_params);
         (rewritten, eval.synths, eval.diag)
     };
     gctx.diagnostics = diag;
@@ -236,6 +238,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             module.types.push(id);
         }
     }
+    super::erased_args::drop_literal_args(gctx, &literal_params);
 }
 
 /// The utilities with an evaluation. The rest of TypeScript's
@@ -2813,6 +2816,48 @@ mod tests {
         );
         // A class isn't specialised: its instantiations are the base.
         assert_eq!(param_type(&gctx, &module, "f", 0), &TypeRef::ident("Gauge"));
+    }
+
+    #[test]
+    fn unrewritten_references_drop_literal_only_arguments() {
+        let (module, gctx) = parse(
+            "interface Rounding<U extends \"hour\" | \"minute\"> { smallestUnit?: U }
+             interface Probe { go(): void }
+             declare function f(a: Rounding<\"hour\"> | keyof Missing): void;
+             type Maker = Probe;
+             declare const Maker: { new (options: Rounding<\"hour\">): Probe };",
+        );
+        fn args(ty: &TypeRef, out: &mut Vec<String>) {
+            match ty {
+                TypeRef::Reference {
+                    segments,
+                    generic_args,
+                } => {
+                    if !generic_args.is_empty() {
+                        out.push(segments.join("."));
+                    }
+                    generic_args.iter().for_each(|a| args(a, out));
+                }
+                TypeRef::Union(u) => u.members().iter().for_each(|m| args(m, out)),
+                _ => {}
+            }
+        }
+        let mut found = Vec::new();
+        args(param_type(&gctx, &module, "f", 0), &mut found);
+        let maker = module
+            .types
+            .iter()
+            .find_map(|&id| match &gctx.get_type(id).kind {
+                TypeKind::Variable(v) if v.js_name == "Maker" => Some(v),
+                _ => None,
+            })
+            .expect("Maker has a variable");
+        for c in &maker.constructs {
+            for p in &c.params {
+                args(&p.type_ref, &mut found);
+            }
+        }
+        assert!(found.is_empty(), "{found:?}");
     }
 
     #[test]

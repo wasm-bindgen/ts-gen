@@ -524,6 +524,23 @@ pub mod polish {
         #[wasm_bindgen(method, catch)]
         pub fn level(this: &Gauge) -> Result<LevelReturnKind, JsValue>;
     }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Approximate;
+        #[wasm_bindgen(method, catch)]
+        pub fn fuzzy(this: &Approximate, options: &Rounding) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "fuzzy")]
+        pub fn fuzzy_with_js_value(this: &Approximate, options: &JsValue) -> Result<(), JsValue>;
+    }
+    #[allow(dead_code)]
+    pub type Maker = Approximate;
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        #[wasm_bindgen(constructor, js_class = "Maker", js_namespace = "Polish", catch)]
+        pub fn new(options: &Rounding) -> Result<Approximate, JsValue>;
+    }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PluralizeUnitHour {
