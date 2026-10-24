@@ -159,6 +159,14 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         let listing = super::binding_scope(gctx, anchor);
         let scope = synth.place.scope;
         let synthesised_enum = matches!(synth.kind, SynthKind::Enum(_));
+        // Only a use-site specialisation extends a base.
+        let specialises = match &synth.kind {
+            SynthKind::Dict { extends, .. } => match extends.first() {
+                Some(TypeRef::Reference { segments, .. }) => Some(segments.clone()),
+                _ => None,
+            },
+            SynthKind::Enum(_) => None,
+        };
         let kind = match synth.kind {
             SynthKind::Enum(literals) => TypeKind::StringEnum(string_enum(&synth.name, &literals)),
             SynthKind::Dict {
@@ -200,6 +208,9 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         });
         if synthesised_enum {
             gctx.synthesised_enums.insert(id);
+        }
+        if let Some(base) = specialises {
+            gctx.specialisations.insert(id, base);
         }
         gctx.scopes.insert(scope, synth.name.clone(), id);
         gctx.declare(scope, &synth.name, id);

@@ -84,6 +84,12 @@ declare global {
       roundAgain(options: Rounding<Exclude<"day" | TimeUnit, "day">>): void;
       step(options: Stepped<"hour">): void;
       clock(): Clock<"hour">;
+      // A variant names the generic base its specialisation extends,
+      // unless another specialisation of the base is beside it.
+      snap(to: PluralizeUnit<TimeUnit>): void;
+      snap(to: Rounding<TimeUnit>): void;
+      nudge(options: Rounding<TimeUnit>): void;
+      nudge(options: Rounding<"hour">): void;
     }
   }
 }
