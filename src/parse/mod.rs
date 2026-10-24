@@ -791,23 +791,7 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
     // js_sys types: real types available via `use js_sys::*`.
     // Registered as opaque interfaces — resolve_alias won't look through them.
     for &name in crate::codegen::typemap::JS_SYS_RESERVED {
-        let type_id = gctx.insert_type(crate::ir::TypeDeclaration {
-            kind: crate::ir::TypeKind::Interface(crate::ir::InterfaceDecl {
-                construct: Vec::new(),
-                name: name.to_string(),
-                js_name: name.to_string(),
-                type_params: vec![],
-                extends: vec![],
-                members: vec![],
-                classification: crate::ir::InterfaceClassification::ClassLike,
-                body_scope: scope,
-            }),
-            module_context: crate::ir::ModuleContext::Global,
-            doc: None,
-            scope_id: scope,
-        });
-        gctx.scopes.insert(scope, name.to_string(), type_id);
-        gctx.builtin_type_ids.insert(type_id);
+        insert_builtin(gctx, scope, name);
     }
 
     // Web platform built-in types (ReadableStream, Request, etc.) and
@@ -818,24 +802,86 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
         .iter()
         .chain(crate::external_map::JS_SYS_RENAMES);
     for (name, _) in defaults {
-        let type_id = gctx.insert_type(crate::ir::TypeDeclaration {
-            kind: crate::ir::TypeKind::Interface(crate::ir::InterfaceDecl {
-                construct: Vec::new(),
+        insert_builtin(gctx, scope, name);
+    }
+
+    populate_intl_namespace(gctx, scope);
+}
+
+/// The global `Intl` namespace of TypeScript's lib, holding the lib aliases
+/// js-sys has no type for, which lower as aliases do. Its other members
+/// name no declaration: the external map's defaults resolve the
+/// `js_sys::Intl` types by their qualified paths (`Intl.Locale`). A global
+/// `declare namespace Intl` in an input merges into it, as it does with the
+/// lib's.
+///
+/// `LocalesArgument` is the lib's `UnicodeBCP47LocaleIdentifier | Locale |
+/// readonly (UnicodeBCP47LocaleIdentifier | Locale)[] | undefined` without
+/// its `Locale` arms, so its list is a `string[]` and lowers like any other.
+/// An `Intl::Locale` is passed by its `to_string()`. The aliases are builtins,
+/// so an `--external` mapping of their path replaces them (see
+/// [`GlobalContext::resolve_path`]); `LocalesArgument` names its locale by
+/// path for a mapping of `Intl.UnicodeBCP47LocaleIdentifier` to reach it.
+fn populate_intl_namespace(gctx: &mut GlobalContext, global: ScopeId) {
+    use crate::ir::{TypeAliasDecl, TypeDeclaration, TypeKind, TypeRef};
+    let intl = gctx.create_child_scope(global);
+    gctx.scopes
+        .insert_namespace(global, "Intl".to_string(), intl);
+    let aliases = [
+        ("UnicodeBCP47LocaleIdentifier", TypeRef::String),
+        (
+            "LocalesArgument",
+            TypeRef::union([
+                TypeRef::Reference {
+                    segments: vec![
+                        "Intl".to_string(),
+                        "UnicodeBCP47LocaleIdentifier".to_string(),
+                    ],
+                    generic_args: vec![],
+                },
+                TypeRef::Array(Box::new(TypeRef::String)),
+                TypeRef::Undefined,
+            ]),
+        ),
+    ];
+    for (name, target) in aliases {
+        let type_id = gctx.insert_type(TypeDeclaration {
+            kind: TypeKind::TypeAlias(TypeAliasDecl {
                 name: name.to_string(),
-                js_name: name.to_string(),
                 type_params: vec![],
-                extends: vec![],
-                members: vec![],
-                classification: crate::ir::InterfaceClassification::ClassLike,
-                body_scope: scope,
+                target,
+                from_module: None,
+                body_scope: intl,
             }),
             module_context: crate::ir::ModuleContext::Global,
             doc: None,
-            scope_id: scope,
+            scope_id: intl,
         });
-        gctx.scopes.insert(scope, name.to_string(), type_id);
+        gctx.scopes.insert(intl, name.to_string(), type_id);
+        gctx.exports.insert(intl, name, name);
         gctx.builtin_type_ids.insert(type_id);
     }
+}
+
+/// Register `name` in `scope` as an opaque builtin interface.
+fn insert_builtin(gctx: &mut GlobalContext, scope: ScopeId, name: &str) {
+    let type_id = gctx.insert_type(crate::ir::TypeDeclaration {
+        kind: crate::ir::TypeKind::Interface(crate::ir::InterfaceDecl {
+            construct: Vec::new(),
+            name: name.to_string(),
+            js_name: name.to_string(),
+            type_params: vec![],
+            extends: vec![],
+            members: vec![],
+            classification: crate::ir::InterfaceClassification::ClassLike,
+            body_scope: scope,
+        }),
+        module_context: crate::ir::ModuleContext::Global,
+        doc: None,
+        scope_id: scope,
+    });
+    gctx.scopes.insert(scope, name.to_string(), type_id);
+    gctx.builtin_type_ids.insert(type_id);
 }
 
 /// Keep one declaration per namespace. TypeScript merges repeated

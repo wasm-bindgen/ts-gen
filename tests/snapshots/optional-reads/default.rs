@@ -22,7 +22,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "optional-reads")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Settings;
     #[doc = " Anything, `null`, or absent: all in-band."]

@@ -1204,6 +1204,8 @@ impl<'a> CodegenContext<'a> {
     ///
     /// Uses a visited set to detect and break circular alias chains.
     ///
+    /// `name` may be a qualified path (`Ns.Alias`).
+    ///
     /// A generic alias named bare means its defaults (`Fetcher` is
     /// `Fetcher<undefined>`), so they replace its parameters in the target.
     pub fn resolve_alias(
@@ -1338,7 +1340,7 @@ impl<'a> CodegenContext<'a> {
         scope: ScopeId,
         visited: &mut HashSet<TypeId>,
     ) -> Option<(std::borrow::Cow<'b, ir::TypeRef>, ScopeId)> {
-        let type_id = self.gctx.scopes.resolve(scope, name)?;
+        let type_id = self.gctx.resolve_path(scope, name)?;
         if !visited.insert(type_id) {
             return None; // circular alias chain
         }
@@ -2359,6 +2361,25 @@ fn emit_type_name(name: &str, use_scope: ScopeId, ctx: &CodegenContext<'_>) -> T
             Some(prefix) => quote! { #prefix #ident },
             None => quote! { #ident },
         };
+    }
+
+    // A qualified name (`Intl.Locale`) maps by its whole path, when its
+    // head is the global namespace of that name (or none): a local
+    // namespace shadowing it means something else. The path is spelled in
+    // place rather than aliased, since its last segment may be a local
+    // type's name.
+    if let Some((head, _)) = name.split_once('.') {
+        let scopes = &ctx.gctx.scopes;
+        let global_head = scopes.resolve_namespace(use_scope, head)
+            == scopes.resolve_namespace(ctx.root_scope, head);
+        if global_head {
+            if let Some(rust_path) = ctx.gctx.external_map.resolve_qualified(name) {
+                return rust_path
+                    .path
+                    .parse()
+                    .unwrap_or_else(|_| quote! { JsValue });
+            }
+        }
     }
 
     // External map
@@ -4720,6 +4741,89 @@ mod tests {
         assert_eq!(*target, TypeRef::ident("Position"));
         assert!(same_decl(&ctx, "Position", scope, file));
         assert!(ctx.resolve_alias("Position", scope).is_none());
+    }
+
+    #[test]
+    fn intl_members_map_by_qualified_path() {
+        // A global `Intl` namespace merges with the lib's, as in TypeScript;
+        // a namespace's own `Intl` shadows it.
+        let src = "declare namespace Intl { interface Mine {} }\n\
+                   declare namespace Outer { namespace Intl { interface X {} } }";
+        let (module, mut gctx) = crate::parse_source(src, None).unwrap();
+        let file = *module.file_scopes.first().expect("file scope");
+        let intl = |name: &str| TypeRef::Reference {
+            segments: vec!["Intl".to_string(), name.to_string()],
+            generic_args: vec![],
+        };
+        {
+            let ctx = CodegenContext::from_module(&module, &gctx);
+            let lower = |ty: &TypeRef, pos, scope| {
+                to_syn_type(ty, pos, Some(&ctx), scope, &ModuleContext::Global).to_string()
+            };
+            assert_eq!(
+                lower(&intl("DateTimeFormatOptions"), TypePosition::ARGUMENT, file),
+                "& :: js_sys :: Intl :: DateTimeFormatOptions"
+            );
+            assert_eq!(
+                lower(&intl("Locale"), TypePosition::RETURN, file),
+                ":: js_sys :: Intl :: Locale"
+            );
+            assert_eq!(
+                lower(&intl("Mine"), TypePosition::RETURN, file),
+                "intl :: Mine"
+            );
+            // Not in js-sys.
+            assert_eq!(
+                lower(&intl("Missing"), TypePosition::RETURN, file),
+                "JsValue"
+            );
+            // `Outer.Intl` isn't the lib's.
+            let outer = namespace_scope(&ctx, file, "Outer");
+            assert_eq!(
+                lower(&intl("Locale"), TypePosition::RETURN, outer),
+                "JsValue"
+            );
+            // The lib aliases chase from qualified paths.
+            let (target, _) = ctx
+                .resolve_alias("Intl.UnicodeBCP47LocaleIdentifier", file)
+                .unwrap();
+            assert_eq!(*target, TypeRef::String);
+            let (target, scope) = ctx.resolve_alias("Intl.LocalesArgument", file).unwrap();
+            let TypeRef::Union(u) = target.as_ref() else {
+                panic!("`Intl.LocalesArgument` is a union");
+            };
+            assert_eq!(
+                u.members(),
+                [
+                    intl("UnicodeBCP47LocaleIdentifier"),
+                    TypeRef::Array(Box::new(TypeRef::String)),
+                    TypeRef::Undefined,
+                ]
+            );
+            assert!(ctx
+                .resolve_alias("Intl.UnicodeBCP47LocaleIdentifier", scope)
+                .is_some());
+        }
+        // An `--external` mapping beats the default, and replaces a lib
+        // alias; a local declaration still wins.
+        gctx.external_map.add_mappings(
+            "Intl.Locale=my::Locale, Intl.LocalesArgument=my::Locales, Intl.Mine=my::Mine",
+        );
+        let ctx = CodegenContext::from_module(&module, &gctx);
+        let lower = |ty: &TypeRef| {
+            to_syn_type(
+                ty,
+                TypePosition::RETURN,
+                Some(&ctx),
+                file,
+                &ModuleContext::Global,
+            )
+            .to_string()
+        };
+        assert_eq!(lower(&intl("Locale")), "my :: Locale");
+        assert!(ctx.resolve_alias("Intl.LocalesArgument", file).is_none());
+        assert_eq!(lower(&intl("LocalesArgument")), "my :: Locales");
+        assert_eq!(lower(&intl("Mine")), "intl :: Mine");
     }
 
     #[test]

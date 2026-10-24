@@ -2,6 +2,7 @@
   "private": true,
   "dependencies": {
     "alias-constructors": "file:./js/alias-constructors",
+    "builtin-errors": "file:./js/builtin-errors",
     "declared-modules": "file:./js/declared-modules",
     "error-enum-node": "file:./js/error-enum-node",
     "es-module-lexer": "^1.6.0",

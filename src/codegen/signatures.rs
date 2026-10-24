@@ -1435,17 +1435,20 @@ fn flatten_into(
             true
         }
 
-        // Bare references: resolve through aliases, then re-flatten.
+        // References without arguments, bare or qualified (`Ns.Alias`):
+        // resolve through aliases, then re-flatten.
         //
         // The target flattens in the alias's own scope, but its
         // alternatives lower from the use site's. Where the use site
         // reads one of their names differently (a namespace shadowing
         // it), the alias stays whole instead, and lowers from its own
         // scope.
-        TypeRef::Reference { .. } if ty.as_ident().is_some() => {
-            let head = ty.as_ident().unwrap();
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if generic_args.is_empty() => {
             if let Some(c) = cgctx {
-                if let Some((target, alias_scope)) = c.resolve_alias(head, scope) {
+                if let Some((target, alias_scope)) = c.resolve_alias(&segments.join("."), scope) {
                     let start = out.len();
                     if !flatten_into(&target, cgctx, alias_scope, out) {
                         return false;
@@ -1516,10 +1519,12 @@ fn flatten_collapse_to_lub(
             crate::codegen::subtyping::lub_union(u.members(), cgctx, scope).unwrap_or(TypeRef::Any)
         }
         TypeRef::PropertyKey => TypeRef::Any,
-        TypeRef::Reference { .. } if ty.as_ident().is_some() => {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if generic_args.is_empty() => {
             if let Some(c) = cgctx {
-                if let Some((target, alias_scope)) = c.resolve_alias(ty.as_ident().unwrap(), scope)
-                {
+                if let Some((target, alias_scope)) = c.resolve_alias(&segments.join("."), scope) {
                     // As in `flatten_into`, the alias stays whole where its
                     // LUB would read differently from the use site.
                     let lub = flatten_collapse_to_lub(&target, cgctx, alias_scope);

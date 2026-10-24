@@ -338,7 +338,13 @@ impl GlobalContext {
             self.scopes.get(bindings).namespace(local)
         })?;
         let (local, bindings) = self.exports.binding(members, member)?;
-        self.scopes.get(bindings).get(local)
+        let id = self.scopes.get(bindings).get(local)?;
+        // A builtin member (the lib's `Intl.LocalesArgument`) gives way to an
+        // `--external` mapping of its path, as a bare builtin does to a
+        // mapping of its name. It is replaced before codegen chases it as
+        // an alias, so the path is left to the external map.
+        let mapped = || self.external_map.resolve_qualified(path).is_some();
+        (!self.builtin_type_ids.contains(&id) || !mapped()).then_some(id)
     }
 
     /// The scope a declaration of `name` in `scope` binds in: the exports a
