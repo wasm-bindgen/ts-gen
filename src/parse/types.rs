@@ -98,7 +98,7 @@ fn convert_ts_type_with_arena(
                 .iter()
                 .map(|t| convert_ts_type_with_arena(t, scope, scopes, diag))
                 .collect();
-            simplify_union(types)
+            TypeRef::union(types)
         }
 
         // === Intersection types ===
@@ -191,8 +191,9 @@ fn convert_ts_type_with_arena(
 
         // JSDoc types
         TSType::JSDocNullableType(nullable) => {
+            // JSDoc `?T` / `T?` is `T | null`.
             let inner = convert_ts_type_with_arena(&nullable.type_annotation, scope, scopes, diag);
-            TypeRef::Nullable(Box::new(inner))
+            TypeRef::union([inner, TypeRef::Null])
         }
         TSType::JSDocNonNullableType(non_nullable) => {
             convert_ts_type_with_arena(&non_nullable.type_annotation, scope, scopes, diag)
@@ -325,9 +326,11 @@ fn convert_tuple_element(
         TSTupleElement::TSRestType(rest) => {
             convert_ts_type_with_arena(&rest.type_annotation, scope, scopes, diag)
         }
+        // An optional element reads as `T | undefined`; a tuple has no
+        // declaration to hold the `?`.
         TSTupleElement::TSOptionalType(opt) => {
             let inner = convert_ts_type_with_arena(&opt.type_annotation, scope, scopes, diag);
-            TypeRef::Nullable(Box::new(inner))
+            TypeRef::union([inner, TypeRef::Undefined])
         }
         // All remaining variants are TSType variants flattened by inherit_variants!
         other => match other.as_ts_type() {
@@ -416,7 +419,7 @@ fn convert_formal_params_with_arena(
         result.push(crate::ir::Param {
             name,
             type_ref,
-            optional: param.optional,
+            optional: param.optional || param.initializer.is_some(),
             variadic: false,
             slice_mode: None,
         });
@@ -467,41 +470,6 @@ fn convert_literal_type(lit: &TSLiteralType<'_>, _diag: &mut DiagnosticCollector
             Expression::BigIntLiteral(_) => TypeRef::BigInt,
             _ => TypeRef::Number,
         },
-    }
-}
-
-/// Simplify a union type at parse time.
-///
-/// Coalesces `null` / `undefined` arms into the standard
-/// `Nullable<T>` wrapper that the rest of the pipeline understands —
-/// `string | null` and `string | undefined` and
-/// `string | null | undefined` all become `Nullable<String>`.
-pub(crate) fn simplify_union(types: Vec<TypeRef>) -> TypeRef {
-    let mut non_null_types = Vec::new();
-    let mut has_null = false;
-    let mut has_undefined = false;
-
-    for ty in types {
-        match ty {
-            TypeRef::Null => has_null = true,
-            TypeRef::Undefined => has_undefined = true,
-            TypeRef::Void => has_undefined = true,
-            other => non_null_types.push(other),
-        }
-    }
-
-    let core_type = if non_null_types.len() == 1 {
-        non_null_types.pop().unwrap()
-    } else if non_null_types.is_empty() {
-        return TypeRef::Null;
-    } else {
-        TypeRef::Union(non_null_types)
-    };
-
-    if has_null || has_undefined {
-        TypeRef::Nullable(Box::new(core_type))
-    } else {
-        core_type
     }
 }
 
@@ -592,6 +560,61 @@ mod tests {
             f.params[3].type_ref,
             TypeRef::generic("Array", vec![TypeRef::String, TypeRef::Number])
         );
+    }
+
+    #[test]
+    fn unions_parse_to_normal_form() {
+        let (module, gctx) = crate::parse_source(
+            "type MaybeStr = string | null;
+             declare function f(a: ?string, b: (string | null) | undefined | null, c: null | undefined, d: MaybeStr | undefined, e?: string, f2: [number, string?], g: number | void): void;",
+            None,
+        )
+        .unwrap();
+        let f = module
+            .types
+            .iter()
+            .find_map(|id| match &gctx.get_type(*id).kind {
+                crate::ir::TypeKind::Function(f) => Some(f),
+                _ => None,
+            })
+            .unwrap();
+        let ty = |i: usize| &f.params[i].type_ref;
+        let s = || TypeRef::String;
+        assert_eq!(*ty(0), TypeRef::union([s(), TypeRef::Null]));
+        assert_eq!(
+            *ty(1),
+            TypeRef::union([s(), TypeRef::Null, TypeRef::Undefined])
+        );
+        assert_eq!(*ty(2), TypeRef::union([TypeRef::Null, TypeRef::Undefined]));
+        assert_eq!(
+            *ty(3),
+            TypeRef::union([TypeRef::ident("MaybeStr"), TypeRef::Undefined])
+        );
+        // `?` is the parameter's, not the type's.
+        assert_eq!(*ty(4), s());
+        assert!(f.params[4].optional);
+        assert_eq!(
+            *ty(5),
+            TypeRef::Tuple(vec![
+                TypeRef::Number,
+                TypeRef::union([s(), TypeRef::Undefined])
+            ])
+        );
+        assert_eq!(
+            *ty(6),
+            TypeRef::union([TypeRef::Number, TypeRef::Undefined])
+        );
+    }
+
+    #[test]
+    fn default_initializer_makes_a_parameter_optional() {
+        let (module, gctx) =
+            crate::parse_source("declare function f(a: number, b = 2): void;", None).unwrap();
+        let crate::ir::TypeKind::Function(f) = &gctx.get_type(module.types[0]).kind else {
+            panic!("expected function");
+        };
+        assert!(!f.params[0].optional);
+        assert!(f.params[1].optional);
     }
 
     #[test]

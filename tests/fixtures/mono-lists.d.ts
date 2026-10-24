@@ -1,4 +1,4 @@
-//! @ts-gen --experimental-generic-mono --lib-name mono-lists --export mono-lists
+//! @ts-gen --lib-name mono-lists --export mono-lists
 
 // Every string leaf of a list or built-in container argument accepts any
 // string shape, variadics included, and a string list return gets a

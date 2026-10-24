@@ -124,10 +124,15 @@ fn collect_in_scope_type_params(
                 collect_in_scope_type_params(a, scope, scopes, out);
             }
         }
-        TypeRef::Array(inner) | TypeRef::Nullable(inner) => {
+        TypeRef::Array(inner) => {
             collect_in_scope_type_params(inner, scope, scopes, out);
         }
-        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+        TypeRef::Union(u) => {
+            for m in u.members() {
+                collect_in_scope_type_params(m, scope, scopes, out);
+            }
+        }
+        TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
             for m in members {
                 collect_in_scope_type_params(m, scope, scopes, out);
             }
@@ -307,7 +312,7 @@ pub(crate) fn convert_formal_params_with_synthesis(
             None => TypeRef::Any,
         };
 
-        let optional = param.optional;
+        let optional = param.optional || param.initializer.is_some();
         result_params.push(Param {
             name,
             type_ref,
@@ -873,6 +878,7 @@ fn convert_class_method(
                     scope: parent_scope,
                     js_name,
                     type_ref: return_type,
+                    optional: false,
                     doc,
                 })]
             } else {
@@ -960,6 +966,7 @@ fn convert_class_property(
             scope: parent_scope,
             js_name: js_name.clone(),
             type_ref: type_ref.clone(),
+            optional: prop.optional,
             doc,
         })];
         if !prop.readonly {
@@ -1015,6 +1022,7 @@ fn convert_accessor_property(
                 scope: parent_scope,
                 js_name: js_name.clone(),
                 type_ref: type_ref.clone(),
+                optional: false,
                 doc,
             }),
             Member::StaticSetter(StaticSetterMember {

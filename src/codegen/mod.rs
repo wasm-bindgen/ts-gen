@@ -7,7 +7,7 @@ pub mod classes;
 pub mod discriminated_unions;
 pub mod enums;
 pub mod functions;
-pub(crate) mod primitive_unions;
+pub(crate) mod null_arms;
 pub mod signatures;
 pub mod subtyping;
 pub mod surface;
@@ -144,9 +144,8 @@ pub fn generate_with_options(
         anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
     })?;
     split_unshared_views(&mut file.items);
-    if options.experimental_generic_mono {
-        signatures::state_abi_bounds(&mut file.items);
-    }
+    signatures::state_abi_bounds(&mut file.items);
+    null_arms::apply(&mut file.items);
     let formatted = rustfmt(&quote::ToTokens::to_token_stream(&file).to_string())?;
     // Prepend a header comment. Line comments don't survive `quote!`
     // token generation, so they have to be emitted as plain text
@@ -486,7 +485,6 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
         T::TypedSlice(e, _) => e.typed_array().to_string(),
         // `Array<T>` / `T[]` lowers to `Vec<T>` in return position.
         T::Array(inner) => format!("VecOf{}", dynamic_union_variant_name(inner)),
-        T::Nullable(inner) => format!("Optional{}", dynamic_union_variant_name(inner)),
         T::Reference { segments, .. } => {
             // Use the last segment for qualified paths.
             to_pascal_case(segments.last().map(|s| s.as_str()).unwrap_or("Unknown"))

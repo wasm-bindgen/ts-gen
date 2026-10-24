@@ -168,6 +168,8 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>], mode: MergeMode) -
             MergeMode::Meet => present.iter().all(|g| g.optional),
         };
 
+        // A branch without the property makes it optional, which is what
+        // reads it as `undefined`.
         let type_ref = merge_member_types(present.iter().map(|g| g.type_ref.clone()), mode);
         let doc = present.iter().find_map(|g| g.doc.clone());
 
@@ -260,13 +262,10 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>], mode: MergeMode) -
 
 /// Combine per-property branch types into a single `TypeRef`.
 ///
-/// Identical branches collapse to a single type. Otherwise a join hands
-/// off to the regular [`simplify_union`] from the parse layer so
-/// `null` / `undefined` arms coalesce into `Nullable<T>` (matching
-/// what users get from a hand-written `T | null` union), and a meet
-/// leaves a `TypeRef::Intersection` for codegen to bound.
-///
-/// [`simplify_union`]: crate::parse::types::simplify_union
+/// Identical branches collapse to a single type. Otherwise a join is the
+/// union of the branch types, in the same normal form as a hand-written
+/// one (see [`crate::ir::Union`]), and a meet leaves a
+/// `TypeRef::Intersection` for codegen to bound.
 fn merge_member_types(types: impl IntoIterator<Item = TypeRef>, mode: MergeMode) -> TypeRef {
     let mut all: Vec<TypeRef> = types.into_iter().collect();
     if all.is_empty() {
@@ -277,7 +276,7 @@ fn merge_member_types(types: impl IntoIterator<Item = TypeRef>, mode: MergeMode)
         return all.into_iter().next().unwrap();
     }
     match mode {
-        MergeMode::Join => crate::parse::types::simplify_union(all),
+        MergeMode::Join => TypeRef::union(all),
         MergeMode::Meet => crate::parse::types::simplify_intersection(all),
     }
 }

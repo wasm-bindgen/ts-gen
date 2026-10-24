@@ -41,7 +41,7 @@ src/
 
 tests/
 ├── fixtures/*.d.ts            # input declarations
-├── snapshots/*.rs             # expected generated output (BLESS=1 to update)
+├── snapshots/<name>/*.rs      # expected output per CLI configuration (default, mono)
 └── snapshot.rs                # the snapshot harness
 
 integration-tests/
@@ -102,8 +102,10 @@ Three layers:
    expansion). New behaviour should ship with unit tests in the
    relevant module's `#[cfg(test)] mod tests`.
 2. **Snapshot tests** (`cargo test --test snapshot`) — fixture-driven.
-   Every fixture under `tests/fixtures/` pairs with a snapshot under
-   `tests/snapshots/`. Re-bless with `BLESS=1 cargo test`. Snapshot
+   Every fixture under `tests/fixtures/` is rendered under each CLI
+   configuration in `tests/snapshot.rs` (`default`, and `mono` for
+   `--experimental-generic-mono`) into `tests/snapshots/<name>/`. Re-bless
+   with `BLESS=1 cargo test`. Snapshot
    diffs in PRs should match documented convention changes — silently
    diff-only PRs are a smell.
 3. **Integration tests** (`integration-tests/`) — actual wasm-bindgen

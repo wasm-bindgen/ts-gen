@@ -1,4 +1,3 @@
-//! @ts-gen --experimental-generic-mono
 
 // Per-monomorphization lowering peels an alias in its own scope as well:
 // `TopMode` is the top-level `Mode` enum even inside `Shadow`, where `Mode`

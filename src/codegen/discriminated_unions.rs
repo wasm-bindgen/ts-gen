@@ -58,9 +58,9 @@ pub fn generate_discriminated_union(
     // We pass the **branch's own getter** rather than the merged-shape
     // getter so the factory pipeline sees the branch-specific type.
     // For example `EmailAttachment.contentId` is `string` in the
-    // `inline` branch but `Nullable<String>` in the merged shape; using
-    // the branch getter ensures `new_inline(content_id: &str, ...)`
-    // takes the narrower type rather than `Option<&str>`.
+    // `inline` branch but optional in the merged shape; using the
+    // branch getter makes it a required `new_inline(content_id: &str,
+    // ...)` argument rather than a builder-only setter.
     //
     // Branch types are typically narrower than merged setter types
     // (the merged type is a LUB across branches). The factory layer

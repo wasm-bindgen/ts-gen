@@ -1,4 +1,4 @@
-//! @ts-gen --experimental-generic-mono --lib-name generic-mono-review --export generic-mono-review
+//! @ts-gen --lib-name generic-mono-review --export generic-mono-review
 
 export type Id = string;
 

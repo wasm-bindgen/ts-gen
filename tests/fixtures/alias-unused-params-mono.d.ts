@@ -1,4 +1,3 @@
-//! @ts-gen --experimental-generic-mono
 
 // A Rust alias can't declare a type parameter its target doesn't use
 // (E0091). Parameters the lowered target doesn't mention are dropped from

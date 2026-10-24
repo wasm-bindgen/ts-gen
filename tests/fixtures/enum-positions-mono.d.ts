@@ -1,4 +1,4 @@
-//! @ts-gen --experimental-generic-mono --lib-name enum-positions-mono --export enum-positions-mono
+//! @ts-gen --lib-name enum-positions-mono --export enum-positions-mono
 
 // Per-monomorphization generics carry native ABI types, so an enum stays
 // named inside a locally declared generic and an awaited Promise, exactly

@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, ArrayTuple, Function, JsOption, JsString, Map, Number, Object};
+use js_sys::{Array, ArrayTuple, Function, JsString, Map, Nullable, Number, Object};
 
 use ts_gen_integration_tests::enum_positions::{
     codes::Region, Level, LevelOrStringReturnKind, Mode, ModeAlias, ModeOrNumberReturnKind,
@@ -31,7 +31,7 @@ async fn enum_positions_compile(
 
     let mode: JsString = probe.next_mode().await?;
     let _: Option<Mode> = Mode::from_js_value(&mode);
-    let _: JsOption<JsString> = probe.maybe_mode().await?;
+    let _: Nullable<JsString> = probe.maybe_mode().await?;
     let _: Map<JsString, JsString> = probe.mode_map();
     let _: Object<JsString> = probe.mode_record();
     let _: ArrayTuple<(JsString, Number)> = probe.pair();

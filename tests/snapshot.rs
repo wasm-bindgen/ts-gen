@@ -1,12 +1,16 @@
 //! Snapshot tests for ts-gen code generation.
 //!
 //! Every `.d.ts` file in `tests/fixtures/` is automatically discovered and run
-//! through the `ts-gen` CLI binary, then the generated Rust output is compared
-//! against a blessed snapshot in `tests/snapshots/<name>.rs`.
+//! through the `ts-gen` CLI binary once per entry in [`CONFIGS`], then each
+//! generated Rust output is compared against a blessed snapshot in
+//! `tests/snapshots/<name>/<config>.rs`. Keeping the configurations side by
+//! side in one directory makes the effect of a flag on a fixture a plain
+//! `diff` between siblings.
 //!
 //! Fixtures can include `//! @ts-gen <args>` directive comments at the top.
 //! The args after `//! @ts-gen` are passed **verbatim** to the CLI, so any
-//! flags the CLI supports (e.g. `--lib-name`, `--external`) just work.
+//! flags the CLI supports (e.g. `--lib-name`, `--external`) just work. Flags
+//! owned by a configuration can't appear there.
 //!
 //! To add a new snapshot test, just drop a `.d.ts` file into `tests/fixtures/`.
 //! To update snapshots after intentional changes:
@@ -17,6 +21,10 @@
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
+
+/// The CLI configurations every fixture is rendered under, as
+/// `(snapshot file stem, extra CLI args)`.
+const CONFIGS: &[(&str, &[&str])] = &[("default", &[]), ("mono", &["--experimental-generic-mono"])];
 
 /// Root of the ts-gen crate (where Cargo.toml lives).
 fn crate_root() -> PathBuf {
@@ -140,53 +148,94 @@ fn assert_snapshot(snap_path: &Path, actual: &str) {
     );
 }
 
-/// Run the `ts-gen` CLI on a `.d.ts` fixture and compare the generated Rust
-/// output against the blessed snapshot.
+/// Run the `ts-gen` CLI on a `.d.ts` fixture under every configuration and
+/// compare each generated Rust output against its blessed snapshot.
 fn snapshot_test(fixture_name: &str) {
     let root = crate_root();
     let fixture = root.join("tests/fixtures").join(fixture_name);
     let base_name = fixture_name.replace(".d.ts", "");
-    let snap_path = root
-        .join("tests")
-        .join("snapshots")
-        .join(format!("{base_name}.rs"));
+    let snap_dir = root.join("tests").join("snapshots").join(&base_name);
 
     // Collect any extra CLI flags from directive comments
     let extra_args = collect_directive_args(&fixture);
-
-    let out_dir = TempDir::new(&format!("snapshot-{base_name}"));
-    let out_file = out_dir.0.join("bindings.rs");
-
-    // Invoke the CLI binary: ts-gen --input <fixture> --output <out_file> [extra_args...]
-    let output = Command::new(ts_gen_bin())
-        .arg("--input")
-        .arg(&fixture)
-        .arg("--output")
-        .arg(&out_file)
-        .args(&extra_args)
-        .output()
-        .expect("Failed to execute ts-gen binary");
-
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        panic!(
-            "ts-gen CLI failed for {fixture_name}:\n\
-             exit code: {:?}\n\
-             stderr:\n{stderr}\n\
-             stdout:\n{stdout}",
-            output.status.code()
-        );
+    for (_, config_args) in CONFIGS {
+        for flag in *config_args {
+            assert!(
+                !extra_args.iter().any(|a| a == flag),
+                "{fixture_name}: `{flag}` is applied by the snapshot harness, \
+                 remove it from the `//! @ts-gen` directive"
+            );
+        }
     }
 
-    let rust_code = std::fs::read_to_string(&out_file).unwrap_or_else(|e| {
-        panic!(
-            "Failed to read generated output {}: {e}",
-            out_file.display()
-        )
-    });
+    let out_dir = TempDir::new(&format!("snapshot-{base_name}"));
 
-    assert_snapshot(&snap_path, &rust_code);
+    for (config_name, config_args) in CONFIGS {
+        let out_file = out_dir.0.join(format!("{config_name}.rs"));
+
+        // Invoke the CLI binary: ts-gen --input <fixture> --output <out_file> [extra_args...]
+        let output = Command::new(ts_gen_bin())
+            .arg("--input")
+            .arg(&fixture)
+            .arg("--output")
+            .arg(&out_file)
+            .args(&extra_args)
+            .args(*config_args)
+            .output()
+            .expect("Failed to execute ts-gen binary");
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            panic!(
+                "ts-gen CLI failed for {fixture_name} ({config_name}):\n\
+                 exit code: {:?}\n\
+                 stderr:\n{stderr}\n\
+                 stdout:\n{stdout}",
+                output.status.code()
+            );
+        }
+
+        let rust_code = std::fs::read_to_string(&out_file).unwrap_or_else(|e| {
+            panic!(
+                "Failed to read generated output {}: {e}",
+                out_file.display()
+            )
+        });
+
+        assert_snapshot(&snap_dir.join(format!("{config_name}.rs")), &rust_code);
+    }
+}
+
+/// Every entry under `tests/snapshots/` must be the directory of a current
+/// fixture holding exactly one file per configuration, so a renamed fixture or
+/// a dropped configuration can't leave stale snapshots behind.
+fn check_stale_snapshots(fixtures: &[String]) -> Vec<String> {
+    let snapshots_dir = crate_root().join("tests/snapshots");
+    let expected_files: Vec<String> = CONFIGS
+        .iter()
+        .map(|(name, _)| format!("{name}.rs"))
+        .collect();
+    let mut stale = Vec::new();
+    for entry in std::fs::read_dir(&snapshots_dir)
+        .into_iter()
+        .flatten()
+        .flatten()
+    {
+        let path = entry.path();
+        let name = entry.file_name().to_string_lossy().to_string();
+        if !path.is_dir() || !fixtures.contains(&format!("{name}.d.ts")) {
+            stale.push(path.display().to_string());
+            continue;
+        }
+        for file in std::fs::read_dir(&path).into_iter().flatten().flatten() {
+            if !expected_files.contains(&file.file_name().to_string_lossy().to_string()) {
+                stale.push(file.path().display().to_string());
+            }
+        }
+    }
+    stale.sort();
+    stale
 }
 
 /// Discover all `.d.ts` files in `tests/fixtures/` and run a snapshot test
@@ -243,7 +292,18 @@ fn snapshots() {
         panic!("{report}");
     }
 
-    eprintln!("All {} snapshot tests passed.", fixtures.len());
+    let stale = check_stale_snapshots(&fixtures);
+    assert!(
+        stale.is_empty(),
+        "Snapshots without a fixture or configuration, delete them:\n  {}",
+        stale.join("\n  ")
+    );
+
+    eprintln!(
+        "All {} snapshot tests passed under {} configurations.",
+        fixtures.len(),
+        CONFIGS.len()
+    );
 }
 
 /// Diagnostics aren't part of a snapshot, so the absence of the dropped
@@ -299,7 +359,7 @@ fn ambient_module_imports_resolve_independently_of_cwd() {
 
     let actual = std::fs::read_to_string(&out_file).unwrap();
     let expected = std::fs::read_to_string(
-        crate_root().join("tests/snapshots/ambient-module-import-base-dir.rs"),
+        crate_root().join("tests/snapshots/ambient-module-import-base-dir/default.rs"),
     )
     .unwrap();
     assert_eq!(actual, expected);

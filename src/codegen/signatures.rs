@@ -45,9 +45,8 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::codegen::primitive_unions;
 use crate::codegen::typemap::{self, CodegenContext, TypePosition};
-use crate::ir::{Param, SharedMemory, Throws, TypeRef};
+use crate::ir::{Nullability, Param, SharedMemory, Throws, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::naming::{ident_chars, snake_ident, to_snake_case, LocalScope, Suffix};
 
@@ -285,10 +284,15 @@ pub fn collect_type_params(
                 collect_type_params(a, cgctx, scope, out);
             }
         }
-        TypeRef::Array(inner) | TypeRef::Nullable(inner) => {
+        TypeRef::Array(inner) => {
             collect_type_params(inner, cgctx, scope, out);
         }
-        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+        TypeRef::Union(u) => {
+            for m in u.members() {
+                collect_type_params(m, cgctx, scope, out);
+            }
+        }
+        TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
             for m in members {
                 collect_type_params(m, cgctx, scope, out);
             }
@@ -332,13 +336,17 @@ pub fn collect_type_params(
 /// and deduping the final names against the surrounding extern block.
 pub fn expand_signatures(
     overloads: &[Overload<'_>],
+    kind: SignatureKind,
     cgctx: Option<&CodegenContext<'_>>,
 ) -> Vec<ExpandedSignature> {
+    // A setter always takes its value: not calling it is the omission, so
+    // its arms drop `undefined`.
+    let setter = matches!(kind, SignatureKind::Setter | SignatureKind::StaticSetter);
     // Phase 1: Per-overload expansion — optional truncation + union cartesian product.
     let mut all_sigs: Vec<(usize, Vec<ConcreteParam>)> = Vec::new();
     let mut first_overload_sigs = 0;
     for (index, overload) in overloads.iter().enumerate() {
-        let sigs = expand_single_overload(overload.params, cgctx, overload.body_scope);
+        let sigs = expand_single_overload(overload.params, setter, cgctx, overload.body_scope);
         if index == 0 {
             first_overload_sigs = sigs.len();
         }
@@ -400,10 +408,19 @@ pub fn expand_signatures(
         .into_iter()
         .zip(deduped)
         .zip(origins)
-        .map(|((name_suffix, params), overload)| ExpandedSignature {
-            overload,
-            name_suffix,
-            params,
+        .map(|((mut name_suffix, params), overload)| {
+            // A setter admitting only `null` still names its arm.
+            if setter
+                && name_suffix.is_empty()
+                && matches!(&params[..], [p] if p.type_ref == TypeRef::Null)
+            {
+                name_suffix = "_with_null".to_string();
+            }
+            ExpandedSignature {
+                overload,
+                name_suffix,
+                params,
+            }
         })
         .collect()
 }
@@ -496,7 +513,7 @@ pub fn build_signatures(
     let base = spec
         .rust_name
         .map_or_else(|| base_rust_name(spec.js_name, spec.kind), ident_chars);
-    let expansions = expand_signatures(spec.overloads, cgctx);
+    let expansions = expand_signatures(spec.overloads, spec.kind, cgctx);
 
     let per_mono = CodegenContext::generic_mono(cgctx);
     let mut out = Vec::with_capacity(expansions.len());
@@ -632,6 +649,7 @@ fn concrete_params_eq(a: &[ConcreteParam], b: &[ConcreteParam]) -> bool {
 /// variadic param appending.
 fn expand_single_overload(
     params: &[Param],
+    setter: bool,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> Vec<Vec<ConcreteParam>> {
@@ -645,27 +663,36 @@ fn expand_single_overload(
     // Pre-flatten every param's alternatives once. Reused below in
     // the cartesian-size projection and in the expansion loop, so
     // we never re-flatten the same `TypeRef`.
-    let per_param_alts: Vec<Vec<TypeRef>> = non_variadic
+    let mut per_param_alts: Vec<Vec<TypeRef>> = non_variadic
         .iter()
         .map(|p| flatten_type(&p.type_ref, cgctx, scope))
         .collect();
 
-    // Cap the cartesian product across params. Each optional param
+    // `undefined` is absence: an optional parameter, or a trailing one
+    // admitting it (`x: T | undefined` with only omittable parameters after
+    // it), is omitted for that arm, and its other arms take the plain type.
+    // One that cannot be omitted keeps `Option<T>`. A setter's value is
+    // never omitted, and drops `undefined` from its arms.
+    let mut omittable = vec![false; non_variadic.len()];
+    let mut tail = true;
+    for (i, param) in non_variadic.iter().enumerate().rev() {
+        let admits_undefined = per_param_alts[i].iter().any(TypeRef::admits_undefined);
+        omittable[i] = !setter && (param.optional || (tail && admits_undefined));
+        tail &= omittable[i];
+        if omittable[i] || setter {
+            per_param_alts[i] = without_undefined(std::mem::take(&mut per_param_alts[i]));
+        }
+    }
+
+    // Cap the cartesian product across params. Each omittable param
     // contributes +1 (the truncation case) on top of its alt count;
     // required params multiply. Above the cap, every param's
     // alternative list collapses to a single LUB so the cartesian
     // degenerates to one signature.
-    let projected: usize = non_variadic
+    let projected: usize = per_param_alts
         .iter()
-        .zip(per_param_alts.iter())
-        .map(|(p, alts)| {
-            let n = alts.len().max(1);
-            if p.optional {
-                n + 1
-            } else {
-                n
-            }
-        })
+        .zip(&omittable)
+        .map(|(alts, &omittable)| alts.len().max(1) + usize::from(omittable))
         .fold(1usize, |acc, n| acc.saturating_mul(n));
     let collapse_each = projected > CARTESIAN_PRODUCT_LIMIT;
     if collapse_each {
@@ -689,10 +716,14 @@ fn expand_single_overload(
 
     for (i, (param, mut type_alternatives)) in non_variadic.iter().zip(per_param_alts).enumerate() {
         if collapse_each && type_alternatives.len() > 1 {
-            type_alternatives = vec![flatten_collapse_to_lub(&param.type_ref, cgctx, scope)];
+            type_alternatives =
+                split_null_arm(vec![flatten_collapse_to_lub(&param.type_ref, cgctx, scope)]);
+            if omittable[i] || setter {
+                type_alternatives = without_undefined(type_alternatives);
+            }
         }
 
-        if param.optional {
+        if omittable[i] {
             // Only extend sigs that are "full" up to this point (len == i).
             // Shorter sigs are from earlier optional truncation — they stay frozen.
             let frozen: Vec<Vec<ConcreteParam>> =
@@ -767,16 +798,19 @@ fn expand_single_overload(
     sigs
 }
 
-/// [`flatten_type`] for dictionary-factory fields. Literal members stay
-/// separate alternatives even under per-monomorphization primitive-union
-/// grouping, because the factory bakes each literal into its own
-/// `new_<literal>` constructor rather than taking it as an argument.
+/// The arms of an omittable parameter: omission stands for `undefined`, so
+/// each arm takes its type without it.
+pub(crate) fn without_undefined(alts: Vec<TypeRef>) -> Vec<TypeRef> {
+    alts.iter().map(TypeRef::without_undefined).collect()
+}
+
+/// [`flatten_type`] for dictionary-factory fields.
 pub fn flatten_dictionary_field(
     ty: &TypeRef,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> Vec<TypeRef> {
-    flatten_type_with(ty, cgctx, scope, true)
+    flatten_type(ty, cgctx, scope)
 }
 
 /// Hard cap on the number of alternatives any single [`flatten_type`]
@@ -830,29 +864,13 @@ const CARTESIAN_PRODUCT_LIMIT: usize = 64;
 /// that some source-level alternatives were dropped from the
 /// public API.
 ///
-/// ## Primitive-union grouping
-///
-/// Under per-monomorphization codegen, primitive alternatives spanning
-/// two or more categories (`string | number`) merge into one grouped
-/// alternative that lowers to a `js_sys` marker-trait bound; see
-/// [`primitive_unions::group_alternatives`].
+/// The expansion is the same with and without per-monomorphization; only
+/// the rendered argument types differ (`impl JsStringLike` for `&str`).
 fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> Vec<TypeRef> {
-    flatten_type_with(ty, cgctx, scope, false)
-}
-
-fn flatten_type_with(
-    ty: &TypeRef,
-    cgctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
-    keep_literals: bool,
-) -> Vec<TypeRef> {
     let mut out: Vec<TypeRef> = Vec::new();
     if flatten_into(ty, cgctx, scope, &mut out) {
         pair_typed_array_slice(&mut out, cgctx, scope);
-        if cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) {
-            return primitive_unions::group_alternatives(out, keep_literals);
-        }
-        return out;
+        return split_null_arm(out);
     }
     if let Some(c) = cgctx {
         c.warn(format!(
@@ -863,7 +881,41 @@ fn flatten_type_with(
             FLATTEN_ALTERNATIVE_LIMIT,
         ));
     }
-    vec![flatten_collapse_to_lub(ty, cgctx, scope)]
+    split_null_arm(vec![flatten_collapse_to_lub(ty, cgctx, scope)])
+}
+
+/// A written `null` is an ordinary union arm: each alternative is taken
+/// without it (`Option<T>` where `undefined` is still admitted) and `null`
+/// has an arm of its own, whose parameter the emitters drop and pass `null`
+/// for (`f(x)` and `f_with_null()`; see [`super::null_arms`]). `any | null`
+/// is `any`, whose `&JsValue` already takes `null`, so it needs no arm.
+fn split_null_arm(alts: Vec<TypeRef>) -> Vec<TypeRef> {
+    let null_of = |t: &TypeRef| {
+        t.split_empties()
+            .filter(|(_, n)| n.admits_null())
+            .map(|(core, n)| (matches!(core, TypeRef::Any | TypeRef::Unknown), core, n))
+    };
+    if !alts
+        .iter()
+        .any(|t| null_of(t).is_some_and(|(in_band, ..)| !in_band))
+    {
+        return alts;
+    }
+    let arm = !alts
+        .iter()
+        .any(|t| null_of(t).is_some_and(|(in_band, ..)| in_band));
+    let mut out: Vec<TypeRef> = alts
+        .into_iter()
+        .map(|t| match null_of(&t) {
+            Some((false, core, Nullability::Both)) => core.with_empties(Nullability::Undefined),
+            Some((false, core, _)) => core,
+            _ => t,
+        })
+        .collect();
+    if arm {
+        out.push(TypeRef::Null);
+    }
+    out
 }
 
 /// Pair a typed array with the `number[]` (or `bigint[]` for a 64-bit
@@ -874,15 +926,23 @@ fn flatten_type_with(
 /// alternative. With more than one typed array the element is ambiguous
 /// and nothing pairs, except for a `Uint8Array` beside a
 /// `Uint8ClampedArray`: both hold `u8`, so the slice is a `Uint8Array`.
+/// A nullable view keeps its empties (`Option<&[u8]>`, `Nullable<&[u8]>`).
+/// `Clamped` has no `Option` form, so a clamped view keeps neither.
 fn pair_typed_array_slice(
     alts: &mut Vec<TypeRef>,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) {
     use crate::ir::TypedArrayElement as E;
+    fn peel_nullable(t: &TypeRef) -> (TypeRef, Option<Nullability>) {
+        match t.split_empties() {
+            Some((core, n)) => (core, Some(n)),
+            None => (t.clone(), None),
+        }
+    }
     let typed: Vec<_> = alts
         .iter()
-        .filter_map(|t| match t {
+        .filter_map(|t| match &peel_nullable(t).0 {
             TypeRef::Reference {
                 segments,
                 generic_args,
@@ -910,12 +970,15 @@ fn pair_typed_array_slice(
     };
     let Some(i) = alts
         .iter()
-        .position(|t| matches!(t, TypeRef::Array(inner) if pairs(inner)))
+        .position(|t| matches!(&peel_nullable(t).0, TypeRef::Array(inner) if pairs(inner)))
     else {
         return;
     };
-    alts.remove(i);
-    alts.insert(0, TypeRef::TypedSlice(elem, shared));
+    let view = match peel_nullable(&alts.remove(i)).1 {
+        Some(n) if !elem.is_clamped() => TypeRef::TypedSlice(elem, shared).with_empties(n),
+        _ => TypeRef::TypedSlice(elem, shared),
+    };
+    alts.insert(0, view);
 }
 
 /// Push every flatten-alternative for `ty` into `out`. Returns
@@ -936,11 +999,24 @@ fn flatten_into(
         return false;
     }
     match ty {
+        // A union admitting empties fans out the rest and keeps the empties
+        // on each alternative; `split_null_arm` then lifts `null` into an
+        // arm of its own. An alternative admitting empties of its own
+        // (through an alias) merges them in.
+        TypeRef::Union(_) if let Some((core, n)) = ty.split_empties() => {
+            let mut alts = Vec::new();
+            if !flatten_into(&core, cgctx, scope, &mut alts) {
+                return false;
+            }
+            out.extend(alts.into_iter().map(|alt| alt.with_empties(n)));
+            true
+        }
+
         // Unions fan out into each member recursively. Short-circuit
         // as soon as the limit trips so a huge union doesn't pay for
         // members beyond the cap.
-        TypeRef::Union(members) => {
-            for m in members {
+        TypeRef::Union(u) => {
+            for m in u.members() {
                 if !flatten_into(m, cgctx, scope, out) {
                     return false;
                 }
@@ -979,24 +1055,13 @@ fn flatten_into(
             true
         }
 
-        // Nullable: flatten the inner, dropping the `Null` arm.
-        // Argument-position `Nullable<T>` carries no useful overload
-        // information — a `_with_null(val: &Null)` variant is API
-        // noise. Return-position handling (`Option<T>` /
-        // `JsOption<T>`) is independent and lives in `to_syn_type`.
-        TypeRef::Nullable(inner) => flatten_into(inner, cgctx, scope, out),
-
-        // `PropertyKey` stays whole for per-mono grouping so it keeps
-        // the `js_sys::PropertyKey` spelling; otherwise it fans out like
-        // the union it abbreviates.
-        TypeRef::PropertyKey if !cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) => {
-            flatten_into(
-                &TypeRef::Union(TypeRef::property_key_members()),
-                cgctx,
-                scope,
-                out,
-            )
-        }
+        // `PropertyKey` fans out like the union it abbreviates.
+        TypeRef::PropertyKey => flatten_into(
+            &TypeRef::union(TypeRef::property_key_members()),
+            cgctx,
+            scope,
+            out,
+        ),
 
         // Everything else is terminal — generic containers are not
         // distributive (`Array<A | B>` and `Record<K, A | B>` are
@@ -1016,18 +1081,19 @@ fn flatten_into(
 ///
 /// Returns [`crate::codegen::subtyping::lub_union`] for unions
 /// (and aliases that chase through to one); otherwise returns the
-/// input unchanged. The `Null`-arm-drop applied by `Nullable`
-/// flattening carries through for argument-position consistency.
+/// input unchanged. The empties stay beside the collapsed rest.
 fn flatten_collapse_to_lub(
     ty: &TypeRef,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> TypeRef {
     match ty {
-        TypeRef::Union(members) => {
-            crate::codegen::subtyping::lub_union(members, cgctx, scope).unwrap_or(TypeRef::Any)
+        TypeRef::Union(_) if let Some((core, n)) = ty.split_empties() => {
+            flatten_collapse_to_lub(&core, cgctx, scope).with_empties(n)
         }
-        TypeRef::Nullable(inner) => flatten_collapse_to_lub(inner, cgctx, scope),
+        TypeRef::Union(u) => {
+            crate::codegen::subtyping::lub_union(u.members(), cgctx, scope).unwrap_or(TypeRef::Any)
+        }
         TypeRef::PropertyKey => TypeRef::Any,
         TypeRef::Reference { .. } if ty.as_ident().is_some() => {
             if let Some(c) = cgctx {
@@ -1085,6 +1151,14 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
     // semantic disambiguation (`_with_record` + `_with_context`).
     let mut names = Vec::with_capacity(signatures.len());
     let mut used = LocalScope::default();
+    let is_null = |p: &ConcreteParam| matches!(p.type_ref, TypeRef::Null);
+    // `_with_null` names the arm when one parameter admits `null`; with more,
+    // each is named for its parameter (`_with_value_null`).
+    let null_positions: std::collections::HashSet<usize> = signatures
+        .iter()
+        .flat_map(|sig| sig.iter().enumerate().filter(|(_, p)| is_null(p)))
+        .map(|(i, _)| i)
+        .collect();
 
     for (sig_idx, sig) in signatures.iter().enumerate() {
         // The first signature gets the base name without any suffix;
@@ -1121,6 +1195,8 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
                     continue;
                 }
                 match other.get(abs_idx) {
+                    // A `null` arm names itself, not the arms beside it.
+                    Some(other_param) if is_null(other_param) && !is_null(param) => {}
                     Some(other_param) => {
                         if other_param.name == param.name && other_param.type_ref != param.type_ref
                         {
@@ -1142,7 +1218,11 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
             }
 
             let param_snake = snake_ident(&param.name);
-            let (text, from_type) = if any_same_name_different_type {
+            let (text, from_type) = if is_null(param) && null_positions.len() > 1 {
+                (format!("{param_snake}_null"), false)
+            } else if is_null(param) {
+                ("null".to_string(), false)
+            } else if any_same_name_different_type {
                 (type_snake_name(&param.type_ref), true)
             } else {
                 (param_snake.clone(), false)
@@ -1334,11 +1414,8 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::Any | TypeRef::Unknown => "js_value".to_string(),
         TypeRef::Object => "object".to_string(),
         TypeRef::ArrayBufferView => "typed_array".to_string(),
-        // Grouped per-mono primitive unions (`number_or_string`,
-        // `property_key`). Outside that mode `PropertyKey` has already
-        // fanned out into its members.
-        TypeRef::Union(_) | TypeRef::PropertyKey => primitive_unions::PrimitiveUnion::classify(ty)
-            .map_or_else(|| "js_value".to_string(), |u| u.suffix()),
+        TypeRef::Union(_) if let Some((core, _)) = ty.split_empties() => type_snake_name(&core),
+        TypeRef::Union(_) | TypeRef::PropertyKey => "js_value".to_string(),
         // Snake-case the leftmost (head) segment of any named
         // reference. Type args don't participate in `_with_` suffixes.
         // A synthesised `Array<T>` / `ReadonlyArray<T>` reference
@@ -1352,7 +1429,6 @@ fn type_snake_name(ty: &TypeRef) -> String {
             to_snake_case(head)
         }
         TypeRef::Array(_) | TypeRef::TypedSlice(..) => "slice".to_string(),
-        TypeRef::Nullable(inner) => type_snake_name(inner),
         TypeRef::Function(_) => "function".to_string(),
         _ => "js_value".to_string(),
     }
@@ -1378,6 +1454,8 @@ pub fn generate_concrete_params(
             let attr = param_attr(p, cgctx, scope);
             let ty = if p.variadic {
                 quote! { &[JsValue] }
+            } else if matches!(p.type_ref, TypeRef::Null) {
+                super::null_arms::marker()
             } else {
                 typemap::to_syn_type(
                     &p.type_ref,
@@ -1486,6 +1564,9 @@ pub(crate) fn render_param_type(
     if param.variadic && !mono.is_some_and(spreads_list) {
         return quote! { &[JsValue] };
     }
+    if matches!(param.type_ref, TypeRef::Null) {
+        return super::null_arms::marker();
+    }
     mono.and_then(|ctx| {
         mono_argument_type(&param.type_ref).or_else(|| {
             typemap::mono_string_like_argument(&param.type_ref, ctx, scope, from_module)
@@ -1502,20 +1583,18 @@ pub(crate) fn render_param_type(
     })
 }
 
-/// Per-monomorphization argument bounds: strings become `impl
-/// JsStringLike`, and grouped primitive unions become the matching `impl
-/// js_sys::Js…Like` marker trait. Each occurrence is an independent
-/// anonymous type parameter.
+/// Per-monomorphization argument bounds: a string becomes `impl
+/// JsStringLike`, inside its carrier where one is admitted. Each occurrence
+/// is an independent anonymous type parameter.
 fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
-    let bound = |ty: &TypeRef| match ty {
-        TypeRef::String | TypeRef::StringLiteral(_) => {
-            Some(quote! { ::wasm_bindgen::JsStringLike })
-        }
-        _ => primitive_unions::PrimitiveUnion::classify(ty).map(|u| u.trait_path()),
-    };
+    if let Some((core, n)) = ty.split_empties() {
+        return mono_argument_type(&core).map(|marker| typemap::nullable_carrier(marker, n));
+    }
     match ty {
-        TypeRef::Nullable(inner) => bound(inner).map(|b| quote! { Option<impl #b> }),
-        _ => bound(ty).map(|b| quote! { impl #b }),
+        TypeRef::String | TypeRef::StringLiteral(_) => {
+            Some(quote! { impl ::wasm_bindgen::JsStringLike })
+        }
+        _ => None,
     }
 }
 
@@ -1633,6 +1712,10 @@ pub fn generate_dictionary_params_in(
 /// imported type implements its ABI for any arguments, so it is bounded
 /// only by `'static`; bare parameters and std containers of them are
 /// bounded in full.
+///
+/// An erased import's type parameter is a `JsGeneric` handle, but an
+/// awaited carrier of one (`Nullable<T>`) converts through the carrier's
+/// ABI, so it is bounded by that carrier's trait.
 pub(crate) fn state_abi_bounds(items: &mut [syn::Item]) {
     for item in items {
         match item {
@@ -1641,18 +1724,48 @@ pub(crate) fn state_abi_bounds(items: &mut [syn::Item]) {
                     state_abi_bounds(items);
                 }
             }
-            syn::Item::ForeignMod(block)
-                if has_wasm_bindgen_flag(&block.attrs, "experimental_generic_mono") =>
-            {
+            syn::Item::ForeignMod(block) => {
+                let mono = has_wasm_bindgen_flag(&block.attrs, "experimental_generic_mono");
                 for item in &mut block.items {
-                    if let syn::ForeignItem::Fn(f) = item {
-                        state_fn_abi_bounds(f);
+                    match item {
+                        syn::ForeignItem::Fn(f) if mono => state_fn_abi_bounds(f),
+                        syn::ForeignItem::Fn(f) => state_awaited_carrier_bound(f),
+                        _ => {}
                     }
                 }
             }
             _ => {}
         }
     }
+}
+
+fn state_awaited_carrier_bound(f: &mut syn::ForeignItemFn) {
+    let syn::ReturnType::Type(_, ret) = &f.sig.output else {
+        return;
+    };
+    if f.sig.asyncness.is_none() {
+        return;
+    }
+    let params: std::collections::HashSet<String> = f
+        .sig
+        .generics
+        .type_params()
+        .map(|p| p.ident.to_string())
+        .collect();
+    let ret = result_ok_type(ret).unwrap_or(ret);
+    let Some((param, carrier)) = carrier_param(ret, &params) else {
+        return;
+    };
+    let abi = match carrier {
+        "Option" => quote! { ::wasm_bindgen::convert::OptionFromWasmAbi },
+        _ => quote! { ::wasm_bindgen::convert::NullableFromWasmAbi },
+    };
+    let param = param.clone();
+    f.sig
+        .generics
+        .make_where_clause()
+        .predicates
+        .push(syn::parse_quote! { #param: #abi });
 }
 
 fn has_wasm_bindgen_flag(attrs: &[syn::Attribute], flag: &str) -> bool {
@@ -1684,7 +1797,7 @@ fn abi_shape(ty: &syn::Type, params: &std::collections::HashSet<String>) -> AbiS
                 && matches!(p.path.segments[0].arguments, syn::PathArguments::None);
             match last.as_deref() {
                 Some(name) if bare && params.contains(name) => AbiShape::Dependent,
-                Some("Option" | "Vec" | "Box") => AbiShape::Dependent,
+                Some("Option" | "Nullable" | "Vec" | "Box") => AbiShape::Dependent,
                 _ => AbiShape::Imported,
             }
         }
@@ -1748,12 +1861,17 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn) {
     let into = quote! { ::wasm_bindgen::convert::IntoWasmAbi };
     let from = quote! { ::wasm_bindgen::convert::FromWasmAbi };
     // `Option<T>` has its ABI exactly when `T: Option{Into,From}WasmAbi`,
-    // which is the form a generic caller writes.
+    // and `Nullable<T>` (alone or under `Option`) when
+    // `T: Nullable{Into,From}WasmAbi`, which is the form a generic caller
+    // writes.
     let bounded = |ty: &syn::Type, abi: &TokenStream| -> (TokenStream, TokenStream) {
-        if let Some(inner) = option_param(ty, &params) {
-            let abi = match abi.to_string().contains("Into") {
-                true => quote! { ::wasm_bindgen::convert::OptionIntoWasmAbi },
-                false => quote! { ::wasm_bindgen::convert::OptionFromWasmAbi },
+        if let Some((inner, carrier)) = carrier_param(ty, &params) {
+            let into = abi.to_string().contains("Into");
+            let abi = match (carrier, into) {
+                ("Option", true) => quote! { ::wasm_bindgen::convert::OptionIntoWasmAbi },
+                ("Option", false) => quote! { ::wasm_bindgen::convert::OptionFromWasmAbi },
+                (_, true) => quote! { ::wasm_bindgen::convert::NullableIntoWasmAbi },
+                (_, false) => quote! { ::wasm_bindgen::convert::NullableFromWasmAbi },
             };
             return (inner.to_token_stream(), abi);
         }
@@ -1844,28 +1962,38 @@ fn is_bare_param(path: &syn::Path, params: &std::collections::HashSet<String>) -
         .is_some_and(|i| params.contains(&i.to_string()))
 }
 
-/// `T` of an `Option<T>` whose `T` is a bare type parameter.
-fn option_param<'t>(
+/// The bare type parameter `T` of an `Option<T>`, `Nullable<T>` or
+/// `Option<Nullable<T>>`, with the carrier whose ABI trait bounds it.
+fn carrier_param<'t>(
     ty: &'t syn::Type,
     params: &std::collections::HashSet<String>,
-) -> Option<&'t syn::Ident> {
+) -> Option<(&'t syn::Ident, &'static str)> {
     let syn::Type::Path(p) = ty else {
         return None;
     };
     let last = p.path.segments.last()?;
-    if last.ident != "Option" {
-        return None;
-    }
+    let carrier = match last.ident.to_string().as_str() {
+        "Option" => "Option",
+        "Nullable" => "Nullable",
+        _ => return None,
+    };
     let syn::PathArguments::AngleBracketed(args) = &last.arguments else {
         return None;
     };
-    let Some(syn::GenericArgument::Type(syn::Type::Path(inner))) = args.args.first() else {
+    let Some(syn::GenericArgument::Type(inner)) = args.args.first() else {
+        return None;
+    };
+    if let Some((param, "Nullable")) = carrier_param(inner, params) {
+        return Some((param, "Nullable"));
+    }
+    let syn::Type::Path(inner) = inner else {
         return None;
     };
     inner
         .path
         .get_ident()
         .filter(|i| params.contains(&i.to_string()))
+        .map(|i| (i, carrier))
 }
 
 /// `T` of a `Result<T, E>`.
@@ -1921,7 +2049,7 @@ mod tests {
     use super::*;
     use crate::codegen::typemap::CodegenContext;
     use crate::context::GlobalContext;
-    use crate::ir::TypeRef;
+    use crate::ir::{Nullability, TypeRef};
 
     fn no_used() -> LocalScope {
         LocalScope::default()
@@ -1936,6 +2064,7 @@ mod tests {
                 pub async fn load<T, U>(this: &Store<T>, u: U, key: impl JsStringLike) -> Result<Holder<T>, JsValue>;
                 pub fn find<T>(value: &T, rest: Vec<T>) -> Option<T>;
                 pub fn plain(value: f64) -> f64;
+                pub fn nullable<T, U>(value: Nullable<T>, both: Option<Nullable<U>>) -> Option<Nullable<T>>;
             }
         };
         state_abi_bounds(&mut file.items);
@@ -1964,6 +2093,9 @@ mod tests {
                  :: wasm_bindgen :: convert :: OptionFromWasmAbi , \
                  Vec < T > : :: wasm_bindgen :: convert :: IntoWasmAbi",
                 "",
+                "where T : :: wasm_bindgen :: convert :: NullableIntoWasmAbi + \
+                 :: wasm_bindgen :: convert :: NullableFromWasmAbi , \
+                 U : :: wasm_bindgen :: convert :: NullableIntoWasmAbi",
             ]
         );
     }
@@ -1975,33 +2107,18 @@ mod tests {
             "impl :: wasm_bindgen :: JsStringLike"
         );
         assert_eq!(
-            mono_argument_type(&TypeRef::Nullable(Box::new(TypeRef::String)))
+            mono_argument_type(&TypeRef::String.with_empties(Nullability::Undefined))
                 .unwrap()
                 .to_string(),
             "Option < impl :: wasm_bindgen :: JsStringLike >"
         );
+        assert_eq!(
+            mono_argument_type(&TypeRef::String.with_empties(Nullability::Null))
+                .unwrap()
+                .to_string(),
+            "Nullable < impl :: wasm_bindgen :: JsStringLike >"
+        );
         assert!(mono_argument_type(&TypeRef::Number).is_none());
-    }
-
-    #[test]
-    fn mono_primitive_unions_use_marker_traits() {
-        let union = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
-        assert_eq!(
-            mono_argument_type(&union).unwrap().to_string(),
-            "impl :: js_sys :: JsNumberOrStringLike"
-        );
-        assert_eq!(
-            mono_argument_type(&TypeRef::Nullable(Box::new(union)))
-                .unwrap()
-                .to_string(),
-            "Option < impl :: js_sys :: JsNumberOrStringLike >"
-        );
-        assert_eq!(
-            mono_argument_type(&TypeRef::PropertyKey)
-                .unwrap()
-                .to_string(),
-            "impl :: js_sys :: PropertyKey"
-        );
     }
 
     #[test]
@@ -3112,7 +3229,7 @@ mod tests {
     fn typed_array_pairs_with_its_element_array() {
         use crate::ir::TypedArrayElement as E;
         let array = |elem: TypeRef| TypeRef::Array(Box::new(elem));
-        let flat = |members: Vec<TypeRef>| flatten_no_ctx(&TypeRef::Union(members));
+        let flat = |members: Vec<TypeRef>| flatten_no_ctx(&TypeRef::union(members));
         assert_eq!(
             flat(vec![TypeRef::ident("Uint8Array"), array(TypeRef::Number)]),
             vec![
@@ -3154,6 +3271,36 @@ mod tests {
                 TypeRef::generic("Uint8Array", vec![TypeRef::ident("ArrayBuffer")]),
             ]
         );
+        let bytes = TypeRef::union([TypeRef::ident("Uint8Array"), array(TypeRef::Number)]);
+        let nullable = |n| flatten_no_ctx(&bytes.clone().with_empties(n));
+        let view = TypeRef::TypedSlice(E::U8, SharedMemory::Accepted);
+        let handle = |n| TypeRef::ident("Uint8Array").with_empties(n);
+        let undefined = Nullability::Undefined;
+        assert_eq!(
+            nullable(undefined),
+            vec![view.clone().with_empties(undefined), handle(undefined)]
+        );
+        // A written `null` is an arm of its own beside the bare alternatives.
+        assert_eq!(
+            nullable(Nullability::Null),
+            vec![view.clone(), TypeRef::ident("Uint8Array"), TypeRef::Null]
+        );
+        assert_eq!(
+            nullable(Nullability::Both),
+            vec![
+                view.clone().with_empties(undefined),
+                handle(undefined),
+                TypeRef::Null
+            ]
+        );
+        let clamped = TypeRef::union([TypeRef::ident("Uint8ClampedArray"), array(TypeRef::Number)]);
+        assert_eq!(
+            flatten_no_ctx(&clamped.with_empties(Nullability::Undefined)),
+            vec![
+                TypeRef::TypedSlice(E::U8Clamped, SharedMemory::Accepted),
+                TypeRef::ident("Uint8ClampedArray").with_empties(Nullability::Undefined),
+            ]
+        );
         for unpaired in [
             vec![TypeRef::ident("Uint8Array"), array(TypeRef::BigInt)],
             vec![TypeRef::ident("BigInt64Array"), array(TypeRef::Number)],
@@ -3169,7 +3316,7 @@ mod tests {
 
     #[test]
     fn record_with_mixed_primitive_union_does_not_distribute() {
-        let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number, TypeRef::Boolean]);
+        let union_v = TypeRef::union([TypeRef::String, TypeRef::Number, TypeRef::Boolean]);
         let ty = TypeRef::generic("Record", vec![TypeRef::String, union_v.clone()]);
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);
@@ -3181,7 +3328,7 @@ mod tests {
 
     #[test]
     fn record_with_union_key_does_not_distribute() {
-        let union_k = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
+        let union_k = TypeRef::union([TypeRef::String, TypeRef::Number]);
         let ty = TypeRef::generic("Record", vec![union_k.clone(), TypeRef::String]);
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);
@@ -3204,7 +3351,7 @@ mod tests {
 
     #[test]
     fn array_with_mixed_primitive_union_does_not_distribute() {
-        let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
+        let union_v = TypeRef::union([TypeRef::String, TypeRef::Number]);
         let ty = TypeRef::Array(Box::new(union_v.clone()));
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);
@@ -3216,8 +3363,8 @@ mod tests {
 
     #[test]
     fn map_with_union_type_args_does_not_distribute() {
-        let k = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
-        let v = TypeRef::Union(vec![TypeRef::String, TypeRef::Boolean]);
+        let k = TypeRef::union([TypeRef::String, TypeRef::Number]);
+        let v = TypeRef::union([TypeRef::String, TypeRef::Boolean]);
         let ty = TypeRef::generic("Map", vec![k.clone(), v.clone()]);
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);
@@ -3232,7 +3379,7 @@ mod tests {
 
     #[test]
     fn promise_with_union_does_not_distribute() {
-        let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
+        let union_v = TypeRef::union([TypeRef::String, TypeRef::Number]);
         let ty = TypeRef::generic("Promise", vec![union_v.clone()]);
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);

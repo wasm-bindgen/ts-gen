@@ -1,4 +1,4 @@
-//! @ts-gen --experimental-generic-mono --lib-name slice-args-mono --export slice-args-mono
+//! @ts-gen --lib-name slice-args-mono --export slice-args-mono
 
 // Per-monomorphization keeps a type-parameter element as a bare `T`, which
 // wasm-bindgen lowers per instantiation: `T = f64` would be a `Float64Array`
