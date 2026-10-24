@@ -52,13 +52,13 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_promise(this: &State, key: &str, value: &str) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    async fn put_with_null_js(
+    async fn __put_with_null(
         this: &State,
         key: &str,
         value: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    fn put_with_null_promise_js(
+    fn __put_with_null_promise(
         this: &State,
         key: &str,
         value: &::wasm_bindgen::JsValue,
@@ -94,12 +94,12 @@ extern "C" {
 impl State {
     #[doc = " A `null` argument arm gets its own `_promise` form too."]
     pub async fn put_with_null(&self, key: &str) -> Result<(), JsValue> {
-        self.put_with_null_js(key, &::wasm_bindgen::JsValue::NULL)
+        self.__put_with_null(key, &::wasm_bindgen::JsValue::NULL)
             .await
     }
     #[doc = " A `null` argument arm gets its own `_promise` form too."]
     pub fn put_with_null_promise(&self, key: &str) -> Promise<Undefined> {
-        self.put_with_null_promise_js(key, &::wasm_bindgen::JsValue::NULL)
+        self.__put_with_null_promise(key, &::wasm_bindgen::JsValue::NULL)
     }
 }
 #[wasm_bindgen]

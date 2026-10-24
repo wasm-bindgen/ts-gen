@@ -40,3 +40,8 @@ export declare function arity(a: string | undefined, b?: number | null): string;
 
 /** A non-trailing `undefined` is passed, not omitted. */
 export declare function pick(a: string | undefined, b: number): string;
+
+// A parameter that only admits `null` is `only_null_with_null()`, never a
+// bare `only_null()`, which would read as omitting it.
+/** Reports how many arguments arrived and the first. */
+export declare function onlyNull(value: null): string;

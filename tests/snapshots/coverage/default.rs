@@ -292,11 +292,11 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_next(this: &LinkedList, val: &LinkedList);
     #[wasm_bindgen(method, setter, js_name = "next")]
-    fn set_next_with_null_js(this: &LinkedList, val: &::wasm_bindgen::JsValue);
+    fn __set_next_with_null(this: &LinkedList, val: &::wasm_bindgen::JsValue);
 }
 impl LinkedList {
     pub fn set_next_with_null(&self) {
-        self.set_next_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_next_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
 impl LinkedList {
@@ -555,7 +555,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_array_buffer(this: &FetchOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    fn set_body_with_null_js(this: &FetchOptions, val: &::wasm_bindgen::JsValue);
+    fn __set_body_with_null(this: &FetchOptions, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn redirect(this: &FetchOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -567,7 +567,7 @@ extern "C" {
 }
 impl FetchOptions {
     pub fn set_body_with_null(&self) {
-        self.set_body_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_body_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
 impl FetchOptions {

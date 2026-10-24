@@ -47,3 +47,6 @@ export function arity(...args) {
 export function pick(a, b) {
   return `${arguments.length}:${a === undefined ? "undefined" : a}:${b}`;
 }
+export function onlyNull(...args) {
+  return `${args.length}:${String(args[0])}`;
+}

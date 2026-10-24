@@ -77,7 +77,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    fn new_with_null_js(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
+    fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_readable_stream_and_init(
         body: &ReadableStream,
@@ -106,7 +106,7 @@ extern "C" {
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    fn new_with_null_and_init_js(
+    fn __new_with_null_and_init(
         body: &::wasm_bindgen::JsValue,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
@@ -152,10 +152,10 @@ extern "C" {
 }
 impl Response {
     pub fn new_with_null() -> Result<Response, JsValue> {
-        Self::new_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        Self::__new_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn new_with_null_and_init(init: &ResponseInit) -> Result<Response, JsValue> {
-        Self::new_with_null_and_init_js(&::wasm_bindgen::JsValue::NULL, init)
+        Self::__new_with_null_and_init(&::wasm_bindgen::JsValue::NULL, init)
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

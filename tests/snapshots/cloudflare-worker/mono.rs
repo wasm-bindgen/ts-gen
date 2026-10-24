@@ -164,7 +164,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_form_data(this: &RequestInit, val: &FormData);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    fn set_body_with_null_js(this: &RequestInit, val: &::wasm_bindgen::JsValue);
+    fn __set_body_with_null(this: &RequestInit, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn redirect(this: &RequestInit) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "redirect")]
@@ -178,7 +178,7 @@ extern "C" {
 }
 impl RequestInit {
     pub fn set_body_with_null(&self) {
-        self.set_body_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_body_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
 impl RequestInit {
@@ -273,7 +273,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    fn new_with_null_js(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
+    fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_readable_stream_and_init(
         body: &ReadableStream,
@@ -302,7 +302,7 @@ extern "C" {
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    fn new_with_null_and_init_js(
+    fn __new_with_null_and_init(
         body: &::wasm_bindgen::JsValue,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
@@ -364,10 +364,10 @@ extern "C" {
 }
 impl Response {
     pub fn new_with_null() -> Result<Response, JsValue> {
-        Self::new_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        Self::__new_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn new_with_null_and_init(init: &ResponseInit) -> Result<Response, JsValue> {
-        Self::new_with_null_and_init_js(&::wasm_bindgen::JsValue::NULL, init)
+        Self::__new_with_null_and_init(&::wasm_bindgen::JsValue::NULL, init)
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

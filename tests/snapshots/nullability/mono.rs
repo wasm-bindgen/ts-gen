@@ -44,7 +44,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_nullable(this: &Settings, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "nullable")]
-    fn set_nullable_with_null_js(this: &Settings, val: &::wasm_bindgen::JsValue);
+    fn __set_nullable_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn both(this: &Settings) -> Option<Nullable<String>>;
     #[wasm_bindgen(method, getter, js_name = "both")]
@@ -52,7 +52,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_both(this: &Settings, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "both")]
-    fn set_both_with_null_js(this: &Settings, val: &::wasm_bindgen::JsValue);
+    fn __set_both_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn aliased(this: &Settings) -> Option<Nullable<String>>;
     #[wasm_bindgen(method, getter, js_name = "aliased")]
@@ -60,35 +60,35 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_aliased(this: &Settings, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "aliased")]
-    fn set_aliased_with_null_js(this: &Settings, val: &::wasm_bindgen::JsValue);
+    fn __set_aliased_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn mode(this: &Settings) -> Option<Nullable<Mode>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &Settings, val: Mode);
     #[wasm_bindgen(method, setter, js_name = "mode")]
-    fn set_mode_with_null_js(this: &Settings, val: &::wasm_bindgen::JsValue);
+    fn __set_mode_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn empties(this: &Settings) -> Option<Null>;
     #[wasm_bindgen(method, setter, js_name = "empties")]
-    fn set_empties_with_null_js(this: &Settings, val: &::wasm_bindgen::JsValue);
+    fn __set_empties_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn limit(this: &Settings) -> Option<Nullable<f64>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_limit(this: &Settings, val: f64);
     #[wasm_bindgen(method, setter, js_name = "limit")]
-    fn set_limit_with_null_js(this: &Settings, val: &::wasm_bindgen::JsValue);
+    fn __set_limit_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn owner(this: &Settings) -> Option<Nullable<Registry>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_owner(this: &Settings, val: &Registry);
     #[wasm_bindgen(method, setter, js_name = "owner")]
-    fn set_owner_with_null_js(this: &Settings, val: &::wasm_bindgen::JsValue);
+    fn __set_owner_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn values(this: &Settings) -> Option<Nullable<Vec<f64>>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_values(this: &Settings, #[wasm_bindgen(slice = "array")] val: &[f64]);
     #[wasm_bindgen(method, setter, js_name = "values")]
-    fn set_values_with_null_js(this: &Settings, val: &::wasm_bindgen::JsValue);
+    fn __set_values_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn key(this: &Settings) -> Option<Nullable<KeyKind>>;
     #[wasm_bindgen(method, setter)]
@@ -96,35 +96,35 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "key")]
     pub fn set_key_with_f64(this: &Settings, val: f64);
     #[wasm_bindgen(method, setter, js_name = "key")]
-    fn set_key_with_null_js(this: &Settings, val: &::wasm_bindgen::JsValue);
+    fn __set_key_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
 }
 impl Settings {
     pub fn set_nullable_with_null(&self) {
-        self.set_nullable_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_nullable_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn set_both_with_null(&self) {
-        self.set_both_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_both_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn set_aliased_with_null(&self) {
-        self.set_aliased_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_aliased_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn set_mode_with_null(&self) {
-        self.set_mode_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_mode_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn set_empties_with_null(&self) {
-        self.set_empties_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_empties_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn set_limit_with_null(&self) {
-        self.set_limit_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_limit_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn set_owner_with_null(&self) {
-        self.set_owner_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_owner_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn set_values_with_null(&self) {
-        self.set_values_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_values_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn set_key_with_null(&self) {
-        self.set_key_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_key_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
 impl Settings {
@@ -261,13 +261,13 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Registry , setter)]
     pub fn set_fallback(val: &Registry);
     # [wasm_bindgen (static_method_of = Registry , setter , js_name = "fallback")]
-    fn set_fallback_with_null_js(val: &::wasm_bindgen::JsValue);
+    fn __set_fallback_with_null(val: &::wasm_bindgen::JsValue);
     # [wasm_bindgen (static_method_of = Registry , getter)]
     pub fn last() -> Option<Nullable<Registry>>;
     # [wasm_bindgen (static_method_of = Registry , setter)]
     pub fn set_last(val: &Registry);
     # [wasm_bindgen (static_method_of = Registry , setter , js_name = "last")]
-    fn set_last_with_null_js(val: &::wasm_bindgen::JsValue);
+    fn __set_last_with_null(val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn pending(this: &Registry) -> Promise<Nullable<JsString>>;
     #[wasm_bindgen(method, getter)]
@@ -275,10 +275,10 @@ extern "C" {
 }
 impl Registry {
     pub fn set_fallback_with_null() {
-        Self::set_fallback_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        Self::__set_fallback_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn set_last_with_null() {
-        Self::set_last_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        Self::__set_last_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
@@ -303,57 +303,57 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(body: impl ::wasm_bindgen::JsStringLike) -> Result<Body, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Body")]
-    fn new_with_body_null_js(body: &::wasm_bindgen::JsValue) -> Result<Body, JsValue>;
+    fn __new_with_body_null(body: &::wasm_bindgen::JsValue) -> Result<Body, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Body")]
     pub fn new_with_length(
         body: impl ::wasm_bindgen::JsStringLike,
         length: f64,
     ) -> Result<Body, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Body")]
-    fn new_with_body_null_and_length_js(
+    fn __new_with_body_null_and_length(
         body: &::wasm_bindgen::JsValue,
         length: f64,
     ) -> Result<Body, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Body")]
-    fn new_with_length_null_js(
+    fn __new_with_length_null(
         body: impl ::wasm_bindgen::JsStringLike,
         length: &::wasm_bindgen::JsValue,
     ) -> Result<Body, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Body")]
-    fn new_with_body_null_and_length_null_js(
+    fn __new_with_body_null_and_length_null(
         body: &::wasm_bindgen::JsValue,
         length: &::wasm_bindgen::JsValue,
     ) -> Result<Body, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn put(this: &Body, value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    fn put_with_null_js(this: &Body, value: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __put_with_null(this: &Body, value: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
     # [wasm_bindgen (static_method_of = Body , catch)]
     pub fn from(owner: &Registry) -> Result<Body, JsValue>;
     # [wasm_bindgen (static_method_of = Body , catch , js_name = "from")]
-    fn from_with_null_js(owner: &::wasm_bindgen::JsValue) -> Result<Body, JsValue>;
+    fn __from_with_null(owner: &::wasm_bindgen::JsValue) -> Result<Body, JsValue>;
 }
 impl Body {
     pub fn new_with_body_null() -> Result<Body, JsValue> {
-        Self::new_with_body_null_js(&::wasm_bindgen::JsValue::NULL)
+        Self::__new_with_body_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn new_with_body_null_and_length(length: f64) -> Result<Body, JsValue> {
-        Self::new_with_body_null_and_length_js(&::wasm_bindgen::JsValue::NULL, length)
+        Self::__new_with_body_null_and_length(&::wasm_bindgen::JsValue::NULL, length)
     }
     pub fn new_with_length_null(body: impl ::wasm_bindgen::JsStringLike) -> Result<Body, JsValue> {
-        Self::new_with_length_null_js(body, &::wasm_bindgen::JsValue::NULL)
+        Self::__new_with_length_null(body, &::wasm_bindgen::JsValue::NULL)
     }
     pub fn new_with_body_null_and_length_null() -> Result<Body, JsValue> {
-        Self::new_with_body_null_and_length_null_js(
+        Self::__new_with_body_null_and_length_null(
             &::wasm_bindgen::JsValue::NULL,
             &::wasm_bindgen::JsValue::NULL,
         )
     }
     pub fn put_with_null(&self) -> Result<(), JsValue> {
-        self.put_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__put_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn from_with_null() -> Result<Body, JsValue> {
-        Self::from_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        Self::__from_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
@@ -374,10 +374,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "nullable")]
-    fn nullable_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __nullable_with_null(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn nullable_with_null() -> Result<(), JsValue> {
-    nullable_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __nullable_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -406,20 +406,20 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "both")]
-    fn both_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<Option<Nullable<String>>, JsValue>;
+    fn __both_with_null(x: &::wasm_bindgen::JsValue) -> Result<Option<Nullable<String>>, JsValue>;
 }
 pub fn both_with_null() -> Result<Option<Nullable<String>>, JsValue> {
-    both_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __both_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "both")]
-    fn both_with_null_js_string_js(
+    fn __both_with_null_js_string(
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Option<Nullable<JsString>>, JsValue>;
 }
 pub fn both_with_null_js_string() -> Result<Option<Nullable<JsString>>, JsValue> {
-    both_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
+    __both_with_null_js_string(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -434,10 +434,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "optionalBoth")]
-    fn optional_both_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __optional_both_with_null(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn optional_both_with_null() -> Result<(), JsValue> {
-    optional_both_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __optional_both_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -466,22 +466,22 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "aliased")]
-    fn aliased_with_null_js(
+    fn __aliased_with_null(
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Option<Nullable<String>>, JsValue>;
 }
 pub fn aliased_with_null() -> Result<Option<Nullable<String>>, JsValue> {
-    aliased_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __aliased_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "aliased")]
-    fn aliased_with_null_js_string_js(
+    fn __aliased_with_null_js_string(
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Option<Nullable<JsString>>, JsValue>;
 }
 pub fn aliased_with_null_js_string() -> Result<Option<Nullable<JsString>>, JsValue> {
-    aliased_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
+    __aliased_with_null_js_string(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -498,20 +498,20 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "aliasedNull")]
-    fn aliased_null_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<Nullable<String>, JsValue>;
+    fn __aliased_null_with_null(x: &::wasm_bindgen::JsValue) -> Result<Nullable<String>, JsValue>;
 }
 pub fn aliased_null_with_null() -> Result<Nullable<String>, JsValue> {
-    aliased_null_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __aliased_null_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "aliasedNull")]
-    fn aliased_null_with_null_js_string_js(
+    fn __aliased_null_with_null_js_string(
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Nullable<JsString>, JsValue>;
 }
 pub fn aliased_null_with_null_js_string() -> Result<Nullable<JsString>, JsValue> {
-    aliased_null_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
+    __aliased_null_with_null_js_string(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -540,22 +540,22 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "optAliasedNull")]
-    fn opt_aliased_null_with_null_js(
+    fn __opt_aliased_null_with_null(
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Option<Nullable<String>>, JsValue>;
 }
 pub fn opt_aliased_null_with_null() -> Result<Option<Nullable<String>>, JsValue> {
-    opt_aliased_null_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __opt_aliased_null_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "optAliasedNull")]
-    fn opt_aliased_null_with_null_js_string_js(
+    fn __opt_aliased_null_with_null_js_string(
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Option<Nullable<JsString>>, JsValue>;
 }
 pub fn opt_aliased_null_with_null_js_string() -> Result<Option<Nullable<JsString>>, JsValue> {
-    opt_aliased_null_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
+    __opt_aliased_null_with_null_js_string(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -570,10 +570,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "count")]
-    fn count_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<Option<Nullable<f64>>, JsValue>;
+    fn __count_with_null(x: &::wasm_bindgen::JsValue) -> Result<Option<Nullable<f64>>, JsValue>;
 }
 pub fn count_with_null() -> Result<Option<Nullable<f64>>, JsValue> {
-    count_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __count_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -583,10 +583,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "countNull")]
-    fn count_null_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __count_null_with_null(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn count_null_with_null() -> Result<(), JsValue> {
-    count_null_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __count_null_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -601,10 +601,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "countOptional")]
-    fn count_optional_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __count_optional_with_null(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn count_optional_with_null() -> Result<(), JsValue> {
-    count_optional_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __count_optional_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -614,10 +614,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "flag")]
-    fn flag_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<Nullable<bool>, JsValue>;
+    fn __flag_with_null(x: &::wasm_bindgen::JsValue) -> Result<Nullable<bool>, JsValue>;
 }
 pub fn flag_with_null() -> Result<Nullable<bool>, JsValue> {
-    flag_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __flag_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -632,12 +632,12 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "registry")]
-    fn registry_with_null_js(
+    fn __registry_with_null(
         r: &::wasm_bindgen::JsValue,
     ) -> Result<Option<Nullable<Registry>>, JsValue>;
 }
 pub fn registry_with_null() -> Result<Option<Nullable<Registry>>, JsValue> {
-    registry_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __registry_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -647,10 +647,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "registryNull")]
-    fn registry_null_with_null_js(r: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __registry_null_with_null(r: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn registry_null_with_null() -> Result<(), JsValue> {
-    registry_null_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __registry_null_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -665,10 +665,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "registryOptional")]
-    fn registry_optional_with_null_js(r: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __registry_optional_with_null(r: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn registry_optional_with_null() -> Result<(), JsValue> {
-    registry_optional_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __registry_optional_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -688,10 +688,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "scalar")]
-    fn scalar_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __scalar_with_null(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn scalar_with_null() -> Result<(), JsValue> {
-    scalar_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __scalar_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -706,10 +706,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "scalarNull")]
-    fn scalar_null_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __scalar_null_with_null(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn scalar_null_with_null() -> Result<(), JsValue> {
-    scalar_null_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __scalar_null_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -729,10 +729,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "scalarOptional")]
-    fn scalar_optional_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __scalar_optional_with_null(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn scalar_optional_with_null() -> Result<(), JsValue> {
-    scalar_optional_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __scalar_optional_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -760,10 +760,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "leadingNull")]
-    fn leading_null_with_null_js(a: &::wasm_bindgen::JsValue, b: f64) -> Result<(), JsValue>;
+    fn __leading_null_with_null(a: &::wasm_bindgen::JsValue, b: f64) -> Result<(), JsValue>;
 }
 pub fn leading_null_with_null(b: f64) -> Result<(), JsValue> {
-    leading_null_with_null_js(&::wasm_bindgen::JsValue::NULL, b)
+    __leading_null_with_null(&::wasm_bindgen::JsValue::NULL, b)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -793,13 +793,13 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chain")]
-    fn chain_with_a_and_null_js(
+    fn __chain_with_a_and_null(
         a: impl ::wasm_bindgen::JsStringLike,
         b: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
 }
 pub fn chain_with_a_and_null(a: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue> {
-    chain_with_a_and_null_js(a, &::wasm_bindgen::JsValue::NULL)
+    __chain_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -822,13 +822,13 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainOptional")]
-    fn chain_optional_with_a_and_null_js(
+    fn __chain_optional_with_a_and_null(
         a: impl ::wasm_bindgen::JsStringLike,
         b: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
 }
 pub fn chain_optional_with_a_and_null(a: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue> {
-    chain_optional_with_a_and_null_js(a, &::wasm_bindgen::JsValue::NULL)
+    __chain_optional_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -851,13 +851,13 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainThree")]
-    fn chain_three_with_a_and_null_js(
+    fn __chain_three_with_a_and_null(
         a: impl ::wasm_bindgen::JsStringLike,
         b: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
 }
 pub fn chain_three_with_a_and_null(a: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue> {
-    chain_three_with_a_and_null_js(a, &::wasm_bindgen::JsValue::NULL)
+    __chain_three_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -871,7 +871,7 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainThree")]
-    fn chain_three_with_a_and_null_and_c_js(
+    fn __chain_three_with_a_and_null_and_c(
         a: impl ::wasm_bindgen::JsStringLike,
         b: &::wasm_bindgen::JsValue,
         c: bool,
@@ -881,7 +881,7 @@ pub fn chain_three_with_a_and_null_and_c(
     a: impl ::wasm_bindgen::JsStringLike,
     c: bool,
 ) -> Result<(), JsValue> {
-    chain_three_with_a_and_null_and_c_js(a, &::wasm_bindgen::JsValue::NULL, c)
+    __chain_three_with_a_and_null_and_c(a, &::wasm_bindgen::JsValue::NULL, c)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -891,10 +891,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "modeArg")]
-    fn mode_arg_with_null_js(m: &::wasm_bindgen::JsValue) -> Result<Nullable<Mode>, JsValue>;
+    fn __mode_arg_with_null(m: &::wasm_bindgen::JsValue) -> Result<Nullable<Mode>, JsValue>;
 }
 pub fn mode_arg_with_null() -> Result<Nullable<Mode>, JsValue> {
-    mode_arg_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __mode_arg_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -909,12 +909,12 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "modeBoth")]
-    fn mode_both_with_null_js(
+    fn __mode_both_with_null(
         m: &::wasm_bindgen::JsValue,
     ) -> Result<Option<Nullable<Mode>>, JsValue>;
 }
 pub fn mode_both_with_null() -> Result<Option<Nullable<Mode>>, JsValue> {
-    mode_both_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __mode_both_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -929,10 +929,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "modeOptional")]
-    fn mode_optional_with_null_js(m: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __mode_optional_with_null(m: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn mode_optional_with_null() -> Result<(), JsValue> {
-    mode_optional_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __mode_optional_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -942,10 +942,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "emptiesOnly")]
-    fn empties_only_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<Option<Null>, JsValue>;
+    fn __empties_only_with_null(x: &::wasm_bindgen::JsValue) -> Result<Option<Null>, JsValue>;
 }
 pub fn empties_only_with_null() -> Result<Option<Null>, JsValue> {
-    empties_only_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __empties_only_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -957,7 +957,7 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "generic")]
-    fn generic_with_null_js<T>(x: &::wasm_bindgen::JsValue) -> Result<Nullable<T>, JsValue>
+    fn __generic_with_null<T>(x: &::wasm_bindgen::JsValue) -> Result<Nullable<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::NullableFromWasmAbi;
 }
@@ -965,7 +965,7 @@ pub fn generic_with_null<T>() -> Result<Nullable<T>, JsValue>
 where
     T: ::wasm_bindgen::convert::NullableFromWasmAbi,
 {
-    generic_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __generic_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -984,7 +984,7 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "genericBoth")]
-    fn generic_both_with_null_js<T>(
+    fn __generic_both_with_null<T>(
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Option<Nullable<T>>, JsValue>
     where
@@ -994,7 +994,7 @@ pub fn generic_both_with_null<T>() -> Result<Option<Nullable<T>>, JsValue>
 where
     T: ::wasm_bindgen::convert::NullableFromWasmAbi,
 {
-    generic_both_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __generic_both_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -1081,10 +1081,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "numbers")]
-    fn numbers_with_null_js(xs: &::wasm_bindgen::JsValue) -> Result<Nullable<Vec<f64>>, JsValue>;
+    fn __numbers_with_null(xs: &::wasm_bindgen::JsValue) -> Result<Nullable<Vec<f64>>, JsValue>;
 }
 pub fn numbers_with_null() -> Result<Nullable<Vec<f64>>, JsValue> {
-    numbers_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __numbers_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -1101,12 +1101,12 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "numbersBoth")]
-    fn numbers_both_with_null_js(
+    fn __numbers_both_with_null(
         xs: &::wasm_bindgen::JsValue,
     ) -> Result<Option<Nullable<Vec<f64>>>, JsValue>;
 }
 pub fn numbers_both_with_null() -> Result<Option<Nullable<Vec<f64>>>, JsValue> {
-    numbers_both_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __numbers_both_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -1123,10 +1123,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "numbersOptional")]
-    fn numbers_optional_with_null_js(xs: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __numbers_optional_with_null(xs: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn numbers_optional_with_null() -> Result<(), JsValue> {
-    numbers_optional_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __numbers_optional_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -1141,10 +1141,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "bytes")]
-    fn bytes_with_null_js(xs: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __bytes_with_null(xs: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn bytes_with_null() -> Result<(), JsValue> {
-    bytes_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __bytes_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -1164,10 +1164,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "bytesBoth")]
-    fn bytes_both_with_null_js(xs: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __bytes_both_with_null(xs: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn bytes_both_with_null() -> Result<(), JsValue> {
-    bytes_both_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __bytes_both_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -1177,10 +1177,10 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "jsdoc")]
-    fn jsdoc_with_null_js(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __jsdoc_with_null(x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
 pub fn jsdoc_with_null() -> Result<(), JsValue> {
-    jsdoc_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __jsdoc_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -1267,11 +1267,11 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_path(this: &Upload, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "path")]
-    fn set_path_with_null_js(this: &Upload, val: &::wasm_bindgen::JsValue);
+    fn __set_path_with_null(this: &Upload, val: &::wasm_bindgen::JsValue);
 }
 impl Upload {
     pub fn set_path_with_null(&self) {
-        self.set_path_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_path_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
 impl Upload {
@@ -1350,11 +1350,11 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_src(this: &Cover, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "src")]
-    fn set_src_with_null_js(this: &Cover, val: &::wasm_bindgen::JsValue);
+    fn __set_src_with_null(this: &Cover, val: &::wasm_bindgen::JsValue);
 }
 impl Cover {
     pub fn set_src_with_null(&self) {
-        self.set_src_with_null_js(&::wasm_bindgen::JsValue::NULL)
+        self.__set_src_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
 impl Cover {

@@ -97,3 +97,8 @@ fn non_trailing_undefined_is_passed() {
     assert_eq!(pick(None, 1.0), "2:undefined:1");
     assert_eq!(pick(Some("a"), 1.0), "2:a:1");
 }
+
+#[wasm_bindgen_test]
+fn null_only_parameter_is_named_with_null_and_sends_null() {
+    assert_eq!(only_null_with_null(), "1:null");
+}

@@ -139,7 +139,10 @@ Function, method and constructor arguments, setters, builder methods and
 factories expand the union instead: each empty is an arm.
 
 * `null` gets a variant of its own with no argument for that position:
-  `f(x: T | null)` gives `f(x: &T)` and `f_with_null()`.
+  `f(x: T | null)` gives `f(x: &T)` and `f_with_null()`. A variant
+  passing only `null` never takes the bare name, which would read as
+  omitting the argument: `f(x: null)` gives `f_with_null()` alone, and
+  `f(a: null, b: null)` `f_with_a_null_and_b_null()`.
 * `undefined` is absence. A parameter is omittable when it is optional,
   or when it is trailing and its type admits `undefined` (so a required
   trailing `x: T | undefined` expands like `x?: T`). Trailing-ness
@@ -149,7 +152,8 @@ factories expand the union instead: each empty is an arm.
   cannot be omitted keeps `Option<T>`.
 * A setter or builder method expresses `undefined` by not being called,
   so `x?: T`, `x?: T | undefined` and `x: T | undefined` all give
-  `set_x(&T)`. A setter whose only arm is `null` is `set_x_with_null()`.
+  `set_x(&T)`. A setter whose only arm is `null` is `set_x_with_null()`,
+  by the rule above.
 
 | TS                                  | Write variants                                                       |
 | ----------------------------------- | -------------------------------------------------------------------- |
@@ -162,6 +166,7 @@ factories expand the union instead: each empty is an arm.
 | `f(a?: T, b?: U \| null, c?: V)`    | `f()`, `f_with_a`, `f_with_a_and_b`, `f_with_a_and_null`, `f_with_a_and_b_and_c`, `f_with_a_and_null_and_c` |
 | `x?: T \| null` (setter)            | `set_x(&T)`, `set_x_with_null()`                                     |
 | `x?: T \| null` (builder)           | `.x(&T)`, `.x_with_null()`                                           |
+| `f(x: null)`                        | `f_with_null()`                                                      |
 | `x?: null` (setter)                 | `set_x_with_null()`                                                  |
 
 * **Argument position**: after the `null` arm is split off, an
@@ -175,7 +180,7 @@ factories expand the union instead: each empty is an arm.
   `new_with_blob(body: &Blob)`, `new_with_null()`), so
   `Response(body?: BodyInit | null)` gives `new()`, `new_with_str`, ...
   and `new_with_null()`.
-* **The `null` arm** binds the import privately as `<name>_js` taking
+* **The `null` arm** binds the import privately as `__<name>` taking
   `&JsValue` in that position (with `js_name` naming the JS member), and
   the public `<name>` wraps it, passing `&JsValue::NULL`. A type
   parameter used only by the `null` position is dropped from the
@@ -1667,7 +1672,10 @@ For every JS callable, `ts-gen`:
    [primitive union arguments](#primitive-union-arguments)).
 2. **Cross-overload dedup**: When multiple overloads expand to the same
    concrete parameter list, drop the duplicates. Two overloads that
-   both truncate to `(callback)` produce only one binding.
+   both truncate to `(callback)` produce only one binding. Duplicates
+   that differ only in the value of string-literal parameters are kept
+   as arms of one binding instead (see
+   [literal-keyed overloads](#inline-wrappers)).
 3. **Suffix assignment**: Across all surviving expansions, compute
    `_with_X` / `_with_X_and_Y` suffixes that disambiguate them. The
    primary variant gets `""`; the others are named after the
@@ -2740,6 +2748,144 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 * **Rendered doc**: `@throws {never}` lines do *not* contribute to
   the `## Errors` section. By definition there are no errors to
   document.
+
+## Inline wrappers
+
+Everything ts-gen emits is an `extern "C"` binding, except where the
+extern ABI cannot express the declared type. There, the extern binding
+is emitted under a private name and a non-extern `pub fn` of the public
+name converts over it. The rule is narrow on purpose: a wrapper is
+never emitted for ergonomics, only where no extern signature can carry
+the type, and the extern form stays reachable (within the module) under
+a `__`-prefixed name (`__<name>`). Two constructs qualify today:
+
+* **`null` arms.** The extern ABI has no type that only admits `null`,
+  so `f(x: T | null)`'s `f_with_null()` binds `__f_with_null(x:
+  &JsValue)` and passes `&JsValue::NULL` (see [Writes](#writes)).
+* **Overloads keyed by a string literal**, below.
+
+**Overloads distinguished only by a string literal.** Rust has no
+literal types, so `get(key, type: "json")` and `get(key, type:
+"arrayBuffer")` both lower to `(key: &str, type: &str)` and used to
+collapse into one binding with the first overload's return type. The
+extern ABI cannot carry the literal; the wrapper can:
+
+```ts
+interface KVNamespace {
+  get(key: string): Promise<string | null>;
+  get(key: string, type: "text"): Promise<string | null>;
+  get(key: string, type: "json"): Promise<any>;
+  get(key: string, type: "arrayBuffer"): Promise<ArrayBuffer | null>;
+  get(key: string[], type: "text"): Promise<Map<string, string | null>>;
+  get(key: string[], type: "json"): Promise<Map<string, any>>;
+}
+declare class CompressionStream {
+  constructor(format: "gzip" | "deflate" | "deflate-raw");
+}
+```
+
+```rust
+extern "C" {
+    pub async fn get(this: &KVNamespace, key: &str) -> Result<Nullable<String>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_text(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<String>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_json(this: &KVNamespace, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_array_buffer(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<ArrayBuffer>, JsValue>;
+    // …
+    #[wasm_bindgen(constructor, catch)]
+    fn __new(format: &str) -> Result<CompressionStream, JsValue>;
+}
+impl KVNamespace {
+    pub async fn get_text(&self, key: &str) -> Result<Nullable<String>, JsValue> {
+        self.__get_text(key, "text").await
+    }
+    pub async fn get_json(&self, key: &str) -> Result<JsValue, JsValue> { /* "json" */ }
+    pub async fn get_array_buffer(&self, key: &str) -> Result<Nullable<ArrayBuffer>, JsValue> { /* … */ }
+    pub async fn get_text_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsNullable<JsString>>, JsValue> { /* … */ }
+    pub async fn get_json_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsValue>, JsValue> { /* … */ }
+}
+impl CompressionStream {
+    pub fn new_gzip() -> Result<CompressionStream, JsValue> { Self::__new("gzip") }
+    pub fn new_deflate() -> Result<CompressionStream, JsValue> { Self::__new("deflate") }
+    pub fn new_deflate_raw() -> Result<CompressionStream, JsValue> { /* "deflate-raw" */ }
+}
+```
+
+* A **cohort** is a set of two or more expansions that agree on every
+  parameter except string-literal ones at the same positions. The arms
+  come from separate overloads or from one overload's literal union
+  (`"gzip" | "deflate" | "deflate-raw"`); a lone literal
+  (`getAll(name: "Set-Cookie")`) is not a cohort and keeps the plain
+  `&str` binding, as does a cohort that also absorbed a plain `string`
+  arm (`"a" | "b" | string`), since the plain form already covers it.
+* A literal repeated across overloads (`tag(m: "a" | "b")` beside
+  `tag(m: "b" | "c")`, or a merged declaration's copy of an overload)
+  is one arm: `tag_a`, `tag_b`, `tag_c`. It keeps the first overload's
+  return type, as TypeScript resolves a call to the first overload that
+  matches.
+* Each wrapper is named `<base>_<literal>` in snake case, followed by
+  the `_with_` suffix the remaining parameters earn among the plain
+  expansions and the other cohorts' remaining parameters (`get_json`,
+  `get_json_with_slice`). An arm left with no
+  parameter to name earns none, since the literal already sets it apart:
+  Temporal's `getTimeZoneTransition(direction: "next" | "previous")`
+  beside `(direction: TransitionOptions)` gives
+  `get_time_zone_transition_next` and `get_time_zone_transition(&self,
+  direction: &TransitionOptions)`. Every arm is named
+  explicitly; no arm takes the bare base name, which stays with the
+  literal-free overload (`get(key)`) when there is one.
+* Arms with the same return type share one extern binding; a
+  different return type gets its own, since the extern return is what
+  wasm-bindgen converts. A binding serving every arm of the cohort is
+  named for the cohort behind a `__` prefix (`__new` serves all three formats,
+  `__get_time_zone_transition` both directions). When the arms need
+  several, each is named after its first arm instead (`__get_text`,
+  `__get_json`), since the cohort's name alone cannot tell them apart.
+* The `_promise` and `try_` companions follow per arm
+  (`get_json_promise`, `try_describe_raw`) over their own extern
+  (`__get_json_promise`, `__try_describe`), and so, under
+  `--experimental-generic-mono`, does the `_js_string` return variant
+  (`describe_raw_js_string` over `__describe_js_string`). The prefix,
+  rather than a suffix, keeps a private binding from reading as one of
+  these public variants. A cohort's binding steps aside for a plain
+  `null` arm's (`__<name>_2`): `f(x: T | null)` beside `f(kind: "a" |
+  "b", x: T | null)` gives `f_with_null()` over `__f_with_null` and
+  `f_a_with_null()` over `__f_with_null_2`.
+* A plain `null` arm the literal arms leave alone keeps `_with_null`
+  (see [Writes](#writes)): `mode(kind: "x" | "y" | null)` gives `mode_x()`,
+  `mode_y()` and `mode_with_null()`, not a bare `mode()`.
+* A generic receiver (`KVStore<Key>`) gives `impl<Key: JsGeneric>
+  KVStore<Key>`; the method's own type parameters stay on the wrapper
+  fn. A static's wrappers go where wasm-bindgen puts the static: one
+  returning its own type hoists those type arguments
+  (`impl<T> Boxed<T> { pub fn of_a(value: &T) -> Boxed<T> }`), a bare one
+  binds the type's defaults (`impl Boxed { pub fn label_a() -> String }`). A wrapper repeats its extern's `where` clause, since it calls the
+  extern under the same bounds: the ABI traits a generic import states
+  under `--experimental-generic-mono` (`Key: IntoWasmAbi`), and an
+  awaited carrier's (`ExpectedValue: NullableFromWasmAbi` on
+  `get_json`).
+* A `null` arm beside the literal (`pick(kind: "a" | "b", x: T |
+  null)`) makes a cohort of its own, named `_with_null` as a lone
+  `null` arm is. Its wrappers drop the `null` parameter too and pass
+  `&JsValue::NULL`, over one `__pick_with_null` extern taking
+  `&JsValue` there; a type parameter only that position named is
+  dropped from both:
+
+  ```rust
+  extern "C" {
+      fn __pick(this: &Picker, kind: &str, x: &ArrayBuffer);
+      fn __pick_with_null(this: &Picker, kind: &str, x: &JsValue);
+  }
+  impl Picker {
+      pub fn pick_a(&self, x: &ArrayBuffer) { self.__pick("a", x) }
+      pub fn pick_a_with_null(&self) { self.__pick_with_null("a", &JsValue::NULL) }
+      // … `pick_b`, `pick_b_with_null`
+  }
+  ```
+* Doc comments move to the wrappers; the extern binding is not `pub`.
+* Setters are exempt: `set_disposition("inline")` takes the value.
 
 ## Subtyping LUB across unions
 

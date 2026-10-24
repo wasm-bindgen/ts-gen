@@ -94,20 +94,20 @@ extern "C" {
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(js_name = "maybeRows")]
-    fn maybe_rows_with_null_js(rows: &::wasm_bindgen::JsValue) -> Nullable<Vec<Array<JsString>>>;
+    fn __maybe_rows_with_null(rows: &::wasm_bindgen::JsValue) -> Nullable<Vec<Array<JsString>>>;
 }
 pub fn maybe_rows_with_null() -> Nullable<Vec<Array<JsString>>> {
-    maybe_rows_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __maybe_rows_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "maybeRows")]
-    fn try_maybe_rows_with_null_js(
+    fn __try_maybe_rows_with_null(
         rows: &::wasm_bindgen::JsValue,
     ) -> Result<Nullable<Vec<Array<JsString>>>, JsValue>;
 }
 pub fn try_maybe_rows_with_null() -> Result<Nullable<Vec<Array<JsString>>>, JsValue> {
-    try_maybe_rows_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    __try_maybe_rows_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
