@@ -18,9 +18,16 @@
 //!
 //! A generic alias is instantiated only when its target needs evaluation;
 //! otherwise `Foo<Bar>` stays a Rust generic alias. A type parameter met
-//! outside the scope of the type being rewritten is read at its bound, so
-//! `PluralizeUnit<Units>` inside `RoundingOptions<Units extends DateUnit |
-//! TimeUnit>` is every unit: Rust can't vary an enum per instantiation.
+//! outside the scope of the type being rewritten is read at its bound.
+//!
+//! An interface's literal-only type parameter (`Units extends DateUnit |
+//! TimeUnit`) has no Rust form, so it is erased: `PluralizeUnit<Units>`
+//! inside `RoundingOptions` is every unit. Each instantiation is
+//! specialised instead. A parent instantiation narrows the extending
+//! interface's own members, and a use site that narrows names a dictionary
+//! extending the erased base with the narrowed members
+//! (`RoundingOptionsWithLargestUnitDateUnit`).
+//!
 //! Anything that can't be evaluated keeps the lowering it had before, with
 //! a warning.
 
@@ -30,9 +37,9 @@ use std::rc::Rc;
 
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
-    GetterMember, InterfaceDecl, MappedType, Member, Modifier, Module, Param, SetterMember,
-    StringEnumDecl, StringEnumVariant, Throws, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam,
-    TypeRef,
+    GetterMember, Heritage, InterfaceClassification, InterfaceDecl, MappedType, Member, Modifier,
+    Module, Param, SetterMember, StringEnumDecl, StringEnumVariant, Throws, TypeAliasDecl,
+    TypeDeclaration, TypeKind, TypeParam, TypeRef,
 };
 use crate::parse::classify::classify_interface;
 use crate::parse::scope::{Binding, ScopeId};
@@ -97,6 +104,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         .collect();
 
     let diag = std::mem::take(&mut gctx.diagnostics);
+    let gctx_type_level_only;
     let (rewritten, synths, diag) = {
         let mut eval = Eval {
             gctx,
@@ -109,7 +117,13 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             used: LocalScope::with_claimed(names),
             diag,
             depth: 0,
+            literal_params: HashMap::new(),
+            literal_scopes: HashMap::new(),
+            spec_names: HashMap::new(),
+            naming: true,
+            type_level_only: HashSet::new(),
         };
+        eval.find_literal_params();
         let mut rewritten = Vec::new();
         for id in ids {
             let decl = eval.gctx.get_type(id);
@@ -127,9 +141,11 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
                 rewritten.push((id, kind));
             }
         }
+        gctx_type_level_only = std::mem::take(&mut eval.type_level_only);
         (rewritten, eval.synths, eval.diag)
     };
     gctx.diagnostics = diag;
+    gctx.type_level_only.extend(gctx_type_level_only);
 
     for (id, kind) in rewritten {
         gctx.get_type_mut(id).kind = kind;
@@ -142,9 +158,23 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         // under the scope its blocks share.
         let listing = super::binding_scope(gctx, anchor);
         let scope = synth.place.scope;
+        let synthesised_enum = matches!(synth.kind, SynthKind::Enum(_));
+        // Only a use-site specialisation extends a base.
+        let specialises = match &synth.kind {
+            SynthKind::Dict { extends, .. } => match extends.first() {
+                Some(TypeRef::Reference { segments, .. }) => Some(segments.clone()),
+                _ => None,
+            },
+            SynthKind::Enum(_) => None,
+        };
         let kind = match synth.kind {
             SynthKind::Enum(literals) => TypeKind::StringEnum(string_enum(&synth.name, &literals)),
-            SynthKind::Dict { props, type_params } => {
+            SynthKind::Dict {
+                props,
+                type_params,
+                extends,
+                ..
+            } => {
                 let body_scope = gctx.scopes.create_child(scope);
                 for p in &type_params {
                     gctx.scopes
@@ -157,7 +187,13 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
                     name: synth.name.clone(),
                     js_name: synth.name.clone(),
                     type_params,
-                    extends: Vec::new(),
+                    extends: extends
+                        .into_iter()
+                        .map(|type_ref| Heritage {
+                            type_ref,
+                            scope: body_scope,
+                        })
+                        .collect(),
                     members,
                     construct: Vec::new(),
                     body_scope,
@@ -170,6 +206,12 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             doc: None,
             scope_id: scope,
         });
+        if synthesised_enum {
+            gctx.synthesised_enums.insert(id);
+        }
+        if let Some(base) = specialises {
+            gctx.specialisations.insert(id, base);
+        }
         gctx.scopes.insert(scope, synth.name.clone(), id);
         gctx.declare(scope, &synth.name, id);
         let exports = gctx.scopes.get(scope).exports.unwrap_or(scope);
@@ -235,11 +277,31 @@ struct Placement {
 enum SynthKind {
     Enum(Vec<String>),
     /// A dictionary is generic over the type parameters its members
-    /// capture from the use site.
+    /// capture from the use site. A specialisation extends its generic
+    /// base and declares only the members it narrows; `inherited` are the
+    /// base's, for reading its whole shape before it is declared.
     Dict {
         props: Vec<Prop>,
         type_params: Vec<TypeParam>,
+        extends: Vec<TypeRef>,
+        inherited: Vec<Prop>,
     },
+}
+
+/// An instantiation of an interface with literal-only parameters (see
+/// [`Eval::specialise`]).
+struct Specialised {
+    /// The interface with the literal-only arguments dropped.
+    base: TypeRef,
+    /// The properties the arguments narrow.
+    narrowed: Vec<Prop>,
+    /// The rest, as the base has them.
+    inherited: Vec<Prop>,
+    /// The interface's name followed by the literal-only arguments.
+    name: String,
+    /// Whether the interface is a dictionary, which a use site can
+    /// specialise with a dictionary of its own.
+    dictionary: bool,
 }
 
 struct Synth {
@@ -312,6 +374,21 @@ struct Eval<'g> {
     used: LocalScope,
     diag: DiagnosticCollector,
     depth: u32,
+    /// Each interface's literal-only type parameters, by position. They
+    /// are erased from the declaration, which reads them at their bound,
+    /// and specialised at each instantiation.
+    literal_params: HashMap<TypeId, Vec<usize>>,
+    /// The names of those parameters, by the body scope declaring them.
+    literal_scopes: HashMap<ScopeId, HashSet<String>>,
+    /// Specialisations declared so far, by scope, base and narrowed
+    /// members.
+    spec_names: HashMap<(ScopeId, String, DictKey), String>,
+    /// Whether a result named by a reference is materialised. Off while
+    /// a specialisation is compared with its base, so that comparing
+    /// declares nothing.
+    naming: bool,
+    /// See [`GlobalContext::type_level_only`].
+    type_level_only: HashSet<TypeId>,
 }
 
 const MAX_DEPTH: u32 = 64;
@@ -359,12 +436,28 @@ impl<'g> Eval<'g> {
                     self.rewrite_params(&mut c.params, scope, &name, place);
                 }
                 self.flatten_heritage(iface, place);
+                if let Some(positions) = self.literal_params.get(&place.anchor) {
+                    let mut i = 0;
+                    iface.type_params.retain(|_| {
+                        i += 1;
+                        !positions.contains(&(i - 1))
+                    });
+                }
             }
             TypeKind::Class(class) => {
                 let name = class.name.clone();
                 let body_scope = class.body_scope;
                 self.rewrite_type_params(&mut class.type_params, body_scope, &name, place);
                 self.rewrite_members(&mut class.members, &name, place);
+                // A class can't be specialised per instantiation, so its
+                // parents read an interface's literal-only parameters at
+                // their bound.
+                if let Some(parent) = &mut class.extends {
+                    parent.type_ref = self.erase_literal_args(&parent.type_ref, parent.scope);
+                }
+                for ty in &mut class.implements {
+                    *ty = self.erase_literal_args(ty, body_scope);
+                }
             }
             TypeKind::DiscriminatedUnion(du) => {
                 let name = du.name.clone();
@@ -515,6 +608,28 @@ impl<'g> Eval<'g> {
             Some((value, _)) => value,
             None => ty.clone(),
         };
+        // A literal-only parameter standing alone is its argument or bound,
+        // read as written: an enum it names, else its literals inline.
+        if value
+            .as_ident()
+            .is_some_and(|n| self.is_literal_param(scope, n))
+        {
+            let result = self.eval(ty, scope, env, dest, hint, place)?;
+            let (values, empties) = match result.split_empties() {
+                Some((values, n)) => (values, Some(n)),
+                None => (result, None),
+            };
+            let values = match self.string_literals(&values, dest) {
+                Some(literals) if union_members(&values).len() > 1 => {
+                    TypeRef::union(literals.into_iter().map(TypeRef::StringLiteral))
+                }
+                _ => values,
+            };
+            return Some(match empties {
+                Some(n) => values.with_empties(n),
+                None => values,
+            });
+        }
         let named = matches!(
             value,
             TypeRef::Reference { .. } | TypeRef::KeyOf(_) | TypeRef::IndexedAccess(..)
@@ -525,7 +640,7 @@ impl<'g> Eval<'g> {
             hint.to_string()
         };
         let result = self.eval(ty, scope, env, dest, &hint, place)?;
-        Some(if named {
+        Some(if named && self.naming {
             self.materialize(result, &hint, dest, place)
         } else {
             result
@@ -540,6 +655,55 @@ impl<'g> Eval<'g> {
         let scope = alias.body_scope;
         if !self.needs_eval(&alias.target, scope) {
             return None;
+        }
+        // An alias of a specialisation is that specialisation, by its name.
+        if let (
+            Some(id),
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            },
+            true,
+        ) = (
+            self.literal_decl(&alias.target, scope),
+            &alias.target,
+            alias.type_params.is_empty(),
+        ) {
+            self.depth = 0;
+            let (segments, generic_args) = (segments.clone(), generic_args.clone());
+            let name = alias.name.clone();
+            let spec = self.specialise(
+                id,
+                &segments,
+                &generic_args,
+                scope,
+                &Env::default(),
+                scope,
+                &name,
+                place,
+            );
+            let Some(spec) = spec.filter(|s| !s.narrowed.is_empty() && s.dictionary) else {
+                alias.target = self.erase_literal_args(&alias.target, scope);
+                return None;
+            };
+            self.spec_names.insert(
+                (place.scope, spec.base.format_ts(), dict_key(&spec.narrowed)),
+                name.clone(),
+            );
+            let members = props_to_members(&spec.narrowed, scope);
+            return Some(TypeKind::Interface(InterfaceDecl {
+                classification: classify_interface(&members),
+                name: name.clone(),
+                js_name: name,
+                type_params: Vec::new(),
+                extends: vec![Heritage {
+                    type_ref: spec.base,
+                    scope,
+                }],
+                members,
+                construct: Vec::new(),
+                body_scope: scope,
+            }));
         }
         let mut env = Env::default();
         for p in &alias.type_params {
@@ -604,6 +768,42 @@ impl<'g> Eval<'g> {
         let mut flattened: Vec<Prop> = Vec::new();
         let mut kept = Vec::new();
         for heritage in std::mem::take(&mut iface.extends) {
+            // A parent with literal-only parameters stays the parent, erased;
+            // the members its arguments narrow become the interface's own.
+            if let (
+                Some(id),
+                TypeRef::Reference {
+                    segments,
+                    generic_args,
+                },
+            ) = (
+                self.literal_decl(&heritage.type_ref, heritage.scope),
+                &heritage.type_ref,
+            ) {
+                self.depth = 0;
+                let hint = iface.name.clone();
+                let base = match self.specialise(
+                    id,
+                    segments,
+                    generic_args,
+                    heritage.scope,
+                    &Env::default(),
+                    body_scope,
+                    &hint,
+                    place,
+                ) {
+                    Some(spec) => {
+                        flattened.extend(spec.narrowed);
+                        spec.base
+                    }
+                    None => self.erase_literal_args(&heritage.type_ref, heritage.scope),
+                };
+                kept.push(Heritage {
+                    type_ref: base,
+                    scope: heritage.scope,
+                });
+                continue;
+            }
             if !self.flattens(&heritage.type_ref, heritage.scope) {
                 kept.push(heritage);
                 continue;
@@ -700,7 +900,9 @@ impl<'g> Eval<'g> {
                 segments,
                 generic_args,
             } => {
-                if generic_args.iter().any(|a| self.needs_eval(a, scope)) {
+                if generic_args.iter().any(|a| self.needs_eval(a, scope))
+                    || self.literal_decl(ty, scope).is_some()
+                {
                     return true;
                 }
                 if segments.len() != 1 {
@@ -714,7 +916,8 @@ impl<'g> Eval<'g> {
                         }
                         _ => false,
                     },
-                    Some(Binding::TypeParam | Binding::Erased(_)) => false,
+                    Some(Binding::TypeParam) => self.is_literal_param(scope, &segments[0]),
+                    Some(Binding::Erased(_)) => false,
                 }
             }
             _ => false,
@@ -855,6 +1058,14 @@ impl<'g> Eval<'g> {
                 .map(|a| this.eval(a, scope, env, dest, hint, place))
                 .collect::<Option<Vec<_>>>()
         };
+        let reference = TypeRef::Reference {
+            segments: segments.to_vec(),
+            generic_args: generic_args.to_vec(),
+        };
+        let shadowed = segments.len() == 1 && env.get(&segments[0]).is_some();
+        if let Some(id) = self.literal_decl(&reference, scope).filter(|_| !shadowed) {
+            return self.specialise_use(id, segments, generic_args, scope, env, dest, hint, place);
+        }
         if segments.len() != 1 {
             let path = segments.join(".");
             let from = self.gctx.resolve_path(scope, &path);
@@ -874,7 +1085,10 @@ impl<'g> Eval<'g> {
         match self.gctx.scopes.resolve_binding(scope, name) {
             Some(Binding::TypeParam) => {
                 let owner = self.param_owner(scope, name)?;
-                if self.param_owner(dest, name) == Some(owner) {
+                // A literal-only parameter is erased, even in its own scope.
+                if self.param_owner(dest, name) == Some(owner)
+                    && !self.is_literal_param(scope, name)
+                {
                     return Some(TypeRef::ident(name));
                 }
                 let bound = self.param_bound(owner, name)?;
@@ -1316,6 +1530,26 @@ impl<'g> Eval<'g> {
                 (None, None) => {}
             }
         }
+        self.props_in(id, &bound_env, dest, place)
+    }
+
+    /// The properties of the declaration `id`, inherited ones included,
+    /// with its type parameters bound in `bound_env`.
+    fn props_in(
+        &mut self,
+        id: TypeId,
+        bound_env: &Env,
+        dest: ScopeId,
+        place: Placement,
+    ) -> Option<Vec<Prop>> {
+        let kind = self.evaluated(id);
+        let body_scope = match &*kind {
+            TypeKind::Interface(i) => i.body_scope,
+            TypeKind::Class(c) => c.body_scope,
+            TypeKind::TypeAlias(a) => a.body_scope,
+            _ => return None,
+        };
+        let bound_env = bound_env.clone();
         let (members, extends): (&[Member], Vec<crate::ir::Heritage>) = match &*kind {
             TypeKind::Interface(i) => (&i.members, i.extends.clone()),
             TypeKind::Class(c) => (&c.members, c.extends.iter().cloned().collect()),
@@ -1483,7 +1717,18 @@ impl<'g> Eval<'g> {
 
     fn synth_props(&self, scope: ScopeId, segments: &[String]) -> Option<Vec<Prop>> {
         match &self.synth(scope, segments)?.kind {
-            SynthKind::Dict { props, .. } => Some(props.clone()),
+            SynthKind::Dict {
+                props, inherited, ..
+            } => {
+                let mut all = props.clone();
+                all.extend(
+                    inherited
+                        .iter()
+                        .filter(|p| !props.iter().any(|q| q.js_name == p.js_name))
+                        .cloned(),
+                );
+                Some(all)
+            }
             SynthKind::Enum(_) => None,
         }
     }
@@ -1507,6 +1752,7 @@ impl<'g> Eval<'g> {
     /// type, is left out: `Partial<Box<T>>` is `PartialBox`, generic over
     /// `T`, while `Partial<T>` evaluates at `T`'s bound and is `PartialT`.
     fn spell_at(&self, ty: &TypeRef, scope: ScopeId, env: &Env, dest: ScopeId) -> String {
+        let ty = &self.spelled_as(ty, scope, env);
         let mut names = Vec::new();
         idents(ty, &mut names);
         let kept: HashSet<String> = names
@@ -1541,6 +1787,344 @@ impl<'g> Eval<'g> {
             .find(|p| p.name == name)?
             .constraint
             .clone()
+    }
+
+    /// `ty`, written in `scope`, with the type parameters bound in `env`
+    /// replaced by their arguments and the literal-only ones by their
+    /// bounds, for spelling an instantiation by what it is given.
+    fn spelled_as(&self, ty: &TypeRef, scope: ScopeId, env: &Env) -> TypeRef {
+        let mut names = Vec::new();
+        idents(ty, &mut names);
+        let map: HashMap<String, TypeRef> = names
+            .into_iter()
+            .filter_map(|n| {
+                if let Some(bound) = env.get(&n) {
+                    return Some((n, self.spelled_as(&bound.ty, bound.scope, &bound.env)));
+                }
+                if !self.is_literal_param(scope, &n) {
+                    return None;
+                }
+                let owner = self.param_owner(scope, &n)?;
+                let bound = self.param_bound(owner, &n)?;
+                Some((n, self.spelled_as(&bound, owner, &Env::default())))
+            })
+            .collect();
+        if map.is_empty() {
+            ty.clone()
+        } else {
+            ty.substitute(&map)
+        }
+    }
+
+    /// Find each interface's literal-only type parameters: those whose
+    /// constraint evaluates to string literals, so every argument selects
+    /// among them. The literal aliases such a constraint names are
+    /// recorded as type-level only, as are those of a generic alias's
+    /// literal-only constraint.
+    fn find_literal_params(&mut self) {
+        let candidates: Vec<(TypeId, ScopeId, ScopeId, Vec<TypeParam>, bool)> = self
+            .gctx
+            .iter_types()
+            .filter(|(id, _)| !self.gctx.builtin_type_ids.contains(id))
+            .filter_map(|(id, decl)| match &decl.kind {
+                TypeKind::Interface(i) if !i.type_params.is_empty() => {
+                    Some((id, decl.scope_id, i.body_scope, i.type_params.clone(), true))
+                }
+                TypeKind::TypeAlias(a) if !a.type_params.is_empty() => Some((
+                    id,
+                    decl.scope_id,
+                    a.body_scope,
+                    a.type_params.clone(),
+                    false,
+                )),
+                _ => None,
+            })
+            .collect();
+        // Reading a constraint declares nothing.
+        let naming = std::mem::replace(&mut self.naming, false);
+        for (id, scope, body_scope, params, interface) in candidates {
+            let place = Placement { anchor: id, scope };
+            let mut positions = Vec::new();
+            for (i, p) in params.iter().enumerate() {
+                let Some(constraint) = &p.constraint else {
+                    continue;
+                };
+                if self.gctx.scopes.get(body_scope).get_binding(&p.name) != Some(Binding::TypeParam)
+                {
+                    continue;
+                }
+                self.depth = 0;
+                let literal = self
+                    .literal_set(constraint, body_scope, &Env::default(), body_scope, place)
+                    .is_some_and(|literals| !literals.is_empty());
+                if !literal {
+                    continue;
+                }
+                let mut names = Vec::new();
+                idents(constraint, &mut names);
+                for name in names {
+                    if let Some(Binding::Declared(alias)) =
+                        self.gctx.scopes.resolve_binding(body_scope, &name)
+                    {
+                        if matches!(
+                            self.gctx.get_type(alias).kind,
+                            TypeKind::TypeAlias(_) | TypeKind::StringEnum(_)
+                        ) {
+                            self.type_level_only.insert(alias);
+                        }
+                    }
+                }
+                if interface {
+                    positions.push(i);
+                    self.literal_scopes
+                        .entry(body_scope)
+                        .or_default()
+                        .insert(p.name.clone());
+                }
+            }
+            if !positions.is_empty() {
+                self.literal_params.insert(id, positions);
+            }
+        }
+        self.naming = naming;
+    }
+
+    /// The interface with literal-only parameters that `ty`, a reference
+    /// written in `scope`, names.
+    fn literal_decl(&self, ty: &TypeRef, scope: ScopeId) -> Option<TypeId> {
+        let TypeRef::Reference { segments, .. } = ty else {
+            return None;
+        };
+        let id = self.gctx.resolve_path(scope, &segments.join("."))?;
+        self.literal_params.contains_key(&id).then_some(id)
+    }
+
+    /// Whether `name`, visible from `scope`, is a literal-only parameter.
+    fn is_literal_param(&self, scope: ScopeId, name: &str) -> bool {
+        self.param_owner(scope, name).is_some_and(|owner| {
+            self.literal_scopes
+                .get(&owner)
+                .is_some_and(|names| names.contains(name))
+        })
+    }
+
+    /// `ty` without the arguments it passes for literal-only parameters,
+    /// when it names an interface that has them.
+    fn erase_literal_args(&self, ty: &TypeRef, scope: ScopeId) -> TypeRef {
+        let (
+            Some(id),
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            },
+        ) = (self.literal_decl(ty, scope), ty)
+        else {
+            return ty.clone();
+        };
+        let positions = &self.literal_params[&id];
+        TypeRef::Reference {
+            segments: segments.clone(),
+            generic_args: generic_args
+                .iter()
+                .enumerate()
+                .filter(|(i, _)| !positions.contains(i))
+                .map(|(_, a)| a.clone())
+                .collect(),
+        }
+    }
+
+    /// Specialise the interface `id` at `generic_args`, written in `scope`
+    /// under `env`, for `dest`. The base is the interface with its
+    /// literal-only parameters erased, which reads them at their bound;
+    /// the narrowed properties are those the arguments give another type
+    /// than the base has, typed in `dest`.
+    #[allow(clippy::too_many_arguments)]
+    fn specialise(
+        &mut self,
+        id: TypeId,
+        segments: &[String],
+        generic_args: &[TypeRef],
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        hint: &str,
+        place: Placement,
+    ) -> Option<Specialised> {
+        let TypeKind::Interface(iface) = &self.gctx.get_type(id).kind else {
+            return None;
+        };
+        let (params, body_scope) = (iface.type_params.clone(), iface.body_scope);
+        let dictionary = iface.classification == InterfaceClassification::Dictionary;
+        let literal = self.literal_params[&id].clone();
+        let mut base_env = Env::default();
+        let mut spec_env = Env::default();
+        let mut kept_args = Vec::new();
+        let mut spelled = Vec::new();
+        for (i, p) in params.iter().enumerate() {
+            let arg = generic_args.get(i);
+            if literal.contains(&i) {
+                let constraint = p.constraint.clone()?;
+                base_env = base_env.bind(
+                    p.name.clone(),
+                    constraint.clone(),
+                    body_scope,
+                    Env::default(),
+                );
+                spec_env = match (arg, &p.default) {
+                    (Some(arg), _) => {
+                        spelled.push(self.spell_at(arg, scope, env, dest));
+                        spec_env.bind(p.name.clone(), arg.clone(), scope, env.clone())
+                    }
+                    (None, Some(default)) => {
+                        spelled.push(spell(default));
+                        let outer = spec_env.clone();
+                        spec_env.bind(p.name.clone(), default.clone(), body_scope, outer)
+                    }
+                    (None, None) => {
+                        spec_env.bind(p.name.clone(), constraint, body_scope, Env::default())
+                    }
+                };
+                continue;
+            }
+            match (arg, &p.default) {
+                (Some(arg), _) => {
+                    let evaluated = self.eval(arg, scope, env, dest, hint, place);
+                    kept_args.push(evaluated.unwrap_or_else(|| fallback(arg)));
+                    base_env = base_env.bind(p.name.clone(), arg.clone(), scope, env.clone());
+                    spec_env = spec_env.bind(p.name.clone(), arg.clone(), scope, env.clone());
+                }
+                (None, Some(default)) => {
+                    let outer = base_env.clone();
+                    base_env = base_env.bind(p.name.clone(), default.clone(), body_scope, outer);
+                    let outer = spec_env.clone();
+                    spec_env = spec_env.bind(p.name.clone(), default.clone(), body_scope, outer);
+                }
+                (None, None) => {}
+            }
+        }
+        let base = TypeRef::Reference {
+            segments: segments.to_vec(),
+            generic_args: kept_args,
+        };
+        // Compare the evaluations unnamed, then name only what narrows.
+        let naming = std::mem::replace(&mut self.naming, false);
+        let base_props = self.props_in(id, &base_env, dest, place);
+        let spec_props = self.props_in(id, &spec_env, dest, place);
+        self.naming = naming;
+        let (base_props, spec_props) = (base_props?, spec_props?);
+        let narrows = |p: &Prop| {
+            !p.method
+                && !base_props
+                    .iter()
+                    .any(|b| b.js_name == p.js_name && b.type_ref == p.type_ref)
+        };
+        let narrowed: HashSet<String> = spec_props
+            .iter()
+            .filter(|p| narrows(p))
+            .map(|p| p.js_name.clone())
+            .collect();
+        let props = if narrowed.is_empty() || !self.naming {
+            spec_props
+        } else {
+            self.props_in(id, &spec_env, dest, place)?
+        };
+        let (narrowed, inherited) = props
+            .into_iter()
+            .partition(|p| narrowed.contains(&p.js_name));
+        Some(Specialised {
+            base,
+            narrowed,
+            inherited,
+            name: format!(
+                "{}{}",
+                to_pascal_case(segments.last().unwrap()),
+                spelled.concat()
+            ),
+            dictionary,
+        })
+    }
+
+    /// An instantiation of an interface with literal-only parameters, at a
+    /// use site: its erased base when the arguments narrow nothing, else
+    /// a dictionary extending the base with the narrowed properties,
+    /// named after the instantiation and shared by every instantiation
+    /// that narrows the same way.
+    #[allow(clippy::too_many_arguments)]
+    fn specialise_use(
+        &mut self,
+        id: TypeId,
+        segments: &[String],
+        generic_args: &[TypeRef],
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        hint: &str,
+        place: Placement,
+    ) -> Option<TypeRef> {
+        if !self.naming {
+            // Comparing: the evaluated arguments tell instantiations apart.
+            return Some(TypeRef::Reference {
+                segments: segments.to_vec(),
+                generic_args: generic_args
+                    .iter()
+                    .map(|a| self.eval(a, scope, env, dest, hint, place))
+                    .collect::<Option<Vec<_>>>()?,
+            });
+        }
+        let Some(spec) = self.specialise(id, segments, generic_args, scope, env, dest, hint, place)
+        else {
+            // Unevaluable arguments name the base.
+            let reference = TypeRef::Reference {
+                segments: segments.to_vec(),
+                generic_args: generic_args.iter().map(fallback).collect(),
+            };
+            return Some(self.erase_literal_args(&reference, scope));
+        };
+        let path = segments.join(".");
+        let visible = self.gctx.scopes.chain(dest).contains(&place.scope)
+            && self.gctx.resolve_path(place.scope, &path) == Some(id);
+        if spec.narrowed.is_empty() || !spec.dictionary || !visible {
+            return Some(spec.base);
+        }
+        let mut captured = self.captured_params(&spec.narrowed, dest);
+        let mut names = Vec::new();
+        idents(&spec.base, &mut names);
+        for n in names {
+            if self.gctx.scopes.resolve_binding(dest, &n) == Some(Binding::TypeParam)
+                && !captured.contains(&n)
+            {
+                captured.push(n);
+            }
+        }
+        let reference = |name: String| TypeRef::Reference {
+            segments: vec![name],
+            generic_args: captured.iter().map(TypeRef::ident).collect(),
+        };
+        let key = (place.scope, spec.base.format_ts(), dict_key(&spec.narrowed));
+        if let Some(name) = self.spec_names.get(&key) {
+            return Some(reference(name.clone()));
+        }
+        let name = self.used.declare(&spec.name, Suffix::Pascal);
+        self.spec_names.insert(key, name.clone());
+        let type_params = captured
+            .iter()
+            .map(|name| TypeParam {
+                name: name.clone(),
+                constraint: None,
+                default: None,
+            })
+            .collect();
+        self.synths.push(Synth {
+            name: name.clone(),
+            place,
+            kind: SynthKind::Dict {
+                props: spec.narrowed,
+                type_params,
+                extends: vec![spec.base],
+                inherited: spec.inherited,
+            },
+        });
+        Some(reference(name))
     }
 
     /// Name an evaluated type that has no name of its own: string literals
@@ -1610,6 +2194,10 @@ impl<'g> Eval<'g> {
         if !self.gctx.scopes.chain(dest).contains(&place.scope) {
             return None;
         }
+        // Comparing: a stand-in that tells shapes apart.
+        if !self.naming {
+            return Some(TypeRef::Unresolved(format!("{:?}", dict_key(&props))));
+        }
         let captured = self.captured_params(&props, dest);
         let reference = |name: String| TypeRef::Reference {
             segments: vec![name],
@@ -1632,7 +2220,12 @@ impl<'g> Eval<'g> {
         self.synths.push(Synth {
             name: name.clone(),
             place,
-            kind: SynthKind::Dict { props, type_params },
+            kind: SynthKind::Dict {
+                props,
+                type_params,
+                extends: Vec::new(),
+                inherited: Vec::new(),
+            },
         });
         Some(reference(name))
     }
@@ -2108,6 +2701,61 @@ mod tests {
             unreachable!()
         };
         assert_eq!(g.type_ref, TypeRef::ident("Plural"));
+        // `U` only selects among literals, so it is erased.
+        assert!(rounding.type_params.is_empty());
+    }
+
+    #[test]
+    fn literal_only_parameters_specialise_at_each_instantiation() {
+        let (module, gctx) = parse(
+            "type Unit = \"hour\" | \"minute\";
+             type Plural<T extends Unit> = T | { hour: \"hours\"; minute: \"minutes\" }[T];
+             interface Rounding<U extends Unit> { smallestUnit?: Plural<U>; increment?: number }
+             interface HourRounding extends Rounding<\"hour\"> {}
+             declare function f(a: Rounding<\"minute\">, b: Rounding<Unit>, c: Rounding<Exclude<Unit, \"hour\">>): void;",
+        );
+        let parent = |name: &str| match kind(&gctx, &module, name) {
+            TypeKind::Interface(i) => i.extends[0].type_ref.clone(),
+            other => panic!("{name} is {other:?}"),
+        };
+        // A parent narrows the members it changes into the child's own.
+        assert_eq!(parent("HourRounding"), TypeRef::ident("Rounding"));
+        assert_eq!(
+            props(kind(&gctx, &module, "HourRounding")),
+            [("smallestUnit", true, false)]
+        );
+        // A use site names a dictionary extending the base; one at the
+        // bound is the base, and one narrowing alike shares the first.
+        assert_eq!(
+            param_type(&gctx, &module, "f", 0),
+            &TypeRef::ident("RoundingMinute")
+        );
+        assert_eq!(parent("RoundingMinute"), TypeRef::ident("Rounding"));
+        assert_eq!(
+            props(kind(&gctx, &module, "RoundingMinute")),
+            [("smallestUnit", true, false)]
+        );
+        assert_eq!(
+            param_type(&gctx, &module, "f", 1),
+            &TypeRef::ident("Rounding")
+        );
+        assert_eq!(
+            param_type(&gctx, &module, "f", 2),
+            &TypeRef::ident("RoundingMinute")
+        );
+        let TypeKind::Interface(minute) = kind(&gctx, &module, "RoundingMinute") else {
+            unreachable!()
+        };
+        let Member::Getter(g) = &minute.members[0] else {
+            unreachable!()
+        };
+        assert_eq!(
+            variants(kind(&gctx, &module, g.type_ref.as_ident().unwrap())),
+            ["minute", "minutes"]
+        );
+        // `Unit` only constrained literal-only parameters.
+        let unit = gctx.scopes.resolve(module.file_scopes[0], "Unit").unwrap();
+        assert!(gctx.type_level_only.contains(&unit));
     }
 
     #[test]

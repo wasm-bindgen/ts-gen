@@ -866,6 +866,21 @@ impl TypeParam {
         }
         of(self.constraint.as_ref()?)
     }
+
+    /// Whether the constraint is written as string literals only (`K
+    /// extends "a" | "b"`). On an interface such a parameter stays live for
+    /// type-level evaluation, which specialises it at each instantiation
+    /// rather than reading it as `string`.
+    pub fn selects_string_literals(&self) -> bool {
+        match &self.constraint {
+            Some(TypeRef::StringLiteral(_)) => true,
+            Some(TypeRef::Union(items)) => items
+                .members()
+                .iter()
+                .all(|m| matches!(m, TypeRef::StringLiteral(_))),
+            _ => false,
+        }
+    }
 }
 
 // ─── Top-level Module ────────────────────────────────────────────────
