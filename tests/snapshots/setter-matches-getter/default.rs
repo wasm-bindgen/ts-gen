@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DigitsOptions;
     #[wasm_bindgen(method, getter, js_name = "fractionalSecondDigits")]
@@ -44,7 +44,7 @@ impl DigitsOptionsBuilder {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequiredDigits;
     #[wasm_bindgen(method, getter)]
@@ -90,7 +90,7 @@ impl RequiredDigits {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Toggle;
     #[wasm_bindgen(method, getter)]
