@@ -2186,6 +2186,10 @@ Rules:
   the same class and share one variant. A declared class's variant is
   named by its Rust path, so `{A.Fault | B.Fault}` gives `AFault(a::Fault)`
   and `BFault(b::Fault)`.
+* `Other` is reserved for the fallback arm, and an ident already taken
+  is numbered in source order, first seen wins: a declared `class Other`
+  is `Other2(Other)`, and `{AFault | A.Fault}` gives `AFault(AFault)` and
+  `AFault2(a::Fault)`.
 * A `@throws` name must be declared in the input, a `js_sys` error
   class (`Error`, `TypeError`, `RangeError`, `SyntaxError`,
   `ReferenceError`, `EvalError`, `UriError`), or mapped with

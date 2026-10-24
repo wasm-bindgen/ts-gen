@@ -12,6 +12,14 @@ export class SubFault extends Fault {
   }
 }
 
+export class Other extends Error {}
+
+export class CodesFault extends Error {}
+
+export const Codes = {
+  Fault: class Fault extends Error {},
+};
+
 function thrown(kind) {
   switch (kind) {
     case "sub":
@@ -26,6 +34,12 @@ function thrown(kind) {
       return 42;
     case "opaque":
       return Object.create(null);
+    case "other":
+      return new Other("declared other");
+    case "codes-fault":
+      return new CodesFault("flat fault");
+    case "codes.fault":
+      return new Codes.Fault("namespaced fault");
   }
   return undefined;
 }
@@ -34,6 +48,10 @@ export function raise(kind) {
   const value = thrown(kind);
   if (value !== undefined) throw value;
   return kind;
+}
+
+export function raiseNamed(kind) {
+  return raise(kind);
 }
 
 export function raiseUntyped(kind) {

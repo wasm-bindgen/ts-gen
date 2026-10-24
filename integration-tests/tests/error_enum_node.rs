@@ -66,6 +66,21 @@ fn getter_throws_through_the_enum() {
 }
 
 #[wasm_bindgen_test]
+fn repeated_variant_idents_are_numbered() {
+    let err = try_raise_named("other").unwrap_err();
+    assert!(matches!(err, JsException::Other2(_)), "{err:?}");
+    assert_eq!(err.to_string(), "declared other");
+
+    let err = try_raise_named("codes-fault").unwrap_err();
+    assert!(matches!(err, JsException::CodesFault(_)), "{err:?}");
+    assert_eq!(err.to_string(), "flat fault");
+
+    let err = try_raise_named("codes.fault").unwrap_err();
+    assert!(matches!(err, JsException::CodesFault2(_)), "{err:?}");
+    assert_eq!(err.to_string(), "namespaced fault");
+}
+
+#[wasm_bindgen_test]
 fn untyped_bindings_keep_the_error_type() {
     let CaughtError(value) = try_raise_untyped("fault").unwrap_err();
     assert!(matches!(JsException::from(value), JsException::Fault(_)));

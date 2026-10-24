@@ -278,6 +278,10 @@ pub fn generate_error_enum(
     }
 
     let mut seen = HashSet::new();
+    // `Other` is the fallback arm. A repeated ident (`{Other}`, or `A.Fault`
+    // beside a declared `AFault`) is numbered in source order, first-seen
+    // wins, as in `dynamic_union_variant_names`.
+    let mut idents_used = HashSet::from(["Other".to_string()]);
     let mut variants = Vec::new();
     for throws in throws_names {
         let path = &throws.path;
@@ -291,10 +295,15 @@ pub fn generate_error_enum(
         }
         let key = resolved.ok_or_else(|| last_segment(path).to_string());
         if seen.insert(key) {
+            let base = variant_ident(path, resolved, ctx);
+            let ident = std::iter::once(base.clone())
+                .chain((2..).map(|i| format!("{base}{i}")))
+                .find(|candidate| idents_used.insert(candidate.clone()))
+                .expect("an unused numbered ident exists");
             variants.push(Variant {
                 name: throws,
                 resolved,
-                ident: variant_ident(path, resolved, ctx),
+                ident,
             });
         }
     }
@@ -545,6 +554,40 @@ mod tests {
                 .map(|v| tokens.find(v).unwrap_or_else(|| panic!("missing {v}")))
                 .collect();
             assert!(order[0] < order[1] && order[1] < order[2], "{tokens}");
+        });
+    }
+
+    #[test]
+    fn repeated_variant_idents_are_numbered() {
+        let src = r#"
+            declare class Other extends Error {}
+            declare class AFault extends Error {}
+            declare namespace A {
+                class Fault extends Error {}
+            }
+            declare class D {
+                /** @throws {Other | AFault | A.Fault} */
+                g(): void;
+            }
+        "#;
+        with_ctx(src, |ctx, names| {
+            let tokens = generate_error_enum("JsException", names, ctx).to_string();
+            assert!(tokens.contains("Other2 (Other)"), "{tokens}");
+            assert!(tokens.contains("Other (JsValue)"), "{tokens}");
+            assert!(tokens.contains("AFault (AFault)"), "{tokens}");
+            assert!(tokens.contains("AFault2 (a :: Fault)"), "{tokens}");
+            let file: syn::File = syn::parse2(generate_error_enum("JsException", names, ctx))
+                .expect("the enum parses");
+            let syn::Item::Enum(item) = &file.items[0] else {
+                panic!("expected the enum first");
+            };
+            let mut idents: Vec<String> =
+                item.variants.iter().map(|v| v.ident.to_string()).collect();
+            let count = idents.len();
+            idents.sort();
+            idents.dedup();
+            assert_eq!(idents.len(), count, "{idents:?}");
+            assert!(ctx.take_diagnostics().diagnostics.is_empty());
         });
     }
 

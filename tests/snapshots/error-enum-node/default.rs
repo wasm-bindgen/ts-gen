@@ -37,6 +37,48 @@ extern "C" {
 }
 #[wasm_bindgen(module = "error-enum-node")]
 extern "C" {
+    # [wasm_bindgen (extends = Error , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Other;
+}
+#[wasm_bindgen(module = "error-enum-node")]
+extern "C" {
+    # [wasm_bindgen (extends = Error , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type CodesFault;
+}
+pub mod codes {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "error-enum-node")]
+    extern "C" {
+        # [wasm_bindgen (extends = Error , extends = Object , js_namespace = "Codes")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Fault;
+    }
+}
+#[wasm_bindgen(module = "error-enum-node")]
+extern "C" {
+    #[doc = " Throws per `kind`: `other`, `codes-fault` or `codes.fault`."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `Other | CodesFault | Codes.Fault`"]
+    #[wasm_bindgen(js_name = "raiseNamed")]
+    pub fn raise_named(kind: &str) -> String;
+}
+#[wasm_bindgen(module = "error-enum-node")]
+extern "C" {
+    #[doc = " Throws per `kind`: `other`, `codes-fault` or `codes.fault`."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `Other | CodesFault | Codes.Fault`"]
+    #[wasm_bindgen(catch, js_name = "raiseNamed")]
+    pub fn try_raise_named(kind: &str) -> Result<String, JsException>;
+}
+#[wasm_bindgen(module = "error-enum-node")]
+extern "C" {
     #[doc = " `raise` without a `@throws`: the `crate::CaughtError` default."]
     #[wasm_bindgen(js_name = "raiseUntyped")]
     pub fn raise_untyped(kind: &str) -> String;
@@ -68,6 +110,9 @@ pub enum JsException {
     SubFault(SubFault),
     Fault(Fault),
     TypeError(TypeError),
+    Other2(Other),
+    CodesFault(CodesFault),
+    CodesFault2(codes::Fault),
     Other(JsValue),
 }
 impl From<JsValue> for JsException {
@@ -84,6 +129,18 @@ impl From<JsValue> for JsException {
             Ok(error) => return Self::TypeError(error),
             Err(value) => value,
         };
+        let value = match value.dyn_into::<Other>() {
+            Ok(error) => return Self::Other2(error),
+            Err(value) => value,
+        };
+        let value = match value.dyn_into::<CodesFault>() {
+            Ok(error) => return Self::CodesFault(error),
+            Err(value) => value,
+        };
+        let value = match value.dyn_into::<codes::Fault>() {
+            Ok(error) => return Self::CodesFault2(error),
+            Err(value) => value,
+        };
         Self::Other(value)
     }
 }
@@ -93,6 +150,9 @@ impl From<JsException> for JsValue {
             JsException::SubFault(error) => error.into(),
             JsException::Fault(error) => error.into(),
             JsException::TypeError(error) => error.into(),
+            JsException::Other2(error) => error.into(),
+            JsException::CodesFault(error) => error.into(),
+            JsException::CodesFault2(error) => error.into(),
             JsException::Other(value) => value,
         }
     }
@@ -103,6 +163,9 @@ impl AsRef<JsValue> for JsException {
             Self::SubFault(error) => error.as_ref(),
             Self::Fault(error) => error.as_ref(),
             Self::TypeError(error) => error.as_ref(),
+            Self::Other2(error) => error.as_ref(),
+            Self::CodesFault(error) => error.as_ref(),
+            Self::CodesFault2(error) => error.as_ref(),
             Self::Other(value) => value,
         }
     }
