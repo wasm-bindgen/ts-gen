@@ -1492,167 +1492,187 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn until(this: &PlainDate, other: &PlainDate) -> Result<Duration, RangeError>;
+        pub fn until(this: &PlainDate, other: &PlainDate) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time(
             this: &PlainDate,
             other: &ZonedDateTime,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_time(
             this: &PlainDate,
             other: &PlainDateTime,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_date_like_object(
             this: &PlainDate,
             other: &DateLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str(
             this: &PlainDate,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_and_options(
             this: &PlainDate,
             other: &PlainDate,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_and_options(
             this: &PlainDate,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_time_and_options(
             this: &PlainDate,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_date_like_object_and_options(
             this: &PlainDate,
             other: &DateLikeObject,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &PlainDate,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn since(this: &PlainDate, other: &PlainDate) -> Result<Duration, RangeError>;
+        pub fn since(this: &PlainDate, other: &PlainDate) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time(
             this: &PlainDate,
             other: &ZonedDateTime,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_time(
             this: &PlainDate,
             other: &PlainDateTime,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_date_like_object(
             this: &PlainDate,
             other: &DateLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str(
             this: &PlainDate,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_and_options(
             this: &PlainDate,
             other: &PlainDate,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_and_options(
             this: &PlainDate,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_time_and_options(
             this: &PlainDate,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_date_like_object_and_options(
             this: &PlainDate,
             other: &DateLikeObject,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &PlainDate,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch)]
         pub fn equals(this: &PlainDate, other: &PlainDate) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
@@ -1734,81 +1754,91 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &PlainDate) -> Result<String, RangeError>;
+        pub fn to_locale_string(this: &PlainDate) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &PlainDate) -> Result<JsString, RangeError>;
+        pub fn to_locale_string_js_string(this: &PlainDate) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(
             this: &PlainDate,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_js_string(
             this: &PlainDate,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(
             this: &PlainDate,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_js_string(
             this: &PlainDate,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainDate,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &PlainDate,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainDate,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options_js_string(
             this: &PlainDate,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json(this: &PlainDate) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
@@ -2178,167 +2208,187 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn until(this: &PlainTime, other: &PlainTime) -> Result<Duration, RangeError>;
+        pub fn until(this: &PlainTime, other: &PlainTime) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_time(
             this: &PlainTime,
             other: &PlainDateTime,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time(
             this: &PlainTime,
             other: &ZonedDateTime,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_time_like_object(
             this: &PlainTime,
             other: &TimeLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str(
             this: &PlainTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_time_and_options(
             this: &PlainTime,
             other: &PlainTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_time_and_options(
             this: &PlainTime,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_and_options(
             this: &PlainTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_time_like_object_and_options(
             this: &PlainTime,
             other: &TimeLikeObject,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &PlainTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn since(this: &PlainTime, other: &PlainTime) -> Result<Duration, RangeError>;
+        pub fn since(this: &PlainTime, other: &PlainTime) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_time(
             this: &PlainTime,
             other: &PlainDateTime,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time(
             this: &PlainTime,
             other: &ZonedDateTime,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_time_like_object(
             this: &PlainTime,
             other: &TimeLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str(
             this: &PlainTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_time_and_options(
             this: &PlainTime,
             other: &PlainTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_time_and_options(
             this: &PlainTime,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_and_options(
             this: &PlainTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_time_like_object_and_options(
             this: &PlainTime,
             other: &TimeLikeObject,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &PlainTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch)]
         pub fn equals(this: &PlainTime, other: &PlainTime) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
@@ -2394,81 +2444,91 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &PlainTime) -> Result<String, RangeError>;
+        pub fn to_locale_string(this: &PlainTime) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &PlainTime) -> Result<JsString, RangeError>;
+        pub fn to_locale_string_js_string(this: &PlainTime) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(
             this: &PlainTime,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_js_string(
             this: &PlainTime,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(
             this: &PlainTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_js_string(
             this: &PlainTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainTime,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &PlainTime,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options_js_string(
             this: &PlainTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json(this: &PlainTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
@@ -3042,167 +3102,187 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn until(this: &PlainDateTime, other: &PlainDateTime) -> Result<Duration, RangeError>;
+        pub fn until(this: &PlainDateTime, other: &PlainDateTime) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time(
             this: &PlainDateTime,
             other: &ZonedDateTime,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date(
             this: &PlainDateTime,
             other: &PlainDate,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_date_time_like_object(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str(
             this: &PlainDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_time_and_options(
             this: &PlainDateTime,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_and_options(
             this: &PlainDateTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_and_options(
             this: &PlainDateTime,
             other: &PlainDate,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_date_time_like_object_and_options(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &PlainDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn since(this: &PlainDateTime, other: &PlainDateTime) -> Result<Duration, RangeError>;
+        pub fn since(this: &PlainDateTime, other: &PlainDateTime) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time(
             this: &PlainDateTime,
             other: &ZonedDateTime,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date(
             this: &PlainDateTime,
             other: &PlainDate,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_date_time_like_object(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str(
             this: &PlainDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_time_and_options(
             this: &PlainDateTime,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_and_options(
             this: &PlainDateTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_and_options(
             this: &PlainDateTime,
             other: &PlainDate,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_date_time_like_object_and_options(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &PlainDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
@@ -3258,81 +3338,91 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &PlainDateTime) -> Result<String, RangeError>;
+        pub fn to_locale_string(this: &PlainDateTime) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &PlainDateTime) -> Result<JsString, RangeError>;
+        pub fn to_locale_string_js_string(this: &PlainDateTime) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(
             this: &PlainDateTime,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_js_string(
             this: &PlainDateTime,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(
             this: &PlainDateTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_js_string(
             this: &PlainDateTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainDateTime,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &PlainDateTime,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainDateTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options_js_string(
             this: &PlainDateTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json(this: &PlainDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
@@ -3811,99 +3901,111 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn until(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<Duration, RangeError>;
+        pub fn until(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_like_object(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str(
             this: &ZonedDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_like_object_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &ZonedDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn since(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<Duration, RangeError>;
+        pub fn since(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_like_object(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str(
             this: &ZonedDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_like_object_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &ZonedDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
@@ -3949,81 +4051,91 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &ZonedDateTime) -> Result<String, RangeError>;
+        pub fn to_locale_string(this: &ZonedDateTime) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &ZonedDateTime) -> Result<JsString, RangeError>;
+        pub fn to_locale_string_js_string(this: &ZonedDateTime) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(
             this: &ZonedDateTime,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_js_string(
             this: &ZonedDateTime,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(
             this: &ZonedDateTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_js_string(
             this: &ZonedDateTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &ZonedDateTime,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &ZonedDateTime,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &ZonedDateTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options_js_string(
             this: &ZonedDateTime,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json(this: &ZonedDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
@@ -4466,153 +4578,171 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch)]
-        pub fn compare(one: &Duration, two: &Duration) -> Result<f64, RangeError>;
+        pub fn compare(one: &Duration, two: &Duration) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_duration(
             one: &DurationLikeObject,
             two: &Duration,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_duration(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &Duration,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_and_duration_like_object(
             one: &Duration,
             two: &DurationLikeObject,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_duration_like_object(
             one: &DurationLikeObject,
             two: &DurationLikeObject,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_duration_like_object(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &DurationLikeObject,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_and_str(
             one: &Duration,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_str(
             one: &DurationLikeObject,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_str(
             one: impl ::wasm_bindgen::JsStringLike,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_and_duration_and_options(
             one: &Duration,
             two: &Duration,
             options: &DurationRelativeToOptions,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_duration_and_options(
             one: &DurationLikeObject,
             two: &Duration,
             options: &DurationRelativeToOptions,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_duration_and_options(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &Duration,
             options: &DurationRelativeToOptions,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_and_duration_like_object_and_options(
             one: &Duration,
             two: &DurationLikeObject,
             options: &DurationRelativeToOptions,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_duration_like_object_and_options(
             one: &DurationLikeObject,
             two: &DurationLikeObject,
             options: &DurationRelativeToOptions,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_duration_like_object_and_options(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &DurationLikeObject,
             options: &DurationRelativeToOptions,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_and_str_and_options(
             one: &Duration,
             two: impl ::wasm_bindgen::JsStringLike,
             options: &DurationRelativeToOptions,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_str_and_options(
             one: &DurationLikeObject,
             two: impl ::wasm_bindgen::JsStringLike,
             options: &DurationRelativeToOptions,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_str_and_options(
             one: impl ::wasm_bindgen::JsStringLike,
             two: impl ::wasm_bindgen::JsStringLike,
             options: &DurationRelativeToOptions,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[wasm_bindgen(method, getter)]
         pub fn years(this: &Duration) -> f64;
         #[wasm_bindgen(method, getter)]
@@ -4653,45 +4783,51 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn add(this: &Duration, other: &Duration) -> Result<Duration, RangeError>;
+        pub fn add(this: &Duration, other: &Duration) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_duration_like_object(
             this: &Duration,
             other: &DurationLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str(
             this: &Duration,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn subtract(this: &Duration, other: &Duration) -> Result<Duration, RangeError>;
+        pub fn subtract(this: &Duration, other: &Duration) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_like_object(
             this: &Duration,
             other: &DurationLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if either duration has calendar units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str(
             this: &Duration,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid, or calendar units need `relativeTo`"]
@@ -4703,11 +4839,12 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid, or calendar units need `relativeTo`"]
+        #[doc = " * `TypeError` — if `relativeTo` is an object missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "round")]
         pub fn round_with_duration_rounding_options(
             this: &Duration,
             round_to: &DurationRoundingOptions,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has calendar units, which need `relativeTo`"]
@@ -4719,11 +4856,12 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has calendar units and `relativeTo` is not given"]
+        #[doc = " * `TypeError` — if `relativeTo` is an object missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "total")]
         pub fn total_with_duration_total_options(
             this: &Duration,
             total_of: &DurationTotalOptions,
-        ) -> Result<f64, RangeError>;
+        ) -> Result<f64, Error>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &Duration) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
@@ -4741,81 +4879,91 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &Duration) -> Result<String, RangeError>;
+        pub fn to_locale_string(this: &Duration) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &Duration) -> Result<JsString, RangeError>;
+        pub fn to_locale_string_js_string(this: &Duration) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(
             this: &Duration,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_js_string(
             this: &Duration,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(
             this: &Duration,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_js_string(
             this: &Duration,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &Duration,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DurationFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &Duration,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DurationFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &Duration,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DurationFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options_js_string(
             this: &Duration,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DurationFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json(this: &Duration) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
@@ -4972,45 +5120,51 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn add(this: &Instant, duration: &Duration) -> Result<Instant, RangeError>;
+        pub fn add(this: &Instant, duration: &Duration) -> Result<Instant, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_duration_like_object(
             this: &Instant,
             duration: &DurationLikeObject,
-        ) -> Result<Instant, RangeError>;
+        ) -> Result<Instant, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str(
             this: &Instant,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Instant, RangeError>;
+        ) -> Result<Instant, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn subtract(this: &Instant, duration: &Duration) -> Result<Instant, RangeError>;
+        pub fn subtract(this: &Instant, duration: &Duration) -> Result<Instant, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_like_object(
             this: &Instant,
             duration: &DurationLikeObject,
-        ) -> Result<Instant, RangeError>;
+        ) -> Result<Instant, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has date units, or the result is out of range"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str(
             this: &Instant,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Instant, RangeError>;
+        ) -> Result<Instant, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the options are invalid"]
@@ -5152,81 +5306,91 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &Instant) -> Result<String, RangeError>;
+        pub fn to_locale_string(this: &Instant) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &Instant) -> Result<JsString, RangeError>;
+        pub fn to_locale_string_js_string(this: &Instant) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(
             this: &Instant,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_js_string(
             this: &Instant,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(
             this: &Instant,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_js_string(
             this: &Instant,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &Instant,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &Instant,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &Instant,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options_js_string(
             this: &Instant,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json(this: &Instant) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
@@ -5498,101 +5662,111 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn until(this: &PlainYearMonth, other: &PlainYearMonth)
-            -> Result<Duration, RangeError>;
+        pub fn until(this: &PlainYearMonth, other: &PlainYearMonth) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_year_month_like_object(
             this: &PlainYearMonth,
             other: &YearMonthLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str(
             this: &PlainYearMonth,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_year_month_and_options(
             this: &PlainYearMonth,
             other: &PlainYearMonth,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_year_month_like_object_and_options(
             this: &PlainYearMonth,
             other: &YearMonthLikeObject,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &PlainYearMonth,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch)]
-        pub fn since(this: &PlainYearMonth, other: &PlainYearMonth)
-            -> Result<Duration, RangeError>;
+        pub fn since(this: &PlainYearMonth, other: &PlainYearMonth) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_year_month_like_object(
             this: &PlainYearMonth,
             other: &YearMonthLikeObject,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str(
             this: &PlainYearMonth,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_year_month_and_options(
             this: &PlainYearMonth,
             other: &PlainYearMonth,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_year_month_like_object_and_options(
             this: &PlainYearMonth,
             other: &YearMonthLikeObject,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the calendars differ, or the options are invalid"]
+        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &PlainYearMonth,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Result<Duration, RangeError>;
+        ) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch)]
         pub fn equals(this: &PlainYearMonth, other: &PlainYearMonth) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
@@ -5622,81 +5796,91 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &PlainYearMonth) -> Result<String, RangeError>;
+        pub fn to_locale_string(this: &PlainYearMonth) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &PlainYearMonth) -> Result<JsString, RangeError>;
+        pub fn to_locale_string_js_string(this: &PlainYearMonth) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(
             this: &PlainYearMonth,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_js_string(
             this: &PlainYearMonth,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(
             this: &PlainYearMonth,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_js_string(
             this: &PlainYearMonth,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainYearMonth,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &PlainYearMonth,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainYearMonth,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options_js_string(
             this: &PlainYearMonth,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json(this: &PlainYearMonth) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
@@ -5901,81 +6085,91 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &PlainMonthDay) -> Result<String, RangeError>;
+        pub fn to_locale_string(this: &PlainMonthDay) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &PlainMonthDay) -> Result<JsString, RangeError>;
+        pub fn to_locale_string_js_string(this: &PlainMonthDay) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(
             this: &PlainMonthDay,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_js_string(
             this: &PlainMonthDay,
             locales: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(
             this: &PlainMonthDay,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_js_string(
             this: &PlainMonthDay,
             locales: &[impl ::wasm_bindgen::JsStringLike],
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainMonthDay,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &PlainMonthDay,
             locales: impl ::wasm_bindgen::JsStringLike,
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainMonthDay,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<String, RangeError>;
+        ) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
+        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options_js_string(
             this: &PlainMonthDay,
             locales: &[impl ::wasm_bindgen::JsStringLike],
             options: &::js_sys::Intl::DateTimeFormatOptions,
-        ) -> Result<JsString, RangeError>;
+        ) -> Result<JsString, Error>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json(this: &PlainMonthDay) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]

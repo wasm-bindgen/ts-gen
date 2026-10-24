@@ -169,16 +169,25 @@ declare namespace Temporal {
          */
         with(dateLike: PartialTemporalLike<DateLikeObject>, options?: OverflowOptions): PlainDate;
         withCalendar(calendarLike: CalendarLike): PlainDate;
-        /** @throws {RangeError} if the calendars differ, or the options are invalid */
+        /**
+         * @throws {RangeError} if the calendars differ, or the options are invalid
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         until(other: PlainDateLike, options?: RoundingOptionsWithLargestUnit<DateUnit>): Duration;
-        /** @throws {RangeError} if the calendars differ, or the options are invalid */
+        /**
+         * @throws {RangeError} if the calendars differ, or the options are invalid
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         since(other: PlainDateLike, options?: RoundingOptionsWithLargestUnit<DateUnit>): Duration;
         equals(other: PlainDateLike): boolean;
         toPlainDateTime(time?: PlainTimeLike): PlainDateTime;
         toZonedDateTime(timeZone: TimeZoneLike): ZonedDateTime;
         toZonedDateTime(item: PlainDateToZonedDateTimeOptions): ZonedDateTime;
         toString(options?: PlainDateToStringOptions): string;
-        /** @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's */
+        /**
+         * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
+         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
@@ -214,9 +223,15 @@ declare namespace Temporal {
          * @throws {TypeError} if the object has no recognised fields
          */
         with(timeLike: PartialTemporalLike<TimeLikeObject>, options?: OverflowOptions): PlainTime;
-        /** @throws {RangeError} if the options are invalid */
+        /**
+         * @throws {RangeError} if the options are invalid
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         until(other: PlainTimeLike, options?: RoundingOptionsWithLargestUnit<TimeUnit>): Duration;
-        /** @throws {RangeError} if the options are invalid */
+        /**
+         * @throws {RangeError} if the options are invalid
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         since(other: PlainTimeLike, options?: RoundingOptionsWithLargestUnit<TimeUnit>): Duration;
         equals(other: PlainTimeLike): boolean;
         /** @throws {RangeError} if the rounding options are invalid */
@@ -224,7 +239,10 @@ declare namespace Temporal {
         /** @throws {RangeError} if the rounding options are invalid */
         round(roundTo: RoundingOptions<TimeUnit>): PlainTime;
         toString(options?: PlainTimeToStringOptions): string;
-        /** @throws {RangeError} if the locale or options are invalid */
+        /**
+         * @throws {RangeError} if the locale or options are invalid
+         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
@@ -278,9 +296,15 @@ declare namespace Temporal {
         withCalendar(calendar: CalendarLike): PlainDateTime;
         add(duration: DurationLike, options?: OverflowOptions): PlainDateTime;
         subtract(duration: DurationLike, options?: OverflowOptions): PlainDateTime;
-        /** @throws {RangeError} if the calendars differ, or the options are invalid */
+        /**
+         * @throws {RangeError} if the calendars differ, or the options are invalid
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         until(other: PlainDateTimeLike, options?: RoundingOptionsWithLargestUnit<DateUnit | TimeUnit>): Duration;
-        /** @throws {RangeError} if the calendars differ, or the options are invalid */
+        /**
+         * @throws {RangeError} if the calendars differ, or the options are invalid
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         since(other: PlainDateTimeLike, options?: RoundingOptionsWithLargestUnit<DateUnit | TimeUnit>): Duration;
         /** @throws {RangeError} if the rounding options are invalid */
         round(roundTo: PluralizeUnit<"day" | TimeUnit>): PlainDateTime;
@@ -288,7 +312,10 @@ declare namespace Temporal {
         round(roundTo: RoundingOptions<"day" | TimeUnit>): PlainDateTime;
         equals(other: PlainDateTimeLike): boolean;
         toString(options?: PlainDateTimeToStringOptions): string;
-        /** @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's */
+        /**
+         * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
+         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
@@ -360,9 +387,15 @@ declare namespace Temporal {
         withCalendar(calendar: CalendarLike): ZonedDateTime;
         add(duration: DurationLike, options?: OverflowOptions): ZonedDateTime;
         subtract(duration: DurationLike, options?: OverflowOptions): ZonedDateTime;
-        /** @throws {RangeError} if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid */
+        /**
+         * @throws {RangeError} if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         until(other: ZonedDateTimeLike, options?: RoundingOptionsWithLargestUnit<DateUnit | TimeUnit>): Duration;
-        /** @throws {RangeError} if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid */
+        /**
+         * @throws {RangeError} if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         since(other: ZonedDateTimeLike, options?: RoundingOptionsWithLargestUnit<DateUnit | TimeUnit>): Duration;
         /** @throws {RangeError} if the rounding options are invalid */
         round(roundTo: PluralizeUnit<"day" | TimeUnit>): ZonedDateTime;
@@ -370,7 +403,10 @@ declare namespace Temporal {
         round(roundTo: RoundingOptions<"day" | TimeUnit>): ZonedDateTime;
         equals(other: ZonedDateTimeLike): boolean;
         toString(options?: ZonedDateTimeToStringOptions): string;
-        /** @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's */
+        /**
+         * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
+         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
@@ -429,20 +465,35 @@ declare namespace Temporal {
         with(durationLike: PartialTemporalLike<DurationLikeObject>): Duration;
         negated(): Duration;
         abs(): Duration;
-        /** @throws {RangeError} if either duration has calendar units, or the result is out of range */
+        /**
+         * @throws {RangeError} if either duration has calendar units, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         add(other: DurationLike): Duration;
-        /** @throws {RangeError} if either duration has calendar units, or the result is out of range */
+        /**
+         * @throws {RangeError} if either duration has calendar units, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         subtract(other: DurationLike): Duration;
         /** @throws {RangeError} if the rounding options are invalid, or calendar units need `relativeTo` */
         round(roundTo: PluralizeUnit<"day" | TimeUnit>): Duration;
-        /** @throws {RangeError} if the rounding options are invalid, or calendar units need `relativeTo` */
+        /**
+         * @throws {RangeError} if the rounding options are invalid, or calendar units need `relativeTo`
+         * @throws {TypeError} if `relativeTo` is an object missing the fields it needs
+         */
         round(roundTo: DurationRoundingOptions): Duration;
         /** @throws {RangeError} if the duration has calendar units, which need `relativeTo` */
         total(totalOf: PluralizeUnit<"day" | TimeUnit>): number;
-        /** @throws {RangeError} if the duration has calendar units and `relativeTo` is not given */
+        /**
+         * @throws {RangeError} if the duration has calendar units and `relativeTo` is not given
+         * @throws {TypeError} if `relativeTo` is an object missing the fields it needs
+         */
         total(totalOf: DurationTotalOptions): number;
         toString(options?: DurationToStringOptions): string;
-        /** @throws {RangeError} if the locale or options are invalid */
+        /**
+         * @throws {RangeError} if the locale or options are invalid
+         * @throws {TypeError} if `locales` holds something other than a string or `Intl.Locale`
+         */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DurationFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
@@ -458,7 +509,10 @@ declare namespace Temporal {
          * @throws {TypeError} if an object is missing the fields it needs
          */
         from(item: DurationLike): Duration;
-        /** @throws {RangeError} if either duration has calendar units and `relativeTo` is not given */
+        /**
+         * @throws {RangeError} if either duration has calendar units and `relativeTo` is not given
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         compare(one: DurationLike, two: DurationLike, options?: DurationRelativeToOptions): number;
     }
     var Duration: DurationConstructor;
@@ -470,9 +524,15 @@ declare namespace Temporal {
     interface Instant {
         readonly epochMilliseconds: number;
         readonly epochNanoseconds: bigint;
-        /** @throws {RangeError} if the duration has date units, or the result is out of range */
+        /**
+         * @throws {RangeError} if the duration has date units, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         add(duration: DurationLike): Instant;
-        /** @throws {RangeError} if the duration has date units, or the result is out of range */
+        /**
+         * @throws {RangeError} if the duration has date units, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         subtract(duration: DurationLike): Instant;
         /** @throws {RangeError} if the options are invalid */
         until(other: InstantLike, options?: RoundingOptionsWithLargestUnit<TimeUnit>): Duration;
@@ -484,7 +544,10 @@ declare namespace Temporal {
         round(roundTo: RoundingOptions<TimeUnit>): Instant;
         equals(other: InstantLike): boolean;
         toString(options?: InstantToStringOptions): string;
-        /** @throws {RangeError} if the locale or options are invalid */
+        /**
+         * @throws {RangeError} if the locale or options are invalid
+         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
@@ -531,13 +594,22 @@ declare namespace Temporal {
         with(yearMonthLike: PartialTemporalLike<YearMonthLikeObject>, options?: OverflowOptions): PlainYearMonth;
         add(duration: DurationLike, options?: OverflowOptions): PlainYearMonth;
         subtract(duration: DurationLike, options?: OverflowOptions): PlainYearMonth;
-        /** @throws {RangeError} if the calendars differ, or the options are invalid */
+        /**
+         * @throws {RangeError} if the calendars differ, or the options are invalid
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         until(other: PlainYearMonthLike, options?: RoundingOptionsWithLargestUnit<"year" | "month">): Duration;
-        /** @throws {RangeError} if the calendars differ, or the options are invalid */
+        /**
+         * @throws {RangeError} if the calendars differ, or the options are invalid
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         since(other: PlainYearMonthLike, options?: RoundingOptionsWithLargestUnit<"year" | "month">): Duration;
         equals(other: PlainYearMonthLike): boolean;
         toString(options?: PlainDateToStringOptions): string;
-        /** @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's */
+        /**
+         * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
+         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
@@ -575,7 +647,10 @@ declare namespace Temporal {
         with(monthDayLike: PartialTemporalLike<DateLikeObject>, options?: OverflowOptions): PlainMonthDay;
         equals(other: PlainMonthDayLike): boolean;
         toString(options?: PlainDateToStringOptions): string;
-        /** @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's */
+        /**
+         * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
+         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
