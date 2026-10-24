@@ -525,6 +525,18 @@ pub mod polish {
             options: &RoundingHour,
         ) -> Result<(), JsValue>;
     }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "Polish")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Gauge;
+        #[wasm_bindgen(constructor, js_namespace = "Polish", catch)]
+        pub fn new() -> Result<Gauge, JsValue>;
+        #[wasm_bindgen(method)]
+        pub fn level(this: &Gauge) -> LevelReturnKind;
+        #[wasm_bindgen(method, catch, js_name = "level")]
+        pub fn try_level(this: &Gauge) -> Result<LevelReturnKind, JsValue>;
+    }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PluralizeUnitHour {
@@ -821,4 +833,9 @@ pub enum HourSteppingLargestUnitKind {
     Auto = "auto",
     Hour = "hour",
     Hours = "hours",
+}
+#[wasm_bindgen(private)]
+pub enum LevelReturnKind {
+    Low = "low",
+    High = "high",
 }
