@@ -1,6 +1,8 @@
 //! @ts-gen --lib-name literal-discriminants --export literal-discriminants
 
-// Dictionary factories bake number literals in as `f64` literals.
+// Dictionary factories pass an integer literal as the getter's enum
+// variant, read through the alias, and bake any other number literal in as
+// an `f64` literal.
 export type KeepAlive = 0 | 1 | 2;
 
 export interface Options {

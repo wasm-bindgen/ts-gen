@@ -32,10 +32,6 @@ pub enum Priority {
     Normal = 0i32,
     High = 1i32,
 }
-#[allow(dead_code)]
-pub type StringOrNumber = JsValue;
-#[allow(dead_code)]
-pub type BodyInit = JsValue;
 #[wasm_bindgen]
 extern "C" {
     pub fn send(body: &ReadableStream);
@@ -75,8 +71,6 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "send")]
     pub fn try_send_with_blob(body: &Blob) -> Result<(), JsValue>;
 }
-#[allow(dead_code)]
-pub type RequestInfo = JsValue;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch)]

@@ -16,8 +16,6 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "set")]
     pub fn try_set<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, value: &T) -> Result<(), JsValue>;
 }
-#[allow(dead_code)]
-pub type Loose = JsValue;
 #[wasm_bindgen(module = "generic-defaults")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

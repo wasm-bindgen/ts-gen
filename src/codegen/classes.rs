@@ -303,7 +303,7 @@ impl ClassConfig<'_> {
         slice_mode: Option<crate::ir::SliceModeHint>,
     ) -> crate::ir::Param {
         let mut type_ref = match self.setter_enum(js_name, ty) {
-            Some(e) => e.param_type(ty),
+            Some(e) => e.param_type(),
             None => ty.clone(),
         };
         if let Some(widened) = slice_mode.and_then(|m| m.widen_bare_typed_array(&type_ref)) {

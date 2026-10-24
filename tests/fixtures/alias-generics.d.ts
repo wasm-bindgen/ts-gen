@@ -44,7 +44,8 @@ declare module "hidden" {
     readonly h: number;
   }
   type Triple<X, Y = string> = [X, Y, Hidden];
-  export { Triple };
+  type Either<X> = X | Hidden;
+  export { Triple, Either };
 }
 
 declare module "uses" {
@@ -54,4 +55,6 @@ declare module "uses" {
   // No path from `uses` reaches the unexported `Hidden`, so `H.Triple<number>`
   // is not chased and names the alias.
   export function triple(t: H.Triple<number>): void;
+  // Nor is the union alias `H.Either<number>`, which then still names it.
+  export function either(e: H.Either<number>): void;
 }

@@ -112,6 +112,8 @@ pub mod hidden {
     }
     #[allow(dead_code)]
     pub type Triple<X, Y = JsString> = ArrayTuple<(X, Y, Hidden)>;
+    #[allow(dead_code)]
+    pub type Either = JsValue;
 }
 pub mod uses {
     #[allow(unused_imports)]
@@ -133,5 +135,14 @@ pub mod uses {
     extern "C" {
         #[wasm_bindgen(catch, js_name = "triple")]
         pub fn try_triple(t: &super::hidden::Triple<Number>) -> Result<(), JsValue>;
+    }
+    #[wasm_bindgen(module = "uses")]
+    extern "C" {
+        pub fn either(e: &super::hidden::Either);
+    }
+    #[wasm_bindgen(module = "uses")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "either")]
+        pub fn try_either(e: &super::hidden::Either) -> Result<(), JsValue>;
     }
 }

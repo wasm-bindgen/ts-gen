@@ -62,8 +62,6 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "values")]
     pub fn try_values(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
 }
-#[allow(dead_code)]
-pub type HeadersInit = JsValue;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -121,8 +119,6 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "formData")]
     pub fn form_data_promise(this: &Request) -> Promise<FormData>;
 }
-#[allow(dead_code)]
-pub type RequestInfo = JsValue;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -133,7 +129,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_method(this: &RequestInit, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &RequestInit) -> Option<JsValue>;
+    pub fn headers(this: &RequestInit) -> Option<HeadersKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &RequestInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -141,7 +137,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_slice(this: &RequestInit, val: &[ArrayTuple<(JsString, JsString)>]);
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &RequestInit) -> Option<Nullable<JsValue>>;
+    pub fn body(this: &RequestInit) -> Option<Nullable<BodyKind>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body(this: &RequestInit, val: &ReadableStream);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -240,8 +236,6 @@ impl RequestInitBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type BodyInit = JsValue;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -374,7 +368,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "statusText")]
     pub fn set_status_text(this: &ResponseInit, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &ResponseInit) -> Option<JsValue>;
+    pub fn headers(this: &ResponseInit) -> Option<HeadersKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -536,4 +530,19 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(js_name = "fetch")]
     pub fn fetch_with_str_and_init_promise(input: &str, init: &RequestInit) -> Promise<Response>;
+}
+#[wasm_bindgen(private, fallback)]
+pub enum HeadersKind {
+    Headers(Headers),
+    VecOfTuple(Vec<ArrayTuple<(JsString, JsString)>>),
+    Record(Object<JsString>),
+}
+#[wasm_bindgen(private)]
+pub enum BodyKind {
+    ReadableStream(ReadableStream),
+    String(String),
+    ArrayBuffer(ArrayBuffer),
+    Blob(Blob),
+    UrlSearchParams(URLSearchParams),
+    FormData(FormData),
 }

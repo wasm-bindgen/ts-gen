@@ -4,8 +4,6 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[allow(dead_code)]
-pub type Loose = JsValue;
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

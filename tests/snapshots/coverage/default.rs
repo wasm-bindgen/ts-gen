@@ -735,7 +735,7 @@ impl MutableWidget {
         }
     }
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum HeadersKind {
     Headers(Headers),
     Record(Object<JsString>),

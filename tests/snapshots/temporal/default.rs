@@ -8,26 +8,6 @@ pub mod temporal {
     #[allow(unused_imports)]
     use super::*;
     #[allow(dead_code)]
-    pub type CalendarLike = JsValue;
-    #[allow(dead_code)]
-    pub type DurationLike = JsValue;
-    #[allow(dead_code)]
-    pub type InstantLike = JsValue;
-    #[allow(dead_code)]
-    pub type PlainDateLike = JsValue;
-    #[allow(dead_code)]
-    pub type PlainDateTimeLike = JsValue;
-    #[allow(dead_code)]
-    pub type PlainMonthDayLike = JsValue;
-    #[allow(dead_code)]
-    pub type PlainTimeLike = JsValue;
-    #[allow(dead_code)]
-    pub type PlainYearMonthLike = JsValue;
-    #[allow(dead_code)]
-    pub type TimeZoneLike = JsValue;
-    #[allow(dead_code)]
-    pub type ZonedDateTimeLike = JsValue;
-    #[allow(dead_code)]
     pub type PartialTemporalLike = JsValue;
     #[wasm_bindgen]
     extern "C" {
@@ -455,7 +435,7 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ZonedDateTimeLikeObject;
         #[wasm_bindgen(method, getter, js_name = "timeZone")]
-        pub fn time_zone(this: &ZonedDateTimeLikeObject) -> JsValue;
+        pub fn time_zone(this: &ZonedDateTimeLikeObject) -> TimeZoneKind;
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
         pub fn set_time_zone(this: &ZonedDateTimeLikeObject, val: &ZonedDateTime);
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
@@ -1103,7 +1083,7 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainDateToZonedDateTimeOptions;
         #[wasm_bindgen(method, getter, js_name = "plainTime")]
-        pub fn plain_time(this: &PlainDateToZonedDateTimeOptions) -> Option<JsValue>;
+        pub fn plain_time(this: &PlainDateToZonedDateTimeOptions) -> Option<PlainTimeKind>;
         #[wasm_bindgen(method, setter, js_name = "plainTime")]
         pub fn set_plain_time(this: &PlainDateToZonedDateTimeOptions, val: &PlainTime);
         #[wasm_bindgen(method, setter, js_name = "plainTime")]
@@ -1124,7 +1104,7 @@ pub mod temporal {
         #[wasm_bindgen(method, setter, js_name = "plainTime")]
         pub fn set_plain_time_with_str(this: &PlainDateToZonedDateTimeOptions, val: &str);
         #[wasm_bindgen(method, getter, js_name = "timeZone")]
-        pub fn time_zone(this: &PlainDateToZonedDateTimeOptions) -> JsValue;
+        pub fn time_zone(this: &PlainDateToZonedDateTimeOptions) -> TimeZoneKind;
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
         pub fn set_time_zone(this: &PlainDateToZonedDateTimeOptions, val: &ZonedDateTime);
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
@@ -6875,7 +6855,7 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type InstantToStringOptions;
         #[wasm_bindgen(method, getter, js_name = "timeZone")]
-        pub fn time_zone(this: &InstantToStringOptions) -> Option<JsValue>;
+        pub fn time_zone(this: &InstantToStringOptions) -> Option<TimeZoneKind>;
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
         pub fn set_time_zone(this: &InstantToStringOptions, val: &ZonedDateTime);
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
@@ -9129,6 +9109,11 @@ pub mod temporal {
     }
 }
 #[wasm_bindgen(private)]
+pub enum TimeZoneKind {
+    ZonedDateTime(temporal::ZonedDateTime),
+    String(String),
+}
+#[wasm_bindgen(private)]
 pub enum DisambiguationKind {
     Compatible = "compatible",
     Earlier = "earlier",
@@ -9193,6 +9178,14 @@ pub enum CalendarNameKind {
     Never = "never",
     Critical = "critical",
 }
+#[wasm_bindgen(private, fallback)]
+pub enum PlainTimeKind {
+    PlainTime(temporal::PlainTime),
+    PlainDateTime(temporal::PlainDateTime),
+    ZonedDateTime(temporal::ZonedDateTime),
+    String(String),
+    TimeLikeObject(temporal::TimeLikeObject),
+}
 #[wasm_bindgen(private)]
 pub enum OffsetKind {
     Auto = "auto",
@@ -9211,8 +9204,11 @@ pub enum ZonedDateTimeFromOptionsOffsetKind {
     Prefer = "prefer",
     Reject = "reject",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum RelativeToKind {
-    ZonedDateTimeLike(JsValue),
-    PlainDateLike(JsValue),
+    ZonedDateTime(temporal::ZonedDateTime),
+    String(String),
+    PlainDate(temporal::PlainDate),
+    PlainDateTime(temporal::PlainDateTime),
+    Object(Object),
 }

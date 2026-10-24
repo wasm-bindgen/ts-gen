@@ -200,8 +200,6 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "setMaybe")]
     pub fn try_set_maybe_with_f64(value: f64) -> Result<(), JsValue>;
 }
-#[allow(dead_code)]
-pub type Id = JsValue;
 #[wasm_bindgen(module = "primitive-unions-mono")]
 extern "C" {
     pub fn lookup(id: &str);

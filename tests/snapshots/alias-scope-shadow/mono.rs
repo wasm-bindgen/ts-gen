@@ -57,12 +57,6 @@ impl Inner {
 pub type TopX = Pair<Inner, Inner>;
 #[allow(dead_code)]
 pub type TopAll<T = Inner> = Pair<T, T>;
-#[allow(dead_code)]
-pub type InnerOrName = JsValue;
-#[allow(dead_code)]
-pub type Chained = JsValue;
-#[allow(dead_code)]
-pub type Names = JsValue;
 pub mod shadow {
     #[allow(unused_imports)]
     use super::*;
