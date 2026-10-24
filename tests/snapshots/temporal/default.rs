@@ -1970,8 +1970,6 @@ pub mod temporal {
             this: &PlainDate,
             item: &PlainDateToZonedDateTimeOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &PlainDate) -> String;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainDate) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -2013,6 +2011,11 @@ pub mod temporal {
         pub fn try_to_json(this: &PlainDate) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &PlainDate) -> Result<(), JsValue>;
+    }
+    impl core::fmt::Display for PlainDate {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+        }
     }
     #[wasm_bindgen]
     extern "C" {
@@ -2666,8 +2669,6 @@ pub mod temporal {
             this: &PlainTime,
             round_to: &RoundingOptions<JsString>,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &PlainTime) -> String;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -2709,6 +2710,11 @@ pub mod temporal {
         pub fn try_to_json(this: &PlainTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &PlainTime) -> Result<(), JsValue>;
+    }
+    impl core::fmt::Display for PlainTime {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+        }
     }
     #[wasm_bindgen]
     extern "C" {
@@ -3651,8 +3657,6 @@ pub mod temporal {
         pub fn equals_with_str(this: &PlainDateTime, other: &str) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
         pub fn try_equals_with_str(this: &PlainDateTime, other: &str) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &PlainDateTime) -> String;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -3741,6 +3745,11 @@ pub mod temporal {
         pub fn to_plain_time(this: &PlainDateTime) -> PlainTime;
         #[wasm_bindgen(method, catch, js_name = "toPlainTime")]
         pub fn try_to_plain_time(this: &PlainDateTime) -> Result<PlainTime, JsValue>;
+    }
+    impl core::fmt::Display for PlainDateTime {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+        }
     }
     #[wasm_bindgen]
     extern "C" {
@@ -4433,8 +4442,6 @@ pub mod temporal {
         pub fn equals_with_str(this: &ZonedDateTime, other: &str) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
         pub fn try_equals_with_str(this: &ZonedDateTime, other: &str) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &ZonedDateTime) -> String;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &ZonedDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -4533,6 +4540,11 @@ pub mod temporal {
             &self,
         ) -> Result<Nullable<ZonedDateTime>, JsValue> {
             self.__try_get_time_zone_transition("previous")
+        }
+    }
+    impl core::fmt::Display for ZonedDateTime {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
         }
     }
     #[wasm_bindgen]
@@ -5175,8 +5187,6 @@ pub mod temporal {
             this: &Duration,
             total_of: &DurationTotalOptions,
         ) -> Result<f64, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &Duration) -> String;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &Duration) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -5216,6 +5226,11 @@ pub mod temporal {
         pub fn try_to_json(this: &Duration) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
         pub fn value_of(this: &Duration) -> Result<(), JsValue>;
+    }
+    impl core::fmt::Display for Duration {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+        }
     }
     #[wasm_bindgen]
     extern "C" {
@@ -5522,8 +5537,6 @@ pub mod temporal {
         pub fn equals_with_str(this: &Instant, other: &str) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
         pub fn try_equals_with_str(this: &Instant, other: &str) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &Instant) -> String;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &Instant) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -5576,6 +5589,11 @@ pub mod temporal {
             this: &Instant,
             time_zone: &str,
         ) -> Result<ZonedDateTime, JsValue>;
+    }
+    impl core::fmt::Display for Instant {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+        }
     }
     #[wasm_bindgen]
     extern "C" {
@@ -6022,8 +6040,6 @@ pub mod temporal {
         pub fn equals_with_str(this: &PlainYearMonth, other: &str) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
         pub fn try_equals_with_str(this: &PlainYearMonth, other: &str) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &PlainYearMonth) -> String;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainYearMonth) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -6075,6 +6091,11 @@ pub mod temporal {
             this: &PlainYearMonth,
             item: &PlainYearMonthToPlainDateOptions,
         ) -> Result<PlainDate, JsValue>;
+    }
+    impl core::fmt::Display for PlainYearMonth {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+        }
     }
     #[wasm_bindgen]
     extern "C" {
@@ -6228,8 +6249,6 @@ pub mod temporal {
         pub fn equals_with_str(this: &PlainMonthDay, other: &str) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
         pub fn try_equals_with_str(this: &PlainMonthDay, other: &str) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &PlainMonthDay) -> String;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainMonthDay) -> Result<String, JsValue>;
         #[wasm_bindgen(method, js_name = "toString")]
@@ -6281,6 +6300,11 @@ pub mod temporal {
             this: &PlainMonthDay,
             item: &PlainMonthDayToPlainDateOptions,
         ) -> Result<PlainDate, JsValue>;
+    }
+    impl core::fmt::Display for PlainMonthDay {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+        }
     }
     #[wasm_bindgen]
     extern "C" {
