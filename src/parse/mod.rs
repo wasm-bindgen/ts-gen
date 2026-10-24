@@ -25,12 +25,47 @@ use crate::context::GlobalContext;
 use crate::ir::Module;
 use crate::parse::scope::ScopeId;
 
+/// Options that change what the parse produces. Type-level evaluation
+/// lowers some types differently under per-monomorphization, so a module
+/// parsed with [`ParseOptions::experimental_generic_mono`] is generated
+/// with the same setting.
+#[derive(Debug, Clone, Default)]
+pub struct ParseOptions {
+    experimental_generic_mono: bool,
+}
+
+impl ParseOptions {
+    /// Create parse options with the default behavior.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Evaluate for wasm-bindgen's experimental per-monomorphization
+    /// codegen: an interface's literal-only type parameter stays generic,
+    /// bounded by a trait projecting its type-level functions, instead of
+    /// specialising each instantiation.
+    pub fn experimental_generic_mono(mut self, enabled: bool) -> Self {
+        self.experimental_generic_mono = enabled;
+        self
+    }
+}
+
 /// Parse one or more `.d.ts` files and produce a `Module` + `GlobalContext`.
 pub fn parse_dts_files(
     paths: &[impl AsRef<Path>],
     lib_name: Option<&str>,
 ) -> Result<(Module, GlobalContext)> {
+    parse_dts_files_with(paths, lib_name, &ParseOptions::default())
+}
+
+/// [`parse_dts_files`] with explicit options.
+pub fn parse_dts_files_with(
+    paths: &[impl AsRef<Path>],
+    lib_name: Option<&str>,
+    options: &ParseOptions,
+) -> Result<(Module, GlobalContext)> {
     let mut gctx = GlobalContext::new();
+    gctx.experimental_generic_mono = options.experimental_generic_mono;
     let mut module = Module::new(&mut gctx, lib_name);
     let global = module.global_scope;
 
@@ -81,7 +116,17 @@ pub fn parse_single_source(
     source: &str,
     lib_name: Option<&str>,
 ) -> Result<(Module, GlobalContext)> {
+    parse_single_source_with(source, lib_name, &ParseOptions::default())
+}
+
+/// [`parse_single_source`] with explicit options.
+pub fn parse_single_source_with(
+    source: &str,
+    lib_name: Option<&str>,
+    options: &ParseOptions,
+) -> Result<(Module, GlobalContext)> {
     let mut gctx = GlobalContext::new();
+    gctx.experimental_generic_mono = options.experimental_generic_mono;
     let mut module = Module::new(&mut gctx, lib_name);
     let file_scope = gctx.create_child_scope(module.global_scope);
     let path = Path::new("<input>");

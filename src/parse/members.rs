@@ -215,6 +215,7 @@ pub(crate) fn try_synthesize_iterable_return(
             name,
             constraint: None,
             default: None,
+            trait_bound: None,
         })
         .collect();
 
@@ -693,6 +694,7 @@ fn try_synthesize_inline_param(
             name: name.clone(),
             constraint: None,
             default: None,
+            trait_bound: None,
         })
         .collect();
     let reference = TypeRef::Reference {

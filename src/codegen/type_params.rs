@@ -239,6 +239,7 @@ mod tests {
             name: name.into(),
             constraint: None,
             default: None,
+            trait_bound: None,
         }
     }
 

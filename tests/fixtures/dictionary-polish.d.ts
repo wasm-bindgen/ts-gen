@@ -72,6 +72,19 @@ declare global {
 
     type HourStepping = Stepped<"hour">;
 
+    // Under `--experimental-generic-mono` the parameter stays generic,
+    // bounded by a trait per family: an interface passing it on through
+    // `extends`, even a flattened `Pick`, shares its parent's trait, and
+    // one reading a function of it its parent doesn't extends that trait.
+    interface Bounded<U extends "day" | TimeUnit> extends Rounding<U> {
+      maximumUnit?: "none" | PluralizeUnit<U>;
+    }
+
+    interface PickedRounding<U extends "day" | TimeUnit>
+      extends Pick<Rounding<U>, "smallestUnit" | "increment"> {}
+
+    interface TimePicking extends PickedRounding<TimeUnit> {}
+
     // An interface with methods can't be specialised, so its instantiations
     // are the base.
     interface Clock<U extends TimeUnit> {
@@ -83,6 +96,7 @@ declare global {
       roundTime(options: Rounding<TimeUnit>): void;
       roundAgain(options: Rounding<Exclude<"day" | TimeUnit, "day">>): void;
       step(options: Stepped<"hour">): void;
+      bound(options: Bounded<"day" | "hour">): void;
       clock(): Clock<"hour">;
       // A variant names the generic base its specialisation extends,
       // unless another specialisation of the base is beside it.

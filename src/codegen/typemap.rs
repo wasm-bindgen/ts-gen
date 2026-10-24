@@ -504,6 +504,9 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef, head: &dyn Fn(&[String]) -
             buf.push_str(")->");
             write_type_ref_key(buf, &sig.return_type, head);
         }
+        TypeRef::Projection { param, assoc } => {
+            let _ = write!(buf, "{param}::{assoc}");
+        }
         TypeRef::Unresolved(s) => {
             buf.push('?');
             buf.push_str(s);
@@ -661,6 +664,18 @@ pub(crate) fn externalised_modules(module: &ir::Module, gctx: &GlobalContext) ->
 impl<'a> CodegenContext<'a> {
     /// Whether per-monomorphization codegen is on. Takes an `Option` because
     /// most emitters carry an optional context; no context means default mode.
+    /// The type an argument enum's impl gives an associated type of a
+    /// literal-only parameter's trait, with the scope it resolves in.
+    pub(crate) fn projection_target(&self, arg: &str, assoc: &str) -> Option<(TypeRef, ScopeId)> {
+        self.gctx.param_traits.values().flatten().find_map(|t| {
+            let i = t.assoc.iter().position(|a| a == assoc)?;
+            t.impls
+                .iter()
+                .find(|(enum_ref, _)| enum_ref.as_ident() == Some(arg))
+                .map(|(_, targets)| (targets[i].clone(), t.scope))
+        })
+    }
+
     pub(crate) fn generic_mono(ctx: Option<&CodegenContext<'_>>) -> bool {
         ctx.is_some_and(|ctx| ctx.experimental_generic_mono)
     }
@@ -1457,6 +1472,7 @@ impl<'a> CodegenContext<'a> {
             | TypeRef::IndexedAccess(..)
             | TypeRef::Mapped(_)
             | TypeRef::ObjectLiteral(_)
+            | TypeRef::Projection { .. }
             | TypeRef::Unresolved(_) => true,
         }
     }
@@ -2157,6 +2173,24 @@ pub fn to_syn_type(
     let borrow = pos.is_argument() && !pos.inner;
 
     match ty {
+        // An associated type of a literal-only parameter's trait is a string
+        // enum, taken by value. Substituted by an argument enum, it is that
+        // enum's impl target.
+        TypeRef::Projection { param, assoc } => {
+            if let Some(c) = ctx {
+                let generic = matches!(
+                    c.gctx.scopes.resolve_binding(scope, param),
+                    Some(crate::parse::scope::Binding::TypeParam)
+                );
+                if !generic {
+                    if let Some((target, target_scope)) = c.projection_target(param, assoc) {
+                        return to_syn_type(&target, pos, ctx, target_scope, from_module);
+                    }
+                }
+            }
+            let (param, assoc) = (make_ident(param), make_ident(assoc));
+            quote! { #param::#assoc }
+        }
         // === Primitives (outer position only reaches here) ===
         TypeRef::Boolean => quote! { bool },
         TypeRef::Number => quote! { f64 },
@@ -4355,6 +4389,7 @@ mod tests {
             name: name.to_string(),
             constraint: None,
             default,
+            trait_bound: None,
         };
         // `<T, U = T[], V>`: `U` sees `T`'s default, `V` has none.
         let alias = ir::TypeAliasDecl {
