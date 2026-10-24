@@ -1339,6 +1339,24 @@ pub mod temporal {
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum DateUnit {
+        Year = "year",
+        Month = "month",
+        Week = "week",
+        Day = "day",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum TimeUnit {
+        Hour = "hour",
+        Minute = "minute",
+        Second = "second",
+        Millisecond = "millisecond",
+        Microsecond = "microsecond",
+        Nanosecond = "nanosecond",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PluralizeUnit {
         Year = "year",
         Month = "month",
@@ -1483,40 +1501,62 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptions;
+        pub type RoundingOptions<Units = DateUnitOrTimeUnit>;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit(this: &RoundingOptions) -> Option<PluralizeUnit>;
+        pub fn smallest_unit<Units: RoundingOptionsUnits>(
+            this: &RoundingOptions<Units>,
+        ) -> Option<Units::PluralizeUnit>
+        where
+            Option<Units::PluralizeUnit>: ::wasm_bindgen::convert::FromWasmAbi;
         #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit(this: &RoundingOptions, val: PluralizeUnit);
+        pub fn set_smallest_unit<Units: RoundingOptionsUnits>(
+            this: &RoundingOptions<Units>,
+            val: Units::PluralizeUnit,
+        ) where
+            Units::PluralizeUnit: ::wasm_bindgen::convert::IntoWasmAbi;
         #[wasm_bindgen(method, getter, js_name = "roundingIncrement")]
-        pub fn rounding_increment(this: &RoundingOptions) -> Option<f64>;
+        pub fn rounding_increment<Units: RoundingOptionsUnits>(
+            this: &RoundingOptions<Units>,
+        ) -> Option<f64>;
         #[wasm_bindgen(method, setter, js_name = "roundingIncrement")]
-        pub fn set_rounding_increment(this: &RoundingOptions, val: f64);
+        pub fn set_rounding_increment<Units: RoundingOptionsUnits>(
+            this: &RoundingOptions<Units>,
+            val: f64,
+        );
         #[wasm_bindgen(method, getter, js_name = "roundingMode")]
-        pub fn rounding_mode(this: &RoundingOptions) -> Option<RoundingModeKind>;
+        pub fn rounding_mode<Units: RoundingOptionsUnits>(
+            this: &RoundingOptions<Units>,
+        ) -> Option<RoundingModeKind>;
         #[wasm_bindgen(method, setter, js_name = "roundingMode")]
-        pub fn set_rounding_mode(this: &RoundingOptions, val: RoundingModeKind);
+        pub fn set_rounding_mode<Units: RoundingOptionsUnits>(
+            this: &RoundingOptions<Units>,
+            val: RoundingModeKind,
+        );
     }
-    impl RoundingOptions {
-        pub fn new() -> RoundingOptions {
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> RoundingOptions<Units> {
+        pub fn new() -> RoundingOptions<Units> {
             Self::builder().build()
         }
-        pub fn builder() -> RoundingOptionsBuilder {
+        pub fn builder() -> RoundingOptionsBuilder<Units> {
             RoundingOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
-    impl Default for RoundingOptions {
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> Default
+        for RoundingOptions<Units>
+    {
         fn default() -> Self {
             Self::new()
         }
     }
-    pub struct RoundingOptionsBuilder {
-        inner: RoundingOptions,
+    pub struct RoundingOptionsBuilder<Units> {
+        inner: RoundingOptions<Units>,
     }
-    impl RoundingOptionsBuilder {
-        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
+        RoundingOptionsBuilder<Units>
+    {
+        pub fn smallest_unit(self, val: Units::PluralizeUnit) -> Self {
             self.inner.set_smallest_unit(val);
             self
         }
@@ -1528,40 +1568,87 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn build(self) -> RoundingOptions {
+        pub fn build(self) -> RoundingOptions<Units> {
             self.inner
         }
     }
+    pub trait RoundingOptionsUnits {
+        type PluralizeUnit: ::wasm_bindgen::convert::IntoWasmAbi
+            + ::wasm_bindgen::convert::FromWasmAbi
+            + ::wasm_bindgen::convert::OptionIntoWasmAbi
+            + ::wasm_bindgen::convert::OptionFromWasmAbi;
+    }
+    impl RoundingOptionsUnits for DateUnitOrTimeUnit {
+        type PluralizeUnit = PluralizeUnit;
+    }
+    impl RoundingOptionsUnits for TimeUnit {
+        type PluralizeUnit = PluralizeTimeUnit;
+    }
+    impl RoundingOptionsUnits for DayOrTimeUnit {
+        type PluralizeUnit = PluralizeDayOrTimeUnit;
+    }
+    impl RoundingOptionsUnits for DateUnit {
+        type PluralizeUnit = PluralizeDateUnit;
+    }
+    impl RoundingOptionsUnits for YearOrMonth {
+        type PluralizeUnit = PluralizeUnitYearOrMonth;
+    }
+    impl RoundingOptionsUnits for ExcludeTimeUnitHour {
+        type PluralizeUnit = PluralizeExcludeTimeUnitHour;
+    }
+    impl RoundingOptionsUnits for ExcludeTimeUnitHourOrMinute {
+        type PluralizeUnit = PluralizeExcludeTimeUnitHourOrMinute;
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = RoundingOptions , extends = Object , is_type_of = JsValue :: is_object)]
+        # [wasm_bindgen (extends = Object , extends = RoundingOptions :: < Units > , no_deref , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptionsWithLargestUnit;
+        pub type RoundingOptionsWithLargestUnit<Units = DateUnitOrTimeUnit>;
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(this: &RoundingOptionsWithLargestUnit) -> Option<LargestUnitKind>;
+        pub fn largest_unit<Units: RoundingOptionsWithLargestUnitUnits>(
+            this: &RoundingOptionsWithLargestUnit<Units>,
+        ) -> Option<Units::LargestUnit>
+        where
+            Option<Units::LargestUnit>: ::wasm_bindgen::convert::FromWasmAbi;
         #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(this: &RoundingOptionsWithLargestUnit, val: LargestUnitKind);
+        pub fn set_largest_unit<Units: RoundingOptionsWithLargestUnitUnits>(
+            this: &RoundingOptionsWithLargestUnit<Units>,
+            val: Units::LargestUnit,
+        ) where
+            Units::LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi;
     }
-    impl RoundingOptionsWithLargestUnit {
-        pub fn new() -> RoundingOptionsWithLargestUnit {
+    impl<Units> ::core::ops::Deref for RoundingOptionsWithLargestUnit<Units> {
+        type Target = RoundingOptions<Units>;
+        fn deref(&self) -> &RoundingOptions<Units> {
+            JsCast::unchecked_ref(self)
+        }
+    }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsWithLargestUnitUnits>
+        RoundingOptionsWithLargestUnit<Units>
+    {
+        pub fn new() -> RoundingOptionsWithLargestUnit<Units> {
             Self::builder().build()
         }
-        pub fn builder() -> RoundingOptionsWithLargestUnitBuilder {
+        pub fn builder() -> RoundingOptionsWithLargestUnitBuilder<Units> {
             RoundingOptionsWithLargestUnitBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
-    impl Default for RoundingOptionsWithLargestUnit {
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsWithLargestUnitUnits> Default
+        for RoundingOptionsWithLargestUnit<Units>
+    {
         fn default() -> Self {
             Self::new()
         }
     }
-    pub struct RoundingOptionsWithLargestUnitBuilder {
-        inner: RoundingOptionsWithLargestUnit,
+    pub struct RoundingOptionsWithLargestUnitBuilder<Units> {
+        inner: RoundingOptionsWithLargestUnit<Units>,
     }
-    impl RoundingOptionsWithLargestUnitBuilder {
-        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsWithLargestUnitUnits>
+        RoundingOptionsWithLargestUnitBuilder<Units>
+    {
+        pub fn smallest_unit(self, val: Units::PluralizeUnit) -> Self {
             self.inner.set_smallest_unit(val);
             self
         }
@@ -1573,48 +1660,85 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn largest_unit(self, val: LargestUnitKind) -> Self {
+        pub fn largest_unit(self, val: Units::LargestUnit) -> Self {
             self.inner.set_largest_unit(val);
             self
         }
-        pub fn build(self) -> RoundingOptionsWithLargestUnit {
+        pub fn build(self) -> RoundingOptionsWithLargestUnit<Units> {
             self.inner
         }
+    }
+    pub trait RoundingOptionsWithLargestUnitUnits: RoundingOptionsUnits {
+        type LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi
+            + ::wasm_bindgen::convert::FromWasmAbi
+            + ::wasm_bindgen::convert::OptionIntoWasmAbi
+            + ::wasm_bindgen::convert::OptionFromWasmAbi;
+    }
+    impl RoundingOptionsWithLargestUnitUnits for DateUnit {
+        type LargestUnit = DateUnitLargestUnitKind;
+    }
+    impl RoundingOptionsWithLargestUnitUnits for TimeUnit {
+        type LargestUnit = TimeUnitLargestUnitKind;
+    }
+    impl RoundingOptionsWithLargestUnitUnits for DateUnitOrTimeUnit {
+        type LargestUnit = LargestUnitKind;
+    }
+    impl RoundingOptionsWithLargestUnitUnits for YearOrMonth {
+        type LargestUnit = YearOrMonthLargestUnitKind;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type ToStringRoundingOptions;
+        pub type ToStringRoundingOptions<Units = DateUnitOrTimeUnit>;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit(this: &ToStringRoundingOptions) -> Option<PluralizeUnit>;
+        pub fn smallest_unit<Units: RoundingOptionsUnits>(
+            this: &ToStringRoundingOptions<Units>,
+        ) -> Option<Units::PluralizeUnit>
+        where
+            Option<Units::PluralizeUnit>: ::wasm_bindgen::convert::FromWasmAbi;
         #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit(this: &ToStringRoundingOptions, val: PluralizeUnit);
+        pub fn set_smallest_unit<Units: RoundingOptionsUnits>(
+            this: &ToStringRoundingOptions<Units>,
+            val: Units::PluralizeUnit,
+        ) where
+            Units::PluralizeUnit: ::wasm_bindgen::convert::IntoWasmAbi;
         #[wasm_bindgen(method, getter, js_name = "roundingMode")]
-        pub fn rounding_mode(this: &ToStringRoundingOptions) -> Option<RoundingModeKind>;
+        pub fn rounding_mode<Units: RoundingOptionsUnits>(
+            this: &ToStringRoundingOptions<Units>,
+        ) -> Option<RoundingModeKind>;
         #[wasm_bindgen(method, setter, js_name = "roundingMode")]
-        pub fn set_rounding_mode(this: &ToStringRoundingOptions, val: RoundingModeKind);
+        pub fn set_rounding_mode<Units: RoundingOptionsUnits>(
+            this: &ToStringRoundingOptions<Units>,
+            val: RoundingModeKind,
+        );
     }
-    impl ToStringRoundingOptions {
-        pub fn new() -> ToStringRoundingOptions {
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
+        ToStringRoundingOptions<Units>
+    {
+        pub fn new() -> ToStringRoundingOptions<Units> {
             Self::builder().build()
         }
-        pub fn builder() -> ToStringRoundingOptionsBuilder {
+        pub fn builder() -> ToStringRoundingOptionsBuilder<Units> {
             ToStringRoundingOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
-    impl Default for ToStringRoundingOptions {
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> Default
+        for ToStringRoundingOptions<Units>
+    {
         fn default() -> Self {
             Self::new()
         }
     }
-    pub struct ToStringRoundingOptionsBuilder {
-        inner: ToStringRoundingOptions,
+    pub struct ToStringRoundingOptionsBuilder<Units> {
+        inner: ToStringRoundingOptions<Units>,
     }
-    impl ToStringRoundingOptionsBuilder {
-        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
+        ToStringRoundingOptionsBuilder<Units>
+    {
+        pub fn smallest_unit(self, val: Units::PluralizeUnit) -> Self {
             self.inner.set_smallest_unit(val);
             self
         }
@@ -1622,50 +1746,62 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn build(self) -> ToStringRoundingOptions {
+        pub fn build(self) -> ToStringRoundingOptions<Units> {
             self.inner
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = ToStringRoundingOptions , extends = Object , is_type_of = JsValue :: is_object)]
+        # [wasm_bindgen (extends = Object , extends = ToStringRoundingOptions :: < Units > , no_deref , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type ToStringRoundingOptionsWithFractionalSeconds;
+        pub type ToStringRoundingOptionsWithFractionalSeconds<Units = DateUnitOrTimeUnit>;
         #[wasm_bindgen(method, getter, js_name = "fractionalSecondDigits")]
-        pub fn fractional_second_digits(
-            this: &ToStringRoundingOptionsWithFractionalSeconds,
+        pub fn fractional_second_digits<Units: RoundingOptionsUnits>(
+            this: &ToStringRoundingOptionsWithFractionalSeconds<Units>,
         ) -> Option<FractionalSecondDigitsKind>;
         #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
-        pub fn set_fractional_second_digits(
-            this: &ToStringRoundingOptionsWithFractionalSeconds,
+        pub fn set_fractional_second_digits<Units: RoundingOptionsUnits>(
+            this: &ToStringRoundingOptionsWithFractionalSeconds<Units>,
             val: FractionalSecondDigitsKind,
         );
         #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
-        pub fn set_fractional_second_digits_with_f64(
-            this: &ToStringRoundingOptionsWithFractionalSeconds,
+        pub fn set_fractional_second_digits_with_f64<Units: RoundingOptionsUnits>(
+            this: &ToStringRoundingOptionsWithFractionalSeconds<Units>,
             val: f64,
         );
     }
-    impl ToStringRoundingOptionsWithFractionalSeconds {
-        pub fn new() -> ToStringRoundingOptionsWithFractionalSeconds {
+    impl<Units> ::core::ops::Deref for ToStringRoundingOptionsWithFractionalSeconds<Units> {
+        type Target = ToStringRoundingOptions<Units>;
+        fn deref(&self) -> &ToStringRoundingOptions<Units> {
+            JsCast::unchecked_ref(self)
+        }
+    }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
+        ToStringRoundingOptionsWithFractionalSeconds<Units>
+    {
+        pub fn new() -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
             Self::builder().build()
         }
-        pub fn builder() -> ToStringRoundingOptionsWithFractionalSecondsBuilder {
+        pub fn builder() -> ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
             ToStringRoundingOptionsWithFractionalSecondsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
-    impl Default for ToStringRoundingOptionsWithFractionalSeconds {
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> Default
+        for ToStringRoundingOptionsWithFractionalSeconds<Units>
+    {
         fn default() -> Self {
             Self::new()
         }
     }
-    pub struct ToStringRoundingOptionsWithFractionalSecondsBuilder {
-        inner: ToStringRoundingOptionsWithFractionalSeconds,
+    pub struct ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
+        inner: ToStringRoundingOptionsWithFractionalSeconds<Units>,
     }
-    impl ToStringRoundingOptionsWithFractionalSecondsBuilder {
-        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
+        ToStringRoundingOptionsWithFractionalSecondsBuilder<Units>
+    {
+        pub fn smallest_unit(self, val: Units::PluralizeUnit) -> Self {
             self.inner.set_smallest_unit(val);
             self
         }
@@ -1681,7 +1817,7 @@ pub mod temporal {
             self.inner.set_fractional_second_digits_with_f64(val);
             self
         }
-        pub fn build(self) -> ToStringRoundingOptionsWithFractionalSeconds {
+        pub fn build(self) -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
             self.inner
         }
     }
@@ -1962,7 +2098,7 @@ pub mod temporal {
         pub fn until_with_options(
             this: &PlainDate,
             other: impl PlainDateLike,
-            options: &RoundingOptionsWithLargestUnitDateUnit,
+            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -1978,7 +2114,7 @@ pub mod temporal {
         pub fn since_with_options(
             this: &PlainDate,
             other: impl PlainDateLike,
-            options: &RoundingOptionsWithLargestUnitDateUnit,
+            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch)]
         pub fn equals(this: &PlainDate, other: impl PlainDateLike) -> Result<bool, JsValue>;
@@ -2115,18 +2251,15 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds , extends = Object , is_type_of = JsValue :: is_object)]
+        # [wasm_bindgen (extends = Object , extends = ToStringRoundingOptionsWithFractionalSeconds :: < ExcludeTimeUnitHour > , no_deref , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainTimeToStringOptions;
-        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit(
-            this: &PlainTimeToStringOptions,
-        ) -> Option<PluralizeExcludeTimeUnitHour>;
-        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit(
-            this: &PlainTimeToStringOptions,
-            val: PluralizeExcludeTimeUnitHour,
-        );
+    }
+    impl ::core::ops::Deref for PlainTimeToStringOptions {
+        type Target = ToStringRoundingOptionsWithFractionalSeconds<ExcludeTimeUnitHour>;
+        fn deref(&self) -> &ToStringRoundingOptionsWithFractionalSeconds<ExcludeTimeUnitHour> {
+            JsCast::unchecked_ref(self)
+        }
     }
     impl PlainTimeToStringOptions {
         pub fn new() -> PlainTimeToStringOptions {
@@ -2147,6 +2280,10 @@ pub mod temporal {
         inner: PlainTimeToStringOptions,
     }
     impl PlainTimeToStringOptionsBuilder {
+        pub fn smallest_unit(self, val: PluralizeExcludeTimeUnitHour) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
         pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
             self.inner.set_rounding_mode(val);
             self
@@ -2157,10 +2294,6 @@ pub mod temporal {
         }
         pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
             self.inner.set_fractional_second_digits_with_f64(val);
-            self
-        }
-        pub fn smallest_unit(self, val: PluralizeExcludeTimeUnitHour) -> Self {
-            self.inner.set_smallest_unit(val);
             self
         }
         pub fn build(self) -> PlainTimeToStringOptions {
@@ -2295,7 +2428,7 @@ pub mod temporal {
         pub fn until_with_options(
             this: &PlainTime,
             other: impl PlainTimeLike,
-            options: &RoundingOptionsWithLargestUnitTimeUnit,
+            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -2311,7 +2444,7 @@ pub mod temporal {
         pub fn since_with_options(
             this: &PlainTime,
             other: impl PlainTimeLike,
-            options: &RoundingOptionsWithLargestUnitTimeUnit,
+            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch)]
         pub fn equals(this: &PlainTime, other: impl PlainTimeLike) -> Result<bool, JsValue>;
@@ -2329,7 +2462,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "round")]
         pub fn round_with_rounding_options(
             this: &PlainTime,
-            round_to: &RoundingOptionsTimeUnit,
+            round_to: &RoundingOptions<TimeUnit>,
         ) -> Result<PlainTime, RangeError>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn try_to_string(this: &PlainTime) -> Result<String, JsValue>;
@@ -2450,6 +2583,15 @@ pub mod temporal {
         # [wasm_bindgen (extends = PlainDateToStringOptions , extends = PlainTimeToStringOptions , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainDateTimeToStringOptions;
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(
+            this: &PlainDateTimeToStringOptions,
+        ) -> Option<PluralizeExcludeTimeUnitHour>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(
+            this: &PlainDateTimeToStringOptions,
+            val: PluralizeExcludeTimeUnitHour,
+        );
         #[wasm_bindgen(method, getter, js_name = "roundingMode")]
         pub fn rounding_mode(this: &PlainDateTimeToStringOptions) -> Option<RoundingModeKind>;
         #[wasm_bindgen(method, setter, js_name = "roundingMode")]
@@ -2465,15 +2607,6 @@ pub mod temporal {
         );
         #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
         pub fn set_fractional_second_digits_with_f64(this: &PlainDateTimeToStringOptions, val: f64);
-        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit(
-            this: &PlainDateTimeToStringOptions,
-        ) -> Option<PluralizeExcludeTimeUnitHour>;
-        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit(
-            this: &PlainDateTimeToStringOptions,
-            val: PluralizeExcludeTimeUnitHour,
-        );
     }
     impl PlainDateTimeToStringOptions {
         pub fn new() -> PlainDateTimeToStringOptions {
@@ -2498,6 +2631,10 @@ pub mod temporal {
             self.inner.set_calendar_name(val);
             self
         }
+        pub fn smallest_unit(self, val: PluralizeExcludeTimeUnitHour) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
         pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
             self.inner.set_rounding_mode(val);
             self
@@ -2508,10 +2645,6 @@ pub mod temporal {
         }
         pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
             self.inner.set_fractional_second_digits_with_f64(val);
-            self
-        }
-        pub fn smallest_unit(self, val: PluralizeExcludeTimeUnitHour) -> Self {
-            self.inner.set_smallest_unit(val);
             self
         }
         pub fn build(self) -> PlainDateTimeToStringOptions {
@@ -2798,7 +2931,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "round")]
         pub fn round_with_rounding_options(
             this: &PlainDateTime,
-            round_to: &RoundingOptionsDayOrTimeUnit,
+            round_to: &RoundingOptions<DayOrTimeUnit>,
         ) -> Result<PlainDateTime, RangeError>;
         #[wasm_bindgen(method, catch)]
         pub fn equals(this: &PlainDateTime, other: impl PlainDateTimeLike)
@@ -2969,6 +3102,10 @@ pub mod temporal {
             self.inner.set_calendar_name(val);
             self
         }
+        pub fn smallest_unit(self, val: PluralizeExcludeTimeUnitHour) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
         pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
             self.inner.set_rounding_mode(val);
             self
@@ -2979,10 +3116,6 @@ pub mod temporal {
         }
         pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
             self.inner.set_fractional_second_digits_with_f64(val);
-            self
-        }
-        pub fn smallest_unit(self, val: PluralizeExcludeTimeUnitHour) -> Self {
-            self.inner.set_smallest_unit(val);
             self
         }
         pub fn offset(self, val: OffsetKind) -> Self {
@@ -3269,7 +3402,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "round")]
         pub fn round_with_rounding_options(
             this: &ZonedDateTime,
-            round_to: &RoundingOptionsDayOrTimeUnit,
+            round_to: &RoundingOptions<DayOrTimeUnit>,
         ) -> Result<ZonedDateTime, RangeError>;
         #[wasm_bindgen(method, catch)]
         pub fn equals(this: &ZonedDateTime, other: impl ZonedDateTimeLike)
@@ -3535,18 +3668,17 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds , extends = Object , is_type_of = JsValue :: is_object)]
+        # [wasm_bindgen (extends = Object , extends = ToStringRoundingOptionsWithFractionalSeconds :: < ExcludeTimeUnitHourOrMinute > , no_deref , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurationToStringOptions;
-        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit(
-            this: &DurationToStringOptions,
-        ) -> Option<PluralizeExcludeTimeUnitHourOrMinute>;
-        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit(
-            this: &DurationToStringOptions,
-            val: PluralizeExcludeTimeUnitHourOrMinute,
-        );
+    }
+    impl ::core::ops::Deref for DurationToStringOptions {
+        type Target = ToStringRoundingOptionsWithFractionalSeconds<ExcludeTimeUnitHourOrMinute>;
+        fn deref(
+            &self,
+        ) -> &ToStringRoundingOptionsWithFractionalSeconds<ExcludeTimeUnitHourOrMinute> {
+            JsCast::unchecked_ref(self)
+        }
     }
     impl DurationToStringOptions {
         pub fn new() -> DurationToStringOptions {
@@ -3567,6 +3699,10 @@ pub mod temporal {
         inner: DurationToStringOptions,
     }
     impl DurationToStringOptionsBuilder {
+        pub fn smallest_unit(self, val: PluralizeExcludeTimeUnitHourOrMinute) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
         pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
             self.inner.set_rounding_mode(val);
             self
@@ -3577,10 +3713,6 @@ pub mod temporal {
         }
         pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
             self.inner.set_fractional_second_digits_with_f64(val);
-            self
-        }
-        pub fn smallest_unit(self, val: PluralizeExcludeTimeUnitHourOrMinute) -> Self {
-            self.inner.set_smallest_unit(val);
             self
         }
         pub fn build(self) -> DurationToStringOptions {
@@ -3976,6 +4108,10 @@ pub mod temporal {
         inner: InstantToStringOptions,
     }
     impl InstantToStringOptionsBuilder {
+        pub fn smallest_unit(self, val: PluralizeExcludeTimeUnitHour) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
         pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
             self.inner.set_rounding_mode(val);
             self
@@ -3986,10 +4122,6 @@ pub mod temporal {
         }
         pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
             self.inner.set_fractional_second_digits_with_f64(val);
-            self
-        }
-        pub fn smallest_unit(self, val: PluralizeExcludeTimeUnitHour) -> Self {
-            self.inner.set_smallest_unit(val);
             self
         }
         pub fn time_zone(self, val: impl TimeZoneLike) -> Self {
@@ -4055,7 +4187,7 @@ pub mod temporal {
         pub fn until_with_options(
             this: &Instant,
             other: impl InstantLike,
-            options: &RoundingOptionsWithLargestUnitTimeUnit,
+            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -4069,7 +4201,7 @@ pub mod temporal {
         pub fn since_with_options(
             this: &Instant,
             other: impl InstantLike,
-            options: &RoundingOptionsWithLargestUnitTimeUnit,
+            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -4082,7 +4214,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "round")]
         pub fn round_with_rounding_options(
             this: &Instant,
-            round_to: &RoundingOptionsTimeUnit,
+            round_to: &RoundingOptions<TimeUnit>,
         ) -> Result<Instant, RangeError>;
         #[wasm_bindgen(method, catch)]
         pub fn equals(this: &Instant, other: impl InstantLike) -> Result<bool, JsValue>;
@@ -4356,7 +4488,7 @@ pub mod temporal {
         pub fn until_with_options(
             this: &PlainYearMonth,
             other: impl PlainYearMonthLike,
-            options: &RoundingOptionsWithLargestUnitYearOrMonth,
+            options: &RoundingOptionsWithLargestUnit<YearOrMonth>,
         ) -> Result<Duration, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -4375,7 +4507,7 @@ pub mod temporal {
         pub fn since_with_options(
             this: &PlainYearMonth,
             other: impl PlainYearMonthLike,
-            options: &RoundingOptionsWithLargestUnitYearOrMonth,
+            options: &RoundingOptionsWithLargestUnit<YearOrMonth>,
         ) -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch)]
         pub fn equals(
@@ -4754,6 +4886,20 @@ pub mod temporal {
             f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
         }
     }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum DateUnitOrTimeUnit {
+        Year = "year",
+        Month = "month",
+        Week = "week",
+        Day = "day",
+        Hour = "hour",
+        Minute = "minute",
+        Second = "second",
+        Millisecond = "millisecond",
+        Microsecond = "microsecond",
+        Nanosecond = "nanosecond",
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -4837,95 +4983,12 @@ pub mod temporal {
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum PluralizeDateUnit {
-        Year = "year",
-        Month = "month",
-        Week = "week",
-        Day = "day",
-        Years = "years",
-        Months = "months",
-        Weeks = "weeks",
-        Days = "days",
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        # [wasm_bindgen (extends = RoundingOptionsWithLargestUnit , extends = Object , is_type_of = JsValue :: is_object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptionsWithLargestUnitDateUnit;
-        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(
-            this: &RoundingOptionsWithLargestUnitDateUnit,
-        ) -> Option<RoundingOptionsWithLargestUnitDateUnitLargestUnitKind>;
-        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(
-            this: &RoundingOptionsWithLargestUnitDateUnit,
-            val: RoundingOptionsWithLargestUnitDateUnitLargestUnitKind,
-        );
-        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit(
-            this: &RoundingOptionsWithLargestUnitDateUnit,
-        ) -> Option<PluralizeDateUnit>;
-        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit(
-            this: &RoundingOptionsWithLargestUnitDateUnit,
-            val: PluralizeDateUnit,
-        );
-    }
-    impl RoundingOptionsWithLargestUnitDateUnit {
-        pub fn new() -> RoundingOptionsWithLargestUnitDateUnit {
-            Self::builder().build()
-        }
-        pub fn builder() -> RoundingOptionsWithLargestUnitDateUnitBuilder {
-            RoundingOptionsWithLargestUnitDateUnitBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
-            }
-        }
-    }
-    impl Default for RoundingOptionsWithLargestUnitDateUnit {
-        fn default() -> Self {
-            Self::new()
-        }
-    }
-    pub struct RoundingOptionsWithLargestUnitDateUnitBuilder {
-        inner: RoundingOptionsWithLargestUnitDateUnit,
-    }
-    impl RoundingOptionsWithLargestUnitDateUnitBuilder {
-        pub fn rounding_increment(self, val: f64) -> Self {
-            self.inner.set_rounding_increment(val);
-            self
-        }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
-            self.inner.set_rounding_mode(val);
-            self
-        }
-        pub fn largest_unit(
-            self,
-            val: RoundingOptionsWithLargestUnitDateUnitLargestUnitKind,
-        ) -> Self {
-            self.inner.set_largest_unit(val);
-            self
-        }
-        pub fn smallest_unit(self, val: PluralizeDateUnit) -> Self {
-            self.inner.set_smallest_unit(val);
-            self
-        }
-        pub fn build(self) -> RoundingOptionsWithLargestUnitDateUnit {
-            self.inner
-        }
-    }
-    #[wasm_bindgen(private)]
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum PluralizeExcludeTimeUnitHour {
+    pub enum ExcludeTimeUnitHour {
         Minute = "minute",
         Second = "second",
         Millisecond = "millisecond",
         Microsecond = "microsecond",
         Nanosecond = "nanosecond",
-        Minutes = "minutes",
-        Seconds = "seconds",
-        Milliseconds = "milliseconds",
-        Microseconds = "microseconds",
-        Nanoseconds = "nanoseconds",
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -4942,117 +5005,6 @@ pub mod temporal {
         Milliseconds = "milliseconds",
         Microseconds = "microseconds",
         Nanoseconds = "nanoseconds",
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        # [wasm_bindgen (extends = RoundingOptionsWithLargestUnit , extends = Object , is_type_of = JsValue :: is_object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptionsWithLargestUnitTimeUnit;
-        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(
-            this: &RoundingOptionsWithLargestUnitTimeUnit,
-        ) -> Option<RoundingOptionsWithLargestUnitTimeUnitLargestUnitKind>;
-        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(
-            this: &RoundingOptionsWithLargestUnitTimeUnit,
-            val: RoundingOptionsWithLargestUnitTimeUnitLargestUnitKind,
-        );
-        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit(
-            this: &RoundingOptionsWithLargestUnitTimeUnit,
-        ) -> Option<PluralizeTimeUnit>;
-        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit(
-            this: &RoundingOptionsWithLargestUnitTimeUnit,
-            val: PluralizeTimeUnit,
-        );
-    }
-    impl RoundingOptionsWithLargestUnitTimeUnit {
-        pub fn new() -> RoundingOptionsWithLargestUnitTimeUnit {
-            Self::builder().build()
-        }
-        pub fn builder() -> RoundingOptionsWithLargestUnitTimeUnitBuilder {
-            RoundingOptionsWithLargestUnitTimeUnitBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
-            }
-        }
-    }
-    impl Default for RoundingOptionsWithLargestUnitTimeUnit {
-        fn default() -> Self {
-            Self::new()
-        }
-    }
-    pub struct RoundingOptionsWithLargestUnitTimeUnitBuilder {
-        inner: RoundingOptionsWithLargestUnitTimeUnit,
-    }
-    impl RoundingOptionsWithLargestUnitTimeUnitBuilder {
-        pub fn rounding_increment(self, val: f64) -> Self {
-            self.inner.set_rounding_increment(val);
-            self
-        }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
-            self.inner.set_rounding_mode(val);
-            self
-        }
-        pub fn largest_unit(
-            self,
-            val: RoundingOptionsWithLargestUnitTimeUnitLargestUnitKind,
-        ) -> Self {
-            self.inner.set_largest_unit(val);
-            self
-        }
-        pub fn smallest_unit(self, val: PluralizeTimeUnit) -> Self {
-            self.inner.set_smallest_unit(val);
-            self
-        }
-        pub fn build(self) -> RoundingOptionsWithLargestUnitTimeUnit {
-            self.inner
-        }
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        # [wasm_bindgen (extends = RoundingOptions , extends = Object , is_type_of = JsValue :: is_object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptionsTimeUnit;
-        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit(this: &RoundingOptionsTimeUnit) -> Option<PluralizeTimeUnit>;
-        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit(this: &RoundingOptionsTimeUnit, val: PluralizeTimeUnit);
-    }
-    impl RoundingOptionsTimeUnit {
-        pub fn new() -> RoundingOptionsTimeUnit {
-            Self::builder().build()
-        }
-        pub fn builder() -> RoundingOptionsTimeUnitBuilder {
-            RoundingOptionsTimeUnitBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
-            }
-        }
-    }
-    impl Default for RoundingOptionsTimeUnit {
-        fn default() -> Self {
-            Self::new()
-        }
-    }
-    pub struct RoundingOptionsTimeUnitBuilder {
-        inner: RoundingOptionsTimeUnit,
-    }
-    impl RoundingOptionsTimeUnitBuilder {
-        pub fn rounding_increment(self, val: f64) -> Self {
-            self.inner.set_rounding_increment(val);
-            self
-        }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
-            self.inner.set_rounding_mode(val);
-            self
-        }
-        pub fn smallest_unit(self, val: PluralizeTimeUnit) -> Self {
-            self.inner.set_smallest_unit(val);
-            self
-        }
-        pub fn build(self) -> RoundingOptionsTimeUnit {
-            self.inner
-        }
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -5204,51 +5156,16 @@ pub mod temporal {
         Microseconds = "microseconds",
         Nanoseconds = "nanoseconds",
     }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        # [wasm_bindgen (extends = RoundingOptions , extends = Object , is_type_of = JsValue :: is_object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptionsDayOrTimeUnit;
-        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit(this: &RoundingOptionsDayOrTimeUnit)
-            -> Option<PluralizeDayOrTimeUnit>;
-        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit(this: &RoundingOptionsDayOrTimeUnit, val: PluralizeDayOrTimeUnit);
-    }
-    impl RoundingOptionsDayOrTimeUnit {
-        pub fn new() -> RoundingOptionsDayOrTimeUnit {
-            Self::builder().build()
-        }
-        pub fn builder() -> RoundingOptionsDayOrTimeUnitBuilder {
-            RoundingOptionsDayOrTimeUnitBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
-            }
-        }
-    }
-    impl Default for RoundingOptionsDayOrTimeUnit {
-        fn default() -> Self {
-            Self::new()
-        }
-    }
-    pub struct RoundingOptionsDayOrTimeUnitBuilder {
-        inner: RoundingOptionsDayOrTimeUnit,
-    }
-    impl RoundingOptionsDayOrTimeUnitBuilder {
-        pub fn rounding_increment(self, val: f64) -> Self {
-            self.inner.set_rounding_increment(val);
-            self
-        }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
-            self.inner.set_rounding_mode(val);
-            self
-        }
-        pub fn smallest_unit(self, val: PluralizeDayOrTimeUnit) -> Self {
-            self.inner.set_smallest_unit(val);
-            self
-        }
-        pub fn build(self) -> RoundingOptionsDayOrTimeUnit {
-            self.inner
-        }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum DayOrTimeUnit {
+        Day = "day",
+        Hour = "hour",
+        Minute = "minute",
+        Second = "second",
+        Millisecond = "millisecond",
+        Microsecond = "microsecond",
+        Nanosecond = "nanosecond",
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -5400,15 +5317,11 @@ pub mod temporal {
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum PluralizeExcludeTimeUnitHourOrMinute {
+    pub enum ExcludeTimeUnitHourOrMinute {
         Second = "second",
         Millisecond = "millisecond",
         Microsecond = "microsecond",
         Nanosecond = "nanosecond",
-        Seconds = "seconds",
-        Milliseconds = "milliseconds",
-        Microseconds = "microseconds",
-        Nanoseconds = "nanoseconds",
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -5488,76 +5401,639 @@ pub mod temporal {
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum YearOrMonth {
+        Year = "year",
+        Month = "month",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum PluralizeDateUnit {
+        Year = "year",
+        Month = "month",
+        Week = "week",
+        Day = "day",
+        Years = "years",
+        Months = "months",
+        Weeks = "weeks",
+        Days = "days",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PluralizeUnitYearOrMonth {
         Year = "year",
         Month = "month",
         Years = "years",
         Months = "months",
     }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        # [wasm_bindgen (extends = RoundingOptionsWithLargestUnit , extends = Object , is_type_of = JsValue :: is_object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptionsWithLargestUnitYearOrMonth;
-        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(
-            this: &RoundingOptionsWithLargestUnitYearOrMonth,
-        ) -> Option<RoundingOptionsWithLargestUnitYearOrMonthLargestUnitKind>;
-        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(
-            this: &RoundingOptionsWithLargestUnitYearOrMonth,
-            val: RoundingOptionsWithLargestUnitYearOrMonthLargestUnitKind,
-        );
-        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-        pub fn smallest_unit(
-            this: &RoundingOptionsWithLargestUnitYearOrMonth,
-        ) -> Option<PluralizeUnitYearOrMonth>;
-        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-        pub fn set_smallest_unit(
-            this: &RoundingOptionsWithLargestUnitYearOrMonth,
-            val: PluralizeUnitYearOrMonth,
-        );
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum PluralizeExcludeTimeUnitHour {
+        Minute = "minute",
+        Second = "second",
+        Millisecond = "millisecond",
+        Microsecond = "microsecond",
+        Nanosecond = "nanosecond",
+        Minutes = "minutes",
+        Seconds = "seconds",
+        Milliseconds = "milliseconds",
+        Microseconds = "microseconds",
+        Nanoseconds = "nanoseconds",
     }
-    impl RoundingOptionsWithLargestUnitYearOrMonth {
-        pub fn new() -> RoundingOptionsWithLargestUnitYearOrMonth {
-            Self::builder().build()
-        }
-        pub fn builder() -> RoundingOptionsWithLargestUnitYearOrMonthBuilder {
-            RoundingOptionsWithLargestUnitYearOrMonthBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum PluralizeExcludeTimeUnitHourOrMinute {
+        Second = "second",
+        Millisecond = "millisecond",
+        Microsecond = "microsecond",
+        Nanosecond = "nanosecond",
+        Seconds = "seconds",
+        Milliseconds = "milliseconds",
+        Microseconds = "microseconds",
+        Nanoseconds = "nanoseconds",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum DateUnitLargestUnitKind {
+        Auto = "auto",
+        Year = "year",
+        Month = "month",
+        Week = "week",
+        Day = "day",
+        Years = "years",
+        Months = "months",
+        Weeks = "weeks",
+        Days = "days",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum TimeUnitLargestUnitKind {
+        Auto = "auto",
+        Hour = "hour",
+        Minute = "minute",
+        Second = "second",
+        Millisecond = "millisecond",
+        Microsecond = "microsecond",
+        Nanosecond = "nanosecond",
+        Hours = "hours",
+        Minutes = "minutes",
+        Seconds = "seconds",
+        Milliseconds = "milliseconds",
+        Microseconds = "microseconds",
+        Nanoseconds = "nanoseconds",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum LargestUnitKind {
+        Auto = "auto",
+        Year = "year",
+        Month = "month",
+        Week = "week",
+        Day = "day",
+        Hour = "hour",
+        Minute = "minute",
+        Second = "second",
+        Millisecond = "millisecond",
+        Microsecond = "microsecond",
+        Nanosecond = "nanosecond",
+        Years = "years",
+        Months = "months",
+        Weeks = "weeks",
+        Days = "days",
+        Hours = "hours",
+        Minutes = "minutes",
+        Seconds = "seconds",
+        Milliseconds = "milliseconds",
+        Microseconds = "microseconds",
+        Nanoseconds = "nanoseconds",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum YearOrMonthLargestUnitKind {
+        Auto = "auto",
+        Year = "year",
+        Month = "month",
+        Years = "years",
+        Months = "months",
+    }
+    impl From<DateUnitOrTimeUnit> for PluralizeUnit {
+        fn from(value: DateUnitOrTimeUnit) -> PluralizeUnit {
+            match value {
+                DateUnitOrTimeUnit::Year => PluralizeUnit::Year,
+                DateUnitOrTimeUnit::Month => PluralizeUnit::Month,
+                DateUnitOrTimeUnit::Week => PluralizeUnit::Week,
+                DateUnitOrTimeUnit::Day => PluralizeUnit::Day,
+                DateUnitOrTimeUnit::Hour => PluralizeUnit::Hour,
+                DateUnitOrTimeUnit::Minute => PluralizeUnit::Minute,
+                DateUnitOrTimeUnit::Second => PluralizeUnit::Second,
+                DateUnitOrTimeUnit::Millisecond => PluralizeUnit::Millisecond,
+                DateUnitOrTimeUnit::Microsecond => PluralizeUnit::Microsecond,
+                DateUnitOrTimeUnit::Nanosecond => PluralizeUnit::Nanosecond,
+                DateUnitOrTimeUnit::__Invalid => PluralizeUnit::__Invalid,
             }
         }
     }
-    impl Default for RoundingOptionsWithLargestUnitYearOrMonth {
-        fn default() -> Self {
-            Self::new()
+    impl From<DateUnitOrTimeUnit> for LargestUnitKind {
+        fn from(value: DateUnitOrTimeUnit) -> LargestUnitKind {
+            match value {
+                DateUnitOrTimeUnit::Year => LargestUnitKind::Year,
+                DateUnitOrTimeUnit::Month => LargestUnitKind::Month,
+                DateUnitOrTimeUnit::Week => LargestUnitKind::Week,
+                DateUnitOrTimeUnit::Day => LargestUnitKind::Day,
+                DateUnitOrTimeUnit::Hour => LargestUnitKind::Hour,
+                DateUnitOrTimeUnit::Minute => LargestUnitKind::Minute,
+                DateUnitOrTimeUnit::Second => LargestUnitKind::Second,
+                DateUnitOrTimeUnit::Millisecond => LargestUnitKind::Millisecond,
+                DateUnitOrTimeUnit::Microsecond => LargestUnitKind::Microsecond,
+                DateUnitOrTimeUnit::Nanosecond => LargestUnitKind::Nanosecond,
+                DateUnitOrTimeUnit::__Invalid => LargestUnitKind::__Invalid,
+            }
         }
     }
-    pub struct RoundingOptionsWithLargestUnitYearOrMonthBuilder {
-        inner: RoundingOptionsWithLargestUnitYearOrMonth,
+    impl From<ExcludeTimeUnitHour> for TimeUnit {
+        fn from(value: ExcludeTimeUnitHour) -> TimeUnit {
+            match value {
+                ExcludeTimeUnitHour::Minute => TimeUnit::Minute,
+                ExcludeTimeUnitHour::Second => TimeUnit::Second,
+                ExcludeTimeUnitHour::Millisecond => TimeUnit::Millisecond,
+                ExcludeTimeUnitHour::Microsecond => TimeUnit::Microsecond,
+                ExcludeTimeUnitHour::Nanosecond => TimeUnit::Nanosecond,
+                ExcludeTimeUnitHour::__Invalid => TimeUnit::__Invalid,
+            }
+        }
     }
-    impl RoundingOptionsWithLargestUnitYearOrMonthBuilder {
-        pub fn rounding_increment(self, val: f64) -> Self {
-            self.inner.set_rounding_increment(val);
-            self
+    impl From<ExcludeTimeUnitHour> for PluralizeUnit {
+        fn from(value: ExcludeTimeUnitHour) -> PluralizeUnit {
+            match value {
+                ExcludeTimeUnitHour::Minute => PluralizeUnit::Minute,
+                ExcludeTimeUnitHour::Second => PluralizeUnit::Second,
+                ExcludeTimeUnitHour::Millisecond => PluralizeUnit::Millisecond,
+                ExcludeTimeUnitHour::Microsecond => PluralizeUnit::Microsecond,
+                ExcludeTimeUnitHour::Nanosecond => PluralizeUnit::Nanosecond,
+                ExcludeTimeUnitHour::__Invalid => PluralizeUnit::__Invalid,
+            }
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
-            self.inner.set_rounding_mode(val);
-            self
+    }
+    impl From<ExcludeTimeUnitHour> for DateUnitOrTimeUnit {
+        fn from(value: ExcludeTimeUnitHour) -> DateUnitOrTimeUnit {
+            match value {
+                ExcludeTimeUnitHour::Minute => DateUnitOrTimeUnit::Minute,
+                ExcludeTimeUnitHour::Second => DateUnitOrTimeUnit::Second,
+                ExcludeTimeUnitHour::Millisecond => DateUnitOrTimeUnit::Millisecond,
+                ExcludeTimeUnitHour::Microsecond => DateUnitOrTimeUnit::Microsecond,
+                ExcludeTimeUnitHour::Nanosecond => DateUnitOrTimeUnit::Nanosecond,
+                ExcludeTimeUnitHour::__Invalid => DateUnitOrTimeUnit::__Invalid,
+            }
         }
-        pub fn largest_unit(
-            self,
-            val: RoundingOptionsWithLargestUnitYearOrMonthLargestUnitKind,
-        ) -> Self {
-            self.inner.set_largest_unit(val);
-            self
+    }
+    impl From<ExcludeTimeUnitHour> for PluralizeTimeUnit {
+        fn from(value: ExcludeTimeUnitHour) -> PluralizeTimeUnit {
+            match value {
+                ExcludeTimeUnitHour::Minute => PluralizeTimeUnit::Minute,
+                ExcludeTimeUnitHour::Second => PluralizeTimeUnit::Second,
+                ExcludeTimeUnitHour::Millisecond => PluralizeTimeUnit::Millisecond,
+                ExcludeTimeUnitHour::Microsecond => PluralizeTimeUnit::Microsecond,
+                ExcludeTimeUnitHour::Nanosecond => PluralizeTimeUnit::Nanosecond,
+                ExcludeTimeUnitHour::__Invalid => PluralizeTimeUnit::__Invalid,
+            }
         }
-        pub fn smallest_unit(self, val: PluralizeUnitYearOrMonth) -> Self {
-            self.inner.set_smallest_unit(val);
-            self
+    }
+    impl From<ExcludeTimeUnitHour> for PluralizeDayOrTimeUnit {
+        fn from(value: ExcludeTimeUnitHour) -> PluralizeDayOrTimeUnit {
+            match value {
+                ExcludeTimeUnitHour::Minute => PluralizeDayOrTimeUnit::Minute,
+                ExcludeTimeUnitHour::Second => PluralizeDayOrTimeUnit::Second,
+                ExcludeTimeUnitHour::Millisecond => PluralizeDayOrTimeUnit::Millisecond,
+                ExcludeTimeUnitHour::Microsecond => PluralizeDayOrTimeUnit::Microsecond,
+                ExcludeTimeUnitHour::Nanosecond => PluralizeDayOrTimeUnit::Nanosecond,
+                ExcludeTimeUnitHour::__Invalid => PluralizeDayOrTimeUnit::__Invalid,
+            }
         }
-        pub fn build(self) -> RoundingOptionsWithLargestUnitYearOrMonth {
-            self.inner
+    }
+    impl From<ExcludeTimeUnitHour> for DayOrTimeUnit {
+        fn from(value: ExcludeTimeUnitHour) -> DayOrTimeUnit {
+            match value {
+                ExcludeTimeUnitHour::Minute => DayOrTimeUnit::Minute,
+                ExcludeTimeUnitHour::Second => DayOrTimeUnit::Second,
+                ExcludeTimeUnitHour::Millisecond => DayOrTimeUnit::Millisecond,
+                ExcludeTimeUnitHour::Microsecond => DayOrTimeUnit::Microsecond,
+                ExcludeTimeUnitHour::Nanosecond => DayOrTimeUnit::Nanosecond,
+                ExcludeTimeUnitHour::__Invalid => DayOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHour> for PluralizeExcludeTimeUnitHour {
+        fn from(value: ExcludeTimeUnitHour) -> PluralizeExcludeTimeUnitHour {
+            match value {
+                ExcludeTimeUnitHour::Minute => PluralizeExcludeTimeUnitHour::Minute,
+                ExcludeTimeUnitHour::Second => PluralizeExcludeTimeUnitHour::Second,
+                ExcludeTimeUnitHour::Millisecond => PluralizeExcludeTimeUnitHour::Millisecond,
+                ExcludeTimeUnitHour::Microsecond => PluralizeExcludeTimeUnitHour::Microsecond,
+                ExcludeTimeUnitHour::Nanosecond => PluralizeExcludeTimeUnitHour::Nanosecond,
+                ExcludeTimeUnitHour::__Invalid => PluralizeExcludeTimeUnitHour::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHour> for TimeUnitLargestUnitKind {
+        fn from(value: ExcludeTimeUnitHour) -> TimeUnitLargestUnitKind {
+            match value {
+                ExcludeTimeUnitHour::Minute => TimeUnitLargestUnitKind::Minute,
+                ExcludeTimeUnitHour::Second => TimeUnitLargestUnitKind::Second,
+                ExcludeTimeUnitHour::Millisecond => TimeUnitLargestUnitKind::Millisecond,
+                ExcludeTimeUnitHour::Microsecond => TimeUnitLargestUnitKind::Microsecond,
+                ExcludeTimeUnitHour::Nanosecond => TimeUnitLargestUnitKind::Nanosecond,
+                ExcludeTimeUnitHour::__Invalid => TimeUnitLargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHour> for LargestUnitKind {
+        fn from(value: ExcludeTimeUnitHour) -> LargestUnitKind {
+            match value {
+                ExcludeTimeUnitHour::Minute => LargestUnitKind::Minute,
+                ExcludeTimeUnitHour::Second => LargestUnitKind::Second,
+                ExcludeTimeUnitHour::Millisecond => LargestUnitKind::Millisecond,
+                ExcludeTimeUnitHour::Microsecond => LargestUnitKind::Microsecond,
+                ExcludeTimeUnitHour::Nanosecond => LargestUnitKind::Nanosecond,
+                ExcludeTimeUnitHour::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeTimeUnit> for PluralizeUnit {
+        fn from(value: PluralizeTimeUnit) -> PluralizeUnit {
+            match value {
+                PluralizeTimeUnit::Hour => PluralizeUnit::Hour,
+                PluralizeTimeUnit::Minute => PluralizeUnit::Minute,
+                PluralizeTimeUnit::Second => PluralizeUnit::Second,
+                PluralizeTimeUnit::Millisecond => PluralizeUnit::Millisecond,
+                PluralizeTimeUnit::Microsecond => PluralizeUnit::Microsecond,
+                PluralizeTimeUnit::Nanosecond => PluralizeUnit::Nanosecond,
+                PluralizeTimeUnit::Hours => PluralizeUnit::Hours,
+                PluralizeTimeUnit::Minutes => PluralizeUnit::Minutes,
+                PluralizeTimeUnit::Seconds => PluralizeUnit::Seconds,
+                PluralizeTimeUnit::Milliseconds => PluralizeUnit::Milliseconds,
+                PluralizeTimeUnit::Microseconds => PluralizeUnit::Microseconds,
+                PluralizeTimeUnit::Nanoseconds => PluralizeUnit::Nanoseconds,
+                PluralizeTimeUnit::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeTimeUnit> for PluralizeDayOrTimeUnit {
+        fn from(value: PluralizeTimeUnit) -> PluralizeDayOrTimeUnit {
+            match value {
+                PluralizeTimeUnit::Hour => PluralizeDayOrTimeUnit::Hour,
+                PluralizeTimeUnit::Minute => PluralizeDayOrTimeUnit::Minute,
+                PluralizeTimeUnit::Second => PluralizeDayOrTimeUnit::Second,
+                PluralizeTimeUnit::Millisecond => PluralizeDayOrTimeUnit::Millisecond,
+                PluralizeTimeUnit::Microsecond => PluralizeDayOrTimeUnit::Microsecond,
+                PluralizeTimeUnit::Nanosecond => PluralizeDayOrTimeUnit::Nanosecond,
+                PluralizeTimeUnit::Hours => PluralizeDayOrTimeUnit::Hours,
+                PluralizeTimeUnit::Minutes => PluralizeDayOrTimeUnit::Minutes,
+                PluralizeTimeUnit::Seconds => PluralizeDayOrTimeUnit::Seconds,
+                PluralizeTimeUnit::Milliseconds => PluralizeDayOrTimeUnit::Milliseconds,
+                PluralizeTimeUnit::Microseconds => PluralizeDayOrTimeUnit::Microseconds,
+                PluralizeTimeUnit::Nanoseconds => PluralizeDayOrTimeUnit::Nanoseconds,
+                PluralizeTimeUnit::__Invalid => PluralizeDayOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeTimeUnit> for TimeUnitLargestUnitKind {
+        fn from(value: PluralizeTimeUnit) -> TimeUnitLargestUnitKind {
+            match value {
+                PluralizeTimeUnit::Hour => TimeUnitLargestUnitKind::Hour,
+                PluralizeTimeUnit::Minute => TimeUnitLargestUnitKind::Minute,
+                PluralizeTimeUnit::Second => TimeUnitLargestUnitKind::Second,
+                PluralizeTimeUnit::Millisecond => TimeUnitLargestUnitKind::Millisecond,
+                PluralizeTimeUnit::Microsecond => TimeUnitLargestUnitKind::Microsecond,
+                PluralizeTimeUnit::Nanosecond => TimeUnitLargestUnitKind::Nanosecond,
+                PluralizeTimeUnit::Hours => TimeUnitLargestUnitKind::Hours,
+                PluralizeTimeUnit::Minutes => TimeUnitLargestUnitKind::Minutes,
+                PluralizeTimeUnit::Seconds => TimeUnitLargestUnitKind::Seconds,
+                PluralizeTimeUnit::Milliseconds => TimeUnitLargestUnitKind::Milliseconds,
+                PluralizeTimeUnit::Microseconds => TimeUnitLargestUnitKind::Microseconds,
+                PluralizeTimeUnit::Nanoseconds => TimeUnitLargestUnitKind::Nanoseconds,
+                PluralizeTimeUnit::__Invalid => TimeUnitLargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeTimeUnit> for LargestUnitKind {
+        fn from(value: PluralizeTimeUnit) -> LargestUnitKind {
+            match value {
+                PluralizeTimeUnit::Hour => LargestUnitKind::Hour,
+                PluralizeTimeUnit::Minute => LargestUnitKind::Minute,
+                PluralizeTimeUnit::Second => LargestUnitKind::Second,
+                PluralizeTimeUnit::Millisecond => LargestUnitKind::Millisecond,
+                PluralizeTimeUnit::Microsecond => LargestUnitKind::Microsecond,
+                PluralizeTimeUnit::Nanosecond => LargestUnitKind::Nanosecond,
+                PluralizeTimeUnit::Hours => LargestUnitKind::Hours,
+                PluralizeTimeUnit::Minutes => LargestUnitKind::Minutes,
+                PluralizeTimeUnit::Seconds => LargestUnitKind::Seconds,
+                PluralizeTimeUnit::Milliseconds => LargestUnitKind::Milliseconds,
+                PluralizeTimeUnit::Microseconds => LargestUnitKind::Microseconds,
+                PluralizeTimeUnit::Nanoseconds => LargestUnitKind::Nanoseconds,
+                PluralizeTimeUnit::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeDayOrTimeUnit> for PluralizeUnit {
+        fn from(value: PluralizeDayOrTimeUnit) -> PluralizeUnit {
+            match value {
+                PluralizeDayOrTimeUnit::Day => PluralizeUnit::Day,
+                PluralizeDayOrTimeUnit::Hour => PluralizeUnit::Hour,
+                PluralizeDayOrTimeUnit::Minute => PluralizeUnit::Minute,
+                PluralizeDayOrTimeUnit::Second => PluralizeUnit::Second,
+                PluralizeDayOrTimeUnit::Millisecond => PluralizeUnit::Millisecond,
+                PluralizeDayOrTimeUnit::Microsecond => PluralizeUnit::Microsecond,
+                PluralizeDayOrTimeUnit::Nanosecond => PluralizeUnit::Nanosecond,
+                PluralizeDayOrTimeUnit::Days => PluralizeUnit::Days,
+                PluralizeDayOrTimeUnit::Hours => PluralizeUnit::Hours,
+                PluralizeDayOrTimeUnit::Minutes => PluralizeUnit::Minutes,
+                PluralizeDayOrTimeUnit::Seconds => PluralizeUnit::Seconds,
+                PluralizeDayOrTimeUnit::Milliseconds => PluralizeUnit::Milliseconds,
+                PluralizeDayOrTimeUnit::Microseconds => PluralizeUnit::Microseconds,
+                PluralizeDayOrTimeUnit::Nanoseconds => PluralizeUnit::Nanoseconds,
+                PluralizeDayOrTimeUnit::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeDayOrTimeUnit> for LargestUnitKind {
+        fn from(value: PluralizeDayOrTimeUnit) -> LargestUnitKind {
+            match value {
+                PluralizeDayOrTimeUnit::Day => LargestUnitKind::Day,
+                PluralizeDayOrTimeUnit::Hour => LargestUnitKind::Hour,
+                PluralizeDayOrTimeUnit::Minute => LargestUnitKind::Minute,
+                PluralizeDayOrTimeUnit::Second => LargestUnitKind::Second,
+                PluralizeDayOrTimeUnit::Millisecond => LargestUnitKind::Millisecond,
+                PluralizeDayOrTimeUnit::Microsecond => LargestUnitKind::Microsecond,
+                PluralizeDayOrTimeUnit::Nanosecond => LargestUnitKind::Nanosecond,
+                PluralizeDayOrTimeUnit::Days => LargestUnitKind::Days,
+                PluralizeDayOrTimeUnit::Hours => LargestUnitKind::Hours,
+                PluralizeDayOrTimeUnit::Minutes => LargestUnitKind::Minutes,
+                PluralizeDayOrTimeUnit::Seconds => LargestUnitKind::Seconds,
+                PluralizeDayOrTimeUnit::Milliseconds => LargestUnitKind::Milliseconds,
+                PluralizeDayOrTimeUnit::Microseconds => LargestUnitKind::Microseconds,
+                PluralizeDayOrTimeUnit::Nanoseconds => LargestUnitKind::Nanoseconds,
+                PluralizeDayOrTimeUnit::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<DayOrTimeUnit> for PluralizeUnit {
+        fn from(value: DayOrTimeUnit) -> PluralizeUnit {
+            match value {
+                DayOrTimeUnit::Day => PluralizeUnit::Day,
+                DayOrTimeUnit::Hour => PluralizeUnit::Hour,
+                DayOrTimeUnit::Minute => PluralizeUnit::Minute,
+                DayOrTimeUnit::Second => PluralizeUnit::Second,
+                DayOrTimeUnit::Millisecond => PluralizeUnit::Millisecond,
+                DayOrTimeUnit::Microsecond => PluralizeUnit::Microsecond,
+                DayOrTimeUnit::Nanosecond => PluralizeUnit::Nanosecond,
+                DayOrTimeUnit::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<DayOrTimeUnit> for DateUnitOrTimeUnit {
+        fn from(value: DayOrTimeUnit) -> DateUnitOrTimeUnit {
+            match value {
+                DayOrTimeUnit::Day => DateUnitOrTimeUnit::Day,
+                DayOrTimeUnit::Hour => DateUnitOrTimeUnit::Hour,
+                DayOrTimeUnit::Minute => DateUnitOrTimeUnit::Minute,
+                DayOrTimeUnit::Second => DateUnitOrTimeUnit::Second,
+                DayOrTimeUnit::Millisecond => DateUnitOrTimeUnit::Millisecond,
+                DayOrTimeUnit::Microsecond => DateUnitOrTimeUnit::Microsecond,
+                DayOrTimeUnit::Nanosecond => DateUnitOrTimeUnit::Nanosecond,
+                DayOrTimeUnit::__Invalid => DateUnitOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<DayOrTimeUnit> for PluralizeDayOrTimeUnit {
+        fn from(value: DayOrTimeUnit) -> PluralizeDayOrTimeUnit {
+            match value {
+                DayOrTimeUnit::Day => PluralizeDayOrTimeUnit::Day,
+                DayOrTimeUnit::Hour => PluralizeDayOrTimeUnit::Hour,
+                DayOrTimeUnit::Minute => PluralizeDayOrTimeUnit::Minute,
+                DayOrTimeUnit::Second => PluralizeDayOrTimeUnit::Second,
+                DayOrTimeUnit::Millisecond => PluralizeDayOrTimeUnit::Millisecond,
+                DayOrTimeUnit::Microsecond => PluralizeDayOrTimeUnit::Microsecond,
+                DayOrTimeUnit::Nanosecond => PluralizeDayOrTimeUnit::Nanosecond,
+                DayOrTimeUnit::__Invalid => PluralizeDayOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<DayOrTimeUnit> for LargestUnitKind {
+        fn from(value: DayOrTimeUnit) -> LargestUnitKind {
+            match value {
+                DayOrTimeUnit::Day => LargestUnitKind::Day,
+                DayOrTimeUnit::Hour => LargestUnitKind::Hour,
+                DayOrTimeUnit::Minute => LargestUnitKind::Minute,
+                DayOrTimeUnit::Second => LargestUnitKind::Second,
+                DayOrTimeUnit::Millisecond => LargestUnitKind::Millisecond,
+                DayOrTimeUnit::Microsecond => LargestUnitKind::Microsecond,
+                DayOrTimeUnit::Nanosecond => LargestUnitKind::Nanosecond,
+                DayOrTimeUnit::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for TimeUnit {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> TimeUnit {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => TimeUnit::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => TimeUnit::Millisecond,
+                ExcludeTimeUnitHourOrMinute::Microsecond => TimeUnit::Microsecond,
+                ExcludeTimeUnitHourOrMinute::Nanosecond => TimeUnit::Nanosecond,
+                ExcludeTimeUnitHourOrMinute::__Invalid => TimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for PluralizeUnit {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> PluralizeUnit {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => PluralizeUnit::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => PluralizeUnit::Millisecond,
+                ExcludeTimeUnitHourOrMinute::Microsecond => PluralizeUnit::Microsecond,
+                ExcludeTimeUnitHourOrMinute::Nanosecond => PluralizeUnit::Nanosecond,
+                ExcludeTimeUnitHourOrMinute::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for DateUnitOrTimeUnit {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> DateUnitOrTimeUnit {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => DateUnitOrTimeUnit::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => DateUnitOrTimeUnit::Millisecond,
+                ExcludeTimeUnitHourOrMinute::Microsecond => DateUnitOrTimeUnit::Microsecond,
+                ExcludeTimeUnitHourOrMinute::Nanosecond => DateUnitOrTimeUnit::Nanosecond,
+                ExcludeTimeUnitHourOrMinute::__Invalid => DateUnitOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for ExcludeTimeUnitHour {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> ExcludeTimeUnitHour {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => ExcludeTimeUnitHour::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => ExcludeTimeUnitHour::Millisecond,
+                ExcludeTimeUnitHourOrMinute::Microsecond => ExcludeTimeUnitHour::Microsecond,
+                ExcludeTimeUnitHourOrMinute::Nanosecond => ExcludeTimeUnitHour::Nanosecond,
+                ExcludeTimeUnitHourOrMinute::__Invalid => ExcludeTimeUnitHour::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for PluralizeTimeUnit {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> PluralizeTimeUnit {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => PluralizeTimeUnit::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => PluralizeTimeUnit::Millisecond,
+                ExcludeTimeUnitHourOrMinute::Microsecond => PluralizeTimeUnit::Microsecond,
+                ExcludeTimeUnitHourOrMinute::Nanosecond => PluralizeTimeUnit::Nanosecond,
+                ExcludeTimeUnitHourOrMinute::__Invalid => PluralizeTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for PluralizeDayOrTimeUnit {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> PluralizeDayOrTimeUnit {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => PluralizeDayOrTimeUnit::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => PluralizeDayOrTimeUnit::Millisecond,
+                ExcludeTimeUnitHourOrMinute::Microsecond => PluralizeDayOrTimeUnit::Microsecond,
+                ExcludeTimeUnitHourOrMinute::Nanosecond => PluralizeDayOrTimeUnit::Nanosecond,
+                ExcludeTimeUnitHourOrMinute::__Invalid => PluralizeDayOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for DayOrTimeUnit {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> DayOrTimeUnit {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => DayOrTimeUnit::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => DayOrTimeUnit::Millisecond,
+                ExcludeTimeUnitHourOrMinute::Microsecond => DayOrTimeUnit::Microsecond,
+                ExcludeTimeUnitHourOrMinute::Nanosecond => DayOrTimeUnit::Nanosecond,
+                ExcludeTimeUnitHourOrMinute::__Invalid => DayOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for PluralizeExcludeTimeUnitHour {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> PluralizeExcludeTimeUnitHour {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => PluralizeExcludeTimeUnitHour::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => {
+                    PluralizeExcludeTimeUnitHour::Millisecond
+                }
+                ExcludeTimeUnitHourOrMinute::Microsecond => {
+                    PluralizeExcludeTimeUnitHour::Microsecond
+                }
+                ExcludeTimeUnitHourOrMinute::Nanosecond => PluralizeExcludeTimeUnitHour::Nanosecond,
+                ExcludeTimeUnitHourOrMinute::__Invalid => PluralizeExcludeTimeUnitHour::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for PluralizeExcludeTimeUnitHourOrMinute {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> PluralizeExcludeTimeUnitHourOrMinute {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => PluralizeExcludeTimeUnitHourOrMinute::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => {
+                    PluralizeExcludeTimeUnitHourOrMinute::Millisecond
+                }
+                ExcludeTimeUnitHourOrMinute::Microsecond => {
+                    PluralizeExcludeTimeUnitHourOrMinute::Microsecond
+                }
+                ExcludeTimeUnitHourOrMinute::Nanosecond => {
+                    PluralizeExcludeTimeUnitHourOrMinute::Nanosecond
+                }
+                ExcludeTimeUnitHourOrMinute::__Invalid => {
+                    PluralizeExcludeTimeUnitHourOrMinute::__Invalid
+                }
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for TimeUnitLargestUnitKind {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> TimeUnitLargestUnitKind {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => TimeUnitLargestUnitKind::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => TimeUnitLargestUnitKind::Millisecond,
+                ExcludeTimeUnitHourOrMinute::Microsecond => TimeUnitLargestUnitKind::Microsecond,
+                ExcludeTimeUnitHourOrMinute::Nanosecond => TimeUnitLargestUnitKind::Nanosecond,
+                ExcludeTimeUnitHourOrMinute::__Invalid => TimeUnitLargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<ExcludeTimeUnitHourOrMinute> for LargestUnitKind {
+        fn from(value: ExcludeTimeUnitHourOrMinute) -> LargestUnitKind {
+            match value {
+                ExcludeTimeUnitHourOrMinute::Second => LargestUnitKind::Second,
+                ExcludeTimeUnitHourOrMinute::Millisecond => LargestUnitKind::Millisecond,
+                ExcludeTimeUnitHourOrMinute::Microsecond => LargestUnitKind::Microsecond,
+                ExcludeTimeUnitHourOrMinute::Nanosecond => LargestUnitKind::Nanosecond,
+                ExcludeTimeUnitHourOrMinute::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<YearOrMonth> for DateUnit {
+        fn from(value: YearOrMonth) -> DateUnit {
+            match value {
+                YearOrMonth::Year => DateUnit::Year,
+                YearOrMonth::Month => DateUnit::Month,
+                YearOrMonth::__Invalid => DateUnit::__Invalid,
+            }
+        }
+    }
+    impl From<YearOrMonth> for PluralizeUnit {
+        fn from(value: YearOrMonth) -> PluralizeUnit {
+            match value {
+                YearOrMonth::Year => PluralizeUnit::Year,
+                YearOrMonth::Month => PluralizeUnit::Month,
+                YearOrMonth::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<YearOrMonth> for DateUnitOrTimeUnit {
+        fn from(value: YearOrMonth) -> DateUnitOrTimeUnit {
+            match value {
+                YearOrMonth::Year => DateUnitOrTimeUnit::Year,
+                YearOrMonth::Month => DateUnitOrTimeUnit::Month,
+                YearOrMonth::__Invalid => DateUnitOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<YearOrMonth> for PluralizeDateUnit {
+        fn from(value: YearOrMonth) -> PluralizeDateUnit {
+            match value {
+                YearOrMonth::Year => PluralizeDateUnit::Year,
+                YearOrMonth::Month => PluralizeDateUnit::Month,
+                YearOrMonth::__Invalid => PluralizeDateUnit::__Invalid,
+            }
+        }
+    }
+    impl From<YearOrMonth> for PluralizeUnitYearOrMonth {
+        fn from(value: YearOrMonth) -> PluralizeUnitYearOrMonth {
+            match value {
+                YearOrMonth::Year => PluralizeUnitYearOrMonth::Year,
+                YearOrMonth::Month => PluralizeUnitYearOrMonth::Month,
+                YearOrMonth::__Invalid => PluralizeUnitYearOrMonth::__Invalid,
+            }
+        }
+    }
+    impl From<YearOrMonth> for DateUnitLargestUnitKind {
+        fn from(value: YearOrMonth) -> DateUnitLargestUnitKind {
+            match value {
+                YearOrMonth::Year => DateUnitLargestUnitKind::Year,
+                YearOrMonth::Month => DateUnitLargestUnitKind::Month,
+                YearOrMonth::__Invalid => DateUnitLargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<YearOrMonth> for LargestUnitKind {
+        fn from(value: YearOrMonth) -> LargestUnitKind {
+            match value {
+                YearOrMonth::Year => LargestUnitKind::Year,
+                YearOrMonth::Month => LargestUnitKind::Month,
+                YearOrMonth::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<YearOrMonth> for YearOrMonthLargestUnitKind {
+        fn from(value: YearOrMonth) -> YearOrMonthLargestUnitKind {
+            match value {
+                YearOrMonth::Year => YearOrMonthLargestUnitKind::Year,
+                YearOrMonth::Month => YearOrMonthLargestUnitKind::Month,
+                YearOrMonth::__Invalid => YearOrMonthLargestUnitKind::__Invalid,
+            }
         }
     }
     impl From<PluralizeDateUnit> for PluralizeUnit {
@@ -5572,6 +6048,91 @@ pub mod temporal {
                 PluralizeDateUnit::Weeks => PluralizeUnit::Weeks,
                 PluralizeDateUnit::Days => PluralizeUnit::Days,
                 PluralizeDateUnit::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeDateUnit> for DateUnitLargestUnitKind {
+        fn from(value: PluralizeDateUnit) -> DateUnitLargestUnitKind {
+            match value {
+                PluralizeDateUnit::Year => DateUnitLargestUnitKind::Year,
+                PluralizeDateUnit::Month => DateUnitLargestUnitKind::Month,
+                PluralizeDateUnit::Week => DateUnitLargestUnitKind::Week,
+                PluralizeDateUnit::Day => DateUnitLargestUnitKind::Day,
+                PluralizeDateUnit::Years => DateUnitLargestUnitKind::Years,
+                PluralizeDateUnit::Months => DateUnitLargestUnitKind::Months,
+                PluralizeDateUnit::Weeks => DateUnitLargestUnitKind::Weeks,
+                PluralizeDateUnit::Days => DateUnitLargestUnitKind::Days,
+                PluralizeDateUnit::__Invalid => DateUnitLargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeDateUnit> for LargestUnitKind {
+        fn from(value: PluralizeDateUnit) -> LargestUnitKind {
+            match value {
+                PluralizeDateUnit::Year => LargestUnitKind::Year,
+                PluralizeDateUnit::Month => LargestUnitKind::Month,
+                PluralizeDateUnit::Week => LargestUnitKind::Week,
+                PluralizeDateUnit::Day => LargestUnitKind::Day,
+                PluralizeDateUnit::Years => LargestUnitKind::Years,
+                PluralizeDateUnit::Months => LargestUnitKind::Months,
+                PluralizeDateUnit::Weeks => LargestUnitKind::Weeks,
+                PluralizeDateUnit::Days => LargestUnitKind::Days,
+                PluralizeDateUnit::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeUnitYearOrMonth> for PluralizeUnit {
+        fn from(value: PluralizeUnitYearOrMonth) -> PluralizeUnit {
+            match value {
+                PluralizeUnitYearOrMonth::Year => PluralizeUnit::Year,
+                PluralizeUnitYearOrMonth::Month => PluralizeUnit::Month,
+                PluralizeUnitYearOrMonth::Years => PluralizeUnit::Years,
+                PluralizeUnitYearOrMonth::Months => PluralizeUnit::Months,
+                PluralizeUnitYearOrMonth::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeUnitYearOrMonth> for PluralizeDateUnit {
+        fn from(value: PluralizeUnitYearOrMonth) -> PluralizeDateUnit {
+            match value {
+                PluralizeUnitYearOrMonth::Year => PluralizeDateUnit::Year,
+                PluralizeUnitYearOrMonth::Month => PluralizeDateUnit::Month,
+                PluralizeUnitYearOrMonth::Years => PluralizeDateUnit::Years,
+                PluralizeUnitYearOrMonth::Months => PluralizeDateUnit::Months,
+                PluralizeUnitYearOrMonth::__Invalid => PluralizeDateUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeUnitYearOrMonth> for DateUnitLargestUnitKind {
+        fn from(value: PluralizeUnitYearOrMonth) -> DateUnitLargestUnitKind {
+            match value {
+                PluralizeUnitYearOrMonth::Year => DateUnitLargestUnitKind::Year,
+                PluralizeUnitYearOrMonth::Month => DateUnitLargestUnitKind::Month,
+                PluralizeUnitYearOrMonth::Years => DateUnitLargestUnitKind::Years,
+                PluralizeUnitYearOrMonth::Months => DateUnitLargestUnitKind::Months,
+                PluralizeUnitYearOrMonth::__Invalid => DateUnitLargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeUnitYearOrMonth> for LargestUnitKind {
+        fn from(value: PluralizeUnitYearOrMonth) -> LargestUnitKind {
+            match value {
+                PluralizeUnitYearOrMonth::Year => LargestUnitKind::Year,
+                PluralizeUnitYearOrMonth::Month => LargestUnitKind::Month,
+                PluralizeUnitYearOrMonth::Years => LargestUnitKind::Years,
+                PluralizeUnitYearOrMonth::Months => LargestUnitKind::Months,
+                PluralizeUnitYearOrMonth::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeUnitYearOrMonth> for YearOrMonthLargestUnitKind {
+        fn from(value: PluralizeUnitYearOrMonth) -> YearOrMonthLargestUnitKind {
+            match value {
+                PluralizeUnitYearOrMonth::Year => YearOrMonthLargestUnitKind::Year,
+                PluralizeUnitYearOrMonth::Month => YearOrMonthLargestUnitKind::Month,
+                PluralizeUnitYearOrMonth::Years => YearOrMonthLargestUnitKind::Years,
+                PluralizeUnitYearOrMonth::Months => YearOrMonthLargestUnitKind::Months,
+                PluralizeUnitYearOrMonth::__Invalid => YearOrMonthLargestUnitKind::__Invalid,
             }
         }
     }
@@ -5626,62 +6187,37 @@ pub mod temporal {
             }
         }
     }
-    impl From<PluralizeTimeUnit> for PluralizeUnit {
-        fn from(value: PluralizeTimeUnit) -> PluralizeUnit {
+    impl From<PluralizeExcludeTimeUnitHour> for TimeUnitLargestUnitKind {
+        fn from(value: PluralizeExcludeTimeUnitHour) -> TimeUnitLargestUnitKind {
             match value {
-                PluralizeTimeUnit::Hour => PluralizeUnit::Hour,
-                PluralizeTimeUnit::Minute => PluralizeUnit::Minute,
-                PluralizeTimeUnit::Second => PluralizeUnit::Second,
-                PluralizeTimeUnit::Millisecond => PluralizeUnit::Millisecond,
-                PluralizeTimeUnit::Microsecond => PluralizeUnit::Microsecond,
-                PluralizeTimeUnit::Nanosecond => PluralizeUnit::Nanosecond,
-                PluralizeTimeUnit::Hours => PluralizeUnit::Hours,
-                PluralizeTimeUnit::Minutes => PluralizeUnit::Minutes,
-                PluralizeTimeUnit::Seconds => PluralizeUnit::Seconds,
-                PluralizeTimeUnit::Milliseconds => PluralizeUnit::Milliseconds,
-                PluralizeTimeUnit::Microseconds => PluralizeUnit::Microseconds,
-                PluralizeTimeUnit::Nanoseconds => PluralizeUnit::Nanoseconds,
-                PluralizeTimeUnit::__Invalid => PluralizeUnit::__Invalid,
+                PluralizeExcludeTimeUnitHour::Minute => TimeUnitLargestUnitKind::Minute,
+                PluralizeExcludeTimeUnitHour::Second => TimeUnitLargestUnitKind::Second,
+                PluralizeExcludeTimeUnitHour::Millisecond => TimeUnitLargestUnitKind::Millisecond,
+                PluralizeExcludeTimeUnitHour::Microsecond => TimeUnitLargestUnitKind::Microsecond,
+                PluralizeExcludeTimeUnitHour::Nanosecond => TimeUnitLargestUnitKind::Nanosecond,
+                PluralizeExcludeTimeUnitHour::Minutes => TimeUnitLargestUnitKind::Minutes,
+                PluralizeExcludeTimeUnitHour::Seconds => TimeUnitLargestUnitKind::Seconds,
+                PluralizeExcludeTimeUnitHour::Milliseconds => TimeUnitLargestUnitKind::Milliseconds,
+                PluralizeExcludeTimeUnitHour::Microseconds => TimeUnitLargestUnitKind::Microseconds,
+                PluralizeExcludeTimeUnitHour::Nanoseconds => TimeUnitLargestUnitKind::Nanoseconds,
+                PluralizeExcludeTimeUnitHour::__Invalid => TimeUnitLargestUnitKind::__Invalid,
             }
         }
     }
-    impl From<PluralizeTimeUnit> for PluralizeDayOrTimeUnit {
-        fn from(value: PluralizeTimeUnit) -> PluralizeDayOrTimeUnit {
+    impl From<PluralizeExcludeTimeUnitHour> for LargestUnitKind {
+        fn from(value: PluralizeExcludeTimeUnitHour) -> LargestUnitKind {
             match value {
-                PluralizeTimeUnit::Hour => PluralizeDayOrTimeUnit::Hour,
-                PluralizeTimeUnit::Minute => PluralizeDayOrTimeUnit::Minute,
-                PluralizeTimeUnit::Second => PluralizeDayOrTimeUnit::Second,
-                PluralizeTimeUnit::Millisecond => PluralizeDayOrTimeUnit::Millisecond,
-                PluralizeTimeUnit::Microsecond => PluralizeDayOrTimeUnit::Microsecond,
-                PluralizeTimeUnit::Nanosecond => PluralizeDayOrTimeUnit::Nanosecond,
-                PluralizeTimeUnit::Hours => PluralizeDayOrTimeUnit::Hours,
-                PluralizeTimeUnit::Minutes => PluralizeDayOrTimeUnit::Minutes,
-                PluralizeTimeUnit::Seconds => PluralizeDayOrTimeUnit::Seconds,
-                PluralizeTimeUnit::Milliseconds => PluralizeDayOrTimeUnit::Milliseconds,
-                PluralizeTimeUnit::Microseconds => PluralizeDayOrTimeUnit::Microseconds,
-                PluralizeTimeUnit::Nanoseconds => PluralizeDayOrTimeUnit::Nanoseconds,
-                PluralizeTimeUnit::__Invalid => PluralizeDayOrTimeUnit::__Invalid,
-            }
-        }
-    }
-    impl From<PluralizeDayOrTimeUnit> for PluralizeUnit {
-        fn from(value: PluralizeDayOrTimeUnit) -> PluralizeUnit {
-            match value {
-                PluralizeDayOrTimeUnit::Day => PluralizeUnit::Day,
-                PluralizeDayOrTimeUnit::Hour => PluralizeUnit::Hour,
-                PluralizeDayOrTimeUnit::Minute => PluralizeUnit::Minute,
-                PluralizeDayOrTimeUnit::Second => PluralizeUnit::Second,
-                PluralizeDayOrTimeUnit::Millisecond => PluralizeUnit::Millisecond,
-                PluralizeDayOrTimeUnit::Microsecond => PluralizeUnit::Microsecond,
-                PluralizeDayOrTimeUnit::Nanosecond => PluralizeUnit::Nanosecond,
-                PluralizeDayOrTimeUnit::Days => PluralizeUnit::Days,
-                PluralizeDayOrTimeUnit::Hours => PluralizeUnit::Hours,
-                PluralizeDayOrTimeUnit::Minutes => PluralizeUnit::Minutes,
-                PluralizeDayOrTimeUnit::Seconds => PluralizeUnit::Seconds,
-                PluralizeDayOrTimeUnit::Milliseconds => PluralizeUnit::Milliseconds,
-                PluralizeDayOrTimeUnit::Microseconds => PluralizeUnit::Microseconds,
-                PluralizeDayOrTimeUnit::Nanoseconds => PluralizeUnit::Nanoseconds,
-                PluralizeDayOrTimeUnit::__Invalid => PluralizeUnit::__Invalid,
+                PluralizeExcludeTimeUnitHour::Minute => LargestUnitKind::Minute,
+                PluralizeExcludeTimeUnitHour::Second => LargestUnitKind::Second,
+                PluralizeExcludeTimeUnitHour::Millisecond => LargestUnitKind::Millisecond,
+                PluralizeExcludeTimeUnitHour::Microsecond => LargestUnitKind::Microsecond,
+                PluralizeExcludeTimeUnitHour::Nanosecond => LargestUnitKind::Nanosecond,
+                PluralizeExcludeTimeUnitHour::Minutes => LargestUnitKind::Minutes,
+                PluralizeExcludeTimeUnitHour::Seconds => LargestUnitKind::Seconds,
+                PluralizeExcludeTimeUnitHour::Milliseconds => LargestUnitKind::Milliseconds,
+                PluralizeExcludeTimeUnitHour::Microseconds => LargestUnitKind::Microseconds,
+                PluralizeExcludeTimeUnitHour::Nanoseconds => LargestUnitKind::Nanoseconds,
+                PluralizeExcludeTimeUnitHour::__Invalid => LargestUnitKind::__Invalid,
             }
         }
     }
@@ -5697,39 +6233,6 @@ pub mod temporal {
                 PluralizeExcludeTimeUnitHourOrMinute::Microseconds => PluralizeUnit::Microseconds,
                 PluralizeExcludeTimeUnitHourOrMinute::Nanoseconds => PluralizeUnit::Nanoseconds,
                 PluralizeExcludeTimeUnitHourOrMinute::__Invalid => PluralizeUnit::__Invalid,
-            }
-        }
-    }
-    impl From<PluralizeExcludeTimeUnitHourOrMinute> for PluralizeExcludeTimeUnitHour {
-        fn from(value: PluralizeExcludeTimeUnitHourOrMinute) -> PluralizeExcludeTimeUnitHour {
-            match value {
-                PluralizeExcludeTimeUnitHourOrMinute::Second => {
-                    PluralizeExcludeTimeUnitHour::Second
-                }
-                PluralizeExcludeTimeUnitHourOrMinute::Millisecond => {
-                    PluralizeExcludeTimeUnitHour::Millisecond
-                }
-                PluralizeExcludeTimeUnitHourOrMinute::Microsecond => {
-                    PluralizeExcludeTimeUnitHour::Microsecond
-                }
-                PluralizeExcludeTimeUnitHourOrMinute::Nanosecond => {
-                    PluralizeExcludeTimeUnitHour::Nanosecond
-                }
-                PluralizeExcludeTimeUnitHourOrMinute::Seconds => {
-                    PluralizeExcludeTimeUnitHour::Seconds
-                }
-                PluralizeExcludeTimeUnitHourOrMinute::Milliseconds => {
-                    PluralizeExcludeTimeUnitHour::Milliseconds
-                }
-                PluralizeExcludeTimeUnitHourOrMinute::Microseconds => {
-                    PluralizeExcludeTimeUnitHour::Microseconds
-                }
-                PluralizeExcludeTimeUnitHourOrMinute::Nanoseconds => {
-                    PluralizeExcludeTimeUnitHour::Nanoseconds
-                }
-                PluralizeExcludeTimeUnitHourOrMinute::__Invalid => {
-                    PluralizeExcludeTimeUnitHour::__Invalid
-                }
             }
         }
     }
@@ -5781,25 +6284,140 @@ pub mod temporal {
             }
         }
     }
-    impl From<PluralizeUnitYearOrMonth> for PluralizeUnit {
-        fn from(value: PluralizeUnitYearOrMonth) -> PluralizeUnit {
+    impl From<PluralizeExcludeTimeUnitHourOrMinute> for PluralizeExcludeTimeUnitHour {
+        fn from(value: PluralizeExcludeTimeUnitHourOrMinute) -> PluralizeExcludeTimeUnitHour {
             match value {
-                PluralizeUnitYearOrMonth::Year => PluralizeUnit::Year,
-                PluralizeUnitYearOrMonth::Month => PluralizeUnit::Month,
-                PluralizeUnitYearOrMonth::Years => PluralizeUnit::Years,
-                PluralizeUnitYearOrMonth::Months => PluralizeUnit::Months,
-                PluralizeUnitYearOrMonth::__Invalid => PluralizeUnit::__Invalid,
+                PluralizeExcludeTimeUnitHourOrMinute::Second => {
+                    PluralizeExcludeTimeUnitHour::Second
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Millisecond => {
+                    PluralizeExcludeTimeUnitHour::Millisecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Microsecond => {
+                    PluralizeExcludeTimeUnitHour::Microsecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Nanosecond => {
+                    PluralizeExcludeTimeUnitHour::Nanosecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Seconds => {
+                    PluralizeExcludeTimeUnitHour::Seconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Milliseconds => {
+                    PluralizeExcludeTimeUnitHour::Milliseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Microseconds => {
+                    PluralizeExcludeTimeUnitHour::Microseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Nanoseconds => {
+                    PluralizeExcludeTimeUnitHour::Nanoseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::__Invalid => {
+                    PluralizeExcludeTimeUnitHour::__Invalid
+                }
             }
         }
     }
-    impl From<PluralizeUnitYearOrMonth> for PluralizeDateUnit {
-        fn from(value: PluralizeUnitYearOrMonth) -> PluralizeDateUnit {
+    impl From<PluralizeExcludeTimeUnitHourOrMinute> for TimeUnitLargestUnitKind {
+        fn from(value: PluralizeExcludeTimeUnitHourOrMinute) -> TimeUnitLargestUnitKind {
             match value {
-                PluralizeUnitYearOrMonth::Year => PluralizeDateUnit::Year,
-                PluralizeUnitYearOrMonth::Month => PluralizeDateUnit::Month,
-                PluralizeUnitYearOrMonth::Years => PluralizeDateUnit::Years,
-                PluralizeUnitYearOrMonth::Months => PluralizeDateUnit::Months,
-                PluralizeUnitYearOrMonth::__Invalid => PluralizeDateUnit::__Invalid,
+                PluralizeExcludeTimeUnitHourOrMinute::Second => TimeUnitLargestUnitKind::Second,
+                PluralizeExcludeTimeUnitHourOrMinute::Millisecond => {
+                    TimeUnitLargestUnitKind::Millisecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Microsecond => {
+                    TimeUnitLargestUnitKind::Microsecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Nanosecond => {
+                    TimeUnitLargestUnitKind::Nanosecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Seconds => TimeUnitLargestUnitKind::Seconds,
+                PluralizeExcludeTimeUnitHourOrMinute::Milliseconds => {
+                    TimeUnitLargestUnitKind::Milliseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Microseconds => {
+                    TimeUnitLargestUnitKind::Microseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Nanoseconds => {
+                    TimeUnitLargestUnitKind::Nanoseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::__Invalid => {
+                    TimeUnitLargestUnitKind::__Invalid
+                }
+            }
+        }
+    }
+    impl From<PluralizeExcludeTimeUnitHourOrMinute> for LargestUnitKind {
+        fn from(value: PluralizeExcludeTimeUnitHourOrMinute) -> LargestUnitKind {
+            match value {
+                PluralizeExcludeTimeUnitHourOrMinute::Second => LargestUnitKind::Second,
+                PluralizeExcludeTimeUnitHourOrMinute::Millisecond => LargestUnitKind::Millisecond,
+                PluralizeExcludeTimeUnitHourOrMinute::Microsecond => LargestUnitKind::Microsecond,
+                PluralizeExcludeTimeUnitHourOrMinute::Nanosecond => LargestUnitKind::Nanosecond,
+                PluralizeExcludeTimeUnitHourOrMinute::Seconds => LargestUnitKind::Seconds,
+                PluralizeExcludeTimeUnitHourOrMinute::Milliseconds => LargestUnitKind::Milliseconds,
+                PluralizeExcludeTimeUnitHourOrMinute::Microseconds => LargestUnitKind::Microseconds,
+                PluralizeExcludeTimeUnitHourOrMinute::Nanoseconds => LargestUnitKind::Nanoseconds,
+                PluralizeExcludeTimeUnitHourOrMinute::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<DateUnitLargestUnitKind> for LargestUnitKind {
+        fn from(value: DateUnitLargestUnitKind) -> LargestUnitKind {
+            match value {
+                DateUnitLargestUnitKind::Auto => LargestUnitKind::Auto,
+                DateUnitLargestUnitKind::Year => LargestUnitKind::Year,
+                DateUnitLargestUnitKind::Month => LargestUnitKind::Month,
+                DateUnitLargestUnitKind::Week => LargestUnitKind::Week,
+                DateUnitLargestUnitKind::Day => LargestUnitKind::Day,
+                DateUnitLargestUnitKind::Years => LargestUnitKind::Years,
+                DateUnitLargestUnitKind::Months => LargestUnitKind::Months,
+                DateUnitLargestUnitKind::Weeks => LargestUnitKind::Weeks,
+                DateUnitLargestUnitKind::Days => LargestUnitKind::Days,
+                DateUnitLargestUnitKind::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<TimeUnitLargestUnitKind> for LargestUnitKind {
+        fn from(value: TimeUnitLargestUnitKind) -> LargestUnitKind {
+            match value {
+                TimeUnitLargestUnitKind::Auto => LargestUnitKind::Auto,
+                TimeUnitLargestUnitKind::Hour => LargestUnitKind::Hour,
+                TimeUnitLargestUnitKind::Minute => LargestUnitKind::Minute,
+                TimeUnitLargestUnitKind::Second => LargestUnitKind::Second,
+                TimeUnitLargestUnitKind::Millisecond => LargestUnitKind::Millisecond,
+                TimeUnitLargestUnitKind::Microsecond => LargestUnitKind::Microsecond,
+                TimeUnitLargestUnitKind::Nanosecond => LargestUnitKind::Nanosecond,
+                TimeUnitLargestUnitKind::Hours => LargestUnitKind::Hours,
+                TimeUnitLargestUnitKind::Minutes => LargestUnitKind::Minutes,
+                TimeUnitLargestUnitKind::Seconds => LargestUnitKind::Seconds,
+                TimeUnitLargestUnitKind::Milliseconds => LargestUnitKind::Milliseconds,
+                TimeUnitLargestUnitKind::Microseconds => LargestUnitKind::Microseconds,
+                TimeUnitLargestUnitKind::Nanoseconds => LargestUnitKind::Nanoseconds,
+                TimeUnitLargestUnitKind::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<YearOrMonthLargestUnitKind> for DateUnitLargestUnitKind {
+        fn from(value: YearOrMonthLargestUnitKind) -> DateUnitLargestUnitKind {
+            match value {
+                YearOrMonthLargestUnitKind::Auto => DateUnitLargestUnitKind::Auto,
+                YearOrMonthLargestUnitKind::Year => DateUnitLargestUnitKind::Year,
+                YearOrMonthLargestUnitKind::Month => DateUnitLargestUnitKind::Month,
+                YearOrMonthLargestUnitKind::Years => DateUnitLargestUnitKind::Years,
+                YearOrMonthLargestUnitKind::Months => DateUnitLargestUnitKind::Months,
+                YearOrMonthLargestUnitKind::__Invalid => DateUnitLargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<YearOrMonthLargestUnitKind> for LargestUnitKind {
+        fn from(value: YearOrMonthLargestUnitKind) -> LargestUnitKind {
+            match value {
+                YearOrMonthLargestUnitKind::Auto => LargestUnitKind::Auto,
+                YearOrMonthLargestUnitKind::Year => LargestUnitKind::Year,
+                YearOrMonthLargestUnitKind::Month => LargestUnitKind::Month,
+                YearOrMonthLargestUnitKind::Years => LargestUnitKind::Years,
+                YearOrMonthLargestUnitKind::Months => LargestUnitKind::Months,
+                YearOrMonthLargestUnitKind::__Invalid => LargestUnitKind::__Invalid,
             }
         }
     }
@@ -5832,30 +6450,6 @@ pub enum RoundingModeKind {
     HalfExpand = "halfExpand",
     HalfTrunc = "halfTrunc",
     HalfEven = "halfEven",
-}
-#[wasm_bindgen(private)]
-pub enum LargestUnitKind {
-    Auto = "auto",
-    Year = "year",
-    Month = "month",
-    Week = "week",
-    Day = "day",
-    Hour = "hour",
-    Minute = "minute",
-    Second = "second",
-    Millisecond = "millisecond",
-    Microsecond = "microsecond",
-    Nanosecond = "nanosecond",
-    Years = "years",
-    Months = "months",
-    Weeks = "weeks",
-    Days = "days",
-    Hours = "hours",
-    Minutes = "minutes",
-    Seconds = "seconds",
-    Milliseconds = "milliseconds",
-    Microseconds = "microseconds",
-    Nanoseconds = "nanoseconds",
 }
 #[wasm_bindgen(private)]
 pub enum FractionalSecondDigitsKind {
@@ -5894,40 +6488,4 @@ pub enum RelativeToKind {
     PlainDate(temporal::PlainDate),
     PlainDateTime(temporal::PlainDateTime),
     Object(Object),
-}
-#[wasm_bindgen(private)]
-pub enum RoundingOptionsWithLargestUnitDateUnitLargestUnitKind {
-    Auto = "auto",
-    Year = "year",
-    Month = "month",
-    Week = "week",
-    Day = "day",
-    Years = "years",
-    Months = "months",
-    Weeks = "weeks",
-    Days = "days",
-}
-#[wasm_bindgen(private)]
-pub enum RoundingOptionsWithLargestUnitTimeUnitLargestUnitKind {
-    Auto = "auto",
-    Hour = "hour",
-    Minute = "minute",
-    Second = "second",
-    Millisecond = "millisecond",
-    Microsecond = "microsecond",
-    Nanosecond = "nanosecond",
-    Hours = "hours",
-    Minutes = "minutes",
-    Seconds = "seconds",
-    Milliseconds = "milliseconds",
-    Microseconds = "microseconds",
-    Nanoseconds = "nanoseconds",
-}
-#[wasm_bindgen(private)]
-pub enum RoundingOptionsWithLargestUnitYearOrMonthLargestUnitKind {
-    Auto = "auto",
-    Year = "year",
-    Month = "month",
-    Years = "years",
-    Months = "months",
 }

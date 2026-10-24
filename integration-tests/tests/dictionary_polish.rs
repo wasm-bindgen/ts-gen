@@ -5,7 +5,7 @@ use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::dictionary_polish::{
     polish::{
-        Approximate, Gauge, Holder, HourStepping, Maker, MinuteStepping, Options,
+        Approximate, BoundedDayOrHour, Gauge, Holder, HourStepping, Maker, MinuteStepping, Options,
         PartialBoxLikeObject, PartialOmitLikeBoxLikeObject, PluralizeTimeUnit, PluralizeUnit,
         PluralizeUnitHour, PluralizeUnitMinute, Rounder, Rounding, RoundingHour, RoundingTimeUnit,
         Stepped, TimeLikeObject, Transition,
@@ -115,6 +115,7 @@ fn use_sites_take_their_specialisation(rounder: &Rounder) {
     rounder.round_time(&RoundingTimeUnit::new());
     rounder.round_again(&RoundingTimeUnit::new());
     rounder.step(&HourStepping::new());
+    rounder.bound(&BoundedDayOrHour::new());
     let _: PluralizeTimeUnit = rounder.clock().now();
     // A variant is named for the base its specialisation extends.
     rounder.snap(PluralizeTimeUnit::Hours);

@@ -28,6 +28,14 @@
 //! extending the erased base with the narrowed members
 //! (`RoundingOptionsWithLargestUnitDateUnit`).
 //!
+//! Under `--experimental-generic-mono` the parameter stays instead. Each
+//! argument becomes a string enum, and each type-level function of the
+//! parameter an associated type of a trait bounding it, one trait per
+//! family of interfaces passing the parameter on (`RoundingOptionsUnits`,
+//! with `type PluralizeUnit` and an impl per argument enum). Members read
+//! through the trait (`Units::PluralizeUnit`), and instantiations keep
+//! their arguments.
+//!
 //! Anything that can't be evaluated keeps the lowering it had before, with
 //! a warning.
 
@@ -38,8 +46,8 @@ use std::rc::Rc;
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
     GetterMember, Heritage, InterfaceClassification, InterfaceDecl, MappedType, Member, Modifier,
-    Module, Param, SetterMember, StringEnumDecl, StringEnumVariant, Throws, TypeAliasDecl,
-    TypeDeclaration, TypeKind, TypeParam, TypeRef,
+    Module, Param, ParamFamily, ParamImpl, ParamTrait, SetterMember, StringEnumDecl,
+    StringEnumVariant, Throws, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam, TypeRef,
 };
 use crate::parse::classify::classify_interface;
 use crate::parse::scope::{Binding, ScopeId};
@@ -105,6 +113,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
 
     let diag = std::mem::take(&mut gctx.diagnostics);
     let gctx_type_level_only;
+    let gctx_param_traits;
     let literal_params;
     let (rewritten, synths, diag) = {
         let mut eval = Eval {
@@ -123,6 +132,15 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             spec_names: HashMap::new(),
             naming: true,
             type_level_only: HashSet::new(),
+            mono: gctx.experimental_generic_mono,
+            param_args: HashMap::new(),
+            nodes: Vec::new(),
+            node_index: HashMap::new(),
+            families: Vec::new(),
+            arg_enums: Vec::new(),
+            member_name: None,
+            param_traits: HashMap::new(),
+            param_bounds: HashMap::new(),
         };
         eval.find_literal_params();
         let mut rewritten = Vec::new();
@@ -142,12 +160,38 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
                 rewritten.push((id, kind));
             }
         }
+        if eval.mono {
+            eval.build_param_traits();
+            // Each literal-only parameter defaults to its enum, bounded by
+            // its trait.
+            for (id, bounds) in std::mem::take(&mut eval.param_bounds) {
+                let index = match rewritten.iter().position(|(r, _)| *r == id) {
+                    Some(i) => i,
+                    None => {
+                        rewritten.push((id, eval.gctx.get_type(id).kind.clone()));
+                        rewritten.len() - 1
+                    }
+                };
+                if let TypeKind::Interface(iface) = &mut rewritten[index].1 {
+                    for (param, bound, default) in bounds {
+                        if let Some(tp) = iface.type_params.iter_mut().find(|p| p.name == param) {
+                            tp.trait_bound = Some(bound);
+                            tp.default = default;
+                        }
+                    }
+                }
+            }
+            gctx_param_traits = std::mem::take(&mut eval.param_traits);
+        } else {
+            gctx_param_traits = HashMap::new();
+        }
         gctx_type_level_only = std::mem::take(&mut eval.type_level_only);
         literal_params = std::mem::take(&mut eval.literal_params);
         (rewritten, eval.synths, eval.diag)
     };
     gctx.diagnostics = diag;
     gctx.type_level_only.extend(gctx_type_level_only);
+    gctx.param_traits.extend(gctx_param_traits);
 
     for (id, kind) in rewritten {
         gctx.get_type_mut(id).kind = kind;
@@ -228,7 +272,17 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             module.types.push(id);
         }
     }
-    super::erased_args::drop_literal_args(gctx, &literal_params);
+    if gctx.experimental_generic_mono {
+        // A merged class erases its literal-only parameters here too; an
+        // interface keeps them, and loses only an argument no enum names.
+        let (classes, interfaces): (HashMap<_, _>, HashMap<_, _>) = literal_params
+            .into_iter()
+            .partition(|(id, _)| matches!(gctx.get_type(*id).kind, TypeKind::Class(_)));
+        super::erased_args::drop_literal_args(gctx, &classes);
+        super::erased_args::drop_unnamed_literal_args(gctx, &interfaces);
+    } else {
+        super::erased_args::drop_literal_args(gctx, &literal_params);
+    }
 }
 
 /// The utilities with an evaluation. The rest of TypeScript's
@@ -392,6 +446,25 @@ struct Eval<'g> {
     naming: bool,
     /// See [`GlobalContext::type_level_only`].
     type_level_only: HashSet<TypeId>,
+    /// Whether to evaluate for per-monomorphization, where a literal-only
+    /// parameter stays generic instead of specialising (see
+    /// [`Eval::generic_use`] and [`Eval::project`]).
+    mono: bool,
+    /// Literal-only parameters, by owner and name, bound to an argument
+    /// enum while an associated type's impl target is read.
+    param_args: HashMap<(ScopeId, String), (TypeRef, ScopeId, Env)>,
+    nodes: Vec<ParamNode>,
+    node_index: HashMap<(ScopeId, String), usize>,
+    /// Each family's associated functions, by the family's node.
+    families: Vec<Vec<AssocFn>>,
+    /// Argument enums by their sorted values, with their scopes.
+    arg_enums: Vec<(Vec<String>, ScopeId, TypeRef)>,
+    /// The member whose type is being evaluated, naming an inline
+    /// associated function.
+    member_name: Option<String>,
+    param_traits: HashMap<TypeId, Vec<ParamTrait>>,
+    /// Each interface's literal-only parameters' traits and default enums.
+    param_bounds: HashMap<TypeId, Vec<(String, String, Option<TypeRef>)>>,
 }
 
 const MAX_DEPTH: u32 = 64;
@@ -439,7 +512,11 @@ impl<'g> Eval<'g> {
                     self.rewrite_params(&mut c.params, scope, &name, place);
                 }
                 self.flatten_heritage(iface, place);
-                if let Some(positions) = self.literal_params.get(&place.anchor) {
+                if let Some(positions) = self
+                    .literal_params
+                    .get(&place.anchor)
+                    .filter(|_| !self.mono)
+                {
                     let mut i = 0;
                     iface.type_params.retain(|_| {
                         i += 1;
@@ -538,11 +615,15 @@ impl<'g> Eval<'g> {
             match m {
                 Member::Getter(g) => {
                     let hint = format!("{parent}{}", to_pascal_case(&g.js_name));
+                    self.member_name = Some(g.js_name.clone());
                     self.rewrite_type(&mut g.type_ref, g.scope, &hint, place);
+                    self.member_name = None;
                 }
                 Member::Setter(s) => {
                     let hint = format!("{parent}{}", to_pascal_case(&s.js_name));
+                    self.member_name = Some(s.js_name.clone());
                     self.rewrite_type(&mut s.type_ref, s.scope, &hint, place);
+                    self.member_name = None;
                 }
                 Member::StaticGetter(g) => {
                     let hint = format!("{parent}{}", to_pascal_case(&g.js_name));
@@ -555,9 +636,11 @@ impl<'g> Eval<'g> {
                 Member::Method(m) => {
                     let name = format!("{parent}{}", to_pascal_case(&m.js_name));
                     let scope = m.body_scope;
+                    self.member_name = Some(m.js_name.clone());
                     self.rewrite_type_params(&mut m.type_params, scope, &name, place);
                     self.rewrite_params(&mut m.params, scope, &name, place);
                     self.rewrite_type(&mut m.return_type, scope, &format!("{name}Return"), place);
+                    self.member_name = None;
                 }
                 Member::StaticMethod(m) => {
                     let name = format!("{parent}{}", to_pascal_case(&m.js_name));
@@ -618,6 +701,20 @@ impl<'g> Eval<'g> {
             Some((value, _)) => value,
             None => ty.clone(),
         };
+        if self.mono && self.naming {
+            let empties = |t: TypeRef| match ty.split_empties() {
+                Some((_, n)) => t.with_empties(n),
+                None => t,
+            };
+            // Per-monomorphization keeps the parameter: alone it is itself,
+            // and a function of it reads an associated type of its trait.
+            if let Some(param) = self.passed_param(&value, scope, env, dest) {
+                return Some(empties(TypeRef::ident(param)));
+            }
+            if let Some(projection) = self.project(&value, scope, env, dest, place) {
+                return Some(empties(projection));
+            }
+        }
         // A literal-only parameter standing alone is its argument or bound,
         // read as written: an enum it names, else its literals inline.
         if value
@@ -681,6 +778,22 @@ impl<'g> Eval<'g> {
         ) {
             self.depth = 0;
             let (segments, generic_args) = (segments.clone(), generic_args.clone());
+            // Per-monomorphization keeps the alias, of the instantiation.
+            if self.mono && matches!(self.gctx.get_type(id).kind, TypeKind::Interface(_)) {
+                let target = self.generic_use(
+                    id,
+                    &segments,
+                    &generic_args,
+                    scope,
+                    &Env::default(),
+                    scope,
+                    &alias.name.clone(),
+                    place,
+                );
+                alias.target =
+                    target.unwrap_or_else(|| self.erase_literal_args(&alias.target, scope));
+                return None;
+            }
             let name = alias.name.clone();
             let spec = self.specialise(
                 id,
@@ -792,6 +905,26 @@ impl<'g> Eval<'g> {
             ) {
                 self.depth = 0;
                 let hint = iface.name.clone();
+                if self.mono && matches!(self.gctx.get_type(id).kind, TypeKind::Interface(_)) {
+                    let (segments, generic_args) = (segments.clone(), generic_args.clone());
+                    let parent = self.generic_use(
+                        id,
+                        &segments,
+                        &generic_args,
+                        heritage.scope,
+                        &Env::default(),
+                        body_scope,
+                        &hint,
+                        place,
+                    );
+                    kept.push(Heritage {
+                        type_ref: parent.unwrap_or_else(|| {
+                            self.erase_literal_args(&heritage.type_ref, heritage.scope)
+                        }),
+                        scope: heritage.scope,
+                    });
+                    continue;
+                }
                 let base = match self.specialise(
                     id,
                     segments,
@@ -1074,6 +1207,9 @@ impl<'g> Eval<'g> {
         };
         let shadowed = segments.len() == 1 && env.get(&segments[0]).is_some();
         if let Some(id) = self.literal_decl(&reference, scope).filter(|_| !shadowed) {
+            if self.mono && matches!(self.gctx.get_type(id).kind, TypeKind::Interface(_)) {
+                return self.generic_use(id, segments, generic_args, scope, env, dest, hint, place);
+            }
             return self.specialise_use(id, segments, generic_args, scope, env, dest, hint, place);
         }
         if segments.len() != 1 {
@@ -1095,6 +1231,9 @@ impl<'g> Eval<'g> {
         match self.gctx.scopes.resolve_binding(scope, name) {
             Some(Binding::TypeParam) => {
                 let owner = self.param_owner(scope, name)?;
+                if let Some((ty, s, e)) = self.param_args.get(&(owner, name.clone())).cloned() {
+                    return self.eval(&ty, s, &e, dest, hint, place);
+                }
                 // A literal-only parameter is erased, even in its own scope.
                 if self.param_owner(dest, name) == Some(owner)
                     && !self.is_literal_param(scope, name)
@@ -1474,6 +1613,11 @@ impl<'g> Eval<'g> {
                     match self.gctx.scopes.resolve_binding(scope, &segments[0]) {
                         Some(Binding::TypeParam) => {
                             let owner = self.param_owner(scope, &segments[0])?;
+                            if let Some((ty, s, e)) =
+                                self.param_args.get(&(owner, segments[0].clone())).cloned()
+                            {
+                                return self.shape(&ty, s, &e, dest, place);
+                            }
                             let bound = self.param_bound(owner, &segments[0])?;
                             return self.shape(&bound, owner, &Env::default(), dest, place);
                         }
@@ -1594,16 +1738,13 @@ impl<'g> Eval<'g> {
             let readonly = !members
                 .iter()
                 .any(|m| matches!(m, Member::Setter(s) if &s.js_name == js_name));
+            let member = self.member_name.replace(js_name.clone());
+            let type_ref =
+                self.eval_named(type_ref, member_scope, &bound_env, dest, js_name, place);
+            self.member_name = member;
             props.push(Prop {
                 js_name: js_name.clone(),
-                type_ref: self.eval_named(
-                    type_ref,
-                    member_scope,
-                    &bound_env,
-                    dest,
-                    js_name,
-                    place,
-                )?,
+                type_ref: type_ref?,
                 optional,
                 readonly,
                 doc: doc.clone(),
@@ -1815,6 +1956,9 @@ impl<'g> Eval<'g> {
                     return None;
                 }
                 let owner = self.param_owner(scope, &n)?;
+                if let Some((ty, s, e)) = self.param_args.get(&(owner, n.clone())) {
+                    return Some((n, self.spelled_as(ty, *s, e)));
+                }
                 let bound = self.param_bound(owner, &n)?;
                 Some((n, self.spelled_as(&bound, owner, &Env::default())))
             })
@@ -1878,7 +2022,10 @@ impl<'g> Eval<'g> {
                     continue;
                 }
                 let mut names = Vec::new();
-                idents(constraint, &mut names);
+                // Per-monomorphization names each argument by its enum.
+                if !self.mono {
+                    idents(constraint, &mut names);
+                }
                 for name in names {
                     if let Some(Binding::Declared(alias)) =
                         self.gctx.scopes.resolve_binding(body_scope, &name)
@@ -1897,6 +2044,40 @@ impl<'g> Eval<'g> {
                         .entry(body_scope)
                         .or_default()
                         .insert(p.name.clone());
+                    let decl = self.gctx.get_type(id);
+                    if let (true, TypeKind::Interface(iface)) = (self.mono, &decl.kind) {
+                        self.node_index
+                            .insert((body_scope, p.name.clone()), self.nodes.len());
+                        self.nodes.push(ParamNode {
+                            iface: id,
+                            name: iface.name.clone(),
+                            param: p.name.clone(),
+                            owner: body_scope,
+                            place,
+                            parents: Vec::new(),
+                            family: 0,
+                            functions: Vec::new(),
+                            args: Vec::new(),
+                            default_enum: None,
+                        });
+                        // A declared enum among the bound's members names
+                        // an argument of its values.
+                        for member in union_members(constraint) {
+                            let TypeRef::Reference { segments, .. } = &member else {
+                                continue;
+                            };
+                            let Some(enum_id) =
+                                self.gctx.resolve_path(body_scope, &segments.join("."))
+                            else {
+                                continue;
+                            };
+                            if let Some(mut values) = self.string_literals(&member, body_scope) {
+                                values.sort();
+                                let s = self.gctx.get_type(enum_id).scope_id;
+                                self.arg_enums.push((values, s, member.clone()));
+                            }
+                        }
+                    }
                 }
             }
             if !positions.is_empty() {
@@ -1904,6 +2085,9 @@ impl<'g> Eval<'g> {
             }
         }
         self.naming = naming;
+        if self.mono {
+            self.link_param_nodes();
+        }
     }
 
     /// The interface with literal-only parameters that `ty`, a reference
@@ -2129,6 +2313,7 @@ impl<'g> Eval<'g> {
                 name: name.clone(),
                 constraint: None,
                 default: None,
+                trait_bound: None,
             })
             .collect();
         self.synths.push(Synth {
@@ -2232,6 +2417,7 @@ impl<'g> Eval<'g> {
                 name: name.clone(),
                 constraint: None,
                 default: None,
+                trait_bound: None,
             })
             .collect();
         self.synths.push(Synth {
@@ -2245,6 +2431,674 @@ impl<'g> Eval<'g> {
             },
         });
         Some(reference(name))
+    }
+}
+
+/// Under per-monomorphization, an interface's literal-only type parameter.
+/// It stays generic, bounded by a trait with an associated type per
+/// type-level function of it the members read (see [`Eval::project`]).
+struct ParamNode {
+    iface: TypeId,
+    name: String,
+    param: String,
+    /// The interface's body scope, declaring the parameter.
+    owner: ScopeId,
+    place: Placement,
+    /// The literal-only parameters this one is passed on to as written:
+    /// `RoundingOptionsWithLargestUnit<Units> extends
+    /// RoundingOptions<Units>`. Their traits are its supertraits.
+    parents: Vec<usize>,
+    /// The node whose parameters it is connected to through `parents`,
+    /// which name associated types alike.
+    family: usize,
+    /// The associated types its members read, by index in the family.
+    functions: Vec<usize>,
+    /// The argument enums it is instantiated with, and their scopes.
+    args: Vec<(TypeRef, ScopeId)>,
+    /// The enum it defaults to, once computed.
+    default_enum: Option<(TypeRef, ScopeId)>,
+}
+
+/// A type-level function of a literal-only parameter that members read as
+/// an associated type of the parameter's trait.
+struct AssocFn {
+    /// The function with the parameter as `$`, which identifies it.
+    key: String,
+    name: String,
+    ty: TypeRef,
+    scope: ScopeId,
+    env: Env,
+    owner: ScopeId,
+    param: String,
+    member: String,
+    /// A reference (`PluralizeUnit<Units>`) names each impl's target by its
+    /// instantiation; an inline type after the argument and the member.
+    named: bool,
+}
+
+impl<'g> Eval<'g> {
+    /// Record each literal-only parameter of an interface as a node, and
+    /// connect the parameters passed on to another's.
+    fn link_param_nodes(&mut self) {
+        for n in 0..self.nodes.len() {
+            let TypeKind::Interface(iface) = &self.gctx.get_type(self.nodes[n].iface).kind else {
+                continue;
+            };
+            let mut refs: Vec<(TypeRef, ScopeId)> = iface
+                .extends
+                .iter()
+                .map(|h| (h.type_ref.clone(), h.scope))
+                .collect();
+            for m in &iface.members {
+                match m {
+                    Member::Getter(g) => refs.push((g.type_ref.clone(), g.scope)),
+                    Member::Setter(s) => refs.push((s.type_ref.clone(), s.scope)),
+                    Member::Method(m) => {
+                        for p in &m.params {
+                            refs.push((p.type_ref.clone(), m.body_scope));
+                        }
+                        refs.push((m.return_type.clone(), m.body_scope));
+                    }
+                    _ => {}
+                }
+            }
+            let mut parents = Vec::new();
+            for (ty, scope) in &refs {
+                self.pass_throughs(ty, *scope, n, &mut parents);
+            }
+            parents.retain(|&p| p != n);
+            parents.dedup();
+            self.nodes[n].parents = parents;
+        }
+        // One family per connected set of parameters.
+        let mut root: Vec<usize> = (0..self.nodes.len()).collect();
+        fn find(root: &mut [usize], i: usize) -> usize {
+            let mut i = i;
+            while root[i] != i {
+                root[i] = root[root[i]];
+                i = root[i];
+            }
+            i
+        }
+        for n in 0..self.nodes.len() {
+            for p in self.nodes[n].parents.clone() {
+                let (a, b) = (find(&mut root, n), find(&mut root, p));
+                root[a.max(b)] = a.min(b);
+            }
+        }
+        for n in 0..self.nodes.len() {
+            self.nodes[n].family = find(&mut root, n);
+        }
+        self.families = (0..self.nodes.len()).map(|_| Vec::new()).collect();
+    }
+
+    /// The nodes `ty`, written in `scope`, passes node `n`'s parameter on
+    /// to, as an argument by itself.
+    fn pass_throughs(&self, ty: &TypeRef, scope: ScopeId, n: usize, out: &mut Vec<usize>) {
+        match ty {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => {
+                let target = self
+                    .gctx
+                    .resolve_path(scope, &segments.join("."))
+                    .and_then(|id| match &self.gctx.get_type(id).kind {
+                        TypeKind::Interface(i) => Some(i),
+                        _ => None,
+                    });
+                if let Some(target) = target {
+                    let (param, owner) = (&self.nodes[n].param, self.nodes[n].owner);
+                    for (q, arg) in generic_args.iter().enumerate() {
+                        if arg.as_ident() != Some(param.as_str())
+                            || self.param_owner(scope, param) != Some(owner)
+                        {
+                            continue;
+                        }
+                        let Some(tp) = target.type_params.get(q) else {
+                            continue;
+                        };
+                        if let Some(&j) = self.node_index.get(&(target.body_scope, tp.name.clone()))
+                        {
+                            out.push(j);
+                        }
+                    }
+                }
+                for a in generic_args {
+                    self.pass_throughs(a, scope, n, out);
+                }
+            }
+            TypeRef::Array(t) => self.pass_throughs(t, scope, n, out),
+            TypeRef::Union(u) => u
+                .members()
+                .iter()
+                .for_each(|m| self.pass_throughs(m, scope, n, out)),
+            TypeRef::Intersection(v) | TypeRef::Tuple(v) => {
+                v.iter().for_each(|m| self.pass_throughs(m, scope, n, out))
+            }
+            _ => {}
+        }
+    }
+
+    fn node_of(&self, owner: ScopeId, param: &str) -> Option<usize> {
+        self.node_index.get(&(owner, param.to_string())).copied()
+    }
+
+    /// The literal-only parameters `ty`, written in `scope` under `env`,
+    /// mentions, each with its owner, following the bindings.
+    fn literal_params_in(
+        &self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        out: &mut Vec<(ScopeId, String)>,
+    ) {
+        let mut names = Vec::new();
+        idents(ty, &mut names);
+        for n in names {
+            if let Some(bound) = env.get(&n) {
+                self.literal_params_in(&bound.ty, bound.scope, &bound.env, out);
+            } else if self.is_literal_param(scope, &n) {
+                if let Some(owner) = self.param_owner(scope, &n) {
+                    if !out.iter().any(|(o, p)| *o == owner && *p == n) {
+                        out.push((owner, n));
+                    }
+                }
+            }
+        }
+    }
+
+    /// The literal-only parameter of `dest` that `ty` is a function of,
+    /// when it mentions no other and isn't bound to an argument.
+    fn projected_param(
+        &self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+    ) -> Option<(ScopeId, String)> {
+        let mut found = Vec::new();
+        self.literal_params_in(ty, scope, env, &mut found);
+        let [(owner, param)] = found.as_slice() else {
+            return None;
+        };
+        (self.param_owner(dest, param) == Some(*owner)
+            && !self.param_args.contains_key(&(*owner, param.clone()))
+            && self.node_of(*owner, param).is_some())
+        .then(|| (*owner, param.clone()))
+    }
+
+    /// The literal-only parameter of `dest` that `ty` is by itself.
+    fn passed_param(
+        &self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+    ) -> Option<String> {
+        let name = ty.as_ident()?;
+        if let Some(bound) = env.get(name) {
+            return self.passed_param(&bound.ty, bound.scope, &bound.env, dest);
+        }
+        let owner = self.param_owner(scope, name)?;
+        (self.param_owner(dest, name) == Some(owner)
+            && self.node_of(owner, name).is_some()
+            && !self.param_args.contains_key(&(owner, name.to_string())))
+        .then(|| name.to_string())
+    }
+
+    /// `ty`, written in `scope`, with the type parameters bound in `env`
+    /// replaced by their arguments.
+    fn substituted(&self, ty: &TypeRef, env: &Env) -> TypeRef {
+        let mut names = Vec::new();
+        idents(ty, &mut names);
+        let map: HashMap<String, TypeRef> = names
+            .into_iter()
+            .filter_map(|n| {
+                let bound = env.get(&n)?;
+                Some((n, self.substituted(&bound.ty, &bound.env)))
+            })
+            .collect();
+        if map.is_empty() {
+            ty.clone()
+        } else {
+            ty.substitute(&map)
+        }
+    }
+
+    /// A member type that is a string-literal function of a literal-only
+    /// parameter of `dest`, under per-monomorphization: the associated
+    /// type of the parameter's trait that reads it (`Units::PluralizeUnit`).
+    fn project(
+        &mut self,
+        value: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        place: Placement,
+    ) -> Option<TypeRef> {
+        let (owner, param) = self.projected_param(value, scope, env, dest)?;
+        // Only an enum crosses as an associated type: read at the bound,
+        // the function must be string literals.
+        let naming = std::mem::replace(&mut self.naming, false);
+        let at_bound = self.eval(value, scope, env, dest, "", place);
+        self.naming = naming;
+        if !at_bound
+            .and_then(|t| self.string_literals(&t, dest))
+            .is_some_and(|l| !l.is_empty())
+        {
+            return None;
+        }
+        let node = self.node_of(owner, &param)?;
+        let family = self.nodes[node].family;
+        let generic = HashMap::from([(param.clone(), TypeRef::ident("$"))]);
+        let key = self
+            .substituted(value, env)
+            .substitute(&generic)
+            .format_ts();
+        let index = match self.families[family].iter().position(|f| f.key == key) {
+            Some(i) => i,
+            None => {
+                let member = self.member_name.clone().unwrap_or_default();
+                let named = matches!(value, TypeRef::Reference { .. });
+                let base = match value {
+                    TypeRef::Reference { segments, .. } => to_pascal_case(segments.last().unwrap()),
+                    _ if !member.is_empty() => to_pascal_case(&member),
+                    _ => "Kind".to_string(),
+                };
+                let taken = |name: &str, fns: &[AssocFn]| fns.iter().any(|f| f.name == name);
+                let mut name = base.clone();
+                let mut k = 2;
+                while taken(&name, &self.families[family]) {
+                    name = format!("{base}{k}");
+                    k += 1;
+                }
+                self.families[family].push(AssocFn {
+                    key,
+                    name,
+                    ty: value.clone(),
+                    scope,
+                    env: env.clone(),
+                    owner,
+                    param: param.clone(),
+                    member,
+                    named,
+                });
+                self.families[family].len() - 1
+            }
+        };
+        if !self.nodes[node].functions.contains(&index) {
+            self.nodes[node].functions.push(index);
+        }
+        Some(TypeRef::Projection {
+            base: Box::new(TypeRef::ident(param)),
+            base_scope: None,
+            family: self.family_of(family),
+            assoc: self.families[family][index].name.clone(),
+        })
+    }
+
+    /// The string enum an argument for a literal-only parameter is, with
+    /// the scope it resolves in: a declared one it names, else one of the
+    /// same values seen before, else one synthesised under its spelling.
+    fn arg_enum(
+        &mut self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        place: Placement,
+    ) -> Option<(TypeRef, ScopeId)> {
+        let evaluated = self.eval(ty, scope, env, dest, "", place)?;
+        let literals = self.string_literals(&evaluated, dest)?;
+        if literals.is_empty() {
+            return None;
+        }
+        let mut set = literals.clone();
+        set.sort();
+        let chain = self.gctx.scopes.chain(dest);
+        if let Some((_, s, r)) = self
+            .arg_enums
+            .iter()
+            .find(|(values, s, _)| *values == set && chain.contains(s))
+        {
+            return Some((r.clone(), *s));
+        }
+        let declared = match &evaluated {
+            TypeRef::Reference { segments, .. } => self
+                .gctx
+                .resolve_path(dest, &segments.join("."))
+                .map(|id| self.gctx.get_type(id).scope_id),
+            _ => None,
+        };
+        let found = match declared {
+            Some(s) => (evaluated, s),
+            None => {
+                let hint = self.spell_at(ty, scope, env, dest);
+                let r = self.synth_enum(literals, &hint, dest, place);
+                r.as_ident()?;
+                (r, place.scope)
+            }
+        };
+        self.arg_enums.push((set, found.1, found.0.clone()));
+        Some(found)
+    }
+
+    /// The enum a node's parameter defaults to: its declared default's,
+    /// else its bound's.
+    fn node_default(&mut self, n: usize) -> Option<(TypeRef, ScopeId)> {
+        if let Some(d) = &self.nodes[n].default_enum {
+            return Some(d.clone());
+        }
+        let (owner, param, place) = (
+            self.nodes[n].owner,
+            self.nodes[n].param.clone(),
+            self.nodes[n].place,
+        );
+        let p = self
+            .params_of
+            .get(&owner)?
+            .iter()
+            .find(|p| p.name == param)?
+            .clone();
+        let ty = p.default.or(p.constraint)?;
+        let depth = std::mem::replace(&mut self.depth, 0);
+        let found = self.arg_enum(&ty, owner, &Env::default(), place.scope, place);
+        self.depth = depth;
+        let found = found?;
+        self.nodes[n].default_enum = Some(found.clone());
+        Some(found)
+    }
+
+    /// An instantiation of an interface with literal-only parameters under
+    /// per-monomorphization: the interface, each literal-only argument its
+    /// enum (or the parameter of `dest` passed on by itself).
+    #[allow(clippy::too_many_arguments)]
+    fn generic_use(
+        &mut self,
+        id: TypeId,
+        segments: &[String],
+        generic_args: &[TypeRef],
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        hint: &str,
+        place: Placement,
+    ) -> Option<TypeRef> {
+        let TypeKind::Interface(iface) = &self.gctx.get_type(id).kind else {
+            return None;
+        };
+        let (params, body_scope) = (iface.type_params.clone(), iface.body_scope);
+        let mut args = Vec::new();
+        for (i, p) in params.iter().enumerate() {
+            let Some(arg) = generic_args.get(i) else {
+                break;
+            };
+            let Some(node) = self.node_of(body_scope, &p.name) else {
+                let evaluated = self.eval(arg, scope, env, dest, hint, place);
+                args.push(evaluated.unwrap_or_else(|| fallback(arg)));
+                continue;
+            };
+            if let Some(param) = self.passed_param(arg, scope, env, dest) {
+                args.push(TypeRef::ident(param));
+                continue;
+            }
+            let mut live = Vec::new();
+            self.literal_params_in(arg, scope, env, &mut live);
+            let live = live.iter().any(|(owner, n)| {
+                self.param_owner(dest, n) == Some(*owner)
+                    && !self.param_args.contains_key(&(*owner, n.clone()))
+            });
+            let found = if !self.naming || live {
+                None
+            } else {
+                self.arg_enum(arg, scope, env, dest, place)
+            };
+            let found = match found {
+                Some(found) => {
+                    if !self.nodes[node].args.contains(&found) {
+                        self.nodes[node].args.push(found.clone());
+                    }
+                    Some(found)
+                }
+                None if self.naming => self.node_default(node),
+                None => None,
+            };
+            match found {
+                Some((r, _)) => args.push(r),
+                None => args.push(fallback(arg)),
+            }
+        }
+        // Trailing arguments that are the parameters' default enums go,
+        // as the bare name already means them.
+        while let Some(last) = args.last() {
+            let i = args.len() - 1;
+            let default = match self.node_of(body_scope, &params[i].name) {
+                Some(node) if self.naming => self.node_default(node),
+                _ => None,
+            };
+            if default.is_some_and(|(d, _)| &d == last) {
+                args.pop();
+            } else {
+                break;
+            }
+        }
+        Some(TypeRef::Reference {
+            segments: segments.to_vec(),
+            generic_args: args,
+        })
+    }
+
+    /// The type an associated function gives at `arg`, bound to its
+    /// parameter, or at the bound when `arg` is `None`.
+    fn assoc_target(
+        &mut self,
+        f: usize,
+        family: usize,
+        arg: Option<&(TypeRef, ScopeId)>,
+        home: Placement,
+    ) -> Option<TypeRef> {
+        let (ty, scope, env, owner, param, member, named) = {
+            let f = &self.families[family][f];
+            (
+                f.ty.clone(),
+                f.scope,
+                f.env.clone(),
+                f.owner,
+                f.param.clone(),
+                f.member.clone(),
+                f.named,
+            )
+        };
+        if let Some((a, s)) = arg {
+            // An enum the impl's scope can't name reads as its literals.
+            let path = a.format_ts();
+            let read = match self.gctx.resolve_path(*s, &path) {
+                Some(id) if self.gctx.resolve_path(home.scope, &path) != Some(id) => self
+                    .string_literals(a, *s)
+                    .map(|l| TypeRef::union(l.into_iter().map(TypeRef::StringLiteral)))
+                    .unwrap_or_else(|| a.clone()),
+                _ => a.clone(),
+            };
+            self.param_args
+                .insert((owner, param.clone()), (read, *s, Env::default()));
+        }
+        self.depth = 0;
+        let dest = home.scope;
+        let result = if named {
+            self.eval_named(&ty, scope, &env, dest, &member, home)
+        } else {
+            let hint = match arg {
+                Some((a, _)) => format!("{}{}Kind", spell(a), to_pascal_case(&member)),
+                None => format!("{}Kind", to_pascal_case(&member)),
+            };
+            self.eval(&ty, scope, &env, dest, &hint, home)
+                .and_then(|t| {
+                    let literals = self.string_literals(&t, dest)?;
+                    Some(self.synth_enum(literals, &hint, dest, home))
+                })
+        };
+        self.param_args.remove(&(owner, param));
+        result
+    }
+
+    /// The IR identity of the family rooted at node `family`.
+    fn family_of(&self, family: usize) -> ParamFamily {
+        ParamFamily {
+            iface: self.nodes[family].iface,
+            param: self.nodes[family].param.clone(),
+        }
+    }
+
+    /// Resolve each node's trait, parents first, and each trait's impls.
+    /// A node whose members read nothing its one parent's trait doesn't
+    /// already has that trait; any other declares the rest beside its
+    /// interface, extending its parents' traits.
+    fn build_param_traits(&mut self) {
+        struct Built {
+            name: String,
+            supertraits: Vec<usize>,
+            assoc: Vec<usize>,
+            family: usize,
+            home: usize,
+            args: Vec<(TypeRef, ScopeId)>,
+        }
+        let mut traits: Vec<Built> = Vec::new();
+        let mut trait_of: Vec<Option<usize>> = vec![None; self.nodes.len()];
+        fn closure(traits: &[Built], t: usize, out: &mut Vec<usize>) {
+            for &a in &traits[t].assoc {
+                if !out.contains(&a) {
+                    out.push(a);
+                }
+            }
+            for &s in &traits[t].supertraits {
+                closure(traits, s, out);
+            }
+        }
+        let mut visiting = vec![false; self.nodes.len()];
+        fn order(nodes: &[ParamNode], n: usize, visiting: &mut [bool], out: &mut Vec<usize>) {
+            if visiting[n] {
+                return;
+            }
+            visiting[n] = true;
+            for &p in &nodes[n].parents {
+                order(nodes, p, visiting, out);
+            }
+            out.push(n);
+        }
+        let mut sorted = Vec::new();
+        for n in 0..self.nodes.len() {
+            order(&self.nodes, n, &mut visiting, &mut sorted);
+        }
+        for n in sorted {
+            let mut supers: Vec<usize> = Vec::new();
+            for &p in &self.nodes[n].parents {
+                if let Some(t) = trait_of[p] {
+                    if !supers.contains(&t) {
+                        supers.push(t);
+                    }
+                }
+            }
+            let mut inherited = Vec::new();
+            for &s in &supers {
+                closure(&traits, s, &mut inherited);
+            }
+            let own: Vec<usize> = self.nodes[n]
+                .functions
+                .iter()
+                .copied()
+                .filter(|f| !inherited.contains(f))
+                .collect();
+            if own.is_empty() && supers.len() == 1 {
+                trait_of[n] = Some(supers[0]);
+                continue;
+            }
+            let candidate = format!(
+                "{}{}",
+                self.nodes[n].name,
+                to_pascal_case(&self.nodes[n].param)
+            );
+            let name = self.used.declare(&candidate, Suffix::Pascal);
+            traits.push(Built {
+                name,
+                supertraits: supers,
+                assoc: own,
+                family: self.nodes[n].family,
+                home: n,
+                args: Vec::new(),
+            });
+            trait_of[n] = Some(traits.len() - 1);
+        }
+        // Each argument implements the trait of every node it is given to,
+        // and their supertraits.
+        for (n, t) in trait_of.iter().enumerate() {
+            let Some(t) = *t else { continue };
+            let mut args = self.nodes[n].args.clone();
+            if let Some(d) = self.node_default(n) {
+                if !args.contains(&d) {
+                    args.insert(0, d);
+                }
+            }
+            let mut stack = vec![t];
+            while let Some(t) = stack.pop() {
+                for a in &args {
+                    if !traits[t].args.contains(a) {
+                        traits[t].args.push(a.clone());
+                    }
+                }
+                stack.extend(traits[t].supertraits.iter().copied());
+            }
+        }
+        for t in 0..traits.len() {
+            let home = traits[t].home;
+            let place = self.nodes[home].place;
+            let mut impls = Vec::new();
+            for arg in traits[t].args.clone() {
+                // The home's own default reads the function at the bound,
+                // as the specialising lowering's base does.
+                let at_bound = Some(&arg) == self.nodes[home].default_enum.as_ref();
+                let mut targets = Vec::new();
+                for &f in &traits[t].assoc.clone() {
+                    let target = self
+                        .assoc_target(f, traits[t].family, (!at_bound).then_some(&arg), place)
+                        .unwrap_or_else(|| TypeRef::ident("JsValue"));
+                    targets.push(target);
+                }
+                impls.push(ParamImpl {
+                    arg: arg.0,
+                    arg_scope: arg.1,
+                    targets,
+                });
+            }
+            let built = ParamTrait {
+                name: traits[t].name.clone(),
+                family: self.family_of(traits[t].family),
+                supertraits: traits[t]
+                    .supertraits
+                    .iter()
+                    .map(|&s| traits[s].name.clone())
+                    .collect(),
+                assoc: traits[t]
+                    .assoc
+                    .iter()
+                    .map(|&f| self.families[traits[t].family][f].name.clone())
+                    .collect(),
+                impls,
+                scope: place.scope,
+            };
+            self.param_traits
+                .entry(self.nodes[home].iface)
+                .or_default()
+                .push(built);
+        }
+        for (n, t) in trait_of.iter().enumerate() {
+            let Some(t) = *t else { continue };
+            let default = self.nodes[n].default_enum.clone().map(|(r, _)| r);
+            self.param_bounds
+                .entry(self.nodes[n].iface)
+                .or_default()
+                .push((self.nodes[n].param.clone(), traits[t].name.clone(), default));
+        }
     }
 }
 
@@ -2773,6 +3627,94 @@ mod tests {
         // `Unit` only constrained literal-only parameters.
         let unit = gctx.scopes.resolve(module.file_scopes[0], "Unit").unwrap();
         assert!(gctx.type_level_only.contains(&unit));
+    }
+
+    #[test]
+    fn literal_only_parameters_stay_generic_under_mono() {
+        let (module, gctx) = super::super::parse_single_source_with(
+            "type Unit = \"hour\" | \"minute\";
+             type Plural<T extends Unit> = T | { hour: \"hours\"; minute: \"minutes\" }[T];
+             interface Rounding<U extends Unit> { smallestUnit?: Plural<U>; unit?: U }
+             interface HourRounding extends Rounding<\"hour\"> {}
+             interface Bounded<U extends Unit> extends Rounding<U> { maximumUnit?: \"none\" | U }
+             declare function f(a: Rounding<\"minute\">, b: Rounding<Unit>): void;",
+            None,
+            &super::super::ParseOptions::new().experimental_generic_mono(true),
+        )
+        .unwrap();
+        let interface = |name: &str| match kind(&gctx, &module, name) {
+            TypeKind::Interface(i) => i.clone(),
+            other => panic!("{name} is {other:?}"),
+        };
+        // The parameter stays, bounded by its family's trait and defaulting
+        // to the bound's enum; members read through the trait, and one
+        // typed exactly `U` reads `U`.
+        let rounding = interface("Rounding");
+        let u = &rounding.type_params[0];
+        assert_eq!(u.trait_bound.as_deref(), Some("RoundingU"));
+        assert_eq!(u.default, Some(TypeRef::ident("Unit")));
+        let reads: Vec<_> = rounding
+            .members
+            .iter()
+            .filter_map(|m| match m {
+                Member::Getter(g) => Some(g.type_ref.clone()),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(
+            reads,
+            [
+                TypeRef::Projection {
+                    base: Box::new(TypeRef::ident("U")),
+                    base_scope: None,
+                    family: ParamFamily {
+                        iface: gctx
+                            .scopes
+                            .resolve(module.file_scopes[0], "Rounding")
+                            .unwrap(),
+                        param: "U".into(),
+                    },
+                    assoc: "Plural".into()
+                },
+                TypeRef::ident("U"),
+            ]
+        );
+        // An instantiation keeps its chain, and a use site at the bound
+        // elides the argument.
+        assert_eq!(
+            interface("HourRounding").extends[0].type_ref,
+            TypeRef::generic("Rounding", vec![TypeRef::ident("Hour")])
+        );
+        assert_eq!(
+            param_type(&gctx, &module, "f", 0),
+            &TypeRef::generic("Rounding", vec![TypeRef::ident("Minute")])
+        );
+        assert_eq!(
+            param_type(&gctx, &module, "f", 1),
+            &TypeRef::ident("Rounding")
+        );
+        // One impl per argument enum plus the default; a child reading a
+        // function its parent doesn't extends the parent's trait.
+        let traits: Vec<_> = gctx.param_traits.values().flatten().collect();
+        let trait_named = |name: &str| *traits.iter().find(|t| t.name == name).unwrap();
+        let base = trait_named("RoundingU");
+        assert_eq!(base.assoc, ["Plural"]);
+        let args: Vec<_> = base.impls.iter().map(|im| im.arg.clone()).collect();
+        assert_eq!(
+            args,
+            [
+                TypeRef::ident("Hour"),
+                TypeRef::ident("Minute"),
+                TypeRef::ident("Unit")
+            ]
+        );
+        let bounded = trait_named("BoundedU");
+        assert_eq!(bounded.supertraits, ["RoundingU"]);
+        assert_eq!(bounded.assoc, ["MaximumUnit"]);
+        assert_eq!(
+            interface("Bounded").extends[0].type_ref,
+            TypeRef::generic("Rounding", vec![TypeRef::ident("U")])
+        );
     }
 
     #[test]

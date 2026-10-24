@@ -465,6 +465,15 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
             buf.push_str(")->");
             write_type_ref_key(buf, &sig.return_type);
         }
+        TypeRef::Projection {
+            base,
+            family,
+            assoc,
+            ..
+        } => {
+            write_type_ref_key(buf, base);
+            let _ = write!(buf, "::{}.{}#{assoc}", family.iface.index(), family.param);
+        }
         TypeRef::Unresolved(s) => {
             buf.push('?');
             buf.push_str(s);
@@ -620,6 +629,38 @@ pub(crate) fn externalised_modules(module: &ir::Module, gctx: &GlobalContext) ->
 }
 
 impl<'a> CodegenContext<'a> {
+    /// The type the impl of argument enum `arg`, resolving in `scope`,
+    /// gives associated type `assoc` of `family`, with the scope it
+    /// resolves in. The family's trait declaring `assoc` holds the impl,
+    /// whose enum is the same declaration as `arg`.
+    pub(crate) fn projection_target(
+        &self,
+        arg: &TypeRef,
+        scope: ScopeId,
+        family: &crate::ir::ParamFamily,
+        assoc: &str,
+    ) -> Option<(TypeRef, ScopeId)> {
+        let declared = |ty: &TypeRef, scope: ScopeId| match ty {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } if generic_args.is_empty() => self.gctx.resolve_path(scope, &segments.join(".")),
+            _ => None,
+        };
+        let arg = declared(arg, scope)?;
+        let t = self
+            .gctx
+            .param_traits
+            .values()
+            .flatten()
+            .find(|t| &t.family == family && t.assoc.iter().any(|a| a == assoc))?;
+        let i = t.assoc.iter().position(|a| a == assoc)?;
+        t.impls
+            .iter()
+            .find(|im| declared(&im.arg, im.arg_scope) == Some(arg))
+            .map(|im| (im.targets[i].clone(), t.scope))
+    }
+
     /// Whether per-monomorphization codegen is on. Takes an `Option` because
     /// most emitters carry an optional context; no context means default mode.
     pub(crate) fn generic_mono(ctx: Option<&CodegenContext<'_>>) -> bool {
@@ -1341,6 +1382,7 @@ impl<'a> CodegenContext<'a> {
             | TypeRef::IndexedAccess(..)
             | TypeRef::Mapped(_)
             | TypeRef::ObjectLiteral(_)
+            | TypeRef::Projection { .. }
             | TypeRef::Unresolved(_) => true,
         }
     }
@@ -2030,6 +2072,44 @@ pub fn to_syn_type(
     let borrow = pos.is_argument() && !pos.inner;
 
     match ty {
+        // An associated type of a literal-only parameter's trait is a string
+        // enum, taken by value. Substituted by an argument enum, it is that
+        // enum's impl target.
+        TypeRef::Projection {
+            base,
+            base_scope,
+            family,
+            assoc,
+        } => {
+            let base_scope = base_scope.unwrap_or(scope);
+            let generic = base.as_ident().is_some_and(|name| {
+                ctx.is_none_or(|c| {
+                    matches!(
+                        c.gctx.scopes.resolve_binding(base_scope, name),
+                        Some(crate::parse::scope::Binding::TypeParam)
+                    )
+                })
+            });
+            if !generic {
+                if let Some((target, target_scope)) =
+                    ctx.and_then(|c| c.projection_target(base, base_scope, family, assoc))
+                {
+                    return to_syn_type(&target, pos, ctx, target_scope, from_module);
+                }
+            }
+            let assoc = make_ident(assoc);
+            match base.as_ident() {
+                Some(param) => {
+                    let param = make_ident(param);
+                    quote! { #param::#assoc }
+                }
+                None => {
+                    let base =
+                        to_syn_type(base, TypePosition::RETURN, ctx, base_scope, from_module);
+                    quote! { <#base>::#assoc }
+                }
+            }
+        }
         // === Primitives (outer position only reaches here) ===
         TypeRef::Boolean => quote! { bool },
         TypeRef::Number => quote! { f64 },
@@ -4217,6 +4297,7 @@ mod tests {
             name: name.to_string(),
             constraint: None,
             default,
+            trait_bound: None,
         };
         // `<T, U = T[], V>`: `U` sees `T`'s default, `V` has none.
         let alias = ir::TypeAliasDecl {

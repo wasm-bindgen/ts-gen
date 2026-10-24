@@ -63,6 +63,32 @@ pub(crate) fn drop_literal_args(gctx: &mut GlobalContext, positions: &HashMap<Ty
     drop_args(gctx, positions, Some(&declared));
 }
 
+/// Under per-monomorphization an interface keeps its literal-only
+/// parameters, and an argument for one is the enum evaluation names. A
+/// reference evaluation left as written still gives the literals: from the
+/// first such argument on, the arguments go, and the parameters take their
+/// defaults.
+pub(crate) fn drop_unnamed_literal_args(
+    gctx: &mut GlobalContext,
+    positions: &HashMap<TypeId, Vec<usize>>,
+) {
+    if positions.is_empty() {
+        return;
+    }
+    let ids: Vec<TypeId> = gctx.iter_types().map(|(id, _)| id).collect();
+    for id in ids {
+        let pass = Pass {
+            gctx,
+            erased: positions,
+            declared: None,
+            unnamed_only: true,
+        };
+        let decl = gctx.get_type(id);
+        let kind = pass.kind(&decl.kind, decl.scope_id);
+        gctx.get_type_mut(id).kind = kind;
+    }
+}
+
 fn drop_args(
     gctx: &mut GlobalContext,
     erased: &HashMap<TypeId, Vec<usize>>,
@@ -74,6 +100,7 @@ fn drop_args(
             gctx,
             erased,
             declared,
+            unnamed_only: false,
         };
         let decl = gctx.get_type(id);
         let kind = pass.kind(&decl.kind, decl.scope_id);
@@ -87,6 +114,9 @@ struct Pass<'a> {
     /// When set, the parameter count each declaration has left: only a
     /// reference with more arguments still gives the erased ones.
     declared: Option<&'a HashMap<TypeId, usize>>,
+    /// Drop only from the first erased position whose argument isn't a
+    /// name (see [`drop_unnamed_literal_args`]).
+    unnamed_only: bool,
 }
 
 impl Pass<'_> {
@@ -217,6 +247,21 @@ impl Pass<'_> {
                         })
                     })
                     .and_then(|id| self.erased.get(&id));
+                if self.unnamed_only {
+                    let cut = erased.and_then(|e| {
+                        generic_args
+                            .iter()
+                            .enumerate()
+                            .position(|(i, a)| e.contains(&i) && a.as_ident().is_none())
+                    });
+                    return TypeRef::Reference {
+                        segments: segments.clone(),
+                        generic_args: generic_args[..cut.unwrap_or(generic_args.len())]
+                            .iter()
+                            .map(sub)
+                            .collect(),
+                    };
+                }
                 TypeRef::Reference {
                     segments: segments.clone(),
                     generic_args: generic_args
@@ -280,6 +325,7 @@ impl Pass<'_> {
             | TypeRef::NumberLiteral(_)
             | TypeRef::BooleanLiteral(_)
             | TypeRef::Never
+            | TypeRef::Projection { .. }
             | TypeRef::Unresolved(_) => ty.clone(),
         }
     }

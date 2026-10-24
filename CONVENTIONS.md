@@ -4765,6 +4765,109 @@ pub fn until_with_options(
   each instantiation is specialised: the output surface emits such an
   alias only when a signature still reaches it, or `--export` names it.
 
+#### Under `--experimental-generic-mono`
+
+Mono output can express what a literal-only parameter selects, so the
+parameter stays a Rust generic and nothing is specialised. Each argument
+becomes a string enum, and each type-level function of the parameter an
+associated type of a trait bounding it:
+
+```rust
+#[wasm_bindgen(extends = Object, is_type_of = JsValue::is_object)]
+pub type RoundingOptions<Units = DateUnitOrTimeUnit>;
+pub fn smallest_unit<Units: RoundingOptionsUnits>(
+    this: &RoundingOptions<Units>,
+) -> Option<Units::PluralizeUnit>
+where
+    Option<Units::PluralizeUnit>: FromWasmAbi;
+
+pub trait RoundingOptionsUnits {
+    type PluralizeUnit: IntoWasmAbi + FromWasmAbi + OptionIntoWasmAbi + OptionFromWasmAbi;
+}
+impl RoundingOptionsUnits for DateUnitOrTimeUnit {
+    type PluralizeUnit = PluralizeUnit;
+}
+impl RoundingOptionsUnits for DateUnit {
+    type PluralizeUnit = PluralizeDateUnit;
+}
+
+#[wasm_bindgen(
+    extends = Object,
+    extends = RoundingOptions::<Units>,
+    no_deref,
+    is_type_of = JsValue::is_object,
+)]
+pub type RoundingOptionsWithLargestUnit<Units = DateUnitOrTimeUnit>;
+pub trait RoundingOptionsWithLargestUnitUnits: RoundingOptionsUnits {
+    type LargestUnit: IntoWasmAbi + FromWasmAbi + OptionIntoWasmAbi + OptionFromWasmAbi;
+}
+impl RoundingOptionsWithLargestUnitUnits for DateUnit {
+    type LargestUnit = DateUnitLargestUnitKind;
+}
+
+#[wasm_bindgen(
+    extends = Object,
+    extends = ToStringRoundingOptionsWithFractionalSeconds::<ExcludeTimeUnitHour>,
+    no_deref,
+    is_type_of = JsValue::is_object,
+)]
+pub type PlainTimeToStringOptions;
+
+pub fn until_with_options(
+    this: &PlainDate,
+    other: impl PlainDateLike,
+    options: &RoundingOptionsWithLargestUnit<DateUnit>,
+) -> Result<Duration, Error>;
+```
+
+* **An argument is a string enum**: the enum it names (`DateUnit`), an
+  existing one with the same literals, or one named like any evaluated
+  type (`ExcludeTimeUnitHour`, `YearOrMonth`, `Hour`). The parameter
+  defaults to its bound's enum, and a trailing argument equal to the
+  default is elided (`&RoundingOptionsWithLargestUnit` at the bound).
+* **A member typed exactly `U` reads `U`**; any other function of `U`
+  reads through the trait (`U::PluralizeUnit`), with the where clauses
+  generic members already carry. Builders are generic too, bounded by
+  `IntoWasmAbi` and the trait.
+* **Parameters passed on form a family.** An interface passing its
+  parameter to a parent, through `extends` or a flattened `Pick`, or to
+  a member's reference, shares a trait with it. An interface reading no
+  function its parent's trait lacks reuses that trait
+  (`ToStringRoundingOptions` and `RoundingOptions` both bound by
+  `RoundingOptionsUnits`); one reading new functions gets its own trait,
+  `{Interface}{Param}`, extending the parents'
+  (`RoundingOptionsWithLargestUnitUnits: RoundingOptionsUnits`). Reusing
+  keeps one bound across the family, so a generic helper over
+  `RoundingOptions<U>` accepts every child instantiation through `Deref`;
+  extending keeps a parent's impls free of associated types it never
+  reads.
+* **An associated type is named for its function**, within its family:
+  the alias it instantiates (`PluralizeUnit`), or the member it types for
+  an inline one (`LargestUnit`, `MaximumUnit`). Two families may both
+  read a `LargestUnit`; a projection names its family, so each reads its
+  own. Each impl's target is named like
+  any evaluated type, by the instantiation (`PluralizeDateUnit`) or the
+  `<Field>Kind` with the argument's spelling before it
+  (`DateUnitLargestUnitKind`); at the default it is the base's own
+  (`LargestUnitKind`).
+* **There is one impl per argument enum plus the default**, collected
+  across every instantiation the family reaches. An argument is its
+  declaration, not its name: `Spans.Unit` and `Steps.Unit` given to one
+  family are two impls, and an inherited member reads its argument in
+  the scope the `extends` clause writes it in, however many parents it
+  is passed on through.
+* **Parse and generate in one mode.** Evaluation lowers literal-only
+  parameters for the mode `ParseOptions` selects, so
+  `generate_with_options` returns an error when its
+  `experimental_generic_mono` differs.
+* **A generic parent comes after `Object`.** wasm-bindgen builds the
+  first `extends` from a `JsValue`, which only a parent at its defaults
+  has, so a parent with arguments follows `extends = Object`, is written
+  with a turbofish, and `Deref` is implemented by hand through
+  `JsCast::unchecked_ref`.
+* **Classes are unchanged.** A merged class still erases the parameter,
+  and its instantiations are the base, as in default output.
+
 ## Multiple-context name resolution
 
 When the same name appears in different `ModuleContext`s (e.g. a global
