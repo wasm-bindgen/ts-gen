@@ -28,6 +28,8 @@ declare global {
     interface ToStringOptions {
       // `OffsetKind`; `FromOptions.offset` is another set, `OffsetKind2`.
       offset?: "auto" | "never";
+      // The values of `js_sys::Intl::RoundingMode`, which stands in.
+      roundingMode?: "ceil" | "floor" | "expand" | "trunc" | "halfCeil" | "halfFloor" | "halfExpand" | "halfTrunc" | "halfEven";
       // Emitted in `clock`; `Calendar.Options`, a sibling namespace, names
       // it by path.
       unit?: "day" | "week";
