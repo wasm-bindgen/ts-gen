@@ -3494,15 +3494,18 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
   that the input declares more than once (globally and inside a
   module), since names are matched without scope.
 * A side declaration's type-parameter defaults replace the input's, by
-  parameter name: upstream's `Request<CfHostMetadata, Cf =
-  CfProperties<CfHostMetadata>>` defaults `Cf` to a union of the incoming
-  and outgoing shapes, which erases, so the side file's `interface
-  Request<CfHostMetadata = unknown, Cf = IncomingRequestCfProperties<
-  CfHostMetadata>> {}` makes the bare `Request` read `cf()` as the
-  incoming properties. An alias in the side file may do the same for its
-  own parameters (`type RequestInfo<…, Cf = IncomingRequestCfProperties<…>>
-  = …`, whose target is ignored). A default for a parameter the input
-  lacks fails the run.
+  parameter name; a default for a parameter the input lacks fails the
+  run. The output changes where a default is read, which is an alias's
+  expansion. The `annotate` fixture's `RequestInfo<Meta = unknown, Cf =
+  CfProperties> = Request<Meta, Cf> | string`, modelled on
+  workers-types, defaults `Cf` to a union of the incoming
+  and outgoing shapes (`CfProperties = Incoming | Outgoing`), which
+  erases, so a `RequestInfo` argument lowers to `&Request<JsValue,
+  JsValue>`; the side file's `type RequestInfo<Meta = unknown, Cf =
+  Incoming> = …` (whose target is ignored) makes it `&Request<JsValue,
+  Incoming>`. A class or interface default is replaced as well, but the
+  emitted `Request<Meta, Cf>` has no Rust default, so a bare `Request`
+  is unchanged.
 * The side file may use `interface` for a class and need not repeat
   type parameters or parameter types other than tagged ones; only names
   matter.
