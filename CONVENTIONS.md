@@ -67,7 +67,8 @@ position vs return position. Argument-position container types are
 borrowed by reference; return-position container types are owned.
 
 `never` is dropped from a union, so a merged `value: T` /
-`value?: never` property is `Option<T>`.
+`value?: never` property reads as `Option<T>` and is set with `&T` (see
+[Optional and nullable types](#optional-and-nullable-types)).
 
 TypeScript's built-in `PropertyKey` is recognised without a declaration
 and lowers exactly like `string | number | symbol`.
@@ -2257,7 +2258,7 @@ interface Env { TYPED: KVNamespace<"a" | "b">; }
 
 ```rust
 pub type KVNamespace;
-pub async fn get(this: &KVNamespace, key: &str) -> Result<JsOption<JsString>, JsValue>;
+pub async fn get(this: &KVNamespace, key: &str) -> Result<Nullable<String>, JsValue>;
 pub async fn list<Metadata: ::wasm_bindgen::JsGeneric>(
     this: &KVNamespace,
 ) -> Result<KVNamespaceListResult<Metadata>, JsValue>;
