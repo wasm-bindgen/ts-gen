@@ -24,6 +24,7 @@
 //! Anything that can't be evaluated keeps the lowering it had before, with
 //! a warning.
 
+use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
@@ -104,6 +105,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             synths: Vec::new(),
             enum_names: HashMap::new(),
             dict_names: HashMap::new(),
+            done: HashMap::new(),
             used: LocalScope::with_claimed(names),
             diag,
             depth: 0,
@@ -111,6 +113,11 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         let mut rewritten = Vec::new();
         for id in ids {
             let decl = eval.gctx.get_type(id);
+            if is_plain_alias(&decl.kind) {
+                let kind = eval.evaluated(id).into_owned();
+                rewritten.push((id, kind));
+                continue;
+            }
             let place = Placement {
                 anchor: id,
                 scope: decl.scope_id,
@@ -137,14 +144,19 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         let scope = synth.place.scope;
         let kind = match synth.kind {
             SynthKind::Enum(literals) => TypeKind::StringEnum(string_enum(&synth.name, &literals)),
-            SynthKind::Dict(props) => {
+            SynthKind::Dict { props, type_params } => {
                 let body_scope = gctx.scopes.create_child(scope);
+                for p in &type_params {
+                    gctx.scopes
+                        .get_mut(body_scope)
+                        .insert_type_param(p.name.clone());
+                }
                 let members = props_to_members(&props, body_scope);
                 TypeKind::Interface(InterfaceDecl {
                     classification: classify_interface(&members),
                     name: synth.name.clone(),
                     js_name: synth.name.clone(),
-                    type_params: Vec::new(),
+                    type_params,
                     extends: Vec::new(),
                     members,
                     construct: Vec::new(),
@@ -222,7 +234,12 @@ struct Placement {
 
 enum SynthKind {
     Enum(Vec<String>),
-    Dict(Vec<Prop>),
+    /// A dictionary is generic over the type parameters its members
+    /// capture from the use site.
+    Dict {
+        props: Vec<Prop>,
+        type_params: Vec<TypeParam>,
+    },
 }
 
 struct Synth {
@@ -289,6 +306,9 @@ struct Eval<'g> {
     synths: Vec<Synth>,
     enum_names: HashMap<(ScopeId, Vec<String>), String>,
     dict_names: HashMap<(ScopeId, DictKey), String>,
+    /// Non-generic aliases rewritten so far. One is evaluated when first
+    /// used, so a utility over an alias reads its result, not its target.
+    done: HashMap<TypeId, TypeKind>,
     used: LocalScope,
     diag: DiagnosticCollector,
     depth: u32,
@@ -296,7 +316,30 @@ struct Eval<'g> {
 
 const MAX_DEPTH: u32 = 64;
 
-impl Eval<'_> {
+impl<'g> Eval<'g> {
+    /// The kind of `id`, a non-generic alias's rewritten on demand.
+    fn evaluated(&mut self, id: TypeId) -> Cow<'g, TypeKind> {
+        if let Some(kind) = self.done.get(&id) {
+            return Cow::Owned(kind.clone());
+        }
+        let decl = self.gctx.get_type(id);
+        if !is_plain_alias(&decl.kind) {
+            return Cow::Borrowed(&decl.kind);
+        }
+        // A cycle reads the target as written.
+        self.done.insert(id, decl.kind.clone());
+        let place = Placement {
+            anchor: id,
+            scope: decl.scope_id,
+        };
+        let mut kind = decl.kind.clone();
+        let depth = std::mem::replace(&mut self.depth, 0);
+        self.rewrite_kind(&mut kind, place);
+        self.depth = depth;
+        self.done.insert(id, kind.clone());
+        Cow::Owned(kind)
+    }
+
     /// Rewrite every type in `kind`; whether anything changed.
     fn rewrite_kind(&mut self, kind: &mut TypeKind, place: Placement) -> bool {
         let before = format!("{kind:?}");
@@ -772,6 +815,9 @@ impl Eval<'_> {
                         return None;
                     }
                     members.push(prop.type_ref.clone());
+                    if prop.optional {
+                        members.push(TypeRef::Undefined);
+                    }
                 }
                 TypeRef::union(members)
             }
@@ -932,15 +978,16 @@ impl Eval<'_> {
         }
         let test = self.eval(args.get(1)?, scope, env, dest, hint, place)?;
         // A string enum tests as its literals.
-        let test: Vec<TypeRef> = union_members(&test)
-            .into_iter()
-            .flat_map(|t| match self.string_literals(&t, dest) {
+        let mut expanded_test = Vec::new();
+        for t in union_members(&test) {
+            match self.string_literals(&t, dest) {
                 Some(literals) if matches!(t, TypeRef::Reference { .. }) => {
-                    literals.into_iter().map(TypeRef::StringLiteral).collect()
+                    expanded_test.extend(literals.into_iter().map(TypeRef::StringLiteral));
                 }
-                _ => vec![t],
-            })
-            .collect();
+                _ => expanded_test.push(t),
+            }
+        }
+        let test = expanded_test;
         let has_literals = test.iter().any(|t| matches!(t, TypeRef::StringLiteral(_)));
         let mut kept = Vec::new();
         for member in union_members(&subject) {
@@ -980,7 +1027,10 @@ impl Eval<'_> {
         let mut props = source.to_vec();
         match utility {
             Utility::Partial => props.iter_mut().for_each(|p| p.optional = true),
-            Utility::Required => props.iter_mut().for_each(|p| p.optional = false),
+            Utility::Required => props.iter_mut().for_each(|p| {
+                p.optional = false;
+                p.type_ref = without_undefined(&p.type_ref);
+            }),
             Utility::Readonly => props.iter_mut().for_each(|p| p.readonly = true),
             Utility::Pick | Utility::Omit => {
                 let keys = self.literal_set(args.get(1)?, scope, env, dest, place)?;
@@ -1013,7 +1063,7 @@ impl Eval<'_> {
             let from = source
                 .as_ref()
                 .and_then(|props| props.iter().find(|p| p.js_name == key));
-            let type_ref = match &mapped.value {
+            let mut type_ref = match &mapped.value {
                 Some(value) => {
                     let env = env.bind(
                         mapped.key.clone(),
@@ -1036,6 +1086,9 @@ impl Eval<'_> {
                 Some(Modifier::Remove) => false,
                 None => inherited,
             };
+            if mapped.optional == Some(Modifier::Remove) {
+                type_ref = without_undefined(&type_ref);
+            }
             props.push(Prop {
                 js_name: key,
                 type_ref,
@@ -1137,7 +1190,9 @@ impl Eval<'_> {
                         Some(Binding::Declared(_)) => {}
                     }
                 }
-                let id = self.gctx.resolve_path(scope, &segments.join("."))?;
+                let Some(id) = self.gctx.resolve_path(scope, &segments.join(".")) else {
+                    return self.synth_props(scope, segments);
+                };
                 self.shape_of_decl(id, generic_args, scope, env, dest, place)
             }
             _ => None,
@@ -1153,8 +1208,8 @@ impl Eval<'_> {
         dest: ScopeId,
         place: Placement,
     ) -> Option<Vec<Prop>> {
-        let decl = self.gctx.get_type(id);
-        let (type_params, body_scope) = match &decl.kind {
+        let kind = self.evaluated(id);
+        let (type_params, body_scope) = match &*kind {
             TypeKind::Interface(i) => (&i.type_params, i.body_scope),
             TypeKind::Class(c) => (&c.type_params, c.body_scope),
             TypeKind::TypeAlias(a) => (&a.type_params, a.body_scope),
@@ -1177,7 +1232,7 @@ impl Eval<'_> {
                 (None, None) => {}
             }
         }
-        let (members, extends): (&[Member], Vec<crate::ir::Heritage>) = match &decl.kind {
+        let (members, extends): (&[Member], Vec<crate::ir::Heritage>) = match &*kind {
             TypeKind::Interface(i) => (&i.members, i.extends.clone()),
             TypeKind::Class(c) => (&c.members, c.extends.iter().cloned().collect()),
             TypeKind::TypeAlias(a) => {
@@ -1239,7 +1294,7 @@ impl Eval<'_> {
 
     /// The union of `members`. One mixing string literals with string enums
     /// reads the enums as their literals, so the whole is one literal set.
-    fn literal_union(&self, members: Vec<TypeRef>, dest: ScopeId) -> TypeRef {
+    fn literal_union(&mut self, members: Vec<TypeRef>, dest: ScopeId) -> TypeRef {
         let members: Vec<TypeRef> = members
             .into_iter()
             .flat_map(|m| union_members(&m))
@@ -1247,19 +1302,22 @@ impl Eval<'_> {
         let has_literal = members
             .iter()
             .any(|m| matches!(m, TypeRef::StringLiteral(_)));
-        let has_enum = members.iter().any(|m| {
-            matches!(m, TypeRef::Reference { .. }) && self.string_literals(m, dest).is_some()
-        });
-        if !(has_literal && has_enum) {
-            return TypeRef::union(members);
+        let mut expanded = Vec::new();
+        let mut has_enum = false;
+        for m in &members {
+            match self.string_literals(m, dest) {
+                Some(literals) if matches!(m, TypeRef::Reference { .. }) => {
+                    has_enum = true;
+                    expanded.extend(literals.into_iter().map(TypeRef::StringLiteral));
+                }
+                _ => expanded.push(m.clone()),
+            }
         }
-        TypeRef::union(members.into_iter().flat_map(|m| match &m {
-            TypeRef::Reference { .. } => match self.string_literals(&m, dest) {
-                Some(literals) => literals.into_iter().map(TypeRef::StringLiteral).collect(),
-                None => vec![m],
-            },
-            _ => vec![m],
-        }))
+        if has_literal && has_enum {
+            TypeRef::union(expanded)
+        } else {
+            TypeRef::union(members)
+        }
     }
 
     /// The string literals `ty` evaluates to, in order.
@@ -1277,11 +1335,16 @@ impl Eval<'_> {
 
     /// The string literals of an evaluated type, reading a string enum
     /// (or an alias of one) as its variants. `None` for anything else.
-    fn string_literals(&self, ty: &TypeRef, scope: ScopeId) -> Option<Vec<String>> {
+    fn string_literals(&mut self, ty: &TypeRef, scope: ScopeId) -> Option<Vec<String>> {
         self.string_literals_in(ty, scope, 0)
     }
 
-    fn string_literals_in(&self, ty: &TypeRef, scope: ScopeId, depth: u32) -> Option<Vec<String>> {
+    fn string_literals_in(
+        &mut self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        depth: u32,
+    ) -> Option<Vec<String>> {
         if depth > 32 {
             return None;
         }
@@ -1291,17 +1354,17 @@ impl Eval<'_> {
                 TypeRef::StringLiteral(s) => out.push(s),
                 TypeRef::Never => {}
                 TypeRef::Reference { segments, .. } => {
-                    let id = self.gctx.resolve_path(scope, &segments.join("."))?;
-                    match &self.gctx.get_type(id).kind {
+                    let Some(id) = self.gctx.resolve_path(scope, &segments.join(".")) else {
+                        out.extend(self.synth_literals(scope, &segments)?);
+                        continue;
+                    };
+                    match &*self.evaluated(id) {
                         TypeKind::StringEnum(e) => {
                             out.extend(e.variants.iter().map(|v| v.js_value.clone()));
                         }
                         TypeKind::TypeAlias(a) if a.type_params.is_empty() => {
-                            out.extend(self.string_literals_in(
-                                &a.target,
-                                a.body_scope,
-                                depth + 1,
-                            )?);
+                            let (target, body_scope) = (a.target.clone(), a.body_scope);
+                            out.extend(self.string_literals_in(&target, body_scope, depth + 1)?);
                         }
                         _ => return None,
                     }
@@ -1312,6 +1375,47 @@ impl Eval<'_> {
         let mut seen = HashSet::new();
         out.retain(|s| seen.insert(s.clone()));
         Some(out)
+    }
+
+    /// A synthesised declaration named by `segments`, visible from `scope`.
+    /// Synths are declared once the pass ends, so until then a reference to
+    /// one resolves here.
+    fn synth(&self, scope: ScopeId, segments: &[String]) -> Option<&Synth> {
+        if segments.len() != 1 {
+            return None;
+        }
+        let chain = self.gctx.scopes.chain(scope);
+        self.synths
+            .iter()
+            .find(|s| s.name == segments[0] && chain.contains(&s.place.scope))
+    }
+
+    fn synth_literals(&self, scope: ScopeId, segments: &[String]) -> Option<Vec<String>> {
+        match &self.synth(scope, segments)?.kind {
+            SynthKind::Enum(literals) => Some(literals.clone()),
+            SynthKind::Dict { .. } => None,
+        }
+    }
+
+    fn synth_props(&self, scope: ScopeId, segments: &[String]) -> Option<Vec<Prop>> {
+        match &self.synth(scope, segments)?.kind {
+            SynthKind::Dict { props, .. } => Some(props.clone()),
+            SynthKind::Enum(_) => None,
+        }
+    }
+
+    /// The type parameters in scope at `dest` that `props` mention.
+    fn captured_params(&self, props: &[Prop], dest: ScopeId) -> Vec<String> {
+        let mut names = Vec::new();
+        for p in props {
+            idents(&p.type_ref, &mut names);
+        }
+        let mut seen = HashSet::new();
+        names.retain(|n| {
+            self.gctx.scopes.resolve_binding(dest, n) == Some(Binding::TypeParam)
+                && seen.insert(n.clone())
+        });
+        names
     }
 
     /// The body scope declaring the type parameter `name` visible from
@@ -1403,18 +1507,31 @@ impl Eval<'_> {
         if !self.gctx.scopes.chain(dest).contains(&place.scope) {
             return None;
         }
+        let captured = self.captured_params(&props, dest);
+        let reference = |name: String| TypeRef::Reference {
+            segments: vec![name],
+            generic_args: captured.iter().map(TypeRef::ident).collect(),
+        };
         let key = (place.scope, dict_key(&props));
         if let Some(name) = self.dict_names.get(&key) {
-            return Some(TypeRef::ident(name.clone()));
+            return Some(reference(name.clone()));
         }
         let name = self.used.declare(hint, Suffix::Pascal);
         self.dict_names.insert(key, name.clone());
+        let type_params = captured
+            .iter()
+            .map(|name| TypeParam {
+                name: name.clone(),
+                constraint: None,
+                default: None,
+            })
+            .collect();
         self.synths.push(Synth {
             name: name.clone(),
             place,
-            kind: SynthKind::Dict(props),
+            kind: SynthKind::Dict { props, type_params },
         });
-        Some(TypeRef::ident(name))
+        Some(reference(name))
     }
 }
 
@@ -1448,6 +1565,51 @@ fn dict_key(props: &[Prop]) -> DictKey {
             )
         })
         .collect()
+}
+
+fn is_plain_alias(kind: &TypeKind) -> bool {
+    matches!(kind, TypeKind::TypeAlias(a) if a.type_params.is_empty())
+}
+
+/// `-?` removes `undefined` from the property's type as well.
+fn without_undefined(ty: &TypeRef) -> TypeRef {
+    TypeRef::union(
+        union_members(ty)
+            .into_iter()
+            .filter(|m| !matches!(m, TypeRef::Undefined | TypeRef::Void)),
+    )
+}
+
+/// Every single-segment name `ty` mentions, type parameters included.
+fn idents(ty: &TypeRef, out: &mut Vec<String>) {
+    match ty {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => {
+            if segments.len() == 1 && generic_args.is_empty() {
+                out.push(segments[0].clone());
+            }
+            generic_args.iter().for_each(|a| idents(a, out));
+        }
+        TypeRef::Array(e) | TypeRef::KeyOf(e) => idents(e, out),
+        TypeRef::Union(u) => u.members().iter().for_each(|m| idents(m, out)),
+        TypeRef::Intersection(v) | TypeRef::Tuple(v) => v.iter().for_each(|m| idents(m, out)),
+        TypeRef::Function(sig) => {
+            sig.params.iter().for_each(|p| idents(&p.type_ref, out));
+            idents(&sig.return_type, out);
+        }
+        TypeRef::IndexedAccess(o, i) => {
+            idents(o, out);
+            idents(i, out);
+        }
+        TypeRef::Mapped(m) => {
+            idents(&m.keys, out);
+            m.value.iter().for_each(|v| idents(v, out));
+        }
+        TypeRef::ObjectLiteral(props) => props.iter().for_each(|p| idents(&p.type_ref, out)),
+        _ => {}
+    }
 }
 
 fn union_members(ty: &TypeRef) -> Vec<TypeRef> {
@@ -1796,6 +1958,79 @@ mod tests {
             rendered.matches("could not be evaluated").count(),
             3,
             "{rendered}"
+        );
+    }
+
+    #[test]
+    fn utilities_read_an_alias_evaluated() {
+        let (module, gctx) = parse(
+            "type Unit = \"hour\" | \"minute\" | \"second\";
+             type Minute = Exclude<Unit, \"hour\" | \"second\">;
+             type NotMinute = Exclude<Unit, Minute>;
+             type Keys = Exclude<keyof Options, \"fixed\">;
+             interface Options { name: string; size?: number; readonly fixed: boolean }
+             declare function f(a: Exclude<Minute, \"minute\">, b: Pick<Options, Keys>): void;",
+        );
+        assert_eq!(
+            variants(kind(&gctx, &module, "NotMinute")),
+            ["hour", "second"]
+        );
+        assert_eq!(param_type(&gctx, &module, "f", 0), &TypeRef::Never);
+        assert_eq!(
+            props(kind(&gctx, &module, "PickOptionsKeys")),
+            [("name", false, false), ("size", true, false)]
+        );
+    }
+
+    #[test]
+    fn dictionaries_capturing_a_type_parameter_are_generic_over_it() {
+        let (module, gctx) = parse(
+            "interface Box<T> { value: T; label: string }
+             interface Holder<T> { partial: Partial<Box<T>> }",
+        );
+        let TypeKind::Interface(holder) = kind(&gctx, &module, "Holder") else {
+            unreachable!()
+        };
+        let Member::Getter(g) = &holder.members[0] else {
+            unreachable!()
+        };
+        assert_eq!(
+            g.type_ref,
+            TypeRef::Reference {
+                segments: vec!["PartialBoxT".into()],
+                generic_args: vec![TypeRef::ident("T")],
+            }
+        );
+        let TypeKind::Interface(dict) = kind(&gctx, &module, "PartialBoxT") else {
+            unreachable!()
+        };
+        assert_eq!(dict.type_params.len(), 1);
+        assert_eq!(dict.type_params[0].name, "T");
+        assert_eq!(
+            gctx.scopes.resolve_binding(dict.body_scope, "T"),
+            Some(Binding::TypeParam)
+        );
+    }
+
+    #[test]
+    fn indexed_access_on_an_optional_property_admits_undefined() {
+        let (module, gctx) = parse(
+            "interface Options { name: string; size?: number }
+             type Strict = { [P in keyof Options]-?: Options[P] };
+             declare function f(a: Options[\"size\"], b: Options[\"name\"], c: Required<Options>): void;",
+        );
+        assert_eq!(
+            param_type(&gctx, &module, "f", 0),
+            &TypeRef::union([TypeRef::Number, TypeRef::Undefined])
+        );
+        assert_eq!(param_type(&gctx, &module, "f", 1), &TypeRef::String);
+        assert_eq!(
+            props(kind(&gctx, &module, "Strict")),
+            [("name", false, false), ("size", false, false)]
+        );
+        assert_eq!(
+            param_type(&gctx, &module, "f", 2),
+            &TypeRef::ident("Strict")
         );
     }
 }

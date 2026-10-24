@@ -133,6 +133,21 @@ pub enum OptionKey {
     Size = "size",
     Fixed = "fixed",
 }
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NotMinute {
+    Hour = "hour",
+    Second = "second",
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    pub fn keyed(picked: &PickOptionsNameOrSize);
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "keyed")]
+    pub fn try_keyed(picked: &PickOptionsNameOrSize) -> Result<(), JsValue>;
+}
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -217,6 +232,15 @@ extern "C" {
         flags: &FlagsAOrB,
     ) -> Result<(), JsValue>;
 }
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    pub fn size(opts: &Options) -> Option<f64>;
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "size")]
+    pub fn try_size(opts: &Options) -> Result<Option<f64>, JsValue>;
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Plural {
@@ -286,6 +310,45 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "round")]
     pub fn try_round(opts: &Rounding<JsString>) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Box<T: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method, getter)]
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>) -> T;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, val: &T);
+    #[wasm_bindgen(method, getter)]
+    pub fn label<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_label<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, val: &str);
+}
+impl<T: ::wasm_bindgen::JsGeneric> Box<T> {
+    pub fn new(value: &T, label: &str) -> Box<T> {
+        let inner: Box<T> = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value(value);
+        inner.set_label(label);
+        inner
+    }
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Holder<T: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method, getter)]
+    pub fn partial<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> PartialBoxT<T>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_partial<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>, val: &PartialBoxT<T>);
+}
+impl<T: ::wasm_bindgen::JsGeneric> Holder<T> {
+    pub fn new(partial: &PartialBoxT<T>) -> Holder<T> {
+        let inner: Holder<T> = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_partial(partial);
+        inner
+    }
 }
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {
@@ -517,7 +580,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &RequiredOptions, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn size(this: &RequiredOptions) -> Option<f64>;
+    pub fn size(this: &RequiredOptions) -> f64;
     #[wasm_bindgen(method, setter)]
     pub fn set_size(this: &RequiredOptions, val: f64);
     #[wasm_bindgen(method, getter)]
@@ -648,6 +711,46 @@ pub enum PluralHourOrMinute {
     Minute = "minute",
     Hours = "hours",
     Minutes = "minutes",
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PartialBoxT<T: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method, getter)]
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &PartialBoxT<T>) -> Option<T>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &PartialBoxT<T>, val: &T);
+    #[wasm_bindgen(method, getter)]
+    pub fn label<T: ::wasm_bindgen::JsGeneric>(this: &PartialBoxT<T>) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_label<T: ::wasm_bindgen::JsGeneric>(this: &PartialBoxT<T>, val: &str);
+}
+impl<T: ::wasm_bindgen::JsGeneric> PartialBoxT<T> {
+    pub fn new() -> PartialBoxT<T> {
+        Self::builder().build()
+    }
+    pub fn builder() -> PartialBoxTBuilder<T> {
+        PartialBoxTBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct PartialBoxTBuilder<T: ::wasm_bindgen::JsGeneric> {
+    inner: PartialBoxT<T>,
+}
+impl<T: ::wasm_bindgen::JsGeneric> PartialBoxTBuilder<T> {
+    pub fn value(self, val: &T) -> Self {
+        self.inner.set_value(val);
+        self
+    }
+    pub fn label(self, val: &str) -> Self {
+        self.inner.set_label(val);
+        self
+    }
+    pub fn build(self) -> PartialBoxT<T> {
+        self.inner
+    }
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

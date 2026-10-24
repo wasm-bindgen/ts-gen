@@ -33,6 +33,10 @@ export type Sized = Pick<Options, "size">;
 export type Minute = Exclude<Unit, "hour" | "second">;
 export type OptionKey = keyof Options;
 
+// A utility over an alias reads the alias evaluated.
+export type NotMinute = Exclude<Unit, Minute>;
+export declare function keyed(picked: Pick<Options, Exclude<OptionKey, "fixed">>): void;
+
 // A utility in `extends` has no parent to defer to, so it flattens.
 export interface Named extends Omit<Options, "size"> {
   label?: string | undefined;
@@ -49,7 +53,9 @@ export declare function mapped(
   flags: Flags<"a" | "b">,
 ): void;
 
-// Indexed access distributes over a literal key union.
+// Indexed access distributes over a literal key union; an optional
+// property's type admits `undefined`, which `-?` and `Required` remove.
+export declare function size(opts: Options): Options["size"];
 export type Plural<T extends Unit> = T | { hour: "hours"; minute: "minutes"; second: "seconds" }[T];
 export declare function plural(all: Plural<Unit>, some: Plural<"hour" | "minute">): void;
 
@@ -60,6 +66,10 @@ export interface Rounding<U extends Unit> {
   largestUnit?: "auto" | Plural<U> | undefined;
 }
 export declare function round(opts: Rounding<"hour">): void;
+
+// A dictionary capturing a type parameter of the use site is generic over it.
+export interface Box<T> { value: T; label: string }
+export interface Holder<T> { partial: Partial<Box<T>> }
 
 // Inherited properties take part in `keyof` and the object utilities.
 export interface Extended extends Options {

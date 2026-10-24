@@ -3,8 +3,9 @@
 use js_sys::JsString;
 use ts_gen_integration_tests::type_eval::scoped::PartialSettings;
 use ts_gen_integration_tests::type_eval::{
-    ExcludeUnitHour, KeyOfExtended, Mixed, Named, OptionKey, PartialOptions, PickOptionsNameOrSize,
-    Plural, PluralHourOrMinute, ReadonlyOptions, Rounding, Sized,
+    ExcludeUnitHour, Holder, KeyOfExtended, Mixed, Named, NotMinute, OptionKey, PartialBoxT,
+    PartialOptions, PickOptionsNameOrSize, Plural, PluralHourOrMinute, ReadonlyOptions,
+    RequiredOptions, Rounding, Sized,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -12,7 +13,16 @@ use ts_gen_integration_tests::type_eval::{
 // string enums for literal results and all-optional dictionaries with
 // builders for object results, flattened members included.
 #[allow(dead_code)]
-fn evaluated_types_compile(rounding: &Rounding<JsString>, frozen: &ReadonlyOptions) {
+fn evaluated_types_compile(
+    rounding: &Rounding<JsString>,
+    frozen: &ReadonlyOptions,
+    required: &RequiredOptions,
+    holder: &Holder<JsString>,
+) {
+    let _: f64 = required.size();
+    let partial_box: PartialBoxT<JsString> = holder.partial();
+    let _: Option<JsString> = partial_box.value();
+    let _: Holder<JsString> = Holder::new(&PartialBoxT::builder().label("l").build());
     let partial = PartialOptions::new();
     partial.set_name("n");
     partial.set_size(1.0);
@@ -32,6 +42,7 @@ fn evaluated_types_compile(rounding: &Rounding<JsString>, frozen: &ReadonlyOptio
     rounding.set_smallest_unit(Plural::Hours);
     let _ = (
         ExcludeUnitHour::Minute,
+        NotMinute::Hour,
         KeyOfExtended::Extra,
         OptionKey::Fixed,
         PluralHourOrMinute::Minutes,

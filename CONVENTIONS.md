@@ -3271,7 +3271,12 @@ pub type Sized;            // size?
   over an all-optional `T` is `T`.
 * **An alias to an evaluated type is promoted.** `type Sized = Pick<…>`
   is the dictionary `Sized`; `type OptionKey = keyof Options` is the enum
-  `OptionKey`.
+  `OptionKey`. A utility over such an alias reads it evaluated, so
+  `Exclude<Unit, Minute>` and `Pick<Options, Exclude<OptionKey, "fixed">>`
+  work wherever the alias is declared.
+* **A dictionary capturing a type parameter is generic over it.** Inside
+  `interface Holder<T> { partial: Partial<Box<T>> }` the field is
+  `PartialBoxT<T>`, a dictionary declared with `T` as its own parameter.
 * **A utility in `extends` flattens.** wasm-bindgen inheritance is
   `extends = Parent`, which needs a declared parent, so `Omit<…>`,
   `Pick<…>`, `Partial<…>` and an instantiated generic alias in an
@@ -3294,6 +3299,10 @@ pub type Sized;            // size?
   optionality and `readonly` it has in `T` unless a `?` / `-?` /
   `readonly` modifier says otherwise, and keeps its type when the mapped
   type gives none. An `as` clause is not followed.
+* **Indexed access on an optional property admits `undefined`.**
+  `Options["size"]` is `number | undefined`, so a function returning it
+  returns `Option<f64>`. `-?` and `Required` remove the `undefined` again,
+  as TypeScript does: `Required<Options>` has `size: f64`.
 * **`never`** is dropped from a union and erases to `JsValue` alone.
 * **What can't be evaluated keeps its old lowering**, with a warning: a
   utility is its first argument (`Partial<Widget>` over a class with
