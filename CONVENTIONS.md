@@ -919,7 +919,7 @@ setter, and names its factory with `.` and a leading `-` spelled out
 A literal that the field's [setter takes through its
 enum](#literal-union-setters) is passed as that enum's variant instead
 (`mode: true | "x" | "y"` → `new_x()` calling
-`set_mode_with_mode_kind(ModeKind::X)`).
+`set_mode(ModeKind::X)`).
 
 Mixed unions like `disposition: "inline" | string` produce one variant
 per literal *plus* a generic catch-all that takes the field as a
@@ -998,11 +998,11 @@ emits builder methods `headers`, `headers_with_slice`,
 
 A property's getter returns the
 [synthesised enum](#erased-return-position-unions-become-dynamic-union-enums)
-for a union of literals, so its setter takes that enum for the literal
-members the enum keeps as their own variants: string literals, and every
-member of a C-style integer enum. The other members keep their per-type
-overloads. The enum takes the position of its first literal member for
-`_with_<type>` naming, and the getter's value can be passed straight back.
+for a union of literals, so its unsuffixed setter and builder method take
+that same enum, and the getter's value can be passed straight back. The
+enum stands for the literal members it keeps as their own variants:
+string literals, and every member of a C-style integer enum. The other
+members keep their `_with_<type>` overloads after it.
 
 ```ts
 interface Options {
@@ -1014,8 +1014,8 @@ interface Options {
 
 ```rust
 pub fn mode(this: &Options) -> ModeKind;
-pub fn set_mode(this: &Options, val: bool);
-pub fn set_mode_with_mode_kind(this: &Options, val: ModeKind);
+pub fn set_mode(this: &Options, val: ModeKind);
+pub fn set_mode_with_bool(this: &Options, val: bool);
 pub fn set_inline(this: &Options, val: InlineKind);
 pub fn set_level(this: &Options, val: LevelKind);
 ```
@@ -1025,7 +1025,11 @@ pub fn set_level(this: &Options, val: LevelKind);
 * String literals covered by a `string` member stay on the `&str` setter,
   which is already exact: `mode: "x" | string` keeps `set_mode(&str)`.
 * Number and boolean literals in a mixed union widen inside the enum too
-  (`F64(f64)`, `Bool(bool)`), so they keep their `f64` / `bool` overloads.
+  (`F64(f64)`, `Bool(bool)`). However many there are, they share one
+  `f64` / `bool` overload: `digits?: "auto" | 0 | 1 | … | 9` gives
+  `set_digits(DigitsKind)` and `set_digits_with_f64(f64)`, where the
+  ten literals as separate alternatives would overflow the fan-out limit
+  and leave only a `&JsValue` setter.
 * Unions without literal members keep their per-type overloads.
 * Builder methods for optional fields follow their setter.
 

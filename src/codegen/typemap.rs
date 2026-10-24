@@ -3201,19 +3201,28 @@ impl SetterEnum {
             .map(|(_, v)| v.as_str())
     }
 
-    /// `ty` with the enum's literal members replaced by the enum, at the
-    /// position of the first one.
+    /// `ty` with the enum first, standing for the literal members it keeps
+    /// as variants, so the unsuffixed setter takes what the getter reads.
+    /// The literals it widens into a payload (`0 | 1` into `F64(f64)`,
+    /// `true` into `Bool(bool)`) collapse into that primitive, which keeps
+    /// one `_with_f64` / `_with_bool` setter however many literals there
+    /// are, rather than overflowing the per-member fan-out.
     pub(crate) fn param_type(&self, ty: &TypeRef) -> TypeRef {
         match ty {
             TypeRef::Union(u) => {
                 let mut out: Vec<TypeRef> = Vec::with_capacity(u.members().len());
-                let mut placed = false;
+                out.push(TypeRef::ident(self.name.clone()));
                 for m in u.members() {
-                    if self.variant(m).is_none() {
-                        out.push(m.clone());
-                    } else if !placed {
-                        out.push(TypeRef::ident(self.name.clone()));
-                        placed = true;
+                    if self.variant(m).is_some() {
+                        continue;
+                    }
+                    let m = match m {
+                        TypeRef::NumberLiteral(_) => TypeRef::Number,
+                        TypeRef::BooleanLiteral(_) => TypeRef::Boolean,
+                        other => other.clone(),
+                    };
+                    if !out.contains(&m) {
+                        out.push(m);
                     }
                 }
                 TypeRef::union(out)
@@ -3595,7 +3604,7 @@ mod tests {
     use crate::parse::scope::ScopeId;
 
     #[test]
-    fn setter_enum_replaces_its_literals_at_the_first_position() {
+    fn setter_enum_goes_first_and_widens_the_literals_it_absorbs() {
         let e = SetterEnum {
             name: "ModeKind".to_string(),
             variants: vec![
@@ -3612,11 +3621,12 @@ mod tests {
                 x.clone(),
                 TypeRef::NumberLiteral(1.0),
                 y.clone(),
+                TypeRef::NumberLiteral(2.0),
             ])),
             union(vec![
-                TypeRef::BooleanLiteral(true),
                 TypeRef::ident("ModeKind"),
-                TypeRef::NumberLiteral(1.0),
+                TypeRef::Boolean,
+                TypeRef::Number,
             ])
         );
         assert_eq!(

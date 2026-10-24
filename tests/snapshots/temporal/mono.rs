@@ -857,7 +857,12 @@ pub mod temporal {
         #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
         pub fn set_fractional_second_digits<Units>(
             this: &ToStringRoundingOptionsWithFractionalSeconds<Units>,
-            val: &JsValue,
+            val: FractionalSecondDigitsKind,
+        );
+        #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
+        pub fn set_fractional_second_digits_with_f64<Units>(
+            this: &ToStringRoundingOptionsWithFractionalSeconds<Units>,
+            val: f64,
         );
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi>
@@ -886,8 +891,12 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+        pub fn fractional_second_digits(self, val: FractionalSecondDigitsKind) -> Self {
             self.inner.set_fractional_second_digits(val);
+            self
+        }
+        pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
+            self.inner.set_fractional_second_digits_with_f64(val);
             self
         }
         pub fn build(self) -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
@@ -1670,8 +1679,12 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+        pub fn fractional_second_digits(self, val: FractionalSecondDigitsKind) -> Self {
             self.inner.set_fractional_second_digits(val);
+            self
+        }
+        pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
+            self.inner.set_fractional_second_digits_with_f64(val);
             self
         }
         pub fn build(self) -> PlainTimeToStringOptions {
@@ -2125,7 +2138,12 @@ pub mod temporal {
             this: &PlainDateTimeToStringOptions,
         ) -> Option<FractionalSecondDigitsKind>;
         #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
-        pub fn set_fractional_second_digits(this: &PlainDateTimeToStringOptions, val: &JsValue);
+        pub fn set_fractional_second_digits(
+            this: &PlainDateTimeToStringOptions,
+            val: FractionalSecondDigitsKind,
+        );
+        #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
+        pub fn set_fractional_second_digits_with_f64(this: &PlainDateTimeToStringOptions, val: f64);
     }
     impl PlainDateTimeToStringOptions {
         pub fn new() -> PlainDateTimeToStringOptions {
@@ -2153,8 +2171,12 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+        pub fn fractional_second_digits(self, val: FractionalSecondDigitsKind) -> Self {
             self.inner.set_fractional_second_digits(val);
+            self
+        }
+        pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
+            self.inner.set_fractional_second_digits_with_f64(val);
             self
         }
         pub fn build(self) -> PlainDateTimeToStringOptions {
@@ -2864,8 +2886,12 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+        pub fn fractional_second_digits(self, val: FractionalSecondDigitsKind) -> Self {
             self.inner.set_fractional_second_digits(val);
+            self
+        }
+        pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
+            self.inner.set_fractional_second_digits_with_f64(val);
             self
         }
         pub fn offset(self, val: OffsetKind) -> Self {
@@ -3570,8 +3596,12 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+        pub fn fractional_second_digits(self, val: FractionalSecondDigitsKind) -> Self {
             self.inner.set_fractional_second_digits(val);
+            self
+        }
+        pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
+            self.inner.set_fractional_second_digits_with_f64(val);
             self
         }
         pub fn build(self) -> DurationToStringOptions {
@@ -3984,8 +4014,12 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+        pub fn fractional_second_digits(self, val: FractionalSecondDigitsKind) -> Self {
             self.inner.set_fractional_second_digits(val);
+            self
+        }
+        pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
+            self.inner.set_fractional_second_digits_with_f64(val);
             self
         }
         pub fn time_zone(self, val: &ZonedDateTime) -> Self {

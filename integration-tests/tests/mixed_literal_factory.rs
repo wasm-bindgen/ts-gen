@@ -11,13 +11,13 @@ use ts_gen_integration_tests::mixed_literal_factory::{
 #[allow(dead_code)]
 fn mixed_literal_factory_compile() {
     let bool_or_strings = BoolOrStrings::new_y();
-    bool_or_strings.set_mode(true);
-    bool_or_strings.set_mode_with_mode_kind(ModeKind::X);
-    bool_or_strings.set_mode_with_mode_kind(bool_or_strings.mode());
+    bool_or_strings.set_mode_with_bool(true);
+    bool_or_strings.set_mode(ModeKind::X);
+    bool_or_strings.set_mode(bool_or_strings.mode());
 
     let number_or_strings = NumberOrStrings::new_x();
-    number_or_strings.set_mode(0.0);
-    number_or_strings.set_mode_with_number_or_strings_mode_kind(NumberOrStringsModeKind::Y);
+    number_or_strings.set_mode_with_f64(0.0);
+    number_or_strings.set_mode(NumberOrStringsModeKind::Y);
 
     let mixed = Mixed::new_2();
     mixed.set_mode(MixedModeKind::X);
