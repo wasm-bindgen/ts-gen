@@ -278,13 +278,17 @@ impl ClassConfig<'_> {
         names
     }
 
-    /// The type declaring a member written in `scope`: the declaration
-    /// whose body that is, so a member inherited or flattened into this
-    /// type keeps its owner. This type when unknown or `None`.
-    fn owner_name(&self, scope: Option<ScopeId>) -> String {
+    /// The type declaring a member written in `scope`, qualified by its
+    /// module (see [`super::typemap::CodegenContext::owner_key`]): the
+    /// declaration whose body that is, so a member inherited or flattened
+    /// into this type keeps its owner. This type when unknown or `None`.
+    fn owner_key(&self, scope: Option<ScopeId>) -> String {
+        let Some(cgctx) = self.cgctx else {
+            return self.rust_name.clone();
+        };
         scope
-            .and_then(|s| self.cgctx?.owner_of(s))
-            .unwrap_or_else(|| self.rust_name.clone())
+            .and_then(|s| cgctx.owner_of(s))
+            .unwrap_or_else(|| cgctx.owner_key(&cgctx.emit_path.borrow(), &self.rust_name))
     }
 
     /// The enum a property's setter shares with its getter; see
@@ -296,7 +300,7 @@ impl ClassConfig<'_> {
         ty: &TypeRef,
         owner_scope: Option<ScopeId>,
     ) -> Option<super::typemap::SetterEnum> {
-        let owner = self.owner_name(owner_scope);
+        let owner = self.owner_key(owner_scope);
         super::typemap::setter_enum(
             ty,
             self.cgctx,
@@ -2188,6 +2192,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     // Constructors always return the constructed type, wrapped in Result
     // when `catch` (which is always-true here per `SignatureKind::Constructor`).
     // The class is named from its own body, wherever the params resolve.
+    let owner = config.owner_key(None);
     let ret = to_return_type(
         &return_type,
         sig.catch,
@@ -2201,7 +2206,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
             base: &sig.rust_name,
             field: &sig.js_name,
             kind: super::typemap::ReturnAnchorKind::Callable,
-            parent: Some(&config.rust_name),
+            parent: Some(&owner),
         },
     );
 
@@ -2274,6 +2279,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         wb_parts.push(quote! { js_name = #js_name });
     }
 
+    let owner = config.owner_key(None);
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
@@ -2287,7 +2293,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
             base: &sig.rust_name,
             field: &sig.js_name,
             kind: super::typemap::ReturnAnchorKind::Callable,
-            parent: Some(&config.rust_name),
+            parent: Some(&owner),
         },
     );
     let ret = if is_void_return(&sig.return_type) && !sig.catch {
@@ -2357,6 +2363,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         wb_parts.push(quote! { js_name = #js_name });
     }
 
+    let owner = config.owner_key(None);
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
@@ -2370,7 +2377,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
             base: &sig.rust_name,
             field: &sig.js_name,
             kind: super::typemap::ReturnAnchorKind::Callable,
-            parent: Some(&config.rust_name),
+            parent: Some(&owner),
         },
     );
     let ret = if is_void_return(&sig.return_type) && !sig.catch {
@@ -2413,7 +2420,7 @@ fn generate_getter(
     // Top-level erasing-union return synthesises a dynamic-union
     // enum (see [`ReturnAnchor`]). For getters the anchor is the
     // property name itself — no `Return` infix.
-    let owner = config.owner_name(Some(getter.scope));
+    let owner = config.owner_key(Some(getter.scope));
     let anchor = super::typemap::ReturnAnchor {
         base: &getter.js_name,
         kind: super::typemap::ReturnAnchorKind::Getter,
@@ -2609,6 +2616,7 @@ fn generate_static_getter(
     let rust_ident = super::typemap::make_ident(&rust_name);
 
     let lowered_ty = read_type(&getter.type_ref, getter.optional);
+    let owner = config.owner_key(None);
     let getter_type = super::typemap::to_getter_return_type(
         &lowered_ty,
         config.cgctx,
@@ -2617,7 +2625,7 @@ fn generate_static_getter(
         super::typemap::ReturnAnchor {
             base: &getter.js_name,
             kind: super::typemap::ReturnAnchorKind::Getter,
-            parent: Some(&config.rust_name),
+            parent: Some(&owner),
             field: &getter.js_name,
         },
     );

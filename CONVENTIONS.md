@@ -3549,6 +3549,9 @@ Identity depends on the members:
   its ordered member list *and* the member declaring it (owner and JS
   name). Two such unions only share an enum when they are the same
   member reached twice: a getter, its setter and its builder method.
+  Owners and member types are compared as declarations, not names, so
+  `limit?: Foo | number` on an `Options` in each of two namespaces, each
+  with its own `Foo`, is two enums.
   Structural matches on unrelated members stay apart, since a payload
   union named after one of them misleads at every other use.
 
