@@ -45,9 +45,9 @@ use std::rc::Rc;
 
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
-    FunctionSig, GetterMember, Heritage, InterfaceClassification, InterfaceDecl, MappedType,
-    Member, Modifier, Module, Param, ParamTrait, SetterMember, StringEnumDecl, StringEnumVariant,
-    Throws, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam, TypeRef,
+    FunctionSig, GetterMember, Heritage, InterfaceClassification, InterfaceDecl, MappedType, Member, Modifier,
+    Module, Param, ParamFamily, ParamImpl, ParamTrait, SetterMember, StringEnumDecl,
+    StringEnumVariant, Throws, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam, TypeRef,
 };
 use crate::parse::classify::classify_interface;
 use crate::parse::scope::{Binding, ScopeId};
@@ -2778,7 +2778,9 @@ impl<'g> Eval<'g> {
             self.nodes[node].functions.push(index);
         }
         Some(TypeRef::Projection {
-            param,
+            base: Box::new(TypeRef::ident(param)),
+            base_scope: None,
+            family: self.family_of(family),
             assoc: self.families[family][index].name.clone(),
         })
     }
@@ -2956,8 +2958,17 @@ impl<'g> Eval<'g> {
             )
         };
         if let Some((a, s)) = arg {
+            // An enum the impl's scope can't name reads as its literals.
+            let path = a.format_ts();
+            let read = match self.gctx.resolve_path(*s, &path) {
+                Some(id) if self.gctx.resolve_path(home.scope, &path) != Some(id) => self
+                    .string_literals(a, *s)
+                    .map(|l| TypeRef::union(l.into_iter().map(TypeRef::StringLiteral)))
+                    .unwrap_or_else(|| a.clone()),
+                _ => a.clone(),
+            };
             self.param_args
-                .insert((owner, param.clone()), (a.clone(), *s, Env::default()));
+                .insert((owner, param.clone()), (read, *s, Env::default()));
         }
         self.depth = 0;
         let dest = home.scope;
@@ -2976,6 +2987,14 @@ impl<'g> Eval<'g> {
         };
         self.param_args.remove(&(owner, param));
         result
+    }
+
+    /// The IR identity of the family rooted at node `family`.
+    fn family_of(&self, family: usize) -> ParamFamily {
+        ParamFamily {
+            iface: self.nodes[family].iface,
+            param: self.nodes[family].param.clone(),
+        }
     }
 
     /// Resolve each node's trait, parents first, and each trait's impls.
@@ -3092,10 +3111,15 @@ impl<'g> Eval<'g> {
                         .unwrap_or_else(|| TypeRef::ident("JsValue"));
                     targets.push(target);
                 }
-                impls.push((arg.0, targets));
+                impls.push(ParamImpl {
+                    arg: arg.0,
+                    arg_scope: arg.1,
+                    targets,
+                });
             }
             let built = ParamTrait {
                 name: traits[t].name.clone(),
+                family: self.family_of(traits[t].family),
                 supertraits: traits[t]
                     .supertraits
                     .iter()
@@ -3688,7 +3712,15 @@ mod tests {
             reads,
             [
                 TypeRef::Projection {
-                    param: "U".into(),
+                    base: Box::new(TypeRef::ident("U")),
+                    base_scope: None,
+                    family: ParamFamily {
+                        iface: gctx
+                            .scopes
+                            .resolve(module.file_scopes[0], "Rounding")
+                            .unwrap(),
+                        param: "U".into(),
+                    },
                     assoc: "Plural".into()
                 },
                 TypeRef::ident("U"),
@@ -3714,7 +3746,7 @@ mod tests {
         let trait_named = |name: &str| *traits.iter().find(|t| t.name == name).unwrap();
         let base = trait_named("RoundingU");
         assert_eq!(base.assoc, ["Plural"]);
-        let args: Vec<_> = base.impls.iter().map(|(a, _)| a.clone()).collect();
+        let args: Vec<_> = base.impls.iter().map(|im| im.arg.clone()).collect();
         assert_eq!(
             args,
             [

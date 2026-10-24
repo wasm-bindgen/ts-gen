@@ -631,6 +631,311 @@ pub mod polish {
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Spanning<U = HourOrWeek>;
+        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+        pub fn largest_unit<U: SpanningU>(this: &Spanning<U>) -> Option<U::LargestUnit>
+        where
+            Option<U::LargestUnit>: ::wasm_bindgen::convert::FromWasmAbi;
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit<U: SpanningU>(this: &Spanning<U>, val: U::LargestUnit)
+        where
+            U::LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi;
+    }
+    impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanningU> Spanning<U> {
+        pub fn new() -> Spanning<U> {
+            Self::builder().build()
+        }
+        pub fn builder() -> SpanningBuilder<U> {
+            SpanningBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanningU> Default for Spanning<U> {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct SpanningBuilder<U> {
+        inner: Spanning<U>,
+    }
+    impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanningU> SpanningBuilder<U> {
+        pub fn largest_unit(self, val: U::LargestUnit) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn build(self) -> Spanning<U> {
+            self.inner
+        }
+    }
+    pub trait SpanningU {
+        type LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi
+            + ::wasm_bindgen::convert::FromWasmAbi
+            + ::wasm_bindgen::convert::OptionIntoWasmAbi
+            + ::wasm_bindgen::convert::OptionFromWasmAbi;
+    }
+    impl SpanningU for HourOrWeek {
+        type LargestUnit = LargestUnitKind2;
+    }
+    impl SpanningU for Hour {
+        type LargestUnit = HourLargestUnitKind2;
+    }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , extends = Spanning :: < Hour > , no_deref , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type HourSpanning;
+    }
+    impl ::core::ops::Deref for HourSpanning {
+        type Target = Spanning<Hour>;
+        fn deref(&self) -> &Spanning<Hour> {
+            JsCast::unchecked_ref(self)
+        }
+    }
+    impl HourSpanning {
+        pub fn new() -> HourSpanning {
+            Self::builder().build()
+        }
+        pub fn builder() -> HourSpanningBuilder {
+            HourSpanningBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for HourSpanning {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct HourSpanningBuilder {
+        inner: HourSpanning,
+    }
+    impl HourSpanningBuilder {
+        pub fn largest_unit(self, val: HourLargestUnitKind2) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn build(self) -> HourSpanning {
+            self.inner
+        }
+    }
+    pub mod spans {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(private)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub enum Unit {
+            Hour = "hour",
+            Hours = "hours",
+        }
+        #[wasm_bindgen(experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Span<U = UnitOrDay>;
+            #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+            pub fn largest_unit<U: SpanU>(this: &Span<U>) -> Option<U::LargestUnit>
+            where
+                Option<U::LargestUnit>: ::wasm_bindgen::convert::FromWasmAbi;
+            #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+            pub fn set_largest_unit<U: SpanU>(this: &Span<U>, val: U::LargestUnit)
+            where
+                U::LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi;
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Span<U> {
+            pub fn new() -> Span<U> {
+                Self::builder().build()
+            }
+            pub fn builder() -> SpanBuilder<U> {
+                SpanBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Default for Span<U> {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct SpanBuilder<U> {
+            inner: Span<U>,
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> SpanBuilder<U> {
+            pub fn largest_unit(self, val: U::LargestUnit) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> Span<U> {
+                self.inner
+            }
+        }
+        pub trait SpanU {
+            type LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi
+                + ::wasm_bindgen::convert::FromWasmAbi
+                + ::wasm_bindgen::convert::OptionIntoWasmAbi
+                + ::wasm_bindgen::convert::OptionFromWasmAbi;
+        }
+        impl SpanU for UnitOrDay {
+            type LargestUnit = LargestUnitKind3;
+        }
+        impl SpanU for Unit {
+            type LargestUnit = UnitLargestUnitKind;
+        }
+        impl SpanU for super::steps::Unit {
+            type LargestUnit = UnitLargestUnitKind2;
+        }
+        #[wasm_bindgen(experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , extends = Span :: < Unit > , no_deref , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type HourSpan;
+        }
+        impl ::core::ops::Deref for HourSpan {
+            type Target = Span<Unit>;
+            fn deref(&self) -> &Span<Unit> {
+                JsCast::unchecked_ref(self)
+            }
+        }
+        impl HourSpan {
+            pub fn new() -> HourSpan {
+                Self::builder().build()
+            }
+            pub fn builder() -> HourSpanBuilder {
+                HourSpanBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl Default for HourSpan {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct HourSpanBuilder {
+            inner: HourSpan,
+        }
+        impl HourSpanBuilder {
+            pub fn largest_unit(self, val: UnitLargestUnitKind) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> HourSpan {
+                self.inner
+            }
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub enum UnitOrDay {
+            Hour = "hour",
+            Hours = "hours",
+            Day = "day",
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub enum LargestUnitKind3 {
+            Auto = "auto",
+            Hour = "hour",
+            Hours = "hours",
+            Day = "day",
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub enum UnitLargestUnitKind {
+            Auto = "auto",
+            Hour = "hour",
+            Hours = "hours",
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub enum UnitLargestUnitKind2 {
+            Auto = "auto",
+            Day = "day",
+            Hours = "hours",
+        }
+        impl From<UnitOrDay> for LargestUnitKind3 {
+            fn from(value: UnitOrDay) -> LargestUnitKind3 {
+                match value {
+                    UnitOrDay::Hour => LargestUnitKind3::Hour,
+                    UnitOrDay::Hours => LargestUnitKind3::Hours,
+                    UnitOrDay::Day => LargestUnitKind3::Day,
+                    UnitOrDay::__Invalid => LargestUnitKind3::__Invalid,
+                }
+            }
+        }
+        impl From<UnitLargestUnitKind> for LargestUnitKind3 {
+            fn from(value: UnitLargestUnitKind) -> LargestUnitKind3 {
+                match value {
+                    UnitLargestUnitKind::Auto => LargestUnitKind3::Auto,
+                    UnitLargestUnitKind::Hour => LargestUnitKind3::Hour,
+                    UnitLargestUnitKind::Hours => LargestUnitKind3::Hours,
+                    UnitLargestUnitKind::__Invalid => LargestUnitKind3::__Invalid,
+                }
+            }
+        }
+        impl From<UnitLargestUnitKind2> for LargestUnitKind3 {
+            fn from(value: UnitLargestUnitKind2) -> LargestUnitKind3 {
+                match value {
+                    UnitLargestUnitKind2::Auto => LargestUnitKind3::Auto,
+                    UnitLargestUnitKind2::Day => LargestUnitKind3::Day,
+                    UnitLargestUnitKind2::Hours => LargestUnitKind3::Hours,
+                    UnitLargestUnitKind2::__Invalid => LargestUnitKind3::__Invalid,
+                }
+            }
+        }
+    }
+    pub mod steps {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(private)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub enum Unit {
+            Day = "day",
+            Hours = "hours",
+        }
+        #[wasm_bindgen(experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , extends = super :: spans :: Span :: < Unit > , no_deref , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type DaySpan;
+        }
+        impl ::core::ops::Deref for DaySpan {
+            type Target = super::spans::Span<Unit>;
+            fn deref(&self) -> &super::spans::Span<Unit> {
+                JsCast::unchecked_ref(self)
+            }
+        }
+        impl DaySpan {
+            pub fn new() -> DaySpan {
+                Self::builder().build()
+            }
+            pub fn builder() -> DaySpanBuilder {
+                DaySpanBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl Default for DaySpan {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct DaySpanBuilder {
+            inner: DaySpan,
+        }
+        impl DaySpanBuilder {
+            pub fn largest_unit(self, val: super::spans::UnitLargestUnitKind2) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> DaySpan {
+                self.inner
+            }
+        }
+    }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Clock<U = TimeUnit>;
         #[wasm_bindgen(method, catch)]
         pub fn now<U: ClockU>(this: &Clock<U>) -> Result<U::PluralizeUnit, JsValue>
@@ -876,6 +1181,12 @@ pub mod polish {
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum HourOrWeek {
+        Hour = "hour",
+        Week = "week",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DayOrHour {
         Day = "day",
         Hour = "hour",
@@ -963,6 +1274,19 @@ pub mod polish {
         Days = "days",
         Hours = "hours",
     }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum LargestUnitKind2 {
+        Auto = "auto",
+        Hour = "hour",
+        Week = "week",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum HourLargestUnitKind2 {
+        Auto = "auto",
+        Hour = "hour",
+    }
     impl From<Hour> for TimeUnit {
         fn from(value: Hour) -> TimeUnit {
             match value {
@@ -992,6 +1316,14 @@ pub mod polish {
             match value {
                 Hour::Hour => DayOrTimeUnit::Hour,
                 Hour::__Invalid => DayOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<Hour> for HourOrWeek {
+        fn from(value: Hour) -> HourOrWeek {
+            match value {
+                Hour::Hour => HourOrWeek::Hour,
+                Hour::__Invalid => HourOrWeek::__Invalid,
             }
         }
     }
@@ -1064,6 +1396,22 @@ pub mod polish {
             match value {
                 Hour::Hour => DayOrHourMaximumUnitKind::Hour,
                 Hour::__Invalid => DayOrHourMaximumUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<Hour> for LargestUnitKind2 {
+        fn from(value: Hour) -> LargestUnitKind2 {
+            match value {
+                Hour::Hour => LargestUnitKind2::Hour,
+                Hour::__Invalid => LargestUnitKind2::__Invalid,
+            }
+        }
+    }
+    impl From<Hour> for HourLargestUnitKind2 {
+        fn from(value: Hour) -> HourLargestUnitKind2 {
+            match value {
+                Hour::Hour => HourLargestUnitKind2::Hour,
+                Hour::__Invalid => HourLargestUnitKind2::__Invalid,
             }
         }
     }
@@ -1210,6 +1558,15 @@ pub mod polish {
             match value {
                 Minute::Minute => MaximumUnitKind::Minute,
                 Minute::__Invalid => MaximumUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<HourOrWeek> for LargestUnitKind2 {
+        fn from(value: HourOrWeek) -> LargestUnitKind2 {
+            match value {
+                HourOrWeek::Hour => LargestUnitKind2::Hour,
+                HourOrWeek::Week => LargestUnitKind2::Week,
+                HourOrWeek::__Invalid => LargestUnitKind2::__Invalid,
             }
         }
     }
@@ -1549,6 +1906,51 @@ pub mod polish {
                 DayOrHourMaximumUnitKind::Days => MaximumUnitKind::Days,
                 DayOrHourMaximumUnitKind::Hours => MaximumUnitKind::Hours,
                 DayOrHourMaximumUnitKind::__Invalid => MaximumUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<HourLargestUnitKind2> for LargestUnitKind {
+        fn from(value: HourLargestUnitKind2) -> LargestUnitKind {
+            match value {
+                HourLargestUnitKind2::Auto => LargestUnitKind::Auto,
+                HourLargestUnitKind2::Hour => LargestUnitKind::Hour,
+                HourLargestUnitKind2::__Invalid => LargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<HourLargestUnitKind2> for TimeUnitLargestUnitKind {
+        fn from(value: HourLargestUnitKind2) -> TimeUnitLargestUnitKind {
+            match value {
+                HourLargestUnitKind2::Auto => TimeUnitLargestUnitKind::Auto,
+                HourLargestUnitKind2::Hour => TimeUnitLargestUnitKind::Hour,
+                HourLargestUnitKind2::__Invalid => TimeUnitLargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<HourLargestUnitKind2> for HourLargestUnitKind {
+        fn from(value: HourLargestUnitKind2) -> HourLargestUnitKind {
+            match value {
+                HourLargestUnitKind2::Auto => HourLargestUnitKind::Auto,
+                HourLargestUnitKind2::Hour => HourLargestUnitKind::Hour,
+                HourLargestUnitKind2::__Invalid => HourLargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<HourLargestUnitKind2> for DayOrHourLargestUnitKind {
+        fn from(value: HourLargestUnitKind2) -> DayOrHourLargestUnitKind {
+            match value {
+                HourLargestUnitKind2::Auto => DayOrHourLargestUnitKind::Auto,
+                HourLargestUnitKind2::Hour => DayOrHourLargestUnitKind::Hour,
+                HourLargestUnitKind2::__Invalid => DayOrHourLargestUnitKind::__Invalid,
+            }
+        }
+    }
+    impl From<HourLargestUnitKind2> for LargestUnitKind2 {
+        fn from(value: HourLargestUnitKind2) -> LargestUnitKind2 {
+            match value {
+                HourLargestUnitKind2::Auto => LargestUnitKind2::Auto,
+                HourLargestUnitKind2::Hour => LargestUnitKind2::Hour,
+                HourLargestUnitKind2::__Invalid => LargestUnitKind2::__Invalid,
             }
         }
     }
