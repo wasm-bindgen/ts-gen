@@ -3,12 +3,9 @@
 use js_sys::JsString;
 use wasm_bindgen_test::*;
 
-use ts_gen_integration_tests::dictionary_polish::{
-    polish::{
-        Holder, Options, PartialBoxLikeObject, PartialOmitLikeBoxLikeObject, PluralizeTimeUnit,
-        TimeLikeObject, Transition,
-    },
-    DirectionKind,
+use ts_gen_integration_tests::dictionary_polish::polish::{
+    DirectionKind, Holder, Options, PartialBoxLikeObject, PartialOmitLikeBoxLikeObject,
+    PluralizeTimeUnit, TimeLikeObject, Transition,
 };
 
 // Dictionaries need no backing module, so these run.
