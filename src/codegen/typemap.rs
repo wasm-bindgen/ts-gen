@@ -1103,10 +1103,16 @@ impl<'a> CodegenContext<'a> {
         ctx.resolve_collisions();
         // Each union alias's `<Alias>Kind` enum is named before any read
         // enum claims a name, so naming doesn't depend on emission order.
+        // Namespace members included, as `collect_declaration` walks them.
         if ctx.experimental_generic_mono {
-            for &type_id in &module.types {
-                if let TypeKind::TypeAlias(alias) = &gctx.get_type(type_id).kind {
-                    ctx.union_alias_of(alias);
+            let mut pending: Vec<TypeId> = module.types.iter().rev().copied().collect();
+            while let Some(type_id) = pending.pop() {
+                match &gctx.get_type(type_id).kind {
+                    TypeKind::TypeAlias(alias) => {
+                        ctx.union_alias_of(alias);
+                    }
+                    TypeKind::Namespace(ns) => pending.extend(ns.declarations.iter().rev()),
+                    _ => {}
                 }
             }
         }
@@ -5743,6 +5749,36 @@ mod tests {
             assert!(!ctx.union_alias(&id("Errors"), scope).unwrap().readable);
             assert_eq!(read(id("Errors")), "Error");
         }
+    }
+
+    #[test]
+    fn namespaced_union_alias_kind_claims_its_name_first() {
+        let src = r#"
+            declare namespace Ns {
+                class Day {}
+                type DayLike = Day | string;
+            }
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let file = *module.file_scopes.first().expect("file scope");
+        let ns = gctx.scopes.resolve_namespace(file, "Ns").unwrap();
+        let options = GenerateOptions::new().experimental_generic_mono(true);
+        let ctx = CodegenContext::from_module_full(&module, &gctx, &options, None).unwrap();
+        // A getter `dayLike` read first would name its enum `DayLikeKind`.
+        let read = to_getter_return_type(
+            &TypeRef::union([TypeRef::ident("Day"), TypeRef::Number]),
+            Some(&ctx),
+            ns,
+            &ModuleContext::Global,
+            ReturnAnchor {
+                base: "dayLike",
+                kind: ReturnAnchorKind::Getter,
+                parent: Some("Options"),
+            },
+        );
+        assert_eq!(read.to_string(), "OptionsDayLikeKind");
+        let alias = ctx.union_alias(&TypeRef::ident("DayLike"), ns).unwrap();
+        assert_eq!(alias.kind.as_deref(), Some("DayLikeKind"));
     }
 
     #[test]
