@@ -49,16 +49,16 @@ extern "C" {
     pub type Formatter;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Formatter, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Formatter")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(locales: &str) -> Result<Formatter, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Formatter")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_slice(locales: &[JsString]) -> Result<Formatter, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Formatter")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_options(
         locales: &str,
         options: &::js_sys::Intl::DateTimeFormatOptions,
     ) -> Result<Formatter, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Formatter")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_slice_and_options(
         locales: &[JsString],
         options: &::js_sys::Intl::DateTimeFormatOptions,
@@ -170,7 +170,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "builtin-errors")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FormatSettings;
     #[wasm_bindgen(method, getter)]
