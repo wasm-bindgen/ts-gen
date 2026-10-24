@@ -32,7 +32,7 @@ fn nested_aliases_read_as_one_union() {
     assert!(options("missing").relative_to().is_none());
     assert!(matches!(
         relative_to("zonedFields"),
-        RelativeToKind::Object(_)
+        RelativeToReturnKind::Object(_)
     ));
 }
 
