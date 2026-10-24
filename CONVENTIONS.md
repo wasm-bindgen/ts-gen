@@ -3284,8 +3284,8 @@ members become arms it can decide between:
   The shape arm before it keeps its `is_object` check and isn't the
   fallback.
 * A union left with a single arm can't be told apart and keeps its
-  regular lowering, so a union of dictionaries reads as `JsValue`, with
-  no warning.
+  regular lowering, so a union of dictionaries reads as `JsValue`
+  (`Option<JsValue>` for an optional property), with no warning.
 
 ```ts
 declare namespace Temporal {
