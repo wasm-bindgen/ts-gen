@@ -759,6 +759,39 @@ pub mod polish {
                 self.inner
             }
         }
+        #[wasm_bindgen]
+        extern "C" {
+            # [wasm_bindgen (extends = Span , extends = Object , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Mid;
+        }
+        impl Mid {
+            pub fn new() -> Mid {
+                Self::builder().build()
+            }
+            pub fn builder() -> MidBuilder {
+                MidBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl Default for Mid {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct MidBuilder {
+            inner: Mid,
+        }
+        impl MidBuilder {
+            pub fn largest_unit(self, val: SpanLargestUnitKind) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> Mid {
+                self.inner
+            }
+        }
     }
     pub mod steps {
         #[allow(unused_imports)]
@@ -799,6 +832,39 @@ pub mod polish {
                 self
             }
             pub fn build(self) -> DaySpan {
+                self.inner
+            }
+        }
+        #[wasm_bindgen]
+        extern "C" {
+            # [wasm_bindgen (extends = super :: spans :: Mid , extends = Object , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type DaySpan2;
+        }
+        impl DaySpan2 {
+            pub fn new() -> DaySpan2 {
+                Self::builder().build()
+            }
+            pub fn builder() -> DaySpan2Builder {
+                DaySpan2Builder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl Default for DaySpan2 {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct DaySpan2Builder {
+            inner: DaySpan2,
+        }
+        impl DaySpan2Builder {
+            pub fn largest_unit(self, val: SpanLargestUnitKind) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> DaySpan2 {
                 self.inner
             }
         }

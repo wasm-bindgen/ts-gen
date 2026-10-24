@@ -823,6 +823,45 @@ pub mod polish {
                 self.inner
             }
         }
+        #[wasm_bindgen(experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , extends = Span :: < U > , no_deref , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Mid<U = UnitOrDay>;
+        }
+        impl<U> ::core::ops::Deref for Mid<U> {
+            type Target = Span<U>;
+            fn deref(&self) -> &Span<U> {
+                JsCast::unchecked_ref(self)
+            }
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Mid<U> {
+            pub fn new() -> Mid<U> {
+                Self::builder().build()
+            }
+            pub fn builder() -> MidBuilder<U> {
+                MidBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Default for Mid<U> {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct MidBuilder<U> {
+            inner: Mid<U>,
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> MidBuilder<U> {
+            pub fn largest_unit(self, val: U::LargestUnit) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> Mid<U> {
+                self.inner
+            }
+        }
         #[wasm_bindgen(private)]
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub enum UnitOrDay {
@@ -928,6 +967,45 @@ pub mod polish {
                 self
             }
             pub fn build(self) -> DaySpan {
+                self.inner
+            }
+        }
+        #[wasm_bindgen(experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , extends = super :: spans :: Mid :: < Unit > , no_deref , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type DaySpan2;
+        }
+        impl ::core::ops::Deref for DaySpan2 {
+            type Target = super::spans::Mid<Unit>;
+            fn deref(&self) -> &super::spans::Mid<Unit> {
+                JsCast::unchecked_ref(self)
+            }
+        }
+        impl DaySpan2 {
+            pub fn new() -> DaySpan2 {
+                Self::builder().build()
+            }
+            pub fn builder() -> DaySpan2Builder {
+                DaySpan2Builder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl Default for DaySpan2 {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct DaySpan2Builder {
+            inner: DaySpan2,
+        }
+        impl DaySpan2Builder {
+            pub fn largest_unit(self, val: super::spans::UnitLargestUnitKind2) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> DaySpan2 {
                 self.inner
             }
         }
