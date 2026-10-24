@@ -25,7 +25,13 @@ pub fn apply(
             TypeKind::Class(c) => (&c.name, &c.members, &c.type_params),
             TypeKind::Interface(i) => (&i.name, &i.members, &i.type_params),
             TypeKind::Function(f) => {
-                apply_function(gctx, module, adecl.doc.as_deref(), f, &mut errors);
+                apply_function(
+                    gctx,
+                    module,
+                    errors_section(adecl.doc.as_deref()),
+                    f,
+                    &mut errors,
+                );
                 continue;
             }
             // An alias carries no members; only its type-parameter
@@ -81,7 +87,7 @@ fn apply_function(
         own: scalar_leaf(&o.return_type),
         params: &o.params,
         throws: &o.throws,
-        doc: o.doc.as_deref(),
+        doc: errors_section(o.doc.as_deref()),
     }))
     .filter(|o| !o.is_empty())
     .collect();
@@ -209,8 +215,9 @@ struct Overlay<'a> {
     /// Parameters, of which only `@rust`-tagged ones are applied.
     params: &'a [Param],
     throws: &'a Throws,
-    /// Rendered side doc (the `## Errors` section of `@throws`), appended
-    /// to the target's doc.
+    /// The `## Errors` section `@throws` renders in the side doc, appended
+    /// to the target's doc. The side description is not carried over: a
+    /// member copied from upstream would repeat the input's.
     doc: Option<&'a str>,
 }
 
@@ -325,7 +332,7 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
                 own: scalar_leaf(&g.type_ref),
                 params: &[],
                 throws: &Throws::None,
-                doc: g.doc.as_deref(),
+                doc: errors_section(g.doc.as_deref()),
             },
         ),
         Member::StaticGetter(g) => (
@@ -334,7 +341,7 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
                 own: scalar_leaf(&g.type_ref),
                 params: &[],
                 throws: &Throws::None,
-                doc: g.doc.as_deref(),
+                doc: errors_section(g.doc.as_deref()),
             },
         ),
         Member::Method(m) => (
@@ -343,7 +350,7 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
                 own: scalar_leaf(&m.return_type),
                 params: &m.params,
                 throws: &m.throws,
-                doc: m.doc.as_deref(),
+                doc: errors_section(m.doc.as_deref()),
             },
         ),
         Member::StaticMethod(m) => (
@@ -352,7 +359,7 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
                 own: scalar_leaf(&m.return_type),
                 params: &m.params,
                 throws: &m.throws,
-                doc: m.doc.as_deref(),
+                doc: errors_section(m.doc.as_deref()),
             },
         ),
         Member::Constructor(c) => (
@@ -361,7 +368,7 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
                 own: None,
                 params: &c.params,
                 throws: &c.throws,
-                doc: c.doc.as_deref(),
+                doc: errors_section(c.doc.as_deref()),
             },
         ),
         Member::Setter(_) | Member::StaticSetter(_) | Member::IndexSignature(_) => return None,
@@ -474,6 +481,20 @@ fn apply_members(
     }
 }
 
+/// The rendered `## Errors` section of a side doc, up to the next
+/// section; `None` without one.
+fn errors_section(doc: Option<&str>) -> Option<&str> {
+    let doc = doc?;
+    let start = if doc.starts_with("## Errors") {
+        0
+    } else {
+        doc.find("\n## Errors")? + 1
+    };
+    let rest = &doc[start..];
+    let end = rest.find("\n## ").unwrap_or(rest.len());
+    Some(rest[..end].trim_end())
+}
+
 fn mismatch(scalar: RustScalar, what: &str, ty: &TypeRef) -> String {
     format!(
         "{what} `{}` cannot cross as `@rust {}` (u64/i64 need `bigint`, other scalars `number`)",
@@ -541,6 +562,21 @@ mod tests {
         let errs = errors(ambiguous, side);
         assert_eq!(errs.len(), 1);
         assert!(errs[0].contains("names 2 declarations"), "{errs:?}");
+    }
+
+    #[test]
+    fn errors_section_only() {
+        use super::errors_section;
+        assert_eq!(errors_section(Some("Creates a clone.")), None);
+        assert_eq!(errors_section(None), None);
+        let doc =
+            "Creates a clone.\n\n## Errors\n\n* `TypeError` — used\n\n## Example\n\n```js\nx\n```";
+        assert_eq!(
+            errors_section(Some(doc)),
+            Some("## Errors\n\n* `TypeError` — used")
+        );
+        let doc = "## Errors\n\n* `TypeError` — used";
+        assert_eq!(errors_section(Some(doc)), Some(doc));
     }
 
     #[test]
