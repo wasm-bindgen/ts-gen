@@ -353,9 +353,9 @@ pub mod polish {
         Hours = "hours",
         Minutes = "minutes",
     }
-}
-#[wasm_bindgen(private)]
-pub enum DirectionKind {
-    Next = "next",
-    Previous = "previous",
+    #[wasm_bindgen(private)]
+    pub enum DirectionKind {
+        Next = "next",
+        Previous = "previous",
+    }
 }

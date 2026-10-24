@@ -6,7 +6,7 @@ use js_sys::{Array, Function, JsString, Nullable, Number};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::enum_positions_mono::{
-    Details, Holder, Level, Mode, ModeAlias, ModeOrNumberReturnKind, Probe,
+    Details, Holder, Level, Mode, ModeAlias, ModeOrNumberArgReturnKind, Probe,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -46,8 +46,8 @@ async fn enum_positions_mono_compile(
     probe.on_mode(callback);
 
     match probe.mode_or_number_arg(Mode::Fast) {
-        ModeOrNumberReturnKind::Mode(mode) => probe.alias(mode),
-        ModeOrNumberReturnKind::F64(_) => {}
+        ModeOrNumberArgReturnKind::Mode(mode) => probe.alias(mode),
+        ModeOrNumberArgReturnKind::F64(_) => {}
     }
     probe.mode_or_number_arg_with_f64(1.0);
     probe.mode_or_number_or_string(Mode::Slow);

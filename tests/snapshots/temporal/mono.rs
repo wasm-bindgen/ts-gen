@@ -3030,11 +3030,9 @@ pub mod temporal {
         #[wasm_bindgen(method, setter)]
         pub fn set_disambiguation(this: &ZonedDateTimeFromOptions, val: DisambiguationKind);
         #[wasm_bindgen(method, getter)]
-        pub fn offset(
-            this: &ZonedDateTimeFromOptions,
-        ) -> Option<ZonedDateTimeFromOptionsOffsetKind>;
+        pub fn offset(this: &ZonedDateTimeFromOptions) -> Option<OffsetKind2>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_offset(this: &ZonedDateTimeFromOptions, val: ZonedDateTimeFromOptionsOffsetKind);
+        pub fn set_offset(this: &ZonedDateTimeFromOptions, val: OffsetKind2);
     }
     impl ZonedDateTimeFromOptions {
         pub fn new() -> ZonedDateTimeFromOptions {
@@ -3063,7 +3061,7 @@ pub mod temporal {
             self.inner.set_disambiguation(val);
             self
         }
-        pub fn offset(self, val: ZonedDateTimeFromOptionsOffsetKind) -> Self {
+        pub fn offset(self, val: OffsetKind2) -> Self {
             self.inner.set_offset(val);
             self
         }
@@ -5239,95 +5237,95 @@ pub mod temporal {
             self.inner
         }
     }
-}
-#[wasm_bindgen(private)]
-pub enum DisambiguationKind {
-    Compatible = "compatible",
-    Earlier = "earlier",
-    Later = "later",
-    Reject = "reject",
-}
-#[wasm_bindgen(private)]
-pub enum OverflowKind {
-    Constrain = "constrain",
-    Reject = "reject",
-}
-#[wasm_bindgen(private)]
-pub enum DirectionKind {
-    Next = "next",
-    Previous = "previous",
-}
-#[wasm_bindgen(private)]
-pub enum RoundingModeKind {
-    Ceil = "ceil",
-    Floor = "floor",
-    Expand = "expand",
-    Trunc = "trunc",
-    HalfCeil = "halfCeil",
-    HalfFloor = "halfFloor",
-    HalfExpand = "halfExpand",
-    HalfTrunc = "halfTrunc",
-    HalfEven = "halfEven",
-}
-#[wasm_bindgen(private)]
-pub enum LargestUnitKind {
-    Auto = "auto",
-    Year = "year",
-    Month = "month",
-    Week = "week",
-    Day = "day",
-    Hour = "hour",
-    Minute = "minute",
-    Second = "second",
-    Millisecond = "millisecond",
-    Microsecond = "microsecond",
-    Nanosecond = "nanosecond",
-    Years = "years",
-    Months = "months",
-    Weeks = "weeks",
-    Days = "days",
-    Hours = "hours",
-    Minutes = "minutes",
-    Seconds = "seconds",
-    Milliseconds = "milliseconds",
-    Microseconds = "microseconds",
-    Nanoseconds = "nanoseconds",
-}
-#[wasm_bindgen(private)]
-pub enum FractionalSecondDigitsKind {
-    Auto = "auto",
-    F64(f64),
-}
-#[wasm_bindgen(private)]
-pub enum CalendarNameKind {
-    Auto = "auto",
-    Always = "always",
-    Never = "never",
-    Critical = "critical",
-}
-#[wasm_bindgen(private)]
-pub enum OffsetKind {
-    Auto = "auto",
-    Never = "never",
-}
-#[wasm_bindgen(private)]
-pub enum TimeZoneNameKind {
-    Auto = "auto",
-    Never = "never",
-    Critical = "critical",
-}
-#[wasm_bindgen(private)]
-pub enum ZonedDateTimeFromOptionsOffsetKind {
-    Use = "use",
-    Ignore = "ignore",
-    Prefer = "prefer",
-    Reject = "reject",
-}
-#[wasm_bindgen(private, fallback)]
-pub enum RelativeToKind {
-    ZonedDateTime(temporal::ZonedDateTime),
-    String(String),
-    PlainDate(temporal::PlainDate),
-    PlainDateTime(temporal::PlainDateTime),
-    Object(Object),
+    #[wasm_bindgen(private)]
+    pub enum DisambiguationKind {
+        Compatible = "compatible",
+        Earlier = "earlier",
+        Later = "later",
+        Reject = "reject",
+    }
+    #[wasm_bindgen(private)]
+    pub enum OverflowKind {
+        Constrain = "constrain",
+        Reject = "reject",
+    }
+    #[wasm_bindgen(private)]
+    pub enum DirectionKind {
+        Next = "next",
+        Previous = "previous",
+    }
+    #[wasm_bindgen(private)]
+    pub enum RoundingModeKind {
+        Ceil = "ceil",
+        Floor = "floor",
+        Expand = "expand",
+        Trunc = "trunc",
+        HalfCeil = "halfCeil",
+        HalfFloor = "halfFloor",
+        HalfExpand = "halfExpand",
+        HalfTrunc = "halfTrunc",
+        HalfEven = "halfEven",
+    }
+    #[wasm_bindgen(private)]
+    pub enum LargestUnitKind {
+        Auto = "auto",
+        Year = "year",
+        Month = "month",
+        Week = "week",
+        Day = "day",
+        Hour = "hour",
+        Minute = "minute",
+        Second = "second",
+        Millisecond = "millisecond",
+        Microsecond = "microsecond",
+        Nanosecond = "nanosecond",
+        Years = "years",
+        Months = "months",
+        Weeks = "weeks",
+        Days = "days",
+        Hours = "hours",
+        Minutes = "minutes",
+        Seconds = "seconds",
+        Milliseconds = "milliseconds",
+        Microseconds = "microseconds",
+        Nanoseconds = "nanoseconds",
+    }
+    #[wasm_bindgen(private)]
+    pub enum FractionalSecondDigitsKind {
+        Auto = "auto",
+        F64(f64),
+    }
+    #[wasm_bindgen(private)]
+    pub enum CalendarNameKind {
+        Auto = "auto",
+        Always = "always",
+        Never = "never",
+        Critical = "critical",
+    }
+    #[wasm_bindgen(private)]
+    pub enum OffsetKind {
+        Auto = "auto",
+        Never = "never",
+    }
+    #[wasm_bindgen(private)]
+    pub enum TimeZoneNameKind {
+        Auto = "auto",
+        Never = "never",
+        Critical = "critical",
+    }
+    #[wasm_bindgen(private)]
+    pub enum OffsetKind2 {
+        Use = "use",
+        Ignore = "ignore",
+        Prefer = "prefer",
+        Reject = "reject",
+    }
+    #[wasm_bindgen(private, fallback)]
+    pub enum RelativeToKind {
+        ZonedDateTime(ZonedDateTime),
+        String(String),
+        PlainDate(PlainDate),
+        PlainDateTime(PlainDateTime),
+        Object(Object),
+    }
 }

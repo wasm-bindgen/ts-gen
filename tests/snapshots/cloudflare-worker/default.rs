@@ -453,7 +453,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "statusText")]
     pub fn set_status_text(this: &ResponseInit, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &ResponseInit) -> Option<HeadersKind>;
+    pub fn headers(this: &ResponseInit) -> Option<HeadersKind2>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -613,6 +613,12 @@ pub fn fetch_with_init_promise(
 }
 #[wasm_bindgen(private, fallback)]
 pub enum HeadersKind {
+    Headers(Headers),
+    VecOfTuple(Vec<ArrayTuple<(JsString, JsString)>>),
+    Record(Object<JsString>),
+}
+#[wasm_bindgen(private, fallback)]
+pub enum HeadersKind2 {
     Headers(Headers),
     VecOfTuple(Vec<ArrayTuple<(JsString, JsString)>>),
     Record(Object<JsString>),
