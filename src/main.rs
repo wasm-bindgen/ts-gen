@@ -53,6 +53,8 @@ struct Cli {
     ///   - `Blob=::web_sys::Blob` maps a specific type
     ///   - `node:buffer=node_buffer_sys` maps a module
     ///   - `node:*=node_sys::*` maps a module prefix with wildcard
+    ///   - `Intl.Locale=my_intl::Locale` maps a namespace member by its path
+    ///   - `Intl.*=my_intl::*` maps a namespace's members with wildcard
     ///
     /// Multiple mappings can be comma-separated or specified multiple times.
     #[arg(short = 'e', long = "external", num_args = 1..)]
@@ -67,7 +69,8 @@ struct Cli {
     /// link against `web_sys` (custom runtimes, node-only outputs) or
     /// when you want to provide every mapping explicitly via
     /// `--external`. Explicit `--external` mappings always override the
-    /// defaults regardless of this flag.
+    /// defaults regardless of this flag. The `js_sys` defaults (`URIError`,
+    /// `Intl.*`) stay.
     #[arg(long = "no-web-sys")]
     no_web_sys: bool,
 

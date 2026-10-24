@@ -9,6 +9,8 @@
 //! --external "node:*=node_sys::*"              # wildcard module mapping
 //! --external "Blob=::web_sys::Blob"            # explicit type mapping
 //! --external "node:buffer=node_buffer_sys"     # specific module mapping
+//! --external "Intl.Locale=my_intl::Locale"     # qualified type mapping
+//! --external "Intl.*=my_intl::*"               # wildcard namespace mapping
 //! ```
 //!
 //! Multiple mappings can be comma-separated or specified with multiple flags.
@@ -25,15 +27,20 @@ pub struct RustPath {
 /// Maps TypeScript module specifiers and type names to Rust paths.
 #[derive(Clone, Debug, Default)]
 pub struct ExternalMap {
-    /// Explicit type mappings from `--external`: `"Blob" → "::web_sys::Blob"`
+    /// Explicit type mappings from `--external`: `"Blob" → "::web_sys::Blob"`,
+    /// or by qualified path, `"Intl.Locale" → "my_intl::Locale"`.
     type_map: HashMap<String, String>,
     /// Module mappings: `"node:buffer" → "node_buffer_sys"`
     module_map: HashMap<String, String>,
     /// Wildcard module mappings: `"node:" → "node_sys"`
     /// Stored as (prefix, rust_crate) pairs.
     wildcard_map: Vec<(String, String)>,
-    /// Built-in defaults (web platform types → `::web_sys::...`, plus the
-    /// `js_sys` names whose Rust spelling differs from TS). Checked last,
+    /// Wildcard namespace mappings: `"Intl." → "my_intl"`, longest prefix
+    /// first. They map qualified type paths only.
+    namespace_wildcard_map: Vec<(String, String)>,
+    /// Built-in defaults (web platform types → `::web_sys::...`, the
+    /// `js_sys` names whose Rust spelling differs from TS, and the lib's
+    /// `Intl.<Name>` types → `::js_sys::Intl::<Name>`). Checked last,
     /// so any user-supplied mapping (explicit or module-based) wins.
     /// Populated by `new()`; cleared in test contexts where bare
     /// behaviour is needed.
@@ -43,6 +50,56 @@ pub struct ExternalMap {
 /// `js_sys` classes whose Rust name is not the TS name, so the
 /// `use js_sys::*` glob cannot supply them under the TS spelling.
 pub const JS_SYS_RENAMES: &[(&str, &str)] = &[("URIError", "::js_sys::UriError")];
+
+/// The `js_sys::Intl` types, which TypeScript's lib declares as members of
+/// the global `Intl` namespace: `Intl.<Name>` defaults to
+/// `::js_sys::Intl::<Name>`. Like the renames, these need nothing beyond
+/// js-sys and survive `--no-web-sys`. js-sys's string enums
+/// (`Intl::LocaleMatcher`, …) are left out: TypeScript spells those as
+/// literal unions, which lower on their own.
+pub const JS_SYS_INTL: &[&str] = &[
+    "Collator",
+    "CollatorOptions",
+    "DateTimeFormat",
+    "DateTimeFormatOptions",
+    "DateTimeFormatPart",
+    "DateTimeRangeFormatPart",
+    "DisplayNames",
+    "DisplayNamesOptions",
+    "Duration",
+    "DurationFormat",
+    "DurationFormatOptions",
+    "DurationFormatPart",
+    "ListFormat",
+    "ListFormatOptions",
+    "ListFormatPart",
+    "Locale",
+    "LocaleMatcherOptions",
+    "NumberFormat",
+    "NumberFormatOptions",
+    "NumberFormatPart",
+    "NumberRangeFormatPart",
+    "PluralRules",
+    "PluralRulesOptions",
+    "RelativeTimeFormat",
+    "RelativeTimeFormatOptions",
+    "RelativeTimeFormatPart",
+    "ResolvedCollatorOptions",
+    "ResolvedDateTimeFormatOptions",
+    "ResolvedDisplayNamesOptions",
+    "ResolvedDurationFormatOptions",
+    "ResolvedListFormatOptions",
+    "ResolvedNumberFormatOptions",
+    "ResolvedPluralRulesOptions",
+    "ResolvedRelativeTimeFormatOptions",
+    "ResolvedSegmenterOptions",
+    "SegmentData",
+    "Segmenter",
+    "SegmenterOptions",
+    "Segments",
+    "TextInfo",
+    "WeekInfo",
+];
 
 /// Default mappings for the web platform types declared in the TS lib.
 /// Anything in this list resolves to its `web_sys::` equivalent unless the
@@ -81,6 +138,10 @@ impl ExternalMap {
             map.default_type_map
                 .insert(name.to_string(), path.to_string());
         }
+        for name in JS_SYS_INTL {
+            map.default_type_map
+                .insert(format!("Intl.{name}"), format!("::js_sys::Intl::{name}"));
+        }
         map
     }
 
@@ -93,7 +154,7 @@ impl ExternalMap {
     /// Drop the built-in web platform defaults. Used by the
     /// `--no-web-sys` CLI flag for environments that don't link
     /// `web_sys` (Node-only runtimes, custom JS hosts, …). The `js_sys`
-    /// renames stay: they need nothing beyond the prelude.
+    /// renames and `Intl` types stay: they need nothing beyond js-sys.
     pub fn clear_defaults(&mut self) {
         for &(name, _) in WEB_SYS_DEFAULTS {
             self.default_type_map.remove(name);
@@ -106,6 +167,8 @@ impl ExternalMap {
     /// - `"Blob=::web_sys::Blob"` → explicit type map
     /// - `"node:buffer=node_buffer_sys"` → module map
     /// - `"node:*=node_sys::*"` → wildcard module map
+    /// - `"Intl.Locale=my_intl::Locale"` → explicit type map, by qualified path
+    /// - `"Intl.*=my_intl::*"` → wildcard namespace map
     pub fn add_mapping(&mut self, mapping: &str) {
         let Some((lhs, rhs)) = mapping.split_once('=') else {
             return;
@@ -113,16 +176,20 @@ impl ExternalMap {
         let lhs = lhs.trim();
         let rhs = rhs.trim();
 
+        let is_module = |lhs: &str| lhs.contains(':') || lhs.contains('/');
         if lhs.ends_with('*') && rhs.ends_with('*') {
-            // Wildcard: "node:*=node_sys::*"
             let prefix = lhs.trim_end_matches('*');
             let rust_prefix = rhs.trim_end_matches('*').trim_end_matches("::");
-            self.wildcard_map
-                .push((prefix.to_string(), rust_prefix.to_string()));
+            // A namespace path ("Intl.*") or a module prefix ("node:*").
+            let wildcards = if prefix.ends_with('.') && !is_module(prefix) {
+                &mut self.namespace_wildcard_map
+            } else {
+                &mut self.wildcard_map
+            };
+            wildcards.push((prefix.to_string(), rust_prefix.to_string()));
             // Sort by prefix length descending so longer (more specific) prefixes match first
-            self.wildcard_map
-                .sort_by_key(|b| std::cmp::Reverse(b.0.len()));
-        } else if lhs.contains(':') || lhs.contains('/') {
+            wildcards.sort_by_key(|b| std::cmp::Reverse(b.0.len()));
+        } else if is_module(lhs) {
             // Module mapping: "node:buffer=node_buffer_sys"
             self.module_map.insert(lhs.to_string(), rhs.to_string());
         } else {
@@ -194,9 +261,35 @@ impl ExternalMap {
             })
     }
 
+    /// Resolve a qualified type path (`Intl.Locale`) that names no
+    /// declaration: an explicit mapping of the path, then the longest
+    /// wildcard namespace mapping covering it (`Intl.*=my_intl::*` maps
+    /// `Intl.Locale` to `my_intl::Locale`, and a nested `Intl.A.B` to
+    /// `my_intl::A::B`), then the built-in defaults.
+    pub fn resolve_qualified(&self, path: &str) -> Option<RustPath> {
+        if let Some(rust_path) = self.type_map.get(path) {
+            return Some(RustPath {
+                path: rust_path.clone(),
+            });
+        }
+        for (prefix, rust_prefix) in &self.namespace_wildcard_map {
+            if let Some(rest) = path.strip_prefix(prefix.as_str()) {
+                return Some(RustPath {
+                    path: format!("{rust_prefix}::{}", rest.replace('.', "::")),
+                });
+            }
+        }
+        self.default_type_map.get(path).map(|rust_path| RustPath {
+            path: rust_path.clone(),
+        })
+    }
+
     /// Check if any mappings have been configured.
     pub fn is_empty(&self) -> bool {
-        self.type_map.is_empty() && self.module_map.is_empty() && self.wildcard_map.is_empty()
+        self.type_map.is_empty()
+            && self.module_map.is_empty()
+            && self.wildcard_map.is_empty()
+            && self.namespace_wildcard_map.is_empty()
     }
 }
 
@@ -317,6 +410,61 @@ mod tests {
             map.resolve_type("URIError").unwrap().path,
             "::js_sys::UriError"
         );
+        assert_eq!(
+            map.resolve_qualified("Intl.Locale").unwrap().path,
+            "::js_sys::Intl::Locale"
+        );
+    }
+
+    #[test]
+    fn test_qualified_defaults_and_overrides() {
+        let mut map = ExternalMap::new();
+        assert_eq!(
+            map.resolve_qualified("Intl.DateTimeFormatOptions")
+                .unwrap()
+                .path,
+            "::js_sys::Intl::DateTimeFormatOptions"
+        );
+        // Only the qualified path maps: a bare `Locale` is another name.
+        assert!(map.resolve_type("Locale").is_none());
+        assert!(map.resolve_qualified("Intl.Missing").is_none());
+
+        map.add_mapping("Intl.DateTimeFormatOptions=my::Opts");
+        assert_eq!(
+            map.resolve_qualified("Intl.DateTimeFormatOptions")
+                .unwrap()
+                .path,
+            "my::Opts"
+        );
+        assert_eq!(
+            map.resolve_qualified("Intl.Locale").unwrap().path,
+            "::js_sys::Intl::Locale"
+        );
+    }
+
+    #[test]
+    fn test_namespace_wildcard() {
+        let mut map = ExternalMap::new();
+        map.add_mapping("Intl.*=my_intl::*");
+        map.add_mapping("Intl.Locale=my::Locale");
+        // Explicit beats the wildcard, which beats the defaults.
+        assert_eq!(
+            map.resolve_qualified("Intl.Locale").unwrap().path,
+            "my::Locale"
+        );
+        assert_eq!(
+            map.resolve_qualified("Intl.DateTimeFormatOptions")
+                .unwrap()
+                .path,
+            "my_intl::DateTimeFormatOptions"
+        );
+        assert_eq!(
+            map.resolve_qualified("Intl.A.B").unwrap().path,
+            "my_intl::A::B"
+        );
+        assert!(map.resolve_qualified("Other.Locale").is_none());
+        // A namespace wildcard isn't a module prefix.
+        assert!(map.resolve("Locale", "Intl.x").is_none());
     }
 
     #[test]

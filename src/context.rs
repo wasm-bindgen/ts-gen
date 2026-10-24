@@ -61,10 +61,6 @@ pub struct GlobalContext {
     /// emission; treating them as "unresolved" would alias them to
     /// `JsValue` even though `js_sys` already provides them.
     pub builtin_type_ids: std::collections::HashSet<TypeId>,
-    /// The Rust path of each builtin that `use js_sys::*` doesn't bring
-    /// in under its own name, such as `::js_sys::Intl::Locale` for
-    /// `Intl.Locale`. Codegen spells these in full.
-    pub builtin_paths: std::collections::HashMap<TypeId, String>,
     /// Scopes of every `declare module "x"`, by specifier: the module's
     /// exports scope and each block's own.
     pub ambient_module_scopes: std::collections::HashMap<String, Vec<ScopeId>>,
@@ -200,7 +196,6 @@ impl GlobalContext {
             external_map: ExternalMap::new(),
             pending_imports: Vec::new(),
             builtin_type_ids: std::collections::HashSet::new(),
-            builtin_paths: std::collections::HashMap::new(),
             ambient_module_scopes: std::collections::HashMap::new(),
             ambient_modules: std::collections::HashMap::new(),
             block_exports: std::collections::HashMap::new(),
@@ -343,7 +338,13 @@ impl GlobalContext {
             self.scopes.get(bindings).namespace(local)
         })?;
         let (local, bindings) = self.exports.binding(members, member)?;
-        self.scopes.get(bindings).get(local)
+        let id = self.scopes.get(bindings).get(local)?;
+        // A builtin member (the lib's `Intl.LocalesArgument`) gives way to an
+        // `--external` mapping of its path, as a bare builtin does to a
+        // mapping of its name. It is replaced before codegen chases it as
+        // an alias, so the path is left to the external map.
+        let mapped = || self.external_map.resolve_qualified(path).is_some();
+        (!self.builtin_type_ids.contains(&id) || !mapped()).then_some(id)
     }
 
     /// The scope a declaration of `name` in `scope` binds in: the exports a

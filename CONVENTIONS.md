@@ -45,7 +45,6 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Multiple-context name resolution](#multiple-context-name-resolution)
 * [Duplicate identifiers](#duplicate-identifiers)
 * [External type mapping and web platform defaults](#external-type-mapping-and-web-platform-defaults)
-  * [The lib's `Intl` namespace](#the-libs-intl-namespace)
 
 ---
 
@@ -4376,67 +4375,82 @@ a `var` beside a `class` or an `enum`, merges as before.
 ## External type mapping and web platform defaults
 
 Names that resolve through scope but aren't declared in the input
-source — `Blob`, `Headers`, `Event`, `ReadableStream`, `Response`, … —
-fall through to the **external map**. The resolution order at each use
-site is:
+source — `Blob`, `Headers`, `Event`, `ReadableStream`, `Response`,
+`Intl.DateTimeFormatOptions`, … — fall through to the **external map**.
+The resolution order at each use site is:
 
 1. **`js_sys::*` glob** for the names listed in `JS_SYS_RESERVED`
    (`Error`, `Promise`, `Map`, `Array`, `Object`, …). Emitted as bare
    idents, no `use` alias needed.
 2. **User-supplied `--external` mappings**, in priority order:
-   explicit type maps (`Blob=::web_sys::Blob`) > module maps
+   explicit type maps (`Blob=::web_sys::Blob`, or by qualified path,
+   `Intl.DateTimeFormatOptions=my_intl::Options`) > module maps
    (`node:buffer=node_buffer_sys`) > wildcard module maps
-   (`node:*=node_sys::*`).
-3. **Built-in web platform defaults**: `Blob`, `Event`, `Headers`,
-   `DOMException`, `ReadableStream`, `Response`, `URL`, `URLSearchParams`,
-   `WebSocket`, … all map to their `::web_sys::*` equivalents
-   automatically. The full list lives in
-   `external_map::WEB_SYS_DEFAULTS`. Run with `--no-web-sys` to
-   disable these defaults (e.g. for environments that don't link
-   `web_sys`).
+   (`node:*=node_sys::*`). A qualified path also takes a wildcard
+   namespace map (`Intl.*=my_intl::*`, which maps `Intl.Locale` to
+   `my_intl::Locale`), below its explicit maps.
+3. **Built-in defaults**:
+   * The web platform types: `Blob`, `Event`, `Headers`, `DOMException`,
+     `ReadableStream`, `Response`, `URL`, `URLSearchParams`, `WebSocket`,
+     … all map to their `::web_sys::*` equivalents automatically. The full
+     list lives in `external_map::WEB_SYS_DEFAULTS`. Run with
+     `--no-web-sys` to disable these defaults (e.g. for environments that
+     don't link `web_sys`).
+   * The one `js_sys` class whose Rust spelling differs from TS,
+     `URIError`, maps to `::js_sys::UriError`
+     (`external_map::JS_SYS_RENAMES`).
+   * The lib's `Intl` namespace: `Intl.<Name>` maps to
+     `::js_sys::Intl::<Name>` for each type js-sys has there
+     (`external_map::JS_SYS_INTL`): the `Collator`, `DateTimeFormat`,
+     `DisplayNames`, `DurationFormat`, `ListFormat`, `Locale`,
+     `NumberFormat`, `PluralRules`, `RelativeTimeFormat` and `Segmenter`
+     classes, their `…Options`, `Resolved…Options` and `…Part` types, and
+     the few records around them (`SegmentData`, `Segments`, `WeekInfo`,
+     `TextInfo`, `Duration`, `LocaleMatcherOptions`). js-sys's string
+     enums (`Intl::LocaleMatcher`, …) aren't mapped: TypeScript spells
+     those as literal unions, which lower on their own.
+
+   The `js_sys` defaults survive `--no-web-sys`, as they need nothing
+   beyond js-sys.
 4. **Fallback**: emit a `#[allow(dead_code)] use JsValue as Foo;`
    alias plus an error diagnostic so the output still compiles while
-   surfacing the missing mapping.
+   surfacing the missing mapping. A qualified name erases to `JsValue`
+   in place.
 
 User mappings always override the defaults. The `js_sys` short-circuit
 is unaffected by `--no-web-sys` — those names are part of the
-generated file's `use js_sys::*;` prelude. The one `js_sys` class whose
-Rust spelling differs from TS, `URIError`, is aliased from
-`::js_sys::UriError` through the same default-mapping path
-(`external_map::JS_SYS_RENAMES`) and likewise survives `--no-web-sys`.
+generated file's `use js_sys::*;` prelude.
 
-### The lib's `Intl` namespace
+A bare name's mapping lands as a `use` alias at the top of the generated
+file. A qualified name's maps by its whole path and is spelled in place
+(`::js_sys::Intl::Locale`), since its last segment alone may be a local
+type's name; so a qualified mapping should be an absolute path
+(`::my_intl::Options`, `crate::…`) or start at a crate name. It applies
+only where the path's head is the global namespace of that name: a local
+namespace named `Intl` shadows the lib's, and a member it lacks stays
+unresolved. A global `declare namespace Intl` in an input merges with the
+lib's, as in TypeScript: its members are emitted in its `pub mod` and
+shadow the lib's of the same name, ahead of any mapping, and the rest
+still map.
 
-TypeScript's lib declares the global `Intl` namespace, which inputs use
-without declaring (`toLocaleString(locales?: Intl.LocalesArgument, options?:
-Intl.DateTimeFormatOptions)`). ts-gen knows it as it knows the other
-builtins:
+The lib's two `Intl` aliases that js-sys has no type for, which inputs
+use without declaring (`toLocaleString(locales?: Intl.LocalesArgument,
+options?: Intl.DateTimeFormatOptions)`), aren't defaults of the map but
+built-in aliases, and lower like any other alias. `Intl.UnicodeBCP47LocaleIdentifier` is `string`, and
+`Intl.LocalesArgument` is `Intl.UnicodeBCP47LocaleIdentifier | readonly
+JsString[] | undefined`, so a locales parameter fans out into a single
+locale and a list of `JsString` handles, the shapes js-sys's own bindings
+take (`Date::to_locale_string(locale: &str, …)`,
+`Temporal::PlainDate::to_locale_string(locales: &[JsString], …)`). The
+lib's `Intl.Locale` arms are left out: one would add a `_with_locale`
+overload to every locales parameter, doubling the overloads with the
+trailing options, and in the list it would make the element a union that
+erases to `JsValue`. An `Intl::Locale` is passed as its `to_string()`.
 
-* `Intl.<Name>` lowers to `::js_sys::Intl::<Name>` for each type js-sys has
-  there (`typemap::JS_SYS_INTL`): the `Collator`, `DateTimeFormat`,
-  `DisplayNames`, `DurationFormat`, `ListFormat`, `Locale`, `NumberFormat`,
-  `PluralRules`, `RelativeTimeFormat` and `Segmenter` classes, their
-  `…Options`, `Resolved…Options` and `…Part` types, and the few records
-  around them (`SegmentData`, `Segments`, `WeekInfo`, `TextInfo`,
-  `Duration`, `LocaleMatcherOptions`). The path is spelled in full, since a
-  local type named `Intl` would shadow the glob's module. Any other member
-  stays unresolved, erasing to `JsValue` with an error. js-sys's string
-  enums (`Intl::LocaleMatcher`, …) aren't mapped: TypeScript spells those
-  as literal unions, which lower on their own.
-* The lib aliases js-sys has no type for are built in, and lower like any
-  other alias. `Intl.UnicodeBCP47LocaleIdentifier` is `string`, and
-  `Intl.LocalesArgument` is `UnicodeBCP47LocaleIdentifier | readonly
-  JsString[] | undefined`, so a locales parameter fans out into a single
-  locale and a list of `JsString` handles, the shapes js-sys's own bindings
-  take (`Date::to_locale_string(locale: &str, …)`,
-  `Temporal::PlainDate::to_locale_string(locales: &[JsString], …)`). The
-  lib's `Intl.Locale` arms are left out: one would add a `_with_locale`
-  overload to every locales parameter, doubling the overloads with the
-  trailing options, and in the list it would make the element a union that
-  erases to `JsValue`. An `Intl::Locale` is passed as its `to_string()`.
-* A global `declare namespace Intl` in an input merges with the lib's, as
-  in TypeScript: its members are emitted in its `pub mod` and shadow the
-  lib's of the same name, and the rest still lower onto `js_sys::Intl`.
+An `--external` mapping of either path (or an `Intl.*` wildcard) replaces
+the alias, as a mapping of a bare builtin's name does: with
+`--external Intl.LocalesArgument=::my_intl::Locales`, a locales parameter
+is a single `&::my_intl::Locales`, without the fan-out.
 
 ```ts
 declare class PlainDate {

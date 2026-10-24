@@ -53,7 +53,8 @@ Map external types from other crates:
 ```sh
 ts-gen --input types.d.ts --output src/bindings.rs \
   --external "Blob=::web_sys::Blob" \
-  --external "node:buffer=node_buffer_sys"
+  --external "node:buffer=node_buffer_sys" \
+  --external "Intl.DateTimeFormatOptions=::my_intl::Options"
 ```
 
 Route untyped JS exceptions into your own error type (must implement

@@ -808,33 +808,38 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
     populate_intl_namespace(gctx, scope);
 }
 
-/// The global `Intl` namespace of TypeScript's lib, as an exported member
-/// scope: the `js_sys::Intl` types, and the lib aliases js-sys has no type
-/// for. A global `declare namespace Intl` in an input merges into it, as it
-/// does with the lib's.
+/// The global `Intl` namespace of TypeScript's lib, holding the lib aliases
+/// js-sys has no type for, which lower as aliases do. Its other members
+/// name no declaration: the external map's defaults resolve the
+/// `js_sys::Intl` types by their qualified paths (`Intl.Locale`). A global
+/// `declare namespace Intl` in an input merges into it, as it does with the
+/// lib's.
 ///
 /// `LocalesArgument` is the lib's `UnicodeBCP47LocaleIdentifier | Locale |
 /// readonly (UnicodeBCP47LocaleIdentifier | Locale)[] | undefined` without
 /// its `Locale` arms, and its list takes `JsString` handles, which is how
 /// js-sys's own bindings take locales (`&str` or `&[JsString]`). An
-/// `Intl::Locale` is passed by its `to_string()`.
+/// `Intl::Locale` is passed by its `to_string()`. The aliases are builtins,
+/// so an `--external` mapping of their path replaces them (see
+/// [`GlobalContext::resolve_path`]); `LocalesArgument` names its locale by
+/// path for a mapping of `Intl.UnicodeBCP47LocaleIdentifier` to reach it.
 fn populate_intl_namespace(gctx: &mut GlobalContext, global: ScopeId) {
     use crate::ir::{TypeAliasDecl, TypeDeclaration, TypeKind, TypeRef};
     let intl = gctx.create_child_scope(global);
     gctx.scopes
         .insert_namespace(global, "Intl".to_string(), intl);
-    for &name in crate::codegen::typemap::JS_SYS_INTL {
-        let type_id = insert_builtin(gctx, intl, name);
-        gctx.exports.insert(intl, name, name);
-        gctx.builtin_paths
-            .insert(type_id, format!("::js_sys::Intl::{name}"));
-    }
     let aliases = [
         ("UnicodeBCP47LocaleIdentifier", TypeRef::String),
         (
             "LocalesArgument",
             TypeRef::union([
-                TypeRef::ident("UnicodeBCP47LocaleIdentifier"),
+                TypeRef::Reference {
+                    segments: vec![
+                        "Intl".to_string(),
+                        "UnicodeBCP47LocaleIdentifier".to_string(),
+                    ],
+                    generic_args: vec![],
+                },
                 TypeRef::Array(Box::new(TypeRef::ident("JsString"))),
                 TypeRef::Undefined,
             ]),
@@ -855,11 +860,12 @@ fn populate_intl_namespace(gctx: &mut GlobalContext, global: ScopeId) {
         });
         gctx.scopes.insert(intl, name.to_string(), type_id);
         gctx.exports.insert(intl, name, name);
+        gctx.builtin_type_ids.insert(type_id);
     }
 }
 
 /// Register `name` in `scope` as an opaque builtin interface.
-fn insert_builtin(gctx: &mut GlobalContext, scope: ScopeId, name: &str) -> crate::context::TypeId {
+fn insert_builtin(gctx: &mut GlobalContext, scope: ScopeId, name: &str) {
     let type_id = gctx.insert_type(crate::ir::TypeDeclaration {
         kind: crate::ir::TypeKind::Interface(crate::ir::InterfaceDecl {
             construct: Vec::new(),
@@ -877,7 +883,6 @@ fn insert_builtin(gctx: &mut GlobalContext, scope: ScopeId, name: &str) -> crate
     });
     gctx.scopes.insert(scope, name.to_string(), type_id);
     gctx.builtin_type_ids.insert(type_id);
-    type_id
 }
 
 /// Keep one declaration per namespace. TypeScript merges repeated

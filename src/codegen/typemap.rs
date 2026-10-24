@@ -16,7 +16,7 @@ use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::quote;
 
 use crate::codegen::GenerateOptions;
 use crate::context::{GlobalContext, TypeId};
@@ -98,55 +98,6 @@ pub const JS_SYS_RESERVED: &[&str] = &[
     "WeakMap",
     "WeakRef",
     "WeakSet",
-];
-
-/// The `js_sys::Intl` types, which TypeScript's lib declares as members of
-/// the global `Intl` namespace. `Intl.<Name>` lowers to
-/// `::js_sys::Intl::<Name>`; any other `Intl` member stays unresolved.
-/// js-sys's string enums (`Intl::LocaleMatcher`, …) are left out: TypeScript
-/// spells those as literal unions, which lower on their own.
-pub const JS_SYS_INTL: &[&str] = &[
-    "Collator",
-    "CollatorOptions",
-    "DateTimeFormat",
-    "DateTimeFormatOptions",
-    "DateTimeFormatPart",
-    "DateTimeRangeFormatPart",
-    "DisplayNames",
-    "DisplayNamesOptions",
-    "Duration",
-    "DurationFormat",
-    "DurationFormatOptions",
-    "DurationFormatPart",
-    "ListFormat",
-    "ListFormatOptions",
-    "ListFormatPart",
-    "Locale",
-    "LocaleMatcherOptions",
-    "NumberFormat",
-    "NumberFormatOptions",
-    "NumberFormatPart",
-    "NumberRangeFormatPart",
-    "PluralRules",
-    "PluralRulesOptions",
-    "RelativeTimeFormat",
-    "RelativeTimeFormatOptions",
-    "RelativeTimeFormatPart",
-    "ResolvedCollatorOptions",
-    "ResolvedDateTimeFormatOptions",
-    "ResolvedDisplayNamesOptions",
-    "ResolvedDurationFormatOptions",
-    "ResolvedListFormatOptions",
-    "ResolvedNumberFormatOptions",
-    "ResolvedPluralRulesOptions",
-    "ResolvedRelativeTimeFormatOptions",
-    "ResolvedSegmenterOptions",
-    "SegmentData",
-    "Segmenter",
-    "SegmenterOptions",
-    "Segments",
-    "TextInfo",
-    "WeekInfo",
 ];
 
 /// Prelude names the generated code spells bare, so a declaration with one
@@ -2328,11 +2279,6 @@ fn emit_type_name(name: &str, use_scope: ScopeId, ctx: &CodegenContext<'_>) -> T
     // expected to land via a `--external` mapping at the top of the
     // generated file. Either way the right token is the bare ident.
     if let Some(type_id) = resolved {
-        if let Some(path) = ctx.gctx.builtin_paths.get(&type_id) {
-            return syn::parse_str::<syn::Path>(path)
-                .expect("builtin paths are Rust paths")
-                .into_token_stream();
-        }
         if ctx.gctx.builtin_type_ids.contains(&type_id) {
             // Names in the js_sys glob need no use alias.
             if !JS_SYS_RESERVED.contains(&ident_name) {
@@ -2415,6 +2361,25 @@ fn emit_type_name(name: &str, use_scope: ScopeId, ctx: &CodegenContext<'_>) -> T
             Some(prefix) => quote! { #prefix #ident },
             None => quote! { #ident },
         };
+    }
+
+    // A qualified name (`Intl.Locale`) maps by its whole path, when its
+    // head is the global namespace of that name (or none): a local
+    // namespace shadowing it means something else. The path is spelled in
+    // place rather than aliased, since its last segment may be a local
+    // type's name.
+    if let Some((head, _)) = name.split_once('.') {
+        let scopes = &ctx.gctx.scopes;
+        let global_head = scopes.resolve_namespace(use_scope, head)
+            == scopes.resolve_namespace(ctx.root_scope, head);
+        if global_head {
+            if let Some(rust_path) = ctx.gctx.external_map.resolve_qualified(name) {
+                return rust_path
+                    .path
+                    .parse()
+                    .unwrap_or_else(|_| quote! { JsValue });
+            }
+        }
     }
 
     // External map
@@ -4779,50 +4744,86 @@ mod tests {
     }
 
     #[test]
-    fn intl_members_lower_onto_js_sys_intl() {
-        // A global `Intl` namespace merges with the lib's, as in TypeScript.
-        let src = "declare namespace Intl { interface Mine {} }";
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module(&module, &gctx);
+    fn intl_members_map_by_qualified_path() {
+        // A global `Intl` namespace merges with the lib's, as in TypeScript;
+        // a namespace's own `Intl` shadows it.
+        let src = "declare namespace Intl { interface Mine {} }\n\
+                   declare namespace Outer { namespace Intl { interface X {} } }";
+        let (module, mut gctx) = crate::parse_source(src, None).unwrap();
         let file = *module.file_scopes.first().expect("file scope");
         let intl = |name: &str| TypeRef::Reference {
             segments: vec!["Intl".to_string(), name.to_string()],
             generic_args: vec![],
         };
-        let lower = |ty: &TypeRef, pos| {
-            to_syn_type(ty, pos, Some(&ctx), file, &ModuleContext::Global).to_string()
+        {
+            let ctx = CodegenContext::from_module(&module, &gctx);
+            let lower = |ty: &TypeRef, pos, scope| {
+                to_syn_type(ty, pos, Some(&ctx), scope, &ModuleContext::Global).to_string()
+            };
+            assert_eq!(
+                lower(&intl("DateTimeFormatOptions"), TypePosition::ARGUMENT, file),
+                "& :: js_sys :: Intl :: DateTimeFormatOptions"
+            );
+            assert_eq!(
+                lower(&intl("Locale"), TypePosition::RETURN, file),
+                ":: js_sys :: Intl :: Locale"
+            );
+            assert_eq!(
+                lower(&intl("Mine"), TypePosition::RETURN, file),
+                "intl :: Mine"
+            );
+            // Not in js-sys.
+            assert_eq!(
+                lower(&intl("Missing"), TypePosition::RETURN, file),
+                "JsValue"
+            );
+            // `Outer.Intl` isn't the lib's.
+            let outer = namespace_scope(&ctx, file, "Outer");
+            assert_eq!(
+                lower(&intl("Locale"), TypePosition::RETURN, outer),
+                "JsValue"
+            );
+            // The lib aliases chase from qualified paths.
+            let (target, _) = ctx
+                .resolve_alias("Intl.UnicodeBCP47LocaleIdentifier", file)
+                .unwrap();
+            assert_eq!(*target, TypeRef::String);
+            let (target, scope) = ctx.resolve_alias("Intl.LocalesArgument", file).unwrap();
+            let TypeRef::Union(u) = target.as_ref() else {
+                panic!("`Intl.LocalesArgument` is a union");
+            };
+            assert_eq!(
+                u.members(),
+                [
+                    intl("UnicodeBCP47LocaleIdentifier"),
+                    TypeRef::Array(Box::new(TypeRef::ident("JsString"))),
+                    TypeRef::Undefined,
+                ]
+            );
+            assert!(ctx
+                .resolve_alias("Intl.UnicodeBCP47LocaleIdentifier", scope)
+                .is_some());
+        }
+        // An `--external` mapping beats the default, and replaces a lib
+        // alias; a local declaration still wins.
+        gctx.external_map.add_mappings(
+            "Intl.Locale=my::Locale, Intl.LocalesArgument=my::Locales, Intl.Mine=my::Mine",
+        );
+        let ctx = CodegenContext::from_module(&module, &gctx);
+        let lower = |ty: &TypeRef| {
+            to_syn_type(
+                ty,
+                TypePosition::RETURN,
+                Some(&ctx),
+                file,
+                &ModuleContext::Global,
+            )
+            .to_string()
         };
-        assert_eq!(
-            lower(&intl("DateTimeFormatOptions"), TypePosition::ARGUMENT),
-            "& :: js_sys :: Intl :: DateTimeFormatOptions"
-        );
-        assert_eq!(
-            lower(&intl("Locale"), TypePosition::RETURN),
-            ":: js_sys :: Intl :: Locale"
-        );
-        assert_eq!(lower(&intl("Mine"), TypePosition::RETURN), "intl :: Mine");
-        // Not in js-sys.
-        assert_eq!(lower(&intl("Missing"), TypePosition::RETURN), "JsValue");
-        // The lib aliases chase from qualified paths.
-        let (target, _) = ctx
-            .resolve_alias("Intl.UnicodeBCP47LocaleIdentifier", file)
-            .unwrap();
-        assert_eq!(*target, TypeRef::String);
-        let (target, scope) = ctx.resolve_alias("Intl.LocalesArgument", file).unwrap();
-        let TypeRef::Union(u) = target.as_ref() else {
-            panic!("`Intl.LocalesArgument` is a union");
-        };
-        assert_eq!(
-            u.members(),
-            [
-                TypeRef::ident("UnicodeBCP47LocaleIdentifier"),
-                TypeRef::Array(Box::new(TypeRef::ident("JsString"))),
-                TypeRef::Undefined,
-            ]
-        );
-        assert!(ctx
-            .resolve_alias("UnicodeBCP47LocaleIdentifier", scope)
-            .is_some());
+        assert_eq!(lower(&intl("Locale")), "my :: Locale");
+        assert!(ctx.resolve_alias("Intl.LocalesArgument", file).is_none());
+        assert_eq!(lower(&intl("LocalesArgument")), "my :: Locales");
+        assert_eq!(lower(&intl("Mine")), "intl :: Mine");
     }
 
     #[test]
