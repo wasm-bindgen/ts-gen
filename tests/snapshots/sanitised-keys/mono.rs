@@ -35,28 +35,20 @@ extern "C" {
     pub fn cfmodel_js_string() -> JsString;
     # [wasm_bindgen (static_method_of = Pair , setter , js_name = "@cf/model")]
     pub fn set_cfmodel(val: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, js_name = "$emit")]
-    pub fn emit(this: &Pair, event: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, catch, js_name = "$emit")]
-    pub fn try_emit(this: &Pair, event: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "@cf/run")]
-    pub fn cfrun(this: &Pair);
+    pub fn emit(this: &Pair, event: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "@cf/run")]
-    pub fn try_cfrun(this: &Pair) -> Result<(), JsValue>;
-    # [wasm_bindgen (static_method_of = Pair , js_name = "$create")]
-    pub fn create() -> Pair;
+    pub fn cfrun(this: &Pair) -> Result<(), JsValue>;
     # [wasm_bindgen (static_method_of = Pair , catch , js_name = "$create")]
-    pub fn try_create() -> Result<Pair, JsValue>;
+    pub fn create() -> Result<Pair, JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Socket;
-    #[wasm_bindgen(method)]
-    pub fn accept(this: &Socket);
-    #[wasm_bindgen(method, catch, js_name = "accept")]
-    pub fn try_accept(this: &Socket) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn accept(this: &Socket) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
@@ -65,10 +57,8 @@ extern "C" {
     pub type Store;
     #[wasm_bindgen(constructor, js_class = "$Store", catch)]
     pub fn new() -> Result<Store, JsValue>;
-    # [wasm_bindgen (static_method_of = Store , js_class = "$Store")]
-    pub fn create() -> Store;
-    # [wasm_bindgen (static_method_of = Store , js_class = "$Store" , catch , js_name = "create")]
-    pub fn try_create() -> Result<Store, JsValue>;
+    # [wasm_bindgen (static_method_of = Store , js_class = "$Store" , catch)]
+    pub fn create() -> Result<Store, JsValue>;
     # [wasm_bindgen (static_method_of = Store , js_class = "$Store" , getter)]
     pub fn count() -> f64;
     # [wasm_bindgen (static_method_of = Store , js_class = "$Store" , setter)]
@@ -76,13 +66,8 @@ extern "C" {
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "$")]
-    pub fn dollar_2(selector: impl ::wasm_bindgen::JsStringLike) -> Pair;
-}
-#[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "$")]
-    pub fn try_dollar_2(selector: impl ::wasm_bindgen::JsStringLike) -> Result<Pair, JsValue>;
+    pub fn dollar_2(selector: impl ::wasm_bindgen::JsStringLike) -> Result<Pair, JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
@@ -92,15 +77,9 @@ extern "C" {
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "$$")]
-    pub fn dollar_dollar(selector: impl ::wasm_bindgen::JsStringLike) -> Vec<Pair>;
-}
-#[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "$$")]
-    pub fn try_dollar_dollar(
-        selector: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Vec<Pair>, JsValue>;
+    pub fn dollar_dollar(selector: impl ::wasm_bindgen::JsStringLike)
+        -> Result<Vec<Pair>, JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
@@ -110,15 +89,8 @@ extern "C" {
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    pub fn each(underscore: f64, dollar: impl ::wasm_bindgen::JsStringLike);
-}
-#[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "each")]
-    pub fn try_each(
-        underscore: f64,
-        dollar: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn each(underscore: f64, dollar: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -130,12 +102,8 @@ pub enum Op {
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    pub fn compare(op: Op);
-}
-#[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "compare")]
-    pub fn try_compare(op: Op) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn compare(op: Op) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
@@ -236,41 +204,31 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MethodCollide;
-    #[wasm_bindgen(method)]
-    pub fn data(this: &MethodCollide);
-    #[wasm_bindgen(method, catch, js_name = "data")]
-    pub fn try_data(this: &MethodCollide) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn data(this: &MethodCollide) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter, js_name = "$data")]
     pub fn data_2(this: &MethodCollide) -> String;
     #[wasm_bindgen(method, getter, js_name = "$data")]
     pub fn data_2_js_string(this: &MethodCollide) -> JsString;
     #[wasm_bindgen(method, setter, js_name = "$data")]
     pub fn set_data_2(this: &MethodCollide, val: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, js_name = "setFoo")]
-    pub fn set_foo(this: &MethodCollide);
     #[wasm_bindgen(method, catch, js_name = "setFoo")]
-    pub fn try_set_foo(this: &MethodCollide) -> Result<(), JsValue>;
+    pub fn set_foo(this: &MethodCollide) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn foo(this: &MethodCollide) -> String;
     #[wasm_bindgen(method, getter, js_name = "foo")]
     pub fn foo_js_string(this: &MethodCollide) -> JsString;
     #[wasm_bindgen(method, setter, js_name = "foo")]
     pub fn set_foo_2(this: &MethodCollide, val: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method)]
-    pub fn call(this: &MethodCollide);
+    #[wasm_bindgen(method, catch)]
+    pub fn call(this: &MethodCollide) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "call")]
-    pub fn try_call(this: &MethodCollide) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "call")]
-    pub fn call_with_a(this: &MethodCollide, a: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, catch, js_name = "call")]
-    pub fn try_call_with_a(
+    pub fn call_with_a(
         this: &MethodCollide,
         a: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "call")]
-    pub fn call_with_a_2(this: &MethodCollide, a: f64);
     #[wasm_bindgen(method, catch, js_name = "call")]
-    pub fn try_call_with_a_2(this: &MethodCollide, a: f64) -> Result<(), JsValue>;
+    pub fn call_with_a_2(this: &MethodCollide, a: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
@@ -318,10 +276,8 @@ extern "C" {
     pub fn data_2_js_string(this: &SetterNumbers) -> JsString;
     #[wasm_bindgen(method, setter, js_name = "$data")]
     pub fn set_data_2(this: &SetterNumbers, val: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, js_name = "setData")]
-    pub fn set_data(this: &SetterNumbers);
     #[wasm_bindgen(method, catch, js_name = "setData")]
-    pub fn try_set_data(this: &SetterNumbers) -> Result<(), JsValue>;
+    pub fn set_data(this: &SetterNumbers) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
@@ -332,62 +288,35 @@ extern "C" {
     pub fn value(this: &ReadonlyCollide) -> String;
     #[wasm_bindgen(method, getter, js_name = "value")]
     pub fn value_js_string(this: &ReadonlyCollide) -> JsString;
-    #[wasm_bindgen(method, js_name = "setValue")]
-    pub fn set_value(this: &ReadonlyCollide, value: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, catch, js_name = "setValue")]
-    pub fn try_set_value(
+    pub fn set_value(
         this: &ReadonlyCollide,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     # [wasm_bindgen (static_method_of = ReadonlyCollide , getter)]
     pub fn level() -> f64;
-    # [wasm_bindgen (static_method_of = ReadonlyCollide , js_name = "setLevel")]
-    pub fn set_level(level: f64);
     # [wasm_bindgen (static_method_of = ReadonlyCollide , catch , js_name = "setLevel")]
-    pub fn try_set_level(level: f64) -> Result<(), JsValue>;
+    pub fn set_level(level: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    pub fn ajax(url_: impl ::wasm_bindgen::JsStringLike);
-}
-#[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "ajax")]
-    pub fn try_ajax(url_: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "$ajax")]
-    pub fn ajax_2(url_: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(catch)]
+    pub fn ajax(url_: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "$ajax")]
-    pub fn try_ajax_2(url_: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+    pub fn ajax_2(url_: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    pub fn dollar();
-}
-#[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "dollar")]
-    pub fn try_dollar() -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "collideArgs")]
-    pub fn collide_args(
-        a: impl ::wasm_bindgen::JsStringLike,
-        a2: f64,
-        foo_bar: impl ::wasm_bindgen::JsStringLike,
-        foo_bar2: f64,
-    );
+    #[wasm_bindgen(catch)]
+    pub fn dollar() -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "collideArgs")]
-    pub fn try_collide_args(
+    pub fn collide_args(
         a: impl ::wasm_bindgen::JsStringLike,
         a2: f64,
         foo_bar: impl ::wasm_bindgen::JsStringLike,
@@ -474,10 +403,8 @@ extern "C" {
     pub type ReservedMethod;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<ReservedMethod, JsValue>;
-    #[wasm_bindgen(method, js_name = "new")]
-    pub fn new_2(this: &ReservedMethod);
     #[wasm_bindgen(method, catch, js_name = "new")]
-    pub fn try_new_2(this: &ReservedMethod) -> Result<(), JsValue>;
+    pub fn new_2(this: &ReservedMethod) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
@@ -499,26 +426,16 @@ extern "C" {
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetchUrl")]
-    pub fn fetch_url(url_: impl ::wasm_bindgen::JsStringLike);
-}
-#[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchUrl")]
-    pub fn try_fetch_url(url_: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+    pub fn fetch_url(url_: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 pub mod scoped {
     #[allow(unused_imports)]
     use super::*;
     #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "fetchUrl", js_namespace = "Scoped")]
-        pub fn fetch_url(url_: impl ::wasm_bindgen::JsStringLike);
-    }
-    #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
-    extern "C" {
         #[wasm_bindgen(catch, js_name = "fetchUrl", js_namespace = "Scoped")]
-        pub fn try_fetch_url(url_: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+        pub fn fetch_url(url_: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     }
 }
 pub mod ns {

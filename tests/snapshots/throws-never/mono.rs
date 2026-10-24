@@ -20,36 +20,12 @@ extern "C" {
     pub async fn loaded(this: &NeverThrows) -> Loaded;
     #[doc = " Sync method without `@throws {never}` — keeps the `try_normal_op`"]
     #[doc = " companion as usual."]
-    #[wasm_bindgen(method, js_name = "normalOp")]
-    pub fn normal_op(this: &NeverThrows, x: f64) -> String;
-    #[doc = " Sync method without `@throws {never}` — keeps the `try_normal_op`"]
-    #[doc = " companion as usual."]
-    #[wasm_bindgen(method, js_name = "normalOp")]
-    pub fn normal_op_js_string(this: &NeverThrows, x: f64) -> JsString;
+    #[wasm_bindgen(method, catch, js_name = "normalOp")]
+    pub fn normal_op(this: &NeverThrows, x: f64) -> Result<String, JsValue>;
     #[doc = " Sync method without `@throws {never}` — keeps the `try_normal_op`"]
     #[doc = " companion as usual."]
     #[wasm_bindgen(method, catch, js_name = "normalOp")]
-    pub fn try_normal_op(this: &NeverThrows, x: f64) -> Result<String, JsValue>;
-    #[doc = " Sync method without `@throws {never}` — keeps the `try_normal_op`"]
-    #[doc = " companion as usual."]
-    #[wasm_bindgen(method, catch, js_name = "normalOp")]
-    pub fn try_normal_op_js_string(this: &NeverThrows, x: f64) -> Result<JsString, JsValue>;
-    #[doc = " Sync with a typed throws — keeps `try_typed_op` returning the"]
-    #[doc = " typed error. `Throws::Type` is the existing behavior."]
-    #[doc = ""]
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `RangeError`"]
-    #[wasm_bindgen(method, js_name = "typedOp")]
-    pub fn typed_op(this: &NeverThrows, x: f64) -> String;
-    #[doc = " Sync with a typed throws — keeps `try_typed_op` returning the"]
-    #[doc = " typed error. `Throws::Type` is the existing behavior."]
-    #[doc = ""]
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `RangeError`"]
-    #[wasm_bindgen(method, js_name = "typedOp")]
-    pub fn typed_op_js_string(this: &NeverThrows, x: f64) -> JsString;
+    pub fn normal_op_js_string(this: &NeverThrows, x: f64) -> Result<JsString, JsValue>;
     #[doc = " Sync with a typed throws — keeps `try_typed_op` returning the"]
     #[doc = " typed error. `Throws::Type` is the existing behavior."]
     #[doc = ""]
@@ -57,7 +33,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `RangeError`"]
     #[wasm_bindgen(method, catch, js_name = "typedOp")]
-    pub fn try_typed_op(this: &NeverThrows, x: f64) -> Result<String, RangeError>;
+    pub fn typed_op(this: &NeverThrows, x: f64) -> Result<String, RangeError>;
     #[doc = " Sync with a typed throws — keeps `try_typed_op` returning the"]
     #[doc = " typed error. `Throws::Type` is the existing behavior."]
     #[doc = ""]
@@ -65,7 +41,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `RangeError`"]
     #[wasm_bindgen(method, catch, js_name = "typedOp")]
-    pub fn try_typed_op_js_string(this: &NeverThrows, x: f64) -> Result<JsString, RangeError>;
+    pub fn typed_op_js_string(this: &NeverThrows, x: f64) -> Result<JsString, RangeError>;
     #[doc = " Constructor with `@throws {never}` is a no-op — JS `new` can"]
     #[doc = " always throw, so the constructor still catches."]
     #[wasm_bindgen(constructor, catch)]

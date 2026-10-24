@@ -5,13 +5,13 @@
     "declared-modules": "file:./js/declared-modules",
     "es-module-lexer": "^1.6.0",
     "export-default": "file:./js/export-default",
+    "fallible": "file:./js/fallible",
     "module-export-assignment": "file:./js/module-export-assignment",
     "module-file-locals": "file:./js/module-file-locals",
     "module-namespace-values": "file:./js/module-namespace-values",
     "mono-lists": "file:./js/mono-lists",
     "node-nullable": "file:./js/node-nullable",
     "slice-args": "file:./js/slice-args",
-    "slice-args-mono": "file:./js/slice-args-mono",
     "slice-hints": "file:./js/slice-hints"
   }
 }

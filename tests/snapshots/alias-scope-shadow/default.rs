@@ -151,4 +151,56 @@ pub mod shadow {
         #[wasm_bindgen(catch, js_name = "own", js_namespace = "Shadow")]
         pub fn try_own(i: &Inner) -> Result<(), JsValue>;
     }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "Shadow")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Mode;
+        #[wasm_bindgen(method, getter)]
+        pub fn shadow(this: &Mode) -> bool;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_shadow(this: &Mode, val: bool);
+    }
+    impl Mode {
+        pub fn new(shadow: bool) -> Mode {
+            let inner: Mode = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_shadow(shadow);
+            inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(js_namespace = "Shadow")]
+        pub fn hold(h: &super::Holder<JsString>) -> super::Holder<JsString>;
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "hold", js_namespace = "Shadow")]
+        pub fn try_hold(h: &super::Holder<JsString>) -> Result<super::Holder<JsString>, JsValue>;
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(catch, js_namespace = "Shadow")]
+        pub async fn next() -> Result<JsString, JsValue>;
+    }
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Mode {
+    Fast = "fast",
+    Slow = "slow",
+}
+#[allow(dead_code)]
+pub type TopMode = Mode;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Holder<T: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new<T: ::wasm_bindgen::JsGeneric>(value: &T) -> Result<Holder<T>, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> T;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn try_get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> Result<T, JsValue>;
 }

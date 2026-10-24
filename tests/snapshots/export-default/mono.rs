@@ -15,10 +15,8 @@ extern "C" {
     pub fn name(this: &Processor) -> String;
     #[wasm_bindgen(method, getter, js_name = "name")]
     pub fn name_js_string(this: &Processor) -> JsString;
-    # [wasm_bindgen (static_method_of = Processor , js_class = "default")]
-    pub fn named(name: impl ::wasm_bindgen::JsStringLike) -> Processor;
-    # [wasm_bindgen (static_method_of = Processor , js_class = "default" , catch , js_name = "named")]
-    pub fn try_named(name: impl ::wasm_bindgen::JsStringLike) -> Result<Processor, JsValue>;
+    # [wasm_bindgen (static_method_of = Processor , js_class = "default" , catch)]
+    pub fn named(name: impl ::wasm_bindgen::JsStringLike) -> Result<Processor, JsValue>;
 }
 pub mod export_default {
     #[allow(unused_imports)]
@@ -28,23 +26,13 @@ pub mod export_default {
         use super::*;
         #[wasm_bindgen(module = "export-default/create", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_name = "default")]
-            pub fn create(name: impl ::wasm_bindgen::JsStringLike) -> String;
-        }
-        #[wasm_bindgen(module = "export-default/create", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(js_name = "default")]
-            pub fn create_js_string(name: impl ::wasm_bindgen::JsStringLike) -> JsString;
+            #[wasm_bindgen(catch, js_name = "default")]
+            pub fn create(name: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
         }
         #[wasm_bindgen(module = "export-default/create", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "default")]
-            pub fn try_create(name: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-        }
-        #[wasm_bindgen(module = "export-default/create", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "default")]
-            pub fn try_create_js_string(
+            pub fn create_js_string(
                 name: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<JsString, JsValue>;
         }
@@ -64,46 +52,26 @@ pub mod export_default {
         use super::*;
         #[wasm_bindgen(module = "export-default/merged", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_name = "default")]
-            pub fn make() -> String;
-        }
-        #[wasm_bindgen(module = "export-default/merged", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(js_name = "default")]
-            pub fn make_js_string() -> JsString;
+            #[wasm_bindgen(catch, js_name = "default")]
+            pub fn make() -> Result<String, JsValue>;
         }
         #[wasm_bindgen(module = "export-default/merged", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "default")]
-            pub fn try_make() -> Result<String, JsValue>;
-        }
-        #[wasm_bindgen(module = "export-default/merged", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "default")]
-            pub fn try_make_js_string() -> Result<JsString, JsValue>;
+            pub fn make_js_string() -> Result<JsString, JsValue>;
         }
         pub mod make {
             #[allow(unused_imports)]
             use super::*;
             #[wasm_bindgen(module = "export-default/merged", experimental_generic_mono)]
             extern "C" {
-                #[wasm_bindgen(js_namespace = "default")]
-                pub fn helper() -> String;
-            }
-            #[wasm_bindgen(module = "export-default/merged", experimental_generic_mono)]
-            extern "C" {
-                #[wasm_bindgen(js_name = "helper", js_namespace = "default")]
-                pub fn helper_js_string() -> JsString;
+                #[wasm_bindgen(catch, js_namespace = "default")]
+                pub fn helper() -> Result<String, JsValue>;
             }
             #[wasm_bindgen(module = "export-default/merged", experimental_generic_mono)]
             extern "C" {
                 #[wasm_bindgen(catch, js_name = "helper", js_namespace = "default")]
-                pub fn try_helper() -> Result<String, JsValue>;
-            }
-            #[wasm_bindgen(module = "export-default/merged", experimental_generic_mono)]
-            extern "C" {
-                #[wasm_bindgen(catch, js_name = "helper", js_namespace = "default")]
-                pub fn try_helper_js_string() -> Result<JsString, JsValue>;
+                pub fn helper_js_string() -> Result<JsString, JsValue>;
             }
         }
     }
@@ -112,45 +80,26 @@ pub mod export_default {
         use super::*;
         #[wasm_bindgen(module = "export-default/renamed", experimental_generic_mono)]
         extern "C" {
-            pub fn create() -> String;
-        }
-        #[wasm_bindgen(module = "export-default/renamed", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(js_name = "create")]
-            pub fn create_js_string() -> JsString;
+            #[wasm_bindgen(catch)]
+            pub fn create() -> Result<String, JsValue>;
         }
         #[wasm_bindgen(module = "export-default/renamed", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "create")]
-            pub fn try_create() -> Result<String, JsValue>;
-        }
-        #[wasm_bindgen(module = "export-default/renamed", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "create")]
-            pub fn try_create_js_string() -> Result<JsString, JsValue>;
+            pub fn create_js_string() -> Result<JsString, JsValue>;
         }
         pub mod create {
             #[allow(unused_imports)]
             use super::*;
             #[wasm_bindgen(module = "export-default/renamed", experimental_generic_mono)]
             extern "C" {
-                #[wasm_bindgen(js_namespace = "create")]
-                pub fn helper() -> String;
-            }
-            #[wasm_bindgen(module = "export-default/renamed", experimental_generic_mono)]
-            extern "C" {
-                #[wasm_bindgen(js_name = "helper", js_namespace = "create")]
-                pub fn helper_js_string() -> JsString;
+                #[wasm_bindgen(catch, js_namespace = "create")]
+                pub fn helper() -> Result<String, JsValue>;
             }
             #[wasm_bindgen(module = "export-default/renamed", experimental_generic_mono)]
             extern "C" {
                 #[wasm_bindgen(catch, js_name = "helper", js_namespace = "create")]
-                pub fn try_helper() -> Result<String, JsValue>;
-            }
-            #[wasm_bindgen(module = "export-default/renamed", experimental_generic_mono)]
-            extern "C" {
-                #[wasm_bindgen(catch, js_name = "helper", js_namespace = "create")]
-                pub fn try_helper_js_string() -> Result<JsString, JsValue>;
+                pub fn helper_js_string() -> Result<JsString, JsValue>;
             }
         }
     }
@@ -162,23 +111,13 @@ pub mod export_default {
             use super::*;
             #[wasm_bindgen(module = "export-default/namespace", experimental_generic_mono)]
             extern "C" {
-                #[wasm_bindgen(js_namespace = "default")]
-                pub fn f() -> String;
-            }
-            #[wasm_bindgen(module = "export-default/namespace", experimental_generic_mono)]
-            extern "C" {
-                #[wasm_bindgen(js_name = "f", js_namespace = "default")]
-                pub fn f_js_string() -> JsString;
+                #[wasm_bindgen(catch, js_namespace = "default")]
+                pub fn f() -> Result<String, JsValue>;
             }
             #[wasm_bindgen(module = "export-default/namespace", experimental_generic_mono)]
             extern "C" {
                 #[wasm_bindgen(catch, js_name = "f", js_namespace = "default")]
-                pub fn try_f() -> Result<String, JsValue>;
-            }
-            #[wasm_bindgen(module = "export-default/namespace", experimental_generic_mono)]
-            extern "C" {
-                #[wasm_bindgen(catch, js_name = "f", js_namespace = "default")]
-                pub fn try_f_js_string() -> Result<JsString, JsValue>;
+                pub fn f_js_string() -> Result<JsString, JsValue>;
             }
         }
     }

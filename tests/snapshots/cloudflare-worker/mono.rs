@@ -27,75 +27,38 @@ extern "C" {
     pub fn new_with_record(init: &Object<JsString>) -> Result<Headers, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Headers")]
     pub fn new_with_slice(init: &[ArrayTuple<(JsString, JsString)>]) -> Result<Headers, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn append(
         this: &Headers,
         name: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
-    );
-    #[wasm_bindgen(method, catch, js_name = "append")]
-    pub fn try_append(
-        this: &Headers,
-        name: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn delete(this: &Headers, name: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub fn try_delete(
-        this: &Headers,
-        name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn get(this: &Headers, name: impl ::wasm_bindgen::JsStringLike) -> Nullable<String>;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_js_string(
-        this: &Headers,
-        name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Nullable<JsString>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(
+    #[wasm_bindgen(method, catch)]
+    pub fn delete(this: &Headers, name: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn get(
         this: &Headers,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get_js_string(
+    pub fn get_js_string(
         this: &Headers,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<JsString>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn has(this: &Headers, name: impl ::wasm_bindgen::JsStringLike) -> bool;
-    #[wasm_bindgen(method, catch, js_name = "has")]
-    pub fn try_has(
-        this: &Headers,
-        name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
+    pub fn has(this: &Headers, name: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, catch)]
     pub fn set(
         this: &Headers,
         name: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
-    );
-    #[wasm_bindgen(method, catch, js_name = "set")]
-    pub fn try_set(
-        this: &Headers,
-        name: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn entries(this: &Headers) -> Iterator<ArrayTuple<(JsString, JsString)>>;
-    #[wasm_bindgen(method, catch, js_name = "entries")]
-    pub fn try_entries(
-        this: &Headers,
-    ) -> Result<Iterator<ArrayTuple<(JsString, JsString)>>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn keys(this: &Headers) -> Iterator<JsString>;
-    #[wasm_bindgen(method, catch, js_name = "keys")]
-    pub fn try_keys(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn values(this: &Headers) -> Iterator<JsString>;
-    #[wasm_bindgen(method, catch, js_name = "values")]
-    pub fn try_values(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn entries(this: &Headers) -> Result<Iterator<ArrayTuple<(JsString, JsString)>>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn keys(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn values(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
 }
 #[allow(dead_code)]
 pub type HeadersInit = JsValue;
@@ -138,10 +101,8 @@ extern "C" {
     pub fn redirect_js_string(this: &Request) -> JsString;
     #[wasm_bindgen(method, getter)]
     pub fn signal(this: &Request) -> AbortSignal;
-    #[wasm_bindgen(method)]
-    pub fn clone(this: &Request) -> Request;
-    #[wasm_bindgen(method, catch, js_name = "clone")]
-    pub fn try_clone(this: &Request) -> Result<Request, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn clone(this: &Request) -> Result<Request, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Request) -> Result<ArrayBuffer, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -335,25 +296,17 @@ extern "C" {
         body: &::wasm_bindgen::JsValue,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response)]
-    pub fn redirect(url: impl ::wasm_bindgen::JsStringLike) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch)]
+    pub fn redirect(url: impl ::wasm_bindgen::JsStringLike) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "redirect")]
-    pub fn try_redirect(url: impl ::wasm_bindgen::JsStringLike) -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response , js_name = "redirect")]
-    pub fn redirect_with_status(url: impl ::wasm_bindgen::JsStringLike, status: f64) -> Response;
-    # [wasm_bindgen (static_method_of = Response , catch , js_name = "redirect")]
-    pub fn try_redirect_with_status(
+    pub fn redirect_with_status(
         url: impl ::wasm_bindgen::JsStringLike,
         status: f64,
     ) -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response)]
-    pub fn json(data: &JsValue) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch)]
+    pub fn json(data: &JsValue) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn try_json(data: &JsValue) -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response , js_name = "json")]
-    pub fn json_with_init(data: &JsValue, init: &ResponseInit) -> Response;
-    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn try_json_with_init(data: &JsValue, init: &ResponseInit) -> Result<Response, JsValue>;
+    pub fn json_with_init(data: &JsValue, init: &ResponseInit) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &Response) -> f64;
     #[wasm_bindgen(method, getter, js_name = "statusText")]
@@ -372,10 +325,8 @@ extern "C" {
     pub fn url(this: &Response) -> String;
     #[wasm_bindgen(method, getter, js_name = "url")]
     pub fn url_js_string(this: &Response) -> JsString;
-    #[wasm_bindgen(method)]
-    pub fn clone(this: &Response) -> Response;
-    #[wasm_bindgen(method, catch, js_name = "clone")]
-    pub fn try_clone(this: &Response) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn clone(this: &Response) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Response) -> Result<ArrayBuffer, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -466,14 +417,10 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ExecutionContext;
-    #[wasm_bindgen(method, js_name = "waitUntil")]
-    pub fn wait_until(this: &ExecutionContext, promise: &Promise);
     #[wasm_bindgen(method, catch, js_name = "waitUntil")]
-    pub fn try_wait_until(this: &ExecutionContext, promise: &Promise) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "passThroughOnException")]
-    pub fn pass_through_on_exception(this: &ExecutionContext);
+    pub fn wait_until(this: &ExecutionContext, promise: &Promise) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "passThroughOnException")]
-    pub fn try_pass_through_on_exception(this: &ExecutionContext) -> Result<(), JsValue>;
+    pub fn pass_through_on_exception(this: &ExecutionContext) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -516,10 +463,8 @@ extern "C" {
     pub fn cron(this: &ScheduledController) -> String;
     #[wasm_bindgen(method, getter, js_name = "cron")]
     pub fn cron_js_string(this: &ScheduledController) -> JsString;
-    #[wasm_bindgen(method, js_name = "noRetry")]
-    pub fn no_retry(this: &ScheduledController);
     #[wasm_bindgen(method, catch, js_name = "noRetry")]
-    pub fn try_no_retry(this: &ScheduledController) -> Result<(), JsValue>;
+    pub fn no_retry(this: &ScheduledController) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

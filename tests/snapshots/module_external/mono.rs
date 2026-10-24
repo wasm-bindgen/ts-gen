@@ -17,10 +17,8 @@ pub mod x {
             # [wasm_bindgen (extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type UsesBar;
-            #[wasm_bindgen(method)]
-            pub fn method(this: &UsesBar, b: &Bar);
-            #[wasm_bindgen(method, catch, js_name = "method")]
-            pub fn try_method(this: &UsesBar, b: &Bar) -> Result<(), JsValue>;
+            #[wasm_bindgen(method, catch)]
+            pub fn method(this: &UsesBar, b: &Bar) -> Result<(), JsValue>;
         }
     }
 }

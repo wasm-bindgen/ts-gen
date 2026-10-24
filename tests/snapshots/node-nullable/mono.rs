@@ -54,216 +54,108 @@ impl OptionsBuilder {
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " `null` disables the fallback; `undefined` takes the default `\"anon\"`."]
-    pub fn describe(name: impl ::wasm_bindgen::JsStringLike) -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " `null` disables the fallback; `undefined` takes the default `\"anon\"`."]
-    #[wasm_bindgen(js_name = "describe")]
-    pub fn describe_js_string(name: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn describe(name: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " `null` disables the fallback; `undefined` takes the default `\"anon\"`."]
     #[wasm_bindgen(catch, js_name = "describe")]
-    pub fn try_describe(name: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    pub fn describe_js_string(name: impl ::wasm_bindgen::JsStringLike)
+        -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[doc = " `null` disables the fallback; `undefined` takes the default `\"anon\"`."]
     #[wasm_bindgen(catch, js_name = "describe")]
-    pub fn try_describe_js_string(
-        name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "describe")]
-    fn describe_with_null_js(name: &::wasm_bindgen::JsValue) -> String;
+    fn describe_with_null_js(name: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
 }
 #[doc = " `null` disables the fallback; `undefined` takes the default `\"anon\"`."]
-pub fn describe_with_null() -> String {
+pub fn describe_with_null() -> Result<String, JsValue> {
     describe_with_null_js(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "describe")]
-    fn describe_with_null_js_string_js(name: &::wasm_bindgen::JsValue) -> JsString;
+    #[wasm_bindgen(catch, js_name = "describe")]
+    fn describe_with_null_js_string_js(name: &::wasm_bindgen::JsValue)
+        -> Result<JsString, JsValue>;
 }
 #[doc = " `null` disables the fallback; `undefined` takes the default `\"anon\"`."]
-pub fn describe_with_null_js_string() -> JsString {
+pub fn describe_with_null_js_string() -> Result<JsString, JsValue> {
     describe_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "describe")]
-    fn try_describe_with_null_js(name: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
-}
-#[doc = " `null` disables the fallback; `undefined` takes the default `\"anon\"`."]
-pub fn try_describe_with_null() -> Result<String, JsValue> {
-    try_describe_with_null_js(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "describe")]
-    fn try_describe_with_null_js_string_js(
-        name: &::wasm_bindgen::JsValue,
-    ) -> Result<JsString, JsValue>;
-}
-#[doc = " `null` disables the fallback; `undefined` takes the default `\"anon\"`."]
-pub fn try_describe_with_null_js_string() -> Result<JsString, JsValue> {
-    try_describe_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
     #[doc = " `undefined` takes the default `1`."]
-    pub fn repeat() -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " `undefined` takes the default `1`."]
-    #[wasm_bindgen(js_name = "repeat")]
-    pub fn repeat_js_string() -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn repeat() -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " `undefined` takes the default `1`."]
     #[wasm_bindgen(catch, js_name = "repeat")]
-    pub fn try_repeat() -> Result<String, JsValue>;
+    pub fn repeat_js_string() -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " `undefined` takes the default `1`."]
     #[wasm_bindgen(catch, js_name = "repeat")]
-    pub fn try_repeat_js_string() -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " `undefined` takes the default `1`."]
-    #[wasm_bindgen(js_name = "repeat")]
-    pub fn repeat_with_count(count: f64) -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " `undefined` takes the default `1`."]
-    #[wasm_bindgen(js_name = "repeat")]
-    pub fn repeat_with_count_js_string(count: f64) -> JsString;
+    pub fn repeat_with_count(count: f64) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " `undefined` takes the default `1`."]
     #[wasm_bindgen(catch, js_name = "repeat")]
-    pub fn try_repeat_with_count(count: f64) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " `undefined` takes the default `1`."]
-    #[wasm_bindgen(catch, js_name = "repeat")]
-    pub fn try_repeat_with_count_js_string(count: f64) -> Result<JsString, JsValue>;
+    pub fn repeat_with_count_js_string(count: f64) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-    pub fn greet() -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-    #[wasm_bindgen(js_name = "greet")]
-    pub fn greet_js_string() -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn greet() -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
     #[wasm_bindgen(catch, js_name = "greet")]
-    pub fn try_greet() -> Result<String, JsValue>;
+    pub fn greet_js_string() -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
     #[wasm_bindgen(catch, js_name = "greet")]
-    pub fn try_greet_js_string() -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-    #[wasm_bindgen(js_name = "greet")]
-    pub fn greet_with_name(name: impl ::wasm_bindgen::JsStringLike) -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-    #[wasm_bindgen(js_name = "greet")]
-    pub fn greet_with_name_js_string(name: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    pub fn greet_with_name(name: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
     #[wasm_bindgen(catch, js_name = "greet")]
-    pub fn try_greet_with_name(name: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-    #[wasm_bindgen(catch, js_name = "greet")]
-    pub fn try_greet_with_name_js_string(
+    pub fn greet_with_name_js_string(
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "greet")]
-    fn greet_with_null_js(name: &::wasm_bindgen::JsValue) -> String;
+    #[wasm_bindgen(catch, js_name = "greet")]
+    fn greet_with_null_js(name: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
 }
 #[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-pub fn greet_with_null() -> String {
+pub fn greet_with_null() -> Result<String, JsValue> {
     greet_with_null_js(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "greet")]
-    fn greet_with_null_js_string_js(name: &::wasm_bindgen::JsValue) -> JsString;
+    #[wasm_bindgen(catch, js_name = "greet")]
+    fn greet_with_null_js_string_js(name: &::wasm_bindgen::JsValue) -> Result<JsString, JsValue>;
 }
 #[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-pub fn greet_with_null_js_string() -> JsString {
+pub fn greet_with_null_js_string() -> Result<JsString, JsValue> {
     greet_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "greet")]
-    fn try_greet_with_null_js(name: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
-}
-#[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-pub fn try_greet_with_null() -> Result<String, JsValue> {
-    try_greet_with_null_js(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "greet")]
-    fn try_greet_with_null_js_string_js(
-        name: &::wasm_bindgen::JsValue,
-    ) -> Result<JsString, JsValue>;
-}
-#[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-pub fn try_greet_with_null_js_string() -> Result<JsString, JsValue> {
-    try_greet_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
     #[doc = " Returns `null` for an unknown key and `undefined` for a known empty one."]
-    pub fn lookup(key: impl ::wasm_bindgen::JsStringLike) -> Option<Nullable<String>>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Returns `null` for an unknown key and `undefined` for a known empty one."]
-    #[wasm_bindgen(js_name = "lookup")]
-    pub fn lookup_js_string(key: impl ::wasm_bindgen::JsStringLike) -> Option<Nullable<JsString>>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Returns `null` for an unknown key and `undefined` for a known empty one."]
-    #[wasm_bindgen(catch, js_name = "lookup")]
-    pub fn try_lookup(
+    #[wasm_bindgen(catch)]
+    pub fn lookup(
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<Nullable<String>>, JsValue>;
 }
@@ -271,7 +163,7 @@ extern "C" {
 extern "C" {
     #[doc = " Returns `null` for an unknown key and `undefined` for a known empty one."]
     #[wasm_bindgen(catch, js_name = "lookup")]
-    pub fn try_lookup_js_string(
+    pub fn lookup_js_string(
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<Nullable<JsString>>, JsValue>;
 }
@@ -301,188 +193,97 @@ extern "C" {
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " Tells `undefined`, `null` and a value apart."]
-    pub fn classify() -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Tells `undefined`, `null` and a value apart."]
-    #[wasm_bindgen(js_name = "classify")]
-    pub fn classify_js_string() -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn classify() -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " Tells `undefined`, `null` and a value apart."]
     #[wasm_bindgen(catch, js_name = "classify")]
-    pub fn try_classify() -> Result<String, JsValue>;
+    pub fn classify_js_string() -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " Tells `undefined`, `null` and a value apart."]
     #[wasm_bindgen(catch, js_name = "classify")]
-    pub fn try_classify_js_string() -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Tells `undefined`, `null` and a value apart."]
-    #[wasm_bindgen(js_name = "classify")]
-    pub fn classify_with_value(value: impl ::wasm_bindgen::JsStringLike) -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Tells `undefined`, `null` and a value apart."]
-    #[wasm_bindgen(js_name = "classify")]
-    pub fn classify_with_value_js_string(value: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    pub fn classify_with_value(value: impl ::wasm_bindgen::JsStringLike)
+        -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " Tells `undefined`, `null` and a value apart."]
     #[wasm_bindgen(catch, js_name = "classify")]
-    pub fn try_classify_with_value(
-        value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Tells `undefined`, `null` and a value apart."]
-    #[wasm_bindgen(catch, js_name = "classify")]
-    pub fn try_classify_with_value_js_string(
+    pub fn classify_with_value_js_string(
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "classify")]
-    fn classify_with_null_js(value: &::wasm_bindgen::JsValue) -> String;
+    #[wasm_bindgen(catch, js_name = "classify")]
+    fn classify_with_null_js(value: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
 }
 #[doc = " Tells `undefined`, `null` and a value apart."]
-pub fn classify_with_null() -> String {
+pub fn classify_with_null() -> Result<String, JsValue> {
     classify_with_null_js(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "classify")]
-    fn classify_with_null_js_string_js(value: &::wasm_bindgen::JsValue) -> JsString;
-}
-#[doc = " Tells `undefined`, `null` and a value apart."]
-pub fn classify_with_null_js_string() -> JsString {
-    classify_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "classify")]
-    fn try_classify_with_null_js(value: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
-}
-#[doc = " Tells `undefined`, `null` and a value apart."]
-pub fn try_classify_with_null() -> Result<String, JsValue> {
-    try_classify_with_null_js(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "classify")]
-    fn try_classify_with_null_js_string_js(
+    fn classify_with_null_js_string_js(
         value: &::wasm_bindgen::JsValue,
     ) -> Result<JsString, JsValue>;
 }
 #[doc = " Tells `undefined`, `null` and a value apart."]
-pub fn try_classify_with_null_js_string() -> Result<JsString, JsValue> {
-    try_classify_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
+pub fn classify_with_null_js_string() -> Result<JsString, JsValue> {
+    classify_with_null_js_string_js(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " An `Options` whose `label` is missing, `undefined`, `null` or `\"x\"`."]
-    pub fn options(label: impl ::wasm_bindgen::JsStringLike) -> Options;
+    #[wasm_bindgen(catch)]
+    pub fn options(label: impl ::wasm_bindgen::JsStringLike) -> Result<Options, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[doc = " An `Options` whose `label` is missing, `undefined`, `null` or `\"x\"`."]
-    #[wasm_bindgen(catch, js_name = "options")]
-    pub fn try_options(label: impl ::wasm_bindgen::JsStringLike) -> Result<Options, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    pub fn configure(options: &Options) -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "configure")]
-    pub fn configure_js_string(options: &Options) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn configure(options: &Options) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "configure")]
-    pub fn try_configure(options: &Options) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "configure")]
-    pub fn try_configure_js_string(options: &Options) -> Result<JsString, JsValue>;
+    pub fn configure_js_string(options: &Options) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
-    pub fn arity() -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " How many arguments arrived, and what the last one was."]
-    #[wasm_bindgen(js_name = "arity")]
-    pub fn arity_js_string() -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn arity() -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
     #[wasm_bindgen(catch, js_name = "arity")]
-    pub fn try_arity() -> Result<String, JsValue>;
+    pub fn arity_js_string() -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
     #[wasm_bindgen(catch, js_name = "arity")]
-    pub fn try_arity_js_string() -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " How many arguments arrived, and what the last one was."]
-    #[wasm_bindgen(js_name = "arity")]
-    pub fn arity_with_a(a: impl ::wasm_bindgen::JsStringLike) -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " How many arguments arrived, and what the last one was."]
-    #[wasm_bindgen(js_name = "arity")]
-    pub fn arity_with_a_js_string(a: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    pub fn arity_with_a(a: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
     #[wasm_bindgen(catch, js_name = "arity")]
-    pub fn try_arity_with_a(a: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " How many arguments arrived, and what the last one was."]
-    #[wasm_bindgen(catch, js_name = "arity")]
-    pub fn try_arity_with_a_js_string(
+    pub fn arity_with_a_js_string(
         a: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
-    #[wasm_bindgen(js_name = "arity")]
-    pub fn arity_with_a_and_b(a: impl ::wasm_bindgen::JsStringLike, b: f64) -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " How many arguments arrived, and what the last one was."]
-    #[wasm_bindgen(js_name = "arity")]
-    pub fn arity_with_a_and_b_js_string(a: impl ::wasm_bindgen::JsStringLike, b: f64) -> JsString;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " How many arguments arrived, and what the last one was."]
     #[wasm_bindgen(catch, js_name = "arity")]
-    pub fn try_arity_with_a_and_b(
+    pub fn arity_with_a_and_b(
         a: impl ::wasm_bindgen::JsStringLike,
         b: f64,
     ) -> Result<String, JsValue>;
@@ -491,86 +292,48 @@ extern "C" {
 extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
     #[wasm_bindgen(catch, js_name = "arity")]
-    pub fn try_arity_with_a_and_b_js_string(
+    pub fn arity_with_a_and_b_js_string(
         a: impl ::wasm_bindgen::JsStringLike,
         b: f64,
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "arity")]
+    #[wasm_bindgen(catch, js_name = "arity")]
     fn arity_with_a_and_null_js(
         a: impl ::wasm_bindgen::JsStringLike,
         b: &::wasm_bindgen::JsValue,
-    ) -> String;
+    ) -> Result<String, JsValue>;
 }
 #[doc = " How many arguments arrived, and what the last one was."]
-pub fn arity_with_a_and_null(a: impl ::wasm_bindgen::JsStringLike) -> String {
+pub fn arity_with_a_and_null(a: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue> {
     arity_with_a_and_null_js(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "arity")]
+    #[wasm_bindgen(catch, js_name = "arity")]
     fn arity_with_a_and_null_js_string_js(
-        a: impl ::wasm_bindgen::JsStringLike,
-        b: &::wasm_bindgen::JsValue,
-    ) -> JsString;
-}
-#[doc = " How many arguments arrived, and what the last one was."]
-pub fn arity_with_a_and_null_js_string(a: impl ::wasm_bindgen::JsStringLike) -> JsString {
-    arity_with_a_and_null_js_string_js(a, &::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "arity")]
-    fn try_arity_with_a_and_null_js(
-        a: impl ::wasm_bindgen::JsStringLike,
-        b: &::wasm_bindgen::JsValue,
-    ) -> Result<String, JsValue>;
-}
-#[doc = " How many arguments arrived, and what the last one was."]
-pub fn try_arity_with_a_and_null(a: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue> {
-    try_arity_with_a_and_null_js(a, &::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "arity")]
-    fn try_arity_with_a_and_null_js_string_js(
         a: impl ::wasm_bindgen::JsStringLike,
         b: &::wasm_bindgen::JsValue,
     ) -> Result<JsString, JsValue>;
 }
 #[doc = " How many arguments arrived, and what the last one was."]
-pub fn try_arity_with_a_and_null_js_string(
+pub fn arity_with_a_and_null_js_string(
     a: impl ::wasm_bindgen::JsStringLike,
 ) -> Result<JsString, JsValue> {
-    try_arity_with_a_and_null_js_string_js(a, &::wasm_bindgen::JsValue::NULL)
+    arity_with_a_and_null_js_string_js(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " A non-trailing `undefined` is passed, not omitted."]
-    pub fn pick(a: Option<impl ::wasm_bindgen::JsStringLike>, b: f64) -> String;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " A non-trailing `undefined` is passed, not omitted."]
-    #[wasm_bindgen(js_name = "pick")]
-    pub fn pick_js_string(a: Option<impl ::wasm_bindgen::JsStringLike>, b: f64) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn pick(a: Option<impl ::wasm_bindgen::JsStringLike>, b: f64) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " A non-trailing `undefined` is passed, not omitted."]
     #[wasm_bindgen(catch, js_name = "pick")]
-    pub fn try_pick(
-        a: Option<impl ::wasm_bindgen::JsStringLike>,
-        b: f64,
-    ) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " A non-trailing `undefined` is passed, not omitted."]
-    #[wasm_bindgen(catch, js_name = "pick")]
-    pub fn try_pick_js_string(
+    pub fn pick_js_string(
         a: Option<impl ::wasm_bindgen::JsStringLike>,
         b: f64,
     ) -> Result<JsString, JsValue>;

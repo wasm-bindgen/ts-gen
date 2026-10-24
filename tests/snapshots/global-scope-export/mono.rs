@@ -9,14 +9,10 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Win;
-    #[wasm_bindgen(method)]
-    pub fn a(this: &Win);
-    #[wasm_bindgen(method, catch, js_name = "a")]
-    pub fn try_a(this: &Win) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn b(this: &Win);
-    #[wasm_bindgen(method, catch, js_name = "b")]
-    pub fn try_b(this: &Win) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn a(this: &Win) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn b(this: &Win) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -42,14 +38,10 @@ extern "C" {
     pub type XV;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<XV, JsValue>;
-    # [wasm_bindgen (static_method_of = XV)]
-    pub fn stat();
-    # [wasm_bindgen (static_method_of = XV , catch , js_name = "stat")]
-    pub fn try_stat() -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn inst(this: &XV);
-    #[wasm_bindgen(method, catch, js_name = "inst")]
-    pub fn try_inst(this: &XV) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = XV , catch)]
+    pub fn stat() -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn inst(this: &XV) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -58,14 +50,10 @@ extern "C" {
     pub type VX;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<VX, JsValue>;
-    # [wasm_bindgen (static_method_of = VX)]
-    pub fn stat();
-    # [wasm_bindgen (static_method_of = VX , catch , js_name = "stat")]
-    pub fn try_stat() -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn inst(this: &VX);
-    #[wasm_bindgen(method, catch, js_name = "inst")]
-    pub fn try_inst(this: &VX) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = VX , catch)]
+    pub fn stat() -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn inst(this: &VX) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -74,14 +62,10 @@ extern "C" {
     pub type XC;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<XC, JsValue>;
-    # [wasm_bindgen (static_method_of = XC)]
-    pub fn stat();
-    # [wasm_bindgen (static_method_of = XC , catch , js_name = "stat")]
-    pub fn try_stat() -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn inst(this: &XC);
-    #[wasm_bindgen(method, catch, js_name = "inst")]
-    pub fn try_inst(this: &XC) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = XC , catch)]
+    pub fn stat() -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn inst(this: &XC) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -102,13 +86,8 @@ impl XF {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "FX")]
-    pub fn fx() -> FX;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "FX")]
-    pub fn try_fx() -> Result<FX, JsValue>;
+    pub fn fx() -> Result<FX, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -129,12 +108,8 @@ impl Proc {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn f(w: &Win, o: &OnlyA);
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "f")]
-    pub fn try_f(w: &Win, o: &OnlyA) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn f(w: &Win, o: &OnlyA) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -143,24 +118,15 @@ extern "C" {
     pub type CX;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<CX, JsValue>;
-    # [wasm_bindgen (static_method_of = CX)]
-    pub fn stat();
-    # [wasm_bindgen (static_method_of = CX , catch , js_name = "stat")]
-    pub fn try_stat() -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn inst(this: &CX);
-    #[wasm_bindgen(method, catch, js_name = "inst")]
-    pub fn try_inst(this: &CX) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "XF")]
-    pub fn xf() -> XF;
+    # [wasm_bindgen (static_method_of = CX , catch)]
+    pub fn stat() -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn inst(this: &CX) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "XF")]
-    pub fn try_xf() -> Result<XF, JsValue>;
+    pub fn xf() -> Result<XF, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -186,12 +152,8 @@ extern "C" {
     pub type SX;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<SX, JsValue>;
-    # [wasm_bindgen (static_method_of = SX)]
-    pub fn added() -> SX;
-    # [wasm_bindgen (static_method_of = SX , catch , js_name = "added")]
-    pub fn try_added() -> Result<SX, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn inst(this: &SX);
-    #[wasm_bindgen(method, catch, js_name = "inst")]
-    pub fn try_inst(this: &SX) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = SX , catch)]
+    pub fn added() -> Result<SX, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn inst(this: &SX) -> Result<(), JsValue>;
 }

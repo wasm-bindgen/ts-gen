@@ -6,280 +6,143 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "setValue")]
-    pub fn set_value(value: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(catch, js_name = "setValue")]
+    pub fn set_value(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setValue")]
-    pub fn try_set_value(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setValue")]
-    pub fn set_value_with_f64(value: f64);
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "setValue")]
-    pub fn try_set_value_with_f64(value: f64) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setFlag")]
-    pub fn set_flag(value: bool);
+    pub fn set_value_with_f64(value: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setFlag")]
-    pub fn try_set_flag(value: bool) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setFlag")]
-    pub fn set_flag_with_big_int(value: &BigInt);
+    pub fn set_flag(value: bool) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setFlag")]
-    pub fn try_set_flag_with_big_int(value: &BigInt) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setAny")]
-    pub fn set_any(value: &BigInt);
+    pub fn set_flag_with_big_int(value: &BigInt) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setAny")]
-    pub fn try_set_any(value: &BigInt) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setAny")]
-    pub fn set_any_with_bool(value: bool);
+    pub fn set_any(value: &BigInt) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setAny")]
-    pub fn try_set_any_with_bool(value: bool) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setAny")]
-    pub fn set_any_with_f64(value: f64);
+    pub fn set_any_with_bool(value: bool) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setAny")]
-    pub fn try_set_any_with_f64(value: f64) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setAny")]
-    pub fn set_any_with_str(value: impl ::wasm_bindgen::JsStringLike);
+    pub fn set_any_with_f64(value: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setAny")]
-    pub fn try_set_any_with_str(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setAny")]
-    pub fn set_any_with_symbol(value: &Symbol);
+    pub fn set_any_with_str(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setAny")]
-    pub fn try_set_any_with_symbol(value: &Symbol) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setKeyed")]
-    pub fn set_keyed(value: impl ::wasm_bindgen::JsStringLike);
+    pub fn set_any_with_symbol(value: &Symbol) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setKeyed")]
-    pub fn try_set_keyed(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setKeyed")]
-    pub fn set_keyed_with_symbol(value: &Symbol);
+    pub fn set_keyed(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setKeyed")]
-    pub fn try_set_keyed_with_symbol(value: &Symbol) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setLevel")]
-    pub fn set_level(level: f64);
+    pub fn set_keyed_with_symbol(value: &Symbol) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setLevel")]
-    pub fn try_set_level(level: f64) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setLevel")]
-    pub fn set_level_with_str(level: impl ::wasm_bindgen::JsStringLike);
+    pub fn set_level(level: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setLevel")]
-    pub fn try_set_level_with_str(level: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setNullable")]
-    pub fn set_nullable(value: impl ::wasm_bindgen::JsStringLike);
+    pub fn set_level_with_str(level: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setNullable")]
-    pub fn try_set_nullable(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setNullable")]
-    pub fn set_nullable_with_f64(value: f64);
+    pub fn set_nullable(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setNullable")]
-    pub fn try_set_nullable_with_f64(value: f64) -> Result<(), JsValue>;
+    pub fn set_nullable_with_f64(value: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "setNullable")]
-    fn set_nullable_with_null_js(value: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(catch, js_name = "setNullable")]
+    fn set_nullable_with_null_js(value: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
 }
-pub fn set_nullable_with_null() {
+pub fn set_nullable_with_null() -> Result<(), JsValue> {
     set_nullable_with_null_js(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "setNullable")]
-    fn try_set_nullable_with_null_js(value: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
-}
-pub fn try_set_nullable_with_null() -> Result<(), JsValue> {
-    try_set_nullable_with_null_js(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setMaybe")]
-    pub fn set_maybe();
+    #[wasm_bindgen(catch, js_name = "setMaybe")]
+    pub fn set_maybe() -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setMaybe")]
-    pub fn try_set_maybe() -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setMaybe")]
-    pub fn set_maybe_with_str(value: impl ::wasm_bindgen::JsStringLike);
+    pub fn set_maybe_with_str(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setMaybe")]
-    pub fn try_set_maybe_with_str(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setMaybe")]
-    pub fn set_maybe_with_f64(value: f64);
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "setMaybe")]
-    pub fn try_set_maybe_with_f64(value: f64) -> Result<(), JsValue>;
+    pub fn set_maybe_with_f64(value: f64) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type Id = JsValue;
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    pub fn lookup(id: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(catch)]
+    pub fn lookup(id: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "lookup")]
-    pub fn try_lookup(id: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "lookup")]
-    pub fn lookup_with_f64(id: f64);
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "lookup")]
-    pub fn try_lookup_with_f64(id: f64) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "hasKey")]
-    pub fn has_key(key: impl ::wasm_bindgen::JsStringLike) -> bool;
+    pub fn lookup_with_f64(id: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKey")]
-    pub fn try_has_key(key: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "hasKey")]
-    pub fn has_key_with_f64(key: f64) -> bool;
+    pub fn has_key(key: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKey")]
-    pub fn try_has_key_with_f64(key: f64) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "hasKey")]
-    pub fn has_key_with_symbol(key: &Symbol) -> bool;
+    pub fn has_key_with_f64(key: f64) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKey")]
-    pub fn try_has_key_with_symbol(key: &Symbol) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "hasKeyExplicit")]
-    pub fn has_key_explicit(key: impl ::wasm_bindgen::JsStringLike) -> bool;
+    pub fn has_key_with_symbol(key: &Symbol) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKeyExplicit")]
-    pub fn try_has_key_explicit(key: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "hasKeyExplicit")]
-    pub fn has_key_explicit_with_f64(key: f64) -> bool;
+    pub fn has_key_explicit(key: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKeyExplicit")]
-    pub fn try_has_key_explicit_with_f64(key: f64) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "hasKeyExplicit")]
-    pub fn has_key_explicit_with_symbol(key: &Symbol) -> bool;
+    pub fn has_key_explicit_with_f64(key: f64) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKeyExplicit")]
-    pub fn try_has_key_explicit_with_symbol(key: &Symbol) -> Result<bool, JsValue>;
+    pub fn has_key_explicit_with_symbol(key: &Symbol) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
@@ -302,51 +165,28 @@ impl Target {
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    pub fn send(to: &Target);
+    #[wasm_bindgen(catch)]
+    pub fn send(to: &Target) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "send")]
-    pub fn try_send(to: &Target) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "send")]
-    pub fn send_with_str(to: impl ::wasm_bindgen::JsStringLike);
+    pub fn send_with_str(to: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "send")]
-    pub fn try_send_with_str(to: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "send")]
-    pub fn send_with_f64(to: f64);
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "send")]
-    pub fn try_send_with_f64(to: f64) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setMode")]
-    pub fn set_mode(mode: impl ::wasm_bindgen::JsStringLike);
+    pub fn send_with_f64(to: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setMode")]
-    pub fn try_set_mode(mode: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+    pub fn set_mode(mode: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    pub fn current() -> CurrentReturnKind;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "current")]
-    pub fn try_current() -> Result<CurrentReturnKind, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn current() -> Result<CurrentReturnKind, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
@@ -359,34 +199,21 @@ extern "C" {
     pub fn new_with_f64(key: f64) -> Result<Store, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Store")]
     pub fn new_with_symbol(key: &Symbol) -> Result<Store, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn get(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> String;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_js_string(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn get(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(this: &Store, key: impl ::wasm_bindgen::JsStringLike)
-        -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get_js_string(
+    pub fn get_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_f64(this: &Store, key: f64) -> String;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_f64_js_string(this: &Store, key: f64) -> JsString;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get_with_f64(this: &Store, key: f64) -> Result<String, JsValue>;
+    pub fn get_with_f64(this: &Store, key: f64) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get_with_f64_js_string(this: &Store, key: f64) -> Result<JsString, JsValue>;
-    # [wasm_bindgen (static_method_of = Store)]
-    pub fn of(value: bool) -> Store;
+    pub fn get_with_f64_js_string(this: &Store, key: f64) -> Result<JsString, JsValue>;
+    # [wasm_bindgen (static_method_of = Store , catch)]
+    pub fn of(value: bool) -> Result<Store, JsValue>;
     # [wasm_bindgen (static_method_of = Store , catch , js_name = "of")]
-    pub fn try_of(value: bool) -> Result<Store, JsValue>;
-    # [wasm_bindgen (static_method_of = Store , js_name = "of")]
-    pub fn of_with_f64(value: f64) -> Store;
-    # [wasm_bindgen (static_method_of = Store , catch , js_name = "of")]
-    pub fn try_of_with_f64(value: f64) -> Result<Store, JsValue>;
+    pub fn of_with_f64(value: f64) -> Result<Store, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {

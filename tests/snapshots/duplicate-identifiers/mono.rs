@@ -58,20 +58,16 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TwoClasses;
-    #[wasm_bindgen(method)]
-    pub fn a(this: &TwoClasses);
-    #[wasm_bindgen(method, catch, js_name = "a")]
-    pub fn try_a(this: &TwoClasses) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn a(this: &TwoClasses) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Widget;
-    #[wasm_bindgen(method)]
-    pub fn w(this: &Widget);
-    #[wasm_bindgen(method, catch, js_name = "w")]
-    pub fn try_w(this: &Widget) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn w(this: &Widget) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -146,28 +142,20 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Both;
-    #[wasm_bindgen(method)]
-    pub fn c(this: &Both);
-    #[wasm_bindgen(method, catch, js_name = "c")]
-    pub fn try_c(this: &Both) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn i(this: &Both);
-    #[wasm_bindgen(method, catch, js_name = "i")]
-    pub fn try_i(this: &Both) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn c(this: &Both) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn i(this: &Both) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Late;
-    #[wasm_bindgen(method)]
-    pub fn c(this: &Late);
-    #[wasm_bindgen(method, catch, js_name = "c")]
-    pub fn try_c(this: &Late) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn i(this: &Late);
-    #[wasm_bindgen(method, catch, js_name = "i")]
-    pub fn try_i(this: &Late) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn c(this: &Late) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn i(this: &Late) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -176,10 +164,8 @@ extern "C" {
     pub type VarClass;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<VarClass, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn v(this: &VarClass);
-    #[wasm_bindgen(method, catch, js_name = "v")]
-    pub fn try_v(this: &VarClass) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn v(this: &VarClass) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -203,13 +189,8 @@ pub mod opts {
     use super::*;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Opts")]
-        pub fn make() -> super::Opts;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "make", js_namespace = "Opts")]
-        pub fn try_make() -> Result<super::Opts, JsValue>;
+        #[wasm_bindgen(catch, js_namespace = "Opts")]
+        pub fn make() -> Result<super::Opts, JsValue>;
     }
 }
 #[wasm_bindgen(private)]
@@ -224,34 +205,14 @@ pub mod level {
     use super::*;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Level")]
-        pub fn parse(s: impl ::wasm_bindgen::JsStringLike) -> super::Level;
+        #[wasm_bindgen(catch, js_namespace = "Level")]
+        pub fn parse(s: impl ::wasm_bindgen::JsStringLike) -> Result<super::Level, JsValue>;
     }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "parse", js_namespace = "Level")]
-        pub fn try_parse(s: impl ::wasm_bindgen::JsStringLike) -> Result<super::Level, JsValue>;
-    }
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "use")]
-    pub fn use_(
-        dup: &Dup,
-        first: &IfaceFirst,
-        prim: impl ::wasm_bindgen::JsStringLike,
-        mode: Mode,
-        two: &TwoClasses,
-        widget: &Widget,
-        color: Color,
-        later: &Later,
-        t: &n::T,
-    );
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "use")]
-    pub fn try_use_(
+    pub fn use_(
         dup: &Dup,
         first: &IfaceFirst,
         prim: impl ::wasm_bindgen::JsStringLike,
@@ -265,13 +226,8 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "useOther")]
-    pub fn use_other(dup: &Dup, first: &IfaceFirst, two: &TwoClasses, merged: &Merged, t: &n::T);
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "useOther")]
-    pub fn try_use_other(
+    pub fn use_other(
         dup: &Dup,
         first: &IfaceFirst,
         two: &TwoClasses,

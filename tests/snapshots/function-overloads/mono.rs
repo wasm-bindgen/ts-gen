@@ -6,166 +6,84 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn parse(input: impl ::wasm_bindgen::JsStringLike) -> Object;
+    #[wasm_bindgen(catch)]
+    pub fn parse(input: impl ::wasm_bindgen::JsStringLike) -> Result<Object, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn try_parse(input: impl ::wasm_bindgen::JsStringLike) -> Result<Object, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "parse")]
-    pub fn parse_with_array_buffer(input: &ArrayBuffer) -> Object;
+    pub fn parse_with_array_buffer(input: &ArrayBuffer) -> Result<Object, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn try_parse_with_array_buffer(input: &ArrayBuffer) -> Result<Object, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "parse")]
     pub fn parse_with_str_and_reviver(
-        input: impl ::wasm_bindgen::JsStringLike,
-        reviver: &Function,
-    ) -> Object;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn try_parse_with_str_and_reviver(
         input: impl ::wasm_bindgen::JsStringLike,
         reviver: &Function,
     ) -> Result<Object, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn f(x: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(catch)]
+    pub fn f(x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "f")]
-    pub fn try_f(x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "f")]
-    pub fn f_with_f64(x: f64);
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "f")]
-    pub fn try_f_with_f64(x: f64) -> Result<(), JsValue>;
+    pub fn f_with_f64(x: f64) -> Result<(), JsValue>;
 }
 pub mod n {
     #[allow(unused_imports)]
     use super::*;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "N")]
-        pub fn g(x: impl ::wasm_bindgen::JsStringLike);
+        #[wasm_bindgen(catch, js_namespace = "N")]
+        pub fn g(x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "g", js_namespace = "N")]
-        pub fn try_g(x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(js_name = "g", js_namespace = "N")]
-        pub fn g_with_f64(x: f64);
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "g", js_namespace = "N")]
-        pub fn try_g_with_f64(x: f64) -> Result<(), JsValue>;
+        pub fn g_with_f64(x: f64) -> Result<(), JsValue>;
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn sz(x: impl ::wasm_bindgen::JsStringLike) -> String;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "sz")]
-    pub fn sz_js_string(x: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn sz(x: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "sz")]
-    pub fn try_sz(x: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    pub fn sz_js_string(x: impl ::wasm_bindgen::JsStringLike) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "sz")]
-    pub fn try_sz_js_string(x: impl ::wasm_bindgen::JsStringLike) -> Result<JsString, JsValue>;
+    pub fn sz_with_f64(x: f64) -> Result<f64, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "sz")]
-    pub fn sz_with_f64(x: f64) -> f64;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "sz")]
-    pub fn try_sz_with_f64(x: f64) -> Result<f64, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    pub fn gen<T>(x: T) -> T
+    #[wasm_bindgen(catch)]
+    pub fn gen<T>(x: T) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "gen")]
-    pub fn try_gen<T>(x: T) -> Result<T, JsValue>
-    where
-        T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "gen")]
-    pub fn gen_with_f64_and_y(x: f64, y: f64) -> f64;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "gen")]
-    pub fn try_gen_with_f64_and_y(x: f64, y: f64) -> Result<f64, JsValue>;
+    pub fn gen_with_f64_and_y(x: f64, y: f64) -> Result<f64, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " Reads text."]
-    pub fn read(x: impl ::wasm_bindgen::JsStringLike) -> String;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[doc = " Reads text."]
-    #[wasm_bindgen(js_name = "read")]
-    pub fn read_js_string(x: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn read(x: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " Reads text."]
     #[wasm_bindgen(catch, js_name = "read")]
-    pub fn try_read(x: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[doc = " Reads text."]
-    #[wasm_bindgen(catch, js_name = "read")]
-    pub fn try_read_js_string(x: impl ::wasm_bindgen::JsStringLike) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[doc = " Reads a byte."]
-    #[doc = ""]
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `RangeError` — When out of range."]
-    #[wasm_bindgen(js_name = "read")]
-    pub fn read_with_f64(x: f64) -> f64;
+    pub fn read_js_string(x: impl ::wasm_bindgen::JsStringLike) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -175,52 +93,34 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `RangeError` — When out of range."]
     #[wasm_bindgen(catch, js_name = "read")]
-    pub fn try_read_with_f64(x: f64) -> Result<f64, RangeError>;
+    pub fn read_with_f64(x: f64) -> Result<f64, RangeError>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Twin;
-    #[wasm_bindgen(method)]
-    pub fn sz(this: &Twin, x: impl ::wasm_bindgen::JsStringLike) -> String;
-    #[wasm_bindgen(method, js_name = "sz")]
-    pub fn sz_js_string(this: &Twin, x: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn sz(this: &Twin, x: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sz")]
-    pub fn try_sz(this: &Twin, x: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "sz")]
-    pub fn try_sz_js_string(
+    pub fn sz_js_string(
         this: &Twin,
         x: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, js_name = "sz")]
-    pub fn sz_with_f64(this: &Twin, x: f64) -> f64;
     #[wasm_bindgen(method, catch, js_name = "sz")]
-    pub fn try_sz_with_f64(this: &Twin, x: f64) -> Result<f64, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn gen<T>(this: &Twin, x: T) -> T
+    pub fn sz_with_f64(this: &Twin, x: f64) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn gen<T>(this: &Twin, x: T) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "gen")]
-    pub fn try_gen<T>(this: &Twin, x: T) -> Result<T, JsValue>
-    where
-        T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, js_name = "gen")]
-    pub fn gen_with_f64_and_y(this: &Twin, x: f64, y: f64) -> f64;
-    #[wasm_bindgen(method, catch, js_name = "gen")]
-    pub fn try_gen_with_f64_and_y(this: &Twin, x: f64, y: f64) -> Result<f64, JsValue>;
+    pub fn gen_with_f64_and_y(this: &Twin, x: f64, y: f64) -> Result<f64, JsValue>;
     #[doc = " Reads text."]
-    #[wasm_bindgen(method)]
-    pub fn read(this: &Twin, x: impl ::wasm_bindgen::JsStringLike) -> String;
-    #[doc = " Reads text."]
-    #[wasm_bindgen(method, js_name = "read")]
-    pub fn read_js_string(this: &Twin, x: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn read(this: &Twin, x: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
     #[doc = " Reads text."]
     #[wasm_bindgen(method, catch, js_name = "read")]
-    pub fn try_read(this: &Twin, x: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-    #[doc = " Reads text."]
-    #[wasm_bindgen(method, catch, js_name = "read")]
-    pub fn try_read_js_string(
+    pub fn read_js_string(
         this: &Twin,
         x: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
@@ -229,21 +129,10 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `RangeError` — When out of range."]
-    #[wasm_bindgen(method, js_name = "read")]
-    pub fn read_with_f64(this: &Twin, x: f64) -> f64;
-    #[doc = " Reads a byte."]
-    #[doc = ""]
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `RangeError` — When out of range."]
     #[wasm_bindgen(method, catch, js_name = "read")]
-    pub fn try_read_with_f64(this: &Twin, x: f64) -> Result<f64, RangeError>;
-    # [wasm_bindgen (static_method_of = Twin)]
-    pub fn of(x: impl ::wasm_bindgen::JsStringLike) -> Twin;
+    pub fn read_with_f64(this: &Twin, x: f64) -> Result<f64, RangeError>;
+    # [wasm_bindgen (static_method_of = Twin , catch)]
+    pub fn of(x: impl ::wasm_bindgen::JsStringLike) -> Result<Twin, JsValue>;
     # [wasm_bindgen (static_method_of = Twin , catch , js_name = "of")]
-    pub fn try_of(x: impl ::wasm_bindgen::JsStringLike) -> Result<Twin, JsValue>;
-    # [wasm_bindgen (static_method_of = Twin , js_name = "of")]
-    pub fn of_with_f64(x: f64) -> f64;
-    # [wasm_bindgen (static_method_of = Twin , catch , js_name = "of")]
-    pub fn try_of_with_f64(x: f64) -> Result<f64, JsValue>;
+    pub fn of_with_f64(x: f64) -> Result<f64, JsValue>;
 }

@@ -36,55 +36,31 @@ pub mod ovi {
     }
     #[wasm_bindgen(module = "ovi", experimental_generic_mono)]
     extern "C" {
-        pub fn k(x: impl ::wasm_bindgen::JsStringLike);
+        #[wasm_bindgen(catch)]
+        pub fn k(x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "ovi", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "k")]
-        pub fn try_k(x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen(module = "ovi", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(js_name = "k")]
-        pub fn k_with_f64(x: f64);
+        pub fn k_with_f64(x: f64) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "ovi", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "k")]
-        pub fn try_k_with_f64(x: f64) -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen(module = "ovi", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(js_name = "k")]
-        pub fn k_with_bool(x: bool);
-    }
-    #[wasm_bindgen(module = "ovi", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "k")]
-        pub fn try_k_with_bool(x: bool) -> Result<(), JsValue>;
+        pub fn k_with_bool(x: bool) -> Result<(), JsValue>;
     }
     pub mod ns {
         #[allow(unused_imports)]
         use super::*;
         #[wasm_bindgen(module = "ovi", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_namespace = "NS")]
-            pub fn h(x: impl ::wasm_bindgen::JsStringLike);
+            #[wasm_bindgen(catch, js_namespace = "NS")]
+            pub fn h(x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
         }
         #[wasm_bindgen(module = "ovi", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "h", js_namespace = "NS")]
-            pub fn try_h(x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-        }
-        #[wasm_bindgen(module = "ovi", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(js_name = "h", js_namespace = "NS")]
-            pub fn h_with_f64(x: f64);
-        }
-        #[wasm_bindgen(module = "ovi", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "h", js_namespace = "NS")]
-            pub fn try_h_with_f64(x: f64) -> Result<(), JsValue>;
+            pub fn h_with_f64(x: f64) -> Result<(), JsValue>;
         }
     }
 }
@@ -96,13 +72,8 @@ pub mod loc {
         use super::*;
         #[wasm_bindgen(module = "loc", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_namespace = "M")]
-            pub fn f();
-        }
-        #[wasm_bindgen(module = "loc", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "f", js_namespace = "M")]
-            pub fn try_f() -> Result<(), JsValue>;
+            #[wasm_bindgen(catch, js_namespace = "M")]
+            pub fn f() -> Result<(), JsValue>;
         }
     }
     #[wasm_bindgen(module = "loc", experimental_generic_mono)]
@@ -132,13 +103,8 @@ pub mod loc {
         use super::*;
         #[wasm_bindgen(module = "loc", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_namespace = "N")]
-            pub fn g();
-        }
-        #[wasm_bindgen(module = "loc", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "g", js_namespace = "N")]
-            pub fn try_g() -> Result<(), JsValue>;
+            #[wasm_bindgen(catch, js_namespace = "N")]
+            pub fn g() -> Result<(), JsValue>;
         }
     }
 }
@@ -189,21 +155,13 @@ pub mod ib {
     use super::*;
     #[wasm_bindgen(module = "ib", experimental_generic_mono)]
     extern "C" {
-        pub fn fa(t: &super::ia::T);
+        #[wasm_bindgen(catch)]
+        pub fn fa(t: &super::ia::T) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "ib", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(catch, js_name = "fa")]
-        pub fn try_fa(t: &super::ia::T) -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen(module = "ib", experimental_generic_mono)]
-    extern "C" {
-        pub fn fb(t: &super::ic::T);
-    }
-    #[wasm_bindgen(module = "ib", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "fb")]
-        pub fn try_fb(t: &super::ic::T) -> Result<(), JsValue>;
+        #[wasm_bindgen(catch)]
+        pub fn fb(t: &super::ic::T) -> Result<(), JsValue>;
     }
 }
 pub mod dflt {
@@ -214,13 +172,8 @@ pub mod dflt {
         use super::*;
         #[wasm_bindgen(module = "dflt", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_namespace = "default")]
-            pub fn f();
-        }
-        #[wasm_bindgen(module = "dflt", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "f", js_namespace = "default")]
-            pub fn try_f() -> Result<(), JsValue>;
+            #[wasm_bindgen(catch, js_namespace = "default")]
+            pub fn f() -> Result<(), JsValue>;
         }
     }
     pub mod n {
@@ -228,13 +181,8 @@ pub mod dflt {
         use super::*;
         #[wasm_bindgen(module = "dflt", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_namespace = "N")]
-            pub fn g();
-        }
-        #[wasm_bindgen(module = "dflt", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "g", js_namespace = "N")]
-            pub fn try_g() -> Result<(), JsValue>;
+            #[wasm_bindgen(catch, js_namespace = "N")]
+            pub fn g() -> Result<(), JsValue>;
         }
     }
 }
@@ -243,10 +191,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type W;
-    #[wasm_bindgen(method)]
-    pub fn glob(this: &W);
-    #[wasm_bindgen(method, catch, js_name = "glob")]
-    pub fn try_glob(this: &W) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn glob(this: &W) -> Result<(), JsValue>;
 }
 pub mod mm2 {
     #[allow(unused_imports)]
@@ -258,14 +204,10 @@ pub mod mm2 {
         pub type W;
         #[wasm_bindgen(constructor, catch)]
         pub fn new() -> Result<W, JsValue>;
-        # [wasm_bindgen (static_method_of = W)]
-        pub fn make() -> super::W;
-        # [wasm_bindgen (static_method_of = W , catch , js_name = "make")]
-        pub fn try_make() -> Result<super::W, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn w(this: &W);
-        #[wasm_bindgen(method, catch, js_name = "w")]
-        pub fn try_w(this: &W) -> Result<(), JsValue>;
+        # [wasm_bindgen (static_method_of = W , catch)]
+        pub fn make() -> Result<super::W, JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn w(this: &W) -> Result<(), JsValue>;
     }
 }
 pub mod lh {
@@ -290,12 +232,8 @@ pub mod lh {
     }
     #[wasm_bindgen(module = "lh", experimental_generic_mono)]
     extern "C" {
-        pub fn u(h: &H2);
-    }
-    #[wasm_bindgen(module = "lh", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "u")]
-        pub fn try_u(h: &H2) -> Result<(), JsValue>;
+        #[wasm_bindgen(catch)]
+        pub fn u(h: &H2) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "lh", experimental_generic_mono)]
     extern "C" {
@@ -316,12 +254,8 @@ pub mod lh {
     }
     #[wasm_bindgen(module = "lh", experimental_generic_mono)]
     extern "C" {
-        pub fn v(h: &H);
-    }
-    #[wasm_bindgen(module = "lh", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "v")]
-        pub fn try_v(h: &H) -> Result<(), JsValue>;
+        #[wasm_bindgen(catch)]
+        pub fn v(h: &H) -> Result<(), JsValue>;
     }
 }
 pub mod mm {
@@ -334,13 +268,9 @@ pub mod mm {
         pub type W;
         #[wasm_bindgen(constructor, catch)]
         pub fn new() -> Result<W, JsValue>;
-        # [wasm_bindgen (static_method_of = W)]
-        pub fn make() -> super::W;
-        # [wasm_bindgen (static_method_of = W , catch , js_name = "make")]
-        pub fn try_make() -> Result<super::W, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn w(this: &W);
-        #[wasm_bindgen(method, catch, js_name = "w")]
-        pub fn try_w(this: &W) -> Result<(), JsValue>;
+        # [wasm_bindgen (static_method_of = W , catch)]
+        pub fn make() -> Result<super::W, JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn w(this: &W) -> Result<(), JsValue>;
     }
 }

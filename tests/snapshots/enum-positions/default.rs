@@ -33,6 +33,61 @@ pub mod codes {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Holder<T: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new<T: ::wasm_bindgen::JsGeneric>(value: &T) -> Result<Holder<T>, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> T;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn try_get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> Result<T, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn set<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>, value: &T);
+    #[wasm_bindgen(method, catch, js_name = "set")]
+    pub fn try_set<T: ::wasm_bindgen::JsGeneric>(
+        this: &Holder<T>,
+        value: &T,
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "enum-positions")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Details<T: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method, getter)]
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Details<T>) -> T;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &Details<T>, val: &T);
+    #[wasm_bindgen(method, getter)]
+    pub fn fallback<T: ::wasm_bindgen::JsGeneric>(this: &Details<T>) -> Option<T>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_fallback<T: ::wasm_bindgen::JsGeneric>(this: &Details<T>, val: &T);
+}
+impl<T: ::wasm_bindgen::JsGeneric> Details<T> {
+    pub fn new(value: &T) -> Details<T> {
+        Self::builder(value).build()
+    }
+    pub fn builder(value: &T) -> DetailsBuilder<T> {
+        let inner: Details<T> = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value(value);
+        DetailsBuilder { inner }
+    }
+}
+pub struct DetailsBuilder<T: ::wasm_bindgen::JsGeneric> {
+    inner: Details<T>,
+}
+impl<T: ::wasm_bindgen::JsGeneric> DetailsBuilder<T> {
+    pub fn fallback(self, val: &T) -> Self {
+        self.inner.set_fallback(val);
+        self
+    }
+    pub fn build(self) -> Details<T> {
+        self.inner
+    }
+}
+#[wasm_bindgen(module = "enum-positions")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Probe;
     #[wasm_bindgen(method, getter)]
     pub fn level(this: &Probe) -> Level;
@@ -105,6 +160,46 @@ extern "C" {
     pub fn level_or_string(this: &Probe) -> LevelOrStringReturnKind;
     #[wasm_bindgen(method, catch, js_name = "levelOrString")]
     pub fn try_level_or_string(this: &Probe) -> Result<LevelOrStringReturnKind, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn holder(this: &Probe, h: &Holder<JsString>) -> Holder<Number>;
+    #[wasm_bindgen(method, catch, js_name = "holder")]
+    pub fn try_holder(this: &Probe, h: &Holder<JsString>) -> Result<Holder<Number>, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn details(this: &Probe, d: &Details<JsString>) -> Details<Number>;
+    #[wasm_bindgen(method, catch, js_name = "details")]
+    pub fn try_details(this: &Probe, d: &Details<JsString>) -> Result<Details<Number>, JsValue>;
+    #[wasm_bindgen(method, js_name = "maybeHolder")]
+    pub fn maybe_holder(this: &Probe) -> Holder<JsNullable<JsString>>;
+    #[wasm_bindgen(method, catch, js_name = "maybeHolder")]
+    pub fn try_maybe_holder(this: &Probe) -> Result<Holder<JsNullable<JsString>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "nextLevel")]
+    pub async fn next_level(this: &Probe) -> Result<Option<Number>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "nextDetails")]
+    pub async fn next_details(this: &Probe) -> Result<Details<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "modeOrNumberArg")]
+    pub fn mode_or_number_arg(this: &Probe, x: Mode) -> ModeOrNumberReturnKind;
+    #[wasm_bindgen(method, catch, js_name = "modeOrNumberArg")]
+    pub fn try_mode_or_number_arg(this: &Probe, x: Mode)
+        -> Result<ModeOrNumberReturnKind, JsValue>;
+    #[wasm_bindgen(method, js_name = "modeOrNumberArg")]
+    pub fn mode_or_number_arg_with_f64(this: &Probe, x: f64) -> ModeOrNumberReturnKind;
+    #[wasm_bindgen(method, catch, js_name = "modeOrNumberArg")]
+    pub fn try_mode_or_number_arg_with_f64(
+        this: &Probe,
+        x: f64,
+    ) -> Result<ModeOrNumberReturnKind, JsValue>;
+    #[wasm_bindgen(method, js_name = "modeOrNumberOrString")]
+    pub fn mode_or_number_or_string(this: &Probe, x: Mode);
+    #[wasm_bindgen(method, catch, js_name = "modeOrNumberOrString")]
+    pub fn try_mode_or_number_or_string(this: &Probe, x: Mode) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "modeOrNumberOrString")]
+    pub fn mode_or_number_or_string_with_f64(this: &Probe, x: f64);
+    #[wasm_bindgen(method, catch, js_name = "modeOrNumberOrString")]
+    pub fn try_mode_or_number_or_string_with_f64(this: &Probe, x: f64) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "modeOrNumberOrString")]
+    pub fn mode_or_number_or_string_with_str(this: &Probe, x: &str);
+    #[wasm_bindgen(method, catch, js_name = "modeOrNumberOrString")]
+    pub fn try_mode_or_number_or_string_with_str(this: &Probe, x: &str) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
 pub enum ModeOrNumberReturnKind {

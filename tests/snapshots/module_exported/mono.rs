@@ -17,14 +17,10 @@ pub mod x {
             pub type Bar;
             #[wasm_bindgen(constructor, catch)]
             pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Result<Bar, JsValue>;
-            #[wasm_bindgen(method)]
-            pub fn name(this: &Bar) -> String;
-            #[wasm_bindgen(method, js_name = "name")]
-            pub fn name_js_string(this: &Bar) -> JsString;
+            #[wasm_bindgen(method, catch)]
+            pub fn name(this: &Bar) -> Result<String, JsValue>;
             #[wasm_bindgen(method, catch, js_name = "name")]
-            pub fn try_name(this: &Bar) -> Result<String, JsValue>;
-            #[wasm_bindgen(method, catch, js_name = "name")]
-            pub fn try_name_js_string(this: &Bar) -> Result<JsString, JsValue>;
+            pub fn name_js_string(this: &Bar) -> Result<JsString, JsValue>;
         }
     }
     pub mod uses {
@@ -35,10 +31,8 @@ pub mod x {
             # [wasm_bindgen (extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type UsesBar;
-            #[wasm_bindgen(method)]
-            pub fn method(this: &UsesBar, b: &super::foo::Bar);
-            #[wasm_bindgen(method, catch, js_name = "method")]
-            pub fn try_method(this: &UsesBar, b: &super::foo::Bar) -> Result<(), JsValue>;
+            #[wasm_bindgen(method, catch)]
+            pub fn method(this: &UsesBar, b: &super::foo::Bar) -> Result<(), JsValue>;
         }
     }
 }

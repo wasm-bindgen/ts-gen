@@ -14,18 +14,8 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `URIError` — on a malformed escape sequence"]
-    #[wasm_bindgen(method)]
-    pub fn decode(this: &Codec, input: impl ::wasm_bindgen::JsStringLike) -> String;
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `URIError` — on a malformed escape sequence"]
-    #[wasm_bindgen(method, js_name = "decode")]
-    pub fn decode_js_string(this: &Codec, input: impl ::wasm_bindgen::JsStringLike) -> JsString;
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `URIError` — on a malformed escape sequence"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn try_decode(
+    #[wasm_bindgen(method, catch)]
+    pub fn decode(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<String, URIError>;
@@ -33,26 +23,15 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `URIError` — on a malformed escape sequence"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn try_decode_js_string(
+    pub fn decode_js_string(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, URIError>;
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `AggregateError` — when several escape sequences are malformed"]
-    #[wasm_bindgen(method, js_name = "decodeAll")]
-    pub fn decode_all(this: &Codec, input: impl ::wasm_bindgen::JsStringLike) -> String;
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `AggregateError` — when several escape sequences are malformed"]
-    #[wasm_bindgen(method, js_name = "decodeAll")]
-    pub fn decode_all_js_string(this: &Codec, input: impl ::wasm_bindgen::JsStringLike)
-        -> JsString;
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `AggregateError` — when several escape sequences are malformed"]
     #[wasm_bindgen(method, catch, js_name = "decodeAll")]
-    pub fn try_decode_all(
+    pub fn decode_all(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<String, AggregateError>;
@@ -60,7 +39,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `AggregateError` — when several escape sequences are malformed"]
     #[wasm_bindgen(method, catch, js_name = "decodeAll")]
-    pub fn try_decode_all_js_string(
+    pub fn decode_all_js_string(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, AggregateError>;

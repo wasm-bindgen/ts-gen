@@ -45,11 +45,11 @@ async fn enum_positions_mono_compile(
     let _: Array<JsString> = probe.mode_array(modes);
     probe.on_mode(callback);
 
-    match probe.mode_or_number(Mode::Fast) {
+    match probe.mode_or_number_arg(Mode::Fast) {
         ModeOrNumberReturnKind::Mode(mode) => probe.alias(mode),
         ModeOrNumberReturnKind::F64(_) => {}
     }
-    probe.mode_or_number_with_f64(1.0);
+    probe.mode_or_number_arg_with_f64(1.0);
     probe.mode_or_number_or_string(Mode::Slow);
     probe.mode_or_number_or_string_with_str("fast");
     probe.mode_or_number_or_string_with_f64(2.0);

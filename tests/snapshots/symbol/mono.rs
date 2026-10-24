@@ -6,100 +6,55 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
-    pub fn describe(value: &Symbol) -> String;
-}
-#[wasm_bindgen(module = "symbol", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "describe")]
-    pub fn describe_js_string(value: &Symbol) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn describe(value: &Symbol) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describe")]
-    pub fn try_describe(value: &Symbol) -> Result<String, JsValue>;
+    pub fn describe_js_string(value: &Symbol) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "describe")]
-    pub fn try_describe_js_string(value: &Symbol) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "symbol", experimental_generic_mono)]
-extern "C" {
-    pub fn create() -> Symbol;
+    #[wasm_bindgen(catch)]
+    pub fn create() -> Result<Symbol, JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "create")]
-    pub fn try_create() -> Result<Symbol, JsValue>;
-}
-#[wasm_bindgen(module = "symbol", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "create")]
-    pub fn create_with_description(description: impl ::wasm_bindgen::JsStringLike) -> Symbol;
-}
-#[wasm_bindgen(module = "symbol", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "create")]
-    pub fn try_create_with_description(
+    pub fn create_with_description(
         description: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Symbol, JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
-    pub fn find(name: impl ::wasm_bindgen::JsStringLike) -> Nullable<Symbol>;
+    #[wasm_bindgen(catch)]
+    pub fn find(name: impl ::wasm_bindgen::JsStringLike) -> Result<Nullable<Symbol>, JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "find")]
-    pub fn try_find(name: impl ::wasm_bindgen::JsStringLike) -> Result<Nullable<Symbol>, JsValue>;
-}
-#[wasm_bindgen(module = "symbol", experimental_generic_mono)]
-extern "C" {
-    pub fn all() -> Vec<Symbol>;
-}
-#[wasm_bindgen(module = "symbol", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "all")]
-    pub fn try_all() -> Result<Vec<Symbol>, JsValue>;
-}
-#[wasm_bindgen(module = "symbol", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "forEach")]
-    pub fn for_each(callback: &Function<fn(Symbol) -> Undefined>);
+    #[wasm_bindgen(catch)]
+    pub fn all() -> Result<Vec<Symbol>, JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "forEach")]
-    pub fn try_for_each(callback: &Function<fn(Symbol) -> Undefined>) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "symbol", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setKey")]
-    pub fn set_key(key: impl ::wasm_bindgen::JsStringLike);
+    pub fn for_each(callback: &Function<fn(Symbol) -> Undefined>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setKey")]
-    pub fn try_set_key(key: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "symbol", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setKey")]
-    pub fn set_key_with_symbol(key: &Symbol);
+    pub fn set_key(key: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setKey")]
-    pub fn try_set_key_with_symbol(key: &Symbol) -> Result<(), JsValue>;
+    pub fn set_key_with_symbol(key: &Symbol) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
-    pub fn lookup() -> LookupReturnKind;
-}
-#[wasm_bindgen(module = "symbol", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "lookup")]
-    pub fn try_lookup() -> Result<LookupReturnKind, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn lookup() -> Result<LookupReturnKind, JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {

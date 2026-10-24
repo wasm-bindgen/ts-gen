@@ -6,72 +6,38 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "hasKey")]
-    pub fn has_key(key: impl ::wasm_bindgen::JsStringLike) -> bool;
+    #[wasm_bindgen(catch, js_name = "hasKey")]
+    pub fn has_key(key: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKey")]
-    pub fn try_has_key(key: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(module = "property-key", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "hasKey")]
-    pub fn has_key_with_f64(key: f64) -> bool;
+    pub fn has_key_with_f64(key: f64) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKey")]
-    pub fn try_has_key_with_f64(key: f64) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(module = "property-key", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "hasKey")]
-    pub fn has_key_with_symbol(key: &Symbol) -> bool;
-}
-#[wasm_bindgen(module = "property-key", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "hasKey")]
-    pub fn try_has_key_with_symbol(key: &Symbol) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(module = "property-key", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "firstKey")]
-    pub fn first_key() -> FirstKeyReturnKind;
+    pub fn has_key_with_symbol(key: &Symbol) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "firstKey")]
-    pub fn try_first_key() -> Result<FirstKeyReturnKind, JsValue>;
+    pub fn first_key() -> Result<FirstKeyReturnKind, JsValue>;
 }
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
-    pub fn keys() -> Vec<JsValue>;
-}
-#[wasm_bindgen(module = "property-key", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "keys")]
-    pub fn try_keys() -> Result<Vec<JsValue>, JsValue>;
-}
-#[wasm_bindgen(module = "property-key", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setValue")]
-    pub fn set_value(value: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(catch)]
+    pub fn keys() -> Result<Vec<JsValue>, JsValue>;
 }
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setValue")]
-    pub fn try_set_value(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "property-key", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "setValue")]
-    pub fn set_value_with_f64(value: f64);
+    pub fn set_value(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setValue")]
-    pub fn try_set_value_with_f64(value: f64) -> Result<(), JsValue>;
+    pub fn set_value_with_f64(value: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
 pub enum FirstKeyReturnKind {

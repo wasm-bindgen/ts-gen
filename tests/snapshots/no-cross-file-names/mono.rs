@@ -12,53 +12,30 @@ use JsValue as Secret;
 use JsValue as Shared;
 #[wasm_bindgen(module = "no-cross-file-names", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "useSecret")]
-    pub fn use_secret(s: &Secret);
-}
-#[wasm_bindgen(module = "no-cross-file-names", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "useSecret")]
-    pub fn try_use_secret(s: &Secret) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "no-cross-file-names", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "useShared")]
-    pub fn use_shared(s: &Shared);
+    pub fn use_secret(s: &Secret) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "no-cross-file-names", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "useShared")]
-    pub fn try_use_shared(s: &Shared) -> Result<(), JsValue>;
+    pub fn use_shared(s: &Shared) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "no-cross-file-names", experimental_generic_mono)]
 extern "C" {
-    pub fn a();
+    #[wasm_bindgen(catch)]
+    pub fn a() -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "no-cross-file-names", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "a")]
-    pub fn try_a() -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "no-cross-file-names", experimental_generic_mono)]
-extern "C" {
-    pub fn b();
-}
-#[wasm_bindgen(module = "no-cross-file-names", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "b")]
-    pub fn try_b() -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn b() -> Result<(), JsValue>;
 }
 pub mod no_cross_file_names_dep {
     #[allow(unused_imports)]
     use super::*;
     #[wasm_bindgen(module = "no-cross-file-names-dep", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "useHidden")]
-        pub fn use_hidden(h: &Hidden);
-    }
-    #[wasm_bindgen(module = "no-cross-file-names-dep", experimental_generic_mono)]
-    extern "C" {
         #[wasm_bindgen(catch, js_name = "useHidden")]
-        pub fn try_use_hidden(h: &Hidden) -> Result<(), JsValue>;
+        pub fn use_hidden(h: &Hidden) -> Result<(), JsValue>;
     }
 }

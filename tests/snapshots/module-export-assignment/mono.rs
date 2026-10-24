@@ -6,23 +6,13 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "module-export-assignment", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "default")]
-    pub fn check(value: &JsValue);
-}
-#[wasm_bindgen(module = "module-export-assignment", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "default")]
-    pub fn try_check(value: &JsValue) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "module-export-assignment", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "strictEqual")]
-    pub fn strict_equal(actual: &JsValue, expected: &JsValue) -> bool;
+    pub fn check(value: &JsValue) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "module-export-assignment", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "strictEqual")]
-    pub fn try_strict_equal(actual: &JsValue, expected: &JsValue) -> Result<bool, JsValue>;
+    pub fn strict_equal(actual: &JsValue, expected: &JsValue) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "module-export-assignment", experimental_generic_mono)]
 extern "C" {
@@ -35,23 +25,13 @@ pub mod nested {
     use super::*;
     #[wasm_bindgen(module = "module-export-assignment", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "nested")]
-        pub fn run() -> String;
-    }
-    #[wasm_bindgen(module = "module-export-assignment", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(js_name = "run", js_namespace = "nested")]
-        pub fn run_js_string() -> JsString;
+        #[wasm_bindgen(catch, js_namespace = "nested")]
+        pub fn run() -> Result<String, JsValue>;
     }
     #[wasm_bindgen(module = "module-export-assignment", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "run", js_namespace = "nested")]
-        pub fn try_run() -> Result<String, JsValue>;
-    }
-    #[wasm_bindgen(module = "module-export-assignment", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "run", js_namespace = "nested")]
-        pub fn try_run_js_string() -> Result<JsString, JsValue>;
+        pub fn run_js_string() -> Result<JsString, JsValue>;
     }
 }
 pub mod module_export_assignment {
@@ -69,10 +49,8 @@ pub mod module_export_assignment {
             pub fn new(start: f64) -> Result<Counter, JsValue>;
             #[wasm_bindgen(method, getter)]
             pub fn value(this: &Counter) -> f64;
-            #[wasm_bindgen(method)]
-            pub fn increment(this: &Counter);
-            #[wasm_bindgen(method, catch, js_name = "increment")]
-            pub fn try_increment(this: &Counter) -> Result<(), JsValue>;
+            #[wasm_bindgen(method, catch)]
+            pub fn increment(this: &Counter) -> Result<(), JsValue>;
         }
     }
     pub mod global {
@@ -80,22 +58,13 @@ pub mod module_export_assignment {
         use super::*;
         #[wasm_bindgen(module = "module-export-assignment/global", experimental_generic_mono)]
         extern "C" {
-            pub fn greet(name: impl ::wasm_bindgen::JsStringLike) -> String;
-        }
-        #[wasm_bindgen(module = "module-export-assignment/global", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(js_name = "greet")]
-            pub fn greet_js_string(name: impl ::wasm_bindgen::JsStringLike) -> JsString;
+            #[wasm_bindgen(catch)]
+            pub fn greet(name: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
         }
         #[wasm_bindgen(module = "module-export-assignment/global", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "greet")]
-            pub fn try_greet(name: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-        }
-        #[wasm_bindgen(module = "module-export-assignment/global", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "greet")]
-            pub fn try_greet_js_string(
+            pub fn greet_js_string(
                 name: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<JsString, JsValue>;
         }
@@ -106,20 +75,13 @@ pub mod module_export_assignment {
             pub type Greeter;
             #[wasm_bindgen(constructor, catch)]
             pub fn new(prefix: impl ::wasm_bindgen::JsStringLike) -> Result<Greeter, JsValue>;
-            #[wasm_bindgen(method)]
-            pub fn greet(this: &Greeter, name: impl ::wasm_bindgen::JsStringLike) -> String;
-            #[wasm_bindgen(method, js_name = "greet")]
-            pub fn greet_js_string(
-                this: &Greeter,
-                name: impl ::wasm_bindgen::JsStringLike,
-            ) -> JsString;
-            #[wasm_bindgen(method, catch, js_name = "greet")]
-            pub fn try_greet(
+            #[wasm_bindgen(method, catch)]
+            pub fn greet(
                 this: &Greeter,
                 name: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<String, JsValue>;
             #[wasm_bindgen(method, catch, js_name = "greet")]
-            pub fn try_greet_js_string(
+            pub fn greet_js_string(
                 this: &Greeter,
                 name: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<JsString, JsValue>;

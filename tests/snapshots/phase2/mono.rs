@@ -17,13 +17,9 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Writable;
-    #[wasm_bindgen(method)]
-    pub fn write(this: &Writable, data: impl ::wasm_bindgen::JsStringLike) -> bool;
-    #[wasm_bindgen(method, catch, js_name = "write")]
-    pub fn try_write(
-        this: &Writable,
-        data: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn write(this: &Writable, data: impl ::wasm_bindgen::JsStringLike)
+        -> Result<bool, JsValue>;
 }
 #[allow(dead_code)]
 pub type WritableStream = Writable;
@@ -41,42 +37,23 @@ pub type StringOrNumber = JsValue;
 pub type BodyInit = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn send(body: &ReadableStream);
+    #[wasm_bindgen(catch)]
+    pub fn send(body: &ReadableStream) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "send")]
-    pub fn try_send(body: &ReadableStream) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "send")]
-    pub fn send_with_str(body: impl ::wasm_bindgen::JsStringLike);
+    pub fn send_with_str(body: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "send")]
-    pub fn try_send_with_str(body: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "send")]
-    pub fn send_with_array_buffer(body: &ArrayBuffer);
+    pub fn send_with_array_buffer(body: &ArrayBuffer) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "send")]
-    pub fn try_send_with_array_buffer(body: &ArrayBuffer) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "send")]
-    pub fn send_with_blob(body: &Blob);
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "send")]
-    pub fn try_send_with_blob(body: &Blob) -> Result<(), JsValue>;
+    pub fn send_with_blob(body: &Blob) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type RequestInfo = JsValue;

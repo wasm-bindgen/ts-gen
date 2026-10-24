@@ -60,14 +60,10 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Sender;
-    #[wasm_bindgen(method)]
-    pub fn send(this: &Sender, kind: Kind);
+    #[wasm_bindgen(method, catch)]
+    pub fn send(this: &Sender, kind: Kind) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "send")]
-    pub fn try_send(this: &Sender, kind: Kind) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "send")]
-    pub fn send_with_options(this: &Sender, kind: Kind, options: &SendOptions);
-    #[wasm_bindgen(method, catch, js_name = "send")]
-    pub fn try_send_with_options(
+    pub fn send_with_options(
         this: &Sender,
         kind: Kind,
         options: &SendOptions,

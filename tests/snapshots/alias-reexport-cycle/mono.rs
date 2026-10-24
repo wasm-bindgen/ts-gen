@@ -23,12 +23,7 @@ pub mod m {
     pub type Position = super::Position;
     #[wasm_bindgen(module = "alias-reexport-cycle", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "m")]
-        pub fn at(p: &super::Position) -> super::Position;
-    }
-    #[wasm_bindgen(module = "alias-reexport-cycle", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "at", js_namespace = "m")]
-        pub fn try_at(p: &super::Position) -> Result<super::Position, JsValue>;
+        #[wasm_bindgen(catch, js_namespace = "m")]
+        pub fn at(p: &super::Position) -> Result<super::Position, JsValue>;
     }
 }

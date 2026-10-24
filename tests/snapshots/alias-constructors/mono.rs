@@ -9,12 +9,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stub<T>;
-    #[wasm_bindgen(method)]
-    pub fn get<T>(this: &Stub<T>) -> T
-    where
-        T: ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get<T>(this: &Stub<T>) -> Result<T, JsValue>
+    #[wasm_bindgen(method, catch)]
+    pub fn get<T>(this: &Stub<T>) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
 }
@@ -29,23 +25,13 @@ extern "C" {
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "unwrapText")]
-    pub fn unwrap_text(stub: &Wrap<String>) -> String;
-}
-#[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "unwrapText")]
-    pub fn unwrap_text_js_string(stub: &Wrap<String>) -> JsString;
+    #[wasm_bindgen(catch, js_name = "unwrapText")]
+    pub fn unwrap_text(stub: &Wrap<String>) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "unwrapText")]
-    pub fn try_unwrap_text(stub: &Wrap<String>) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "unwrapText")]
-    pub fn try_unwrap_text_js_string(stub: &Wrap<String>) -> Result<JsString, JsValue>;
+    pub fn unwrap_text_js_string(stub: &Wrap<String>) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
@@ -67,14 +53,10 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Labelled;
-    #[wasm_bindgen(method)]
-    pub fn text(this: &Labelled) -> String;
-    #[wasm_bindgen(method, js_name = "text")]
-    pub fn text_js_string(this: &Labelled) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn text(this: &Labelled) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "text")]
-    pub fn try_text(this: &Labelled) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "text")]
-    pub fn try_text_js_string(this: &Labelled) -> Result<JsString, JsValue>;
+    pub fn text_js_string(this: &Labelled) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
@@ -129,10 +111,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Proto;
-    #[wasm_bindgen(method)]
-    pub fn p(this: &Proto);
-    #[wasm_bindgen(method, catch, js_name = "p")]
-    pub fn try_p(this: &Proto) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn p(this: &Proto) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type ProtoOnly = Proto;
@@ -155,12 +135,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Wrapped<T>;
-    #[wasm_bindgen(method)]
-    pub fn get<T>(this: &Wrapped<T>) -> T
-    where
-        T: ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get<T>(this: &Wrapped<T>) -> Result<T, JsValue>
+    #[wasm_bindgen(method, catch)]
+    pub fn get<T>(this: &Wrapped<T>) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
 }
@@ -169,14 +145,10 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StaticNew;
-    # [wasm_bindgen (static_method_of = StaticNew)]
-    pub fn new() -> StaticNew;
-    # [wasm_bindgen (static_method_of = StaticNew , catch , js_name = "new")]
-    pub fn try_new() -> Result<StaticNew, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn y(this: &StaticNew);
-    #[wasm_bindgen(method, catch, js_name = "y")]
-    pub fn try_y(this: &StaticNew) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = StaticNew , catch)]
+    pub fn new() -> Result<StaticNew, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn y(this: &StaticNew) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type SN = StaticNew;
@@ -191,10 +163,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CapNew;
-    #[wasm_bindgen(method, js_name = "New")]
-    pub fn new(this: &CapNew);
     #[wasm_bindgen(method, catch, js_name = "New")]
-    pub fn try_new(this: &CapNew) -> Result<(), JsValue>;
+    pub fn new(this: &CapNew) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type CN = CapNew;
@@ -216,10 +186,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Counter;
-    #[wasm_bindgen(method)]
-    pub fn count(this: &Counter) -> f64;
-    #[wasm_bindgen(method, catch, js_name = "count")]
-    pub fn try_count(this: &Counter) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn count(this: &Counter) -> Result<f64, JsValue>;
 }
 #[allow(dead_code)]
 pub type Multi = MultiA;
@@ -238,22 +206,16 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MultiA;
-    #[wasm_bindgen(method)]
-    pub fn a(this: &MultiA) -> String;
-    #[wasm_bindgen(method, js_name = "a")]
-    pub fn a_js_string(this: &MultiA) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn a(this: &MultiA) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "a")]
-    pub fn try_a(this: &MultiA) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "a")]
-    pub fn try_a_js_string(this: &MultiA) -> Result<JsString, JsValue>;
+    pub fn a_js_string(this: &MultiA) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MultiB;
-    #[wasm_bindgen(method)]
-    pub fn b(this: &MultiB) -> f64;
-    #[wasm_bindgen(method, catch, js_name = "b")]
-    pub fn try_b(this: &MultiB) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn b(this: &MultiB) -> Result<f64, JsValue>;
 }

@@ -24,7 +24,10 @@ use std::process::Command;
 
 /// The CLI configurations every fixture is rendered under, as
 /// `(snapshot file stem, extra CLI args)`.
-const CONFIGS: &[(&str, &[&str])] = &[("default", &[]), ("mono", &["--experimental-generic-mono"])];
+const CONFIGS: &[(&str, &[&str])] = &[
+    ("default", &[]),
+    ("mono", &["--experimental-generic-mono", "--fallible"]),
+];
 
 /// Root of the ts-gen crate (where Cargo.toml lives).
 fn crate_root() -> PathBuf {

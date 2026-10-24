@@ -24,25 +24,13 @@ extern "C" {
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "byAlias")]
-    pub fn by_alias(id: impl ::wasm_bindgen::JsStringLike) -> String;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "byAlias")]
-    pub fn by_alias_js_string(id: impl ::wasm_bindgen::JsStringLike) -> JsString;
+    #[wasm_bindgen(catch, js_name = "byAlias")]
+    pub fn by_alias(id: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "byAlias")]
-    pub fn try_by_alias(id: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "byAlias")]
-    pub fn try_by_alias_js_string(
-        id: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
+    pub fn by_alias_js_string(id: impl ::wasm_bindgen::JsStringLike) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
@@ -58,17 +46,8 @@ extern "C" {
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "withS")]
-    pub fn with_s(s: &S, s2: &S2, name: impl ::wasm_bindgen::JsStringLike);
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "withS")]
-    pub fn try_with_s(
-        s: &S,
-        s2: &S2,
-        name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue>;
+    pub fn with_s(s: &S, s2: &S2, name: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
@@ -79,84 +58,45 @@ extern "C" {
     pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
-    #[wasm_bindgen(method)]
-    pub fn get<T>(this: &Holder<T>) -> T
+    #[wasm_bindgen(method, catch)]
+    pub fn get<T>(this: &Holder<T>) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get<T>(this: &Holder<T>) -> Result<T, JsValue>
-    where
-        T: ::wasm_bindgen::convert::FromWasmAbi;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "takesHolder")]
-    pub fn takes_holder(h: &Holder<String>, g: &Holder<String>);
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "takesHolder")]
-    pub fn try_takes_holder(h: &Holder<String>, g: &Holder<String>) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "holderOfId")]
-    pub fn holder_of_id() -> Holder<String>;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "holderOfId")]
-    pub fn holder_of_id_js_string() -> Holder<JsString>;
+    pub fn takes_holder(h: &Holder<String>, g: &Holder<String>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "holderOfId")]
-    pub fn try_holder_of_id() -> Result<Holder<String>, JsValue>;
+    pub fn holder_of_id() -> Result<Holder<String>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "holderOfId")]
-    pub fn try_holder_of_id_js_string() -> Result<Holder<JsString>, JsValue>;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "literalHolder")]
-    pub fn literal_holder() -> Holder<String>;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "literalHolder")]
-    pub fn literal_holder_js_string() -> Holder<JsString>;
+    pub fn holder_of_id_js_string() -> Result<Holder<JsString>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "literalHolder")]
-    pub fn try_literal_holder() -> Result<Holder<String>, JsValue>;
+    pub fn literal_holder() -> Result<Holder<String>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "literalHolder")]
-    pub fn try_literal_holder_js_string() -> Result<Holder<JsString>, JsValue>;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "literalUnion")]
-    pub fn literal_union() -> LiteralUnionReturnKind;
+    pub fn literal_holder_js_string() -> Result<Holder<JsString>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "literalUnion")]
-    pub fn try_literal_union() -> Result<LiteralUnionReturnKind, JsValue>;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "shadowsAlias")]
-    pub fn shadows_alias<Id>(h: &Holder<Id>) -> Holder<Id>;
+    pub fn literal_union() -> Result<LiteralUnionReturnKind, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "shadowsAlias")]
-    pub fn try_shadows_alias<Id>(h: &Holder<Id>) -> Result<Holder<Id>, JsValue>;
+    pub fn shadows_alias<Id>(h: &Holder<Id>) -> Result<Holder<Id>, JsValue>;
 }
 #[wasm_bindgen(private)]
 pub enum LiteralUnionReturnKind {

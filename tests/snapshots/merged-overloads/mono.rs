@@ -9,21 +9,15 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stream;
-    #[wasm_bindgen(method)]
-    pub fn write(this: &Stream, data: bool);
+    #[wasm_bindgen(method, catch)]
+    pub fn write(this: &Stream, data: bool) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "write")]
-    pub fn try_write(this: &Stream, data: bool) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "write")]
-    pub fn write_with_str(this: &Stream, data: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, catch, js_name = "write")]
-    pub fn try_write_with_str(
+    pub fn write_with_str(
         this: &Stream,
         data: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "write")]
-    pub fn write_with_f64(this: &Stream, data: f64);
     #[wasm_bindgen(method, catch, js_name = "write")]
-    pub fn try_write_with_f64(this: &Stream, data: f64) -> Result<(), JsValue>;
+    pub fn write_with_f64(this: &Stream, data: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn size(this: &Stream) -> f64;
 }
@@ -32,14 +26,10 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Widget;
-    #[wasm_bindgen(method)]
-    pub fn draw(this: &Widget, x: f64);
+    #[wasm_bindgen(method, catch)]
+    pub fn draw(this: &Widget, x: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "draw")]
-    pub fn try_draw(this: &Widget, x: f64) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "draw")]
-    pub fn draw_with_str(this: &Widget, x: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, catch, js_name = "draw")]
-    pub fn try_draw_with_str(
+    pub fn draw_with_str(
         this: &Widget,
         x: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
@@ -49,24 +39,18 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Gadget;
-    #[wasm_bindgen(method)]
-    pub fn run(this: &Gadget, x: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, catch)]
+    pub fn run(this: &Gadget, x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "run")]
-    pub fn try_run(this: &Gadget, x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "run")]
-    pub fn run_with_f64(this: &Gadget, x: f64);
-    #[wasm_bindgen(method, catch, js_name = "run")]
-    pub fn try_run_with_f64(this: &Gadget, x: f64) -> Result<(), JsValue>;
+    pub fn run_with_f64(this: &Gadget, x: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Clock;
-    #[wasm_bindgen(method)]
-    pub fn now(this: &Clock, x: impl ::wasm_bindgen::JsStringLike) -> Date;
-    #[wasm_bindgen(method, catch, js_name = "now")]
-    pub fn try_now(this: &Clock, x: impl ::wasm_bindgen::JsStringLike) -> Result<Date, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn now(this: &Clock, x: impl ::wasm_bindgen::JsStringLike) -> Result<Date, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -77,25 +61,17 @@ extern "C" {
     pub fn new(id: f64) -> Result<Codec, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Codec")]
     pub fn new_with_name(name: impl ::wasm_bindgen::JsStringLike) -> Result<Codec, JsValue>;
-    # [wasm_bindgen (static_method_of = Codec)]
-    pub fn from(input: &ArrayBuffer) -> Codec;
+    # [wasm_bindgen (static_method_of = Codec , catch)]
+    pub fn from(input: &ArrayBuffer) -> Result<Codec, JsValue>;
     # [wasm_bindgen (static_method_of = Codec , catch , js_name = "from")]
-    pub fn try_from(input: &ArrayBuffer) -> Result<Codec, JsValue>;
-    # [wasm_bindgen (static_method_of = Codec , js_name = "from")]
-    pub fn from_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Codec;
-    # [wasm_bindgen (static_method_of = Codec , catch , js_name = "from")]
-    pub fn try_from_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Result<Codec, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn encode(this: &Codec, input: impl ::wasm_bindgen::JsStringLike) -> String;
-    #[wasm_bindgen(method, js_name = "encode")]
-    pub fn encode_js_string(this: &Codec, input: impl ::wasm_bindgen::JsStringLike) -> JsString;
-    #[wasm_bindgen(method, catch, js_name = "encode")]
-    pub fn try_encode(
+    pub fn from_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Result<Codec, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn encode(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "encode")]
-    pub fn try_encode_js_string(
+    pub fn encode_js_string(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
@@ -105,15 +81,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Box;
-    #[wasm_bindgen(method)]
-    pub fn put(this: &Box, x: f64);
+    #[wasm_bindgen(method, catch)]
+    pub fn put(this: &Box, x: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub fn try_put(this: &Box, x: f64) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_str(this: &Box, x: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub fn try_put_with_str(
-        this: &Box,
-        x: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue>;
+    pub fn put_with_str(this: &Box, x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }

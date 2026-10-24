@@ -72,20 +72,8 @@ pub enum Loop {
 }
 #[wasm_bindgen(module = "enum-initializers", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "useAll")]
-    pub fn use_all(
-        mode: Mode,
-        label: Label,
-        merged: Merged,
-        restart: Restart,
-        cycle: Cycle,
-        r#loop: Loop,
-    );
-}
-#[wasm_bindgen(module = "enum-initializers", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "useAll")]
-    pub fn try_use_all(
+    pub fn use_all(
         mode: Mode,
         label: Label,
         merged: Merged,

@@ -33,14 +33,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTarget;
-    #[wasm_bindgen(method, js_name = "addEventListener")]
-    pub fn add_event_listener(
-        this: &EventTarget,
-        r#type: impl ::wasm_bindgen::JsStringLike,
-        listener: &Function,
-    );
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener(
+    pub fn add_event_listener(
         this: &EventTarget,
         r#type: impl ::wasm_bindgen::JsStringLike,
         listener: &Function,
@@ -51,20 +45,16 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Serializable;
-    #[wasm_bindgen(method, js_name = "toJSON")]
-    pub fn to_json(this: &Serializable) -> JsValue;
     #[wasm_bindgen(method, catch, js_name = "toJSON")]
-    pub fn try_to_json(this: &Serializable) -> Result<JsValue, JsValue>;
+    pub fn to_json(this: &Serializable) -> Result<JsValue, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = EventTarget , extends = Serializable , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventEmitter;
-    #[wasm_bindgen(method)]
-    pub fn emit(this: &EventEmitter, event: impl ::wasm_bindgen::JsStringLike) -> bool;
-    #[wasm_bindgen(method, catch, js_name = "emit")]
-    pub fn try_emit(
+    #[wasm_bindgen(method, catch)]
+    pub fn emit(
         this: &EventEmitter,
         event: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
@@ -77,14 +67,8 @@ pub mod node_js {
         # [wasm_bindgen (extends = Object , js_namespace = "NodeJS")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type EventEmitter;
-        #[wasm_bindgen(method)]
+        #[wasm_bindgen(method, catch)]
         pub fn on(
-            this: &EventEmitter,
-            event: impl ::wasm_bindgen::JsStringLike,
-            listener: &Function,
-        ) -> JsValue;
-        #[wasm_bindgen(method, catch, js_name = "on")]
-        pub fn try_on(
             this: &EventEmitter,
             event: impl ::wasm_bindgen::JsStringLike,
             listener: &Function,
@@ -96,53 +80,37 @@ extern "C" {
     # [wasm_bindgen (extends = node_js :: EventEmitter , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stream;
-    #[wasm_bindgen(method)]
-    pub fn pipe(this: &Stream, destination: &Stream) -> Stream;
-    #[wasm_bindgen(method, catch, js_name = "pipe")]
-    pub fn try_pipe(this: &Stream, destination: &Stream) -> Result<Stream, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn pipe(this: &Stream, destination: &Stream) -> Result<Stream, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Counter;
-    #[wasm_bindgen(method)]
-    pub fn count(this: &Counter) -> f64;
-    #[wasm_bindgen(method, catch, js_name = "count")]
-    pub fn try_count_2(this: &Counter) -> Result<f64, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn try_count(this: &Counter) -> f64;
-    #[wasm_bindgen(method, catch, js_name = "try_count")]
-    pub fn try_try_count(this: &Counter) -> Result<f64, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn reset(this: &Counter);
-    #[wasm_bindgen(method, catch, js_name = "reset")]
-    pub fn try_reset(this: &Counter) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn count(this: &Counter) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn try_count(this: &Counter) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn reset(this: &Counter) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Duplex;
-    #[wasm_bindgen(method)]
-    pub fn read(this: &Duplex) -> JsValue;
-    #[wasm_bindgen(method, catch, js_name = "read")]
-    pub fn try_read(this: &Duplex) -> Result<JsValue, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn write(this: &Duplex, data: &ArrayBuffer) -> bool;
+    #[wasm_bindgen(method, catch)]
+    pub fn read(this: &Duplex) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn write(this: &Duplex, data: &ArrayBuffer) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "write")]
-    pub fn try_write(this: &Duplex, data: &ArrayBuffer) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, js_name = "write")]
-    pub fn write_with_str(this: &Duplex, data: impl ::wasm_bindgen::JsStringLike) -> bool;
-    #[wasm_bindgen(method, catch, js_name = "write")]
-    pub fn try_write_with_str(
+    pub fn write_with_str(
         this: &Duplex,
         data: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn end(this: &Duplex);
-    #[wasm_bindgen(method, catch, js_name = "end")]
-    pub fn try_end(this: &Duplex) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn end(this: &Duplex) -> Result<(), JsValue>;
 }
 pub mod intl {
     #[allow(unused_imports)]
@@ -152,14 +120,8 @@ pub mod intl {
         # [wasm_bindgen (extends = Object , js_namespace = "Intl")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Collator;
-        #[wasm_bindgen(method)]
+        #[wasm_bindgen(method, catch)]
         pub fn compare(
-            this: &Collator,
-            a: impl ::wasm_bindgen::JsStringLike,
-            b: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        #[wasm_bindgen(method, catch, js_name = "compare")]
-        pub fn try_compare(
             this: &Collator,
             a: impl ::wasm_bindgen::JsStringLike,
             b: impl ::wasm_bindgen::JsStringLike,

@@ -1,0 +1,6 @@
+{
+  "name": "fallible",
+  "private": true,
+  "type": "module",
+  "exports": "./index.js"
+}

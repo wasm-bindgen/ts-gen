@@ -182,16 +182,8 @@ impl Payload {
 }
 #[wasm_bindgen(module = "discriminated-union-enum", experimental_generic_mono)]
 extern "C" {
-    pub fn send(attachment: &Attachment, reply: &Reply, payload: &Payload);
-}
-#[wasm_bindgen(module = "discriminated-union-enum", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "send")]
-    pub fn try_send(
-        attachment: &Attachment,
-        reply: &Reply,
-        payload: &Payload,
-    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn send(attachment: &Attachment, reply: &Reply, payload: &Payload) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
 pub enum DispositionKind {

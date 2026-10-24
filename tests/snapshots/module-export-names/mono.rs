@@ -35,13 +35,8 @@ pub mod ns {
         use super::*;
         #[wasm_bindgen(module = "ns", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_namespace = "N1")]
-            pub fn f();
-        }
-        #[wasm_bindgen(module = "ns", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "f", js_namespace = "N1")]
-            pub fn try_f() -> Result<(), JsValue>;
+            #[wasm_bindgen(catch, js_namespace = "N1")]
+            pub fn f() -> Result<(), JsValue>;
         }
         #[wasm_bindgen(module = "ns", experimental_generic_mono)]
         extern "C" {
@@ -55,12 +50,8 @@ pub mod ns {
     }
     #[wasm_bindgen(module = "ns", experimental_generic_mono)]
     extern "C" {
-        pub fn g(t: &n1::T);
-    }
-    #[wasm_bindgen(module = "ns", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "g")]
-        pub fn try_g(t: &n1::T) -> Result<(), JsValue>;
+        #[wasm_bindgen(catch)]
+        pub fn g(t: &n1::T) -> Result<(), JsValue>;
     }
 }
 pub mod plain {
@@ -68,21 +59,13 @@ pub mod plain {
     use super::*;
     #[wasm_bindgen(module = "plain", experimental_generic_mono)]
     extern "C" {
-        pub fn make();
+        #[wasm_bindgen(catch)]
+        pub fn make() -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "plain", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(catch, js_name = "make")]
-        pub fn try_make() -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen(module = "plain", experimental_generic_mono)]
-    extern "C" {
-        pub fn create();
-    }
-    #[wasm_bindgen(module = "plain", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "create")]
-        pub fn try_create() -> Result<(), JsValue>;
+        #[wasm_bindgen(catch)]
+        pub fn create() -> Result<(), JsValue>;
     }
 }
 pub mod pure {
@@ -93,13 +76,8 @@ pub mod pure {
         use super::*;
         #[wasm_bindgen(module = "pure", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_namespace = "M")]
-            pub fn f();
-        }
-        #[wasm_bindgen(module = "pure", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "f", js_namespace = "M")]
-            pub fn try_f() -> Result<(), JsValue>;
+            #[wasm_bindgen(catch, js_namespace = "M")]
+            pub fn f() -> Result<(), JsValue>;
         }
     }
 }
@@ -108,34 +86,21 @@ pub mod own {
     use super::*;
     #[wasm_bindgen(module = "own", experimental_generic_mono)]
     extern "C" {
-        pub fn make();
+        #[wasm_bindgen(catch)]
+        pub fn make() -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "own", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(catch, js_name = "make")]
-        pub fn try_make() -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen(module = "own", experimental_generic_mono)]
-    extern "C" {
-        pub fn create();
-    }
-    #[wasm_bindgen(module = "own", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "create")]
-        pub fn try_create() -> Result<(), JsValue>;
+        #[wasm_bindgen(catch)]
+        pub fn create() -> Result<(), JsValue>;
     }
     pub mod make {
         #[allow(unused_imports)]
         use super::*;
         #[wasm_bindgen(module = "own", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_namespace = "make")]
-            pub fn helper();
-        }
-        #[wasm_bindgen(module = "own", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "helper", js_namespace = "make")]
-            pub fn try_helper() -> Result<(), JsValue>;
+            #[wasm_bindgen(catch, js_namespace = "make")]
+            pub fn helper() -> Result<(), JsValue>;
         }
     }
     pub mod create {
@@ -167,13 +132,8 @@ pub mod col {
         }
         #[wasm_bindgen(module = "col", experimental_generic_mono)]
         extern "C" {
-            #[wasm_bindgen(js_namespace = "M")]
-            pub fn f(t: &T);
-        }
-        #[wasm_bindgen(module = "col", experimental_generic_mono)]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "f", js_namespace = "M")]
-            pub fn try_f(t: &T) -> Result<(), JsValue>;
+            #[wasm_bindgen(catch, js_namespace = "M")]
+            pub fn f(t: &T) -> Result<(), JsValue>;
         }
     }
     pub mod m_2 {
@@ -201,12 +161,8 @@ pub mod col {
     }
     #[wasm_bindgen(module = "col", experimental_generic_mono)]
     extern "C" {
-        pub fn g(t: &m_2::T);
-    }
-    #[wasm_bindgen(module = "col", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "g")]
-        pub fn try_g(t: &m_2::T) -> Result<(), JsValue>;
+        #[wasm_bindgen(catch)]
+        pub fn g(t: &m_2::T) -> Result<(), JsValue>;
     }
 }
 pub mod reached {
@@ -239,12 +195,7 @@ pub mod user {
     use super::*;
     #[wasm_bindgen(module = "user", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "use")]
-        pub fn use_(x: &super::reached::m::T);
-    }
-    #[wasm_bindgen(module = "user", experimental_generic_mono)]
-    extern "C" {
         #[wasm_bindgen(catch, js_name = "use")]
-        pub fn try_use_(x: &super::reached::m::T) -> Result<(), JsValue>;
+        pub fn use_(x: &super::reached::m::T) -> Result<(), JsValue>;
     }
 }

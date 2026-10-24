@@ -24,7 +24,7 @@ fn class_generic_slices_arrive_as_arrays() {
 #[wasm_bindgen_test]
 fn mixed_slice_modes_share_a_binding() {
     assert_eq!(
-        mixed::<String>(&["a".to_string()], &[1.0], &[2.0]),
+        mixed_generic::<String>(&["a".to_string()], &[1.0], &[2.0]),
         "Array(a) Array(1) Float64Array(2)"
     );
 }

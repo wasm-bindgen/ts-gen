@@ -108,21 +108,13 @@ impl Scaled {
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    pub fn level() -> LevelReturnKind;
+    #[wasm_bindgen(catch)]
+    pub fn level() -> Result<LevelReturnKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "level")]
-    pub fn try_level() -> Result<LevelReturnKind, JsValue>;
-}
-#[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
-extern "C" {
-    pub fn direction() -> DirectionReturnKind;
-}
-#[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "direction")]
-    pub fn try_direction() -> Result<DirectionReturnKind, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn direction() -> Result<DirectionReturnKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
@@ -143,57 +135,33 @@ impl Feedback {
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    pub fn ratio() -> f64;
+    #[wasm_bindgen(catch)]
+    pub fn ratio() -> Result<f64, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "ratio")]
-    pub fn try_ratio() -> Result<f64, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn count() -> Result<f64, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    pub fn count() -> f64;
+    #[wasm_bindgen(catch)]
+    pub fn wide() -> Result<f64, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "count")]
-    pub fn try_count() -> Result<f64, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn size() -> Result<SizeReturnKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    pub fn wide() -> f64;
+    #[wasm_bindgen(catch)]
+    pub fn repeat() -> Result<RepeatReturnKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "wide")]
-    pub fn try_wide() -> Result<f64, JsValue>;
-}
-#[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
-extern "C" {
-    pub fn size() -> SizeReturnKind;
-}
-#[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "size")]
-    pub fn try_size() -> Result<SizeReturnKind, JsValue>;
-}
-#[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
-extern "C" {
-    pub fn repeat() -> RepeatReturnKind;
-}
-#[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "repeat")]
-    pub fn try_repeat() -> Result<RepeatReturnKind, JsValue>;
-}
-#[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
-extern "C" {
-    pub fn flag() -> FlagReturnKind;
-}
-#[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "flag")]
-    pub fn try_flag() -> Result<FlagReturnKind, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn flag() -> Result<FlagReturnKind, JsValue>;
 }
 #[wasm_bindgen(private)]
 pub enum LevelReturnKind {

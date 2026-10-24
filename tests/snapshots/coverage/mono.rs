@@ -97,14 +97,10 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Serializable;
-    #[wasm_bindgen(method)]
-    pub fn serialize(this: &Serializable) -> String;
-    #[wasm_bindgen(method, js_name = "serialize")]
-    pub fn serialize_js_string(this: &Serializable) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn serialize(this: &Serializable) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "serialize")]
-    pub fn try_serialize(this: &Serializable) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "serialize")]
-    pub fn try_serialize_js_string(this: &Serializable) -> Result<JsString, JsValue>;
+    pub fn serialize_js_string(this: &Serializable) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -188,30 +184,18 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GlobalMixin;
-    #[wasm_bindgen(method, js_name = "customMethod")]
-    pub fn custom_method(this: &GlobalMixin);
     #[wasm_bindgen(method, catch, js_name = "customMethod")]
-    pub fn try_custom_method(this: &GlobalMixin) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "globalHelper")]
-    pub fn global_helper(x: f64) -> String;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "globalHelper")]
-    pub fn global_helper_js_string(x: f64) -> JsString;
+    pub fn custom_method(this: &GlobalMixin) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "globalHelper")]
-    pub fn try_global_helper(x: f64) -> Result<String, JsValue>;
+    pub fn global_helper(x: f64) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "globalHelper")]
-    pub fn try_global_helper_js_string(x: f64) -> Result<JsString, JsValue>;
+    pub fn global_helper_js_string(x: f64) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -243,13 +227,8 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "createProcessor")]
-    pub fn create_processor(name: impl ::wasm_bindgen::JsStringLike) -> DefaultProcessor;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "createProcessor")]
-    pub fn try_create_processor(
+    pub fn create_processor(
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<DefaultProcessor, JsValue>;
 }
@@ -348,106 +327,50 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn parse(input: impl ::wasm_bindgen::JsStringLike) -> Object;
+    #[wasm_bindgen(catch)]
+    pub fn parse(input: impl ::wasm_bindgen::JsStringLike) -> Result<Object, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn try_parse(input: impl ::wasm_bindgen::JsStringLike) -> Result<Object, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "parse")]
-    pub fn parse_with_array_buffer(input: &ArrayBuffer) -> Object;
+    pub fn parse_with_array_buffer(input: &ArrayBuffer) -> Result<Object, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn try_parse_with_array_buffer(input: &ArrayBuffer) -> Result<Object, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "parse")]
     pub fn parse_with_str_and_reviver(
-        input: impl ::wasm_bindgen::JsStringLike,
-        reviver: &Function,
-    ) -> Object;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn try_parse_with_str_and_reviver(
         input: impl ::wasm_bindgen::JsStringLike,
         reviver: &Function,
     ) -> Result<Object, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn stringify(value: &JsValue) -> String;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "stringify")]
-    pub fn stringify_js_string(value: &JsValue) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn stringify(value: &JsValue) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "stringify")]
-    pub fn try_stringify(value: &JsValue) -> Result<String, JsValue>;
+    pub fn stringify_js_string(value: &JsValue) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "stringify")]
-    pub fn try_stringify_js_string(value: &JsValue) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "stringify")]
-    pub fn stringify_with_replacer(value: &JsValue, replacer: &Function) -> String;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "stringify")]
-    pub fn stringify_with_replacer_js_string(value: &JsValue, replacer: &Function) -> JsString;
+    pub fn stringify_with_replacer(value: &JsValue, replacer: &Function)
+        -> Result<String, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "stringify")]
-    pub fn try_stringify_with_replacer(
-        value: &JsValue,
-        replacer: &Function,
-    ) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "stringify")]
-    pub fn try_stringify_with_replacer_js_string(
+    pub fn stringify_with_replacer_js_string(
         value: &JsValue,
         replacer: &Function,
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "stringify")]
-    pub fn stringify_with_replacer_and_space(
-        value: &JsValue,
-        replacer: &Function,
-        space: f64,
-    ) -> String;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "stringify")]
-    pub fn stringify_with_replacer_and_space_js_string(
-        value: &JsValue,
-        replacer: &Function,
-        space: f64,
-    ) -> JsString;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "stringify")]
-    pub fn try_stringify_with_replacer_and_space(
+    pub fn stringify_with_replacer_and_space(
         value: &JsValue,
         replacer: &Function,
         space: f64,
@@ -456,7 +379,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "stringify")]
-    pub fn try_stringify_with_replacer_and_space_js_string(
+    pub fn stringify_with_replacer_and_space_js_string(
         value: &JsValue,
         replacer: &Function,
         space: f64,
@@ -495,34 +418,20 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTarget;
-    #[wasm_bindgen(method, js_name = "addEventListener")]
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     pub fn add_event_listener(
         this: &EventTarget,
         r#type: impl ::wasm_bindgen::JsStringLike,
         listener: &Function,
-    );
-    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener(
-        this: &EventTarget,
-        r#type: impl ::wasm_bindgen::JsStringLike,
-        listener: &Function,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "removeEventListener")]
+    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     pub fn remove_event_listener(
         this: &EventTarget,
         r#type: impl ::wasm_bindgen::JsStringLike,
         listener: &Function,
-    );
-    #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener(
-        this: &EventTarget,
-        r#type: impl ::wasm_bindgen::JsStringLike,
-        listener: &Function,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "dispatchEvent")]
-    pub fn dispatch_event(this: &EventTarget, event: &Object) -> bool;
     #[wasm_bindgen(method, catch, js_name = "dispatchEvent")]
-    pub fn try_dispatch_event(this: &EventTarget, event: &Object) -> Result<bool, JsValue>;
+    pub fn dispatch_event(this: &EventTarget, event: &Object) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -531,48 +440,27 @@ extern "C" {
     pub type EventEmitter;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<EventEmitter, JsValue>;
-    # [wasm_bindgen (static_method_of = EventEmitter , js_name = "listenerCount")]
-    pub fn listener_count(emitter: &EventEmitter, event: impl ::wasm_bindgen::JsStringLike) -> f64;
     # [wasm_bindgen (static_method_of = EventEmitter , catch , js_name = "listenerCount")]
-    pub fn try_listener_count(
+    pub fn listener_count(
         emitter: &EventEmitter,
         event: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<f64, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn on(
         this: &EventEmitter,
         event: impl ::wasm_bindgen::JsStringLike,
         listener: &Function,
-    ) -> JsValue;
-    #[wasm_bindgen(method, catch, js_name = "on")]
-    pub fn try_on(
-        this: &EventEmitter,
-        event: impl ::wasm_bindgen::JsStringLike,
-        listener: &Function,
     ) -> Result<JsValue, JsValue>;
-    #[wasm_bindgen(method, variadic)]
+    #[wasm_bindgen(method, variadic, catch)]
     pub fn emit(
         this: &EventEmitter,
         event: impl ::wasm_bindgen::JsStringLike,
         args: &[JsValue],
-    ) -> bool;
-    #[wasm_bindgen(method, variadic, catch, js_name = "emit")]
-    pub fn try_emit(
-        this: &EventEmitter,
-        event: impl ::wasm_bindgen::JsStringLike,
-        args: &[JsValue],
     ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, js_name = "removeAllListeners")]
-    pub fn remove_all_listeners(this: &EventEmitter) -> JsValue;
     #[wasm_bindgen(method, catch, js_name = "removeAllListeners")]
-    pub fn try_remove_all_listeners(this: &EventEmitter) -> Result<JsValue, JsValue>;
-    #[wasm_bindgen(method, js_name = "removeAllListeners")]
+    pub fn remove_all_listeners(this: &EventEmitter) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "removeAllListeners")]
     pub fn remove_all_listeners_with_event(
-        this: &EventEmitter,
-        event: impl ::wasm_bindgen::JsStringLike,
-    ) -> JsValue;
-    #[wasm_bindgen(method, catch, js_name = "removeAllListeners")]
-    pub fn try_remove_all_listeners_with_event(
         this: &EventEmitter,
         event: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsValue, JsValue>;
@@ -582,46 +470,29 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage;
-    #[wasm_bindgen(method, js_name = "getItem")]
-    pub fn get_item(this: &Storage, key: impl ::wasm_bindgen::JsStringLike) -> Nullable<String>;
-    #[wasm_bindgen(method, js_name = "getItem")]
-    pub fn get_item_js_string(
-        this: &Storage,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Nullable<JsString>;
     #[wasm_bindgen(method, catch, js_name = "getItem")]
-    pub fn try_get_item(
+    pub fn get_item(
         this: &Storage,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getItem")]
-    pub fn try_get_item_js_string(
+    pub fn get_item_js_string(
         this: &Storage,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<JsString>, JsValue>;
-    #[wasm_bindgen(method, js_name = "setItem")]
+    #[wasm_bindgen(method, catch, js_name = "setItem")]
     pub fn set_item(
         this: &Storage,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
-    );
-    #[wasm_bindgen(method, catch, js_name = "setItem")]
-    pub fn try_set_item(
-        this: &Storage,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "removeItem")]
-    pub fn remove_item(this: &Storage, key: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, catch, js_name = "removeItem")]
-    pub fn try_remove_item(
+    pub fn remove_item(
         this: &Storage,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn clear(this: &Storage);
-    #[wasm_bindgen(method, catch, js_name = "clear")]
-    pub fn try_clear(this: &Storage) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn clear(this: &Storage) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn length(this: &Storage) -> f64;
 }

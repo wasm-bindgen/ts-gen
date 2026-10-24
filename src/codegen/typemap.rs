@@ -201,6 +201,10 @@ pub struct CodegenContext<'a> {
     /// `Error` rather than `JsValue`. See
     /// [`crate::codegen::GenerateOptions::errors_as_error`].
     pub errors_as_error: bool,
+    /// Whether sync callables emit one catching `Result` form under the
+    /// primary name instead of a trapping primary plus `try_<name>`. See
+    /// [`crate::codegen::GenerateOptions::fallible`].
+    pub fallible: bool,
     /// Whether generic imports use wasm-bindgen's experimental
     /// per-monomorphization codegen rather than type erasure.
     pub experimental_generic_mono: bool,
@@ -654,7 +658,7 @@ impl<'a> CodegenContext<'a> {
     /// Build a `CodegenContext` from a parsed IR module + global context.
     /// Used by tests and library callers that don't customise codegen.
     pub fn from_module(module: &ir::Module, gctx: &'a GlobalContext) -> Self {
-        Self::from_module_full(module, gctx, false, false, None)
+        Self::from_module_full(module, gctx, false, false, false, None)
     }
 
     /// Build a `CodegenContext` with the full set of per-codegen options
@@ -664,6 +668,7 @@ impl<'a> CodegenContext<'a> {
         module: &ir::Module,
         gctx: &'a GlobalContext,
         errors_as_error: bool,
+        fallible: bool,
         experimental_generic_mono: bool,
         surface: Option<&crate::codegen::surface::Surface<'_>>,
     ) -> Self {
@@ -687,6 +692,7 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             errors_as_error,
+            fallible,
             experimental_generic_mono,
             exported_modules,
             externalised_modules,
@@ -727,6 +733,7 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             errors_as_error: false,
+            fallible: false,
             experimental_generic_mono: false,
             exported_modules: HashSet::new(),
             externalised_modules: HashSet::new(),
@@ -3332,7 +3339,7 @@ mod tests {
         };
         let ts = TypeRef::Array(Box::new(TypeRef::ident("T")));
         let modes = |mono: bool| {
-            let ctx = CodegenContext::from_module_full(&module, &gctx, false, mono, None);
+            let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, mono, None);
             [
                 param_slice_mode(&cp("xs", ts.clone()), Some(&ctx), holder.body_scope),
                 param_slice_mode(
@@ -3922,7 +3929,7 @@ mod tests {
     /// to the source file, so aliases and local generics resolve.
     fn with_mono_ctx(src: &str, f: impl FnOnce(&CodegenContext<'_>, ScopeId)) {
         let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, true, None);
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, true, None);
         let scope = *module.file_scopes.first().expect("file scope");
         f(&ctx, scope);
     }
@@ -4407,7 +4414,7 @@ mod tests {
             declare namespace Codes { type Region = "eu" | "us"; }
         "#;
         let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, None);
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, false, None);
         let scope = *module.file_scopes.first().expect("file scope");
         let lower = |ty: &TypeRef, pos: TypePosition| {
             to_syn_type(ty, pos, Some(&ctx), scope, &ModuleContext::Global).to_string()
@@ -4465,7 +4472,7 @@ mod tests {
             }
         "#;
         let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, None);
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, false, None);
         let scope = *module.file_scopes.first().expect("file scope");
         let outer = match &gctx
             .get_type(gctx.resolve_path(scope, "Outer").unwrap())
@@ -4500,7 +4507,7 @@ mod tests {
             }
         "#;
         let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, None);
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, false, None);
         let file = module.file_scopes[0];
         let events = gctx.scopes.get(file).namespace("Events").unwrap();
         let inner = gctx.scopes.get(events).namespace("Inner").unwrap();

@@ -10,17 +10,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Foo;
     #[doc = " Plain method — fallible variant uses the new default error type."]
-    #[wasm_bindgen(method)]
-    pub fn bar(this: &Foo, x: f64) -> String;
-    #[doc = " Plain method — fallible variant uses the new default error type."]
-    #[wasm_bindgen(method, js_name = "bar")]
-    pub fn bar_js_string(this: &Foo, x: f64) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn bar(this: &Foo, x: f64) -> Result<String, Error>;
     #[doc = " Plain method — fallible variant uses the new default error type."]
     #[wasm_bindgen(method, catch, js_name = "bar")]
-    pub fn try_bar(this: &Foo, x: f64) -> Result<String, Error>;
-    #[doc = " Plain method — fallible variant uses the new default error type."]
-    #[wasm_bindgen(method, catch, js_name = "bar")]
-    pub fn try_bar_js_string(this: &Foo, x: f64) -> Result<JsString, Error>;
+    pub fn bar_js_string(this: &Foo, x: f64) -> Result<JsString, Error>;
     #[doc = " Async method — `Result<T, Error>` instead of `Result<T, JsValue>`."]
     #[wasm_bindgen(method, catch)]
     pub async fn baz(this: &Foo) -> Result<f64, Error>;
@@ -30,19 +24,8 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `TypeError` — when input is invalid"]
-    #[wasm_bindgen(method)]
-    pub fn parse(this: &Foo, input: impl ::wasm_bindgen::JsStringLike) -> f64;
-    #[doc = " Method with explicit `@throws` — the typed error wins regardless"]
-    #[doc = " of the flag."]
-    #[doc = ""]
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `TypeError` — when input is invalid"]
-    #[wasm_bindgen(method, catch, js_name = "parse")]
-    pub fn try_parse(
-        this: &Foo,
-        input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<f64, TypeError>;
+    #[wasm_bindgen(method, catch)]
+    pub fn parse(this: &Foo, input: impl ::wasm_bindgen::JsStringLike) -> Result<f64, TypeError>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

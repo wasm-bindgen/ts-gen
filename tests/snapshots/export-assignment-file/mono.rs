@@ -6,21 +6,11 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "export-assignment-file", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "default")]
-    pub fn check(value: &JsValue);
-}
-#[wasm_bindgen(module = "export-assignment-file", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "default")]
-    pub fn try_check(value: &JsValue) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "export-assignment-file", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "strictEqual")]
-    pub fn strict_equal(actual: &JsValue, expected: &JsValue) -> bool;
+    pub fn check(value: &JsValue) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "export-assignment-file", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "strictEqual")]
-    pub fn try_strict_equal(actual: &JsValue, expected: &JsValue) -> Result<bool, JsValue>;
+    pub fn strict_equal(actual: &JsValue, expected: &JsValue) -> Result<bool, JsValue>;
 }

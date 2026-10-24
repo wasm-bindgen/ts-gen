@@ -616,183 +616,92 @@ pub mod temporal {
         use super::*;
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_name = "timeZoneId" , js_namespace = ["Temporal" , "Now"])]
-            pub fn time_zone_id() -> String;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (js_name = "timeZoneId" , js_namespace = ["Temporal" , "Now"])]
-            pub fn time_zone_id_js_string() -> JsString;
+            # [wasm_bindgen (catch , js_name = "timeZoneId" , js_namespace = ["Temporal" , "Now"])]
+            pub fn time_zone_id() -> Result<String, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (catch , js_name = "timeZoneId" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_time_zone_id() -> Result<String, JsValue>;
+            pub fn time_zone_id_js_string() -> Result<JsString, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (catch , js_name = "timeZoneId" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_time_zone_id_js_string() -> Result<JsString, JsValue>;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (js_namespace = ["Temporal" , "Now"])]
-            pub fn instant() -> super::Instant;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "instant" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_instant() -> Result<super::Instant, JsValue>;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn plain_date_time_iso() -> super::PlainDateTime;
+            # [wasm_bindgen (catch , js_namespace = ["Temporal" , "Now"])]
+            pub fn instant() -> Result<super::Instant, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (catch , js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_plain_date_time_iso() -> Result<super::PlainDateTime, JsValue>;
+            pub fn plain_date_time_iso() -> Result<super::PlainDateTime, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
+            # [wasm_bindgen (catch , js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
             pub fn plain_date_time_iso_with_zoned_date_time(
                 time_zone: &super::ZonedDateTime,
-            ) -> super::PlainDateTime;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_plain_date_time_iso_with_zoned_date_time(
-                time_zone: &super::ZonedDateTime,
             ) -> Result<super::PlainDateTime, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
+            # [wasm_bindgen (catch , js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
             pub fn plain_date_time_iso_with_str(
                 time_zone: impl ::wasm_bindgen::JsStringLike,
-            ) -> super::PlainDateTime;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "plainDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_plain_date_time_iso_with_str(
-                time_zone: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<super::PlainDateTime, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn zoned_date_time_iso() -> super::ZonedDateTime;
+            # [wasm_bindgen (catch , js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
+            pub fn zoned_date_time_iso() -> Result<super::ZonedDateTime, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (catch , js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_zoned_date_time_iso() -> Result<super::ZonedDateTime, JsValue>;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
             pub fn zoned_date_time_iso_with_zoned_date_time(
                 time_zone: &super::ZonedDateTime,
-            ) -> super::ZonedDateTime;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_zoned_date_time_iso_with_zoned_date_time(
-                time_zone: &super::ZonedDateTime,
             ) -> Result<super::ZonedDateTime, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
+            # [wasm_bindgen (catch , js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
             pub fn zoned_date_time_iso_with_str(
                 time_zone: impl ::wasm_bindgen::JsStringLike,
-            ) -> super::ZonedDateTime;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "zonedDateTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_zoned_date_time_iso_with_str(
-                time_zone: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<super::ZonedDateTime, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn plain_date_iso() -> super::PlainDate;
+            # [wasm_bindgen (catch , js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
+            pub fn plain_date_iso() -> Result<super::PlainDate, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (catch , js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_plain_date_iso() -> Result<super::PlainDate, JsValue>;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
             pub fn plain_date_iso_with_zoned_date_time(
                 time_zone: &super::ZonedDateTime,
-            ) -> super::PlainDate;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_plain_date_iso_with_zoned_date_time(
-                time_zone: &super::ZonedDateTime,
             ) -> Result<super::PlainDate, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
+            # [wasm_bindgen (catch , js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
             pub fn plain_date_iso_with_str(
                 time_zone: impl ::wasm_bindgen::JsStringLike,
-            ) -> super::PlainDate;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "plainDateISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_plain_date_iso_with_str(
-                time_zone: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<super::PlainDate, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn plain_time_iso() -> super::PlainTime;
+            # [wasm_bindgen (catch , js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
+            pub fn plain_time_iso() -> Result<super::PlainTime, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (catch , js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_plain_time_iso() -> Result<super::PlainTime, JsValue>;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
             pub fn plain_time_iso_with_zoned_date_time(
-                time_zone: &super::ZonedDateTime,
-            ) -> super::PlainTime;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
-            # [wasm_bindgen (catch , js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_plain_time_iso_with_zoned_date_time(
                 time_zone: &super::ZonedDateTime,
             ) -> Result<super::PlainTime, JsValue>;
         }
         #[wasm_bindgen(experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn plain_time_iso_with_str(
-                time_zone: impl ::wasm_bindgen::JsStringLike,
-            ) -> super::PlainTime;
-        }
-        #[wasm_bindgen(experimental_generic_mono)]
-        extern "C" {
             # [wasm_bindgen (catch , js_name = "plainTimeISO" , js_namespace = ["Temporal" , "Now"])]
-            pub fn try_plain_time_iso_with_str(
+            pub fn plain_time_iso_with_str(
                 time_zone: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<super::PlainTime, JsValue>;
         }
@@ -934,319 +843,161 @@ pub mod temporal {
             iso_day: f64,
             calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal")]
-        pub fn from(item: &PlainDate) -> PlainDate;
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch)]
+        pub fn from(item: &PlainDate) -> Result<PlainDate, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from(item: &PlainDate) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> PlainDate;
+        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> Result<PlainDate, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time(item: &ZonedDateTime) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_plain_date_time(item: &PlainDateTime) -> PlainDate;
+        pub fn from_with_plain_date_time(item: &PlainDateTime) -> Result<PlainDate, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_date_time(item: &PlainDateTime) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_date_like_object(item: &DateLikeObject) -> PlainDate;
+        pub fn from_with_date_like_object(item: &DateLikeObject) -> Result<PlainDate, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_date_like_object(item: &DateLikeObject) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> PlainDate;
+        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike)
+            -> Result<PlainDate, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str(
-            item: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "from")]
         pub fn from_with_plain_date_and_options(
             item: &PlainDate,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_date_and_options(
-            item: &PlainDate,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_zoned_date_time_and_options(
             item: &ZonedDateTime,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time_and_options(
-            item: &ZonedDateTime,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_plain_date_time_and_options(
             item: &PlainDateTime,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_date_time_and_options(
-            item: &PlainDateTime,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_date_like_object_and_options(
             item: &DateLikeObject,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_date_like_object_and_options(
-            item: &DateLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_str_and_options(
             item: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal")]
-        pub fn compare(one: &PlainDate, two: &PlainDate) -> f64;
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch)]
+        pub fn compare(one: &PlainDate, two: &PlainDate) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare(one: &PlainDate, two: &PlainDate) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_plain_date(
             one: &ZonedDateTime,
             two: &PlainDate,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_plain_date(
-            one: &ZonedDateTime,
-            two: &PlainDate,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_plain_date(
             one: &PlainDateTime,
             two: &PlainDate,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_plain_date(
-            one: &PlainDateTime,
-            two: &PlainDate,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_date_like_object_and_plain_date(
             one: &DateLikeObject,
             two: &PlainDate,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_date_like_object_and_plain_date(
-            one: &DateLikeObject,
-            two: &PlainDate,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_plain_date(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &PlainDate,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_plain_date(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainDate,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_and_zoned_date_time(
             one: &PlainDate,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_and_zoned_date_time(
-            one: &PlainDate,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_zoned_date_time(
             one: &ZonedDateTime,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_zoned_date_time(
-            one: &ZonedDateTime,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_zoned_date_time(
             one: &PlainDateTime,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_zoned_date_time(
-            one: &PlainDateTime,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_date_like_object_and_zoned_date_time(
             one: &DateLikeObject,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_date_like_object_and_zoned_date_time(
-            one: &DateLikeObject,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_zoned_date_time(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_zoned_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_and_plain_date_time(
             one: &PlainDate,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_and_plain_date_time(
-            one: &PlainDate,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_plain_date_time(
             one: &ZonedDateTime,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_plain_date_time(
-            one: &ZonedDateTime,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_plain_date_time(
             one: &PlainDateTime,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_plain_date_time(
-            one: &PlainDateTime,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_date_like_object_and_plain_date_time(
             one: &DateLikeObject,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_date_like_object_and_plain_date_time(
-            one: &DateLikeObject,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_plain_date_time(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_plain_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_and_date_like_object(
             one: &PlainDate,
             two: &DateLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_and_date_like_object(
-            one: &PlainDate,
-            two: &DateLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_date_like_object(
             one: &ZonedDateTime,
             two: &DateLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_date_like_object(
-            one: &ZonedDateTime,
-            two: &DateLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_date_like_object(
             one: &PlainDateTime,
             two: &DateLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_date_like_object(
-            one: &PlainDateTime,
-            two: &DateLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_date_like_object_and_date_like_object(
             one: &DateLikeObject,
             two: &DateLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_date_like_object_and_date_like_object(
-            one: &DateLikeObject,
-            two: &DateLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_date_like_object(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &DateLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_date_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &DateLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_and_str(
             one: &PlainDate,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_and_str(
-            one: &PlainDate,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_str(
             one: &ZonedDateTime,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_str(
-            one: &ZonedDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_str(
             one: &PlainDateTime,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_str(
-            one: &PlainDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_date_like_object_and_str(
             one: &DateLikeObject,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_date_like_object_and_str(
-            one: &DateLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
         # [wasm_bindgen (static_method_of = PlainDate , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_str(
+        pub fn compare_with_str_and_str(
             one: impl ::wasm_bindgen::JsStringLike,
             two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
@@ -1288,602 +1039,325 @@ pub mod temporal {
         pub fn months_in_year(this: &PlainDate) -> f64;
         #[wasm_bindgen(method, getter, js_name = "inLeapYear")]
         pub fn in_leap_year(this: &PlainDate) -> bool;
-        #[wasm_bindgen(method, js_name = "toPlainYearMonth")]
-        pub fn to_plain_year_month(this: &PlainDate) -> PlainYearMonth;
         #[wasm_bindgen(method, catch, js_name = "toPlainYearMonth")]
-        pub fn try_to_plain_year_month(this: &PlainDate) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainMonthDay")]
-        pub fn to_plain_month_day(this: &PlainDate) -> PlainMonthDay;
+        pub fn to_plain_year_month(this: &PlainDate) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainMonthDay")]
-        pub fn try_to_plain_month_day(this: &PlainDate) -> Result<PlainMonthDay, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn add(this: &PlainDate, duration: &Duration) -> PlainDate;
+        pub fn to_plain_month_day(this: &PlainDate) -> Result<PlainMonthDay, JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn add(this: &PlainDate, duration: &Duration) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add(this: &PlainDate, duration: &Duration) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
         pub fn add_with_duration_like_object(
             this: &PlainDate,
             duration: &DurationLikeObject,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object(
-            this: &PlainDate,
-            duration: &DurationLikeObject,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str(
             this: &PlainDate,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str(
-            this: &PlainDate,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_duration_and_options(
             this: &PlainDate,
             duration: &Duration,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_and_options(
-            this: &PlainDate,
-            duration: &Duration,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_duration_like_object_and_options(
             this: &PlainDate,
             duration: &DurationLikeObject,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object_and_options(
-            this: &PlainDate,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str_and_options(
             this: &PlainDate,
             duration: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str_and_options(
-            this: &PlainDate,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn subtract(this: &PlainDate, duration: &Duration) -> PlainDate;
+        #[wasm_bindgen(method, catch)]
+        pub fn subtract(this: &PlainDate, duration: &Duration) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract(this: &PlainDate, duration: &Duration) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
         pub fn subtract_with_duration_like_object(
             this: &PlainDate,
             duration: &DurationLikeObject,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object(
-            this: &PlainDate,
-            duration: &DurationLikeObject,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str(
             this: &PlainDate,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str(
-            this: &PlainDate,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_and_options(
             this: &PlainDate,
             duration: &Duration,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_and_options(
-            this: &PlainDate,
-            duration: &Duration,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_like_object_and_options(
             this: &PlainDate,
             duration: &DurationLikeObject,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object_and_options(
-            this: &PlainDate,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str_and_options(
             this: &PlainDate,
             duration: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str_and_options(
-            this: &PlainDate,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn with(this: &PlainDate, date_like: &PartialTemporalLike) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with(
+        #[wasm_bindgen(method, catch)]
+        pub fn with(
             this: &PlainDate,
             date_like: &PartialTemporalLike,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "with")]
+        #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &PlainDate,
             date_like: &PartialTemporalLike,
             options: &OverflowOptions,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with_with_options(
-            this: &PlainDate,
-            date_like: &PartialTemporalLike,
-            options: &OverflowOptions,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
-        pub fn with_calendar(this: &PlainDate, calendar_like: &PlainDate) -> PlainDate;
         #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar(
+        pub fn with_calendar(
             this: &PlainDate,
             calendar_like: &PlainDate,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_plain_date_time(
             this: &PlainDate,
             calendar_like: &PlainDateTime,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_plain_date_time(
-            this: &PlainDate,
-            calendar_like: &PlainDateTime,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_plain_month_day(
             this: &PlainDate,
             calendar_like: &PlainMonthDay,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_plain_month_day(
-            this: &PlainDate,
-            calendar_like: &PlainMonthDay,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_plain_year_month(
             this: &PlainDate,
             calendar_like: &PlainYearMonth,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_plain_year_month(
-            this: &PlainDate,
-            calendar_like: &PlainYearMonth,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_zoned_date_time(
             this: &PlainDate,
             calendar_like: &ZonedDateTime,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_zoned_date_time(
-            this: &PlainDate,
-            calendar_like: &ZonedDateTime,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_str(
             this: &PlainDate,
             calendar_like: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainDate;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_str(
-            this: &PlainDate,
-            calendar_like: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn until(this: &PlainDate, other: &PlainDate) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn until(this: &PlainDate, other: &PlainDate) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until(this: &PlainDate, other: &PlainDate) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
-        pub fn until_with_zoned_date_time(this: &PlainDate, other: &ZonedDateTime) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time(
+        pub fn until_with_zoned_date_time(
             this: &PlainDate,
             other: &ZonedDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
-        pub fn until_with_plain_date_time(this: &PlainDate, other: &PlainDateTime) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_plain_date_time(
+        pub fn until_with_plain_date_time(
             this: &PlainDate,
             other: &PlainDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
-        pub fn until_with_date_like_object(this: &PlainDate, other: &DateLikeObject) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_date_like_object(
+        pub fn until_with_date_like_object(
             this: &PlainDate,
             other: &DateLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str(
             this: &PlainDate,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str(
-            this: &PlainDate,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_and_options(
             this: &PlainDate,
             other: &PlainDate,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_plain_date_and_options(
-            this: &PlainDate,
-            other: &PlainDate,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_and_options(
             this: &PlainDate,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time_and_options(
-            this: &PlainDate,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_time_and_options(
             this: &PlainDate,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_plain_date_time_and_options(
-            this: &PlainDate,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_date_like_object_and_options(
             this: &PlainDate,
             other: &DateLikeObject,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_date_like_object_and_options(
-            this: &PlainDate,
-            other: &DateLikeObject,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &PlainDate,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str_and_options(
-            this: &PlainDate,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn since(this: &PlainDate, other: &PlainDate) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn since(this: &PlainDate, other: &PlainDate) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since(this: &PlainDate, other: &PlainDate) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
-        pub fn since_with_zoned_date_time(this: &PlainDate, other: &ZonedDateTime) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time(
+        pub fn since_with_zoned_date_time(
             this: &PlainDate,
             other: &ZonedDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
-        pub fn since_with_plain_date_time(this: &PlainDate, other: &PlainDateTime) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_plain_date_time(
+        pub fn since_with_plain_date_time(
             this: &PlainDate,
             other: &PlainDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
-        pub fn since_with_date_like_object(this: &PlainDate, other: &DateLikeObject) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_date_like_object(
+        pub fn since_with_date_like_object(
             this: &PlainDate,
             other: &DateLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str(
             this: &PlainDate,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str(
-            this: &PlainDate,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_and_options(
             this: &PlainDate,
             other: &PlainDate,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_plain_date_and_options(
-            this: &PlainDate,
-            other: &PlainDate,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_and_options(
             this: &PlainDate,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time_and_options(
-            this: &PlainDate,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_time_and_options(
             this: &PlainDate,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_plain_date_time_and_options(
-            this: &PlainDate,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_date_like_object_and_options(
             this: &PlainDate,
             other: &DateLikeObject,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_date_like_object_and_options(
-            this: &PlainDate,
-            other: &DateLikeObject,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &PlainDate,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<DateUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str_and_options(
-            this: &PlainDate,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<DateUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn equals(this: &PlainDate, other: &PlainDate) -> bool;
+        #[wasm_bindgen(method, catch)]
+        pub fn equals(this: &PlainDate, other: &PlainDate) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals(this: &PlainDate, other: &PlainDate) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_zoned_date_time(this: &PlainDate, other: &ZonedDateTime) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_zoned_date_time(
+        pub fn equals_with_zoned_date_time(
             this: &PlainDate,
             other: &ZonedDateTime,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_plain_date_time(this: &PlainDate, other: &PlainDateTime) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_plain_date_time(
+        pub fn equals_with_plain_date_time(
             this: &PlainDate,
             other: &PlainDateTime,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_date_like_object(this: &PlainDate, other: &DateLikeObject) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_date_like_object(
+        pub fn equals_with_date_like_object(
             this: &PlainDate,
             other: &DateLikeObject,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_str(this: &PlainDate, other: impl ::wasm_bindgen::JsStringLike) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_str(
+        pub fn equals_with_str(
             this: &PlainDate,
             other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDateTime")]
-        pub fn to_plain_date_time(this: &PlainDate) -> PlainDateTime;
         #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn try_to_plain_date_time(this: &PlainDate) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDateTime")]
+        pub fn to_plain_date_time(this: &PlainDate) -> Result<PlainDateTime, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
         pub fn to_plain_date_time_with_plain_time(
             this: &PlainDate,
             time: &PlainTime,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn try_to_plain_date_time_with_plain_time(
-            this: &PlainDate,
-            time: &PlainTime,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDateTime")]
+        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
         pub fn to_plain_date_time_with_plain_date_time(
             this: &PlainDate,
             time: &PlainDateTime,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn try_to_plain_date_time_with_plain_date_time(
-            this: &PlainDate,
-            time: &PlainDateTime,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDateTime")]
+        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
         pub fn to_plain_date_time_with_zoned_date_time(
             this: &PlainDate,
             time: &ZonedDateTime,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn try_to_plain_date_time_with_zoned_date_time(
-            this: &PlainDate,
-            time: &ZonedDateTime,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDateTime")]
+        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
         pub fn to_plain_date_time_with_time_like_object(
             this: &PlainDate,
             time: &TimeLikeObject,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn try_to_plain_date_time_with_time_like_object(
-            this: &PlainDate,
-            time: &TimeLikeObject,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDateTime")]
+        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
         pub fn to_plain_date_time_with_str(
             this: &PlainDate,
             time: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn try_to_plain_date_time_with_str(
-            this: &PlainDate,
-            time: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toZonedDateTime")]
-        pub fn to_zoned_date_time(this: &PlainDate, time_zone: &ZonedDateTime) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn try_to_zoned_date_time(
+        pub fn to_zoned_date_time(
             this: &PlainDate,
             time_zone: &ZonedDateTime,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toZonedDateTime")]
+        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
         pub fn to_zoned_date_time_with_str(
             this: &PlainDate,
             time_zone: impl ::wasm_bindgen::JsStringLike,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn try_to_zoned_date_time_with_str(
-            this: &PlainDate,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toZonedDateTime")]
+        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
         pub fn to_zoned_date_time_with_item(
             this: &PlainDate,
             item: &PlainDateToZonedDateTimeOptions,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn try_to_zoned_date_time_with_item(
-            this: &PlainDate,
-            item: &PlainDateToZonedDateTimeOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &PlainDate) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string_js_string(this: &PlainDate) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string(this: &PlainDate) -> Result<String, JsValue>;
+        pub fn to_string(this: &PlainDate) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_js_string(this: &PlainDate) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
+        pub fn to_string_js_string(this: &PlainDate) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options(
             this: &PlainDate,
             options: &PlainDateToStringOptions,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options_js_string(
             this: &PlainDate,
             options: &PlainDateToStringOptions,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options(
-            this: &PlainDate,
-            options: &PlainDateToStringOptions,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options_js_string(
-            this: &PlainDate,
-            options: &PlainDateToStringOptions,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &PlainDate) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &PlainDate) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string(this: &PlainDate) -> Result<String, JsValue>;
+        pub fn to_locale_string(this: &PlainDate) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_js_string(this: &PlainDate) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_locales(this: &PlainDate, locales: &JsValue) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        pub fn to_locale_string_js_string(this: &PlainDate) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
+        pub fn to_locale_string_with_locales(
+            this: &PlainDate,
+            locales: &JsValue,
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_js_string(
             this: &PlainDate,
             locales: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales(
-            this: &PlainDate,
-            locales: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_js_string(
-            this: &PlainDate,
-            locales: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options(
             this: &PlainDate,
             locales: &JsValue,
             options: &JsValue,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options_js_string(
             this: &PlainDate,
             locales: &JsValue,
             options: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options(
-            this: &PlainDate,
-            locales: &JsValue,
-            options: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options_js_string(
-            this: &PlainDate,
-            locales: &JsValue,
-            options: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json(this: &PlainDate) -> String;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json_js_string(this: &PlainDate) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json(this: &PlainDate) -> Result<String, JsValue>;
+        pub fn to_json(this: &PlainDate) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json_js_string(this: &PlainDate) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &PlainDate) -> JsValue;
+        pub fn to_json_js_string(this: &PlainDate) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &PlainDate) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &PlainDate) -> Result<JsValue, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -1932,319 +1406,161 @@ pub mod temporal {
             microsecond: f64,
             nanosecond: f64,
         ) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal")]
-        pub fn from(item: &PlainTime) -> PlainTime;
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch)]
+        pub fn from(item: &PlainTime) -> Result<PlainTime, JsValue>;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from(item: &PlainTime) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_plain_date_time(item: &PlainDateTime) -> PlainTime;
+        pub fn from_with_plain_date_time(item: &PlainDateTime) -> Result<PlainTime, JsValue>;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_date_time(item: &PlainDateTime) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> PlainTime;
+        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> Result<PlainTime, JsValue>;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time(item: &ZonedDateTime) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_time_like_object(item: &TimeLikeObject) -> PlainTime;
+        pub fn from_with_time_like_object(item: &TimeLikeObject) -> Result<PlainTime, JsValue>;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_time_like_object(item: &TimeLikeObject) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> PlainTime;
+        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike)
+            -> Result<PlainTime, JsValue>;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str(
-            item: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "from")]
         pub fn from_with_plain_time_and_options(
             item: &PlainTime,
             options: &OverflowOptions,
-        ) -> PlainTime;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_time_and_options(
-            item: &PlainTime,
-            options: &OverflowOptions,
         ) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_plain_date_time_and_options(
             item: &PlainDateTime,
             options: &OverflowOptions,
-        ) -> PlainTime;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_date_time_and_options(
-            item: &PlainDateTime,
-            options: &OverflowOptions,
         ) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_zoned_date_time_and_options(
             item: &ZonedDateTime,
             options: &OverflowOptions,
-        ) -> PlainTime;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time_and_options(
-            item: &ZonedDateTime,
-            options: &OverflowOptions,
         ) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_time_like_object_and_options(
             item: &TimeLikeObject,
             options: &OverflowOptions,
-        ) -> PlainTime;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_time_like_object_and_options(
-            item: &TimeLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_str_and_options(
             item: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> PlainTime;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<PlainTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal")]
-        pub fn compare(one: &PlainTime, two: &PlainTime) -> f64;
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch)]
+        pub fn compare(one: &PlainTime, two: &PlainTime) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare(one: &PlainTime, two: &PlainTime) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_plain_time(
             one: &PlainDateTime,
             two: &PlainTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_plain_time(
-            one: &PlainDateTime,
-            two: &PlainTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_plain_time(
             one: &ZonedDateTime,
             two: &PlainTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_plain_time(
-            one: &ZonedDateTime,
-            two: &PlainTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_time_like_object_and_plain_time(
             one: &TimeLikeObject,
             two: &PlainTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_time_like_object_and_plain_time(
-            one: &TimeLikeObject,
-            two: &PlainTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_plain_time(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &PlainTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_plain_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_time_and_plain_date_time(
             one: &PlainTime,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_time_and_plain_date_time(
-            one: &PlainTime,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_plain_date_time(
             one: &PlainDateTime,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_plain_date_time(
-            one: &PlainDateTime,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_plain_date_time(
             one: &ZonedDateTime,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_plain_date_time(
-            one: &ZonedDateTime,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_time_like_object_and_plain_date_time(
             one: &TimeLikeObject,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_time_like_object_and_plain_date_time(
-            one: &TimeLikeObject,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_plain_date_time(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_plain_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_time_and_zoned_date_time(
             one: &PlainTime,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_time_and_zoned_date_time(
-            one: &PlainTime,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_zoned_date_time(
             one: &PlainDateTime,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_zoned_date_time(
-            one: &PlainDateTime,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_zoned_date_time(
             one: &ZonedDateTime,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_zoned_date_time(
-            one: &ZonedDateTime,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_time_like_object_and_zoned_date_time(
             one: &TimeLikeObject,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_time_like_object_and_zoned_date_time(
-            one: &TimeLikeObject,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_zoned_date_time(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_zoned_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_time_and_time_like_object(
             one: &PlainTime,
             two: &TimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_time_and_time_like_object(
-            one: &PlainTime,
-            two: &TimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_time_like_object(
             one: &PlainDateTime,
             two: &TimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_time_like_object(
-            one: &PlainDateTime,
-            two: &TimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_time_like_object(
             one: &ZonedDateTime,
             two: &TimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_time_like_object(
-            one: &ZonedDateTime,
-            two: &TimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_time_like_object_and_time_like_object(
             one: &TimeLikeObject,
             two: &TimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_time_like_object_and_time_like_object(
-            one: &TimeLikeObject,
-            two: &TimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_time_like_object(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &TimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_time_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &TimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_time_and_str(
             one: &PlainTime,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_time_and_str(
-            one: &PlainTime,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_str(
             one: &PlainDateTime,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_str(
-            one: &PlainDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_str(
             one: &ZonedDateTime,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_str(
-            one: &ZonedDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_time_like_object_and_str(
             one: &TimeLikeObject,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_time_like_object_and_str(
-            one: &TimeLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
         # [wasm_bindgen (static_method_of = PlainTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_str(
+        pub fn compare_with_str_and_str(
             one: impl ::wasm_bindgen::JsStringLike,
             two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
@@ -2260,398 +1576,220 @@ pub mod temporal {
         pub fn microsecond(this: &PlainTime) -> f64;
         #[wasm_bindgen(method, getter)]
         pub fn nanosecond(this: &PlainTime) -> f64;
-        #[wasm_bindgen(method)]
-        pub fn add(this: &PlainTime, duration: &Duration) -> PlainTime;
+        #[wasm_bindgen(method, catch)]
+        pub fn add(this: &PlainTime, duration: &Duration) -> Result<PlainTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add(this: &PlainTime, duration: &Duration) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
         pub fn add_with_duration_like_object(
             this: &PlainTime,
             duration: &DurationLikeObject,
-        ) -> PlainTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object(
-            this: &PlainTime,
-            duration: &DurationLikeObject,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str(
             this: &PlainTime,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str(
-            this: &PlainTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn subtract(this: &PlainTime, duration: &Duration) -> PlainTime;
+        #[wasm_bindgen(method, catch)]
+        pub fn subtract(this: &PlainTime, duration: &Duration) -> Result<PlainTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract(this: &PlainTime, duration: &Duration) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
         pub fn subtract_with_duration_like_object(
             this: &PlainTime,
             duration: &DurationLikeObject,
-        ) -> PlainTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object(
-            this: &PlainTime,
-            duration: &DurationLikeObject,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str(
             this: &PlainTime,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str(
-            this: &PlainTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn with(this: &PlainTime, time_like: &PartialTemporalLike) -> PlainTime;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with(
+        #[wasm_bindgen(method, catch)]
+        pub fn with(
             this: &PlainTime,
             time_like: &PartialTemporalLike,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "with")]
+        #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &PlainTime,
             time_like: &PartialTemporalLike,
             options: &OverflowOptions,
-        ) -> PlainTime;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with_with_options(
-            this: &PlainTime,
-            time_like: &PartialTemporalLike,
-            options: &OverflowOptions,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn until(this: &PlainTime, other: &PlainTime) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn until(this: &PlainTime, other: &PlainTime) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until(this: &PlainTime, other: &PlainTime) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
-        pub fn until_with_plain_date_time(this: &PlainTime, other: &PlainDateTime) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_plain_date_time(
+        pub fn until_with_plain_date_time(
             this: &PlainTime,
             other: &PlainDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
-        pub fn until_with_zoned_date_time(this: &PlainTime, other: &ZonedDateTime) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time(
+        pub fn until_with_zoned_date_time(
             this: &PlainTime,
             other: &ZonedDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
-        pub fn until_with_time_like_object(this: &PlainTime, other: &TimeLikeObject) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_time_like_object(
+        pub fn until_with_time_like_object(
             this: &PlainTime,
             other: &TimeLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str(
             this: &PlainTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str(
-            this: &PlainTime,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_time_and_options(
             this: &PlainTime,
             other: &PlainTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_plain_time_and_options(
-            this: &PlainTime,
-            other: &PlainTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_time_and_options(
             this: &PlainTime,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_plain_date_time_and_options(
-            this: &PlainTime,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_and_options(
             this: &PlainTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time_and_options(
-            this: &PlainTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_time_like_object_and_options(
             this: &PlainTime,
             other: &TimeLikeObject,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_time_like_object_and_options(
-            this: &PlainTime,
-            other: &TimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &PlainTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str_and_options(
-            this: &PlainTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn since(this: &PlainTime, other: &PlainTime) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn since(this: &PlainTime, other: &PlainTime) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since(this: &PlainTime, other: &PlainTime) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
-        pub fn since_with_plain_date_time(this: &PlainTime, other: &PlainDateTime) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_plain_date_time(
+        pub fn since_with_plain_date_time(
             this: &PlainTime,
             other: &PlainDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
-        pub fn since_with_zoned_date_time(this: &PlainTime, other: &ZonedDateTime) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time(
+        pub fn since_with_zoned_date_time(
             this: &PlainTime,
             other: &ZonedDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
-        pub fn since_with_time_like_object(this: &PlainTime, other: &TimeLikeObject) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_time_like_object(
+        pub fn since_with_time_like_object(
             this: &PlainTime,
             other: &TimeLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str(
             this: &PlainTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str(
-            this: &PlainTime,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_time_and_options(
             this: &PlainTime,
             other: &PlainTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_plain_time_and_options(
-            this: &PlainTime,
-            other: &PlainTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_time_and_options(
             this: &PlainTime,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_plain_date_time_and_options(
-            this: &PlainTime,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_and_options(
             this: &PlainTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time_and_options(
-            this: &PlainTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_time_like_object_and_options(
             this: &PlainTime,
             other: &TimeLikeObject,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_time_like_object_and_options(
-            this: &PlainTime,
-            other: &TimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &PlainTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str_and_options(
-            this: &PlainTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn equals(this: &PlainTime, other: &PlainTime) -> bool;
+        #[wasm_bindgen(method, catch)]
+        pub fn equals(this: &PlainTime, other: &PlainTime) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals(this: &PlainTime, other: &PlainTime) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_plain_date_time(this: &PlainTime, other: &PlainDateTime) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_plain_date_time(
+        pub fn equals_with_plain_date_time(
             this: &PlainTime,
             other: &PlainDateTime,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_zoned_date_time(this: &PlainTime, other: &ZonedDateTime) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_zoned_date_time(
+        pub fn equals_with_zoned_date_time(
             this: &PlainTime,
             other: &ZonedDateTime,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_time_like_object(this: &PlainTime, other: &TimeLikeObject) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_time_like_object(
+        pub fn equals_with_time_like_object(
             this: &PlainTime,
             other: &TimeLikeObject,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_str(this: &PlainTime, other: impl ::wasm_bindgen::JsStringLike) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_str(
+        pub fn equals_with_str(
             this: &PlainTime,
             other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn round(this: &PlainTime, round_to: &PluralizeUnit) -> PlainTime;
+        #[wasm_bindgen(method, catch)]
+        pub fn round(this: &PlainTime, round_to: &PluralizeUnit) -> Result<PlainTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round(this: &PlainTime, round_to: &PluralizeUnit) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "round")]
         pub fn round_with_rounding_options(
             this: &PlainTime,
             round_to: &RoundingOptions<TimeUnit>,
-        ) -> PlainTime;
-        #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_rounding_options(
-            this: &PlainTime,
-            round_to: &RoundingOptions<TimeUnit>,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &PlainTime) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string_js_string(this: &PlainTime) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string(this: &PlainTime) -> Result<String, JsValue>;
+        pub fn to_string(this: &PlainTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_js_string(this: &PlainTime) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
+        pub fn to_string_js_string(this: &PlainTime) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options(
             this: &PlainTime,
             options: &PlainTimeToStringOptions,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options_js_string(
             this: &PlainTime,
             options: &PlainTimeToStringOptions,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options(
-            this: &PlainTime,
-            options: &PlainTimeToStringOptions,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options_js_string(
-            this: &PlainTime,
-            options: &PlainTimeToStringOptions,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &PlainTime) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &PlainTime) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string(this: &PlainTime) -> Result<String, JsValue>;
+        pub fn to_locale_string(this: &PlainTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_js_string(this: &PlainTime) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_locales(this: &PlainTime, locales: &JsValue) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        pub fn to_locale_string_js_string(this: &PlainTime) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
+        pub fn to_locale_string_with_locales(
+            this: &PlainTime,
+            locales: &JsValue,
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_js_string(
             this: &PlainTime,
             locales: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales(
-            this: &PlainTime,
-            locales: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_js_string(
-            this: &PlainTime,
-            locales: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options(
             this: &PlainTime,
             locales: &JsValue,
             options: &JsValue,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options_js_string(
             this: &PlainTime,
             locales: &JsValue,
             options: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options(
-            this: &PlainTime,
-            locales: &JsValue,
-            options: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options_js_string(
-            this: &PlainTime,
-            locales: &JsValue,
-            options: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json(this: &PlainTime) -> String;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json_js_string(this: &PlainTime) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json(this: &PlainTime) -> Result<String, JsValue>;
+        pub fn to_json(this: &PlainTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json_js_string(this: &PlainTime) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &PlainTime) -> JsValue;
+        pub fn to_json_js_string(this: &PlainTime) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &PlainTime) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &PlainTime) -> Result<JsValue, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -2771,320 +1909,164 @@ pub mod temporal {
             nanosecond: f64,
             calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal")]
-        pub fn from(item: &PlainDateTime) -> PlainDateTime;
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch)]
+        pub fn from(item: &PlainDateTime) -> Result<PlainDateTime, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from(item: &PlainDateTime) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> PlainDateTime;
+        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> Result<PlainDateTime, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time(
-            item: &ZonedDateTime,
-        ) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_plain_date(item: &PlainDate) -> PlainDateTime;
+        pub fn from_with_plain_date(item: &PlainDate) -> Result<PlainDateTime, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_date(item: &PlainDate) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_date_time_like_object(item: &DateTimeLikeObject) -> PlainDateTime;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_date_time_like_object(
+        pub fn from_with_date_time_like_object(
             item: &DateTimeLikeObject,
         ) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> PlainDateTime;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str(
+        pub fn from_with_str(
             item: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_plain_date_time_and_options(
             item: &PlainDateTime,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_date_time_and_options(
-            item: &PlainDateTime,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_zoned_date_time_and_options(
             item: &ZonedDateTime,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time_and_options(
-            item: &ZonedDateTime,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_plain_date_and_options(
             item: &PlainDate,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_date_and_options(
-            item: &PlainDate,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_date_time_like_object_and_options(
             item: &DateTimeLikeObject,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_date_time_like_object_and_options(
-            item: &DateTimeLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_str_and_options(
             item: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal")]
-        pub fn compare(one: &PlainDateTime, two: &PlainDateTime) -> f64;
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch)]
+        pub fn compare(one: &PlainDateTime, two: &PlainDateTime) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare(one: &PlainDateTime, two: &PlainDateTime) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_plain_date_time(
             one: &ZonedDateTime,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_plain_date_time(
-            one: &ZonedDateTime,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_and_plain_date_time(
             one: &PlainDate,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_and_plain_date_time(
-            one: &PlainDate,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_date_time_like_object_and_plain_date_time(
             one: &DateTimeLikeObject,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_date_time_like_object_and_plain_date_time(
-            one: &DateTimeLikeObject,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_plain_date_time(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &PlainDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_plain_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_zoned_date_time(
             one: &PlainDateTime,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_zoned_date_time(
-            one: &PlainDateTime,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_zoned_date_time(
             one: &ZonedDateTime,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_zoned_date_time(
-            one: &ZonedDateTime,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_and_zoned_date_time(
             one: &PlainDate,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_and_zoned_date_time(
-            one: &PlainDate,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_date_time_like_object_and_zoned_date_time(
             one: &DateTimeLikeObject,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_date_time_like_object_and_zoned_date_time(
-            one: &DateTimeLikeObject,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_zoned_date_time(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_zoned_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_plain_date(
             one: &PlainDateTime,
             two: &PlainDate,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_plain_date(
-            one: &PlainDateTime,
-            two: &PlainDate,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_plain_date(
             one: &ZonedDateTime,
             two: &PlainDate,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_plain_date(
-            one: &ZonedDateTime,
-            two: &PlainDate,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
-        pub fn compare_with_plain_date_and_plain_date(one: &PlainDate, two: &PlainDate) -> f64;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_and_plain_date(
+        pub fn compare_with_plain_date_and_plain_date(
             one: &PlainDate,
             two: &PlainDate,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_date_time_like_object_and_plain_date(
             one: &DateTimeLikeObject,
             two: &PlainDate,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_date_time_like_object_and_plain_date(
-            one: &DateTimeLikeObject,
-            two: &PlainDate,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_plain_date(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &PlainDate,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_plain_date(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainDate,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_date_time_like_object(
             one: &PlainDateTime,
             two: &DateTimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_date_time_like_object(
-            one: &PlainDateTime,
-            two: &DateTimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_date_time_like_object(
             one: &ZonedDateTime,
             two: &DateTimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_date_time_like_object(
-            one: &ZonedDateTime,
-            two: &DateTimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_and_date_time_like_object(
             one: &PlainDate,
             two: &DateTimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_and_date_time_like_object(
-            one: &PlainDate,
-            two: &DateTimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_date_time_like_object_and_date_time_like_object(
             one: &DateTimeLikeObject,
             two: &DateTimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_date_time_like_object_and_date_time_like_object(
-            one: &DateTimeLikeObject,
-            two: &DateTimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_date_time_like_object(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &DateTimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_date_time_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &DateTimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_time_and_str(
             one: &PlainDateTime,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_time_and_str(
-            one: &PlainDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_str(
             one: &ZonedDateTime,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_str(
-            one: &ZonedDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_date_and_str(
             one: &PlainDate,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_date_and_str(
-            one: &PlainDate,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_date_time_like_object_and_str(
             one: &DateTimeLikeObject,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_date_time_like_object_and_str(
-            one: &DateTimeLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
         # [wasm_bindgen (static_method_of = PlainDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_str(
+        pub fn compare_with_str_and_str(
             one: impl ::wasm_bindgen::JsStringLike,
             two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
@@ -3138,650 +2120,345 @@ pub mod temporal {
         pub fn months_in_year(this: &PlainDateTime) -> f64;
         #[wasm_bindgen(method, getter, js_name = "inLeapYear")]
         pub fn in_leap_year(this: &PlainDateTime) -> bool;
-        #[wasm_bindgen(method)]
-        pub fn with(this: &PlainDateTime, date_time_like: &PartialTemporalLike) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with(
+        #[wasm_bindgen(method, catch)]
+        pub fn with(
             this: &PlainDateTime,
             date_time_like: &PartialTemporalLike,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "with")]
+        #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &PlainDateTime,
             date_time_like: &PartialTemporalLike,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with_with_options(
-            this: &PlainDateTime,
-            date_time_like: &PartialTemporalLike,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
-        pub fn with_plain_time(this: &PlainDateTime) -> PlainDateTime;
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time(this: &PlainDateTime) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
+        pub fn with_plain_time(this: &PlainDateTime) -> Result<PlainDateTime, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time_with_plain_time(
             this: &PlainDateTime,
             plain_time: &PlainTime,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time_with_plain_time(
-            this: &PlainDateTime,
-            plain_time: &PlainTime,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
+        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time_with_plain_date_time(
             this: &PlainDateTime,
             plain_time: &PlainDateTime,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time_with_plain_date_time(
-            this: &PlainDateTime,
-            plain_time: &PlainDateTime,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
+        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time_with_zoned_date_time(
             this: &PlainDateTime,
             plain_time: &ZonedDateTime,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time_with_zoned_date_time(
-            this: &PlainDateTime,
-            plain_time: &ZonedDateTime,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
+        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time_with_time_like_object(
             this: &PlainDateTime,
             plain_time: &TimeLikeObject,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time_with_time_like_object(
-            this: &PlainDateTime,
-            plain_time: &TimeLikeObject,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
+        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time_with_str(
             this: &PlainDateTime,
             plain_time: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time_with_str(
-            this: &PlainDateTime,
-            plain_time: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
-        pub fn with_calendar(this: &PlainDateTime, calendar: &PlainDate) -> PlainDateTime;
         #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar(
+        pub fn with_calendar(
             this: &PlainDateTime,
             calendar: &PlainDate,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_plain_date_time(
             this: &PlainDateTime,
             calendar: &PlainDateTime,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_plain_date_time(
-            this: &PlainDateTime,
-            calendar: &PlainDateTime,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_plain_month_day(
             this: &PlainDateTime,
             calendar: &PlainMonthDay,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_plain_month_day(
-            this: &PlainDateTime,
-            calendar: &PlainMonthDay,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_plain_year_month(
             this: &PlainDateTime,
             calendar: &PlainYearMonth,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_plain_year_month(
-            this: &PlainDateTime,
-            calendar: &PlainYearMonth,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_zoned_date_time(
             this: &PlainDateTime,
             calendar: &ZonedDateTime,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_zoned_date_time(
-            this: &PlainDateTime,
-            calendar: &ZonedDateTime,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_str(
             this: &PlainDateTime,
             calendar: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_str(
-            this: &PlainDateTime,
-            calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn add(this: &PlainDateTime, duration: &Duration) -> PlainDateTime;
+        #[wasm_bindgen(method, catch)]
+        pub fn add(this: &PlainDateTime, duration: &Duration) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add(this: &PlainDateTime, duration: &Duration)
-            -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
         pub fn add_with_duration_like_object(
             this: &PlainDateTime,
             duration: &DurationLikeObject,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object(
-            this: &PlainDateTime,
-            duration: &DurationLikeObject,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str(
             this: &PlainDateTime,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str(
-            this: &PlainDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_duration_and_options(
             this: &PlainDateTime,
             duration: &Duration,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_and_options(
-            this: &PlainDateTime,
-            duration: &Duration,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_duration_like_object_and_options(
             this: &PlainDateTime,
             duration: &DurationLikeObject,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object_and_options(
-            this: &PlainDateTime,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str_and_options(
             this: &PlainDateTime,
             duration: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str_and_options(
-            this: &PlainDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn subtract(this: &PlainDateTime, duration: &Duration) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract(
+        #[wasm_bindgen(method, catch)]
+        pub fn subtract(
             this: &PlainDateTime,
             duration: &Duration,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_like_object(
             this: &PlainDateTime,
             duration: &DurationLikeObject,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object(
-            this: &PlainDateTime,
-            duration: &DurationLikeObject,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str(
             this: &PlainDateTime,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str(
-            this: &PlainDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_and_options(
             this: &PlainDateTime,
             duration: &Duration,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_and_options(
-            this: &PlainDateTime,
-            duration: &Duration,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_like_object_and_options(
             this: &PlainDateTime,
             duration: &DurationLikeObject,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object_and_options(
-            this: &PlainDateTime,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str_and_options(
             this: &PlainDateTime,
             duration: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str_and_options(
-            this: &PlainDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn until(this: &PlainDateTime, other: &PlainDateTime) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn until(this: &PlainDateTime, other: &PlainDateTime) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until(this: &PlainDateTime, other: &PlainDateTime) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
-        pub fn until_with_zoned_date_time(this: &PlainDateTime, other: &ZonedDateTime) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time(
+        pub fn until_with_zoned_date_time(
             this: &PlainDateTime,
             other: &ZonedDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
-        pub fn until_with_plain_date(this: &PlainDateTime, other: &PlainDate) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_plain_date(
+        pub fn until_with_plain_date(
             this: &PlainDateTime,
             other: &PlainDate,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_date_time_like_object(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_date_time_like_object(
-            this: &PlainDateTime,
-            other: &DateTimeLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str(
             this: &PlainDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str(
-            this: &PlainDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_time_and_options(
             this: &PlainDateTime,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_plain_date_time_and_options(
-            this: &PlainDateTime,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_and_options(
             this: &PlainDateTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time_and_options(
-            this: &PlainDateTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_date_and_options(
             this: &PlainDateTime,
             other: &PlainDate,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_plain_date_and_options(
-            this: &PlainDateTime,
-            other: &PlainDate,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_date_time_like_object_and_options(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_date_time_like_object_and_options(
-            this: &PlainDateTime,
-            other: &DateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &PlainDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str_and_options(
-            this: &PlainDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn since(this: &PlainDateTime, other: &PlainDateTime) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn since(this: &PlainDateTime, other: &PlainDateTime) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since(this: &PlainDateTime, other: &PlainDateTime) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
-        pub fn since_with_zoned_date_time(this: &PlainDateTime, other: &ZonedDateTime) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time(
+        pub fn since_with_zoned_date_time(
             this: &PlainDateTime,
             other: &ZonedDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
-        pub fn since_with_plain_date(this: &PlainDateTime, other: &PlainDate) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_plain_date(
+        pub fn since_with_plain_date(
             this: &PlainDateTime,
             other: &PlainDate,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_date_time_like_object(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_date_time_like_object(
-            this: &PlainDateTime,
-            other: &DateTimeLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str(
             this: &PlainDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str(
-            this: &PlainDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_time_and_options(
             this: &PlainDateTime,
             other: &PlainDateTime,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_plain_date_time_and_options(
-            this: &PlainDateTime,
-            other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_and_options(
             this: &PlainDateTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time_and_options(
-            this: &PlainDateTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_date_and_options(
             this: &PlainDateTime,
             other: &PlainDate,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_plain_date_and_options(
-            this: &PlainDateTime,
-            other: &PlainDate,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_date_time_like_object_and_options(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_date_time_like_object_and_options(
-            this: &PlainDateTime,
-            other: &DateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &PlainDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str_and_options(
-            this: &PlainDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn round(this: &PlainDateTime, round_to: &PluralizeUnit) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round(
+        #[wasm_bindgen(method, catch)]
+        pub fn round(
             this: &PlainDateTime,
             round_to: &PluralizeUnit,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "round")]
+        #[wasm_bindgen(method, catch, js_name = "round")]
         pub fn round_with_rounding_options(
             this: &PlainDateTime,
             round_to: &RoundingOptions<JsValue>,
-        ) -> PlainDateTime;
-        #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_rounding_options(
-            this: &PlainDateTime,
-            round_to: &RoundingOptions<JsValue>,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn equals(this: &PlainDateTime, other: &PlainDateTime) -> bool;
+        #[wasm_bindgen(method, catch)]
+        pub fn equals(this: &PlainDateTime, other: &PlainDateTime) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals(this: &PlainDateTime, other: &PlainDateTime) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_zoned_date_time(this: &PlainDateTime, other: &ZonedDateTime) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_zoned_date_time(
+        pub fn equals_with_zoned_date_time(
             this: &PlainDateTime,
             other: &ZonedDateTime,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_plain_date(this: &PlainDateTime, other: &PlainDate) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_plain_date(
+        pub fn equals_with_plain_date(
             this: &PlainDateTime,
             other: &PlainDate,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
+        #[wasm_bindgen(method, catch, js_name = "equals")]
         pub fn equals_with_date_time_like_object(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
-        ) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_date_time_like_object(
-            this: &PlainDateTime,
-            other: &DateTimeLikeObject,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
+        #[wasm_bindgen(method, catch, js_name = "equals")]
         pub fn equals_with_str(
             this: &PlainDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_str(
-            this: &PlainDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &PlainDateTime) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string_js_string(this: &PlainDateTime) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string(this: &PlainDateTime) -> Result<String, JsValue>;
+        pub fn to_string(this: &PlainDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_js_string(this: &PlainDateTime) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
+        pub fn to_string_js_string(this: &PlainDateTime) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options(
             this: &PlainDateTime,
             options: &PlainDateTimeToStringOptions,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options_js_string(
             this: &PlainDateTime,
             options: &PlainDateTimeToStringOptions,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options(
-            this: &PlainDateTime,
-            options: &PlainDateTimeToStringOptions,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options_js_string(
-            this: &PlainDateTime,
-            options: &PlainDateTimeToStringOptions,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &PlainDateTime) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &PlainDateTime) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string(this: &PlainDateTime) -> Result<String, JsValue>;
+        pub fn to_locale_string(this: &PlainDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_js_string(this: &PlainDateTime) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_locales(this: &PlainDateTime, locales: &JsValue) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        pub fn to_locale_string_js_string(this: &PlainDateTime) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
+        pub fn to_locale_string_with_locales(
+            this: &PlainDateTime,
+            locales: &JsValue,
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_js_string(
             this: &PlainDateTime,
             locales: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales(
-            this: &PlainDateTime,
-            locales: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_js_string(
-            this: &PlainDateTime,
-            locales: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options(
             this: &PlainDateTime,
             locales: &JsValue,
             options: &JsValue,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options_js_string(
             this: &PlainDateTime,
             locales: &JsValue,
             options: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options(
-            this: &PlainDateTime,
-            locales: &JsValue,
-            options: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options_js_string(
-            this: &PlainDateTime,
-            locales: &JsValue,
-            options: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json(this: &PlainDateTime) -> String;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json_js_string(this: &PlainDateTime) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json(this: &PlainDateTime) -> Result<String, JsValue>;
+        pub fn to_json(this: &PlainDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json_js_string(this: &PlainDateTime) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &PlainDateTime) -> JsValue;
+        pub fn to_json_js_string(this: &PlainDateTime) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &PlainDateTime) -> Result<JsValue, JsValue>;
-        #[wasm_bindgen(method, js_name = "toZonedDateTime")]
-        pub fn to_zoned_date_time(this: &PlainDateTime, time_zone: &ZonedDateTime)
-            -> ZonedDateTime;
+        pub fn value_of(this: &PlainDateTime) -> Result<JsValue, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn try_to_zoned_date_time(
+        pub fn to_zoned_date_time(
             this: &PlainDateTime,
             time_zone: &ZonedDateTime,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toZonedDateTime")]
+        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
         pub fn to_zoned_date_time_with_str(
             this: &PlainDateTime,
             time_zone: impl ::wasm_bindgen::JsStringLike,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn try_to_zoned_date_time_with_str(
-            this: &PlainDateTime,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toZonedDateTime")]
+        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
         pub fn to_zoned_date_time_with_zoned_date_time_and_options(
             this: &PlainDateTime,
             time_zone: &ZonedDateTime,
             options: &DisambiguationOptions,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn try_to_zoned_date_time_with_zoned_date_time_and_options(
-            this: &PlainDateTime,
-            time_zone: &ZonedDateTime,
-            options: &DisambiguationOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toZonedDateTime")]
+        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
         pub fn to_zoned_date_time_with_str_and_options(
             this: &PlainDateTime,
             time_zone: impl ::wasm_bindgen::JsStringLike,
             options: &DisambiguationOptions,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
-        pub fn try_to_zoned_date_time_with_str_and_options(
-            this: &PlainDateTime,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
-            options: &DisambiguationOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDate")]
-        pub fn to_plain_date(this: &PlainDateTime) -> PlainDate;
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
-        pub fn try_to_plain_date(this: &PlainDateTime) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainTime")]
-        pub fn to_plain_time(this: &PlainDateTime) -> PlainTime;
+        pub fn to_plain_date(this: &PlainDateTime) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainTime")]
-        pub fn try_to_plain_time(this: &PlainDateTime) -> Result<PlainTime, JsValue>;
+        pub fn to_plain_time(this: &PlainDateTime) -> Result<PlainTime, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -3878,135 +2555,70 @@ pub mod temporal {
             time_zone: impl ::wasm_bindgen::JsStringLike,
             calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal")]
-        pub fn from(item: &ZonedDateTime) -> ZonedDateTime;
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch)]
+        pub fn from(item: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
         # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from(item: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "from")]
         pub fn from_with_zoned_date_time_like_object(
             item: &ZonedDateTimeLikeObject,
-        ) -> ZonedDateTime;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time_like_object(
-            item: &ZonedDateTimeLikeObject,
         ) -> Result<ZonedDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> ZonedDateTime;
         # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str(
+        pub fn from_with_str(
             item: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_zoned_date_time_and_options(
             item: &ZonedDateTime,
             options: &ZonedDateTimeFromOptions,
-        ) -> ZonedDateTime;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time_and_options(
-            item: &ZonedDateTime,
-            options: &ZonedDateTimeFromOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_zoned_date_time_like_object_and_options(
             item: &ZonedDateTimeLikeObject,
             options: &ZonedDateTimeFromOptions,
-        ) -> ZonedDateTime;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time_like_object_and_options(
-            item: &ZonedDateTimeLikeObject,
-            options: &ZonedDateTimeFromOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_str_and_options(
             item: impl ::wasm_bindgen::JsStringLike,
             options: &ZonedDateTimeFromOptions,
-        ) -> ZonedDateTime;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &ZonedDateTimeFromOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal")]
-        pub fn compare(one: &ZonedDateTime, two: &ZonedDateTime) -> f64;
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch)]
+        pub fn compare(one: &ZonedDateTime, two: &ZonedDateTime) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare(one: &ZonedDateTime, two: &ZonedDateTime) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "compare")]
         pub fn compare_with_zoned_date_time_like_object_and_zoned_date_time(
             one: &ZonedDateTimeLikeObject,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_like_object_and_zoned_date_time(
-            one: &ZonedDateTimeLikeObject,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_zoned_date_time(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_zoned_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_zoned_date_time_like_object(
             one: &ZonedDateTime,
             two: &ZonedDateTimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_zoned_date_time_like_object(
-            one: &ZonedDateTime,
-            two: &ZonedDateTimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_like_object_and_zoned_date_time_like_object(
             one: &ZonedDateTimeLikeObject,
             two: &ZonedDateTimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_like_object_and_zoned_date_time_like_object(
-            one: &ZonedDateTimeLikeObject,
-            two: &ZonedDateTimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_zoned_date_time_like_object(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &ZonedDateTimeLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_zoned_date_time_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTimeLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_str(
             one: &ZonedDateTime,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_str(
-            one: &ZonedDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_like_object_and_str(
             one: &ZonedDateTimeLikeObject,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_like_object_and_str(
-            one: &ZonedDateTimeLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
         # [wasm_bindgen (static_method_of = ZonedDateTime , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_str(
+        pub fn compare_with_str_and_str(
             one: impl ::wasm_bindgen::JsStringLike,
             two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
@@ -4076,570 +2688,295 @@ pub mod temporal {
         pub fn offset(this: &ZonedDateTime) -> String;
         #[wasm_bindgen(method, getter, js_name = "offset")]
         pub fn offset_js_string(this: &ZonedDateTime) -> JsString;
-        #[wasm_bindgen(method)]
+        #[wasm_bindgen(method, catch)]
         pub fn with(
             this: &ZonedDateTime,
             zoned_date_time_like: &PartialTemporalLike,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with(
-            this: &ZonedDateTime,
-            zoned_date_time_like: &PartialTemporalLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "with")]
+        #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &ZonedDateTime,
             zoned_date_time_like: &PartialTemporalLike,
             options: &ZonedDateTimeFromOptions,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with_with_options(
-            this: &ZonedDateTime,
-            zoned_date_time_like: &PartialTemporalLike,
-            options: &ZonedDateTimeFromOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
-        pub fn with_plain_time(this: &ZonedDateTime) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time(this: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
+        pub fn with_plain_time(this: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time_with_plain_time(
             this: &ZonedDateTime,
             plain_time: &PlainTime,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time_with_plain_time(
-            this: &ZonedDateTime,
-            plain_time: &PlainTime,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
+        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time_with_plain_date_time(
             this: &ZonedDateTime,
             plain_time: &PlainDateTime,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time_with_plain_date_time(
-            this: &ZonedDateTime,
-            plain_time: &PlainDateTime,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
+        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time_with_zoned_date_time(
             this: &ZonedDateTime,
             plain_time: &ZonedDateTime,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time_with_zoned_date_time(
-            this: &ZonedDateTime,
-            plain_time: &ZonedDateTime,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
+        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time_with_time_like_object(
             this: &ZonedDateTime,
             plain_time: &TimeLikeObject,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time_with_time_like_object(
-            this: &ZonedDateTime,
-            plain_time: &TimeLikeObject,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withPlainTime")]
+        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
         pub fn with_plain_time_with_str(
             this: &ZonedDateTime,
             plain_time: impl ::wasm_bindgen::JsStringLike,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time_with_str(
-            this: &ZonedDateTime,
-            plain_time: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withTimeZone")]
-        pub fn with_time_zone(this: &ZonedDateTime, time_zone: &ZonedDateTime) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "withTimeZone")]
-        pub fn try_with_time_zone(
+        pub fn with_time_zone(
             this: &ZonedDateTime,
             time_zone: &ZonedDateTime,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withTimeZone")]
+        #[wasm_bindgen(method, catch, js_name = "withTimeZone")]
         pub fn with_time_zone_with_str(
             this: &ZonedDateTime,
             time_zone: impl ::wasm_bindgen::JsStringLike,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withTimeZone")]
-        pub fn try_with_time_zone_with_str(
-            this: &ZonedDateTime,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
-        pub fn with_calendar(this: &ZonedDateTime, calendar: &PlainDate) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar(
+        pub fn with_calendar(
             this: &ZonedDateTime,
             calendar: &PlainDate,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_plain_date_time(
             this: &ZonedDateTime,
             calendar: &PlainDateTime,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_plain_date_time(
-            this: &ZonedDateTime,
-            calendar: &PlainDateTime,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_plain_month_day(
             this: &ZonedDateTime,
             calendar: &PlainMonthDay,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_plain_month_day(
-            this: &ZonedDateTime,
-            calendar: &PlainMonthDay,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_plain_year_month(
             this: &ZonedDateTime,
             calendar: &PlainYearMonth,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_plain_year_month(
-            this: &ZonedDateTime,
-            calendar: &PlainYearMonth,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_zoned_date_time(
             this: &ZonedDateTime,
             calendar: &ZonedDateTime,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_zoned_date_time(
-            this: &ZonedDateTime,
-            calendar: &ZonedDateTime,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "withCalendar")]
+        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
         pub fn with_calendar_with_str(
             this: &ZonedDateTime,
             calendar: impl ::wasm_bindgen::JsStringLike,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "withCalendar")]
-        pub fn try_with_calendar_with_str(
-            this: &ZonedDateTime,
-            calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn add(this: &ZonedDateTime, duration: &Duration) -> ZonedDateTime;
+        #[wasm_bindgen(method, catch)]
+        pub fn add(this: &ZonedDateTime, duration: &Duration) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add(this: &ZonedDateTime, duration: &Duration)
-            -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
         pub fn add_with_duration_like_object(
             this: &ZonedDateTime,
             duration: &DurationLikeObject,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object(
-            this: &ZonedDateTime,
-            duration: &DurationLikeObject,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str(
             this: &ZonedDateTime,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str(
-            this: &ZonedDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_duration_and_options(
             this: &ZonedDateTime,
             duration: &Duration,
             options: &OverflowOptions,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_and_options(
-            this: &ZonedDateTime,
-            duration: &Duration,
-            options: &OverflowOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_duration_like_object_and_options(
             this: &ZonedDateTime,
             duration: &DurationLikeObject,
             options: &OverflowOptions,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object_and_options(
-            this: &ZonedDateTime,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str_and_options(
             this: &ZonedDateTime,
             duration: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str_and_options(
-            this: &ZonedDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn subtract(this: &ZonedDateTime, duration: &Duration) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract(
+        #[wasm_bindgen(method, catch)]
+        pub fn subtract(
             this: &ZonedDateTime,
             duration: &Duration,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_like_object(
             this: &ZonedDateTime,
             duration: &DurationLikeObject,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object(
-            this: &ZonedDateTime,
-            duration: &DurationLikeObject,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str(
             this: &ZonedDateTime,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str(
-            this: &ZonedDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_and_options(
             this: &ZonedDateTime,
             duration: &Duration,
             options: &OverflowOptions,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_and_options(
-            this: &ZonedDateTime,
-            duration: &Duration,
-            options: &OverflowOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_like_object_and_options(
             this: &ZonedDateTime,
             duration: &DurationLikeObject,
             options: &OverflowOptions,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object_and_options(
-            this: &ZonedDateTime,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str_and_options(
             this: &ZonedDateTime,
             duration: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str_and_options(
-            this: &ZonedDateTime,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn until(this: &ZonedDateTime, other: &ZonedDateTime) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn until(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
         pub fn until_with_zoned_date_time_like_object(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time_like_object(
-            this: &ZonedDateTime,
-            other: &ZonedDateTimeLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str(
             this: &ZonedDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str(
-            this: &ZonedDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time_and_options(
-            this: &ZonedDateTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_like_object_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time_like_object_and_options(
-            this: &ZonedDateTime,
-            other: &ZonedDateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &ZonedDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str_and_options(
-            this: &ZonedDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn since(this: &ZonedDateTime, other: &ZonedDateTime) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn since(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
         pub fn since_with_zoned_date_time_like_object(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time_like_object(
-            this: &ZonedDateTime,
-            other: &ZonedDateTimeLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str(
             this: &ZonedDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str(
-            this: &ZonedDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time_and_options(
-            this: &ZonedDateTime,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_like_object_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time_like_object_and_options(
-            this: &ZonedDateTime,
-            other: &ZonedDateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &ZonedDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<JsValue>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str_and_options(
-            this: &ZonedDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn round(this: &ZonedDateTime, round_to: &PluralizeUnit) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round(
+        #[wasm_bindgen(method, catch)]
+        pub fn round(
             this: &ZonedDateTime,
             round_to: &PluralizeUnit,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "round")]
+        #[wasm_bindgen(method, catch, js_name = "round")]
         pub fn round_with_rounding_options(
             this: &ZonedDateTime,
             round_to: &RoundingOptions<JsValue>,
-        ) -> ZonedDateTime;
-        #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_rounding_options(
-            this: &ZonedDateTime,
-            round_to: &RoundingOptions<JsValue>,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn equals(this: &ZonedDateTime, other: &ZonedDateTime) -> bool;
+        #[wasm_bindgen(method, catch)]
+        pub fn equals(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals(this: &ZonedDateTime, other: &ZonedDateTime) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
         pub fn equals_with_zoned_date_time_like_object(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
-        ) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_zoned_date_time_like_object(
-            this: &ZonedDateTime,
-            other: &ZonedDateTimeLikeObject,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
+        #[wasm_bindgen(method, catch, js_name = "equals")]
         pub fn equals_with_str(
             this: &ZonedDateTime,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_str(
-            this: &ZonedDateTime,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &ZonedDateTime) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string_js_string(this: &ZonedDateTime) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string(this: &ZonedDateTime) -> Result<String, JsValue>;
+        pub fn to_string(this: &ZonedDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_js_string(this: &ZonedDateTime) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
+        pub fn to_string_js_string(this: &ZonedDateTime) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options(
             this: &ZonedDateTime,
             options: &ZonedDateTimeToStringOptions,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options_js_string(
             this: &ZonedDateTime,
             options: &ZonedDateTimeToStringOptions,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options(
-            this: &ZonedDateTime,
-            options: &ZonedDateTimeToStringOptions,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options_js_string(
-            this: &ZonedDateTime,
-            options: &ZonedDateTimeToStringOptions,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &ZonedDateTime) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &ZonedDateTime) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string(this: &ZonedDateTime) -> Result<String, JsValue>;
+        pub fn to_locale_string(this: &ZonedDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_js_string(this: &ZonedDateTime) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_locales(this: &ZonedDateTime, locales: &JsValue) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        pub fn to_locale_string_js_string(this: &ZonedDateTime) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
+        pub fn to_locale_string_with_locales(
+            this: &ZonedDateTime,
+            locales: &JsValue,
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_js_string(
             this: &ZonedDateTime,
             locales: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales(
-            this: &ZonedDateTime,
-            locales: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_js_string(
-            this: &ZonedDateTime,
-            locales: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options(
             this: &ZonedDateTime,
             locales: &JsValue,
             options: &JsValue,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options_js_string(
             this: &ZonedDateTime,
             locales: &JsValue,
             options: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options(
-            this: &ZonedDateTime,
-            locales: &JsValue,
-            options: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options_js_string(
-            this: &ZonedDateTime,
-            locales: &JsValue,
-            options: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json(this: &ZonedDateTime) -> String;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json_js_string(this: &ZonedDateTime) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json(this: &ZonedDateTime) -> Result<String, JsValue>;
+        pub fn to_json(this: &ZonedDateTime) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json_js_string(this: &ZonedDateTime) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &ZonedDateTime) -> JsValue;
+        pub fn to_json_js_string(this: &ZonedDateTime) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &ZonedDateTime) -> Result<JsValue, JsValue>;
-        #[wasm_bindgen(method, js_name = "startOfDay")]
-        pub fn start_of_day(this: &ZonedDateTime) -> ZonedDateTime;
+        pub fn value_of(this: &ZonedDateTime) -> Result<JsValue, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "startOfDay")]
-        pub fn try_start_of_day(this: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
+        pub fn start_of_day(this: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
         pub fn get_time_zone_transition(
             this: &ZonedDateTime,
             direction: impl ::wasm_bindgen::JsStringLike,
-        ) -> Nullable<ZonedDateTime>;
-        #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
-        pub fn try_get_time_zone_transition(
-            this: &ZonedDateTime,
-            direction: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Nullable<ZonedDateTime>, JsValue>;
-        #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
+        #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
         pub fn get_time_zone_transition_with_transition_options(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
-        ) -> Nullable<ZonedDateTime>;
-        #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
-        pub fn try_get_time_zone_transition_with_transition_options(
-            this: &ZonedDateTime,
-            direction: &TransitionOptions,
         ) -> Result<Nullable<ZonedDateTime>, JsValue>;
-        #[wasm_bindgen(method, js_name = "toInstant")]
-        pub fn to_instant(this: &ZonedDateTime) -> Instant;
         #[wasm_bindgen(method, catch, js_name = "toInstant")]
-        pub fn try_to_instant(this: &ZonedDateTime) -> Result<Instant, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDate")]
-        pub fn to_plain_date(this: &ZonedDateTime) -> PlainDate;
+        pub fn to_instant(this: &ZonedDateTime) -> Result<Instant, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
-        pub fn try_to_plain_date(this: &ZonedDateTime) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainTime")]
-        pub fn to_plain_time(this: &ZonedDateTime) -> PlainTime;
+        pub fn to_plain_date(this: &ZonedDateTime) -> Result<PlainDate, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainTime")]
-        pub fn try_to_plain_time(this: &ZonedDateTime) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDateTime")]
-        pub fn to_plain_date_time(this: &ZonedDateTime) -> PlainDateTime;
+        pub fn to_plain_time(this: &ZonedDateTime) -> Result<PlainTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn try_to_plain_date_time(this: &ZonedDateTime) -> Result<PlainDateTime, JsValue>;
+        pub fn to_plain_date_time(this: &ZonedDateTime) -> Result<PlainDateTime, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -4835,210 +3172,106 @@ pub mod temporal {
             microseconds: f64,
             nanoseconds: f64,
         ) -> Result<Duration, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal")]
-        pub fn from(item: &Duration) -> Duration;
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch)]
+        pub fn from(item: &Duration) -> Result<Duration, JsValue>;
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from(item: &Duration) -> Result<Duration, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_duration_like_object(item: &DurationLikeObject) -> Duration;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_duration_like_object(
+        pub fn from_with_duration_like_object(
             item: &DurationLikeObject,
         ) -> Result<Duration, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> Duration;
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str(
-            item: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Duration, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal")]
-        pub fn compare(one: &Duration, two: &Duration) -> f64;
+        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> Result<Duration, JsValue>;
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch)]
+        pub fn compare(one: &Duration, two: &Duration) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare(one: &Duration, two: &Duration) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_duration(
             one: &DurationLikeObject,
             two: &Duration,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_like_object_and_duration(
-            one: &DurationLikeObject,
-            two: &Duration,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_duration(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &Duration,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_duration(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &Duration,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_and_duration_like_object(
             one: &Duration,
             two: &DurationLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_and_duration_like_object(
-            one: &Duration,
-            two: &DurationLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_duration_like_object(
             one: &DurationLikeObject,
             two: &DurationLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_like_object_and_duration_like_object(
-            one: &DurationLikeObject,
-            two: &DurationLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_duration_like_object(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &DurationLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_duration_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &DurationLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_and_str(
             one: &Duration,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_and_str(
-            one: &Duration,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_str(
             one: &DurationLikeObject,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_like_object_and_str(
-            one: &DurationLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_str(
             one: impl ::wasm_bindgen::JsStringLike,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_and_duration_and_options(
             one: &Duration,
             two: &Duration,
             options: &DurationRelativeToOptions,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_and_duration_and_options(
-            one: &Duration,
-            two: &Duration,
-            options: &DurationRelativeToOptions,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_duration_and_options(
             one: &DurationLikeObject,
             two: &Duration,
             options: &DurationRelativeToOptions,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_like_object_and_duration_and_options(
-            one: &DurationLikeObject,
-            two: &Duration,
-            options: &DurationRelativeToOptions,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_duration_and_options(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &Duration,
             options: &DurationRelativeToOptions,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_duration_and_options(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &Duration,
-            options: &DurationRelativeToOptions,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_and_duration_like_object_and_options(
             one: &Duration,
             two: &DurationLikeObject,
             options: &DurationRelativeToOptions,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_and_duration_like_object_and_options(
-            one: &Duration,
-            two: &DurationLikeObject,
-            options: &DurationRelativeToOptions,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_duration_like_object_and_options(
             one: &DurationLikeObject,
             two: &DurationLikeObject,
             options: &DurationRelativeToOptions,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_like_object_and_duration_like_object_and_options(
-            one: &DurationLikeObject,
-            two: &DurationLikeObject,
-            options: &DurationRelativeToOptions,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_duration_like_object_and_options(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &DurationLikeObject,
             options: &DurationRelativeToOptions,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_duration_like_object_and_options(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &DurationLikeObject,
-            options: &DurationRelativeToOptions,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_and_str_and_options(
             one: &Duration,
             two: impl ::wasm_bindgen::JsStringLike,
             options: &DurationRelativeToOptions,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_and_str_and_options(
-            one: &Duration,
-            two: impl ::wasm_bindgen::JsStringLike,
-            options: &DurationRelativeToOptions,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_duration_like_object_and_str_and_options(
             one: &DurationLikeObject,
             two: impl ::wasm_bindgen::JsStringLike,
             options: &DurationRelativeToOptions,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_duration_like_object_and_str_and_options(
-            one: &DurationLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
-            options: &DurationRelativeToOptions,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , js_name = "compare")]
-        pub fn compare_with_str_and_str_and_options(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-            options: &DurationRelativeToOptions,
-        ) -> f64;
         # [wasm_bindgen (static_method_of = Duration , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_str_and_options(
+        pub fn compare_with_str_and_str_and_options(
             one: impl ::wasm_bindgen::JsStringLike,
             two: impl ::wasm_bindgen::JsStringLike,
             options: &DurationRelativeToOptions,
@@ -5067,181 +3300,99 @@ pub mod temporal {
         pub fn sign(this: &Duration) -> f64;
         #[wasm_bindgen(method, getter)]
         pub fn blank(this: &Duration) -> bool;
-        #[wasm_bindgen(method)]
-        pub fn with(this: &Duration, duration_like: &PartialTemporalLike) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with(
+        #[wasm_bindgen(method, catch)]
+        pub fn with(
             this: &Duration,
             duration_like: &PartialTemporalLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn negated(this: &Duration) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "negated")]
-        pub fn try_negated(this: &Duration) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn abs(this: &Duration) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "abs")]
-        pub fn try_abs(this: &Duration) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn add(this: &Duration, other: &Duration) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn negated(this: &Duration) -> Result<Duration, JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn abs(this: &Duration) -> Result<Duration, JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn add(this: &Duration, other: &Duration) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add(this: &Duration, other: &Duration) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
         pub fn add_with_duration_like_object(
             this: &Duration,
             other: &DurationLikeObject,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object(
-            this: &Duration,
-            other: &DurationLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
-        pub fn add_with_str(this: &Duration, other: impl ::wasm_bindgen::JsStringLike) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str(
+        pub fn add_with_str(
             this: &Duration,
             other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn subtract(this: &Duration, other: &Duration) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn subtract(this: &Duration, other: &Duration) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract(this: &Duration, other: &Duration) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
         pub fn subtract_with_duration_like_object(
             this: &Duration,
             other: &DurationLikeObject,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object(
-            this: &Duration,
-            other: &DurationLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str(
             this: &Duration,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str(
-            this: &Duration,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn round(this: &Duration, round_to: &PluralizeUnit) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn round(this: &Duration, round_to: &PluralizeUnit) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round(this: &Duration, round_to: &PluralizeUnit) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "round")]
         pub fn round_with_duration_rounding_options(
             this: &Duration,
             round_to: &DurationRoundingOptions,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_duration_rounding_options(
-            this: &Duration,
-            round_to: &DurationRoundingOptions,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn total(this: &Duration, total_of: &PluralizeUnit) -> f64;
+        #[wasm_bindgen(method, catch)]
+        pub fn total(this: &Duration, total_of: &PluralizeUnit) -> Result<f64, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "total")]
-        pub fn try_total(this: &Duration, total_of: &PluralizeUnit) -> Result<f64, JsValue>;
-        #[wasm_bindgen(method, js_name = "total")]
         pub fn total_with_duration_total_options(
             this: &Duration,
             total_of: &DurationTotalOptions,
-        ) -> f64;
-        #[wasm_bindgen(method, catch, js_name = "total")]
-        pub fn try_total_with_duration_total_options(
-            this: &Duration,
-            total_of: &DurationTotalOptions,
         ) -> Result<f64, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &Duration) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string_js_string(this: &Duration) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string(this: &Duration) -> Result<String, JsValue>;
+        pub fn to_string(this: &Duration) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_js_string(this: &Duration) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string_with_options(this: &Duration, options: &DurationToStringOptions)
-            -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
+        pub fn to_string_js_string(this: &Duration) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
+        pub fn to_string_with_options(
+            this: &Duration,
+            options: &DurationToStringOptions,
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options_js_string(
             this: &Duration,
             options: &DurationToStringOptions,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options(
-            this: &Duration,
-            options: &DurationToStringOptions,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options_js_string(
-            this: &Duration,
-            options: &DurationToStringOptions,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &Duration) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &Duration) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string(this: &Duration) -> Result<String, JsValue>;
+        pub fn to_locale_string(this: &Duration) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_js_string(this: &Duration) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_locales(this: &Duration, locales: &JsValue) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        pub fn to_locale_string_js_string(this: &Duration) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
+        pub fn to_locale_string_with_locales(
+            this: &Duration,
+            locales: &JsValue,
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_js_string(
             this: &Duration,
             locales: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales(
-            this: &Duration,
-            locales: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_js_string(
-            this: &Duration,
-            locales: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options(
             this: &Duration,
             locales: &JsValue,
             options: &JsValue,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options_js_string(
             this: &Duration,
             locales: &JsValue,
             options: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options(
-            this: &Duration,
-            locales: &JsValue,
-            options: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options_js_string(
-            this: &Duration,
-            locales: &JsValue,
-            options: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json(this: &Duration) -> String;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json_js_string(this: &Duration) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json(this: &Duration) -> Result<String, JsValue>;
+        pub fn to_json(this: &Duration) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json_js_string(this: &Duration) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &Duration) -> JsValue;
+        pub fn to_json_js_string(this: &Duration) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &Duration) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &Duration) -> Result<JsValue, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -5291,103 +3442,55 @@ pub mod temporal {
         pub type Instant;
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new(epoch_nanoseconds: &BigInt) -> Result<Instant, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal")]
-        pub fn from(item: &Instant) -> Instant;
+        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch)]
+        pub fn from(item: &Instant) -> Result<Instant, JsValue>;
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from(item: &Instant) -> Result<Instant, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> Instant;
+        pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> Result<Instant, JsValue>;
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time(item: &ZonedDateTime) -> Result<Instant, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> Instant;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str(
-            item: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Instant, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "fromEpochMilliseconds")]
-        pub fn from_epoch_milliseconds(epoch_milliseconds: f64) -> Instant;
+        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> Result<Instant, JsValue>;
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "fromEpochMilliseconds")]
-        pub fn try_from_epoch_milliseconds(epoch_milliseconds: f64) -> Result<Instant, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "fromEpochNanoseconds")]
-        pub fn from_epoch_nanoseconds(epoch_nanoseconds: &BigInt) -> Instant;
+        pub fn from_epoch_milliseconds(epoch_milliseconds: f64) -> Result<Instant, JsValue>;
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "fromEpochNanoseconds")]
-        pub fn try_from_epoch_nanoseconds(epoch_nanoseconds: &BigInt) -> Result<Instant, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal")]
-        pub fn compare(one: &Instant, two: &Instant) -> f64;
+        pub fn from_epoch_nanoseconds(epoch_nanoseconds: &BigInt) -> Result<Instant, JsValue>;
+        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch)]
+        pub fn compare(one: &Instant, two: &Instant) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare(one: &Instant, two: &Instant) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "compare")]
-        pub fn compare_with_zoned_date_time_and_instant(one: &ZonedDateTime, two: &Instant) -> f64;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_instant(
+        pub fn compare_with_zoned_date_time_and_instant(
             one: &ZonedDateTime,
             two: &Instant,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_instant(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &Instant,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_instant(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &Instant,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "compare")]
-        pub fn compare_with_instant_and_zoned_date_time(one: &Instant, two: &ZonedDateTime) -> f64;
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_instant_and_zoned_date_time(
+        pub fn compare_with_instant_and_zoned_date_time(
             one: &Instant,
             two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_zoned_date_time(
             one: &ZonedDateTime,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_zoned_date_time(
-            one: &ZonedDateTime,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_zoned_date_time(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &ZonedDateTime,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_zoned_date_time(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &ZonedDateTime,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_instant_and_str(
             one: &Instant,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_instant_and_str(
-            one: &Instant,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_zoned_date_time_and_str(
             one: &ZonedDateTime,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_zoned_date_time_and_str(
-            one: &ZonedDateTime,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_str(
+        pub fn compare_with_str_and_str(
             one: impl ::wasm_bindgen::JsStringLike,
             two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
@@ -5395,294 +3498,162 @@ pub mod temporal {
         pub fn epoch_milliseconds(this: &Instant) -> f64;
         #[wasm_bindgen(method, getter, js_name = "epochNanoseconds")]
         pub fn epoch_nanoseconds(this: &Instant) -> BigInt;
-        #[wasm_bindgen(method)]
-        pub fn add(this: &Instant, duration: &Duration) -> Instant;
+        #[wasm_bindgen(method, catch)]
+        pub fn add(this: &Instant, duration: &Duration) -> Result<Instant, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add(this: &Instant, duration: &Duration) -> Result<Instant, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
         pub fn add_with_duration_like_object(
             this: &Instant,
             duration: &DurationLikeObject,
-        ) -> Instant;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object(
-            this: &Instant,
-            duration: &DurationLikeObject,
         ) -> Result<Instant, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
-        pub fn add_with_str(this: &Instant, duration: impl ::wasm_bindgen::JsStringLike)
-            -> Instant;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str(
+        pub fn add_with_str(
             this: &Instant,
             duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Instant, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn subtract(this: &Instant, duration: &Duration) -> Instant;
+        #[wasm_bindgen(method, catch)]
+        pub fn subtract(this: &Instant, duration: &Duration) -> Result<Instant, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract(this: &Instant, duration: &Duration) -> Result<Instant, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
         pub fn subtract_with_duration_like_object(
             this: &Instant,
             duration: &DurationLikeObject,
-        ) -> Instant;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object(
-            this: &Instant,
-            duration: &DurationLikeObject,
         ) -> Result<Instant, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str(
             this: &Instant,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> Instant;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str(
-            this: &Instant,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Instant, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn until(this: &Instant, other: &Instant) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn until(this: &Instant, other: &Instant) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until(this: &Instant, other: &Instant) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
-        pub fn until_with_zoned_date_time(this: &Instant, other: &ZonedDateTime) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time(
+        pub fn until_with_zoned_date_time(
             this: &Instant,
             other: &ZonedDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
-        pub fn until_with_str(this: &Instant, other: impl ::wasm_bindgen::JsStringLike)
-            -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str(
+        pub fn until_with_str(
             this: &Instant,
             other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_instant_and_options(
             this: &Instant,
             other: &Instant,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_instant_and_options(
-            this: &Instant,
-            other: &Instant,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_zoned_date_time_and_options(
             this: &Instant,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_zoned_date_time_and_options(
-            this: &Instant,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &Instant,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str_and_options(
-            this: &Instant,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn since(this: &Instant, other: &Instant) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn since(this: &Instant, other: &Instant) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since(this: &Instant, other: &Instant) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
-        pub fn since_with_zoned_date_time(this: &Instant, other: &ZonedDateTime) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time(
+        pub fn since_with_zoned_date_time(
             this: &Instant,
             other: &ZonedDateTime,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
-        pub fn since_with_str(this: &Instant, other: impl ::wasm_bindgen::JsStringLike)
-            -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str(
+        pub fn since_with_str(
             this: &Instant,
             other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_instant_and_options(
             this: &Instant,
             other: &Instant,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_instant_and_options(
-            this: &Instant,
-            other: &Instant,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_zoned_date_time_and_options(
             this: &Instant,
             other: &ZonedDateTime,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_zoned_date_time_and_options(
-            this: &Instant,
-            other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &Instant,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<TimeUnit>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str_and_options(
-            this: &Instant,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<TimeUnit>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn round(this: &Instant, round_to: &PluralizeUnit) -> Instant;
+        #[wasm_bindgen(method, catch)]
+        pub fn round(this: &Instant, round_to: &PluralizeUnit) -> Result<Instant, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round(this: &Instant, round_to: &PluralizeUnit) -> Result<Instant, JsValue>;
-        #[wasm_bindgen(method, js_name = "round")]
         pub fn round_with_rounding_options(
             this: &Instant,
             round_to: &RoundingOptions<TimeUnit>,
-        ) -> Instant;
-        #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_rounding_options(
-            this: &Instant,
-            round_to: &RoundingOptions<TimeUnit>,
         ) -> Result<Instant, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn equals(this: &Instant, other: &Instant) -> bool;
+        #[wasm_bindgen(method, catch)]
+        pub fn equals(this: &Instant, other: &Instant) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals(this: &Instant, other: &Instant) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_zoned_date_time(this: &Instant, other: &ZonedDateTime) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_zoned_date_time(
+        pub fn equals_with_zoned_date_time(
             this: &Instant,
             other: &ZonedDateTime,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_str(this: &Instant, other: impl ::wasm_bindgen::JsStringLike) -> bool;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_str(
+        pub fn equals_with_str(
             this: &Instant,
             other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &Instant) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string_js_string(this: &Instant) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string(this: &Instant) -> Result<String, JsValue>;
+        pub fn to_string(this: &Instant) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_js_string(this: &Instant) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string_with_options(this: &Instant, options: &InstantToStringOptions) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
+        pub fn to_string_js_string(this: &Instant) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
+        pub fn to_string_with_options(
+            this: &Instant,
+            options: &InstantToStringOptions,
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options_js_string(
             this: &Instant,
             options: &InstantToStringOptions,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options(
-            this: &Instant,
-            options: &InstantToStringOptions,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options_js_string(
-            this: &Instant,
-            options: &InstantToStringOptions,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &Instant) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &Instant) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string(this: &Instant) -> Result<String, JsValue>;
+        pub fn to_locale_string(this: &Instant) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_js_string(this: &Instant) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_locales(this: &Instant, locales: &JsValue) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        pub fn to_locale_string_js_string(this: &Instant) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
+        pub fn to_locale_string_with_locales(
+            this: &Instant,
+            locales: &JsValue,
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_js_string(
             this: &Instant,
             locales: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales(
-            this: &Instant,
-            locales: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_js_string(
-            this: &Instant,
-            locales: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options(
             this: &Instant,
             locales: &JsValue,
             options: &JsValue,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options_js_string(
             this: &Instant,
             locales: &JsValue,
             options: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options(
-            this: &Instant,
-            locales: &JsValue,
-            options: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options_js_string(
-            this: &Instant,
-            locales: &JsValue,
-            options: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json(this: &Instant) -> String;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json_js_string(this: &Instant) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json(this: &Instant) -> Result<String, JsValue>;
+        pub fn to_json(this: &Instant) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json_js_string(this: &Instant) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &Instant) -> JsValue;
+        pub fn to_json_js_string(this: &Instant) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &Instant) -> Result<JsValue, JsValue>;
-        #[wasm_bindgen(method, js_name = "toZonedDateTimeISO")]
-        pub fn to_zoned_date_time_iso(this: &Instant, time_zone: &ZonedDateTime) -> ZonedDateTime;
+        pub fn value_of(this: &Instant) -> Result<JsValue, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTimeISO")]
-        pub fn try_to_zoned_date_time_iso(
+        pub fn to_zoned_date_time_iso(
             this: &Instant,
             time_zone: &ZonedDateTime,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(method, js_name = "toZonedDateTimeISO")]
-        pub fn to_zoned_date_time_iso_with_str(
-            this: &Instant,
-            time_zone: impl ::wasm_bindgen::JsStringLike,
-        ) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTimeISO")]
-        pub fn try_to_zoned_date_time_iso_with_str(
+        pub fn to_zoned_date_time_iso_with_str(
             this: &Instant,
             time_zone: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
@@ -5735,133 +3706,70 @@ pub mod temporal {
             calendar: impl ::wasm_bindgen::JsStringLike,
             reference_iso_day: f64,
         ) -> Result<PlainYearMonth, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal")]
-        pub fn from(item: &PlainYearMonth) -> PlainYearMonth;
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch)]
+        pub fn from(item: &PlainYearMonth) -> Result<PlainYearMonth, JsValue>;
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from(item: &PlainYearMonth) -> Result<PlainYearMonth, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_year_month_like_object(item: &YearMonthLikeObject) -> PlainYearMonth;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_year_month_like_object(
+        pub fn from_with_year_month_like_object(
             item: &YearMonthLikeObject,
         ) -> Result<PlainYearMonth, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> PlainYearMonth;
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str(
+        pub fn from_with_str(
             item: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainYearMonth, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_plain_year_month_and_options(
             item: &PlainYearMonth,
             options: &OverflowOptions,
-        ) -> PlainYearMonth;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_year_month_and_options(
-            item: &PlainYearMonth,
-            options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_year_month_like_object_and_options(
             item: &YearMonthLikeObject,
             options: &OverflowOptions,
-        ) -> PlainYearMonth;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_year_month_like_object_and_options(
-            item: &YearMonthLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_str_and_options(
             item: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> PlainYearMonth;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal")]
-        pub fn compare(one: &PlainYearMonth, two: &PlainYearMonth) -> f64;
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch)]
+        pub fn compare(one: &PlainYearMonth, two: &PlainYearMonth) -> Result<f64, JsValue>;
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare(one: &PlainYearMonth, two: &PlainYearMonth) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "compare")]
         pub fn compare_with_year_month_like_object_and_plain_year_month(
             one: &YearMonthLikeObject,
             two: &PlainYearMonth,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_year_month_like_object_and_plain_year_month(
-            one: &YearMonthLikeObject,
-            two: &PlainYearMonth,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_plain_year_month(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &PlainYearMonth,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_plain_year_month(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &PlainYearMonth,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_year_month_and_year_month_like_object(
             one: &PlainYearMonth,
             two: &YearMonthLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_year_month_and_year_month_like_object(
-            one: &PlainYearMonth,
-            two: &YearMonthLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_year_month_like_object_and_year_month_like_object(
             one: &YearMonthLikeObject,
             two: &YearMonthLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_year_month_like_object_and_year_month_like_object(
-            one: &YearMonthLikeObject,
-            two: &YearMonthLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_str_and_year_month_like_object(
             one: impl ::wasm_bindgen::JsStringLike,
             two: &YearMonthLikeObject,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_year_month_like_object(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: &YearMonthLikeObject,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_plain_year_month_and_str(
             one: &PlainYearMonth,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_plain_year_month_and_str(
-            one: &PlainYearMonth,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "compare")]
+        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
         pub fn compare_with_year_month_like_object_and_str(
             one: &YearMonthLikeObject,
             two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_year_month_like_object_and_str(
-            one: &YearMonthLikeObject,
-            two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , js_name = "compare")]
-        pub fn compare_with_str_and_str(
-            one: impl ::wasm_bindgen::JsStringLike,
-            two: impl ::wasm_bindgen::JsStringLike,
-        ) -> f64;
         # [wasm_bindgen (static_method_of = PlainYearMonth , js_namespace = "Temporal" , catch , js_name = "compare")]
-        pub fn try_compare_with_str_and_str(
+        pub fn compare_with_str_and_str(
             one: impl ::wasm_bindgen::JsStringLike,
             two: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<f64, JsValue>;
@@ -5891,398 +3799,200 @@ pub mod temporal {
         pub fn months_in_year(this: &PlainYearMonth) -> f64;
         #[wasm_bindgen(method, getter, js_name = "inLeapYear")]
         pub fn in_leap_year(this: &PlainYearMonth) -> bool;
-        #[wasm_bindgen(method)]
-        pub fn with(this: &PlainYearMonth, year_month_like: &PartialTemporalLike)
-            -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with(
+        #[wasm_bindgen(method, catch)]
+        pub fn with(
             this: &PlainYearMonth,
             year_month_like: &PartialTemporalLike,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "with")]
+        #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &PlainYearMonth,
             year_month_like: &PartialTemporalLike,
             options: &OverflowOptions,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with_with_options(
-            this: &PlainYearMonth,
-            year_month_like: &PartialTemporalLike,
-            options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn add(this: &PlainYearMonth, duration: &Duration) -> PlainYearMonth;
+        #[wasm_bindgen(method, catch)]
+        pub fn add(this: &PlainYearMonth, duration: &Duration) -> Result<PlainYearMonth, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add(
-            this: &PlainYearMonth,
-            duration: &Duration,
-        ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
         pub fn add_with_duration_like_object(
             this: &PlainYearMonth,
             duration: &DurationLikeObject,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object(
-            this: &PlainYearMonth,
-            duration: &DurationLikeObject,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str(
             this: &PlainYearMonth,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str(
-            this: &PlainYearMonth,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_duration_and_options(
             this: &PlainYearMonth,
             duration: &Duration,
             options: &OverflowOptions,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_and_options(
-            this: &PlainYearMonth,
-            duration: &Duration,
-            options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_duration_like_object_and_options(
             this: &PlainYearMonth,
             duration: &DurationLikeObject,
             options: &OverflowOptions,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_duration_like_object_and_options(
-            this: &PlainYearMonth,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "add")]
+        #[wasm_bindgen(method, catch, js_name = "add")]
         pub fn add_with_str_and_options(
             this: &PlainYearMonth,
             duration: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "add")]
-        pub fn try_add_with_str_and_options(
-            this: &PlainYearMonth,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn subtract(this: &PlainYearMonth, duration: &Duration) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract(
+        #[wasm_bindgen(method, catch)]
+        pub fn subtract(
             this: &PlainYearMonth,
             duration: &Duration,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_like_object(
             this: &PlainYearMonth,
             duration: &DurationLikeObject,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object(
-            this: &PlainYearMonth,
-            duration: &DurationLikeObject,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str(
             this: &PlainYearMonth,
             duration: impl ::wasm_bindgen::JsStringLike,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str(
-            this: &PlainYearMonth,
-            duration: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_and_options(
             this: &PlainYearMonth,
             duration: &Duration,
             options: &OverflowOptions,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_and_options(
-            this: &PlainYearMonth,
-            duration: &Duration,
-            options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_duration_like_object_and_options(
             this: &PlainYearMonth,
             duration: &DurationLikeObject,
             options: &OverflowOptions,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_duration_like_object_and_options(
-            this: &PlainYearMonth,
-            duration: &DurationLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method, js_name = "subtract")]
+        #[wasm_bindgen(method, catch, js_name = "subtract")]
         pub fn subtract_with_str_and_options(
             this: &PlainYearMonth,
             duration: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
-        ) -> PlainYearMonth;
-        #[wasm_bindgen(method, catch, js_name = "subtract")]
-        pub fn try_subtract_with_str_and_options(
-            this: &PlainYearMonth,
-            duration: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn until(this: &PlainYearMonth, other: &PlainYearMonth) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn until(this: &PlainYearMonth, other: &PlainYearMonth) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until(
-            this: &PlainYearMonth,
-            other: &PlainYearMonth,
-        ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
         pub fn until_with_year_month_like_object(
             this: &PlainYearMonth,
             other: &YearMonthLikeObject,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_year_month_like_object(
-            this: &PlainYearMonth,
-            other: &YearMonthLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str(
             this: &PlainYearMonth,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str(
-            this: &PlainYearMonth,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_plain_year_month_and_options(
             this: &PlainYearMonth,
             other: &PlainYearMonth,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_plain_year_month_and_options(
-            this: &PlainYearMonth,
-            other: &PlainYearMonth,
-            options: &RoundingOptionsWithLargestUnit<String>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_year_month_like_object_and_options(
             this: &PlainYearMonth,
             other: &YearMonthLikeObject,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_year_month_like_object_and_options(
-            this: &PlainYearMonth,
-            other: &YearMonthLikeObject,
-            options: &RoundingOptionsWithLargestUnit<String>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "until")]
+        #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &PlainYearMonth,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "until")]
-        pub fn try_until_with_str_and_options(
-            this: &PlainYearMonth,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<String>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn since(this: &PlainYearMonth, other: &PlainYearMonth) -> Duration;
+        #[wasm_bindgen(method, catch)]
+        pub fn since(this: &PlainYearMonth, other: &PlainYearMonth) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since(
-            this: &PlainYearMonth,
-            other: &PlainYearMonth,
-        ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
         pub fn since_with_year_month_like_object(
             this: &PlainYearMonth,
             other: &YearMonthLikeObject,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_year_month_like_object(
-            this: &PlainYearMonth,
-            other: &YearMonthLikeObject,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str(
             this: &PlainYearMonth,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str(
-            this: &PlainYearMonth,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_plain_year_month_and_options(
             this: &PlainYearMonth,
             other: &PlainYearMonth,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_plain_year_month_and_options(
-            this: &PlainYearMonth,
-            other: &PlainYearMonth,
-            options: &RoundingOptionsWithLargestUnit<String>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_year_month_like_object_and_options(
             this: &PlainYearMonth,
             other: &YearMonthLikeObject,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_year_month_like_object_and_options(
-            this: &PlainYearMonth,
-            other: &YearMonthLikeObject,
-            options: &RoundingOptionsWithLargestUnit<String>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method, js_name = "since")]
+        #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &PlainYearMonth,
             other: impl ::wasm_bindgen::JsStringLike,
             options: &RoundingOptionsWithLargestUnit<String>,
-        ) -> Duration;
-        #[wasm_bindgen(method, catch, js_name = "since")]
-        pub fn try_since_with_str_and_options(
-            this: &PlainYearMonth,
-            other: impl ::wasm_bindgen::JsStringLike,
-            options: &RoundingOptionsWithLargestUnit<String>,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn equals(this: &PlainYearMonth, other: &PlainYearMonth) -> bool;
+        #[wasm_bindgen(method, catch)]
+        pub fn equals(this: &PlainYearMonth, other: &PlainYearMonth) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals(this: &PlainYearMonth, other: &PlainYearMonth) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
         pub fn equals_with_year_month_like_object(
             this: &PlainYearMonth,
             other: &YearMonthLikeObject,
-        ) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_year_month_like_object(
-            this: &PlainYearMonth,
-            other: &YearMonthLikeObject,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
+        #[wasm_bindgen(method, catch, js_name = "equals")]
         pub fn equals_with_str(
             this: &PlainYearMonth,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_str(
-            this: &PlainYearMonth,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &PlainYearMonth) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string_js_string(this: &PlainYearMonth) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string(this: &PlainYearMonth) -> Result<String, JsValue>;
+        pub fn to_string(this: &PlainYearMonth) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_js_string(this: &PlainYearMonth) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
+        pub fn to_string_js_string(this: &PlainYearMonth) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options(
             this: &PlainYearMonth,
             options: &PlainDateToStringOptions,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options_js_string(
             this: &PlainYearMonth,
             options: &PlainDateToStringOptions,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options(
-            this: &PlainYearMonth,
-            options: &PlainDateToStringOptions,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options_js_string(
-            this: &PlainYearMonth,
-            options: &PlainDateToStringOptions,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &PlainYearMonth) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &PlainYearMonth) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string(this: &PlainYearMonth) -> Result<String, JsValue>;
+        pub fn to_locale_string(this: &PlainYearMonth) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_js_string(this: &PlainYearMonth) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_locales(this: &PlainYearMonth, locales: &JsValue) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        pub fn to_locale_string_js_string(this: &PlainYearMonth) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
+        pub fn to_locale_string_with_locales(
+            this: &PlainYearMonth,
+            locales: &JsValue,
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_js_string(
             this: &PlainYearMonth,
             locales: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales(
-            this: &PlainYearMonth,
-            locales: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_js_string(
-            this: &PlainYearMonth,
-            locales: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options(
             this: &PlainYearMonth,
             locales: &JsValue,
             options: &JsValue,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options_js_string(
             this: &PlainYearMonth,
             locales: &JsValue,
             options: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options(
-            this: &PlainYearMonth,
-            locales: &JsValue,
-            options: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options_js_string(
-            this: &PlainYearMonth,
-            locales: &JsValue,
-            options: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json(this: &PlainYearMonth) -> String;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json_js_string(this: &PlainYearMonth) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json(this: &PlainYearMonth) -> Result<String, JsValue>;
+        pub fn to_json(this: &PlainYearMonth) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json_js_string(this: &PlainYearMonth) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &PlainYearMonth) -> JsValue;
+        pub fn to_json_js_string(this: &PlainYearMonth) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &PlainYearMonth) -> Result<JsValue, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDate")]
-        pub fn to_plain_date(
-            this: &PlainYearMonth,
-            item: &PlainYearMonthToPlainDateOptions,
-        ) -> PlainDate;
+        pub fn value_of(this: &PlainYearMonth) -> Result<JsValue, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
-        pub fn try_to_plain_date(
+        pub fn to_plain_date(
             this: &PlainYearMonth,
             item: &PlainYearMonthToPlainDateOptions,
         ) -> Result<PlainDate, JsValue>;
@@ -6370,49 +4080,26 @@ pub mod temporal {
             calendar: impl ::wasm_bindgen::JsStringLike,
             reference_iso_year: f64,
         ) -> Result<PlainMonthDay, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal")]
-        pub fn from(item: &PlainMonthDay) -> PlainMonthDay;
+        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch)]
+        pub fn from(item: &PlainMonthDay) -> Result<PlainMonthDay, JsValue>;
         # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from(item: &PlainMonthDay) -> Result<PlainMonthDay, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_date_like_object(item: &DateLikeObject) -> PlainMonthDay;
+        pub fn from_with_date_like_object(item: &DateLikeObject) -> Result<PlainMonthDay, JsValue>;
         # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_date_like_object(
-            item: &DateLikeObject,
-        ) -> Result<PlainMonthDay, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_str(item: impl ::wasm_bindgen::JsStringLike) -> PlainMonthDay;
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str(
+        pub fn from_with_str(
             item: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainMonthDay, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_plain_month_day_and_options(
             item: &PlainMonthDay,
             options: &OverflowOptions,
-        ) -> PlainMonthDay;
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_plain_month_day_and_options(
-            item: &PlainMonthDay,
-            options: &OverflowOptions,
         ) -> Result<PlainMonthDay, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , js_name = "from")]
+        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
         pub fn from_with_date_like_object_and_options(
             item: &DateLikeObject,
             options: &OverflowOptions,
-        ) -> PlainMonthDay;
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_date_like_object_and_options(
-            item: &DateLikeObject,
-            options: &OverflowOptions,
         ) -> Result<PlainMonthDay, JsValue>;
-        # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , js_name = "from")]
-        pub fn from_with_str_and_options(
-            item: impl ::wasm_bindgen::JsStringLike,
-            options: &OverflowOptions,
-        ) -> PlainMonthDay;
         # [wasm_bindgen (static_method_of = PlainMonthDay , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str_and_options(
+        pub fn from_with_str_and_options(
             item: impl ::wasm_bindgen::JsStringLike,
             options: &OverflowOptions,
         ) -> Result<PlainMonthDay, JsValue>;
@@ -6426,142 +4113,77 @@ pub mod temporal {
         pub fn month_code_js_string(this: &PlainMonthDay) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn day(this: &PlainMonthDay) -> f64;
-        #[wasm_bindgen(method)]
-        pub fn with(this: &PlainMonthDay, month_day_like: &PartialTemporalLike) -> PlainMonthDay;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with(
+        #[wasm_bindgen(method, catch)]
+        pub fn with(
             this: &PlainMonthDay,
             month_day_like: &PartialTemporalLike,
         ) -> Result<PlainMonthDay, JsValue>;
-        #[wasm_bindgen(method, js_name = "with")]
+        #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &PlainMonthDay,
             month_day_like: &PartialTemporalLike,
             options: &OverflowOptions,
-        ) -> PlainMonthDay;
-        #[wasm_bindgen(method, catch, js_name = "with")]
-        pub fn try_with_with_options(
-            this: &PlainMonthDay,
-            month_day_like: &PartialTemporalLike,
-            options: &OverflowOptions,
         ) -> Result<PlainMonthDay, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn equals(this: &PlainMonthDay, other: &PlainMonthDay) -> bool;
+        #[wasm_bindgen(method, catch)]
+        pub fn equals(this: &PlainMonthDay, other: &PlainMonthDay) -> Result<bool, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals(this: &PlainMonthDay, other: &PlainMonthDay) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
-        pub fn equals_with_date_like_object(this: &PlainMonthDay, other: &DateLikeObject) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_date_like_object(
+        pub fn equals_with_date_like_object(
             this: &PlainMonthDay,
             other: &DateLikeObject,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "equals")]
+        #[wasm_bindgen(method, catch, js_name = "equals")]
         pub fn equals_with_str(
             this: &PlainMonthDay,
             other: impl ::wasm_bindgen::JsStringLike,
-        ) -> bool;
-        #[wasm_bindgen(method, catch, js_name = "equals")]
-        pub fn try_equals_with_str(
-            this: &PlainMonthDay,
-            other: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<bool, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string(this: &PlainMonthDay) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
-        pub fn to_string_js_string(this: &PlainMonthDay) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string(this: &PlainMonthDay) -> Result<String, JsValue>;
+        pub fn to_string(this: &PlainMonthDay) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_js_string(this: &PlainMonthDay) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toString")]
+        pub fn to_string_js_string(this: &PlainMonthDay) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options(
             this: &PlainMonthDay,
             options: &PlainDateToStringOptions,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toString")]
         pub fn to_string_with_options_js_string(
             this: &PlainMonthDay,
             options: &PlainDateToStringOptions,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options(
-            this: &PlainMonthDay,
-            options: &PlainDateToStringOptions,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toString")]
-        pub fn try_to_string_with_options_js_string(
-            this: &PlainMonthDay,
-            options: &PlainDateToStringOptions,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string(this: &PlainMonthDay) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_js_string(this: &PlainMonthDay) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string(this: &PlainMonthDay) -> Result<String, JsValue>;
+        pub fn to_locale_string(this: &PlainMonthDay) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_js_string(this: &PlainMonthDay) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
-        pub fn to_locale_string_with_locales(this: &PlainMonthDay, locales: &JsValue) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        pub fn to_locale_string_js_string(this: &PlainMonthDay) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
+        pub fn to_locale_string_with_locales(
+            this: &PlainMonthDay,
+            locales: &JsValue,
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_js_string(
             this: &PlainMonthDay,
             locales: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales(
-            this: &PlainMonthDay,
-            locales: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_js_string(
-            this: &PlainMonthDay,
-            locales: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options(
             this: &PlainMonthDay,
             locales: &JsValue,
             options: &JsValue,
-        ) -> String;
-        #[wasm_bindgen(method, js_name = "toLocaleString")]
+        ) -> Result<String, JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_locales_and_options_js_string(
             this: &PlainMonthDay,
             locales: &JsValue,
             options: &JsValue,
-        ) -> JsString;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options(
-            this: &PlainMonthDay,
-            locales: &JsValue,
-            options: &JsValue,
-        ) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string_with_locales_and_options_js_string(
-            this: &PlainMonthDay,
-            locales: &JsValue,
-            options: &JsValue,
         ) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json(this: &PlainMonthDay) -> String;
-        #[wasm_bindgen(method, js_name = "toJSON")]
-        pub fn to_json_js_string(this: &PlainMonthDay) -> JsString;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json(this: &PlainMonthDay) -> Result<String, JsValue>;
+        pub fn to_json(this: &PlainMonthDay) -> Result<String, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
-        pub fn try_to_json_js_string(this: &PlainMonthDay) -> Result<JsString, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &PlainMonthDay) -> JsValue;
+        pub fn to_json_js_string(this: &PlainMonthDay) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &PlainMonthDay) -> Result<JsValue, JsValue>;
-        #[wasm_bindgen(method, js_name = "toPlainDate")]
-        pub fn to_plain_date(
-            this: &PlainMonthDay,
-            item: &PlainMonthDayToPlainDateOptions,
-        ) -> PlainDate;
+        pub fn value_of(this: &PlainMonthDay) -> Result<JsValue, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
-        pub fn try_to_plain_date(
+        pub fn to_plain_date(
             this: &PlainMonthDay,
             item: &PlainMonthDayToPlainDateOptions,
         ) -> Result<PlainDate, JsValue>;

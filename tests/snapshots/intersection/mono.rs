@@ -182,41 +182,23 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
     ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn refine(this: &Store, value: &Derived);
-    #[wasm_bindgen(method, catch, js_name = "refine")]
-    pub fn try_refine(this: &Store, value: &Derived) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn same(this: &Store, value: &Derived);
-    #[wasm_bindgen(method, catch, js_name = "same")]
-    pub fn try_same(this: &Store, value: &Derived) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn unrelated(this: &Store, value: &JsValue);
-    #[wasm_bindgen(method, catch, js_name = "unrelated")]
-    pub fn try_unrelated(this: &Store, value: &JsValue) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn shape(this: &Store, value: &StoreValue);
-    #[wasm_bindgen(method, catch, js_name = "shape")]
-    pub fn try_shape(this: &Store, value: &StoreValue) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn generic<T>(this: &Store, value: T)
+    #[wasm_bindgen(method, catch)]
+    pub fn refine(this: &Store, value: &Derived) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn same(this: &Store, value: &Derived) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn unrelated(this: &Store, value: &JsValue) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn shape(this: &Store, value: &StoreValue) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn generic<T>(this: &Store, value: T) -> Result<(), JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
-    #[wasm_bindgen(method, catch, js_name = "generic")]
-    pub fn try_generic<T>(this: &Store, value: T) -> Result<(), JsValue>
-    where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
-    #[wasm_bindgen(method)]
-    pub fn primitive(this: &Store, value: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, catch, js_name = "primitive")]
-    pub fn try_primitive(
-        this: &Store,
-        value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn anything(this: &Store, value: &JsValue);
-    #[wasm_bindgen(method, catch, js_name = "anything")]
-    pub fn try_anything(this: &Store, value: &JsValue) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn primitive(this: &Store, value: impl ::wasm_bindgen::JsStringLike)
+        -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn anything(this: &Store, value: &JsValue) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
@@ -324,12 +306,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Provider<T>;
-    #[wasm_bindgen(method)]
-    pub fn call<T>(this: &Provider<T>) -> T
-    where
-        T: ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, catch, js_name = "call")]
-    pub fn try_call<T>(this: &Provider<T>) -> Result<T, JsValue>
+    #[wasm_bindgen(method, catch)]
+    pub fn call<T>(this: &Provider<T>) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
 }

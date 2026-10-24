@@ -9,10 +9,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Foo;
-    #[wasm_bindgen(method)]
-    pub fn m(this: &Foo, options: &foo::Options);
-    #[wasm_bindgen(method, catch, js_name = "m")]
-    pub fn try_m(this: &Foo, options: &foo::Options) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn m(this: &Foo, options: &foo::Options) -> Result<(), JsValue>;
 }
 pub mod foo {
     #[allow(unused_imports)]
@@ -39,13 +37,8 @@ pub mod foo {
 }
 #[wasm_bindgen(module = "namespace-merge", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "makeFoo")]
-    pub fn make_foo() -> Foo;
-}
-#[wasm_bindgen(module = "namespace-merge", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "makeFoo")]
-    pub fn try_make_foo() -> Result<Foo, JsValue>;
+    pub fn make_foo() -> Result<Foo, JsValue>;
 }
 pub mod bar {
     #[allow(unused_imports)]
@@ -62,19 +55,13 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bar;
-    #[wasm_bindgen(method)]
-    pub fn power(this: &Bar, power: bar::Power) -> Bar;
-    #[wasm_bindgen(method, catch, js_name = "power")]
-    pub fn try_power(this: &Bar, power: bar::Power) -> Result<Bar, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn power(this: &Bar, power: bar::Power) -> Result<Bar, JsValue>;
 }
 #[wasm_bindgen(module = "namespace-merge", experimental_generic_mono)]
 extern "C" {
-    pub fn make(config: &make::Config);
-}
-#[wasm_bindgen(module = "namespace-merge", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "make")]
-    pub fn try_make(config: &make::Config) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn make(config: &make::Config) -> Result<(), JsValue>;
 }
 pub mod make {
     #[allow(unused_imports)]
@@ -104,10 +91,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Shape;
-    #[wasm_bindgen(method)]
-    pub fn axis(this: &Shape, axis: shape::Axis);
-    #[wasm_bindgen(method, catch, js_name = "axis")]
-    pub fn try_axis(this: &Shape, axis: shape::Axis) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn axis(this: &Shape, axis: shape::Axis) -> Result<(), JsValue>;
 }
 pub mod shape {
     #[allow(unused_imports)]

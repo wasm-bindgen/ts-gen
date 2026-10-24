@@ -14,14 +14,10 @@ pub mod n {
         pub type Foo;
         #[wasm_bindgen(constructor, js_namespace = "N", catch)]
         pub fn new() -> Result<Foo, JsValue>;
-        # [wasm_bindgen (static_method_of = Foo , js_namespace = "N")]
-        pub fn create() -> Foo;
-        # [wasm_bindgen (static_method_of = Foo , js_namespace = "N" , catch , js_name = "create")]
-        pub fn try_create() -> Result<Foo, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn go(this: &Foo);
-        #[wasm_bindgen(method, catch, js_name = "go")]
-        pub fn try_go(this: &Foo) -> Result<(), JsValue>;
+        # [wasm_bindgen (static_method_of = Foo , js_namespace = "N" , catch)]
+        pub fn create() -> Result<Foo, JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn go(this: &Foo) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -30,10 +26,8 @@ pub mod n {
         pub type Before;
         #[wasm_bindgen(constructor, js_namespace = "N", catch)]
         pub fn new(x: f64) -> Result<Before, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn b(this: &Before);
-        #[wasm_bindgen(method, catch, js_name = "b")]
-        pub fn try_b(this: &Before) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn b(this: &Before) -> Result<(), JsValue>;
     }
 }
 pub mod r {
@@ -46,10 +40,8 @@ pub mod r {
         pub type Q;
         #[wasm_bindgen(constructor, js_namespace = "R", catch)]
         pub fn new() -> Result<Q, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn q(this: &Q);
-        #[wasm_bindgen(method, catch, js_name = "q")]
-        pub fn try_q(this: &Q) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn q(this: &Q) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -58,10 +50,8 @@ pub mod r {
         pub type P;
         #[wasm_bindgen(constructor, js_namespace = "R", catch)]
         pub fn new() -> Result<P, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn p(this: &P);
-        #[wasm_bindgen(method, catch, js_name = "p")]
-        pub fn try_p(this: &P) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn p(this: &P) -> Result<(), JsValue>;
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -71,14 +61,10 @@ extern "C" {
     pub type W;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<W, JsValue>;
-    # [wasm_bindgen (static_method_of = W)]
-    pub fn make() -> W;
-    # [wasm_bindgen (static_method_of = W , catch , js_name = "make")]
-    pub fn try_make() -> Result<W, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn w(this: &W);
-    #[wasm_bindgen(method, catch, js_name = "w")]
-    pub fn try_w(this: &W) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = W , catch)]
+    pub fn make() -> Result<W, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn w(this: &W) -> Result<(), JsValue>;
 }
 pub mod m {
     #[allow(unused_imports)]
@@ -90,10 +76,8 @@ pub mod m {
         pub type W;
         #[wasm_bindgen(constructor, catch)]
         pub fn new() -> Result<W, JsValue>;
-        # [wasm_bindgen (static_method_of = W)]
-        pub fn make() -> super::W;
-        # [wasm_bindgen (static_method_of = W , catch , js_name = "make")]
-        pub fn try_make() -> Result<super::W, JsValue>;
+        # [wasm_bindgen (static_method_of = W , catch)]
+        pub fn make() -> Result<super::W, JsValue>;
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -108,10 +92,8 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Multi")]
     pub fn new_with_s_and_n(s: impl ::wasm_bindgen::JsStringLike, n: f64)
         -> Result<Multi, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn m(this: &Multi);
-    #[wasm_bindgen(method, catch, js_name = "m")]
-    pub fn try_m(this: &Multi) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn m(this: &Multi) -> Result<(), JsValue>;
 }
 pub mod ctors {
     #[allow(unused_imports)]
@@ -127,13 +109,9 @@ pub mod q {
         pub type Qual;
         #[wasm_bindgen(constructor, js_namespace = "Q", catch)]
         pub fn new() -> Result<Qual, JsValue>;
-        # [wasm_bindgen (static_method_of = Qual , js_namespace = "Q")]
-        pub fn make() -> Qual;
-        # [wasm_bindgen (static_method_of = Qual , js_namespace = "Q" , catch , js_name = "make")]
-        pub fn try_make() -> Result<Qual, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn q(this: &Qual);
-        #[wasm_bindgen(method, catch, js_name = "q")]
-        pub fn try_q(this: &Qual) -> Result<(), JsValue>;
+        # [wasm_bindgen (static_method_of = Qual , js_namespace = "Q" , catch)]
+        pub fn make() -> Result<Qual, JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn q(this: &Qual) -> Result<(), JsValue>;
     }
 }

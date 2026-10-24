@@ -9,8 +9,8 @@ extern "C" {
     #[doc = " Retains the received array for `first()` to read."]
     #[doc = ""]
     #[doc = " * `data` - consumed synchronously by the host"]
-    #[wasm_bindgen(js_name = "keepView")]
-    pub fn keep_view(#[wasm_bindgen(slice = "view")] data: &[f64]);
+    #[wasm_bindgen(catch, js_name = "keepView")]
+    pub fn keep_view(#[wasm_bindgen(slice = "view")] data: &[f64]) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
@@ -18,221 +18,108 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `data` - consumed synchronously by the host"]
     #[wasm_bindgen(catch, js_name = "keepView")]
-    pub fn try_keep_view(#[wasm_bindgen(slice = "view")] data: &[f64]) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Retains the received array for `first()` to read."]
-    #[doc = ""]
-    #[doc = " * `data` - consumed synchronously by the host"]
-    #[wasm_bindgen(js_name = "keepView")]
-    pub fn keep_view_with_float64_array(data: &Float64Array);
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Retains the received array for `first()` to read."]
-    #[doc = ""]
-    #[doc = " * `data` - consumed synchronously by the host"]
-    #[wasm_bindgen(catch, js_name = "keepView")]
-    pub fn try_keep_view_with_float64_array(data: &Float64Array) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `data`"]
-    #[wasm_bindgen(js_name = "keepCopy")]
-    pub fn keep_copy(#[wasm_bindgen(slice = "copy")] data: &[f64]);
+    pub fn keep_view_with_float64_array(data: &Float64Array) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `data`"]
     #[wasm_bindgen(catch, js_name = "keepCopy")]
-    pub fn try_keep_copy(#[wasm_bindgen(slice = "copy")] data: &[f64]) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `data`"]
-    #[wasm_bindgen(js_name = "keepCopy")]
-    pub fn keep_copy_with_float64_array(data: &Float64Array);
+    pub fn keep_copy(#[wasm_bindgen(slice = "copy")] data: &[f64]) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `data`"]
     #[wasm_bindgen(catch, js_name = "keepCopy")]
-    pub fn try_keep_copy_with_float64_array(data: &Float64Array) -> Result<(), JsValue>;
+    pub fn keep_copy_with_float64_array(data: &Float64Array) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " Reads element 0 of the last retained array."]
-    pub fn first() -> f64;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Reads element 0 of the last retained array."]
-    #[wasm_bindgen(catch, js_name = "first")]
-    pub fn try_first() -> Result<f64, JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn first() -> Result<f64, JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `values` - a plain `Array` instead of the typed copy"]
-    pub fn entries(#[wasm_bindgen(slice = "array")] values: &[i64]) -> String;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `values` - a plain `Array` instead of the typed copy"]
-    #[wasm_bindgen(js_name = "entries")]
-    pub fn entries_js_string(#[wasm_bindgen(slice = "array")] values: &[i64]) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn entries(#[wasm_bindgen(slice = "array")] values: &[i64]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `values` - a plain `Array` instead of the typed copy"]
     #[wasm_bindgen(catch, js_name = "entries")]
-    pub fn try_entries(#[wasm_bindgen(slice = "array")] values: &[i64]) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `values` - a plain `Array` instead of the typed copy"]
-    #[wasm_bindgen(catch, js_name = "entries")]
-    pub fn try_entries_js_string(
+    pub fn entries_js_string(
         #[wasm_bindgen(slice = "array")] values: &[i64],
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `values` - a plain `Array` instead of the typed copy"]
-    #[wasm_bindgen(js_name = "entries")]
-    pub fn entries_with_big_int64_array(values: &BigInt64Array) -> String;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `values` - a plain `Array` instead of the typed copy"]
-    #[wasm_bindgen(js_name = "entries")]
-    pub fn entries_with_big_int64_array_js_string(values: &BigInt64Array) -> JsString;
+    #[wasm_bindgen(catch, js_name = "entries")]
+    pub fn entries_with_big_int64_array(values: &BigInt64Array) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `values` - a plain `Array` instead of the typed copy"]
     #[wasm_bindgen(catch, js_name = "entries")]
-    pub fn try_entries_with_big_int64_array(values: &BigInt64Array) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `values` - a plain `Array` instead of the typed copy"]
-    #[wasm_bindgen(catch, js_name = "entries")]
-    pub fn try_entries_with_big_int64_array_js_string(
+    pub fn entries_with_big_int64_array_js_string(
         values: &BigInt64Array,
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `bytes`"]
-    pub fn digest(#[wasm_bindgen(slice = "copy")] bytes: &[u8]) -> String;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `bytes`"]
-    #[wasm_bindgen(js_name = "digest")]
-    pub fn digest_js_string(#[wasm_bindgen(slice = "copy")] bytes: &[u8]) -> JsString;
+    #[wasm_bindgen(catch)]
+    pub fn digest(#[wasm_bindgen(slice = "copy")] bytes: &[u8]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `bytes`"]
     #[wasm_bindgen(catch, js_name = "digest")]
-    pub fn try_digest(#[wasm_bindgen(slice = "copy")] bytes: &[u8]) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `bytes`"]
-    #[wasm_bindgen(catch, js_name = "digest")]
-    pub fn try_digest_js_string(
+    pub fn digest_js_string(
         #[wasm_bindgen(slice = "copy")] bytes: &[u8],
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `bytes`"]
-    #[wasm_bindgen(js_name = "digest")]
-    pub fn digest_with_uint8_array(bytes: &Uint8Array) -> String;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `bytes`"]
-    #[wasm_bindgen(js_name = "digest")]
-    pub fn digest_with_uint8_array_js_string(bytes: &Uint8Array) -> JsString;
+    #[wasm_bindgen(catch, js_name = "digest")]
+    pub fn digest_with_uint8_array(bytes: &Uint8Array) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `bytes`"]
     #[wasm_bindgen(catch, js_name = "digest")]
-    pub fn try_digest_with_uint8_array(bytes: &Uint8Array) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `bytes`"]
-    #[wasm_bindgen(catch, js_name = "digest")]
-    pub fn try_digest_with_uint8_array_js_string(bytes: &Uint8Array) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[cfg(not(target_feature = "atomics"))]
-    #[doc = " * `data`"]
-    #[wasm_bindgen(js_name = "keepUnsharedView")]
-    pub fn keep_unshared_view(#[wasm_bindgen(slice = "view")] data: &[u8]);
-    #[cfg(target_feature = "atomics")]
-    #[doc = " * `data`"]
-    #[wasm_bindgen(js_name = "keepUnsharedView")]
-    pub fn keep_unshared_view(#[wasm_bindgen(slice = "copy")] data: &[u8]);
+    pub fn digest_with_uint8_array_js_string(bytes: &Uint8Array) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[cfg(not(target_feature = "atomics"))]
     #[doc = " * `data`"]
     #[wasm_bindgen(catch, js_name = "keepUnsharedView")]
-    pub fn try_keep_unshared_view(
-        #[wasm_bindgen(slice = "view")] data: &[u8],
-    ) -> Result<(), JsValue>;
+    pub fn keep_unshared_view(#[wasm_bindgen(slice = "view")] data: &[u8]) -> Result<(), JsValue>;
     #[cfg(target_feature = "atomics")]
     #[doc = " * `data`"]
     #[wasm_bindgen(catch, js_name = "keepUnsharedView")]
-    pub fn try_keep_unshared_view(
-        #[wasm_bindgen(slice = "copy")] data: &[u8],
-    ) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `data`"]
-    #[wasm_bindgen(js_name = "keepUnsharedView")]
-    pub fn keep_unshared_view_with_uint8_array(data: &Uint8Array);
+    pub fn keep_unshared_view(#[wasm_bindgen(slice = "copy")] data: &[u8]) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `data`"]
     #[wasm_bindgen(catch, js_name = "keepUnsharedView")]
-    pub fn try_keep_unshared_view_with_uint8_array(data: &Uint8Array) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `data`"]
-    #[wasm_bindgen(js_name = "keepSharedView")]
-    pub fn keep_shared_view(#[wasm_bindgen(slice = "view")] data: &[u8]);
+    pub fn keep_unshared_view_with_uint8_array(data: &Uint8Array) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `data`"]
     #[wasm_bindgen(catch, js_name = "keepSharedView")]
-    pub fn try_keep_shared_view(#[wasm_bindgen(slice = "view")] data: &[u8])
-        -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[doc = " * `data`"]
-    #[wasm_bindgen(js_name = "keepSharedView")]
-    pub fn keep_shared_view_with_uint8_array(data: &Uint8Array);
+    pub fn keep_shared_view(#[wasm_bindgen(slice = "view")] data: &[u8]) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `data`"]
     #[wasm_bindgen(catch, js_name = "keepSharedView")]
-    pub fn try_keep_shared_view_with_uint8_array(data: &Uint8Array) -> Result<(), JsValue>;
+    pub fn keep_shared_view_with_uint8_array(data: &Uint8Array) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
@@ -275,23 +162,13 @@ impl TargetBuilder {
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "describeTarget")]
-    pub fn describe_target(target: &Target) -> String;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "describeTarget")]
-    pub fn describe_target_js_string(target: &Target) -> JsString;
+    #[wasm_bindgen(catch, js_name = "describeTarget")]
+    pub fn describe_target(target: &Target) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describeTarget")]
-    pub fn try_describe_target(target: &Target) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "slice-hints", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "describeTarget")]
-    pub fn try_describe_target_js_string(target: &Target) -> Result<JsString, JsValue>;
+    pub fn describe_target_js_string(target: &Target) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(private)]
 pub enum BufferKind {

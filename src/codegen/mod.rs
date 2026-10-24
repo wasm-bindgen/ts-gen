@@ -66,6 +66,13 @@ pub struct GenerateOptions {
     /// error rather than the silent `JsValue` pass-through.
     errors_as_error: bool,
 
+    /// When `true`, a sync method or function that would otherwise get a
+    /// trapping primary plus a `try_<name>` companion is emitted once,
+    /// under the primary name, with `catch` and a `Result` return.
+    /// `@throws {never}` still yields an infallible binding; async
+    /// callables, constructors and setters are unaffected.
+    fallible: bool,
+
     /// Opt generic imports into wasm-bindgen's experimental
     /// per-monomorphization codegen. Type parameters are emitted without
     /// `JsGeneric` bounds and cross the ABI at their concrete Rust types.
@@ -99,6 +106,12 @@ impl GenerateOptions {
     /// Configure whether untyped caught exceptions use `js_sys::Error`.
     pub fn errors_as_error(mut self, enabled: bool) -> Self {
         self.errors_as_error = enabled;
+        self
+    }
+
+    /// Configure whether sync callables emit a single `Result` form.
+    pub fn fallible(mut self, enabled: bool) -> Self {
+        self.fallible = enabled;
         self
     }
 
@@ -276,6 +289,7 @@ fn generate_tokens(
         module,
         gctx,
         options.errors_as_error,
+        options.fallible,
         options.experimental_generic_mono,
         Some(&surface),
     );
