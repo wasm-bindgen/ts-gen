@@ -101,6 +101,15 @@ declare global {
       new (): Gauge<"low">;
     };
 
+    // A reference evaluation leaves as written drops its literal-only
+    // arguments: an unevaluable type, a variable's construct signatures.
+    interface Approximate {
+      fuzzy<T>(options: Rounding<"hour"> | keyof T): void;
+    }
+    type Maker = Approximate;
+    const Maker: {
+      new (options: Rounding<"hour">): Approximate;
+    };
   }
 }
 
