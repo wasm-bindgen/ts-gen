@@ -148,6 +148,12 @@ extern "C" {
     pub fn of<T>(value: T) -> Result<Labelled<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
+    # [wasm_bindgen (static_method_of = Labelled , catch)]
+    pub async fn load<T>() -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+    # [wasm_bindgen (static_method_of = Labelled , js_name = "load")]
+    pub fn load_promise<T>() -> Promise<T>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &Labelled<T>) -> T
     where
@@ -186,4 +192,16 @@ extern "C" {
     pub fn props<Props>(this: &Storage<Props>) -> Result<Props, JsValue>
     where
         Props: ::wasm_bindgen::convert::FromWasmAbi;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "loadValue")]
+    pub async fn load_value<T>() -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "loadValue")]
+    pub fn load_value_promise<T>() -> Promise<T>;
 }

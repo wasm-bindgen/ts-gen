@@ -1,10 +1,12 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::Object;
+use js_sys::{JsString, Number, Object};
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_test::*;
 
-use ts_gen_integration_tests::generic_type_level::{Bag, Labelled, PingTarget, TransformStream};
+use ts_gen_integration_tests::generic_type_level::{
+    load_value, Bag, Labelled, PingTarget, TransformStream,
+};
 
 fn assert_eq<T: Eq>() {}
 
@@ -17,6 +19,16 @@ fn every_type_is_eq() {
     assert_eq::<Labelled<JsValue>>();
     assert_eq::<PingTarget>();
     assert_eq::<Bag>();
+}
+
+// An async static and an async free function resolving to a bare type
+// parameter bind it `FromWasmAbi`, which `JsFuture<T>` needs to convert
+// the settled value, and resolve to the caller's choice of `T`.
+#[allow(dead_code)]
+async fn async_bare_param_returns() -> Result<(), JsValue> {
+    let _: JsString = Labelled::<JsValue>::load::<JsString>().await?;
+    let _: Number = load_value::<Number>().await?;
+    Ok(())
 }
 
 #[wasm_bindgen_test]

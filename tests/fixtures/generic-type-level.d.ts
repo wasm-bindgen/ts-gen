@@ -2,7 +2,9 @@
 // Rust default (the TS default, else `JsValue`) so the bare name stays
 // usable; constructors / statics only bind the parameters they mention;
 // subclasses of generic parents extend the bare head; every type derives
-// `Eq`, generic ones and children of generic parents included.
+// `Eq`, generic ones and children of generic parents included. An async
+// static or free function resolving to a bare type parameter bounds it
+// `FromWasmAbi` too.
 
 interface Event {
   readonly type: string;
@@ -37,6 +39,7 @@ declare class Labelled<T> {
   constructor(value: T);
   static empty(): Labelled;
   static of<T>(value: T): Labelled<T>;
+  static load<T>(): Promise<T>;
   readonly value: T;
 }
 
@@ -45,3 +48,5 @@ interface Storage<Props = unknown> {
   run<T>(callback: () => Promise<T>): Promise<T>;
   props(): Props;
 }
+
+declare function loadValue<T>(): Promise<T>;

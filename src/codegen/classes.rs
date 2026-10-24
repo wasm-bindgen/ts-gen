@@ -1866,21 +1866,21 @@ fn generic_bounds_for_method(config: &ClassConfig, sig: &FunctionSignature) -> V
         .chain(std::iter::once(&sig.return_type))
         .collect();
     bounds.extend(config.local_generic_bounds(sig.body_scope, &sig_tys));
-    widen_async_return_param(bounds, config, sig)
+    widen_async_return_param(bounds, config.cgctx, sig)
 }
 
 /// An `async fn` resolving to a bare type parameter is converted from
 /// the settled `JsValue` by wasm-bindgen's `JsFuture<T>`, which needs
 /// `T: FromWasmAbi` on top of `JsGeneric`.
-fn widen_async_return_param(
+pub(super) fn widen_async_return_param(
     bounds: Vec<TokenStream>,
-    config: &ClassConfig,
+    cgctx: Option<&CodegenContext<'_>>,
     sig: &FunctionSignature,
 ) -> Vec<TokenStream> {
-    if !sig.is_async || CodegenContext::generic_mono(config.cgctx) {
+    if !sig.is_async || CodegenContext::generic_mono(cgctx) {
         return bounds;
     }
-    let Some(cgctx) = config.cgctx else {
+    let Some(cgctx) = cgctx else {
         return bounds;
     };
     let Some(name) = sig.return_type.as_ident() else {
@@ -1892,7 +1892,7 @@ fn widen_async_return_param(
     ) {
         return bounds;
     }
-    let plain = CodegenContext::type_param_decl(config.cgctx, name).to_string();
+    let plain = CodegenContext::type_param_decl(Some(cgctx), name).to_string();
     let ident = super::typemap::make_ident(name);
     bounds
         .into_iter()
@@ -2134,7 +2134,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
         .collect();
     bounds.extend(config.local_generic_bounds(scope, &sig_tys));
-    let generics = render_generic_bounds(&bounds);
+    let generics = render_generic_bounds(&widen_async_return_param(bounds, config.cgctx, sig));
 
     quote! {
         #doc

@@ -2220,7 +2220,10 @@ parameters thread through every site that mentions `Foo`:
   `Foo<{…}>` and a child of `Record<string, unknown>` all compare.
 * An `async fn` whose resolved value is a bare type parameter bounds
   it `T: JsGeneric + FromWasmAbi` — `JsFuture<T>` converts the
-  settled value through `FromWasmAbi`. Inside a callback type
+  settled value through `FromWasmAbi`. This holds for methods,
+  statics and free functions alike
+  (`static load<T>(): Promise<T>` → `pub async fn load<T: JsGeneric +
+  FromWasmAbi>() -> Result<T, JsValue>`). Inside a callback type
   (`Function<fn() -> Promise<T>>`) a promised type parameter erases to
   `Promise`, since wasm-bindgen's `JsFunction` cannot normalise the
   nested projection.

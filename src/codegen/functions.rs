@@ -189,10 +189,11 @@ fn generic_bounds_for_function(
     if names.is_empty() {
         return Vec::new();
     }
-    names
+    let bounds = names
         .iter()
         .map(|n| CodegenContext::type_param_decl(Some(cgctx), n))
-        .collect()
+        .collect();
+    super::classes::widen_async_return_param(bounds, Some(cgctx), sig)
 }
 
 /// The names wasm-bindgen's expansion of an import and the dictionary
