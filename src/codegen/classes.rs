@@ -724,9 +724,15 @@ pub(crate) fn generate_param_trait(
     let render = |ty: &TypeRef| {
         super::typemap::to_syn_type(ty, TypePosition::RETURN, Some(cgctx), t.scope, from_module)
     };
-    let impls = t.impls.iter().map(|(arg, targets)| {
-        let arg = render(arg);
-        let targets = targets.iter().map(render);
+    let impls = t.impls.iter().map(|im| {
+        let arg = super::typemap::to_syn_type(
+            &im.arg,
+            TypePosition::RETURN,
+            Some(cgctx),
+            im.arg_scope,
+            from_module,
+        );
+        let targets = im.targets.iter().map(render);
         quote! {
             impl #name for #arg {
                 #(type #assoc = #targets;)*
@@ -2999,7 +3005,7 @@ fn collect_parent_members(
     let own: Vec<Member> = members
         .iter()
         .map(|m| {
-            let m = m.substitute(&map);
+            let m = m.substitute_from(&map, Some(scope));
             // A method without its own `<T>` resolves everything in the
             // child's scope once the parent's parameters are substituted.
             match m {

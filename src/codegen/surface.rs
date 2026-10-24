@@ -586,8 +586,9 @@ impl<'d> Builder<'_, 'd> {
             // The traits bounding its literal-only parameters are emitted
             // beside it, impls and their enums included.
             for t in self.gctx.param_traits.get(&id).into_iter().flatten() {
-                for (arg, targets) in &t.impls {
-                    for ty in std::iter::once(arg).chain(targets) {
+                for im in &t.impls {
+                    type_refs(&im.arg, im.arg_scope, &mut refs);
+                    for ty in &im.targets {
                         type_refs(ty, t.scope, &mut refs);
                     }
                 }

@@ -4970,15 +4970,20 @@ pub fn until_with_options(
   `RoundingOptions<U>` accepts every child instantiation through `Deref`;
   extending keeps a parent's impls free of associated types it never
   reads.
-* **An associated type is named for its function**: the alias it
-  instantiates (`PluralizeUnit`), or the member it types for an inline
-  one (`LargestUnit`, `MaximumUnit`). Each impl's target is named like
+* **An associated type is named for its function**, within its family:
+  the alias it instantiates (`PluralizeUnit`), or the member it types for
+  an inline one (`LargestUnit`, `MaximumUnit`). Two families may both
+  read a `LargestUnit`; a projection names its family, so each reads its
+  own. Each impl's target is named like
   any evaluated type, by the instantiation (`PluralizeDateUnit`) or the
   `<Field>Kind` with the argument's spelling before it
   (`DateUnitLargestUnitKind`); at the default it is the base's own
   (`LargestUnitKind`).
 * **There is one impl per argument enum plus the default**, collected
-  across every instantiation the family reaches.
+  across every instantiation the family reaches. An argument is its
+  declaration, not its name: `Spans.Unit` and `Steps.Unit` given to one
+  family are two impls, and an inherited member reads its argument in
+  the scope the `extends` clause writes it in.
 * **A generic parent comes after `Object`.** wasm-bindgen builds the
   first `extends` from a `JsValue`, which only a parent at its defaults
   has, so a parent with arguments follows `extends = Object`, is written
