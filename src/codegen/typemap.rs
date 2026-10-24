@@ -1204,6 +1204,8 @@ impl<'a> CodegenContext<'a> {
     ///
     /// Uses a visited set to detect and break circular alias chains.
     ///
+    /// `name` may be a qualified path (`Ns.Alias`).
+    ///
     /// A generic alias named bare means its defaults (`Fetcher` is
     /// `Fetcher<undefined>`), so they replace its parameters in the target.
     pub fn resolve_alias(
@@ -1338,7 +1340,7 @@ impl<'a> CodegenContext<'a> {
         scope: ScopeId,
         visited: &mut HashSet<TypeId>,
     ) -> Option<(std::borrow::Cow<'b, ir::TypeRef>, ScopeId)> {
-        let type_id = self.gctx.scopes.resolve(scope, name)?;
+        let type_id = self.gctx.resolve_path(scope, name)?;
         if !visited.insert(type_id) {
             return None; // circular alias chain
         }

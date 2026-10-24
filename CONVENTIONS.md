@@ -3914,8 +3914,9 @@ namespace exported under its own name as well keeps it.
   the alias's meaning, and a bundler's re-export of a renamed declaration
   under its original name (`export { ns_Position as Position }` inside
   `ns`) reaches the declaration instead of naming itself again. A union
-  alias fans out into overloads only when every alternative means the same
-  at the use site; otherwise the parameter keeps the alias whole:
+  alias, bare or qualified (`Ns.Alias`), fans out into overloads only when
+  every alternative means the same at the use site; otherwise the
+  parameter keeps the alias whole:
 
   ```ts
   interface Inner { top: string; }

@@ -7,7 +7,10 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn emit(name: &str, options: &events::Options) -> Result<String, JsValue>;
+    pub fn emit(
+        name: impl ::wasm_bindgen::JsStringLike,
+        options: &events::Options,
+    ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
