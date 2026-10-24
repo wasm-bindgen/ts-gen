@@ -2821,7 +2821,9 @@ impl CompressionStream {
   `new_gzip_js` serves all three formats); a different return type gets
   its own, since the extern return is what wasm-bindgen converts.
 * The `_promise` and `try_` companions follow per arm
-  (`get_json_promise`, `try_describe_raw`) over their own extern.
+  (`get_json_promise`, `try_describe_raw`) over their own extern, and
+  so, under `--experimental-generic-mono`, does the `_js_string` return
+  variant (`describe_raw_js_string`).
 * Setters are exempt: `set_disposition("inline")` takes the value.
 
 ## Subtyping LUB across unions

@@ -115,7 +115,7 @@ impl KVNamespace {
     ) -> Result<Nullable<String>, JsValue> {
         self.get_text_js(key, "text").await
     }
-    pub async fn get_text(
+    pub async fn get_text_js_string(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<JsString>, JsValue> {
@@ -303,10 +303,10 @@ impl SubtleCrypto {
     pub fn describe_raw() -> Result<String, JsValue> {
         Self::describe_jwk_js("raw")
     }
-    pub fn describe_jwk() -> Result<JsString, JsValue> {
+    pub fn describe_jwk_js_string() -> Result<JsString, JsValue> {
         Self::describe_jwk_js_string_js("jwk")
     }
-    pub fn describe_raw() -> Result<JsString, JsValue> {
+    pub fn describe_raw_js_string() -> Result<JsString, JsValue> {
         Self::describe_jwk_js_string_js("raw")
     }
 }

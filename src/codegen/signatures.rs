@@ -870,7 +870,21 @@ fn push_with_js_string_return(
     out.push(sig.clone());
     if has_js_return {
         let mut js_sig = sig;
-        js_sig.rust_name = names.declare(&format!("{}_js_string", js_sig.rust_name), Suffix::Snake);
+        // A literal cohort's wrappers carry the arms' names, so each arm
+        // gets its own `_js_string` sibling; the binding is named for the
+        // first.
+        match &mut js_sig.literal {
+            Some(spec) => {
+                for (_, name) in &mut spec.arms {
+                    *name = names.declare(&format!("{name}_js_string"), Suffix::Snake);
+                }
+                js_sig.rust_name = spec.arms[0].1.clone();
+            }
+            None => {
+                js_sig.rust_name =
+                    names.declare(&format!("{}_js_string", js_sig.rust_name), Suffix::Snake);
+            }
+        }
         js_sig.js_string_return = true;
         out.push(js_sig);
     }

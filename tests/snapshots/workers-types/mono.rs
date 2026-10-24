@@ -9622,7 +9622,7 @@ impl KVNamespace {
     ) -> Result<Nullable<String>, JsValue> {
         self.get_text_js(key, "text").await
     }
-    pub async fn get_text(
+    pub async fn get_text_js_string(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<JsString>, JsValue> {
@@ -9700,7 +9700,7 @@ impl KVNamespace {
     ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue> {
         self.get_with_metadata_text_js(key, "text").await
     }
-    pub async fn get_with_metadata_text<Metadata>(
+    pub async fn get_with_metadata_text_js_string<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue> {
