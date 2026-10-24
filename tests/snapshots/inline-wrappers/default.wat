@@ -39,6 +39,10 @@
   (import "inline-wrappers" "R2Object.upload" (func $inline-wrappers:R2Object.upload (param $this externref) (param $parts externref)))
   ;; seek(offset: i64): i64
   (import "inline-wrappers" "R2Object.seek" (func $inline-wrappers:R2Object.seek (param $this externref) (param $offset externref) (result externref)))
+  ;; settled: Promise<u64>
+  (import "inline-wrappers" "R2Object.settled" (func $inline-wrappers:R2Object.settled (param $this externref) (result externref)))
+  ;; matrix(): u64[][]
+  (import "inline-wrappers" "R2Object.matrix" (func $inline-wrappers:R2Object.matrix (param $this externref) (result externref)))
 
   ;; R2Bucket
   ;; maxSize(): u64
