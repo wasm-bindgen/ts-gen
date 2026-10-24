@@ -24,6 +24,8 @@ impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi> Request<Meta> {
     }
 }
 #[allow(dead_code)]
+pub type Info = JsValue;
+#[allow(dead_code)]
 pub type Pair<A, B = String> = ArrayTuple<(A, B)>;
 #[allow(dead_code)]
 pub type Same<A, B = A> = ArrayTuple<(A, B)>;
@@ -109,6 +111,8 @@ pub mod hidden {
     }
     #[allow(dead_code)]
     pub type Triple<X, Y = String> = ArrayTuple<(X, Y, Hidden)>;
+    #[allow(dead_code)]
+    pub type Either = JsValue;
 }
 pub mod uses {
     #[allow(unused_imports)]
@@ -122,5 +126,10 @@ pub mod uses {
     extern "C" {
         #[wasm_bindgen(catch)]
         pub fn triple(t: &super::hidden::Triple<f64>) -> Result<(), JsValue>;
+    }
+    #[wasm_bindgen(module = "uses", experimental_generic_mono)]
+    extern "C" {
+        #[wasm_bindgen(catch)]
+        pub fn either(e: &super::hidden::Either) -> Result<(), JsValue>;
     }
 }

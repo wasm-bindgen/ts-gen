@@ -3949,10 +3949,11 @@ namespace exported under its own name as well keeps it.
   target naming something no such path reaches is not chased; the
   reference then names the alias.
 
-  The alias itself is still emitted, except a union alias that erases to
-  `JsValue`: every use lowers through it to its members, so `pub type
-  Like = JsValue;` would name nothing. One that reaches itself (below) is
-  named by its uses and stays. A Rust alias can't declare a type
+  The alias itself is still emitted, except a union alias without type
+  parameters that erases to `JsValue`: every use lowers through it to its
+  members, so `pub type Like = JsValue;` would name nothing. One that
+  reaches itself (below) is named by its uses and stays, and so does a
+  generic one, which an instantiation that isn't chased names. A Rust alias can't declare a type
   parameter its target doesn't use (E0091), so a parameter the lowered
   target doesn't mention is dropped from the alias. This covers a target
   that never names it as well as one lowering erases; the trailing kept

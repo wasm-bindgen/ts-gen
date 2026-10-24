@@ -4201,6 +4201,8 @@ extern "C" {
         event: &EventType,
     ) -> Result<(), JsValue>;
 }
+#[allow(dead_code)]
+pub type EventListenerOrEventListenerObject = JsValue;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -9433,6 +9435,8 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
+#[allow(dead_code)]
+pub type RequestInfo = JsValue;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Body , extends = Object)]
@@ -39115,6 +39119,8 @@ pub enum ContinentCode {
     Oc = "OC",
     Sa = "SA",
 }
+#[allow(dead_code)]
+pub type CfProperties = JsValue;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -43390,6 +43396,8 @@ pub mod rpc {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkflowEntrypointBranded;
     }
+    #[allow(dead_code)]
+    pub type Serializable = JsValue;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = super :: Disposable , extends = Object , is_type_of = JsValue :: is_object)]

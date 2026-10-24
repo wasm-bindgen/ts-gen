@@ -114,6 +114,8 @@ pub mod events {
     #[allow(dead_code)]
     pub type Pair<A, B> = ArrayTuple<(A, B)>;
     #[allow(dead_code)]
+    pub type Loose = JsValue;
+    #[allow(dead_code)]
     pub type Result_<T> = ArrayTuple<(T, JsString)>;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {

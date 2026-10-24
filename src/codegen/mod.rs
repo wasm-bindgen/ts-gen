@@ -712,12 +712,18 @@ fn generate_type_alias(
 
     // A union alias that erases names nothing a use site can't spell as
     // `JsValue`, and every use resolves through it to its members, so it
-    // is dead. One that reaches itself is named by its uses, and one
-    // moved aside by a collision is re-exported, so those stay.
+    // is dead. One that reaches itself is named by its uses, one moved
+    // aside by a collision is re-exported, and a generic one is named by an
+    // instantiation that can't be chased (`H.Either<number>` reaching an
+    // unexported member), so those stay.
     let union_alias = cgctx
         .resolve_alias(&alias.name, scope)
         .is_some_and(|(target, _)| matches!(target.as_ref(), crate::ir::TypeRef::Union(_)));
-    if union_alias && renamed.is_none() && target.to_string() == "JsValue" {
+    if union_alias
+        && renamed.is_none()
+        && alias.type_params.is_empty()
+        && target.to_string() == "JsValue"
+    {
         return quote! {};
     }
 
