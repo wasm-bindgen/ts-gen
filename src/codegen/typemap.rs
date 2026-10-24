@@ -1198,6 +1198,11 @@ pub fn to_syn_type(
         match ty {
             TypeRef::Boolean | TypeRef::BooleanLiteral(_) => return quote! { Boolean },
             TypeRef::Number | TypeRef::NumberLiteral(_) => return quote! { Number },
+            // A generic argument must be a JS type, so a `@rust` scalar
+            // inside a handle (`Promise<…>` that is not an async return,
+            // `Array<…>`, `JsNullable<…>`) keeps the JS number it narrows.
+            TypeRef::RustScalar(s) if s.is_bigint() => return quote! { BigInt },
+            TypeRef::RustScalar(_) => return quote! { Number },
             TypeRef::String | TypeRef::StringLiteral(_) => return quote! { JsString },
             TypeRef::Void | TypeRef::Undefined => return quote! { Undefined },
             _ => {}
@@ -2144,20 +2149,14 @@ pub fn to_return_type(
             None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
         }
     } else if let Some((core, n, scope)) = split_empties_in(ty, ctx, scope) {
-        let inner_ty = to_syn_type(
-            &core,
-            TypePosition::RETURN.to_inner(),
-            ctx,
-            scope,
-            from_module,
-        );
+        let inner_ty = to_syn_type(&core, async_leaf_pos(&core), ctx, scope, from_module);
         if is_jsvalue_arg(&inner_ty) {
             inner_ty
         } else {
             nullable_carrier(inner_ty, n)
         }
     } else {
-        to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module)
+        to_syn_type(ty, async_leaf_pos(ty), ctx, scope, from_module)
     };
 
     if catch {
@@ -2236,6 +2235,7 @@ fn is_mono_native_leaf(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -
             | TypeRef::BooleanLiteral(_)
             | TypeRef::Number
             | TypeRef::NumberLiteral(_)
+            | TypeRef::RustScalar(_)
             | TypeRef::String
             | TypeRef::StringLiteral(_)
     ) || ctx.enum_kind(ty, scope).is_some()
@@ -2260,6 +2260,17 @@ fn local_generic_args<'t>(
             },
         ),
         _ => None,
+    }
+}
+
+/// The position an async return's resolved value lowers in. It is a
+/// handle's argument, except that a `@rust` scalar keeps its Rust form:
+/// the future converts the settled JS number (`Result<u32, _>`).
+fn async_leaf_pos(ty: &TypeRef) -> TypePosition {
+    if matches!(ty, TypeRef::RustScalar(_)) {
+        TypePosition::RETURN
+    } else {
+        TypePosition::RETURN.to_inner()
     }
 }
 

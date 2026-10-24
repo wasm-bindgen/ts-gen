@@ -347,13 +347,19 @@ impl RustScalar {
         })
     }
 
+    /// Whether wasm-bindgen crosses this scalar as a JS `BigInt`.
+    pub fn is_bigint(self) -> bool {
+        matches!(self, Self::U64 | Self::I64)
+    }
+
     /// Whether a TS leaf type can cross the boundary as this scalar.
     /// wasm-bindgen passes `u64`/`i64` as `BigInt`, so they need a
     /// `bigint`; every other scalar is a JS `number`.
     pub fn accepts(self, leaf: &TypeRef) -> bool {
-        match self {
-            Self::U64 | Self::I64 => matches!(leaf, TypeRef::BigInt),
-            _ => matches!(leaf, TypeRef::Number),
+        if self.is_bigint() {
+            matches!(leaf, TypeRef::BigInt)
+        } else {
+            matches!(leaf, TypeRef::Number)
         }
     }
 
