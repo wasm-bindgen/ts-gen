@@ -227,7 +227,7 @@ impl SubtleCrypto {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KVStore<Key: ::wasm_bindgen::JsGeneric>;
+    pub type KVStore<Key: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     async fn get_text_js<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVStore<Key>,
