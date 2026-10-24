@@ -900,7 +900,11 @@ options do. A dictionary whose required fields are all single literals
 therefore gets a plain `new()`. The branches of a discriminated union
 each pin one literal, but across branches the field is the choice, so
 it still names each branch's factory (`new_inline` / `new_attachment`
-above).
+above). The choice is the field's declared option count: when a
+dictionary's factory cartesian goes over 64 combinations and each
+field is cut to its first option, a literal-union field still names
+the one remaining factory (`new_inline`, never a bare `new` that
+silently picks `"inline"`).
 
 A number literal is baked in as a float literal matching the `f64`
 setter, and names its factory with `.` and a leading `-` spelled out

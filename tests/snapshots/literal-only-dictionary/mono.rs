@@ -176,8 +176,82 @@ impl PartBuilder {
         self.inner
     }
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type CappedAttachment;
+    #[wasm_bindgen(method, getter)]
+    pub fn disposition(this: &CappedAttachment) -> DispositionKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_disposition(this: &CappedAttachment, val: DispositionKind);
+    #[wasm_bindgen(method, getter)]
+    pub fn a(this: &CappedAttachment) -> AKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_a(this: &CappedAttachment, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "a")]
+    pub fn set_a_with_f64(this: &CappedAttachment, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn b(this: &CappedAttachment) -> AKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_b(this: &CappedAttachment, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "b")]
+    pub fn set_b_with_f64(this: &CappedAttachment, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn c(this: &CappedAttachment) -> AKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_c(this: &CappedAttachment, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "c")]
+    pub fn set_c_with_f64(this: &CappedAttachment, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn d(this: &CappedAttachment) -> AKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_d(this: &CappedAttachment, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "d")]
+    pub fn set_d_with_f64(this: &CappedAttachment, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn e(this: &CappedAttachment) -> AKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_e(this: &CappedAttachment, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "e")]
+    pub fn set_e_with_f64(this: &CappedAttachment, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn f(this: &CappedAttachment) -> AKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_f(this: &CappedAttachment, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "f")]
+    pub fn set_f_with_f64(this: &CappedAttachment, val: f64);
+}
+impl CappedAttachment {
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `disposition: \"inline\"`"]
+    pub fn new_inline(
+        a: impl ::wasm_bindgen::JsStringLike,
+        b: impl ::wasm_bindgen::JsStringLike,
+        c: impl ::wasm_bindgen::JsStringLike,
+        d: impl ::wasm_bindgen::JsStringLike,
+        e: impl ::wasm_bindgen::JsStringLike,
+        f: impl ::wasm_bindgen::JsStringLike,
+    ) -> CappedAttachment {
+        let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(DispositionKind::Inline);
+        inner.set_a(a);
+        inner.set_b(b);
+        inner.set_c(c);
+        inner.set_d(d);
+        inner.set_e(e);
+        inner.set_f(f);
+        inner
+    }
+}
 #[wasm_bindgen(private)]
 pub enum DispositionKind {
     Inline = "inline",
     Attachment = "attachment",
+}
+#[wasm_bindgen(private)]
+pub enum AKind {
+    String(String),
+    F64(f64),
 }

@@ -21,3 +21,16 @@ interface Attachment {
 type Part =
   | { disposition: "inline"; contentId: string; filename: string }
   | { disposition: "attachment"; contentId?: undefined; filename: string };
+
+// Above the 64-combination factory cap each field keeps only its first
+// option, but a literal-union field still offers a choice, so the one
+// remaining factory is still named after its literal (`new_inline`).
+interface CappedAttachment {
+  disposition: "inline" | "attachment";
+  a: string | number;
+  b: string | number;
+  c: string | number;
+  d: string | number;
+  e: string | number;
+  f: string | number;
+}
