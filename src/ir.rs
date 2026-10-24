@@ -47,9 +47,24 @@ impl ModuleContext {
         match self {
             ModuleContext::Global => true,
             ModuleContext::Module(module) => {
-                module.contains(':') || NODE_BUILTIN_MODULES.contains(&&**module)
+                has_builtin_scheme(module) || NODE_BUILTIN_MODULES.contains(&&**module)
             }
         }
+    }
+}
+
+/// Whether `specifier` has a builtin's `scheme:` prefix. A URL
+/// (`https://…`, `file:///…`) is not one, and neither is a package
+/// registry's scheme (`npm:lodash`, `jsr:@std/path`) or an inline or
+/// object URL's (`data:…`, `blob:…`).
+fn has_builtin_scheme(specifier: &str) -> bool {
+    match specifier.split_once(':') {
+        Some((scheme, rest)) => {
+            !scheme.is_empty()
+                && !rest.starts_with("//")
+                && !matches!(scheme, "npm" | "jsr" | "data" | "blob")
+        }
+        None => false,
     }
 }
 

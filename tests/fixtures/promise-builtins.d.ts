@@ -1,13 +1,14 @@
 //! @ts-gen --lib-name promise-builtins --export promise-builtins --export tests/fixtures/promise-builtins.d.ts
-//! @ts-gen --export node:fs --export fs --export cloudflare:sockets --export bun:sqlite --export user-lib
+//! @ts-gen --export node:fs --export fs --export cloudflare:sockets --export bun:sqlite --export user-lib --export npm:lodash --export jsr:@std/path --export https://esm.sh/foo
 
 // Fixture: under `--fallible` (the `mono` snapshot) an async callable's
 // sync `_promise` form catches a synchronous throw, except where calling
 // it never throws synchronously, because the host's async functions
 // reject rather than throw:
-// * a builtin, whose binding resolves to a specifier with a `:`
+// * a builtin, whose binding resolves to a specifier with a `scheme:`
 //   (`node:fs`, `cloudflare:sockets`, `bun:sqlite`) or a bare Node
-//   builtin (`fs`);
+//   builtin (`fs`), but not a package registry's (`npm:`, `jsr:`), a
+//   `data:` or `blob:` URL, or a URL with a `//` (`https://…`);
 // * a global: a global function, a global class's methods and statics,
 //   a global namespace's functions;
 // * a callable declared `async`. TypeScript rejects `async` in an ambient
@@ -80,11 +81,26 @@ declare module "cloudflare:sockets" {
 }
 
 declare module "bun:sqlite" {
-  /** Any specifier with a `:` is a builtin: plain. */
+  /** Any other specifier with a `scheme:` is a builtin: plain. */
   export function open(path: string): Promise<number>;
 }
 
 declare module "user-lib" {
   /** A user module: `Result<Promise<JsString>, JsValue>`. */
+  export function fetchText(url: string): Promise<string>;
+}
+
+declare module "npm:lodash" {
+  /** A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`. */
+  export function fetchText(url: string): Promise<string>;
+}
+
+declare module "jsr:@std/path" {
+  /** A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`. */
+  export function fetchText(url: string): Promise<string>;
+}
+
+declare module "https://esm.sh/foo" {
+  /** A URL is no builtin: `Result<Promise<JsString>, JsValue>`. */
   export function fetchText(url: string): Promise<string>;
 }

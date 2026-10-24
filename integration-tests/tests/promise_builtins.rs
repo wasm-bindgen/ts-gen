@@ -6,8 +6,8 @@ use js_sys::{JsString, Number, Promise, TypeError, Undefined};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::promise_builtins::{
-    bun, cloudflare, count, count_promise, fs, load_promise, node, scheduler, size_promise,
-    sleep_promise, user_lib, Cache, Store,
+    bun, cloudflare, count, count_promise, fs, https, jsr, load_promise, node, npm, scheduler,
+    size_promise, sleep_promise, user_lib, Cache, Store,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -25,6 +25,11 @@ async fn promise_builtins_compile(
     let _: Result<Promise<Number>, TypeError> = count_promise("k");
     let _: Result<Promise<JsString>, JsValue> = store.get_promise("k");
     let _: Result<Promise<JsString>, JsValue> = user_lib::fetch_text_promise("u");
+
+    // Package registry schemes and URLs are not builtins.
+    let _: Result<Promise<JsString>, JsValue> = npm::lodash::fetch_text_promise("u");
+    let _: Result<Promise<JsString>, JsValue> = jsr::std::path::fetch_text_promise("u");
+    let _: Result<Promise<JsString>, JsValue> = https::esmsh::foo::fetch_text_promise("u");
 
     // Declared `async`.
     let _: Promise<Number> = size_promise("k");

@@ -1718,10 +1718,14 @@ whatever its `@throws`: on an async callable `@throws` describes the
 rejection, which the `async fn` form keeps carrying. This covers a
 callable whose binding is
 
-* **builtin**: it resolves to a module specifier containing a `:`
-  (`node:fs`, `cloudflare:sockets`, `bun:sqlite`, `workerd:…`), or to a
-  bare Node builtin (`fs`, `fs/promises`, `path`, …, Node's
-  `require("module").builtinModules`);
+* **builtin**: it resolves to a module specifier with a `scheme:`
+  prefix (`node:fs`, `cloudflare:sockets`, `bun:sqlite`, `workerd:…`),
+  or to a bare Node builtin (`fs`, `fs/promises`, `path`, …, Node's
+  `require("module").builtinModules`). The scheme is the non-empty text
+  before the first `:`. A URL, whose `:` is followed by `//`
+  (`https://esm.sh/foo`, `file:///x`), is not a builtin, and neither are
+  the schemes `npm:`, `jsr:`, `data:` and `blob:`, which name a package
+  or an inline or object URL (`npm:lodash`, `jsr:@std/path`);
 * **global**: it has no module, so it lives on the global object: global
   functions, global classes and interfaces with their methods and
   statics, and the functions of global namespaces.
@@ -1730,8 +1734,8 @@ A callable's module is the one its declaration is bound in, the
 `module = "…"` its extern block carries: a `declare module "…"` body's,
 the `--lib-name` module's for a module file's declarations, and none for
 a script file's or a `declare global` block's. Callables of any other
-module, such as the `--lib-name` library or a package, keep the
-`--fallible` rule.
+module, such as the `--lib-name` library, a package (`npm:lodash`
+included) or a URL, keep the `--fallible` rule.
 
 A function or method declared `async` gets the same: the modifier
 promises a rejection rather than a throw. TypeScript rejects `async` in

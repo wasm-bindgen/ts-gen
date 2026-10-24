@@ -112,9 +112,10 @@ struct Cli {
     /// `--errors-as-error`). `@throws {never}` keeps a binding
     /// infallible. Async callables, constructors and setters are
     /// unchanged. An async callable's sync `_promise` form catches too,
-    /// unless it is a builtin or global one (any specifier with a `:`, a
-    /// bare Node builtin, or no module) or declared `async`, which reject
-    /// rather than throw.
+    /// unless it is a builtin or global one (a specifier with a scheme
+    /// such as `node:`, other than a URL or `npm:`, `jsr:`, `data:` or
+    /// `blob:`; a bare Node builtin; or no module) or declared `async`,
+    /// which reject rather than throw.
     #[arg(long = "fallible")]
     fallible: bool,
 

@@ -282,13 +282,13 @@ pub mod bun {
         use super::*;
         #[wasm_bindgen(module = "bun:sqlite", experimental_generic_mono)]
         extern "C" {
-            #[doc = " Any specifier with a `:` is a builtin: plain."]
+            #[doc = " Any other specifier with a `scheme:` is a builtin: plain."]
             #[wasm_bindgen(catch)]
             pub async fn open(path: impl ::wasm_bindgen::JsStringLike) -> Result<f64, JsValue>;
         }
         #[wasm_bindgen(module = "bun:sqlite", experimental_generic_mono)]
         extern "C" {
-            #[doc = " Any specifier with a `:` is a builtin: plain."]
+            #[doc = " Any other specifier with a `scheme:` is a builtin: plain."]
             #[wasm_bindgen(js_name = "open")]
             pub fn open_promise(path: impl ::wasm_bindgen::JsStringLike) -> Promise<Number>;
         }
@@ -318,5 +318,109 @@ pub mod user_lib {
         pub fn fetch_text_promise(
             url: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Promise<JsString>, JsValue>;
+    }
+}
+pub mod npm {
+    #[allow(unused_imports)]
+    use super::*;
+    pub mod lodash {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "npm:lodash", experimental_generic_mono)]
+        extern "C" {
+            #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
+            #[wasm_bindgen(catch, js_name = "fetchText")]
+            pub async fn fetch_text(
+                url: impl ::wasm_bindgen::JsStringLike,
+            ) -> Result<String, JsValue>;
+        }
+        #[wasm_bindgen(module = "npm:lodash", experimental_generic_mono)]
+        extern "C" {
+            #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
+            #[wasm_bindgen(catch, js_name = "fetchText")]
+            pub async fn fetch_text_js_string(
+                url: impl ::wasm_bindgen::JsStringLike,
+            ) -> Result<JsString, JsValue>;
+        }
+        #[wasm_bindgen(module = "npm:lodash", experimental_generic_mono)]
+        extern "C" {
+            #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
+            #[wasm_bindgen(catch, js_name = "fetchText")]
+            pub fn fetch_text_promise(
+                url: impl ::wasm_bindgen::JsStringLike,
+            ) -> Result<Promise<JsString>, JsValue>;
+        }
+    }
+}
+pub mod jsr {
+    #[allow(unused_imports)]
+    use super::*;
+    pub mod std {
+        #[allow(unused_imports)]
+        use super::*;
+        pub mod path {
+            #[allow(unused_imports)]
+            use super::*;
+            #[wasm_bindgen(module = "jsr:@std/path", experimental_generic_mono)]
+            extern "C" {
+                #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
+                #[wasm_bindgen(catch, js_name = "fetchText")]
+                pub async fn fetch_text(
+                    url: impl ::wasm_bindgen::JsStringLike,
+                ) -> Result<String, JsValue>;
+            }
+            #[wasm_bindgen(module = "jsr:@std/path", experimental_generic_mono)]
+            extern "C" {
+                #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
+                #[wasm_bindgen(catch, js_name = "fetchText")]
+                pub async fn fetch_text_js_string(
+                    url: impl ::wasm_bindgen::JsStringLike,
+                ) -> Result<JsString, JsValue>;
+            }
+            #[wasm_bindgen(module = "jsr:@std/path", experimental_generic_mono)]
+            extern "C" {
+                #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
+                #[wasm_bindgen(catch, js_name = "fetchText")]
+                pub fn fetch_text_promise(
+                    url: impl ::wasm_bindgen::JsStringLike,
+                ) -> Result<Promise<JsString>, JsValue>;
+            }
+        }
+    }
+}
+pub mod https {
+    #[allow(unused_imports)]
+    use super::*;
+    pub mod esmsh {
+        #[allow(unused_imports)]
+        use super::*;
+        pub mod foo {
+            #[allow(unused_imports)]
+            use super::*;
+            #[wasm_bindgen(module = "https://esm.sh/foo", experimental_generic_mono)]
+            extern "C" {
+                #[doc = " A URL is no builtin: `Result<Promise<JsString>, JsValue>`."]
+                #[wasm_bindgen(catch, js_name = "fetchText")]
+                pub async fn fetch_text(
+                    url: impl ::wasm_bindgen::JsStringLike,
+                ) -> Result<String, JsValue>;
+            }
+            #[wasm_bindgen(module = "https://esm.sh/foo", experimental_generic_mono)]
+            extern "C" {
+                #[doc = " A URL is no builtin: `Result<Promise<JsString>, JsValue>`."]
+                #[wasm_bindgen(catch, js_name = "fetchText")]
+                pub async fn fetch_text_js_string(
+                    url: impl ::wasm_bindgen::JsStringLike,
+                ) -> Result<JsString, JsValue>;
+            }
+            #[wasm_bindgen(module = "https://esm.sh/foo", experimental_generic_mono)]
+            extern "C" {
+                #[doc = " A URL is no builtin: `Result<Promise<JsString>, JsValue>`."]
+                #[wasm_bindgen(catch, js_name = "fetchText")]
+                pub fn fetch_text_promise(
+                    url: impl ::wasm_bindgen::JsStringLike,
+                ) -> Result<Promise<JsString>, JsValue>;
+            }
+        }
     }
 }

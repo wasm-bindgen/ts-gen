@@ -2302,6 +2302,7 @@ mod tests {
             (module("fs/promises"), false),
             (module("cloudflare:sockets"), false),
             (module("bun:sqlite"), false),
+            (module("workerd:x"), false),
             (module("user-lib"), true),
         ] {
             for kind in [SignatureKind::Function, SignatureKind::Method] {
@@ -2326,8 +2327,21 @@ mod tests {
                 }
             }
         }
-        // A module that only resembles a builtin's name is the user's.
-        for name in ["fsx", "node-fetch", "@cloudflare/workers-types"] {
+        // A module that only resembles a builtin is the user's: a package
+        // registry's scheme, a URL, a `data:` or `blob:` URL, or a
+        // lookalike name.
+        for name in [
+            "npm:lodash",
+            "jsr:@std/path",
+            "https://esm.sh/foo",
+            "http://x",
+            "file:///x",
+            "data:text/javascript,export{}",
+            "blob:https://x/uuid",
+            "fsx",
+            "node-fetch",
+            "@cloudflare/workers-types",
+        ] {
             let sigs = expand_fallible_in(
                 &module(name),
                 false,
