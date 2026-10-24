@@ -2278,9 +2278,17 @@ Method-level parameters follow the same rule
 The arguments are dropped once every input is parsed, before codegen, so
 everything downstream sees `KVNamespaceListResult<Metadata>`. In
 per-monomorphization mode, the erased `Key` therefore adds no
-`list_js_string` variant. A reference left with no arguments lowers
-like a bare one: `Params<P>` against `type Params<P extends string> =
-Record<P, string>` lowers to the alias's target, `Object`.
+`list_js_string` variant.
+
+A type alias's parameters don't erase, even primitive-constrained ones:
+evaluation instantiates the alias at its arguments, which reading `K` as
+`string` would lose. `Flags<"x" | "y">` against `type Flags<K extends
+string> = { [P in K]: boolean }` is a dictionary with `x` and `y`
+(`FlagsXOrY`). An alias that evaluation leaves alone lowers to its own
+name: `params: Params<P>` against `type Params<P extends string = any> =
+Record<P, string | string[]>` is `Params`, with `pub type Params =
+Object;`. An object-type alias promoted to an interface (`type Shape<K
+extends string> = { key: K }`) is an interface, and erases like one.
 
 ### Primitive union arguments
 
