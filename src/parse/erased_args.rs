@@ -237,6 +237,7 @@ impl Pass<'_> {
             | TypeRef::NumberLiteral(_)
             | TypeRef::BooleanLiteral(_)
             | TypeRef::Never
+            | TypeRef::Projection { .. }
             | TypeRef::Unresolved(_) => ty.clone(),
         }
     }

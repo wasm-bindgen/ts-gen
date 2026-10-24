@@ -115,6 +115,12 @@ pub struct GlobalContext {
     /// with the generic base each extends, which names them in a
     /// variant's `_with_` suffix.
     pub(crate) specialisations: std::collections::HashMap<TypeId, Vec<String>>,
+    /// Whether the parse evaluated for per-monomorphization (see
+    /// [`crate::parse::ParseOptions::experimental_generic_mono`]).
+    pub experimental_generic_mono: bool,
+    /// Under per-monomorphization, the traits bounding interfaces'
+    /// literal-only type parameters, by the interface emitting each.
+    pub(crate) param_traits: std::collections::HashMap<TypeId, Vec<crate::ir::ParamTrait>>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -225,6 +231,8 @@ impl GlobalContext {
             type_level_only: std::collections::HashSet::new(),
             synthesised_enums: std::collections::HashSet::new(),
             specialisations: std::collections::HashMap::new(),
+            experimental_generic_mono: false,
+            param_traits: std::collections::HashMap::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),

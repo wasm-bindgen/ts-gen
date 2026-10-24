@@ -75,6 +75,10 @@ pub(crate) struct ClassConfig<'a> {
     /// Scope for type reference resolution. For class-like configs
     /// this is the type's body scope (holds its `<T, …>`).
     scope: ScopeId,
+    /// The first parent, when it takes arguments for literal-only
+    /// parameters (see [`extends_list`]): wasm-bindgen derefs only to a
+    /// parent built from a `JsValue`, so the type derefs to it by hand.
+    deref_target: Option<TokenStream>,
 }
 
 /// What a member base names; instance and static members of the same JS
@@ -330,7 +334,7 @@ impl<'a> ClassConfig<'a> {
         // scope to thread through name resolution everywhere inside
         // its extern block.
         let scope = decl.body_scope;
-        let extends = extends_list(decl.extends.as_slice(), cgctx, ctx);
+        let (extends, deref_target) = extends_list(decl.extends.as_slice(), cgctx, ctx);
         let module = match ctx {
             ModuleContext::Module(m) => Some(m.clone()),
             ModuleContext::Global => None,
@@ -354,6 +358,7 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            deref_target,
         }
     }
 
@@ -365,7 +370,7 @@ impl<'a> ClassConfig<'a> {
         dictionary: bool,
     ) -> Self {
         let scope = decl.body_scope;
-        let extends = extends_list(&decl.extends, cgctx, ctx);
+        let (extends, deref_target) = extends_list(&decl.extends, cgctx, ctx);
         let module = match ctx {
             ModuleContext::Module(m) => Some(m.clone()),
             ModuleContext::Global => None,
@@ -387,6 +392,7 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            deref_target,
         }
     }
 
@@ -410,6 +416,7 @@ impl<'a> ClassConfig<'a> {
             type_params: self.type_params.clone(),
             cgctx: self.cgctx,
             scope: self.scope,
+            deref_target: self.deref_target.clone(),
         }
     }
 
@@ -444,6 +451,7 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            deref_target: None,
         }
     }
 
@@ -478,6 +486,16 @@ impl<'a> ClassConfig<'a> {
     /// Lowering of a type parameter's default in generic-argument
     /// position; see [`super::typemap::type_param_default_tokens`].
     fn type_param_default_tokens(&self, tp: &crate::ir::TypeParam) -> TokenStream {
+        // A literal-only parameter's default is its enum, by value.
+        if let (Some(_), Some(default)) = (&tp.trait_bound, &tp.default) {
+            return super::typemap::to_syn_type(
+                default,
+                TypePosition::RETURN,
+                self.cgctx,
+                self.scope,
+                &self.from_module(),
+            );
+        }
         super::typemap::type_param_default_tokens(
             tp.default.as_ref(),
             self.cgctx,
@@ -535,7 +553,13 @@ impl<'a> ClassConfig<'a> {
             .iter()
             .map(|tp| {
                 let ident = super::typemap::make_ident(&tp.name);
-                quote! { #ident: ::wasm_bindgen::convert::IntoWasmAbi }
+                match &tp.trait_bound {
+                    Some(t) => {
+                        let t = super::typemap::make_ident(t);
+                        quote! { #ident: ::wasm_bindgen::convert::IntoWasmAbi + #t }
+                    }
+                    None => quote! { #ident: ::wasm_bindgen::convert::IntoWasmAbi },
+                }
             })
             .collect::<Vec<_>>();
         render_generic_bounds(&bounds)
@@ -564,7 +588,16 @@ impl<'a> ClassConfig<'a> {
     fn type_param_bounds(&self) -> Vec<TokenStream> {
         self.type_params
             .iter()
-            .map(|tp| CodegenContext::type_param_decl(self.cgctx, &tp.name))
+            .map(|tp| match &tp.trait_bound {
+                Some(t) if CodegenContext::generic_mono(self.cgctx) => {
+                    let (ident, t) = (
+                        super::typemap::make_ident(&tp.name),
+                        super::typemap::make_ident(t),
+                    );
+                    quote! { #ident: #t }
+                }
+                _ => CodegenContext::type_param_decl(self.cgctx, &tp.name),
+            })
             .collect()
     }
 
@@ -655,7 +688,80 @@ pub fn generate_class_like_interface(
 ) -> TokenStream {
     let mut config = ClassConfig::from_interface(decl, ctx, cgctx, scope, false);
     config.js_namespace = js_namespace.to_vec();
-    generate_extern_block(&config)
+    let extern_block = generate_extern_block(&config);
+    let deref = manual_deref(&config);
+    quote! {
+        #extern_block
+        #deref
+    }
+}
+
+/// The trait bounding a literal-only type parameter under
+/// per-monomorphization, and each argument enum's impl. Every associated
+/// type is a string enum, so it states the ABI an accessor needs of it
+/// once, for every caller generic over the parameter.
+pub(crate) fn generate_param_trait(
+    t: &crate::ir::ParamTrait,
+    cgctx: &CodegenContext<'_>,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    let name = super::typemap::make_ident(&t.name);
+    let supertraits: Vec<_> = t
+        .supertraits
+        .iter()
+        .map(|s| super::typemap::make_ident(s))
+        .collect();
+    let supertraits = if supertraits.is_empty() {
+        quote! {}
+    } else {
+        quote! { : #(#supertraits)+* }
+    };
+    let assoc: Vec<_> = t
+        .assoc
+        .iter()
+        .map(|a| super::typemap::make_ident(a))
+        .collect();
+    let render = |ty: &TypeRef| {
+        super::typemap::to_syn_type(ty, TypePosition::RETURN, Some(cgctx), t.scope, from_module)
+    };
+    let impls = t.impls.iter().map(|(arg, targets)| {
+        let arg = render(arg);
+        let targets = targets.iter().map(render);
+        quote! {
+            impl #name for #arg {
+                #(type #assoc = #targets;)*
+            }
+        }
+    });
+    quote! {
+        pub trait #name #supertraits {
+            #(
+                type #assoc: ::wasm_bindgen::convert::IntoWasmAbi
+                    + ::wasm_bindgen::convert::FromWasmAbi
+                    + ::wasm_bindgen::convert::OptionIntoWasmAbi
+                    + ::wasm_bindgen::convert::OptionFromWasmAbi;
+            )*
+        }
+        #(#impls)*
+    }
+}
+
+/// The `Deref` to a first parent given arguments (see
+/// [`ClassConfig::deref_target`]).
+fn manual_deref(config: &ClassConfig) -> TokenStream {
+    let Some(target) = &config.deref_target else {
+        return quote! {};
+    };
+    let ident = super::typemap::make_ident(&config.effective_rust_name());
+    let args = config.type_generics_args();
+    quote! {
+        impl #args ::core::ops::Deref for #ident #args {
+            type Target = #target;
+            fn deref(&self) -> &#target {
+                JsCast::unchecked_ref(self)
+            }
+        }
+    }
 }
 
 /// Generate a complete `extern "C"` block for a class inside a namespace, with `js_namespace`.
@@ -684,10 +790,12 @@ pub fn generate_dictionary_extern(
     config.js_namespace = js_namespace.to_vec();
 
     let extern_block = generate_extern_block(&config);
+    let deref = manual_deref(&config);
     let factory = generate_dictionary_factory(&config.with_first_parent_members(decl));
 
     quote! {
         #extern_block
+        #deref
         #factory
     }
 }
@@ -746,7 +854,14 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // interpolation leaves the bare identifier intact.
     let type_args = config.type_generics_args();
     let type_decl = config.helper_generics_decl();
-    let builder_struct_decl = config.type_generics_decl();
+    // The struct only holds the type; its impls bound what they call.
+    let builder_struct_decl = render_generic_bounds(
+        &config
+            .type_params
+            .iter()
+            .map(|tp| CodegenContext::type_param_decl(config.cgctx, &tp.name))
+            .collect::<Vec<_>>(),
+    );
     let rust_type = quote! { #rust_type_ident #type_args };
     let builder_name = quote! { #builder_name_ident #type_args };
 
@@ -2007,6 +2122,13 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
     let mut wb_parts: Vec<TokenStream> = Vec::new();
 
     let mut has_object = false;
+    // wasm-bindgen builds the first parent from a `JsValue`, which a
+    // parent given arguments isn't: `Object` comes first, and the type
+    // derefs to the parent by hand.
+    if config.deref_target.is_some() {
+        wb_parts.push(quote! { extends = Object });
+        has_object = true;
+    }
     for extends in &config.extends {
         let extends_str = extends.to_string();
         // Skip extends that resolve to JsValue (implicit, causes conflicting impls)
@@ -2020,6 +2142,9 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
             }
         }
         if extends_str == "Object" {
+            if config.deref_target.is_some() {
+                continue;
+            }
             has_object = true;
         }
         wb_parts.push(quote! { extends = #extends });
@@ -2027,6 +2152,9 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
     // Every type extends Object at minimum
     if !has_object {
         wb_parts.push(quote! { extends = Object });
+    }
+    if config.deref_target.is_some() {
+        wb_parts.push(quote! { no_deref });
     }
 
     if config.runtime_class {
@@ -2892,12 +3020,19 @@ fn collect_parent_members(
 /// a stand-in `Object` would take the first slot, which wasm-bindgen
 /// makes the `Deref` target. `Object` closes the list when nothing else
 /// does.
+///
+/// Under per-monomorphization, a parent given arguments for literal-only
+/// parameters keeps them (`ToStringRoundingOptions::<ExcludeTimeUnitHour>`,
+/// in the expression form the attribute's path is used in) unless they are
+/// its defaults. When that parent comes first, its type is returned too,
+/// for the type to deref to.
 fn extends_list(
     parents: &[crate::ir::Heritage],
     cgctx: Option<&CodegenContext<'_>>,
     from_module: &ModuleContext,
-) -> Vec<TokenStream> {
+) -> (Vec<TokenStream>, Option<TokenStream>) {
     let mut out: Vec<TokenStream> = Vec::new();
+    let mut deref_target = None;
     for crate::ir::Heritage {
         type_ref: parent,
         scope,
@@ -2924,6 +3059,16 @@ fn extends_list(
             *scope,
             from_module,
         );
+        let args = cgctx.and_then(|c| literal_parent_args(parent, c, *scope, from_module));
+        let tokens = match args {
+            Some(args) => {
+                if out.is_empty() {
+                    deref_target = Some(quote! { #tokens<#(#args),*> });
+                }
+                quote! { #tokens::<#(#args),*> }
+            }
+            None => tokens,
+        };
         // Two declarations' clauses can name one parent.
         let rendered = tokens.to_string();
         if rendered == "JsValue" || out.iter().any(|t| t.to_string() == rendered) {
@@ -2934,5 +3079,42 @@ fn extends_list(
     if out.is_empty() {
         out.push(quote! { Object });
     }
-    out
+    (out, deref_target)
+}
+
+/// The arguments a parent with literal-only parameters is given under
+/// per-monomorphization, when they aren't all its defaults.
+fn literal_parent_args(
+    parent: &TypeRef,
+    c: &CodegenContext<'_>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> Option<Vec<TokenStream>> {
+    let TypeRef::Reference {
+        segments,
+        generic_args,
+    } = parent
+    else {
+        return None;
+    };
+    if !c.experimental_generic_mono || generic_args.is_empty() {
+        return None;
+    }
+    let id = c.gctx.resolve_path(scope, &segments.join("."))?;
+    let TypeKind::Interface(iface) = &c.gctx.get_type(id).kind else {
+        return None;
+    };
+    if iface.type_params.iter().all(|tp| tp.trait_bound.is_none()) {
+        return None;
+    }
+    let render = |t: &TypeRef, s: ScopeId| {
+        super::typemap::to_syn_type(t, TypePosition::RETURN, Some(c), s, from_module)
+    };
+    let args: Vec<TokenStream> = generic_args.iter().map(|a| render(a, scope)).collect();
+    let defaults = iface.type_params.iter().zip(&args).all(|(tp, a)| {
+        tp.default
+            .as_ref()
+            .is_some_and(|d| render(d, iface.body_scope).to_string() == a.to_string())
+    });
+    (!defaults).then_some(args)
 }

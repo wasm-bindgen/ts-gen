@@ -7,6 +7,10 @@ use wasm_bindgen::prelude::*;
 pub mod polish {
     #[allow(unused_imports)]
     use super::*;
+    #[allow(dead_code)]
+    pub type PartialShapeLike = JsValue;
+    #[allow(dead_code)]
+    pub type PartialOmitLike = JsValue;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -471,6 +475,141 @@ pub mod polish {
     }
     #[wasm_bindgen]
     extern "C" {
+        # [wasm_bindgen (extends = Rounding , extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Bounded;
+        #[wasm_bindgen(method, getter, js_name = "maximumUnit")]
+        pub fn maximum_unit(this: &Bounded) -> Option<MaximumUnitKind>;
+        #[wasm_bindgen(method, setter, js_name = "maximumUnit")]
+        pub fn set_maximum_unit(this: &Bounded, val: MaximumUnitKind);
+    }
+    impl Bounded {
+        pub fn new() -> Bounded {
+            Self::builder().build()
+        }
+        pub fn builder() -> BoundedBuilder {
+            BoundedBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for Bounded {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct BoundedBuilder {
+        inner: Bounded,
+    }
+    impl BoundedBuilder {
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn largest_unit(self, val: LargestUnitKind) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn increment(self, val: f64) -> Self {
+            self.inner.set_increment(val);
+            self
+        }
+        pub fn maximum_unit(self, val: MaximumUnitKind) -> Self {
+            self.inner.set_maximum_unit(val);
+            self
+        }
+        pub fn build(self) -> Bounded {
+            self.inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type PickedRounding;
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &PickedRounding) -> Option<PluralizeUnit>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &PickedRounding, val: PluralizeUnit);
+        #[wasm_bindgen(method, getter)]
+        pub fn increment(this: &PickedRounding) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_increment(this: &PickedRounding, val: f64);
+    }
+    impl PickedRounding {
+        pub fn new() -> PickedRounding {
+            Self::builder().build()
+        }
+        pub fn builder() -> PickedRoundingBuilder {
+            PickedRoundingBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for PickedRounding {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct PickedRoundingBuilder {
+        inner: PickedRounding,
+    }
+    impl PickedRoundingBuilder {
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn increment(self, val: f64) -> Self {
+            self.inner.set_increment(val);
+            self
+        }
+        pub fn build(self) -> PickedRounding {
+            self.inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = PickedRounding , extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type TimePicking;
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &TimePicking) -> Option<PluralizeTimeUnit>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &TimePicking, val: PluralizeTimeUnit);
+    }
+    impl TimePicking {
+        pub fn new() -> TimePicking {
+            Self::builder().build()
+        }
+        pub fn builder() -> TimePickingBuilder {
+            TimePickingBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for TimePicking {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct TimePickingBuilder {
+        inner: TimePicking,
+    }
+    impl TimePickingBuilder {
+        pub fn increment(self, val: f64) -> Self {
+            self.inner.set_increment(val);
+            self
+        }
+        pub fn smallest_unit(self, val: PluralizeTimeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn build(self) -> TimePicking {
+            self.inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Clock;
@@ -500,6 +639,10 @@ pub mod polish {
         pub fn step(this: &Rounder, options: &HourStepping);
         #[wasm_bindgen(method, catch, js_name = "step")]
         pub fn try_step(this: &Rounder, options: &HourStepping) -> Result<(), JsValue>;
+        #[wasm_bindgen(method)]
+        pub fn bound(this: &Rounder, options: &BoundedDayOrHour);
+        #[wasm_bindgen(method, catch, js_name = "bound")]
+        pub fn try_bound(this: &Rounder, options: &BoundedDayOrHour) -> Result<(), JsValue>;
         #[wasm_bindgen(method)]
         pub fn clock(this: &Rounder) -> Clock;
         #[wasm_bindgen(method, catch, js_name = "clock")]
@@ -541,51 +684,6 @@ pub mod polish {
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type Defaulted<T: ::wasm_bindgen::JsGeneric = Approximate>;
-        #[wasm_bindgen(method, getter)]
-        pub fn side<T: ::wasm_bindgen::JsGeneric>(this: &Defaulted<T>) -> Option<SideKind>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_side<T: ::wasm_bindgen::JsGeneric>(this: &Defaulted<T>, val: SideKind);
-        #[wasm_bindgen(method, getter)]
-        pub fn extra<T: ::wasm_bindgen::JsGeneric>(this: &Defaulted<T>) -> Option<T>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_extra<T: ::wasm_bindgen::JsGeneric>(this: &Defaulted<T>, val: &T);
-    }
-    impl<T: ::wasm_bindgen::JsGeneric> Defaulted<T> {
-        pub fn new() -> Defaulted<T> {
-            Self::builder().build()
-        }
-        pub fn builder() -> DefaultedBuilder<T> {
-            DefaultedBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
-            }
-        }
-    }
-    impl<T: ::wasm_bindgen::JsGeneric> Default for Defaulted<T> {
-        fn default() -> Self {
-            Self::new()
-        }
-    }
-    pub struct DefaultedBuilder<T: ::wasm_bindgen::JsGeneric> {
-        inner: Defaulted<T>,
-    }
-    impl<T: ::wasm_bindgen::JsGeneric> DefaultedBuilder<T> {
-        pub fn side(self, val: SideKind) -> Self {
-            self.inner.set_side(val);
-            self
-        }
-        pub fn extra(self, val: &T) -> Self {
-            self.inner.set_extra(val);
-            self
-        }
-        pub fn build(self) -> Defaulted<T> {
-            self.inner
-        }
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Approximate;
         #[wasm_bindgen(method)]
         pub fn fuzzy(this: &Approximate, options: &Rounding);
@@ -598,24 +696,13 @@ pub mod polish {
             this: &Approximate,
             options: &JsValue,
         ) -> Result<(), JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn defaulted(this: &Approximate, options: &Defaulted);
-        #[wasm_bindgen(method, catch, js_name = "defaulted")]
-        pub fn try_defaulted(this: &Approximate, options: &Defaulted) -> Result<(), JsValue>;
-        #[wasm_bindgen(method, js_name = "defaulted")]
-        pub fn defaulted_with_js_value(this: &Approximate, options: &JsValue);
-        #[wasm_bindgen(method, catch, js_name = "defaulted")]
-        pub fn try_defaulted_with_js_value(
-            this: &Approximate,
-            options: &JsValue,
-        ) -> Result<(), JsValue>;
     }
     #[allow(dead_code)]
     pub type Maker = Approximate;
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(constructor, js_class = "Maker", js_namespace = "Polish", catch)]
-        pub fn new(options: &RoundingHour) -> Result<Approximate, JsValue>;
+        pub fn new(options: &Rounding) -> Result<Approximate, JsValue>;
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -776,6 +863,71 @@ pub mod polish {
             self.inner
         }
     }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum PluralizeUnitDayOrHour {
+        Day = "day",
+        Hour = "hour",
+        Days = "days",
+        Hours = "hours",
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Bounded , extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type BoundedDayOrHour;
+        #[wasm_bindgen(method, getter, js_name = "maximumUnit")]
+        pub fn maximum_unit(this: &BoundedDayOrHour) -> Option<BoundedDayOrHourMaximumUnitKind>;
+        #[wasm_bindgen(method, setter, js_name = "maximumUnit")]
+        pub fn set_maximum_unit(this: &BoundedDayOrHour, val: BoundedDayOrHourMaximumUnitKind);
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &BoundedDayOrHour) -> Option<PluralizeUnitDayOrHour>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &BoundedDayOrHour, val: PluralizeUnitDayOrHour);
+        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+        pub fn largest_unit(this: &BoundedDayOrHour) -> Option<BoundedDayOrHourLargestUnitKind>;
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit(this: &BoundedDayOrHour, val: BoundedDayOrHourLargestUnitKind);
+    }
+    impl BoundedDayOrHour {
+        pub fn new() -> BoundedDayOrHour {
+            Self::builder().build()
+        }
+        pub fn builder() -> BoundedDayOrHourBuilder {
+            BoundedDayOrHourBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for BoundedDayOrHour {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct BoundedDayOrHourBuilder {
+        inner: BoundedDayOrHour,
+    }
+    impl BoundedDayOrHourBuilder {
+        pub fn increment(self, val: f64) -> Self {
+            self.inner.set_increment(val);
+            self
+        }
+        pub fn maximum_unit(self, val: BoundedDayOrHourMaximumUnitKind) -> Self {
+            self.inner.set_maximum_unit(val);
+            self
+        }
+        pub fn smallest_unit(self, val: PluralizeUnitDayOrHour) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn largest_unit(self, val: BoundedDayOrHourLargestUnitKind) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn build(self) -> BoundedDayOrHour {
+            self.inner
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Rounding , extends = Object , is_type_of = JsValue :: is_object)]
@@ -843,6 +995,15 @@ pub mod polish {
             }
         }
     }
+    impl From<PluralizeUnitHour> for PluralizeUnitDayOrHour {
+        fn from(value: PluralizeUnitHour) -> PluralizeUnitDayOrHour {
+            match value {
+                PluralizeUnitHour::Hour => PluralizeUnitDayOrHour::Hour,
+                PluralizeUnitHour::Hours => PluralizeUnitDayOrHour::Hours,
+                PluralizeUnitHour::__Invalid => PluralizeUnitDayOrHour::__Invalid,
+            }
+        }
+    }
     impl From<PluralizeTimeUnit> for PluralizeUnit {
         fn from(value: PluralizeTimeUnit) -> PluralizeUnit {
             match value {
@@ -872,15 +1033,24 @@ pub mod polish {
             }
         }
     }
+    impl From<PluralizeUnitDayOrHour> for PluralizeUnit {
+        fn from(value: PluralizeUnitDayOrHour) -> PluralizeUnit {
+            match value {
+                PluralizeUnitDayOrHour::Day => PluralizeUnit::Day,
+                PluralizeUnitDayOrHour::Hour => PluralizeUnit::Hour,
+                PluralizeUnitDayOrHour::Days => PluralizeUnit::Days,
+                PluralizeUnitDayOrHour::Hours => PluralizeUnit::Hours,
+                PluralizeUnitDayOrHour::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectionKind {
     Next = "next",
     Previous = "previous",
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LargestUnitKind {
     Auto = "auto",
     Day = "day",
@@ -891,13 +1061,11 @@ pub enum LargestUnitKind {
     Minutes = "minutes",
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StepKind {
     Hour = "hour",
     Minute = "minute",
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SteppedLargestUnitKind {
     Auto = "auto",
     Hour = "hour",
@@ -906,28 +1074,45 @@ pub enum SteppedLargestUnitKind {
     Minutes = "minutes",
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MinuteSteppingLargestUnitKind {
     Auto = "auto",
     Minute = "minute",
     Minutes = "minutes",
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HourSteppingLargestUnitKind {
     Auto = "auto",
     Hour = "hour",
     Hours = "hours",
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MaximumUnitKind {
+    None = "none",
+    Day = "day",
+    Hour = "hour",
+    Minute = "minute",
+    Days = "days",
+    Hours = "hours",
+    Minutes = "minutes",
+}
+#[wasm_bindgen(private)]
 pub enum LevelReturnKind {
     Low = "low",
     High = "high",
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SideKind {
-    A = "a",
-    B = "b",
+pub enum BoundedDayOrHourMaximumUnitKind {
+    None = "none",
+    Day = "day",
+    Hour = "hour",
+    Days = "days",
+    Hours = "hours",
+}
+#[wasm_bindgen(private)]
+pub enum BoundedDayOrHourLargestUnitKind {
+    Auto = "auto",
+    Day = "day",
+    Hour = "hour",
+    Days = "days",
+    Hours = "hours",
 }
