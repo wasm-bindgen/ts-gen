@@ -34,6 +34,8 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
   * [`--fallible` — single `Result` form](#--fallible--single-result-form)
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
+* [`@rust` JSDoc → Rust scalar](#rust-jsdoc--rust-scalar)
+* [`--annotate` side files](#--annotate-side-files)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
 * [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-)
@@ -2162,6 +2164,115 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 * **Rendered doc**: `@throws {never}` lines do *not* contribute to
   the `## Errors` section. By definition there are no errors to
   document.
+
+## `@rust` JSDoc → Rust scalar
+
+TS `number` lowers to `f64`, which is wrong-shaped for most of the
+numbers a platform API actually carries (`status: number` is a `u16`,
+`port: number` a `u16`, `limit: number` a `u32`). A `@rust` tag forces
+the Rust scalar; wasm-bindgen converts the JS number at the boundary:
+
+```ts
+interface Response {
+  /** @rust u16 */
+  readonly status: number;
+  /**
+   * @rust status: u16
+   * @rust u32
+   */
+  withStatus(status: number, reason?: string): number;
+  /** @rust u32 */
+  count(): Promise<number>;
+}
+```
+
+```rust
+pub fn status(this: &Response) -> u16;
+pub fn with_status(this: &Response, status: u16) -> u32;
+pub async fn count(this: &Response) -> Result<u32, JsValue>;
+```
+
+* `@rust <type>` applies to the member's own type: a property (getter,
+  setter and builder method alike) or a callable's return.
+* `@rust <param>: <type>` applies to the named parameter of a method,
+  constructor or function; several tags may be stacked.
+* The scalar replaces the leaf through `| null` / `| undefined` and an
+  optional declaration (read as `Nullable<u16>` / `Option<u16>`), `T[]`
+  (`Vec<u8>` / `&[u8]`) and `Promise<…>` (`Result<u32, _>`).
+* Accepted scalars: `u8 u16 u32 u64 i8 i16 i32 i64 f32 f64 usize`.
+  wasm-bindgen crosses `u64`/`i64` as a JS `BigInt`, so they apply only
+  to a `bigint` leaf; every other scalar applies only to a `number`
+  leaf. A `@rust u64` on a `number` would make the JS glue reject the
+  value at runtime, so it is refused: sizes beyond `u32` stay `f64`
+  (exact to 2^53). An unknown scalar, an incompatible leaf, or a
+  parameter name that does not exist is an error diagnostic and the
+  tag is ignored.
+
+Why a JSDoc tag rather than a branded alias (`type u16 = number`): the
+alias form needs the upstream declaration to *use* the alias, which an
+upstream file never does, so annotations would still have to be
+layered on — and a tag reads as what it is, a Rust-side refinement,
+while a `u16` alias in `.d.ts` suggests a TS-level distinction that
+does not exist.
+
+## `--annotate` side files
+
+Upstream declaration files (`@cloudflare/workers-types`,
+`lib.dom.d.ts`) carry no `@rust` or `@throws` tags, and editing a
+vendored copy does not survive an upgrade. `--annotate` takes side
+`.d.ts` files that re-declare **only the members they tag**; the tags
+are applied to the input's declarations by declaration name and member
+name, and the side file is otherwise not emitted:
+
+```ts
+// annotations.d.ts
+interface Response {
+  /** @rust u16 */
+  readonly status: number;
+  /** @throws {TypeError} if the body has already been used */
+  clone(): Response;
+}
+interface Console { /** @throws {never} */ log(...data: any[]): void; }
+declare abstract class Cache { /** @rust ttl: u32 */ put(url: string, ttl?: number): Promise<void>; }
+```
+
+```sh
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
+       --annotate annotations.d.ts …
+```
+
+* `@rust` applies as if written on the input member; a property's tag
+  reaches its setter too. Parameters match by name.
+* `@throws` replaces the input member's failure mode. Getters are
+  infallible, so on a property it contributes only its doc.
+* A side member applies to every overload of the input method or
+  function, and its rendered doc (the `## Errors` section of `@throws`)
+  is appended to the input's doc once. Overloads may differ in return
+  type (`delete(key): Promise<boolean>`, `delete(keys: string[]):
+  Promise<number>`), so a return `@rust` applies to the overloads that
+  can carry it.
+* A declaration, member or parameter named in the side file that does
+  not exist in the input fails the run, so a typo cannot silently miss
+  a binding; so does an invalid `@rust` tag, or one whose scalar the
+  input's type cannot carry. Side members without tags are ignored.
+* Only classes, interfaces and functions can be annotated: a
+  `declare namespace`, `declare module`, alias or variable in the side
+  file fails the run rather than being skipped, as does a bare name
+  that the input declares more than once (globally and inside a
+  module), since names are matched without scope.
+* A side declaration's type-parameter defaults replace the input's, by
+  parameter name: upstream's `Request<CfHostMetadata, Cf =
+  CfProperties<CfHostMetadata>>` defaults `Cf` to a union of the incoming
+  and outgoing shapes, which erases, so the side file's `interface
+  Request<CfHostMetadata = unknown, Cf = IncomingRequestCfProperties<
+  CfHostMetadata>> {}` makes the bare `Request` read `cf()` as the
+  incoming properties. An alias in the side file may do the same for its
+  own parameters (`type RequestInfo<…, Cf = IncomingRequestCfProperties<…>>
+  = …`, whose target is ignored). A default for a parameter the input
+  lacks fails the run.
+* The side file may use `interface` for a class and need not repeat
+  type parameters or parameter types other than tagged ones; only names
+  matter.
 
 ## Subtyping LUB across unions
 

@@ -37,6 +37,19 @@ struct Cli {
     #[arg(short = 'E', long = "export", num_args = 1..)]
     export: Vec<String>,
 
+    /// Side `.d.ts` files whose `@rust` and `@throws` JSDoc tags are
+    /// layered onto the input declarations, matched by declaration and
+    /// member name.
+    ///
+    /// Upstream declaration files carry no such tags and editing a
+    /// vendored copy does not survive an upgrade. A side file re-declares
+    /// only the members it annotates (`interface Response { /** @rust u16
+    /// */ readonly status: number; }`); the tags are applied to the input's
+    /// declarations and the side file itself is not emitted. A name that
+    /// matches nothing is an error.
+    #[arg(long = "annotate", num_args = 1..)]
+    annotate: Vec<PathBuf>,
+
     /// JS module specifier (required when .d.ts has top-level exports).
     /// This module is the library the output binds, so it is emitted at
     /// the top level rather than in a `pub mod`.
@@ -123,6 +136,24 @@ fn main() -> Result<()> {
     // Apply external type mappings
     for mapping in &cli.external {
         gctx.external_map.add_mappings(mapping);
+    }
+
+    if !cli.annotate.is_empty() {
+        let files = resolve_input_files(&cli.annotate)?;
+        let (annotations, agctx) = ts_gen::parse::parse_dts_files(&files, cli.lib_name.as_deref())?;
+        agctx.diagnostics.emit();
+        if agctx.diagnostics.has_errors() {
+            let files: Vec<String> = cli
+                .annotate
+                .iter()
+                .map(|p| p.display().to_string())
+                .collect();
+            bail!("--annotate: invalid tags in {}", files.join(", "));
+        }
+        let errors = ts_gen::parse::annotate::apply(&mut gctx, &module, &annotations, &agctx);
+        if !errors.is_empty() {
+            bail!("--annotate:\n  {}", errors.join("\n  "));
+        }
     }
 
     gctx.diagnostics.emit();

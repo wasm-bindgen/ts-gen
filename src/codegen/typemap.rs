@@ -326,6 +326,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::ArrayBufferView => buf.push_str("ArrayBufferView"),
         TypeRef::PropertyKey => buf.push_str("PropertyKey"),
         TypeRef::TypedSlice(e, _) => write!(buf, "slice:{}", e.typed_array()).unwrap(),
+        TypeRef::RustScalar(s) => buf.push_str(s.as_str()),
         TypeRef::StringLiteral(s) => write!(buf, "lit:{s:?}").unwrap(),
         TypeRef::NumberLiteral(n) => write!(buf, "lit:{n}").unwrap(),
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
@@ -909,6 +910,7 @@ impl<'a> CodegenContext<'a> {
             | TypeRef::ArrayBufferView
             | TypeRef::PropertyKey
             | TypeRef::TypedSlice(..)
+            | TypeRef::RustScalar(_)
             | TypeRef::StringLiteral(_)
             | TypeRef::NumberLiteral(_)
             | TypeRef::BooleanLiteral(_)
@@ -1248,6 +1250,11 @@ pub fn to_syn_type(
         TypeRef::Unknown => maybe_ref(quote! { JsValue }, borrow),
         TypeRef::Object => maybe_ref(quote! { Object }, borrow),
         TypeRef::Symbol => maybe_ref(quote! { Symbol }, borrow),
+        // Always by value; wasm-bindgen converts the JS number.
+        TypeRef::RustScalar(s) => {
+            let ident = syn::Ident::new(s.as_str(), proc_macro2::Span::call_site());
+            quote! { #ident }
+        }
 
         // === TS-only synthetic ===
         // `ArrayBufferView` is a TS-only union alias (typed-array
@@ -2833,8 +2840,8 @@ fn is_mono_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: Sco
 }
 
 /// Whether a top-level `T[]` element keeps its Rust-native form
-/// (`String` / `f64`) inside the slice / `Vec`, rather than its handle
-/// form. Enums count as the primitive they carry.
+/// (`String` / `f64` / a `@rust` scalar) inside the slice / `Vec`, rather
+/// than its handle form. Enums count as the primitive they carry.
 fn is_native_array_element(
     elem: &TypeRef,
     ctx: Option<&CodegenContext<'_>>,
@@ -2846,6 +2853,7 @@ fn is_native_array_element(
             | TypeRef::StringLiteral(_)
             | TypeRef::Number
             | TypeRef::NumberLiteral(_)
+            | TypeRef::RustScalar(_)
             | TypeRef::Boolean
             | TypeRef::BooleanLiteral(_)
     )
@@ -2957,7 +2965,8 @@ pub(crate) fn is_mono_string_list_return(
     )
 }
 
-/// Whether a top-level `T[]` element lowers to `f64`.
+/// Whether a top-level `T[]` element is a JS number: `f64`, or the scalar
+/// a `@rust` tag forces.
 fn is_numeric_array_element(
     elem: &TypeRef,
     ctx: Option<&CodegenContext<'_>>,
@@ -2965,7 +2974,7 @@ fn is_numeric_array_element(
 ) -> bool {
     matches!(
         native_array_leaf(elem, ctx, scope).as_ref(),
-        TypeRef::Number | TypeRef::NumberLiteral(_)
+        TypeRef::Number | TypeRef::NumberLiteral(_) | TypeRef::RustScalar(_)
     )
 }
 
