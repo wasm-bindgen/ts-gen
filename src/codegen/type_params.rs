@@ -148,9 +148,12 @@ fn owning_type_default(
 }
 
 /// Type parameters an argument of type `ty` still names once lowered.
-/// Mirrors `to_syn_type`'s callback lowering: a variadic callback is the
-/// untyped `Function`, and a `Promise<T>` callback return erases, so
-/// neither mentions anything.
+/// Mirrors `to_syn_type`'s callback lowering: a callback's rest parameter
+/// lowers to `JsValue` (or an untyped `Array`), so it mentions nothing,
+/// while its other parameters and its return keep their type parameters.
+/// A `Promise<T>` callback return does not count: wasm-bindgen cannot
+/// pass a `Function` returning `Promise<T>` for a generic `T`, so `T` is
+/// left to the return rules, which erase it unless it is the whole return.
 fn surviving_type_params(
     ty: &TypeRef,
     cgctx: &CodegenContext<'_>,
@@ -159,10 +162,7 @@ fn surviving_type_params(
 ) {
     match ty {
         TypeRef::Function(sig) => {
-            if sig.params.iter().any(|p| p.variadic) {
-                return;
-            }
-            for p in &sig.params {
+            for p in sig.params.iter().filter(|p| !p.variadic) {
                 surviving_type_params(&p.type_ref, cgctx, scope, out);
             }
             let promised_param = sig.return_type.as_promise_inner().is_some_and(|inner| {

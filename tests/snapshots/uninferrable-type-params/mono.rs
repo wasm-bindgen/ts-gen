@@ -93,6 +93,22 @@ extern "C" {
         closure: &Function<fn(Store) -> Promise>,
     ) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
+    pub async fn collect(
+        this: &Store,
+        make: &Function<fn() -> Promise>,
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
+    #[wasm_bindgen(method, js_name = "collect")]
+    pub fn collect_promise(
+        this: &Store,
+        make: &Function<fn() -> Promise>,
+    ) -> Promise<Map<JsString, JsValue>>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn each<T>(this: &Store, r#fn: &Function) -> Result<Map<JsString, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "each")]
+    pub fn each_promise<T>(this: &Store, r#fn: &Function) -> Promise<Map<JsString, T>>;
+    #[wasm_bindgen(method, catch)]
     pub async fn run(this: &Store) -> Result<Row, JsValue>;
     #[wasm_bindgen(method, js_name = "run")]
     pub fn run_promise(this: &Store) -> Promise<Row>;
