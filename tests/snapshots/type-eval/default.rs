@@ -742,9 +742,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
     pub fn set_smallest_unit(this: &RoundingHour, val: PluralHour);
     #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-    pub fn largest_unit(this: &RoundingHour) -> Option<RoundingHourLargestUnitKind>;
+    pub fn largest_unit(this: &RoundingHour) -> Option<LargestUnitKind2>;
     #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-    pub fn set_largest_unit(this: &RoundingHour, val: RoundingHourLargestUnitKind);
+    pub fn set_largest_unit(this: &RoundingHour, val: LargestUnitKind2);
 }
 impl RoundingHour {
     pub fn new() -> RoundingHour {
@@ -769,7 +769,7 @@ impl RoundingHourBuilder {
         self.inner.set_smallest_unit(val);
         self
     }
-    pub fn largest_unit(self, val: RoundingHourLargestUnitKind) -> Self {
+    pub fn largest_unit(self, val: LargestUnitKind2) -> Self {
         self.inner.set_largest_unit(val);
         self
     }
@@ -933,7 +933,7 @@ pub enum LargestUnitKind {
     Seconds = "seconds",
 }
 #[wasm_bindgen(private)]
-pub enum RoundingHourLargestUnitKind {
+pub enum LargestUnitKind2 {
     Auto = "auto",
     Hour = "hour",
     Hours = "hours",

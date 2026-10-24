@@ -316,9 +316,9 @@ pub mod polish {
         #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
         pub fn set_smallest_unit(this: &Stepped, val: PluralizeTimeUnit);
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(this: &Stepped) -> Option<SteppedLargestUnitKind>;
+        pub fn largest_unit(this: &Stepped) -> Option<LargestUnitKind2>;
         #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(this: &Stepped, val: SteppedLargestUnitKind);
+        pub fn set_largest_unit(this: &Stepped, val: LargestUnitKind2);
     }
     impl Stepped {
         pub fn new() -> Stepped {
@@ -351,7 +351,7 @@ pub mod polish {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn largest_unit(self, val: SteppedLargestUnitKind) -> Self {
+        pub fn largest_unit(self, val: LargestUnitKind2) -> Self {
             self.inner.set_largest_unit(val);
             self
         }
@@ -373,9 +373,9 @@ pub mod polish {
         #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
         pub fn set_smallest_unit(this: &MinuteStepping, val: PluralizeUnitMinute);
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(this: &MinuteStepping) -> Option<MinuteSteppingLargestUnitKind>;
+        pub fn largest_unit(this: &MinuteStepping) -> Option<LargestUnitKind3>;
         #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(this: &MinuteStepping, val: MinuteSteppingLargestUnitKind);
+        pub fn set_largest_unit(this: &MinuteStepping, val: LargestUnitKind3);
     }
     impl MinuteStepping {
         pub fn new() -> MinuteStepping {
@@ -408,7 +408,7 @@ pub mod polish {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn largest_unit(self, val: MinuteSteppingLargestUnitKind) -> Self {
+        pub fn largest_unit(self, val: LargestUnitKind3) -> Self {
             self.inner.set_largest_unit(val);
             self
         }
@@ -430,9 +430,9 @@ pub mod polish {
         #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
         pub fn set_smallest_unit(this: &HourStepping, val: PluralizeUnitHour);
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(this: &HourStepping) -> Option<HourSteppingLargestUnitKind>;
+        pub fn largest_unit(this: &HourStepping) -> Option<LargestUnitKind4>;
         #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(this: &HourStepping, val: HourSteppingLargestUnitKind);
+        pub fn set_largest_unit(this: &HourStepping, val: LargestUnitKind4);
     }
     impl HourStepping {
         pub fn new() -> HourStepping {
@@ -465,7 +465,7 @@ pub mod polish {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn largest_unit(self, val: HourSteppingLargestUnitKind) -> Self {
+        pub fn largest_unit(self, val: LargestUnitKind4) -> Self {
             self.inner.set_largest_unit(val);
             self
         }
@@ -824,9 +824,9 @@ pub mod polish {
         #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
         pub fn set_smallest_unit(this: &RoundingTimeUnit, val: PluralizeTimeUnit);
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(this: &RoundingTimeUnit) -> Option<SteppedLargestUnitKind>;
+        pub fn largest_unit(this: &RoundingTimeUnit) -> Option<LargestUnitKind2>;
         #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(this: &RoundingTimeUnit, val: SteppedLargestUnitKind);
+        pub fn set_largest_unit(this: &RoundingTimeUnit, val: LargestUnitKind2);
     }
     impl RoundingTimeUnit {
         pub fn new() -> RoundingTimeUnit {
@@ -855,7 +855,7 @@ pub mod polish {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn largest_unit(self, val: SteppedLargestUnitKind) -> Self {
+        pub fn largest_unit(self, val: LargestUnitKind2) -> Self {
             self.inner.set_largest_unit(val);
             self
         }
@@ -877,17 +877,17 @@ pub mod polish {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type BoundedDayOrHour;
         #[wasm_bindgen(method, getter, js_name = "maximumUnit")]
-        pub fn maximum_unit(this: &BoundedDayOrHour) -> Option<BoundedDayOrHourMaximumUnitKind>;
+        pub fn maximum_unit(this: &BoundedDayOrHour) -> Option<MaximumUnitKind2>;
         #[wasm_bindgen(method, setter, js_name = "maximumUnit")]
-        pub fn set_maximum_unit(this: &BoundedDayOrHour, val: BoundedDayOrHourMaximumUnitKind);
+        pub fn set_maximum_unit(this: &BoundedDayOrHour, val: MaximumUnitKind2);
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
         pub fn smallest_unit(this: &BoundedDayOrHour) -> Option<PluralizeUnitDayOrHour>;
         #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
         pub fn set_smallest_unit(this: &BoundedDayOrHour, val: PluralizeUnitDayOrHour);
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(this: &BoundedDayOrHour) -> Option<BoundedDayOrHourLargestUnitKind>;
+        pub fn largest_unit(this: &BoundedDayOrHour) -> Option<LargestUnitKind5>;
         #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(this: &BoundedDayOrHour, val: BoundedDayOrHourLargestUnitKind);
+        pub fn set_largest_unit(this: &BoundedDayOrHour, val: LargestUnitKind5);
     }
     impl BoundedDayOrHour {
         pub fn new() -> BoundedDayOrHour {
@@ -912,7 +912,7 @@ pub mod polish {
             self.inner.set_increment(val);
             self
         }
-        pub fn maximum_unit(self, val: BoundedDayOrHourMaximumUnitKind) -> Self {
+        pub fn maximum_unit(self, val: MaximumUnitKind2) -> Self {
             self.inner.set_maximum_unit(val);
             self
         }
@@ -920,7 +920,7 @@ pub mod polish {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn largest_unit(self, val: BoundedDayOrHourLargestUnitKind) -> Self {
+        pub fn largest_unit(self, val: LargestUnitKind5) -> Self {
             self.inner.set_largest_unit(val);
             self
         }
@@ -938,9 +938,9 @@ pub mod polish {
         #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
         pub fn set_smallest_unit(this: &RoundingHour, val: PluralizeUnitHour);
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(this: &RoundingHour) -> Option<HourSteppingLargestUnitKind>;
+        pub fn largest_unit(this: &RoundingHour) -> Option<LargestUnitKind4>;
         #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(this: &RoundingHour, val: HourSteppingLargestUnitKind);
+        pub fn set_largest_unit(this: &RoundingHour, val: LargestUnitKind4);
     }
     impl RoundingHour {
         pub fn new() -> RoundingHour {
@@ -969,7 +969,7 @@ pub mod polish {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn largest_unit(self, val: HourSteppingLargestUnitKind) -> Self {
+        pub fn largest_unit(self, val: LargestUnitKind4) -> Self {
             self.inner.set_largest_unit(val);
             self
         }
@@ -1044,75 +1044,75 @@ pub mod polish {
             }
         }
     }
-}
-#[wasm_bindgen(private)]
-pub enum DirectionKind {
-    Next = "next",
-    Previous = "previous",
-}
-#[wasm_bindgen(private)]
-pub enum LargestUnitKind {
-    Auto = "auto",
-    Day = "day",
-    Hour = "hour",
-    Minute = "minute",
-    Days = "days",
-    Hours = "hours",
-    Minutes = "minutes",
-}
-#[wasm_bindgen(private)]
-pub enum StepKind {
-    Hour = "hour",
-    Minute = "minute",
-}
-#[wasm_bindgen(private)]
-pub enum SteppedLargestUnitKind {
-    Auto = "auto",
-    Hour = "hour",
-    Minute = "minute",
-    Hours = "hours",
-    Minutes = "minutes",
-}
-#[wasm_bindgen(private)]
-pub enum MinuteSteppingLargestUnitKind {
-    Auto = "auto",
-    Minute = "minute",
-    Minutes = "minutes",
-}
-#[wasm_bindgen(private)]
-pub enum HourSteppingLargestUnitKind {
-    Auto = "auto",
-    Hour = "hour",
-    Hours = "hours",
-}
-#[wasm_bindgen(private)]
-pub enum MaximumUnitKind {
-    None = "none",
-    Day = "day",
-    Hour = "hour",
-    Minute = "minute",
-    Days = "days",
-    Hours = "hours",
-    Minutes = "minutes",
-}
-#[wasm_bindgen(private)]
-pub enum LevelReturnKind {
-    Low = "low",
-    High = "high",
-}
-#[wasm_bindgen(private)]
-pub enum BoundedDayOrHourMaximumUnitKind {
-    None = "none",
-    Day = "day",
-    Hour = "hour",
-    Days = "days",
-    Hours = "hours",
-}
-#[wasm_bindgen(private)]
-pub enum BoundedDayOrHourLargestUnitKind {
-    Auto = "auto",
-    Day = "day",
-    Hour = "hour",
-    Days = "days",
-    Hours = "hours",
+    #[wasm_bindgen(private)]
+    pub enum DirectionKind {
+        Next = "next",
+        Previous = "previous",
+    }
+    #[wasm_bindgen(private)]
+    pub enum LargestUnitKind {
+        Auto = "auto",
+        Day = "day",
+        Hour = "hour",
+        Minute = "minute",
+        Days = "days",
+        Hours = "hours",
+        Minutes = "minutes",
+    }
+    #[wasm_bindgen(private)]
+    pub enum StepKind {
+        Hour = "hour",
+        Minute = "minute",
+    }
+    #[wasm_bindgen(private)]
+    pub enum LargestUnitKind2 {
+        Auto = "auto",
+        Hour = "hour",
+        Minute = "minute",
+        Hours = "hours",
+        Minutes = "minutes",
+    }
+    #[wasm_bindgen(private)]
+    pub enum LargestUnitKind3 {
+        Auto = "auto",
+        Minute = "minute",
+        Minutes = "minutes",
+    }
+    #[wasm_bindgen(private)]
+    pub enum LargestUnitKind4 {
+        Auto = "auto",
+        Hour = "hour",
+        Hours = "hours",
+    }
+    #[wasm_bindgen(private)]
+    pub enum MaximumUnitKind {
+        None = "none",
+        Day = "day",
+        Hour = "hour",
+        Minute = "minute",
+        Days = "days",
+        Hours = "hours",
+        Minutes = "minutes",
+    }
+    #[wasm_bindgen(private)]
+    pub enum LevelReturnKind {
+        Low = "low",
+        High = "high",
+    }
+    #[wasm_bindgen(private)]
+    pub enum MaximumUnitKind2 {
+        None = "none",
+        Day = "day",
+        Hour = "hour",
+        Days = "days",
+        Hours = "hours",
+    }
+    #[wasm_bindgen(private)]
+    pub enum LargestUnitKind5 {
+        Auto = "auto",
+        Day = "day",
+        Hour = "hour",
+        Days = "days",
+        Hours = "hours",
+    }
 }

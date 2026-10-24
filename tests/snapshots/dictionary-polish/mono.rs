@@ -1496,14 +1496,14 @@ pub mod polish {
             }
         }
     }
-}
-#[wasm_bindgen(private)]
-pub enum DirectionKind {
-    Next = "next",
-    Previous = "previous",
-}
-#[wasm_bindgen(private)]
-pub enum LevelReturnKind {
-    Low = "low",
-    High = "high",
+    #[wasm_bindgen(private)]
+    pub enum DirectionKind {
+        Next = "next",
+        Previous = "previous",
+    }
+    #[wasm_bindgen(private)]
+    pub enum LevelReturnKind {
+        Low = "low",
+        High = "high",
+    }
 }
