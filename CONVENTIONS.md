@@ -2268,6 +2268,13 @@ pub fn typed(this: &Env) -> KVNamespace;
 Method-level parameters follow the same rule
 (`tag<Level extends "info" | "warn">(level: Level)` → `level: &str`).
 
+The arguments are dropped once every input is parsed, before codegen, so
+everything downstream sees `KVNamespaceListResult<Metadata>`. In
+per-monomorphization mode, the erased `Key` therefore adds no
+`list_js_string` variant. A reference left with no arguments lowers
+like a bare one: `Params<P>` against `type Params<P extends string> =
+Record<P, string>` lowers to the alias's target, `Object`.
+
 ### Primitive union arguments
 
 In per-monomorphization mode, primitive union arguments expand per member

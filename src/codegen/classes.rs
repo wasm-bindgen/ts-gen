@@ -2443,12 +2443,11 @@ fn collect_parent_members(
         ),
         _ => return,
     };
-    let args = c.live_generic_args(id, generic_args);
     let map: HashMap<String, TypeRef> = type_params
         .iter()
         .enumerate()
         .map(|(i, tp)| {
-            let arg = args
+            let arg = generic_args
                 .get(i)
                 .cloned()
                 .or_else(|| tp.default.clone())

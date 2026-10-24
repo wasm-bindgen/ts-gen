@@ -104,12 +104,6 @@ extern "C" {
     pub async fn list<Metadata>(this: &Store) -> Result<ListResult<Metadata>, JsValue>
     where
         Metadata: 'static;
-    #[wasm_bindgen(method, catch, js_name = "list")]
-    pub async fn list_js_string<Metadata>(
-        this: &Store,
-    ) -> Result<ListResult<Metadata, JsString>, JsValue>
-    where
-        Metadata: 'static;
     #[wasm_bindgen(method, js_name = "list")]
     pub fn list_promise<Metadata>(this: &Store) -> Promise<ListResult<Metadata>>;
     #[wasm_bindgen(method, catch)]

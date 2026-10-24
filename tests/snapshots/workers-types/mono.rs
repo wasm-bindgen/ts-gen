@@ -8749,12 +8749,6 @@ extern "C" {
     ) -> Result<KVNamespaceListResult<Metadata>, JsValue>
     where
         Metadata: 'static;
-    #[wasm_bindgen(method, catch, js_name = "list")]
-    pub async fn list_js_string<Metadata>(
-        this: &KVNamespace,
-    ) -> Result<KVNamespaceListResult<Metadata, JsString>, JsValue>
-    where
-        Metadata: 'static;
     #[wasm_bindgen(method, js_name = "list")]
     pub fn list_promise<Metadata>(this: &KVNamespace) -> Promise<KVNamespaceListResult<Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "list")]
@@ -8762,13 +8756,6 @@ extern "C" {
         this: &KVNamespace,
         options: &KVNamespaceListOptions,
     ) -> Result<KVNamespaceListResult<Metadata>, JsValue>
-    where
-        Metadata: 'static;
-    #[wasm_bindgen(method, catch, js_name = "list")]
-    pub async fn list_with_options_js_string<Metadata>(
-        this: &KVNamespace,
-        options: &KVNamespaceListOptions,
-    ) -> Result<KVNamespaceListResult<Metadata, JsString>, JsValue>
     where
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "list")]
