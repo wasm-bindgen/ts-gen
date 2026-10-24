@@ -2752,8 +2752,12 @@ is emitted under a private name and a non-extern `pub fn` of the public
 name converts over it. The rule is narrow on purpose: a wrapper is
 never emitted for ergonomics, only where no extern signature can carry
 the type, and the extern form stays reachable (within the module) under
-a `_js` name. One construct qualifies today: overloads keyed by a string
-literal.
+a `_js` name. Two constructs qualify today:
+
+* **`null` arms.** The extern ABI has no type that only admits `null`,
+  so `f(x: T | null)`'s `f_with_null()` binds `f_with_null_js(x:
+  &JsValue)` and passes `&JsValue::NULL` (see [Writes](#writes)).
+* **Overloads keyed by a string literal**, below.
 
 **Overloads distinguished only by a string literal.** Rust has no
 literal types, so `get(key, type: "json")` and `get(key, type:
