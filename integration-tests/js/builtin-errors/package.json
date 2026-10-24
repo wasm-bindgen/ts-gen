@@ -1,5 +1,5 @@
 {
-  "name": "intl-types",
+  "name": "builtin-errors",
   "private": true,
   "type": "module",
   "main": "index.js"

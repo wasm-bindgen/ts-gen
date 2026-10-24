@@ -68,3 +68,200 @@ extern "C" {
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<JsString>, Error>;
 }
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Formatter;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Formatter, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Formatter")]
+    pub fn new_with_str(locales: impl ::wasm_bindgen::JsStringLike) -> Result<Formatter, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Formatter")]
+    pub fn new_with_slice(locales: &[JsString]) -> Result<Formatter, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Formatter")]
+    pub fn new_with_str_and_options(
+        locales: impl ::wasm_bindgen::JsStringLike,
+        options: &::js_sys::Intl::DateTimeFormatOptions,
+    ) -> Result<Formatter, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Formatter")]
+    pub fn new_with_slice_and_options(
+        locales: &[JsString],
+        options: &::js_sys::Intl::DateTimeFormatOptions,
+    ) -> Result<Formatter, JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn received(this: &Formatter) -> String;
+    #[wasm_bindgen(method, getter, js_name = "received")]
+    pub fn received_js_string(this: &Formatter) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn format(this: &Formatter) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "format")]
+    pub fn format_js_string(this: &Formatter) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "format")]
+    pub fn format_with_str(
+        this: &Formatter,
+        locales: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "format")]
+    pub fn format_with_str_js_string(
+        this: &Formatter,
+        locales: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "format")]
+    pub fn format_with_slice(this: &Formatter, locales: &[JsString]) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "format")]
+    pub fn format_with_slice_js_string(
+        this: &Formatter,
+        locales: &[JsString],
+    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "format")]
+    pub fn format_with_str_and_options(
+        this: &Formatter,
+        locales: impl ::wasm_bindgen::JsStringLike,
+        options: &::js_sys::Object,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "format")]
+    pub fn format_with_str_and_options_js_string(
+        this: &Formatter,
+        locales: impl ::wasm_bindgen::JsStringLike,
+        options: &::js_sys::Object,
+    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "format")]
+    pub fn format_with_slice_and_options(
+        this: &Formatter,
+        locales: &[JsString],
+        options: &::js_sys::Object,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "format")]
+    pub fn format_with_slice_and_options_js_string(
+        this: &Formatter,
+        locales: &[JsString],
+        options: &::js_sys::Object,
+    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn locale(
+        this: &Formatter,
+        tag: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<::js_sys::Intl::Locale, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn describe() -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describe")]
+    pub fn describe_js_string() -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describe")]
+    pub fn describe_with_str(locales: impl ::wasm_bindgen::JsStringLike)
+        -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describe")]
+    pub fn describe_with_str_js_string(
+        locales: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describe")]
+    pub fn describe_with_slice(locales: &[JsString]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describe")]
+    pub fn describe_with_slice_js_string(locales: &[JsString]) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describe")]
+    pub fn describe_with_str_and_options(
+        locales: impl ::wasm_bindgen::JsStringLike,
+        options: &::js_sys::Intl::DateTimeFormatOptions,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describe")]
+    pub fn describe_with_str_and_options_js_string(
+        locales: impl ::wasm_bindgen::JsStringLike,
+        options: &::js_sys::Intl::DateTimeFormatOptions,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describe")]
+    pub fn describe_with_slice_and_options(
+        locales: &[JsString],
+        options: &::js_sys::Intl::DateTimeFormatOptions,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describe")]
+    pub fn describe_with_slice_and_options_js_string(
+        locales: &[JsString],
+        options: &::js_sys::Intl::DateTimeFormatOptions,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type FormatSettings;
+    #[wasm_bindgen(method, getter)]
+    pub fn locales(this: &FormatSettings) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_locales(this: &FormatSettings, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "locales")]
+    pub fn set_locales_with_slice(this: &FormatSettings, val: &[JsString]);
+    #[wasm_bindgen(method, getter, js_name = "dateTime")]
+    pub fn date_time(this: &FormatSettings) -> Option<::js_sys::Intl::DateTimeFormatOptions>;
+    #[wasm_bindgen(method, setter, js_name = "dateTime")]
+    pub fn set_date_time(this: &FormatSettings, val: &::js_sys::Intl::DateTimeFormatOptions);
+}
+impl FormatSettings {
+    pub fn new() -> FormatSettings {
+        Self::builder().build()
+    }
+    pub fn builder() -> FormatSettingsBuilder {
+        FormatSettingsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct FormatSettingsBuilder {
+    inner: FormatSettings,
+}
+impl FormatSettingsBuilder {
+    pub fn locales(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_locales(val);
+        self
+    }
+    pub fn locales_with_slice(self, val: &[JsString]) -> Self {
+        self.inner.set_locales_with_slice(val);
+        self
+    }
+    pub fn date_time(self, val: &::js_sys::Intl::DateTimeFormatOptions) -> Self {
+        self.inner.set_date_time(val);
+        self
+    }
+    pub fn build(self) -> FormatSettings {
+        self.inner
+    }
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn settings(value: &FormatSettings) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "settings")]
+    pub fn settings_js_string(value: &FormatSettings) -> Result<JsString, JsValue>;
+}
