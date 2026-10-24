@@ -63,6 +63,7 @@ mod tests {
             scope: crate::parse::scope::ScopeId::DUMMY,
             js_name: name.to_string(),
             type_ref: TypeRef::Any,
+            optional: false,
             doc: None,
         })
     }

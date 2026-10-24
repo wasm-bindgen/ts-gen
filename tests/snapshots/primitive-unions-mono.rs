@@ -7,34 +7,82 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setValue")]
-    pub fn set_value(value: impl ::js_sys::JsNumberOrStringLike);
+    pub fn set_value(value: impl ::wasm_bindgen::JsStringLike);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setValue")]
-    pub fn try_set_value(value: impl ::js_sys::JsNumberOrStringLike) -> Result<(), JsValue>;
+    pub fn try_set_value(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "setValue")]
+    pub fn set_value_with_f64(value: f64);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setValue")]
+    pub fn try_set_value_with_f64(value: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setFlag")]
-    pub fn set_flag(value: impl ::js_sys::JsBigIntOrBooleanLike);
+    pub fn set_flag(value: bool);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setFlag")]
-    pub fn try_set_flag(value: impl ::js_sys::JsBigIntOrBooleanLike) -> Result<(), JsValue>;
+    pub fn try_set_flag(value: bool) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "setFlag")]
+    pub fn set_flag_with_big_int(value: &BigInt);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setFlag")]
+    pub fn try_set_flag_with_big_int(value: &BigInt) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setAny")]
-    pub fn set_any(value: impl ::js_sys::JsBigIntOrBooleanOrNumberOrStringLike);
+    pub fn set_any(value: &BigInt);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setAny")]
-    pub fn try_set_any(
-        value: impl ::js_sys::JsBigIntOrBooleanOrNumberOrStringLike,
-    ) -> Result<(), JsValue>;
+    pub fn try_set_any(value: &BigInt) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "setAny")]
+    pub fn set_any_with_bool(value: bool);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setAny")]
+    pub fn try_set_any_with_bool(value: bool) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "setAny")]
+    pub fn set_any_with_f64(value: f64);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setAny")]
+    pub fn try_set_any_with_f64(value: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "setAny")]
+    pub fn set_any_with_str(value: impl ::wasm_bindgen::JsStringLike);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setAny")]
+    pub fn try_set_any_with_str(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
@@ -69,22 +117,58 @@ extern "C" {
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setLevel")]
-    pub fn set_level(level: impl ::js_sys::JsNumberOrStringLike);
+    pub fn set_level(level: f64);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setLevel")]
-    pub fn try_set_level(level: impl ::js_sys::JsNumberOrStringLike) -> Result<(), JsValue>;
+    pub fn try_set_level(level: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "setLevel")]
+    pub fn set_level_with_str(level: impl ::wasm_bindgen::JsStringLike);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setLevel")]
+    pub fn try_set_level_with_str(level: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setNullable")]
-    pub fn set_nullable(value: impl ::js_sys::JsNumberOrStringLike);
+    pub fn set_nullable(value: impl ::wasm_bindgen::JsStringLike);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setNullable")]
-    pub fn try_set_nullable(value: impl ::js_sys::JsNumberOrStringLike) -> Result<(), JsValue>;
+    pub fn try_set_nullable(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "setNullable")]
+    pub fn set_nullable_with_f64(value: f64);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setNullable")]
+    pub fn try_set_nullable_with_f64(value: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "setNullable")]
+    fn set_nullable_with_null_js(value: &::wasm_bindgen::JsValue);
+}
+pub fn set_nullable_with_null() {
+    set_nullable_with_null_js(&::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setNullable")]
+    fn try_set_nullable_with_null_js(value: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+}
+pub fn try_set_nullable_with_null() -> Result<(), JsValue> {
+    try_set_nullable_with_null_js(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
@@ -99,45 +183,103 @@ extern "C" {
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setMaybe")]
-    pub fn set_maybe_with_value(value: impl ::js_sys::JsNumberOrStringLike);
+    pub fn set_maybe_with_str(value: impl ::wasm_bindgen::JsStringLike);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setMaybe")]
-    pub fn try_set_maybe_with_value(
-        value: impl ::js_sys::JsNumberOrStringLike,
-    ) -> Result<(), JsValue>;
+    pub fn try_set_maybe_with_str(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "setMaybe")]
+    pub fn set_maybe_with_f64(value: f64);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setMaybe")]
+    pub fn try_set_maybe_with_f64(value: f64) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type Id = JsValue;
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    pub fn lookup(id: impl ::js_sys::JsNumberOrStringLike);
+    pub fn lookup(id: impl ::wasm_bindgen::JsStringLike);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "lookup")]
-    pub fn try_lookup(id: impl ::js_sys::JsNumberOrStringLike) -> Result<(), JsValue>;
+    pub fn try_lookup(id: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "lookup")]
+    pub fn lookup_with_f64(id: f64);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "lookup")]
+    pub fn try_lookup_with_f64(id: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "hasKey")]
-    pub fn has_key(key: impl ::js_sys::PropertyKey) -> bool;
+    pub fn has_key(key: impl ::wasm_bindgen::JsStringLike) -> bool;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKey")]
-    pub fn try_has_key(key: impl ::js_sys::PropertyKey) -> Result<bool, JsValue>;
+    pub fn try_has_key(key: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "hasKey")]
+    pub fn has_key_with_f64(key: f64) -> bool;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "hasKey")]
+    pub fn try_has_key_with_f64(key: f64) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "hasKey")]
+    pub fn has_key_with_symbol(key: &Symbol) -> bool;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "hasKey")]
+    pub fn try_has_key_with_symbol(key: &Symbol) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "hasKeyExplicit")]
-    pub fn has_key_explicit(key: impl ::js_sys::PropertyKey) -> bool;
+    pub fn has_key_explicit(key: impl ::wasm_bindgen::JsStringLike) -> bool;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKeyExplicit")]
-    pub fn try_has_key_explicit(key: impl ::js_sys::PropertyKey) -> Result<bool, JsValue>;
+    pub fn try_has_key_explicit(key: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "hasKeyExplicit")]
+    pub fn has_key_explicit_with_f64(key: f64) -> bool;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "hasKeyExplicit")]
+    pub fn try_has_key_explicit_with_f64(key: f64) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "hasKeyExplicit")]
+    pub fn has_key_explicit_with_symbol(key: &Symbol) -> bool;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "hasKeyExplicit")]
+    pub fn try_has_key_explicit_with_symbol(key: &Symbol) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
@@ -170,14 +312,22 @@ extern "C" {
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "send")]
-    pub fn send_with_number_or_string(to: impl ::js_sys::JsNumberOrStringLike);
+    pub fn send_with_str(to: impl ::wasm_bindgen::JsStringLike);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "send")]
-    pub fn try_send_with_number_or_string(
-        to: impl ::js_sys::JsNumberOrStringLike,
-    ) -> Result<(), JsValue>;
+    pub fn try_send_with_str(to: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "send")]
+    pub fn send_with_f64(to: f64);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "send")]
+    pub fn try_send_with_f64(to: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
@@ -204,25 +354,39 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new(key: impl ::js_sys::PropertyKey) -> Result<Store, JsValue>;
+    pub fn new(key: impl ::wasm_bindgen::JsStringLike) -> Result<Store, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Store")]
+    pub fn new_with_f64(key: f64) -> Result<Store, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Store")]
+    pub fn new_with_symbol(key: &Symbol) -> Result<Store, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn get(this: &Store, key: impl ::js_sys::JsNumberOrStringLike) -> String;
+    pub fn get(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> String;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_js_string(this: &Store, key: impl ::js_sys::JsNumberOrStringLike) -> JsString;
+    pub fn get_js_string(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> JsString;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(
-        this: &Store,
-        key: impl ::js_sys::JsNumberOrStringLike,
-    ) -> Result<String, JsValue>;
+    pub fn try_get(this: &Store, key: impl ::wasm_bindgen::JsStringLike)
+        -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get_js_string(
         this: &Store,
-        key: impl ::js_sys::JsNumberOrStringLike,
+        key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_f64(this: &Store, key: f64) -> String;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_f64_js_string(this: &Store, key: f64) -> JsString;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn try_get_with_f64(this: &Store, key: f64) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn try_get_with_f64_js_string(this: &Store, key: f64) -> Result<JsString, JsValue>;
     # [wasm_bindgen (static_method_of = Store)]
-    pub fn of(value: impl ::js_sys::JsBooleanOrNumberLike) -> Store;
+    pub fn of(value: bool) -> Store;
     # [wasm_bindgen (static_method_of = Store , catch , js_name = "of")]
-    pub fn try_of(value: impl ::js_sys::JsBooleanOrNumberLike) -> Result<Store, JsValue>;
+    pub fn try_of(value: bool) -> Result<Store, JsValue>;
+    # [wasm_bindgen (static_method_of = Store , js_name = "of")]
+    pub fn of_with_f64(value: f64) -> Store;
+    # [wasm_bindgen (static_method_of = Store , catch , js_name = "of")]
+    pub fn try_of_with_f64(value: f64) -> Result<Store, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
@@ -238,66 +402,143 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &Settings) -> CurrentReturnKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_id(this: &Settings, val: impl ::js_sys::JsNumberOrStringLike);
+    pub fn set_id(this: &Settings, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "id")]
+    pub fn set_id_with_f64(this: &Settings, val: f64);
     #[wasm_bindgen(method, getter)]
     pub fn label(this: &Settings) -> Option<LabelKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_label(this: &Settings, val: impl ::js_sys::JsBooleanOrStringLike);
+    pub fn set_label(this: &Settings, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "label")]
+    pub fn set_label_with_bool(this: &Settings, val: bool);
     #[wasm_bindgen(method, getter)]
     pub fn from(this: &Settings) -> FromKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_from(this: &Settings, val: &Target);
     #[wasm_bindgen(method, setter, js_name = "from")]
-    pub fn set_from_with_boolean_or_string(
-        this: &Settings,
-        val: impl ::js_sys::JsBooleanOrStringLike,
-    );
+    pub fn set_from_with_str(this: &Settings, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "from")]
+    pub fn set_from_with_bool(this: &Settings, val: bool);
 }
 impl Settings {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `level: \"low\"`"]
-    pub fn new_low(id: impl ::js_sys::JsNumberOrStringLike, from: &Target) -> Settings {
+    pub fn new_low(id: impl ::wasm_bindgen::JsStringLike, from: &Target) -> Settings {
         Self::builder_low(id, from).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `level: \"low\"`"]
-    pub fn new_low_with_boolean_or_string(
-        id: impl ::js_sys::JsNumberOrStringLike,
-        from: impl ::js_sys::JsBooleanOrStringLike,
+    pub fn new_low_with_str_and_str(
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: impl ::wasm_bindgen::JsStringLike,
     ) -> Settings {
-        Self::builder_low_with_boolean_or_string(id, from).build()
+        Self::builder_low_with_str_and_str(id, from).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"low\"`"]
+    pub fn new_low_with_str_and_bool(
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: bool,
+    ) -> Settings {
+        Self::builder_low_with_str_and_bool(id, from).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"low\"`"]
+    pub fn new_low_with_f64_and_target(id: f64, from: &Target) -> Settings {
+        Self::builder_low_with_f64_and_target(id, from).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"low\"`"]
+    pub fn new_low_with_f64_and_str(id: f64, from: impl ::wasm_bindgen::JsStringLike) -> Settings {
+        Self::builder_low_with_f64_and_str(id, from).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"low\"`"]
+    pub fn new_low_with_f64_and_bool(id: f64, from: bool) -> Settings {
+        Self::builder_low_with_f64_and_bool(id, from).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `level: \"high\"`"]
-    pub fn new_high(id: impl ::js_sys::JsNumberOrStringLike, from: &Target) -> Settings {
+    pub fn new_high(id: impl ::wasm_bindgen::JsStringLike, from: &Target) -> Settings {
         Self::builder_high(id, from).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `level: \"high\"`"]
-    pub fn new_high_with_boolean_or_string(
-        id: impl ::js_sys::JsNumberOrStringLike,
-        from: impl ::js_sys::JsBooleanOrStringLike,
+    pub fn new_high_with_str_and_str(
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: impl ::wasm_bindgen::JsStringLike,
     ) -> Settings {
-        Self::builder_high_with_boolean_or_string(id, from).build()
+        Self::builder_high_with_str_and_str(id, from).build()
     }
-    pub fn new(level: f64, id: impl ::js_sys::JsNumberOrStringLike, from: &Target) -> Settings {
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"high\"`"]
+    pub fn new_high_with_str_and_bool(
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: bool,
+    ) -> Settings {
+        Self::builder_high_with_str_and_bool(id, from).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"high\"`"]
+    pub fn new_high_with_f64_and_target(id: f64, from: &Target) -> Settings {
+        Self::builder_high_with_f64_and_target(id, from).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"high\"`"]
+    pub fn new_high_with_f64_and_str(id: f64, from: impl ::wasm_bindgen::JsStringLike) -> Settings {
+        Self::builder_high_with_f64_and_str(id, from).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"high\"`"]
+    pub fn new_high_with_f64_and_bool(id: f64, from: bool) -> Settings {
+        Self::builder_high_with_f64_and_bool(id, from).build()
+    }
+    pub fn new(level: f64, id: impl ::wasm_bindgen::JsStringLike, from: &Target) -> Settings {
         Self::builder(level, id, from).build()
     }
-    pub fn new_with_boolean_or_string(
+    pub fn new_with_str_and_str(
         level: f64,
-        id: impl ::js_sys::JsNumberOrStringLike,
-        from: impl ::js_sys::JsBooleanOrStringLike,
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: impl ::wasm_bindgen::JsStringLike,
     ) -> Settings {
-        Self::builder_with_boolean_or_string(level, id, from).build()
+        Self::builder_with_str_and_str(level, id, from).build()
+    }
+    pub fn new_with_str_and_bool(
+        level: f64,
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: bool,
+    ) -> Settings {
+        Self::builder_with_str_and_bool(level, id, from).build()
+    }
+    pub fn new_with_f64_and_target(level: f64, id: f64, from: &Target) -> Settings {
+        Self::builder_with_f64_and_target(level, id, from).build()
+    }
+    pub fn new_with_f64_and_str(
+        level: f64,
+        id: f64,
+        from: impl ::wasm_bindgen::JsStringLike,
+    ) -> Settings {
+        Self::builder_with_f64_and_str(level, id, from).build()
+    }
+    pub fn new_with_f64_and_bool(level: f64, id: f64, from: bool) -> Settings {
+        Self::builder_with_f64_and_bool(level, id, from).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `level: \"low\"`"]
-    pub fn builder_low(id: impl ::js_sys::JsNumberOrStringLike, from: &Target) -> SettingsBuilder {
+    pub fn builder_low(id: impl ::wasm_bindgen::JsStringLike, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
         inner.set_id(id);
@@ -307,20 +548,66 @@ impl Settings {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `level: \"low\"`"]
-    pub fn builder_low_with_boolean_or_string(
-        id: impl ::js_sys::JsNumberOrStringLike,
-        from: impl ::js_sys::JsBooleanOrStringLike,
+    pub fn builder_low_with_str_and_str(
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: impl ::wasm_bindgen::JsStringLike,
     ) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
         inner.set_id(id);
-        inner.set_from_with_boolean_or_string(from);
+        inner.set_from_with_str(from);
+        SettingsBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"low\"`"]
+    pub fn builder_low_with_str_and_bool(
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: bool,
+    ) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::Low);
+        inner.set_id(id);
+        inner.set_from_with_bool(from);
+        SettingsBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"low\"`"]
+    pub fn builder_low_with_f64_and_target(id: f64, from: &Target) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::Low);
+        inner.set_id_with_f64(id);
+        inner.set_from(from);
+        SettingsBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"low\"`"]
+    pub fn builder_low_with_f64_and_str(
+        id: f64,
+        from: impl ::wasm_bindgen::JsStringLike,
+    ) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::Low);
+        inner.set_id_with_f64(id);
+        inner.set_from_with_str(from);
+        SettingsBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"low\"`"]
+    pub fn builder_low_with_f64_and_bool(id: f64, from: bool) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::Low);
+        inner.set_id_with_f64(id);
+        inner.set_from_with_bool(from);
         SettingsBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `level: \"high\"`"]
-    pub fn builder_high(id: impl ::js_sys::JsNumberOrStringLike, from: &Target) -> SettingsBuilder {
+    pub fn builder_high(id: impl ::wasm_bindgen::JsStringLike, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);
         inner.set_id(id);
@@ -330,19 +617,65 @@ impl Settings {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `level: \"high\"`"]
-    pub fn builder_high_with_boolean_or_string(
-        id: impl ::js_sys::JsNumberOrStringLike,
-        from: impl ::js_sys::JsBooleanOrStringLike,
+    pub fn builder_high_with_str_and_str(
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: impl ::wasm_bindgen::JsStringLike,
     ) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);
         inner.set_id(id);
-        inner.set_from_with_boolean_or_string(from);
+        inner.set_from_with_str(from);
+        SettingsBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"high\"`"]
+    pub fn builder_high_with_str_and_bool(
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: bool,
+    ) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::High);
+        inner.set_id(id);
+        inner.set_from_with_bool(from);
+        SettingsBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"high\"`"]
+    pub fn builder_high_with_f64_and_target(id: f64, from: &Target) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::High);
+        inner.set_id_with_f64(id);
+        inner.set_from(from);
+        SettingsBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"high\"`"]
+    pub fn builder_high_with_f64_and_str(
+        id: f64,
+        from: impl ::wasm_bindgen::JsStringLike,
+    ) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::High);
+        inner.set_id_with_f64(id);
+        inner.set_from_with_str(from);
+        SettingsBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: \"high\"`"]
+    pub fn builder_high_with_f64_and_bool(id: f64, from: bool) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::High);
+        inner.set_id_with_f64(id);
+        inner.set_from_with_bool(from);
         SettingsBuilder { inner }
     }
     pub fn builder(
         level: f64,
-        id: impl ::js_sys::JsNumberOrStringLike,
+        id: impl ::wasm_bindgen::JsStringLike,
         from: &Target,
     ) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
@@ -351,15 +684,51 @@ impl Settings {
         inner.set_from(from);
         SettingsBuilder { inner }
     }
-    pub fn builder_with_boolean_or_string(
+    pub fn builder_with_str_and_str(
         level: f64,
-        id: impl ::js_sys::JsNumberOrStringLike,
-        from: impl ::js_sys::JsBooleanOrStringLike,
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: impl ::wasm_bindgen::JsStringLike,
     ) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level_with_f64(level);
         inner.set_id(id);
-        inner.set_from_with_boolean_or_string(from);
+        inner.set_from_with_str(from);
+        SettingsBuilder { inner }
+    }
+    pub fn builder_with_str_and_bool(
+        level: f64,
+        id: impl ::wasm_bindgen::JsStringLike,
+        from: bool,
+    ) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level_with_f64(level);
+        inner.set_id(id);
+        inner.set_from_with_bool(from);
+        SettingsBuilder { inner }
+    }
+    pub fn builder_with_f64_and_target(level: f64, id: f64, from: &Target) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level_with_f64(level);
+        inner.set_id_with_f64(id);
+        inner.set_from(from);
+        SettingsBuilder { inner }
+    }
+    pub fn builder_with_f64_and_str(
+        level: f64,
+        id: f64,
+        from: impl ::wasm_bindgen::JsStringLike,
+    ) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level_with_f64(level);
+        inner.set_id_with_f64(id);
+        inner.set_from_with_str(from);
+        SettingsBuilder { inner }
+    }
+    pub fn builder_with_f64_and_bool(level: f64, id: f64, from: bool) -> SettingsBuilder {
+        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level_with_f64(level);
+        inner.set_id_with_f64(id);
+        inner.set_from_with_bool(from);
         SettingsBuilder { inner }
     }
 }
@@ -367,8 +736,12 @@ pub struct SettingsBuilder {
     inner: Settings,
 }
 impl SettingsBuilder {
-    pub fn label(self, val: impl ::js_sys::JsBooleanOrStringLike) -> Self {
+    pub fn label(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_label(val);
+        self
+    }
+    pub fn label_with_bool(self, val: bool) -> Self {
+        self.inner.set_label_with_bool(val);
         self
     }
     pub fn build(self) -> Settings {

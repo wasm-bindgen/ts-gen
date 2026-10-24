@@ -57,7 +57,7 @@ impl JsDocInfo {
     /// * No `@throws` info at all → [`Throws::None`]
     /// * `@throws {never}` alone → [`Throws::Never`]
     /// * Single named type → [`Throws::Type`] with `TypeRef::Named`
-    /// * Multiple names → [`Throws::Type`] with `TypeRef::Union(...)`
+    /// * Multiple names → [`Throws::Type`] with a `TypeRef::Union`
     ///
     /// `@throws {never | OtherError}` resolves to `Throws::Type(OtherError)`
     /// — the `never` is dropped during parsing and only the residual
@@ -73,9 +73,7 @@ impl JsDocInfo {
             0 if self.nothrow => Throws::Never,
             0 => Throws::None,
             1 => Throws::Type(TypeRef::ident(self.throws[0].clone())),
-            _ => Throws::Type(TypeRef::Union(
-                self.throws.iter().map(TypeRef::ident).collect(),
-            )),
+            _ => Throws::Type(TypeRef::union(self.throws.iter().map(TypeRef::ident))),
         }
     }
 }

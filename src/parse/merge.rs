@@ -114,6 +114,7 @@ pub fn extract_var_members(
                     scope: parent_scope,
                     js_name: js_name.clone(),
                     type_ref: type_ref.clone(),
+                    optional: prop.optional,
                     doc,
                 }));
                 if !prop.readonly {

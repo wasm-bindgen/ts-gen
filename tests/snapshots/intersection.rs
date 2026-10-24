@@ -145,7 +145,7 @@ extern "C" {
         this: &Store,
         key: &str,
         options: &StoreOptions,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_get_options(
         this: &Store,

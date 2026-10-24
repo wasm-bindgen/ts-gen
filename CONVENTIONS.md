@@ -64,26 +64,157 @@ position vs return position. Argument-position container types are
 borrowed by reference; return-position container types are owned.
 
 TypeScript's built-in `PropertyKey` is recognised without a declaration
-and lowers exactly like `string | number | symbol`, except for
-[primitive union arguments](#primitive-union-arguments) in
-per-monomorphization mode.
+and lowers exactly like `string | number | symbol`.
 
 ## Optional and nullable types
 
-* `T | null` → `Option<T>` in return position. In argument position the
-  `null` arm is dropped — the parameter takes `T` directly. A
-  `_with_null(val: &Null)` overload would force callers to construct a
-  `Null` value with no real upside, and the omission case for
-  truly-optional params is already covered by the optional-truncation
-  rule below.
-* `T | undefined` and `T | null | undefined` follow the same rules as
-  `T | null` — coalesced at parse time; the rendered union has no
-  separate `null`/`undefined` arm.
-* In inner type positions, `T | null` → `JsOption<T>` unless `T` already
-  erases to `JsValue`; `JsOption<JsValue>` simplifies to `JsValue`.
-* `T?` on a property → getter returns `Option<T>`; setter takes `T`.
-* `f(x?: T)` (optional parameter) → produces an overload pair, *not* an
-  `Option<T>` parameter. See [Signature flattening](#signature-flattening).
+`null` and `undefined` are ordinary union members in the IR, as in
+TypeScript. Every union is built through one constructor that keeps it
+in a canonical form: nested unions (including ones reached through a
+union alias at parse time) are flattened, repeats are dropped, `void`
+inside a union is `undefined`, value members keep their source order
+and the empties come last, `null` before `undefined`. A union of one
+value and an empty is still a union, so `T | null`, JSDoc `?T` and
+`T?` are all `T | null`, and `null | undefined` is a union of the two
+empties. Optionality is a property of the declaration, not the type:
+`x?: T` and `f(x?: T)` record `optional` beside a plain `T`, and a
+parameter with a default initializer (`f(x = 1)`) is optional too.
+
+Lowering reads the empties off a union (merging empties held by
+aliases, so `MaybeStr | undefined` with `type MaybeStr = string | null`
+admits both) and picks a carrier for each top-level position. Two Rust
+carriers, each owning one empty, nest for the union:
+
+| TS                       | Rust                  | JS → Rust                                     | Rust → JS             |
+| ------------------------ | --------------------- | --------------------------------------------- | --------------------- |
+| `T \| undefined`         | `Option<T>`           | `undefined` is `None`                         | `None` is `undefined` |
+| `T \| null`              | `Nullable<T>`         | `null` is `Null`                              | `Null` is `null`      |
+| `T \| null \| undefined` | `Option<Nullable<T>>` | `undefined` is `None`, `null` is `Some(Null)` | each state as itself  |
+
+`Nullable<T>` is wasm-bindgen's two-state `enum Nullable<T> { Null,
+Value(T) }` (in the prelude, and re-exported as `js_sys::Nullable`), so a
+Node-style `fn(x: T | null)` that checks `x === null`, or a
+default-parameter initializer that fires on `undefined`, receives exactly
+the empty passed. The `Option` layer over a `Nullable` is always strict,
+so `null` reaches the `Nullable`; a bare `Option<T>` also reads `null` as
+`None` for most `T` unless built with
+`--cfg wasm_bindgen_unstable_strict_option`. `opt.and_then(Nullable::value)`
+collapses the union to `Option<T>`. `Nullable<Nullable<T>>`,
+`Nullable<Option<T>>` and `Option<Option<T>>` are never emitted.
+
+### Reads
+
+Getters, static getters, function and method returns, and the awaited
+value of an async function use the carriers exactly. A read admits
+`undefined` when its type does or when its declaration is optional, so
+`x?: T` reads as `Option<T>` and `x?: T | null` as
+`Option<Nullable<T>>`, for instance and static properties alike.
+`null | undefined` with nothing else reads as `Option<Null>`. A
+`JsValue` inner stays bare, since it carries both empties in-band.
+
+| TS                                  | Rust read                                       |
+| ----------------------------------- | ----------------------------------------------- |
+| `get(key): Promise<R2ObjectBody \| null>` | `async fn get(..) -> Result<Nullable<R2ObjectBody>, JsValue>` |
+| `f(): Promise<number \| undefined>` | `async fn f() -> Result<Option<f64>, JsValue>`  |
+| `f<T>(): Promise<T \| null>`        | `async fn f<T>() -> Result<Nullable<T>, JsValue>` |
+| `readonly x?: string \| null`       | `fn x(&self) -> Option<Nullable<String>>`       |
+
+An awaited carrier around a type parameter bounds it through the
+carrier's trait (`T: NullableFromWasmAbi`, `T: OptionFromWasmAbi`).
+
+### Writes
+
+Function, method and constructor arguments, setters, builder methods and
+factories expand the union instead: each empty is an arm.
+
+* `null` gets a variant of its own with no argument for that position:
+  `f(x: T | null)` gives `f(x: &T)` and `f_with_null()`.
+* `undefined` is absence. A parameter is omittable when it is optional,
+  or when it is trailing and its type admits `undefined` (so a required
+  trailing `x: T | undefined` expands like `x?: T`). Trailing-ness
+  follows the omission chain: a parameter is trailing when every
+  parameter after it can be omitted too. An omittable parameter drops
+  `undefined` from its value arms, which take the plain type; one that
+  cannot be omitted keeps `Option<T>`.
+* A setter or builder method expresses `undefined` by not being called,
+  so `x?: T`, `x?: T | undefined` and `x: T | undefined` all give
+  `set_x(&T)`. A setter whose only arm is `null` is `set_x_with_null()`.
+
+| TS                                  | Write variants                                                       |
+| ----------------------------------- | -------------------------------------------------------------------- |
+| `f(x: T \| null)`                   | `f(x: &T)`, `f_with_null()`                                          |
+| `f(x: T \| undefined)`              | `f()`, `f_with_x(x: &T)`                                             |
+| `f(x?: T \| null)`                  | `f()`, `f_with_x(x: &T)`, `f_with_null()`                            |
+| `f(x: string \| number \| null \| undefined)` | `f()`, `f_with_str(x: &str)`, `f_with_f64(x: f64)`, `f_with_null()` |
+| `f(a: T \| undefined, b: number)`   | `f(a: Option<&T>, b: f64)`                                           |
+| `f(a: T \| undefined, b?: number)`  | `f()`, `f_with_a(a: &T)`, `f_with_a_and_b(a: &T, b: f64)`            |
+| `f(a?: T, b?: U \| null, c?: V)`    | `f()`, `f_with_a`, `f_with_a_and_b`, `f_with_a_and_null`, `f_with_a_and_b_and_c`, `f_with_a_and_null_and_c` |
+| `x?: T \| null` (setter)            | `set_x(&T)`, `set_x_with_null()`                                     |
+| `x?: T \| null` (builder)           | `.x(&T)`, `.x_with_null()`                                           |
+| `x?: null` (setter)                 | `set_x_with_null()`                                                  |
+
+* **Argument position**: after the `null` arm is split off, an
+  `undefined` that cannot be omitted is `Option<&T>` around the borrowed
+  form (`Option<f64>`, `Option<ModeKind>` for an enum, `Option<&[f64]>`
+  keeping its slice mode). When `T` is a type parameter it is taken by
+  value (`Option<T>`): the macro cannot borrow a generic. A `JsValue`
+  inner (`any | null`) collapses to `&JsValue` and has no `null` arm, as
+  `JsValue::NULL` is the empty. Union inners fan out as usual and the
+  `null` arm sits beside them (`new_with_str(body: &str)`,
+  `new_with_blob(body: &Blob)`, `new_with_null()`), so
+  `Response(body?: BodyInit | null)` gives `new()`, `new_with_str`, ...
+  and `new_with_null()`.
+* **The `null` arm** binds the import privately as `<name>_js` taking
+  `&JsValue` in that position (with `js_name` naming the JS member), and
+  the public `<name>` wraps it, passing `&JsValue::NULL`. A type
+  parameter used only by the `null` position is dropped from the
+  wrapper. The arm is `_with_null` when one parameter admits `null`; with
+  more, each is named for its parameter (`new_with_body_null`,
+  `new_with_body_null_and_length(length)`, `new_with_length_null(body)`).
+* **Properties keep TypeScript's distinction** between `x?: T` and a
+  required `x: T | undefined`. The first is set through the builder or
+  setter; the second is a required factory argument taking
+  `Option<&T>`, whose factory calls `set_x(val)` for `Some` and leaves
+  the property unset for `None`. A required `x: null | undefined` takes
+  `Option<&Null>` and calls `set_x_with_null()` for `Some`.
+* A discriminated-union branch whose property is required in one
+  branch and optional in another has a merged setter of the optional
+  shape; the branch factory keeps the branch's own type (a `null` branch
+  calls `set_x_with_null()`; see
+  [Per-branch required fields](#per-branch-required-fields-in-discriminated-unions)).
+
+### Inner positions
+
+A position inside a generic container (`Promise<T | null>`,
+`Array<T | undefined>`, a callback's arguments and return value) cannot
+expand, and needs a `JsGeneric` handle: `JsNullable<T>` when `null` is
+admitted (`T | null | undefined` too; `is_empty` covers both),
+`JsOption<T>` for `T | undefined` only. A `JsValue` inner stays bare.
+A nullable alias declaration (`type MaybeStr = string | null`) is
+`JsNullable<JsString>` for the same reason.
+
+### Per-monomorphization
+
+`experimental_generic_mono` expands writes identically, with the same
+names; a string argument takes `impl JsStringLike`
+(`Option<impl JsStringLike>` where it cannot be omitted). Inner
+positions use the carriers where wasm-bindgen accepts them:
+
+| Position                                    | Mono                                  |
+| ------------------------------------------- | ------------------------------------- |
+| returned `Promise<string \| null>`          | `Promise<Nullable<JsString>>`         |
+| user generic `Holder<string \| null>`       | `Holder<Nullable<String>>`            |
+| `type MaybeStr = string \| null`            | `pub type MaybeStr = Nullable<String>` |
+| `Promise<T \| null>` argument               | `&Promise<JsNullable<T>>`             |
+| `T[]`, `Array<..>`, `Record<..>`, `Map<..>` | `JsNullable<T>` / `JsOption<T>`       |
+| `Function<fn(..)>` arguments and return     | `JsNullable<T>` / `JsOption<T>`       |
+
+The remaining handle positions are ones wasm-bindgen does not accept a
+carrier in yet: `Function<fn(..)>` needs `ErasableGeneric<Repr =
+JsValue>` and `JsCast` on its signature types, slices need
+`VectorRefIntoWasmAbi`, and the js-sys `Array`, `Map` and `Object`
+APIs (and `Promise::resolve`) need `ErasableGeneric<Repr = JsValue>` on
+the element.
 
 ## Array and slice types
 
@@ -110,7 +241,7 @@ other element takes its inner-position handle form:
 | `Foo` (named JS / Rust type) | `Foo`                  |
 | `any` / `unknown`            | `JsValue`              |
 | `boolean`                    | `bool`                 |
-| `T \| null`                  | `JsOption<U>`          |
+| `T \| null`                  | `JsNullable<U>`        |
 | `T[]`                        | `Array<U>`             |
 
 Strings stay owned (`Vec<String>`, not `Vec<&str>`); JS-imported
@@ -139,9 +270,9 @@ callee neither retains the buffer nor re-enters wasm. The TS type picks
 the copy shape instead:
 
 * A `T[]` parameter is a plain JS `Array` the callee may keep, so a
-  slice of numbers (`&[f64]` or `Option<&[f64]>`) gets
-  `slice = "array"`, after resolving aliases, literal unions and numeric
-  enums.
+  slice of numbers (`&[f64]` or `Option<&[f64]>`)
+  gets `slice = "array"`, after resolving aliases, literal unions and
+  numeric enums.
 * Under [per-monomorphization](#in-scope-generic-type-parameters), a
   `T[]` whose element is a type parameter gets `slice = "array"` too:
   wasm-bindgen resolves the mode per instantiation, so `T = f64` reaches
@@ -261,8 +392,13 @@ pub fn fill(#[wasm_bindgen(slice = "copy")] data: ::wasm_bindgen::Clamped<&[u8]>
 pub fn fill_with_uint8_clamped_array(data: &Uint8ClampedArray);
 ```
 
-The pairing applies after aliases, `null` and optional parameters are
+The pairing applies after aliases and optional parameters are
 flattened, and to a generic member such as `Uint8Array<ArrayBuffer>`.
+A trailing `undefined` is omission and `null` is an arm of its own.
+Where `undefined` cannot be omitted the view keeps it (`Option<&[u8]>`).
+`Clamped` has no `Option` form, so such a `Uint8ClampedArray` view keeps
+no empty and `undefined` goes through the handle
+(`Option<&Uint8ClampedArray>`).
 It needs exactly one typed array whose element matches the array's
 (`bigint` for the 64-bit arrays, `number` for the rest), except that
 `Uint8Array | Uint8ClampedArray | number[]` pairs as the `Uint8Array`
@@ -711,6 +847,9 @@ that:
 EmailAttachment::new_inline(content_id: &str, filename: &str, type_: &str, content: &str)
 EmailAttachment::new_attachment(filename: &str, type_: &str, content: &str)
 ```
+
+The merged `set_content_id` takes `&str` (a setter expresses
+`undefined` by not being called), so `new_inline` calls it directly.
 
 The builder wrapper (`EmailAttachmentBuilder`) still exposes a fluent
 `content_id(self, val)` setter — it reflects the merged-shape view
@@ -1339,8 +1478,9 @@ For every JS callable, `ts-gen`:
    Unions inside generic type arguments do not distribute:
    `Array<A | B>` and `Record<K, A | B>` are each one parameter shape,
    not `Array<A> | Array<B>` or `Record<K, A> | Record<K, B>`.
-   Under `--experimental-generic-mono`, primitive members spanning
-   several categories expand as one alternative instead (see
+   A trailing parameter admitting `undefined` truncates like an
+   optional one. The expansion is the same under
+   `--experimental-generic-mono` (see
    [primitive union arguments](#primitive-union-arguments)).
 2. **Cross-overload dedup**: When multiple overloads expand to the same
    concrete parameter list, drop the duplicates. Two overloads that
@@ -1509,12 +1649,14 @@ sync returns or arguments:
 | `Promise<number>`              | `Result<Number, JsValue>`     |
 | `Promise<string>`              | `Result<JsString, JsValue>`   |
 | `Promise<void>`                | `Result<Undefined, JsValue>`  |
-| `Promise<T \| null>`           | `Result<JsOption<T>, JsValue>`|
+| `Promise<T \| null>`           | `Result<Nullable<T>, JsValue>`  |
+| `Promise<number \| undefined>`  | `Result<Option<Number>, JsValue>`|
 | `Promise<Foo>` (named JS type) | `Result<Foo, JsValue>`        |
 
 `wasm-bindgen`'s typed `Promise<T>` / `JsFuture<T>` require
 `T: JsGeneric` — an externref-backed type — which bare Rust
-primitives aren't. The `js_sys` wrappers are. Callers recover Rust
+primitives aren't. The `js_sys` wrappers are. The awaited value's own
+empties use the [read carriers](#reads) around that handle. Callers recover Rust
 primitives via `value_of()` (for `Boolean` / `Number`) or
 `String::from(_)` / `.into()` (for `JsString`).
 
@@ -1609,7 +1751,9 @@ uses its native ABI representation. Each import states the ABI bounds it
 needs, so a generic caller can read them off the declaration: `IntoWasmAbi`
 for an argument (`T: RefIntoWasmAbi` for a borrowed `&T`, and
 `T: VectorRefIntoWasmAbi` for a borrowed `&[T]`), `FromWasmAbi` for a return,
-`OptionIntoWasmAbi`/`OptionFromWasmAbi` for `Option<T>`, and `'static` when
+`OptionIntoWasmAbi`/`OptionFromWasmAbi` for `Option<T>`,
+`NullableIntoWasmAbi`/`NullableFromWasmAbi` for `Nullable<T>` and
+`Option<Nullable<T>>`, and `'static` when
 awaited. Imported types such as `Holder<T>` need only `'static`:
 
 ```rust
@@ -1738,7 +1882,7 @@ a primitive, a nullable primitive, or a locally declared generic type:
 | `Promise<string>` | `Result<JsString, _>` | `Result<String, _>` + `_js_string` |
 | `Promise<number>` | `Result<Number, _>` | `Result<f64, _>` |
 | `Promise<boolean>` | `Result<Boolean, _>` | `Result<bool, _>` |
-| `Promise<string \| undefined>` | `Result<JsOption<JsString>, _>` | `Result<Option<String>, _>` + `_js_string` |
+| `Promise<string \| undefined>` | `Result<Option<JsString>, _>` | `Result<Option<String>, _>` + `_js_string` |
 | `Promise<Details<string>>` | `Result<Details<JsString>, _>` | `Result<Details<String>, _>` + `_js_string` |
 | `Promise<Array<string>>` | `Result<Array<JsString>, _>` | unchanged |
 
@@ -1840,56 +1984,37 @@ impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
 
 ### Primitive union arguments
 
-In per-monomorphization mode, primitive union arguments use `js_sys`'s
-primitive-union marker traits instead of
-[signature flattening](#signature-flattening). When a parameter's
-alternatives include primitives from two or more of `bigint`, `boolean`,
-`number`, and `string`, those alternatives merge into one argument-position
-`impl` bound named `Js` + the categories in alphabetical order joined by
-`Or` + `Like`:
+In per-monomorphization mode, primitive union arguments expand per member
+through [signature flattening](#signature-flattening), exactly as without
+it, so the names are the same in both modes. Only the argument types
+differ: a string member takes `impl JsStringLike`.
 
 ```ts
 function setValue(value: string | number): void;
-function setLevel(level: 1 | 2 | "auto"): void;
 function hasKey(key: PropertyKey): boolean;
 function send(to: Target | string | number): void;
 ```
 
 ```rust
-pub fn set_value(value: impl ::js_sys::JsNumberOrStringLike);
-pub fn set_level(level: impl ::js_sys::JsNumberOrStringLike);
-pub fn has_key(key: impl ::js_sys::PropertyKey) -> bool;
+pub fn set_value(value: impl ::wasm_bindgen::JsStringLike);
+#[wasm_bindgen(js_name = "setValue")]
+pub fn set_value_with_f64(value: f64);
+pub fn has_key(key: impl ::wasm_bindgen::JsStringLike) -> bool;
+#[wasm_bindgen(js_name = "hasKey")]
+pub fn has_key_with_f64(key: f64) -> bool;
+#[wasm_bindgen(js_name = "hasKey")]
+pub fn has_key_with_symbol(key: &Symbol) -> bool;
 pub fn send(to: &Target);
 #[wasm_bindgen(js_name = "send")]
-pub fn send_with_number_or_string(to: impl ::js_sys::JsNumberOrStringLike);
+pub fn send_with_str(to: impl ::wasm_bindgen::JsStringLike);
+#[wasm_bindgen(js_name = "send")]
+pub fn send_with_f64(to: f64);
 ```
 
-* Literals count toward their category, so `1 | 2 | "auto"` is a
-  `number | string` union.
-* Aliases resolve first, and `null` / `undefined` arms are dropped as for
-  every argument-position union.
-* Non-primitive members keep their own overloads. The grouped binding takes
-  the position of the first primitive member, and its `_with_` suffix lists
-  the categories (`_with_number_or_string`).
-* A union covering one category (`"a" | "b" | string`) is not a primitive
-  union and keeps the `impl JsStringLike` / concrete-type rules above.
-* `symbol` only groups as part of `number | string | symbol`, which maps to
-  `js_sys::PropertyKey` whether it's spelled `PropertyKey` or written out.
-  In any other mix, `symbol` members keep their own `&Symbol` overload
-  and the remaining members group: `string | symbol | boolean` becomes
-  `impl JsBooleanOrStringLike` plus `_with_symbol(&Symbol)`, and
-  `string | symbol` stays `impl JsStringLike` plus `&Symbol`.
-* Dictionary factories keep literal members as `new_<literal>` constructors
-  and group only the remaining non-literal members.
-* Setters group the members left after
-  [literal union setters](#literal-union-setters) take their enum, so
-  `level: "low" | "high" | number` is `set_level(LevelKind)` plus
-  `set_level_with_f64(f64)`.
-
-Return positions are unchanged: an erased union still becomes a
+The `js_sys` primitive-union marker traits (`JsNumberOrStringLike` and
+the rest) are not emitted. Return positions are unchanged: an erased
+union still becomes a
 [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums).
-Without `--experimental-generic-mono` the traits aren't available, so
-primitive unions (including `PropertyKey`) keep the per-member fan-out.
 
 ## `@throws` JSDoc → typed error
 

@@ -1,5 +1,7 @@
 #![cfg(target_arch = "wasm32")]
 
+use js_sys::Nullable;
+
 use ts_gen_integration_tests::literal_discriminants::{
     count, direction, flag, level, ratio, repeat, size, wide, DirectionReturnKind, Feedback,
     FlagReturnKind, LevelReturnKind, Options, RepeatReturnKind, Scaled, SizeReturnKind, ValueKind,
@@ -21,7 +23,7 @@ fn literal_discriminants_compile(feedback: &Feedback) {
         DirectionReturnKind::Neg1 | DirectionReturnKind::N0 | DirectionReturnKind::N1 => {}
     }
     match feedback.value() {
-        Some(ValueKind::Neg1 | ValueKind::N1) | None => {}
+        Nullable::Value(ValueKind::Neg1 | ValueKind::N1) | Nullable::Null => {}
     }
 
     let _: f64 = ratio();

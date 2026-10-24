@@ -732,7 +732,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         })
     };
     // Factories call the setter the extern block emits, so they take its
-    // type. A discriminated-union branch narrows its getter
+    // type, not the getter's: a discriminated-union branch narrows its getter
     // (`disposition: "inline"`), while the setter keeps the merged type
     // (`"inline" | "attachment"`) and with it the enum a literal is passed as.
     let assigned_type = |g: &crate::ir::GetterMember| -> crate::ir::TypeRef {
@@ -793,6 +793,11 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             /// The scope the field's type resolves in.
             scope: ScopeId,
             setter_ident: syn::Ident,
+            /// A required field admitting `undefined` takes `Option<T>`, and
+            /// `None` leaves the setter, which takes the plain `T`, uncalled.
+            unwrap: bool,
+            /// Whether the setter takes a value, which its `null` arm doesn't.
+            takes_value: bool,
         },
     }
     struct FieldDim {
@@ -850,15 +855,11 @@ pub(crate) fn generate_dictionary_factory_with_passes(
 
             // Setter expansion dedups by rendered Rust type, keeping only the
             // first member of each (`"x" | "y"` leaves one setter typed
-            // `"x"`), so match on the rendered type rather than the IR. Per-mono
-            // primitive-union grouping gives setters and factory options
-            // different groupings of the same members (the factory keeps
-            // literals apart), so fall back to the grouped setter whose
-            // marker trait accepts the option's type.
-            let pick_setter = |target: &crate::ir::TypeRef| -> Option<syn::Ident> {
-                fn param_type<'s>(sig: &&'s FunctionSignature) -> Option<&'s crate::ir::TypeRef> {
-                    sig.params.first().map(|p| &p.type_ref)
-                }
+            // `"x"`), so match on the rendered type rather than the IR.
+            fn param_type(sig: &FunctionSignature) -> Option<&crate::ir::TypeRef> {
+                sig.params.first().map(|p| &p.type_ref)
+            }
+            let find_setter = |target: &crate::ir::TypeRef| -> Option<&FunctionSignature> {
                 let render = |param: &ConcreteParam| {
                     super::signatures::render_param_type(
                         param,
@@ -881,14 +882,10 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                             .first()
                             .is_some_and(|p| render(p) == target_rendered)
                     })
-                    .or_else(|| {
-                        setters.iter().find(|sig| {
-                            param_type(sig)
-                                .and_then(super::primitive_unions::PrimitiveUnion::classify)
-                                .is_some_and(|u| u.accepts(target))
-                        })
-                    })
-                    .map(|sig| super::typemap::make_ident(&sig.rust_name))
+                    .or_else(|| setters.iter().find(|sig| param_type(sig) == Some(target)))
+            };
+            let pick_setter = |target: &crate::ir::TypeRef| -> Option<syn::Ident> {
+                find_setter(target).map(|sig| super::typemap::make_ident(&sig.rust_name))
             };
             // Fallback for fields without per-member setter granularity:
             // the first setter handles everything (typical when the IR
@@ -962,10 +959,22 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 members.iter().collect()
             };
             for m in value_targets {
-                let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                let unwrap = m.admits_undefined();
+                let target = m.without_undefined();
+                let setter = find_setter(&target);
+                let setter_ident = setter
+                    .map(|sig| super::typemap::make_ident(&sig.rust_name))
+                    .unwrap_or_else(|| default_setter.clone());
+                let assigned = setter.and_then(param_type).unwrap_or(&target).clone();
+                let takes_value = assigned != crate::ir::TypeRef::Null;
+                let type_ref = if unwrap {
+                    assigned.with_empties(crate::ir::Nullability::Undefined)
+                } else {
+                    assigned
+                };
                 let param = ConcreteParam {
                     name: param_name.clone(),
-                    type_ref: m.clone(),
+                    type_ref,
                     variadic: false,
                     slice_mode: None,
                 };
@@ -974,6 +983,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     param,
                     scope: g.scope,
                     setter_ident,
+                    unwrap,
+                    takes_value,
                 });
             }
             if options.is_empty() {
@@ -1107,16 +1118,42 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                             None => format!("* {bullet_head}"),
                         });
                     }
+                    // A `null` arm's setter passes `null` itself, so the arm
+                    // only names the factory (`new_with_null`).
+                    FieldOption::Value {
+                        param,
+                        scope,
+                        setter_ident,
+                        ..
+                    } if matches!(param.type_ref, crate::ir::TypeRef::Null) => {
+                        init_calls.push(quote! { inner.#setter_ident(); });
+                        value_params.push(param.clone());
+                        value_scopes.push(*scope);
+                    }
                     FieldOption::Value {
                         field_doc,
                         param,
                         scope,
                         setter_ident,
+                        unwrap,
+                        takes_value,
                     } => {
                         let arg_ident =
                             super::signatures::dictionary_param_ident(&param.name, config.cgctx);
                         arg_idents.push(arg_ident.clone());
-                        init_calls.push(quote! { inner.#setter_ident(#arg_ident); });
+                        init_calls.push(match (unwrap, takes_value) {
+                            (true, true) => quote! {
+                                if let Some(val) = #arg_ident {
+                                    inner.#setter_ident(val);
+                                }
+                            },
+                            (true, false) => quote! {
+                                if #arg_ident.is_some() {
+                                    inner.#setter_ident();
+                                }
+                            },
+                            _ => quote! { inner.#setter_ident(#arg_ident); },
+                        });
                         value_params.push(param.clone());
                         value_scopes.push(*scope);
                         if let Some(doc) = field_doc {
@@ -1170,14 +1207,21 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 continue;
             }
             let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
+            let (value_params, value_scopes): (Vec<ConcreteParam>, Vec<ScopeId>) = plan
+                .value_params
+                .iter()
+                .zip(&plan.value_scopes)
+                .filter(|(p, _)| !matches!(p.type_ref, TypeRef::Null))
+                .map(|(p, s)| (p.clone(), *s))
+                .unzip();
             let DictionaryParams {
                 bounds: abv_bounds,
                 helper_where_clause,
                 params: params_tokens,
                 ..
             } = super::signatures::generate_dictionary_params_in(
-                &plan.value_params,
-                &plan.value_scopes,
+                &value_params,
+                &value_scopes,
                 config.cgctx,
                 config.scope,
                 &config.from_module(),
@@ -1191,8 +1235,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // redeclares all bounds because each `pub fn` there is
             // independent (see `generic_params_for_method`).
             let mut combo_bounds: Vec<TokenStream> = Vec::new();
-            let combo_param_tys: Vec<&TypeRef> =
-                plan.value_params.iter().map(|p| &p.type_ref).collect();
+            let combo_param_tys: Vec<&TypeRef> = value_params.iter().map(|p| &p.type_ref).collect();
             combo_bounds.extend(config.local_generic_bounds(config.scope, &combo_param_tys));
             combo_bounds.extend(abv_bounds);
             let generics = render_generic_bounds(&combo_bounds);
@@ -1318,6 +1361,13 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             };
             let method_ident = super::typemap::make_ident(&builder_method_name);
             let setter_ident = super::typemap::make_ident(&sig.rust_name);
+            // A `null` arm sets the field to `null` (`.label_with_null()`).
+            let sig_params: Vec<ConcreteParam> = sig
+                .params
+                .iter()
+                .filter(|p| !matches!(p.type_ref, TypeRef::Null))
+                .cloned()
+                .collect();
             // Mirrors `generate_setter`: an `ArrayBufferView` param is a
             // `<T: TypedArray>` generic on the extern setter, so the fluent
             // method that forwards to it must carry the same bound.
@@ -1327,14 +1377,13 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 params,
                 ..
             } = generate_dictionary_params(
-                &sig.params,
+                &sig_params,
                 config.cgctx,
                 sig.body_scope,
                 &config.from_module(),
             );
             let generics = render_generic_bounds(&abv_bounds);
-            let param_idents: Vec<_> = sig
-                .params
+            let param_idents: Vec<_> = sig_params
                 .iter()
                 .map(|p| super::signatures::dictionary_param_ident(&p.name, config.cgctx))
                 .collect();
@@ -1903,23 +1952,7 @@ fn generate_getter(
     let rust_name = names.declare(&candidate, Suffix::Snake);
     let rust_ident = super::typemap::make_ident(&rust_name);
 
-    // Optional `?:` properties widen to `T | undefined` at the IR
-    // level. Modeling that as `Nullable<T>` lets the regular
-    // `to_syn_type` lowering handle every collapse rule uniformly —
-    // notably the `Option<JsValue>` → `JsValue` shortcut and the
-    // inner-position `JsOption` switch — without the getter site
-    // open-coding its own `Option<#inner>` wrap.
-    let lowered_ty = if getter.optional {
-        // Avoid `Option<Option<T>>` if the source already had a
-        // Nullable: a `T?` property whose type is `T | null` is just
-        // a single layer of optionality.
-        match &getter.type_ref {
-            TypeRef::Nullable(_) => getter.type_ref.clone(),
-            other => TypeRef::Nullable(Box::new(other.clone())),
-        }
-    } else {
-        getter.type_ref.clone()
-    };
+    let lowered_ty = read_type(&getter.type_ref, getter.optional);
     // Top-level erasing-union return synthesises a dynamic-union
     // enum (see [`ReturnAnchor`]). For getters the anchor is the
     // property name itself — no `Return` infix.
@@ -2082,8 +2115,9 @@ fn generate_static_getter(
     let rust_name = names.declare(&candidate, Suffix::Snake);
     let rust_ident = super::typemap::make_ident(&rust_name);
 
+    let lowered_ty = read_type(&getter.type_ref, getter.optional);
     let getter_type = super::typemap::to_getter_return_type(
-        &getter.type_ref,
+        &lowered_ty,
         config.cgctx,
         getter.scope,
         &config.from_module(),
@@ -2112,7 +2146,7 @@ fn generate_static_getter(
     let source_name = &getter.js_name;
     let js_class = config.js_class_parts();
     let js_string_variant =
-        getter_js_string_variant(config, &getter.type_ref, getter.scope, &rust_name, names).map(
+        getter_js_string_variant(config, &lowered_ty, getter.scope, &rust_name, names).map(
             |(js_ident, js_type)| {
                 quote! {
                     #doc
@@ -2205,6 +2239,16 @@ fn generate_static_setter(
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────
+
+/// A property's type as read: an optional property may be absent, so its
+/// read admits `undefined` whatever its type says.
+fn read_type(ty: &TypeRef, optional: bool) -> TypeRef {
+    if optional {
+        ty.clone().with_empties(crate::ir::Nullability::Undefined)
+    } else {
+        ty.clone()
+    }
+}
 
 /// Convert concrete params to `fn` parameter token stream.
 /// Lower the `extends` parents of a declaration. A parent that erases to

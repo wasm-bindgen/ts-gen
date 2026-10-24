@@ -80,7 +80,7 @@ extern "C" {
         this: &Store,
         key: &str,
         options: &Conditional,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_get_options(
         this: &Store,
@@ -88,12 +88,12 @@ extern "C" {
         options: &GetOptions,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn first(this: &Store) -> Result<JsOption<JsString>, JsValue>;
+    pub async fn first(this: &Store) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "first")]
     pub async fn first_with_column(
         this: &Store,
         column: &str,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn put(this: &Store, key: &str, value: &str) -> Result<Undefined, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]

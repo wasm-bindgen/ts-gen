@@ -111,9 +111,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "details")]
     pub fn try_details(this: &Probe, d: &Details<Mode>) -> Result<Details<Level>, JsValue>;
     #[wasm_bindgen(method, js_name = "maybeHolder")]
-    pub fn maybe_holder(this: &Probe) -> Holder<Option<Mode>>;
+    pub fn maybe_holder(this: &Probe) -> Holder<Nullable<Mode>>;
     #[wasm_bindgen(method, catch, js_name = "maybeHolder")]
-    pub fn try_maybe_holder(this: &Probe) -> Result<Holder<Option<Mode>>, JsValue>;
+    pub fn try_maybe_holder(this: &Probe) -> Result<Holder<Nullable<Mode>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub async fn next_mode(this: &Probe) -> Result<Mode, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextLevel")]
@@ -174,14 +174,15 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberOrString")]
     pub fn try_mode_or_number_or_string(this: &Probe, x: Mode) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "modeOrNumberOrString")]
-    pub fn mode_or_number_or_string_with_number_or_string(
-        this: &Probe,
-        x: impl ::js_sys::JsNumberOrStringLike,
-    );
+    pub fn mode_or_number_or_string_with_f64(this: &Probe, x: f64);
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberOrString")]
-    pub fn try_mode_or_number_or_string_with_number_or_string(
+    pub fn try_mode_or_number_or_string_with_f64(this: &Probe, x: f64) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "modeOrNumberOrString")]
+    pub fn mode_or_number_or_string_with_str(this: &Probe, x: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, catch, js_name = "modeOrNumberOrString")]
+    pub fn try_mode_or_number_or_string_with_str(
         this: &Probe,
-        x: impl ::js_sys::JsNumberOrStringLike,
+        x: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]

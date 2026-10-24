@@ -1008,6 +1008,7 @@ fn static_members(members: &[crate::ir::Member]) -> Vec<crate::ir::Member> {
                     scope: g.scope,
                     js_name: g.js_name.clone(),
                     type_ref: g.type_ref.clone(),
+                    optional: g.optional,
                     doc: g.doc.clone(),
                 }))
             }

@@ -43,6 +43,14 @@ fn typed_array_unions_pass_a_typed_copy() {
     assert_eq!(pixels(&[7]), "Uint8Array(7)");
     assert_eq!(floats(), "none");
     assert_eq!(floats_with_slice(&[0.5]), "Float64Array(0.5)");
+    assert_eq!(floats_with_null(), "null");
+    assert_eq!(maybe_bytes_with_slice(&[5]), "Uint8Array(5)");
+    assert_eq!(maybe_bytes(), "none");
+    assert_eq!(
+        maybe_clamped_with_slice(Clamped(&[6])),
+        "Uint8ClampedArray(6)"
+    );
+    assert_eq!(maybe_clamped(), "none");
 }
 
 #[wasm_bindgen_test]

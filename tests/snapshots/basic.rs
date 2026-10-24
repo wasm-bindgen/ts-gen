@@ -67,6 +67,8 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    fn new_with_null_js(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_readable_stream_and_init(
         body: &ReadableStream,
         init: &ResponseInit,
@@ -88,6 +90,11 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_form_data_and_init(
         body: &FormData,
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    fn new_with_null_and_init_js(
+        body: &::wasm_bindgen::JsValue,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[doc = " Returns a new Response with a network error."]
@@ -140,7 +147,15 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn url(this: &Response) -> String;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &Response) -> Option<ReadableStream>;
+    pub fn body(this: &Response) -> Nullable<ReadableStream>;
+}
+impl Response {
+    pub fn new_with_null() -> Result<Response, JsValue> {
+        Self::new_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn new_with_null_and_init(init: &ResponseInit) -> Result<Response, JsValue> {
+        Self::new_with_null_and_init_js(&::wasm_bindgen::JsValue::NULL, init)
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -148,7 +163,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Body;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &Body) -> Option<ReadableStream>;
+    pub fn body(this: &Body) -> Nullable<ReadableStream>;
     #[wasm_bindgen(method, getter, js_name = "bodyUsed")]
     pub fn body_used(this: &Body) -> bool;
     #[doc = " Returns the body as an ArrayBuffer."]

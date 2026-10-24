@@ -25,7 +25,11 @@ export const unsigned = describe;
 export const buffered = describe;
 export const clamped = describe;
 export const pixels = describe;
-export const floats = (values) => (values === undefined ? "none" : describe(values));
+const describeEmpty = (values) =>
+  values === undefined ? "none" : values === null ? "null" : describe(values);
+export const floats = describeEmpty;
+export const maybeBytes = describeEmpty;
+export const maybeClamped = describeEmpty;
 export const mixed = (nums, bytes) => `${describe(nums)}|${describe(bytes)}`;
 export const spelled = describe;
 export const spelled_readonly = describe;

@@ -41,6 +41,79 @@ impl ModuleContext {
 
 // ─── Type References ─────────────────────────────────────────────────
 
+/// The empties a type admits, `null`, `undefined` or both, as lowering
+/// reads them off a union with [`TypeRef::split_empties`]. Never stored in
+/// the IR, where the empties are union members.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Nullability {
+    Null,
+    Undefined,
+    Both,
+}
+
+impl Nullability {
+    fn of(null: bool, undefined: bool) -> Option<Self> {
+        match (null, undefined) {
+            (true, true) => Some(Self::Both),
+            (true, false) => Some(Self::Null),
+            (false, true) => Some(Self::Undefined),
+            (false, false) => None,
+        }
+    }
+
+    pub fn admits_null(self) -> bool {
+        matches!(self, Self::Null | Self::Both)
+    }
+
+    pub fn admits_undefined(self) -> bool {
+        matches!(self, Self::Undefined | Self::Both)
+    }
+
+    pub fn with(self, other: Self) -> Self {
+        Self::of(
+            self.admits_null() || other.admits_null(),
+            self.admits_undefined() || other.admits_undefined(),
+        )
+        .unwrap()
+    }
+
+    /// `null` and `undefined` members for these empties, in union order.
+    fn members(self) -> impl Iterator<Item = TypeRef> {
+        let null = self.admits_null().then_some(TypeRef::Null);
+        let undefined = self.admits_undefined().then_some(TypeRef::Undefined);
+        null.into_iter().chain(undefined)
+    }
+}
+
+/// The members of a [`TypeRef::Union`], in normal form: nested unions
+/// flattened, each member once, the value members in source order and the
+/// empties last (`null` before `undefined`), with two or more members. A
+/// `void` member is `undefined`. Built only by [`TypeRef::union`], so equal
+/// unions compare equal and no empty is held twice.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Union(Vec<TypeRef>);
+
+impl Union {
+    /// Every member, the empties last.
+    pub fn members(&self) -> &[TypeRef] {
+        &self.0
+    }
+
+    /// The members other than `null` and `undefined`.
+    pub fn values(&self) -> &[TypeRef] {
+        let n = self.0.iter().filter(|m| m.is_empty_type()).count();
+        &self.0[..self.0.len() - n]
+    }
+
+    /// The empties among the members.
+    pub fn nullability(&self) -> Option<Nullability> {
+        Nullability::of(
+            self.0.contains(&TypeRef::Null),
+            self.0.contains(&TypeRef::Undefined),
+        )
+    }
+}
+
 /// A reference to a TypeScript type, resolved from the AST.
 ///
 /// The IR mirrors TypeScript's own type system: only the syntactic
@@ -100,10 +173,9 @@ pub enum TypeRef {
     /// `Array` symbol and goes through name resolution). `T[]` is
     /// unaffected by local shadowing of `Array`.
     Array(Box<TypeRef>),
-    /// `T | null` / `T | undefined` / `T?` — wraps the inner in
-    /// `Option<T>` at lowering. Coalesces `null`/`undefined` arms.
-    Nullable(Box<TypeRef>),
-    Union(Vec<TypeRef>),
+    /// `A | B`, in normal form (see [`Union`]). `null` and `undefined`
+    /// are ordinary members: `T | null` is `Union[T, Null]`.
+    Union(Union),
     Intersection(Vec<TypeRef>),
     Tuple(Vec<TypeRef>),
     /// `(args) => ret` — function type literal.
@@ -237,6 +309,78 @@ impl TypedArrayElement {
 }
 
 impl TypeRef {
+    /// The union of `members` in normal form (see [`Union`]). A single
+    /// surviving member is returned bare, so this is also how a union is
+    /// widened (`TypeRef::union([ty, TypeRef::Undefined])`).
+    pub fn union(members: impl IntoIterator<Item = TypeRef>) -> TypeRef {
+        fn add(ty: TypeRef, values: &mut Vec<TypeRef>, null: &mut bool, undefined: &mut bool) {
+            match ty {
+                TypeRef::Union(Union(members)) => {
+                    for m in members {
+                        add(m, values, null, undefined);
+                    }
+                }
+                TypeRef::Null => *null = true,
+                TypeRef::Undefined | TypeRef::Void => *undefined = true,
+                other if values.contains(&other) => {}
+                other => values.push(other),
+            }
+        }
+        let (mut values, mut null, mut undefined) = (Vec::new(), false, false);
+        for m in members {
+            add(m, &mut values, &mut null, &mut undefined);
+        }
+        values.extend(
+            Nullability::of(null, undefined)
+                .into_iter()
+                .flat_map(Nullability::members),
+        );
+        match values.len() {
+            0 => TypeRef::Any,
+            1 => values.pop().unwrap(),
+            _ => TypeRef::Union(Union(values)),
+        }
+    }
+
+    /// `self` without its empties, and which it admits; `None` when it
+    /// admits neither, or is itself `null` or `undefined`. With nothing
+    /// else, `null | undefined` is `null` admitting `undefined`.
+    pub fn split_empties(&self) -> Option<(TypeRef, Nullability)> {
+        let TypeRef::Union(u) = self else {
+            return None;
+        };
+        let n = u.nullability()?;
+        Some(match u.values() {
+            [] => (TypeRef::Null, Nullability::Undefined),
+            [one] => (one.clone(), n),
+            values => (TypeRef::Union(Union(values.to_vec())), n),
+        })
+    }
+
+    /// `self` admitting `n` as well.
+    pub fn with_empties(self, n: Nullability) -> TypeRef {
+        TypeRef::union(std::iter::once(self).chain(n.members()))
+    }
+
+    /// Whether `self` is a union admitting `undefined`.
+    pub fn admits_undefined(&self) -> bool {
+        self.split_empties()
+            .is_some_and(|(_, n)| n.admits_undefined())
+    }
+
+    /// `self` without `undefined`.
+    pub fn without_undefined(&self) -> TypeRef {
+        match self.split_empties() {
+            Some((core, Nullability::Both)) => core.with_empties(Nullability::Null),
+            Some((core, Nullability::Undefined)) => core,
+            _ => self.clone(),
+        }
+    }
+
+    fn is_empty_type(&self) -> bool {
+        matches!(self, TypeRef::Null | TypeRef::Undefined)
+    }
+
     /// Construct a single-segment, non-generic reference: `Foo`.
     /// Convenience for the common case of a bare ident.
     pub fn ident(name: impl Into<String>) -> Self {
@@ -327,18 +471,16 @@ impl TypeRef {
                 // Wrap composite inner types in parens so e.g.
                 // `(A | B)[]` doesn't render as the wrong-precedence
                 // `A | B[]`.
-                let needs_parens = matches!(
-                    inner.as_ref(),
-                    TypeRef::Union(_) | TypeRef::Intersection(_) | TypeRef::Nullable(_)
-                );
+                let needs_parens =
+                    matches!(inner.as_ref(), TypeRef::Union(_) | TypeRef::Intersection(_));
                 if needs_parens {
                     format!("({})[]", inner.format_ts())
                 } else {
                     format!("{}[]", inner.format_ts())
                 }
             }
-            TypeRef::Nullable(inner) => format!("{} | null", inner.format_ts()),
-            TypeRef::Union(members) => members
+            TypeRef::Union(u) => u
+                .members()
                 .iter()
                 .map(Self::format_ts)
                 .collect::<Vec<_>>()
@@ -407,6 +549,8 @@ pub struct FunctionSig {
 pub struct Param {
     pub name: String,
     pub type_ref: TypeRef,
+    /// `x?: T`, or a default initializer: whether the argument may be
+    /// left out. Says nothing about the type, which is as written.
     pub optional: bool,
     pub variadic: bool,
     /// Slice mode requested by a `{@slice mode}` JSDoc inline tag in this
@@ -444,15 +588,15 @@ impl SliceModeHint {
     /// into the `TypedArray | number[]` (or `bigint[]`) union shape, so
     /// the hinted type takes the element-slice lowering with the typed
     /// array kept as a handle overload — "Rust callers hold native
-    /// elements here". `Nullable` is preserved around the union.
+    /// elements here". The empties are kept beside the union.
     pub fn widen_bare_typed_array(self, ty: &TypeRef) -> Option<TypeRef> {
         if self == Self::Array {
             return None;
         }
-        if let TypeRef::Nullable(inner) = ty {
+        if let Some((core, n)) = ty.split_empties() {
             return self
-                .widen_bare_typed_array(inner)
-                .map(|t| TypeRef::Nullable(Box::new(t)));
+                .widen_bare_typed_array(&core)
+                .map(|t| t.with_empties(n));
         }
         let TypeRef::Reference { segments, .. } = ty else {
             return None;
@@ -465,7 +609,7 @@ impl SliceModeHint {
         } else {
             TypeRef::Number
         };
-        Some(TypeRef::Union(vec![
+        Some(TypeRef::union([
             ty.clone(),
             TypeRef::Array(Box::new(array_elem)),
         ]))
@@ -885,9 +1029,10 @@ pub struct GetterMember {
     pub scope: crate::parse::scope::ScopeId,
     /// Original JS property name (source of truth for naming).
     pub js_name: String,
-    /// Return type of the getter.
+    /// The property's declared type.
     pub type_ref: TypeRef,
-    /// Whether declared with `?:` syntax — wraps return in `Option`.
+    /// Whether declared with `?:`, so the property may be absent: a read
+    /// admits `undefined` whatever the type says.
     pub optional: bool,
     pub doc: Option<String>,
 }
@@ -972,6 +1117,8 @@ pub struct StaticGetterMember {
     /// Original JS property name (source of truth for naming).
     pub js_name: String,
     pub type_ref: TypeRef,
+    /// Whether declared with `?:`; see [`GetterMember::optional`].
+    pub optional: bool,
     pub doc: Option<String>,
 }
 
@@ -1222,7 +1369,7 @@ mod tests {
 
     #[test]
     fn format_ts_union_renders_with_pipes() {
-        let ty = TypeRef::Union(vec![
+        let ty = TypeRef::union([
             TypeRef::String,
             TypeRef::ident("ArrayBuffer"),
             TypeRef::ArrayBufferView,
@@ -1234,10 +1381,7 @@ mod tests {
     fn format_ts_array_wraps_composite_inner_in_parens() {
         // `(string | number)[]` — without parens this would mean
         // `string | (number[])`, which is wrong precedence.
-        let ty = TypeRef::Array(Box::new(TypeRef::Union(vec![
-            TypeRef::String,
-            TypeRef::Number,
-        ])));
+        let ty = TypeRef::Array(Box::new(TypeRef::union([TypeRef::String, TypeRef::Number])));
         assert_eq!(ty.format_ts(), "(string | number)[]");
     }
 
@@ -1251,7 +1395,7 @@ mod tests {
     fn format_ts_generic_with_inner_union() {
         let ty = TypeRef::generic(
             "Array",
-            vec![TypeRef::Union(vec![
+            vec![TypeRef::union([
                 TypeRef::NumberLiteral(32.0),
                 TypeRef::StringLiteral("foo".into()),
             ])],
@@ -1278,8 +1422,83 @@ mod tests {
     }
 
     #[test]
-    fn format_ts_nullable() {
-        let ty = TypeRef::Nullable(Box::new(TypeRef::String));
-        assert_eq!(ty.format_ts(), "string | null");
+    fn format_ts_empties() {
+        let ty = TypeRef::union([TypeRef::Undefined, TypeRef::String, TypeRef::Null]);
+        assert_eq!(ty.format_ts(), "string | null | undefined");
+        assert_eq!(
+            TypeRef::String
+                .with_empties(Nullability::Undefined)
+                .format_ts(),
+            "string | undefined"
+        );
+    }
+
+    #[test]
+    fn union_normal_form() {
+        let s = || TypeRef::String;
+        let n = || TypeRef::Number;
+        let members = |ty: TypeRef| match ty {
+            TypeRef::Union(u) => u.members().to_vec(),
+            other => panic!("expected a union, got {other:?}"),
+        };
+        // Flattened, each member once, values in source order, empties last.
+        assert_eq!(
+            members(TypeRef::union([
+                TypeRef::Undefined,
+                s(),
+                TypeRef::union([n(), TypeRef::Null]),
+                s(),
+                TypeRef::Void,
+                TypeRef::Null,
+            ])),
+            vec![s(), n(), TypeRef::Null, TypeRef::Undefined]
+        );
+        // Equal types compare equal however they were spelled.
+        assert_eq!(
+            TypeRef::union([TypeRef::Null, s(), TypeRef::Undefined]),
+            TypeRef::union([TypeRef::union([s(), TypeRef::Undefined]), TypeRef::Null])
+        );
+        // One value with empties is still a union; one member alone is bare.
+        assert_eq!(
+            members(TypeRef::union([s(), TypeRef::Null])),
+            vec![s(), TypeRef::Null]
+        );
+        assert_eq!(TypeRef::union([s(), s()]), s());
+        assert_eq!(
+            TypeRef::union([TypeRef::Undefined, TypeRef::Void]),
+            TypeRef::Undefined
+        );
+        assert_eq!(
+            members(TypeRef::union([TypeRef::Undefined, TypeRef::Null])),
+            vec![TypeRef::Null, TypeRef::Undefined]
+        );
+    }
+
+    #[test]
+    fn split_empties_reads_the_empties_off_the_members() {
+        let s = || TypeRef::String;
+        let both = TypeRef::union([s(), TypeRef::Null, TypeRef::Undefined]);
+        assert_eq!(both.split_empties(), Some((s(), Nullability::Both)));
+        assert!(both.admits_undefined());
+        assert_eq!(
+            both.without_undefined(),
+            TypeRef::union([s(), TypeRef::Null])
+        );
+        let pair = TypeRef::union([s(), TypeRef::Number, TypeRef::Null]);
+        assert_eq!(
+            pair.split_empties(),
+            Some((TypeRef::union([s(), TypeRef::Number]), Nullability::Null))
+        );
+        assert_eq!(
+            TypeRef::union([TypeRef::Null, TypeRef::Undefined]).split_empties(),
+            Some((TypeRef::Null, Nullability::Undefined))
+        );
+        assert_eq!(TypeRef::Null.split_empties(), None);
+        assert_eq!(TypeRef::union([s(), TypeRef::Number]).split_empties(), None);
+        assert_eq!(
+            s().with_empties(Nullability::Null)
+                .with_empties(Nullability::Undefined),
+            both
+        );
     }
 }
