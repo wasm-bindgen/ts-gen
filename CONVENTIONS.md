@@ -175,7 +175,7 @@ factories expand the union instead: each empty is an arm.
   `new_with_blob(body: &Blob)`, `new_with_null()`), so
   `Response(body?: BodyInit | null)` gives `new()`, `new_with_str`, ...
   and `new_with_null()`.
-* **The `null` arm** binds the import privately as `<name>_js` taking
+* **The `null` arm** binds the import privately as `__<name>` taking
   `&JsValue` in that position (with `js_name` naming the JS member), and
   the public `<name>` wraps it, passing `&JsValue::NULL`. A type
   parameter used only by the `null` position is dropped from the
@@ -2752,10 +2752,10 @@ is emitted under a private name and a non-extern `pub fn` of the public
 name converts over it. The rule is narrow on purpose: a wrapper is
 never emitted for ergonomics, only where no extern signature can carry
 the type, and the extern form stays reachable (within the module) under
-a `_js` name. Two constructs qualify today:
+a `__`-prefixed name (`__<name>`). Two constructs qualify today:
 
 * **`null` arms.** The extern ABI has no type that only admits `null`,
-  so `f(x: T | null)`'s `f_with_null()` binds `f_with_null_js(x:
+  so `f(x: T | null)`'s `f_with_null()` binds `__f_with_null(x:
   &JsValue)` and passes `&JsValue::NULL` (see [Writes](#writes)).
 * **Overloads keyed by a string literal**, below.
 

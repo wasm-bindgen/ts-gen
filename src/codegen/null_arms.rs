@@ -1,6 +1,6 @@
 //! A written `null` is an ordinary union arm: `f(x: T | null)` binds
 //! `f(x)` and `f_with_null()`. The extern binding of a `null` arm keeps the
-//! parameter as `&JsValue` under a private `<name>_js` name, and a wrapper
+//! parameter as `&JsValue` under a private `__<name>` name, and a wrapper
 //! of the public name drops it, passing `null` itself.
 //!
 //! The signature emitters render such a parameter as a placeholder type
@@ -9,6 +9,7 @@
 
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, ToTokens};
+use syn::ext::IdentExt;
 use syn::{
     FnArg, ForeignItem, ForeignItemFn, GenericArgument, GenericParam, Generics, Ident, Item, Pat,
     PathArguments, ReturnType, Type, WherePredicate,
@@ -239,7 +240,7 @@ fn wrap(item: &mut ForeignItemFn) -> Option<Wrapper> {
     }
     let (attr_idx, binding) = read_binding(item);
     let public_name = item.sig.ident.clone();
-    let extern_name = format_ident!("{public_name}_js");
+    let extern_name = format_ident!("__{}", public_name.unraw());
     let skip = usize::from(binding.method);
 
     let call_args: Vec<TokenStream> = item
@@ -417,11 +418,11 @@ mod tests {
                 pub fn new_with_null<T>(body: &__TsGenNull) -> Result<Holder<T>, JsValue>;
             }");
         assert!(
-            out.contains("fn set_label_with_null_js(this: &Foo, val: &::wasm_bindgen::JsValue);")
+            out.contains("fn __set_label_with_null(this: &Foo, val: &::wasm_bindgen::JsValue);")
         );
         assert!(out.contains("pub fn set_label_with_null(&self) {"));
-        assert!(out.contains("self.set_label_with_null_js(&::wasm_bindgen::JsValue::NULL)"));
-        assert!(out.contains("fn put_with_null_js(key: &str, value: &::wasm_bindgen::JsValue);"));
+        assert!(out.contains("self.__set_label_with_null(&::wasm_bindgen::JsValue::NULL)"));
+        assert!(out.contains("fn __put_with_null(key: &str, value: &::wasm_bindgen::JsValue);"));
         assert!(out.contains("pub fn put_with_null(key: &str) {"));
         assert!(out.contains("impl<T> Holder<T> {"));
         assert!(out.contains("pub fn new_with_null() -> Result<Holder<T>, JsValue> {"));

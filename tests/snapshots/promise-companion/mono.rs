@@ -76,13 +76,13 @@ extern "C" {
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    async fn put_with_null_js(
+    async fn __put_with_null(
         this: &State,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    fn put_with_null_promise_js(
+    fn __put_with_null_promise(
         this: &State,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &::wasm_bindgen::JsValue,
@@ -125,7 +125,7 @@ impl State {
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue> {
-        self.put_with_null_js(key, &::wasm_bindgen::JsValue::NULL)
+        self.__put_with_null(key, &::wasm_bindgen::JsValue::NULL)
             .await
     }
     #[doc = " A `null` argument arm gets its own `_promise` form too."]
@@ -133,7 +133,7 @@ impl State {
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Undefined> {
-        self.put_with_null_promise_js(key, &::wasm_bindgen::JsValue::NULL)
+        self.__put_with_null_promise(key, &::wasm_bindgen::JsValue::NULL)
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
