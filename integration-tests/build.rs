@@ -25,9 +25,11 @@ use std::path::{Path, PathBuf};
 /// The snapshot tests render every fixture under each codegen configuration,
 /// so a configuration flag belongs to the test file rather than the fixture:
 /// a `//! @ts-gen --experimental-generic-mono` header on the test `.rs`
-/// compiles it against the per-monomorphization bindings, and
-/// `//! @ts-gen --fallible` against the single `Result` forms. A
-/// `<name>_mono.rs` test may share `<name>.d.ts` with `<name>.rs`.
+/// compiles it against the per-monomorphization bindings,
+/// `//! @ts-gen --fallible` against the single `Result` forms, and
+/// `//! @ts-gen --promise-only` against the sync promise-returning forms
+/// of async callables. A `<name>_mono.rs` test may share `<name>.d.ts`
+/// with `<name>.rs`.
 fn main() {
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let crate_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -79,6 +81,8 @@ struct Entry {
     experimental_generic_mono: bool,
     /// Whether the test file opts into single `Result` forms for sync callables.
     fallible: bool,
+    /// Whether the test file opts into promise-only async bindings.
+    promise_only: bool,
     /// Whether the fixture declares its own `--lib-name` (module mode).
     /// Script-mode fixtures parse without one and export by `--export`.
     module_mode: bool,
@@ -149,6 +153,7 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
             externals: directive.externals,
             experimental_generic_mono: test_directive.experimental_generic_mono,
             fallible: test_directive.fallible,
+            promise_only: test_directive.promise_only,
             export_specs: directive.export_specs,
             inputs: directive
                 .inputs
@@ -173,6 +178,8 @@ struct Directive {
     experimental_generic_mono: bool,
     /// Whether `--fallible` is present.
     fallible: bool,
+    /// Whether `--promise-only` is present.
+    promise_only: bool,
     /// All `--export <spec>` (or `-E <spec>`) values.
     export_specs: Vec<String>,
     /// All `--input <path>` (or `-i <path>`) values.
@@ -191,6 +198,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let mut externals = Vec::new();
     let mut experimental_generic_mono = false;
     let mut fallible = false;
+    let mut promise_only = false;
     let mut export_specs = Vec::new();
     let mut inputs = Vec::new();
     let mut error_enum = None;
@@ -217,6 +225,10 @@ fn parse_directive(dts_path: &Path) -> Directive {
                     }
                     "--fallible" => {
                         fallible = true;
+                        i += 1;
+                    }
+                    "--promise-only" => {
+                        promise_only = true;
                         i += 1;
                     }
                     "--export" | "-E" if i + 1 < args.len() => {
@@ -255,6 +267,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
         externals,
         experimental_generic_mono,
         fallible,
+        promise_only,
         export_specs,
         inputs,
         error_enum,
@@ -347,6 +360,7 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
     let mut options = ts_gen::codegen::GenerateOptions::new()
         .experimental_generic_mono(entry.experimental_generic_mono)
         .fallible(entry.fallible)
+        .promise_only(entry.promise_only)
         .exports(exports);
     if let Some(name) = &entry.error_enum {
         options = options.error_enum(name);

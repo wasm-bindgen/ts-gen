@@ -90,6 +90,15 @@ pub struct GenerateOptions {
     /// `JsGeneric` bounds and cross the ABI at their concrete Rust types.
     experimental_generic_mono: bool,
 
+    /// Bind a `Promise`-returning method or function once, as a sync
+    /// binding returning the `Promise<T>` under its primary name, instead
+    /// of an `async fn` plus a sync `<name>_promise` form. Under
+    /// [`experimental_generic_mono`](Self::experimental_generic_mono) the
+    /// `T` of a returned `Promise<T>` is the awaited Rust value
+    /// (`Promise<String>`); otherwise it is the `js_sys` handle
+    /// (`Promise<JsString>`).
+    promise_only: bool,
+
     /// The output surface — the authoritative list of inputs (files /
     /// modules) whose declarations are emitted. The `--input` set
     /// still defines the *type universe* for resolution; `exports`
@@ -145,6 +154,13 @@ impl GenerateOptions {
     /// Configure wasm-bindgen's experimental per-monomorphization codegen.
     pub fn experimental_generic_mono(mut self, enabled: bool) -> Self {
         self.experimental_generic_mono = enabled;
+        self
+    }
+
+    /// Configure whether `Promise`-returning callables are bound once, as a
+    /// sync binding returning the `Promise<T>`, with no `async fn` form.
+    pub fn promise_only(mut self, enabled: bool) -> Self {
+        self.promise_only = enabled;
         self
     }
 

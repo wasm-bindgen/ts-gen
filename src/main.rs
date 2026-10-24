@@ -123,6 +123,20 @@ struct Cli {
     /// generic imports instead of erasing their type parameters to JsValue.
     #[arg(long = "experimental-generic-mono")]
     experimental_generic_mono: bool,
+
+    /// Bind every `Promise`-returning method and function once, as a sync
+    /// `name()` returning the `Promise<T>`, instead of an `async fn` plus a
+    /// `name_promise()` form.
+    ///
+    /// The JS call happens when `name()` is called, as in JS, and callers
+    /// write `name().await` (js-sys implements `IntoFuture` for
+    /// `Promise<T>`). Under `--fallible` it returns `Result<Promise<T>, E>`
+    /// by the `_promise` rule above. With `--experimental-generic-mono`,
+    /// `T` is the awaited Rust value (`Promise<String>`,
+    /// `Promise<Array<String>>`, `Promise<Nullable<String>>`); without it,
+    /// the `js_sys` handle (`Promise<JsString>`).
+    #[arg(long = "promise-only")]
+    promise_only: bool,
 }
 
 fn main() -> Result<()> {
@@ -189,6 +203,7 @@ fn main() -> Result<()> {
         .errors_as_error(cli.errors_as_error)
         .fallible(cli.fallible)
         .experimental_generic_mono(cli.experimental_generic_mono)
+        .promise_only(cli.promise_only)
         .exports(exports);
     if let Some(path) = &cli.error_type {
         options = options.error_type(path);

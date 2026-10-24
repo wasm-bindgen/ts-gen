@@ -12,6 +12,7 @@
     "module-namespace-values": "file:./js/module-namespace-values",
     "mono-lists": "file:./js/mono-lists",
     "node-nullable": "file:./js/node-nullable",
+    "promise-only": "file:./js/promise-only",
     "slice-args": "file:./js/slice-args",
     "slice-hints": "file:./js/slice-hints"
   }
