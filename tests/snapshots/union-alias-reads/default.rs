@@ -108,13 +108,13 @@ impl RelativeOptions {
     }
     #[doc = " * `zone` - A union alias read whole."]
     #[doc = " * `fields` - Only dictionaries."]
-    pub fn new_with_zoned_and_day_fields(zone: &Zoned, fields: &DayFields) -> RelativeOptions {
-        Self::builder_with_zoned_and_day_fields(zone, fields).build()
+    pub fn new_with_day_fields(zone: &Zoned, fields: &DayFields) -> RelativeOptions {
+        Self::builder_with_day_fields(zone, fields).build()
     }
     #[doc = " * `zone` - A union alias read whole."]
     #[doc = " * `fields` - Only dictionaries."]
-    pub fn new_with_str_and_zoned_fields(zone: &str, fields: &ZonedFields) -> RelativeOptions {
-        Self::builder_with_str_and_zoned_fields(zone, fields).build()
+    pub fn new_with_str(zone: &str, fields: &ZonedFields) -> RelativeOptions {
+        Self::builder_with_str(zone, fields).build()
     }
     #[doc = " * `zone` - A union alias read whole."]
     #[doc = " * `fields` - Only dictionaries."]
@@ -131,10 +131,7 @@ impl RelativeOptions {
     }
     #[doc = " * `zone` - A union alias read whole."]
     #[doc = " * `fields` - Only dictionaries."]
-    pub fn builder_with_zoned_and_day_fields(
-        zone: &Zoned,
-        fields: &DayFields,
-    ) -> RelativeOptionsBuilder {
+    pub fn builder_with_day_fields(zone: &Zoned, fields: &DayFields) -> RelativeOptionsBuilder {
         let inner: RelativeOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_zone(zone);
         inner.set_fields_with_day_fields(fields);
@@ -142,10 +139,7 @@ impl RelativeOptions {
     }
     #[doc = " * `zone` - A union alias read whole."]
     #[doc = " * `fields` - Only dictionaries."]
-    pub fn builder_with_str_and_zoned_fields(
-        zone: &str,
-        fields: &ZonedFields,
-    ) -> RelativeOptionsBuilder {
+    pub fn builder_with_str(zone: &str, fields: &ZonedFields) -> RelativeOptionsBuilder {
         let inner: RelativeOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_zone_with_str(zone);
         inner.set_fields(fields);

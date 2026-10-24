@@ -928,9 +928,9 @@ naming follows the standard
 
 ```rust
 SendEmailBuilder::new(from: &str, to: &str, subject: &str)
-SendEmailBuilder::new_with_str_and_array(from: &str, to: &Array<JsString>, subject: &str)
-SendEmailBuilder::new_with_email_address_and_str(from: &EmailAddress, to: &str, subject: &str)
-SendEmailBuilder::new_with_email_address_and_array(from: &EmailAddress, to: &Array<JsString>, subject: &str)
+SendEmailBuilder::new_with_slice(from: &str, to: &[String], subject: &str)
+SendEmailBuilder::new_with_email_address(from: &EmailAddress, to: &str, subject: &str)
+SendEmailBuilder::new_with_email_address_and_slice(from: &EmailAddress, to: &[String], subject: &str)
 // matching builder*, builder_with_*, etc.
 ```
 
@@ -1723,7 +1723,7 @@ pub fn parse(input: &str) -> Object;
 #[wasm_bindgen(js_name = "parse")]
 pub fn parse_with_array_buffer(input: &ArrayBuffer) -> Object;
 #[wasm_bindgen(js_name = "parse")]
-pub fn parse_with_str_and_reviver(input: &str, reviver: &Function) -> Object;
+pub fn parse_with_reviver(input: &str, reviver: &Function) -> Object;
 ```
 
 Methods, static methods and constructors are the same: every merged
@@ -1774,7 +1774,8 @@ For every JS callable, `ts-gen`:
 3. **Suffix assignment**: Across all surviving expansions, compute
    `_with_X` / `_with_X_and_Y` suffixes that disambiguate them. The
    primary variant gets `""`; the others are named after the
-   parameters that distinguish them.
+   parameters that distinguish them (see
+   [variant names](#variant-names)).
 
    The primary is the first overload's shortest expansion, unless a
    shorter expansion matches its leading parameters (names and types),
@@ -1851,6 +1852,40 @@ pub fn show_with_f64_and_opts(value: f64, opts: &ShowOpts);
 `compute_rust_names` in `codegen::signatures` handles the suffix
 disambiguation, including readability adjustments when the same
 parameter name appears in multiple alternatives.
+
+### Variant names
+
+A variant's suffix names what it adds beyond the bare form: the
+parameters where it departs from the primary, by name where the primary
+lacks the parameter, by type where a sibling has the same parameter with
+another type.
+
+```ts
+until(other: PlainDate | string, options?: DifferenceOptions): Duration;
+```
+
+```rust
+pub fn until(this: &PlainDate, other: &PlainDate) -> Duration;
+pub fn until_with_str(this: &PlainDate, other: &str) -> Duration;
+pub fn until_with_options(this: &PlainDate, other: &PlainDate, options: &DifferenceOptions) -> Duration;
+pub fn until_with_str_and_options(this: &PlainDate, other: &str, options: &DifferenceOptions) -> Duration;
+```
+
+The `other` of `until_with_options` is the primary's own, so it goes
+unnamed; `until_with_str_and_options` departs in both. Where two
+variants would add the same thing at different positions, each is named
+in full instead: `compare(one: A | B, two: A | B)` gives
+`compare_with_b_and_a` and `compare_with_a_and_b`, never a lone
+`compare_with_b` for one of them.
+
+The same holds across overloads: `put(key, value, options?)` beside
+`put(entries, options?)` gives `put_with_options` for the first with
+options, and `put_with_entries` and `put_with_entries_and_options` for
+the second, which departs from the primary in its parameter names.
+
+A base name that already reads `with` (`with`, `set_with`) continues the
+suffix with `_and_`: `with(fields, options?)` gives `with` and
+`with_and_options`, not `with_with_options`.
 
 ### `_with_<type>` suffix vocabulary
 

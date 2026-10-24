@@ -125,14 +125,14 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_promise(this: &Store, key: &str, value: &str) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_key_and_value_and_options(
+    pub async fn put_with_options(
         this: &Store,
         key: &str,
         value: &str,
         options: &GetOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_key_and_value_and_options_promise(
+    pub fn put_with_options_promise(
         this: &Store,
         key: &str,
         value: &str,
@@ -163,4 +163,40 @@ extern "C" {
     pub async fn find_with_f64(this: &Store, key: f64) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "find")]
     pub fn find_with_f64_promise(this: &Store, key: f64) -> Promise<JsString>;
+    #[wasm_bindgen(method)]
+    pub fn until(this: &Store, other: &Store) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "until")]
+    pub fn try_until(this: &Store, other: &Store) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, js_name = "until")]
+    pub fn until_with_str(this: &Store, other: &str) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "until")]
+    pub fn try_until_with_str(this: &Store, other: &str) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, js_name = "until")]
+    pub fn until_with_options(this: &Store, other: &Store, options: &GetOptions) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "until")]
+    pub fn try_until_with_options(
+        this: &Store,
+        other: &Store,
+        options: &GetOptions,
+    ) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, js_name = "until")]
+    pub fn until_with_str_and_options(this: &Store, other: &str, options: &GetOptions) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "until")]
+    pub fn try_until_with_str_and_options(
+        this: &Store,
+        other: &str,
+        options: &GetOptions,
+    ) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn with(this: &Store, fields: &Conditional) -> Store;
+    #[wasm_bindgen(method, catch, js_name = "with")]
+    pub fn try_with(this: &Store, fields: &Conditional) -> Result<Store, JsValue>;
+    #[wasm_bindgen(method, js_name = "with")]
+    pub fn with_and_options(this: &Store, fields: &Conditional, options: &GetOptions) -> Store;
+    #[wasm_bindgen(method, catch, js_name = "with")]
+    pub fn try_with_and_options(
+        this: &Store,
+        fields: &Conditional,
+        options: &GetOptions,
+    ) -> Result<Store, JsValue>;
 }

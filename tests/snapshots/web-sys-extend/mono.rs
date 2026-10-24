@@ -126,7 +126,7 @@ extern "C" {
 extern "C" {
     #[doc = " Perform a fetch with extended options, returning an extended response."]
     #[wasm_bindgen(catch, js_name = "fetch")]
-    pub async fn fetch_with_request_and_init(
+    pub async fn fetch_with_init(
         input: &Request,
         init: &FetchOptions,
     ) -> Result<ResponseExt, JsValue>;
@@ -135,10 +135,7 @@ extern "C" {
 extern "C" {
     #[doc = " Perform a fetch with extended options, returning an extended response."]
     #[wasm_bindgen(js_name = "fetch")]
-    pub fn fetch_with_request_and_init_promise(
-        input: &Request,
-        init: &FetchOptions,
-    ) -> Promise<ResponseExt>;
+    pub fn fetch_with_init_promise(input: &Request, init: &FetchOptions) -> Promise<ResponseExt>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
