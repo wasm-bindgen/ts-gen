@@ -689,6 +689,7 @@ fn function(f: &crate::ir::FunctionDecl, walk: &mut impl FnMut(&TypeRef, ScopeId
     }
     walk(&f.return_type, f.body_scope);
     for o in &f.overloads {
+        type_params(&o.type_params, o.body_scope, walk);
         for p in &o.params {
             walk(&p.type_ref, o.body_scope);
         }

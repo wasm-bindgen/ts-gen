@@ -1,10 +1,11 @@
-//! @ts-gen --export Bucket --export openBucket --export cloudflare:sockets
+//! @ts-gen --export Bucket --export openBucket --export listBuckets --export cloudflare:sockets
 
-// Root selection: `Bucket` and `openBucket` are roots; the closure
-// reaches `BucketObject`, `GetOptions`, `Checksums` (through a method
+// Root selection: `Bucket`, `openBucket` and `listBuckets` are roots; the
+// closure reaches `BucketObject`, `GetOptions`, `Checksums` (through a method
 // return / parameter / nested property), `Conditional` (through the
-// options bag), `Socket` (through the exported module), and the
-// `BucketKind` enum. `Unrelated` and `Dangling` are never reached.
+// options bag), `Socket` (through the exported module), the
+// `BucketKind` enum, and `ListDefaults` (through a later overload's own
+// type-parameter default). `Unrelated` and `Dangling` are never reached.
 
 interface Checksums {
   md5?: string;
@@ -32,6 +33,14 @@ declare abstract class Bucket {
 }
 
 declare function openBucket(name: string): Bucket;
+
+interface ListDefaults {
+  limit?: number;
+}
+
+declare function listBuckets(prefix: string): string[];
+// No argument infers `T`, so the binding returns it at this default.
+declare function listBuckets<T = ListDefaults>(): Map<string, T>;
 
 interface Unrelated {
   nothing: number;
