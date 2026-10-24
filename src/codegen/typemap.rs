@@ -232,6 +232,8 @@ pub struct CodegenContext<'a> {
     /// The type parameters lowered while [`Self::alias_params`] probes an
     /// alias, innermost probe last.
     alias_param_mentions: RefCell<Vec<HashSet<String>>>,
+    /// [`Self::is_recursive_alias`], by the alias's id.
+    recursive_aliases: RefCell<HashMap<TypeId, bool>>,
 }
 
 /// How a local generic alias's type parameters carry over to the Rust
@@ -800,6 +802,7 @@ impl<'a> CodegenContext<'a> {
             unresolved_module_refs: RefCell::new(HashSet::new()),
             alias_params: RefCell::new(HashMap::new()),
             alias_param_mentions: RefCell::new(Vec::new()),
+            recursive_aliases: RefCell::new(HashMap::new()),
         };
         for (spec, scopes) in &gctx.ambient_module_scopes {
             let path = ctx.specifier_path(spec);
@@ -842,6 +845,7 @@ impl<'a> CodegenContext<'a> {
             unresolved_module_refs: RefCell::new(HashSet::new()),
             alias_params: RefCell::new(HashMap::new()),
             alias_param_mentions: RefCell::new(Vec::new()),
+            recursive_aliases: RefCell::new(HashMap::new()),
         }
     }
 
@@ -1095,6 +1099,10 @@ impl<'a> CodegenContext<'a> {
         let TypeKind::TypeAlias(ref alias) = self.gctx.get_type(type_id).kind else {
             return None;
         };
+        // A self-referential alias is named rather than chased.
+        if self.is_recursive_alias(type_id) {
+            return None;
+        }
         let target = alias_target_with_defaults(alias);
         // If the target is itself a single-segment path, keep resolving.
         // Generic instantiations and qualified paths stop here.
@@ -1104,6 +1112,75 @@ impl<'a> CodegenContext<'a> {
             }
         }
         Some((target, alias.body_scope))
+    }
+
+    /// Whether the alias `id` reaches itself through the aliases its
+    /// target (or a parameter default) names, directly (`type Next<T> =
+    /// (n: Next<T>) => void`) or through other aliases. Expanding such an
+    /// alias never ends, so its references keep the alias name.
+    pub(crate) fn is_recursive_alias(&self, id: TypeId) -> bool {
+        if let Some(&recursive) = self.recursive_aliases.borrow().get(&id) {
+            return recursive;
+        }
+        let recursive = self.alias_reaches(id, id, &mut HashSet::new());
+        self.recursive_aliases.borrow_mut().insert(id, recursive);
+        recursive
+    }
+
+    /// Whether the alias `from` names `target`, or an alias that does.
+    fn alias_reaches(&self, from: TypeId, target: TypeId, visited: &mut HashSet<TypeId>) -> bool {
+        if !visited.insert(from) {
+            return false;
+        }
+        let TypeKind::TypeAlias(alias) = &self.gctx.get_type(from).kind else {
+            return false;
+        };
+        let scope = alias.body_scope;
+        std::iter::once(&alias.target)
+            .chain(
+                alias
+                    .type_params
+                    .iter()
+                    .filter_map(|tp| tp.default.as_ref()),
+            )
+            .any(|ty| self.type_reaches_alias(ty, scope, target, visited))
+    }
+
+    /// Whether `ty`, read in `scope`, names the alias `target` or an
+    /// alias that does.
+    fn type_reaches_alias(
+        &self,
+        ty: &ir::TypeRef,
+        scope: ScopeId,
+        target: TypeId,
+        visited: &mut HashSet<TypeId>,
+    ) -> bool {
+        let children: Vec<&ir::TypeRef> = match ty {
+            ir::TypeRef::Reference {
+                segments,
+                generic_args,
+            } => {
+                if let Some(id) = self.gctx.resolve_path(scope, &segments.join(".")) {
+                    if id == target || self.alias_reaches(id, target, visited) {
+                        return true;
+                    }
+                }
+                generic_args.iter().collect()
+            }
+            ir::TypeRef::Array(inner) => vec![&**inner],
+            ir::TypeRef::Union(u) => u.members().iter().collect(),
+            ir::TypeRef::Intersection(items) | ir::TypeRef::Tuple(items) => items.iter().collect(),
+            ir::TypeRef::Function(sig) => sig
+                .params
+                .iter()
+                .map(|p| &p.type_ref)
+                .chain(std::iter::once(&*sig.return_type))
+                .collect(),
+            _ => return false,
+        };
+        children
+            .into_iter()
+            .any(|t| self.type_reaches_alias(t, scope, target, visited))
     }
 
     /// Chase a generic alias instantiation: `Foo<A, B>` where `Foo` is
@@ -1132,7 +1209,7 @@ impl<'a> CodegenContext<'a> {
         let TypeKind::TypeAlias(alias) = &self.gctx.get_type(type_id).kind else {
             return None;
         };
-        if alias.type_params.is_empty() {
+        if alias.type_params.is_empty() || self.is_recursive_alias(type_id) {
             return None;
         }
         // The given arguments are the use site's own, so only the target and
@@ -1164,7 +1241,7 @@ impl<'a> CodegenContext<'a> {
         let TypeKind::TypeAlias(alias) = &decl.kind else {
             return None;
         };
-        if alias.type_params.is_empty() {
+        if alias.type_params.is_empty() || self.is_recursive_alias(type_id) {
             return None;
         }
         let scopes = &self.gctx.scopes;
@@ -1766,6 +1843,7 @@ pub fn to_syn_type(
             if segments.len() > 1 && generic_args.is_empty() {
                 if let Some(c) = ctx {
                     let resolved = c.gctx.resolve_path(scope, &segments.join("."));
+                    let resolved = resolved.filter(|&id| !c.is_recursive_alias(id));
                     if let Some(TypeKind::TypeAlias(alias)) =
                         resolved.map(|id| &c.gctx.get_type(id).kind)
                     {

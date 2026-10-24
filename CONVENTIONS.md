@@ -3431,6 +3431,27 @@ namespace exported under its own name as well keeps it.
       pub fn use_(a: &super::Pair<super::Inner, super::Inner>, b: &JsValue);
   }
   ```
+* An alias that reaches itself, through its own target or a parameter
+  default, directly or through other aliases, is never chased: expanding
+  it would not end. Its references name the alias, generic arguments
+  lowered as usual:
+
+  ```ts
+  type Next<T> = (next: Next<T>) => void;
+  type Ping = (pong: Pong) => void;
+  type Pong = (ping: Ping) => void;
+  declare function step(next: Next<string>, ping: Ping): void;
+  ```
+
+  ```rust
+  pub type Next<T> = Function<fn(Next<T>) -> Undefined>;
+  pub type Ping = Function<fn(Pong) -> Undefined>;
+  pub type Pong = Function<fn(Ping) -> Undefined>;
+  pub fn step(next: &Next<JsString>, ping: &Ping);
+  ```
+
+  Rust rejects a cyclic `pub type` (E0391), so such an alias only
+  generates; the bindings that name it don't compile.
 * `export { Local as Public };` (sourceless) → exports what the binding
   `Local` declares in the exporting block under the public name, as an
   entry in its [export map](#the-export-map). A declaration of the block
