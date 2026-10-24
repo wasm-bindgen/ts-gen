@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ListKey<Metadata: ::wasm_bindgen::JsGeneric>;
+    pub type ListKey<Metadata: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn name<Metadata: ::wasm_bindgen::JsGeneric>(this: &ListKey<Metadata>) -> String;
     #[wasm_bindgen(method, setter)]
@@ -49,7 +49,7 @@ impl<Metadata: ::wasm_bindgen::JsGeneric> ListKeyBuilder<Metadata> {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ListResult<Metadata: ::wasm_bindgen::JsGeneric>;
+    pub type ListResult<Metadata: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn keys<Metadata: ::wasm_bindgen::JsGeneric>(
         this: &ListResult<Metadata>,
@@ -102,7 +102,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Target<EventMap: ::wasm_bindgen::JsGeneric>;
+    pub type Target<EventMap: ::wasm_bindgen::JsGeneric = Object>;
     #[wasm_bindgen(method, js_name = "addEventListener")]
     pub fn add_event_listener<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &Target<EventMap>,
@@ -164,7 +164,7 @@ impl Point {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Slot<V: ::wasm_bindgen::JsGeneric>;
+    pub type Slot<V: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<V: ::wasm_bindgen::JsGeneric>(this: &Slot<V>) -> V;
     #[wasm_bindgen(method, setter)]

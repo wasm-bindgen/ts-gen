@@ -44,7 +44,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KeyValueStoreList<T>;
+    pub type KeyValueStoreList<T = JsValue>;
     #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(
@@ -55,7 +55,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KeyValueStoreListAsync<T>;
+    pub type KeyValueStoreListAsync<T = JsValue>;
     #[doc = " Conformance to the JS async iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, catch, js_name = "[Symbol.asyncIterator]")]
     pub fn async_iterator<T>(
@@ -74,7 +74,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type CursorWalk<T>;
+    pub type CursorWalk<T = JsValue>;
     #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(this: &CursorWalk<T>) -> Result<Iterator<T>, JsValue>;

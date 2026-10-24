@@ -27,7 +27,7 @@ impl Local {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Pair<A, B>;
+    pub type Pair<A = JsValue, B = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn a<A, B>(this: &Pair<A, B>) -> A
     where
@@ -64,17 +64,17 @@ pub type Skip<A, C> = Pair<A, C>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn brand(value: &Branded<Local>) -> Result<(), JsValue>;
+    pub fn brand(value: &Local) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn erase(value: &Erased) -> Result<Partly, JsValue>;
+    pub fn erase(value: &JsValue) -> Result<Local, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn skip(value: &Skip<String, bool>) -> Result<(), JsValue>;
+    pub fn skip(value: &Pair<String, bool>) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type WithDefault<T, U = String> = Pair<T, U>;
@@ -132,23 +132,23 @@ pub mod ns {
 extern "C" {
     #[wasm_bindgen(catch)]
     pub fn defaults(
-        a: &WithDefault<f64>,
-        b: &Chained<f64>,
+        a: &Pair<f64, String>,
+        b: &Pair<f64, f64>,
         c: &Pair<Undefined, Undefined>,
-        d: &Fetcher<String>,
-        e: &ns::WithInner<String>,
+        d: &Pair<String, String>,
+        e: &Pair<String, ns::Inner>,
         f: &Pair<Undefined, Undefined>,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "defaultReturn")]
-    pub fn default_return() -> Result<WithDefault<f64>, JsValue>;
+    pub fn default_return() -> Result<Pair<f64, String>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "skipReturn")]
-    pub fn skip_return() -> Result<Skip<f64, bool>, JsValue>;
+    pub fn skip_return() -> Result<Pair<f64, bool>, JsValue>;
 }
 pub mod cf {
     #[allow(unused_imports)]
@@ -189,17 +189,17 @@ pub type Chosen<T = Color> = T;
 extern "C" {
     #[wasm_bindgen(catch)]
     pub fn misc(
-        handler: &Handler,
-        color: ColorAlias,
-        qualified: ns::ColorOf,
+        handler: &Function<fn(cf::Env) -> Undefined>,
+        color: Color,
+        qualified: Color,
         chosen: Color,
-        given: &Pair<Chosen<f64>, String>,
+        given: &Pair<f64, String>,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "qualifiedReturn")]
-    pub fn qualified_return() -> Result<ns::WithInner<String>, JsValue>;
+    pub fn qualified_return() -> Result<Pair<String, ns::Inner>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -210,11 +210,11 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T>;
+    pub type Holder<T = JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn get<T>(this: &Holder<T>) -> Result<Erased, JsValue>;
+    pub fn get<T>(this: &Holder<T>) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn take<T>(this: &Holder<T>, value: &Skip<T, String>) -> Result<(), JsValue>;
+    pub fn take<T>(this: &Holder<T>, value: &Pair<T, String>) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn entry<T, U>(this: &Holder<T>) -> Result<Erased, JsValue>;
+    pub fn entry<T, U>(this: &Holder<T>) -> Result<JsValue, JsValue>;
 }

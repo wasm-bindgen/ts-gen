@@ -27,7 +27,7 @@ impl U {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type GenAbv<T>;
+    pub type GenAbv<T = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &GenAbv<T>) -> Option<T>
     where
@@ -76,7 +76,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> GenAbvBuilder<T> {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ReqAbv<T>;
+    pub type ReqAbv<T = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &ReqAbv<T>) -> T
     where

@@ -25,6 +25,26 @@ use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::{LocalScope, Suffix};
 
+/// Heads [`lower_reference`] maps to `js_sys` containers rather than to
+/// a declaration of the same name.
+const DEDICATED_HEADS: &[&str] = &[
+    "Promise",
+    "PromiseLike",
+    "Set",
+    "ReadonlySet",
+    "Map",
+    "ReadonlyMap",
+    "Record",
+    "Iterator",
+    "IterableIterator",
+    "AsyncIterator",
+    "AsyncIterableIterator",
+    "Iterable",
+    "AsyncIterable",
+    "Array",
+    "ReadonlyArray",
+];
+
 /// js_sys type names reserved by the `use js_sys::*` glob import.
 /// User-defined types that collide with these will be renamed.
 pub const JS_SYS_RESERVED: &[&str] = &[
@@ -232,6 +252,14 @@ pub struct CodegenContext<'a> {
     /// The type parameters lowered while [`Self::alias_params`] probes an
     /// alias, innermost probe last.
     alias_param_mentions: RefCell<Vec<HashSet<String>>>,
+    /// [`Self::is_recursive_alias`], by the alias's id.
+    recursive_aliases: RefCell<HashMap<TypeId, bool>>,
+    /// The types [`Self::trim_default_args`] is reading the defaults of.
+    trimming: RefCell<HashSet<TypeId>>,
+    /// Arguments standing in for type parameters while a default is read
+    /// against them: the scope declaring the parameters, and each one's
+    /// argument tokens. Innermost last.
+    param_args: RefCell<Vec<(ScopeId, HashMap<String, TokenStream>)>>,
 }
 
 /// How a local generic alias's type parameters carry over to the Rust
@@ -410,6 +438,116 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
             buf.push_str(&ty.format_ts());
         }
     }
+}
+
+/// What a name binds in a scope.
+#[derive(Clone, Copy, PartialEq)]
+enum Bound {
+    Type(crate::context::TypeId),
+    Namespace(ScopeId),
+}
+
+/// How a reference's first segment, written in an alias target, reads
+/// from the scope referencing the alias.
+enum Qualify {
+    /// It binds the same there.
+    Keep,
+    /// It needs this qualified path instead.
+    As(Vec<String>),
+    /// No path from there reaches it.
+    Unreachable,
+}
+
+/// `ty` with the first segment of each reference replaced as `qualify`
+/// says, given the segment and whether it heads a path.
+fn qualify_references(
+    ty: &ir::TypeRef,
+    qualify: &dyn Fn(&str, bool) -> Qualify,
+) -> Option<ir::TypeRef> {
+    let q = |t: &ir::TypeRef| qualify_references(t, qualify);
+    let all = |items: &[ir::TypeRef]| items.iter().map(q).collect::<Option<Vec<_>>>();
+    Some(match ty {
+        ir::TypeRef::Reference {
+            segments,
+            generic_args,
+        } => ir::TypeRef::Reference {
+            segments: match qualify(&segments[0], segments.len() > 1) {
+                Qualify::Keep => segments.clone(),
+                Qualify::As(path) => path
+                    .into_iter()
+                    .chain(segments[1..].iter().cloned())
+                    .collect(),
+                Qualify::Unreachable => return None,
+            },
+            generic_args: all(generic_args)?,
+        },
+        ir::TypeRef::Array(inner) => ir::TypeRef::Array(Box::new(q(inner)?)),
+        ir::TypeRef::Union(u) => ir::TypeRef::union(all(u.members())?),
+        ir::TypeRef::Intersection(items) => ir::TypeRef::Intersection(all(items)?),
+        ir::TypeRef::Tuple(items) => ir::TypeRef::Tuple(all(items)?),
+        ir::TypeRef::Function(sig) => ir::TypeRef::Function(ir::FunctionSig {
+            params: sig
+                .params
+                .iter()
+                .map(|p| {
+                    Some(ir::Param {
+                        type_ref: q(&p.type_ref)?,
+                        ..p.clone()
+                    })
+                })
+                .collect::<Option<_>>()?,
+            return_type: Box::new(q(&sig.return_type)?),
+        }),
+        other => other.clone(),
+    })
+}
+
+/// `alias`'s target with `generic_args` substituted for its parameters;
+/// a missing argument takes the parameter's default, else `any`.
+fn alias_instance(alias: &ir::TypeAliasDecl, generic_args: &[ir::TypeRef]) -> ir::TypeRef {
+    // A default may name an earlier parameter (`<A, B = A>`), so each
+    // one is substituted with the map built so far.
+    let mut map: HashMap<&str, ir::TypeRef> = HashMap::new();
+    for (i, tp) in alias.type_params.iter().enumerate() {
+        let arg = generic_args
+            .get(i)
+            .cloned()
+            .or_else(|| tp.default.as_ref().map(|d| d.substitute(&map)))
+            .unwrap_or(ir::TypeRef::Any);
+        map.insert(&tp.name, arg);
+    }
+    alias.target.substitute(&map)
+}
+
+/// The Rust default of a generic type's parameter, as its `pub type`
+/// declaration spells it: the TS default lowered like a generic
+/// argument in the type's `scope`, `JsValue` when there is none. When
+/// the default's target itself erases to `JsValue` (an alias of a union,
+/// an unresolved name) its type arguments go with it:
+/// `CfProperties<CfHostMetadata>` is just `JsValue`.
+pub(crate) fn type_param_default_tokens(
+    default: Option<&TypeRef>,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    let Some(default) = default else {
+        return quote! { JsValue };
+    };
+    let tokens = to_syn_type(
+        default,
+        TypePosition::ARGUMENT.to_inner(),
+        ctx,
+        scope,
+        from_module,
+    );
+    if let (TypeRef::Reference { segments, .. }, Some(ctx)) = (default, ctx) {
+        let uses = ctx.external_uses.borrow();
+        if uses.get(&segments[0]).is_some_and(|v| v == "JsValue") {
+            return quote! { JsValue };
+        }
+    }
+    tokens
 }
 
 /// The `Module(spec)` groups fully covered by the external map (Rule 3).
@@ -643,6 +781,191 @@ impl<'a> CodegenContext<'a> {
         Some(out)
     }
 
+    /// The type parameters of the local generic class, interface or
+    /// discriminated union `id`, which its `pub type` declares with
+    /// defaults, and the scope they bind in.
+    fn declared_params(&self, id: TypeId) -> Option<(&'a [ir::TypeParam], ScopeId)> {
+        if !self.local_type_ids.contains(&id) {
+            return None;
+        }
+        let (type_params, scope) = match &self.gctx.get_type(id).kind {
+            TypeKind::Class(c) => (c.type_params.as_slice(), c.body_scope),
+            TypeKind::Interface(i) => (i.type_params.as_slice(), i.body_scope),
+            TypeKind::DiscriminatedUnion(d) => (d.type_params.as_slice(), d.body_scope),
+            _ => return None,
+        };
+        (!type_params.is_empty()).then_some((type_params, scope))
+    }
+
+    /// Run `f` without keeping its diagnostics or letting an alias probe
+    /// in progress see the type parameters it lowers as its own.
+    fn quietly<R>(&self, f: impl FnOnce() -> R) -> R {
+        let diagnostics = self.diagnostics.take();
+        let reported = self.unresolved_module_refs.borrow().clone();
+        self.alias_param_mentions.borrow_mut().push(HashSet::new());
+        let r = f();
+        self.alias_param_mentions.borrow_mut().pop();
+        self.diagnostics.replace(diagnostics);
+        self.unresolved_module_refs.replace(reported);
+        r
+    }
+
+    /// The declared Rust default of parameter `i` of the generic type
+    /// `id` (see [`type_param_default_tokens`]), read against the
+    /// arguments `earlier` chosen for the parameters before it. `None`
+    /// while that type's own defaults are being read (`Node<C =
+    /// Node<…>>`). The declaration reports the default's diagnostics.
+    fn default_arg(&self, id: TypeId, i: usize, earlier: &[TokenStream]) -> Option<TokenStream> {
+        let (type_params, scope) = self.declared_params(id)?;
+        let tp = type_params.get(i)?;
+        if !self.trimming.borrow_mut().insert(id) {
+            return None;
+        }
+        let args = type_params
+            .iter()
+            .map(|tp| tp.name.clone())
+            .zip(earlier.iter().cloned())
+            .collect();
+        self.param_args.borrow_mut().push((scope, args));
+        let default = self.quietly(|| {
+            type_param_default_tokens(
+                tp.default.as_ref(),
+                Some(self),
+                scope,
+                &self.gctx.get_type(id).module_context,
+            )
+        });
+        self.param_args.borrow_mut().pop();
+        self.trimming.borrow_mut().remove(&id);
+        Some(default)
+    }
+
+    /// `args` of a reference to the local generic class, interface or
+    /// discriminated union `id`, without the trailing ones its `pub type`
+    /// declaration defaults to (see [`type_param_default_tokens`]):
+    /// `Request<JsValue, JsValue>` is `Request`, and `Foo<JsString,
+    /// JsValue>` with `B = JsValue` is `Foo<JsString>`. A default naming an
+    /// earlier parameter is read with that parameter's argument, so
+    /// `Holder<JsValue, Box>` with `U = Box<T>` is `Holder`.
+    pub(crate) fn trim_default_args(
+        &self,
+        id: TypeId,
+        mut args: Vec<TokenStream>,
+    ) -> Vec<TokenStream> {
+        while let Some(last) = args.last() {
+            let i = args.len() - 1;
+            match self.default_arg(id, i, &args[..i]) {
+                Some(default) if default.to_string() == last.to_string() => args.pop(),
+                _ => break,
+            };
+        }
+        args
+    }
+
+    /// Generic hoisting for a parameter of type `ty`, used in `scope`: a
+    /// local generic class, interface or discriminated union whose
+    /// arguments, as written or defaulted, include the top type
+    /// `JsValue` (`unknown`, `any`, an erased union) takes a fresh type
+    /// parameter there instead, so any instantiation passes without an
+    /// upcast. `fresh` names each one from the declaration's parameter.
+    /// Returns the parameter's type and the names hoisted, in order.
+    pub(crate) fn hoisted_param_type(
+        &self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        from_module: &ModuleContext,
+        fresh: &mut dyn FnMut(&str) -> String,
+    ) -> Option<(TokenStream, Vec<String>)> {
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = ty
+        else {
+            return None;
+        };
+        let dotted = segments.join(".");
+        if segments.len() == 1 && DEDICATED_HEADS.contains(&dotted.as_str()) {
+            return None;
+        }
+        if self.resolve_alias_instance(ty, scope).is_some() || self.enum_repr(ty, scope).is_some() {
+            return None;
+        }
+        let id = self.gctx.resolve_path(scope, &dotted)?;
+        // A dictionary is built through its generated factory, whose type
+        // parameters only the parameter it is passed to pins, so it keeps
+        // the defaults (`f(&Options::new())` needs no annotation).
+        let built = match &self.gctx.get_type(id).kind {
+            TypeKind::Interface(i) => i.classification == ir::InterfaceClassification::Dictionary,
+            TypeKind::DiscriminatedUnion(_) => true,
+            _ => false,
+        };
+        if built {
+            return None;
+        }
+        let (type_params, _) = self.declared_params(id)?;
+        if generic_args.len() > type_params.len() {
+            return None;
+        }
+        let arg = |a: &TypeRef| {
+            generic_arg_tokens(a, TypePosition::ARGUMENT, Some(self), scope, from_module)
+        };
+        // Which positions hold the top type, read without diagnostics: the
+        // given arguments are lowered again below when any does.
+        let mut probed: Vec<TokenStream> = Vec::with_capacity(type_params.len());
+        for i in 0..type_params.len() {
+            let tokens = match generic_args.get(i) {
+                Some(a) => self.quietly(|| arg(a)),
+                None => self.default_arg(id, i, &probed)?,
+            };
+            probed.push(tokens);
+        }
+        let hoisted: Vec<usize> = (0..type_params.len())
+            .filter(|&i| is_jsvalue_arg(&probed[i]))
+            .collect();
+        if hoisted.is_empty() {
+            return None;
+        }
+        let mut names = Vec::with_capacity(hoisted.len());
+        // Every other position keeps its argument; a default that reads a
+        // hoisted parameter no longer gives it, so it is spelled out.
+        let args: Vec<TokenStream> = (0..type_params.len())
+            .map(|i| {
+                if hoisted.contains(&i) {
+                    let name = fresh(&type_params[i].name);
+                    let ident = make_ident(&name);
+                    names.push(name);
+                    quote! { #ident }
+                } else {
+                    match generic_args.get(i) {
+                        Some(a) => arg(a),
+                        None => probed[i].clone(),
+                    }
+                }
+            })
+            .collect();
+        let args = self.trim_default_args(id, args);
+        let base = if segments.len() > 1 {
+            emit_type_name(&dotted, scope, self)
+        } else {
+            named_type_to_rust(&dotted, Some(self), scope)
+        };
+        Some((quote! { &#base<#(#args),*> }, names))
+    }
+
+    /// The argument standing in for the type parameter `name`, used in
+    /// `scope`, while a default is read against the arguments chosen for
+    /// its earlier parameters.
+    fn param_arg(&self, scope: ScopeId, name: &str) -> Option<TokenStream> {
+        let param_args = self.param_args.borrow();
+        let (declaring, args) = param_args.last()?;
+        let scopes = &self.gctx.scopes;
+        let binds = scopes
+            .chain(scope)
+            .into_iter()
+            .find(|&s| scopes.get(s).get_binding(name).is_some())?;
+        (binds == *declaring).then(|| args.get(name).cloned())?
+    }
+
     /// A parameter named `name`, or `name_` when a static in scope has its
     /// name, since a parameter can't shadow a static (E0530).
     pub(crate) fn param_name(ctx: Option<&Self>, name: &str) -> String {
@@ -721,6 +1044,9 @@ impl<'a> CodegenContext<'a> {
             unresolved_module_refs: RefCell::new(HashSet::new()),
             alias_params: RefCell::new(HashMap::new()),
             alias_param_mentions: RefCell::new(Vec::new()),
+            recursive_aliases: RefCell::new(HashMap::new()),
+            trimming: RefCell::new(HashSet::new()),
+            param_args: RefCell::new(Vec::new()),
         };
         for (spec, scopes) in &gctx.ambient_module_scopes {
             let path = ctx.specifier_path(spec);
@@ -763,6 +1089,9 @@ impl<'a> CodegenContext<'a> {
             unresolved_module_refs: RefCell::new(HashSet::new()),
             alias_params: RefCell::new(HashMap::new()),
             alias_param_mentions: RefCell::new(Vec::new()),
+            recursive_aliases: RefCell::new(HashMap::new()),
+            trimming: RefCell::new(HashSet::new()),
+            param_args: RefCell::new(Vec::new()),
         }
     }
 
@@ -1016,6 +1345,10 @@ impl<'a> CodegenContext<'a> {
         let TypeKind::TypeAlias(ref alias) = self.gctx.get_type(type_id).kind else {
             return None;
         };
+        // A self-referential alias is named rather than chased.
+        if self.is_recursive_alias(type_id) {
+            return None;
+        }
         let target = alias_target_with_defaults(alias);
         // If the target is itself a single-segment path, keep resolving.
         // Generic instantiations and qualified paths stop here.
@@ -1025,6 +1358,220 @@ impl<'a> CodegenContext<'a> {
             }
         }
         Some((target, alias.body_scope))
+    }
+
+    /// Whether the alias `id` reaches itself through the aliases its
+    /// target (or a parameter default) names, directly (`type Next<T> =
+    /// (n: Next<T>) => void`) or through other aliases. Expanding such an
+    /// alias never ends, so its references keep the alias name.
+    pub(crate) fn is_recursive_alias(&self, id: TypeId) -> bool {
+        if let Some(&recursive) = self.recursive_aliases.borrow().get(&id) {
+            return recursive;
+        }
+        let recursive = self.alias_reaches(id, id, &mut HashSet::new());
+        self.recursive_aliases.borrow_mut().insert(id, recursive);
+        recursive
+    }
+
+    /// Whether the alias `from` names `target`, or an alias that does.
+    fn alias_reaches(&self, from: TypeId, target: TypeId, visited: &mut HashSet<TypeId>) -> bool {
+        if !visited.insert(from) {
+            return false;
+        }
+        let TypeKind::TypeAlias(alias) = &self.gctx.get_type(from).kind else {
+            return false;
+        };
+        let scope = alias.body_scope;
+        std::iter::once(&alias.target)
+            .chain(
+                alias
+                    .type_params
+                    .iter()
+                    .filter_map(|tp| tp.default.as_ref()),
+            )
+            .any(|ty| self.type_reaches_alias(ty, scope, target, visited))
+    }
+
+    /// Whether `ty`, read in `scope`, names the alias `target` or an
+    /// alias that does.
+    fn type_reaches_alias(
+        &self,
+        ty: &ir::TypeRef,
+        scope: ScopeId,
+        target: TypeId,
+        visited: &mut HashSet<TypeId>,
+    ) -> bool {
+        let children: Vec<&ir::TypeRef> = match ty {
+            ir::TypeRef::Reference {
+                segments,
+                generic_args,
+            } => {
+                if let Some(id) = self.gctx.resolve_path(scope, &segments.join(".")) {
+                    if id == target || self.alias_reaches(id, target, visited) {
+                        return true;
+                    }
+                }
+                generic_args.iter().collect()
+            }
+            ir::TypeRef::Array(inner) => vec![&**inner],
+            ir::TypeRef::Union(u) => u.members().iter().collect(),
+            ir::TypeRef::Intersection(items) | ir::TypeRef::Tuple(items) => items.iter().collect(),
+            ir::TypeRef::Function(sig) => sig
+                .params
+                .iter()
+                .map(|p| &p.type_ref)
+                .chain(std::iter::once(&*sig.return_type))
+                .collect(),
+            _ => return false,
+        };
+        children
+            .into_iter()
+            .any(|t| self.type_reaches_alias(t, scope, target, visited))
+    }
+
+    /// Chase a generic alias instantiation: `Foo<A, B>` where `Foo` is
+    /// `type Foo<T, U> = …` yields the target with `T`/`U` substituted.
+    /// Missing arguments take the parameter default, else `any`. Qualified
+    /// references go through [`Self::resolve_qualified_alias_instance`];
+    /// non-alias heads and aliases without parameters yield `None`, as
+    /// [`Self::resolve_alias`] chases those from the alias's own scope.
+    ///
+    /// The result lowers in the referencing scope, where the arguments were
+    /// written, so a bare reference is chased only where the target (and
+    /// any default standing in for an omitted argument) reads alike from
+    /// there and from the alias's body scope.
+    pub fn resolve_alias_instance(&self, ty: &ir::TypeRef, scope: ScopeId) -> Option<ir::TypeRef> {
+        let ir::TypeRef::Reference {
+            segments,
+            generic_args,
+        } = ty
+        else {
+            return None;
+        };
+        if segments.len() != 1 {
+            return self.resolve_qualified_alias_instance(segments, generic_args, scope);
+        }
+        let type_id = self.gctx.scopes.resolve(scope, &segments[0])?;
+        let TypeKind::TypeAlias(alias) = &self.gctx.get_type(type_id).kind else {
+            return None;
+        };
+        if alias.type_params.is_empty() || self.is_recursive_alias(type_id) {
+            return None;
+        }
+        // The given arguments are the use site's own, so only the target and
+        // the defaults filling omitted ones need to read alike.
+        let given = vec![ir::TypeRef::Any; generic_args.len().min(alias.type_params.len())];
+        if !self.resolves_alike(&alias_instance(alias, &given), alias.body_scope, scope) {
+            return None;
+        }
+        Some(alias_instance(alias, generic_args))
+    }
+
+    /// [`Self::resolve_alias_instance`] for `Ns.Alias<A, B>`. The result
+    /// lowers in the referencing scope, where the arguments were written,
+    /// so each name in the target that the referencing scope would bind
+    /// differently is first qualified through the namespaces of the path
+    /// (`Ns.X` for a sibling, the shorter `Outer.X` for a name from an
+    /// enclosing namespace). A target naming something no such path
+    /// reaches, such as an unexported member, is not chased. An alias
+    /// without parameters is not either: with no arguments to keep,
+    /// `to_syn_type` lowers its target where it was declared.
+    fn resolve_qualified_alias_instance(
+        &self,
+        segments: &[String],
+        generic_args: &[ir::TypeRef],
+        scope: ScopeId,
+    ) -> Option<ir::TypeRef> {
+        let type_id = self.gctx.resolve_path(scope, &segments.join("."))?;
+        let decl = self.gctx.get_type(type_id);
+        let TypeKind::TypeAlias(alias) = &decl.kind else {
+            return None;
+        };
+        if alias.type_params.is_empty() || self.is_recursive_alias(type_id) {
+            return None;
+        }
+        let scopes = &self.gctx.scopes;
+        // The namespace each proper prefix of the path reaches.
+        let mut chain = vec![scopes.resolve_namespace(scope, &segments[0])?];
+        for name in &segments[1..segments.len() - 1] {
+            let ns = *chain.last()?;
+            let (local, bound) = self.gctx.exports.binding(ns, name)?;
+            chain.push(scopes.get(bound).namespace(local)?);
+        }
+        // A name heading a path binds a namespace, otherwise a type.
+        let resolve = |s: ScopeId, name: &str, path: bool| {
+            if path {
+                scopes.resolve_namespace(s, name).map(Bound::Namespace)
+            } else {
+                scopes.resolve(s, name).map(Bound::Type)
+            }
+        };
+        let member = |ns: ScopeId, name: &str, path: bool| {
+            let members = scopes.get(ns);
+            if path {
+                members.namespace(name).map(Bound::Namespace)
+            } else {
+                members.get(name).map(Bound::Type)
+            }
+        };
+        let qualify = |name: &str, path: bool| {
+            if !path && alias.type_params.iter().any(|tp| tp.name == name) {
+                return Qualify::Keep;
+            }
+            let meant = resolve(decl.scope_id, name, path);
+            if resolve(scope, name, path) == meant {
+                return Qualify::Keep;
+            }
+            if meant.is_none() {
+                return Qualify::Unreachable;
+            }
+            // Each namespace's export map, read forward: any public name
+            // whose local binding is the one meant reaches it, the name's
+            // own first, so a declaration exported under several names is
+            // found by each.
+            for (depth, &ns) in chain.iter().enumerate().rev() {
+                let public = self
+                    .gctx
+                    .exports
+                    .bindings(ns)
+                    .filter(|&(_, local, bound)| member(bound, local, path) == meant)
+                    .min_by_key(|&(public, _, _)| public != name)
+                    .map(|(public, _, _)| public);
+                if let Some(public) = public {
+                    return Qualify::As(
+                        segments[..=depth]
+                            .iter()
+                            .cloned()
+                            .chain(std::iter::once(public.to_string()))
+                            .collect(),
+                    );
+                }
+            }
+            Qualify::Unreachable
+        };
+        // A default stands in for an omitted argument, so it is read where
+        // it is written, like the target.
+        let type_params = alias
+            .type_params
+            .iter()
+            .enumerate()
+            .map(|(i, tp)| {
+                let default = match &tp.default {
+                    Some(d) if i >= generic_args.len() => Some(qualify_references(d, &qualify)?),
+                    _ => None,
+                };
+                Some(ir::TypeParam {
+                    default,
+                    ..tp.clone()
+                })
+            })
+            .collect::<Option<Vec<_>>>()?;
+        let alias = ir::TypeAliasDecl {
+            type_params,
+            target: qualify_references(&alias.target, &qualify)?,
+            ..alias.clone()
+        };
+        Some(alias_instance(&alias, generic_args))
     }
 
     /// Emit an error diagnostic during code generation.
@@ -1409,7 +1956,25 @@ pub fn to_syn_type(
                 .take(8)
                 .map(|p| to_syn_type(&p.type_ref, inner_pos, ctx, scope, from_module))
                 .collect();
-            let ret = to_syn_type(&sig.return_type, inner_pos, ctx, scope, from_module);
+            // `Function<fn() -> Promise<T>>` with a type parameter `T`
+            // does not satisfy wasm-bindgen's `JsFunction` (the nested
+            // `ErasableGeneric::Repr` projection fails to normalise), so
+            // the promised value erases inside callback signatures.
+            let promised_param = sig.return_type.as_promise_inner().is_some_and(|inner| {
+                inner.as_ident().is_some_and(|name| {
+                    ctx.is_some_and(|c| {
+                        matches!(
+                            c.gctx.scopes.resolve_binding(scope, name),
+                            Some(crate::parse::scope::Binding::TypeParam)
+                        )
+                    })
+                })
+            });
+            let ret = if promised_param {
+                quote! { Promise }
+            } else {
+                to_syn_type(&sig.return_type, inner_pos, ctx, scope, from_module)
+            };
             // A `fn` pointer type has fixed arity, so a rest parameter
             // cannot be spelled; the untyped `Function` accepts any
             // closure, which is what `(...args: any[]) => void` means.
@@ -1524,6 +2089,7 @@ pub fn to_syn_type(
             if segments.len() > 1 && generic_args.is_empty() {
                 if let Some(c) = ctx {
                     let resolved = c.gctx.resolve_path(scope, &segments.join("."));
+                    let resolved = resolved.filter(|&id| !c.is_recursive_alias(id));
                     if let Some(TypeKind::TypeAlias(alias)) =
                         resolved.map(|id| &c.gctx.get_type(id).kind)
                     {
@@ -1531,6 +2097,9 @@ pub fn to_syn_type(
                         return to_syn_type(&target, pos, ctx, alias.body_scope, from_module);
                     }
                 }
+            }
+            if let Some(target) = ctx.and_then(|c| c.resolve_alias_instance(ty, scope)) {
+                return to_syn_type(&target, pos, ctx, scope, from_module);
             }
             if let Some(repr) = ctx.and_then(|c| c.enum_repr(ty, scope)) {
                 if pos.inner {
@@ -1958,6 +2527,9 @@ fn lower_reference(
                 c.gctx.scopes.resolve_binding(scope, head),
                 Some(crate::parse::scope::Binding::TypeParam),
             ) {
+                if let Some(arg) = c.param_arg(scope, head) {
+                    return arg;
+                }
                 if let Some(mentions) = c.alias_param_mentions.borrow_mut().last_mut() {
                     mentions.insert(head.to_string());
                 }
@@ -2026,15 +2598,31 @@ fn with_generic_args(
     }
     let arg_tokens: Vec<TokenStream> = generic_args
         .iter()
-        .map(|a| {
-            if CodegenContext::generic_mono(ctx) {
-                to_mono_user_generic_arg(a, ctx, scope, from_module)
-            } else {
-                to_syn_type(a, pos.to_inner(), ctx, scope, from_module)
-            }
-        })
+        .map(|a| generic_arg_tokens(a, pos, ctx, scope, from_module))
         .collect();
+    let arg_tokens = match ctx.and_then(|c| Some((c, c.gctx.resolve_path(scope, name)?))) {
+        Some((c, id)) => c.trim_default_args(id, arg_tokens),
+        None => arg_tokens,
+    };
+    if arg_tokens.is_empty() {
+        return base;
+    }
     quote! { #base<#(#arg_tokens),*> }
+}
+
+/// One generic argument of a locally declared generic type.
+fn generic_arg_tokens(
+    arg: &TypeRef,
+    pos: TypePosition,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    if CodegenContext::generic_mono(ctx) {
+        to_mono_user_generic_arg(arg, ctx, scope, from_module)
+    } else {
+        to_syn_type(arg, pos.to_inner(), ctx, scope, from_module)
+    }
 }
 
 /// TS 5.7+ makes the typed arrays and `DataView` generic over their buffer
@@ -2052,15 +2640,7 @@ fn alias_target_with_defaults(alias: &ir::TypeAliasDecl) -> std::borrow::Cow<'_,
     if alias.type_params.is_empty() {
         return std::borrow::Cow::Borrowed(&alias.target);
     }
-    let mut defaults: HashMap<&str, TypeRef> = HashMap::new();
-    for tp in &alias.type_params {
-        let default = tp
-            .default
-            .as_ref()
-            .map_or(TypeRef::Any, |d| d.substitute(&defaults));
-        defaults.insert(&tp.name, default);
-    }
-    std::borrow::Cow::Owned(alias.target.substitute(&defaults))
+    std::borrow::Cow::Owned(alias_instance(alias, &[]))
 }
 
 /// Create a `syn::Ident`, sanitizing invalid characters and escaping keywords.
@@ -2463,6 +3043,13 @@ fn to_mono_js_string_return_type_impl(
                     }
                 })
                 .collect::<Vec<_>>();
+            let args = match ctx.gctx.resolve_path(peeled_scope, &segments.join(".")) {
+                Some(id) => ctx.trim_default_args(id, args),
+                None => args,
+            };
+            if args.is_empty() {
+                return base;
+            }
             quote! { #base<#(#args),*> }
         }
         _ => to_syn_type(ty, TypePosition::RETURN, Some(ctx), scope, from_module),

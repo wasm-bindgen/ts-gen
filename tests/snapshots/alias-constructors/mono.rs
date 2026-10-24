@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Stub<T>;
+    pub type Stub<T = JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn get<T>(this: &Stub<T>) -> Result<T, JsValue>
     where
@@ -26,12 +26,12 @@ extern "C" {
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "unwrapText")]
-    pub fn unwrap_text(stub: &Wrap<String>) -> Result<String, JsValue>;
+    pub fn unwrap_text(stub: &Stub<String>) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "unwrapText")]
-    pub fn unwrap_text_js_string(stub: &Wrap<String>) -> Result<JsString, JsValue>;
+    pub fn unwrap_text_js_string(stub: &Stub<String>) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
@@ -134,7 +134,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Wrapped<T>;
+    pub type Wrapped<T = JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn get<T>(this: &Wrapped<T>) -> Result<T, JsValue>
     where

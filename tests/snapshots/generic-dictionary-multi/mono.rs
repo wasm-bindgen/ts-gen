@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ResultBox<T, E>;
+    pub type ResultBox<T = JsValue, E = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T, E>(this: &ResultBox<T, E>) -> T
     where

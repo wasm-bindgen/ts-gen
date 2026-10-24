@@ -263,7 +263,7 @@ impl Registry {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T: ::wasm_bindgen::JsGeneric>;
+    pub type Holder<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method)]
     pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> T;
     #[wasm_bindgen(method, catch, js_name = "get")]

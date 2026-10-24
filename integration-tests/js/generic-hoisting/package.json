@@ -1,0 +1,6 @@
+{
+  "name": "generic-hoisting",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}

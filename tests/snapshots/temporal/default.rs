@@ -683,7 +683,7 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptions<Units: ::wasm_bindgen::JsGeneric>;
+        pub type RoundingOptions<Units: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
         pub fn smallest_unit<Units: ::wasm_bindgen::JsGeneric>(
             this: &RoundingOptions<Units>,
@@ -746,7 +746,7 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = RoundingOptions , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptionsWithLargestUnit<Units: ::wasm_bindgen::JsGeneric>;
+        pub type RoundingOptionsWithLargestUnit<Units: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
         pub fn largest_unit<Units: ::wasm_bindgen::JsGeneric>(
             this: &RoundingOptionsWithLargestUnit<Units>,
@@ -795,7 +795,7 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type ToStringRoundingOptions<Units: ::wasm_bindgen::JsGeneric>;
+        pub type ToStringRoundingOptions<Units: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
         pub fn smallest_unit<Units: ::wasm_bindgen::JsGeneric>(
             this: &ToStringRoundingOptions<Units>,
@@ -845,7 +845,9 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = ToStringRoundingOptions , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type ToStringRoundingOptionsWithFractionalSeconds<Units: ::wasm_bindgen::JsGeneric>;
+        pub type ToStringRoundingOptionsWithFractionalSeconds<
+            Units: ::wasm_bindgen::JsGeneric = JsValue,
+        >;
         #[wasm_bindgen(method, getter, js_name = "fractionalSecondDigits")]
         pub fn fractional_second_digits<Units: ::wasm_bindgen::JsGeneric>(
             this: &ToStringRoundingOptionsWithFractionalSeconds<Units>,
@@ -3491,61 +3493,61 @@ pub mod temporal {
         pub fn until_with_plain_date_time_and_options(
             this: &PlainDateTime,
             other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn try_until_with_plain_date_time_and_options(
             this: &PlainDateTime,
             other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "until")]
         pub fn until_with_zoned_date_time_and_options(
             this: &PlainDateTime,
             other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn try_until_with_zoned_date_time_and_options(
             this: &PlainDateTime,
             other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "until")]
         pub fn until_with_plain_date_and_options(
             this: &PlainDateTime,
             other: &PlainDate,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn try_until_with_plain_date_and_options(
             this: &PlainDateTime,
             other: &PlainDate,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "until")]
         pub fn until_with_date_time_like_object_and_options(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn try_until_with_date_time_like_object_and_options(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &PlainDateTime,
             other: &str,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn try_until_with_str_and_options(
             this: &PlainDateTime,
             other: &str,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method)]
         pub fn since(this: &PlainDateTime, other: &PlainDateTime) -> Duration;
@@ -3583,61 +3585,61 @@ pub mod temporal {
         pub fn since_with_plain_date_time_and_options(
             this: &PlainDateTime,
             other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn try_since_with_plain_date_time_and_options(
             this: &PlainDateTime,
             other: &PlainDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "since")]
         pub fn since_with_zoned_date_time_and_options(
             this: &PlainDateTime,
             other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn try_since_with_zoned_date_time_and_options(
             this: &PlainDateTime,
             other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "since")]
         pub fn since_with_plain_date_and_options(
             this: &PlainDateTime,
             other: &PlainDate,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn try_since_with_plain_date_and_options(
             this: &PlainDateTime,
             other: &PlainDate,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "since")]
         pub fn since_with_date_time_like_object_and_options(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn try_since_with_date_time_like_object_and_options(
             this: &PlainDateTime,
             other: &DateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &PlainDateTime,
             other: &str,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn try_since_with_str_and_options(
             this: &PlainDateTime,
             other: &str,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method)]
         pub fn round(this: &PlainDateTime, round_to: PluralizeUnitDayOrTimeUnit) -> PlainDateTime;
@@ -3649,12 +3651,12 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "round")]
         pub fn round_with_rounding_options(
             this: &PlainDateTime,
-            round_to: &RoundingOptions<JsValue>,
+            round_to: &RoundingOptions,
         ) -> PlainDateTime;
         #[wasm_bindgen(method, catch, js_name = "round")]
         pub fn try_round_with_rounding_options(
             this: &PlainDateTime,
-            round_to: &RoundingOptions<JsValue>,
+            round_to: &RoundingOptions,
         ) -> Result<PlainDateTime, JsValue>;
         #[wasm_bindgen(method)]
         pub fn equals(this: &PlainDateTime, other: &PlainDateTime) -> bool;
@@ -4356,37 +4358,37 @@ pub mod temporal {
         pub fn until_with_zoned_date_time_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn try_until_with_zoned_date_time_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "until")]
         pub fn until_with_zoned_date_time_like_object_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn try_until_with_zoned_date_time_like_object_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "until")]
         pub fn until_with_str_and_options(
             this: &ZonedDateTime,
             other: &str,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "until")]
         pub fn try_until_with_str_and_options(
             this: &ZonedDateTime,
             other: &str,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method)]
         pub fn since(this: &ZonedDateTime, other: &ZonedDateTime) -> Duration;
@@ -4410,37 +4412,37 @@ pub mod temporal {
         pub fn since_with_zoned_date_time_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn try_since_with_zoned_date_time_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTime,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "since")]
         pub fn since_with_zoned_date_time_like_object_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn try_since_with_zoned_date_time_like_object_and_options(
             this: &ZonedDateTime,
             other: &ZonedDateTimeLikeObject,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, js_name = "since")]
         pub fn since_with_str_and_options(
             this: &ZonedDateTime,
             other: &str,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Duration;
         #[wasm_bindgen(method, catch, js_name = "since")]
         pub fn try_since_with_str_and_options(
             this: &ZonedDateTime,
             other: &str,
-            options: &RoundingOptionsWithLargestUnit<JsValue>,
+            options: &RoundingOptionsWithLargestUnit,
         ) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method)]
         pub fn round(this: &ZonedDateTime, round_to: PluralizeUnitDayOrTimeUnit) -> ZonedDateTime;
@@ -4452,12 +4454,12 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "round")]
         pub fn round_with_rounding_options(
             this: &ZonedDateTime,
-            round_to: &RoundingOptions<JsValue>,
+            round_to: &RoundingOptions,
         ) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "round")]
         pub fn try_round_with_rounding_options(
             this: &ZonedDateTime,
-            round_to: &RoundingOptions<JsValue>,
+            round_to: &RoundingOptions,
         ) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method)]
         pub fn equals(this: &ZonedDateTime, other: &ZonedDateTime) -> bool;

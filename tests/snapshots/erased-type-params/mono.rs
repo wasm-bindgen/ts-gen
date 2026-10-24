@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ListKey<Metadata>;
+    pub type ListKey<Metadata = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn name<Metadata>(this: &ListKey<Metadata>) -> String;
     #[wasm_bindgen(method, getter, js_name = "name")]
@@ -50,7 +50,7 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> ListKeyBuilder<Metadata> {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ListResult<Metadata>;
+    pub type ListResult<Metadata = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn keys<Metadata>(this: &ListResult<Metadata>) -> Vec<ListKey<Metadata>>
     where
@@ -119,7 +119,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Target<EventMap>;
+    pub type Target<EventMap = Object>;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     pub fn add_event_listener<EventMap>(
         this: &Target<EventMap>,
@@ -175,7 +175,7 @@ impl Point {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Slot<V>;
+    pub type Slot<V = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<V>(this: &Slot<V>) -> V
     where

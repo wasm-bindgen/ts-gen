@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Cursor<T>;
+    pub type Cursor<T = JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn next<T>(this: &Cursor<T>) -> Result<CursorNextReturn<T>, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -20,7 +20,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type CursorNextReturn<T>;
+    pub type CursorNextReturn<T = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn done<T>(this: &CursorNextReturn<T>) -> Option<bool>;
     #[wasm_bindgen(method, setter)]

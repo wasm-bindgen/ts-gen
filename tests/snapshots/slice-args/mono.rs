@@ -482,7 +482,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Bag<T>;
+    pub type Bag<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T>() -> Result<Bag<T>, JsValue>;
     #[wasm_bindgen(method, catch)]

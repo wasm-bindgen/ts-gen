@@ -188,7 +188,7 @@ impl MessageBuilder {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box<T>;
+    pub type Box<T = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &Box<T>) -> T
     where

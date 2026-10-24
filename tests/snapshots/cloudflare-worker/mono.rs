@@ -452,7 +452,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ExportedHandler<E>;
+    pub type ExportedHandler<E = Env>;
     #[wasm_bindgen(method, catch)]
     pub async fn fetch<E>(
         this: &ExportedHandler<E>,
