@@ -53,8 +53,13 @@ declare global {
         overflow?: "constrain" | "reject";
         // Only used here: emitted in `clock::zone`.
         mode?: "fast" | "slow";
-        // The same union as `precision`, but its own enum.
-        limit?: number | "auto";
+        // `Calendar.Options.limit` is spelled the same, on an owner of the
+        // same name, but its `Foo` is another type: its own enum.
+        limit?: Foo | number;
+      }
+
+      interface Foo {
+        zone: string;
       }
     }
   }
@@ -62,6 +67,11 @@ declare global {
   namespace Calendar {
     interface Options {
       unit?: "day" | "week";
+      limit?: Foo | number;
+    }
+
+    interface Foo {
+      calendar: string;
     }
 
     // One set in two orders, whose values give the same variant name: the

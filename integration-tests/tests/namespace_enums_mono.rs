@@ -43,6 +43,33 @@ fn synthesised_enums_round_trip_from_their_modules() {
     assert!(matches!(calendar.unit(), Some(clock::UnitKind::Week)));
 }
 
+// `Clock.Zone.Options.limit` and `Calendar.Options.limit` are both
+// `Foo | number` on an owner named `Options`, but each namespace's `Foo` is
+// its own type, so each member has its own enum, reading its own `Foo`.
+#[wasm_bindgen_test]
+fn same_named_owners_in_two_namespaces_keep_their_own_enums() {
+    let zone = clock::zone::Options::builder()
+        .limit(&clock::zone::Foo::new("utc"))
+        .build();
+    match zone.limit() {
+        Some(clock::zone::LimitKind::Foo(foo)) => assert_eq!(foo.zone(), "utc"),
+        _ => panic!("expected the zone's Foo"),
+    }
+
+    let calendar = calendar::Options::builder()
+        .limit(&calendar::Foo::new("iso8601"))
+        .build();
+    match calendar.limit() {
+        Some(calendar::LimitKind2::Foo(foo)) => assert_eq!(foo.calendar(), "iso8601"),
+        _ => panic!("expected the calendar's Foo"),
+    }
+    calendar.set_limit_with_f64(1.0);
+    assert!(matches!(
+        calendar.limit(),
+        Some(calendar::LimitKind2::F64(l)) if l == 1.0
+    ));
+}
+
 // `"foo-bar" | "foo_bar"` and `"foo_bar" | "foo-bar"` are one enum with one
 // numbering, so each literal factory sends the literal it is named for.
 #[wasm_bindgen_test]

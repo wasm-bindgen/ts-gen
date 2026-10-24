@@ -207,7 +207,7 @@ pub mod clock {
             #[wasm_bindgen(method, getter)]
             pub fn limit(this: &Options) -> Option<LimitKind>;
             #[wasm_bindgen(method, setter)]
-            pub fn set_limit(this: &Options, val: LimitKind);
+            pub fn set_limit(this: &Options, val: &Foo);
             #[wasm_bindgen(method, setter, js_name = "limit")]
             pub fn set_limit_with_f64(this: &Options, val: f64);
         }
@@ -238,7 +238,7 @@ pub mod clock {
                 self.inner.set_mode(val);
                 self
             }
-            pub fn limit(self, val: LimitKind) -> Self {
+            pub fn limit(self, val: &Foo) -> Self {
                 self.inner.set_limit(val);
                 self
             }
@@ -250,15 +250,34 @@ pub mod clock {
                 self.inner
             }
         }
+        #[wasm_bindgen(experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Foo;
+            #[wasm_bindgen(method, getter)]
+            pub fn zone(this: &Foo) -> String;
+            #[wasm_bindgen(method, getter, js_name = "zone")]
+            pub fn zone_js_string(this: &Foo) -> JsString;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_zone(this: &Foo, val: impl ::wasm_bindgen::JsStringLike);
+        }
+        impl Foo {
+            pub fn new(zone: impl ::wasm_bindgen::JsStringLike) -> Foo {
+                let inner: Foo = JsCast::unchecked_into(js_sys::Object::new());
+                inner.set_zone(zone);
+                inner
+            }
+        }
         #[wasm_bindgen(private)]
         pub enum ModeKind {
             Fast = "fast",
             Slow = "slow",
         }
-        #[wasm_bindgen(private)]
+        #[wasm_bindgen(private, fallback)]
         pub enum LimitKind {
             F64(f64),
-            Auto = "auto",
+            Foo(Foo),
         }
     }
     #[wasm_bindgen(private)]
@@ -311,6 +330,12 @@ pub mod calendar {
         pub fn unit(this: &Options) -> Option<super::clock::UnitKind>;
         #[wasm_bindgen(method, setter)]
         pub fn set_unit(this: &Options, val: super::clock::UnitKind);
+        #[wasm_bindgen(method, getter)]
+        pub fn limit(this: &Options) -> Option<LimitKind2>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_limit(this: &Options, val: &Foo);
+        #[wasm_bindgen(method, setter, js_name = "limit")]
+        pub fn set_limit_with_f64(this: &Options, val: f64);
     }
     impl Options {
         pub fn new() -> Options {
@@ -335,8 +360,35 @@ pub mod calendar {
             self.inner.set_unit(val);
             self
         }
+        pub fn limit(self, val: &Foo) -> Self {
+            self.inner.set_limit(val);
+            self
+        }
+        pub fn limit_with_f64(self, val: f64) -> Self {
+            self.inner.set_limit_with_f64(val);
+            self
+        }
         pub fn build(self) -> Options {
             self.inner
+        }
+    }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Foo;
+        #[wasm_bindgen(method, getter)]
+        pub fn calendar(this: &Foo) -> String;
+        #[wasm_bindgen(method, getter, js_name = "calendar")]
+        pub fn calendar_js_string(this: &Foo) -> JsString;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_calendar(this: &Foo, val: impl ::wasm_bindgen::JsStringLike);
+    }
+    impl Foo {
+        pub fn new(calendar: impl ::wasm_bindgen::JsStringLike) -> Foo {
+            let inner: Foo = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_calendar(calendar);
+            inner
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -419,6 +471,11 @@ pub mod calendar {
         pub fn build(self) -> ReversedSeparator {
             self.inner
         }
+    }
+    #[wasm_bindgen(private, fallback)]
+    pub enum LimitKind2 {
+        F64(f64),
+        Foo(Foo),
     }
     #[wasm_bindgen(private)]
     pub enum SepKind {
