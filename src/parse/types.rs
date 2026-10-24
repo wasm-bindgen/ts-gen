@@ -585,6 +585,7 @@ pub fn convert_type_params(
                         _ => convert_ts_type(c, diag),
                     }),
                     default: p.default.as_ref().map(|d| convert_ts_type(d, diag)),
+                    trait_bound: None,
                 })
                 .collect()
         })

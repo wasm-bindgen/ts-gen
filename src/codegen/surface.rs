@@ -582,6 +582,15 @@ impl<'d> Builder<'_, 'd> {
             let decl = self.items[&id][0].clone();
             let mut refs = Vec::new();
             declaration_refs(&decl, &mut refs);
+            // The traits bounding its literal-only parameters are emitted
+            // beside it, impls and their enums included.
+            for t in self.gctx.param_traits.get(&id).into_iter().flatten() {
+                for (arg, targets) in &t.impls {
+                    for ty in std::iter::once(arg).chain(targets) {
+                        type_refs(ty, t.scope, &mut refs);
+                    }
+                }
+            }
             for (name, scope) in refs {
                 if let Some(target) = self.resolve(&name, scope) {
                     self.reach(target);
@@ -812,6 +821,7 @@ fn type_refs(ty: &TypeRef, scope: ScopeId, out: &mut Vec<(String, ScopeId)>) {
         | TypeRef::IndexedAccess(..)
         | TypeRef::Mapped(_)
         | TypeRef::ObjectLiteral(_)
+        | TypeRef::Projection { .. }
         | TypeRef::Unresolved(_) => {}
     }
 }
