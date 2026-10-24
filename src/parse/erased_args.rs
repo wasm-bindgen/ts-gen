@@ -36,11 +36,44 @@ pub(crate) fn drop_erased_args(gctx: &mut GlobalContext) {
     if erased.is_empty() {
         return;
     }
+    drop_args(gctx, &erased, None);
+}
+
+/// Drop the arguments still given for type-level evaluation's erased
+/// literal-only parameters (see [`super::eval`]) at `positions`, from each
+/// reference evaluation left as written: a type it could not evaluate, or
+/// a variable's construct signatures. A reference evaluation rewrote no
+/// longer has more arguments than its declaration's parameters, and is
+/// left alone.
+pub(crate) fn drop_literal_args(gctx: &mut GlobalContext, positions: &HashMap<TypeId, Vec<usize>>) {
+    if positions.is_empty() {
+        return;
+    }
+    let declared: HashMap<TypeId, usize> = positions
+        .keys()
+        .filter_map(|&id| {
+            let count = match &gctx.get_type(id).kind {
+                TypeKind::Class(c) => c.type_params.len(),
+                TypeKind::Interface(i) => i.type_params.len(),
+                _ => return None,
+            };
+            Some((id, count))
+        })
+        .collect();
+    drop_args(gctx, positions, Some(&declared));
+}
+
+fn drop_args(
+    gctx: &mut GlobalContext,
+    erased: &HashMap<TypeId, Vec<usize>>,
+    declared: Option<&HashMap<TypeId, usize>>,
+) {
     let ids: Vec<TypeId> = gctx.iter_types().map(|(id, _)| id).collect();
     for id in ids {
         let pass = Pass {
             gctx,
-            erased: &erased,
+            erased,
+            declared,
         };
         let decl = gctx.get_type(id);
         let kind = pass.kind(&decl.kind, decl.scope_id);
@@ -51,6 +84,9 @@ pub(crate) fn drop_erased_args(gctx: &mut GlobalContext) {
 struct Pass<'a> {
     gctx: &'a GlobalContext,
     erased: &'a HashMap<TypeId, Vec<usize>>,
+    /// When set, the parameter count each declaration has left: only a
+    /// reference with more arguments still gives the erased ones.
+    declared: Option<&'a HashMap<TypeId, usize>>,
 }
 
 impl Pass<'_> {
@@ -173,6 +209,13 @@ impl Pass<'_> {
                 let erased = self
                     .gctx
                     .resolve_path(scope, &segments.join("."))
+                    .filter(|id| {
+                        self.declared.is_none_or(|declared| {
+                            declared
+                                .get(id)
+                                .is_some_and(|&count| generic_args.len() > count)
+                        })
+                    })
                     .and_then(|id| self.erased.get(&id));
                 TypeRef::Reference {
                     segments: segments.clone(),
