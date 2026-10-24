@@ -2210,7 +2210,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectId;
     #[wasm_bindgen(method, catch, js_name = "toString")]
-    pub fn to_string(this: &DurableObjectId) -> Result<String, JsValue>;
+    pub fn try_to_string(this: &DurableObjectId) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toString")]
     pub fn to_string_js_string(this: &DurableObjectId) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -2219,6 +2219,11 @@ extern "C" {
     pub fn name(this: &DurableObjectId) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "name")]
     pub fn name_js_string(this: &DurableObjectId) -> Option<JsString>;
+}
+impl core::fmt::Display for DurableObjectId {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -14443,7 +14448,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "toJSON")]
     pub fn to_json_js_string(this: &URL) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toString")]
-    pub fn to_string(this: &URL) -> Result<String, JsValue>;
+    pub fn try_to_string(this: &URL) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toString")]
     pub fn to_string_js_string(this: &URL) -> Result<JsString, JsValue>;
     #[doc = " The **`URL.canParse()`** static method of the URL interface returns a boolean indicating whether or not an absolute URL, or a relative URL combined with a base URL, are parsable and valid."]
@@ -14497,6 +14502,11 @@ extern "C" {
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/revokeObjectURL_static)"]
     # [wasm_bindgen (static_method_of = URL , catch , js_name = "revokeObjectURL")]
     pub fn revoke_object_url(object_url: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+impl core::fmt::Display for URL {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -14629,9 +14639,14 @@ extern "C" {
     where
         This: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "toString")]
-    pub fn to_string(this: &URLSearchParams) -> Result<String, JsValue>;
+    pub fn try_to_string(this: &URLSearchParams) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toString")]
     pub fn to_string_js_string(this: &URLSearchParams) -> Result<JsString, JsValue>;
+}
+impl core::fmt::Display for URLSearchParams {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

@@ -34,6 +34,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Methods + the `try_<name>` companion](#methods--the-try_name-companion)
   * [`--fallible` — single `Result` form](#--fallible--single-result-form)
   * [`never` returns keep only the catching form](#never-returns-keep-only-the-catching-form)
+  * [`toString()` is `Display`](#tostring-is-display)
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
@@ -1902,6 +1903,8 @@ catch), setters (never catch) and property getters are not affected
 sync `<name>_promise` form (below) catches under the flag like any
 other sync primary, unless calling it
 [never throws synchronously](#builtins-globals-and-async-never-throw-synchronously).
+A parameterless `toString()` keeps its `try_to_string` name, since
+`to_string` is [`ToString`'s](#tostring-is-display).
 Without the flag, output is identical to the default.
 
 ### `never` returns keep only the catching form
@@ -1958,6 +1961,52 @@ pub fn reject_later_promise(message: &str) -> Promise<Undefined>;
   and properties typed `never` are unchanged (`JsValue` reads, see
   [Primitive types](#primitive-types)), and so are constructors, which
   always catch.
+
+### `toString()` is `Display`
+
+A parameterless `toString(): string` method is the type's
+`core::fmt::Display`. An inherent `to_string(&self) -> String` would
+shadow the blanket `ToString` (clippy's `inherent_to_string`), so none
+is declared: `format!("{x}")` and `x.to_string()` call JS `toString()`
+through `Display`.
+
+```ts
+declare class PlainDate {
+  toString(options?: PlainDateToStringOptions): string;
+}
+```
+
+```rust
+#[wasm_bindgen(method, catch, js_name = "toString")]
+pub fn try_to_string(this: &PlainDate) -> Result<String, JsValue>;
+#[wasm_bindgen(method, js_name = "toString")]
+pub fn to_string_with_options(this: &PlainDate, options: &PlainDateToStringOptions) -> String;
+#[wasm_bindgen(method, catch, js_name = "toString")]
+pub fn try_to_string_with_options(/* … */) -> Result<String, JsValue>;
+
+impl core::fmt::Display for PlainDate {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+    }
+}
+```
+
+* Only the bare `to_string` binding is replaced. The catching
+  `try_to_string` stays, typed by the error model (`@throws`,
+  `--error-type`), and is the form that keeps the JS error. Under
+  `--fallible` the single catching form is `try_to_string` too, since
+  `to_string` belongs to `ToString`. A throwing `toString` makes `fmt`
+  return `fmt::Error`, which `format!` and `.to_string()` turn into a
+  panic.
+* `@throws {never}` leaves no catching form, so `fmt` calls a private
+  `__to_string` extern instead.
+* The overloads with parameters (`to_string_with_options`) and the
+  per-monomorphization `to_string_js_string` variant keep their
+  bindings.
+* A `toString` that takes a required parameter or doesn't return
+  `string` is an ordinary method.
+* `Display` is not inherited by a subclass, but `.to_string()` is still
+  found on the parent through `Deref`.
 
 ## `Promise<T>` returns become `async fn`
 

@@ -1624,6 +1624,9 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
         }
     }
 
+    // Rust items emitted beside the extern block (`Display`).
+    let mut impls: Vec<TokenStream> = Vec::new();
+
     // Track which method groups have been expanded (by js_name).
     let mut expanded_methods: HashSet<String> = HashSet::new();
     let mut expanded_static_methods: HashSet<String> = HashSet::new();
@@ -1709,7 +1712,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     .collect();
                 let base = config.member_base(MemberKind::Method, &m.js_name);
                 unreserve_base(&mut names, &base);
-                let sigs = build_signatures(
+                let mut sigs = build_signatures(
                     &CallableSpec {
                         js_name: &m.js_name,
                         rust_name: Some(&base),
@@ -1720,6 +1723,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     &mut names,
                     config.cgctx,
                 );
+                if let Some(display) = display_to_string(config, &mut sigs, &mut names) {
+                    items.extend(display.binding);
+                    impls.push(display.impl_);
+                }
                 for sig in &sigs {
                     items.push(generate_expanded_method(config, sig));
                 }
@@ -1809,7 +1816,92 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
             #(#items)*
         }
         #public_alias
+        #(#impls)*
     }
+}
+
+/// The `Display` form of a parameterless `toString(): string`.
+struct DisplayToString {
+    /// The private extern `Display` calls, when no `try_` form is emitted.
+    binding: Option<TokenStream>,
+    /// `impl core::fmt::Display`.
+    impl_: TokenStream,
+}
+
+/// A parameterless `toString(): string` is the type's `Display`: an
+/// inherent `to_string(&self) -> String` would shadow the blanket
+/// `ToString` (clippy's `inherent_to_string`), so it is replaced by
+/// `impl Display` and `.to_string()` comes from `ToString`. `fmt` calls the
+/// catching form, so a throwing `toString` returns `fmt::Error`.
+///
+/// The other expansions keep their bindings: the `try_to_string`
+/// companion, the `_js_string` variant and the overloads with parameters
+/// (`to_string_with_options`). Under `--fallible` the single catching
+/// form can't take `to_string` either, so it keeps the `try_` name the
+/// default policy gives it. Under `@throws {never}` there is no catching
+/// form, and `fmt` calls a private `__to_string` extern instead.
+fn display_to_string(
+    config: &ClassConfig,
+    sigs: &mut Vec<FunctionSignature>,
+    names: &mut LocalScope,
+) -> Option<DisplayToString> {
+    let is_plain_to_string = |sig: &FunctionSignature| {
+        sig.js_name == "toString"
+            && sig.params.is_empty()
+            && !sig.is_async
+            && !sig.js_string_return
+            && sig.literal.is_none()
+            && matches!(sig.return_type, TypeRef::String)
+    };
+    let idx = sigs
+        .iter()
+        .position(|sig| sig.rust_name == "to_string" && is_plain_to_string(sig))?;
+    let doc = super::doc_tokens(&sigs[idx].doc);
+    if sigs[idx].catch {
+        sigs[idx].rust_name = names.declare("try_to_string", Suffix::Snake);
+    } else {
+        let primary = sigs.remove(idx);
+        // `__to_string` stands in when `@throws {never}` leaves no catching form.
+        if !sigs.iter().any(|sig| sig.catch && is_plain_to_string(sig)) {
+            sigs.insert(
+                idx,
+                FunctionSignature {
+                    rust_name: names.declare("__to_string", Suffix::Snake),
+                    catch: true,
+                    error_type: None,
+                    doc: None,
+                    ..primary
+                },
+            );
+        }
+    }
+    let (idx, caller) = sigs
+        .iter()
+        .enumerate()
+        .find(|(_, sig)| sig.catch && is_plain_to_string(sig))
+        .map(|(i, sig)| (i, sig.rust_name.clone()))?;
+    let binding = caller.starts_with("__").then(|| {
+        let sig = sigs.remove(idx);
+        // Private: only `Display` calls it.
+        let mut binding: syn::ForeignItemFn = syn::parse2(generate_expanded_method(config, &sig))
+            .expect("a method binding parses as a foreign fn");
+        binding.vis = syn::Visibility::Inherited;
+        quote! { #binding }
+    });
+
+    let caller = super::typemap::make_ident(&caller);
+    let rust_type = super::typemap::make_ident(&config.effective_rust_name());
+    let type_args = config.type_generics_args();
+    let generics = config.type_generics_decl();
+    let impl_ = quote! {
+        #doc
+        impl #generics core::fmt::Display for #rust_type #type_args {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                f.write_str(&self.#caller().map_err(|_| core::fmt::Error)?)
+            }
+        }
+    };
+    Some(DisplayToString { binding, impl_ })
 }
 
 /// Generate the type declaration:
