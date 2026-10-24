@@ -694,7 +694,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_tag(this: &NotificationOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn data(this: &NotificationOptions) -> Option<JsValue>;
+    pub fn data(this: &NotificationOptions) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &NotificationOptions, val: &JsValue);
 }

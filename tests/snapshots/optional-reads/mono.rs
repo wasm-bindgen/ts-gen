@@ -8,22 +8,45 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Moment;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Moment, JsValue>;
+}
+#[wasm_bindgen(module = "optional-reads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Tagged;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Tagged, JsValue>;
+}
+#[wasm_bindgen(module = "optional-reads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Settings;
-    #[doc = " Anything, or absent."]
+    #[doc = " Anything, `null`, or absent: all in-band."]
     #[wasm_bindgen(method, getter)]
-    pub fn data(this: &Settings) -> Option<JsValue>;
+    pub fn data(this: &Settings) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &Settings, val: &JsValue);
-    #[doc = " Anything, or absent."]
+    #[doc = " Anything, `null`, or absent: all in-band."]
     #[wasm_bindgen(method, getter)]
-    pub fn detail(this: &Settings) -> Option<JsValue>;
+    pub fn detail(this: &Settings) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_detail(this: &Settings, val: &JsValue);
-    #[doc = " Anything, `null`, or absent."]
+    #[doc = " No member subtypes the other, so it erases."]
+    #[wasm_bindgen(method, getter)]
+    pub fn stamp(this: &Settings) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_stamp(this: &Settings, val: &JsValue);
+    #[doc = " Erased, `null`, or absent."]
     #[wasm_bindgen(method, getter)]
     pub fn cleared(this: &Settings) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cleared(this: &Settings, val: &JsValue);
+    #[wasm_bindgen(method, setter, js_name = "cleared")]
+    fn __set_cleared_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[doc = " Required, but admitting `undefined`."]
     #[wasm_bindgen(method, getter)]
     pub fn maybe(this: &Settings) -> Option<JsValue>;
@@ -34,6 +57,11 @@ extern "C" {
     pub fn value(this: &Settings) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_value(this: &Settings, val: &JsValue);
+}
+impl Settings {
+    pub fn set_cleared_with_null(&self) {
+        self.__set_cleared_with_null(&::wasm_bindgen::JsValue::NULL)
+    }
 }
 impl Settings {
     #[doc = " * `maybe` - Required, but admitting `undefined`."]
@@ -64,8 +92,16 @@ impl SettingsBuilder {
         self.inner.set_detail(val);
         self
     }
+    pub fn stamp(self, val: &JsValue) -> Self {
+        self.inner.set_stamp(val);
+        self
+    }
     pub fn cleared(self, val: &JsValue) -> Self {
         self.inner.set_cleared(val);
+        self
+    }
+    pub fn cleared_with_null(self) -> Self {
+        self.inner.set_cleared_with_null();
         self
     }
     pub fn build(self) -> Settings {
@@ -82,18 +118,23 @@ extern "C" {
     pub fn missing() -> Option<JsValue>;
     # [wasm_bindgen (static_method_of = Registry , setter)]
     pub fn set_missing(val: &JsValue);
-    #[doc = " Present."]
-    # [wasm_bindgen (static_method_of = Registry , getter)]
-    pub fn present() -> Option<JsValue>;
-    # [wasm_bindgen (static_method_of = Registry , setter)]
-    pub fn set_present(val: &JsValue);
     #[doc = " Present, holding `null`."]
     # [wasm_bindgen (static_method_of = Registry , getter)]
     pub fn cleared() -> Option<Nullable<JsValue>>;
     # [wasm_bindgen (static_method_of = Registry , setter)]
     pub fn set_cleared(val: &JsValue);
-    #[wasm_bindgen(method, getter)]
-    pub fn extra(this: &Registry) -> Option<JsValue>;
+    # [wasm_bindgen (static_method_of = Registry , setter , js_name = "cleared")]
+    fn __set_cleared_with_null(val: &::wasm_bindgen::JsValue);
+    #[doc = " The top type, holding `null`."]
+    # [wasm_bindgen (static_method_of = Registry , getter)]
+    pub fn anything() -> JsValue;
+    # [wasm_bindgen (static_method_of = Registry , setter)]
+    pub fn set_anything(val: &JsValue);
+}
+impl Registry {
+    pub fn set_cleared_with_null() {
+        Self::__set_cleared_with_null(&::wasm_bindgen::JsValue::NULL)
+    }
 }
 #[wasm_bindgen(module = "optional-reads", experimental_generic_mono)]
 extern "C" {

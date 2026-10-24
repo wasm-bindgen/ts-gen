@@ -3094,12 +3094,14 @@ pub fn to_getter_return_type(
             return nullable_carrier(inner_tokens, n);
         }
     }
-    // A property that can be absent keeps its `Option` around a `JsValue`,
-    // so absence reads as `None`. The `Option` would read `null` as `None`
-    // too, so a written `null` nests a `Nullable` under it, as for any other
-    // value.
+    // A property that can be absent keeps its `Option` around a type that
+    // erases to `JsValue`, so absence reads as `None`. The `Option` would
+    // read `null` as `None` too, so a written `null` nests a `Nullable`
+    // under it, as for any other value. The top type already holds both
+    // empties in-band, where an `Option` would only lose `null`, so it
+    // stays bare.
     if let Some((core, n, core_scope)) = split_empties_in(ty, ctx, scope) {
-        if n.admits_undefined() {
+        if n.admits_undefined() && !is_top_type(&core, ctx, core_scope) {
             let inner = to_syn_type(&core, TypePosition::RETURN, ctx, core_scope, from_module);
             if is_jsvalue_arg(&inner) {
                 return nullable_carrier(inner, n);
@@ -3107,6 +3109,17 @@ pub fn to_getter_return_type(
         }
     }
     to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)
+}
+
+/// Whether `ty` is `any` or `unknown`, through aliases.
+fn is_top_type(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
+    match ty {
+        TypeRef::Any | TypeRef::Unknown => true,
+        TypeRef::Reference { .. } if let Some(name) = ty.as_ident() => ctx
+            .and_then(|c| c.resolve_alias(name, scope))
+            .is_some_and(|(target, alias_scope)| is_top_type(&target, ctx, alias_scope)),
+        _ => false,
+    }
 }
 
 /// Anchor for naming a synthesised dynamic-union enum. Carries the
@@ -5010,7 +5023,8 @@ mod tests {
 
     #[test]
     fn absent_getters_keep_their_option_around_js_value() {
-        let (module, gctx) = crate::parse_source("declare class Foo {}", None).unwrap();
+        let src = "declare class Foo {} declare class Bar {} type Anything = unknown;";
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
         let ctx = CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
             .unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
@@ -5029,17 +5043,27 @@ mod tests {
             )
             .to_string()
         };
+        let erased = || TypeRef::Intersection(vec![TypeRef::ident("Foo"), TypeRef::ident("Bar")]);
         assert_eq!(
-            read(vec![TypeRef::Any, TypeRef::Undefined]),
+            read(vec![erased(), TypeRef::Undefined]),
             "Option < JsValue >"
         );
         assert_eq!(
-            read(vec![TypeRef::Unknown, TypeRef::Null, TypeRef::Undefined]),
+            read(vec![erased(), TypeRef::Null, TypeRef::Undefined]),
             "Option < Nullable < JsValue >>"
         );
-        // Without `undefined`, `JsValue` carries `null` in-band.
-        assert_eq!(read(vec![TypeRef::Any, TypeRef::Null]), "JsValue");
-        assert_eq!(read(vec![TypeRef::Any]), "JsValue");
+        // The top type holds both empties in-band, and without `undefined`
+        // so does any `JsValue`.
+        assert_eq!(read(vec![TypeRef::Any, TypeRef::Undefined]), "JsValue");
+        assert_eq!(
+            read(vec![TypeRef::Unknown, TypeRef::Null, TypeRef::Undefined]),
+            "JsValue"
+        );
+        assert_eq!(
+            read(vec![TypeRef::ident("Anything"), TypeRef::Undefined]),
+            "JsValue"
+        );
+        assert_eq!(read(vec![erased(), TypeRef::Null]), "JsValue");
         assert_eq!(
             read(vec![TypeRef::ident("Foo"), TypeRef::Undefined]),
             "Option < Foo >"

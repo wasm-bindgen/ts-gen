@@ -119,9 +119,13 @@ value of an async function use the carriers exactly. A read admits
 `null | undefined` with nothing else reads as `Option<Null>`. A
 `JsValue` inner stays bare, since it carries both empties in-band,
 except under a property that can be absent: a getter or static getter
-admitting `undefined` keeps its `Option`, so an absent field reads as
-`None` whatever its type. That `Option` would also read `null` as
-`None`, so a written `null` keeps its `Nullable` under it.
+admitting `undefined` whose type erases to `JsValue` (an unrelated
+intersection, a union with no useful bound) keeps its `Option`, so an
+absent field reads as `None`. That `Option` would also read `null` as
+`None`, so a written `null` keeps its `Nullable` under it. The top type is
+different: `any` and `unknown` already admit `undefined` and `null`
+in-band, so an `Option` would add nothing and lose a stored `null`, and
+`x?: any` stays a bare `JsValue`.
 
 | TS                                  | Rust read                                       |
 | ----------------------------------- | ----------------------------------------------- |
@@ -130,9 +134,10 @@ admitting `undefined` keeps its `Option`, so an absent field reads as
 | `f(): Promise<number \| undefined>` | `async fn f() -> Result<Option<f64>, JsValue>`  |
 | `f<T>(): Promise<T \| null>`        | `async fn f<T>() -> Result<Nullable<T>, JsValue>` |
 | `readonly x?: string \| null`       | `fn x(&self) -> Option<Nullable<String>>`       |
-| `x?: any`                           | `fn x(&self) -> Option<JsValue>`                |
-| `x?: unknown \| null`               | `fn x(&self) -> Option<Nullable<JsValue>>`      |
-| `x: any \| null`                    | `fn x(&self) -> JsValue`                        |
+| `x?: A & B` (erased)                | `fn x(&self) -> Option<JsValue>`                |
+| `x?: (A & B) \| null` (erased)      | `fn x(&self) -> Option<Nullable<JsValue>>`      |
+| `x: (A & B) \| null` (erased)       | `fn x(&self) -> JsValue`                        |
+| `x?: any`, `x?: unknown \| null`    | `fn x(&self) -> JsValue`                        |
 
 The awaited value [lowers like a sync return](#awaited-values-lower-like-sync-returns),
 so the carrier holds the read form (`String`, `f64`, an enum), not the
