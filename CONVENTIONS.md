@@ -3497,14 +3497,15 @@ impl R2Object {
 
 * Applies to getters, setters, parameters, sync and async returns,
   static methods, constructors and free functions; the public
-  signature is exactly what the scalar would have been, through
-  `Option<_>` (`?` / `| null`), `Vec<_>` / `&[_]` (`T[]`) and
-  `Result<_, E>`. A `@rust u64` on a `bigint` needs no wrapper.
+  signature is exactly what the scalar would have been, through the
+  read carriers `Option<_>` / `Nullable<_>` (`?`, `| undefined`,
+  `| null`), `Vec<_>` / `&[_]` (`T[]`) and `Result<_, E>`. A `@rust u64`
+  on a `bigint` needs no wrapper.
 * A generic receiver (`Box<T>`) gives `impl<T: JsGeneric> Box<T>`; the
   method's own type parameters stay on the wrapper fn.
 * The `_promise` companion is handed to JS (`waitUntil`, `Promise.race`),
-  so it keeps `Promise<f64>` and gets no wrapper. The same holds for a
-  scalar inside a callback type.
+  so it keeps the JS number (`Promise<Number>`) and gets no wrapper. The
+  same holds for a scalar inside a callback type.
 * Dictionary factories and builder methods take the public scalar and
   call the wrapper setter, so `R2PutOptions::builder().size(5)` reads as
   declared.

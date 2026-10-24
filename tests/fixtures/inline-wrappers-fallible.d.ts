@@ -1,10 +1,10 @@
 //! @ts-gen --lib-name inline-wrappers --export inline-wrappers --errors-as-error
 // `@rust u64` / `i64` on a `number`: the extern ABI crosses 64-bit
 // integers as BigInt, so the binding keeps `f64` under a private
-// `<name>_js` name and an inline `pub fn` of the public name converts
+// `__<name>` name and an inline `pub fn` of the public name converts
 // with `as`, through `?` / `| null`, `T[]`, `Promise<…>` and `Result`.
 // The `_promise` companion hands its `Promise<T>` to JS, so it stays
-// `Promise<f64>`.
+// `Promise<Number>`.
 
 export interface R2Object {
   /** @rust u64 */
