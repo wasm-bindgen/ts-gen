@@ -2198,8 +2198,9 @@ parameters thread through every site that mentions `Foo`:
 * Every reference to the type leaves the trailing arguments that equal
   the declared Rust defaults to them, in both modes. `fetch(input:
   RequestInfo)` instantiates `Request<unknown, CfProperties<unknown>>`,
-  which lowers to `Request<JsValue, JsValue>` and is written `Request`,
-  and `Foo<string, unknown>` with `B = unknown` is `Foo<JsString>`. A
+  which lowers to `Request<JsValue, JsValue>` and, where
+  [generic hoisting](#generic-hoisting-for-parameters) leaves it, is
+  written `Request`, and `Foo<string, unknown>` with `B = unknown` is `Foo<JsString>`. A
   default naming an earlier parameter is read with that parameter's
   argument, so `Holder<string, Box<string>>` with `U = Box<T>` is
   `Holder<JsString>`. Only the trailing run goes, as Rust can't skip a
@@ -2363,6 +2364,62 @@ name: `params: Params<P>` against `type Params<P extends string = any> =
 Record<P, string | string[]>` is `Params`, with `pub type Params =
 Object;`. An object-type alias promoted to an interface (`type Shape<K
 extends string> = { key: K }`) is an interface, and erases like one.
+
+### Generic hoisting for parameters
+
+TypeScript accepts any `Request<M, C>` where `Request<unknown,
+CfProperties>` is expected, through covariance. The erased Rust form
+`&Request<JsValue, JsValue>` would take only that one instantiation,
+so a caller holding a `Request<MyMeta, MyCf>` would have to upcast it
+and lose its type. So when a parameter's own type is a generic class or
+class-like interface and one of its argument positions lowers to the
+top type `JsValue` (a default, `unknown`/`any`, an erased union), that
+position takes a fresh type parameter on the binding instead:
+
+```ts
+declare function fetch(input: RequestInfo | URL, init?: RequestInit<RequestInitCfProperties>): Promise<Response>;
+```
+
+```rust
+pub async fn fetch<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+    input: &Request<CfHostMetadata, Cf>,
+) -> Result<Response, JsValue>;
+#[wasm_bindgen(catch, js_name = "fetch")]
+pub async fn fetch_with_str(input: &str) -> Result<Response, JsValue>;
+```
+
+Under `--experimental-generic-mono` the fresh parameters are bounded
+`::wasm_bindgen::MonoGeneric` instead, which holds for JS handles and
+native leaves alike (`Envelope<String, f64>`).
+
+* Free functions, constructors, methods and static methods hoist, sync,
+  `async` and `_promise` forms alike. Only parameters do: a return keeps
+  the [declared defaults](#type-level-generics-propagate-to-every-binding-site)
+  (`fn copy(…) -> Envelope`), as does a setter's value.
+* Only the parameter's own type hoists, including each arm a union
+  [expands](#signature-flattening) to (`fetch` above, beside
+  `fetch_with_str`). Inside `Option<…>` or any other wrapper the
+  defaults stay: Rust's fn generics have no defaults, so a caller
+  passing `None` would need a turbofish.
+* Positions holding anything else keep it (`Envelope<string>` is
+  `&Envelope<JsString, Body>`), and a trailing one equal to its default
+  is left to it, read against the hoisted parameters.
+* A dictionary (and a discriminated union) doesn't hoist. It is built
+  through its generated factory, whose type parameters only the
+  parameter it is passed to pins, so `f(&Options::new())` keeps
+  compiling without an annotation.
+* Each fresh parameter is named after the declaration's type parameter,
+  numbered (`Meta2`) past the binding's own parameters, a method's
+  class parameters included, and past any declared type it would
+  shadow (`QueueEvent<Body = unknown>` hoists `Body2` beside the
+  `Body` interface). They are declared after the bounds listed above:
+
+```rust
+pub fn forward<Meta: JsGeneric, Body: JsGeneric, Meta2: JsGeneric, Body2: JsGeneric>(
+    this: &Envelope<Meta, Body>,
+    other: &Envelope<Meta2, Body2>,
+) -> String;
+```
 
 ### Primitive union arguments
 

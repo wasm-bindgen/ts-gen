@@ -25,6 +25,26 @@ use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::{LocalScope, Suffix};
 
+/// Heads [`lower_reference`] maps to `js_sys` containers rather than to
+/// a declaration of the same name.
+const DEDICATED_HEADS: &[&str] = &[
+    "Promise",
+    "PromiseLike",
+    "Set",
+    "ReadonlySet",
+    "Map",
+    "ReadonlyMap",
+    "Record",
+    "Iterator",
+    "IterableIterator",
+    "AsyncIterator",
+    "AsyncIterableIterator",
+    "Iterable",
+    "AsyncIterable",
+    "Array",
+    "ReadonlyArray",
+];
+
 /// js_sys type names reserved by the `use js_sys::*` glob import.
 /// User-defined types that collide with these will be renamed.
 pub const JS_SYS_RESERVED: &[&str] = &[
@@ -761,6 +781,65 @@ impl<'a> CodegenContext<'a> {
         Some(out)
     }
 
+    /// The type parameters of the local generic class, interface or
+    /// discriminated union `id`, which its `pub type` declares with
+    /// defaults, and the scope they bind in.
+    fn declared_params(&self, id: TypeId) -> Option<(&'a [ir::TypeParam], ScopeId)> {
+        if !self.local_type_ids.contains(&id) {
+            return None;
+        }
+        let (type_params, scope) = match &self.gctx.get_type(id).kind {
+            TypeKind::Class(c) => (c.type_params.as_slice(), c.body_scope),
+            TypeKind::Interface(i) => (i.type_params.as_slice(), i.body_scope),
+            TypeKind::DiscriminatedUnion(d) => (d.type_params.as_slice(), d.body_scope),
+            _ => return None,
+        };
+        (!type_params.is_empty()).then_some((type_params, scope))
+    }
+
+    /// Run `f` without keeping its diagnostics or letting an alias probe
+    /// in progress see the type parameters it lowers as its own.
+    fn quietly<R>(&self, f: impl FnOnce() -> R) -> R {
+        let diagnostics = self.diagnostics.take();
+        let reported = self.unresolved_module_refs.borrow().clone();
+        self.alias_param_mentions.borrow_mut().push(HashSet::new());
+        let r = f();
+        self.alias_param_mentions.borrow_mut().pop();
+        self.diagnostics.replace(diagnostics);
+        self.unresolved_module_refs.replace(reported);
+        r
+    }
+
+    /// The declared Rust default of parameter `i` of the generic type
+    /// `id` (see [`type_param_default_tokens`]), read against the
+    /// arguments `earlier` chosen for the parameters before it. `None`
+    /// while that type's own defaults are being read (`Node<C =
+    /// Node<…>>`). The declaration reports the default's diagnostics.
+    fn default_arg(&self, id: TypeId, i: usize, earlier: &[TokenStream]) -> Option<TokenStream> {
+        let (type_params, scope) = self.declared_params(id)?;
+        let tp = type_params.get(i)?;
+        if !self.trimming.borrow_mut().insert(id) {
+            return None;
+        }
+        let args = type_params
+            .iter()
+            .map(|tp| tp.name.clone())
+            .zip(earlier.iter().cloned())
+            .collect();
+        self.param_args.borrow_mut().push((scope, args));
+        let default = self.quietly(|| {
+            type_param_default_tokens(
+                tp.default.as_ref(),
+                Some(self),
+                scope,
+                &self.gctx.get_type(id).module_context,
+            )
+        });
+        self.param_args.borrow_mut().pop();
+        self.trimming.borrow_mut().remove(&id);
+        Some(default)
+    }
+
     /// `args` of a reference to the local generic class, interface or
     /// discriminated union `id`, without the trailing ones its `pub type`
     /// declaration defaults to (see [`type_param_default_tokens`]):
@@ -773,52 +852,104 @@ impl<'a> CodegenContext<'a> {
         id: TypeId,
         mut args: Vec<TokenStream>,
     ) -> Vec<TokenStream> {
-        let decl = self.gctx.get_type(id);
-        let (type_params, scope) = match &decl.kind {
-            TypeKind::Class(c) => (&c.type_params, c.body_scope),
-            TypeKind::Interface(i) => (&i.type_params, i.body_scope),
-            TypeKind::DiscriminatedUnion(d) => (&d.type_params, d.body_scope),
-            _ => return args,
-        };
-        // A default naming its own type (`Node<C = Node<…>>`) keeps that
-        // reference's arguments.
-        if !self.local_type_ids.contains(&id) || !self.trimming.borrow_mut().insert(id) {
-            return args;
-        }
-        // The declaration reports the defaults' diagnostics when it's
-        // emitted, and an alias probe in progress mustn't see their
-        // parameters as its own.
-        let diagnostics = self.diagnostics.take();
-        let reported = self.unresolved_module_refs.borrow().clone();
-        self.alias_param_mentions.borrow_mut().push(HashSet::new());
         while let Some(last) = args.last() {
             let i = args.len() - 1;
-            let Some(tp) = type_params.get(i) else {
-                break;
+            match self.default_arg(id, i, &args[..i]) {
+                Some(default) if default.to_string() == last.to_string() => args.pop(),
+                _ => break,
             };
-            let earlier = type_params[..i]
-                .iter()
-                .map(|tp| tp.name.clone())
-                .zip(args[..i].iter().cloned())
-                .collect();
-            self.param_args.borrow_mut().push((scope, earlier));
-            let default = type_param_default_tokens(
-                tp.default.as_ref(),
-                Some(self),
-                scope,
-                &decl.module_context,
-            );
-            self.param_args.borrow_mut().pop();
-            if default.to_string() != last.to_string() {
-                break;
-            }
-            args.pop();
         }
-        self.alias_param_mentions.borrow_mut().pop();
-        self.diagnostics.replace(diagnostics);
-        self.unresolved_module_refs.replace(reported);
-        self.trimming.borrow_mut().remove(&id);
         args
+    }
+
+    /// Generic hoisting for a parameter of type `ty`, used in `scope`: a
+    /// local generic class, interface or discriminated union whose
+    /// arguments, as written or defaulted, include the top type
+    /// `JsValue` (`unknown`, `any`, an erased union) takes a fresh type
+    /// parameter there instead, so any instantiation passes without an
+    /// upcast. `fresh` names each one from the declaration's parameter.
+    /// Returns the parameter's type and the names hoisted, in order.
+    pub(crate) fn hoisted_param_type(
+        &self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        from_module: &ModuleContext,
+        fresh: &mut dyn FnMut(&str) -> String,
+    ) -> Option<(TokenStream, Vec<String>)> {
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = ty
+        else {
+            return None;
+        };
+        let dotted = segments.join(".");
+        if segments.len() == 1 && DEDICATED_HEADS.contains(&dotted.as_str()) {
+            return None;
+        }
+        if self.resolve_alias_instance(ty, scope).is_some() || self.enum_repr(ty, scope).is_some() {
+            return None;
+        }
+        let id = self.gctx.resolve_path(scope, &dotted)?;
+        // A dictionary is built through its generated factory, whose type
+        // parameters only the parameter it is passed to pins, so it keeps
+        // the defaults (`f(&Options::new())` needs no annotation).
+        let built = match &self.gctx.get_type(id).kind {
+            TypeKind::Interface(i) => i.classification == ir::InterfaceClassification::Dictionary,
+            TypeKind::DiscriminatedUnion(_) => true,
+            _ => false,
+        };
+        if built {
+            return None;
+        }
+        let (type_params, _) = self.declared_params(id)?;
+        if generic_args.len() > type_params.len() {
+            return None;
+        }
+        let arg = |a: &TypeRef| {
+            generic_arg_tokens(a, TypePosition::ARGUMENT, Some(self), scope, from_module)
+        };
+        // Which positions hold the top type, read without diagnostics: the
+        // given arguments are lowered again below when any does.
+        let mut probed: Vec<TokenStream> = Vec::with_capacity(type_params.len());
+        for i in 0..type_params.len() {
+            let tokens = match generic_args.get(i) {
+                Some(a) => self.quietly(|| arg(a)),
+                None => self.default_arg(id, i, &probed)?,
+            };
+            probed.push(tokens);
+        }
+        let hoisted: Vec<usize> = (0..type_params.len())
+            .filter(|&i| is_jsvalue_arg(&probed[i]))
+            .collect();
+        if hoisted.is_empty() {
+            return None;
+        }
+        let mut names = Vec::with_capacity(hoisted.len());
+        // Every other position keeps its argument; a default that reads a
+        // hoisted parameter no longer gives it, so it is spelled out.
+        let args: Vec<TokenStream> = (0..type_params.len())
+            .map(|i| {
+                if hoisted.contains(&i) {
+                    let name = fresh(&type_params[i].name);
+                    let ident = make_ident(&name);
+                    names.push(name);
+                    quote! { #ident }
+                } else {
+                    match generic_args.get(i) {
+                        Some(a) => arg(a),
+                        None => probed[i].clone(),
+                    }
+                }
+            })
+            .collect();
+        let args = self.trim_default_args(id, args);
+        let base = if segments.len() > 1 {
+            emit_type_name(&dotted, scope, self)
+        } else {
+            named_type_to_rust(&dotted, Some(self), scope)
+        };
+        Some((quote! { &#base<#(#args),*> }, names))
     }
 
     /// The argument standing in for the type parameter `name`, used in

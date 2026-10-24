@@ -848,12 +848,21 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "reportError")]
     pub fn report_error(this: &ServiceWorkerGlobalScope, error: &JsValue) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn fetch(
+    pub async fn fetch<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &ServiceWorkerGlobalScope,
-        input: &Request,
+        input: &Request<CfHostMetadata, Cf>,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, js_name = "fetch")]
-    pub fn fetch_promise(this: &ServiceWorkerGlobalScope, input: &Request) -> Promise<Response>;
+    pub fn fetch_promise<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
+        this: &ServiceWorkerGlobalScope,
+        input: &Request<CfHostMetadata, Cf>,
+    ) -> Promise<Response>;
     #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub async fn fetch_with_str(
         this: &ServiceWorkerGlobalScope,
@@ -875,15 +884,21 @@ extern "C" {
         input: &URL,
     ) -> Promise<Response>;
     #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub async fn fetch_with_request_and_init(
+    pub async fn fetch_with_request_and_init<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &ServiceWorkerGlobalScope,
-        input: &Request,
+        input: &Request<CfHostMetadata, Cf>,
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, js_name = "fetch")]
-    pub fn fetch_with_request_and_init_promise(
+    pub fn fetch_with_request_and_init_promise<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &ServiceWorkerGlobalScope,
-        input: &Request,
+        input: &Request<CfHostMetadata, Cf>,
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Promise<Response>;
     #[wasm_bindgen(method, catch, js_name = "fetch")]
@@ -1190,9 +1205,9 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object(
+    pub fn add_event_listener_with_event_listener_object<EventType: ::wasm_bindgen::MonoGeneric>(
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -1207,9 +1222,11 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options(
+    pub fn add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options<
+        EventType: ::wasm_bindgen::MonoGeneric,
+    >(
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
         options: &EventTargetAddEventListenerOptions,
     ) -> Result<(), JsValue>;
 }
@@ -1225,9 +1242,11 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object_and_bool(
+    pub fn add_event_listener_with_event_listener_object_and_bool<
+        EventType: ::wasm_bindgen::MonoGeneric,
+    >(
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
         options: bool,
     ) -> Result<(), JsValue>;
 }
@@ -1242,9 +1261,11 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object(
+    pub fn remove_event_listener_with_event_listener_object<
+        EventType: ::wasm_bindgen::MonoGeneric,
+    >(
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -1259,9 +1280,11 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object_and_event_target_event_listener_options(
+    pub fn remove_event_listener_with_event_listener_object_and_event_target_event_listener_options<
+        EventType: ::wasm_bindgen::MonoGeneric,
+    >(
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
         options: &EventTargetEventListenerOptions,
     ) -> Result<(), JsValue>;
 }
@@ -1277,9 +1300,11 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object_and_bool(
+    pub fn remove_event_listener_with_event_listener_object_and_bool<
+        EventType: ::wasm_bindgen::MonoGeneric,
+    >(
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
         options: bool,
     ) -> Result<(), JsValue>;
 }
@@ -1305,7 +1330,9 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)"]
     #[wasm_bindgen(catch, js_name = "dispatchEvent")]
-    pub fn dispatch_event_with_queue_event(event: &QueueEvent) -> Result<bool, JsValue>;
+    pub fn dispatch_event_with_queue_event<Body2: ::wasm_bindgen::MonoGeneric>(
+        event: &QueueEvent<Body2>,
+    ) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -1453,12 +1480,22 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub async fn fetch(input: &Request) -> Result<Response, JsValue>;
+    pub async fn fetch<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
+        input: &Request<CfHostMetadata, Cf>,
+    ) -> Result<Response, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "fetch")]
-    pub fn fetch_promise(input: &Request) -> Promise<Response>;
+    pub fn fetch_promise<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
+        input: &Request<CfHostMetadata, Cf>,
+    ) -> Promise<Response>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -1485,16 +1522,22 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
-    pub async fn fetch_with_request_and_init(
-        input: &Request,
+    pub async fn fetch_with_request_and_init<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
+        input: &Request<CfHostMetadata, Cf>,
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Result<Response, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "fetch")]
-    pub fn fetch_with_request_and_init_promise(
-        input: &Request,
+    pub fn fetch_with_request_and_init_promise<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
+        input: &Request<CfHostMetadata, Cf>,
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Promise<Response>;
 }
@@ -2127,7 +2170,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObject;
     #[wasm_bindgen(method, catch)]
-    pub fn fetch(this: &DurableObject, request: &Request) -> Result<FetchReturnKind, JsValue>;
+    pub fn fetch<CfHostMetadata: ::wasm_bindgen::MonoGeneric, Cf: ::wasm_bindgen::MonoGeneric>(
+        this: &DurableObject,
+        request: &Request<CfHostMetadata, Cf>,
+    ) -> Result<FetchReturnKind, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn alarm(this: &DurableObject) -> Result<Option<Promise<Undefined>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "alarm")]
@@ -3610,10 +3656,13 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object<EventMap>(
+    pub fn add_event_listener_with_event_listener_object<
+        EventMap,
+        EventType: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
     ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
@@ -3631,10 +3680,11 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     pub fn add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options<
         EventMap,
+        EventType: ::wasm_bindgen::MonoGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
         options: &EventTargetAddEventListenerOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
@@ -3651,10 +3701,13 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object_and_bool<EventMap>(
+    pub fn add_event_listener_with_event_listener_object_and_bool<
+        EventMap,
+        EventType: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
         options: bool,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
@@ -3670,10 +3723,13 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object<EventMap>(
+    pub fn remove_event_listener_with_event_listener_object<
+        EventMap,
+        EventType: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
@@ -3691,10 +3747,11 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     pub fn remove_event_listener_with_event_listener_object_and_event_target_event_listener_options<
         EventMap,
+        EventType: ::wasm_bindgen::MonoGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
         options: &EventTargetEventListenerOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
@@ -3711,10 +3768,13 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object_and_bool<EventMap>(
+    pub fn remove_event_listener_with_event_listener_object_and_bool<
+        EventMap,
+        EventType: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &EventListenerObject<JsValue>,
+        handler: &EventListenerObject<EventType>,
         options: bool,
     ) -> Result<(), JsValue>;
     #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
@@ -4273,9 +4333,21 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &Cache, request: &Request) -> Result<bool, JsValue>;
+    pub async fn delete<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
+        this: &Cache,
+        request: &Request<CfHostMetadata, Cf>,
+    ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_promise(this: &Cache, request: &Request) -> Promise<Boolean>;
+    pub fn delete_promise<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
+        this: &Cache,
+        request: &Request<CfHostMetadata, Cf>,
+    ) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_str(
         this: &Cache,
@@ -4291,15 +4363,21 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_url_promise(this: &Cache, request: &URL) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_request_and_options(
+    pub async fn delete_with_request_and_options<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &Cache,
-        request: &Request,
+        request: &Request<CfHostMetadata, Cf>,
         options: &CacheQueryOptions,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_with_request_and_options_promise(
+    pub fn delete_with_request_and_options_promise<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &Cache,
-        request: &Request,
+        request: &Request<CfHostMetadata, Cf>,
         options: &CacheQueryOptions,
     ) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
@@ -4327,9 +4405,21 @@ extern "C" {
         options: &CacheQueryOptions,
     ) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "match")]
-    pub async fn match_(this: &Cache, request: &Request) -> Result<Option<Response>, JsValue>;
+    pub async fn match_<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
+        this: &Cache,
+        request: &Request<CfHostMetadata, Cf>,
+    ) -> Result<Option<Response>, JsValue>;
     #[wasm_bindgen(method, js_name = "match")]
-    pub fn match__promise(this: &Cache, request: &Request) -> Promise<Option<Response>>;
+    pub fn match__promise<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
+        this: &Cache,
+        request: &Request<CfHostMetadata, Cf>,
+    ) -> Promise<Option<Response>>;
     #[wasm_bindgen(method, catch, js_name = "match")]
     pub async fn match_with_str(
         this: &Cache,
@@ -4345,15 +4435,21 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "match")]
     pub fn match_with_url_promise(this: &Cache, request: &URL) -> Promise<Option<Response>>;
     #[wasm_bindgen(method, catch, js_name = "match")]
-    pub async fn match_with_request_and_options(
+    pub async fn match_with_request_and_options<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &Cache,
-        request: &Request,
+        request: &Request<CfHostMetadata, Cf>,
         options: &CacheQueryOptions,
     ) -> Result<Option<Response>, JsValue>;
     #[wasm_bindgen(method, js_name = "match")]
-    pub fn match_with_request_and_options_promise(
+    pub fn match_with_request_and_options_promise<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
         this: &Cache,
-        request: &Request,
+        request: &Request<CfHostMetadata, Cf>,
         options: &CacheQueryOptions,
     ) -> Promise<Option<Response>>;
     #[wasm_bindgen(method, catch, js_name = "match")]
@@ -4381,9 +4477,20 @@ extern "C" {
         options: &CacheQueryOptions,
     ) -> Promise<Option<Response>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn put(this: &Cache, request: &Request, response: &Response) -> Result<(), JsValue>;
+    pub async fn put<CfHostMetadata: ::wasm_bindgen::MonoGeneric, Cf: ::wasm_bindgen::MonoGeneric>(
+        this: &Cache,
+        request: &Request<CfHostMetadata, Cf>,
+        response: &Response,
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_promise(this: &Cache, request: &Request, response: &Response) -> Promise<Undefined>;
+    pub fn put_promise<
+        CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+        Cf: ::wasm_bindgen::MonoGeneric,
+    >(
+        this: &Cache,
+        request: &Request<CfHostMetadata, Cf>,
+        response: &Response,
+    ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_str(
         this: &Cache,
@@ -7484,9 +7591,9 @@ extern "C" {
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
-    pub fn before_with_readable_stream(
+    pub fn before_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
     pub fn before_with_response(this: &Element, content: &Response) -> Result<Element, JsValue>;
@@ -7497,9 +7604,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
-    pub fn before_with_readable_stream_and_options(
+    pub fn before_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
@@ -7514,9 +7621,9 @@ extern "C" {
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
-    pub fn after_with_readable_stream(
+    pub fn after_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
     pub fn after_with_response(this: &Element, content: &Response) -> Result<Element, JsValue>;
@@ -7527,9 +7634,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
-    pub fn after_with_readable_stream_and_options(
+    pub fn after_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
@@ -7544,9 +7651,9 @@ extern "C" {
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "prepend")]
-    pub fn prepend_with_readable_stream(
+    pub fn prepend_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "prepend")]
     pub fn prepend_with_response(this: &Element, content: &Response) -> Result<Element, JsValue>;
@@ -7557,9 +7664,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "prepend")]
-    pub fn prepend_with_readable_stream_and_options(
+    pub fn prepend_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "prepend")]
@@ -7574,9 +7681,9 @@ extern "C" {
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "append")]
-    pub fn append_with_readable_stream(
+    pub fn append_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "append")]
     pub fn append_with_response(this: &Element, content: &Response) -> Result<Element, JsValue>;
@@ -7587,9 +7694,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "append")]
-    pub fn append_with_readable_stream_and_options(
+    pub fn append_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "append")]
@@ -7604,9 +7711,9 @@ extern "C" {
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "replace")]
-    pub fn replace_with_readable_stream(
+    pub fn replace_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "replace")]
     pub fn replace_with_response(this: &Element, content: &Response) -> Result<Element, JsValue>;
@@ -7617,9 +7724,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "replace")]
-    pub fn replace_with_readable_stream_and_options(
+    pub fn replace_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "replace")]
@@ -7638,9 +7745,9 @@ extern "C" {
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setInnerContent")]
-    pub fn set_inner_content_with_readable_stream(
+    pub fn set_inner_content_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setInnerContent")]
     pub fn set_inner_content_with_response(
@@ -7654,9 +7761,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setInnerContent")]
-    pub fn set_inner_content_with_readable_stream_and_options(
+    pub fn set_inner_content_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &Element,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<Element, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setInnerContent")]
@@ -7688,9 +7795,9 @@ extern "C" {
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<EndTag, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
-    pub fn before_with_readable_stream(
+    pub fn before_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &EndTag,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<EndTag, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
     pub fn before_with_response(this: &EndTag, content: &Response) -> Result<EndTag, JsValue>;
@@ -7701,9 +7808,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<EndTag, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
-    pub fn before_with_readable_stream_and_options(
+    pub fn before_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &EndTag,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<EndTag, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
@@ -7718,9 +7825,9 @@ extern "C" {
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<EndTag, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
-    pub fn after_with_readable_stream(
+    pub fn after_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &EndTag,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<EndTag, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
     pub fn after_with_response(this: &EndTag, content: &Response) -> Result<EndTag, JsValue>;
@@ -7731,9 +7838,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<EndTag, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
-    pub fn after_with_readable_stream_and_options(
+    pub fn after_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &EndTag,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<EndTag, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
@@ -7811,9 +7918,9 @@ extern "C" {
     pub fn before(this: &Text, content: impl ::wasm_bindgen::JsStringLike)
         -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
-    pub fn before_with_readable_stream(
+    pub fn before_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &Text,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
     pub fn before_with_response(this: &Text, content: &Response) -> Result<Text, JsValue>;
@@ -7824,9 +7931,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
-    pub fn before_with_readable_stream_and_options(
+    pub fn before_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &Text,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "before")]
@@ -7838,9 +7945,9 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub fn after(this: &Text, content: impl ::wasm_bindgen::JsStringLike) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
-    pub fn after_with_readable_stream(
+    pub fn after_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &Text,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
     pub fn after_with_response(this: &Text, content: &Response) -> Result<Text, JsValue>;
@@ -7851,9 +7958,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
-    pub fn after_with_readable_stream_and_options(
+    pub fn after_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &Text,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "after")]
@@ -7868,9 +7975,9 @@ extern "C" {
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "replace")]
-    pub fn replace_with_readable_stream(
+    pub fn replace_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &Text,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
     ) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "replace")]
     pub fn replace_with_response(this: &Text, content: &Response) -> Result<Text, JsValue>;
@@ -7881,9 +7988,9 @@ extern "C" {
         options: &ContentOptions,
     ) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "replace")]
-    pub fn replace_with_readable_stream_and_options(
+    pub fn replace_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &Text,
-        content: &ReadableStream,
+        content: &ReadableStream<R>,
         options: &ContentOptions,
     ) -> Result<Text, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "replace")]
@@ -8354,8 +8461,14 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Request<CfHostMetadata = JsValue, Cf = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<CfHostMetadata, Cf>(input: &Request)
-        -> Result<Request<CfHostMetadata, Cf>, JsValue>;
+    pub fn new<
+        CfHostMetadata,
+        Cf,
+        CfHostMetadata2: ::wasm_bindgen::MonoGeneric,
+        Cf2: ::wasm_bindgen::MonoGeneric,
+    >(
+        input: &Request<CfHostMetadata2, Cf2>,
+    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
     pub fn new_with_str<CfHostMetadata, Cf>(
         input: impl ::wasm_bindgen::JsStringLike,
@@ -8365,8 +8478,13 @@ extern "C" {
         input: &URL,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
-    pub fn new_with_request_and_init<CfHostMetadata, Cf>(
-        input: &Request,
+    pub fn new_with_request_and_init<
+        CfHostMetadata,
+        Cf,
+        CfHostMetadata2: ::wasm_bindgen::MonoGeneric,
+        Cf2: ::wasm_bindgen::MonoGeneric,
+    >(
+        input: &Request<CfHostMetadata2, Cf2>,
         init: &RequestInit<Cf>,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
@@ -9070,16 +9188,16 @@ extern "C" {
         value: &Object,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_readable_stream(
+    pub async fn put_with_readable_stream<R: ::wasm_bindgen::MonoGeneric>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_readable_stream_promise(
+    pub fn put_with_readable_stream_promise<R: ::wasm_bindgen::MonoGeneric>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_str_and_options(
@@ -9124,17 +9242,17 @@ extern "C" {
         options: &KVNamespacePutOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_readable_stream_and_options(
+    pub async fn put_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
         options: &KVNamespacePutOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_readable_stream_and_options_promise(
+    pub fn put_with_readable_stream_and_options_promise<R: ::wasm_bindgen::MonoGeneric>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
         options: &KVNamespacePutOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
@@ -10058,16 +10176,16 @@ extern "C" {
         options: &R2GetOptions,
     ) -> Promise<Nullable<R2ObjectBody>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn put(
+    pub async fn put<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
     ) -> Result<Nullable<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_promise(
+    pub fn put_promise<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
     ) -> Promise<Nullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_array_buffer(
@@ -10130,17 +10248,17 @@ extern "C" {
         value: &::wasm_bindgen::JsValue,
     ) -> Promise<Nullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_readable_stream_and_r2_bucket_options2(
+    pub async fn put_with_readable_stream_and_r2_bucket_options2<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
         options: &R2BucketOptions2,
     ) -> Result<Nullable<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_readable_stream_and_r2_bucket_options2_promise(
+    pub fn put_with_readable_stream_and_r2_bucket_options2_promise<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
         options: &R2BucketOptions2,
     ) -> Promise<Nullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -10214,17 +10332,17 @@ extern "C" {
         options: &R2BucketOptions2,
     ) -> Promise<Nullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_readable_stream_and_r2_put_options(
+    pub async fn put_with_readable_stream_and_r2_put_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
         options: &R2PutOptions,
     ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_readable_stream_and_r2_put_options_promise(
+    pub fn put_with_readable_stream_and_r2_put_options_promise<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -10615,16 +10733,16 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "uploadId")]
     pub fn upload_id_js_string(this: &R2MultipartUpload) -> JsString;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part(
+    pub async fn upload_part<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
     ) -> Result<R2UploadedPart, JsValue>;
     #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_promise(
+    pub fn upload_part_promise<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub async fn upload_part_with_array_buffer(
@@ -10675,17 +10793,17 @@ extern "C" {
         value: &Blob,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part_with_readable_stream_and_options(
+    pub async fn upload_part_with_readable_stream_and_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
         options: &R2UploadPartOptions,
     ) -> Result<R2UploadedPart, JsValue>;
     #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_with_readable_stream_and_options_promise(
+    pub fn upload_part_with_readable_stream_and_options_promise<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ReadableStream,
+        value: &ReadableStream<R>,
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
@@ -12300,7 +12418,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamDefaultReader<R = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<R>(stream: &ReadableStream) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
+    pub fn new<R, R2: ::wasm_bindgen::MonoGeneric>(
+        stream: &ReadableStream<R2>,
+    ) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn closed<R>(this: &ReadableStreamDefaultReader<R>) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
@@ -12345,7 +12465,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamBYOBReader;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new(stream: &ReadableStream) -> Result<ReadableStreamBYOBReader, JsValue>;
+    pub fn new<R: ::wasm_bindgen::MonoGeneric>(
+        stream: &ReadableStream<R>,
+    ) -> Result<ReadableStreamBYOBReader, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn closed(this: &ReadableStreamBYOBReader) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
@@ -12747,7 +12869,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WritableStreamDefaultWriter<W = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<W>(stream: &WritableStream) -> Result<WritableStreamDefaultWriter<W>, JsValue>;
+    pub fn new<W, W2: ::wasm_bindgen::MonoGeneric>(
+        stream: &WritableStream<W2>,
+    ) -> Result<WritableStreamDefaultWriter<W>, JsValue>;
     #[doc = " The **`closed`** read-only property of the the stream errors or the writer's lock is released."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed)"]
@@ -15061,7 +15185,9 @@ extern "C" {
     # [wasm_bindgen (static_method_of = EventSource , getter , js_name = "CLOSED")]
     pub fn closed() -> f64;
     # [wasm_bindgen (static_method_of = EventSource , catch)]
-    pub fn from(stream: &ReadableStream) -> Result<EventSource, JsValue>;
+    pub fn from<R: ::wasm_bindgen::MonoGeneric>(
+        stream: &ReadableStream<R>,
+    ) -> Result<EventSource, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -40483,10 +40609,10 @@ pub mod cloudflare {
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type EmailMessage;
             #[wasm_bindgen(constructor, catch)]
-            pub fn new(
+            pub fn new<R: ::wasm_bindgen::MonoGeneric>(
                 from: impl ::wasm_bindgen::JsStringLike,
                 to: impl ::wasm_bindgen::JsStringLike,
-                raw: &super::super::ReadableStream,
+                raw: &super::super::ReadableStream<R>,
             ) -> Result<EmailMessage, JsValue>;
             #[wasm_bindgen(constructor, catch, js_name = "EmailMessage")]
             pub fn new_with_str(
@@ -40762,14 +40888,19 @@ pub mod cloudflare {
                 message: &super::super::ForwardableEmailMessage,
             ) -> Result<Option<Promise<Undefined>>, JsValue>;
             #[wasm_bindgen(method, catch)]
-            pub fn fetch<Env, Props>(
+            pub fn fetch<
+                Env,
+                Props,
+                CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+                Cf: ::wasm_bindgen::MonoGeneric,
+            >(
                 this: &WorkerEntrypoint<Env, Props>,
-                request: &super::super::Request,
+                request: &super::super::Request<CfHostMetadata, Cf>,
             ) -> Result<FetchReturnKind, JsValue>;
             #[wasm_bindgen(method, catch)]
-            pub fn queue<Env, Props>(
+            pub fn queue<Env, Props, Body2: ::wasm_bindgen::MonoGeneric>(
                 this: &WorkerEntrypoint<Env, Props>,
-                batch: &super::super::MessageBatch,
+                batch: &super::super::MessageBatch<Body2>,
             ) -> Result<Option<Promise<Undefined>>, JsValue>;
             #[wasm_bindgen(method, catch)]
             pub fn scheduled<Env, Props>(
@@ -40829,9 +40960,14 @@ pub mod cloudflare {
                 alarm_info: &super::super::AlarmInvocationInfo,
             ) -> Result<Option<Promise<Undefined>>, JsValue>;
             #[wasm_bindgen(method, catch)]
-            pub fn fetch<Env, Props>(
+            pub fn fetch<
+                Env,
+                Props,
+                CfHostMetadata: ::wasm_bindgen::MonoGeneric,
+                Cf: ::wasm_bindgen::MonoGeneric,
+            >(
                 this: &DurableObject<Env, Props>,
-                request: &super::super::Request,
+                request: &super::super::Request<CfHostMetadata, Cf>,
             ) -> Result<FetchReturnKind, JsValue>;
             #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
             pub fn web_socket_message<Env, Props>(

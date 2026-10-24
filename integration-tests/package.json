@@ -7,6 +7,7 @@
     "es-module-lexer": "^1.6.0",
     "export-default": "file:./js/export-default",
     "fallible": "file:./js/fallible",
+    "generic-hoisting": "file:./js/generic-hoisting",
     "module-export-assignment": "file:./js/module-export-assignment",
     "module-file-locals": "file:./js/module-file-locals",
     "module-namespace-values": "file:./js/module-namespace-values",

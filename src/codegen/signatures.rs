@@ -1601,31 +1601,74 @@ fn param_attr(
     }
 }
 
-/// Convert parameters, using argument-position `impl Trait` bounds for
-/// strings and primitive unions in per-monomorphization mode (see
-/// [`mono_argument_type`]).
-pub(crate) fn generate_concrete_params_with_mono_bounds(
+/// A callable's own parameters, using argument-position `impl Trait`
+/// bounds for strings and primitive unions in per-monomorphization mode
+/// (see [`mono_argument_type`]), with generic hoisting (see
+/// [`CodegenContext::hoisted_param_type`]): a parameter of a generic type
+/// whose arguments include the top type takes a fresh type parameter in
+/// each such position, declared after the callable's `bounds`. Only a
+/// parameter's own type is hoisted, never one inside `Option` or another
+/// wrapper, since a caller passing `None` would have nothing to infer the
+/// parameter from.
+pub(crate) fn generate_callable_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
+    bounds: &mut Vec<TokenStream>,
 ) -> TokenStream {
-    let per_mono = CodegenContext::generic_mono(cgctx);
-    if !per_mono {
+    let Some(ctx) = cgctx else {
         return generate_concrete_params(params, cgctx, scope, from_module);
-    }
-
+    };
+    // Fresh names take the declaration's parameter names, numbered past
+    // the callable's own parameters and any type the signature could name.
+    let mut names = LocalScope::with_claimed(bounds.iter().filter_map(bound_name));
+    let mut fresh = |name: &str| loop {
+        let candidate = names.declare(name, Suffix::Pascal);
+        let shadows = typemap::is_prelude_reserved(&candidate)
+            || matches!(
+                ctx.gctx.scopes.resolve_binding(scope, &candidate),
+                Some(crate::parse::scope::Binding::Declared(_))
+            );
+        if !shadows {
+            return candidate;
+        }
+    };
+    let bound = if ctx.experimental_generic_mono {
+        quote! { ::wasm_bindgen::MonoGeneric }
+    } else {
+        quote! { ::wasm_bindgen::JsGeneric }
+    };
     let items = params
         .iter()
         .zip(param_idents(params, cgctx))
         .map(|(param, name)| {
             let attr = param_attr(param, cgctx, scope);
-            let ty = render_param_type(param, cgctx, scope, from_module);
+            let hoisted = (!param.variadic)
+                .then(|| ctx.hoisted_param_type(&param.type_ref, scope, from_module, &mut fresh))
+                .flatten();
+            let ty = match hoisted {
+                Some((ty, hoisted)) => {
+                    for h in hoisted {
+                        let ident = typemap::make_ident(&h);
+                        bounds.push(quote! { #ident: #bound });
+                    }
+                    ty
+                }
+                None => render_param_type(param, cgctx, scope, from_module),
+            };
             quote! { #attr #name: #ty }
         })
         .collect::<Vec<_>>();
-
     quote! { #(#items),* }
+}
+
+/// The parameter a `<…>` entry (`T`, `T: Bound`) declares.
+fn bound_name(bound: &TokenStream) -> Option<String> {
+    match bound.clone().into_iter().next()? {
+        proc_macro2::TokenTree::Ident(i) => Some(i.to_string()),
+        _ => None,
+    }
 }
 
 /// The Rust type of one concrete parameter, exactly as the emitters render
@@ -2405,11 +2448,12 @@ mod tests {
             concrete("rest", TypeRef::Any, true),
         ];
         let render = |cgctx: &CodegenContext<'_>| {
-            generate_concrete_params_with_mono_bounds(
+            generate_callable_params(
                 &params,
                 Some(cgctx),
                 scope,
                 &crate::ir::ModuleContext::Global,
+                &mut Vec::new(),
             )
             .to_string()
         };

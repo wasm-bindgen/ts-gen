@@ -28,9 +28,9 @@ use quote::quote;
 use std::collections::HashMap;
 
 use crate::codegen::signatures::{
-    build_signatures, generate_concrete_params_with_mono_bounds, generate_dictionary_params,
-    is_void_return, public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam,
-    DictionaryParams, FunctionSignature, Overload, SignatureKind,
+    build_signatures, generate_callable_params, generate_dictionary_params, is_void_return,
+    public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam, DictionaryParams,
+    FunctionSignature, Overload, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, CodegenContext, TypePosition};
 use crate::ir::{
@@ -1903,12 +1903,6 @@ pub(super) fn widen_async_return_param(
 fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let scope = sig.body_scope;
-    let params = generate_concrete_params_with_mono_bounds(
-        &sig.params,
-        config.cgctx,
-        scope,
-        &config.from_module(),
-    );
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
 
@@ -1974,18 +1968,25 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         wb_parts.push(quote! { js_name = #js_name });
     }
 
-    let generics = if CodegenContext::generic_mono(config.cgctx) {
-        render_generic_bounds(&generic_bounds_for_method(config, sig))
+    let mut bounds = if CodegenContext::generic_mono(config.cgctx) {
+        generic_bounds_for_method(config, sig)
     } else {
         // A constructor only binds the type parameters its own
         // arguments mention; the rest are instantiated at their
         // defaults in the return type so `Foo::new()` needs no turbofish.
-        let bounds: Vec<TokenStream> = mentioned
+        mentioned
             .iter()
             .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
-            .collect();
-        render_generic_bounds(&bounds)
+            .collect()
     };
+    let params = generate_callable_params(
+        &sig.params,
+        config.cgctx,
+        scope,
+        &config.from_module(),
+        &mut bounds,
+    );
+    let generics = render_generic_bounds(&bounds);
 
     quote! {
         #doc
@@ -2002,11 +2003,13 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     // names through that scope so `T` (etc.) lowers to a bare ident
     // rather than slipping through to `emit_type_name`.
     let method_scope = sig.body_scope;
-    let params = generate_concrete_params_with_mono_bounds(
+    let mut bounds = generic_bounds_for_method(config, sig);
+    let params = generate_callable_params(
         &sig.params,
         config.cgctx,
         method_scope,
         &config.from_module(),
+        &mut bounds,
     );
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
@@ -2050,7 +2053,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         quote! {}
     };
 
-    let method_generics = render_generic_bounds(&generic_bounds_for_method(config, sig));
+    let method_generics = render_generic_bounds(&bounds);
     let this_generics = config.type_generics_args();
 
     quote! {
@@ -2065,11 +2068,27 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let scope = sig.body_scope;
-    let params = generate_concrete_params_with_mono_bounds(
+    // Static methods have no `this`, so type-level parameters are only
+    // declared when the signature mentions them.
+    let sig_tys: Vec<&TypeRef> = sig
+        .params
+        .iter()
+        .map(|p| &p.type_ref)
+        .chain(std::iter::once(&sig.return_type))
+        .collect();
+    let mut bounds: Vec<TokenStream> = config
+        .mentioned_type_params(scope, &sig_tys)
+        .iter()
+        .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
+        .collect();
+    bounds.extend(config.local_generic_bounds(scope, &sig_tys));
+    let mut bounds = widen_async_return_param(bounds, config.cgctx, sig);
+    let params = generate_callable_params(
         &sig.params,
         config.cgctx,
         scope,
         &config.from_module(),
+        &mut bounds,
     );
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
@@ -2114,21 +2133,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         quote! {}
     };
 
-    // Static methods have no `this`, so type-level parameters are only
-    // declared when the signature mentions them.
-    let sig_tys: Vec<&TypeRef> = sig
-        .params
-        .iter()
-        .map(|p| &p.type_ref)
-        .chain(std::iter::once(&sig.return_type))
-        .collect();
-    let mut bounds: Vec<TokenStream> = config
-        .mentioned_type_params(scope, &sig_tys)
-        .iter()
-        .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
-        .collect();
-    bounds.extend(config.local_generic_bounds(scope, &sig_tys));
-    let generics = render_generic_bounds(&widen_async_return_param(bounds, config.cgctx, sig));
+    let generics = render_generic_bounds(&bounds);
 
     quote! {
         #doc

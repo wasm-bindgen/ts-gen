@@ -4,7 +4,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::codegen::signatures::{
-    build_signatures, generate_concrete_params_with_mono_bounds, is_void_return, public_rust_name,
+    build_signatures, generate_callable_params, is_void_return, public_rust_name,
     render_generic_bounds, CallableSpec, FunctionSignature, Overload, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
@@ -105,7 +105,8 @@ fn generate_expanded_free_function(
     // directly so `T` references lower to a bare ident.
     let scope = sig.body_scope;
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
-    let params = generate_concrete_params_with_mono_bounds(&sig.params, cgctx, scope, ctx);
+    let mut bounds = generic_bounds_for_function(sig, cgctx);
+    let params = generate_callable_params(&sig.params, cgctx, scope, ctx, &mut bounds);
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
@@ -157,7 +158,7 @@ fn generate_expanded_free_function(
 
     let wb_extern_attr = CodegenContext::extern_attr(cgctx, ctx.specifier());
 
-    let generics = render_generic_bounds(&generic_bounds_for_function(sig, cgctx));
+    let generics = render_generic_bounds(&bounds);
 
     quote! {
         #wb_extern_attr
@@ -457,8 +458,9 @@ fn generate_constructs(
         for sig in &sigs {
             let scope = sig.body_scope;
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
+            let mut bounds = generic_bounds_for_function(sig, Some(cgctx));
             let params =
-                generate_concrete_params_with_mono_bounds(&sig.params, Some(cgctx), scope, ctx);
+                generate_callable_params(&sig.params, Some(cgctx), scope, ctx, &mut bounds);
             let ret = to_return_type(
                 &sig.return_type,
                 sig.catch,
@@ -483,7 +485,7 @@ fn generate_constructs(
                 wb_parts.push(quote! { js_name = #js_class });
             }
             let doc = super::doc_tokens(&sig.doc);
-            let generics = render_generic_bounds(&generic_bounds_for_function(sig, Some(cgctx)));
+            let generics = render_generic_bounds(&bounds);
             let wb_extern_attr = CodegenContext::extern_attr(Some(cgctx), ctx.specifier());
             items.push(quote! {
                 #wb_extern_attr
