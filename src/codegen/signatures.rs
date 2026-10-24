@@ -519,14 +519,22 @@ pub fn expand_signatures(
 
 /// The suffix `extra` would get as a member of `cohort`: its sibling's
 /// when a sibling has the same parameters, else what the naming pass
-/// assigns it appended to the cohort.
+/// assigns it appended to the cohort. A suffix without `_with_` parts is
+/// only the naming pass's numeric fallback (`_2`, for an `extra` with no
+/// parameter to name); the literal tag already sets the arm apart, so it
+/// gets none.
 fn suffix_among(cohort: &[Vec<ConcreteParam>], extra: Vec<ConcreteParam>) -> String {
     if let Some(pos) = cohort.iter().position(|s| concrete_params_eq(s, &extra)) {
         return compute_suffixes(cohort).swap_remove(pos);
     }
     let mut all = cohort.to_vec();
     all.push(extra);
-    compute_suffixes(&all).pop().unwrap_or_default()
+    let suffix = compute_suffixes(&all).pop().unwrap_or_default();
+    if suffix.starts_with("_with_") {
+        suffix
+    } else {
+        String::new()
+    }
 }
 
 /// `candidate` as a literal arm of `kept`: both carry string literals at
@@ -3857,6 +3865,37 @@ mod tests {
         assert_eq!(sigs[1].params[1].type_ref, TypeRef::String);
         assert_eq!(sigs[2].return_type, TypeRef::Any);
         assert!(sigs[3].literal.is_none());
+    }
+
+    #[test]
+    fn literal_arm_without_other_params_takes_no_numeric_suffix() {
+        // Temporal's `getTimeZoneTransition(direction: "next" | "previous")`
+        // beside `(direction: TransitionOptions)`: the arms keep no
+        // parameter, and the literal tag alone names them.
+        let mut used = no_used();
+        let next = [lit("direction", "next")];
+        let previous = [lit("direction", "previous")];
+        let options = [typed_param("direction", TypeRef::Number)];
+        let sigs = expand_overloads(
+            "getTimeZoneTransition",
+            &[&next, &previous, &options],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        let names: Vec<&str> = sigs.iter().map(|s| s.rust_name.as_str()).collect();
+        assert!(
+            names.contains(&"get_time_zone_transition_next"),
+            "{names:?}"
+        );
+        assert!(names.contains(&"get_time_zone_transition"), "{names:?}");
+        assert!(!names.iter().any(|n| n.ends_with("_2")), "{names:?}");
+        let spec = sigs
+            .iter()
+            .find_map(|s| s.literal.as_ref())
+            .expect("a literal cohort");
+        assert_eq!(spec.arms[1].1, "get_time_zone_transition_previous");
     }
 
     #[test]

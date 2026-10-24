@@ -2813,7 +2813,12 @@ impl CompressionStream {
   arm (`"a" | "b" | string`), since the plain form already covers it.
 * Each wrapper is named `<base>_<literal>` in snake case, followed by
   the `_with_` suffix the remaining parameters earn among the plain
-  expansions (`get_json`, `get_json_with_slice`). Every arm is named
+  expansions (`get_json`, `get_json_with_slice`). An arm left with no
+  parameter to name earns none, since the literal already sets it apart:
+  Temporal's `getTimeZoneTransition(direction: "next" | "previous")`
+  beside `(direction: TransitionOptions)` gives
+  `get_time_zone_transition_next` and `get_time_zone_transition(&self,
+  direction: &TransitionOptions)`. Every arm is named
   explicitly; no arm takes the bare base name, which stays with the
   literal-free overload (`get(key)`) when there is one.
 * Arms with the same return type share one extern binding, named after

@@ -3352,7 +3352,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "startOfDay")]
         pub fn start_of_day(this: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
-        fn get_time_zone_transition_next_2_js(
+        fn get_time_zone_transition_next_js(
             this: &ZonedDateTime,
             direction: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<Nullable<ZonedDateTime>, JsValue>;
@@ -3371,13 +3371,13 @@ pub mod temporal {
         pub fn to_plain_date_time(this: &ZonedDateTime) -> Result<PlainDateTime, JsValue>;
     }
     impl ZonedDateTime {
-        pub fn get_time_zone_transition_next_2(&self) -> Result<Nullable<ZonedDateTime>, JsValue> {
-            self.get_time_zone_transition_next_2_js("next")
+        pub fn get_time_zone_transition_next(&self) -> Result<Nullable<ZonedDateTime>, JsValue> {
+            self.get_time_zone_transition_next_js("next")
         }
-        pub fn get_time_zone_transition_previous_2(
+        pub fn get_time_zone_transition_previous(
             &self,
         ) -> Result<Nullable<ZonedDateTime>, JsValue> {
-            self.get_time_zone_transition_next_2_js("previous")
+            self.get_time_zone_transition_next_js("previous")
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
