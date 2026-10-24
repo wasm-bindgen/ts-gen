@@ -4984,6 +4984,10 @@ pub fn until_with_options(
   declaration, not its name: `Spans.Unit` and `Steps.Unit` given to one
   family are two impls, and an inherited member reads its argument in
   the scope the `extends` clause writes it in.
+* **Parse and generate in one mode.** Evaluation lowers literal-only
+  parameters for the mode `ParseOptions` selects, so
+  `generate_with_options` returns an error when its
+  `experimental_generic_mono` differs.
 * **A generic parent comes after `Object`.** wasm-bindgen builds the
   first `extends` from a `JsValue`, which only a parent at its defaults
   has, so a parent with arguments follows `extends = Object`, is written
