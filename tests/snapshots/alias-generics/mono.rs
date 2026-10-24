@@ -44,7 +44,7 @@ extern "C" {
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendDefault")]
-    pub fn send_default(this: &Client, input: &Request<JsValue>) -> Result<(), JsValue>;
+    pub fn send_default(this: &Client, input: &Request) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendDefault")]
     pub fn send_default_with_str(
         this: &Client,

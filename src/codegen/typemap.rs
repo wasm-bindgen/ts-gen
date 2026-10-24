@@ -234,6 +234,12 @@ pub struct CodegenContext<'a> {
     alias_param_mentions: RefCell<Vec<HashSet<String>>>,
     /// [`Self::is_recursive_alias`], by the alias's id.
     recursive_aliases: RefCell<HashMap<TypeId, bool>>,
+    /// The types [`Self::trim_default_args`] is reading the defaults of.
+    trimming: RefCell<HashSet<TypeId>>,
+    /// Arguments standing in for type parameters while a default is read
+    /// against them: the scope declaring the parameters, and each one's
+    /// argument tokens. Innermost last.
+    param_args: RefCell<Vec<(ScopeId, HashMap<String, TokenStream>)>>,
 }
 
 /// How a local generic alias's type parameters carry over to the Rust
@@ -493,6 +499,37 @@ fn alias_instance(alias: &ir::TypeAliasDecl, generic_args: &[ir::TypeRef]) -> ir
     alias.target.substitute(&map)
 }
 
+/// The Rust default of a generic type's parameter, as its `pub type`
+/// declaration spells it: the TS default lowered like a generic
+/// argument in the type's `scope`, `JsValue` when there is none. When
+/// the default's target itself erases to `JsValue` (an alias of a union,
+/// an unresolved name) its type arguments go with it:
+/// `CfProperties<CfHostMetadata>` is just `JsValue`.
+pub(crate) fn type_param_default_tokens(
+    default: Option<&TypeRef>,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    let Some(default) = default else {
+        return quote! { JsValue };
+    };
+    let tokens = to_syn_type(
+        default,
+        TypePosition::ARGUMENT.to_inner(),
+        ctx,
+        scope,
+        from_module,
+    );
+    if let (TypeRef::Reference { segments, .. }, Some(ctx)) = (default, ctx) {
+        let uses = ctx.external_uses.borrow();
+        if uses.get(&segments[0]).is_some_and(|v| v == "JsValue") {
+            return quote! { JsValue };
+        }
+    }
+    tokens
+}
+
 /// The `Module(spec)` groups fully covered by the external map (Rule 3).
 /// References to types from these modules go through
 /// `external_map.resolve` in `emit_type_name` instead of producing a local
@@ -724,6 +761,80 @@ impl<'a> CodegenContext<'a> {
         Some(out)
     }
 
+    /// `args` of a reference to the local generic class, interface or
+    /// discriminated union `id`, without the trailing ones its `pub type`
+    /// declaration defaults to (see [`type_param_default_tokens`]):
+    /// `Request<JsValue, JsValue>` is `Request`, and `Foo<JsString,
+    /// JsValue>` with `B = JsValue` is `Foo<JsString>`. A default naming an
+    /// earlier parameter is read with that parameter's argument, so
+    /// `Holder<JsValue, Box>` with `U = Box<T>` is `Holder`.
+    pub(crate) fn trim_default_args(
+        &self,
+        id: TypeId,
+        mut args: Vec<TokenStream>,
+    ) -> Vec<TokenStream> {
+        let decl = self.gctx.get_type(id);
+        let (type_params, scope) = match &decl.kind {
+            TypeKind::Class(c) => (&c.type_params, c.body_scope),
+            TypeKind::Interface(i) => (&i.type_params, i.body_scope),
+            TypeKind::DiscriminatedUnion(d) => (&d.type_params, d.body_scope),
+            _ => return args,
+        };
+        // A default naming its own type (`Node<C = Node<…>>`) keeps that
+        // reference's arguments.
+        if !self.local_type_ids.contains(&id) || !self.trimming.borrow_mut().insert(id) {
+            return args;
+        }
+        // The declaration reports the defaults' diagnostics when it's
+        // emitted, and an alias probe in progress mustn't see their
+        // parameters as its own.
+        let diagnostics = self.diagnostics.take();
+        let reported = self.unresolved_module_refs.borrow().clone();
+        self.alias_param_mentions.borrow_mut().push(HashSet::new());
+        while let Some(last) = args.last() {
+            let i = args.len() - 1;
+            let Some(tp) = type_params.get(i) else {
+                break;
+            };
+            let earlier = type_params[..i]
+                .iter()
+                .map(|tp| tp.name.clone())
+                .zip(args[..i].iter().cloned())
+                .collect();
+            self.param_args.borrow_mut().push((scope, earlier));
+            let default = type_param_default_tokens(
+                tp.default.as_ref(),
+                Some(self),
+                scope,
+                &decl.module_context,
+            );
+            self.param_args.borrow_mut().pop();
+            if default.to_string() != last.to_string() {
+                break;
+            }
+            args.pop();
+        }
+        self.alias_param_mentions.borrow_mut().pop();
+        self.diagnostics.replace(diagnostics);
+        self.unresolved_module_refs.replace(reported);
+        self.trimming.borrow_mut().remove(&id);
+        args
+    }
+
+    /// The argument standing in for the type parameter `name`, used in
+    /// `scope`, while a default is read against the arguments chosen for
+    /// its earlier parameters.
+    fn param_arg(&self, scope: ScopeId, name: &str) -> Option<TokenStream> {
+        let param_args = self.param_args.borrow();
+        let (declaring, args) = param_args.last()?;
+        let scopes = &self.gctx.scopes;
+        let binds = scopes
+            .chain(scope)
+            .into_iter()
+            .find(|&s| scopes.get(s).get_binding(name).is_some())?;
+        (binds == *declaring).then(|| args.get(name).cloned())?
+    }
+
     /// A parameter named `name`, or `name_` when a static in scope has its
     /// name, since a parameter can't shadow a static (E0530).
     pub(crate) fn param_name(ctx: Option<&Self>, name: &str) -> String {
@@ -803,6 +914,8 @@ impl<'a> CodegenContext<'a> {
             alias_params: RefCell::new(HashMap::new()),
             alias_param_mentions: RefCell::new(Vec::new()),
             recursive_aliases: RefCell::new(HashMap::new()),
+            trimming: RefCell::new(HashSet::new()),
+            param_args: RefCell::new(Vec::new()),
         };
         for (spec, scopes) in &gctx.ambient_module_scopes {
             let path = ctx.specifier_path(spec);
@@ -846,6 +959,8 @@ impl<'a> CodegenContext<'a> {
             alias_params: RefCell::new(HashMap::new()),
             alias_param_mentions: RefCell::new(Vec::new()),
             recursive_aliases: RefCell::new(HashMap::new()),
+            trimming: RefCell::new(HashSet::new()),
+            param_args: RefCell::new(Vec::new()),
         }
     }
 
@@ -2281,6 +2396,9 @@ fn lower_reference(
                 c.gctx.scopes.resolve_binding(scope, head),
                 Some(crate::parse::scope::Binding::TypeParam),
             ) {
+                if let Some(arg) = c.param_arg(scope, head) {
+                    return arg;
+                }
                 if let Some(mentions) = c.alias_param_mentions.borrow_mut().last_mut() {
                     mentions.insert(head.to_string());
                 }
@@ -2349,15 +2467,31 @@ fn with_generic_args(
     }
     let arg_tokens: Vec<TokenStream> = generic_args
         .iter()
-        .map(|a| {
-            if CodegenContext::generic_mono(ctx) {
-                to_mono_user_generic_arg(a, ctx, scope, from_module)
-            } else {
-                to_syn_type(a, pos.to_inner(), ctx, scope, from_module)
-            }
-        })
+        .map(|a| generic_arg_tokens(a, pos, ctx, scope, from_module))
         .collect();
+    let arg_tokens = match ctx.and_then(|c| Some((c, c.gctx.resolve_path(scope, name)?))) {
+        Some((c, id)) => c.trim_default_args(id, arg_tokens),
+        None => arg_tokens,
+    };
+    if arg_tokens.is_empty() {
+        return base;
+    }
     quote! { #base<#(#arg_tokens),*> }
+}
+
+/// One generic argument of a locally declared generic type.
+fn generic_arg_tokens(
+    arg: &TypeRef,
+    pos: TypePosition,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    if CodegenContext::generic_mono(ctx) {
+        to_mono_user_generic_arg(arg, ctx, scope, from_module)
+    } else {
+        to_syn_type(arg, pos.to_inner(), ctx, scope, from_module)
+    }
 }
 
 /// TS 5.7+ makes the typed arrays and `DataView` generic over their buffer
@@ -2778,6 +2912,13 @@ fn to_mono_js_string_return_type_impl(
                     }
                 })
                 .collect::<Vec<_>>();
+            let args = match ctx.gctx.resolve_path(peeled_scope, &segments.join(".")) {
+                Some(id) => ctx.trim_default_args(id, args),
+                None => args,
+            };
+            if args.is_empty() {
+                return base;
+            }
             quote! { #base<#(#args),*> }
         }
         _ => to_syn_type(ty, TypePosition::RETURN, Some(ctx), scope, from_module),

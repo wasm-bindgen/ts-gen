@@ -74,3 +74,43 @@ impl<T: ::wasm_bindgen::JsGeneric> OptionsBuilder<T> {
         self.inner
     }
 }
+#[wasm_bindgen(module = "generic-defaults")]
+extern "C" {
+    #[wasm_bindgen(js_name = "looseBox")]
+    pub fn loose_box() -> Box;
+}
+#[wasm_bindgen(module = "generic-defaults")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "looseBox")]
+    pub fn try_loose_box() -> Result<Box, JsValue>;
+}
+#[wasm_bindgen(module = "generic-defaults")]
+extern "C" {
+    #[wasm_bindgen(js_name = "looseHolder")]
+    pub fn loose_holder() -> Holder;
+}
+#[wasm_bindgen(module = "generic-defaults")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "looseHolder")]
+    pub fn try_loose_holder() -> Result<Holder, JsValue>;
+}
+#[wasm_bindgen(module = "generic-defaults")]
+extern "C" {
+    #[wasm_bindgen(js_name = "stringHolder")]
+    pub fn string_holder() -> Holder<JsString>;
+}
+#[wasm_bindgen(module = "generic-defaults")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "stringHolder")]
+    pub fn try_string_holder() -> Result<Holder<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "generic-defaults")]
+extern "C" {
+    #[wasm_bindgen(js_name = "mixedHolder")]
+    pub fn mixed_holder() -> Holder<JsString, Box>;
+}
+#[wasm_bindgen(module = "generic-defaults")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "mixedHolder")]
+    pub fn try_mixed_holder() -> Result<Holder<JsString, Box>, JsValue>;
+}

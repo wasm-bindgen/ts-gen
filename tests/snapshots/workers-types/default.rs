@@ -1057,13 +1057,10 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn fetch(
         this: &ServiceWorkerGlobalScope,
-        input: &Request<JsValue, JsValue>,
+        input: &Request,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, js_name = "fetch")]
-    pub fn fetch_promise(
-        this: &ServiceWorkerGlobalScope,
-        input: &Request<JsValue, JsValue>,
-    ) -> Promise<Response>;
+    pub fn fetch_promise(this: &ServiceWorkerGlobalScope, input: &Request) -> Promise<Response>;
     #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub async fn fetch_with_str(
         this: &ServiceWorkerGlobalScope,
@@ -1087,13 +1084,13 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub async fn fetch_with_request_and_init(
         this: &ServiceWorkerGlobalScope,
-        input: &Request<JsValue, JsValue>,
+        input: &Request,
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, js_name = "fetch")]
     pub fn fetch_with_request_and_init_promise(
         this: &ServiceWorkerGlobalScope,
-        input: &Request<JsValue, JsValue>,
+        input: &Request,
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Promise<Response>;
     #[wasm_bindgen(method, catch, js_name = "fetch")]
@@ -1896,12 +1893,12 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub async fn fetch(input: &Request<JsValue, JsValue>) -> Result<Response, JsValue>;
+    pub async fn fetch(input: &Request) -> Result<Response, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "fetch")]
-    pub fn fetch_promise(input: &Request<JsValue, JsValue>) -> Promise<Response>;
+    pub fn fetch_promise(input: &Request) -> Promise<Response>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -1927,7 +1924,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
     pub async fn fetch_with_request_and_init(
-        input: &Request<JsValue, JsValue>,
+        input: &Request,
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Result<Response, JsValue>;
 }
@@ -1935,7 +1932,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(js_name = "fetch")]
     pub fn fetch_with_request_and_init_promise(
-        input: &Request<JsValue, JsValue>,
+        input: &Request,
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Promise<Response>;
 }
@@ -5060,10 +5057,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &Cache, request: &Request<JsValue, JsValue>)
-        -> Result<bool, JsValue>;
+    pub async fn delete(this: &Cache, request: &Request) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_promise(this: &Cache, request: &Request<JsValue, JsValue>) -> Promise<Boolean>;
+    pub fn delete_promise(this: &Cache, request: &Request) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_str(this: &Cache, request: &str) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
@@ -5075,13 +5071,13 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_request_and_options(
         this: &Cache,
-        request: &Request<JsValue, JsValue>,
+        request: &Request,
         options: &CacheQueryOptions,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_request_and_options_promise(
         this: &Cache,
-        request: &Request<JsValue, JsValue>,
+        request: &Request,
         options: &CacheQueryOptions,
     ) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
@@ -5109,15 +5105,9 @@ extern "C" {
         options: &CacheQueryOptions,
     ) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "match")]
-    pub async fn match_(
-        this: &Cache,
-        request: &Request<JsValue, JsValue>,
-    ) -> Result<Option<Response>, JsValue>;
+    pub async fn match_(this: &Cache, request: &Request) -> Result<Option<Response>, JsValue>;
     #[wasm_bindgen(method, js_name = "match")]
-    pub fn match__promise(
-        this: &Cache,
-        request: &Request<JsValue, JsValue>,
-    ) -> Promise<JsOption<Response>>;
+    pub fn match__promise(this: &Cache, request: &Request) -> Promise<JsOption<Response>>;
     #[wasm_bindgen(method, catch, js_name = "match")]
     pub async fn match_with_str(this: &Cache, request: &str) -> Result<Option<Response>, JsValue>;
     #[wasm_bindgen(method, js_name = "match")]
@@ -5129,13 +5119,13 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "match")]
     pub async fn match_with_request_and_options(
         this: &Cache,
-        request: &Request<JsValue, JsValue>,
+        request: &Request,
         options: &CacheQueryOptions,
     ) -> Result<Option<Response>, JsValue>;
     #[wasm_bindgen(method, js_name = "match")]
     pub fn match_with_request_and_options_promise(
         this: &Cache,
-        request: &Request<JsValue, JsValue>,
+        request: &Request,
         options: &CacheQueryOptions,
     ) -> Promise<JsOption<Response>>;
     #[wasm_bindgen(method, catch, js_name = "match")]
@@ -5163,17 +5153,9 @@ extern "C" {
         options: &CacheQueryOptions,
     ) -> Promise<JsOption<Response>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn put(
-        this: &Cache,
-        request: &Request<JsValue, JsValue>,
-        response: &Response,
-    ) -> Result<(), JsValue>;
+    pub async fn put(this: &Cache, request: &Request, response: &Response) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_promise(
-        this: &Cache,
-        request: &Request<JsValue, JsValue>,
-        response: &Response,
-    ) -> Promise<Undefined>;
+    pub fn put_promise(this: &Cache, request: &Request, response: &Response) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_str(
         this: &Cache,
@@ -9366,14 +9348,14 @@ extern "C" {
         Cf: ::wasm_bindgen::JsGeneric = JsValue,
     >;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new(input: &Request<JsValue, JsValue>) -> Result<Request, JsValue>;
+    pub fn new(input: &Request) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
     pub fn new_with_str(input: &str) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
     pub fn new_with_url(input: &URL) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
     pub fn new_with_request_and_init<Cf: ::wasm_bindgen::JsGeneric>(
-        input: &Request<JsValue, JsValue>,
+        input: &Request,
         init: &RequestInit<Cf>,
     ) -> Result<Request<JsValue, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
@@ -40004,12 +39986,12 @@ pub mod cloudflare {
             #[wasm_bindgen(method)]
             pub fn queue<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
                 this: &WorkerEntrypoint<Env, Props>,
-                batch: &super::super::MessageBatch<JsValue>,
+                batch: &super::super::MessageBatch,
             ) -> Option<Promise<Undefined>>;
             #[wasm_bindgen(method, catch, js_name = "queue")]
             pub fn try_queue<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
                 this: &WorkerEntrypoint<Env, Props>,
-                batch: &super::super::MessageBatch<JsValue>,
+                batch: &super::super::MessageBatch,
             ) -> Result<Option<Promise<Undefined>>, JsValue>;
             #[wasm_bindgen(method)]
             pub fn scheduled<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
@@ -42419,11 +42401,11 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn request<Env: ::wasm_bindgen::JsGeneric, Data: ::wasm_bindgen::JsGeneric>(
         this: &EventContext<Env, Data>,
-    ) -> Request<JsValue, IncomingRequestCfProperties<JsValue>>;
+    ) -> Request<JsValue, IncomingRequestCfProperties>;
     #[wasm_bindgen(method, setter)]
     pub fn set_request<Env: ::wasm_bindgen::JsGeneric, Data: ::wasm_bindgen::JsGeneric>(
         this: &EventContext<Env, Data>,
-        val: &Request<JsValue, IncomingRequestCfProperties<JsValue>>,
+        val: &Request<JsValue, IncomingRequestCfProperties>,
     );
     #[wasm_bindgen(method, getter, js_name = "functionPath")]
     pub fn function_path<Env: ::wasm_bindgen::JsGeneric, Data: ::wasm_bindgen::JsGeneric>(
@@ -42497,7 +42479,7 @@ extern "C" {
 }
 impl<Env: ::wasm_bindgen::JsGeneric, Data: ::wasm_bindgen::JsGeneric> EventContext<Env, Data> {
     pub fn new(
-        request: &Request<JsValue, IncomingRequestCfProperties<JsValue>>,
+        request: &Request<JsValue, IncomingRequestCfProperties>,
         function_path: &str,
         wait_until: &Function<fn(Promise) -> Undefined>,
         pass_through_on_exception: &Function<fn() -> Undefined>,
@@ -42537,7 +42519,7 @@ extern "C" {
         PluginArgs: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventPluginContext<Env, Data, PluginArgs>,
-    ) -> Request<JsValue, IncomingRequestCfProperties<JsValue>>;
+    ) -> Request<JsValue, IncomingRequestCfProperties>;
     #[wasm_bindgen(method, setter)]
     pub fn set_request<
         Env: ::wasm_bindgen::JsGeneric,
@@ -42545,7 +42527,7 @@ extern "C" {
         PluginArgs: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventPluginContext<Env, Data, PluginArgs>,
-        val: &Request<JsValue, IncomingRequestCfProperties<JsValue>>,
+        val: &Request<JsValue, IncomingRequestCfProperties>,
     );
     #[wasm_bindgen(method, getter, js_name = "functionPath")]
     pub fn function_path<
@@ -42691,7 +42673,7 @@ impl<
     > EventPluginContext<Env, Data, PluginArgs>
 {
     pub fn new(
-        request: &Request<JsValue, IncomingRequestCfProperties<JsValue>>,
+        request: &Request<JsValue, IncomingRequestCfProperties>,
         function_path: &str,
         wait_until: &Function<fn(Promise) -> Undefined>,
         pass_through_on_exception: &Function<fn() -> Undefined>,

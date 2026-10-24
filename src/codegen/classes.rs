@@ -463,28 +463,14 @@ impl<'a> ClassConfig<'a> {
     }
 
     /// Lowering of a type parameter's default in generic-argument
-    /// position; `JsValue` when the TS declaration has none. When the
-    /// default's target itself erases to `JsValue` (an alias of a union,
-    /// an unresolved name) its type arguments go with it:
-    /// `CfProperties<CfHostMetadata>` is just `JsValue`.
+    /// position; see [`super::typemap::type_param_default_tokens`].
     fn type_param_default_tokens(&self, tp: &crate::ir::TypeParam) -> TokenStream {
-        let Some(default) = &tp.default else {
-            return quote! { JsValue };
-        };
-        let tokens = super::typemap::to_syn_type(
-            default,
-            TypePosition::ARGUMENT.to_inner(),
+        super::typemap::type_param_default_tokens(
+            tp.default.as_ref(),
             self.cgctx,
             self.scope,
             &self.from_module(),
-        );
-        if let (TypeRef::Reference { segments, .. }, Some(ctx)) = (default, self.cgctx) {
-            let uses = ctx.external_uses.borrow();
-            if uses.get(&segments[0]).is_some_and(|v| v == "JsValue") {
-                return quote! { JsValue };
-            }
-        }
-        tokens
+        )
     }
 
     /// The TS default of a type parameter as a `TypeRef`, `any` when

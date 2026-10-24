@@ -18,3 +18,9 @@ export declare class Holder<T = Loose, U = Box<T>> {
 export interface Options<T = Box<string>> {
   initial?: T;
 }
+
+// Trailing arguments equal to the declared Rust defaults are left to them.
+export declare function looseBox(): Box<unknown>;
+export declare function looseHolder(): Holder<Loose, Box<Loose>>;
+export declare function stringHolder(): Holder<string, Box<string>>;
+export declare function mixedHolder(): Holder<string, Box<unknown>>;

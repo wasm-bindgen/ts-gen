@@ -2195,6 +2195,18 @@ parameters thread through every site that mentions `Foo`:
   definition, so dictionary builders and helper `impl`s keep the plain
   form and a builder for a defaulted dictionary is named with explicit
   arguments (`Options::<Box<JsString>>::builder()`).
+* Every reference to the type leaves the trailing arguments that equal
+  the declared Rust defaults to them, in both modes. `fetch(input:
+  RequestInfo)` instantiates `Request<unknown, CfProperties<unknown>>`,
+  which lowers to `Request<JsValue, JsValue>` and is written `Request`,
+  and `Foo<string, unknown>` with `B = unknown` is `Foo<JsString>`. A
+  default naming an earlier parameter is read with that parameter's
+  argument, so `Holder<string, Box<string>>` with `U = Box<T>` is
+  `Holder<JsString>`. Only the trailing run goes, as Rust can't skip a
+  middle argument (`Holder<unknown, Box<string>>` stays
+  `Holder<JsValue, Box<JsString>>`), and the comparison is with the
+  Rust spelling, so under `--experimental-generic-mono` a
+  `Foo<String>` is kept against a declared `T = JsString`.
 * Every getter / setter / method `fn` — redeclares
   `<T: ::wasm_bindgen::JsGeneric>` on the `fn` and uses
   `this: &Foo<T>`. The redeclaration is mandatory because each
