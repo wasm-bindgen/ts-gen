@@ -239,6 +239,42 @@ pub struct LiteralSpec {
     pub positions: Vec<usize>,
     /// `(literals in `positions` order, wrapper rust name)`.
     pub arms: Vec<(Vec<String>, String)>,
+    /// What the private binding is named after: the cohort's own name
+    /// (`get_time_zone_transition`) when one binding serves every arm,
+    /// else the binding's first arm (`get_text`), since arms with
+    /// different return types need a binding each.
+    pub stem: String,
+    /// The private binding's Rust name, `<stem>_js`.
+    pub binding: String,
+}
+
+impl LiteralSpec {
+    fn new(
+        positions: Vec<usize>,
+        arms: Vec<(Vec<String>, String)>,
+        stem: String,
+        names: &mut LocalScope,
+    ) -> Self {
+        let binding = names.declare(&format!("{stem}_js"), Suffix::Snake);
+        Self {
+            positions,
+            arms,
+            stem,
+            binding,
+        }
+    }
+
+    /// The spec of a derived form (`try_`, `_promise`, `_js_string`): `f`
+    /// renames every arm and the stem, so the derived binding pairs with
+    /// its own arms.
+    fn derive(&self, names: &mut LocalScope, f: &dyn Fn(&str) -> String) -> Self {
+        let arms = self
+            .arms
+            .iter()
+            .map(|(lits, name)| (lits.clone(), names.declare(&f(name), Suffix::Snake)))
+            .collect();
+        Self::new(self.positions.clone(), arms, f(&self.stem), names)
+    }
 }
 
 /// A fully-resolved emitter input: an [`ExpandedSignature`] augmented with
@@ -277,7 +313,8 @@ pub struct FunctionSignature {
     pub body_scope: ScopeId,
     /// Set when this binding stands for several overloads distinguished
     /// only by string-literal arguments; `rust_name` is then the first
-    /// arm's wrapper name and the extern itself is emitted privately.
+    /// arm's wrapper name, and the extern itself is emitted privately as
+    /// [`LiteralSpec::binding`].
     pub literal: Option<LiteralSpec>,
 }
 
@@ -718,15 +755,18 @@ pub fn build_signatures(
                 None => groups.push((ret, arm.overload, vec![(literals, name)])),
             }
         }
+        let shared = groups.len() == 1;
         for (_, overload, arms) in groups {
+            let stem = if shared {
+                public_rust_name(&format!("{base}{}", exp.name_suffix))
+            } else {
+                arms[0].1.clone()
+            };
             units.push(Unit {
                 params: params.clone(),
                 overload,
                 primary_name: arms[0].1.clone(),
-                literal: Some(LiteralSpec {
-                    positions: positions.clone(),
-                    arms,
-                }),
+                literal: Some(LiteralSpec::new(positions.clone(), arms, stem, names)),
             });
         }
     }
@@ -765,14 +805,7 @@ pub fn build_signatures(
         // Derived forms (`_promise`, `try_`) name their wrappers off each
         // arm's wrapper name, so the extern keeps pairing with its arms.
         let derive = |names: &mut LocalScope, f: &dyn Fn(&str) -> String| {
-            literal.as_ref().map(|spec| LiteralSpec {
-                positions: spec.positions.clone(),
-                arms: spec
-                    .arms
-                    .iter()
-                    .map(|(lits, name)| (lits.clone(), names.declare(&f(name), Suffix::Snake)))
-                    .collect(),
-            })
+            literal.as_ref().map(|spec| spec.derive(names, f))
         };
         let primary_literal = literal.clone();
 
@@ -883,9 +916,7 @@ fn push_with_js_string_return(
         // first.
         match &mut js_sig.literal {
             Some(spec) => {
-                for (_, name) in &mut spec.arms {
-                    *name = names.declare(&format!("{name}_js_string"), Suffix::Snake);
-                }
+                *spec = spec.derive(names, &|n| format!("{n}_js_string"));
                 js_sig.rust_name = spec.arms[0].1.clone();
             }
             None => {
@@ -3864,6 +3895,10 @@ mod tests {
         );
         assert_eq!(sigs[1].params[1].type_ref, TypeRef::String);
         assert_eq!(sigs[2].return_type, TypeRef::Any);
+        // The arms split across two bindings by return type, so each is
+        // named after its first arm rather than after the cohort.
+        assert_eq!(text_spec.binding, "get_text_js");
+        assert_eq!(sigs[2].literal.as_ref().unwrap().binding, "get_json_js");
         assert!(sigs[3].literal.is_none());
     }
 
@@ -3896,6 +3931,62 @@ mod tests {
             .find_map(|s| s.literal.as_ref())
             .expect("a literal cohort");
         assert_eq!(spec.arms[1].1, "get_time_zone_transition_previous");
+    }
+
+    #[test]
+    fn literal_binding_is_named_after_the_cohort() {
+        // One binding serving every arm is named for the cohort, not for
+        // its first literal: `get_time_zone_transition_js`, not
+        // `get_time_zone_transition_next_js`, and so for its `try_` form.
+        let mut used = no_used();
+        let next = [lit("direction", "next")];
+        let previous = [lit("direction", "previous")];
+        let options = [typed_param("direction", TypeRef::Number)];
+        let sigs = expand_overloads(
+            "getTimeZoneTransition",
+            &[&next, &previous, &options],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        let bindings: Vec<(&str, &str)> = sigs
+            .iter()
+            .filter_map(|s| s.literal.as_ref())
+            .map(|l| (l.arms[0].1.as_str(), l.binding.as_str()))
+            .collect();
+        assert_eq!(
+            bindings,
+            [
+                (
+                    "get_time_zone_transition_next",
+                    "get_time_zone_transition_js"
+                ),
+                (
+                    "try_get_time_zone_transition_next",
+                    "try_get_time_zone_transition_js"
+                ),
+            ]
+        );
+
+        // The literal-free overload keeps the bare name; the cohort's
+        // binding takes it with `_js`.
+        let mut used = no_used();
+        let a = [lit("mode", "a")];
+        let b = [lit("mode", "b")];
+        let plain = [typed_param("mode", TypeRef::Number)];
+        let sigs = expand_overloads(
+            "mode",
+            &[&plain, &a, &b],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        let names: Vec<&str> = sigs.iter().map(|s| s.rust_name.as_str()).collect();
+        assert_eq!(names, ["mode", "try_mode", "mode_a", "try_mode_a"]);
+        let spec = sigs[2].literal.as_ref().unwrap();
+        assert_eq!(spec.binding, "mode_js");
     }
 
     #[test]

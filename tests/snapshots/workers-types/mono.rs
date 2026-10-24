@@ -13578,18 +13578,17 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CompressionStream;
     #[wasm_bindgen(constructor, catch, js_name = "CompressionStream")]
-    fn new_gzip_js(format: impl ::wasm_bindgen::JsStringLike)
-        -> Result<CompressionStream, JsValue>;
+    fn new_js(format: impl ::wasm_bindgen::JsStringLike) -> Result<CompressionStream, JsValue>;
 }
 impl CompressionStream {
     pub fn new_gzip() -> Result<CompressionStream, JsValue> {
-        Self::new_gzip_js("gzip")
+        Self::new_js("gzip")
     }
     pub fn new_deflate() -> Result<CompressionStream, JsValue> {
-        Self::new_gzip_js("deflate")
+        Self::new_js("deflate")
     }
     pub fn new_deflate_raw() -> Result<CompressionStream, JsValue> {
-        Self::new_gzip_js("deflate-raw")
+        Self::new_js("deflate-raw")
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -13598,19 +13597,17 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DecompressionStream;
     #[wasm_bindgen(constructor, catch, js_name = "DecompressionStream")]
-    fn new_gzip_js(
-        format: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<DecompressionStream, JsValue>;
+    fn new_js(format: impl ::wasm_bindgen::JsStringLike) -> Result<DecompressionStream, JsValue>;
 }
 impl DecompressionStream {
     pub fn new_gzip() -> Result<DecompressionStream, JsValue> {
-        Self::new_gzip_js("gzip")
+        Self::new_js("gzip")
     }
     pub fn new_deflate() -> Result<DecompressionStream, JsValue> {
-        Self::new_gzip_js("deflate")
+        Self::new_js("deflate")
     }
     pub fn new_deflate_raw() -> Result<DecompressionStream, JsValue> {
-        Self::new_gzip_js("deflate-raw")
+        Self::new_js("deflate-raw")
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

@@ -103,7 +103,7 @@ extern "C" {
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Map<JsString, JsValue>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "mode")]
-    fn mode_fast_js(
+    fn mode_js(
         this: &KVNamespace,
         kind: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
@@ -189,11 +189,11 @@ impl KVNamespace {
     }
     #[doc = " A literal union is one overload with several arms."]
     pub fn mode_fast(&self) -> Result<bool, JsValue> {
-        self.mode_fast_js("fast")
+        self.mode_js("fast")
     }
     #[doc = " A literal union is one overload with several arms."]
     pub fn mode_safe(&self) -> Result<bool, JsValue> {
-        self.mode_fast_js("safe")
+        self.mode_js("safe")
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
@@ -242,9 +242,9 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<ArrayBuffer>, JsValue>;
     # [wasm_bindgen (static_method_of = SubtleCrypto , catch , js_name = "describe")]
-    fn describe_jwk_js(format: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    fn describe_js(format: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
     # [wasm_bindgen (static_method_of = SubtleCrypto , catch , js_name = "describe")]
-    fn describe_jwk_js_string_js(
+    fn describe_js_string_js(
         format: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
 }
@@ -298,16 +298,16 @@ impl SubtleCrypto {
         self.export_key_raw_promise_js("spki", key)
     }
     pub fn describe_jwk() -> Result<String, JsValue> {
-        Self::describe_jwk_js("jwk")
+        Self::describe_js("jwk")
     }
     pub fn describe_raw() -> Result<String, JsValue> {
-        Self::describe_jwk_js("raw")
+        Self::describe_js("raw")
     }
     pub fn describe_jwk_js_string() -> Result<JsString, JsValue> {
-        Self::describe_jwk_js_string_js("jwk")
+        Self::describe_js_string_js("jwk")
     }
     pub fn describe_raw_js_string() -> Result<JsString, JsValue> {
-        Self::describe_jwk_js_string_js("raw")
+        Self::describe_js_string_js("raw")
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]

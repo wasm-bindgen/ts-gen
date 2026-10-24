@@ -78,9 +78,9 @@ extern "C" {
         r#type: &str,
     ) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, js_name = "mode")]
-    fn mode_fast_js(this: &KVNamespace, kind: &str) -> bool;
+    fn mode_js(this: &KVNamespace, kind: &str) -> bool;
     #[wasm_bindgen(method, catch, js_name = "mode")]
-    fn try_mode_fast_js(this: &KVNamespace, kind: &str) -> Result<bool, JsValue>;
+    fn try_mode_js(this: &KVNamespace, kind: &str) -> Result<bool, JsValue>;
 }
 impl KVNamespace {
     pub async fn get_text(&self, key: &str) -> Result<Nullable<String>, JsValue> {
@@ -130,19 +130,19 @@ impl KVNamespace {
     }
     #[doc = " A literal union is one overload with several arms."]
     pub fn mode_fast(&self) -> bool {
-        self.mode_fast_js("fast")
+        self.mode_js("fast")
     }
     #[doc = " A literal union is one overload with several arms."]
     pub fn mode_safe(&self) -> bool {
-        self.mode_fast_js("safe")
+        self.mode_js("safe")
     }
     #[doc = " A literal union is one overload with several arms."]
     pub fn try_mode_fast(&self) -> Result<bool, JsValue> {
-        self.try_mode_fast_js("fast")
+        self.try_mode_js("fast")
     }
     #[doc = " A literal union is one overload with several arms."]
     pub fn try_mode_safe(&self) -> Result<bool, JsValue> {
-        self.try_mode_fast_js("safe")
+        self.try_mode_js("safe")
     }
 }
 #[wasm_bindgen(module = "literal-overloads")]
@@ -181,9 +181,9 @@ extern "C" {
         key: &str,
     ) -> Promise<ArrayBuffer>;
     # [wasm_bindgen (static_method_of = SubtleCrypto , js_name = "describe")]
-    fn describe_jwk_js(format: &str) -> String;
+    fn describe_js(format: &str) -> String;
     # [wasm_bindgen (static_method_of = SubtleCrypto , catch , js_name = "describe")]
-    fn try_describe_jwk_js(format: &str) -> Result<String, JsValue>;
+    fn try_describe_js(format: &str) -> Result<String, JsValue>;
 }
 impl SubtleCrypto {
     pub async fn export_key_jwk(&self, key: &str) -> Result<Object, JsValue> {
@@ -211,16 +211,16 @@ impl SubtleCrypto {
         self.export_key_raw_promise_js("spki", key)
     }
     pub fn describe_jwk() -> String {
-        Self::describe_jwk_js("jwk")
+        Self::describe_js("jwk")
     }
     pub fn describe_raw() -> String {
-        Self::describe_jwk_js("raw")
+        Self::describe_js("raw")
     }
     pub fn try_describe_jwk() -> Result<String, JsValue> {
-        Self::try_describe_jwk_js("jwk")
+        Self::try_describe_js("jwk")
     }
     pub fn try_describe_raw() -> Result<String, JsValue> {
-        Self::try_describe_jwk_js("raw")
+        Self::try_describe_js("raw")
     }
 }
 #[wasm_bindgen(module = "literal-overloads")]

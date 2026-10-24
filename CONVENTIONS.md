@@ -2786,7 +2786,7 @@ extern "C" {
     async fn get_array_buffer_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<ArrayBuffer>, JsValue>;
     // …
     #[wasm_bindgen(constructor, catch)]
-    fn new_gzip_js(format: &str) -> Result<CompressionStream, JsValue>;
+    fn new_js(format: &str) -> Result<CompressionStream, JsValue>;
 }
 impl KVNamespace {
     pub async fn get_text(&self, key: &str) -> Result<Nullable<String>, JsValue> {
@@ -2798,8 +2798,8 @@ impl KVNamespace {
     pub async fn get_json_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsValue>, JsValue> { /* … */ }
 }
 impl CompressionStream {
-    pub fn new_gzip() -> Result<CompressionStream, JsValue> { Self::new_gzip_js("gzip") }
-    pub fn new_deflate() -> Result<CompressionStream, JsValue> { Self::new_gzip_js("deflate") }
+    pub fn new_gzip() -> Result<CompressionStream, JsValue> { Self::new_js("gzip") }
+    pub fn new_deflate() -> Result<CompressionStream, JsValue> { Self::new_js("deflate") }
     pub fn new_deflate_raw() -> Result<CompressionStream, JsValue> { /* "deflate-raw" */ }
 }
 ```
@@ -2821,14 +2821,18 @@ impl CompressionStream {
   direction: &TransitionOptions)`. Every arm is named
   explicitly; no arm takes the bare base name, which stays with the
   literal-free overload (`get(key)`) when there is one.
-* Arms with the same return type share one extern binding, named after
-  the first arm (`get_text_js` also serves nothing else here, but
-  `new_gzip_js` serves all three formats); a different return type gets
-  its own, since the extern return is what wasm-bindgen converts.
+* Arms with the same return type share one extern binding; a
+  different return type gets its own, since the extern return is what
+  wasm-bindgen converts. A binding serving every arm of the cohort is
+  named for the cohort with `_js` (`new_js` serves all three formats,
+  `get_time_zone_transition_js` both directions). When the arms need
+  several, each is named after its first arm instead (`get_text_js`,
+  `get_json_js`), since the cohort's name alone cannot tell them apart.
 * The `_promise` and `try_` companions follow per arm
-  (`get_json_promise`, `try_describe_raw`) over their own extern, and
-  so, under `--experimental-generic-mono`, does the `_js_string` return
-  variant (`describe_raw_js_string`).
+  (`get_json_promise`, `try_describe_raw`) over their own extern
+  (`get_json_promise_js`, `try_describe_js`), and so, under
+  `--experimental-generic-mono`, does the `_js_string` return variant
+  (`describe_raw_js_string`).
 * A generic receiver (`KVStore<Key>`) gives `impl<Key: JsGeneric>
   KVStore<Key>`; the method's own type parameters stay on the wrapper
   fn. A wrapper repeats its extern's `where` clause, since it calls the

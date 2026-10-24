@@ -22,13 +22,15 @@ const LITERAL_ATTR: &str = "ts_gen_literal";
 const WRAPS_ATTR: &str = "ts_gen_wraps";
 
 /// The attribute the signature layer puts on a literal-keyed extern fn:
-/// `#[ts_gen_literal(positions(1), arm("text", get_text), arm("json", get_json))]`.
-/// Positions index the parameters after `this`.
+/// `#[ts_gen_literal(binding(get_js), positions(1), arm("text", get_text), arm("json", get_json))]`.
+/// The extern is renamed to `binding`; positions index the parameters
+/// after `this`.
 pub(crate) fn literal_attr(sig: &crate::codegen::signatures::FunctionSignature) -> TokenStream {
     let Some(spec) = &sig.literal else {
         return quote! {};
     };
     let attr = format_ident!("{LITERAL_ATTR}");
+    let binding = format_ident!("{}", spec.binding);
     let positions = spec
         .positions
         .iter()
@@ -37,10 +39,11 @@ pub(crate) fn literal_attr(sig: &crate::codegen::signatures::FunctionSignature) 
         let name = format_ident!("{name}");
         quote! { arm(#(#lits),*, #name) }
     });
-    quote! { #[#attr(positions(#(#positions),*), #(#arms),*)] }
+    quote! { #[#attr(binding(#binding), positions(#(#positions),*), #(#arms),*)] }
 }
 
 struct LiteralArms {
+    binding: Ident,
     positions: Vec<usize>,
     arms: Vec<(Vec<String>, Ident)>,
 }
@@ -59,13 +62,16 @@ fn take_literal_attr(item: &mut ForeignItemFn) -> Option<LiteralArms> {
 
 impl syn::parse::Parse for LiteralArms {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let mut binding = None;
         let mut positions = Vec::new();
         let mut arms = Vec::new();
         while !input.is_empty() {
             let key: Ident = input.parse()?;
             let content;
             syn::parenthesized!(content in input);
-            if key == "positions" {
+            if key == "binding" {
+                binding = Some(content.parse()?);
+            } else if key == "positions" {
                 let list = content.parse_terminated(syn::LitInt::parse, syn::Token![,])?;
                 for lit in list {
                     positions.push(lit.base10_parse()?);
@@ -84,7 +90,12 @@ impl syn::parse::Parse for LiteralArms {
                 input.parse::<syn::Token![,]>()?;
             }
         }
-        Ok(Self { positions, arms })
+        let binding = binding.ok_or_else(|| input.error("missing binding(..)"))?;
+        Ok(Self {
+            binding,
+            positions,
+            arms,
+        })
     }
 }
 
@@ -290,7 +301,7 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Vec<Wrapper> {
         .collect();
 
     let public_name = item.sig.ident.clone();
-    let extern_name = format_ident!("{public_name}_js");
+    let extern_name = literal.binding.clone();
     let doc_attrs: Vec<_> = item
         .attrs
         .iter()
@@ -590,10 +601,10 @@ mod tests {
         let out = run(
             "#[wasm_bindgen] extern \"C\" {
                 pub type Kv;
-                #[ts_gen_literal(positions(1), arm(\"text\", get_text), arm(\"arrayBuffer\", get_array_buffer))]
+                #[ts_gen_literal(binding(get_text_js), positions(1), arm(\"text\", get_text), arm(\"arrayBuffer\", get_array_buffer))]
                 #[wasm_bindgen(method, catch, js_name = \"get\")]
                 pub async fn get_text(this: &Kv, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
-                #[ts_gen_literal(positions(0), arm(\"gzip\", new_gzip), arm(\"deflate-raw\", new_deflate_raw))]
+                #[ts_gen_literal(binding(new_js), positions(0), arm(\"gzip\", new_gzip), arm(\"deflate-raw\", new_deflate_raw))]
                 #[wasm_bindgen(constructor, catch)]
                 pub fn new_gzip(format: &str) -> Result<Kv, JsValue>;
             }",
@@ -602,26 +613,27 @@ mod tests {
         assert!(out.contains("async fn get_text_js(this: &Kv, key: &str, r#type: &str)"));
         assert!(out.contains("pub async fn get_text(&self, key: &str) -> Result<JsValue, JsValue> {\n        self.get_text_js(key, \"text\").await\n    }"));
         assert!(out.contains("pub async fn get_array_buffer(&self, key: &str) -> Result<JsValue, JsValue> {\n        self.get_text_js(key, \"arrayBuffer\").await\n    }"));
-        assert!(out.contains("pub fn new_deflate_raw() -> Result<Kv, JsValue> {\n        Self::new_gzip_js(\"deflate-raw\")\n    }"));
+        assert!(out.contains("pub fn new_deflate_raw() -> Result<Kv, JsValue> {\n        Self::new_js(\"deflate-raw\")\n    }"));
     }
 
     #[test]
     fn static_and_free_forms() {
         let out = run("#[wasm_bindgen] extern \"C\" {
                 pub type Foo<T: ::wasm_bindgen::JsGeneric = JsValue>;
-                #[ts_gen_literal(positions(0), arm(\"a\", make_a), arm(\"b\", make_b))]
+                #[ts_gen_literal(binding(make_js), positions(0), arm(\"a\", make_a), arm(\"b\", make_b))]
                 #[wasm_bindgen(static_method_of = Foo, js_name = \"make\")]
                 pub fn make_a<T: ::wasm_bindgen::JsGeneric>(kind: &str) -> Foo<T>;
             }
             #[wasm_bindgen] extern \"C\" {
-                #[ts_gen_literal(positions(0), arm(\"x\", pick_x), arm(\"y\", pick_y))]
+                #[ts_gen_literal(binding(pick_js), positions(0), arm(\"x\", pick_x), arm(\"y\", pick_y))]
                 #[wasm_bindgen(js_name = \"pick\")]
                 pub fn pick_x(axis: &str) -> f64;
             }");
         assert!(out.contains("impl<T: ::wasm_bindgen::JsGeneric> Foo<T>"));
-        assert!(out.contains("pub fn make_b() -> Foo<T> {\n        Self::make_a_js(\"b\")\n    }"));
-        assert!(out
-            .contains("#[wasm_bindgen(js_name = \"pick\")]\n    fn pick_x_js(axis: &str) -> f64;"));
-        assert!(out.contains("pub fn pick_y() -> f64 {\n    pick_x_js(\"y\")\n}"));
+        assert!(out.contains("pub fn make_b() -> Foo<T> {\n        Self::make_js(\"b\")\n    }"));
+        assert!(
+            out.contains("#[wasm_bindgen(js_name = \"pick\")]\n    fn pick_js(axis: &str) -> f64;")
+        );
+        assert!(out.contains("pub fn pick_y() -> f64 {\n    pick_js(\"y\")\n}"));
     }
 }
