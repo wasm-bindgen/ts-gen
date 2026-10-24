@@ -3923,7 +3923,10 @@ pub type Sized;            // size?
   `extends = Parent`, which needs a declared parent, so `Omit<…>`,
   `Pick<…>`, `Partial<…>` and an instantiated generic alias in an
   interface's `extends` list become the interface's own members, after
-  the members it declares itself. A plain parent, generic or not, stays
+  the members it declares itself. A property several parents carry
+  (`Pick<V, "id">` and `Omit<V, "values">` both carry `id`) is a member
+  once, typed by the first parent to name it, and one the interface
+  declares itself keeps its own type. A plain parent, generic or not, stays
   `extends = Parent` as before, and `Deref` reaches its members.
 * **Generic aliases instantiate only when they must.** `Foo<Bar>` stays a
   Rust generic alias unless `Foo`'s target contains one of these

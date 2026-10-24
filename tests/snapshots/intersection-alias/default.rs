@@ -315,16 +315,11 @@ extern "C" {
     pub fn id(this: &Match) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &Match, val: &str);
-    #[wasm_bindgen(method, getter, js_name = "id")]
-    pub fn id_2(this: &Match) -> String;
-    #[wasm_bindgen(method, setter, js_name = "id")]
-    pub fn set_id_2(this: &Match, val: &str);
 }
 impl Match {
-    pub fn new(score: f64, id: &str, id: &str) -> Match {
+    pub fn new(score: f64, id: &str) -> Match {
         let inner: Match = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_score(score);
-        inner.set_id(id);
         inner.set_id(id);
         inner
     }

@@ -38,7 +38,8 @@ type Listing = {
   truncated: boolean;
 } & ({ truncated: true; cursor: string } | { truncated: false });
 
-// `Pick<V, …> & Omit<V, …>` both read as `V`, which is named once.
+// `Pick<V, "id">` and `Omit<V, "values">` both flatten to `id`, which is
+// a member once.
 interface Vector {
   id: string;
   values: number[];

@@ -630,7 +630,7 @@ impl<'g> Eval<'g> {
         if flattened.is_empty() {
             return;
         }
-        let own: HashSet<String> = iface
+        let mut seen: HashSet<String> = iface
             .members
             .iter()
             .filter_map(|m| match m {
@@ -640,14 +640,19 @@ impl<'g> Eval<'g> {
                 _ => None,
             })
             .collect();
-        flattened.retain(|p| !own.contains(&p.js_name));
-        if flattened.iter().any(|p| p.method) {
+        if flattened
+            .iter()
+            .any(|p| p.method && !seen.contains(&p.js_name))
+        {
             self.diag.warn(format!(
                 "methods inherited by `{}` through a utility type are dropped",
                 iface.name
             ));
-            flattened.retain(|p| !p.method);
         }
+        flattened.retain(|p| !p.method);
+        // Own members win, then the first parent to name a property:
+        // `Pick<V, "id">` and `Omit<V, "values">` both carry `id`.
+        flattened.retain(|p| seen.insert(p.js_name.clone()));
         iface
             .members
             .extend(props_to_members(&flattened, body_scope));
@@ -1897,7 +1902,8 @@ mod tests {
         let (module, gctx) = parse(
             "interface Options { name: string; size?: number }
              interface Named extends Omit<Options, \"size\"> { label?: string }
-             interface Plain extends Options {}",
+             interface Plain extends Options {}
+             interface Both extends Pick<Options, \"name\">, Omit<Options, \"size\"> {}",
         );
         let TypeKind::Interface(named) = kind(&gctx, &module, "Named") else {
             unreachable!()
@@ -1912,6 +1918,11 @@ mod tests {
         };
         assert_eq!(plain.extends.len(), 1);
         assert!(plain.members.is_empty());
+        // Both parents carry `name`; it is a member once.
+        assert_eq!(
+            props(kind(&gctx, &module, "Both")),
+            [("name", false, false)]
+        );
     }
 
     #[test]
