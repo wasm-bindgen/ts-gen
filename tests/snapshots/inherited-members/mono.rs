@@ -292,3 +292,47 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_own(this: &Siblings, val: f64);
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Resource;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new(id: impl ::wasm_bindgen::JsStringLike) -> Result<Resource, JsValue>;
+    # [wasm_bindgen (static_method_of = Resource , catch)]
+    pub fn open(id: impl ::wasm_bindgen::JsStringLike) -> Result<Resource, JsValue>;
+    # [wasm_bindgen (static_method_of = Resource , getter)]
+    pub fn kind() -> String;
+    # [wasm_bindgen (static_method_of = Resource , getter , js_name = "kind")]
+    pub fn kind_js_string() -> JsString;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &Resource) -> String;
+    #[wasm_bindgen(method, getter, js_name = "id")]
+    pub fn id_js_string(this: &Resource) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn close(this: &Resource) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Base , extends = Resource , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Handle;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &Handle) -> String;
+    #[wasm_bindgen(method, getter, js_name = "id")]
+    pub fn id_js_string(this: &Handle) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn close(this: &Handle) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Base , extends = Resource , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Opened;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &Opened) -> String;
+    #[wasm_bindgen(method, getter, js_name = "id")]
+    pub fn id_js_string(this: &Opened) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub fn close(this: &Opened) -> Result<(), JsValue>;
+}

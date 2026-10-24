@@ -41,3 +41,14 @@ interface Right {
 interface Siblings extends Base, Left, Right {
   own: number;
 }
+// A class parent beyond the first contributes its instance members only:
+// its constructor and statics stay on its own JS global.
+declare class Resource {
+  constructor(id: string);
+  static open(id: string): Resource;
+  static readonly kind: string;
+  readonly id: string;
+  close(): void;
+}
+interface Handle extends Base, Resource {}
+type Opened = Base & Resource;

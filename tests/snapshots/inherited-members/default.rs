@@ -269,3 +269,47 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_own(this: &Siblings, val: f64);
 }
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Resource;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new(id: &str) -> Result<Resource, JsValue>;
+    # [wasm_bindgen (static_method_of = Resource)]
+    pub fn open(id: &str) -> Resource;
+    # [wasm_bindgen (static_method_of = Resource , catch , js_name = "open")]
+    pub fn try_open(id: &str) -> Result<Resource, JsValue>;
+    # [wasm_bindgen (static_method_of = Resource , getter)]
+    pub fn kind() -> String;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &Resource) -> String;
+    #[wasm_bindgen(method)]
+    pub fn close(this: &Resource);
+    #[wasm_bindgen(method, catch, js_name = "close")]
+    pub fn try_close(this: &Resource) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Base , extends = Resource , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Handle;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &Handle) -> String;
+    #[wasm_bindgen(method)]
+    pub fn close(this: &Handle);
+    #[wasm_bindgen(method, catch, js_name = "close")]
+    pub fn try_close(this: &Handle) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Base , extends = Resource , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Opened;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &Opened) -> String;
+    #[wasm_bindgen(method)]
+    pub fn close(this: &Opened);
+    #[wasm_bindgen(method, catch, js_name = "close")]
+    pub fn try_close(this: &Opened) -> Result<(), JsValue>;
+}

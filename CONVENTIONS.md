@@ -715,6 +715,13 @@ also looks through the parents: an interface with no members of its own
 that extends dictionaries is a dictionary, one that extends a class-like
 parent is class-like.
 
+As in TypeScript, `extends` inherits instance members only: properties,
+methods and index signatures. A class parent's constructor and statics
+stay on its own JS global, so `interface Handle extends Base, Resource {}`
+(or `type Handle = Base & Resource`) declares `Resource`'s `id` and
+`close` on `Handle`, but not `Handle::new` or `Handle::open`, which would
+call a `Handle` global that doesn't exist.
+
 ## Dictionary builders
 
 Required properties go in via the constructor; optional properties chain

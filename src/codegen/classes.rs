@@ -2355,8 +2355,8 @@ struct Inherited {
     /// the first `extends =` target, so these are reachable without
     /// re-declaring them.
     first_chain: Vec<Member>,
-    /// From every other parent (and their ancestors). Only `AsRef`
-    /// reaches those, so the child declares them itself.
+    /// The instance members of every other parent (and their ancestors).
+    /// Only `AsRef` reaches those, so the child declares them itself.
     beyond_first: Vec<Member>,
 }
 
@@ -2384,6 +2384,18 @@ fn inherited_members(
         if i == 0 {
             out.first_chain = members;
         } else {
+            // `extends` inherits instance members only. A class parent's
+            // constructor and statics belong to its own JS global, and
+            // re-declared on the child they would call the child's name.
+            members.retain(|m| {
+                matches!(
+                    m,
+                    Member::Getter(_)
+                        | Member::Setter(_)
+                        | Member::Method(_)
+                        | Member::IndexSignature(_)
+                )
+            });
             extend_missing(&mut out.beyond_first, members);
         }
     }
