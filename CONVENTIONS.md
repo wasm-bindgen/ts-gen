@@ -2361,7 +2361,8 @@ impl CompressionStream {
   `new_gzip_js` serves all three formats); a different return type gets
   its own, since the extern return is what wasm-bindgen converts.
 * The `try_` companion follows per arm (`try_describe_raw`) over its
-  own extern.
+  own extern, and so, under `--experimental-generic-mono`, does the
+  `_js_string` return variant (`describe_raw_js_string`).
 * Setters are exempt: `set_disposition("inline")` takes the value.
 
 ## `--annotate` side files

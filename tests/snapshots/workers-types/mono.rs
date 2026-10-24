@@ -7935,7 +7935,7 @@ impl<Key> KVNamespace<Key> {
     pub async fn get_text(&self, key: Key) -> Result<Nullable<String>, JsValue> {
         self.get_text_js(key, "text").await
     }
-    pub async fn get_text(&self, key: Key) -> Result<Nullable<JsString>, JsValue> {
+    pub async fn get_text_js_string(&self, key: Key) -> Result<Nullable<JsString>, JsValue> {
         self.get_text_js_string_js(key, "text").await
     }
     pub async fn get_json<ExpectedValue>(
@@ -7968,7 +7968,7 @@ impl<Key> KVNamespace<Key> {
     ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue> {
         self.get_with_metadata_text_js(key, "text").await
     }
-    pub async fn get_with_metadata_text<Metadata>(
+    pub async fn get_with_metadata_text_js_string<Metadata>(
         &self,
         key: Key,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue> {
