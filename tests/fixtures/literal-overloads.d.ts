@@ -38,3 +38,14 @@ export interface KVStore<Key = unknown> {
   get(key: Key, type: "text"): Promise<string | null>;
   get<ExpectedValue = unknown>(key: Key, type: "json"): Promise<ExpectedValue | null>;
 }
+
+// A literal cohort with a `null` arm: the `(kind, null)` expansions form a
+// cohort of their own, named `_with_null`, whose wrappers drop the `null`
+// parameter as well and pass `null` itself, so the extern binds it as
+// `&JsValue`.
+export declare class Picker {
+  pick(kind: "a" | "b", x: ArrayBuffer | null): void;
+  static make(kind: "a" | "b", x: string | null): Picker;
+  /** The `null` arm's wrappers and extern drop `T`, which only it named. */
+  put<T>(kind: "a" | "b", x: T | null): void;
+}

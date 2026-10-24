@@ -3,7 +3,9 @@
 use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Promise};
 use wasm_bindgen::JsValue;
 
-use ts_gen_integration_tests::literal_overloads::{Headers, KVNamespace, KVStore, SubtleCrypto};
+use ts_gen_integration_tests::literal_overloads::{
+    Headers, KVNamespace, KVStore, Picker, SubtleCrypto,
+};
 
 // No backing JavaScript module; compile-only coverage that each literal arm
 // is a wrapper with the arm's own return type and without the literal
@@ -35,5 +37,20 @@ async fn arms_compile(
 async fn generic_arms_compile(store: &KVStore<JsString>, key: &JsString) -> Result<(), JsValue> {
     let _: Nullable<String> = store.get_text(key).await?;
     let _: Nullable<Object> = store.get_json::<Object>(key).await?;
+    Ok(())
+}
+
+// A literal cohort with a `null` arm: its wrappers drop the `null`
+// parameter and pass `null` themselves, under `_with_null` names.
+#[allow(dead_code)]
+fn null_arms_compile(picker: &Picker, buf: &ArrayBuffer, obj: &Object) -> Result<(), JsValue> {
+    picker.pick_a(buf);
+    picker.pick_b_with_null();
+    picker.try_pick_a_with_null()?;
+    let _: Picker = Picker::make_a("x");
+    let _: Picker = Picker::make_b_with_null();
+    let _: Result<Picker, JsValue> = Picker::try_make_a_with_null();
+    picker.put_a(obj);
+    picker.put_b_with_null();
     Ok(())
 }

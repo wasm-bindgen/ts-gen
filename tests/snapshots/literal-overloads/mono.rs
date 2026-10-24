@@ -396,3 +396,93 @@ impl<Key> KVStore<Key> {
         self.get_json_promise_js(key, "json")
     }
 }
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Picker;
+    #[wasm_bindgen(method, catch, js_name = "pick")]
+    fn pick_js(
+        this: &Picker,
+        kind: impl ::wasm_bindgen::JsStringLike,
+        x: &ArrayBuffer,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "pick")]
+    fn pick_with_null_js(
+        this: &Picker,
+        kind: impl ::wasm_bindgen::JsStringLike,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = Picker , catch , js_name = "make")]
+    fn make_js(
+        kind: impl ::wasm_bindgen::JsStringLike,
+        x: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Picker, JsValue>;
+    # [wasm_bindgen (static_method_of = Picker , catch , js_name = "make")]
+    fn make_with_null_js(
+        kind: impl ::wasm_bindgen::JsStringLike,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<Picker, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    fn put_js<T>(
+        this: &Picker,
+        kind: impl ::wasm_bindgen::JsStringLike,
+        x: T,
+    ) -> Result<(), JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    fn put_with_null_js(
+        this: &Picker,
+        kind: impl ::wasm_bindgen::JsStringLike,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
+}
+impl Picker {
+    pub fn pick_a(&self, x: &ArrayBuffer) -> Result<(), JsValue> {
+        self.pick_js("a", x)
+    }
+    pub fn pick_b(&self, x: &ArrayBuffer) -> Result<(), JsValue> {
+        self.pick_js("b", x)
+    }
+    pub fn pick_a_with_null(&self) -> Result<(), JsValue> {
+        self.pick_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn pick_b_with_null(&self) -> Result<(), JsValue> {
+        self.pick_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn make_a(x: impl ::wasm_bindgen::JsStringLike) -> Result<Picker, JsValue> {
+        Self::make_js("a", x)
+    }
+    pub fn make_b(x: impl ::wasm_bindgen::JsStringLike) -> Result<Picker, JsValue> {
+        Self::make_js("b", x)
+    }
+    pub fn make_a_with_null() -> Result<Picker, JsValue> {
+        Self::make_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn make_b_with_null() -> Result<Picker, JsValue> {
+        Self::make_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn put_a<T>(&self, x: T) -> Result<(), JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        self.put_js("a", x)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn put_b<T>(&self, x: T) -> Result<(), JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        self.put_js("b", x)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn put_a_with_null(&self) -> Result<(), JsValue> {
+        self.put_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn put_b_with_null(&self) -> Result<(), JsValue> {
+        self.put_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+    }
+}

@@ -281,3 +281,127 @@ impl<Key: ::wasm_bindgen::JsGeneric> KVStore<Key> {
         self.get_json_promise_js(key, "json")
     }
 }
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Picker;
+    #[wasm_bindgen(method, js_name = "pick")]
+    fn pick_js(this: &Picker, kind: &str, x: &ArrayBuffer);
+    #[wasm_bindgen(method, catch, js_name = "pick")]
+    fn try_pick_js(this: &Picker, kind: &str, x: &ArrayBuffer) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "pick")]
+    fn pick_with_null_js(this: &Picker, kind: &str, x: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, catch, js_name = "pick")]
+    fn try_pick_with_null_js(
+        this: &Picker,
+        kind: &str,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = Picker , js_name = "make")]
+    fn make_js(kind: &str, x: &str) -> Picker;
+    # [wasm_bindgen (static_method_of = Picker , catch , js_name = "make")]
+    fn try_make_js(kind: &str, x: &str) -> Result<Picker, JsValue>;
+    # [wasm_bindgen (static_method_of = Picker , js_name = "make")]
+    fn make_with_null_js(kind: &str, x: &::wasm_bindgen::JsValue) -> Picker;
+    # [wasm_bindgen (static_method_of = Picker , catch , js_name = "make")]
+    fn try_make_with_null_js(kind: &str, x: &::wasm_bindgen::JsValue) -> Result<Picker, JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    fn put_js<T: ::wasm_bindgen::JsGeneric>(this: &Picker, kind: &str, x: &T);
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    fn try_put_js<T: ::wasm_bindgen::JsGeneric>(
+        this: &Picker,
+        kind: &str,
+        x: &T,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    fn put_with_null_js(this: &Picker, kind: &str, x: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    fn try_put_with_null_js(
+        this: &Picker,
+        kind: &str,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
+}
+impl Picker {
+    pub fn pick_a(&self, x: &ArrayBuffer) {
+        self.pick_js("a", x)
+    }
+    pub fn pick_b(&self, x: &ArrayBuffer) {
+        self.pick_js("b", x)
+    }
+    pub fn try_pick_a(&self, x: &ArrayBuffer) -> Result<(), JsValue> {
+        self.try_pick_js("a", x)
+    }
+    pub fn try_pick_b(&self, x: &ArrayBuffer) -> Result<(), JsValue> {
+        self.try_pick_js("b", x)
+    }
+    pub fn pick_a_with_null(&self) {
+        self.pick_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn pick_b_with_null(&self) {
+        self.pick_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_pick_a_with_null(&self) -> Result<(), JsValue> {
+        self.try_pick_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_pick_b_with_null(&self) -> Result<(), JsValue> {
+        self.try_pick_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn make_a(x: &str) -> Picker {
+        Self::make_js("a", x)
+    }
+    pub fn make_b(x: &str) -> Picker {
+        Self::make_js("b", x)
+    }
+    pub fn try_make_a(x: &str) -> Result<Picker, JsValue> {
+        Self::try_make_js("a", x)
+    }
+    pub fn try_make_b(x: &str) -> Result<Picker, JsValue> {
+        Self::try_make_js("b", x)
+    }
+    pub fn make_a_with_null() -> Picker {
+        Self::make_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn make_b_with_null() -> Picker {
+        Self::make_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_make_a_with_null() -> Result<Picker, JsValue> {
+        Self::try_make_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_make_b_with_null() -> Result<Picker, JsValue> {
+        Self::try_make_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn put_a<T: ::wasm_bindgen::JsGeneric>(&self, x: &T) {
+        self.put_js("a", x)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn put_b<T: ::wasm_bindgen::JsGeneric>(&self, x: &T) {
+        self.put_js("b", x)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn try_put_a<T: ::wasm_bindgen::JsGeneric>(&self, x: &T) -> Result<(), JsValue> {
+        self.try_put_js("a", x)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn try_put_b<T: ::wasm_bindgen::JsGeneric>(&self, x: &T) -> Result<(), JsValue> {
+        self.try_put_js("b", x)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn put_a_with_null(&self) {
+        self.put_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn put_b_with_null(&self) {
+        self.put_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn try_put_a_with_null(&self) -> Result<(), JsValue> {
+        self.try_put_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
+    pub fn try_put_b_with_null(&self) -> Result<(), JsValue> {
+        self.try_put_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+    }
+}

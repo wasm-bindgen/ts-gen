@@ -22,7 +22,7 @@ pub(crate) fn marker() -> TokenStream {
     quote! { &#ident }
 }
 
-fn is_marker(ty: &Type) -> bool {
+pub(crate) fn is_marker(ty: &Type) -> bool {
     match ty {
         Type::Reference(r) => matches!(&*r.elem, Type::Path(p) if p.path.is_ident(MARKER)),
         _ => false,
@@ -191,7 +191,7 @@ fn mentions(tokens: TokenStream, ident: &Ident) -> bool {
 
 /// Drops the type parameters only the `null` arm's parameter mentioned,
 /// with the `where` predicates bounding them.
-fn drop_unused_params(sig: &mut syn::Signature) {
+pub(crate) fn drop_unused_params(sig: &mut syn::Signature) {
     let used = |ident: &Ident, sig: &syn::Signature| {
         let others = sig.generics.params.iter().filter_map(|p| match p {
             GenericParam::Type(t) if t.ident != *ident => Some(t.to_token_stream()),

@@ -2813,7 +2813,8 @@ impl CompressionStream {
   arm (`"a" | "b" | string`), since the plain form already covers it.
 * Each wrapper is named `<base>_<literal>` in snake case, followed by
   the `_with_` suffix the remaining parameters earn among the plain
-  expansions (`get_json`, `get_json_with_slice`). An arm left with no
+  expansions and the other cohorts' remaining parameters (`get_json`,
+  `get_json_with_slice`). An arm left with no
   parameter to name earns none, since the literal already sets it apart:
   Temporal's `getTimeZoneTransition(direction: "next" | "previous")`
   beside `(direction: TransitionOptions)` gives
@@ -2840,6 +2841,24 @@ impl CompressionStream {
   under `--experimental-generic-mono` (`Key: IntoWasmAbi`), and an
   awaited carrier's (`ExpectedValue: NullableFromWasmAbi` on
   `get_json`).
+* A `null` arm beside the literal (`pick(kind: "a" | "b", x: T |
+  null)`) makes a cohort of its own, named `_with_null` as a lone
+  `null` arm is. Its wrappers drop the `null` parameter too and pass
+  `&JsValue::NULL`, over one `pick_with_null_js` extern taking
+  `&JsValue` there; a type parameter only that position named is
+  dropped from both:
+
+  ```rust
+  extern "C" {
+      fn pick_js(this: &Picker, kind: &str, x: &ArrayBuffer);
+      fn pick_with_null_js(this: &Picker, kind: &str, x: &JsValue);
+  }
+  impl Picker {
+      pub fn pick_a(&self, x: &ArrayBuffer) { self.pick_js("a", x) }
+      pub fn pick_a_with_null(&self) { self.pick_with_null_js("a", &JsValue::NULL) }
+      // … `pick_b`, `pick_b_with_null`
+  }
+  ```
 * Doc comments move to the wrappers; the extern binding is not `pub`.
 * Setters are exempt: `set_disposition("inline")` takes the value.
 

@@ -6,10 +6,15 @@
 //! `syn::File`, rewrites the extern signature and emits the wrappers
 //! beside its block.
 //!
-//! Overloads distinguished only by a string-literal argument are the one
-//! use today: the extern takes `&str` and the signature layer tags it (see
+//! This module handles overloads distinguished only by a string-literal
+//! argument (a lone `null` arm is [`null_arms`](super::null_arms)'): the
+//! extern takes `&str` and the signature layer tags it (see
 //! [`literal_attr`]) with one wrapper per literal, each baking its value in.
+//! A cohort of `null` arms (`f(kind: "a" | "b", x: T | null)`) also drops
+//! the `null` parameter here, since the arm wrappers are already the public
+//! face of the extern.
 
+use super::null_arms;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, ToTokens};
 use syn::{
@@ -286,6 +291,19 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Vec<Wrapper> {
         return Vec::new();
     };
     let skip = if binding.method { 1 } else { 0 };
+    let is_null_arm =
+        |arg: &FnArg| matches!(arg, FnArg::Typed(pat) if null_arms::is_marker(&pat.ty));
+    // Parameters that can only be `null`, indexed like the literal
+    // positions: every arm drops them and passes `null` itself.
+    let null_positions: Vec<usize> = item
+        .sig
+        .inputs
+        .iter()
+        .skip(skip)
+        .enumerate()
+        .filter(|(_, arg)| is_null_arm(arg))
+        .map(|(i, _)| i)
+        .collect();
     let param_names: Vec<Ident> = item
         .sig
         .inputs
@@ -315,6 +333,26 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Vec<Wrapper> {
         if let FnArg::Typed(pat) = arg {
             pat.attrs.clear();
         }
+    }
+    if !null_positions.is_empty() {
+        // Type parameters only the `null` parameter mentioned go with it,
+        // on the wrappers and on the extern, which binds it as `&JsValue`.
+        let mut pruned = public_sig.clone();
+        pruned.inputs = pruned
+            .inputs
+            .into_iter()
+            .filter(|a| !is_null_arm(a))
+            .collect();
+        null_arms::drop_unused_params(&mut pruned);
+        public_sig.generics = pruned.generics;
+        for arg in item.sig.inputs.iter_mut() {
+            if let FnArg::Typed(pat) = arg {
+                if null_arms::is_marker(&pat.ty) {
+                    *pat.ty = syn::parse_quote!(&::wasm_bindgen::JsValue);
+                }
+            }
+        }
+        item.sig.generics = public_sig.generics.clone();
     }
 
     // Extern binding: private name, explicit JS name since wasm-bindgen
@@ -399,8 +437,8 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Vec<Wrapper> {
         (Target::Free, quote! { #extern_name })
     };
 
-    // One wrapper per literal arm: the literal parameters dropped from the
-    // public signature, their values passed through.
+    // One wrapper per literal arm: the literal and `null` parameters
+    // dropped from the public signature, their values passed through.
     let typed_inputs: Vec<FnArg> = public_sig.inputs.iter().skip(skip).cloned().collect();
     let receiver: Vec<FnArg> = public_sig.inputs.iter().take(skip).cloned().collect();
     literal
@@ -412,6 +450,9 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Vec<Wrapper> {
             let call_args = param_names.iter().enumerate().map(|(i, pname)| {
                 match values.iter().find(|(pos, _)| *pos == i) {
                     Some((_, lit)) => quote! { #lit },
+                    None if null_positions.contains(&i) => {
+                        quote! { &::wasm_bindgen::JsValue::NULL }
+                    }
                     None => quote! { #pname },
                 }
             });
@@ -425,7 +466,9 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Vec<Wrapper> {
                     typed_inputs
                         .iter()
                         .enumerate()
-                        .filter(|(i, _)| !values.iter().any(|(pos, _)| pos == i))
+                        .filter(|(i, _)| {
+                            !values.iter().any(|(pos, _)| pos == i) && !null_positions.contains(i)
+                        })
                         .map(|(_, a)| a.clone()),
                 )
                 .collect();
@@ -614,6 +657,28 @@ mod tests {
         assert!(out.contains("pub async fn get_text(&self, key: &str) -> Result<JsValue, JsValue> {\n        self.get_text_js(key, \"text\").await\n    }"));
         assert!(out.contains("pub async fn get_array_buffer(&self, key: &str) -> Result<JsValue, JsValue> {\n        self.get_text_js(key, \"arrayBuffer\").await\n    }"));
         assert!(out.contains("pub fn new_deflate_raw() -> Result<Kv, JsValue> {\n        Self::new_js(\"deflate-raw\")\n    }"));
+    }
+
+    #[test]
+    fn null_arm_of_a_literal_cohort_is_dropped_and_passed_as_null() {
+        let out = run("#[wasm_bindgen] extern \"C\" {
+                pub type Picker;
+                #[ts_gen_literal(binding(put_with_null_js), positions(0), arm(\"a\", put_a_with_null), arm(\"b\", put_b_with_null))]
+                #[wasm_bindgen(method, js_name = \"put\")]
+                pub fn put_a_with_null<T>(this: &Picker, kind: &str, x: &__TsGenNull, y: f64);
+            }");
+        assert!(!out.contains("__TsGenNull"), "{out}");
+        assert!(out.contains(
+            "fn put_with_null_js(this: &Picker, kind: &str, x: &::wasm_bindgen::JsValue, y: f64);"
+        ), "{out}");
+        assert!(out.contains("pub fn put_b_with_null(&self, y: f64) {\n        self.put_with_null_js(\"b\", &::wasm_bindgen::JsValue::NULL, y)\n    }"), "{out}");
+        // A type parameter only the `null` parameter could name goes.
+        assert!(!out.contains("<T>"), "{out}");
+
+        // `null_arms` runs after and leaves the rewritten extern alone.
+        let mut file: syn::File = syn::parse_str(&out).unwrap();
+        crate::codegen::null_arms::apply(&mut file.items);
+        assert_eq!(prettyplease::unparse(&file), out);
     }
 
     #[test]

@@ -503,33 +503,43 @@ pub fn expand_signatures(
     }
     // A literal-keyed cohort is named as if the literal parameters were
     // not there: its wrappers take the remaining parameters, so the
-    // suffix is the one those parameters would earn among the plain
-    // expansions. The plain expansions are suffixed among themselves.
-    let keyed: Vec<bool> = arms.iter().map(|a| a.len() > 1).collect();
+    // suffix is the one those parameters earn among the plain expansions
+    // and the other cohorts' remaining parameters (a cohort's `null` arm
+    // is `_with_null` beside its typed one). The plain expansions are
+    // suffixed among themselves.
+    let stripped: Vec<Option<Vec<ConcreteParam>>> = deduped
+        .iter()
+        .zip(&arms)
+        .map(|(sig, arms)| {
+            if arms.len() < 2 {
+                return None;
+            }
+            let positions: Vec<usize> = arms[0].values.iter().map(|(i, _)| *i).collect();
+            Some(
+                sig.iter()
+                    .enumerate()
+                    .filter(|(i, _)| !positions.contains(i))
+                    .map(|(_, p)| p.clone())
+                    .collect(),
+            )
+        })
+        .collect();
     let plain: Vec<Vec<ConcreteParam>> = deduped
         .iter()
-        .zip(&keyed)
-        .filter(|(_, k)| !**k)
+        .zip(&stripped)
+        .filter(|(_, s)| s.is_none())
         .map(|(sig, _)| sig.clone())
         .collect();
     let mut plain_suffixes = compute_suffixes(&plain).into_iter();
-    let suffixes: Vec<String> = deduped
+    let keyed_suffixes = suffixes_among(&plain, stripped.iter().flatten());
+    let mut keyed_suffixes = keyed_suffixes.into_iter();
+    let suffixes: Vec<String> = stripped
         .iter()
-        .zip(&keyed)
-        .zip(&arms)
-        .map(|((sig, keyed), arms)| {
-            if !*keyed {
-                return plain_suffixes.next().unwrap_or_default();
-            }
-            let positions: Vec<usize> = arms[0].values.iter().map(|(i, _)| *i).collect();
-            let stripped: Vec<ConcreteParam> = sig
-                .iter()
-                .enumerate()
-                .filter(|(i, _)| !positions.contains(i))
-                .map(|(_, p)| p.clone())
-                .collect();
-            suffix_among(&plain, stripped)
+        .map(|s| match s {
+            None => plain_suffixes.next(),
+            Some(_) => keyed_suffixes.next(),
         })
+        .map(Option::unwrap_or_default)
         .collect();
     suffixes
         .into_iter()
@@ -554,24 +564,41 @@ pub fn expand_signatures(
         .collect()
 }
 
-/// The suffix `extra` would get as a member of `cohort`: its sibling's
-/// when a sibling has the same parameters, else what the naming pass
-/// assigns it appended to the cohort. A suffix without `_with_` parts is
-/// only the naming pass's numeric fallback (`_2`, for an `extra` with no
-/// parameter to name); the literal tag already sets the arm apart, so it
-/// gets none.
-fn suffix_among(cohort: &[Vec<ConcreteParam>], extra: Vec<ConcreteParam>) -> String {
-    if let Some(pos) = cohort.iter().position(|s| concrete_params_eq(s, &extra)) {
-        return compute_suffixes(cohort).swap_remove(pos);
-    }
+/// The suffix each of `extras` gets beside `cohort`: its sibling's when a
+/// member of `cohort` has the same parameters, else what the naming pass
+/// assigns it among `cohort` and the other distinct extras, appended in
+/// order. A suffix without `_with_` parts is only the naming pass's
+/// numeric fallback (`_2`, for an extra with no parameter to name); the
+/// literal tag already sets the arm apart, so it gets none.
+fn suffixes_among<'a>(
+    cohort: &[Vec<ConcreteParam>],
+    extras: impl Iterator<Item = &'a Vec<ConcreteParam>> + Clone,
+) -> Vec<String> {
+    let cohort_suffixes = compute_suffixes(cohort);
     let mut all = cohort.to_vec();
-    all.push(extra);
-    let suffix = compute_suffixes(&all).pop().unwrap_or_default();
-    if suffix.starts_with("_with_") {
-        suffix
-    } else {
-        String::new()
+    for extra in extras.clone() {
+        if !all.iter().any(|s| concrete_params_eq(s, extra)) {
+            all.push(extra.clone());
+        }
     }
+    let all_suffixes = compute_suffixes(&all);
+    extras
+        .map(|extra| {
+            if let Some(pos) = cohort.iter().position(|s| concrete_params_eq(s, extra)) {
+                return cohort_suffixes[pos].clone();
+            }
+            let pos = all
+                .iter()
+                .position(|s| concrete_params_eq(s, extra))
+                .unwrap_or_default();
+            let suffix = &all_suffixes[pos];
+            if suffix.starts_with("_with_") {
+                suffix.clone()
+            } else {
+                String::new()
+            }
+        })
+        .collect()
 }
 
 /// `candidate` as a literal arm of `kept`: both carry string literals at
@@ -3987,6 +4014,55 @@ mod tests {
         assert_eq!(names, ["mode", "try_mode", "mode_a", "try_mode_a"]);
         let spec = sigs[2].literal.as_ref().unwrap();
         assert_eq!(spec.binding, "mode_js");
+    }
+
+    #[test]
+    fn literal_cohort_null_arm_is_named_with_null() {
+        // `pick(kind: "a" | "b", x: Foo | null)`: the `(kind, null)` arms are
+        // a cohort of their own, named beside the typed cohort as a lone
+        // `null` arm would be (`pick_a_with_null`, not `pick_a_2`).
+        let mut used = no_used();
+        let kind = typed_param(
+            "kind",
+            TypeRef::union([
+                TypeRef::StringLiteral("a".into()),
+                TypeRef::StringLiteral("b".into()),
+            ]),
+        );
+        let x = typed_param("x", TypeRef::union([TypeRef::ident("Foo"), TypeRef::Null]));
+        let sigs = expand_overloads(
+            "pick",
+            &[&[kind, x]],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        let cohorts: Vec<(&str, Vec<&str>)> = sigs
+            .iter()
+            .filter_map(|s| s.literal.as_ref())
+            .map(|l| {
+                (
+                    l.binding.as_str(),
+                    l.arms.iter().map(|(_, n)| n.as_str()).collect(),
+                )
+            })
+            .collect();
+        assert_eq!(
+            cohorts,
+            [
+                ("pick_js", vec!["pick_a", "pick_b"]),
+                ("try_pick_js", vec!["try_pick_a", "try_pick_b"]),
+                (
+                    "pick_with_null_js",
+                    vec!["pick_a_with_null", "pick_b_with_null"]
+                ),
+                (
+                    "try_pick_with_null_js",
+                    vec!["try_pick_a_with_null", "try_pick_b_with_null"]
+                ),
+            ]
+        );
     }
 
     #[test]

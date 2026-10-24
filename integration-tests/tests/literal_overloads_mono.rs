@@ -6,7 +6,7 @@ use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Uint8Arra
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads_mono::{
-    Headers, KVNamespace, KVStore, SubtleCrypto,
+    Headers, KVNamespace, KVStore, Picker, SubtleCrypto,
 };
 
 // No backing JavaScript module; compile-only coverage that under
@@ -45,5 +45,21 @@ async fn generic_arms_compile(store: &KVStore<JsString>) -> Result<(), JsValue> 
     let _: Nullable<String> = store.get_text(JsString::from("k")).await?;
     let _: Nullable<JsString> = store.get_text_js_string(JsString::from("k")).await?;
     let _: Nullable<Object> = store.get_json::<Object>(JsString::from("k")).await?;
+    Ok(())
+}
+
+// A literal cohort with a `null` arm under mono: the extern's `T` and
+// `impl JsStringLike` parameters stay on the typed arms, and the `null`
+// arms take neither.
+#[allow(dead_code)]
+fn null_arms_compile(picker: &Picker, buf: &ArrayBuffer) -> Result<(), JsValue> {
+    picker.pick_a(buf);
+    picker.pick_b_with_null();
+    picker.try_pick_a_with_null()?;
+    let _: Picker = Picker::make_a("x");
+    let _: Picker = Picker::make_a(JsString::from("x"));
+    let _: Picker = Picker::make_b_with_null();
+    picker.put_a(JsString::from("x"));
+    picker.put_b_with_null();
     Ok(())
 }
