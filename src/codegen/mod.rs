@@ -887,7 +887,12 @@ fn generate_union_alias_enum(
             TypeRef::String => "string".to_string(),
             TypeRef::Number => "number".to_string(),
             TypeRef::Boolean => "boolean".to_string(),
-            _ => variant_name.clone(),
+            // The arm's own type name, which the impl is for and a user can
+            // search for, rather than the PascalCased variant name.
+            _ => {
+                let path = payload.to_string().replace(' ', "");
+                path.rsplit("::").next().unwrap_or(&path).to_string()
+            }
         });
         let variant = typemap::make_ident(&variant_name);
         variants.push(quote! { #variant(#payload) });

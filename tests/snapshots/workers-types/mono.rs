@@ -20449,7 +20449,7 @@ impl ResponseFormatJSONObject {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `ResponseFormatTextConfig`",
-    label = "expected ResponseFormatText, ResponseFormatTextJsonSchemaConfig or ResponseFormatJsonObject"
+    label = "expected ResponseFormatText, ResponseFormatTextJSONSchemaConfig or ResponseFormatJSONObject"
 )]
 pub trait ResponseFormatTextConfig: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl ResponseFormatTextConfig for ResponseFormatText {}
@@ -22889,7 +22889,7 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Baai_Bge_Base_En_V1_5_Output`",
-    label = "expected Object or AiCfBaaiBgeBaseEnV15AsyncResponse"
+    label = "expected Object or Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse"
 )]
 pub trait Ai_Cf_Baai_Bge_Base_En_V1_5_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Baai_Bge_Base_En_V1_5_Output for Object {}
@@ -23208,7 +23208,7 @@ impl Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Meta_M2M100_1_2B_Output`",
-    label = "expected Object or AiCfMetaM2M10012BAsyncResponse"
+    label = "expected Object or Ai_Cf_Meta_M2M100_1_2B_AsyncResponse"
 )]
 pub trait Ai_Cf_Meta_M2M100_1_2B_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Meta_M2M100_1_2B_Output for Object {}
@@ -23376,7 +23376,7 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Baai_Bge_Small_En_V1_5_Output`",
-    label = "expected Object or AiCfBaaiBgeSmallEnV15AsyncResponse"
+    label = "expected Object or Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse"
 )]
 pub trait Ai_Cf_Baai_Bge_Small_En_V1_5_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Baai_Bge_Small_En_V1_5_Output for Object {}
@@ -23549,7 +23549,7 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Baai_Bge_Large_En_V1_5_Output`",
-    label = "expected Object or AiCfBaaiBgeLargeEnV15AsyncResponse"
+    label = "expected Object or Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse"
 )]
 pub trait Ai_Cf_Baai_Bge_Large_En_V1_5_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Baai_Bge_Large_En_V1_5_Output for Object {}
@@ -24147,7 +24147,7 @@ extern "C" {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Baai_Bge_M3_Input`",
-    label = "expected AiCfBaaiBgeM3InputQueryAndContexts, AiCfBaaiBgeM3InputEmbedding or Object"
+    label = "expected Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts, Ai_Cf_Baai_Bge_M3_Input_Embedding or Object"
 )]
 pub trait Ai_Cf_Baai_Bge_M3_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Baai_Bge_M3_Input for Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts {}
@@ -24434,7 +24434,7 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Baai_Bge_M3_Output`",
-    label = "expected AiCfBaaiBgeM3OuputQuery, AiCfBaaiBgeM3OutputEmbeddingForContexts, AiCfBaaiBgeM3OuputEmbedding or AiCfBaaiBgeM3AsyncResponse"
+    label = "expected Ai_Cf_Baai_Bge_M3_Ouput_Query, Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts, Ai_Cf_Baai_Bge_M3_Ouput_Embedding or Ai_Cf_Baai_Bge_M3_AsyncResponse"
 )]
 pub trait Ai_Cf_Baai_Bge_M3_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Baai_Bge_M3_Output for Ai_Cf_Baai_Bge_M3_Ouput_Query {}
@@ -24839,7 +24839,7 @@ extern "C" {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input`",
-    label = "expected AiCfMetaLlama3211BVisionInstructPrompt or AiCfMetaLlama3211BVisionInstructMessages"
+    label = "expected Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt or Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages"
 )]
 pub trait Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
@@ -25318,7 +25318,7 @@ extern "C" {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input`",
-    label = "expected AiCfMetaLlama3370BInstructFp8FastPrompt, AiCfMetaLlama3370BInstructFp8FastMessages or AiCfMetaLlama3370BInstructFp8FastAsyncBatch"
+    label = "expected Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt, Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages or Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch"
 )]
 pub trait Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
@@ -25961,7 +25961,7 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output`",
-    label = "expected Object, string or AiCfMetaLlama3370BInstructFp8FastAsyncResponse"
+    label = "expected Object, string or Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse"
 )]
 pub trait Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output:
     ::wasm_bindgen::convert::IntoWasmAbi
@@ -26362,7 +26362,7 @@ extern "C" {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input`",
-    label = "expected AiCfQwenQwen25Coder32BInstructPrompt or AiCfQwenQwen25Coder32BInstructMessages"
+    label = "expected Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt or Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages"
 )]
 pub trait Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
@@ -26913,7 +26913,7 @@ extern "C" {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Qwen_Qwq_32B_Input`",
-    label = "expected AiCfQwenQwq32BPrompt or AiCfQwenQwq32BMessages"
+    label = "expected Ai_Cf_Qwen_Qwq_32B_Prompt or Ai_Cf_Qwen_Qwq_32B_Messages"
 )]
 pub trait Ai_Cf_Qwen_Qwq_32B_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Qwen_Qwq_32B_Input for Ai_Cf_Qwen_Qwq_32B_Prompt {}
@@ -27300,7 +27300,7 @@ extern "C" {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input`",
-    label = "expected AiCfMistralaiMistralSmall3124BInstructPrompt or AiCfMistralaiMistralSmall3124BInstructMessages"
+    label = "expected Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt or Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages"
 )]
 pub trait Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
@@ -27809,7 +27809,7 @@ extern "C" {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Google_Gemma_3_12B_It_Input`",
-    label = "expected AiCfGoogleGemma312BItPrompt or AiCfGoogleGemma312BItMessages"
+    label = "expected Ai_Cf_Google_Gemma_3_12B_It_Prompt or Ai_Cf_Google_Gemma_3_12B_It_Messages"
 )]
 pub trait Ai_Cf_Google_Gemma_3_12B_It_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Google_Gemma_3_12B_It_Input for Ai_Cf_Google_Gemma_3_12B_It_Prompt {}
@@ -28220,7 +28220,7 @@ extern "C" {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input`",
-    label = "expected AiCfMetaLlama4Scout17B16EInstructPrompt, AiCfMetaLlama4Scout17B16EInstructMessages or AiCfMetaLlama4Scout17B16EInstructAsyncBatch"
+    label = "expected Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt, Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages or Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch"
 )]
 pub trait Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
@@ -29206,7 +29206,7 @@ extern "C" {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input`",
-    label = "expected AiCfQwenQwen330BA3BFp8Prompt, AiCfQwenQwen330BA3BFp8Messages or AiCfQwenQwen330BA3BFp8AsyncBatch"
+    label = "expected Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt, Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages or Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch"
 )]
 pub trait Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt {}
@@ -30105,7 +30105,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output`",
-    label = "expected AiCfQwenQwen330BA3BFp8ChatCompletionResponse, AiCfQwenQwen330BA3BFp8TextCompletionResponse, string or AiCfQwenQwen330BA3BFp8AsyncResponse"
+    label = "expected Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response, Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response, string or Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse"
 )]
 pub trait Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response {}
@@ -31800,7 +31800,7 @@ extern "C" {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input`",
-    label = "expected AiCfAisingaporeGemmaSeaLionV427BItPrompt, AiCfAisingaporeGemmaSeaLionV427BItMessages or AiCfAisingaporeGemmaSeaLionV427BItAsyncBatch"
+    label = "expected Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt, Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages or Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch"
 )]
 pub trait Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input:
     ::wasm_bindgen::convert::IntoWasmAbi
@@ -32839,7 +32839,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output`",
-    label = "expected AiCfAisingaporeGemmaSeaLionV427BItChatCompletionResponse, AiCfAisingaporeGemmaSeaLionV427BItTextCompletionResponse, string or AiCfAisingaporeGemmaSeaLionV427BItAsyncResponse"
+    label = "expected Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response, Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response, string or Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse"
 )]
 pub trait Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output:
     ::wasm_bindgen::convert::IntoWasmAbi

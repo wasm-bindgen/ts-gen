@@ -242,7 +242,7 @@ pub enum QueueContentType {
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `BodyInit`",
-    label = "expected ReadableStream, string, ArrayBuffer, Blob, UrlSearchParams or FormData"
+    label = "expected ReadableStream, string, ArrayBuffer, Blob, URLSearchParams or FormData"
 )]
 pub trait BodyInit: ::wasm_bindgen::convert::IntoWasmAbi {}
 impl BodyInit for ReadableStream {}
