@@ -2495,61 +2495,6 @@ pub fn put<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str, value:
 pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str) -> Option<T>;
 ```
 
-### Uninferrable method type parameters
-
-A callable-level parameter that no argument mentions once lowered has
-to be named at every call. That is worth it only where the turbofish
-is itself the cast — the (awaited) return is exactly `T`, `T |
-undefined` or `T | null` — so the rule, per parameter:
-
-1. Mentioned by an argument: kept, inferred at the call. A callback
-   counts as it lowers: its parameters and its return count, but a
-   callback with a rest parameter is the untyped `Function` and
-   mentions nothing. A `Promise<T>` callback return does not count,
-   since wasm-bindgen cannot pass a `Function` returning `Promise<T>`
-   for a generic `T`. A variadic rest likewise counts as it lowers: by default
-   it is `&[JsValue]` and mentions nothing, while under
-   `--experimental-generic-mono` a rest array lowers to a slice, so
-   `of<T>(...items: T[]): Row<T>` keeps `T` (`fn of<T>(items: &[T]) ->
-   Row<T>`) where the default erases it (`fn of(items: &[JsValue]) ->
-   Row`).
-2. Not mentioned, return exactly `T` / `T | undefined` / `T | null`
-   (awaited): kept — `storage.get::<JsString>(key)`, `body.json::<Row>()`.
-3. Otherwise erased and removed from the signature. The substitute is
-   the default declared by the generic type `T` instantiates in the
-   return (`Row<T = Record<string, unknown>>` → `Object`), else the
-   method's own default (`list<T = unknown>` → `JsValue`), else `any`.
-   A type's default that names that type's own parameters (`U = Box<T>`)
-   is skipped, since those names are unbound in the method.
-   A parameter the return never mentions is simply dropped.
-
-Callers wanting a typed container `unchecked_into` it
-(`D1Result<JsValue>` → `D1Result<Row>`). `try_` companions follow the
-same signature. Each overload of a method or
-free function applies the rule to its own type parameters.
-
-```ts
-interface Store {
-  put<T>(key: string, value: T): Promise<void>;
-  get<T = unknown>(key: string): Promise<T | undefined>;
-  transaction<T>(closure: (tx: Store) => Promise<T>): Promise<T>;
-  run<T = unknown>(): Promise<Row<T>>;
-  list<T = unknown>(): Promise<Map<string, T>>;
-  schedule<Args extends unknown[]>(callback: (...args: Args) => void, ...args: Args): number;
-}
-```
-
-```rust
-pub async fn put<T: JsGeneric>(this: &Store, key: &str, value: &T) -> Result<(), JsValue>;
-pub async fn get<T: JsGeneric>(this: &Store, key: &str) -> Result<Option<T>, JsValue>
-where
-    T: OptionFromWasmAbi;
-pub async fn transaction<T: JsGeneric + FromWasmAbi>(this: &Store, closure: &Function<fn(Store) -> Promise>) -> Result<T, JsValue>;
-pub async fn run(this: &Store) -> Result<Row, JsValue>; // Row<Object>, the default
-pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
-pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> f64;
-```
-
 Passing `--experimental-generic-mono` selects wasm-bindgen's experimental
 per-monomorphization path. Every generated extern block receives
 `experimental_generic_mono`, type parameters omit the `JsGeneric` bound, and
@@ -2717,6 +2662,65 @@ regular declared-type / external-map / `JsValue` fallback path.
 Methods redeclare every type parameter mentioned in their signature,
 even those inherited from the surrounding type. `js_sys` follows the
 same convention (see `js_sys::Array::for_each<T: JsGeneric>`).
+
+### Uninferrable method type parameters
+
+A callable-level parameter that no argument mentions once lowered has
+to be named at every call. That is worth it only where the turbofish
+is itself the cast — the (awaited) return is exactly `T`, `T |
+undefined` or `T | null` — so the rule, per parameter:
+
+1. Mentioned by an argument: kept, inferred at the call. A callback
+   counts as it lowers: its parameters and its return count, but a
+   callback with a rest parameter is the untyped `Function` and
+   mentions nothing. A `Promise<T>` callback return does not count,
+   since wasm-bindgen cannot pass a `Function` returning `Promise<T>`
+   for a generic `T`. A variadic rest likewise counts as it lowers: by default
+   it is `&[JsValue]` and mentions nothing, while under
+   `--experimental-generic-mono` a rest array lowers to a slice, so
+   `of<T>(...items: T[]): Row<T>` keeps `T` (`fn of<T>(items: &[T]) ->
+   Row<T>`) where the default erases it (`fn of(items: &[JsValue]) ->
+   Row`).
+2. Not mentioned, return exactly `T` / `T | undefined` / `T | null`
+   (awaited): kept — `storage.get::<JsString>(key)`, `body.json::<Row>()`.
+3. Otherwise erased and removed from the signature. The substitute is
+   the default declared by the generic type `T` instantiates in the
+   return (`Row<T = Record<string, unknown>>` → `Object`), else the
+   method's own default (`list<T = unknown>` → `JsValue`), else `any`.
+   A type's default that names that type's own parameters (`U = Box<T>`)
+   is skipped, since those names are unbound in the method.
+   A parameter the return never mentions is simply dropped.
+
+Callers wanting a typed container `unchecked_into` it
+(`D1Result<JsValue>` → `D1Result<Row>`). `try_` companions follow the
+same signature. Each overload of a method or free function applies the
+rule to its own type parameters, and so does each arm of a
+[literal-keyed overload](#inline-wrappers): workers-types'
+`get(key, "json")` keeps `ExpectedValue` as its whole return
+(`get_json::<Row>(key)`), while `getWithMetadata(key, "json")`
+returns `KVNamespaceGetWithMetadataResult` at its defaults.
+
+```ts
+interface Store {
+  put<T>(key: string, value: T): Promise<void>;
+  get<T = unknown>(key: string): Promise<T | undefined>;
+  transaction<T>(closure: (tx: Store) => Promise<T>): Promise<T>;
+  run<T = unknown>(): Promise<Row<T>>;
+  list<T = unknown>(): Promise<Map<string, T>>;
+  schedule<Args extends unknown[]>(callback: (...args: Args) => void, ...args: Args): number;
+}
+```
+
+```rust
+pub async fn put<T: JsGeneric>(this: &Store, key: &str, value: &T) -> Result<(), JsValue>;
+pub async fn get<T: JsGeneric>(this: &Store, key: &str) -> Result<Option<T>, JsValue>
+where
+    T: OptionFromWasmAbi;
+pub async fn transaction<T: JsGeneric + FromWasmAbi>(this: &Store, closure: &Function<fn(Store) -> Promise>) -> Result<T, JsValue>;
+pub async fn run(this: &Store) -> Result<Row, JsValue>; // Row<Object>, the default
+pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
+pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> f64;
+```
 
 ### Type-level generics propagate to every binding site
 
