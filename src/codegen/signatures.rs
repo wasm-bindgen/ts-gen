@@ -321,6 +321,11 @@ pub fn collect_type_params(
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)
+        | TypeRef::Never
+        | TypeRef::KeyOf(_)
+        | TypeRef::IndexedAccess(..)
+        | TypeRef::Mapped(_)
+        | TypeRef::ObjectLiteral(_)
         | TypeRef::Unresolved(_) => {}
     }
 }

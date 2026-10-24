@@ -38,6 +38,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
 * [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-)
 * [String and numeric enums](#string-and-numeric-enums)
+* [Type-level evaluation](#type-level-evaluation)
 * [Multiple-context name resolution](#multiple-context-name-resolution)
 * [Duplicate identifiers](#duplicate-identifiers)
 * [External type mapping and web platform defaults](#external-type-mapping-and-web-platform-defaults)
@@ -3324,6 +3325,101 @@ pub mod timing {
     pub enum DurationUnit { /* ... */ }
 }
 ```
+
+## Type-level evaluation
+
+`keyof`, indexed access, mapped types and the object and union utilities
+describe a type in terms of others, so they have no lowering of their own.
+Once every file is parsed, ts-gen evaluates them over their concrete
+operands and rewrites each use in place. The utilities with an evaluation
+are `Partial`, `Required`, `Readonly`, `Pick`, `Omit`, `Exclude`, `Extract`
+and `NonNullable`; the rest of TypeScript's (`ReturnType`, `Awaited`, …)
+approximate to their first argument as before.
+
+```ts
+type Unit = "hour" | "minute" | "second";
+interface Options { name: string; size?: number; readonly fixed: boolean }
+
+declare function roundTo(unit: Exclude<Unit, "hour">): void;
+declare function configure(partial: Partial<Options>, picked: Pick<Options, "name">): void;
+type Sized = Pick<Options, "size">;
+type OptionKey = keyof Options;
+interface Named extends Omit<Options, "size"> { label?: string }
+```
+
+emits:
+
+```rust
+pub fn round_to(unit: ExcludeUnitHour);
+pub fn configure(partial: &PartialOptions, picked: &PickOptionsName);
+
+pub enum ExcludeUnitHour { Minute = "minute", Second = "second" }
+pub enum OptionKey { Name = "name", Size = "size", Fixed = "fixed" }
+
+// All-optional dictionaries with builders:
+pub type PartialOptions;   // name?, size?, fixed? (readonly)
+pub type PickOptionsName;  // name
+pub type Sized;            // size?
+
+// `Named` has `label`, `name` and `fixed` as its own members and no parent.
+```
+
+* **A result named by a reference takes the reference's spelling.** A
+  string-literal result named at a use site by a reference, `keyof` or
+  indexed access becomes a string enum of that spelling, PascalCased with
+  its arguments: `Exclude<Unit, "hour">` is `ExcludeUnitHour`,
+  `Plural<"day" | TimeUnit>` is `PluralDayOrTimeUnit`, `keyof Extended` is
+  `KeyOfExtended`. An object result becomes a dictionary interface the same
+  way (`PartialOptions`). An inline union that evaluates to literals stays
+  inline, so a `"auto" | Plural<U>` field still gets its own
+  [`<Field>Kind`](#erased-return-position-unions-become-dynamic-union-enums).
+* **One shape is one type.** Two evaluations with the same members in the
+  same scope share a declaration, under the first name given: `Omit<Options,
+  "fixed">` and `Pick<Options, "name" | "size">` are the same dictionary. A
+  utility that changes nothing keeps the type it was given: `Partial<T>`
+  over an all-optional `T` is `T`.
+* **An alias to an evaluated type is promoted.** `type Sized = Pick<…>`
+  is the dictionary `Sized`; `type OptionKey = keyof Options` is the enum
+  `OptionKey`. A utility over such an alias reads it evaluated, so
+  `Exclude<Unit, Minute>` and `Pick<Options, Exclude<OptionKey, "fixed">>`
+  work wherever the alias is declared.
+* **A dictionary capturing a type parameter is generic over it.** Inside
+  `interface Holder<T> { partial: Partial<Box<T>> }` the field is
+  `PartialBoxT<T>`, a dictionary declared with `T` as its own parameter.
+* **A utility in `extends` flattens.** wasm-bindgen inheritance is
+  `extends = Parent`, which needs a declared parent, so `Omit<…>`,
+  `Pick<…>`, `Partial<…>` and an instantiated generic alias in an
+  interface's `extends` list become the interface's own members, after
+  the members it declares itself. A plain parent, generic or not, stays
+  `extends = Parent` as before, and `Deref` reaches its members.
+* **Generic aliases instantiate only when they must.** `Foo<Bar>` stays a
+  Rust generic alias unless `Foo`'s target contains one of these
+  constructs, in which case each instantiation evaluates with its
+  arguments. The alias's own declaration evaluates at its parameters'
+  bounds, so `type Plural<T extends Unit> = T | { … }[T]` is the enum
+  `Plural` of every unit, and an instantiation at the bound shares it.
+* **A type parameter out of scope evaluates at its bound.** Inside
+  `interface Rounding<U extends Unit> { smallestUnit?: Plural<U> }` the
+  field is `Plural`, every unit: Rust can't vary an enum per
+  instantiation, and the bound is the one type every instantiation is
+  assignable to.
+* **Mapped types** evaluate over a literal key set. Over `keyof T`
+  (possibly through `Exclude`) they are homomorphic: a property keeps the
+  optionality and `readonly` it has in `T` unless a `?` / `-?` /
+  `readonly` modifier says otherwise, and keeps its type when the mapped
+  type gives none. An `as` clause is not followed.
+* **Indexed access on an optional property admits `undefined`.**
+  `Options["size"]` is `number | undefined`, so a function returning it
+  returns `Option<f64>`. `-?` and `Required` remove the `undefined` again
+  from a property they make required, as TypeScript does:
+  `Required<Options>` has `size: f64`, while a `note: string | undefined`
+  that was never optional keeps its `undefined`.
+* **`never`** is dropped from a union and erases to `JsValue` alone.
+* **What can't be evaluated keeps its old lowering**, with a warning: a
+  utility is its first argument (`Partial<Widget>` over a class with
+  methods is `Widget`, since a method has no property type), and `keyof`,
+  indexed access and mapped types erase to `JsValue`. An unconstrained
+  type parameter is the usual cause.
 
 ## Multiple-context name resolution
 

@@ -400,6 +400,15 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
             buf.push('?');
             buf.push_str(s);
         }
+        // Unevaluated constructs erase, so their spelling is their key.
+        TypeRef::Never
+        | TypeRef::KeyOf(_)
+        | TypeRef::IndexedAccess(..)
+        | TypeRef::Mapped(_)
+        | TypeRef::ObjectLiteral(_) => {
+            buf.push('?');
+            buf.push_str(&ty.format_ts());
+        }
     }
 }
 
@@ -926,6 +935,11 @@ impl<'a> CodegenContext<'a> {
             | TypeRef::StringLiteral(_)
             | TypeRef::NumberLiteral(_)
             | TypeRef::BooleanLiteral(_)
+            | TypeRef::Never
+            | TypeRef::KeyOf(_)
+            | TypeRef::IndexedAccess(..)
+            | TypeRef::Mapped(_)
+            | TypeRef::ObjectLiteral(_)
             | TypeRef::Unresolved(_) => true,
         }
     }
@@ -1530,6 +1544,21 @@ pub fn to_syn_type(
         TypeRef::Unresolved(desc) => {
             if let Some(cgctx) = ctx {
                 cgctx.warn(format!("unresolved type `{desc}`, falling back to JsValue"));
+            }
+            maybe_ref(quote! { JsValue }, borrow)
+        }
+        // `never` has no value to lower; the rest reach codegen only when
+        // `parse::eval` could not evaluate them.
+        TypeRef::Never => maybe_ref(quote! { JsValue }, borrow),
+        TypeRef::KeyOf(_)
+        | TypeRef::IndexedAccess(..)
+        | TypeRef::Mapped(_)
+        | TypeRef::ObjectLiteral(_) => {
+            if let Some(cgctx) = ctx {
+                cgctx.warn(format!(
+                    "unevaluated type `{}`, falling back to JsValue",
+                    ty.format_ts()
+                ));
             }
             maybe_ref(quote! { JsValue }, borrow)
         }

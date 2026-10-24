@@ -533,7 +533,12 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
         T::Union(_) | T::PropertyKey => "JsValue".to_string(),
         T::Intersection(_) => "JsValue".to_string(),
         T::Function(_) => "Function".to_string(),
-        T::Unresolved(_) => "JsValue".to_string(),
+        T::Unresolved(_)
+        | T::Never
+        | T::KeyOf(_)
+        | T::IndexedAccess(..)
+        | T::Mapped(_)
+        | T::ObjectLiteral(_) => "JsValue".to_string(),
     }
 }
 

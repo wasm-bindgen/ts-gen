@@ -10,8 +10,6 @@ use JsValue as Cf;
 use JsValue as CfHostMetadata;
 #[allow(dead_code)]
 use JsValue as R;
-#[allow(dead_code)]
-use JsValue as Readonly;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[allow(non_upper_case_globals)]
@@ -1214,7 +1212,33 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)"]
     #[wasm_bindgen(catch, js_name = "dispatchEvent")]
-    pub fn dispatch_event(event: &JsValue) -> Result<bool, JsValue>;
+    pub fn dispatch_event(event: &FetchEvent) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)"]
+    #[wasm_bindgen(catch, js_name = "dispatchEvent")]
+    pub fn dispatch_event_with_scheduled_event(event: &ScheduledEvent) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)"]
+    #[wasm_bindgen(catch, js_name = "dispatchEvent")]
+    pub fn dispatch_event_with_queue_event(event: &QueueEvent) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)"]
+    #[wasm_bindgen(catch, js_name = "dispatchEvent")]
+    pub fn dispatch_event_with_promise_rejection_event(
+        event: &PromiseRejectionEvent,
+    ) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -7579,18 +7603,18 @@ extern "C" {
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_kv_namespace_get_options<Key>(
+    pub async fn get_with_key_and_partial_kv_namespace_get_options_undefined<Key>(
         this: &KVNamespace<Key>,
         key: Key,
-        options: &KVNamespaceGetOptions<Undefined>,
+        options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Nullable<String>, JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_kv_namespace_get_options_js_string<Key>(
+    pub async fn get_with_key_and_partial_kv_namespace_get_options_undefined_js_string<Key>(
         this: &KVNamespace<Key>,
         key: Key,
-        options: &KVNamespaceGetOptions<Undefined>,
+        options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Nullable<JsString>, JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi;
@@ -7611,7 +7635,7 @@ extern "C" {
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_key_and_options_kv_namespace_get_options<Key>(
+    pub async fn get_with_key_and_kv_namespace_get_options<Key>(
         this: &KVNamespace<Key>,
         key: Key,
         options: &KVNamespaceGetOptions<String>,
@@ -7619,7 +7643,7 @@ extern "C" {
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_key_and_options_kv_namespace_get_options_js_string<Key>(
+    pub async fn get_with_key_and_kv_namespace_get_options_js_string<Key>(
         this: &KVNamespace<Key>,
         key: Key,
         options: &KVNamespaceGetOptions<String>,
@@ -7642,15 +7666,15 @@ extern "C" {
     where
         Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_slice_and_kv_namespace_get_options<Key>(
+    pub async fn get_with_slice_and_partial_kv_namespace_get_options_undefined<Key>(
         this: &KVNamespace<Key>,
         #[wasm_bindgen(slice = "array")] key: &[Key],
-        options: &KVNamespaceGetOptions<Undefined>,
+        options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>
     where
         Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_slice_and_options_kv_namespace_get_options<Key>(
+    pub async fn get_with_slice_and_kv_namespace_get_options<Key>(
         this: &KVNamespace<Key>,
         #[wasm_bindgen(slice = "array")] key: &[Key],
         options: &KVNamespaceGetOptions<String>,
@@ -7757,19 +7781,25 @@ extern "C" {
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_and_kv_namespace_get_options<Key, Metadata>(
+    pub async fn get_with_metadata_with_key_and_partial_kv_namespace_get_options_undefined<
+        Key,
+        Metadata,
+    >(
         this: &KVNamespace<Key>,
         key: Key,
-        options: &KVNamespaceGetOptions<Undefined>,
+        options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_and_kv_namespace_get_options_js_string<Key, Metadata>(
+    pub async fn get_with_metadata_with_key_and_partial_kv_namespace_get_options_undefined_js_string<
+        Key,
+        Metadata,
+    >(
         this: &KVNamespace<Key>,
         key: Key,
-        options: &KVNamespaceGetOptions<Undefined>,
+        options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
@@ -7793,10 +7823,7 @@ extern "C" {
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_key_and_options_kv_namespace_get_options<
-        Key,
-        Metadata,
-    >(
+    pub async fn get_with_metadata_with_key_and_kv_namespace_get_options<Key, Metadata>(
         this: &KVNamespace<Key>,
         key: Key,
         options: &KVNamespaceGetOptions<String>,
@@ -7805,10 +7832,7 @@ extern "C" {
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_key_and_options_kv_namespace_get_options_js_string<
-        Key,
-        Metadata,
-    >(
+    pub async fn get_with_metadata_with_key_and_kv_namespace_get_options_js_string<Key, Metadata>(
         this: &KVNamespace<Key>,
         key: Key,
         options: &KVNamespaceGetOptions<String>,
@@ -7834,19 +7858,19 @@ extern "C" {
         Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options<Key, Metadata>(
+    pub async fn get_with_metadata_with_slice_and_partial_kv_namespace_get_options_undefined<
+        Key,
+        Metadata,
+    >(
         this: &KVNamespace<Key>,
         #[wasm_bindgen(slice = "array")] key: &[Key],
-        options: &KVNamespaceGetOptions<Undefined>,
+        options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
     where
         Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_slice_and_options_kv_namespace_get_options<
-        Key,
-        Metadata,
-    >(
+    pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options<Key, Metadata>(
         this: &KVNamespace<Key>,
         #[wasm_bindgen(slice = "array")] key: &[Key],
         options: &KVNamespaceGetOptions<String>,
@@ -30435,7 +30459,7 @@ impl GatewayOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = GatewayOptions , extends = Object)]
+    # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type UniversalGatewayOptions;
     #[doc = " * @deprecated"]
@@ -30979,9 +31003,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_endpoint(this: &AIGatewayUniversalRequest, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &AIGatewayUniversalRequest) -> AIGatewayHeaders;
+    pub fn headers(this: &AIGatewayUniversalRequest) -> PartialAiGatewayHeaders;
     #[wasm_bindgen(method, setter)]
-    pub fn set_headers(this: &AIGatewayUniversalRequest, val: &AIGatewayHeaders);
+    pub fn set_headers(this: &AIGatewayUniversalRequest, val: &PartialAiGatewayHeaders);
     #[wasm_bindgen(method, getter)]
     pub fn query(this: &AIGatewayUniversalRequest) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -30991,7 +31015,7 @@ impl AIGatewayUniversalRequest {
     pub fn new(
         provider: AIGatewayProviders,
         endpoint: impl ::wasm_bindgen::JsStringLike,
-        headers: &AIGatewayHeaders,
+        headers: &PartialAiGatewayHeaders,
         query: &JsValue,
     ) -> AIGatewayUniversalRequest {
         let inner: AIGatewayUniversalRequest = JsCast::unchecked_into(js_sys::Object::new());
@@ -31004,7 +31028,7 @@ impl AIGatewayUniversalRequest {
     pub fn new_with_str(
         provider: impl ::wasm_bindgen::JsStringLike,
         endpoint: impl ::wasm_bindgen::JsStringLike,
-        headers: &AIGatewayHeaders,
+        headers: &PartialAiGatewayHeaders,
         query: &JsValue,
     ) -> AIGatewayUniversalRequest {
         let inner: AIGatewayUniversalRequest = JsCast::unchecked_into(js_sys::Object::new());
@@ -31556,22 +31580,110 @@ impl AutoRagAiSearchRequestBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = AutoRagAiSearchRequest , extends = Object)]
+    # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRagAiSearchRequestStreaming;
     #[wasm_bindgen(method, getter)]
     pub fn stream(this: &AutoRagAiSearchRequestStreaming) -> bool;
     #[wasm_bindgen(method, setter)]
     pub fn set_stream(this: &AutoRagAiSearchRequestStreaming, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn system_prompt(this: &AutoRagAiSearchRequestStreaming) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "system_prompt")]
+    pub fn system_prompt_js_string(this: &AutoRagAiSearchRequestStreaming) -> Option<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_system_prompt(
+        this: &AutoRagAiSearchRequestStreaming,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn query(this: &AutoRagAiSearchRequestStreaming) -> String;
+    #[wasm_bindgen(method, getter, js_name = "query")]
+    pub fn query_js_string(this: &AutoRagAiSearchRequestStreaming) -> JsString;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_query(
+        this: &AutoRagAiSearchRequestStreaming,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn filters(this: &AutoRagAiSearchRequestStreaming) -> Option<FiltersKind>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_filters(this: &AutoRagAiSearchRequestStreaming, val: &CompoundFilter);
+    #[wasm_bindgen(method, setter, js_name = "filters")]
+    pub fn set_filters_with_comparison_filter(
+        this: &AutoRagAiSearchRequestStreaming,
+        val: &ComparisonFilter,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn max_num_results(this: &AutoRagAiSearchRequestStreaming) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_max_num_results(this: &AutoRagAiSearchRequestStreaming, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn ranking_options(this: &AutoRagAiSearchRequestStreaming) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_ranking_options(this: &AutoRagAiSearchRequestStreaming, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn reranking(this: &AutoRagAiSearchRequestStreaming) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_reranking(this: &AutoRagAiSearchRequestStreaming, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn rewrite_query(this: &AutoRagAiSearchRequestStreaming) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_rewrite_query(this: &AutoRagAiSearchRequestStreaming, val: bool);
 }
 impl AutoRagAiSearchRequestStreaming {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `stream: true`"]
-    pub fn new_true() -> AutoRagAiSearchRequestStreaming {
+    pub fn new_true(query: impl ::wasm_bindgen::JsStringLike) -> AutoRagAiSearchRequestStreaming {
+        Self::builder_true(query).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `stream: true`"]
+    pub fn builder_true(
+        query: impl ::wasm_bindgen::JsStringLike,
+    ) -> AutoRagAiSearchRequestStreamingBuilder {
         let inner: AutoRagAiSearchRequestStreaming = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_stream(true);
-        inner
+        inner.set_query(query);
+        AutoRagAiSearchRequestStreamingBuilder { inner }
+    }
+}
+pub struct AutoRagAiSearchRequestStreamingBuilder {
+    inner: AutoRagAiSearchRequestStreaming,
+}
+impl AutoRagAiSearchRequestStreamingBuilder {
+    pub fn system_prompt(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_system_prompt(val);
+        self
+    }
+    pub fn filters(self, val: &CompoundFilter) -> Self {
+        self.inner.set_filters(val);
+        self
+    }
+    pub fn filters_with_comparison_filter(self, val: &ComparisonFilter) -> Self {
+        self.inner.set_filters_with_comparison_filter(val);
+        self
+    }
+    pub fn max_num_results(self, val: f64) -> Self {
+        self.inner.set_max_num_results(val);
+        self
+    }
+    pub fn ranking_options(self, val: &Object) -> Self {
+        self.inner.set_ranking_options(val);
+        self
+    }
+    pub fn reranking(self, val: &Object) -> Self {
+        self.inner.set_reranking(val);
+        self
+    }
+    pub fn rewrite_query(self, val: bool) -> Self {
+        self.inner.set_rewrite_query(val);
+        self
+    }
+    pub fn build(self) -> AutoRagAiSearchRequestStreaming {
+        self.inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -33969,12 +34081,13 @@ extern "C" {
     #[doc = ""]
     #[doc = " @example \"FAILED:self signed certificate\""]
     #[wasm_bindgen(method, getter, js_name = "certVerified")]
-    pub fn cert_verified(this: &IncomingRequestCfPropertiesTLSClientAuth)
-        -> CertVerificationStatus;
+    pub fn cert_verified(
+        this: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> ExcludeCertVerificationStatusNone;
     #[wasm_bindgen(method, setter, js_name = "certVerified")]
     pub fn set_cert_verified(
         this: &IncomingRequestCfPropertiesTLSClientAuth,
-        val: CertVerificationStatus,
+        val: ExcludeCertVerificationStatusNone,
     );
     #[doc = " The presented certificate's revokation status."]
     #[doc = ""]
@@ -34252,7 +34365,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn new_1_1(
-        cert_verified: CertVerificationStatus,
+        cert_verified: ExcludeCertVerificationStatusNone,
         cert_issuer_dn: impl ::wasm_bindgen::JsStringLike,
         cert_subject_dn: impl ::wasm_bindgen::JsStringLike,
         cert_issuer_dnrfc2253: impl ::wasm_bindgen::JsStringLike,
@@ -34339,7 +34452,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn new_1_0(
-        cert_verified: CertVerificationStatus,
+        cert_verified: ExcludeCertVerificationStatusNone,
         cert_issuer_dn: impl ::wasm_bindgen::JsStringLike,
         cert_subject_dn: impl ::wasm_bindgen::JsStringLike,
         cert_issuer_dnrfc2253: impl ::wasm_bindgen::JsStringLike,
@@ -35053,7 +35166,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_meta(this: &D1Response, val: &JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn error(this: &D1Response) -> JsValue;
+    pub fn error(this: &D1Response) -> Undefined;
     #[wasm_bindgen(method, setter)]
     pub fn set_error(this: &D1Response, val: &JsValue);
 }
@@ -36252,9 +36365,13 @@ pub mod cloudflare {
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type WorkflowEvent<T>;
             #[wasm_bindgen(method, getter)]
-            pub fn payload<T>(this: &WorkflowEvent<T>) -> Readonly;
+            pub fn payload<T>(this: &WorkflowEvent<T>) -> T
+            where
+                T: ::wasm_bindgen::convert::FromWasmAbi;
             #[wasm_bindgen(method, setter)]
-            pub fn set_payload<T>(this: &WorkflowEvent<T>, val: &Readonly);
+            pub fn set_payload<T>(this: &WorkflowEvent<T>, val: T)
+            where
+                T: ::wasm_bindgen::convert::IntoWasmAbi;
             #[wasm_bindgen(method, getter)]
             pub fn timestamp<T>(this: &WorkflowEvent<T>) -> Date;
             #[wasm_bindgen(method, setter)]
@@ -36271,7 +36388,7 @@ pub mod cloudflare {
         }
         impl<T: ::wasm_bindgen::convert::IntoWasmAbi> WorkflowEvent<T> {
             pub fn new(
-                payload: &Readonly,
+                payload: T,
                 timestamp: &Date,
                 instance_id: impl ::wasm_bindgen::JsStringLike,
             ) -> WorkflowEvent<T> {
@@ -36288,9 +36405,13 @@ pub mod cloudflare {
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type WorkflowStepEvent<T>;
             #[wasm_bindgen(method, getter)]
-            pub fn payload<T>(this: &WorkflowStepEvent<T>) -> Readonly;
+            pub fn payload<T>(this: &WorkflowStepEvent<T>) -> T
+            where
+                T: ::wasm_bindgen::convert::FromWasmAbi;
             #[wasm_bindgen(method, setter)]
-            pub fn set_payload<T>(this: &WorkflowStepEvent<T>, val: &Readonly);
+            pub fn set_payload<T>(this: &WorkflowStepEvent<T>, val: T)
+            where
+                T: ::wasm_bindgen::convert::IntoWasmAbi;
             #[wasm_bindgen(method, getter)]
             pub fn timestamp<T>(this: &WorkflowStepEvent<T>) -> Date;
             #[wasm_bindgen(method, setter)]
@@ -36304,7 +36425,7 @@ pub mod cloudflare {
         }
         impl<T: ::wasm_bindgen::convert::IntoWasmAbi> WorkflowStepEvent<T> {
             pub fn new(
-                payload: &Readonly,
+                payload: T,
                 timestamp: &Date,
                 r#type: impl ::wasm_bindgen::JsStringLike,
             ) -> WorkflowStepEvent<T> {
@@ -36464,7 +36585,7 @@ pub mod cloudflare {
             #[wasm_bindgen(method, catch)]
             pub async fn run<Env, T>(
                 this: &WorkflowEntrypoint<Env, T>,
-                event: &Readonly,
+                event: &WorkflowEvent<T>,
                 step: &WorkflowStep,
             ) -> Result<JsValue, JsValue>;
         }
@@ -38529,7 +38650,7 @@ pub mod rpc {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = StubBase , extends = Object , js_namespace = "Rpc")]
+        # [wasm_bindgen (extends = Provider , extends = StubBase , extends = Object , js_namespace = "Rpc")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Stub<T>;
     }
@@ -38551,8 +38672,12 @@ pub mod rpc {
     pub type MethodOrProperty = JsValue;
     #[allow(dead_code)]
     pub type MaybeCallableProvider = JsValue;
-    #[allow(dead_code)]
-    pub type Provider = JsValue;
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "Rpc")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Provider<T, Reserved>;
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -42810,7 +42935,7 @@ impl VectorizeVectorBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = VectorizeVector , extends = Object)]
+    # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeMatch;
     #[doc = " The score or rank for similarity, when returned as a result"]
@@ -42818,13 +42943,81 @@ extern "C" {
     pub fn score(this: &VectorizeMatch) -> f64;
     #[wasm_bindgen(method, setter)]
     pub fn set_score(this: &VectorizeMatch, val: f64);
+    #[doc = " The vector values"]
+    #[wasm_bindgen(method, getter)]
+    pub fn values(this: &VectorizeMatch) -> Option<ValuesKind>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_values(this: &VectorizeMatch, val: &Float32Array);
+    #[wasm_bindgen(method, setter, js_name = "values")]
+    pub fn set_values_with_float64_array(this: &VectorizeMatch, val: &Float64Array);
+    #[wasm_bindgen(method, setter, js_name = "values")]
+    pub fn set_values_with_slice(
+        this: &VectorizeMatch,
+        #[wasm_bindgen(slice = "array")] val: &[f64],
+    );
+    #[doc = " The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &VectorizeMatch) -> String;
+    #[doc = " The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
+    #[wasm_bindgen(method, getter, js_name = "id")]
+    pub fn id_js_string(this: &VectorizeMatch) -> JsString;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &VectorizeMatch, val: impl ::wasm_bindgen::JsStringLike);
+    #[doc = " The namespace this vector belongs to."]
+    #[wasm_bindgen(method, getter)]
+    pub fn namespace(this: &VectorizeMatch) -> Option<String>;
+    #[doc = " The namespace this vector belongs to."]
+    #[wasm_bindgen(method, getter, js_name = "namespace")]
+    pub fn namespace_js_string(this: &VectorizeMatch) -> Option<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_namespace(this: &VectorizeMatch, val: impl ::wasm_bindgen::JsStringLike);
+    #[doc = " Metadata associated with the vector. Includes the values of other fields and potentially additional details."]
+    #[wasm_bindgen(method, getter)]
+    pub fn metadata(this: &VectorizeMatch) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_metadata(this: &VectorizeMatch, val: &Object);
 }
 impl VectorizeMatch {
     #[doc = " * `score` - The score or rank for similarity, when returned as a result"]
-    pub fn new(score: f64) -> VectorizeMatch {
+    #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
+    pub fn new(score: f64, id: impl ::wasm_bindgen::JsStringLike) -> VectorizeMatch {
+        Self::builder(score, id).build()
+    }
+    #[doc = " * `score` - The score or rank for similarity, when returned as a result"]
+    #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
+    pub fn builder(score: f64, id: impl ::wasm_bindgen::JsStringLike) -> VectorizeMatchBuilder {
         let inner: VectorizeMatch = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_score(score);
-        inner
+        inner.set_id(id);
+        VectorizeMatchBuilder { inner }
+    }
+}
+pub struct VectorizeMatchBuilder {
+    inner: VectorizeMatch,
+}
+impl VectorizeMatchBuilder {
+    pub fn values(self, val: &Float32Array) -> Self {
+        self.inner.set_values(val);
+        self
+    }
+    pub fn values_with_float64_array(self, val: &Float64Array) -> Self {
+        self.inner.set_values_with_float64_array(val);
+        self
+    }
+    pub fn values_with_slice(self, val: &[f64]) -> Self {
+        self.inner.set_values_with_slice(val);
+        self
+    }
+    pub fn namespace(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_namespace(val);
+        self
+    }
+    pub fn metadata(self, val: &Object) -> Self {
+        self.inner.set_metadata(val);
+        self
+    }
+    pub fn build(self) -> VectorizeMatch {
+        self.inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -43726,6 +43919,581 @@ impl WorkflowInstanceSendEvent {
         inner.set_type(r#type);
         inner.set_payload(payload);
         inner
+    }
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KeyOfWorkerGlobalScopeEventMap {
+    Fetch = "fetch",
+    Scheduled = "scheduled",
+    Queue = "queue",
+    Unhandledrejection = "unhandledrejection",
+    Rejectionhandled = "rejectionhandled",
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PartialKvNamespaceGetOptionsUndefined;
+    #[wasm_bindgen(method, getter, js_name = "type")]
+    pub fn type_(this: &PartialKvNamespaceGetOptionsUndefined) -> Undefined;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &PartialKvNamespaceGetOptionsUndefined, val: &Undefined);
+    #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
+    pub fn cache_ttl(this: &PartialKvNamespaceGetOptionsUndefined) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
+    pub fn set_cache_ttl(this: &PartialKvNamespaceGetOptionsUndefined, val: f64);
+}
+impl PartialKvNamespaceGetOptionsUndefined {
+    pub fn new() -> PartialKvNamespaceGetOptionsUndefined {
+        Self::builder().build()
+    }
+    pub fn builder() -> PartialKvNamespaceGetOptionsUndefinedBuilder {
+        PartialKvNamespaceGetOptionsUndefinedBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct PartialKvNamespaceGetOptionsUndefinedBuilder {
+    inner: PartialKvNamespaceGetOptionsUndefined,
+}
+impl PartialKvNamespaceGetOptionsUndefinedBuilder {
+    pub fn type_(self, val: &Undefined) -> Self {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn cache_ttl(self, val: f64) -> Self {
+        self.inner.set_cache_ttl(val);
+        self
+    }
+    pub fn build(self) -> PartialKvNamespaceGetOptionsUndefined {
+        self.inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PartialAiGatewayHeaders;
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-metadata")]
+    pub fn cf_aig_metadata(this: &PartialAiGatewayHeaders) -> Option<CfAigMetadataKind>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
+    pub fn set_cf_aig_metadata(this: &PartialAiGatewayHeaders, val: &Object);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
+    pub fn set_cf_aig_metadata_with_str(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
+    pub fn cf_aig_custom_cost(this: &PartialAiGatewayHeaders) -> Option<AudioKind>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
+    pub fn set_cf_aig_custom_cost(this: &PartialAiGatewayHeaders, val: &Object);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
+    pub fn set_cf_aig_custom_cost_with_str(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-cache-ttl")]
+    pub fn cf_aig_cache_ttl(this: &PartialAiGatewayHeaders) -> Option<CfAigCacheTtlKind>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-cache-ttl")]
+    pub fn set_cf_aig_cache_ttl(this: &PartialAiGatewayHeaders, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-cache-ttl")]
+    pub fn set_cf_aig_cache_ttl_with_str(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-skip-cache")]
+    pub fn cf_aig_skip_cache(this: &PartialAiGatewayHeaders) -> Option<CfAigSkipCacheKind>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-skip-cache")]
+    pub fn set_cf_aig_skip_cache(this: &PartialAiGatewayHeaders, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-skip-cache")]
+    pub fn set_cf_aig_skip_cache_with_str(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-cache-key")]
+    pub fn cf_aig_cache_key(this: &PartialAiGatewayHeaders) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-cache-key")]
+    pub fn cf_aig_cache_key_js_string(this: &PartialAiGatewayHeaders) -> Option<JsString>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-cache-key")]
+    pub fn set_cf_aig_cache_key(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-event-id")]
+    pub fn cf_aig_event_id(this: &PartialAiGatewayHeaders) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-event-id")]
+    pub fn cf_aig_event_id_js_string(this: &PartialAiGatewayHeaders) -> Option<JsString>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-event-id")]
+    pub fn set_cf_aig_event_id(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-request-timeout")]
+    pub fn cf_aig_request_timeout(this: &PartialAiGatewayHeaders) -> Option<CfAigCacheTtlKind>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-request-timeout")]
+    pub fn set_cf_aig_request_timeout(this: &PartialAiGatewayHeaders, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-request-timeout")]
+    pub fn set_cf_aig_request_timeout_with_str(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-max-attempts")]
+    pub fn cf_aig_max_attempts(this: &PartialAiGatewayHeaders) -> Option<CfAigCacheTtlKind>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-max-attempts")]
+    pub fn set_cf_aig_max_attempts(this: &PartialAiGatewayHeaders, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-max-attempts")]
+    pub fn set_cf_aig_max_attempts_with_str(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-retry-delay")]
+    pub fn cf_aig_retry_delay(this: &PartialAiGatewayHeaders) -> Option<CfAigCacheTtlKind>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-retry-delay")]
+    pub fn set_cf_aig_retry_delay(this: &PartialAiGatewayHeaders, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-retry-delay")]
+    pub fn set_cf_aig_retry_delay_with_str(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-backoff")]
+    pub fn cf_aig_backoff(this: &PartialAiGatewayHeaders) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-backoff")]
+    pub fn cf_aig_backoff_js_string(this: &PartialAiGatewayHeaders) -> Option<JsString>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-backoff")]
+    pub fn set_cf_aig_backoff(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-collect-log")]
+    pub fn cf_aig_collect_log(this: &PartialAiGatewayHeaders) -> Option<CfAigSkipCacheKind>;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-collect-log")]
+    pub fn set_cf_aig_collect_log(this: &PartialAiGatewayHeaders, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-collect-log")]
+    pub fn set_cf_aig_collect_log_with_str(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "Authorization")]
+    pub fn authorization(this: &PartialAiGatewayHeaders) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "Authorization")]
+    pub fn authorization_js_string(this: &PartialAiGatewayHeaders) -> Option<JsString>;
+    #[wasm_bindgen(method, setter, js_name = "Authorization")]
+    pub fn set_authorization(
+        this: &PartialAiGatewayHeaders,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "Content-Type")]
+    pub fn content_type(this: &PartialAiGatewayHeaders) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "Content-Type")]
+    pub fn content_type_js_string(this: &PartialAiGatewayHeaders) -> Option<JsString>;
+    #[wasm_bindgen(method, setter, js_name = "Content-Type")]
+    pub fn set_content_type(this: &PartialAiGatewayHeaders, val: impl ::wasm_bindgen::JsStringLike);
+}
+impl PartialAiGatewayHeaders {
+    pub fn new() -> PartialAiGatewayHeaders {
+        Self::builder().build()
+    }
+    pub fn builder() -> PartialAiGatewayHeadersBuilder {
+        PartialAiGatewayHeadersBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct PartialAiGatewayHeadersBuilder {
+    inner: PartialAiGatewayHeaders,
+}
+impl PartialAiGatewayHeadersBuilder {
+    pub fn cf_aig_metadata(self, val: &Object) -> Self {
+        self.inner.set_cf_aig_metadata(val);
+        self
+    }
+    pub fn cf_aig_metadata_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_metadata_with_str(val);
+        self
+    }
+    pub fn cf_aig_custom_cost(self, val: &Object) -> Self {
+        self.inner.set_cf_aig_custom_cost(val);
+        self
+    }
+    pub fn cf_aig_custom_cost_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_custom_cost_with_str(val);
+        self
+    }
+    pub fn cf_aig_cache_ttl(self, val: f64) -> Self {
+        self.inner.set_cf_aig_cache_ttl(val);
+        self
+    }
+    pub fn cf_aig_cache_ttl_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_cache_ttl_with_str(val);
+        self
+    }
+    pub fn cf_aig_skip_cache(self, val: bool) -> Self {
+        self.inner.set_cf_aig_skip_cache(val);
+        self
+    }
+    pub fn cf_aig_skip_cache_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_skip_cache_with_str(val);
+        self
+    }
+    pub fn cf_aig_cache_key(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_cache_key(val);
+        self
+    }
+    pub fn cf_aig_event_id(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_event_id(val);
+        self
+    }
+    pub fn cf_aig_request_timeout(self, val: f64) -> Self {
+        self.inner.set_cf_aig_request_timeout(val);
+        self
+    }
+    pub fn cf_aig_request_timeout_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_request_timeout_with_str(val);
+        self
+    }
+    pub fn cf_aig_max_attempts(self, val: f64) -> Self {
+        self.inner.set_cf_aig_max_attempts(val);
+        self
+    }
+    pub fn cf_aig_max_attempts_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_max_attempts_with_str(val);
+        self
+    }
+    pub fn cf_aig_retry_delay(self, val: f64) -> Self {
+        self.inner.set_cf_aig_retry_delay(val);
+        self
+    }
+    pub fn cf_aig_retry_delay_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_retry_delay_with_str(val);
+        self
+    }
+    pub fn cf_aig_backoff(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_backoff(val);
+        self
+    }
+    pub fn cf_aig_collect_log(self, val: bool) -> Self {
+        self.inner.set_cf_aig_collect_log(val);
+        self
+    }
+    pub fn cf_aig_collect_log_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cf_aig_collect_log_with_str(val);
+        self
+    }
+    pub fn authorization(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_authorization(val);
+        self
+    }
+    pub fn content_type(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_content_type(val);
+        self
+    }
+    pub fn build(self) -> PartialAiGatewayHeaders {
+        self.inner
+    }
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExcludeCertVerificationStatusNone {
+    Success = "SUCCESS",
+    FailedselfSignedCertificate = "FAILED:self signed certificate",
+    FailedunableToVerifyTheFirstCertificate = "FAILED:unable to verify the first certificate",
+    FailedcertificateIsNotYetValid = "FAILED:certificate is not yet valid",
+    FailedcertificateHasExpired = "FAILED:certificate has expired",
+    Failed = "FAILED",
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type VectorizeVectorMetadataFilter2;
+    #[wasm_bindgen(method, getter, js_name = "$eq")]
+    pub fn eq(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "$eq")]
+    pub fn set_eq(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "$eq")]
+    pub fn set_eq_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "$eq")]
+    pub fn set_eq_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "$eq")]
+    pub fn set_eq_with_slice(
+        this: &VectorizeVectorMetadataFilter2,
+        val: &[impl ::wasm_bindgen::JsStringLike],
+    );
+    #[wasm_bindgen(method, setter, js_name = "$eq")]
+    fn set_eq_with_null_js(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, getter, js_name = "$ne")]
+    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "$ne")]
+    pub fn set_ne(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "$ne")]
+    pub fn set_ne_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "$ne")]
+    pub fn set_ne_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "$ne")]
+    pub fn set_ne_with_slice(
+        this: &VectorizeVectorMetadataFilter2,
+        val: &[impl ::wasm_bindgen::JsStringLike],
+    );
+    #[wasm_bindgen(method, setter, js_name = "$ne")]
+    fn set_ne_with_null_js(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, getter, js_name = "$lt")]
+    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "$lt")]
+    pub fn set_lt(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "$lt")]
+    pub fn set_lt_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "$lt")]
+    pub fn set_lt_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "$lt")]
+    pub fn set_lt_with_slice(
+        this: &VectorizeVectorMetadataFilter2,
+        val: &[impl ::wasm_bindgen::JsStringLike],
+    );
+    #[wasm_bindgen(method, setter, js_name = "$lt")]
+    fn set_lt_with_null_js(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, getter, js_name = "$lte")]
+    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "$lte")]
+    pub fn set_lte(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "$lte")]
+    pub fn set_lte_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "$lte")]
+    pub fn set_lte_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "$lte")]
+    pub fn set_lte_with_slice(
+        this: &VectorizeVectorMetadataFilter2,
+        val: &[impl ::wasm_bindgen::JsStringLike],
+    );
+    #[wasm_bindgen(method, setter, js_name = "$lte")]
+    fn set_lte_with_null_js(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, getter, js_name = "$gt")]
+    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "$gt")]
+    pub fn set_gt(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "$gt")]
+    pub fn set_gt_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "$gt")]
+    pub fn set_gt_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "$gt")]
+    pub fn set_gt_with_slice(
+        this: &VectorizeVectorMetadataFilter2,
+        val: &[impl ::wasm_bindgen::JsStringLike],
+    );
+    #[wasm_bindgen(method, setter, js_name = "$gt")]
+    fn set_gt_with_null_js(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, getter, js_name = "$gte")]
+    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "$gte")]
+    pub fn set_gte(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "$gte")]
+    pub fn set_gte_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "$gte")]
+    pub fn set_gte_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "$gte")]
+    pub fn set_gte_with_slice(
+        this: &VectorizeVectorMetadataFilter2,
+        val: &[impl ::wasm_bindgen::JsStringLike],
+    );
+    #[wasm_bindgen(method, setter, js_name = "$gte")]
+    fn set_gte_with_null_js(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+}
+impl VectorizeVectorMetadataFilter2 {
+    pub fn set_eq_with_null(&self) {
+        self.set_eq_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn set_ne_with_null(&self) {
+        self.set_ne_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn set_lt_with_null(&self) {
+        self.set_lt_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn set_lte_with_null(&self) {
+        self.set_lte_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn set_gt_with_null(&self) {
+        self.set_gt_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn set_gte_with_null(&self) {
+        self.set_gte_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
+}
+impl VectorizeVectorMetadataFilter2 {
+    pub fn new() -> VectorizeVectorMetadataFilter2 {
+        Self::builder().build()
+    }
+    pub fn builder() -> VectorizeVectorMetadataFilter2Builder {
+        VectorizeVectorMetadataFilter2Builder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct VectorizeVectorMetadataFilter2Builder {
+    inner: VectorizeVectorMetadataFilter2,
+}
+impl VectorizeVectorMetadataFilter2Builder {
+    pub fn eq(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_eq(val);
+        self
+    }
+    pub fn eq_with_f64(self, val: f64) -> Self {
+        self.inner.set_eq_with_f64(val);
+        self
+    }
+    pub fn eq_with_bool(self, val: bool) -> Self {
+        self.inner.set_eq_with_bool(val);
+        self
+    }
+    pub fn eq_with_slice(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+        self.inner.set_eq_with_slice(val);
+        self
+    }
+    pub fn eq_with_null(self) -> Self {
+        self.inner.set_eq_with_null();
+        self
+    }
+    pub fn ne(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_ne(val);
+        self
+    }
+    pub fn ne_with_f64(self, val: f64) -> Self {
+        self.inner.set_ne_with_f64(val);
+        self
+    }
+    pub fn ne_with_bool(self, val: bool) -> Self {
+        self.inner.set_ne_with_bool(val);
+        self
+    }
+    pub fn ne_with_slice(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+        self.inner.set_ne_with_slice(val);
+        self
+    }
+    pub fn ne_with_null(self) -> Self {
+        self.inner.set_ne_with_null();
+        self
+    }
+    pub fn lt(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_lt(val);
+        self
+    }
+    pub fn lt_with_f64(self, val: f64) -> Self {
+        self.inner.set_lt_with_f64(val);
+        self
+    }
+    pub fn lt_with_bool(self, val: bool) -> Self {
+        self.inner.set_lt_with_bool(val);
+        self
+    }
+    pub fn lt_with_slice(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+        self.inner.set_lt_with_slice(val);
+        self
+    }
+    pub fn lt_with_null(self) -> Self {
+        self.inner.set_lt_with_null();
+        self
+    }
+    pub fn lte(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_lte(val);
+        self
+    }
+    pub fn lte_with_f64(self, val: f64) -> Self {
+        self.inner.set_lte_with_f64(val);
+        self
+    }
+    pub fn lte_with_bool(self, val: bool) -> Self {
+        self.inner.set_lte_with_bool(val);
+        self
+    }
+    pub fn lte_with_slice(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+        self.inner.set_lte_with_slice(val);
+        self
+    }
+    pub fn lte_with_null(self) -> Self {
+        self.inner.set_lte_with_null();
+        self
+    }
+    pub fn gt(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_gt(val);
+        self
+    }
+    pub fn gt_with_f64(self, val: f64) -> Self {
+        self.inner.set_gt_with_f64(val);
+        self
+    }
+    pub fn gt_with_bool(self, val: bool) -> Self {
+        self.inner.set_gt_with_bool(val);
+        self
+    }
+    pub fn gt_with_slice(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+        self.inner.set_gt_with_slice(val);
+        self
+    }
+    pub fn gt_with_null(self) -> Self {
+        self.inner.set_gt_with_null();
+        self
+    }
+    pub fn gte(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_gte(val);
+        self
+    }
+    pub fn gte_with_f64(self, val: f64) -> Self {
+        self.inner.set_gte_with_f64(val);
+        self
+    }
+    pub fn gte_with_bool(self, val: bool) -> Self {
+        self.inner.set_gte_with_bool(val);
+        self
+    }
+    pub fn gte_with_slice(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+        self.inner.set_gte_with_slice(val);
+        self
+    }
+    pub fn gte_with_null(self) -> Self {
+        self.inner.set_gte_with_null();
+        self
+    }
+    pub fn build(self) -> VectorizeVectorMetadataFilter2 {
+        self.inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type VectorizeVectorMetadataFilter3;
+    #[wasm_bindgen(method, getter, js_name = "$in")]
+    pub fn in_(this: &VectorizeVectorMetadataFilter3) -> Option<Vec<JsValue>>;
+    #[wasm_bindgen(method, setter, js_name = "$in")]
+    pub fn set_in(this: &VectorizeVectorMetadataFilter3, val: &[JsValue]);
+    #[wasm_bindgen(method, getter, js_name = "$nin")]
+    pub fn nin(this: &VectorizeVectorMetadataFilter3) -> Option<Vec<JsValue>>;
+    #[wasm_bindgen(method, setter, js_name = "$nin")]
+    pub fn set_nin(this: &VectorizeVectorMetadataFilter3, val: &[JsValue]);
+}
+impl VectorizeVectorMetadataFilter3 {
+    pub fn new() -> VectorizeVectorMetadataFilter3 {
+        Self::builder().build()
+    }
+    pub fn builder() -> VectorizeVectorMetadataFilter3Builder {
+        VectorizeVectorMetadataFilter3Builder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct VectorizeVectorMetadataFilter3Builder {
+    inner: VectorizeVectorMetadataFilter3,
+}
+impl VectorizeVectorMetadataFilter3Builder {
+    pub fn in_(self, val: &[JsValue]) -> Self {
+        self.inner.set_in(val);
+        self
+    }
+    pub fn nin(self, val: &[JsValue]) -> Self {
+        self.inner.set_nin(val);
+        self
+    }
+    pub fn build(self) -> VectorizeVectorMetadataFilter3 {
+        self.inner
     }
 }
 #[wasm_bindgen(private)]

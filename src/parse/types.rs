@@ -71,7 +71,7 @@ fn convert_ts_type_with_arena(
         TSType::TSAnyKeyword(_) => TypeRef::Any,
         TSType::TSBooleanKeyword(_) => TypeRef::Boolean,
         TSType::TSBigIntKeyword(_) => TypeRef::BigInt,
-        TSType::TSNeverKeyword(_) => TypeRef::Any, // erase `never` to `any`
+        TSType::TSNeverKeyword(_) => TypeRef::Never,
         TSType::TSNullKeyword(_) => TypeRef::Null,
         TSType::TSNumberKeyword(_) => TypeRef::Number,
         TSType::TSObjectKeyword(_) => TypeRef::Object,
@@ -144,31 +144,85 @@ fn convert_ts_type_with_arena(
             diag.warn("Conditional types are not supported, erasing to JsValue");
             TypeRef::Unresolved("conditional type".to_string())
         }
-        TSType::TSMappedType(_) => {
-            diag.warn("Mapped types are not supported, erasing to JsValue");
-            TypeRef::Unresolved("mapped type".to_string())
+        TSType::TSMappedType(mapped) => {
+            // An `as` clause remaps keys, which evaluation doesn't follow.
+            if mapped.name_type.is_some() {
+                diag.warn("Mapped types with an `as` clause are not supported, erasing to JsValue");
+                return TypeRef::Unresolved("mapped type".to_string());
+            }
+            let modifier = |m: Option<TSMappedTypeModifierOperator>| match m {
+                Some(TSMappedTypeModifierOperator::True | TSMappedTypeModifierOperator::Plus) => {
+                    Some(crate::ir::Modifier::Add)
+                }
+                Some(TSMappedTypeModifierOperator::Minus) => Some(crate::ir::Modifier::Remove),
+                None => None,
+            };
+            TypeRef::Mapped(Box::new(crate::ir::MappedType {
+                key: mapped.key.name.to_string(),
+                keys: convert_ts_type_with_arena(&mapped.constraint, scope, scopes, diag),
+                value: mapped
+                    .type_annotation
+                    .as_ref()
+                    .map(|t| convert_ts_type_with_arena(t, scope, scopes, diag)),
+                optional: modifier(mapped.optional),
+                readonly: modifier(mapped.readonly),
+            }))
         }
         TSType::TSTemplateLiteralType(_) => TypeRef::String,
-        TSType::TSIndexedAccessType(_) => {
-            diag.warn("Indexed access types are not supported, erasing to JsValue");
-            TypeRef::Unresolved("indexed access type".to_string())
+        TSType::TSIndexedAccessType(access) => {
+            let object = match &access.object_type {
+                TSType::TSTypeLiteral(lit) => TypeRef::ObjectLiteral(
+                    lit.members
+                        .iter()
+                        .filter_map(|member| {
+                            let TSSignature::TSPropertySignature(prop) = member else {
+                                return None;
+                            };
+                            Some(crate::ir::ObjectProp {
+                                name: crate::parse::members::property_key_name(&prop.key)?,
+                                type_ref: prop.type_annotation.as_ref().map_or(
+                                    TypeRef::Any,
+                                    |ann| {
+                                        convert_ts_type_with_arena(
+                                            &ann.type_annotation,
+                                            scope,
+                                            scopes,
+                                            diag,
+                                        )
+                                    },
+                                ),
+                                optional: prop.optional,
+                                readonly: prop.readonly,
+                            })
+                        })
+                        .collect(),
+                ),
+                other => convert_ts_type_with_arena(other, scope, scopes, diag),
+            };
+            TypeRef::IndexedAccess(
+                Box::new(object),
+                Box::new(convert_ts_type_with_arena(
+                    &access.index_type,
+                    scope,
+                    scopes,
+                    diag,
+                )),
+            )
         }
         TSType::TSInferType(_) => {
             diag.warn("Infer types are not supported, erasing to JsValue");
             TypeRef::Unresolved("infer type".to_string())
         }
-        TSType::TSTypeOperatorType(op) => match op.operator {
-            TSTypeOperatorOperator::Readonly | TSTypeOperatorOperator::Unique => {
-                convert_ts_type_with_arena(&op.type_annotation, scope, scopes, diag)
+        TSType::TSTypeOperatorType(op) => {
+            match op.operator {
+                TSTypeOperatorOperator::Readonly | TSTypeOperatorOperator::Unique => {
+                    convert_ts_type_with_arena(&op.type_annotation, scope, scopes, diag)
+                }
+                TSTypeOperatorOperator::Keyof => TypeRef::KeyOf(Box::new(
+                    convert_ts_type_with_arena(&op.type_annotation, scope, scopes, diag),
+                )),
             }
-            _ => {
-                diag.warn_with_source(
-                    "Type operator not supported, erasing to JsValue",
-                    format!("{:?}", op.operator),
-                );
-                TypeRef::Unresolved("type operator".to_string())
-            }
-        },
+        }
         TSType::TSTypePredicate(_) => TypeRef::Boolean,
         TSType::TSTypeQuery(_) => {
             diag.warn("typeof type queries are not supported, erasing to JsValue");
@@ -266,14 +320,10 @@ fn convert_type_reference(
                 });
             }
 
-            "Partial"
-            | "Required"
-            | "Pick"
-            | "Omit"
-            | "Exclude"
-            | "Extract"
-            | "NonNullable"
-            | "ReturnType"
+            // The object and union utilities stay references for
+            // `parse::eval`; these have no evaluation and approximate to
+            // their first argument.
+            "ReturnType"
             | "Parameters"
             | "ConstructorParameters"
             | "InstanceType"

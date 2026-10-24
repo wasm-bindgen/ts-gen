@@ -25,6 +25,7 @@ src/
 │   ├── classify.rs            # interface classification (class-like vs dictionary)
 │   ├── types.rs               # TS type → IR TypeRef
 │   ├── scope.rs               # scope / TypeId arena
+│   ├── eval.rs                # post-pass: keyof / mapped / utility type evaluation
 │   ├── first_pass/            # two-phase population
 │   │   ├── collect.rs         # phase 1: name registry
 │   │   └── populate.rs        # phase 2: full IR
@@ -121,7 +122,7 @@ Three layers:
   └─> oxc_parser (AST)
         └─> Phase 1: collect type names into TypeRegistry
               └─> Phase 2: populate full IR (resolve refs, merge var+iface, …)
-                    └─> Post-passes (merge_class_pairs, classify, resolve imports)
+                    └─> Post-passes (merge_class_pairs, classify, resolve imports, enums, eval)
                           └─> Codegen (CodegenContext, to_syn_type, emitters)
                                 └─> syn::File → prettyplease → .rs
 ```

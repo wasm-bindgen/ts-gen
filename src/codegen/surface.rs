@@ -710,6 +710,11 @@ fn type_refs(ty: &TypeRef, scope: ScopeId, out: &mut Vec<(String, ScopeId)>) {
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)
+        | TypeRef::Never
+        | TypeRef::KeyOf(_)
+        | TypeRef::IndexedAccess(..)
+        | TypeRef::Mapped(_)
+        | TypeRef::ObjectLiteral(_)
         | TypeRef::Unresolved(_) => {}
     }
 }
