@@ -1,0 +1,6 @@
+{
+  "name": "optional-reads",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}

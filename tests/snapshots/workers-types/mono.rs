@@ -8352,7 +8352,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "statusText")]
     pub fn set_status_text(this: &ResponseInit, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &ResponseInit) -> JsValue;
+    pub fn headers(this: &ResponseInit) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -8607,7 +8607,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_method<Cf>(this: &RequestInit<Cf>, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn headers<Cf>(this: &RequestInit<Cf>) -> JsValue;
+    pub fn headers<Cf>(this: &RequestInit<Cf>) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers<Cf>(this: &RequestInit<Cf>, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -8615,7 +8615,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record<Cf>(this: &RequestInit<Cf>, val: &Object<JsString>);
     #[wasm_bindgen(method, getter)]
-    pub fn body<Cf>(this: &RequestInit<Cf>) -> JsValue;
+    pub fn body<Cf>(this: &RequestInit<Cf>) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body<Cf>(this: &RequestInit<Cf>, val: &ReadableStream<Uint8Array>);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -18154,7 +18154,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_response(this: &AiTextGenerationOutput, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn tool_calls(this: &AiTextGenerationOutput) -> JsValue;
+    pub fn tool_calls(this: &AiTextGenerationOutput) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_tool_calls(this: &AiTextGenerationOutput, val: &JsValue);
     #[wasm_bindgen(method, getter)]
@@ -21940,7 +21940,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseTextConfig;
     #[wasm_bindgen(method, getter)]
-    pub fn format(this: &ResponseTextConfig) -> JsValue;
+    pub fn format(this: &ResponseTextConfig) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_format(this: &ResponseTextConfig, val: &ResponseFormatText);
     #[wasm_bindgen(method, setter, js_name = "format")]
@@ -50371,7 +50371,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilter2;
     #[wasm_bindgen(method, getter, js_name = "$eq")]
-    pub fn eq(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn eq(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     pub fn set_eq(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$eq")]
@@ -50386,7 +50386,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     fn __set_eq_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$ne")]
-    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     pub fn set_ne(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$ne")]
@@ -50401,7 +50401,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     fn __set_ne_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lt")]
-    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     pub fn set_lt(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$lt")]
@@ -50416,7 +50416,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     fn __set_lt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lte")]
-    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     pub fn set_lte(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$lte")]
@@ -50431,7 +50431,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     fn __set_lte_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gt")]
-    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     pub fn set_gt(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$gt")]
@@ -50446,7 +50446,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     fn __set_gt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gte")]
-    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$gte")]
     pub fn set_gte(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$gte")]

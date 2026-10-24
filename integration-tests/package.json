@@ -14,6 +14,7 @@
     "mono-lists": "file:./js/mono-lists",
     "never-returns": "file:./js/never-returns",
     "node-nullable": "file:./js/node-nullable",
+    "optional-reads": "file:./js/optional-reads",
     "slice-args": "file:./js/slice-args",
     "slice-hints": "file:./js/slice-hints"
   }
