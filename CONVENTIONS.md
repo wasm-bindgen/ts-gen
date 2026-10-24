@@ -2258,13 +2258,13 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "size")]
     fn size_js(this: &R2Object) -> f64;
     #[wasm_bindgen(method, catch, js_name = "list")]
-    async fn list_js(this: &R2Object, limit: f64) -> Result<Vec<R2Object>, JsValue>;
+    async fn list_js(this: &R2Object, limit: f64) -> Result<Array<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "count")]
     async fn count_js(this: &R2Object) -> Result<f64, JsValue>;
 }
 impl R2Object {
     pub fn size(&self) -> u64 { self.size_js() as u64 }
-    pub async fn list(&self, limit: u64) -> Result<Vec<R2Object>, JsValue> {
+    pub async fn list(&self, limit: u64) -> Result<Array<R2Object>, JsValue> {
         self.list_js(limit as f64).await
     }
     pub async fn count(&self) -> Result<u64, JsValue> {
@@ -2275,14 +2275,13 @@ impl R2Object {
 
 * Applies to getters, setters, parameters, sync and async returns,
   static methods, constructors and free functions; the public
-  signature is exactly what the scalar would have been, through
-  `Option<_>` (`?` / `| null`), `Vec<_>` / `&[_]` (`T[]`) and
-  `Result<_, E>`. A `@rust u64` on a `bigint` needs no wrapper.
+  signature is exactly what the scalar would have been, through the
+  read carriers `Option<_>` / `Nullable<_>` (`?`, `| undefined`,
+  `| null`), `Vec<_>` / `&[_]` (`T[]`) and `Result<_, E>`. A `@rust u64` on a `bigint` needs no wrapper.
 * A generic receiver (`Box<T>`) gives `impl<T: JsGeneric> Box<T>`; the
   method's own type parameters stay on the wrapper fn.
-* The `_promise` companion is handed to JS (`waitUntil`, `Promise.race`),
-  so it keeps `Promise<f64>` and gets no wrapper. The same holds for a
-  scalar inside a callback type.
+* A scalar inside a callback type is handed to JS, so it keeps `f64`
+  and gets no wrapper.
 * Dictionary factories and builder methods take the public scalar and
   call the wrapper setter, so `R2PutOptions::builder().size(5)` reads as
   declared.

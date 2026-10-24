@@ -1,20 +1,21 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::Promise;
+use js_sys::{Array, Nullable};
 
-use ts_gen_integration_tests::inline_wrappers::{now, Box_, R2Bucket, R2Object, R2PutOptions};
+use ts_gen_integration_tests::inline_wrappers::{
+    now, Box as JsBox, R2Bucket, R2Object, R2PutOptions,
+};
 
 // No backing JavaScript module; compile-only coverage that the `@rust u64`
 // wrappers take the scalar on both sides while the extern binding stays
 // `f64`, across getters, setters, parameters, slices, sync and async
 // returns, statics, constructors and generic receivers.
 #[allow(dead_code)]
-async fn wrappers_compile(obj: &R2Object, boxed: &Box_<R2Object>) -> Result<(), JsValue> {
+async fn wrappers_compile(obj: &R2Object, boxed: &JsBox<R2Object>) -> Result<(), JsValue> {
     let _: u64 = obj.size();
-    let _: Option<u64> = obj.uploaded_at();
-    let _: Vec<R2Object> = obj.list(10).await?;
-    let _: Vec<R2Object> = obj.list_with_prefix(10, "p").await?;
-    let _: Promise<f64> = obj.count_promise();
+    let _: Nullable<u64> = obj.uploaded_at();
+    let _: Array<R2Object> = obj.list(10).await?;
+    let _: Array<R2Object> = obj.list_with_prefix(10, "p").await?;
     let _: u64 = obj.count().await?;
     let _: Vec<u64> = obj.sizes();
     obj.upload(&[1, 2, 3]);

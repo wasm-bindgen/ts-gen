@@ -12,7 +12,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "size")]
     fn size_js(this: &R2Object) -> f64;
     #[wasm_bindgen(method, getter, js_name = "uploadedAt")]
-    pub fn uploaded_at(this: &R2Object) -> Nullable<f64>;
+    fn uploaded_at_js(this: &R2Object) -> Nullable<f64>;
     #[wasm_bindgen(method, catch, js_name = "list")]
     async fn list_js(this: &R2Object, limit: f64) -> Result<Array<R2Object>, Error>;
     #[wasm_bindgen(method, catch, js_name = "list")]
@@ -36,6 +36,9 @@ extern "C" {
 impl R2Object {
     pub fn size(&self) -> u64 {
         self.size_js() as u64
+    }
+    pub fn uploaded_at(&self) -> Nullable<u64> {
+        self.uploaded_at_js().map(|v| v as u64)
     }
     pub async fn list(&self, limit: u64) -> Result<Array<R2Object>, Error> {
         self.list_js(limit as f64).await
