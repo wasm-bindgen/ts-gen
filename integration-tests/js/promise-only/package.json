@@ -1,0 +1,6 @@
+{
+  "name": "promise-only",
+  "private": true,
+  "type": "module",
+  "exports": "./index.js"
+}

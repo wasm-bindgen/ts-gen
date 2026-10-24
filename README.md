@@ -84,6 +84,16 @@ primary plus a `try_<name>` companion:
 ts-gen --input types.d.ts --output src/bindings.rs --fallible
 ```
 
+Bind each `Promise`-returning method and function once, as a sync `name()`
+returning the promise (awaited with `name().await`), instead of an
+`async fn name()` plus a `name_promise()` form. With
+`--experimental-generic-mono`, the promise carries the awaited Rust value
+(`Promise<String>`, `Promise<Array<String>>`, `Promise<Nullable<String>>`):
+
+```sh
+ts-gen --input types.d.ts --output src/bindings.rs --promise-only
+```
+
 ### Library API
 
 ```rust
