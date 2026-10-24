@@ -2448,7 +2448,7 @@ interface SyncKvStorage {
 becomes:
 
 ```rust
-pub type SyncKvStorageList<T: ::wasm_bindgen::JsGeneric>;
+pub type SyncKvStorageList<T: ::wasm_bindgen::JsGeneric = JsValue>;
 
 #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
 pub fn iterator<T: ::wasm_bindgen::JsGeneric>(
@@ -2456,7 +2456,7 @@ pub fn iterator<T: ::wasm_bindgen::JsGeneric>(
 ) -> Iterator<ArrayTuple<(JsString, T)>>;
 
 #[wasm_bindgen(method)]
-pub fn list(this: &SyncKvStorage) -> SyncKvStorageList<JsValue>;
+pub fn list(this: &SyncKvStorage) -> SyncKvStorageList;
 ```
 
 The wrapper's name follows the existing `<Parent><Member>`
@@ -2503,16 +2503,16 @@ is itself the cast — the (awaited) return is exactly `T`, `T |
 undefined` or `T | null` — so the rule, per parameter:
 
 1. Mentioned by an argument: kept, inferred at the call. A callback
-   counts as it lowers: its rest parameter is `JsValue` (or an untyped
-   `Array`), so it never mentions `T`, while its other parameters and
-   its return do. A `Promise<T>` callback return does not count, since
-   wasm-bindgen cannot pass a `Function` returning `Promise<T>` for a
-   generic `T`. A variadic rest likewise counts as it lowers: by default
+   counts as it lowers: its parameters and its return count, but a
+   callback with a rest parameter is the untyped `Function` and
+   mentions nothing. A `Promise<T>` callback return does not count,
+   since wasm-bindgen cannot pass a `Function` returning `Promise<T>`
+   for a generic `T`. A variadic rest likewise counts as it lowers: by default
    it is `&[JsValue]` and mentions nothing, while under
    `--experimental-generic-mono` a rest array lowers to a slice, so
    `of<T>(...items: T[]): Row<T>` keeps `T` (`fn of<T>(items: &[T]) ->
    Row<T>`) where the default erases it (`fn of(items: &[JsValue]) ->
-   Row<Object>`).
+   Row`).
 2. Not mentioned, return exactly `T` / `T | undefined` / `T | null`
    (awaited): kept — `storage.get::<JsString>(key)`, `body.json::<Row>()`.
 3. Otherwise erased and removed from the signature. The substitute is
@@ -2538,14 +2538,14 @@ interface Store {
 ```
 
 ```rust
-pub async fn put<T: JsGeneric>(this: &Store, key: &str, value: &T) -> Result<Undefined, JsValue>;
+pub async fn put<T: JsGeneric>(this: &Store, key: &str, value: &T) -> Result<(), JsValue>;
 pub async fn get<T: JsGeneric>(this: &Store, key: &str) -> Result<Option<T>, JsValue>
 where
     T: OptionFromWasmAbi;
-pub async fn transaction<T: JsGeneric>(this: &Store, closure: &Function<fn(Store) -> Promise<T>>) -> Result<T, JsValue>;
-pub async fn run(this: &Store) -> Result<Row<Object>, JsValue>;
+pub async fn transaction<T: JsGeneric + FromWasmAbi>(this: &Store, closure: &Function<fn(Store) -> Promise>) -> Result<T, JsValue>;
+pub async fn run(this: &Store) -> Result<Row, JsValue>; // Row<Object>, the default
 pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
-pub fn schedule(this: &Store, callback: &Function<fn(JsValue) -> Undefined>, args: &[JsValue]) -> f64;
+pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> f64;
 ```
 
 Passing `--experimental-generic-mono` selects wasm-bindgen's experimental
@@ -2882,11 +2882,12 @@ interface Env { TYPED: KVNamespace<"a" | "b">; }
 ```rust
 pub type KVNamespace;
 pub async fn get(this: &KVNamespace, key: &str) -> Result<Nullable<String>, JsValue>;
-pub async fn list<Metadata: ::wasm_bindgen::JsGeneric>(
-    this: &KVNamespace,
-) -> Result<KVNamespaceListResult<Metadata>, JsValue>;
+pub async fn list(this: &KVNamespace) -> Result<KVNamespaceListResult, JsValue>;
 pub fn typed(this: &Env) -> KVNamespace;
 ```
+
+(`list`'s own `Metadata` erases separately, as no argument infers it;
+see [uninferrable type parameters](#uninferrable-method-type-parameters).)
 
 Method-level parameters follow the same rule
 (`tag<Level extends "info" | "warn">(level: Level)` → `level: &str`).

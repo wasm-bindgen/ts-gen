@@ -99,13 +99,20 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn each<T: ::wasm_bindgen::JsGeneric>(
         this: &Store,
-        r#fn: &Function,
+        r#fn: &Function<fn(T) -> Undefined>,
     ) -> Result<Map<JsString, T>, JsValue>;
     #[wasm_bindgen(method, js_name = "each")]
     pub fn each_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &Store,
-        r#fn: &Function,
+        r#fn: &Function<fn(T) -> Undefined>,
     ) -> Promise<Map<JsString, T>>;
+    #[wasm_bindgen(method, catch, js_name = "eachRest")]
+    pub async fn each_rest(
+        this: &Store,
+        r#fn: &Function,
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
+    #[wasm_bindgen(method, js_name = "eachRest")]
+    pub fn each_rest_promise(this: &Store, r#fn: &Function) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, catch)]
     pub async fn run(this: &Store) -> Result<Row, JsValue>;
     #[wasm_bindgen(method, js_name = "run")]

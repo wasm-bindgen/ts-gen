@@ -25,16 +25,18 @@ interface Store {
   // the whole-return rule still keeps it, and nested it erases.
   transaction<T>(closure: (tx: Store) => Promise<T>): Promise<T>;
   collect<T>(make: () => Promise<T>): Promise<Map<string, T>>;
-  // A callback's other parameters and return do count.
-  each<T>(fn: (item: T, ...rest: unknown[]) => void): Promise<Map<string, T>>;
+  // A callback's parameters and return do count, unless it has a rest
+  // parameter: then it is the untyped `Function` and `T` erases.
+  each<T>(fn: (item: T) => void): Promise<Map<string, T>>;
+  eachRest<T>(fn: (item: T, ...rest: unknown[]) => void): Promise<Map<string, T>>;
   // 3. nested: erased. `Row<T = Record<…>>` wins over the method's
   // `T = unknown`; a builtin container has no default, so the method's
   // applies; `Cursor<T = string>` has one even when the method does not.
   run<T = unknown>(): Promise<Row<T>>;
   list<T = unknown>(): Promise<Map<string, T>>;
   scan<T>(): Cursor<T>;
-  // 4. absent from the return, and the callback's rest parameter lowers
-  // to `JsValue`: dropped.
+  // 4. absent from the return once the variadic callback lowers to the
+  // untyped `Function`: dropped.
   schedule<Args extends unknown[]>(callback: (...args: Args) => void, ...args: Args): number;
 }
 declare function of<T>(...items: T[]): Row<T>;
