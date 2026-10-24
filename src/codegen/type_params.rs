@@ -116,21 +116,16 @@ fn owning_type_default(
             if let Some(pos) = generic_args.iter().position(|a| a.as_ident() == Some(name)) {
                 let id = cgctx.gctx.resolve_path(scope, &segments.join("."))?;
                 let decl = cgctx.gctx.get_type(id);
-                let (type_params, body_scope) = match &decl.kind {
-                    crate::ir::TypeKind::Interface(i) => (&i.type_params, i.body_scope),
-                    crate::ir::TypeKind::Class(c) => (&c.type_params, c.body_scope),
+                let type_params = match &decl.kind {
+                    crate::ir::TypeKind::Interface(i) => &i.type_params,
+                    crate::ir::TypeKind::Class(c) => &c.type_params,
                     _ => return None,
                 };
                 let default = type_params.get(pos)?.default.clone()?;
-                // A default naming one of the type's own parameters has
-                // nothing to stand for here.
-                let refers_to_param = default.as_ident().is_some_and(|n| {
-                    matches!(
-                        cgctx.gctx.scopes.resolve_binding(body_scope, n),
-                        Some(Binding::TypeParam)
-                    )
-                });
-                return (!refers_to_param).then_some(default);
+                // A default naming one of the type's own parameters
+                // (`U = Box<T>`) has nothing to stand for in the method's
+                // scope, where that name is unbound or another type.
+                return (!mentions_any(&default, type_params)).then_some(default);
             }
             generic_args
                 .iter()
@@ -145,6 +140,29 @@ fn owning_type_default(
             .iter()
             .find_map(|m| owning_type_default(m, name, cgctx, scope)),
         _ => None,
+    }
+}
+
+/// `ty` names one of `params` anywhere inside it.
+fn mentions_any(ty: &TypeRef, params: &[TypeParam]) -> bool {
+    let any = |ts: &[TypeRef]| ts.iter().any(|t| mentions_any(t, params));
+    match ty {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => {
+            matches!(segments.as_slice(), [n] if params.iter().any(|p| &p.name == n))
+                || any(generic_args)
+        }
+        TypeRef::Array(inner) | TypeRef::KeyOf(inner) => mentions_any(inner, params),
+        TypeRef::IndexedAccess(obj, key) => mentions_any(obj, params) || mentions_any(key, params),
+        TypeRef::Union(u) => any(u.members()),
+        TypeRef::Intersection(ts) | TypeRef::Tuple(ts) => any(ts),
+        TypeRef::Function(sig) => {
+            sig.params.iter().any(|p| mentions_any(&p.type_ref, params))
+                || mentions_any(&sig.return_type, params)
+        }
+        _ => false,
     }
 }
 
@@ -209,5 +227,40 @@ fn surviving_type_params(
             }
         }
         _ => {}
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn param(name: &str) -> TypeParam {
+        TypeParam {
+            name: name.into(),
+            constraint: None,
+            default: None,
+        }
+    }
+
+    #[test]
+    fn mentions_any_sees_nested_own_parameters() {
+        let own = [param("T"), param("U")];
+        let boxed = TypeRef::generic("Box", vec![TypeRef::ident("T")]);
+        assert!(mentions_any(&boxed, &own));
+        assert!(mentions_any(&TypeRef::Array(Box::new(boxed)), &own));
+        assert!(mentions_any(
+            &TypeRef::union([TypeRef::ident("U"), TypeRef::Null]),
+            &own
+        ));
+        assert!(!mentions_any(
+            &TypeRef::generic("Box", vec![TypeRef::String]),
+            &own
+        ));
+        // Only a bare name is a parameter; `T.U` is a qualified type.
+        let qualified = TypeRef::Reference {
+            segments: vec!["T".into(), "U".into()],
+            generic_args: vec![],
+        };
+        assert!(!mentions_any(&qualified, &own));
     }
 }

@@ -2519,6 +2519,8 @@ undefined` or `T | null` — so the rule, per parameter:
    the default declared by the generic type `T` instantiates in the
    return (`Row<T = Record<string, unknown>>` → `Object`), else the
    method's own default (`list<T = unknown>` → `JsValue`), else `any`.
+   A type's default that names that type's own parameters (`U = Box<T>`)
+   is skipped, since those names are unbound in the method.
    A parameter the return never mentions is simply dropped.
 
 Callers wanting a typed container `unchecked_into` it

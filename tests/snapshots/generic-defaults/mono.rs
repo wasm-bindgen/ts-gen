@@ -83,6 +83,10 @@ extern "C" {
     pub fn boxed<T, U>(this: &Holder<T, U>) -> Result<U, JsValue>
     where
         U: ::wasm_bindgen::convert::FromWasmAbi;
+    # [wasm_bindgen (static_method_of = Holder , catch)]
+    pub fn make() -> Result<Holder<String, JsValue>, JsValue>;
+    # [wasm_bindgen (static_method_of = Holder , catch , js_name = "make")]
+    pub fn make_js_string() -> Result<Holder<JsString, JsValue>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {
@@ -154,4 +158,14 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "mixedHolder")]
     pub fn mixed_holder_js_string() -> Result<Holder<JsString, Box_>, JsValue>;
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "makeHolder")]
+    pub fn make_holder() -> Result<Holder<String, JsValue>, JsValue>;
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "makeHolder")]
+    pub fn make_holder_js_string() -> Result<Holder<JsString, JsValue>, JsValue>;
 }

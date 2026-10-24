@@ -13,6 +13,9 @@ export declare class Holder<T = Loose, U = Box<T>> {
   constructor();
   get(): T;
   boxed(): U;
+  // `U`'s default `Box<T>` names Holder's own `T`, so the uninferrable `V`
+  // erases to the method's fallback (`any`) instead.
+  static make<V>(): Holder<string, V>;
 }
 
 export interface Options<T = Box<string>> {
@@ -24,3 +27,4 @@ export declare function looseBox(): Box<unknown>;
 export declare function looseHolder(): Holder<Loose, Box<Loose>>;
 export declare function stringHolder(): Holder<string, Box<string>>;
 export declare function mixedHolder(): Holder<string, Box<unknown>>;
+export declare function makeHolder<V>(): Holder<string, V>;

@@ -4,7 +4,7 @@ use js_sys::JsString;
 use wasm_bindgen::{JsCast, JsValue};
 
 use ts_gen_integration_tests::generic_defaults::{
-    loose_box, loose_holder, mixed_holder, string_holder, Box_, Holder, Options,
+    loose_box, loose_holder, make_holder, mixed_holder, string_holder, Box_, Holder, Options,
 };
 
 // Compile-only: the defaults make the bare names well-formed Rust types
@@ -27,4 +27,12 @@ fn trimmed_defaults_compile() {
     let _: Holder<JsValue, Box_<JsValue>> = loose_holder();
     let _: Holder<JsString, Box_<JsString>> = string_holder();
     let _: Holder<JsString, Box_<JsValue>> = mixed_holder();
+}
+
+// An uninferrable `V` in `Holder<string, V>` skips `U`'s default `Box<T>`,
+// which names Holder's own `T`, and erases to `any`.
+#[allow(dead_code)]
+fn erased_past_dependent_default_compile() {
+    let _: Holder<JsString, JsValue> = make_holder();
+    let _: Holder<JsString, JsValue> = Holder::make();
 }
