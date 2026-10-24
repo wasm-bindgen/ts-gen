@@ -396,6 +396,16 @@ pub fn collect_type_params(
         | TypeRef::Mapped(_)
         | TypeRef::ObjectLiteral(_)
         | TypeRef::Unresolved(_) => {}
+        // `Units::PluralizeUnit` needs `Units` declared.
+        TypeRef::Projection { param, .. } => {
+            if matches!(
+                cgctx.gctx.scopes.resolve_binding(scope, param),
+                Some(Binding::TypeParam)
+            ) && !out.contains(param)
+            {
+                out.push(param.clone());
+            }
+        }
     }
 }
 
@@ -512,7 +522,8 @@ pub fn expand_signatures(
     // and the other cohorts' remaining parameters (a cohort's `null` arm
     // is `_with_null` beside its typed one). The plain expansions are
     // suffixed among themselves.
-    let stripped: Vec<Option<Vec<ConcreteParam>>> = deduped
+    let named = naming_view(&deduped, &origins, overloads, cgctx);
+    let stripped: Vec<Option<Vec<ConcreteParam>>> = named
         .iter()
         .zip(&arms)
         .map(|(sig, arms)| {
@@ -529,7 +540,7 @@ pub fn expand_signatures(
             )
         })
         .collect();
-    let plain: Vec<Vec<ConcreteParam>> = deduped
+    let plain: Vec<Vec<ConcreteParam>> = named
         .iter()
         .zip(&stripped)
         .filter(|(_, s)| s.is_none())
@@ -571,6 +582,64 @@ pub fn expand_signatures(
                 params,
                 literal_arms,
             }
+        })
+        .collect()
+}
+
+/// The cohort as its `_with_` suffixes name it: a use-site specialisation
+/// (`RoundingOptionsTimeUnit`) reads as the generic base it extends
+/// (`round_with_rounding_options`), unless that name would also cover
+/// another type in the cohort.
+fn naming_view(
+    sigs: &[Vec<ConcreteParam>],
+    origins: &[usize],
+    overloads: &[Overload<'_>],
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<Vec<ConcreteParam>> {
+    let Some(cgctx) = cgctx.filter(|c| !c.gctx.specialisations.is_empty()) else {
+        return sigs.to_vec();
+    };
+    let base_of = |ty: &TypeRef, scope: ScopeId| -> Option<&Vec<String>> {
+        let TypeRef::Reference { segments, .. } = ty else {
+            return None;
+        };
+        let id = cgctx.gctx.resolve_path(scope, &segments.join("."))?;
+        cgctx.gctx.specialisations.get(&id)
+    };
+    let mut covers: std::collections::HashMap<&[String], Vec<&TypeRef>> = Default::default();
+    for (sig, &origin) in sigs.iter().zip(origins) {
+        let scope = overloads[origin].body_scope;
+        for p in sig {
+            let TypeRef::Reference { segments, .. } = &p.type_ref else {
+                continue;
+            };
+            let name = base_of(&p.type_ref, scope).unwrap_or(segments);
+            let seen = covers.entry(name).or_default();
+            if !seen.contains(&&p.type_ref) {
+                seen.push(&p.type_ref);
+            }
+        }
+    }
+    sigs.iter()
+        .zip(origins)
+        .map(|(sig, &origin)| {
+            let scope = overloads[origin].body_scope;
+            sig.iter()
+                .map(|p| match (&p.type_ref, base_of(&p.type_ref, scope)) {
+                    (TypeRef::Reference { generic_args, .. }, Some(base))
+                        if covers[base.as_slice()].len() == 1 =>
+                    {
+                        ConcreteParam {
+                            type_ref: TypeRef::Reference {
+                                segments: base.clone(),
+                                generic_args: generic_args.clone(),
+                            },
+                            ..p.clone()
+                        }
+                    }
+                    _ => p.clone(),
+                })
+                .collect()
         })
         .collect()
 }
@@ -2298,8 +2367,8 @@ pub fn generate_dictionary_params_in(
 /// `VectorRefIntoWasmAbi` on the element of a borrowed `&[T]`),
 /// `FromWasmAbi` for a return, and `'static` for an awaited one. An
 /// imported type implements its ABI for any arguments, so it is bounded
-/// only by `'static`; bare parameters and std containers of them are
-/// bounded in full.
+/// only by `'static`; bare parameters, their associated types
+/// (`U::PluralizeUnit`) and std containers of them are bounded in full.
 ///
 /// An erased import's type parameter is a `JsGeneric` handle, but an
 /// awaited carrier of one (`Nullable<T>`) converts through the carrier's
@@ -2383,8 +2452,12 @@ fn abi_shape(ty: &syn::Type, params: &std::collections::HashSet<String>) -> AbiS
             let last = p.path.segments.last().map(|s| s.ident.to_string());
             let bare = p.path.segments.len() == 1
                 && matches!(p.path.segments[0].arguments, syn::PathArguments::None);
+            // `U::PluralizeUnit`, an associated type of a parameter.
+            let projected =
+                p.path.segments.len() > 1 && params.contains(&p.path.segments[0].ident.to_string());
             match last.as_deref() {
                 Some(name) if bare && params.contains(name) => AbiShape::Dependent,
+                _ if projected => AbiShape::Dependent,
                 Some("Option" | "Nullable" | "Vec" | "Box") => AbiShape::Dependent,
                 _ => AbiShape::Imported,
             }

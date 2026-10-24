@@ -19,6 +19,8 @@ fn literal_discriminants_compile(feedback: &Feedback) {
     match level() {
         KeepAliveKind::N0 | KeepAliveKind::N1 | KeepAliveKind::N2 => {}
     }
+    // The same literal set is one enum: `level()` feeds the setter.
+    Options::new_0().set_keep_alive(level());
     match direction() {
         DirectionReturnKind::Neg1 | DirectionReturnKind::N0 | DirectionReturnKind::N1 => {}
     }

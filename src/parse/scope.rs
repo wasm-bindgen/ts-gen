@@ -298,9 +298,20 @@ impl ScopeArena {
         scope: ScopeId,
         type_params: &mut Vec<crate::ir::TypeParam>,
     ) {
+        self.bind_type_params_keeping(scope, type_params, |_| false);
+    }
+
+    /// [`Self::bind_type_params`], binding the parameters `live` selects
+    /// as type parameters even when they would erase.
+    pub fn bind_type_params_keeping(
+        &mut self,
+        scope: ScopeId,
+        type_params: &mut Vec<crate::ir::TypeParam>,
+        live: impl Fn(&crate::ir::TypeParam) -> bool,
+    ) {
         let mut position = 0;
         type_params.retain(|tp| {
-            let keep = match tp.erasure() {
+            let keep = match tp.erasure().filter(|_| !live(tp)) {
                 Some(erasure) => {
                     self.insert_erased_type_param(scope, tp.name.clone(), erasure, position);
                     false

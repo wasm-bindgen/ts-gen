@@ -560,6 +560,7 @@ impl<'a> CollectCtx<'a> {
                         name: name.to_string(),
                         constraint: None,
                         default: None,
+                        trait_bound: None,
                     })
                     .collect();
             }

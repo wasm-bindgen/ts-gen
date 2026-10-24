@@ -231,6 +231,9 @@ pub struct CodegenContext<'a> {
     /// Member scope of each namespace and declared module → the path of
     /// the `pub mod` it is emitted as.
     pub namespace_paths: HashMap<ScopeId, Vec<String>>,
+    /// Body scope of each class and interface → its
+    /// [`Self::owner_key`], for the owner of a member written there.
+    owners: HashMap<ScopeId, String>,
     /// The `--lib-name` module, which is the output's own and emitted at
     /// the top level.
     lib_name: Option<String>,
@@ -344,21 +347,15 @@ pub(crate) struct AliasParams {
     pub defaulted: Vec<bool>,
 }
 
-/// Registry of synthesised dynamic-union enums, plus the bookkeeping
-/// for first-seen-wins anchor-name allocation.
+/// Registry of synthesised dynamic-union enums, in order of first use.
 #[derive(Debug, Default)]
 pub struct DynamicUnionRegistry {
     /// Identity (member-set key) → assigned Rust enum name.
     pub by_key: indexmap::IndexMap<DynamicUnionKey, DynamicUnionInfo>,
 }
 
-/// Stable identity key for a dynamic union — the ordered list of
-/// member type representations.
-///
-/// Order matches TS source order so two unions with the same members
-/// in different orders are *not* equal. (Order matters at runtime —
-/// dispatch tries variants in source order, so reordering changes
-/// behaviour.)
+/// Stable identity key for a dynamic union; see
+/// [`CodegenContext::synthesise_dynamic_union`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DynamicUnionKey(pub Vec<String>);
 
@@ -383,30 +380,27 @@ pub struct DynamicUnionInfo {
     /// The shapes sharing the `Object` arm, across every use, when more
     /// than one; the emit pass warns about them.
     pub merged_shapes: Vec<TypeRef>,
+    /// The `pub mod` the enum is emitted in: its first use's. Uses in any
+    /// other module name it by path.
+    pub home: Vec<String>,
+    /// The `js_sys` enum with the same values that stands in for it, which
+    /// is imported under [`Self::rust_name`] rather than emitted.
+    pub js_sys: Option<&'static str>,
 }
 
-/// Claim a fresh Rust enum name for a synthesised dynamic union.
+/// Claim a fresh Rust enum name for a synthesised dynamic union: the bare
+/// `<Anchor>Kind`, or numbered (`<Anchor>Kind2`) when that is taken by a
+/// declaration, an alias's enum or an earlier synthesised enum.
 ///
-/// Preference order: bare anchor → parent-prefixed → numeric
-/// suffix on whichever form was tried first. The first call with
-/// a given anchor wins the bare form.
-///
-/// The trailing suffix is `Kind` (rather than `Union`) — Rust
-/// idiom is to name discriminated-enum types `<Concept>Kind`,
-/// e.g. `EmailAttachmentContentKind`.
-fn allocate_dynamic_union_name(
-    names: &mut LocalScope,
-    anchor: &str,
-    parent: Option<&str>,
-) -> String {
-    let bare = format!("{anchor}Kind");
-    if names.claim(bare.clone()) {
-        return bare;
-    }
-    match parent {
-        Some(p) => names.declare(&format!("{p}{anchor}Kind"), Suffix::Pascal),
-        None => names.declare(&bare, Suffix::Pascal),
-    }
+/// The suffix is `Kind` (rather than `Union`): Rust idiom names
+/// discriminated-enum types `<Concept>Kind`, e.g. `ContentKind`.
+fn allocate_dynamic_union_name(names: &mut LocalScope, anchor: &str) -> String {
+    names.declare(&format!("{anchor}Kind"), Suffix::Pascal)
+}
+
+/// The name a `js_sys` enum is imported under: its own.
+fn js_sys_local_name(path: &str) -> &str {
+    path.rsplit("::").next().unwrap_or(path)
 }
 
 /// Stable, hash-friendly representation of a `TypeRef` used as the
@@ -417,11 +411,15 @@ fn allocate_dynamic_union_name(
 /// args, tuple elements, and union members all recurse.
 fn format_type_ref_key(ty: &TypeRef) -> String {
     let mut buf = String::new();
-    write_type_ref_key(&mut buf, ty);
+    write_type_ref_key(&mut buf, ty, &|_| None);
     buf
 }
 
-fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
+/// Writes `ty`'s key into `buf`. `head` names the declaration a
+/// reference's path resolves to, when known, so two declarations spelled
+/// alike have different keys; an unresolved reference is keyed by its
+/// spelling.
+fn write_type_ref_key(buf: &mut String, ty: &TypeRef, head: &dyn Fn(&[String]) -> Option<String>) {
     use std::fmt::Write;
     match ty {
         TypeRef::Boolean => buf.push_str("bool"),
@@ -443,7 +441,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
         TypeRef::Array(inner) => {
             buf.push_str("Array<");
-            write_type_ref_key(buf, inner);
+            write_type_ref_key(buf, inner, head);
             buf.push('>');
         }
         TypeRef::Tuple(parts) => {
@@ -452,7 +450,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
                 if i > 0 {
                     buf.push(',');
                 }
-                write_type_ref_key(buf, p);
+                write_type_ref_key(buf, p, head);
             }
             buf.push('>');
         }
@@ -462,7 +460,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
                 if i > 0 {
                     buf.push('|');
                 }
-                write_type_ref_key(buf, m);
+                write_type_ref_key(buf, m, head);
             }
             buf.push('>');
         }
@@ -472,7 +470,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
                 if i > 0 {
                     buf.push('&');
                 }
-                write_type_ref_key(buf, p);
+                write_type_ref_key(buf, p, head);
             }
             buf.push('>');
         }
@@ -480,14 +478,17 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
             segments,
             generic_args,
         } => {
-            buf.push_str(&segments.join("."));
+            match head(segments) {
+                Some(id) => buf.push_str(&id),
+                None => buf.push_str(&segments.join(".")),
+            }
             if !generic_args.is_empty() {
                 buf.push('<');
                 for (i, a) in generic_args.iter().enumerate() {
                     if i > 0 {
                         buf.push(',');
                     }
-                    write_type_ref_key(buf, a);
+                    write_type_ref_key(buf, a, head);
                 }
                 buf.push('>');
             }
@@ -498,10 +499,13 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
                 if i > 0 {
                     buf.push(',');
                 }
-                write_type_ref_key(buf, &p.type_ref);
+                write_type_ref_key(buf, &p.type_ref, head);
             }
             buf.push_str(")->");
-            write_type_ref_key(buf, &sig.return_type);
+            write_type_ref_key(buf, &sig.return_type, head);
+        }
+        TypeRef::Projection { param, assoc } => {
+            let _ = write!(buf, "{param}::{assoc}");
         }
         TypeRef::Unresolved(s) => {
             buf.push('?');
@@ -660,6 +664,18 @@ pub(crate) fn externalised_modules(module: &ir::Module, gctx: &GlobalContext) ->
 impl<'a> CodegenContext<'a> {
     /// Whether per-monomorphization codegen is on. Takes an `Option` because
     /// most emitters carry an optional context; no context means default mode.
+    /// The type an argument enum's impl gives an associated type of a
+    /// literal-only parameter's trait, with the scope it resolves in.
+    pub(crate) fn projection_target(&self, arg: &str, assoc: &str) -> Option<(TypeRef, ScopeId)> {
+        self.gctx.param_traits.values().flatten().find_map(|t| {
+            let i = t.assoc.iter().position(|a| a == assoc)?;
+            t.impls
+                .iter()
+                .find(|(enum_ref, _)| enum_ref.as_ident() == Some(arg))
+                .map(|(_, targets)| (targets[i].clone(), t.scope))
+        })
+    }
+
     pub(crate) fn generic_mono(ctx: Option<&CodegenContext<'_>>) -> bool {
         ctx.is_some_and(|ctx| ctx.experimental_generic_mono)
     }
@@ -1107,6 +1123,7 @@ impl<'a> CodegenContext<'a> {
             renamed_types: surface.map(|s| s.type_names().clone()).unwrap_or_default(),
             constructed: RefCell::default(),
             namespace_paths: HashMap::new(),
+            owners: HashMap::new(),
             lib_name: module.lib_name.clone(),
             emit_path: RefCell::new(Vec::new()),
             statics_in_scope: RefCell::new(HashSet::new()),
@@ -1168,6 +1185,7 @@ impl<'a> CodegenContext<'a> {
             renamed_types: HashMap::new(),
             constructed: RefCell::default(),
             namespace_paths: HashMap::new(),
+            owners: HashMap::new(),
             lib_name: None,
             emit_path: RefCell::new(Vec::new()),
             statics_in_scope: RefCell::new(HashSet::new()),
@@ -1202,34 +1220,63 @@ impl<'a> CodegenContext<'a> {
     /// Look up or synthesise a dynamic-union enum for a top-level
     /// return-position union that would otherwise erase to `JsValue`.
     ///
-    /// Identity is the ordered member list (TS source order matters
-    /// at runtime — dynamic-union dispatch tries variants in source
-    /// order). Two erasing unions with the same member sequence
-    /// share a single synthesised enum.
+    /// Identity depends on the members:
     ///
-    /// Naming preference, most-simple to most-qualified:
+    /// * A set of literals, all string literals or all integer literals,
+    ///   is keyed by its values in any order and shared by every use. Its
+    ///   variants keep its first use's order.
+    /// * Any other union is keyed by its ordered members (dispatch tries
+    ///   them in source order) and the member declaring it, owner and JS
+    ///   name, so a getter, its setter and its builder method share it,
+    ///   and no other member does.
     ///
-    /// 1. The bare anchor (e.g. `ContentKind`).
-    /// 2. Parent-prefixed (`EmailAttachmentContentKind`).
-    /// 3. Numeric-suffixed (`ContentKind2`, `EmailAttachmentContentKind2`).
-    ///
-    /// First-seen wins on the bare anchor: subsequent distinct
-    /// unions with the same anchor get parent-prefixed (or
-    /// numeric-suffixed if that also collides).
+    /// A new enum is emitted in the `pub mod` being emitted into, named
+    /// [`allocate_dynamic_union_name`]. Alongside the name come the enum's
+    /// members in its own order, which a literal set's uses need not share,
+    /// so variants are named from them.
     pub(crate) fn synthesise_dynamic_union(
         &self,
         arms: &ReadArms,
-        anchor: &str,
-        parent: Option<&str>,
+        use_site: ReturnAnchor<'_>,
         scope: ScopeId,
         from_module: &ModuleContext,
-    ) -> String {
+    ) -> (String, Vec<TypeRef>) {
         let members = &arms.members;
-        let mut key: Vec<String> = members.iter().map(format_type_ref_key).collect();
-        if arms.fallback {
-            key.push("fallback".to_string());
-        }
-        let key = DynamicUnionKey(key);
+        let literal = members
+            .iter()
+            .all(|m| matches!(m, TypeRef::StringLiteral(_) | TypeRef::NumberLiteral(_)));
+        let key = if literal {
+            let mut values: Vec<String> = members.iter().map(format_type_ref_key).collect();
+            values.sort();
+            values.dedup();
+            DynamicUnionKey(values)
+        } else {
+            // A free function has no owner, so its module tells it apart.
+            let owner = match use_site.parent {
+                Some(p) => format!("owner:{p}"),
+                None => format!("module:{}", self.emit_path.borrow().join("::")),
+            };
+            // Names resolve from the use site, so a `Foo` in each of two
+            // namespaces are two members.
+            let head = |segments: &[String]| {
+                let path = segments.join(".");
+                let id = self.gctx.resolve_path(scope, &path)?;
+                Some(format!("#{id:?}"))
+            };
+            let mut key: Vec<String> = members
+                .iter()
+                .map(|m| {
+                    let mut buf = String::new();
+                    write_type_ref_key(&mut buf, m, &head);
+                    buf
+                })
+                .collect();
+            if arms.fallback {
+                key.push("fallback".to_string());
+            }
+            key.extend([owner, format!("field:{}", use_site.field)]);
+            DynamicUnionKey(key)
+        };
         let mut reg = self.dynamic_unions.borrow_mut();
         if let Some(info) = reg.by_key.get_mut(&key) {
             for shape in &arms.merged_shapes {
@@ -1237,21 +1284,67 @@ impl<'a> CodegenContext<'a> {
                     info.merged_shapes.push(shape.clone());
                 }
             }
-            return info.rust_name.clone();
+            return (info.rust_name.clone(), info.members.clone());
         }
-        let chosen = allocate_dynamic_union_name(&mut self.names.borrow_mut(), anchor, parent);
+        let mut names = self.names.borrow_mut();
+        let js_sys = literal
+            .then(|| super::dynamic_unions::js_sys_enum(members))
+            .flatten()
+            .filter(|path| names.claim(js_sys_local_name(path)));
+        let rust_name = match js_sys {
+            Some(path) => {
+                self.register_external(js_sys_local_name(path), path);
+                js_sys_local_name(path).to_string()
+            }
+            None => allocate_dynamic_union_name(&mut names, &use_site.enum_anchor()),
+        };
         reg.by_key.insert(
             key,
             DynamicUnionInfo {
-                rust_name: chosen.clone(),
+                rust_name: rust_name.clone(),
                 members: members.to_vec(),
                 scope,
                 from_module: from_module.clone(),
                 fallback: arms.fallback,
                 merged_shapes: arms.merged_shapes.clone(),
+                home: self.emit_path.borrow().clone(),
+                js_sys,
             },
         );
-        chosen
+        (rust_name, members.to_vec())
+    }
+
+    /// A synthesised enum as named from the `pub mod` being emitted into:
+    /// bare in its own module, by path from any other. A `js_sys` enum is
+    /// imported at the top level, so it is bare everywhere.
+    pub(crate) fn synthesised_enum_path(&self, name: &str) -> TokenStream {
+        let ident = make_ident(name);
+        let registry = self.dynamic_unions.borrow();
+        let home = registry
+            .by_key
+            .values()
+            .find(|info| info.rust_name == name && info.js_sys.is_none())
+            .map(|info| info.home.clone());
+        match home.and_then(|home| self.path_qualifier(&home)) {
+            Some(qualifier) => quote! { #qualifier #ident },
+            None => quote! { #ident },
+        }
+    }
+
+    /// The [`Self::owner_key`] of the class or interface whose body is
+    /// `scope`.
+    pub(crate) fn owner_of(&self, scope: ScopeId) -> Option<String> {
+        self.owners.get(&scope).cloned()
+    }
+
+    /// A type emitted as `name` in the `pub mod` at `path`, unique across
+    /// the output: same-named types in two namespaces are two owners.
+    pub(crate) fn owner_key(&self, path: &[String], name: &str) -> String {
+        path.iter()
+            .map(String::as_str)
+            .chain([name])
+            .collect::<Vec<_>>()
+            .join("::")
     }
 
     /// Whether `name` is a synthesised dynamic-union enum.
@@ -1379,6 +1472,7 @@ impl<'a> CodegenContext<'a> {
             | TypeRef::IndexedAccess(..)
             | TypeRef::Mapped(_)
             | TypeRef::ObjectLiteral(_)
+            | TypeRef::Projection { .. }
             | TypeRef::Unresolved(_) => true,
         }
     }
@@ -1901,6 +1995,17 @@ impl<'a> CodegenContext<'a> {
             ir::TypeKind::Function(_) | ir::TypeKind::Variable(_) => return,
         };
         let name = self.renamed_types.get(&type_id).unwrap_or(name);
+        match &decl.kind {
+            ir::TypeKind::Class(c) => {
+                let key = self.owner_key(mod_path, name);
+                self.owners.insert(c.body_scope, key);
+            }
+            ir::TypeKind::Interface(i) => {
+                let key = self.owner_key(mod_path, name);
+                self.owners.insert(i.body_scope, key);
+            }
+            _ => {}
+        }
         self.local_types.insert(name.clone());
         self.local_type_ids.insert(type_id);
     }
@@ -2068,6 +2173,24 @@ pub fn to_syn_type(
     let borrow = pos.is_argument() && !pos.inner;
 
     match ty {
+        // An associated type of a literal-only parameter's trait is a string
+        // enum, taken by value. Substituted by an argument enum, it is that
+        // enum's impl target.
+        TypeRef::Projection { param, assoc } => {
+            if let Some(c) = ctx {
+                let generic = matches!(
+                    c.gctx.scopes.resolve_binding(scope, param),
+                    Some(crate::parse::scope::Binding::TypeParam)
+                );
+                if !generic {
+                    if let Some((target, target_scope)) = c.projection_target(param, assoc) {
+                        return to_syn_type(&target, pos, ctx, target_scope, from_module);
+                    }
+                }
+            }
+            let (param, assoc) = (make_ident(param), make_ident(assoc));
+            quote! { #param::#assoc }
+        }
         // === Primitives (outer position only reaches here) ===
         TypeRef::Boolean => quote! { bool },
         TypeRef::Number => quote! { f64 },
@@ -2342,8 +2465,7 @@ pub fn to_syn_type(
                     // Synthesised enum names never collide with declared
                     // types. wasm-bindgen enums cross the boundary by value.
                     if c.is_synthesised_enum(&segments[0]) {
-                        let ident = make_ident(&segments[0]);
-                        return quote! { #ident };
+                        return c.synthesised_enum_path(&segments[0]);
                     }
                 }
             }
@@ -3573,9 +3695,12 @@ pub struct ReturnAnchor<'a> {
     /// as-is) or a callable return (where `Return` is appended before
     /// `Kind`).
     pub kind: ReturnAnchorKind,
-    /// Enclosing type / namespace name, used as the prefix on
-    /// collision (`EmailAttachmentContentKind`).
+    /// The type declaring the member. A union that isn't a pure literal
+    /// set is one enum per owner and member.
     pub parent: Option<&'a str>,
+    /// The member's JS name, which identifies the member whatever Rust
+    /// name each of its bindings (`bar`, `try_bar`) has.
+    pub field: &'a str,
 }
 
 /// Distinguishes anchors that already refer to a property (no extra
@@ -3643,15 +3768,8 @@ fn maybe_synthesise_return_union(
     let cgctx = ctx?;
 
     let arms = dynamic_union_members(members, ctx, scope, from_module)?;
-    let name = cgctx.synthesise_dynamic_union(
-        &arms,
-        &anchor.enum_anchor(),
-        anchor.parent,
-        scope,
-        from_module,
-    );
-    let ident = make_ident(&name);
-    Some(quote! { #ident })
+    let (name, _) = cgctx.synthesise_dynamic_union(&arms, anchor, scope, from_module);
+    Some(cgctx.synthesised_enum_path(&name))
 }
 
 /// The getter's synthesised enum, as seen by the matching setter.
@@ -3729,7 +3847,17 @@ pub(crate) fn setter_enum(
     let members = &arms.members;
     let integer_enum = is_integer_literal_union(members);
     let has_string = members.contains(&TypeRef::String);
-    let variant_names = crate::codegen::dynamic_union_variant_names(members);
+    if !members.iter().any(|m| match m {
+        TypeRef::StringLiteral(_) => !has_string,
+        TypeRef::NumberLiteral(_) => integer_enum,
+        _ => false,
+    }) {
+        return None;
+    }
+    // Variants are named in the enum's own order, which can differ from
+    // this use's when another use declared the literal set first.
+    let (name, members) = cgctx.synthesise_dynamic_union(&arms, anchor, scope, from_module);
+    let variant_names = crate::codegen::dynamic_union_variant_names(&members);
     let variants: Vec<(TypeRef, String)> = members
         .iter()
         .zip(variant_names)
@@ -3740,16 +3868,6 @@ pub(crate) fn setter_enum(
         })
         .map(|(m, v)| (m.clone(), v))
         .collect();
-    if variants.is_empty() {
-        return None;
-    }
-    let name = cgctx.synthesise_dynamic_union(
-        &arms,
-        &anchor.enum_anchor(),
-        anchor.parent,
-        scope,
-        from_module,
-    );
     Some(SetterEnum {
         name,
         variants,
@@ -4271,6 +4389,7 @@ mod tests {
             name: name.to_string(),
             constraint: None,
             default,
+            trait_bound: None,
         };
         // `<T, U = T[], V>`: `U` sees `T`'s default, `V` has none.
         let alias = ir::TypeAliasDecl {
@@ -4752,6 +4871,7 @@ mod tests {
             &ModuleContext::Global,
             ReturnAnchor {
                 base: "test",
+                field: "test",
                 kind: ReturnAnchorKind::Callable,
                 parent: None,
             },
@@ -5695,6 +5815,7 @@ mod tests {
             base: "x",
             kind: ReturnAnchorKind::Getter,
             parent: None,
+            field: "x",
         };
         let read = |members: Vec<TypeRef>| {
             to_getter_return_type(
@@ -5752,6 +5873,7 @@ mod tests {
             base: "value",
             kind: ReturnAnchorKind::Getter,
             parent: None,
+            field: "value",
         };
         for mono in [false, true] {
             let options = GenerateOptions::new().experimental_generic_mono(mono);
@@ -5818,7 +5940,8 @@ mod tests {
         let ns = gctx.scopes.resolve_namespace(file, "Ns").unwrap();
         let options = GenerateOptions::new().experimental_generic_mono(true);
         let ctx = CodegenContext::from_module_full(&module, &gctx, &options, None).unwrap();
-        // A getter `dayLike` read first would name its enum `DayLikeKind`.
+        // A getter `dayLike` read first would name its enum `DayLikeKind`;
+        // the alias claimed that, so the getter's is numbered.
         let read = to_getter_return_type(
             &TypeRef::union([TypeRef::ident("Day"), TypeRef::Number]),
             Some(&ctx),
@@ -5828,9 +5951,10 @@ mod tests {
                 base: "dayLike",
                 kind: ReturnAnchorKind::Getter,
                 parent: Some("Options"),
+                field: "dayLike",
             },
         );
-        assert_eq!(read.to_string(), "OptionsDayLikeKind");
+        assert_eq!(read.to_string(), "DayLikeKind2");
         let alias = ctx.union_alias(&TypeRef::ident("DayLike"), ns).unwrap();
         assert_eq!(alias.kind.as_deref(), Some("DayLikeKind"));
     }

@@ -70,9 +70,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type NumberOrStrings;
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &NumberOrStrings) -> NumberOrStringsModeKind;
+    pub fn mode(this: &NumberOrStrings) -> ModeKind2;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(this: &NumberOrStrings, val: NumberOrStringsModeKind);
+    pub fn set_mode(this: &NumberOrStrings, val: ModeKind2);
     #[wasm_bindgen(method, setter, js_name = "mode")]
     pub fn set_mode_with_f64(this: &NumberOrStrings, val: f64);
 }
@@ -98,13 +98,13 @@ impl NumberOrStrings {
     #[doc = " Start a builder with `mode: \"x\"`."]
     pub fn builder_x() -> NumberOrStringsBuilder {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(NumberOrStringsModeKind::X);
+        inner.set_mode(ModeKind2::X);
         NumberOrStringsBuilder { inner }
     }
     #[doc = " Start a builder with `mode: \"y\"`."]
     pub fn builder_y() -> NumberOrStringsBuilder {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(NumberOrStringsModeKind::Y);
+        inner.set_mode(ModeKind2::Y);
         NumberOrStringsBuilder { inner }
     }
 }
@@ -112,7 +112,7 @@ pub struct NumberOrStringsBuilder {
     inner: NumberOrStrings,
 }
 impl NumberOrStringsBuilder {
-    pub fn mode(self, val: NumberOrStringsModeKind) -> Self {
+    pub fn mode(self, val: ModeKind2) -> Self {
         self.inner.set_mode(val);
         self
     }
@@ -130,9 +130,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Mixed;
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &Mixed) -> MixedModeKind;
+    pub fn mode(this: &Mixed) -> ModeKind3;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(this: &Mixed, val: MixedModeKind);
+    pub fn set_mode(this: &Mixed, val: ModeKind3);
     #[wasm_bindgen(method, setter, js_name = "mode")]
     pub fn set_mode_with_f64(this: &Mixed, val: f64);
     #[wasm_bindgen(method, setter, js_name = "mode")]
@@ -162,13 +162,13 @@ impl Mixed {
     #[doc = " Start a builder with `mode: \"x\"`."]
     pub fn builder_x() -> MixedBuilder {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(MixedModeKind::X);
+        inner.set_mode(ModeKind3::X);
         MixedBuilder { inner }
     }
     #[doc = " Start a builder with `mode: \"y\"`."]
     pub fn builder_y() -> MixedBuilder {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(MixedModeKind::Y);
+        inner.set_mode(ModeKind3::Y);
         MixedBuilder { inner }
     }
     #[doc = " Start a builder with `mode: 1`."]
@@ -194,7 +194,7 @@ pub struct MixedBuilder {
     inner: Mixed,
 }
 impl MixedBuilder {
-    pub fn mode(self, val: MixedModeKind) -> Self {
+    pub fn mode(self, val: ModeKind3) -> Self {
         self.inner.set_mode(val);
         self
     }
@@ -270,7 +270,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Open;
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &Open) -> OpenModeKind;
+    pub fn mode(this: &Open) -> ModeKind4;
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &Open, val: &str);
 }
@@ -312,9 +312,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Optional;
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &Optional) -> Option<OptionalModeKind>;
+    pub fn mode(this: &Optional) -> Option<ModeKind5>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(this: &Optional, val: OptionalModeKind);
+    pub fn set_mode(this: &Optional, val: ModeKind5);
 }
 impl Optional {
     pub fn new() -> Optional {
@@ -335,7 +335,7 @@ pub struct OptionalBuilder {
     inner: Optional,
 }
 impl OptionalBuilder {
-    pub fn mode(self, val: OptionalModeKind) -> Self {
+    pub fn mode(self, val: ModeKind5) -> Self {
         self.inner.set_mode(val);
         self
     }
@@ -350,13 +350,13 @@ pub enum ModeKind {
     Y = "y",
 }
 #[wasm_bindgen(private)]
-pub enum NumberOrStringsModeKind {
+pub enum ModeKind2 {
     F64(f64),
     X = "x",
     Y = "y",
 }
 #[wasm_bindgen(private)]
-pub enum MixedModeKind {
+pub enum ModeKind3 {
     X = "x",
     Y = "y",
     F64(f64),
@@ -369,12 +369,12 @@ pub enum LevelKind {
     N2 = 2,
 }
 #[wasm_bindgen(private)]
-pub enum OpenModeKind {
+pub enum ModeKind4 {
     X = "x",
     String(String),
 }
 #[wasm_bindgen(private)]
-pub enum OptionalModeKind {
+pub enum ModeKind5 {
     X = "x",
     Y = "y",
 }

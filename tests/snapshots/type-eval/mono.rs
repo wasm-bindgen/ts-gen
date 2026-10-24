@@ -239,17 +239,25 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Rounding<U = JsValue>;
+    pub type Rounding<U = Unit>;
     #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-    pub fn smallest_unit<U>(this: &Rounding<U>) -> Option<Plural>;
+    pub fn smallest_unit<U: RoundingU>(this: &Rounding<U>) -> Option<U::Plural>
+    where
+        Option<U::Plural>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-    pub fn set_smallest_unit<U>(this: &Rounding<U>, val: Plural);
+    pub fn set_smallest_unit<U: RoundingU>(this: &Rounding<U>, val: U::Plural)
+    where
+        U::Plural: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-    pub fn largest_unit<U>(this: &Rounding<U>) -> Option<LargestUnitKind>;
+    pub fn largest_unit<U: RoundingU>(this: &Rounding<U>) -> Option<U::LargestUnit>
+    where
+        Option<U::LargestUnit>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-    pub fn set_largest_unit<U>(this: &Rounding<U>, val: LargestUnitKind);
+    pub fn set_largest_unit<U: RoundingU>(this: &Rounding<U>, val: U::LargestUnit)
+    where
+        U::LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi;
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Rounding<U> {
+impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> Rounding<U> {
     pub fn new() -> Rounding<U> {
         Self::builder().build()
     }
@@ -259,7 +267,7 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Rounding<U> {
         }
     }
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Default for Rounding<U> {
+impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> Default for Rounding<U> {
     fn default() -> Self {
         Self::new()
     }
@@ -267,12 +275,12 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Default for Rounding<U> {
 pub struct RoundingBuilder<U> {
     inner: Rounding<U>,
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> RoundingBuilder<U> {
-    pub fn smallest_unit(self, val: Plural) -> Self {
+impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> RoundingBuilder<U> {
+    pub fn smallest_unit(self, val: U::Plural) -> Self {
         self.inner.set_smallest_unit(val);
         self
     }
-    pub fn largest_unit(self, val: LargestUnitKind) -> Self {
+    pub fn largest_unit(self, val: U::LargestUnit) -> Self {
         self.inner.set_largest_unit(val);
         self
     }
@@ -280,10 +288,28 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> RoundingBuilder<U> {
         self.inner
     }
 }
+pub trait RoundingU {
+    type Plural: ::wasm_bindgen::convert::IntoWasmAbi
+        + ::wasm_bindgen::convert::FromWasmAbi
+        + ::wasm_bindgen::convert::OptionIntoWasmAbi
+        + ::wasm_bindgen::convert::OptionFromWasmAbi;
+    type LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi
+        + ::wasm_bindgen::convert::FromWasmAbi
+        + ::wasm_bindgen::convert::OptionIntoWasmAbi
+        + ::wasm_bindgen::convert::OptionFromWasmAbi;
+}
+impl RoundingU for Unit {
+    type Plural = Plural;
+    type LargestUnit = LargestUnitKind;
+}
+impl RoundingU for Hour {
+    type Plural = PluralHour;
+    type LargestUnit = HourLargestUnitKind;
+}
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn round(opts: &Rounding<String>) -> Result<(), JsValue>;
+    pub fn round(opts: &Rounding<Hour>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
@@ -696,6 +722,11 @@ pub enum PluralHourOrMinute {
     Hours = "hours",
     Minutes = "minutes",
 }
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Hour {
+    Hour = "hour",
+}
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -794,6 +825,7 @@ impl Default for PartialExtended {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LargestUnitKind {
     Auto = "auto",
     Hour = "hour",
@@ -802,4 +834,205 @@ pub enum LargestUnitKind {
     Hours = "hours",
     Minutes = "minutes",
     Seconds = "seconds",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PluralHour {
+    Hour = "hour",
+    Hours = "hours",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HourLargestUnitKind {
+    Auto = "auto",
+    Hour = "hour",
+    Hours = "hours",
+}
+impl From<ExcludeUnitHour> for Unit {
+    fn from(value: ExcludeUnitHour) -> Unit {
+        match value {
+            ExcludeUnitHour::Minute => Unit::Minute,
+            ExcludeUnitHour::Second => Unit::Second,
+            ExcludeUnitHour::__Invalid => Unit::__Invalid,
+        }
+    }
+}
+impl From<ExcludeUnitHour> for Plural {
+    fn from(value: ExcludeUnitHour) -> Plural {
+        match value {
+            ExcludeUnitHour::Minute => Plural::Minute,
+            ExcludeUnitHour::Second => Plural::Second,
+            ExcludeUnitHour::__Invalid => Plural::__Invalid,
+        }
+    }
+}
+impl From<ExcludeUnitHour> for ExtractUnitOrDayUnit {
+    fn from(value: ExcludeUnitHour) -> ExtractUnitOrDayUnit {
+        match value {
+            ExcludeUnitHour::Minute => ExtractUnitOrDayUnit::Minute,
+            ExcludeUnitHour::Second => ExtractUnitOrDayUnit::Second,
+            ExcludeUnitHour::__Invalid => ExtractUnitOrDayUnit::__Invalid,
+        }
+    }
+}
+impl From<ExcludeUnitHour> for LargestUnitKind {
+    fn from(value: ExcludeUnitHour) -> LargestUnitKind {
+        match value {
+            ExcludeUnitHour::Minute => LargestUnitKind::Minute,
+            ExcludeUnitHour::Second => LargestUnitKind::Second,
+            ExcludeUnitHour::__Invalid => LargestUnitKind::__Invalid,
+        }
+    }
+}
+impl From<ExtractUnitOrDayUnit> for Plural {
+    fn from(value: ExtractUnitOrDayUnit) -> Plural {
+        match value {
+            ExtractUnitOrDayUnit::Hour => Plural::Hour,
+            ExtractUnitOrDayUnit::Minute => Plural::Minute,
+            ExtractUnitOrDayUnit::Second => Plural::Second,
+            ExtractUnitOrDayUnit::__Invalid => Plural::__Invalid,
+        }
+    }
+}
+impl From<ExtractUnitOrDayUnit> for LargestUnitKind {
+    fn from(value: ExtractUnitOrDayUnit) -> LargestUnitKind {
+        match value {
+            ExtractUnitOrDayUnit::Hour => LargestUnitKind::Hour,
+            ExtractUnitOrDayUnit::Minute => LargestUnitKind::Minute,
+            ExtractUnitOrDayUnit::Second => LargestUnitKind::Second,
+            ExtractUnitOrDayUnit::__Invalid => LargestUnitKind::__Invalid,
+        }
+    }
+}
+impl From<PluralHourOrMinute> for Plural {
+    fn from(value: PluralHourOrMinute) -> Plural {
+        match value {
+            PluralHourOrMinute::Hour => Plural::Hour,
+            PluralHourOrMinute::Minute => Plural::Minute,
+            PluralHourOrMinute::Hours => Plural::Hours,
+            PluralHourOrMinute::Minutes => Plural::Minutes,
+            PluralHourOrMinute::__Invalid => Plural::__Invalid,
+        }
+    }
+}
+impl From<PluralHourOrMinute> for LargestUnitKind {
+    fn from(value: PluralHourOrMinute) -> LargestUnitKind {
+        match value {
+            PluralHourOrMinute::Hour => LargestUnitKind::Hour,
+            PluralHourOrMinute::Minute => LargestUnitKind::Minute,
+            PluralHourOrMinute::Hours => LargestUnitKind::Hours,
+            PluralHourOrMinute::Minutes => LargestUnitKind::Minutes,
+            PluralHourOrMinute::__Invalid => LargestUnitKind::__Invalid,
+        }
+    }
+}
+impl From<Hour> for Unit {
+    fn from(value: Hour) -> Unit {
+        match value {
+            Hour::Hour => Unit::Hour,
+            Hour::__Invalid => Unit::__Invalid,
+        }
+    }
+}
+impl From<Hour> for NotMinute {
+    fn from(value: Hour) -> NotMinute {
+        match value {
+            Hour::Hour => NotMinute::Hour,
+            Hour::__Invalid => NotMinute::__Invalid,
+        }
+    }
+}
+impl From<Hour> for Plural {
+    fn from(value: Hour) -> Plural {
+        match value {
+            Hour::Hour => Plural::Hour,
+            Hour::__Invalid => Plural::__Invalid,
+        }
+    }
+}
+impl From<Hour> for ExtractUnitOrDayUnit {
+    fn from(value: Hour) -> ExtractUnitOrDayUnit {
+        match value {
+            Hour::Hour => ExtractUnitOrDayUnit::Hour,
+            Hour::__Invalid => ExtractUnitOrDayUnit::__Invalid,
+        }
+    }
+}
+impl From<Hour> for PluralHourOrMinute {
+    fn from(value: Hour) -> PluralHourOrMinute {
+        match value {
+            Hour::Hour => PluralHourOrMinute::Hour,
+            Hour::__Invalid => PluralHourOrMinute::__Invalid,
+        }
+    }
+}
+impl From<Hour> for LargestUnitKind {
+    fn from(value: Hour) -> LargestUnitKind {
+        match value {
+            Hour::Hour => LargestUnitKind::Hour,
+            Hour::__Invalid => LargestUnitKind::__Invalid,
+        }
+    }
+}
+impl From<Hour> for PluralHour {
+    fn from(value: Hour) -> PluralHour {
+        match value {
+            Hour::Hour => PluralHour::Hour,
+            Hour::__Invalid => PluralHour::__Invalid,
+        }
+    }
+}
+impl From<Hour> for HourLargestUnitKind {
+    fn from(value: Hour) -> HourLargestUnitKind {
+        match value {
+            Hour::Hour => HourLargestUnitKind::Hour,
+            Hour::__Invalid => HourLargestUnitKind::__Invalid,
+        }
+    }
+}
+impl From<PluralHour> for Plural {
+    fn from(value: PluralHour) -> Plural {
+        match value {
+            PluralHour::Hour => Plural::Hour,
+            PluralHour::Hours => Plural::Hours,
+            PluralHour::__Invalid => Plural::__Invalid,
+        }
+    }
+}
+impl From<PluralHour> for PluralHourOrMinute {
+    fn from(value: PluralHour) -> PluralHourOrMinute {
+        match value {
+            PluralHour::Hour => PluralHourOrMinute::Hour,
+            PluralHour::Hours => PluralHourOrMinute::Hours,
+            PluralHour::__Invalid => PluralHourOrMinute::__Invalid,
+        }
+    }
+}
+impl From<PluralHour> for LargestUnitKind {
+    fn from(value: PluralHour) -> LargestUnitKind {
+        match value {
+            PluralHour::Hour => LargestUnitKind::Hour,
+            PluralHour::Hours => LargestUnitKind::Hours,
+            PluralHour::__Invalid => LargestUnitKind::__Invalid,
+        }
+    }
+}
+impl From<PluralHour> for HourLargestUnitKind {
+    fn from(value: PluralHour) -> HourLargestUnitKind {
+        match value {
+            PluralHour::Hour => HourLargestUnitKind::Hour,
+            PluralHour::Hours => HourLargestUnitKind::Hours,
+            PluralHour::__Invalid => HourLargestUnitKind::__Invalid,
+        }
+    }
+}
+impl From<HourLargestUnitKind> for LargestUnitKind {
+    fn from(value: HourLargestUnitKind) -> LargestUnitKind {
+        match value {
+            HourLargestUnitKind::Auto => LargestUnitKind::Auto,
+            HourLargestUnitKind::Hour => LargestUnitKind::Hour,
+            HourLargestUnitKind::Hours => LargestUnitKind::Hours,
+            HourLargestUnitKind::__Invalid => LargestUnitKind::__Invalid,
+        }
+    }
 }
