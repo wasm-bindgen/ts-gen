@@ -310,3 +310,89 @@ impl SubtleCrypto {
         Self::describe_jwk_js_string_js("raw")
     }
 }
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type KVStore<Key>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_text_js<Key>(
+        this: &KVStore<Key>,
+        key: Key,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Nullable<String>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_text_js_string_js<Key>(
+        this: &KVStore<Key>,
+        key: Key,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Nullable<JsString>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    fn get_text_promise_js<Key>(
+        this: &KVStore<Key>,
+        key: Key,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Nullable<JsString>>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_json_js<Key, ExpectedValue>(
+        this: &KVStore<Key>,
+        key: Key,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    fn get_json_promise_js<Key, ExpectedValue>(
+        this: &KVStore<Key>,
+        key: Key,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Nullable<ExpectedValue>>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+}
+impl<Key> KVStore<Key> {
+    pub async fn get_text(&self, key: Key) -> Result<Nullable<String>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        self.get_text_js(key, "text").await
+    }
+    pub async fn get_text_js_string(&self, key: Key) -> Result<Nullable<JsString>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        self.get_text_js_string_js(key, "text").await
+    }
+    pub fn get_text_promise(&self, key: Key) -> Result<Promise<Nullable<JsString>>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        self.get_text_promise_js(key, "text")
+    }
+    pub async fn get_json<ExpectedValue>(
+        &self,
+        key: Key,
+    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static,
+    {
+        self.get_json_js(key, "json").await
+    }
+    pub fn get_json_promise<ExpectedValue>(
+        &self,
+        key: Key,
+    ) -> Result<Promise<Nullable<ExpectedValue>>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        self.get_json_promise_js(key, "json")
+    }
+}

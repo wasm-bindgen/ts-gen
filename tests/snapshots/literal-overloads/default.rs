@@ -223,3 +223,61 @@ impl SubtleCrypto {
         Self::try_describe_jwk_js("raw")
     }
 }
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type KVStore<Key: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_text_js<Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        r#type: &str,
+    ) -> Result<Nullable<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn get_text_promise_js<Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        r#type: &str,
+    ) -> Promise<JsNullable<JsString>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_json_js<Key: ::wasm_bindgen::JsGeneric, ExpectedValue: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        r#type: &str,
+    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    where
+        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn get_json_promise_js<
+        Key: ::wasm_bindgen::JsGeneric,
+        ExpectedValue: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &KVStore<Key>,
+        key: &Key,
+        r#type: &str,
+    ) -> Promise<JsNullable<ExpectedValue>>;
+}
+impl<Key: ::wasm_bindgen::JsGeneric> KVStore<Key> {
+    pub async fn get_text(&self, key: &Key) -> Result<Nullable<String>, JsValue> {
+        self.get_text_js(key, "text").await
+    }
+    pub fn get_text_promise(&self, key: &Key) -> Promise<JsNullable<JsString>> {
+        self.get_text_promise_js(key, "text")
+    }
+    pub async fn get_json<ExpectedValue: ::wasm_bindgen::JsGeneric>(
+        &self,
+        key: &Key,
+    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    where
+        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi,
+    {
+        self.get_json_js(key, "json").await
+    }
+    pub fn get_json_promise<ExpectedValue: ::wasm_bindgen::JsGeneric>(
+        &self,
+        key: &Key,
+    ) -> Promise<JsNullable<ExpectedValue>> {
+        self.get_json_promise_js(key, "json")
+    }
+}

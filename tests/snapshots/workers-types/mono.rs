@@ -9637,7 +9637,10 @@ impl KVNamespace {
     pub async fn get_json<ExpectedValue>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<ExpectedValue>, JsValue> {
+    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    where
+        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static,
+    {
         self.get_json_js(key, "json").await
     }
     pub fn get_json_promise<ExpectedValue>(
@@ -9685,7 +9688,10 @@ impl KVNamespace {
     pub async fn get_json_with_slice<ExpectedValue>(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<Map<JsString, JsNullable<ExpectedValue>>, JsValue> {
+    ) -> Result<Map<JsString, JsNullable<ExpectedValue>>, JsValue>
+    where
+        ExpectedValue: 'static,
+    {
         self.get_json_with_slice_js(key, "json").await
     }
     pub fn get_json_with_slice_promise<ExpectedValue>(
@@ -9697,13 +9703,19 @@ impl KVNamespace {
     pub async fn get_with_metadata_text<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue> {
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
         self.get_with_metadata_text_js(key, "text").await
     }
     pub async fn get_with_metadata_text_js_string<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue> {
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
         self.get_with_metadata_text_js_string_js(key, "text").await
     }
     pub fn get_with_metadata_text_promise<Metadata>(
@@ -9715,7 +9727,11 @@ impl KVNamespace {
     pub async fn get_with_metadata_json<ExpectedValue, Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue> {
+    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static,
+    {
         self.get_with_metadata_json_js(key, "json").await
     }
     pub fn get_with_metadata_json_promise<ExpectedValue, Metadata>(
@@ -9727,7 +9743,10 @@ impl KVNamespace {
     pub async fn get_with_metadata_array_buffer<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue> {
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
         self.get_with_metadata_array_buffer_js(key, "arrayBuffer")
             .await
     }
@@ -9740,7 +9759,10 @@ impl KVNamespace {
     pub async fn get_with_metadata_stream<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue> {
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
         self.get_with_metadata_stream_js(key, "stream").await
     }
     pub fn get_with_metadata_stream_promise<Metadata>(
@@ -9752,7 +9774,10 @@ impl KVNamespace {
     pub async fn get_with_metadata_text_with_slice<Metadata>(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue> {
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static,
+    {
         self.get_with_metadata_text_with_slice_js(key, "text").await
     }
     pub fn get_with_metadata_text_with_slice_promise<Metadata>(
@@ -9765,6 +9790,9 @@ impl KVNamespace {
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static,
     {
         self.get_with_metadata_json_with_slice_js(key, "json").await
     }

@@ -10638,7 +10638,10 @@ impl KVNamespace {
     pub async fn get_json<ExpectedValue: ::wasm_bindgen::JsGeneric>(
         &self,
         key: &str,
-    ) -> Result<Nullable<ExpectedValue>, JsValue> {
+    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    where
+        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi,
+    {
         self.get_json_js(key, "json").await
     }
     pub fn get_json_promise<ExpectedValue: ::wasm_bindgen::JsGeneric>(

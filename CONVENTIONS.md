@@ -2824,6 +2824,14 @@ impl CompressionStream {
   (`get_json_promise`, `try_describe_raw`) over their own extern, and
   so, under `--experimental-generic-mono`, does the `_js_string` return
   variant (`describe_raw_js_string`).
+* A generic receiver (`KVStore<Key>`) gives `impl<Key: JsGeneric>
+  KVStore<Key>`; the method's own type parameters stay on the wrapper
+  fn. A wrapper repeats its extern's `where` clause, since it calls the
+  extern under the same bounds: the ABI traits a generic import states
+  under `--experimental-generic-mono` (`Key: IntoWasmAbi`), and an
+  awaited carrier's (`ExpectedValue: NullableFromWasmAbi` on
+  `get_json`).
+* Doc comments move to the wrappers; the extern binding is not `pub`.
 * Setters are exempt: `set_disposition("inline")` takes the value.
 
 ## Subtyping LUB across unions
