@@ -214,10 +214,57 @@ pub enum TypeRef {
         generic_args: Vec<TypeRef>,
     },
 
+    // === Type-level constructs ===
+    //
+    // Evaluated over concrete operands by `parse::eval` once every file is
+    // parsed; one that reaches codegen could not be evaluated and erases to
+    // `JsValue`.
+    /// `never`. A union drops it; alone it erases.
+    Never,
+    /// `keyof T`.
+    KeyOf(Box<TypeRef>),
+    /// `T[K]`.
+    IndexedAccess(Box<TypeRef>, Box<TypeRef>),
+    /// `{ [P in K]?: V }`.
+    Mapped(Box<MappedType>),
+    /// An inline `{ … }` whose members evaluation reads: the object of an
+    /// indexed access. Elsewhere an inline object type is [`TypeRef::Object`]
+    /// or hoists to an interface.
+    ObjectLiteral(Vec<ObjectProp>),
+
     // === Fallback ===
-    /// For TS constructs we can't represent (conditional types, mapped types,
-    /// template literals, `keyof`, etc.) — erased to `JsValue`.
+    /// For TS constructs we can't represent (conditional types, template
+    /// literals, etc.) — erased to `JsValue`.
     Unresolved(String),
+}
+
+/// `{ [P in K]?: V }`. Without `V` the type is homomorphic: each property
+/// keeps its source type.
+#[derive(Clone, Debug, PartialEq)]
+pub struct MappedType {
+    /// The key type parameter, `P`.
+    pub key: String,
+    /// The key set, `K`.
+    pub keys: TypeRef,
+    pub value: Option<TypeRef>,
+    pub optional: Option<Modifier>,
+    pub readonly: Option<Modifier>,
+}
+
+/// A mapped type's `?` / `+?` / `-?` (or `readonly`) modifier.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Modifier {
+    Add,
+    Remove,
+}
+
+/// A property of an inline object type.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ObjectProp {
+    pub name: String,
+    pub type_ref: TypeRef,
+    pub optional: bool,
+    pub readonly: bool,
 }
 
 /// Whether a typed-array parameter accepts a view of shared memory. TS 5.7+
@@ -322,6 +369,7 @@ impl TypeRef {
                 }
                 TypeRef::Null => *null = true,
                 TypeRef::Undefined | TypeRef::Void => *undefined = true,
+                TypeRef::Never => {}
                 other if values.contains(&other) => {}
                 other => values.push(other),
             }
@@ -530,6 +578,33 @@ impl TypeRef {
                     format!("{name}<{args}>")
                 }
             }
+            TypeRef::Never => "never".into(),
+            TypeRef::KeyOf(t) => format!("keyof {}", t.format_ts()),
+            TypeRef::IndexedAccess(o, i) => format!("{}[{}]", o.format_ts(), i.format_ts()),
+            TypeRef::Mapped(m) => format!(
+                "{{ [{} in {}]{}: {} }}",
+                m.key,
+                m.keys.format_ts(),
+                match m.optional {
+                    Some(Modifier::Add) => "?",
+                    Some(Modifier::Remove) => "-?",
+                    None => "",
+                },
+                m.value.as_ref().map_or("…".to_string(), TypeRef::format_ts)
+            ),
+            TypeRef::ObjectLiteral(props) => format!(
+                "{{ {} }}",
+                props
+                    .iter()
+                    .map(|p| format!(
+                        "{}{}: {}",
+                        p.name,
+                        if p.optional { "?" } else { "" },
+                        p.type_ref.format_ts()
+                    ))
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            ),
             TypeRef::Unresolved(s) => s.clone(),
         }
     }

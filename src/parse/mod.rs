@@ -4,6 +4,7 @@ pub mod classify;
 pub mod ctx;
 pub mod docs;
 mod enums;
+mod eval;
 pub mod first_pass;
 pub mod literal_union;
 pub mod members;
@@ -68,6 +69,7 @@ pub fn parse_dts_files(
     )?;
     bind_constructor_vars(&mut gctx, &mut module);
     enums::evaluate_ts_enums(&mut gctx, &mut module.types);
+    eval::evaluate_types(&mut gctx, &mut module);
 
     Ok((module, gctx))
 }
@@ -85,6 +87,7 @@ pub fn parse_single_source(
     module.add_file(path.to_path_buf(), file_scope, parsed);
     bind_constructor_vars(&mut gctx, &mut module);
     enums::evaluate_ts_enums(&mut gctx, &mut module.types);
+    eval::evaluate_types(&mut gctx, &mut module);
     Ok((module, gctx))
 }
 

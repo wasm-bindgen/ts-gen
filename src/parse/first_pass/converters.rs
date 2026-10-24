@@ -83,11 +83,24 @@ pub fn convert_interface_decl(
 ) -> ir::InterfaceDecl {
     let name = iface.id.name.to_string();
     let type_params = convert_type_params(iface.type_parameters.as_ref(), ctx.diag);
-    let extends: Vec<ir::TypeRef> = iface
-        .extends
-        .iter()
-        .map(|ext| convert_ts_type_name_to_ref(&ext.type_name))
-        .collect();
+    // Arguments resolve where the clause does, so they are kept for
+    // evaluation; the `extends` attribute itself names a bare parent.
+    let extends: Vec<ir::TypeRef> =
+        iface
+            .extends
+            .iter()
+            .map(|ext| {
+                let mut parent = convert_ts_type_name_to_ref(&ext.type_name);
+                if let (ir::TypeRef::Reference { generic_args, .. }, Some(args)) =
+                    (&mut parent, ext.type_arguments.as_ref())
+                {
+                    generic_args.extend(args.params.iter().map(|t| {
+                        crate::parse::types::convert_ts_type_scoped(t, parent_scope, ctx)
+                    }));
+                }
+                parent
+            })
+            .collect();
     interface_from_signatures(
         name,
         type_params,

@@ -286,6 +286,17 @@ impl GlobalContext {
         modules.chain(namespaces.copied())
     }
 
+    /// List `new` in the module that lists `beside`, if one does.
+    pub(crate) fn list_in_module_of(&mut self, beside: TypeId, new: TypeId) -> bool {
+        match self.modules.iter_mut().find(|m| m.types.contains(&beside)) {
+            Some(module) => {
+                module.types.push(new);
+                true
+            }
+            None => false,
+        }
+    }
+
     /// Remove `dropped` from every module's, namespace's and block's
     /// declarations.
     pub(crate) fn drop_types(&mut self, dropped: &std::collections::HashSet<TypeId>) {
