@@ -178,11 +178,24 @@ pub fn generate(module: &Module, gctx: &crate::context::GlobalContext) -> anyhow
 }
 
 /// Generate Rust source code with explicit options.
+///
+/// `options.experimental_generic_mono` has to match the
+/// [`ParseOptions`](crate::parse::ParseOptions) the IR was parsed with:
+/// evaluation already lowered literal-only type parameters for one mode.
 pub fn generate_with_options(
     module: &Module,
     gctx: &crate::context::GlobalContext,
     options: &GenerateOptions,
 ) -> anyhow::Result<String> {
+    if gctx.experimental_generic_mono != options.experimental_generic_mono {
+        let mode = |mono: bool| if mono { "with" } else { "without" };
+        anyhow::bail!(
+            "the IR was parsed {} `experimental_generic_mono` but is generated {} it; \
+             parse and generate in the same mode",
+            mode(gctx.experimental_generic_mono),
+            mode(options.experimental_generic_mono),
+        );
+    }
     let tokens = generate_tokens(module, gctx, options)?;
     // Validate that the tokens are valid Rust syntax.
     let mut file = syn::parse2::<syn::File>(tokens.clone()).map_err(|e| {
@@ -1241,6 +1254,25 @@ mod tests {
             largest_unit_variants(&out, "DaySpan"),
             ["auto", "day", "hours"]
         );
+    }
+
+    #[test]
+    fn generating_in_another_mode_than_parsed_is_an_error() {
+        let src = "interface Rounding<U extends \"hour\" | \"minute\"> { unit?: U }";
+        for parsed in [false, true] {
+            let options = crate::parse::ParseOptions::new().experimental_generic_mono(parsed);
+            let (module, gctx) = crate::parse_source_with_options(src, None, &options).unwrap();
+            for generated in [false, true] {
+                let options = GenerateOptions::new().experimental_generic_mono(generated);
+                let result = super::generate_with_options(&module, &gctx, &options);
+                if parsed == generated {
+                    result.unwrap();
+                } else {
+                    let err = result.unwrap_err().to_string();
+                    assert!(err.contains("same mode"), "{err}");
+                }
+            }
+        }
     }
 
     #[test]
