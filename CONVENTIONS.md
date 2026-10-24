@@ -2266,8 +2266,9 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
   input's type cannot carry. Side members without tags are ignored,
   whatever their description.
 * Only classes, interfaces and functions can be annotated: a
-  `declare namespace`, `declare module`, alias or variable in the side
-  file fails the run rather than being skipped, as does a bare name
+  `declare namespace`, `declare module`, variable, or alias that sets no
+  type-parameter default (see below) in the side file fails the run
+  rather than being skipped, as does a bare name
   that the input declares more than once (globally and inside a
   module), since names are matched without scope.
 * A side declaration's type-parameter defaults replace the input's, by
