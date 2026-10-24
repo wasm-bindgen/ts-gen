@@ -2512,7 +2512,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_rounding_options_time_unit(
+        pub fn round_with_rounding_options(
             this: &PlainTime,
             round_to: &RoundingOptionsTimeUnit,
         ) -> PlainTime;
@@ -2520,7 +2520,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_rounding_options_time_unit(
+        pub fn try_round_with_rounding_options(
             this: &PlainTime,
             round_to: &RoundingOptionsTimeUnit,
         ) -> Result<PlainTime, RangeError>;
@@ -3169,7 +3169,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_rounding_options_day_or_time_unit(
+        pub fn round_with_rounding_options(
             this: &PlainDateTime,
             round_to: &RoundingOptionsDayOrTimeUnit,
         ) -> PlainDateTime;
@@ -3177,7 +3177,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_rounding_options_day_or_time_unit(
+        pub fn try_round_with_rounding_options(
             this: &PlainDateTime,
             round_to: &RoundingOptionsDayOrTimeUnit,
         ) -> Result<PlainDateTime, RangeError>;
@@ -3922,7 +3922,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_rounding_options_day_or_time_unit(
+        pub fn round_with_rounding_options(
             this: &ZonedDateTime,
             round_to: &RoundingOptionsDayOrTimeUnit,
         ) -> ZonedDateTime;
@@ -3930,7 +3930,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_rounding_options_day_or_time_unit(
+        pub fn try_round_with_rounding_options(
             this: &ZonedDateTime,
             round_to: &RoundingOptionsDayOrTimeUnit,
         ) -> Result<ZonedDateTime, RangeError>;
@@ -5151,7 +5151,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_rounding_options_time_unit(
+        pub fn round_with_rounding_options(
             this: &Instant,
             round_to: &RoundingOptionsTimeUnit,
         ) -> Instant;
@@ -5159,7 +5159,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_rounding_options_time_unit(
+        pub fn try_round_with_rounding_options(
             this: &Instant,
             round_to: &RoundingOptionsTimeUnit,
         ) -> Result<Instant, RangeError>;

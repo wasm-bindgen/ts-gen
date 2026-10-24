@@ -4852,6 +4852,12 @@ pub fn until_with_options(
   "day">>` are one dictionary. An alias of an instantiation, `type
   HourStepping = Stepped<"hour">`, is that specialisation under the
   alias's name, and use sites share it.
+* **A variant's `_with_` suffix names the base**, not the specialisation:
+  `round(roundTo: RoundingOptions<TimeUnit>)` beside
+  `round(roundTo: PluralizeUnit<TimeUnit>)` is `round_with_rounding_options`,
+  as it would be without specialising. Where another overload takes a
+  different specialisation of the same base, or the base itself, each keeps
+  its full name (`nudge_with_rounding_hour` beside `nudge(&RoundingTimeUnit)`).
 * **Only a dictionary is specialised at a use site.** An interface with
   methods is still erased, but its instantiations are the base.
 * **The parameter alone reads as its argument**, an enum it names or its

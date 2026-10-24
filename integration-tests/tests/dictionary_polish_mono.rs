@@ -9,8 +9,8 @@ use ts_gen_integration_tests::dictionary_polish_mono::{
     polish::{
         Holder, HourStepping, MinuteStepping, Options, PartialBoxLikeObject,
         PartialOmitLikeBoxLikeObject, PluralizeTimeUnit, PluralizeUnit, PluralizeUnitHour,
-        PluralizeUnitMinute, Rounder, Rounding, RoundingTimeUnit, Stepped, TimeLikeObject,
-        Transition,
+        PluralizeUnitMinute, Rounder, Rounding, RoundingHour, RoundingTimeUnit, Stepped,
+        TimeLikeObject, Transition,
     },
     DirectionKind, MinuteSteppingLargestUnitKind, StepKind, SteppedLargestUnitKind,
 };
@@ -117,4 +117,9 @@ fn use_sites_take_their_specialisation(rounder: &Rounder) {
     rounder.round_again(&RoundingTimeUnit::new());
     rounder.step(&HourStepping::new());
     let _: PluralizeTimeUnit = rounder.clock().now();
+    // A variant is named for the base its specialisation extends.
+    rounder.snap(PluralizeTimeUnit::Hours);
+    rounder.snap_with_rounding(&RoundingTimeUnit::new());
+    rounder.nudge(&RoundingTimeUnit::new());
+    rounder.nudge_with_rounding_hour(&RoundingHour::new());
 }

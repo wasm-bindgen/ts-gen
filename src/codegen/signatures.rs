@@ -512,7 +512,8 @@ pub fn expand_signatures(
     // and the other cohorts' remaining parameters (a cohort's `null` arm
     // is `_with_null` beside its typed one). The plain expansions are
     // suffixed among themselves.
-    let stripped: Vec<Option<Vec<ConcreteParam>>> = deduped
+    let named = naming_view(&deduped, &origins, overloads, cgctx);
+    let stripped: Vec<Option<Vec<ConcreteParam>>> = named
         .iter()
         .zip(&arms)
         .map(|(sig, arms)| {
@@ -529,7 +530,7 @@ pub fn expand_signatures(
             )
         })
         .collect();
-    let plain: Vec<Vec<ConcreteParam>> = deduped
+    let plain: Vec<Vec<ConcreteParam>> = named
         .iter()
         .zip(&stripped)
         .filter(|(_, s)| s.is_none())
@@ -571,6 +572,64 @@ pub fn expand_signatures(
                 params,
                 literal_arms,
             }
+        })
+        .collect()
+}
+
+/// The cohort as its `_with_` suffixes name it: a use-site specialisation
+/// (`RoundingOptionsTimeUnit`) reads as the generic base it extends
+/// (`round_with_rounding_options`), unless that name would also cover
+/// another type in the cohort.
+fn naming_view(
+    sigs: &[Vec<ConcreteParam>],
+    origins: &[usize],
+    overloads: &[Overload<'_>],
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<Vec<ConcreteParam>> {
+    let Some(cgctx) = cgctx.filter(|c| !c.gctx.specialisations.is_empty()) else {
+        return sigs.to_vec();
+    };
+    let base_of = |ty: &TypeRef, scope: ScopeId| -> Option<&Vec<String>> {
+        let TypeRef::Reference { segments, .. } = ty else {
+            return None;
+        };
+        let id = cgctx.gctx.resolve_path(scope, &segments.join("."))?;
+        cgctx.gctx.specialisations.get(&id)
+    };
+    let mut covers: std::collections::HashMap<&[String], Vec<&TypeRef>> = Default::default();
+    for (sig, &origin) in sigs.iter().zip(origins) {
+        let scope = overloads[origin].body_scope;
+        for p in sig {
+            let TypeRef::Reference { segments, .. } = &p.type_ref else {
+                continue;
+            };
+            let name = base_of(&p.type_ref, scope).unwrap_or(segments);
+            let seen = covers.entry(name).or_default();
+            if !seen.contains(&&p.type_ref) {
+                seen.push(&p.type_ref);
+            }
+        }
+    }
+    sigs.iter()
+        .zip(origins)
+        .map(|(sig, &origin)| {
+            let scope = overloads[origin].body_scope;
+            sig.iter()
+                .map(|p| match (&p.type_ref, base_of(&p.type_ref, scope)) {
+                    (TypeRef::Reference { generic_args, .. }, Some(base))
+                        if covers[base.as_slice()].len() == 1 =>
+                    {
+                        ConcreteParam {
+                            type_ref: TypeRef::Reference {
+                                segments: base.clone(),
+                                generic_args: generic_args.clone(),
+                            },
+                            ..p.clone()
+                        }
+                    }
+                    _ => p.clone(),
+                })
+                .collect()
         })
         .collect()
 }
