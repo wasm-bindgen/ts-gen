@@ -31,7 +31,7 @@ use std::rc::Rc;
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
     GetterMember, InterfaceDecl, MappedType, Member, Modifier, Module, Param, SetterMember,
-    StringEnumDecl, StringEnumVariant, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam,
+    StringEnumDecl, StringEnumVariant, Throws, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam,
     TypeRef,
 };
 use crate::parse::classify::classify_interface;
@@ -1715,6 +1715,7 @@ fn props_to_members(props: &[Prop], scope: ScopeId) -> Vec<Member> {
             type_ref: p.type_ref.clone(),
             optional: p.optional,
             doc: p.doc.clone(),
+            throws: Throws::None,
         }));
         if !p.readonly {
             members.push(Member::Setter(SetterMember {
