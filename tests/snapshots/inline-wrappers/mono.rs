@@ -32,6 +32,10 @@ extern "C" {
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "seek")]
     fn seek_js(this: &R2Object, offset: f64) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn settled(this: &R2Object) -> Promise<Number>;
+    #[wasm_bindgen(method, catch)]
+    pub fn matrix(this: &R2Object) -> Result<Vec<Array<Number>>, JsValue>;
 }
 impl R2Object {
     #[doc = " Size in bytes."]

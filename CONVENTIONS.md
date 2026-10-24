@@ -2210,7 +2210,8 @@ pub async fn count(this: &Response) -> Result<u32, JsValue>;
   (`Result<u32, _>`).
 * A generic handle's argument must be a JS type, so inside one the
   tagged leaf keeps the JS number it narrows: `Number`, or `BigInt` for
-  `u64`/`i64`. A `Promise<number>` getter or argument is
+  `u64`/`i64` on a `bigint` (on a `number` they too stay `Number`, with
+  no inline wrapper). A `Promise<number>` getter or argument is
   `Promise<Number>`, `number[][]` is `Vec<Array<Number>>` and
   `(number | null)[]` is `Vec<JsNullable<Number>>`; the tag still
   applies where the leaf reaches a Rust position.

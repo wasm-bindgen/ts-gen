@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, Nullable};
+use js_sys::{Array, Nullable, Number, Promise};
 
 use ts_gen_integration_tests::inline_wrappers::{
     now, Box as JsBox, R2Bucket, R2Object, R2PutOptions,
@@ -20,6 +20,8 @@ async fn wrappers_compile(obj: &R2Object, boxed: &JsBox<R2Object>) -> Result<(),
     let _: Vec<u64> = obj.sizes();
     obj.upload(&[1, 2, 3]);
     let _: i64 = obj.seek(-1);
+    let _: Promise<Number> = obj.settled();
+    let _: Vec<Array<Number>> = obj.matrix();
     let _: u64 = R2Bucket::max_size();
     let _: Result<R2Bucket, JsValue> = R2Bucket::new(1);
     let _: u64 = now();

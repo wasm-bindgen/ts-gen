@@ -25,6 +25,12 @@ export interface R2Object {
    * @rust i64
    */
   seek(offset: number): number;
+  // Inside a generic handle the leaf stays a JS `Number`, as any
+  // `@rust` scalar does there, and needs no wrapper.
+  /** @rust u64 */
+  readonly settled: Promise<number>;
+  /** @rust u64 */
+  matrix(): number[][];
 }
 
 export declare class R2Bucket {
