@@ -99,10 +99,12 @@ pub struct GlobalContext {
     /// the instance of, whose construct signature's return type
     /// `bind_constructor_vars` may find to be a global instance interface.
     pub(crate) constructor_classes: Vec<TypeId>,
-    /// Generic aliases type-level evaluation instantiates at every use
-    /// (`PartialLike<T> = { [P in keyof T]?: T[P] }`), so a use names the
-    /// instantiation rather than the alias. The output surface emits one
-    /// only when a signature still reaches it.
+    /// Aliases type-level evaluation reads through, so a use names
+    /// something else: generic aliases instantiated at every use
+    /// (`PartialLike<T> = { [P in keyof T]?: T[P] }`), and literal aliases
+    /// that only constrain literal-only type parameters (`Units extends
+    /// DateUnit | TimeUnit`). The output surface emits one only when a
+    /// signature still reaches it.
     pub(crate) type_level_only: std::collections::HashSet<TypeId>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,

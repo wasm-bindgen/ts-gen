@@ -9,7 +9,9 @@ use crate::ir;
 use crate::parse::classify::classify_interface;
 use crate::parse::ctx::ParseCtx;
 use crate::parse::docs::DocComments;
-use crate::parse::members::{convert_class_element, convert_ts_signature, create_body_scope};
+use crate::parse::members::{
+    convert_class_element, convert_ts_signature, create_body_scope, create_interface_body_scope,
+};
 use crate::parse::scope::ScopeId;
 use crate::parse::types::{
     convert_formal_params_scoped, convert_ts_type_scoped, convert_type_params,
@@ -131,7 +133,7 @@ pub fn interface_from_signatures(
 ) -> ir::InterfaceDecl {
     let js_name = name.clone();
     let parent = name.clone();
-    let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
+    let body_scope = create_interface_body_scope(&mut type_params, parent_scope, ctx);
     let mut construct = Vec::new();
     let mut members: Vec<ir::Member> = Vec::new();
     for sig in signatures {

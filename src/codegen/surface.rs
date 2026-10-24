@@ -183,9 +183,10 @@ impl<'d> Builder<'_, 'd> {
         // export of the same declaration does.
         entries.sort_by_key(|&(public, _, _)| public == "default");
         for (public, local, bindings) in entries {
-            // A generic alias every use instantiates is named by none of
-            // them; a signature that still names it reaches it, and
-            // `--export` can select it.
+            // An alias evaluation reads through (instantiated at every use,
+            // or a literal alias only constraining literal-only parameters)
+            // is named by no use; a signature that still names it reaches
+            // it, and `--export` can select it.
             let ids = gctx.declarations(bound_in(root, bindings), local);
             if !ids.is_empty() && ids.iter().all(|id| gctx.type_level_only.contains(id)) {
                 continue;
