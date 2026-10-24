@@ -27,19 +27,11 @@ extern "C" {
     pub fn set_verified(this: &Placeholder, val: bool);
 }
 impl Placeholder {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `certPresented: \"0\"`"]
-    #[doc = " * `certVerified: \"NONE\"`"]
-    #[doc = " * `certIssuerDN: \"\"`"]
+    #[doc = " Construct with `certPresented: \"0\"`, `certVerified: \"NONE\"` and `certIssuerDN: \"\"`."]
     pub fn new() -> Placeholder {
         Self::builder().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `certPresented: \"0\"`"]
-    #[doc = " * `certVerified: \"NONE\"`"]
-    #[doc = " * `certIssuerDN: \"\"`"]
+    #[doc = " Start a builder with `certPresented: \"0\"`, `certVerified: \"NONE\"` and `certIssuerDN: \"\"`."]
     pub fn builder() -> PlaceholderBuilder {
         let inner: Placeholder = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cert_presented("0");
@@ -79,27 +71,41 @@ extern "C" {
     pub fn set_filename(this: &Attachment, val: &str);
 }
 impl Attachment {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"attachment\"`"]
-    #[doc = " * `disposition: \"inline\"`"]
+    #[doc = " Construct with `kind: \"attachment\"` and `disposition: \"inline\"`."]
     pub fn new_inline(filename: &str) -> Attachment {
+        Self::builder_inline(filename).build()
+    }
+    #[doc = " Construct with `kind: \"attachment\"` and `disposition: \"attachment\"`."]
+    pub fn new_attachment(filename: &str) -> Attachment {
+        Self::builder_attachment(filename).build()
+    }
+    #[doc = " Start a builder with `kind: \"attachment\"` and `disposition: \"inline\"`."]
+    pub fn builder_inline(filename: &str) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind("attachment");
         inner.set_disposition(DispositionKind::Inline);
         inner.set_filename(filename);
-        inner
+        AttachmentBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"attachment\"`"]
-    #[doc = " * `disposition: \"attachment\"`"]
-    pub fn new_attachment(filename: &str) -> Attachment {
+    #[doc = " Start a builder with `kind: \"attachment\"` and `disposition: \"attachment\"`."]
+    pub fn builder_attachment(filename: &str) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind("attachment");
         inner.set_disposition(DispositionKind::Attachment);
         inner.set_filename(filename);
-        inner
+        AttachmentBuilder { inner }
+    }
+}
+pub struct AttachmentBuilder {
+    inner: Attachment,
+}
+impl AttachmentBuilder {
+    pub fn disposition(self, val: DispositionKind) -> Self {
+        self.inner.set_disposition(val);
+        self
+    }
+    pub fn build(self) -> Attachment {
+        self.inner
     }
 }
 #[wasm_bindgen]
@@ -121,9 +127,7 @@ extern "C" {
     pub fn set_filename(this: &Part, val: &str);
 }
 impl Part {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
+    #[doc = " Construct with `disposition: \"inline\"`."]
     pub fn new_inline(content_id: &str, filename: &str) -> Part {
         let inner: Part = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition(DispositionKind::Inline);
@@ -131,15 +135,11 @@ impl Part {
         inner.set_filename(filename);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Construct with `disposition: \"attachment\"`."]
     pub fn new_attachment(filename: &str) -> Part {
         Self::builder_attachment(filename).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(filename: &str) -> PartBuilder {
         let inner: Part = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition(DispositionKind::Attachment);
@@ -206,10 +206,19 @@ extern "C" {
     pub fn set_f_with_f64(this: &CappedAttachment, val: f64);
 }
 impl CappedAttachment {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
+    #[doc = " Construct with `disposition: \"inline\"`."]
     pub fn new_inline(a: &str, b: &str, c: &str, d: &str, e: &str, f: &str) -> CappedAttachment {
+        Self::builder_inline(a, b, c, d, e, f).build()
+    }
+    #[doc = " Start a builder with `disposition: \"inline\"`."]
+    pub fn builder_inline(
+        a: &str,
+        b: &str,
+        c: &str,
+        d: &str,
+        e: &str,
+        f: &str,
+    ) -> CappedAttachmentBuilder {
         let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition(DispositionKind::Inline);
         inner.set_a(a);
@@ -218,7 +227,19 @@ impl CappedAttachment {
         inner.set_d(d);
         inner.set_e(e);
         inner.set_f(f);
-        inner
+        CappedAttachmentBuilder { inner }
+    }
+}
+pub struct CappedAttachmentBuilder {
+    inner: CappedAttachment,
+}
+impl CappedAttachmentBuilder {
+    pub fn disposition(self, val: DispositionKind) -> Self {
+        self.inner.set_disposition(val);
+        self
+    }
+    pub fn build(self) -> CappedAttachment {
+        self.inner
     }
 }
 #[wasm_bindgen(private)]

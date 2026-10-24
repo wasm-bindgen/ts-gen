@@ -73,6 +73,11 @@ impl Point {
         }
     }
 }
+impl Default for Point {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct PointBuilder {
     inner: Point,
 }

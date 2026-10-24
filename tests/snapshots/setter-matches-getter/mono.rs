@@ -26,6 +26,11 @@ impl DigitsOptions {
         }
     }
 }
+impl Default for DigitsOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct DigitsOptionsBuilder {
     inner: DigitsOptions,
 }
@@ -55,37 +60,61 @@ extern "C" {
     pub fn set_digits_with_f64(this: &RequiredDigits, val: f64);
 }
 impl RequiredDigits {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `digits: \"auto\"`"]
+    #[doc = " Construct with `digits: \"auto\"`."]
     pub fn new_auto() -> RequiredDigits {
+        Self::builder_auto().build()
+    }
+    #[doc = " Construct with `digits: 0`."]
+    pub fn new_0() -> RequiredDigits {
+        Self::builder_0().build()
+    }
+    #[doc = " Construct with `digits: 1`."]
+    pub fn new_1() -> RequiredDigits {
+        Self::builder_1().build()
+    }
+    #[doc = " Construct with `digits: 2`."]
+    pub fn new_2() -> RequiredDigits {
+        Self::builder_2().build()
+    }
+    #[doc = " Start a builder with `digits: \"auto\"`."]
+    pub fn builder_auto() -> RequiredDigitsBuilder {
         let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_digits(FractionalSecondDigitsKind::Auto);
-        inner
+        RequiredDigitsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `digits: 0`"]
-    pub fn new_0() -> RequiredDigits {
+    #[doc = " Start a builder with `digits: 0`."]
+    pub fn builder_0() -> RequiredDigitsBuilder {
         let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_digits_with_f64(0.0);
-        inner
+        RequiredDigitsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `digits: 1`"]
-    pub fn new_1() -> RequiredDigits {
+    #[doc = " Start a builder with `digits: 1`."]
+    pub fn builder_1() -> RequiredDigitsBuilder {
         let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_digits_with_f64(1.0);
-        inner
+        RequiredDigitsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `digits: 2`"]
-    pub fn new_2() -> RequiredDigits {
+    #[doc = " Start a builder with `digits: 2`."]
+    pub fn builder_2() -> RequiredDigitsBuilder {
         let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_digits_with_f64(2.0);
-        inner
+        RequiredDigitsBuilder { inner }
+    }
+}
+pub struct RequiredDigitsBuilder {
+    inner: RequiredDigits,
+}
+impl RequiredDigitsBuilder {
+    pub fn digits(self, val: FractionalSecondDigitsKind) -> Self {
+        self.inner.set_digits(val);
+        self
+    }
+    pub fn digits_with_f64(self, val: f64) -> Self {
+        self.inner.set_digits_with_f64(val);
+        self
+    }
+    pub fn build(self) -> RequiredDigits {
+        self.inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -101,29 +130,51 @@ extern "C" {
     pub fn set_mode_with_bool(this: &Toggle, val: bool);
 }
 impl Toggle {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: true`"]
+    #[doc = " Construct with `mode: true`."]
     pub fn new_true() -> Toggle {
+        Self::builder_true().build()
+    }
+    #[doc = " Construct with `mode: \"x\"`."]
+    pub fn new_x() -> Toggle {
+        Self::builder_x().build()
+    }
+    #[doc = " Construct with `mode: \"y\"`."]
+    pub fn new_y() -> Toggle {
+        Self::builder_y().build()
+    }
+    #[doc = " Start a builder with `mode: true`."]
+    pub fn builder_true() -> ToggleBuilder {
         let inner: Toggle = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode_with_bool(true);
-        inner
+        ToggleBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: \"x\"`"]
-    pub fn new_x() -> Toggle {
+    #[doc = " Start a builder with `mode: \"x\"`."]
+    pub fn builder_x() -> ToggleBuilder {
         let inner: Toggle = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode(ModeKind::X);
-        inner
+        ToggleBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: \"y\"`"]
-    pub fn new_y() -> Toggle {
+    #[doc = " Start a builder with `mode: \"y\"`."]
+    pub fn builder_y() -> ToggleBuilder {
         let inner: Toggle = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode(ModeKind::Y);
-        inner
+        ToggleBuilder { inner }
+    }
+}
+pub struct ToggleBuilder {
+    inner: Toggle,
+}
+impl ToggleBuilder {
+    pub fn mode(self, val: ModeKind) -> Self {
+        self.inner.set_mode(val);
+        self
+    }
+    pub fn mode_with_bool(self, val: bool) -> Self {
+        self.inner.set_mode_with_bool(val);
+        self
+    }
+    pub fn build(self) -> Toggle {
+        self.inner
     }
 }
 #[wasm_bindgen(private)]

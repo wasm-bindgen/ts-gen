@@ -828,6 +828,9 @@ impl<'g> Eval<'g> {
             }
             TypeRef::Mapped(m) => {
                 let props = self.mapped_props(m, scope, env, dest, place)?;
+                if let Some(source) = self.same_shaped_source(m, &props, scope, env, dest, place) {
+                    return Some(source);
+                }
                 return self.synth_dict(props, hint, dest, place);
             }
             TypeRef::ObjectLiteral(_) => TypeRef::Object,
@@ -942,7 +945,7 @@ impl<'g> Eval<'g> {
             spelled.push(spell(&arg));
             bound_env = bound_env.bind(p.name.clone(), arg, dest, Env::default());
         }
-        let hint = format!("{}{}", alias.name, spelled.concat());
+        let hint = instance_spelling(&alias.name, &spelled, Some(&self.used));
         self.eval(
             &alias.target,
             alias.body_scope,
@@ -1047,6 +1050,48 @@ impl<'g> Eval<'g> {
             Utility::Exclude | Utility::Extract | Utility::NonNullable => unreachable!(),
         }
         Some(props)
+    }
+
+    /// The declaration a mapped type over `keyof T` maps, when its result has
+    /// exactly that declaration's members: `PartialTemporalLike<TimeLikeObject>`
+    /// makes optional what already is, so it is `TimeLikeObject` rather
+    /// than a copy of it. Only a declaration the use site names the same
+    /// way qualifies.
+    fn same_shaped_source(
+        &mut self,
+        mapped: &MappedType,
+        props: &[Prop],
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        place: Placement,
+    ) -> Option<TypeRef> {
+        let source = homomorphic_source(&mapped.keys)?;
+        let evaluated = self.eval(source, scope, env, dest, "", place)?;
+        let TypeRef::Reference { segments, .. } = &evaluated else {
+            return None;
+        };
+        let id = self.gctx.resolve_path(dest, &segments.join("."))?;
+        if !matches!(self.gctx.get_type(id).kind, TypeKind::Interface(_)) {
+            return None;
+        }
+        let shape = self.shape(&evaluated, dest, &Env::default(), dest, place)?;
+        // An optional property admits `undefined` whether or not its type
+        // spells it out.
+        let key = |props: &[Prop]| -> DictKey {
+            props
+                .iter()
+                .map(|p| {
+                    let ty = if p.optional {
+                        without_undefined(&p.type_ref)
+                    } else {
+                        p.type_ref.clone()
+                    };
+                    (p.js_name.clone(), ty.format_ts(), p.optional, p.readonly)
+                })
+                .collect()
+        };
+        (key(&shape) == key(props)).then_some(evaluated)
     }
 
     /// The members of an evaluated mapped type.
@@ -1443,7 +1488,7 @@ impl<'g> Eval<'g> {
                         .is_some_and(|owner| self.param_owner(dest, n) == Some(owner))
             })
             .collect();
-        spell_in(ty, &kept, 0)
+        spell_in(ty, &kept, 0, Some(&self.used))
     }
 
     /// The body scope declaring the type parameter `name` visible from
@@ -1688,36 +1733,88 @@ fn fallback(ty: &TypeRef) -> TypeRef {
     }
 }
 
+/// The spelling of `name<args>`: its [`instance_name`] unless that is
+/// `taken`, else the name followed by each argument.
+fn instance_spelling(name: &str, args: &[String], taken: Option<&LocalScope>) -> String {
+    match instance_name(name, args) {
+        Some(short) if !taken.is_some_and(|t| t.contains(&short)) => short,
+        _ => format!("{name}{}", args.concat()),
+    }
+}
+
+/// The short name of a one-argument generic alias instantiation, when the
+/// argument fills the role the alias name ends with. An alias name is read
+/// as its first PascalCase word, the head (`Partial`, `Pluralize`), then
+/// the role of its argument (`TemporalLike`, `Unit`). When the role's last
+/// word is also a word of the argument's spelling, the argument says what
+/// the role does, so the instantiation is the head followed by the
+/// argument: `PartialTemporalLike<ZonedDateTimeLikeObject>` is
+/// `PartialZonedDateTimeLikeObject` and `PluralizeUnit<"day" | TimeUnit>`
+/// is `PluralizeDayOrTimeUnit`. `None` keeps `<Alias><Argument>`.
+fn instance_name(alias: &str, spelled: &[String]) -> Option<String> {
+    let [arg] = spelled else {
+        return None;
+    };
+    let alias_words = pascal_words(alias);
+    let [head, .., role_end] = alias_words.as_slice() else {
+        return None;
+    };
+    pascal_words(arg)
+        .contains(role_end)
+        .then(|| format!("{head}{arg}"))
+}
+
+/// The words of a PascalCase name, each starting at an uppercase letter:
+/// `ZonedDateTimeLikeObject` is `Zoned`, `Date`, `Time`, `Like`, `Object`.
+fn pascal_words(name: &str) -> Vec<&str> {
+    let mut words = Vec::new();
+    let mut start = 0;
+    for (i, c) in name.char_indices().skip(1) {
+        if c.is_uppercase() {
+            words.push(&name[start..i]);
+            start = i;
+        }
+    }
+    if !name.is_empty() {
+        words.push(&name[start..]);
+    }
+    words
+}
+
 /// A PascalCase spelling of a type for naming what it evaluates to:
 /// `PluralizeUnit<"day" | TimeUnit>` is `PluralizeUnitDayOrTimeUnit`.
 fn spell(ty: &TypeRef) -> String {
-    spell_in(ty, &HashSet::new(), 0)
+    spell_in(ty, &HashSet::new(), 0, None)
 }
 
 /// `spell`, leaving out a `generic` parameter where it is an argument of
-/// an inner type (`depth` counts the references entered).
-fn spell_in(ty: &TypeRef, generic: &HashSet<String>, depth: u32) -> String {
-    let spell = |t: &TypeRef| spell_in(t, generic, depth);
+/// an inner type (`depth` counts the references entered). A short
+/// [`instance_name`] already in `taken` falls back to the full spelling.
+fn spell_in(
+    ty: &TypeRef,
+    generic: &HashSet<String>,
+    depth: u32,
+    taken: Option<&LocalScope>,
+) -> String {
+    let spell = |t: &TypeRef| spell_in(t, generic, depth, taken);
     match ty {
         TypeRef::Reference {
             segments,
             generic_args,
         } => {
-            let mut out = to_pascal_case(segments.last().unwrap());
-            for a in generic_args {
-                if depth > 0 && a.as_ident().is_some_and(|n| generic.contains(n)) {
-                    continue;
-                }
-                out.push_str(&spell_in(a, generic, depth + 1));
-            }
-            out
+            let args: Vec<String> = generic_args
+                .iter()
+                .filter(|a| !(depth > 0 && a.as_ident().is_some_and(|n| generic.contains(n))))
+                .map(|a| spell_in(a, generic, depth + 1, taken))
+                .collect();
+            instance_spelling(&to_pascal_case(segments.last().unwrap()), &args, taken)
         }
         TypeRef::StringLiteral(s) => to_enum_variant(s),
         TypeRef::NumberLiteral(n) => to_enum_variant(&n.to_string()),
         TypeRef::BooleanLiteral(b) => to_pascal_case(&b.to_string()),
         TypeRef::Union(u) => u.members().iter().map(spell).collect::<Vec<_>>().join("Or"),
         TypeRef::Array(e) => format!("{}Array", spell(e)),
-        TypeRef::KeyOf(t) => format!("KeyOf{}", spell_in(t, generic, depth + 1)),
+        TypeRef::KeyOf(t) => format!("KeyOf{}", spell_in(t, generic, depth + 1, taken)),
         TypeRef::IndexedAccess(o, i) => format!("{}{}", spell(o), spell(i)),
         other => to_pascal_case(&other.format_ts()),
     }
@@ -2086,6 +2183,55 @@ mod tests {
         assert_eq!(
             param_type(&gctx, &module, "f", 2),
             &TypeRef::ident("Strict")
+        );
+    }
+
+    #[test]
+    fn an_argument_filling_the_alias_role_replaces_it() {
+        let name = |alias: &str, args: &[&str]| {
+            let args: Vec<String> = args.iter().map(|a| a.to_string()).collect();
+            instance_spelling(alias, &args, None)
+        };
+        assert_eq!(
+            name("PartialTemporalLike", &["ZonedDateTimeLikeObject"]),
+            "PartialZonedDateTimeLikeObject"
+        );
+        assert_eq!(
+            name("PluralizeUnit", &["DayOrTimeUnit"]),
+            "PluralizeDayOrTimeUnit"
+        );
+        // No role word in the argument, a one-word alias, several arguments.
+        assert_eq!(
+            name("PartialTemporalLike", &["Options"]),
+            "PartialTemporalLikeOptions"
+        );
+        assert_eq!(name("Plural", &["DayOrTimeUnit"]), "PluralDayOrTimeUnit");
+        assert_eq!(
+            name("PickUnit", &["TimeUnit", "Hour"]),
+            "PickUnitTimeUnitHour"
+        );
+        // A short name a declaration already has keeps the full spelling.
+        let taken = LocalScope::with_claimed(["PluralizeTimeUnit"]);
+        assert_eq!(
+            instance_spelling("PluralizeUnit", &["TimeUnit".to_string()], Some(&taken)),
+            "PluralizeUnitTimeUnit"
+        );
+    }
+
+    #[test]
+    fn a_mapped_type_with_its_source_members_is_its_source() {
+        let (module, gctx) = parse(
+            r#"
+            type Loose<T extends object> = { [P in Exclude<keyof T, "id">]?: T[P] | undefined };
+            interface Times { hour?: number | undefined; minute?: number }
+            interface Ids { id: string; hour?: number }
+            declare function f(a: Loose<Times>, b: Loose<Ids>): void;
+            "#,
+        );
+        assert_eq!(param_type(&gctx, &module, "f", 0), &TypeRef::ident("Times"));
+        assert_eq!(
+            param_type(&gctx, &module, "f", 1),
+            &TypeRef::ident("LooseIds")
         );
     }
 }

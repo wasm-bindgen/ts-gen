@@ -164,6 +164,11 @@ impl RequestInit {
         }
     }
 }
+impl Default for RequestInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct RequestInitBuilder {
     inner: RequestInit,
 }

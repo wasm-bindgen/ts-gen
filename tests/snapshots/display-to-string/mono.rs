@@ -24,6 +24,11 @@ impl StampOptions {
         }
     }
 }
+impl Default for StampOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct StampOptionsBuilder {
     inner: StampOptions,
 }

@@ -176,6 +176,11 @@ impl RequestInit {
         }
     }
 }
+impl Default for RequestInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct RequestInitBuilder {
     inner: RequestInit,
 }
@@ -384,6 +389,11 @@ impl ResponseInit {
         ResponseInitBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ResponseInit {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ResponseInitBuilder {

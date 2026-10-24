@@ -26,6 +26,11 @@ impl GetOptions {
         }
     }
 }
+impl Default for GetOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct GetOptionsBuilder {
     inner: GetOptions,
 }
@@ -58,6 +63,11 @@ impl Conditional {
         ConditionalBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Conditional {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ConditionalBuilder {

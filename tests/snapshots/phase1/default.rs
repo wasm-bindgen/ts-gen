@@ -171,6 +171,11 @@ pub mod intl {
             }
         }
     }
+    impl Default for CollatorOptions {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct CollatorOptionsBuilder {
         inner: CollatorOptions,
     }

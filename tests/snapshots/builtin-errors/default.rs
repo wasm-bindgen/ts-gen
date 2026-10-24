@@ -193,6 +193,11 @@ impl FormatSettings {
         }
     }
 }
+impl Default for FormatSettings {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct FormatSettingsBuilder {
     inner: FormatSettings,
 }

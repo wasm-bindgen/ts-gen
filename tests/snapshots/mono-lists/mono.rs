@@ -277,6 +277,11 @@ impl LabelOptions {
         }
     }
 }
+impl Default for LabelOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct LabelOptionsBuilder {
     inner: LabelOptions,
 }

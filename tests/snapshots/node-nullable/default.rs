@@ -32,6 +32,11 @@ impl Options {
         }
     }
 }
+impl Default for Options {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct OptionsBuilder {
     inner: Options,
 }

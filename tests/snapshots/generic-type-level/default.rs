@@ -107,6 +107,11 @@ impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> Transformer<I, 
         }
     }
 }
+impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> Default for Transformer<I, O> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct TransformerBuilder<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> {
     inner: Transformer<I, O>,
 }

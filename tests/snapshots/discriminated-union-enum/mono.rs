@@ -27,30 +27,22 @@ extern "C" {
     pub fn set_filename(this: &Attachment, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl Attachment {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
+    #[doc = " Construct with `disposition: \"inline\"`."]
     pub fn new_inline(content_id: impl ::wasm_bindgen::JsStringLike) -> Attachment {
         Self::builder_inline(content_id).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Construct with `disposition: \"attachment\"`."]
     pub fn new_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> Attachment {
         Self::builder_attachment(filename).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
+    #[doc = " Start a builder with `disposition: \"inline\"`."]
     pub fn builder_inline(content_id: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition(DispositionKind::Inline);
         inner.set_content_id(content_id);
         AttachmentBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition(DispositionKind::Attachment);
@@ -97,30 +89,22 @@ extern "C" {
     pub fn set_reason(this: &Reply, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl Reply {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: 200`"]
+    #[doc = " Construct with `code: 200`."]
     pub fn new_200(body: impl ::wasm_bindgen::JsStringLike) -> Reply {
         Self::builder_200(body).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: 404`"]
+    #[doc = " Construct with `code: 404`."]
     pub fn new_404(reason: impl ::wasm_bindgen::JsStringLike) -> Reply {
         Self::builder_404(reason).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: 200`"]
+    #[doc = " Start a builder with `code: 200`."]
     pub fn builder_200(body: impl ::wasm_bindgen::JsStringLike) -> ReplyBuilder {
         let inner: Reply = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code(CodeKind::N200);
         inner.set_body(body);
         ReplyBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: 404`"]
+    #[doc = " Start a builder with `code: 404`."]
     pub fn builder_404(reason: impl ::wasm_bindgen::JsStringLike) -> ReplyBuilder {
         let inner: Reply = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code(CodeKind::N404);
@@ -161,23 +145,39 @@ extern "C" {
     pub fn set_data_with_array_buffer(this: &Payload, val: &ArrayBuffer);
 }
 impl Payload {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"text\"`"]
+    #[doc = " Construct with `kind: \"text\"`."]
     pub fn new_text(data: impl ::wasm_bindgen::JsStringLike) -> Payload {
+        Self::builder_text(data).build()
+    }
+    #[doc = " Construct with `kind: \"binary\"`."]
+    pub fn new_binary(data: &ArrayBuffer) -> Payload {
+        Self::builder_binary(data).build()
+    }
+    #[doc = " Start a builder with `kind: \"text\"`."]
+    pub fn builder_text(data: impl ::wasm_bindgen::JsStringLike) -> PayloadBuilder {
         let inner: Payload = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind(KindKind::Text);
         inner.set_data(data);
-        inner
+        PayloadBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"binary\"`"]
-    pub fn new_binary(data: &ArrayBuffer) -> Payload {
+    #[doc = " Start a builder with `kind: \"binary\"`."]
+    pub fn builder_binary(data: &ArrayBuffer) -> PayloadBuilder {
         let inner: Payload = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind(KindKind::Binary);
         inner.set_data_with_array_buffer(data);
-        inner
+        PayloadBuilder { inner }
+    }
+}
+pub struct PayloadBuilder {
+    inner: Payload,
+}
+impl PayloadBuilder {
+    pub fn kind(self, val: KindKind) -> Self {
+        self.inner.set_kind(val);
+        self
+    }
+    pub fn build(self) -> Payload {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "discriminated-union-enum", experimental_generic_mono)]

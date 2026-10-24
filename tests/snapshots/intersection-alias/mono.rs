@@ -42,6 +42,11 @@ impl Geo {
         }
     }
 }
+impl Default for Geo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -225,24 +230,18 @@ extern "C" {
         R: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadResult<R> {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `done: false`"]
+    #[doc = " Construct with `done: false`."]
     pub fn new_false(value: R) -> ReadResult<R> {
         let inner: ReadResult<R> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_done(false);
         inner.set_value(value);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `done: true`"]
+    #[doc = " Construct with `done: true`."]
     pub fn new_true() -> ReadResult<R> {
         Self::builder_true().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `done: true`"]
+    #[doc = " Start a builder with `done: true`."]
     pub fn builder_true() -> ReadResultBuilder<R> {
         let inner: ReadResult<R> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_done(true);

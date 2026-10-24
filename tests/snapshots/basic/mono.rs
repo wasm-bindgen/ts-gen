@@ -231,6 +231,11 @@ impl ResponseInit {
         }
     }
 }
+impl Default for ResponseInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ResponseInitBuilder {
     inner: ResponseInit,
 }
@@ -333,6 +338,11 @@ pub mod cloudflare {
                 SocketOptionsBuilder {
                     inner: JsCast::unchecked_into(js_sys::Object::new()),
                 }
+            }
+        }
+        impl Default for SocketOptions {
+            fn default() -> Self {
+                Self::new()
             }
         }
         pub struct SocketOptionsBuilder {

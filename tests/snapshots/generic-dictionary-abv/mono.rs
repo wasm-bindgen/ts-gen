@@ -53,6 +53,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> GenAbv<T> {
         }
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for GenAbv<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct GenAbvBuilder<T> {
     inner: GenAbv<T>,
 }

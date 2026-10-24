@@ -105,6 +105,11 @@ impl AllOptional {
         }
     }
 }
+impl Default for AllOptional {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct AllOptionalBuilder {
     inner: AllOptional,
 }

@@ -34,6 +34,11 @@ impl SendOptions {
         }
     }
 }
+impl Default for SendOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct SendOptionsBuilder {
     inner: SendOptions,
 }

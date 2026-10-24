@@ -28,6 +28,11 @@ impl Conditional {
         }
     }
 }
+impl Default for Conditional {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ConditionalBuilder {
     inner: Conditional,
 }
@@ -62,6 +67,11 @@ impl GetOptions {
         GetOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for GetOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct GetOptionsBuilder {
@@ -392,26 +402,45 @@ extern "C" {
     pub fn set_role(this: &Message, val: &str);
 }
 impl Message {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Construct with `role: \"user\"`."]
     pub fn new_user() -> Message {
-        let inner: Message = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role("user");
-        inner
+        Self::builder_user().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"assistant\"`"]
+    #[doc = " Construct with `role: \"assistant\"`."]
     pub fn new_assistant() -> Message {
-        let inner: Message = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role("assistant");
-        inner
+        Self::builder_assistant().build()
     }
     pub fn new(role: &str) -> Message {
+        Self::builder(role).build()
+    }
+    #[doc = " Start a builder with `role: \"user\"`."]
+    pub fn builder_user() -> MessageBuilder {
+        let inner: Message = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_role("user");
+        MessageBuilder { inner }
+    }
+    #[doc = " Start a builder with `role: \"assistant\"`."]
+    pub fn builder_assistant() -> MessageBuilder {
+        let inner: Message = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_role("assistant");
+        MessageBuilder { inner }
+    }
+    pub fn builder(role: &str) -> MessageBuilder {
         let inner: Message = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_role(role);
-        inner
+        MessageBuilder { inner }
+    }
+}
+pub struct MessageBuilder {
+    inner: Message,
+}
+impl MessageBuilder {
+    pub fn role(self, val: &str) -> Self {
+        self.inner.set_role(val);
+        self
+    }
+    pub fn build(self) -> Message {
+        self.inner
     }
 }
 #[allow(dead_code)]

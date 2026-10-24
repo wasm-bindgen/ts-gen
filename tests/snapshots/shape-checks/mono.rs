@@ -31,6 +31,11 @@ pub mod shapes {
             }
         }
     }
+    impl Default for RoundingOptions {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct RoundingOptionsBuilder {
         inner: RoundingOptions,
     }
@@ -111,6 +116,11 @@ pub mod shapes {
             }
         }
     }
+    impl Default for Init {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct InitBuilder {
         inner: Init,
     }
@@ -159,6 +169,11 @@ impl GlobalInit {
         }
     }
 }
+impl Default for GlobalInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct GlobalInitBuilder {
     inner: GlobalInit,
 }
@@ -189,6 +204,11 @@ impl ModuleOptions {
         ModuleOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ModuleOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ModuleOptionsBuilder {
@@ -224,30 +244,22 @@ extern "C" {
     pub fn set_b(this: &Choice, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl Choice {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"a\"`"]
+    #[doc = " Construct with `kind: \"a\"`."]
     pub fn new_a(a: f64) -> Choice {
         Self::builder_a(a).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"b\"`"]
+    #[doc = " Construct with `kind: \"b\"`."]
     pub fn new_b(b: impl ::wasm_bindgen::JsStringLike) -> Choice {
         Self::builder_b(b).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"a\"`"]
+    #[doc = " Start a builder with `kind: \"a\"`."]
     pub fn builder_a(a: f64) -> ChoiceBuilder {
         let inner: Choice = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind(KindKind::A);
         inner.set_a(a);
         ChoiceBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"b\"`"]
+    #[doc = " Start a builder with `kind: \"b\"`."]
     pub fn builder_b(b: impl ::wasm_bindgen::JsStringLike) -> ChoiceBuilder {
         let inner: Choice = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind(KindKind::B);

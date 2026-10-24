@@ -101,6 +101,13 @@ impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWa
         }
     }
 }
+impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWasmAbi> Default
+    for Transformer<I, O>
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct TransformerBuilder<I, O> {
     inner: Transformer<I, O>,
 }
