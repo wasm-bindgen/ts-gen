@@ -1234,10 +1234,12 @@ mod tests {
               type Unit = \"hour\" | \"hours\";
               interface Span<U extends Unit | \"day\"> { largestUnit?: \"auto\" | U }
               interface HourSpan extends Span<Unit> {}
+              interface Mid<U extends Unit | \"day\"> extends Span<U> {}
             }
             declare namespace Steps {
               type Unit = \"day\" | \"hours\";
               interface DaySpan extends Spans.Span<Unit> {}
+              interface DaySpan2 extends Spans.Mid<Unit> {}
             }";
         let options = crate::parse::ParseOptions::new().experimental_generic_mono(true);
         let (module, gctx) = crate::parse_source_with_options(src, None, &options).unwrap();
@@ -1260,6 +1262,11 @@ mod tests {
         );
         assert_eq!(
             largest_unit_variants(&out, "DaySpan"),
+            ["auto", "day", "hours"]
+        );
+        // Inherited through `Mid`, `Unit` still resolves where it's written.
+        assert_eq!(
+            largest_unit_variants(&out, "DaySpan2"),
             ["auto", "day", "hours"]
         );
     }

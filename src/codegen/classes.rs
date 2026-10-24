@@ -2902,6 +2902,7 @@ fn inherited_members(
             &parent.type_ref,
             c,
             parent.scope,
+            &[],
             &mut members,
             &mut visited,
         );
@@ -2950,10 +2951,14 @@ fn inherit_into(inherited: Vec<Member>, own: &[Member]) -> Vec<Member> {
     members
 }
 
+/// The members `parent`, resolving in `scope`, contributes. Its `i`th
+/// argument is written in `arg_scopes[i]`, or `scope` past their end: an
+/// argument passed on from a grandchild keeps the grandchild's scope.
 fn collect_parent_members(
     parent: &TypeRef,
     c: &CodegenContext<'_>,
     scope: ScopeId,
+    arg_scopes: &[ScopeId],
     out: &mut Vec<Member>,
     visited: &mut HashSet<crate::context::TypeId>,
 ) {
@@ -2991,21 +2996,44 @@ fn collect_parent_members(
             (tp.name.clone(), arg)
         })
         .collect();
+    let written: HashMap<&str, ScopeId> = type_params
+        .iter()
+        .enumerate()
+        .map(|(i, tp)| {
+            (
+                tp.name.as_str(),
+                arg_scopes.get(i).copied().unwrap_or(scope),
+            )
+        })
+        .collect();
     // Ancestors first so a parent's redeclaration overrides theirs.
     let mut ancestors = Vec::new();
     for grand in &parent_extends {
+        let grand_scopes: Vec<ScopeId> = match &grand.type_ref {
+            TypeRef::Reference { generic_args, .. } => generic_args
+                .iter()
+                .map(|a| {
+                    a.as_ident()
+                        .and_then(|n| written.get(n).copied())
+                        .unwrap_or(grand.scope)
+                })
+                .collect(),
+            _ => Vec::new(),
+        };
         collect_parent_members(
             &grand.type_ref.substitute(&map),
             c,
             grand.scope,
+            &grand_scopes,
             &mut ancestors,
             visited,
         );
     }
+    let from = |param: &str| written.get(param).copied();
     let own: Vec<Member> = members
         .iter()
         .map(|m| {
-            let m = m.substitute_from(&map, Some(scope));
+            let m = m.substitute_from(&map, &from);
             // A method without its own `<T>` resolves everything in the
             // child's scope once the parent's parameters are substituted.
             match m {

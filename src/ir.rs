@@ -608,12 +608,17 @@ impl TypeRef {
     where
         K: std::borrow::Borrow<str> + Eq + std::hash::Hash,
     {
-        self.substitute_from(map, None)
+        self.substitute_from(map, &|_| None)
     }
 
-    /// [`Self::substitute`], the substitutes written in `from`: a
-    /// projection of a substituted parameter resolves its argument there.
-    pub fn substitute_from<K>(&self, map: &HashMap<K, TypeRef>, from: Option<ScopeId>) -> TypeRef
+    /// [`Self::substitute`], each parameter's substitute written in the
+    /// scope `from` gives it: a projection of a substituted parameter
+    /// resolves its argument there.
+    pub fn substitute_from<K>(
+        &self,
+        map: &HashMap<K, TypeRef>,
+        from: &dyn Fn(&str) -> Option<ScopeId>,
+    ) -> TypeRef
     where
         K: std::borrow::Borrow<str> + Eq + std::hash::Hash,
     {
@@ -625,13 +630,12 @@ impl TypeRef {
                 family,
                 assoc,
             } => {
-                let substituted = base.as_ident().is_some_and(|n| map.contains_key(n));
+                let substituted = base.as_ident().filter(|n| map.contains_key(*n));
                 TypeRef::Projection {
                     base: Box::new(sub(base)),
-                    base_scope: if substituted && base_scope.is_none() {
-                        from
-                    } else {
-                        *base_scope
+                    base_scope: match (substituted, base_scope) {
+                        (Some(param), None) => from(param),
+                        _ => *base_scope,
                     },
                     family: family.clone(),
                     assoc: assoc.clone(),
@@ -1369,12 +1373,16 @@ impl Member {
     /// The member with the parent's type parameters replaced, for
     /// inheriting it through `extends Parent<Arg>`.
     pub fn substitute(&self, map: &HashMap<String, TypeRef>) -> Member {
-        self.substitute_from(map, None)
+        self.substitute_from(map, &|_| None)
     }
 
-    /// [`Self::substitute`], the substitutes written in `from` (see
-    /// [`TypeRef::substitute_from`]).
-    pub fn substitute_from(&self, map: &HashMap<String, TypeRef>, from: Option<ScopeId>) -> Member {
+    /// [`Self::substitute`], each substitute written in the scope `from`
+    /// gives it (see [`TypeRef::substitute_from`]).
+    pub fn substitute_from(
+        &self,
+        map: &HashMap<String, TypeRef>,
+        from: &dyn Fn(&str) -> Option<ScopeId>,
+    ) -> Member {
         let ty = |t: &TypeRef| t.substitute_from(map, from);
         let params = |ps: &[Param]| -> Vec<Param> {
             ps.iter()

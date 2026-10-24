@@ -45,9 +45,10 @@ use std::rc::Rc;
 
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
-    FunctionSig, GetterMember, Heritage, InterfaceClassification, InterfaceDecl, MappedType, Member, Modifier,
-    Module, Param, ParamFamily, ParamImpl, ParamTrait, SetterMember, StringEnumDecl,
-    StringEnumVariant, Throws, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam, TypeRef,
+    FunctionSig, GetterMember, Heritage, InterfaceClassification, InterfaceDecl, MappedType,
+    Member, Modifier, Module, Param, ParamFamily, ParamImpl, ParamTrait, SetterMember,
+    StringEnumDecl, StringEnumVariant, Throws, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam,
+    TypeRef,
 };
 use crate::parse::classify::classify_interface;
 use crate::parse::scope::{Binding, ScopeId};
