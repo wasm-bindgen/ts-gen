@@ -502,6 +502,17 @@ pub mod polish {
         pub fn step(this: &Rounder, options: &HourStepping) -> Result<(), JsValue>;
         #[wasm_bindgen(method, catch)]
         pub fn clock(this: &Rounder) -> Result<Clock, JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn snap(this: &Rounder, to: PluralizeTimeUnit) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "snap")]
+        pub fn snap_with_rounding(this: &Rounder, to: &RoundingTimeUnit) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn nudge(this: &Rounder, options: &RoundingTimeUnit) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "nudge")]
+        pub fn nudge_with_rounding_hour(
+            this: &Rounder,
+            options: &RoundingHour,
+        ) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -659,6 +670,55 @@ pub mod polish {
             self
         }
         pub fn build(self) -> RoundingTimeUnit {
+            self.inner
+        }
+    }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Rounding , extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type RoundingHour;
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &RoundingHour) -> Option<PluralizeUnitHour>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &RoundingHour, val: PluralizeUnitHour);
+        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+        pub fn largest_unit(this: &RoundingHour) -> Option<HourSteppingLargestUnitKind>;
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit(this: &RoundingHour, val: HourSteppingLargestUnitKind);
+    }
+    impl RoundingHour {
+        pub fn new() -> RoundingHour {
+            Self::builder().build()
+        }
+        pub fn builder() -> RoundingHourBuilder {
+            RoundingHourBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for RoundingHour {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct RoundingHourBuilder {
+        inner: RoundingHour,
+    }
+    impl RoundingHourBuilder {
+        pub fn increment(self, val: f64) -> Self {
+            self.inner.set_increment(val);
+            self
+        }
+        pub fn smallest_unit(self, val: PluralizeUnitHour) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn largest_unit(self, val: HourSteppingLargestUnitKind) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn build(self) -> RoundingHour {
             self.inner
         }
     }

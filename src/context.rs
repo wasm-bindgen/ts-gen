@@ -110,6 +110,11 @@ pub struct GlobalContext {
     /// name of its own (`PluralizeUnit<TimeUnit>`), which convert into an
     /// enum of the same module with more values.
     pub(crate) synthesised_enums: std::collections::HashSet<TypeId>,
+    /// Dictionaries type-level evaluation synthesised for an instantiation
+    /// that narrows a literal-only parameter (`RoundingOptions<TimeUnit>`),
+    /// with the generic base each extends, which names them in a
+    /// variant's `_with_` suffix.
+    pub(crate) specialisations: std::collections::HashMap<TypeId, Vec<String>>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -219,6 +224,7 @@ impl GlobalContext {
             constructor_classes: Vec::new(),
             type_level_only: std::collections::HashSet::new(),
             synthesised_enums: std::collections::HashSet::new(),
+            specialisations: std::collections::HashMap::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),
