@@ -4461,7 +4461,7 @@ declare class PlainDate {
 ```rust
 pub fn to_locale_string(this: &PlainDate) -> String;
 pub fn to_locale_string_with_str(this: &PlainDate, locales: &str) -> String;
-pub fn to_locale_string_with_slice(this: &PlainDate, locales: &[JsString]) -> String;
+pub fn to_locale_string_with_slice(this: &PlainDate, locales: &[String]) -> String;
 pub fn to_locale_string_with_str_and_options(
     this: &PlainDate,
     locales: &str,
@@ -4469,11 +4469,11 @@ pub fn to_locale_string_with_str_and_options(
 ) -> String;
 pub fn to_locale_string_with_slice_and_options(
     this: &PlainDate,
-    locales: &[JsString],
+    locales: &[String],
     options: &::js_sys::Intl::DateTimeFormatOptions,
 ) -> String;
 ```
 
 Under [per-monomorphization](#in-scope-generic-type-parameters) the single
-locale takes `impl JsStringLike`, as every `string` argument does, while
-the list stays `&[JsString]`, a list of handles rather than of strings.
+locale takes `impl JsStringLike` and the list `&[impl JsStringLike]`, as
+every `string` and `string[]` argument does.
