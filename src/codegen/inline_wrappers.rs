@@ -10,9 +10,8 @@
 //! the extern signature, emits the wrapper beside it and resolves every
 //! remaining marker (builder methods, factories) to the public scalar.
 //!
-//! A marker in a position the wrapper cannot convert (`Promise<f64>` in a
-//! `_promise` companion, a callback's `Function<fn(f64)>`) is simply `f64`:
-//! those forms are JS-typed by design.
+//! A marker in a position the wrapper cannot convert (a callback's
+//! `Function<fn(f64)>`) is simply `f64`: those forms are JS-typed by design.
 
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
@@ -50,6 +49,8 @@ fn scalar_ident(scalar: RustScalar) -> Ident {
 /// How a type converts between its public and extern spelling.
 enum Shape {
     Marker(RustScalar),
+    /// `Option<T>` or `Nullable<T>`, the read carriers of `T | undefined`
+    /// and `T | null`, which both convert through `map`.
     Option(Box<Shape>),
     Vec(Box<Shape>),
     /// `&[T]` in parameter position.
@@ -100,7 +101,7 @@ fn shape(ty: &Type) -> Shape {
                 return Shape::Plain;
             }
             match seg.ident.to_string().as_str() {
-                "Option" => Shape::Option(Box::new(inner)),
+                "Option" | "Nullable" => Shape::Option(Box::new(inner)),
                 "Vec" => Shape::Vec(Box::new(inner)),
                 "Result" => Shape::Result(Box::new(inner)),
                 _ => Shape::Plain,
@@ -591,6 +592,23 @@ mod tests {
         assert!(out.contains("&parts.iter().map(|v| *v as f64).collect::<Vec<_>>()"));
         assert!(out.contains("n.map(|v| v as f64)"));
         assert!(out.contains(".map(|v| v.into_iter().map(|v| v as u64).collect::<Vec<_>>())"));
+    }
+
+    #[test]
+    fn nullable_reads_convert_through_map() {
+        let out = run("#[wasm_bindgen] extern \"C\" {
+                pub type Foo;
+                #[wasm_bindgen(method, getter)]
+                pub fn at(this: &Foo) -> Nullable<__TsGenWideU64>;
+                #[wasm_bindgen(method, getter)]
+                pub fn maybe_at(this: &Foo) -> Option<Nullable<__TsGenWideU64>>;
+            }");
+        assert!(out.contains("fn at_js(this: &Foo) -> Nullable<f64>;"));
+        assert!(out.contains(
+            "pub fn at(&self) -> Nullable<u64> {\n        self.at_js().map(|v| v as u64)"
+        ));
+        assert!(out.contains("pub fn maybe_at(&self) -> Option<Nullable<u64>>"));
+        assert!(out.contains("self.maybe_at_js().map(|v| v.map(|v| v as u64))"));
     }
 
     #[test]

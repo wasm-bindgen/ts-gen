@@ -3,8 +3,6 @@
 // integers as BigInt, so the binding keeps `f64` under a private
 // `<name>_js` name and an inline `pub fn` of the public name converts
 // with `as`, through `?` / `| null`, `T[]`, `Promise<…>` and `Result`.
-// The `_promise` companion hands its `Promise<T>` to JS, so it stays
-// `Promise<f64>`.
 
 export interface R2Object {
   /** @rust u64 */
