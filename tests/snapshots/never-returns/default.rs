@@ -7,8 +7,8 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "never-returns")]
 extern "C" {
     #[doc = " Always throws an `Error` carrying `message`."]
-    #[wasm_bindgen(catch, js_name = "fail")]
-    pub fn try_fail(message: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn fail(message: &str) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "never-returns")]
 extern "C" {
@@ -16,13 +16,13 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `RangeError` — always"]
     #[wasm_bindgen(catch, js_name = "failRange")]
-    pub fn try_fail_range(n: f64) -> Result<(), RangeError>;
+    pub fn fail_range(n: f64) -> Result<(), RangeError>;
 }
 #[wasm_bindgen(module = "never-returns")]
 extern "C" {
     #[doc = " Contradicts its return type: the `never` return wins."]
     #[wasm_bindgen(catch, js_name = "failAnyway")]
-    pub fn try_fail_anyway() -> Result<(), JsValue>;
+    pub fn fail_anyway() -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "never-returns")]
 extern "C" {
@@ -50,20 +50,20 @@ extern "C" {
 #[wasm_bindgen(module = "never-returns")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "check")]
-    pub fn try_check_with_f64(value: f64) -> Result<(), JsValue>;
+    pub fn check_with_f64(value: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "never-returns")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "raise")]
-    fn __try_raise(kind: &str, message: &str) -> Result<(), JsValue>;
+    fn __raise(kind: &str, message: &str) -> Result<(), JsValue>;
 }
 #[doc = " Every literal arm throws."]
-pub fn try_raise_type(message: &str) -> Result<(), JsValue> {
-    __try_raise("type", message)
+pub fn raise_type(message: &str) -> Result<(), JsValue> {
+    __raise("type", message)
 }
 #[doc = " Every literal arm throws."]
-pub fn try_raise_range(message: &str) -> Result<(), JsValue> {
-    __try_raise("range", message)
+pub fn raise_range(message: &str) -> Result<(), JsValue> {
+    __raise("range", message)
 }
 #[wasm_bindgen(module = "never-returns")]
 extern "C" {
@@ -86,16 +86,16 @@ pub fn try_read_text() -> Result<String, JsValue> {
 #[wasm_bindgen(module = "never-returns")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "read")]
-    fn __try_read_fail(kind: &str) -> Result<(), JsValue>;
+    fn __read_fail(kind: &str) -> Result<(), JsValue>;
 }
-pub fn try_read_fail() -> Result<(), JsValue> {
-    __try_read_fail("fail")
+pub fn read_fail() -> Result<(), JsValue> {
+    __read_fail("fail")
 }
 #[wasm_bindgen(module = "never-returns")]
 extern "C" {
     #[doc = " A variable typed as a function binds as one."]
-    #[wasm_bindgen(catch, js_name = "abort")]
-    pub fn try_abort(code: f64) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch)]
+    pub fn abort(code: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "never-returns")]
 extern "C" {
@@ -106,28 +106,28 @@ extern "C" {
     pub fn new() -> Result<Guard, JsValue>;
     #[doc = " A guard has no primitive value."]
     #[wasm_bindgen(method, catch, js_name = "valueOf")]
-    pub fn try_value_of(this: &Guard) -> Result<(), JsValue>;
+    pub fn value_of(this: &Guard) -> Result<(), JsValue>;
     #[doc = " Always rejects."]
     #[wasm_bindgen(method, catch, js_name = "failLater")]
     pub async fn fail_later(this: &Guard) -> Result<(), JsValue>;
     #[doc = " Always rejects."]
     #[wasm_bindgen(method, js_name = "failLater")]
     pub fn fail_later_promise(this: &Guard) -> Promise<Undefined>;
-    # [wasm_bindgen (static_method_of = Guard , catch , js_name = "unreachable")]
-    pub fn try_unreachable(reason: &str) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = Guard , catch)]
+    pub fn unreachable(reason: &str) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "reject")]
-    fn __try_reject(this: &Guard, kind: &str) -> Result<(), JsValue>;
+    fn __reject(this: &Guard, kind: &str) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn impossible(this: &Guard) -> JsValue;
 }
 impl Guard {
     #[doc = " Every literal arm throws."]
-    pub fn try_reject_soft(&self) -> Result<(), JsValue> {
-        self.__try_reject("soft")
+    pub fn reject_soft(&self) -> Result<(), JsValue> {
+        self.__reject("soft")
     }
     #[doc = " Every literal arm throws."]
-    pub fn try_reject_hard(&self) -> Result<(), JsValue> {
-        self.__try_reject("hard")
+    pub fn reject_hard(&self) -> Result<(), JsValue> {
+        self.__reject("hard")
     }
 }
 #[wasm_bindgen(module = "never-returns")]
@@ -137,8 +137,8 @@ extern "C" {
     pub type Halt;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Halt, JsValue>;
-    # [wasm_bindgen (static_method_of = Halt , catch , js_name = "stop")]
-    pub fn try_stop(code: f64) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = Halt , catch)]
+    pub fn stop(code: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
     pub fn ok(this: &Halt) -> bool;
     #[wasm_bindgen(method, catch, js_name = "ok")]

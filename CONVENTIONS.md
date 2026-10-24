@@ -1860,7 +1860,9 @@ throws (`valueOf(): never` on the Temporal classes), or never returns at
 all (`process.exit(): never`, an assertion helper). A plain binding
 could only trap, so a function, method or static method returning
 `never`, a variable typed as such a function included, emits only its
-catching form, and its success type is `()`:
+catching form, and its success type is `()`. That form takes the bare
+name under every policy: `try_` marks the catching twin of a plain
+form, and here there is no plain form for it to tell apart.
 
 ```ts
 declare class PlainDate {
@@ -1870,11 +1872,7 @@ declare function rejectLater(message: string): Promise<never>;
 ```
 
 ```rust
-// default: the plain `value_of` is not emitted
-#[wasm_bindgen(method, catch, js_name = "valueOf")]
-pub fn try_value_of(this: &PlainDate) -> Result<(), JsValue>;
-
-// --fallible
+// default and --fallible alike: no plain form, no `try_value_of`
 #[wasm_bindgen(method, catch, js_name = "valueOf")]
 pub fn value_of(this: &PlainDate) -> Result<(), JsValue>;
 
@@ -1899,13 +1897,12 @@ pub fn reject_later_promise(message: &str) -> Promise<Undefined>;
 * The rule applies per overload and per expansion: with
   `check(value: string): string` and `check(value: number): never`,
   the string form keeps `check` + `try_check`, and the number form is
-  `try_check_with_f64` alone. The arms of a
-  [literal-keyed cohort](#inline-wrappers) follow suit: an arm returning
-  `never` gets only its `try_` wrapper (`read(kind: "fail"): never` →
-  `try_read_fail()`, over a catching `__try_read_fail` binding), and
-  under `--fallible` only its catching wrapper (`read_fail()`).
-* The dropped plain names are left free: no `value_of` is reserved
-  beside `try_value_of`.
+  a catching `check_with_f64` alone. The arms of a
+  [literal-keyed cohort](#inline-wrappers) follow suit: beside
+  `read(kind: "text"): string`'s `read_text` + `try_read_text`,
+  `read(kind: "fail"): never` gets only a catching `read_fail()` wrapper
+  over a catching `__read_fail` binding.
+* No `try_` name is reserved for the missing twin.
 * Only a literal `never` return counts, not an alias of it. Getters
   and properties typed `never` are unchanged (`JsValue` reads, see
   [Primitive types](#primitive-types)), and so are constructors, which

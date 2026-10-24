@@ -8,7 +8,7 @@ use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::never_returns_mono::*;
 
-// Under `--fallible` the bare name is the catching `never` form.
+// Under `--fallible` the bare name is the catching `never` form, as by default.
 
 fn message(err: &JsValue) -> String {
     err.unchecked_ref::<js_sys::Error>().message().into()

@@ -736,8 +736,9 @@ impl CallableSpec<'_> {
 ///   this — they always catch per JS `new` semantics.
 /// * **`never` returns**: a callable returning `never` (or `Promise<never>`)
 ///   never completes normally, so only its catching form is emitted, typed
-///   `()`: the `try_` form by default, the primary under `--fallible`, the
-///   `async fn` and its `Promise<void>` sibling for `Promise<never>`. It
+///   `()`: the primary itself catches, under every policy, with no `try_`
+///   twin; for `Promise<never>`, the `async fn` and its `Promise<void>`
+///   sibling. It
 ///   overrides `@throws {never}`. Decided per expansion, so overloads that
 ///   return something else keep their usual forms.
 /// * **Naming**: each surviving expansion gets `base + suffix` deduped against
@@ -755,19 +756,6 @@ pub fn build_signatures(
     let per_mono = CodegenContext::generic_mono(cgctx);
     let fallible = cgctx.is_some_and(|ctx| ctx.fallible);
     let mut out = Vec::with_capacity(expansions.len());
-    // A sync overload returning `never` keeps only its `try_` form by
-    // default: the plain form could only trap. Its plain name is left
-    // unclaimed, and the `try_` form is named off the undeclared candidate.
-    let try_only = |overload: &Overload<'_>| {
-        spec.kind.allows_try_variant() && !fallible && *overload.return_type == TypeRef::Never
-    };
-    let claim = |names: &mut LocalScope, overload: usize, candidate: String| {
-        if try_only(&spec.overloads[overload]) {
-            candidate
-        } else {
-            names.declare(&candidate, Suffix::Snake)
-        }
-    };
 
     // One emitted binding per expansion, except a literal-keyed cohort,
     // which emits one binding per distinct return type among its arms,
@@ -786,7 +774,7 @@ pub fn build_signatures(
             units.push(Unit {
                 params: exp.params,
                 overload: exp.overload,
-                primary_name: claim(names, exp.overload, primary_candidate),
+                primary_name: names.declare(&primary_candidate, Suffix::Snake),
                 literal: None,
             });
             continue;
@@ -807,7 +795,7 @@ pub fn build_signatures(
                 .collect::<Vec<_>>()
                 .join("_");
             let candidate = public_rust_name(&format!("{base}_{tag}{}", exp.name_suffix));
-            let name = claim(names, arm.overload, candidate);
+            let name = names.declare(&candidate, Suffix::Snake);
             match groups.iter_mut().find(|(r, _, _)| *r == ret) {
                 Some((_, _, arms)) => arms.push((literals, name)),
                 None => groups.push((ret, arm.overload, vec![(literals, name)])),
@@ -848,7 +836,8 @@ pub fn build_signatures(
         };
         // A `never` return (awaited, for `Promise<never>`) means the call
         // never completes normally: it throws, rejects or does not return.
-        // Only the catching form is emitted, with `()` as its success type.
+        // Only the catching form is emitted, under the bare name (`try_`
+        // marks a twin, and there is none), with `()` as its success type.
         let never_returns = spec.kind.allows_try_variant() && return_type == TypeRef::Never;
         let return_type = if never_returns {
             TypeRef::Void
@@ -861,9 +850,10 @@ pub fn build_signatures(
         let nothrow = overload.throws.is_never() && !spec.kind.always_catches() && !never_returns;
         // A sync callable that can throw gets a catching form: as the
         // `try_` companion by default, or as the primary itself under
-        // `--fallible`.
+        // `--fallible` or when it returns `never`.
         let sync_fallible = !is_async && !nothrow && spec.kind.allows_try_variant();
-        let allow_try = sync_fallible && !fallible;
+        let primary_is_catching = fallible || never_returns;
+        let allow_try = sync_fallible && !primary_is_catching;
         out.reserve(match (allow_try, per_mono) {
             (true, true) => 4,
             (true, false) | (false, true) => 2,
@@ -879,9 +869,10 @@ pub fn build_signatures(
         // Primary variant catches when:
         // * the kind always catches (constructors), OR
         // * it's async — *unless* `Throws::Never` opts out, OR
-        // * it's sync and can throw, under `--fallible`.
-        let primary_catches =
-            spec.kind.always_catches() || (is_async && !nothrow) || (sync_fallible && fallible);
+        // * it's sync and can throw, under `--fallible` or returning `never`.
+        let primary_catches = spec.kind.always_catches()
+            || (is_async && !nothrow)
+            || (sync_fallible && primary_is_catching);
         let primary = FunctionSignature {
             rust_name: primary_name.clone(),
             js_name: spec.js_name.to_string(),
@@ -899,9 +890,7 @@ pub fn build_signatures(
             body_scope: scope,
             literal: primary_literal,
         };
-        if !try_only(&overload) {
-            push_with_js_string_return(&mut out, primary, names, cgctx, scope);
-        }
+        push_with_js_string_return(&mut out, primary, names, cgctx, scope);
 
         // An `async fn` import only calls JS when first polled, so a
         // caller that needs the call started now (handing the promise
@@ -3786,7 +3775,8 @@ mod tests {
 
     #[test]
     fn never_return_keeps_only_the_catching_form() {
-        // Default: the plain form is dropped, `try_` catches and returns `()`.
+        // Default: one form, which catches under the bare name and returns
+        // `()`; there is no twin for `try_` to tell it apart from.
         for kind in [
             SignatureKind::Method,
             SignatureKind::StaticMethod,
@@ -3803,13 +3793,13 @@ mod tests {
                 &mut used,
             );
             assert_eq!(sigs.len(), 1, "{kind:?}");
-            assert_eq!(sigs[0].rust_name, "try_value_of");
+            assert_eq!(sigs[0].rust_name, "value_of");
             assert!(sigs[0].catch && !sigs[0].is_async);
             assert_eq!(sigs[0].return_type, TypeRef::Void);
-            // The plain name is not claimed.
-            assert_eq!(used.declare("value_of", Suffix::Snake), "value_of");
+            // No `try_` name is claimed.
+            assert_eq!(used.declare("try_value_of", Suffix::Snake), "try_value_of");
         }
-        // `--fallible`: the primary is the catching form.
+        // `--fallible`: the same.
         let sigs = expand_fallible(
             "valueOf",
             &[],
@@ -3919,7 +3909,8 @@ mod tests {
             Some(&cgctx),
         );
         let names: Vec<_> = sigs.iter().map(|s| s.rust_name.as_str()).collect();
-        assert_eq!(names, ["check", "try_check", "try_check_with_f64"]);
+        assert_eq!(names, ["check", "try_check", "check_with_f64"]);
+        assert!(sigs[2].catch);
         assert_eq!(sigs[2].return_type, TypeRef::Void);
     }
 
@@ -3956,7 +3947,7 @@ mod tests {
                 .collect()
         };
 
-        // Every arm returns `never`: one catch-only binding, `try_` wrappers.
+        // Every arm returns `never`: one catching binding, bare wrappers.
         let mut used = no_used();
         let sigs = build(
             &[
@@ -3968,11 +3959,13 @@ mod tests {
         assert_eq!(sigs.len(), 1);
         assert!(sigs[0].catch);
         assert_eq!(sigs[0].return_type, TypeRef::Void);
-        assert_eq!(arm_names(&sigs), ["try_read_soft", "try_read_hard"]);
-        assert_eq!(used.declare("read_soft", Suffix::Snake), "read_soft");
-        assert_eq!(used.declare("read", Suffix::Snake), "read");
+        assert_eq!(arm_names(&sigs), ["read_soft", "read_hard"]);
+        assert_eq!(
+            used.declare("try_read_soft", Suffix::Snake),
+            "try_read_soft"
+        );
 
-        // Mixed: the returning arm keeps its pair.
+        // Mixed: the returning arm keeps its pair, the `never` arm is bare.
         let mut used = no_used();
         let sigs = build(
             &[
@@ -3983,10 +3976,14 @@ mod tests {
         );
         assert_eq!(
             arm_names(&sigs),
-            ["read_text", "try_read_text", "try_read_fail"]
+            ["read_text", "try_read_text", "read_fail"]
         );
+        assert!(sigs[2].catch);
         assert_eq!(sigs[2].return_type, TypeRef::Void);
-        assert_eq!(used.declare("read_fail", Suffix::Snake), "read_fail");
+        assert_eq!(
+            used.declare("try_read_fail", Suffix::Snake),
+            "try_read_fail"
+        );
     }
 
     #[test]
