@@ -141,9 +141,9 @@ fn apply_function(
 
 /// A side declaration's type-parameter defaults replace the input's, by
 /// parameter name. The input's default is a TypeScript choice that may
-/// erase (`Request<…, Cf = CfProperties<…>>`, a union of the incoming and
-/// outgoing shapes); the side file picks the Rust default for the bare
-/// name (`Cf = IncomingRequestCfProperties<CfHostMetadata>`). Only
+/// erase (`RequestInfo<…, Cf = CfProperties<…>>`, a union of the incoming
+/// and outgoing shapes); the side file picks the one an alias expands
+/// with (`Cf = IncomingRequestCfProperties<CfHostMetadata>`). Only
 /// parameters that declare a default in the side file are touched.
 fn apply_type_param_defaults(
     gctx: &mut GlobalContext,
