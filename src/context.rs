@@ -104,6 +104,10 @@ pub struct GlobalContext {
     /// as their literals, so the output surface emits one only when a
     /// signature still reaches it.
     pub(crate) type_level_only: std::collections::HashSet<TypeId>,
+    /// String enums type-level evaluation synthesised for a result with no
+    /// name of its own (`PluralizeUnit<TimeUnit>`), which convert into an
+    /// enum of the same module with more values.
+    pub(crate) synthesised_enums: std::collections::HashSet<TypeId>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -212,6 +216,7 @@ impl GlobalContext {
             declared: std::collections::HashMap::new(),
             constructor_classes: Vec::new(),
             type_level_only: std::collections::HashSet::new(),
+            synthesised_enums: std::collections::HashSet::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),
