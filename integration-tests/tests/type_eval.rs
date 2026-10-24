@@ -3,7 +3,7 @@
 use js_sys::JsString;
 use ts_gen_integration_tests::type_eval::scoped::PartialSettings;
 use ts_gen_integration_tests::type_eval::{
-    ExcludeUnitHour, Holder, KeyOfExtended, Mixed, Named, NotMinute, OptionKey, PartialBoxT,
+    ExcludeUnitHour, Holder, KeyOfExtended, Mixed, Named, NotMinute, OptionKey, PartialBox,
     PartialOptions, PickOptionsNameOrSize, Plural, PluralHourOrMinute, ReadonlyOptions,
     RequiredOptions, Rounding, Sized,
 };
@@ -20,9 +20,9 @@ fn evaluated_types_compile(
     holder: &Holder<JsString>,
 ) {
     let _: f64 = required.size();
-    let partial_box: PartialBoxT<JsString> = holder.partial();
+    let partial_box: PartialBox<JsString> = holder.partial();
     let _: Option<JsString> = partial_box.value();
-    let _: Holder<JsString> = Holder::new(&PartialBoxT::builder().label("l").build());
+    let _: Holder<JsString> = Holder::new(&PartialBox::builder().label("l").build());
     let partial = PartialOptions::new();
     partial.set_name("n");
     partial.set_size(1.0);

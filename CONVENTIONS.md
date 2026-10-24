@@ -3385,7 +3385,8 @@ pub type Sized;            // size?
   work wherever the alias is declared.
 * **A dictionary capturing a type parameter is generic over it.** Inside
   `interface Holder<T> { partial: Partial<Box<T>> }` the field is
-  `PartialBoxT<T>`, a dictionary declared with `T` as its own parameter.
+  `PartialBox<T>`, a dictionary declared with `T` as its own parameter;
+  the parameter it stays generic over is left out of its name.
 * **A utility in `extends` flattens.** wasm-bindgen inheritance is
   `extends = Parent`, which needs a declared parent, so `Omit<…>`,
   `Pick<…>`, `Partial<…>` and an instantiated generic alias in an

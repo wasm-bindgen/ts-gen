@@ -339,12 +339,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter)]
-    pub fn partial<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> PartialBoxT<T>;
+    pub fn partial<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> PartialBox<T>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_partial<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>, val: &PartialBoxT<T>);
+    pub fn set_partial<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>, val: &PartialBox<T>);
 }
 impl<T: ::wasm_bindgen::JsGeneric> Holder<T> {
-    pub fn new(partial: &PartialBoxT<T>) -> Holder<T> {
+    pub fn new(partial: &PartialBox<T>) -> Holder<T> {
         let inner: Holder<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_partial(partial);
         inner
@@ -716,30 +716,30 @@ pub enum PluralHourOrMinute {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type PartialBoxT<T: ::wasm_bindgen::JsGeneric>;
+    pub type PartialBox<T: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &PartialBoxT<T>) -> Option<T>;
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &PartialBox<T>) -> Option<T>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &PartialBoxT<T>, val: &T);
+    pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &PartialBox<T>, val: &T);
     #[wasm_bindgen(method, getter)]
-    pub fn label<T: ::wasm_bindgen::JsGeneric>(this: &PartialBoxT<T>) -> Option<String>;
+    pub fn label<T: ::wasm_bindgen::JsGeneric>(this: &PartialBox<T>) -> Option<String>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_label<T: ::wasm_bindgen::JsGeneric>(this: &PartialBoxT<T>, val: &str);
+    pub fn set_label<T: ::wasm_bindgen::JsGeneric>(this: &PartialBox<T>, val: &str);
 }
-impl<T: ::wasm_bindgen::JsGeneric> PartialBoxT<T> {
-    pub fn new() -> PartialBoxT<T> {
+impl<T: ::wasm_bindgen::JsGeneric> PartialBox<T> {
+    pub fn new() -> PartialBox<T> {
         Self::builder().build()
     }
-    pub fn builder() -> PartialBoxTBuilder<T> {
-        PartialBoxTBuilder {
+    pub fn builder() -> PartialBoxBuilder<T> {
+        PartialBoxBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-pub struct PartialBoxTBuilder<T: ::wasm_bindgen::JsGeneric> {
-    inner: PartialBoxT<T>,
+pub struct PartialBoxBuilder<T: ::wasm_bindgen::JsGeneric> {
+    inner: PartialBox<T>,
 }
-impl<T: ::wasm_bindgen::JsGeneric> PartialBoxTBuilder<T> {
+impl<T: ::wasm_bindgen::JsGeneric> PartialBoxBuilder<T> {
     pub fn value(self, val: &T) -> Self {
         self.inner.set_value(val);
         self
@@ -748,7 +748,7 @@ impl<T: ::wasm_bindgen::JsGeneric> PartialBoxTBuilder<T> {
         self.inner.set_label(val);
         self
     }
-    pub fn build(self) -> PartialBoxT<T> {
+    pub fn build(self) -> PartialBox<T> {
         self.inner
     }
 }

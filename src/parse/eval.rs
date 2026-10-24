@@ -31,7 +31,7 @@ use std::rc::Rc;
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
     GetterMember, InterfaceDecl, MappedType, Member, Modifier, Module, Param, SetterMember,
-    StringEnumDecl, StringEnumVariant, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam,
+    StringEnumDecl, StringEnumVariant, Throws, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam,
     TypeRef,
 };
 use crate::parse::classify::classify_interface;
@@ -520,7 +520,7 @@ impl<'g> Eval<'g> {
             TypeRef::Reference { .. } | TypeRef::KeyOf(_) | TypeRef::IndexedAccess(..)
         );
         let hint = if named {
-            spell(&value)
+            self.spell_at(&value, scope, env, dest)
         } else {
             hint.to_string()
         };
@@ -1420,6 +1420,25 @@ impl<'g> Eval<'g> {
         names
     }
 
+    /// The spelling of `ty` at a use site. A type parameter that stays
+    /// generic in the result, one in scope at `dest` passed on to an inner
+    /// type, is left out: `Partial<Box<T>>` is `PartialBox`, generic over
+    /// `T`, while `Partial<T>` evaluates at `T`'s bound and is `PartialT`.
+    fn spell_at(&self, ty: &TypeRef, scope: ScopeId, env: &Env, dest: ScopeId) -> String {
+        let mut names = Vec::new();
+        idents(ty, &mut names);
+        let kept: HashSet<String> = names
+            .into_iter()
+            .filter(|n| {
+                env.get(n).is_none()
+                    && self
+                        .param_owner(scope, n)
+                        .is_some_and(|owner| self.param_owner(dest, n) == Some(owner))
+            })
+            .collect();
+        spell_in(ty, &kept, 0)
+    }
+
     /// The body scope declaring the type parameter `name` visible from
     /// `scope`, if a declared type doesn't shadow it first.
     fn param_owner(&self, scope: ScopeId, name: &str) -> Option<ScopeId> {
@@ -1665,6 +1684,13 @@ fn fallback(ty: &TypeRef) -> TypeRef {
 /// A PascalCase spelling of a type for naming what it evaluates to:
 /// `PluralizeUnit<"day" | TimeUnit>` is `PluralizeUnitDayOrTimeUnit`.
 fn spell(ty: &TypeRef) -> String {
+    spell_in(ty, &HashSet::new(), 0)
+}
+
+/// `spell`, leaving out a `generic` parameter where it is an argument of
+/// an inner type (`depth` counts the references entered).
+fn spell_in(ty: &TypeRef, generic: &HashSet<String>, depth: u32) -> String {
+    let spell = |t: &TypeRef| spell_in(t, generic, depth);
     match ty {
         TypeRef::Reference {
             segments,
@@ -1672,7 +1698,10 @@ fn spell(ty: &TypeRef) -> String {
         } => {
             let mut out = to_pascal_case(segments.last().unwrap());
             for a in generic_args {
-                out.push_str(&spell(a));
+                if depth > 0 && a.as_ident().is_some_and(|n| generic.contains(n)) {
+                    continue;
+                }
+                out.push_str(&spell_in(a, generic, depth + 1));
             }
             out
         }
@@ -1681,7 +1710,7 @@ fn spell(ty: &TypeRef) -> String {
         TypeRef::BooleanLiteral(b) => to_pascal_case(&b.to_string()),
         TypeRef::Union(u) => u.members().iter().map(spell).collect::<Vec<_>>().join("Or"),
         TypeRef::Array(e) => format!("{}Array", spell(e)),
-        TypeRef::KeyOf(t) => format!("KeyOf{}", spell(t)),
+        TypeRef::KeyOf(t) => format!("KeyOf{}", spell_in(t, generic, depth + 1)),
         TypeRef::IndexedAccess(o, i) => format!("{}{}", spell(o), spell(i)),
         other => to_pascal_case(&other.format_ts()),
     }
@@ -1715,6 +1744,7 @@ fn props_to_members(props: &[Prop], scope: ScopeId) -> Vec<Member> {
             type_ref: p.type_ref.clone(),
             optional: p.optional,
             doc: p.doc.clone(),
+            throws: Throws::None,
         }));
         if !p.readonly {
             members.push(Member::Setter(SetterMember {
@@ -1999,11 +2029,11 @@ mod tests {
         assert_eq!(
             g.type_ref,
             TypeRef::Reference {
-                segments: vec!["PartialBoxT".into()],
+                segments: vec!["PartialBox".into()],
                 generic_args: vec![TypeRef::ident("T")],
             }
         );
-        let TypeKind::Interface(dict) = kind(&gctx, &module, "PartialBoxT") else {
+        let TypeKind::Interface(dict) = kind(&gctx, &module, "PartialBox") else {
             unreachable!()
         };
         assert_eq!(dict.type_params.len(), 1);
