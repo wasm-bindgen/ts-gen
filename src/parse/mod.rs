@@ -1549,6 +1549,7 @@ mod tests {
                     slice_mode: None,
                 }],
                 scope: ScopeId::DUMMY,
+                type_params: vec![],
                 doc: None,
                 throws: crate::ir::Throws::None,
             })
