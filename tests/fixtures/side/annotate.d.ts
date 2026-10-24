@@ -1,9 +1,17 @@
 // Side file for `annotate.d.ts`: re-declares only the members it tags.
 
+// Only the `## Errors` section of a side doc is carried over: `clone`,
+// copied from upstream, keeps one description, and `ok`, with no tag,
+// is ignored.
 interface Response {
   /** @rust u16 */
   readonly status: number;
-  /** @throws {TypeError} if the body has already been used */
+  /** A note that is not carried over. */
+  readonly ok: boolean;
+  /**
+   * Creates a clone of the response.
+   * @throws {TypeError} if the body has already been used
+   */
   clone(): Response;
 }
 

@@ -3536,15 +3536,18 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
 * `@throws` replaces the input member's failure mode. Getters are
   infallible, so on a property it contributes only its doc.
 * A side member applies to every overload of the input method or
-  function, and its rendered doc (the `## Errors` section of `@throws`)
-  is appended to the input's doc once. Overloads may differ in return
+  function, and the `## Errors` section its `@throws` renders is
+  appended to the input's doc once. The rest of the side doc is not
+  carried over, so a member copied from upstream with its description
+  does not repeat it. Overloads may differ in return
   type (`delete(key): Promise<boolean>`, `delete(keys: string[]):
   Promise<number>`), so a return `@rust` applies to the overloads that
   can carry it.
 * A declaration, member or parameter named in the side file that does
   not exist in the input fails the run, so a typo cannot silently miss
   a binding; so does an invalid `@rust` tag, or one whose scalar the
-  input's type cannot carry. Side members without tags are ignored.
+  input's type cannot carry. Side members without tags are ignored,
+  whatever their description.
 * Only classes, interfaces and functions can be annotated: a
   `declare namespace`, `declare module`, alias or variable in the side
   file fails the run rather than being skipped, as does a bare name
