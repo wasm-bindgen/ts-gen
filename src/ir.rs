@@ -588,6 +588,43 @@ impl TypeRef {
         args.first()
     }
 
+    /// `self` with each bare single-segment reference to a name in `map`
+    /// (type parameter names) replaced by its substitute, recursively.
+    pub fn substitute<K>(&self, map: &HashMap<K, TypeRef>) -> TypeRef
+    where
+        K: std::borrow::Borrow<str> + Eq + std::hash::Hash,
+    {
+        let sub = |t: &TypeRef| t.substitute(map);
+        match self {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => match (segments.as_slice(), generic_args.is_empty()) {
+                ([name], true) if map.contains_key(name.as_str()) => map[name.as_str()].clone(),
+                _ => TypeRef::Reference {
+                    segments: segments.clone(),
+                    generic_args: generic_args.iter().map(sub).collect(),
+                },
+            },
+            TypeRef::Array(t) => TypeRef::Array(Box::new(sub(t))),
+            TypeRef::Union(u) => TypeRef::union(u.members().iter().map(sub)),
+            TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
+            TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
+            TypeRef::Function(sig) => TypeRef::Function(FunctionSig {
+                params: sig
+                    .params
+                    .iter()
+                    .map(|p| Param {
+                        type_ref: sub(&p.type_ref),
+                        ..p.clone()
+                    })
+                    .collect(),
+                return_type: Box::new(sub(&sig.return_type)),
+            }),
+            other => other.clone(),
+        }
+    }
+
     /// Members of the `string | number | symbol` union that
     /// [`TypeRef::PropertyKey`] abbreviates, in `lib.es5.d.ts` order.
     pub fn property_key_members() -> Vec<TypeRef> {

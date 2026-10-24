@@ -632,7 +632,7 @@ impl<'a> CodegenContext<'a> {
             let arg = match (args.get(i), &tp.default) {
                 (Some(arg), _) => arg.clone(),
                 _ if params.defaulted[i] => break,
-                (None, Some(default)) => substitute_type_params(default, &given),
+                (None, Some(default)) => default.substitute(&given),
                 (None, None) => TypeRef::Any,
             };
             if params.kept[i] {
@@ -2087,43 +2087,10 @@ fn alias_target_with_defaults(alias: &ir::TypeAliasDecl) -> std::borrow::Cow<'_,
         let default = tp
             .default
             .as_ref()
-            .map_or(TypeRef::Any, |d| substitute_type_params(d, &defaults));
+            .map_or(TypeRef::Any, |d| d.substitute(&defaults));
         defaults.insert(&tp.name, default);
     }
-    std::borrow::Cow::Owned(substitute_type_params(&alias.target, &defaults))
-}
-
-/// `ty` with each bare reference to a name in `params` replaced.
-fn substitute_type_params(ty: &TypeRef, params: &HashMap<&str, TypeRef>) -> TypeRef {
-    let sub = |t: &TypeRef| substitute_type_params(t, params);
-    match ty {
-        TypeRef::Reference {
-            segments,
-            generic_args,
-        } => match (segments.as_slice(), generic_args.is_empty()) {
-            ([name], true) if params.contains_key(name.as_str()) => params[name.as_str()].clone(),
-            _ => TypeRef::Reference {
-                segments: segments.clone(),
-                generic_args: generic_args.iter().map(sub).collect(),
-            },
-        },
-        TypeRef::Array(t) => TypeRef::Array(Box::new(sub(t))),
-        TypeRef::Union(u) => TypeRef::union(u.members().iter().map(sub)),
-        TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
-        TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
-        TypeRef::Function(sig) => TypeRef::Function(ir::FunctionSig {
-            params: sig
-                .params
-                .iter()
-                .map(|p| ir::Param {
-                    type_ref: sub(&p.type_ref),
-                    ..p.clone()
-                })
-                .collect(),
-            return_type: Box::new(sub(&sig.return_type)),
-        }),
-        other => other.clone(),
-    }
+    std::borrow::Cow::Owned(alias.target.substitute(&defaults))
 }
 
 /// Create a `syn::Ident`, sanitizing invalid characters and escaping keywords.
