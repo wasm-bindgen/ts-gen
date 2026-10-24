@@ -30,8 +30,19 @@ pub fn apply(
             }
             // An alias carries no members; only its type-parameter
             // defaults can be overridden (`RequestInfo<…, Cf = …>`).
+            // This is its only lookup, so it reports a missing or
+            // ambiguous name itself (`apply_members` does for the rest).
             TypeKind::TypeAlias(a) if a.type_params.iter().any(|tp| tp.default.is_some()) => {
-                apply_type_param_defaults(gctx, module, &a.name, &a.type_params, &mut errors);
+                match find_decl(gctx, module, &a.name) {
+                    Ok(_) => apply_type_param_defaults(
+                        gctx,
+                        module,
+                        &a.name,
+                        &a.type_params,
+                        &mut errors,
+                    ),
+                    Err(e) => errors.push(e),
+                }
                 continue;
             }
             // The side file is a curated list: a declaration this pass
@@ -511,6 +522,25 @@ mod tests {
     fn missing_declaration() {
         let side = "interface Nope { /** @rust u16 */ readonly status: number; }";
         assert_eq!(errors(INPUT, side), ["no declaration named `Nope`"]);
+    }
+
+    #[test]
+    fn missing_alias() {
+        let input = "
+            interface Incoming { readonly colo: string; }
+            interface Request<Cf = unknown> { readonly cf?: Cf; }
+            type RequestInfo<Cf = unknown> = Request<Cf> | string;
+        ";
+        let side = "type RequestInfoo<Cf = Incoming> = Request<Cf> | string;";
+        assert_eq!(errors(input, side), ["no declaration named `RequestInfoo`"]);
+        let ambiguous = "
+            type RequestInfo<Cf = unknown> = Cf | string;
+            declare module \"m\" { type RequestInfo<Cf = unknown> = Cf | string; }
+        ";
+        let side = "type RequestInfo<Cf = Incoming> = Cf | string;";
+        let errs = errors(ambiguous, side);
+        assert_eq!(errs.len(), 1);
+        assert!(errs[0].contains("names 2 declarations"), "{errs:?}");
     }
 
     #[test]
