@@ -99,12 +99,6 @@ pub mod polish {
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum TimeUnit {
-        Hour = "hour",
-        Minute = "minute",
-    }
-    #[wasm_bindgen(private)]
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PluralizeUnit {
         Day = "day",
         Hour = "hour",
@@ -259,6 +253,272 @@ pub mod polish {
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Rounding;
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &Rounding) -> Option<PluralizeUnit>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &Rounding, val: PluralizeUnit);
+        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+        pub fn largest_unit(this: &Rounding) -> Option<LargestUnitKind>;
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit(this: &Rounding, val: LargestUnitKind);
+        #[wasm_bindgen(method, getter)]
+        pub fn increment(this: &Rounding) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_increment(this: &Rounding, val: f64);
+    }
+    impl Rounding {
+        pub fn new() -> Rounding {
+            Self::builder().build()
+        }
+        pub fn builder() -> RoundingBuilder {
+            RoundingBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for Rounding {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct RoundingBuilder {
+        inner: Rounding,
+    }
+    impl RoundingBuilder {
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn largest_unit(self, val: LargestUnitKind) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn increment(self, val: f64) -> Self {
+            self.inner.set_increment(val);
+            self
+        }
+        pub fn build(self) -> Rounding {
+            self.inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Rounding , extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Stepped;
+        #[wasm_bindgen(method, getter)]
+        pub fn step(this: &Stepped) -> Option<StepKind>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_step(this: &Stepped, val: StepKind);
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &Stepped) -> Option<PluralizeTimeUnit>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &Stepped, val: PluralizeTimeUnit);
+        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+        pub fn largest_unit(this: &Stepped) -> Option<SteppedLargestUnitKind>;
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit(this: &Stepped, val: SteppedLargestUnitKind);
+    }
+    impl Stepped {
+        pub fn new() -> Stepped {
+            Self::builder().build()
+        }
+        pub fn builder() -> SteppedBuilder {
+            SteppedBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for Stepped {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct SteppedBuilder {
+        inner: Stepped,
+    }
+    impl SteppedBuilder {
+        pub fn increment(self, val: f64) -> Self {
+            self.inner.set_increment(val);
+            self
+        }
+        pub fn step(self, val: StepKind) -> Self {
+            self.inner.set_step(val);
+            self
+        }
+        pub fn smallest_unit(self, val: PluralizeTimeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn largest_unit(self, val: SteppedLargestUnitKind) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn build(self) -> Stepped {
+            self.inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Stepped , extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type MinuteStepping;
+        #[wasm_bindgen(method, getter)]
+        pub fn step(this: &MinuteStepping) -> Option<String>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_step(this: &MinuteStepping, val: &str);
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &MinuteStepping) -> Option<PluralizeUnitMinute>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &MinuteStepping, val: PluralizeUnitMinute);
+        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+        pub fn largest_unit(this: &MinuteStepping) -> Option<MinuteSteppingLargestUnitKind>;
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit(this: &MinuteStepping, val: MinuteSteppingLargestUnitKind);
+    }
+    impl MinuteStepping {
+        pub fn new() -> MinuteStepping {
+            Self::builder().build()
+        }
+        pub fn builder() -> MinuteSteppingBuilder {
+            MinuteSteppingBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for MinuteStepping {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct MinuteSteppingBuilder {
+        inner: MinuteStepping,
+    }
+    impl MinuteSteppingBuilder {
+        pub fn increment(self, val: f64) -> Self {
+            self.inner.set_increment(val);
+            self
+        }
+        pub fn step(self, val: &str) -> Self {
+            self.inner.set_step(val);
+            self
+        }
+        pub fn smallest_unit(self, val: PluralizeUnitMinute) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn largest_unit(self, val: MinuteSteppingLargestUnitKind) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn build(self) -> MinuteStepping {
+            self.inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Stepped , extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type HourStepping;
+        #[wasm_bindgen(method, getter)]
+        pub fn step(this: &HourStepping) -> Option<String>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_step(this: &HourStepping, val: &str);
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &HourStepping) -> Option<PluralizeUnitHour>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &HourStepping, val: PluralizeUnitHour);
+        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+        pub fn largest_unit(this: &HourStepping) -> Option<HourSteppingLargestUnitKind>;
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit(this: &HourStepping, val: HourSteppingLargestUnitKind);
+    }
+    impl HourStepping {
+        pub fn new() -> HourStepping {
+            Self::builder().build()
+        }
+        pub fn builder() -> HourSteppingBuilder {
+            HourSteppingBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for HourStepping {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct HourSteppingBuilder {
+        inner: HourStepping,
+    }
+    impl HourSteppingBuilder {
+        pub fn increment(self, val: f64) -> Self {
+            self.inner.set_increment(val);
+            self
+        }
+        pub fn step(self, val: &str) -> Self {
+            self.inner.set_step(val);
+            self
+        }
+        pub fn smallest_unit(self, val: PluralizeUnitHour) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn largest_unit(self, val: HourSteppingLargestUnitKind) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn build(self) -> HourStepping {
+            self.inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Clock;
+        #[wasm_bindgen(method)]
+        pub fn now(this: &Clock) -> PluralizeTimeUnit;
+        #[wasm_bindgen(method, catch, js_name = "now")]
+        pub fn try_now(this: &Clock) -> Result<PluralizeTimeUnit, JsValue>;
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Rounder;
+        #[wasm_bindgen(method)]
+        pub fn round(this: &Rounder, options: &Rounding);
+        #[wasm_bindgen(method, catch, js_name = "round")]
+        pub fn try_round(this: &Rounder, options: &Rounding) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, js_name = "roundTime")]
+        pub fn round_time(this: &Rounder, options: &RoundingTimeUnit);
+        #[wasm_bindgen(method, catch, js_name = "roundTime")]
+        pub fn try_round_time(this: &Rounder, options: &RoundingTimeUnit) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, js_name = "roundAgain")]
+        pub fn round_again(this: &Rounder, options: &RoundingTimeUnit);
+        #[wasm_bindgen(method, catch, js_name = "roundAgain")]
+        pub fn try_round_again(this: &Rounder, options: &RoundingTimeUnit) -> Result<(), JsValue>;
+        #[wasm_bindgen(method)]
+        pub fn step(this: &Rounder, options: &HourStepping);
+        #[wasm_bindgen(method, catch, js_name = "step")]
+        pub fn try_step(this: &Rounder, options: &HourStepping) -> Result<(), JsValue>;
+        #[wasm_bindgen(method)]
+        pub fn clock(this: &Rounder) -> Clock;
+        #[wasm_bindgen(method, catch, js_name = "clock")]
+        pub fn try_clock(this: &Rounder) -> Result<Clock, JsValue>;
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum PluralizeUnitHour {
+        Hour = "hour",
+        Hours = "hours",
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PartialBoxLikeObject;
         #[wasm_bindgen(method, getter)]
         pub fn width(this: &PartialBoxLikeObject) -> Option<f64>;
@@ -353,9 +613,99 @@ pub mod polish {
         Hours = "hours",
         Minutes = "minutes",
     }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum PluralizeUnitMinute {
+        Minute = "minute",
+        Minutes = "minutes",
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Rounding , extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type RoundingTimeUnit;
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &RoundingTimeUnit) -> Option<PluralizeTimeUnit>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &RoundingTimeUnit, val: PluralizeTimeUnit);
+        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+        pub fn largest_unit(this: &RoundingTimeUnit) -> Option<SteppedLargestUnitKind>;
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit(this: &RoundingTimeUnit, val: SteppedLargestUnitKind);
+    }
+    impl RoundingTimeUnit {
+        pub fn new() -> RoundingTimeUnit {
+            Self::builder().build()
+        }
+        pub fn builder() -> RoundingTimeUnitBuilder {
+            RoundingTimeUnitBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for RoundingTimeUnit {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct RoundingTimeUnitBuilder {
+        inner: RoundingTimeUnit,
+    }
+    impl RoundingTimeUnitBuilder {
+        pub fn increment(self, val: f64) -> Self {
+            self.inner.set_increment(val);
+            self
+        }
+        pub fn smallest_unit(self, val: PluralizeTimeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn largest_unit(self, val: SteppedLargestUnitKind) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn build(self) -> RoundingTimeUnit {
+            self.inner
+        }
+    }
 }
 #[wasm_bindgen(private)]
 pub enum DirectionKind {
     Next = "next",
     Previous = "previous",
+}
+#[wasm_bindgen(private)]
+pub enum LargestUnitKind {
+    Auto = "auto",
+    Day = "day",
+    Hour = "hour",
+    Minute = "minute",
+    Days = "days",
+    Hours = "hours",
+    Minutes = "minutes",
+}
+#[wasm_bindgen(private)]
+pub enum StepKind {
+    Hour = "hour",
+    Minute = "minute",
+}
+#[wasm_bindgen(private)]
+pub enum SteppedLargestUnitKind {
+    Auto = "auto",
+    Hour = "hour",
+    Minute = "minute",
+    Hours = "hours",
+    Minutes = "minutes",
+}
+#[wasm_bindgen(private)]
+pub enum MinuteSteppingLargestUnitKind {
+    Auto = "auto",
+    Minute = "minute",
+    Minutes = "minutes",
+}
+#[wasm_bindgen(private)]
+pub enum HourSteppingLargestUnitKind {
+    Auto = "auto",
+    Hour = "hour",
+    Hours = "hours",
 }

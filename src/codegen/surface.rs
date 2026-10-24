@@ -183,6 +183,13 @@ impl<'d> Builder<'_, 'd> {
         // export of the same declaration does.
         entries.sort_by_key(|&(public, _, _)| public == "default");
         for (public, local, bindings) in entries {
+            // A literal alias that only constrains literal-only parameters
+            // is read through by specialisation; a signature that still
+            // names it reaches it, and `--export` can select it.
+            let ids = gctx.declarations(bound_in(root, bindings), local);
+            if !ids.is_empty() && ids.iter().all(|id| gctx.type_level_only.contains(id)) {
+                continue;
+            }
             self.entry(root, public, local, bindings);
         }
     }

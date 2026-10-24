@@ -99,6 +99,11 @@ pub struct GlobalContext {
     /// the instance of, whose construct signature's return type
     /// `bind_constructor_vars` may find to be a global instance interface.
     pub(crate) constructor_classes: Vec<TypeId>,
+    /// Literal aliases that only constrain literal-only type parameters
+    /// (`Units extends DateUnit | TimeUnit`). Specialisation reads them
+    /// as their literals, so the output surface emits one only when a
+    /// signature still reaches it.
+    pub(crate) type_level_only: std::collections::HashSet<TypeId>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -206,6 +211,7 @@ impl GlobalContext {
             ctor_vars: Vec::new(),
             declared: std::collections::HashMap::new(),
             constructor_classes: Vec::new(),
+            type_level_only: std::collections::HashSet::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),

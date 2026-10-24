@@ -6,7 +6,7 @@ use js_sys::{Array, JsString, Nullable, Object};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::erased_type_params_mono::{
-    ListKey, ListResult, Nested, NestedMapped, Store, V,
+    ListKey, ListResult, Nested, NestedMapped, Store, X,
 };
 
 // Compile-only: the fixture has no backing JavaScript module. An argument
@@ -34,7 +34,7 @@ async fn erased_type_params_mono_compile(store: &Store) -> Result<(), JsValue> {
 #[allow(dead_code)]
 fn erased_type_params_mono_nested_compile(nested: &Nested) {
     let _: f64 = nested.indexed();
-    let _: V = nested.keys();
+    let _: X = nested.keys();
     let mapped: NestedMapped = nested.mapped();
     let _: bool = mapped.x();
     let _: bool = mapped.y();

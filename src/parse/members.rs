@@ -90,6 +90,23 @@ pub(crate) fn create_body_scope(
     body_scope
 }
 
+/// [`create_body_scope`] for an interface. A parameter constrained to
+/// string literals only stays a type parameter: type-level evaluation
+/// specialises it at each instantiation (see `parse::eval`).
+pub(crate) fn create_interface_body_scope(
+    type_params: &mut Vec<TypeParam>,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> ScopeId {
+    let body_scope = ctx.scopes.create_child(parent_scope);
+    ctx.scopes.bind_type_params_keeping(
+        body_scope,
+        type_params,
+        TypeParam::selects_string_literals,
+    );
+    body_scope
+}
+
 /// Walk a [`TypeRef`] and collect every bare reference whose name
 /// resolves to a [`crate::parse::scope::Binding::TypeParam`] in the
 /// given scope chain, in source-appearance order, deduped.

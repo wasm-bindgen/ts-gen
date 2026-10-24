@@ -59,8 +59,9 @@ export declare function size(opts: Options): Options["size"];
 export type Plural<T extends Unit> = T | { hour: "hours"; minute: "minutes"; second: "seconds" }[T];
 export declare function plural(all: Plural<Unit>, some: Plural<"hour" | "minute">): void;
 
-// A type parameter out of scope evaluates at its bound: one enum for every
-// instantiation, named after the alias.
+// A literal-only type parameter is erased and evaluates at its bound: one
+// enum for every unit, named after the alias. An instantiation narrowing it
+// is specialised, `RoundingHour`.
 export interface Rounding<U extends Unit> {
   smallestUnit?: Plural<U> | undefined;
   largestUnit?: "auto" | Plural<U> | undefined;

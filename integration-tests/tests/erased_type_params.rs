@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use ts_gen_integration_tests::erased_type_params::{Nested, NestedMapped, V};
+use ts_gen_integration_tests::erased_type_params::{Nested, NestedMapped, X};
 
 // Compile-only: the fixture has no backing JavaScript module. An argument
 // given for an erased parameter is dropped inside `keyof`, an indexed
@@ -9,15 +9,15 @@ use ts_gen_integration_tests::erased_type_params::{Nested, NestedMapped, V};
 #[allow(dead_code)]
 fn erased_type_params_nested_compile(nested: &Nested) {
     let _: f64 = nested.indexed();
-    let _: V = nested.keys();
-    nested.set_keys(V::X);
+    let _: X = nested.keys();
+    nested.set_keys(X::X);
     let mapped: NestedMapped = nested.mapped();
     let _: bool = mapped.x();
     let _: bool = mapped.y();
     let _: Vec<String> = nested.literal();
     let _ = Nested::new(
         1.0,
-        V::X,
+        X::X,
         &NestedMapped::new(true, false),
         &["s".to_string()],
     );
