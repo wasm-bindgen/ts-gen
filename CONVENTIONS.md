@@ -2275,8 +2275,12 @@ pub fn typed(this: &Env) -> KVNamespace;
 Method-level parameters follow the same rule
 (`tag<Level extends "info" | "warn">(level: Level)` → `level: &str`).
 
-The arguments are dropped once every input is parsed, before codegen, so
-everything downstream sees `KVNamespaceListResult<Metadata>`. In
+The arguments are dropped once every input is parsed, before codegen and
+before [type-level evaluation](#type-level-evaluation), wherever the
+reference sits: inside `keyof`, an indexed access, a mapped type or an
+inline object literal too, so `Slot<"a", number>["value"]` against
+`interface Slot<K extends string, V>` reads `V` as `number`, not `"a"`.
+Everything downstream sees `KVNamespaceListResult<Metadata>`. In
 per-monomorphization mode, the erased `Key` therefore adds no
 `list_js_string` variant.
 

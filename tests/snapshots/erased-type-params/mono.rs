@@ -149,3 +149,112 @@ impl Env {
         inner
     }
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Point;
+    #[wasm_bindgen(method, getter)]
+    pub fn x(this: &Point) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_x(this: &Point, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn y(this: &Point) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_y(this: &Point, val: f64);
+}
+impl Point {
+    pub fn new(x: f64, y: f64) -> Point {
+        let inner: Point = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_x(x);
+        inner.set_y(y);
+        inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Slot<V>;
+    #[wasm_bindgen(method, getter)]
+    pub fn value<V>(this: &Slot<V>) -> V
+    where
+        V: ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_value<V>(this: &Slot<V>, val: V)
+    where
+        V: ::wasm_bindgen::convert::IntoWasmAbi;
+}
+impl<V: ::wasm_bindgen::convert::IntoWasmAbi> Slot<V> {
+    pub fn new(value: V) -> Slot<V> {
+        let inner: Slot<V> = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value(value);
+        inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Nested;
+    #[wasm_bindgen(method, getter)]
+    pub fn indexed(this: &Nested) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_indexed(this: &Nested, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn keys(this: &Nested) -> V;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_keys(this: &Nested, val: V);
+    #[wasm_bindgen(method, getter)]
+    pub fn mapped(this: &Nested) -> NestedMapped;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_mapped(this: &Nested, val: &NestedMapped);
+    #[wasm_bindgen(method, getter)]
+    pub fn literal(this: &Nested) -> Vec<String>;
+    #[wasm_bindgen(method, getter, js_name = "literal")]
+    pub fn literal_js_string(this: &Nested) -> Array<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_literal(this: &Nested, val: &[impl ::wasm_bindgen::JsStringLike]);
+}
+impl Nested {
+    pub fn new(
+        indexed: f64,
+        keys: V,
+        mapped: &NestedMapped,
+        literal: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Nested {
+        let inner: Nested = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_indexed(indexed);
+        inner.set_keys(keys);
+        inner.set_mapped(mapped);
+        inner.set_literal(literal);
+        inner
+    }
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum V {
+    X = "x",
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type NestedMapped;
+    #[wasm_bindgen(method, getter)]
+    pub fn x(this: &NestedMapped) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_x(this: &NestedMapped, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn y(this: &NestedMapped) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_y(this: &NestedMapped, val: bool);
+}
+impl NestedMapped {
+    pub fn new(x: bool, y: bool) -> NestedMapped {
+        let inner: NestedMapped = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_x(x);
+        inner.set_y(y);
+        inner
+    }
+}

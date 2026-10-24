@@ -26,3 +26,17 @@ interface Env {
   KV: Store;
   TYPED: Store<"a" | "b">;
 }
+
+// An argument for an erased parameter is dropped wherever the reference
+// sits, including inside `keyof`, an indexed access, a mapped type and an
+// inline object literal, so `Slot<"a", V>` binds `V`, not `"a"`.
+interface Point { x: number; y: number; }
+interface Slot<K extends string, V> {
+  value: V;
+}
+interface Nested {
+  indexed: Slot<"a", number>["value"];
+  keys: keyof Pick<Point, Slot<"a", "x">["value"]>;
+  mapped: { [P in Slot<"a", "x" | "y">["value"]]: Slot<"b", boolean>["value"] };
+  literal: { inner: Slot<"a", string[]>["value"] }["inner"];
+}

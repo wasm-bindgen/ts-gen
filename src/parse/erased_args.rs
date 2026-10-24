@@ -12,7 +12,10 @@
 use std::collections::HashMap;
 
 use crate::context::{GlobalContext, TypeId};
-use crate::ir::{FunctionDecl, FunctionSig, Member, Param, Throws, TypeKind, TypeParam, TypeRef};
+use crate::ir::{
+    FunctionDecl, FunctionSig, MappedType, Member, ObjectProp, Param, Throws, TypeKind, TypeParam,
+    TypeRef,
+};
 use crate::parse::scope::ScopeId;
 
 pub(crate) fn drop_erased_args(gctx: &mut GlobalContext) {
@@ -196,7 +199,45 @@ impl Pass<'_> {
                     .collect(),
                 return_type: Box::new(sub(&sig.return_type)),
             }),
-            other => other.clone(),
+            TypeRef::KeyOf(t) => TypeRef::KeyOf(Box::new(sub(t))),
+            TypeRef::IndexedAccess(o, i) => {
+                TypeRef::IndexedAccess(Box::new(sub(o)), Box::new(sub(i)))
+            }
+            TypeRef::Mapped(m) => TypeRef::Mapped(Box::new(MappedType {
+                keys: sub(&m.keys),
+                value: m.value.as_ref().map(sub),
+                ..(**m).clone()
+            })),
+            TypeRef::ObjectLiteral(props) => TypeRef::ObjectLiteral(
+                props
+                    .iter()
+                    .map(|p| ObjectProp {
+                        type_ref: sub(&p.type_ref),
+                        ..p.clone()
+                    })
+                    .collect(),
+            ),
+            // Leaves: nothing nested to visit.
+            TypeRef::Reference { .. }
+            | TypeRef::Boolean
+            | TypeRef::Number
+            | TypeRef::String
+            | TypeRef::BigInt
+            | TypeRef::Void
+            | TypeRef::Undefined
+            | TypeRef::Null
+            | TypeRef::Any
+            | TypeRef::Unknown
+            | TypeRef::Object
+            | TypeRef::Symbol
+            | TypeRef::ArrayBufferView
+            | TypeRef::PropertyKey
+            | TypeRef::TypedSlice(..)
+            | TypeRef::StringLiteral(_)
+            | TypeRef::NumberLiteral(_)
+            | TypeRef::BooleanLiteral(_)
+            | TypeRef::Never
+            | TypeRef::Unresolved(_) => ty.clone(),
         }
     }
 }
