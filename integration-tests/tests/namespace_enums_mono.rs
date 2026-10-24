@@ -2,6 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
+use js_sys::Intl::RoundingMode;
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::namespace_enums_mono::{calendar, clock};
@@ -11,10 +12,12 @@ use ts_gen_integration_tests::namespace_enums_mono::{calendar, clock};
 #[wasm_bindgen_test]
 fn synthesised_enums_round_trip_from_their_modules() {
     let to_string = clock::ToStringOptions::builder()
+        .rounding_mode(RoundingMode::HalfEven)
         .unit(clock::UnitKind::Week)
         .style(clock::StyleKind::Short)
         .precision(clock::PrecisionKind::Auto)
         .build();
+    assert_eq!(to_string.rounding_mode(), Some(RoundingMode::HalfEven));
 
     let from = clock::FromOptions::builder()
         .display(to_string.style().unwrap())
