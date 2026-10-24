@@ -1,7 +1,7 @@
 //! Inline wrappers over extern bindings whose declared type the extern ABI
 //! cannot express.
 //!
-//! The extern binding is kept under a private `<name>_js` name and a
+//! The extern binding is kept under a private `__<name>` name and a
 //! `pub fn` of the public name calls it. This pass runs on the finished
 //! `syn::File`, rewrites the extern signature and emits the wrappers
 //! beside its block.
@@ -27,7 +27,7 @@ const LITERAL_ATTR: &str = "ts_gen_literal";
 const WRAPS_ATTR: &str = "ts_gen_wraps";
 
 /// The attribute the signature layer puts on a literal-keyed extern fn:
-/// `#[ts_gen_literal(binding(get_js), positions(1), arm("text", get_text), arm("json", get_json))]`.
+/// `#[ts_gen_literal(binding(__get), positions(1), arm("text", get_text), arm("json", get_json))]`.
 /// The extern is renamed to `binding`; positions index the parameters
 /// after `this`.
 pub(crate) fn literal_attr(sig: &crate::codegen::signatures::FunctionSignature) -> TokenStream {
@@ -637,34 +637,34 @@ mod tests {
         let out = run(
             "#[wasm_bindgen] extern \"C\" {
                 pub type Kv;
-                #[ts_gen_literal(binding(get_text_js), positions(1), arm(\"text\", get_text), arm(\"arrayBuffer\", get_array_buffer))]
+                #[ts_gen_literal(binding(__get_text), positions(1), arm(\"text\", get_text), arm(\"arrayBuffer\", get_array_buffer))]
                 #[wasm_bindgen(method, catch, js_name = \"get\")]
                 pub async fn get_text(this: &Kv, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
-                #[ts_gen_literal(binding(new_js), positions(0), arm(\"gzip\", new_gzip), arm(\"deflate-raw\", new_deflate_raw))]
+                #[ts_gen_literal(binding(__new), positions(0), arm(\"gzip\", new_gzip), arm(\"deflate-raw\", new_deflate_raw))]
                 #[wasm_bindgen(constructor, catch)]
                 pub fn new_gzip(format: &str) -> Result<Kv, JsValue>;
             }",
         );
         assert!(!out.contains("ts_gen_literal"));
-        assert!(out.contains("async fn get_text_js(this: &Kv, key: &str, r#type: &str)"));
-        assert!(out.contains("pub async fn get_text(&self, key: &str) -> Result<JsValue, JsValue> {\n        self.get_text_js(key, \"text\").await\n    }"));
-        assert!(out.contains("pub async fn get_array_buffer(&self, key: &str) -> Result<JsValue, JsValue> {\n        self.get_text_js(key, \"arrayBuffer\").await\n    }"));
-        assert!(out.contains("pub fn new_deflate_raw() -> Result<Kv, JsValue> {\n        Self::new_js(\"deflate-raw\")\n    }"));
+        assert!(out.contains("async fn __get_text(this: &Kv, key: &str, r#type: &str)"));
+        assert!(out.contains("pub async fn get_text(&self, key: &str) -> Result<JsValue, JsValue> {\n        self.__get_text(key, \"text\").await\n    }"));
+        assert!(out.contains("pub async fn get_array_buffer(&self, key: &str) -> Result<JsValue, JsValue> {\n        self.__get_text(key, \"arrayBuffer\").await\n    }"));
+        assert!(out.contains("pub fn new_deflate_raw() -> Result<Kv, JsValue> {\n        Self::__new(\"deflate-raw\")\n    }"));
     }
 
     #[test]
     fn null_arm_of_a_literal_cohort_is_dropped_and_passed_as_null() {
         let out = run("#[wasm_bindgen] extern \"C\" {
                 pub type Picker;
-                #[ts_gen_literal(binding(put_with_null_js), positions(0), arm(\"a\", put_a_with_null), arm(\"b\", put_b_with_null))]
+                #[ts_gen_literal(binding(__put_with_null), positions(0), arm(\"a\", put_a_with_null), arm(\"b\", put_b_with_null))]
                 #[wasm_bindgen(method, js_name = \"put\")]
                 pub fn put_a_with_null<T>(this: &Picker, kind: &str, x: &__TsGenNull, y: f64);
             }");
         assert!(!out.contains("__TsGenNull"), "{out}");
         assert!(out.contains(
-            "fn put_with_null_js(this: &Picker, kind: &str, x: &::wasm_bindgen::JsValue, y: f64);"
+            "fn __put_with_null(this: &Picker, kind: &str, x: &::wasm_bindgen::JsValue, y: f64);"
         ), "{out}");
-        assert!(out.contains("pub fn put_b_with_null(&self, y: f64) {\n        self.put_with_null_js(\"b\", &::wasm_bindgen::JsValue::NULL, y)\n    }"), "{out}");
+        assert!(out.contains("pub fn put_b_with_null(&self, y: f64) {\n        self.__put_with_null(\"b\", &::wasm_bindgen::JsValue::NULL, y)\n    }"), "{out}");
         // A type parameter only the `null` parameter could name goes.
         assert!(!out.contains("<T>"), "{out}");
 
@@ -678,27 +678,30 @@ mod tests {
     fn static_and_free_forms() {
         let out = run("#[wasm_bindgen] extern \"C\" {
                 pub type Foo<T: ::wasm_bindgen::JsGeneric = JsValue>;
-                #[ts_gen_literal(binding(make_js), positions(0), arm(\"a\", make_a), arm(\"b\", make_b))]
+                #[ts_gen_literal(binding(__make), positions(0), arm(\"a\", make_a), arm(\"b\", make_b))]
                 #[wasm_bindgen(static_method_of = Foo, js_name = \"make\")]
                 pub fn make_a<T: ::wasm_bindgen::JsGeneric>(kind: &str) -> Foo<T>;
-                #[ts_gen_literal(binding(label_js), positions(0), arm(\"a\", label_a), arm(\"b\", label_b))]
+                #[ts_gen_literal(binding(__label), positions(0), arm(\"a\", label_a), arm(\"b\", label_b))]
                 #[wasm_bindgen(static_method_of = Foo, js_name = \"label\")]
                 pub fn label_a(kind: &str) -> String;
             }
             #[wasm_bindgen] extern \"C\" {
-                #[ts_gen_literal(binding(pick_js), positions(0), arm(\"x\", pick_x), arm(\"y\", pick_y))]
+                #[ts_gen_literal(binding(__pick), positions(0), arm(\"x\", pick_x), arm(\"y\", pick_y))]
                 #[wasm_bindgen(js_name = \"pick\")]
                 pub fn pick_x(axis: &str) -> f64;
             }");
         assert!(out.contains("impl<T: ::wasm_bindgen::JsGeneric> Foo<T>"));
-        assert!(out.contains("pub fn make_b() -> Foo<T> {\n        Self::make_js(\"b\")\n    }"));
+        assert!(out.contains("pub fn make_b() -> Foo<T> {\n        Self::__make(\"b\")\n    }"));
         // A static not returning its type binds the type's defaults.
-        assert!(out.contains(
-            "impl Foo {\n    pub fn label_a() -> String {\n        Self::label_js(\"a\")\n    }"
-        ), "{out}");
         assert!(
-            out.contains("#[wasm_bindgen(js_name = \"pick\")]\n    fn pick_js(axis: &str) -> f64;")
+            out.contains(
+                "impl Foo {\n    pub fn label_a() -> String {\n        Self::__label(\"a\")\n    }"
+            ),
+            "{out}"
         );
-        assert!(out.contains("pub fn pick_y() -> f64 {\n    pick_js(\"y\")\n}"));
+        assert!(
+            out.contains("#[wasm_bindgen(js_name = \"pick\")]\n    fn __pick(axis: &str) -> f64;")
+        );
+        assert!(out.contains("pub fn pick_y() -> f64 {\n    __pick(\"y\")\n}"));
     }
 }

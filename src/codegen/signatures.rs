@@ -244,7 +244,8 @@ pub struct LiteralSpec {
     /// else the binding's first arm (`get_text`), since arms with
     /// different return types need a binding each.
     pub stem: String,
-    /// The private binding's Rust name, `<stem>_js`.
+    /// The private binding's Rust name, `__<stem>`: the prefix keeps it
+    /// apart from every public name, `_js_string` variants included.
     pub binding: String,
 }
 
@@ -255,7 +256,7 @@ impl LiteralSpec {
         stem: String,
         names: &mut LocalScope,
     ) -> Self {
-        let binding = names.declare(&format!("{stem}_js"), Suffix::Snake);
+        let binding = names.declare(&format!("__{stem}"), Suffix::Snake);
         Self {
             positions,
             arms,
@@ -3930,8 +3931,8 @@ mod tests {
         assert_eq!(sigs[2].return_type, TypeRef::Any);
         // The arms split across two bindings by return type, so each is
         // named after its first arm rather than after the cohort.
-        assert_eq!(text_spec.binding, "get_text_js");
-        assert_eq!(sigs[2].literal.as_ref().unwrap().binding, "get_json_js");
+        assert_eq!(text_spec.binding, "__get_text");
+        assert_eq!(sigs[2].literal.as_ref().unwrap().binding, "__get_json");
         assert!(sigs[3].literal.is_none());
     }
 
@@ -3969,8 +3970,8 @@ mod tests {
     #[test]
     fn literal_binding_is_named_after_the_cohort() {
         // One binding serving every arm is named for the cohort, not for
-        // its first literal: `get_time_zone_transition_js`, not
-        // `get_time_zone_transition_next_js`, and so for its `try_` form.
+        // its first literal: `__get_time_zone_transition`, not
+        // `__get_time_zone_transition_next`, and so for its `try_` form.
         let mut used = no_used();
         let next = [lit("direction", "next")];
         let previous = [lit("direction", "previous")];
@@ -3993,17 +3994,17 @@ mod tests {
             [
                 (
                     "get_time_zone_transition_next",
-                    "get_time_zone_transition_js"
+                    "__get_time_zone_transition"
                 ),
                 (
                     "try_get_time_zone_transition_next",
-                    "try_get_time_zone_transition_js"
+                    "__try_get_time_zone_transition"
                 ),
             ]
         );
 
         // The literal-free overload keeps the bare name; the cohort's
-        // binding takes it with `_js`.
+        // binding takes it with the `__` prefix.
         let mut used = no_used();
         let a = [lit("mode", "a")];
         let b = [lit("mode", "b")];
@@ -4019,7 +4020,7 @@ mod tests {
         let names: Vec<&str> = sigs.iter().map(|s| s.rust_name.as_str()).collect();
         assert_eq!(names, ["mode", "try_mode", "mode_a", "try_mode_a"]);
         let spec = sigs[2].literal.as_ref().unwrap();
-        assert_eq!(spec.binding, "mode_js");
+        assert_eq!(spec.binding, "__mode");
     }
 
     #[test]
@@ -4105,14 +4106,14 @@ mod tests {
         assert_eq!(
             cohorts,
             [
-                ("pick_js", vec!["pick_a", "pick_b"]),
-                ("try_pick_js", vec!["try_pick_a", "try_pick_b"]),
+                ("__pick", vec!["pick_a", "pick_b"]),
+                ("__try_pick", vec!["try_pick_a", "try_pick_b"]),
                 (
-                    "pick_with_null_js",
+                    "__pick_with_null",
                     vec!["pick_a_with_null", "pick_b_with_null"]
                 ),
                 (
-                    "try_pick_with_null_js",
+                    "__try_pick_with_null",
                     vec!["try_pick_a_with_null", "try_pick_b_with_null"]
                 ),
             ]

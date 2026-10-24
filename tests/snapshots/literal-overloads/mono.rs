@@ -25,175 +25,173 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Nullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_text_js(
+    async fn __get_text(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_text_js_string_js(
+    async fn __get_text_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn get_text_promise_js(
+    fn __get_text_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Nullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_json_js(
+    async fn __get_json(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn get_json_promise_js(
+    fn __get_json_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_array_buffer_js(
+    async fn __get_array_buffer(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<ArrayBuffer>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn get_array_buffer_promise_js(
+    fn __get_array_buffer_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Nullable<ArrayBuffer>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_stream_js(
+    async fn __get_stream(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<Uint8Array>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn get_stream_promise_js(
+    fn __get_stream_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Nullable<Uint8Array>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_text_with_slice_js(
+    async fn __get_text_with_slice(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn get_text_with_slice_promise_js(
+    fn __get_text_with_slice_promise(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Map<JsString, JsNullable<JsString>>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_json_with_slice_js(
+    async fn __get_json_with_slice(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn get_json_with_slice_promise_js(
+    fn __get_json_with_slice_promise(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Map<JsString, JsValue>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "mode")]
-    fn mode_js(
-        this: &KVNamespace,
-        kind: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<bool, JsValue>;
+    fn __mode(this: &KVNamespace, kind: impl ::wasm_bindgen::JsStringLike)
+        -> Result<bool, JsValue>;
 }
 impl KVNamespace {
     pub async fn get_text(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<String>, JsValue> {
-        self.get_text_js(key, "text").await
+        self.__get_text(key, "text").await
     }
     pub async fn get_text_js_string(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<JsString>, JsValue> {
-        self.get_text_js_string_js(key, "text").await
+        self.__get_text_js_string(key, "text").await
     }
     pub fn get_text_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Nullable<JsString>>, JsValue> {
-        self.get_text_promise_js(key, "text")
+        self.__get_text_promise(key, "text")
     }
     pub async fn get_json(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsValue, JsValue> {
-        self.get_json_js(key, "json").await
+        self.__get_json(key, "json").await
     }
     pub fn get_json_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise, JsValue> {
-        self.get_json_promise_js(key, "json")
+        self.__get_json_promise(key, "json")
     }
     pub async fn get_array_buffer(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<ArrayBuffer>, JsValue> {
-        self.get_array_buffer_js(key, "arrayBuffer").await
+        self.__get_array_buffer(key, "arrayBuffer").await
     }
     pub fn get_array_buffer_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Nullable<ArrayBuffer>>, JsValue> {
-        self.get_array_buffer_promise_js(key, "arrayBuffer")
+        self.__get_array_buffer_promise(key, "arrayBuffer")
     }
     pub async fn get_stream(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<Uint8Array>, JsValue> {
-        self.get_stream_js(key, "stream").await
+        self.__get_stream(key, "stream").await
     }
     pub fn get_stream_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Nullable<Uint8Array>>, JsValue> {
-        self.get_stream_promise_js(key, "stream")
+        self.__get_stream_promise(key, "stream")
     }
     pub async fn get_text_with_slice(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue> {
-        self.get_text_with_slice_js(key, "text").await
+        self.__get_text_with_slice(key, "text").await
     }
     pub fn get_text_with_slice_promise(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<Promise<Map<JsString, JsNullable<JsString>>>, JsValue> {
-        self.get_text_with_slice_promise_js(key, "text")
+        self.__get_text_with_slice_promise(key, "text")
     }
     pub async fn get_json_with_slice(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<Map<JsString, JsValue>, JsValue> {
-        self.get_json_with_slice_js(key, "json").await
+        self.__get_json_with_slice(key, "json").await
     }
     pub fn get_json_with_slice_promise(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<Promise<Map<JsString, JsValue>>, JsValue> {
-        self.get_json_with_slice_promise_js(key, "json")
+        self.__get_json_with_slice_promise(key, "json")
     }
     #[doc = " A literal union is one overload with several arms."]
     pub fn mode_fast(&self) -> Result<bool, JsValue> {
-        self.mode_js("fast")
+        self.__mode("fast")
     }
     #[doc = " A literal union is one overload with several arms."]
     pub fn mode_safe(&self) -> Result<bool, JsValue> {
-        self.mode_js("safe")
+        self.__mode("safe")
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
@@ -218,96 +216,95 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SubtleCrypto;
     #[wasm_bindgen(method, catch, js_name = "exportKey")]
-    async fn export_key_jwk_js(
+    async fn __export_key_jwk(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Object, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "exportKey")]
-    fn export_key_jwk_promise_js(
+    fn __export_key_jwk_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "exportKey")]
-    async fn export_key_raw_js(
+    async fn __export_key_raw(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "exportKey")]
-    fn export_key_raw_promise_js(
+    fn __export_key_raw_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<ArrayBuffer>, JsValue>;
     # [wasm_bindgen (static_method_of = SubtleCrypto , catch , js_name = "describe")]
-    fn describe_js(format: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    fn __describe(format: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
     # [wasm_bindgen (static_method_of = SubtleCrypto , catch , js_name = "describe")]
-    fn describe_js_string_js(
-        format: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
+    fn __describe_js_string(format: impl ::wasm_bindgen::JsStringLike)
+        -> Result<JsString, JsValue>;
 }
 impl SubtleCrypto {
     pub async fn export_key_jwk(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Object, JsValue> {
-        self.export_key_jwk_js("jwk", key).await
+        self.__export_key_jwk("jwk", key).await
     }
     pub fn export_key_jwk_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Object>, JsValue> {
-        self.export_key_jwk_promise_js("jwk", key)
+        self.__export_key_jwk_promise("jwk", key)
     }
     pub async fn export_key_raw(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<ArrayBuffer, JsValue> {
-        self.export_key_raw_js("raw", key).await
+        self.__export_key_raw("raw", key).await
     }
     pub async fn export_key_pkcs8(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<ArrayBuffer, JsValue> {
-        self.export_key_raw_js("pkcs8", key).await
+        self.__export_key_raw("pkcs8", key).await
     }
     pub async fn export_key_spki(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<ArrayBuffer, JsValue> {
-        self.export_key_raw_js("spki", key).await
+        self.__export_key_raw("spki", key).await
     }
     pub fn export_key_raw_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<ArrayBuffer>, JsValue> {
-        self.export_key_raw_promise_js("raw", key)
+        self.__export_key_raw_promise("raw", key)
     }
     pub fn export_key_pkcs8_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<ArrayBuffer>, JsValue> {
-        self.export_key_raw_promise_js("pkcs8", key)
+        self.__export_key_raw_promise("pkcs8", key)
     }
     pub fn export_key_spki_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<ArrayBuffer>, JsValue> {
-        self.export_key_raw_promise_js("spki", key)
+        self.__export_key_raw_promise("spki", key)
     }
     pub fn describe_jwk() -> Result<String, JsValue> {
-        Self::describe_js("jwk")
+        Self::__describe("jwk")
     }
     pub fn describe_raw() -> Result<String, JsValue> {
-        Self::describe_js("raw")
+        Self::__describe("raw")
     }
     pub fn describe_jwk_js_string() -> Result<JsString, JsValue> {
-        Self::describe_js_string_js("jwk")
+        Self::__describe_js_string("jwk")
     }
     pub fn describe_raw_js_string() -> Result<JsString, JsValue> {
-        Self::describe_js_string_js("raw")
+        Self::__describe_js_string("raw")
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
@@ -316,7 +313,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVStore<Key = JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_text_js<Key>(
+    async fn __get_text<Key>(
         this: &KVStore<Key>,
         key: Key,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -324,7 +321,7 @@ extern "C" {
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_text_js_string_js<Key>(
+    async fn __get_text_js_string<Key>(
         this: &KVStore<Key>,
         key: Key,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -332,7 +329,7 @@ extern "C" {
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn get_text_promise_js<Key>(
+    fn __get_text_promise<Key>(
         this: &KVStore<Key>,
         key: Key,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -340,7 +337,7 @@ extern "C" {
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_json_js<Key, ExpectedValue>(
+    async fn __get_json<Key, ExpectedValue>(
         this: &KVStore<Key>,
         key: Key,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -349,7 +346,7 @@ extern "C" {
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
         ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn get_json_promise_js<Key, ExpectedValue>(
+    fn __get_json_promise<Key, ExpectedValue>(
         this: &KVStore<Key>,
         key: Key,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -362,19 +359,19 @@ impl<Key> KVStore<Key> {
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
     {
-        self.get_text_js(key, "text").await
+        self.__get_text(key, "text").await
     }
     pub async fn get_text_js_string(&self, key: Key) -> Result<Nullable<JsString>, JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
     {
-        self.get_text_js_string_js(key, "text").await
+        self.__get_text_js_string(key, "text").await
     }
     pub fn get_text_promise(&self, key: Key) -> Result<Promise<Nullable<JsString>>, JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
     {
-        self.get_text_promise_js(key, "text")
+        self.__get_text_promise(key, "text")
     }
     pub async fn get_json<ExpectedValue>(
         &self,
@@ -384,7 +381,7 @@ impl<Key> KVStore<Key> {
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
         ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static,
     {
-        self.get_json_js(key, "json").await
+        self.__get_json(key, "json").await
     }
     pub fn get_json_promise<ExpectedValue>(
         &self,
@@ -393,7 +390,7 @@ impl<Key> KVStore<Key> {
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
     {
-        self.get_json_promise_js(key, "json")
+        self.__get_json_promise(key, "json")
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
@@ -402,29 +399,29 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Picker;
     #[wasm_bindgen(method, catch, js_name = "pick")]
-    fn pick_js(
+    fn __pick(
         this: &Picker,
         kind: impl ::wasm_bindgen::JsStringLike,
         x: &ArrayBuffer,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "pick")]
-    fn pick_with_null_js(
+    fn __pick_with_null(
         this: &Picker,
         kind: impl ::wasm_bindgen::JsStringLike,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
     # [wasm_bindgen (static_method_of = Picker , catch , js_name = "make")]
-    fn make_js(
+    fn __make(
         kind: impl ::wasm_bindgen::JsStringLike,
         x: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Picker, JsValue>;
     # [wasm_bindgen (static_method_of = Picker , catch , js_name = "make")]
-    fn make_with_null_js(
+    fn __make_with_null(
         kind: impl ::wasm_bindgen::JsStringLike,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Picker, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    fn put_js<T>(
+    fn __put<T>(
         this: &Picker,
         kind: impl ::wasm_bindgen::JsStringLike,
         x: T,
@@ -432,7 +429,7 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    fn put_with_null_js(
+    fn __put_with_null(
         this: &Picker,
         kind: impl ::wasm_bindgen::JsStringLike,
         x: &::wasm_bindgen::JsValue,
@@ -440,50 +437,50 @@ extern "C" {
 }
 impl Picker {
     pub fn pick_a(&self, x: &ArrayBuffer) -> Result<(), JsValue> {
-        self.pick_js("a", x)
+        self.__pick("a", x)
     }
     pub fn pick_b(&self, x: &ArrayBuffer) -> Result<(), JsValue> {
-        self.pick_js("b", x)
+        self.__pick("b", x)
     }
     pub fn pick_a_with_null(&self) -> Result<(), JsValue> {
-        self.pick_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+        self.__pick_with_null("a", &::wasm_bindgen::JsValue::NULL)
     }
     pub fn pick_b_with_null(&self) -> Result<(), JsValue> {
-        self.pick_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+        self.__pick_with_null("b", &::wasm_bindgen::JsValue::NULL)
     }
     pub fn make_a(x: impl ::wasm_bindgen::JsStringLike) -> Result<Picker, JsValue> {
-        Self::make_js("a", x)
+        Self::__make("a", x)
     }
     pub fn make_b(x: impl ::wasm_bindgen::JsStringLike) -> Result<Picker, JsValue> {
-        Self::make_js("b", x)
+        Self::__make("b", x)
     }
     pub fn make_a_with_null() -> Result<Picker, JsValue> {
-        Self::make_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+        Self::__make_with_null("a", &::wasm_bindgen::JsValue::NULL)
     }
     pub fn make_b_with_null() -> Result<Picker, JsValue> {
-        Self::make_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+        Self::__make_with_null("b", &::wasm_bindgen::JsValue::NULL)
     }
     #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
     pub fn put_a<T>(&self, x: T) -> Result<(), JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi,
     {
-        self.put_js("a", x)
+        self.__put("a", x)
     }
     #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
     pub fn put_b<T>(&self, x: T) -> Result<(), JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi,
     {
-        self.put_js("b", x)
+        self.__put("b", x)
     }
     #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
     pub fn put_a_with_null(&self) -> Result<(), JsValue> {
-        self.put_with_null_js("a", &::wasm_bindgen::JsValue::NULL)
+        self.__put_with_null("a", &::wasm_bindgen::JsValue::NULL)
     }
     #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
     pub fn put_b_with_null(&self) -> Result<(), JsValue> {
-        self.put_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
+        self.__put_with_null("b", &::wasm_bindgen::JsValue::NULL)
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
@@ -492,31 +489,31 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Repeats;
     #[wasm_bindgen(method, catch, js_name = "tag")]
-    fn tag_js(this: &Repeats, m: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    fn __tag(this: &Repeats, m: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "tag")]
-    fn tag_js_string_js(
+    fn __tag_js_string(
         this: &Repeats,
         m: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
 }
 impl Repeats {
     pub fn tag_a(&self) -> Result<String, JsValue> {
-        self.tag_js("a")
+        self.__tag("a")
     }
     pub fn tag_b(&self) -> Result<String, JsValue> {
-        self.tag_js("b")
+        self.__tag("b")
     }
     pub fn tag_c(&self) -> Result<String, JsValue> {
-        self.tag_js("c")
+        self.__tag("c")
     }
     pub fn tag_a_js_string(&self) -> Result<JsString, JsValue> {
-        self.tag_js_string_js("a")
+        self.__tag_js_string("a")
     }
     pub fn tag_b_js_string(&self) -> Result<JsString, JsValue> {
-        self.tag_js_string_js("b")
+        self.__tag_js_string("b")
     }
     pub fn tag_c_js_string(&self) -> Result<JsString, JsValue> {
-        self.tag_js_string_js("c")
+        self.__tag_js_string("c")
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
@@ -525,47 +522,47 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Boxed<T = JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Boxed")]
-    fn new_js<T>(kind: impl ::wasm_bindgen::JsStringLike) -> Result<Boxed<T>, JsValue>;
+    fn __new<T>(kind: impl ::wasm_bindgen::JsStringLike) -> Result<Boxed<T>, JsValue>;
     # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "label")]
-    fn label_js(kind: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    fn __label(kind: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
     # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "label")]
-    fn label_js_string_js(kind: impl ::wasm_bindgen::JsStringLike) -> Result<JsString, JsValue>;
+    fn __label_js_string(kind: impl ::wasm_bindgen::JsStringLike) -> Result<JsString, JsValue>;
     # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "of")]
-    fn of_js<T>(kind: impl ::wasm_bindgen::JsStringLike, value: T) -> Result<Boxed<T>, JsValue>
+    fn __of<T>(kind: impl ::wasm_bindgen::JsStringLike, value: T) -> Result<Boxed<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<T> Boxed<T> {
     pub fn new_a() -> Result<Boxed<T>, JsValue> {
-        Self::new_js("a")
+        Self::__new("a")
     }
     pub fn new_b() -> Result<Boxed<T>, JsValue> {
-        Self::new_js("b")
+        Self::__new("b")
     }
     pub fn of_a(value: T) -> Result<Boxed<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi,
     {
-        Self::of_js("a", value)
+        Self::__of("a", value)
     }
     pub fn of_b(value: T) -> Result<Boxed<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi,
     {
-        Self::of_js("b", value)
+        Self::__of("b", value)
     }
 }
 impl Boxed {
     pub fn label_a() -> Result<String, JsValue> {
-        Self::label_js("a")
+        Self::__label("a")
     }
     pub fn label_b() -> Result<String, JsValue> {
-        Self::label_js("b")
+        Self::__label("b")
     }
     pub fn label_a_js_string() -> Result<JsString, JsValue> {
-        Self::label_js_string_js("a")
+        Self::__label_js_string("a")
     }
     pub fn label_b_js_string() -> Result<JsString, JsValue> {
-        Self::label_js_string_js("b")
+        Self::__label_js_string("b")
     }
 }

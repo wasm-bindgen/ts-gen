@@ -9140,25 +9140,25 @@ extern "C" {
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<Nullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_text_js(
+    async fn __get_text(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_text_js_string_js(
+    async fn __get_text_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    fn get_text_promise_js(
+    fn __get_text_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Nullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_json_js<ExpectedValue>(
+    async fn __get_json<ExpectedValue>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9166,31 +9166,31 @@ extern "C" {
     where
         ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static;
     #[wasm_bindgen(method, js_name = "get")]
-    fn get_json_promise_js<ExpectedValue>(
+    fn __get_json_promise<ExpectedValue>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Nullable<ExpectedValue>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_array_buffer_js(
+    async fn __get_array_buffer(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<ArrayBuffer>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    fn get_array_buffer_promise_js(
+    fn __get_array_buffer_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Nullable<ArrayBuffer>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_stream_js(
+    async fn __get_stream(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<ReadableStream>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    fn get_stream_promise_js(
+    fn __get_stream_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9214,19 +9214,19 @@ extern "C" {
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Nullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_text_with_slice_js(
+    async fn __get_text_with_slice(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    fn get_text_with_slice_promise_js(
+    fn __get_text_with_slice_promise(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Map<JsString, JsNullable<JsString>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_json_with_slice_js<ExpectedValue>(
+    async fn __get_json_with_slice<ExpectedValue>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9234,7 +9234,7 @@ extern "C" {
     where
         ExpectedValue: 'static;
     #[wasm_bindgen(method, js_name = "get")]
-    fn get_json_with_slice_promise_js<ExpectedValue>(
+    fn __get_json_with_slice_promise<ExpectedValue>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9445,7 +9445,7 @@ extern "C" {
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    async fn get_with_metadata_text_js<Metadata>(
+    async fn __get_with_metadata_text<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9453,7 +9453,7 @@ extern "C" {
     where
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    async fn get_with_metadata_text_js_string_js<Metadata>(
+    async fn __get_with_metadata_text_js_string<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9461,13 +9461,13 @@ extern "C" {
     where
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    fn get_with_metadata_text_promise_js<Metadata>(
+    fn __get_with_metadata_text_promise<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    async fn get_with_metadata_json_js<ExpectedValue, Metadata>(
+    async fn __get_with_metadata_json<ExpectedValue, Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9476,13 +9476,13 @@ extern "C" {
         ExpectedValue: 'static,
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    fn get_with_metadata_json_promise_js<ExpectedValue, Metadata>(
+    fn __get_with_metadata_json_promise<ExpectedValue, Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    async fn get_with_metadata_array_buffer_js<Metadata>(
+    async fn __get_with_metadata_array_buffer<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9490,13 +9490,13 @@ extern "C" {
     where
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    fn get_with_metadata_array_buffer_promise_js<Metadata>(
+    fn __get_with_metadata_array_buffer_promise<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    async fn get_with_metadata_stream_js<Metadata>(
+    async fn __get_with_metadata_stream<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9504,7 +9504,7 @@ extern "C" {
     where
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    fn get_with_metadata_stream_promise_js<Metadata>(
+    fn __get_with_metadata_stream_promise<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9532,7 +9532,7 @@ extern "C" {
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    async fn get_with_metadata_text_with_slice_js<Metadata>(
+    async fn __get_with_metadata_text_with_slice<Metadata>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9540,13 +9540,13 @@ extern "C" {
     where
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    fn get_with_metadata_text_with_slice_promise_js<Metadata>(
+    fn __get_with_metadata_text_with_slice_promise<Metadata>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    async fn get_with_metadata_json_with_slice_js<ExpectedValue, Metadata>(
+    async fn __get_with_metadata_json_with_slice<ExpectedValue, Metadata>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9555,7 +9555,7 @@ extern "C" {
         ExpectedValue: 'static,
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    fn get_with_metadata_json_with_slice_promise_js<ExpectedValue, Metadata>(
+    fn __get_with_metadata_json_with_slice_promise<ExpectedValue, Metadata>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -9620,19 +9620,19 @@ impl KVNamespace {
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<String>, JsValue> {
-        self.get_text_js(key, "text").await
+        self.__get_text(key, "text").await
     }
     pub async fn get_text_js_string(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<JsString>, JsValue> {
-        self.get_text_js_string_js(key, "text").await
+        self.__get_text_js_string(key, "text").await
     }
     pub fn get_text_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Nullable<JsString>> {
-        self.get_text_promise_js(key, "text")
+        self.__get_text_promise(key, "text")
     }
     pub async fn get_json<ExpectedValue>(
         &self,
@@ -9641,49 +9641,49 @@ impl KVNamespace {
     where
         ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static,
     {
-        self.get_json_js(key, "json").await
+        self.__get_json(key, "json").await
     }
     pub fn get_json_promise<ExpectedValue>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Nullable<ExpectedValue>> {
-        self.get_json_promise_js(key, "json")
+        self.__get_json_promise(key, "json")
     }
     pub async fn get_array_buffer(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<ArrayBuffer>, JsValue> {
-        self.get_array_buffer_js(key, "arrayBuffer").await
+        self.__get_array_buffer(key, "arrayBuffer").await
     }
     pub fn get_array_buffer_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Nullable<ArrayBuffer>> {
-        self.get_array_buffer_promise_js(key, "arrayBuffer")
+        self.__get_array_buffer_promise(key, "arrayBuffer")
     }
     pub async fn get_stream(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<ReadableStream>, JsValue> {
-        self.get_stream_js(key, "stream").await
+        self.__get_stream(key, "stream").await
     }
     pub fn get_stream_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Nullable<ReadableStream>> {
-        self.get_stream_promise_js(key, "stream")
+        self.__get_stream_promise(key, "stream")
     }
     pub async fn get_text_with_slice(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue> {
-        self.get_text_with_slice_js(key, "text").await
+        self.__get_text_with_slice(key, "text").await
     }
     pub fn get_text_with_slice_promise(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<JsString, JsNullable<JsString>>> {
-        self.get_text_with_slice_promise_js(key, "text")
+        self.__get_text_with_slice_promise(key, "text")
     }
     pub async fn get_json_with_slice<ExpectedValue>(
         &self,
@@ -9692,13 +9692,13 @@ impl KVNamespace {
     where
         ExpectedValue: 'static,
     {
-        self.get_json_with_slice_js(key, "json").await
+        self.__get_json_with_slice(key, "json").await
     }
     pub fn get_json_with_slice_promise<ExpectedValue>(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<JsString, JsNullable<ExpectedValue>>> {
-        self.get_json_with_slice_promise_js(key, "json")
+        self.__get_json_with_slice_promise(key, "json")
     }
     pub async fn get_with_metadata_text<Metadata>(
         &self,
@@ -9707,7 +9707,7 @@ impl KVNamespace {
     where
         Metadata: 'static,
     {
-        self.get_with_metadata_text_js(key, "text").await
+        self.__get_with_metadata_text(key, "text").await
     }
     pub async fn get_with_metadata_text_js_string<Metadata>(
         &self,
@@ -9716,13 +9716,13 @@ impl KVNamespace {
     where
         Metadata: 'static,
     {
-        self.get_with_metadata_text_js_string_js(key, "text").await
+        self.__get_with_metadata_text_js_string(key, "text").await
     }
     pub fn get_with_metadata_text_promise<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>> {
-        self.get_with_metadata_text_promise_js(key, "text")
+        self.__get_with_metadata_text_promise(key, "text")
     }
     pub async fn get_with_metadata_json<ExpectedValue, Metadata>(
         &self,
@@ -9732,13 +9732,13 @@ impl KVNamespace {
         ExpectedValue: 'static,
         Metadata: 'static,
     {
-        self.get_with_metadata_json_js(key, "json").await
+        self.__get_with_metadata_json(key, "json").await
     }
     pub fn get_with_metadata_json_promise<ExpectedValue, Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>> {
-        self.get_with_metadata_json_promise_js(key, "json")
+        self.__get_with_metadata_json_promise(key, "json")
     }
     pub async fn get_with_metadata_array_buffer<Metadata>(
         &self,
@@ -9747,14 +9747,14 @@ impl KVNamespace {
     where
         Metadata: 'static,
     {
-        self.get_with_metadata_array_buffer_js(key, "arrayBuffer")
+        self.__get_with_metadata_array_buffer(key, "arrayBuffer")
             .await
     }
     pub fn get_with_metadata_array_buffer_promise<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>> {
-        self.get_with_metadata_array_buffer_promise_js(key, "arrayBuffer")
+        self.__get_with_metadata_array_buffer_promise(key, "arrayBuffer")
     }
     pub async fn get_with_metadata_stream<Metadata>(
         &self,
@@ -9763,13 +9763,13 @@ impl KVNamespace {
     where
         Metadata: 'static,
     {
-        self.get_with_metadata_stream_js(key, "stream").await
+        self.__get_with_metadata_stream(key, "stream").await
     }
     pub fn get_with_metadata_stream_promise<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>> {
-        self.get_with_metadata_stream_promise_js(key, "stream")
+        self.__get_with_metadata_stream_promise(key, "stream")
     }
     pub async fn get_with_metadata_text_with_slice<Metadata>(
         &self,
@@ -9778,13 +9778,13 @@ impl KVNamespace {
     where
         Metadata: 'static,
     {
-        self.get_with_metadata_text_with_slice_js(key, "text").await
+        self.__get_with_metadata_text_with_slice(key, "text").await
     }
     pub fn get_with_metadata_text_with_slice_promise<Metadata>(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>> {
-        self.get_with_metadata_text_with_slice_promise_js(key, "text")
+        self.__get_with_metadata_text_with_slice_promise(key, "text")
     }
     pub async fn get_with_metadata_json_with_slice<ExpectedValue, Metadata>(
         &self,
@@ -9794,13 +9794,13 @@ impl KVNamespace {
         ExpectedValue: 'static,
         Metadata: 'static,
     {
-        self.get_with_metadata_json_with_slice_js(key, "json").await
+        self.__get_with_metadata_json_with_slice(key, "json").await
     }
     pub fn get_with_metadata_json_with_slice_promise<ExpectedValue, Metadata>(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>> {
-        self.get_with_metadata_json_with_slice_promise_js(key, "json")
+        self.__get_with_metadata_json_with_slice_promise(key, "json")
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -13578,17 +13578,17 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CompressionStream;
     #[wasm_bindgen(constructor, catch, js_name = "CompressionStream")]
-    fn new_js(format: impl ::wasm_bindgen::JsStringLike) -> Result<CompressionStream, JsValue>;
+    fn __new(format: impl ::wasm_bindgen::JsStringLike) -> Result<CompressionStream, JsValue>;
 }
 impl CompressionStream {
     pub fn new_gzip() -> Result<CompressionStream, JsValue> {
-        Self::new_js("gzip")
+        Self::__new("gzip")
     }
     pub fn new_deflate() -> Result<CompressionStream, JsValue> {
-        Self::new_js("deflate")
+        Self::__new("deflate")
     }
     pub fn new_deflate_raw() -> Result<CompressionStream, JsValue> {
-        Self::new_js("deflate-raw")
+        Self::__new("deflate-raw")
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -13597,17 +13597,17 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DecompressionStream;
     #[wasm_bindgen(constructor, catch, js_name = "DecompressionStream")]
-    fn new_js(format: impl ::wasm_bindgen::JsStringLike) -> Result<DecompressionStream, JsValue>;
+    fn __new(format: impl ::wasm_bindgen::JsStringLike) -> Result<DecompressionStream, JsValue>;
 }
 impl DecompressionStream {
     pub fn new_gzip() -> Result<DecompressionStream, JsValue> {
-        Self::new_js("gzip")
+        Self::__new("gzip")
     }
     pub fn new_deflate() -> Result<DecompressionStream, JsValue> {
-        Self::new_js("deflate")
+        Self::__new("deflate")
     }
     pub fn new_deflate_raw() -> Result<DecompressionStream, JsValue> {
-        Self::new_js("deflate-raw")
+        Self::__new("deflate-raw")
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

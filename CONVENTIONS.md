@@ -2783,18 +2783,18 @@ declare class CompressionStream {
 extern "C" {
     pub async fn get(this: &KVNamespace, key: &str) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_text_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<String>, JsValue>;
+    async fn __get_text(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_json_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
+    async fn __get_json(this: &KVNamespace, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_array_buffer_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<ArrayBuffer>, JsValue>;
+    async fn __get_array_buffer(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<ArrayBuffer>, JsValue>;
     // …
     #[wasm_bindgen(constructor, catch)]
-    fn new_js(format: &str) -> Result<CompressionStream, JsValue>;
+    fn __new(format: &str) -> Result<CompressionStream, JsValue>;
 }
 impl KVNamespace {
     pub async fn get_text(&self, key: &str) -> Result<Nullable<String>, JsValue> {
-        self.get_text_js(key, "text").await
+        self.__get_text(key, "text").await
     }
     pub async fn get_json(&self, key: &str) -> Result<JsValue, JsValue> { /* "json" */ }
     pub async fn get_array_buffer(&self, key: &str) -> Result<Nullable<ArrayBuffer>, JsValue> { /* … */ }
@@ -2802,8 +2802,8 @@ impl KVNamespace {
     pub async fn get_json_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsValue>, JsValue> { /* … */ }
 }
 impl CompressionStream {
-    pub fn new_gzip() -> Result<CompressionStream, JsValue> { Self::new_js("gzip") }
-    pub fn new_deflate() -> Result<CompressionStream, JsValue> { Self::new_js("deflate") }
+    pub fn new_gzip() -> Result<CompressionStream, JsValue> { Self::__new("gzip") }
+    pub fn new_deflate() -> Result<CompressionStream, JsValue> { Self::__new("deflate") }
     pub fn new_deflate_raw() -> Result<CompressionStream, JsValue> { /* "deflate-raw" */ }
 }
 ```
@@ -2832,15 +2832,17 @@ impl CompressionStream {
 * Arms with the same return type share one extern binding; a
   different return type gets its own, since the extern return is what
   wasm-bindgen converts. A binding serving every arm of the cohort is
-  named for the cohort with `_js` (`new_js` serves all three formats,
-  `get_time_zone_transition_js` both directions). When the arms need
-  several, each is named after its first arm instead (`get_text_js`,
-  `get_json_js`), since the cohort's name alone cannot tell them apart.
+  named for the cohort behind a `__` prefix (`__new` serves all three formats,
+  `__get_time_zone_transition` both directions). When the arms need
+  several, each is named after its first arm instead (`__get_text`,
+  `__get_json`), since the cohort's name alone cannot tell them apart.
 * The `_promise` and `try_` companions follow per arm
   (`get_json_promise`, `try_describe_raw`) over their own extern
-  (`get_json_promise_js`, `try_describe_js`), and so, under
+  (`__get_json_promise`, `__try_describe`), and so, under
   `--experimental-generic-mono`, does the `_js_string` return variant
-  (`describe_raw_js_string`).
+  (`describe_raw_js_string` over `__describe_js_string`). The prefix,
+  rather than a suffix, keeps a private binding from reading as one of
+  these public variants.
 * A generic receiver (`KVStore<Key>`) gives `impl<Key: JsGeneric>
   KVStore<Key>`; the method's own type parameters stay on the wrapper
   fn. A static's wrappers go where wasm-bindgen puts the static: one
@@ -2854,18 +2856,18 @@ impl CompressionStream {
 * A `null` arm beside the literal (`pick(kind: "a" | "b", x: T |
   null)`) makes a cohort of its own, named `_with_null` as a lone
   `null` arm is. Its wrappers drop the `null` parameter too and pass
-  `&JsValue::NULL`, over one `pick_with_null_js` extern taking
+  `&JsValue::NULL`, over one `__pick_with_null` extern taking
   `&JsValue` there; a type parameter only that position named is
   dropped from both:
 
   ```rust
   extern "C" {
-      fn pick_js(this: &Picker, kind: &str, x: &ArrayBuffer);
-      fn pick_with_null_js(this: &Picker, kind: &str, x: &JsValue);
+      fn __pick(this: &Picker, kind: &str, x: &ArrayBuffer);
+      fn __pick_with_null(this: &Picker, kind: &str, x: &JsValue);
   }
   impl Picker {
-      pub fn pick_a(&self, x: &ArrayBuffer) { self.pick_js("a", x) }
-      pub fn pick_a_with_null(&self) { self.pick_with_null_js("a", &JsValue::NULL) }
+      pub fn pick_a(&self, x: &ArrayBuffer) { self.__pick("a", x) }
+      pub fn pick_a_with_null(&self) { self.__pick_with_null("a", &JsValue::NULL) }
       // … `pick_b`, `pick_b_with_null`
   }
   ```

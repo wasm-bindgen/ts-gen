@@ -1,6 +1,6 @@
 //! @ts-gen --lib-name literal-overloads --export literal-overloads
 // Overloads distinguished only by a string-literal argument: the extern
-// binding takes `&str` under a private `<name>_js` and one inline `pub
+// binding takes `&str` under a private `__<name>` and one inline `pub
 // fn` per literal bakes its value in, named `<base>_<literal>` with the
 // cohort's usual `_with_` suffix after it. Arms with the same return
 // type share one extern; a different return type gets its own. A lone
