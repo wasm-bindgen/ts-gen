@@ -48,6 +48,10 @@ extern "C" {
         key: &str,
         value: &T,
     ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, variadic)]
+    pub fn append(this: &Store, items: &[JsValue]) -> Row;
+    #[wasm_bindgen(method, variadic, catch, js_name = "append")]
+    pub fn try_append(this: &Store, items: &[JsValue]) -> Result<Row, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn get<T: ::wasm_bindgen::JsGeneric>(
         this: &Store,
@@ -122,6 +126,16 @@ extern "C" {
         callback: &Function,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(variadic)]
+    pub fn of(items: &[JsValue]) -> Row;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "of")]
+    pub fn try_of(items: &[JsValue]) -> Result<Row, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {

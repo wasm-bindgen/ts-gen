@@ -3206,6 +3206,22 @@ pub(crate) fn peel_mono<'t>(
     (current, scope)
 }
 
+/// Whether a variadic rest lowers to a typed slice rather than
+/// `&[JsValue]`. Per-monomorphization spreads any sequence, so a rest
+/// array (`...items: T[]`) lowers like any other list argument (`&[T]`)
+/// and mentions its element; otherwise every rest is `&[JsValue]`.
+pub(crate) fn variadic_spreads_list(
+    rest: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> bool {
+    ctx.filter(|c| c.experimental_generic_mono)
+        .is_some_and(|c| {
+            let (rest, _) = peel_mono(rest, c, scope, &mut Default::default());
+            matches!(rest.as_ref(), TypeRef::Array(_))
+        })
+}
+
 /// Leaves that cross the ABI natively rather than as a JS handle: primitives
 /// and enums. A per-mono type parameter instantiated with one keeps it
 /// (`Holder<String>`, `Holder<Kind>`), where an erased `T: JsGeneric` would

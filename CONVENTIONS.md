@@ -2507,7 +2507,12 @@ undefined` or `T | null` — so the rule, per parameter:
    `Array`), so it never mentions `T`, while its other parameters and
    its return do. A `Promise<T>` callback return does not count, since
    wasm-bindgen cannot pass a `Function` returning `Promise<T>` for a
-   generic `T`.
+   generic `T`. A variadic rest likewise counts as it lowers: by default
+   it is `&[JsValue]` and mentions nothing, while under
+   `--experimental-generic-mono` a rest array lowers to a slice, so
+   `of<T>(...items: T[]): Row<T>` keeps `T` (`fn of<T>(items: &[T]) ->
+   Row<T>`) where the default erases it (`fn of(items: &[JsValue]) ->
+   Row<Object>`).
 2. Not mentioned, return exactly `T` / `T | undefined` / `T | null`
    (awaited): kept — `storage.get::<JsString>(key)`, `body.json::<Row>()`.
 3. Otherwise erased and removed from the signature. The substitute is

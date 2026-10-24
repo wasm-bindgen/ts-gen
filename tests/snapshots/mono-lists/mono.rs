@@ -75,6 +75,25 @@ extern "C" {
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "bagOf")]
+    pub fn bag_of<T>(items: &[T]) -> Result<Bag<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Bag<T = JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn size<T>(this: &Bag<T>) -> f64;
+    #[wasm_bindgen(method, catch)]
+    pub fn first<T>(this: &Bag<T>) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
     #[wasm_bindgen(catch)]
     pub fn rows(values: &[Array<impl ::wasm_bindgen::JsStringLike>]) -> Result<String, JsValue>;
 }

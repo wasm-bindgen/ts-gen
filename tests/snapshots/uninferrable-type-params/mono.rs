@@ -56,6 +56,10 @@ extern "C" {
     ) -> Promise<Undefined>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn append<T>(this: &Store, items: &[T]) -> Result<Row<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub async fn get<T>(
         this: &Store,
@@ -122,6 +126,13 @@ extern "C" {
     pub fn scan_js_string(this: &Store) -> Result<Cursor, JsValue>;
     #[wasm_bindgen(method, variadic, catch)]
     pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch)]
+    pub fn of<T>(items: &[T]) -> Result<Row<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

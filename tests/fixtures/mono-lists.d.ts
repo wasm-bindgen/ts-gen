@@ -12,6 +12,12 @@ export declare function tagsLike(values: ArrayLike<string>): string;
 export declare function flags(values: boolean[]): string;
 export declare function join(separator: string, ...parts: string[]): string;
 export declare function sum(...values: number[]): number;
+// A rest array infers its element, so `T` survives erasure.
+export declare function bagOf<T>(...items: T[]): Bag<T>;
+export declare class Bag<T> {
+  readonly size: number;
+  first(): T;
+}
 export declare function rows(values: string[][]): string;
 export declare function unique(values: ReadonlySet<string>): string;
 export declare function lookup(values: Map<string, number>, key: string): number;

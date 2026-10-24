@@ -14,6 +14,9 @@ interface Cursor<T = string> {
 interface Store {
   // 1. mentioned by an argument: inferred at the call.
   put<T>(key: string, value: T): Promise<void>;
+  // A rest array infers its element only per-monomorphization, where it
+  // lowers to `&[T]`; elsewhere it is `&[JsValue]` and `T` erases.
+  append<T>(...items: T[]): Row<T>;
   // 2. the whole return: kept, the caller names the cast.
   get<T = unknown>(key: string): Promise<T | undefined>;
   first<T = unknown>(): Promise<T | null>;
@@ -34,6 +37,7 @@ interface Store {
   // to `JsValue`: dropped.
   schedule<Args extends unknown[]>(callback: (...args: Args) => void, ...args: Args): number;
 }
+declare function of<T>(...items: T[]): Row<T>;
 declare function enterSpan<A extends unknown[], T>(name: string, fn: (...args: A) => T, ...args: A): T;
 // Every declaration of a free function is an overload with its own type
 // parameters, so its own default applies.

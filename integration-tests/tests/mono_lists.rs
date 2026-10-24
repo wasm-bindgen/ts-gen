@@ -25,6 +25,10 @@ fn variadics_spread_any_list() {
     assert_eq!(join("-", &["a", "b"]), "a-b");
     assert_eq!(join("-", &[JsString::from("c")]), "c");
     assert_eq!(sum(&[1.0, 2.5]), 3.5);
+    let bag: Bag<f64> = bag_of(&[1.5, 2.0]);
+    assert_eq!((bag.size(), bag.first()), (2.0, 1.5));
+    let bag: Bag<JsString> = bag_of(&[JsString::from("a")]);
+    assert_eq!(bag.first(), "a");
     assert_eq!(join_tags(&["x", "y"]), "x,y");
     let labels = Labels::new().unwrap();
     assert_eq!(labels.add(&["a"]), "Array(object:a)");

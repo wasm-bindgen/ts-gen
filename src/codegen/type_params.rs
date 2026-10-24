@@ -16,7 +16,7 @@ use std::collections::HashMap;
 use crate::ir::{Member, Param, TypeParam, TypeRef};
 use crate::parse::scope::{Binding, ScopeId};
 
-use super::typemap::CodegenContext;
+use super::typemap::{variadic_spreads_list, CodegenContext};
 
 /// Rewrite the methods of a class-like declaration in place.
 pub(crate) fn erase_uninferrable_in_members(
@@ -61,7 +61,8 @@ pub(crate) fn erase_uninferrable(
     }
     let mut inferred = Vec::new();
     for p in params.iter() {
-        if p.variadic {
+        // A `&[JsValue]` rest names nothing; a per-mono `&[T]` does.
+        if p.variadic && !variadic_spreads_list(&p.type_ref, Some(cgctx), scope) {
             continue;
         }
         surviving_type_params(&p.type_ref, cgctx, scope, &mut inferred);
