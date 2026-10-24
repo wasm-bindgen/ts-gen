@@ -787,6 +787,11 @@ fn generate_type_alias(
 /// them. Its payloads and variant names are a read enum's, and where a read
 /// can tell the arms apart it is the alias's read type too, the shape arm
 /// last as its `fallback`.
+///
+/// Under per-monomorphization the alias's name is a trait instead, which
+/// each arm's argument types implement, so an argument taking `impl Alias`
+/// crosses the ABI as the arm's own type; the enum is `<Alias>Kind` and
+/// implements the trait too, so a read can be passed straight back.
 fn generate_union_alias_enum(
     name: &syn::Ident,
     union: &typemap::UnionAlias,
@@ -794,6 +799,10 @@ fn generate_union_alias_enum(
     from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
     use crate::ir::TypeRef;
+    let enum_name = union
+        .kind
+        .as_deref()
+        .map_or_else(|| name.clone(), typemap::make_ident);
     // A handle converts by value and by reference (a clone of the handle).
     let handle = |ty: &TokenStream| {
         vec![
@@ -801,9 +810,10 @@ fn generate_union_alias_enum(
             (quote! { &#ty }, quote! { value.clone() }),
         ]
     };
-    let mut arms: Vec<TypeRef> = Vec::new();
+    let mut arms: Vec<&TypeRef> = Vec::new();
     let mut payloads: Vec<TokenStream> = Vec::new();
     let mut sources: Vec<Vec<(TokenStream, TokenStream)>> = Vec::new();
+    let mut arguments: Vec<TokenStream> = Vec::new();
     for arm in &union.arms {
         let payload = typemap::to_syn_type(
             arm,
@@ -820,26 +830,50 @@ fn generate_union_alias_enum(
             continue;
         }
         // Each source type with the expression turning `value` into the
-        // payload.
-        let from = match arm {
+        // payload, and the argument types the trait takes for the arm.
+        let (from, args) = match arm {
             TypeRef::String => {
                 let string = quote! { ::std::string::String };
                 let js = quote! { ::js_sys::JsString };
-                vec![
-                    (quote! { &str }, quote! { #string::from(value) }),
-                    (string.clone(), quote! { value }),
-                    (quote! { &#string }, quote! { value.clone() }),
-                    (js.clone(), quote! { #string::from(value) }),
-                    (quote! { &#js }, quote! { #string::from(value) }),
-                ]
+                (
+                    vec![
+                        (quote! { &str }, quote! { #string::from(value) }),
+                        (string.clone(), quote! { value }),
+                        (quote! { &#string }, quote! { value.clone() }),
+                        (js.clone(), quote! { #string::from(value) }),
+                        (quote! { &#js }, quote! { #string::from(value) }),
+                    ],
+                    // As `JsStringLike` takes.
+                    vec![
+                        quote! { &str },
+                        string.clone(),
+                        quote! { &#string },
+                        quote! { &::std::boxed::Box<str> },
+                        quote! { &::std::borrow::Cow<'_, str> },
+                        js.clone(),
+                        quote! { &#js },
+                    ],
+                )
             }
-            TypeRef::Number | TypeRef::Boolean => vec![(payload.clone(), quote! { value })],
-            _ => handle(&payload),
+            TypeRef::Number | TypeRef::Boolean => (
+                vec![(payload.clone(), quote! { value })],
+                vec![payload.clone()],
+            ),
+            _ => (
+                handle(&payload),
+                vec![payload.clone(), quote! { &#payload }],
+            ),
         };
-        arms.push(arm.clone());
+        arms.push(arm);
         payloads.push(payload);
         sources.push(from);
+        for arg in args {
+            if !arguments.iter().any(|a| a.to_string() == arg.to_string()) {
+                arguments.push(arg);
+            }
+        }
     }
+    let arms: Vec<TypeRef> = arms.into_iter().cloned().collect();
     let mut variants = Vec::new();
     let mut conversions = Vec::new();
     for ((variant_name, payload), from) in dynamic_union_variant_names(&arms)
@@ -851,7 +885,7 @@ fn generate_union_alias_enum(
         variants.push(quote! { #variant(#payload) });
         for (source, expr) in from {
             conversions.push(quote! {
-                impl ::core::convert::From<#source> for #name {
+                impl ::core::convert::From<#source> for #enum_name {
                     fn from(value: #source) -> Self {
                         Self::#variant(#expr)
                     }
@@ -860,13 +894,22 @@ fn generate_union_alias_enum(
         }
     }
     let fallback = union.fallback.then(|| quote! { , fallback });
-    quote! {
+    let item = quote! {
         #[wasm_bindgen(private #fallback)]
         #[derive(Clone, Debug)]
-        pub enum #name {
+        pub enum #enum_name {
             #(#variants),*
         }
         #(#conversions)*
+    };
+    if union.kind.is_none() {
+        return item;
+    }
+    quote! {
+        pub trait #name: ::wasm_bindgen::convert::IntoWasmAbi {}
+        #(impl #name for #arguments {})*
+        impl #name for #enum_name {}
+        #item
     }
 }
 

@@ -1763,7 +1763,8 @@ For every JS callable, `ts-gen`:
    not `Array<A> | Array<B>` or `Record<K, A> | Record<K, B>`.
    A trailing parameter admitting `undefined` truncates like an
    optional one. A parameter typed by a named union alias does not
-   expand: it takes the alias's enum (see
+   expand: it takes the alias's enum, or its trait under
+   `--experimental-generic-mono` (see
    [named union aliases](#named-union-aliases)). The
    expansion is the same under
    `--experimental-generic-mono` (see
@@ -2013,8 +2014,51 @@ companions), each named for its two arm types, and
   read enum can't stand in for them: its two dictionaries share one
   untyped `Object` arm, which would take any object.
 
-The enum, its conversions and the bindings over it are the same under
-`--experimental-generic-mono`.
+Under `--experimental-generic-mono` the alias's name is a trait instead,
+which each arm's own argument types implement, so an argument takes
+`impl Alias` and wasm-bindgen monomorphises each call to the arm's own
+ABI, with no conversion and no wrapper. The enum is `<Alias>Kind`,
+emitted for every such alias, readable or not, with the same variants
+and `From` conversions, and it implements the trait too, so a read, or
+an enum built explicitly, is accepted wherever the alias is:
+
+```rust
+pub trait PlainDateLike: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl PlainDateLike for PlainDate {}
+impl PlainDateLike for &PlainDate {}
+// … each class and dictionary arm likewise
+impl PlainDateLike for &str {}
+impl PlainDateLike for String {}
+impl PlainDateLike for &String {}
+impl PlainDateLike for &Box<str> {}
+impl PlainDateLike for &Cow<'_, str> {}
+impl PlainDateLike for JsString {}
+impl PlainDateLike for &JsString {}
+impl PlainDateLike for PlainDateLikeKind {}
+
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum PlainDateLikeKind { /* as above */ }
+
+extern "C" {
+    #[wasm_bindgen(static_method_of = PlainDate)]
+    pub fn compare(one: impl PlainDateLike, two: impl PlainDateLike) -> f64;
+    #[wasm_bindgen(method, getter, js_name = "timeZone")]
+    pub fn time_zone(this: &InstantToStringOptions) -> Option<TimeZoneLikeKind>;
+    #[wasm_bindgen(method, setter, js_name = "timeZone")]
+    pub fn set_time_zone(this: &InstantToStringOptions, val: impl TimeZoneLike);
+}
+```
+
+* A string arm takes what `JsStringLike` does; `number` and `boolean`
+  take `f64` and `bool`; every other arm takes the handle and a
+  reference to it. Nested aliases flatten into one implementation per
+  arm.
+* A parameter that admits `undefined` but cannot be omitted takes
+  `Option<AliasKind>`: the trait asks only `IntoWasmAbi` of its
+  implementations, since `f64` has no `OptionIntoWasmAbi`.
+* `<Alias>Kind` claims its name before any read enum is named, so a
+  getter-named enum that would collide is the one prefixed.
 
 ### `_with_<type>` suffix vocabulary
 
@@ -2885,7 +2929,7 @@ pub fn send_with_f64(to: f64);
 ```
 
 A named alias of the union (`type Id = string | number`) is one
-binding instead, taking the alias's enum (`lookup(id: impl Into<Id>)`,
+binding instead, taking the alias's own trait (`lookup(id: impl Id)`,
 see [named union aliases](#named-union-aliases)). The `js_sys`
 primitive-union marker traits (`JsNumberOrStringLike` and the rest) are
 not emitted. Return positions are unchanged: an erased
@@ -3140,7 +3184,9 @@ a `__`-prefixed name (`__<name>`). Three constructs qualify today:
   `impl Into<T>`, so `f(x: PlainDateLike)` binds `__f(x: PlainDateLike)`
   and the wrapper converts its `impl Into<PlainDateLike>` argument (see
   [named union aliases](#named-union-aliases)). A literal or `null`
-  arm's wrapper converts the same way.
+  arm's wrapper converts the same way. Under
+  `--experimental-generic-mono` the extern takes the alias's trait,
+  `impl PlainDateLike`, itself, and needs no wrapper.
 * **Overloads keyed by a string literal**, below.
 
 **Overloads distinguished only by a string literal.** Rust has no

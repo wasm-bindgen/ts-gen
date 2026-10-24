@@ -2,8 +2,10 @@
 
 #![cfg(target_arch = "wasm32")]
 
-// `union_alias_reads.rs` against the per-monomorphization bindings, which
-// read and take union aliases the same way.
+// `union_alias_reads.rs` against the per-monomorphization bindings. A
+// union alias names a trait each arm's argument type implements, so an
+// argument taking `impl DayLike` crosses as the arm itself, and its enum is
+// `DayLikeKind`, which reads return and which implements the trait too.
 use js_sys::JsString;
 use wasm_bindgen_test::*;
 
@@ -35,41 +37,44 @@ fn nested_aliases_read_as_one_union() {
 }
 
 #[wasm_bindgen_test]
-fn alias_reads_its_own_enum() {
+fn alias_reads_its_kind_enum() {
     match options("zonedFields").zoned() {
-        Some(ZonedLike::ZonedFields(fields)) => assert_eq!(fields.zone(), "Europe/London"),
+        Some(ZonedLikeKind::ZonedFields(fields)) => assert_eq!(fields.zone(), "Europe/London"),
         _ => panic!("expected the dictionary arm"),
     }
-    assert!(matches!(options("zoned").zone(), Zone::Zoned(_)));
-    assert!(matches!(options("string").zone(), Zone::String(s) if s == "2020-01-01"));
+    assert!(matches!(options("zoned").zone(), ZoneKind::Zoned(_)));
+    assert!(matches!(options("string").zone(), ZoneKind::String(s) if s == "2020-01-01"));
 }
 
 #[wasm_bindgen_test]
 fn read_passes_straight_back() {
     let target = options("string");
     target.set_zone(options("zoned").zone());
-    assert!(matches!(target.zone(), Zone::Zoned(z) if z.zone() == "UTC"));
+    assert!(matches!(target.zone(), ZoneKind::Zoned(z) if z.zone() == "UTC"));
     target.set_zoned(options("zonedFields").zoned().unwrap());
-    assert!(matches!(target.zoned(), Some(ZonedLike::ZonedFields(_))));
+    assert!(matches!(
+        target.zoned(),
+        Some(ZonedLikeKind::ZonedFields(_))
+    ));
 
     let span = Span::new(&Day::new(10.0).unwrap());
     assert_eq!(describe(span.start()), "day:10");
     span.set_relative_to("1");
-    assert!(matches!(span.relative_to(), Some(DayLike::String(s)) if s == "1"));
+    assert!(matches!(span.relative_to(), Some(DayLikeKind::String(s)) if s == "1"));
 }
 
 #[wasm_bindgen_test]
-fn dictionaries_alone_write_as_their_enum() {
+fn dictionaries_alone_write_through_the_trait_or_the_enum() {
     assert_eq!(describe_fields(&ZonedFields::new("UTC")), "zone:UTC");
     assert_eq!(describe_fields(DayFields::new(4.0)), "day:4");
     assert_eq!(
-        describe_fields(Fields::DayFields(DayFields::new(5.0))),
+        describe_fields(FieldsKind::DayFields(DayFields::new(5.0))),
         "day:5"
     );
 }
 
-// Each arm converts: a class instance (owned or borrowed), a string
-// (`&str`, `String`, `&String`, `JsString`) and a dictionary.
+// Each arm's own argument type: a class instance (owned or borrowed), a
+// string (`&str`, `String`, `&String`, `JsString`) and a dictionary.
 #[wasm_bindgen_test]
 fn compare_takes_every_arm() {
     let day = Day::new(10.0).unwrap();
@@ -82,7 +87,7 @@ fn compare_takes_every_arm() {
     assert_eq!(Day::compare(&String::from("5"), &fields), 0.0);
     assert_eq!(Day::compare(JsString::from("9"), &day), -1.0);
     assert_eq!(Day::try_compare(&fields, &day).unwrap(), -1.0);
-    assert_eq!(Day::compare(DayLike::from("10"), &day), 0.0);
+    assert_eq!(Day::compare(DayLikeKind::from("10"), &day), 0.0);
 }
 
 #[wasm_bindgen_test]
@@ -110,12 +115,12 @@ fn from_and_equals_take_every_arm() {
 }
 
 #[wasm_bindgen_test]
-fn primitive_arms_convert_from_their_rust_values() {
+fn primitive_arms_take_their_rust_values() {
     let day = Day::new(10.0).unwrap();
     assert_eq!(day.shift(2.0).day(), 12.0);
     assert_eq!(day.shift("3").day(), 13.0);
     assert_eq!(day.shift(true).day(), 11.0);
-    assert_eq!(day.shift(Offset::F64(4.0)).day(), 14.0);
+    assert_eq!(day.shift(OffsetKind::F64(4.0)).day(), 14.0);
 }
 
 #[wasm_bindgen_test]
@@ -129,20 +134,20 @@ fn compose_with_literals_nulls_options_and_async() {
     // `undefined` that can't be omitted takes the enum in its `Option`.
     assert_eq!(day.between(None, "1"), "undefined..string");
     assert_eq!(
-        day.between(Some(DayLike::from(&day)), DayFields::new(1.0)),
+        day.between(Some(DayLikeKind::from(&day)), DayFields::new(1.0)),
         "day..fields"
     );
 }
 
 #[wasm_bindgen_test]
-async fn async_wrapper_converts_before_awaiting() {
+async fn async_binding_takes_the_trait() {
     let day = Day::new(10.0).unwrap();
     assert_eq!(day.later("1").await.unwrap(), "later:string");
     assert_eq!(day.later(&day).await.unwrap(), "later:day");
 }
 
 #[wasm_bindgen_test]
-fn free_functions_and_dictionary_fields_take_the_alias() {
+fn free_functions_and_dictionary_fields_take_the_trait() {
     let day = Day::new(10.0).unwrap();
     assert_eq!(describe(&day), "day:10");
     assert_eq!(describe("2"), "string:2");

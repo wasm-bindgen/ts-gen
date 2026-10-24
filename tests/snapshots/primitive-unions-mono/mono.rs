@@ -102,49 +102,56 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "setMaybe")]
     pub fn set_maybe_with_f64(value: f64) -> Result<(), JsValue>;
 }
+pub trait Id: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Id for &str {}
+impl Id for ::std::string::String {}
+impl Id for &::std::string::String {}
+impl Id for &::std::boxed::Box<str> {}
+impl Id for &::std::borrow::Cow<'_, str> {}
+impl Id for ::js_sys::JsString {}
+impl Id for &::js_sys::JsString {}
+impl Id for f64 {}
+impl Id for IdKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Id {
+pub enum IdKind {
     String(String),
     F64(f64),
 }
-impl ::core::convert::From<&str> for Id {
+impl ::core::convert::From<&str> for IdKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for Id {
+impl ::core::convert::From<::std::string::String> for IdKind {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for Id {
+impl ::core::convert::From<&::std::string::String> for IdKind {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for Id {
+impl ::core::convert::From<::js_sys::JsString> for IdKind {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for Id {
+impl ::core::convert::From<&::js_sys::JsString> for IdKind {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<f64> for Id {
+impl ::core::convert::From<f64> for IdKind {
     fn from(value: f64) -> Self {
         Self::F64(value)
     }
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "lookup")]
-    fn __lookup(id: Id) -> Result<(), JsValue>;
-}
-pub fn lookup(id: impl ::core::convert::Into<Id>) -> Result<(), JsValue> {
-    __lookup(id.into())
+    #[wasm_bindgen(catch)]
+    pub fn lookup(id: impl Id) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {

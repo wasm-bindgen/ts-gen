@@ -66,9 +66,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Request;
     #[wasm_bindgen(constructor, catch)]
-    fn __new(input: RequestInfo) -> Result<Request, JsValue>;
+    pub fn new(input: impl RequestInfo) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    fn __new_with_init(input: RequestInfo, init: &RequestInit) -> Result<Request, JsValue>;
+    pub fn new_with_init(input: impl RequestInfo, init: &RequestInit) -> Result<Request, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn method(this: &Request) -> String;
     #[wasm_bindgen(method, getter, js_name = "method")]
@@ -116,54 +116,54 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "formData")]
     pub fn form_data_promise(this: &Request) -> Promise<FormData>;
 }
-impl Request {
-    pub fn new(input: impl ::core::convert::Into<RequestInfo>) -> Result<Request, JsValue> {
-        Self::__new(input.into())
-    }
-    pub fn new_with_init(
-        input: impl ::core::convert::Into<RequestInfo>,
-        init: &RequestInit,
-    ) -> Result<Request, JsValue> {
-        Self::__new_with_init(input.into(), init)
-    }
-}
+pub trait RequestInfo: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl RequestInfo for Request {}
+impl RequestInfo for &Request {}
+impl RequestInfo for &str {}
+impl RequestInfo for ::std::string::String {}
+impl RequestInfo for &::std::string::String {}
+impl RequestInfo for &::std::boxed::Box<str> {}
+impl RequestInfo for &::std::borrow::Cow<'_, str> {}
+impl RequestInfo for ::js_sys::JsString {}
+impl RequestInfo for &::js_sys::JsString {}
+impl RequestInfo for RequestInfoKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum RequestInfo {
+pub enum RequestInfoKind {
     Request(Request),
     String(String),
 }
-impl ::core::convert::From<Request> for RequestInfo {
+impl ::core::convert::From<Request> for RequestInfoKind {
     fn from(value: Request) -> Self {
         Self::Request(value)
     }
 }
-impl ::core::convert::From<&Request> for RequestInfo {
+impl ::core::convert::From<&Request> for RequestInfoKind {
     fn from(value: &Request) -> Self {
         Self::Request(value.clone())
     }
 }
-impl ::core::convert::From<&str> for RequestInfo {
+impl ::core::convert::From<&str> for RequestInfoKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for RequestInfo {
+impl ::core::convert::From<::std::string::String> for RequestInfoKind {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for RequestInfo {
+impl ::core::convert::From<&::std::string::String> for RequestInfoKind {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for RequestInfo {
+impl ::core::convert::From<::js_sys::JsString> for RequestInfoKind {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for RequestInfo {
+impl ::core::convert::From<&::js_sys::JsString> for RequestInfoKind {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
@@ -188,9 +188,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_slice(this: &RequestInit, val: &[ArrayTuple<(JsString, JsString)>]);
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &RequestInit) -> Option<Nullable<BodyInit>>;
-    #[wasm_bindgen(method, setter, js_name = "body")]
-    fn __set_body(this: &RequestInit, val: BodyInit);
+    pub fn body(this: &RequestInit) -> Option<Nullable<BodyInitKind>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_body(this: &RequestInit, val: impl BodyInit);
     #[wasm_bindgen(method, setter, js_name = "body")]
     fn __set_body_with_null(this: &RequestInit, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
@@ -205,9 +205,6 @@ extern "C" {
     pub fn set_signal(this: &RequestInit, val: &AbortSignal);
 }
 impl RequestInit {
-    pub fn set_body(&self, val: impl ::core::convert::Into<BodyInit>) {
-        self.__set_body(val.into())
-    }
     pub fn set_body_with_null(&self) {
         self.__set_body_with_null(&::wasm_bindgen::JsValue::NULL)
     }
@@ -247,7 +244,7 @@ impl RequestInitBuilder {
         self.inner.set_headers_with_slice(val);
         self
     }
-    pub fn body(self, val: impl ::core::convert::Into<BodyInit>) -> Self {
+    pub fn body(self, val: impl BodyInit) -> Self {
         self.inner.set_body(val);
         self
     }
@@ -267,9 +264,28 @@ impl RequestInitBuilder {
         self.inner
     }
 }
+pub trait BodyInit: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl BodyInit for ReadableStream {}
+impl BodyInit for &ReadableStream {}
+impl BodyInit for &str {}
+impl BodyInit for ::std::string::String {}
+impl BodyInit for &::std::string::String {}
+impl BodyInit for &::std::boxed::Box<str> {}
+impl BodyInit for &::std::borrow::Cow<'_, str> {}
+impl BodyInit for ::js_sys::JsString {}
+impl BodyInit for &::js_sys::JsString {}
+impl BodyInit for ArrayBuffer {}
+impl BodyInit for &ArrayBuffer {}
+impl BodyInit for Blob {}
+impl BodyInit for &Blob {}
+impl BodyInit for URLSearchParams {}
+impl BodyInit for &URLSearchParams {}
+impl BodyInit for FormData {}
+impl BodyInit for &FormData {}
+impl BodyInit for BodyInitKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum BodyInit {
+pub enum BodyInitKind {
     ReadableStream(ReadableStream),
     String(String),
     ArrayBuffer(ArrayBuffer),
@@ -277,77 +293,77 @@ pub enum BodyInit {
     UrlSearchParams(URLSearchParams),
     FormData(FormData),
 }
-impl ::core::convert::From<ReadableStream> for BodyInit {
+impl ::core::convert::From<ReadableStream> for BodyInitKind {
     fn from(value: ReadableStream) -> Self {
         Self::ReadableStream(value)
     }
 }
-impl ::core::convert::From<&ReadableStream> for BodyInit {
+impl ::core::convert::From<&ReadableStream> for BodyInitKind {
     fn from(value: &ReadableStream) -> Self {
         Self::ReadableStream(value.clone())
     }
 }
-impl ::core::convert::From<&str> for BodyInit {
+impl ::core::convert::From<&str> for BodyInitKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for BodyInit {
+impl ::core::convert::From<::std::string::String> for BodyInitKind {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for BodyInit {
+impl ::core::convert::From<&::std::string::String> for BodyInitKind {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for BodyInit {
+impl ::core::convert::From<::js_sys::JsString> for BodyInitKind {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for BodyInit {
+impl ::core::convert::From<&::js_sys::JsString> for BodyInitKind {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<ArrayBuffer> for BodyInit {
+impl ::core::convert::From<ArrayBuffer> for BodyInitKind {
     fn from(value: ArrayBuffer) -> Self {
         Self::ArrayBuffer(value)
     }
 }
-impl ::core::convert::From<&ArrayBuffer> for BodyInit {
+impl ::core::convert::From<&ArrayBuffer> for BodyInitKind {
     fn from(value: &ArrayBuffer) -> Self {
         Self::ArrayBuffer(value.clone())
     }
 }
-impl ::core::convert::From<Blob> for BodyInit {
+impl ::core::convert::From<Blob> for BodyInitKind {
     fn from(value: Blob) -> Self {
         Self::Blob(value)
     }
 }
-impl ::core::convert::From<&Blob> for BodyInit {
+impl ::core::convert::From<&Blob> for BodyInitKind {
     fn from(value: &Blob) -> Self {
         Self::Blob(value.clone())
     }
 }
-impl ::core::convert::From<URLSearchParams> for BodyInit {
+impl ::core::convert::From<URLSearchParams> for BodyInitKind {
     fn from(value: URLSearchParams) -> Self {
         Self::UrlSearchParams(value)
     }
 }
-impl ::core::convert::From<&URLSearchParams> for BodyInit {
+impl ::core::convert::From<&URLSearchParams> for BodyInitKind {
     fn from(value: &URLSearchParams) -> Self {
         Self::UrlSearchParams(value.clone())
     }
 }
-impl ::core::convert::From<FormData> for BodyInit {
+impl ::core::convert::From<FormData> for BodyInitKind {
     fn from(value: FormData) -> Self {
         Self::FormData(value)
     }
 }
-impl ::core::convert::From<&FormData> for BodyInit {
+impl ::core::convert::From<&FormData> for BodyInitKind {
     fn from(value: &FormData) -> Self {
         Self::FormData(value.clone())
     }
@@ -360,11 +376,14 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    fn __new_with_body(body: BodyInit) -> Result<Response, JsValue>;
+    pub fn new_with_body(body: impl BodyInit) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    fn __new_with_body_and_init(body: BodyInit, init: &ResponseInit) -> Result<Response, JsValue>;
+    pub fn new_with_body_and_init(
+        body: impl BodyInit,
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     fn __new_with_null_and_init(
         body: &::wasm_bindgen::JsValue,
@@ -427,17 +446,8 @@ extern "C" {
     pub fn form_data_promise(this: &Response) -> Promise<FormData>;
 }
 impl Response {
-    pub fn new_with_body(body: impl ::core::convert::Into<BodyInit>) -> Result<Response, JsValue> {
-        Self::__new_with_body(body.into())
-    }
     pub fn new_with_null() -> Result<Response, JsValue> {
         Self::__new_with_null(&::wasm_bindgen::JsValue::NULL)
-    }
-    pub fn new_with_body_and_init(
-        body: impl ::core::convert::Into<BodyInit>,
-        init: &ResponseInit,
-    ) -> Result<Response, JsValue> {
-        Self::__new_with_body_and_init(body.into(), init)
     }
     pub fn new_with_null_and_init(init: &ResponseInit) -> Result<Response, JsValue> {
         Self::__new_with_null_and_init(&::wasm_bindgen::JsValue::NULL, init)
@@ -584,42 +594,29 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetch")]
-    async fn __fetch(input: RequestInfo) -> Result<Response, JsValue>;
-}
-pub async fn fetch(input: impl ::core::convert::Into<RequestInfo>) -> Result<Response, JsValue> {
-    __fetch(input.into()).await
+    #[wasm_bindgen(catch)]
+    pub async fn fetch(input: impl RequestInfo) -> Result<Response, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "fetch")]
-    fn __fetch_promise(input: RequestInfo) -> Promise<Response>;
-}
-pub fn fetch_promise(input: impl ::core::convert::Into<RequestInfo>) -> Promise<Response> {
-    __fetch_promise(input.into())
+    pub fn fetch_promise(input: impl RequestInfo) -> Promise<Response>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
-    async fn __fetch_with_init(input: RequestInfo, init: &RequestInit)
-        -> Result<Response, JsValue>;
-}
-pub async fn fetch_with_init(
-    input: impl ::core::convert::Into<RequestInfo>,
-    init: &RequestInit,
-) -> Result<Response, JsValue> {
-    __fetch_with_init(input.into(), init).await
+    pub async fn fetch_with_init(
+        input: impl RequestInfo,
+        init: &RequestInit,
+    ) -> Result<Response, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "fetch")]
-    fn __fetch_with_init_promise(input: RequestInfo, init: &RequestInit) -> Promise<Response>;
-}
-pub fn fetch_with_init_promise(
-    input: impl ::core::convert::Into<RequestInfo>,
-    init: &RequestInit,
-) -> Promise<Response> {
-    __fetch_with_init_promise(input.into(), init)
+    pub fn fetch_with_init_promise(
+        input: impl RequestInfo,
+        init: &RequestInit,
+    ) -> Promise<Response>;
 }
 #[wasm_bindgen(private, fallback)]
 pub enum HeadersKind {

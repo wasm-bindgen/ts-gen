@@ -15587,49 +15587,61 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SqlStorageStatement;
 }
+pub trait SqlStorageValue: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl SqlStorageValue for ArrayBuffer {}
+impl SqlStorageValue for &ArrayBuffer {}
+impl SqlStorageValue for &str {}
+impl SqlStorageValue for ::std::string::String {}
+impl SqlStorageValue for &::std::string::String {}
+impl SqlStorageValue for &::std::boxed::Box<str> {}
+impl SqlStorageValue for &::std::borrow::Cow<'_, str> {}
+impl SqlStorageValue for ::js_sys::JsString {}
+impl SqlStorageValue for &::js_sys::JsString {}
+impl SqlStorageValue for f64 {}
+impl SqlStorageValue for SqlStorageValueKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum SqlStorageValue {
+pub enum SqlStorageValueKind {
     ArrayBuffer(ArrayBuffer),
     String(String),
     F64(f64),
 }
-impl ::core::convert::From<ArrayBuffer> for SqlStorageValue {
+impl ::core::convert::From<ArrayBuffer> for SqlStorageValueKind {
     fn from(value: ArrayBuffer) -> Self {
         Self::ArrayBuffer(value)
     }
 }
-impl ::core::convert::From<&ArrayBuffer> for SqlStorageValue {
+impl ::core::convert::From<&ArrayBuffer> for SqlStorageValueKind {
     fn from(value: &ArrayBuffer) -> Self {
         Self::ArrayBuffer(value.clone())
     }
 }
-impl ::core::convert::From<&str> for SqlStorageValue {
+impl ::core::convert::From<&str> for SqlStorageValueKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for SqlStorageValue {
+impl ::core::convert::From<::std::string::String> for SqlStorageValueKind {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for SqlStorageValue {
+impl ::core::convert::From<&::std::string::String> for SqlStorageValueKind {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for SqlStorageValue {
+impl ::core::convert::From<::js_sys::JsString> for SqlStorageValueKind {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for SqlStorageValue {
+impl ::core::convert::From<&::js_sys::JsString> for SqlStorageValueKind {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<f64> for SqlStorageValue {
+impl ::core::convert::From<f64> for SqlStorageValueKind {
     fn from(value: f64) -> Self {
         Self::F64(value)
     }
@@ -18559,28 +18571,34 @@ impl AiTextToSpeechInputBuilder {
         self.inner
     }
 }
+pub trait AiTextToSpeechOutput: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl AiTextToSpeechOutput for Uint8Array {}
+impl AiTextToSpeechOutput for &Uint8Array {}
+impl AiTextToSpeechOutput for Object {}
+impl AiTextToSpeechOutput for &Object {}
+impl AiTextToSpeechOutput for AiTextToSpeechOutputKind {}
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum AiTextToSpeechOutput {
+pub enum AiTextToSpeechOutputKind {
     Uint8Array(Uint8Array),
     Object(Object),
 }
-impl ::core::convert::From<Uint8Array> for AiTextToSpeechOutput {
+impl ::core::convert::From<Uint8Array> for AiTextToSpeechOutputKind {
     fn from(value: Uint8Array) -> Self {
         Self::Uint8Array(value)
     }
 }
-impl ::core::convert::From<&Uint8Array> for AiTextToSpeechOutput {
+impl ::core::convert::From<&Uint8Array> for AiTextToSpeechOutputKind {
     fn from(value: &Uint8Array) -> Self {
         Self::Uint8Array(value.clone())
     }
 }
-impl ::core::convert::From<Object> for AiTextToSpeechOutput {
+impl ::core::convert::From<Object> for AiTextToSpeechOutputKind {
     fn from(value: Object) -> Self {
         Self::Object(value)
     }
 }
-impl ::core::convert::From<&Object> for AiTextToSpeechOutput {
+impl ::core::convert::From<&Object> for AiTextToSpeechOutputKind {
     fn from(value: &Object) -> Self {
         Self::Object(value.clone())
     }
@@ -18595,17 +18613,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_inputs(this: &BaseAiTextToSpeech, val: &AiTextToSpeechInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &BaseAiTextToSpeech) -> AiTextToSpeechOutput;
+    pub fn post_processed_outputs(this: &BaseAiTextToSpeech) -> AiTextToSpeechOutputKind;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    fn __set_post_processed_outputs(this: &BaseAiTextToSpeech, val: AiTextToSpeechOutput);
-}
-impl BaseAiTextToSpeech {
-    pub fn set_post_processed_outputs(
-        &self,
-        val: impl ::core::convert::Into<AiTextToSpeechOutput>,
-    ) {
-        self.__set_post_processed_outputs(val.into())
-    }
+    pub fn set_post_processed_outputs(this: &BaseAiTextToSpeech, val: impl AiTextToSpeechOutput);
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -19997,61 +20007,73 @@ impl ReasoningBuilder {
         self.inner
     }
 }
+pub trait ResponseContent: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl ResponseContent for ResponseInputText {}
+impl ResponseContent for &ResponseInputText {}
+impl ResponseContent for ResponseInputImage {}
+impl ResponseContent for &ResponseInputImage {}
+impl ResponseContent for ResponseOutputText {}
+impl ResponseContent for &ResponseOutputText {}
+impl ResponseContent for ResponseOutputRefusal {}
+impl ResponseContent for &ResponseOutputRefusal {}
+impl ResponseContent for ResponseContentReasoningText {}
+impl ResponseContent for &ResponseContentReasoningText {}
+impl ResponseContent for ResponseContentKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ResponseContent {
+pub enum ResponseContentKind {
     ResponseInputText(ResponseInputText),
     ResponseInputImage(ResponseInputImage),
     ResponseOutputText(ResponseOutputText),
     ResponseOutputRefusal(ResponseOutputRefusal),
     ResponseContentReasoningText(ResponseContentReasoningText),
 }
-impl ::core::convert::From<ResponseInputText> for ResponseContent {
+impl ::core::convert::From<ResponseInputText> for ResponseContentKind {
     fn from(value: ResponseInputText) -> Self {
         Self::ResponseInputText(value)
     }
 }
-impl ::core::convert::From<&ResponseInputText> for ResponseContent {
+impl ::core::convert::From<&ResponseInputText> for ResponseContentKind {
     fn from(value: &ResponseInputText) -> Self {
         Self::ResponseInputText(value.clone())
     }
 }
-impl ::core::convert::From<ResponseInputImage> for ResponseContent {
+impl ::core::convert::From<ResponseInputImage> for ResponseContentKind {
     fn from(value: ResponseInputImage) -> Self {
         Self::ResponseInputImage(value)
     }
 }
-impl ::core::convert::From<&ResponseInputImage> for ResponseContent {
+impl ::core::convert::From<&ResponseInputImage> for ResponseContentKind {
     fn from(value: &ResponseInputImage) -> Self {
         Self::ResponseInputImage(value.clone())
     }
 }
-impl ::core::convert::From<ResponseOutputText> for ResponseContent {
+impl ::core::convert::From<ResponseOutputText> for ResponseContentKind {
     fn from(value: ResponseOutputText) -> Self {
         Self::ResponseOutputText(value)
     }
 }
-impl ::core::convert::From<&ResponseOutputText> for ResponseContent {
+impl ::core::convert::From<&ResponseOutputText> for ResponseContentKind {
     fn from(value: &ResponseOutputText) -> Self {
         Self::ResponseOutputText(value.clone())
     }
 }
-impl ::core::convert::From<ResponseOutputRefusal> for ResponseContent {
+impl ::core::convert::From<ResponseOutputRefusal> for ResponseContentKind {
     fn from(value: ResponseOutputRefusal) -> Self {
         Self::ResponseOutputRefusal(value)
     }
 }
-impl ::core::convert::From<&ResponseOutputRefusal> for ResponseContent {
+impl ::core::convert::From<&ResponseOutputRefusal> for ResponseContentKind {
     fn from(value: &ResponseOutputRefusal) -> Self {
         Self::ResponseOutputRefusal(value.clone())
     }
 }
-impl ::core::convert::From<ResponseContentReasoningText> for ResponseContent {
+impl ::core::convert::From<ResponseContentReasoningText> for ResponseContentKind {
     fn from(value: ResponseContentReasoningText) -> Self {
         Self::ResponseContentReasoningText(value)
     }
 }
-impl ::core::convert::From<&ResponseContentReasoningText> for ResponseContent {
+impl ::core::convert::From<&ResponseContentReasoningText> for ResponseContentKind {
     fn from(value: &ResponseContentReasoningText) -> Self {
         Self::ResponseContentReasoningText(value.clone())
     }
@@ -20413,39 +20435,47 @@ impl ResponseFormatJSONObject {
         inner
     }
 }
+pub trait ResponseFormatTextConfig: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl ResponseFormatTextConfig for ResponseFormatText {}
+impl ResponseFormatTextConfig for &ResponseFormatText {}
+impl ResponseFormatTextConfig for ResponseFormatTextJSONSchemaConfig {}
+impl ResponseFormatTextConfig for &ResponseFormatTextJSONSchemaConfig {}
+impl ResponseFormatTextConfig for ResponseFormatJSONObject {}
+impl ResponseFormatTextConfig for &ResponseFormatJSONObject {}
+impl ResponseFormatTextConfig for ResponseFormatTextConfigKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ResponseFormatTextConfig {
+pub enum ResponseFormatTextConfigKind {
     ResponseFormatText(ResponseFormatText),
     ResponseFormatTextJsonSchemaConfig(ResponseFormatTextJSONSchemaConfig),
     ResponseFormatJsonObject(ResponseFormatJSONObject),
 }
-impl ::core::convert::From<ResponseFormatText> for ResponseFormatTextConfig {
+impl ::core::convert::From<ResponseFormatText> for ResponseFormatTextConfigKind {
     fn from(value: ResponseFormatText) -> Self {
         Self::ResponseFormatText(value)
     }
 }
-impl ::core::convert::From<&ResponseFormatText> for ResponseFormatTextConfig {
+impl ::core::convert::From<&ResponseFormatText> for ResponseFormatTextConfigKind {
     fn from(value: &ResponseFormatText) -> Self {
         Self::ResponseFormatText(value.clone())
     }
 }
-impl ::core::convert::From<ResponseFormatTextJSONSchemaConfig> for ResponseFormatTextConfig {
+impl ::core::convert::From<ResponseFormatTextJSONSchemaConfig> for ResponseFormatTextConfigKind {
     fn from(value: ResponseFormatTextJSONSchemaConfig) -> Self {
         Self::ResponseFormatTextJsonSchemaConfig(value)
     }
 }
-impl ::core::convert::From<&ResponseFormatTextJSONSchemaConfig> for ResponseFormatTextConfig {
+impl ::core::convert::From<&ResponseFormatTextJSONSchemaConfig> for ResponseFormatTextConfigKind {
     fn from(value: &ResponseFormatTextJSONSchemaConfig) -> Self {
         Self::ResponseFormatTextJsonSchemaConfig(value.clone())
     }
 }
-impl ::core::convert::From<ResponseFormatJSONObject> for ResponseFormatTextConfig {
+impl ::core::convert::From<ResponseFormatJSONObject> for ResponseFormatTextConfigKind {
     fn from(value: ResponseFormatJSONObject) -> Self {
         Self::ResponseFormatJsonObject(value)
     }
 }
-impl ::core::convert::From<&ResponseFormatJSONObject> for ResponseFormatTextConfig {
+impl ::core::convert::From<&ResponseFormatJSONObject> for ResponseFormatTextConfigKind {
     fn from(value: &ResponseFormatJSONObject) -> Self {
         Self::ResponseFormatJsonObject(value.clone())
     }
@@ -20671,28 +20701,34 @@ impl ResponseFunctionCallArgumentsDoneEvent {
         inner
     }
 }
+pub trait ResponseFunctionCallOutputItem: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl ResponseFunctionCallOutputItem for ResponseInputTextContent {}
+impl ResponseFunctionCallOutputItem for &ResponseInputTextContent {}
+impl ResponseFunctionCallOutputItem for ResponseInputImageContent {}
+impl ResponseFunctionCallOutputItem for &ResponseInputImageContent {}
+impl ResponseFunctionCallOutputItem for ResponseFunctionCallOutputItemKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ResponseFunctionCallOutputItem {
+pub enum ResponseFunctionCallOutputItemKind {
     ResponseInputTextContent(ResponseInputTextContent),
     ResponseInputImageContent(ResponseInputImageContent),
 }
-impl ::core::convert::From<ResponseInputTextContent> for ResponseFunctionCallOutputItem {
+impl ::core::convert::From<ResponseInputTextContent> for ResponseFunctionCallOutputItemKind {
     fn from(value: ResponseInputTextContent) -> Self {
         Self::ResponseInputTextContent(value)
     }
 }
-impl ::core::convert::From<&ResponseInputTextContent> for ResponseFunctionCallOutputItem {
+impl ::core::convert::From<&ResponseInputTextContent> for ResponseFunctionCallOutputItemKind {
     fn from(value: &ResponseInputTextContent) -> Self {
         Self::ResponseInputTextContent(value.clone())
     }
 }
-impl ::core::convert::From<ResponseInputImageContent> for ResponseFunctionCallOutputItem {
+impl ::core::convert::From<ResponseInputImageContent> for ResponseFunctionCallOutputItemKind {
     fn from(value: ResponseInputImageContent) -> Self {
         Self::ResponseInputImageContent(value)
     }
 }
-impl ::core::convert::From<&ResponseInputImageContent> for ResponseFunctionCallOutputItem {
+impl ::core::convert::From<&ResponseInputImageContent> for ResponseFunctionCallOutputItemKind {
     fn from(value: &ResponseInputImageContent) -> Self {
         Self::ResponseInputImageContent(value.clone())
     }
@@ -20970,28 +21006,34 @@ impl ResponseIncompleteEvent {
 }
 #[allow(dead_code)]
 pub type ResponseInput = Array;
+pub trait ResponseInputContent: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl ResponseInputContent for ResponseInputText {}
+impl ResponseInputContent for &ResponseInputText {}
+impl ResponseInputContent for ResponseInputImage {}
+impl ResponseInputContent for &ResponseInputImage {}
+impl ResponseInputContent for ResponseInputContentKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ResponseInputContent {
+pub enum ResponseInputContentKind {
     ResponseInputText(ResponseInputText),
     ResponseInputImage(ResponseInputImage),
 }
-impl ::core::convert::From<ResponseInputText> for ResponseInputContent {
+impl ::core::convert::From<ResponseInputText> for ResponseInputContentKind {
     fn from(value: ResponseInputText) -> Self {
         Self::ResponseInputText(value)
     }
 }
-impl ::core::convert::From<&ResponseInputText> for ResponseInputContent {
+impl ::core::convert::From<&ResponseInputText> for ResponseInputContentKind {
     fn from(value: &ResponseInputText) -> Self {
         Self::ResponseInputText(value.clone())
     }
 }
-impl ::core::convert::From<ResponseInputImage> for ResponseInputContent {
+impl ::core::convert::From<ResponseInputImage> for ResponseInputContentKind {
     fn from(value: ResponseInputImage) -> Self {
         Self::ResponseInputImage(value)
     }
 }
-impl ::core::convert::From<&ResponseInputImage> for ResponseInputContent {
+impl ::core::convert::From<&ResponseInputImage> for ResponseInputContentKind {
     fn from(value: &ResponseInputImage) -> Self {
         Self::ResponseInputImage(value.clone())
     }
@@ -21150,9 +21192,23 @@ impl ResponseInputImageContentBuilder {
         self.inner
     }
 }
+pub trait ResponseInputItem: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl ResponseInputItem for EasyInputMessage {}
+impl ResponseInputItem for &EasyInputMessage {}
+impl ResponseInputItem for ResponseInputItemMessage {}
+impl ResponseInputItem for &ResponseInputItemMessage {}
+impl ResponseInputItem for ResponseOutputMessage {}
+impl ResponseInputItem for &ResponseOutputMessage {}
+impl ResponseInputItem for ResponseFunctionToolCall {}
+impl ResponseInputItem for &ResponseFunctionToolCall {}
+impl ResponseInputItem for ResponseInputItemFunctionCallOutput {}
+impl ResponseInputItem for &ResponseInputItemFunctionCallOutput {}
+impl ResponseInputItem for ResponseReasoningItem {}
+impl ResponseInputItem for &ResponseReasoningItem {}
+impl ResponseInputItem for ResponseInputItemKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ResponseInputItem {
+pub enum ResponseInputItemKind {
     EasyInputMessage(EasyInputMessage),
     ResponseInputItemMessage(ResponseInputItemMessage),
     ResponseOutputMessage(ResponseOutputMessage),
@@ -21160,62 +21216,62 @@ pub enum ResponseInputItem {
     ResponseInputItemFunctionCallOutput(ResponseInputItemFunctionCallOutput),
     ResponseReasoningItem(ResponseReasoningItem),
 }
-impl ::core::convert::From<EasyInputMessage> for ResponseInputItem {
+impl ::core::convert::From<EasyInputMessage> for ResponseInputItemKind {
     fn from(value: EasyInputMessage) -> Self {
         Self::EasyInputMessage(value)
     }
 }
-impl ::core::convert::From<&EasyInputMessage> for ResponseInputItem {
+impl ::core::convert::From<&EasyInputMessage> for ResponseInputItemKind {
     fn from(value: &EasyInputMessage) -> Self {
         Self::EasyInputMessage(value.clone())
     }
 }
-impl ::core::convert::From<ResponseInputItemMessage> for ResponseInputItem {
+impl ::core::convert::From<ResponseInputItemMessage> for ResponseInputItemKind {
     fn from(value: ResponseInputItemMessage) -> Self {
         Self::ResponseInputItemMessage(value)
     }
 }
-impl ::core::convert::From<&ResponseInputItemMessage> for ResponseInputItem {
+impl ::core::convert::From<&ResponseInputItemMessage> for ResponseInputItemKind {
     fn from(value: &ResponseInputItemMessage) -> Self {
         Self::ResponseInputItemMessage(value.clone())
     }
 }
-impl ::core::convert::From<ResponseOutputMessage> for ResponseInputItem {
+impl ::core::convert::From<ResponseOutputMessage> for ResponseInputItemKind {
     fn from(value: ResponseOutputMessage) -> Self {
         Self::ResponseOutputMessage(value)
     }
 }
-impl ::core::convert::From<&ResponseOutputMessage> for ResponseInputItem {
+impl ::core::convert::From<&ResponseOutputMessage> for ResponseInputItemKind {
     fn from(value: &ResponseOutputMessage) -> Self {
         Self::ResponseOutputMessage(value.clone())
     }
 }
-impl ::core::convert::From<ResponseFunctionToolCall> for ResponseInputItem {
+impl ::core::convert::From<ResponseFunctionToolCall> for ResponseInputItemKind {
     fn from(value: ResponseFunctionToolCall) -> Self {
         Self::ResponseFunctionToolCall(value)
     }
 }
-impl ::core::convert::From<&ResponseFunctionToolCall> for ResponseInputItem {
+impl ::core::convert::From<&ResponseFunctionToolCall> for ResponseInputItemKind {
     fn from(value: &ResponseFunctionToolCall) -> Self {
         Self::ResponseFunctionToolCall(value.clone())
     }
 }
-impl ::core::convert::From<ResponseInputItemFunctionCallOutput> for ResponseInputItem {
+impl ::core::convert::From<ResponseInputItemFunctionCallOutput> for ResponseInputItemKind {
     fn from(value: ResponseInputItemFunctionCallOutput) -> Self {
         Self::ResponseInputItemFunctionCallOutput(value)
     }
 }
-impl ::core::convert::From<&ResponseInputItemFunctionCallOutput> for ResponseInputItem {
+impl ::core::convert::From<&ResponseInputItemFunctionCallOutput> for ResponseInputItemKind {
     fn from(value: &ResponseInputItemFunctionCallOutput) -> Self {
         Self::ResponseInputItemFunctionCallOutput(value.clone())
     }
 }
-impl ::core::convert::From<ResponseReasoningItem> for ResponseInputItem {
+impl ::core::convert::From<ResponseReasoningItem> for ResponseInputItemKind {
     fn from(value: ResponseReasoningItem) -> Self {
         Self::ResponseReasoningItem(value)
     }
 }
-impl ::core::convert::From<&ResponseReasoningItem> for ResponseInputItem {
+impl ::core::convert::From<&ResponseReasoningItem> for ResponseInputItemKind {
     fn from(value: &ResponseReasoningItem) -> Self {
         Self::ResponseReasoningItem(value.clone())
     }
@@ -21583,87 +21639,105 @@ impl ResponseInputTextContent {
         inner
     }
 }
+pub trait ResponseItem: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl ResponseItem for ResponseInputMessageItem {}
+impl ResponseItem for &ResponseInputMessageItem {}
+impl ResponseItem for ResponseOutputMessage {}
+impl ResponseItem for &ResponseOutputMessage {}
+impl ResponseItem for ResponseFunctionToolCallItem {}
+impl ResponseItem for &ResponseFunctionToolCallItem {}
+impl ResponseItem for ResponseFunctionToolCallOutputItem {}
+impl ResponseItem for &ResponseFunctionToolCallOutputItem {}
+impl ResponseItem for ResponseItemKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ResponseItem {
+pub enum ResponseItemKind {
     ResponseInputMessageItem(ResponseInputMessageItem),
     ResponseOutputMessage(ResponseOutputMessage),
     ResponseFunctionToolCallItem(ResponseFunctionToolCallItem),
     ResponseFunctionToolCallOutputItem(ResponseFunctionToolCallOutputItem),
 }
-impl ::core::convert::From<ResponseInputMessageItem> for ResponseItem {
+impl ::core::convert::From<ResponseInputMessageItem> for ResponseItemKind {
     fn from(value: ResponseInputMessageItem) -> Self {
         Self::ResponseInputMessageItem(value)
     }
 }
-impl ::core::convert::From<&ResponseInputMessageItem> for ResponseItem {
+impl ::core::convert::From<&ResponseInputMessageItem> for ResponseItemKind {
     fn from(value: &ResponseInputMessageItem) -> Self {
         Self::ResponseInputMessageItem(value.clone())
     }
 }
-impl ::core::convert::From<ResponseOutputMessage> for ResponseItem {
+impl ::core::convert::From<ResponseOutputMessage> for ResponseItemKind {
     fn from(value: ResponseOutputMessage) -> Self {
         Self::ResponseOutputMessage(value)
     }
 }
-impl ::core::convert::From<&ResponseOutputMessage> for ResponseItem {
+impl ::core::convert::From<&ResponseOutputMessage> for ResponseItemKind {
     fn from(value: &ResponseOutputMessage) -> Self {
         Self::ResponseOutputMessage(value.clone())
     }
 }
-impl ::core::convert::From<ResponseFunctionToolCallItem> for ResponseItem {
+impl ::core::convert::From<ResponseFunctionToolCallItem> for ResponseItemKind {
     fn from(value: ResponseFunctionToolCallItem) -> Self {
         Self::ResponseFunctionToolCallItem(value)
     }
 }
-impl ::core::convert::From<&ResponseFunctionToolCallItem> for ResponseItem {
+impl ::core::convert::From<&ResponseFunctionToolCallItem> for ResponseItemKind {
     fn from(value: &ResponseFunctionToolCallItem) -> Self {
         Self::ResponseFunctionToolCallItem(value.clone())
     }
 }
-impl ::core::convert::From<ResponseFunctionToolCallOutputItem> for ResponseItem {
+impl ::core::convert::From<ResponseFunctionToolCallOutputItem> for ResponseItemKind {
     fn from(value: ResponseFunctionToolCallOutputItem) -> Self {
         Self::ResponseFunctionToolCallOutputItem(value)
     }
 }
-impl ::core::convert::From<&ResponseFunctionToolCallOutputItem> for ResponseItem {
+impl ::core::convert::From<&ResponseFunctionToolCallOutputItem> for ResponseItemKind {
     fn from(value: &ResponseFunctionToolCallOutputItem) -> Self {
         Self::ResponseFunctionToolCallOutputItem(value.clone())
     }
 }
+pub trait ResponseOutputItem: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl ResponseOutputItem for ResponseOutputMessage {}
+impl ResponseOutputItem for &ResponseOutputMessage {}
+impl ResponseOutputItem for ResponseFunctionToolCall {}
+impl ResponseOutputItem for &ResponseFunctionToolCall {}
+impl ResponseOutputItem for ResponseReasoningItem {}
+impl ResponseOutputItem for &ResponseReasoningItem {}
+impl ResponseOutputItem for ResponseOutputItemKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ResponseOutputItem {
+pub enum ResponseOutputItemKind {
     ResponseOutputMessage(ResponseOutputMessage),
     ResponseFunctionToolCall(ResponseFunctionToolCall),
     ResponseReasoningItem(ResponseReasoningItem),
 }
-impl ::core::convert::From<ResponseOutputMessage> for ResponseOutputItem {
+impl ::core::convert::From<ResponseOutputMessage> for ResponseOutputItemKind {
     fn from(value: ResponseOutputMessage) -> Self {
         Self::ResponseOutputMessage(value)
     }
 }
-impl ::core::convert::From<&ResponseOutputMessage> for ResponseOutputItem {
+impl ::core::convert::From<&ResponseOutputMessage> for ResponseOutputItemKind {
     fn from(value: &ResponseOutputMessage) -> Self {
         Self::ResponseOutputMessage(value.clone())
     }
 }
-impl ::core::convert::From<ResponseFunctionToolCall> for ResponseOutputItem {
+impl ::core::convert::From<ResponseFunctionToolCall> for ResponseOutputItemKind {
     fn from(value: ResponseFunctionToolCall) -> Self {
         Self::ResponseFunctionToolCall(value)
     }
 }
-impl ::core::convert::From<&ResponseFunctionToolCall> for ResponseOutputItem {
+impl ::core::convert::From<&ResponseFunctionToolCall> for ResponseOutputItemKind {
     fn from(value: &ResponseFunctionToolCall) -> Self {
         Self::ResponseFunctionToolCall(value.clone())
     }
 }
-impl ::core::convert::From<ResponseReasoningItem> for ResponseOutputItem {
+impl ::core::convert::From<ResponseReasoningItem> for ResponseOutputItemKind {
     fn from(value: ResponseReasoningItem) -> Self {
         Self::ResponseReasoningItem(value)
     }
 }
-impl ::core::convert::From<&ResponseReasoningItem> for ResponseOutputItem {
+impl ::core::convert::From<&ResponseReasoningItem> for ResponseOutputItemKind {
     fn from(value: &ResponseReasoningItem) -> Self {
         Self::ResponseReasoningItem(value.clone())
     }
@@ -21675,8 +21749,8 @@ extern "C" {
     pub type ResponseOutputItemAddedEvent;
     #[wasm_bindgen(method, getter)]
     pub fn item(this: &ResponseOutputItemAddedEvent) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "item")]
-    fn __set_item(this: &ResponseOutputItemAddedEvent, val: ResponseOutputItem);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item(this: &ResponseOutputItemAddedEvent, val: impl ResponseOutputItem);
     #[wasm_bindgen(method, getter)]
     pub fn output_index(this: &ResponseOutputItemAddedEvent) -> f64;
     #[wasm_bindgen(method, setter)]
@@ -21693,14 +21767,9 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputItemAddedEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseOutputItemAddedEvent {
-    pub fn set_item(&self, val: impl ::core::convert::Into<ResponseOutputItem>) {
-        self.__set_item(val.into())
-    }
-}
-impl ResponseOutputItemAddedEvent {
     #[doc = " Construct with `type: \"response.output_item.added\"`."]
     pub fn new(
-        item: impl ::core::convert::Into<ResponseOutputItem>,
+        item: impl ResponseOutputItem,
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseOutputItemAddedEvent {
@@ -21719,8 +21788,8 @@ extern "C" {
     pub type ResponseOutputItemDoneEvent;
     #[wasm_bindgen(method, getter)]
     pub fn item(this: &ResponseOutputItemDoneEvent) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "item")]
-    fn __set_item(this: &ResponseOutputItemDoneEvent, val: ResponseOutputItem);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item(this: &ResponseOutputItemDoneEvent, val: impl ResponseOutputItem);
     #[wasm_bindgen(method, getter)]
     pub fn output_index(this: &ResponseOutputItemDoneEvent) -> f64;
     #[wasm_bindgen(method, setter)]
@@ -21737,14 +21806,9 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputItemDoneEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseOutputItemDoneEvent {
-    pub fn set_item(&self, val: impl ::core::convert::Into<ResponseOutputItem>) {
-        self.__set_item(val.into())
-    }
-}
-impl ResponseOutputItemDoneEvent {
     #[doc = " Construct with `type: \"response.output_item.done\"`."]
     pub fn new(
-        item: impl ::core::convert::Into<ResponseOutputItem>,
+        item: impl ResponseOutputItem,
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseOutputItemDoneEvent {
@@ -22359,8 +22423,8 @@ extern "C" {
     pub type ResponseTextConfig;
     #[wasm_bindgen(method, getter)]
     pub fn format(this: &ResponseTextConfig) -> Option<JsValue>;
-    #[wasm_bindgen(method, setter, js_name = "format")]
-    fn __set_format(this: &ResponseTextConfig, val: ResponseFormatTextConfig);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_format(this: &ResponseTextConfig, val: impl ResponseFormatTextConfig);
     #[wasm_bindgen(method, getter)]
     pub fn verbosity(this: &ResponseTextConfig) -> Option<Nullable<VerbosityKind>>;
     #[wasm_bindgen(method, setter)]
@@ -22369,9 +22433,6 @@ extern "C" {
     fn __set_verbosity_with_null(this: &ResponseTextConfig, val: &::wasm_bindgen::JsValue);
 }
 impl ResponseTextConfig {
-    pub fn set_format(&self, val: impl ::core::convert::Into<ResponseFormatTextConfig>) {
-        self.__set_format(val.into())
-    }
     pub fn set_verbosity_with_null(&self) {
         self.__set_verbosity_with_null(&::wasm_bindgen::JsValue::NULL)
     }
@@ -22395,7 +22456,7 @@ pub struct ResponseTextConfigBuilder {
     inner: ResponseTextConfig,
 }
 impl ResponseTextConfigBuilder {
-    pub fn format(self, val: impl ::core::convert::Into<ResponseFormatTextConfig>) -> Self {
+    pub fn format(self, val: impl ResponseFormatTextConfig) -> Self {
         self.inner.set_format(val);
         self
     }
@@ -22790,31 +22851,37 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
         self.inner
     }
 }
+pub trait Ai_Cf_Baai_Bge_Base_En_V1_5_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Baai_Bge_Base_En_V1_5_Output for Object {}
+impl Ai_Cf_Baai_Bge_Base_En_V1_5_Output for &Object {}
+impl Ai_Cf_Baai_Bge_Base_En_V1_5_Output for Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse {}
+impl Ai_Cf_Baai_Bge_Base_En_V1_5_Output for &Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse {}
+impl Ai_Cf_Baai_Bge_Base_En_V1_5_Output for Ai_Cf_Baai_Bge_Base_En_V1_5_OutputKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Baai_Bge_Base_En_V1_5_Output {
+pub enum Ai_Cf_Baai_Bge_Base_En_V1_5_OutputKind {
     Object(Object),
     AiCfBaaiBgeBaseEnV15AsyncResponse(Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse),
 }
-impl ::core::convert::From<Object> for Ai_Cf_Baai_Bge_Base_En_V1_5_Output {
+impl ::core::convert::From<Object> for Ai_Cf_Baai_Bge_Base_En_V1_5_OutputKind {
     fn from(value: Object) -> Self {
         Self::Object(value)
     }
 }
-impl ::core::convert::From<&Object> for Ai_Cf_Baai_Bge_Base_En_V1_5_Output {
+impl ::core::convert::From<&Object> for Ai_Cf_Baai_Bge_Base_En_V1_5_OutputKind {
     fn from(value: &Object) -> Self {
         Self::Object(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse>
-    for Ai_Cf_Baai_Bge_Base_En_V1_5_Output
+    for Ai_Cf_Baai_Bge_Base_En_V1_5_OutputKind
 {
     fn from(value: Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse) -> Self {
         Self::AiCfBaaiBgeBaseEnV15AsyncResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse>
-    for Ai_Cf_Baai_Bge_Base_En_V1_5_Output
+    for Ai_Cf_Baai_Bge_Base_En_V1_5_OutputKind
 {
     fn from(value: &Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse) -> Self {
         Self::AiCfBaaiBgeBaseEnV15AsyncResponse(value.clone())
@@ -22881,56 +22948,59 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Baai_Bge_Base_En_V1_5) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    fn __set_post_processed_outputs(
+    pub fn set_post_processed_outputs(
         this: &Base_Ai_Cf_Baai_Bge_Base_En_V1_5,
-        val: Ai_Cf_Baai_Bge_Base_En_V1_5_Output,
+        val: impl Ai_Cf_Baai_Bge_Base_En_V1_5_Output,
     );
 }
-impl Base_Ai_Cf_Baai_Bge_Base_En_V1_5 {
-    pub fn set_post_processed_outputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Baai_Bge_Base_En_V1_5_Output>,
-    ) {
-        self.__set_post_processed_outputs(val.into())
-    }
-}
+pub trait Ai_Cf_Openai_Whisper_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Openai_Whisper_Input for &str {}
+impl Ai_Cf_Openai_Whisper_Input for ::std::string::String {}
+impl Ai_Cf_Openai_Whisper_Input for &::std::string::String {}
+impl Ai_Cf_Openai_Whisper_Input for &::std::boxed::Box<str> {}
+impl Ai_Cf_Openai_Whisper_Input for &::std::borrow::Cow<'_, str> {}
+impl Ai_Cf_Openai_Whisper_Input for ::js_sys::JsString {}
+impl Ai_Cf_Openai_Whisper_Input for &::js_sys::JsString {}
+impl Ai_Cf_Openai_Whisper_Input for Object {}
+impl Ai_Cf_Openai_Whisper_Input for &Object {}
+impl Ai_Cf_Openai_Whisper_Input for Ai_Cf_Openai_Whisper_InputKind {}
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Openai_Whisper_Input {
+pub enum Ai_Cf_Openai_Whisper_InputKind {
     String(String),
     Object(Object),
 }
-impl ::core::convert::From<&str> for Ai_Cf_Openai_Whisper_Input {
+impl ::core::convert::From<&str> for Ai_Cf_Openai_Whisper_InputKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for Ai_Cf_Openai_Whisper_Input {
+impl ::core::convert::From<::std::string::String> for Ai_Cf_Openai_Whisper_InputKind {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for Ai_Cf_Openai_Whisper_Input {
+impl ::core::convert::From<&::std::string::String> for Ai_Cf_Openai_Whisper_InputKind {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for Ai_Cf_Openai_Whisper_Input {
+impl ::core::convert::From<::js_sys::JsString> for Ai_Cf_Openai_Whisper_InputKind {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for Ai_Cf_Openai_Whisper_Input {
+impl ::core::convert::From<&::js_sys::JsString> for Ai_Cf_Openai_Whisper_InputKind {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<Object> for Ai_Cf_Openai_Whisper_Input {
+impl ::core::convert::From<Object> for Ai_Cf_Openai_Whisper_InputKind {
     fn from(value: Object) -> Self {
         Self::Object(value)
     }
 }
-impl ::core::convert::From<&Object> for Ai_Cf_Openai_Whisper_Input {
+impl ::core::convert::From<&Object> for Ai_Cf_Openai_Whisper_InputKind {
     fn from(value: &Object) -> Self {
         Self::Object(value.clone())
     }
@@ -23001,9 +23071,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Openai_Whisper;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Openai_Whisper) -> Ai_Cf_Openai_Whisper_Input;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(this: &Base_Ai_Cf_Openai_Whisper, val: Ai_Cf_Openai_Whisper_Input);
+    pub fn inputs(this: &Base_Ai_Cf_Openai_Whisper) -> Ai_Cf_Openai_Whisper_InputKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(this: &Base_Ai_Cf_Openai_Whisper, val: impl Ai_Cf_Openai_Whisper_Input);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Openai_Whisper) -> Ai_Cf_Openai_Whisper_Output;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
@@ -23011,11 +23081,6 @@ extern "C" {
         this: &Base_Ai_Cf_Openai_Whisper,
         val: &Ai_Cf_Openai_Whisper_Output,
     );
-}
-impl Base_Ai_Cf_Openai_Whisper {
-    pub fn set_inputs(&self, val: impl ::core::convert::Into<Ai_Cf_Openai_Whisper_Input>) {
-        self.__set_inputs(val.into())
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -23097,29 +23162,37 @@ impl Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
         self.inner
     }
 }
+pub trait Ai_Cf_Meta_M2M100_1_2B_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Meta_M2M100_1_2B_Output for Object {}
+impl Ai_Cf_Meta_M2M100_1_2B_Output for &Object {}
+impl Ai_Cf_Meta_M2M100_1_2B_Output for Ai_Cf_Meta_M2M100_1_2B_AsyncResponse {}
+impl Ai_Cf_Meta_M2M100_1_2B_Output for &Ai_Cf_Meta_M2M100_1_2B_AsyncResponse {}
+impl Ai_Cf_Meta_M2M100_1_2B_Output for Ai_Cf_Meta_M2M100_1_2B_OutputKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Meta_M2M100_1_2B_Output {
+pub enum Ai_Cf_Meta_M2M100_1_2B_OutputKind {
     Object(Object),
     AiCfMetaM2M10012BAsyncResponse(Ai_Cf_Meta_M2M100_1_2B_AsyncResponse),
 }
-impl ::core::convert::From<Object> for Ai_Cf_Meta_M2M100_1_2B_Output {
+impl ::core::convert::From<Object> for Ai_Cf_Meta_M2M100_1_2B_OutputKind {
     fn from(value: Object) -> Self {
         Self::Object(value)
     }
 }
-impl ::core::convert::From<&Object> for Ai_Cf_Meta_M2M100_1_2B_Output {
+impl ::core::convert::From<&Object> for Ai_Cf_Meta_M2M100_1_2B_OutputKind {
     fn from(value: &Object) -> Self {
         Self::Object(value.clone())
     }
 }
-impl ::core::convert::From<Ai_Cf_Meta_M2M100_1_2B_AsyncResponse> for Ai_Cf_Meta_M2M100_1_2B_Output {
+impl ::core::convert::From<Ai_Cf_Meta_M2M100_1_2B_AsyncResponse>
+    for Ai_Cf_Meta_M2M100_1_2B_OutputKind
+{
     fn from(value: Ai_Cf_Meta_M2M100_1_2B_AsyncResponse) -> Self {
         Self::AiCfMetaM2M10012BAsyncResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Meta_M2M100_1_2B_AsyncResponse>
-    for Ai_Cf_Meta_M2M100_1_2B_Output
+    for Ai_Cf_Meta_M2M100_1_2B_OutputKind
 {
     fn from(value: &Ai_Cf_Meta_M2M100_1_2B_AsyncResponse) -> Self {
         Self::AiCfMetaM2M10012BAsyncResponse(value.clone())
@@ -23181,18 +23254,10 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Meta_M2M100_1_2B) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    fn __set_post_processed_outputs(
-        this: &Base_Ai_Cf_Meta_M2M100_1_2B,
-        val: Ai_Cf_Meta_M2M100_1_2B_Output,
-    );
-}
-impl Base_Ai_Cf_Meta_M2M100_1_2B {
     pub fn set_post_processed_outputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Meta_M2M100_1_2B_Output>,
-    ) {
-        self.__set_post_processed_outputs(val.into())
-    }
+        this: &Base_Ai_Cf_Meta_M2M100_1_2B,
+        val: impl Ai_Cf_Meta_M2M100_1_2B_Output,
+    );
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -23261,31 +23326,37 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
         self.inner
     }
 }
+pub trait Ai_Cf_Baai_Bge_Small_En_V1_5_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Baai_Bge_Small_En_V1_5_Output for Object {}
+impl Ai_Cf_Baai_Bge_Small_En_V1_5_Output for &Object {}
+impl Ai_Cf_Baai_Bge_Small_En_V1_5_Output for Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse {}
+impl Ai_Cf_Baai_Bge_Small_En_V1_5_Output for &Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse {}
+impl Ai_Cf_Baai_Bge_Small_En_V1_5_Output for Ai_Cf_Baai_Bge_Small_En_V1_5_OutputKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Baai_Bge_Small_En_V1_5_Output {
+pub enum Ai_Cf_Baai_Bge_Small_En_V1_5_OutputKind {
     Object(Object),
     AiCfBaaiBgeSmallEnV15AsyncResponse(Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse),
 }
-impl ::core::convert::From<Object> for Ai_Cf_Baai_Bge_Small_En_V1_5_Output {
+impl ::core::convert::From<Object> for Ai_Cf_Baai_Bge_Small_En_V1_5_OutputKind {
     fn from(value: Object) -> Self {
         Self::Object(value)
     }
 }
-impl ::core::convert::From<&Object> for Ai_Cf_Baai_Bge_Small_En_V1_5_Output {
+impl ::core::convert::From<&Object> for Ai_Cf_Baai_Bge_Small_En_V1_5_OutputKind {
     fn from(value: &Object) -> Self {
         Self::Object(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse>
-    for Ai_Cf_Baai_Bge_Small_En_V1_5_Output
+    for Ai_Cf_Baai_Bge_Small_En_V1_5_OutputKind
 {
     fn from(value: Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse) -> Self {
         Self::AiCfBaaiBgeSmallEnV15AsyncResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse>
-    for Ai_Cf_Baai_Bge_Small_En_V1_5_Output
+    for Ai_Cf_Baai_Bge_Small_En_V1_5_OutputKind
 {
     fn from(value: &Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse) -> Self {
         Self::AiCfBaaiBgeSmallEnV15AsyncResponse(value.clone())
@@ -23352,18 +23423,10 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Baai_Bge_Small_En_V1_5) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    fn __set_post_processed_outputs(
-        this: &Base_Ai_Cf_Baai_Bge_Small_En_V1_5,
-        val: Ai_Cf_Baai_Bge_Small_En_V1_5_Output,
-    );
-}
-impl Base_Ai_Cf_Baai_Bge_Small_En_V1_5 {
     pub fn set_post_processed_outputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Baai_Bge_Small_En_V1_5_Output>,
-    ) {
-        self.__set_post_processed_outputs(val.into())
-    }
+        this: &Base_Ai_Cf_Baai_Bge_Small_En_V1_5,
+        val: impl Ai_Cf_Baai_Bge_Small_En_V1_5_Output,
+    );
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -23432,31 +23495,37 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
         self.inner
     }
 }
+pub trait Ai_Cf_Baai_Bge_Large_En_V1_5_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Baai_Bge_Large_En_V1_5_Output for Object {}
+impl Ai_Cf_Baai_Bge_Large_En_V1_5_Output for &Object {}
+impl Ai_Cf_Baai_Bge_Large_En_V1_5_Output for Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse {}
+impl Ai_Cf_Baai_Bge_Large_En_V1_5_Output for &Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse {}
+impl Ai_Cf_Baai_Bge_Large_En_V1_5_Output for Ai_Cf_Baai_Bge_Large_En_V1_5_OutputKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Baai_Bge_Large_En_V1_5_Output {
+pub enum Ai_Cf_Baai_Bge_Large_En_V1_5_OutputKind {
     Object(Object),
     AiCfBaaiBgeLargeEnV15AsyncResponse(Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse),
 }
-impl ::core::convert::From<Object> for Ai_Cf_Baai_Bge_Large_En_V1_5_Output {
+impl ::core::convert::From<Object> for Ai_Cf_Baai_Bge_Large_En_V1_5_OutputKind {
     fn from(value: Object) -> Self {
         Self::Object(value)
     }
 }
-impl ::core::convert::From<&Object> for Ai_Cf_Baai_Bge_Large_En_V1_5_Output {
+impl ::core::convert::From<&Object> for Ai_Cf_Baai_Bge_Large_En_V1_5_OutputKind {
     fn from(value: &Object) -> Self {
         Self::Object(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse>
-    for Ai_Cf_Baai_Bge_Large_En_V1_5_Output
+    for Ai_Cf_Baai_Bge_Large_En_V1_5_OutputKind
 {
     fn from(value: Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse) -> Self {
         Self::AiCfBaaiBgeLargeEnV15AsyncResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse>
-    for Ai_Cf_Baai_Bge_Large_En_V1_5_Output
+    for Ai_Cf_Baai_Bge_Large_En_V1_5_OutputKind
 {
     fn from(value: &Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse) -> Self {
         Self::AiCfBaaiBgeLargeEnV15AsyncResponse(value.clone())
@@ -23523,56 +23592,59 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Baai_Bge_Large_En_V1_5) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    fn __set_post_processed_outputs(
+    pub fn set_post_processed_outputs(
         this: &Base_Ai_Cf_Baai_Bge_Large_En_V1_5,
-        val: Ai_Cf_Baai_Bge_Large_En_V1_5_Output,
+        val: impl Ai_Cf_Baai_Bge_Large_En_V1_5_Output,
     );
 }
-impl Base_Ai_Cf_Baai_Bge_Large_En_V1_5 {
-    pub fn set_post_processed_outputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Baai_Bge_Large_En_V1_5_Output>,
-    ) {
-        self.__set_post_processed_outputs(val.into())
-    }
-}
+pub trait Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for &str {}
+impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for ::std::string::String {}
+impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for &::std::string::String {}
+impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for &::std::boxed::Box<str> {}
+impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for &::std::borrow::Cow<'_, str> {}
+impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for ::js_sys::JsString {}
+impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for &::js_sys::JsString {}
+impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for Object {}
+impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for &Object {}
+impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputKind {}
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input {
+pub enum Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputKind {
     String(String),
     Object(Object),
 }
-impl ::core::convert::From<&str> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input {
+impl ::core::convert::From<&str> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input {
+impl ::core::convert::From<::std::string::String> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputKind {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input {
+impl ::core::convert::From<&::std::string::String> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputKind {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input {
+impl ::core::convert::From<::js_sys::JsString> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputKind {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input {
+impl ::core::convert::From<&::js_sys::JsString> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputKind {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<Object> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input {
+impl ::core::convert::From<Object> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputKind {
     fn from(value: Object) -> Self {
         Self::Object(value)
     }
 }
-impl ::core::convert::From<&Object> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input {
+impl ::core::convert::From<&Object> for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputKind {
     fn from(value: &Object) -> Self {
         Self::Object(value.clone())
     }
@@ -23628,11 +23700,11 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn inputs(
         this: &Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M,
-    ) -> Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(
+    ) -> Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(
         this: &Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M,
-        val: Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input,
+        val: impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
@@ -23644,51 +23716,54 @@ extern "C" {
         val: &Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output,
     );
 }
-impl Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M {
-    pub fn set_inputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input>,
-    ) {
-        self.__set_inputs(val.into())
-    }
-}
+pub trait Ai_Cf_Openai_Whisper_Tiny_En_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Openai_Whisper_Tiny_En_Input for &str {}
+impl Ai_Cf_Openai_Whisper_Tiny_En_Input for ::std::string::String {}
+impl Ai_Cf_Openai_Whisper_Tiny_En_Input for &::std::string::String {}
+impl Ai_Cf_Openai_Whisper_Tiny_En_Input for &::std::boxed::Box<str> {}
+impl Ai_Cf_Openai_Whisper_Tiny_En_Input for &::std::borrow::Cow<'_, str> {}
+impl Ai_Cf_Openai_Whisper_Tiny_En_Input for ::js_sys::JsString {}
+impl Ai_Cf_Openai_Whisper_Tiny_En_Input for &::js_sys::JsString {}
+impl Ai_Cf_Openai_Whisper_Tiny_En_Input for Object {}
+impl Ai_Cf_Openai_Whisper_Tiny_En_Input for &Object {}
+impl Ai_Cf_Openai_Whisper_Tiny_En_Input for Ai_Cf_Openai_Whisper_Tiny_En_InputKind {}
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Openai_Whisper_Tiny_En_Input {
+pub enum Ai_Cf_Openai_Whisper_Tiny_En_InputKind {
     String(String),
     Object(Object),
 }
-impl ::core::convert::From<&str> for Ai_Cf_Openai_Whisper_Tiny_En_Input {
+impl ::core::convert::From<&str> for Ai_Cf_Openai_Whisper_Tiny_En_InputKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for Ai_Cf_Openai_Whisper_Tiny_En_Input {
+impl ::core::convert::From<::std::string::String> for Ai_Cf_Openai_Whisper_Tiny_En_InputKind {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for Ai_Cf_Openai_Whisper_Tiny_En_Input {
+impl ::core::convert::From<&::std::string::String> for Ai_Cf_Openai_Whisper_Tiny_En_InputKind {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for Ai_Cf_Openai_Whisper_Tiny_En_Input {
+impl ::core::convert::From<::js_sys::JsString> for Ai_Cf_Openai_Whisper_Tiny_En_InputKind {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for Ai_Cf_Openai_Whisper_Tiny_En_Input {
+impl ::core::convert::From<&::js_sys::JsString> for Ai_Cf_Openai_Whisper_Tiny_En_InputKind {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<Object> for Ai_Cf_Openai_Whisper_Tiny_En_Input {
+impl ::core::convert::From<Object> for Ai_Cf_Openai_Whisper_Tiny_En_InputKind {
     fn from(value: Object) -> Self {
         Self::Object(value)
     }
 }
-impl ::core::convert::From<&Object> for Ai_Cf_Openai_Whisper_Tiny_En_Input {
+impl ::core::convert::From<&Object> for Ai_Cf_Openai_Whisper_Tiny_En_InputKind {
     fn from(value: &Object) -> Self {
         Self::Object(value.clone())
     }
@@ -23768,11 +23843,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Openai_Whisper_Tiny_En;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Openai_Whisper_Tiny_En) -> Ai_Cf_Openai_Whisper_Tiny_En_Input;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(
+    pub fn inputs(
         this: &Base_Ai_Cf_Openai_Whisper_Tiny_En,
-        val: Ai_Cf_Openai_Whisper_Tiny_En_Input,
+    ) -> Ai_Cf_Openai_Whisper_Tiny_En_InputKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(
+        this: &Base_Ai_Cf_Openai_Whisper_Tiny_En,
+        val: impl Ai_Cf_Openai_Whisper_Tiny_En_Input,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
@@ -23783,11 +23860,6 @@ extern "C" {
         this: &Base_Ai_Cf_Openai_Whisper_Tiny_En,
         val: &Ai_Cf_Openai_Whisper_Tiny_En_Output,
     );
-}
-impl Base_Ai_Cf_Openai_Whisper_Tiny_En {
-    pub fn set_inputs(&self, val: impl ::core::convert::Into<Ai_Cf_Openai_Whisper_Tiny_En_Input>) {
-        self.__set_inputs(val.into())
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -24009,39 +24081,51 @@ extern "C" {
         val: &Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output,
     );
 }
+pub trait Ai_Cf_Baai_Bge_M3_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Baai_Bge_M3_Input for Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts {}
+impl Ai_Cf_Baai_Bge_M3_Input for &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts {}
+impl Ai_Cf_Baai_Bge_M3_Input for Ai_Cf_Baai_Bge_M3_Input_Embedding {}
+impl Ai_Cf_Baai_Bge_M3_Input for &Ai_Cf_Baai_Bge_M3_Input_Embedding {}
+impl Ai_Cf_Baai_Bge_M3_Input for Object {}
+impl Ai_Cf_Baai_Bge_M3_Input for &Object {}
+impl Ai_Cf_Baai_Bge_M3_Input for Ai_Cf_Baai_Bge_M3_InputKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Baai_Bge_M3_Input {
+pub enum Ai_Cf_Baai_Bge_M3_InputKind {
     AiCfBaaiBgeM3InputQueryAndContexts(Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts),
     AiCfBaaiBgeM3InputEmbedding(Ai_Cf_Baai_Bge_M3_Input_Embedding),
     Object(Object),
 }
-impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts> for Ai_Cf_Baai_Bge_M3_Input {
+impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts>
+    for Ai_Cf_Baai_Bge_M3_InputKind
+{
     fn from(value: Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts) -> Self {
         Self::AiCfBaaiBgeM3InputQueryAndContexts(value)
     }
 }
-impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts> for Ai_Cf_Baai_Bge_M3_Input {
+impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts>
+    for Ai_Cf_Baai_Bge_M3_InputKind
+{
     fn from(value: &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts) -> Self {
         Self::AiCfBaaiBgeM3InputQueryAndContexts(value.clone())
     }
 }
-impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_Input_Embedding> for Ai_Cf_Baai_Bge_M3_Input {
+impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_Input_Embedding> for Ai_Cf_Baai_Bge_M3_InputKind {
     fn from(value: Ai_Cf_Baai_Bge_M3_Input_Embedding) -> Self {
         Self::AiCfBaaiBgeM3InputEmbedding(value)
     }
 }
-impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_Input_Embedding> for Ai_Cf_Baai_Bge_M3_Input {
+impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_Input_Embedding> for Ai_Cf_Baai_Bge_M3_InputKind {
     fn from(value: &Ai_Cf_Baai_Bge_M3_Input_Embedding) -> Self {
         Self::AiCfBaaiBgeM3InputEmbedding(value.clone())
     }
 }
-impl ::core::convert::From<Object> for Ai_Cf_Baai_Bge_M3_Input {
+impl ::core::convert::From<Object> for Ai_Cf_Baai_Bge_M3_InputKind {
     fn from(value: Object) -> Self {
         Self::Object(value)
     }
 }
-impl ::core::convert::From<&Object> for Ai_Cf_Baai_Bge_M3_Input {
+impl ::core::convert::From<&Object> for Ai_Cf_Baai_Bge_M3_InputKind {
     fn from(value: &Object) -> Self {
         Self::Object(value.clone())
     }
@@ -24280,54 +24364,64 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
         self.inner
     }
 }
+pub trait Ai_Cf_Baai_Bge_M3_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Baai_Bge_M3_Output for Ai_Cf_Baai_Bge_M3_Ouput_Query {}
+impl Ai_Cf_Baai_Bge_M3_Output for &Ai_Cf_Baai_Bge_M3_Ouput_Query {}
+impl Ai_Cf_Baai_Bge_M3_Output for Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts {}
+impl Ai_Cf_Baai_Bge_M3_Output for &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts {}
+impl Ai_Cf_Baai_Bge_M3_Output for Ai_Cf_Baai_Bge_M3_Ouput_Embedding {}
+impl Ai_Cf_Baai_Bge_M3_Output for &Ai_Cf_Baai_Bge_M3_Ouput_Embedding {}
+impl Ai_Cf_Baai_Bge_M3_Output for Ai_Cf_Baai_Bge_M3_AsyncResponse {}
+impl Ai_Cf_Baai_Bge_M3_Output for &Ai_Cf_Baai_Bge_M3_AsyncResponse {}
+impl Ai_Cf_Baai_Bge_M3_Output for Ai_Cf_Baai_Bge_M3_OutputKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Baai_Bge_M3_Output {
+pub enum Ai_Cf_Baai_Bge_M3_OutputKind {
     AiCfBaaiBgeM3OuputQuery(Ai_Cf_Baai_Bge_M3_Ouput_Query),
     AiCfBaaiBgeM3OutputEmbeddingForContexts(Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts),
     AiCfBaaiBgeM3OuputEmbedding(Ai_Cf_Baai_Bge_M3_Ouput_Embedding),
     AiCfBaaiBgeM3AsyncResponse(Ai_Cf_Baai_Bge_M3_AsyncResponse),
 }
-impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_Ouput_Query> for Ai_Cf_Baai_Bge_M3_Output {
+impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_Ouput_Query> for Ai_Cf_Baai_Bge_M3_OutputKind {
     fn from(value: Ai_Cf_Baai_Bge_M3_Ouput_Query) -> Self {
         Self::AiCfBaaiBgeM3OuputQuery(value)
     }
 }
-impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_Ouput_Query> for Ai_Cf_Baai_Bge_M3_Output {
+impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_Ouput_Query> for Ai_Cf_Baai_Bge_M3_OutputKind {
     fn from(value: &Ai_Cf_Baai_Bge_M3_Ouput_Query) -> Self {
         Self::AiCfBaaiBgeM3OuputQuery(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts>
-    for Ai_Cf_Baai_Bge_M3_Output
+    for Ai_Cf_Baai_Bge_M3_OutputKind
 {
     fn from(value: Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts) -> Self {
         Self::AiCfBaaiBgeM3OutputEmbeddingForContexts(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts>
-    for Ai_Cf_Baai_Bge_M3_Output
+    for Ai_Cf_Baai_Bge_M3_OutputKind
 {
     fn from(value: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts) -> Self {
         Self::AiCfBaaiBgeM3OutputEmbeddingForContexts(value.clone())
     }
 }
-impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_Ouput_Embedding> for Ai_Cf_Baai_Bge_M3_Output {
+impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_Ouput_Embedding> for Ai_Cf_Baai_Bge_M3_OutputKind {
     fn from(value: Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Self {
         Self::AiCfBaaiBgeM3OuputEmbedding(value)
     }
 }
-impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_Ouput_Embedding> for Ai_Cf_Baai_Bge_M3_Output {
+impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_Ouput_Embedding> for Ai_Cf_Baai_Bge_M3_OutputKind {
     fn from(value: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Self {
         Self::AiCfBaaiBgeM3OuputEmbedding(value.clone())
     }
 }
-impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_AsyncResponse> for Ai_Cf_Baai_Bge_M3_Output {
+impl ::core::convert::From<Ai_Cf_Baai_Bge_M3_AsyncResponse> for Ai_Cf_Baai_Bge_M3_OutputKind {
     fn from(value: Ai_Cf_Baai_Bge_M3_AsyncResponse) -> Self {
         Self::AiCfBaaiBgeM3AsyncResponse(value)
     }
 }
-impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_AsyncResponse> for Ai_Cf_Baai_Bge_M3_Output {
+impl ::core::convert::From<&Ai_Cf_Baai_Bge_M3_AsyncResponse> for Ai_Cf_Baai_Bge_M3_OutputKind {
     fn from(value: &Ai_Cf_Baai_Bge_M3_AsyncResponse) -> Self {
         Self::AiCfBaaiBgeM3AsyncResponse(value.clone())
     }
@@ -24540,23 +24634,15 @@ extern "C" {
     pub type Base_Ai_Cf_Baai_Bge_M3;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &Base_Ai_Cf_Baai_Bge_M3) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(this: &Base_Ai_Cf_Baai_Bge_M3, val: Ai_Cf_Baai_Bge_M3_Input);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(this: &Base_Ai_Cf_Baai_Bge_M3, val: impl Ai_Cf_Baai_Bge_M3_Input);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Baai_Bge_M3) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    fn __set_post_processed_outputs(this: &Base_Ai_Cf_Baai_Bge_M3, val: Ai_Cf_Baai_Bge_M3_Output);
-}
-impl Base_Ai_Cf_Baai_Bge_M3 {
-    pub fn set_inputs(&self, val: impl ::core::convert::Into<Ai_Cf_Baai_Bge_M3_Input>) {
-        self.__set_inputs(val.into())
-    }
     pub fn set_post_processed_outputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Baai_Bge_M3_Output>,
-    ) {
-        self.__set_post_processed_outputs(val.into())
-    }
+        this: &Base_Ai_Cf_Baai_Bge_M3,
+        val: impl Ai_Cf_Baai_Bge_M3_Output,
+    );
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -24679,35 +24765,59 @@ extern "C" {
         val: &Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output,
     );
 }
+pub trait Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input:
+    ::wasm_bindgen::convert::IntoWasmAbi
+{
+}
+impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt
+{
+}
+impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input
+    for &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt
+{
+}
+impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages
+{
+}
+impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input
+    for &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages
+{
+}
+impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_InputKind
+{
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input {
+pub enum Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_InputKind {
     AiCfMetaLlama3211BVisionInstructPrompt(Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt),
     AiCfMetaLlama3211BVisionInstructMessages(Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages),
 }
 impl ::core::convert::From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt>
-    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_InputKind
 {
     fn from(value: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt) -> Self {
         Self::AiCfMetaLlama3211BVisionInstructPrompt(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt>
-    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_InputKind
 {
     fn from(value: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt) -> Self {
         Self::AiCfMetaLlama3211BVisionInstructPrompt(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages>
-    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_InputKind
 {
     fn from(value: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Self {
         Self::AiCfMetaLlama3211BVisionInstructMessages(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages>
-    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_InputKind
 {
     fn from(value: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Self {
         Self::AiCfMetaLlama3211BVisionInstructMessages(value.clone())
@@ -25115,10 +25225,10 @@ extern "C" {
     pub type Base_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &Base_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(
         this: &Base_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct,
-        val: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input,
+        val: impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
@@ -25130,17 +25240,41 @@ extern "C" {
         val: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output,
     );
 }
-impl Base_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct {
-    pub fn set_inputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input>,
-    ) {
-        self.__set_inputs(val.into())
-    }
+pub trait Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input:
+    ::wasm_bindgen::convert::IntoWasmAbi
+{
+}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt
+{
+}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt
+{
+}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages
+{
+}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages
+{
+}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch
+{
+}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch
+{
+}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_InputKind
+{
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input {
+pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_InputKind {
     AiCfMetaLlama3370BInstructFp8FastPrompt(Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt),
     AiCfMetaLlama3370BInstructFp8FastMessages(Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages),
     AiCfMetaLlama3370BInstructFp8FastAsyncBatch(
@@ -25148,42 +25282,42 @@ pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input {
     ),
 }
 impl ::core::convert::From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_InputKind
 {
     fn from(value: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt) -> Self {
         Self::AiCfMetaLlama3370BInstructFp8FastPrompt(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_InputKind
 {
     fn from(value: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt) -> Self {
         Self::AiCfMetaLlama3370BInstructFp8FastPrompt(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_InputKind
 {
     fn from(value: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages) -> Self {
         Self::AiCfMetaLlama3370BInstructFp8FastMessages(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_InputKind
 {
     fn from(value: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages) -> Self {
         Self::AiCfMetaLlama3370BInstructFp8FastMessages(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_InputKind
 {
     fn from(value: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch) -> Self {
         Self::AiCfMetaLlama3370BInstructFp8FastAsyncBatch(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_InputKind
 {
     fn from(value: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch) -> Self {
         Self::AiCfMetaLlama3370BInstructFp8FastAsyncBatch(value.clone())
@@ -25745,67 +25879,92 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
         self.inner
     }
 }
+pub trait Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output:
+    ::wasm_bindgen::convert::IntoWasmAbi
+{
+}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output for Object {}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output for &Object {}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output for &str {}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output for ::std::string::String {}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output for &::std::string::String {}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output for &::std::boxed::Box<str> {}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output for &::std::borrow::Cow<'_, str> {}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output for ::js_sys::JsString {}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output for &::js_sys::JsString {}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse
+{
+}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output
+    for &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse
+{
+}
+impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind
+{
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output {
+pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind {
     Object(Object),
     String(String),
     AiCfMetaLlama3370BInstructFp8FastAsyncResponse(
         Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse,
     ),
 }
-impl ::core::convert::From<Object> for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output {
+impl ::core::convert::From<Object> for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind {
     fn from(value: Object) -> Self {
         Self::Object(value)
     }
 }
-impl ::core::convert::From<&Object> for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output {
+impl ::core::convert::From<&Object> for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind {
     fn from(value: &Object) -> Self {
         Self::Object(value.clone())
     }
 }
-impl ::core::convert::From<&str> for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output {
+impl ::core::convert::From<&str> for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
 impl ::core::convert::From<::std::string::String>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind
 {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
 impl ::core::convert::From<&::std::string::String>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind
 {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
 impl ::core::convert::From<::js_sys::JsString>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind
 {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
 impl ::core::convert::From<&::js_sys::JsString>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind
 {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
 impl ::core::convert::From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind
 {
     fn from(value: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse) -> Self {
         Self::AiCfMetaLlama3370BInstructFp8FastAsyncResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse>
-    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputKind
 {
     fn from(value: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse) -> Self {
         Self::AiCfMetaLlama3370BInstructFp8FastAsyncResponse(value.clone())
@@ -25866,34 +26025,20 @@ extern "C" {
     pub type Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(
         this: &Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input,
+        val: impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
         this: &Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast,
     ) -> PostProcessedOutputsKind;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    fn __set_post_processed_outputs(
-        this: &Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output,
-    );
-}
-impl Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast {
-    pub fn set_inputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input>,
-    ) {
-        self.__set_inputs(val.into())
-    }
     pub fn set_post_processed_outputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output>,
-    ) {
-        self.__set_post_processed_outputs(val.into())
-    }
+        this: &Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast,
+        val: impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output,
+    );
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -26131,35 +26276,53 @@ extern "C" {
         val: &Ai_Cf_Baai_Bge_Reranker_Base_Output,
     );
 }
+pub trait Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input:
+    ::wasm_bindgen::convert::IntoWasmAbi
+{
+}
+impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt {}
+impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input for &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt {}
+impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages
+{
+}
+impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input
+    for &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages
+{
+}
+impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_InputKind
+{
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input {
+pub enum Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_InputKind {
     AiCfQwenQwen25Coder32BInstructPrompt(Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt),
     AiCfQwenQwen25Coder32BInstructMessages(Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages),
 }
 impl ::core::convert::From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt>
-    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_InputKind
 {
     fn from(value: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt) -> Self {
         Self::AiCfQwenQwen25Coder32BInstructPrompt(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt>
-    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_InputKind
 {
     fn from(value: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt) -> Self {
         Self::AiCfQwenQwen25Coder32BInstructPrompt(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages>
-    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_InputKind
 {
     fn from(value: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages) -> Self {
         Self::AiCfQwenQwen25Coder32BInstructMessages(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages>
-    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_InputKind
 {
     fn from(value: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages) -> Self {
         Self::AiCfQwenQwen25Coder32BInstructMessages(value.clone())
@@ -26645,10 +26808,10 @@ extern "C" {
     pub type Base_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &Base_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(
         this: &Base_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct,
-        val: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input,
+        val: impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
@@ -26660,36 +26823,34 @@ extern "C" {
         val: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output,
     );
 }
-impl Base_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct {
-    pub fn set_inputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input>,
-    ) {
-        self.__set_inputs(val.into())
-    }
-}
+pub trait Ai_Cf_Qwen_Qwq_32B_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Qwen_Qwq_32B_Input for Ai_Cf_Qwen_Qwq_32B_Prompt {}
+impl Ai_Cf_Qwen_Qwq_32B_Input for &Ai_Cf_Qwen_Qwq_32B_Prompt {}
+impl Ai_Cf_Qwen_Qwq_32B_Input for Ai_Cf_Qwen_Qwq_32B_Messages {}
+impl Ai_Cf_Qwen_Qwq_32B_Input for &Ai_Cf_Qwen_Qwq_32B_Messages {}
+impl Ai_Cf_Qwen_Qwq_32B_Input for Ai_Cf_Qwen_Qwq_32B_InputKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Qwen_Qwq_32B_Input {
+pub enum Ai_Cf_Qwen_Qwq_32B_InputKind {
     AiCfQwenQwq32BPrompt(Ai_Cf_Qwen_Qwq_32B_Prompt),
     AiCfQwenQwq32BMessages(Ai_Cf_Qwen_Qwq_32B_Messages),
 }
-impl ::core::convert::From<Ai_Cf_Qwen_Qwq_32B_Prompt> for Ai_Cf_Qwen_Qwq_32B_Input {
+impl ::core::convert::From<Ai_Cf_Qwen_Qwq_32B_Prompt> for Ai_Cf_Qwen_Qwq_32B_InputKind {
     fn from(value: Ai_Cf_Qwen_Qwq_32B_Prompt) -> Self {
         Self::AiCfQwenQwq32BPrompt(value)
     }
 }
-impl ::core::convert::From<&Ai_Cf_Qwen_Qwq_32B_Prompt> for Ai_Cf_Qwen_Qwq_32B_Input {
+impl ::core::convert::From<&Ai_Cf_Qwen_Qwq_32B_Prompt> for Ai_Cf_Qwen_Qwq_32B_InputKind {
     fn from(value: &Ai_Cf_Qwen_Qwq_32B_Prompt) -> Self {
         Self::AiCfQwenQwq32BPrompt(value.clone())
     }
 }
-impl ::core::convert::From<Ai_Cf_Qwen_Qwq_32B_Messages> for Ai_Cf_Qwen_Qwq_32B_Input {
+impl ::core::convert::From<Ai_Cf_Qwen_Qwq_32B_Messages> for Ai_Cf_Qwen_Qwq_32B_InputKind {
     fn from(value: Ai_Cf_Qwen_Qwq_32B_Messages) -> Self {
         Self::AiCfQwenQwq32BMessages(value)
     }
 }
-impl ::core::convert::From<&Ai_Cf_Qwen_Qwq_32B_Messages> for Ai_Cf_Qwen_Qwq_32B_Input {
+impl ::core::convert::From<&Ai_Cf_Qwen_Qwq_32B_Messages> for Ai_Cf_Qwen_Qwq_32B_InputKind {
     fn from(value: &Ai_Cf_Qwen_Qwq_32B_Messages) -> Self {
         Self::AiCfQwenQwq32BMessages(value.clone())
     }
@@ -27035,8 +27196,8 @@ extern "C" {
     pub type Base_Ai_Cf_Qwen_Qwq_32B;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &Base_Ai_Cf_Qwen_Qwq_32B) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(this: &Base_Ai_Cf_Qwen_Qwq_32B, val: Ai_Cf_Qwen_Qwq_32B_Input);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(this: &Base_Ai_Cf_Qwen_Qwq_32B, val: impl Ai_Cf_Qwen_Qwq_32B_Input);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Qwen_Qwq_32B) -> Ai_Cf_Qwen_Qwq_32B_Output;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
@@ -27045,14 +27206,33 @@ extern "C" {
         val: &Ai_Cf_Qwen_Qwq_32B_Output,
     );
 }
-impl Base_Ai_Cf_Qwen_Qwq_32B {
-    pub fn set_inputs(&self, val: impl ::core::convert::Into<Ai_Cf_Qwen_Qwq_32B_Input>) {
-        self.__set_inputs(val.into())
-    }
+pub trait Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input:
+    ::wasm_bindgen::convert::IntoWasmAbi
+{
+}
+impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt
+{
+}
+impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input
+    for &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt
+{
+}
+impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages
+{
+}
+impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input
+    for &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages
+{
+}
+impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_InputKind
+{
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input {
+pub enum Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_InputKind {
     AiCfMistralaiMistralSmall3124BInstructPrompt(
         Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt,
     ),
@@ -27061,28 +27241,28 @@ pub enum Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input {
     ),
 }
 impl ::core::convert::From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt>
-    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_InputKind
 {
     fn from(value: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt) -> Self {
         Self::AiCfMistralaiMistralSmall3124BInstructPrompt(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt>
-    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_InputKind
 {
     fn from(value: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt) -> Self {
         Self::AiCfMistralaiMistralSmall3124BInstructPrompt(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages>
-    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_InputKind
 {
     fn from(value: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages) -> Self {
         Self::AiCfMistralaiMistralSmall3124BInstructMessages(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages>
-    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_InputKind
 {
     fn from(value: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages) -> Self {
         Self::AiCfMistralaiMistralSmall3124BInstructMessages(value.clone())
@@ -27516,10 +27696,10 @@ extern "C" {
     pub type Base_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &Base_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(
         this: &Base_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct,
-        val: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input,
+        val: impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
@@ -27531,43 +27711,41 @@ extern "C" {
         val: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output,
     );
 }
-impl Base_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct {
-    pub fn set_inputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input>,
-    ) {
-        self.__set_inputs(val.into())
-    }
-}
+pub trait Ai_Cf_Google_Gemma_3_12B_It_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Google_Gemma_3_12B_It_Input for Ai_Cf_Google_Gemma_3_12B_It_Prompt {}
+impl Ai_Cf_Google_Gemma_3_12B_It_Input for &Ai_Cf_Google_Gemma_3_12B_It_Prompt {}
+impl Ai_Cf_Google_Gemma_3_12B_It_Input for Ai_Cf_Google_Gemma_3_12B_It_Messages {}
+impl Ai_Cf_Google_Gemma_3_12B_It_Input for &Ai_Cf_Google_Gemma_3_12B_It_Messages {}
+impl Ai_Cf_Google_Gemma_3_12B_It_Input for Ai_Cf_Google_Gemma_3_12B_It_InputKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Google_Gemma_3_12B_It_Input {
+pub enum Ai_Cf_Google_Gemma_3_12B_It_InputKind {
     AiCfGoogleGemma312BItPrompt(Ai_Cf_Google_Gemma_3_12B_It_Prompt),
     AiCfGoogleGemma312BItMessages(Ai_Cf_Google_Gemma_3_12B_It_Messages),
 }
 impl ::core::convert::From<Ai_Cf_Google_Gemma_3_12B_It_Prompt>
-    for Ai_Cf_Google_Gemma_3_12B_It_Input
+    for Ai_Cf_Google_Gemma_3_12B_It_InputKind
 {
     fn from(value: Ai_Cf_Google_Gemma_3_12B_It_Prompt) -> Self {
         Self::AiCfGoogleGemma312BItPrompt(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Google_Gemma_3_12B_It_Prompt>
-    for Ai_Cf_Google_Gemma_3_12B_It_Input
+    for Ai_Cf_Google_Gemma_3_12B_It_InputKind
 {
     fn from(value: &Ai_Cf_Google_Gemma_3_12B_It_Prompt) -> Self {
         Self::AiCfGoogleGemma312BItPrompt(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Google_Gemma_3_12B_It_Messages>
-    for Ai_Cf_Google_Gemma_3_12B_It_Input
+    for Ai_Cf_Google_Gemma_3_12B_It_InputKind
 {
     fn from(value: Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Self {
         Self::AiCfGoogleGemma312BItMessages(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Google_Gemma_3_12B_It_Messages>
-    for Ai_Cf_Google_Gemma_3_12B_It_Input
+    for Ai_Cf_Google_Gemma_3_12B_It_InputKind
 {
     fn from(value: &Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Self {
         Self::AiCfGoogleGemma312BItMessages(value.clone())
@@ -27925,10 +28103,10 @@ extern "C" {
     pub type Base_Ai_Cf_Google_Gemma_3_12B_It;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &Base_Ai_Cf_Google_Gemma_3_12B_It) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(
         this: &Base_Ai_Cf_Google_Gemma_3_12B_It,
-        val: Ai_Cf_Google_Gemma_3_12B_It_Input,
+        val: impl Ai_Cf_Google_Gemma_3_12B_It_Input,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
@@ -27940,14 +28118,41 @@ extern "C" {
         val: &Ai_Cf_Google_Gemma_3_12B_It_Output,
     );
 }
-impl Base_Ai_Cf_Google_Gemma_3_12B_It {
-    pub fn set_inputs(&self, val: impl ::core::convert::Into<Ai_Cf_Google_Gemma_3_12B_It_Input>) {
-        self.__set_inputs(val.into())
-    }
+pub trait Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input:
+    ::wasm_bindgen::convert::IntoWasmAbi
+{
+}
+impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt
+{
+}
+impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt
+{
+}
+impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages
+{
+}
+impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages
+{
+}
+impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch
+{
+}
+impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch
+{
+}
+impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_InputKind
+{
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input {
+pub enum Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_InputKind {
     AiCfMetaLlama4Scout17B16EInstructPrompt(Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt),
     AiCfMetaLlama4Scout17B16EInstructMessages(Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages),
     AiCfMetaLlama4Scout17B16EInstructAsyncBatch(
@@ -27955,42 +28160,42 @@ pub enum Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input {
     ),
 }
 impl ::core::convert::From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt>
-    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_InputKind
 {
     fn from(value: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt) -> Self {
         Self::AiCfMetaLlama4Scout17B16EInstructPrompt(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt>
-    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_InputKind
 {
     fn from(value: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt) -> Self {
         Self::AiCfMetaLlama4Scout17B16EInstructPrompt(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages>
-    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_InputKind
 {
     fn from(value: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages) -> Self {
         Self::AiCfMetaLlama4Scout17B16EInstructMessages(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages>
-    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_InputKind
 {
     fn from(value: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages) -> Self {
         Self::AiCfMetaLlama4Scout17B16EInstructMessages(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch>
-    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_InputKind
 {
     fn from(value: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch) -> Self {
         Self::AiCfMetaLlama4Scout17B16EInstructAsyncBatch(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch>
-    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_InputKind
 {
     fn from(value: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch) -> Self {
         Self::AiCfMetaLlama4Scout17B16EInstructAsyncBatch(value.clone())
@@ -28880,10 +29085,10 @@ extern "C" {
     pub type Base_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &Base_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(
         this: &Base_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct,
-        val: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input,
+        val: impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
@@ -28895,58 +29100,58 @@ extern "C" {
         val: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output,
     );
 }
-impl Base_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct {
-    pub fn set_inputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input>,
-    ) {
-        self.__set_inputs(val.into())
-    }
-}
+pub trait Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input for &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input for &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input for &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_InputKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input {
+pub enum Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_InputKind {
     AiCfQwenQwen330BA3BFp8Prompt(Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt),
     AiCfQwenQwen330BA3BFp8Messages(Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages),
     AiCfQwenQwen330BA3BFp8AsyncBatch(Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch),
 }
 impl ::core::convert::From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_InputKind
 {
     fn from(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt) -> Self {
         Self::AiCfQwenQwen330BA3BFp8Prompt(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_InputKind
 {
     fn from(value: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt) -> Self {
         Self::AiCfQwenQwen330BA3BFp8Prompt(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_InputKind
 {
     fn from(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages) -> Self {
         Self::AiCfQwenQwen330BA3BFp8Messages(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_InputKind
 {
     fn from(value: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages) -> Self {
         Self::AiCfQwenQwen330BA3BFp8Messages(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_InputKind
 {
     fn from(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch) -> Self {
         Self::AiCfQwenQwen330BA3BFp8AsyncBatch(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_InputKind
 {
     fn from(value: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch) -> Self {
         Self::AiCfQwenQwen330BA3BFp8AsyncBatch(value.clone())
@@ -29790,9 +29995,30 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder {
         self.inner
     }
 }
+pub trait Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output
+    for &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response
+{
+}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output
+    for &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response
+{
+}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for &str {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for ::std::string::String {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for &::std::string::String {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for &::std::boxed::Box<str> {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for &::std::borrow::Cow<'_, str> {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for ::js_sys::JsString {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for &::js_sys::JsString {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse {}
+impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output {
+pub enum Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind {
     AiCfQwenQwen330BA3BFp8ChatCompletionResponse(
         Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response,
     ),
@@ -29803,67 +30029,67 @@ pub enum Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output {
     AiCfQwenQwen330BA3BFp8AsyncResponse(Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse),
 }
 impl ::core::convert::From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind
 {
     fn from(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response) -> Self {
         Self::AiCfQwenQwen330BA3BFp8ChatCompletionResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind
 {
     fn from(value: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response) -> Self {
         Self::AiCfQwenQwen330BA3BFp8ChatCompletionResponse(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind
 {
     fn from(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response) -> Self {
         Self::AiCfQwenQwen330BA3BFp8TextCompletionResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind
 {
     fn from(value: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response) -> Self {
         Self::AiCfQwenQwen330BA3BFp8TextCompletionResponse(value.clone())
     }
 }
-impl ::core::convert::From<&str> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output {
+impl ::core::convert::From<&str> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output {
+impl ::core::convert::From<::std::string::String> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output {
+impl ::core::convert::From<&::std::string::String> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output {
+impl ::core::convert::From<::js_sys::JsString> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output {
+impl ::core::convert::From<&::js_sys::JsString> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
 impl ::core::convert::From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind
 {
     fn from(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse) -> Self {
         Self::AiCfQwenQwen330BA3BFp8AsyncResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse>
-    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_OutputKind
 {
     fn from(value: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse) -> Self {
         Self::AiCfQwenQwen330BA3BFp8AsyncResponse(value.clone())
@@ -30174,31 +30400,20 @@ extern "C" {
     pub type Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(
         this: &Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8,
-        val: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input,
+        val: impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
         this: &Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8,
     ) -> PostProcessedOutputsKind;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    fn __set_post_processed_outputs(
-        this: &Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8,
-        val: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output,
-    );
-}
-impl Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8 {
-    pub fn set_inputs(&self, val: impl ::core::convert::Into<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input>) {
-        self.__set_inputs(val.into())
-    }
     pub fn set_post_processed_outputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output>,
-    ) {
-        self.__set_post_processed_outputs(val.into())
-    }
+        this: &Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8,
+        val: impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output,
+    );
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -31471,9 +31686,41 @@ extern "C" {
         val: &Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output,
     );
 }
+pub trait Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input:
+    ::wasm_bindgen::convert::IntoWasmAbi
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_InputKind
+{
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input {
+pub enum Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_InputKind {
     AiCfAisingaporeGemmaSeaLionV427BItPrompt(Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt),
     AiCfAisingaporeGemmaSeaLionV427BItMessages(Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages),
     AiCfAisingaporeGemmaSeaLionV427BItAsyncBatch(
@@ -31481,42 +31728,42 @@ pub enum Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input {
     ),
 }
 impl ::core::convert::From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_InputKind
 {
     fn from(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItPrompt(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_InputKind
 {
     fn from(value: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItPrompt(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_InputKind
 {
     fn from(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItMessages(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_InputKind
 {
     fn from(value: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItMessages(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_InputKind
 {
     fn from(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItAsyncBatch(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_InputKind
 {
     fn from(value: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItAsyncBatch(value.clone())
@@ -32474,9 +32721,48 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder {
         self.inner
     }
 }
+pub trait Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output:
+    ::wasm_bindgen::convert::IntoWasmAbi
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output for &str {}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output for ::std::string::String {}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output for &::std::string::String {}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output for &::std::boxed::Box<str> {}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output for &::std::borrow::Cow<'_, str> {}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output for ::js_sys::JsString {}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output for &::js_sys::JsString {}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse
+{
+}
+impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
+{
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output {
+pub enum Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind {
     AiCfAisingaporeGemmaSeaLionV427BItChatCompletionResponse(
         Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response,
     ),
@@ -32489,75 +32775,75 @@ pub enum Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output {
     ),
 }
 impl ::core::convert::From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
 {
     fn from(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItChatCompletionResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
 {
     fn from(value: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItChatCompletionResponse(value.clone())
     }
 }
 impl ::core::convert::From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
 {
     fn from(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItTextCompletionResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
 {
     fn from(value: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItTextCompletionResponse(value.clone())
     }
 }
-impl ::core::convert::From<&str> for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output {
+impl ::core::convert::From<&str> for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
 impl ::core::convert::From<::std::string::String>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
 {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
 impl ::core::convert::From<&::std::string::String>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
 {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
 impl ::core::convert::From<::js_sys::JsString>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
 {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
 impl ::core::convert::From<&::js_sys::JsString>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
 {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
 impl ::core::convert::From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
 {
     fn from(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItAsyncResponse(value)
     }
 }
 impl ::core::convert::From<&Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse>
-    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_OutputKind
 {
     fn from(value: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse) -> Self {
         Self::AiCfAisingaporeGemmaSeaLionV427BItAsyncResponse(value.clone())
@@ -32902,34 +33188,20 @@ extern "C" {
     pub type Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It) -> JsValue;
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    fn __set_inputs(
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inputs(
         this: &Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It,
-        val: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input,
+        val: impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
         this: &Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It,
     ) -> PostProcessedOutputsKind;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    fn __set_post_processed_outputs(
-        this: &Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It,
-        val: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output,
-    );
-}
-impl Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It {
-    pub fn set_inputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input>,
-    ) {
-        self.__set_inputs(val.into())
-    }
     pub fn set_post_processed_outputs(
-        &self,
-        val: impl ::core::convert::Into<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output>,
-    ) {
-        self.__set_post_processed_outputs(val.into())
-    }
+        this: &Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It,
+        val: impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output,
+    );
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -43509,146 +43781,186 @@ pub mod cloudflare {
             Month = "month",
             Year = "year",
         }
+        pub trait WorkflowSleepDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
+        impl WorkflowSleepDuration for &str {}
+        impl WorkflowSleepDuration for ::std::string::String {}
+        impl WorkflowSleepDuration for &::std::string::String {}
+        impl WorkflowSleepDuration for &::std::boxed::Box<str> {}
+        impl WorkflowSleepDuration for &::std::borrow::Cow<'_, str> {}
+        impl WorkflowSleepDuration for ::js_sys::JsString {}
+        impl WorkflowSleepDuration for &::js_sys::JsString {}
+        impl WorkflowSleepDuration for f64 {}
+        impl WorkflowSleepDuration for WorkflowSleepDurationKind {}
         #[wasm_bindgen(private)]
         #[derive(Clone, Debug)]
-        pub enum WorkflowSleepDuration {
+        pub enum WorkflowSleepDurationKind {
             String(String),
             F64(f64),
         }
-        impl ::core::convert::From<&str> for WorkflowSleepDuration {
+        impl ::core::convert::From<&str> for WorkflowSleepDurationKind {
             fn from(value: &str) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<::std::string::String> for WorkflowSleepDuration {
+        impl ::core::convert::From<::std::string::String> for WorkflowSleepDurationKind {
             fn from(value: ::std::string::String) -> Self {
                 Self::String(value)
             }
         }
-        impl ::core::convert::From<&::std::string::String> for WorkflowSleepDuration {
+        impl ::core::convert::From<&::std::string::String> for WorkflowSleepDurationKind {
             fn from(value: &::std::string::String) -> Self {
                 Self::String(value.clone())
             }
         }
-        impl ::core::convert::From<::js_sys::JsString> for WorkflowSleepDuration {
+        impl ::core::convert::From<::js_sys::JsString> for WorkflowSleepDurationKind {
             fn from(value: ::js_sys::JsString) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<&::js_sys::JsString> for WorkflowSleepDuration {
+        impl ::core::convert::From<&::js_sys::JsString> for WorkflowSleepDurationKind {
             fn from(value: &::js_sys::JsString) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<f64> for WorkflowSleepDuration {
+        impl ::core::convert::From<f64> for WorkflowSleepDurationKind {
             fn from(value: f64) -> Self {
                 Self::F64(value)
             }
         }
+        pub trait WorkflowDelayDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
+        impl WorkflowDelayDuration for &str {}
+        impl WorkflowDelayDuration for ::std::string::String {}
+        impl WorkflowDelayDuration for &::std::string::String {}
+        impl WorkflowDelayDuration for &::std::boxed::Box<str> {}
+        impl WorkflowDelayDuration for &::std::borrow::Cow<'_, str> {}
+        impl WorkflowDelayDuration for ::js_sys::JsString {}
+        impl WorkflowDelayDuration for &::js_sys::JsString {}
+        impl WorkflowDelayDuration for f64 {}
+        impl WorkflowDelayDuration for WorkflowDelayDurationKind {}
         #[wasm_bindgen(private)]
         #[derive(Clone, Debug)]
-        pub enum WorkflowDelayDuration {
+        pub enum WorkflowDelayDurationKind {
             String(String),
             F64(f64),
         }
-        impl ::core::convert::From<&str> for WorkflowDelayDuration {
+        impl ::core::convert::From<&str> for WorkflowDelayDurationKind {
             fn from(value: &str) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<::std::string::String> for WorkflowDelayDuration {
+        impl ::core::convert::From<::std::string::String> for WorkflowDelayDurationKind {
             fn from(value: ::std::string::String) -> Self {
                 Self::String(value)
             }
         }
-        impl ::core::convert::From<&::std::string::String> for WorkflowDelayDuration {
+        impl ::core::convert::From<&::std::string::String> for WorkflowDelayDurationKind {
             fn from(value: &::std::string::String) -> Self {
                 Self::String(value.clone())
             }
         }
-        impl ::core::convert::From<::js_sys::JsString> for WorkflowDelayDuration {
+        impl ::core::convert::From<::js_sys::JsString> for WorkflowDelayDurationKind {
             fn from(value: ::js_sys::JsString) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<&::js_sys::JsString> for WorkflowDelayDuration {
+        impl ::core::convert::From<&::js_sys::JsString> for WorkflowDelayDurationKind {
             fn from(value: &::js_sys::JsString) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<f64> for WorkflowDelayDuration {
+        impl ::core::convert::From<f64> for WorkflowDelayDurationKind {
             fn from(value: f64) -> Self {
                 Self::F64(value)
             }
         }
+        pub trait WorkflowTimeoutDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
+        impl WorkflowTimeoutDuration for &str {}
+        impl WorkflowTimeoutDuration for ::std::string::String {}
+        impl WorkflowTimeoutDuration for &::std::string::String {}
+        impl WorkflowTimeoutDuration for &::std::boxed::Box<str> {}
+        impl WorkflowTimeoutDuration for &::std::borrow::Cow<'_, str> {}
+        impl WorkflowTimeoutDuration for ::js_sys::JsString {}
+        impl WorkflowTimeoutDuration for &::js_sys::JsString {}
+        impl WorkflowTimeoutDuration for f64 {}
+        impl WorkflowTimeoutDuration for WorkflowTimeoutDurationKind {}
         #[wasm_bindgen(private)]
         #[derive(Clone, Debug)]
-        pub enum WorkflowTimeoutDuration {
+        pub enum WorkflowTimeoutDurationKind {
             String(String),
             F64(f64),
         }
-        impl ::core::convert::From<&str> for WorkflowTimeoutDuration {
+        impl ::core::convert::From<&str> for WorkflowTimeoutDurationKind {
             fn from(value: &str) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<::std::string::String> for WorkflowTimeoutDuration {
+        impl ::core::convert::From<::std::string::String> for WorkflowTimeoutDurationKind {
             fn from(value: ::std::string::String) -> Self {
                 Self::String(value)
             }
         }
-        impl ::core::convert::From<&::std::string::String> for WorkflowTimeoutDuration {
+        impl ::core::convert::From<&::std::string::String> for WorkflowTimeoutDurationKind {
             fn from(value: &::std::string::String) -> Self {
                 Self::String(value.clone())
             }
         }
-        impl ::core::convert::From<::js_sys::JsString> for WorkflowTimeoutDuration {
+        impl ::core::convert::From<::js_sys::JsString> for WorkflowTimeoutDurationKind {
             fn from(value: ::js_sys::JsString) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<&::js_sys::JsString> for WorkflowTimeoutDuration {
+        impl ::core::convert::From<&::js_sys::JsString> for WorkflowTimeoutDurationKind {
             fn from(value: &::js_sys::JsString) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<f64> for WorkflowTimeoutDuration {
+        impl ::core::convert::From<f64> for WorkflowTimeoutDurationKind {
             fn from(value: f64) -> Self {
                 Self::F64(value)
             }
         }
+        pub trait WorkflowRetentionDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
+        impl WorkflowRetentionDuration for &str {}
+        impl WorkflowRetentionDuration for ::std::string::String {}
+        impl WorkflowRetentionDuration for &::std::string::String {}
+        impl WorkflowRetentionDuration for &::std::boxed::Box<str> {}
+        impl WorkflowRetentionDuration for &::std::borrow::Cow<'_, str> {}
+        impl WorkflowRetentionDuration for ::js_sys::JsString {}
+        impl WorkflowRetentionDuration for &::js_sys::JsString {}
+        impl WorkflowRetentionDuration for f64 {}
+        impl WorkflowRetentionDuration for WorkflowRetentionDurationKind {}
         #[wasm_bindgen(private)]
         #[derive(Clone, Debug)]
-        pub enum WorkflowRetentionDuration {
+        pub enum WorkflowRetentionDurationKind {
             String(String),
             F64(f64),
         }
-        impl ::core::convert::From<&str> for WorkflowRetentionDuration {
+        impl ::core::convert::From<&str> for WorkflowRetentionDurationKind {
             fn from(value: &str) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<::std::string::String> for WorkflowRetentionDuration {
+        impl ::core::convert::From<::std::string::String> for WorkflowRetentionDurationKind {
             fn from(value: ::std::string::String) -> Self {
                 Self::String(value)
             }
         }
-        impl ::core::convert::From<&::std::string::String> for WorkflowRetentionDuration {
+        impl ::core::convert::From<&::std::string::String> for WorkflowRetentionDurationKind {
             fn from(value: &::std::string::String) -> Self {
                 Self::String(value.clone())
             }
         }
-        impl ::core::convert::From<::js_sys::JsString> for WorkflowRetentionDuration {
+        impl ::core::convert::From<::js_sys::JsString> for WorkflowRetentionDurationKind {
             fn from(value: ::js_sys::JsString) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<&::js_sys::JsString> for WorkflowRetentionDuration {
+        impl ::core::convert::From<&::js_sys::JsString> for WorkflowRetentionDurationKind {
             fn from(value: &::js_sys::JsString) -> Self {
                 Self::String(::std::string::String::from(value))
             }
         }
-        impl ::core::convert::From<f64> for WorkflowRetentionDuration {
+        impl ::core::convert::From<f64> for WorkflowRetentionDurationKind {
             fn from(value: f64) -> Self {
                 Self::F64(value)
             }
@@ -43671,15 +43983,10 @@ pub mod cloudflare {
             pub fn set_retries(this: &WorkflowStepConfig, val: &Object);
             #[wasm_bindgen(method, getter)]
             pub fn timeout(this: &WorkflowStepConfig) -> Option<TimeoutKind>;
-            #[wasm_bindgen(method, setter, js_name = "timeout")]
-            fn __set_timeout(this: &WorkflowStepConfig, val: WorkflowTimeoutDuration);
+            #[wasm_bindgen(method, setter)]
+            pub fn set_timeout(this: &WorkflowStepConfig, val: impl WorkflowTimeoutDuration);
             #[wasm_bindgen(method, setter, js_name = "timeout")]
             pub fn set_timeout_with_f64(this: &WorkflowStepConfig, val: f64);
-        }
-        impl WorkflowStepConfig {
-            pub fn set_timeout(&self, val: impl ::core::convert::Into<WorkflowTimeoutDuration>) {
-                self.__set_timeout(val.into())
-            }
         }
         impl WorkflowStepConfig {
             pub fn new() -> WorkflowStepConfig {
@@ -43704,7 +44011,7 @@ pub mod cloudflare {
                 self.inner.set_retries(val);
                 self
             }
-            pub fn timeout(self, val: impl ::core::convert::Into<WorkflowTimeoutDuration>) -> Self {
+            pub fn timeout(self, val: impl WorkflowTimeoutDuration) -> Self {
                 self.inner.set_timeout(val);
                 self
             }
@@ -43891,15 +44198,10 @@ pub mod cloudflare {
             pub fn set_type(this: &WorkflowStepOptions, val: impl ::wasm_bindgen::JsStringLike);
             #[wasm_bindgen(method, getter)]
             pub fn timeout(this: &WorkflowStepOptions) -> Option<TimeoutKind>;
-            #[wasm_bindgen(method, setter, js_name = "timeout")]
-            fn __set_timeout(this: &WorkflowStepOptions, val: WorkflowTimeoutDuration);
+            #[wasm_bindgen(method, setter)]
+            pub fn set_timeout(this: &WorkflowStepOptions, val: impl WorkflowTimeoutDuration);
             #[wasm_bindgen(method, setter, js_name = "timeout")]
             pub fn set_timeout_with_f64(this: &WorkflowStepOptions, val: f64);
-        }
-        impl WorkflowStepOptions {
-            pub fn set_timeout(&self, val: impl ::core::convert::Into<WorkflowTimeoutDuration>) {
-                self.__set_timeout(val.into())
-            }
         }
         impl WorkflowStepOptions {
             pub fn new(r#type: impl ::wasm_bindgen::JsStringLike) -> WorkflowStepOptions {
@@ -43917,7 +44219,7 @@ pub mod cloudflare {
             inner: WorkflowStepOptions,
         }
         impl WorkflowStepOptionsBuilder {
-            pub fn timeout(self, val: impl ::core::convert::Into<WorkflowTimeoutDuration>) -> Self {
+            pub fn timeout(self, val: impl WorkflowTimeoutDuration) -> Self {
                 self.inner.set_timeout(val);
                 self
             }
@@ -46223,39 +46525,47 @@ pub mod rpc {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkflowEntrypointBranded;
     }
+    pub trait EntrypointBranded: ::wasm_bindgen::convert::IntoWasmAbi {}
+    impl EntrypointBranded for WorkerEntrypointBranded {}
+    impl EntrypointBranded for &WorkerEntrypointBranded {}
+    impl EntrypointBranded for DurableObjectBranded {}
+    impl EntrypointBranded for &DurableObjectBranded {}
+    impl EntrypointBranded for WorkflowEntrypointBranded {}
+    impl EntrypointBranded for &WorkflowEntrypointBranded {}
+    impl EntrypointBranded for EntrypointBrandedKind {}
     #[wasm_bindgen(private)]
     #[derive(Clone, Debug)]
-    pub enum EntrypointBranded {
+    pub enum EntrypointBrandedKind {
         WorkerEntrypointBranded(WorkerEntrypointBranded),
         DurableObjectBranded(DurableObjectBranded),
         WorkflowEntrypointBranded(WorkflowEntrypointBranded),
     }
-    impl ::core::convert::From<WorkerEntrypointBranded> for EntrypointBranded {
+    impl ::core::convert::From<WorkerEntrypointBranded> for EntrypointBrandedKind {
         fn from(value: WorkerEntrypointBranded) -> Self {
             Self::WorkerEntrypointBranded(value)
         }
     }
-    impl ::core::convert::From<&WorkerEntrypointBranded> for EntrypointBranded {
+    impl ::core::convert::From<&WorkerEntrypointBranded> for EntrypointBrandedKind {
         fn from(value: &WorkerEntrypointBranded) -> Self {
             Self::WorkerEntrypointBranded(value.clone())
         }
     }
-    impl ::core::convert::From<DurableObjectBranded> for EntrypointBranded {
+    impl ::core::convert::From<DurableObjectBranded> for EntrypointBrandedKind {
         fn from(value: DurableObjectBranded) -> Self {
             Self::DurableObjectBranded(value)
         }
     }
-    impl ::core::convert::From<&DurableObjectBranded> for EntrypointBranded {
+    impl ::core::convert::From<&DurableObjectBranded> for EntrypointBrandedKind {
         fn from(value: &DurableObjectBranded) -> Self {
             Self::DurableObjectBranded(value.clone())
         }
     }
-    impl ::core::convert::From<WorkflowEntrypointBranded> for EntrypointBranded {
+    impl ::core::convert::From<WorkflowEntrypointBranded> for EntrypointBrandedKind {
         fn from(value: WorkflowEntrypointBranded) -> Self {
             Self::WorkflowEntrypointBranded(value)
         }
     }
-    impl ::core::convert::From<&WorkflowEntrypointBranded> for EntrypointBranded {
+    impl ::core::convert::From<&WorkflowEntrypointBranded> for EntrypointBrandedKind {
         fn from(value: &WorkflowEntrypointBranded) -> Self {
             Self::WorkflowEntrypointBranded(value.clone())
         }
@@ -50637,28 +50947,34 @@ pub mod tail_stream {
         }
     }
 }
+pub trait VectorFloatArray: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl VectorFloatArray for Float32Array {}
+impl VectorFloatArray for &Float32Array {}
+impl VectorFloatArray for Float64Array {}
+impl VectorFloatArray for &Float64Array {}
+impl VectorFloatArray for VectorFloatArrayKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum VectorFloatArray {
+pub enum VectorFloatArrayKind {
     Float32Array(Float32Array),
     Float64Array(Float64Array),
 }
-impl ::core::convert::From<Float32Array> for VectorFloatArray {
+impl ::core::convert::From<Float32Array> for VectorFloatArrayKind {
     fn from(value: Float32Array) -> Self {
         Self::Float32Array(value)
     }
 }
-impl ::core::convert::From<&Float32Array> for VectorFloatArray {
+impl ::core::convert::From<&Float32Array> for VectorFloatArrayKind {
     fn from(value: &Float32Array) -> Self {
         Self::Float32Array(value.clone())
     }
 }
-impl ::core::convert::From<Float64Array> for VectorFloatArray {
+impl ::core::convert::From<Float64Array> for VectorFloatArrayKind {
     fn from(value: Float64Array) -> Self {
         Self::Float64Array(value)
     }
 }
-impl ::core::convert::From<&Float64Array> for VectorFloatArray {
+impl ::core::convert::From<&Float64Array> for VectorFloatArrayKind {
     fn from(value: &Float64Array) -> Self {
         Self::Float64Array(value.clone())
     }
@@ -50984,8 +51300,8 @@ extern "C" {
     #[doc = " The vector values"]
     #[wasm_bindgen(method, getter)]
     pub fn values(this: &VectorizeVector) -> ValuesKind;
-    #[wasm_bindgen(method, setter, js_name = "values")]
-    fn __set_values(this: &VectorizeVector, val: VectorFloatArray);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_values(this: &VectorizeVector, val: impl VectorFloatArray);
     #[wasm_bindgen(method, setter, js_name = "values")]
     pub fn set_values_with_slice(
         this: &VectorizeVector,
@@ -51006,16 +51322,11 @@ extern "C" {
     pub fn set_metadata(this: &VectorizeVector, val: &Object);
 }
 impl VectorizeVector {
-    pub fn set_values(&self, val: impl ::core::convert::Into<VectorFloatArray>) {
-        self.__set_values(val.into())
-    }
-}
-impl VectorizeVector {
     #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[doc = " * `values` - The vector values"]
     pub fn new(
         id: impl ::wasm_bindgen::JsStringLike,
-        values: impl ::core::convert::Into<VectorFloatArray>,
+        values: impl VectorFloatArray,
     ) -> VectorizeVector {
         Self::builder(id, values).build()
     }
@@ -51031,7 +51342,7 @@ impl VectorizeVector {
     #[doc = " * `values` - The vector values"]
     pub fn builder(
         id: impl ::wasm_bindgen::JsStringLike,
-        values: impl ::core::convert::Into<VectorFloatArray>,
+        values: impl VectorFloatArray,
     ) -> VectorizeVectorBuilder {
         let inner: VectorizeVector = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
@@ -51079,8 +51390,8 @@ extern "C" {
     #[doc = " The vector values"]
     #[wasm_bindgen(method, getter)]
     pub fn values(this: &VectorizeMatch) -> Option<ValuesKind>;
-    #[wasm_bindgen(method, setter, js_name = "values")]
-    fn __set_values(this: &VectorizeMatch, val: VectorFloatArray);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_values(this: &VectorizeMatch, val: impl VectorFloatArray);
     #[wasm_bindgen(method, setter, js_name = "values")]
     pub fn set_values_with_slice(
         this: &VectorizeMatch,
@@ -51109,11 +51420,6 @@ extern "C" {
     pub fn set_metadata(this: &VectorizeMatch, val: &Object);
 }
 impl VectorizeMatch {
-    pub fn set_values(&self, val: impl ::core::convert::Into<VectorFloatArray>) {
-        self.__set_values(val.into())
-    }
-}
-impl VectorizeMatch {
     #[doc = " * `score` - The score or rank for similarity, when returned as a result"]
     #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     pub fn new(score: f64, id: impl ::wasm_bindgen::JsStringLike) -> VectorizeMatch {
@@ -51132,7 +51438,7 @@ pub struct VectorizeMatchBuilder {
     inner: VectorizeMatch,
 }
 impl VectorizeMatchBuilder {
-    pub fn values(self, val: impl ::core::convert::Into<VectorFloatArray>) -> Self {
+    pub fn values(self, val: impl VectorFloatArray) -> Self {
         self.inner.set_values(val);
         self
     }
@@ -51235,15 +51541,27 @@ extern "C" {
     #[doc = " Returns: A promise that resolves with information about the current index."]
     #[wasm_bindgen(method, js_name = "describe")]
     pub fn describe_promise(this: &VectorizeIndex) -> Promise<VectorizeIndexDetails>;
-    #[wasm_bindgen(method, catch, js_name = "query")]
-    async fn __query(
+    #[doc = " Use the provided vector to perform a similarity search across the index."]
+    #[doc = ""]
+    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
+    #[doc = " * `options` - Configuration options to massage the returned data."]
+    #[doc = ""]
+    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
+    #[wasm_bindgen(method, catch)]
+    pub async fn query(
         this: &VectorizeIndex,
-        vector: VectorFloatArray,
+        vector: impl VectorFloatArray,
     ) -> Result<VectorizeMatches, JsValue>;
+    #[doc = " Use the provided vector to perform a similarity search across the index."]
+    #[doc = ""]
+    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
+    #[doc = " * `options` - Configuration options to massage the returned data."]
+    #[doc = ""]
+    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, js_name = "query")]
-    fn __query_promise(
+    pub fn query_promise(
         this: &VectorizeIndex,
-        vector: VectorFloatArray,
+        vector: impl VectorFloatArray,
     ) -> Promise<VectorizeMatches>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
     #[doc = ""]
@@ -51267,16 +51585,28 @@ extern "C" {
         this: &VectorizeIndex,
         #[wasm_bindgen(slice = "array")] vector: &[f64],
     ) -> Promise<VectorizeMatches>;
+    #[doc = " Use the provided vector to perform a similarity search across the index."]
+    #[doc = ""]
+    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
+    #[doc = " * `options` - Configuration options to massage the returned data."]
+    #[doc = ""]
+    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
-    async fn __query_with_options(
+    pub async fn query_with_options(
         this: &VectorizeIndex,
-        vector: VectorFloatArray,
+        vector: impl VectorFloatArray,
         options: &VectorizeQueryOptions,
     ) -> Result<VectorizeMatches, JsValue>;
+    #[doc = " Use the provided vector to perform a similarity search across the index."]
+    #[doc = ""]
+    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
+    #[doc = " * `options` - Configuration options to massage the returned data."]
+    #[doc = ""]
+    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, js_name = "query")]
-    fn __query_with_options_promise(
+    pub fn query_with_options_promise(
         this: &VectorizeIndex,
-        vector: VectorFloatArray,
+        vector: impl VectorFloatArray,
         options: &VectorizeQueryOptions,
     ) -> Promise<VectorizeMatches>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
@@ -51384,58 +51714,6 @@ extern "C" {
         ids: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Array<VectorizeVector>>;
 }
-impl VectorizeIndex {
-    #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = ""]
-    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
-    #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = ""]
-    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    pub async fn query(
-        &self,
-        vector: impl ::core::convert::Into<VectorFloatArray>,
-    ) -> Result<VectorizeMatches, JsValue> {
-        self.__query(vector.into()).await
-    }
-    #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = ""]
-    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
-    #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = ""]
-    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    pub fn query_promise(
-        &self,
-        vector: impl ::core::convert::Into<VectorFloatArray>,
-    ) -> Promise<VectorizeMatches> {
-        self.__query_promise(vector.into())
-    }
-    #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = ""]
-    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
-    #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = ""]
-    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    pub async fn query_with_options(
-        &self,
-        vector: impl ::core::convert::Into<VectorFloatArray>,
-        options: &VectorizeQueryOptions,
-    ) -> Result<VectorizeMatches, JsValue> {
-        self.__query_with_options(vector.into(), options).await
-    }
-    #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = ""]
-    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
-    #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = ""]
-    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    pub fn query_with_options_promise(
-        &self,
-        vector: impl ::core::convert::Into<VectorFloatArray>,
-        options: &VectorizeQueryOptions,
-    ) -> Promise<VectorizeMatches> {
-        self.__query_with_options_promise(vector.into(), options)
-    }
-}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -51451,13 +51729,28 @@ extern "C" {
     #[doc = " Returns: A promise that resolves with information about the current index."]
     #[wasm_bindgen(method, js_name = "describe")]
     pub fn describe_promise(this: &Vectorize) -> Promise<VectorizeIndexInfo>;
-    #[wasm_bindgen(method, catch, js_name = "query")]
-    async fn __query(
+    #[doc = " Use the provided vector to perform a similarity search across the index."]
+    #[doc = ""]
+    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
+    #[doc = " * `options` - Configuration options to massage the returned data."]
+    #[doc = ""]
+    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
+    #[wasm_bindgen(method, catch)]
+    pub async fn query(
         this: &Vectorize,
-        vector: VectorFloatArray,
+        vector: impl VectorFloatArray,
     ) -> Result<VectorizeMatches, JsValue>;
+    #[doc = " Use the provided vector to perform a similarity search across the index."]
+    #[doc = ""]
+    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
+    #[doc = " * `options` - Configuration options to massage the returned data."]
+    #[doc = ""]
+    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, js_name = "query")]
-    fn __query_promise(this: &Vectorize, vector: VectorFloatArray) -> Promise<VectorizeMatches>;
+    pub fn query_promise(
+        this: &Vectorize,
+        vector: impl VectorFloatArray,
+    ) -> Promise<VectorizeMatches>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
     #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
@@ -51480,16 +51773,28 @@ extern "C" {
         this: &Vectorize,
         #[wasm_bindgen(slice = "array")] vector: &[f64],
     ) -> Promise<VectorizeMatches>;
+    #[doc = " Use the provided vector to perform a similarity search across the index."]
+    #[doc = ""]
+    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
+    #[doc = " * `options` - Configuration options to massage the returned data."]
+    #[doc = ""]
+    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
-    async fn __query_with_options(
+    pub async fn query_with_options(
         this: &Vectorize,
-        vector: VectorFloatArray,
+        vector: impl VectorFloatArray,
         options: &VectorizeQueryOptions,
     ) -> Result<VectorizeMatches, JsValue>;
+    #[doc = " Use the provided vector to perform a similarity search across the index."]
+    #[doc = ""]
+    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
+    #[doc = " * `options` - Configuration options to massage the returned data."]
+    #[doc = ""]
+    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, js_name = "query")]
-    fn __query_with_options_promise(
+    pub fn query_with_options_promise(
         this: &Vectorize,
-        vector: VectorFloatArray,
+        vector: impl VectorFloatArray,
         options: &VectorizeQueryOptions,
     ) -> Promise<VectorizeMatches>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
@@ -51642,58 +51947,6 @@ extern "C" {
         this: &Vectorize,
         ids: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Array<VectorizeVector>>;
-}
-impl Vectorize {
-    #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = ""]
-    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
-    #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = ""]
-    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    pub async fn query(
-        &self,
-        vector: impl ::core::convert::Into<VectorFloatArray>,
-    ) -> Result<VectorizeMatches, JsValue> {
-        self.__query(vector.into()).await
-    }
-    #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = ""]
-    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
-    #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = ""]
-    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    pub fn query_promise(
-        &self,
-        vector: impl ::core::convert::Into<VectorFloatArray>,
-    ) -> Promise<VectorizeMatches> {
-        self.__query_promise(vector.into())
-    }
-    #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = ""]
-    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
-    #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = ""]
-    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    pub async fn query_with_options(
-        &self,
-        vector: impl ::core::convert::Into<VectorFloatArray>,
-        options: &VectorizeQueryOptions,
-    ) -> Result<VectorizeMatches, JsValue> {
-        self.__query_with_options(vector.into(), options).await
-    }
-    #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = ""]
-    #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
-    #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = ""]
-    #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    pub fn query_with_options_promise(
-        &self,
-        vector: impl ::core::convert::Into<VectorFloatArray>,
-        options: &VectorizeQueryOptions,
-    ) -> Promise<VectorizeMatches> {
-        self.__query_with_options_promise(vector.into(), options)
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -51989,74 +52242,94 @@ pub enum WorkflowDurationLabel {
     Month = "month",
     Year = "year",
 }
+pub trait WorkflowSleepDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl WorkflowSleepDuration for &str {}
+impl WorkflowSleepDuration for ::std::string::String {}
+impl WorkflowSleepDuration for &::std::string::String {}
+impl WorkflowSleepDuration for &::std::boxed::Box<str> {}
+impl WorkflowSleepDuration for &::std::borrow::Cow<'_, str> {}
+impl WorkflowSleepDuration for ::js_sys::JsString {}
+impl WorkflowSleepDuration for &::js_sys::JsString {}
+impl WorkflowSleepDuration for f64 {}
+impl WorkflowSleepDuration for WorkflowSleepDurationKind2 {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum WorkflowSleepDuration {
+pub enum WorkflowSleepDurationKind2 {
     String(String),
     F64(f64),
 }
-impl ::core::convert::From<&str> for WorkflowSleepDuration {
+impl ::core::convert::From<&str> for WorkflowSleepDurationKind2 {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for WorkflowSleepDuration {
+impl ::core::convert::From<::std::string::String> for WorkflowSleepDurationKind2 {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for WorkflowSleepDuration {
+impl ::core::convert::From<&::std::string::String> for WorkflowSleepDurationKind2 {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for WorkflowSleepDuration {
+impl ::core::convert::From<::js_sys::JsString> for WorkflowSleepDurationKind2 {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for WorkflowSleepDuration {
+impl ::core::convert::From<&::js_sys::JsString> for WorkflowSleepDurationKind2 {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<f64> for WorkflowSleepDuration {
+impl ::core::convert::From<f64> for WorkflowSleepDurationKind2 {
     fn from(value: f64) -> Self {
         Self::F64(value)
     }
 }
+pub trait WorkflowRetentionDuration: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl WorkflowRetentionDuration for &str {}
+impl WorkflowRetentionDuration for ::std::string::String {}
+impl WorkflowRetentionDuration for &::std::string::String {}
+impl WorkflowRetentionDuration for &::std::boxed::Box<str> {}
+impl WorkflowRetentionDuration for &::std::borrow::Cow<'_, str> {}
+impl WorkflowRetentionDuration for ::js_sys::JsString {}
+impl WorkflowRetentionDuration for &::js_sys::JsString {}
+impl WorkflowRetentionDuration for f64 {}
+impl WorkflowRetentionDuration for WorkflowRetentionDurationKind2 {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum WorkflowRetentionDuration {
+pub enum WorkflowRetentionDurationKind2 {
     String(String),
     F64(f64),
 }
-impl ::core::convert::From<&str> for WorkflowRetentionDuration {
+impl ::core::convert::From<&str> for WorkflowRetentionDurationKind2 {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for WorkflowRetentionDuration {
+impl ::core::convert::From<::std::string::String> for WorkflowRetentionDurationKind2 {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for WorkflowRetentionDuration {
+impl ::core::convert::From<&::std::string::String> for WorkflowRetentionDurationKind2 {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for WorkflowRetentionDuration {
+impl ::core::convert::From<::js_sys::JsString> for WorkflowRetentionDurationKind2 {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for WorkflowRetentionDuration {
+impl ::core::convert::From<&::js_sys::JsString> for WorkflowRetentionDurationKind2 {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<f64> for WorkflowRetentionDuration {
+impl ::core::convert::From<f64> for WorkflowRetentionDurationKind2 {
     fn from(value: f64) -> Self {
         Self::F64(value)
     }

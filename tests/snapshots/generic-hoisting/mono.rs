@@ -4,38 +4,48 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
+pub trait Loose: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Loose for f64 {}
+impl Loose for &str {}
+impl Loose for ::std::string::String {}
+impl Loose for &::std::string::String {}
+impl Loose for &::std::boxed::Box<str> {}
+impl Loose for &::std::borrow::Cow<'_, str> {}
+impl Loose for ::js_sys::JsString {}
+impl Loose for &::js_sys::JsString {}
+impl Loose for LooseKind {}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum Loose {
+pub enum LooseKind {
     F64(f64),
     String(String),
 }
-impl ::core::convert::From<f64> for Loose {
+impl ::core::convert::From<f64> for LooseKind {
     fn from(value: f64) -> Self {
         Self::F64(value)
     }
 }
-impl ::core::convert::From<&str> for Loose {
+impl ::core::convert::From<&str> for LooseKind {
     fn from(value: &str) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<::std::string::String> for Loose {
+impl ::core::convert::From<::std::string::String> for LooseKind {
     fn from(value: ::std::string::String) -> Self {
         Self::String(value)
     }
 }
-impl ::core::convert::From<&::std::string::String> for Loose {
+impl ::core::convert::From<&::std::string::String> for LooseKind {
     fn from(value: &::std::string::String) -> Self {
         Self::String(value.clone())
     }
 }
-impl ::core::convert::From<::js_sys::JsString> for Loose {
+impl ::core::convert::From<::js_sys::JsString> for LooseKind {
     fn from(value: ::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }
 }
-impl ::core::convert::From<&::js_sys::JsString> for Loose {
+impl ::core::convert::From<&::js_sys::JsString> for LooseKind {
     fn from(value: &::js_sys::JsString) -> Self {
         Self::String(::std::string::String::from(value))
     }

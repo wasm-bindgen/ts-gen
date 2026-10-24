@@ -1000,11 +1000,14 @@ pub(crate) fn join_suffix(base: &str, suffix: &str) -> String {
 }
 
 /// Whether `param` takes a named union alias whole, as `impl Into<Alias>`,
-/// which an inline wrapper converts (see [`super::null_arms`]).
+/// which an inline wrapper converts (see [`super::null_arms`]). Under
+/// per-monomorphization the extern takes the alias's trait itself.
 fn takes_union_alias(param: &ConcreteParam, cgctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
     !param.variadic
         && param.type_ref.split_empties().is_none()
-        && cgctx.union_alias(&param.type_ref, scope).is_some()
+        && cgctx
+            .union_alias(&param.type_ref, scope)
+            .is_some_and(|alias| alias.kind.is_none())
 }
 
 fn push_with_js_string_return(

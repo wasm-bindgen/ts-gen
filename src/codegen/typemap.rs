@@ -281,6 +281,9 @@ pub(crate) struct UnionAlias {
     pub readable: bool,
     /// Whether the last arm is the shape arm, the read's fallback.
     pub fallback: bool,
+    /// Under per-monomorphization, the enum's name, `<Alias>Kind`: the
+    /// alias's own name is the trait its arguments take.
+    pub kind: Option<String>,
 }
 
 impl UnionAlias {
@@ -1098,6 +1101,15 @@ impl<'a> CodegenContext<'a> {
             ctx.collect_declaration(type_id, &path, surface);
         }
         ctx.resolve_collisions();
+        // Each union alias's `<Alias>Kind` enum is named before any read
+        // enum claims a name, so naming doesn't depend on emission order.
+        if ctx.experimental_generic_mono {
+            for &type_id in &module.types {
+                if let TypeKind::TypeAlias(alias) = &gctx.get_type(type_id).kind {
+                    ctx.union_alias_of(alias);
+                }
+            }
+        }
         Ok(ctx)
     }
 
@@ -1424,12 +1436,22 @@ impl<'a> CodegenContext<'a> {
             Some(read) => (read.members, true, read.fallback),
             None => (arms, false, false),
         };
+        let kind = self.experimental_generic_mono.then(|| {
+            let bare = format!("{}Kind", alias.name);
+            let mut names = self.names.borrow_mut();
+            if names.claim(bare.clone()) {
+                bare
+            } else {
+                names.declare(&bare, Suffix::Pascal)
+            }
+        });
         Some(UnionAlias {
             arms,
             nullability,
             scope,
             readable,
             fallback,
+            kind,
         })
     }
 
@@ -2400,10 +2422,12 @@ pub(crate) fn split_empties_in(
 
 /// The argument type of a parameter taking a named union alias whole (see
 /// [`CodegenContext::union_alias`]): `impl Into<Alias>`, which an inline
-/// wrapper converts for the extern taking the alias's enum by value.
+/// wrapper converts for the extern taking the alias's enum by value. Under
+/// per-monomorphization it is `impl Alias`, the alias's trait, which each
+/// arm's own argument type implements, so the extern takes it directly.
 /// Where the parameter also admits `undefined` it cannot be omitted, so it
-/// takes the enum in its carrier (`Option<Alias>`), whose `None` would
-/// leave an `impl Into` nothing to infer from.
+/// takes the enum in its carrier (`Option<Alias>`, `Option<AliasKind>`),
+/// whose `None` would leave an `impl` nothing to infer from.
 pub(crate) fn union_alias_argument(
     ty: &TypeRef,
     ctx: &CodegenContext<'_>,
@@ -2413,14 +2437,15 @@ pub(crate) fn union_alias_argument(
         Some((core, n)) => (core, Some(n)),
         None => (ty.clone(), None),
     };
-    ctx.union_alias(&core, scope)?;
+    let alias = ctx.union_alias(&core, scope)?;
     let TypeRef::Reference { segments, .. } = &core else {
         return None;
     };
     let path = emit_type_name(&segments.join("."), scope, ctx);
     Some(match n {
+        None if alias.kind.is_some() => quote! { impl #path },
         None => quote! { impl ::core::convert::Into<#path> },
-        Some(n) => nullable_carrier(path, n),
+        Some(n) => nullable_carrier(union_alias_enum_path(&alias, path), n),
     })
 }
 
@@ -2441,7 +2466,7 @@ fn union_alias_read(
     let TypeRef::Reference { segments, .. } = &core else {
         return None;
     };
-    let path = emit_type_name(&segments.join("."), scope, ctx);
+    let path = union_alias_enum_path(&alias, emit_type_name(&segments.join("."), scope, ctx));
     Some(
         match n
             .into_iter()
@@ -2452,6 +2477,25 @@ fn union_alias_read(
             None => path,
         },
     )
+}
+
+/// The path of a union alias's enum, given the path of the alias: the
+/// alias's own under the default lowering, its `<Alias>Kind` sibling under
+/// per-monomorphization.
+fn union_alias_enum_path(alias: &UnionAlias, path: TokenStream) -> TokenStream {
+    let Some(kind) = &alias.kind else {
+        return path;
+    };
+    let kind = make_ident(kind);
+    match syn::parse2::<syn::Path>(path) {
+        Ok(mut path) => {
+            if let Some(last) = path.segments.last_mut() {
+                last.ident = kind;
+            }
+            quote! { #path }
+        }
+        Err(_) => quote! { #kind },
+    }
 }
 
 /// The read carrier: `Option<T>` is `T | undefined`, `Nullable<T>` is
@@ -5649,10 +5693,9 @@ mod tests {
             kind: ReturnAnchorKind::Getter,
             parent: None,
         };
-        {
-            let ctx =
-                CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
-                    .unwrap();
+        for mono in [false, true] {
+            let options = GenerateOptions::new().experimental_generic_mono(mono);
+            let ctx = CodegenContext::from_module_full(&module, &gctx, &options, None).unwrap();
             let read = |ty: TypeRef| {
                 tokens(to_getter_return_type(
                     &ty,
@@ -5672,7 +5715,11 @@ mod tests {
                 vec![id("Day"), TypeRef::String, id("DayFields")]
             );
             assert!(day_like.readable && day_like.fallback);
-            let (enum_name, argument) = ("DayLike", "impl :: core :: convert :: Into < DayLike >");
+            let (enum_name, argument) = match mono {
+                false => ("DayLike", "impl :: core :: convert :: Into < DayLike >"),
+                true => ("DayLikeKind", "impl DayLike"),
+            };
+            assert_eq!(day_like.kind.as_deref(), mono.then_some("DayLikeKind"));
             assert_eq!(read(id("DayLike")), enum_name);
             assert_eq!(arg(id("DayLike")), argument);
             // The use site's empties and the alias's own take the carrier,

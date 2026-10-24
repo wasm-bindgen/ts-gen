@@ -5,7 +5,9 @@
 // argument enum only, and its reads, like those of an anonymous union of
 // aliases, resolve the aliases to their members: nested aliases are one flat
 // union with repeats dropped, and plain-object dictionaries share one arm.
-// Exercised against a real JS module in the integration tests.
+// Under per-monomorphization the alias names the trait its arguments take,
+// and its enum is `<Alias>Kind`. Exercised against a real JS module in the
+// integration tests.
 
 export declare class Zoned {
   constructor(zone: string);
