@@ -30,7 +30,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CursorNextReturn<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -70,7 +70,7 @@ impl<T: ::wasm_bindgen::JsGeneric> CursorNextReturnBuilder<T> {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CursorAddressReturn;
     #[wasm_bindgen(method, getter)]
@@ -92,7 +92,7 @@ impl CursorAddressReturn {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageOptions;
     #[wasm_bindgen(method, getter)]
@@ -122,8 +122,8 @@ impl ImageOptionsBuilder {
         self.inner
     }
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum CostReturnKind {
-    Object(Object),
     String(String),
+    Object(Object),
 }

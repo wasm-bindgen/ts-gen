@@ -31,7 +31,7 @@ pub mod temporal {
     pub type PartialTemporalLike = JsValue;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DateLikeObject;
         #[wasm_bindgen(method, getter)]
@@ -113,7 +113,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = DateLikeObject , extends = TimeLikeObject , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = DateLikeObject , extends = TimeLikeObject , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DateTimeLikeObject;
         #[wasm_bindgen(method, getter)]
@@ -209,7 +209,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurationLikeObject;
         #[wasm_bindgen(method, getter)]
@@ -313,7 +313,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type TimeLikeObject;
         #[wasm_bindgen(method, getter)]
@@ -385,7 +385,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type YearMonthLikeObject;
         #[wasm_bindgen(method, getter)]
@@ -463,7 +463,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = DateTimeLikeObject , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = DateTimeLikeObject , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ZonedDateTimeLikeObject;
         #[wasm_bindgen(method, getter, js_name = "timeZone")]
@@ -568,7 +568,7 @@ pub mod temporal {
             self.inner
         }
     }
-    #[wasm_bindgen(private, js_namespace = "Temporal")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DateUnit {
         Year = "year",
@@ -576,7 +576,7 @@ pub mod temporal {
         Week = "week",
         Day = "day",
     }
-    #[wasm_bindgen(private, js_namespace = "Temporal")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum TimeUnit {
         Hour = "hour",
@@ -586,7 +586,7 @@ pub mod temporal {
         Microsecond = "microsecond",
         Nanosecond = "nanosecond",
     }
-    #[wasm_bindgen(private, js_namespace = "Temporal")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PluralizeUnit {
         Year = "year",
@@ -612,7 +612,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DisambiguationOptions;
         #[wasm_bindgen(method, getter)]
@@ -644,7 +644,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type OverflowOptions;
         #[wasm_bindgen(method, getter)]
@@ -676,7 +676,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type TransitionOptions;
         #[wasm_bindgen(method, getter)]
@@ -704,7 +704,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type RoundingOptions<Units = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
@@ -752,7 +752,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = RoundingOptions , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = RoundingOptions , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type RoundingOptionsWithLargestUnit<Units = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
@@ -801,7 +801,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ToStringRoundingOptions<Units = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
@@ -847,7 +847,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = ToStringRoundingOptions , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = ToStringRoundingOptions , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ToStringRoundingOptionsWithFractionalSeconds<Units = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "fractionalSecondDigits")]
@@ -991,7 +991,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainDateToStringOptions;
         #[wasm_bindgen(method, getter, js_name = "calendarName")]
@@ -1023,7 +1023,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainDateToZonedDateTimeOptions;
         #[wasm_bindgen(method, getter, js_name = "plainTime")]
@@ -1119,7 +1119,7 @@ pub mod temporal {
         pub type PlainDate;
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new(iso_year: f64, iso_month: f64, iso_day: f64) -> Result<PlainDate, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "PlainDate")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_calendar(
             iso_year: f64,
             iso_month: f64,
@@ -1644,7 +1644,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainTimeToStringOptions;
     }
@@ -1685,24 +1685,24 @@ pub mod temporal {
         pub type PlainTime;
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new() -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "PlainTime")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour(hour: f64) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "PlainTime")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute(hour: f64, minute: f64) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "PlainTime")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second(
             hour: f64,
             minute: f64,
             second: f64,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "PlainTime")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond(
             hour: f64,
             minute: f64,
             second: f64,
             millisecond: f64,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "PlainTime")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond_and_microsecond(
             hour: f64,
             minute: f64,
@@ -1710,7 +1710,7 @@ pub mod temporal {
             millisecond: f64,
             microsecond: f64,
         ) -> Result<PlainTime, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "PlainTime")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond(
             hour: f64,
             minute: f64,
@@ -2109,7 +2109,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = PlainDateToStringOptions , extends = PlainTimeToStringOptions , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = PlainDateToStringOptions , extends = PlainTimeToStringOptions , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainDateTimeToStringOptions;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
@@ -2168,24 +2168,14 @@ pub mod temporal {
         pub type PlainDateTime;
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new(iso_year: f64, iso_month: f64, iso_day: f64) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainDateTime"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour(
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
             hour: f64,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainDateTime"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute(
             iso_year: f64,
             iso_month: f64,
@@ -2193,12 +2183,7 @@ pub mod temporal {
             hour: f64,
             minute: f64,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainDateTime"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second(
             iso_year: f64,
             iso_month: f64,
@@ -2207,12 +2192,7 @@ pub mod temporal {
             minute: f64,
             second: f64,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainDateTime"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond(
             iso_year: f64,
             iso_month: f64,
@@ -2222,12 +2202,7 @@ pub mod temporal {
             second: f64,
             millisecond: f64,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainDateTime"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond_and_microsecond(
             iso_year: f64,
             iso_month: f64,
@@ -2238,12 +2213,7 @@ pub mod temporal {
             millisecond: f64,
             microsecond: f64,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainDateTime"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond(
             iso_year: f64,
             iso_month: f64,
@@ -2255,12 +2225,7 @@ pub mod temporal {
             microsecond: f64,
             nanosecond: f64,
         ) -> Result<PlainDateTime, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainDateTime"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond_and_calendar(
             iso_year: f64,
             iso_month: f64,
@@ -2826,7 +2791,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = PlainDateTimeToStringOptions , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = PlainDateTimeToStringOptions , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ZonedDateTimeToStringOptions;
         #[wasm_bindgen(method, getter)]
@@ -2882,7 +2847,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = OverflowOptions , extends = DisambiguationOptions , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = OverflowOptions , extends = DisambiguationOptions , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ZonedDateTimeFromOptions;
         #[wasm_bindgen(method, getter)]
@@ -2936,12 +2901,7 @@ pub mod temporal {
             epoch_nanoseconds: &BigInt,
             time_zone: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<ZonedDateTime, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "ZonedDateTime"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_calendar(
             epoch_nanoseconds: &BigInt,
             time_zone: impl ::wasm_bindgen::JsStringLike,
@@ -3382,7 +3342,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurationRelativeToOptions;
         #[wasm_bindgen(method, getter, js_name = "relativeTo")]
@@ -3460,7 +3420,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = DurationRelativeToOptions , extends = RoundingOptionsWithLargestUnit , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = DurationRelativeToOptions , extends = RoundingOptionsWithLargestUnit , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurationRoundingOptions;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
@@ -3544,7 +3504,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurationToStringOptions;
     }
@@ -3580,7 +3540,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = DurationRelativeToOptions , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = DurationRelativeToOptions , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurationTotalOptions;
         #[wasm_bindgen(method, getter)]
@@ -3641,24 +3601,24 @@ pub mod temporal {
         pub type Duration;
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new() -> Result<Duration, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "Duration")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years(years: f64) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "Duration")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months(years: f64, months: f64) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "Duration")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks(
             years: f64,
             months: f64,
             weeks: f64,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "Duration")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days(
             years: f64,
             months: f64,
             weeks: f64,
             days: f64,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "Duration")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours(
             years: f64,
             months: f64,
@@ -3666,7 +3626,7 @@ pub mod temporal {
             days: f64,
             hours: f64,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "Duration")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes(
             years: f64,
             months: f64,
@@ -3675,7 +3635,7 @@ pub mod temporal {
             hours: f64,
             minutes: f64,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "Duration")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds(
             years: f64,
             months: f64,
@@ -3685,7 +3645,7 @@ pub mod temporal {
             minutes: f64,
             seconds: f64,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "Duration")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds(
             years: f64,
             months: f64,
@@ -3696,7 +3656,7 @@ pub mod temporal {
             seconds: f64,
             milliseconds: f64,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "Duration")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds(
             years: f64,
             months: f64,
@@ -3708,7 +3668,7 @@ pub mod temporal {
             milliseconds: f64,
             microseconds: f64,
         ) -> Result<Duration, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch, js_name = "Duration")]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds_and_nanoseconds(
             years: f64,
             months: f64,
@@ -3949,7 +3909,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = PlainTimeToStringOptions , extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = PlainTimeToStringOptions , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type InstantToStringOptions;
         #[wasm_bindgen(method, getter, js_name = "timeZone")]
@@ -4225,7 +4185,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainYearMonthToPlainDateOptions;
         #[wasm_bindgen(method, getter)]
@@ -4248,23 +4208,13 @@ pub mod temporal {
         pub type PlainYearMonth;
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new(iso_year: f64, iso_month: f64) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainYearMonth"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_calendar(
             iso_year: f64,
             iso_month: f64,
             calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainYearMonth, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainYearMonth"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_calendar_and_reference_iso_day(
             iso_year: f64,
             iso_month: f64,
@@ -4564,7 +4514,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainMonthDayToPlainDateOptions;
         #[wasm_bindgen(method, getter)]
@@ -4622,23 +4572,13 @@ pub mod temporal {
         pub type PlainMonthDay;
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new(iso_month: f64, iso_day: f64) -> Result<PlainMonthDay, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainMonthDay"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_calendar(
             iso_month: f64,
             iso_day: f64,
             calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainMonthDay, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "Temporal",
-            catch,
-            js_name = "PlainMonthDay"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_calendar_and_reference_iso_year(
             iso_month: f64,
             iso_day: f64,
@@ -4755,7 +4695,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PartialTemporalLikeDateLikeObject;
         #[wasm_bindgen(method, getter)]
@@ -4837,7 +4777,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PartialTemporalLikeTimeLikeObject;
         #[wasm_bindgen(method, getter)]
@@ -4907,7 +4847,7 @@ pub mod temporal {
             self.inner
         }
     }
-    #[wasm_bindgen(private, js_namespace = "Temporal")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PluralizeUnitTimeUnit {
         Hour = "hour",
@@ -4925,7 +4865,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PartialTemporalLikeDateTimeLikeObject;
         #[wasm_bindgen(method, getter)]
@@ -5055,7 +4995,7 @@ pub mod temporal {
             self.inner
         }
     }
-    #[wasm_bindgen(private, js_namespace = "Temporal")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PluralizeUnitDayOrTimeUnit {
         Day = "day",
@@ -5075,7 +5015,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PartialTemporalLikeZonedDateTimeLikeObject;
         #[wasm_bindgen(method, getter)]
@@ -5223,7 +5163,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PartialTemporalLikeDurationLikeObject;
         #[wasm_bindgen(method, getter)]
@@ -5327,7 +5267,7 @@ pub mod temporal {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PartialTemporalLikeYearMonthLikeObject;
         #[wasm_bindgen(method, getter)]

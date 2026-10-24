@@ -28,7 +28,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Options;
     #[doc = " The name."]
@@ -69,7 +69,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Sized;
     #[wasm_bindgen(method, getter)]
@@ -124,7 +124,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Named;
     #[wasm_bindgen(method, getter)]
@@ -155,7 +155,7 @@ impl Named {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Mixed;
     #[doc = " The name."]
@@ -232,7 +232,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Rounding<U = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
@@ -277,7 +277,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Box<T = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -313,7 +313,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Box<T> {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -330,7 +330,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Holder<T> {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Options , extends = Object)]
+    # [wasm_bindgen (extends = Options , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Extended;
     #[wasm_bindgen(method, getter)]
@@ -365,20 +365,20 @@ extern "C" {
 pub mod scoped {
     #[allow(unused_imports)]
     use super::*;
-    #[wasm_bindgen(private, js_namespace = "Scoped")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum Mode {
         Fast = "fast",
         Slow = "slow",
     }
-    #[wasm_bindgen(private, js_namespace = "Scoped")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum NotFast {
         Slow = "slow",
     }
     #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Scoped")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Settings;
         #[wasm_bindgen(method, getter)]
@@ -419,7 +419,7 @@ pub mod scoped {
     }
     #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Scoped")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PartialSettings;
         #[wasm_bindgen(method, getter)]
@@ -497,7 +497,7 @@ pub enum ExtractUnitOrDayUnit {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PartialOptions;
     #[doc = " The name."]
@@ -526,7 +526,7 @@ impl PartialOptions {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequiredOptions;
     #[doc = " The name."]
@@ -555,7 +555,7 @@ impl RequiredOptions {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadonlyOptions;
     #[doc = " The name."]
@@ -580,7 +580,7 @@ impl ReadonlyOptions {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PickOptionsNameOrSize;
     #[doc = " The name."]
@@ -622,7 +622,7 @@ impl PickOptionsNameOrSizeBuilder {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type LooseOptions;
     #[doc = " The name."]
@@ -651,7 +651,7 @@ impl LooseOptions {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FlagsAOrB;
     #[wasm_bindgen(method, getter)]
@@ -681,7 +681,7 @@ pub enum PluralHourOrMinute {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PartialBox<T = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -735,7 +735,7 @@ pub enum KeyOfExtended {
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PartialExtended;
     #[wasm_bindgen(method, getter)]

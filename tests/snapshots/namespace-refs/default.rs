@@ -11,7 +11,7 @@ pub mod cloudflare {
     pub type Exports = JsValue;
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Cloudflare")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Stub;
         #[wasm_bindgen(method, getter)]
@@ -26,7 +26,7 @@ pub mod cloudflare {
             }
         }
     }
-    #[wasm_bindgen(private, js_namespace = "Cloudflare")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum Kind {
         Http = "http",
@@ -34,7 +34,7 @@ pub mod cloudflare {
     }
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Cloudflare")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Socket;
         #[wasm_bindgen(method, getter)]
@@ -55,7 +55,7 @@ pub mod storage {
     use super::*;
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Storage")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Stub;
         #[wasm_bindgen(method, getter)]

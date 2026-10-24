@@ -103,9 +103,9 @@ extern "C" {
     pub type Multi;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Multi, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Multi")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_n(n: f64) -> Result<Multi, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Multi")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_s_and_n(s: &str, n: f64) -> Result<Multi, JsValue>;
     #[wasm_bindgen(method)]
     pub fn m(this: &Multi);

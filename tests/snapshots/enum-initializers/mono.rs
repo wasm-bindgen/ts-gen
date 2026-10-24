@@ -30,7 +30,7 @@ pub enum Mode {
 pub mod ns {
     #[allow(unused_imports)]
     use super::*;
-    #[wasm_bindgen(private, js_namespace = "Ns")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum Inner {
         Value = "inner",

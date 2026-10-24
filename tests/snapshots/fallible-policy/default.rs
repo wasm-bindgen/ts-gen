@@ -11,7 +11,7 @@ extern "C" {
     pub type Headers;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Headers, crate::Error>;
-    #[wasm_bindgen(constructor, catch, js_name = "Headers")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_init(init: &Object<JsString>) -> Result<Headers, crate::Error>;
     #[doc = " Sync method — `Result<Nullable<String>, crate::Error>`, no `try_get`."]
     #[wasm_bindgen(method)]

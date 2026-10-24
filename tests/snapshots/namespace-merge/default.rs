@@ -19,7 +19,7 @@ pub mod foo {
     use super::*;
     #[wasm_bindgen(module = "namespace-merge")]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Foo")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Options;
         #[wasm_bindgen(method, getter)]
@@ -48,7 +48,7 @@ extern "C" {
 pub mod bar {
     #[allow(unused_imports)]
     use super::*;
-    #[wasm_bindgen(private, js_namespace = "Bar")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum Power {
         On = "on",
@@ -79,7 +79,7 @@ pub mod make {
     use super::*;
     #[wasm_bindgen(module = "namespace-merge")]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "make")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Config;
         #[wasm_bindgen(method, getter)]
@@ -97,7 +97,7 @@ pub mod make {
 }
 #[wasm_bindgen(module = "namespace-merge")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Shape;
     #[wasm_bindgen(method)]
@@ -108,7 +108,7 @@ extern "C" {
 pub mod shape {
     #[allow(unused_imports)]
     use super::*;
-    #[wasm_bindgen(private, js_namespace = "Shape")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum Axis {
         X = "x",

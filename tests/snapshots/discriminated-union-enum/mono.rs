@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "discriminated-union-enum", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Attachment;
     #[wasm_bindgen(method, getter)]
@@ -76,7 +76,7 @@ impl AttachmentBuilder {
 }
 #[wasm_bindgen(module = "discriminated-union-enum", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Reply;
     #[wasm_bindgen(method, getter)]
@@ -146,7 +146,7 @@ impl ReplyBuilder {
 }
 #[wasm_bindgen(module = "discriminated-union-enum", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Payload;
     #[wasm_bindgen(method, getter)]

@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = cloudflare :: email :: EmailMessage , extends = Object)]
+    # [wasm_bindgen (extends = cloudflare :: email :: EmailMessage , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ForwardableEmailMessage;
     #[wasm_bindgen(method, catch)]
@@ -72,7 +72,7 @@ pub mod msg {
         use super::*;
         #[wasm_bindgen(module = "msg:b", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type Msg;
             #[wasm_bindgen(method, getter)]

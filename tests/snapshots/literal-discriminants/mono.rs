@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 pub type KeepAlive = Number;
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Options;
     #[wasm_bindgen(method, getter, js_name = "keepAlive")]
@@ -80,7 +80,7 @@ impl OptionsBuilder {
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Scaled;
     #[wasm_bindgen(method, getter)]
@@ -118,7 +118,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Feedback;
     #[wasm_bindgen(method, getter)]

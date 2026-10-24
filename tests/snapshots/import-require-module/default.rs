@@ -30,7 +30,7 @@ pub mod dep {
     use super::*;
     #[wasm_bindgen(module = "dep")]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Options;
         #[wasm_bindgen(method, getter)]

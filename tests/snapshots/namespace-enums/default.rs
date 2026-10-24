@@ -26,7 +26,7 @@ pub enum Precision {
 pub mod timing {
     #[allow(unused_imports)]
     use super::*;
-    #[wasm_bindgen(private, js_namespace = "Timing")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DurationUnit {
         Second = "second",

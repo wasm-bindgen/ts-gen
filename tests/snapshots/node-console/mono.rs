@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "node:console", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ConsoleOptions;
     #[wasm_bindgen(method, getter)]
@@ -97,7 +97,7 @@ extern "C" {
     #[doc = " * `stdout` - A writable stream for log output"]
     #[doc = " * `stderr` - A writable stream for error output"]
     #[doc = " * `ignoreErrors` - Whether to ignore errors when writing"]
-    #[wasm_bindgen(constructor, catch, js_name = "Console")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_stderr(stdout: &Object, stderr: &Object) -> Result<Console, JsValue>;
     #[doc = " Creates a new `Console` with one or two writable stream instances."]
     #[doc = " `stdout` is a writable stream to print log or info output."]
@@ -106,7 +106,7 @@ extern "C" {
     #[doc = " * `stdout` - A writable stream for log output"]
     #[doc = " * `stderr` - A writable stream for error output"]
     #[doc = " * `ignoreErrors` - Whether to ignore errors when writing"]
-    #[wasm_bindgen(constructor, catch, js_name = "Console")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_stderr_and_ignore_errors(
         stdout: &Object,
         stderr: &Object,

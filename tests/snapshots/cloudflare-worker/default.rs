@@ -21,11 +21,11 @@ extern "C" {
     pub type Headers;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Headers, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Headers")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_headers(init: &Headers) -> Result<Headers, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Headers")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_record(init: &Object<JsString>) -> Result<Headers, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Headers")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_slice(init: &[ArrayTuple<(JsString, JsString)>]) -> Result<Headers, JsValue>;
     #[wasm_bindgen(method)]
     pub fn append(this: &Headers, name: &str, value: &str);
@@ -71,14 +71,14 @@ extern "C" {
     pub type Request;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(input: &Request) -> Result<Request, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(input: &str) -> Result<Request, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_request_and_init(
         input: &Request,
         init: &RequestInit,
     ) -> Result<Request, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_init(input: &str, init: &RequestInit) -> Result<Request, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn method(this: &Request) -> String;
@@ -125,7 +125,7 @@ extern "C" {
 pub type RequestInfo = JsValue;
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequestInit;
     #[wasm_bindgen(method, getter)]
@@ -249,45 +249,45 @@ extern "C" {
     pub type Response;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_readable_stream(body: &ReadableStream) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(body: &str) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_array_buffer(body: &ArrayBuffer) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_blob(body: &Blob) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_search_params(body: &URLSearchParams) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_readable_stream_and_init(
         body: &ReadableStream,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_init(body: &str, init: &ResponseInit) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_array_buffer_and_init(
         body: &ArrayBuffer,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_blob_and_init(body: &Blob, init: &ResponseInit) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_search_params_and_init(
         body: &URLSearchParams,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_form_data_and_init(
         body: &FormData,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new_with_null_and_init(
         body: &::wasm_bindgen::JsValue,
         init: &ResponseInit,
@@ -362,7 +362,7 @@ impl Response {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInit;
     #[wasm_bindgen(method, getter)]
@@ -436,13 +436,13 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Env;
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ExportedHandler<E: ::wasm_bindgen::JsGeneric = Env>;
     #[wasm_bindgen(method, catch)]
@@ -476,7 +476,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ScheduledController;
     #[wasm_bindgen(method, getter, js_name = "scheduledTime")]

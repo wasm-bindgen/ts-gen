@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base;
     #[wasm_bindgen(method, getter)]
@@ -25,7 +25,7 @@ impl Base {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Geo;
     #[wasm_bindgen(method, getter)]
@@ -59,7 +59,7 @@ impl GeoBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Base , extends = Geo , extends = Object)]
+    # [wasm_bindgen (extends = Base , extends = Geo , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Child;
     #[wasm_bindgen(method, getter)]
@@ -98,7 +98,7 @@ impl ChildBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Destinations;
     #[wasm_bindgen(method, getter)]
@@ -142,7 +142,7 @@ impl DestinationsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Base , extends = Destinations , extends = Object)]
+    # [wasm_bindgen (extends = Base , extends = Destinations , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Message;
     #[wasm_bindgen(method, getter)]
@@ -186,7 +186,7 @@ impl MessageBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Box<T = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -207,7 +207,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Tagged;
     #[wasm_bindgen(method, getter)]
@@ -226,7 +226,7 @@ impl Tagged {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Tagged , extends = Box , extends = Object)]
+    # [wasm_bindgen (extends = Tagged , extends = Box , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Named;
     #[wasm_bindgen(method, getter)]
@@ -242,7 +242,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Left;
     #[wasm_bindgen(method, getter)]
@@ -256,7 +256,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Right;
     #[wasm_bindgen(method, getter)]
@@ -274,7 +274,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Base , extends = Left , extends = Right , extends = Object)]
+    # [wasm_bindgen (extends = Base , extends = Left , extends = Right , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Siblings;
     #[wasm_bindgen(method, getter)]
@@ -314,7 +314,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Base , extends = Resource , extends = Object)]
+    # [wasm_bindgen (extends = Base , extends = Resource , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Handle;
     #[wasm_bindgen(method, getter)]
@@ -326,7 +326,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Base , extends = Resource , extends = Object)]
+    # [wasm_bindgen (extends = Base , extends = Resource , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Opened;
     #[wasm_bindgen(method, getter)]

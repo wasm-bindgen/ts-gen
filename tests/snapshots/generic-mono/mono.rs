@@ -56,7 +56,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EvaluationDetails<T = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "flagKey")]
@@ -108,7 +108,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> {
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Pair<A = JsValue, B = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -138,7 +138,7 @@ impl<A: ::wasm_bindgen::convert::IntoWasmAbi, B: ::wasm_bindgen::convert::IntoWa
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TypedArrayOptions;
     #[wasm_bindgen(method, getter)]

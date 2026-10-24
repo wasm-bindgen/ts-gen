@@ -16,7 +16,7 @@ pub enum Mode {
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Settings;
     #[wasm_bindgen(method, getter)]
@@ -278,21 +278,21 @@ extern "C" {
     pub type Body;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(body: &str) -> Result<Body, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Body")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new_with_body_null(body: &::wasm_bindgen::JsValue) -> Result<Body, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Body")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_length(body: &str, length: f64) -> Result<Body, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Body")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new_with_body_null_and_length(
         body: &::wasm_bindgen::JsValue,
         length: f64,
     ) -> Result<Body, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Body")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new_with_length_null(
         body: &str,
         length: &::wasm_bindgen::JsValue,
     ) -> Result<Body, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Body")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new_with_body_null_and_length_null(
         body: &::wasm_bindgen::JsValue,
         length: &::wasm_bindgen::JsValue,
@@ -1671,7 +1671,7 @@ pub fn try_jsdoc_with_null() -> Result<(), JsValue> {
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Attachment;
     #[wasm_bindgen(method, getter)]
@@ -1737,7 +1737,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Upload;
     #[wasm_bindgen(method, getter)]
@@ -1822,7 +1822,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cover;
     #[wasm_bindgen(method, getter)]

@@ -607,8 +607,9 @@ the setter is named `set_<snake_case>`.
   or enum variant named `$_`.
 * `js_name = "..."` is emitted whenever the final Rust ident (after all of
   the above) no longer spells the JS name, so `wasm-bindgen` binds to the
-  correct runtime name. This applies to types, methods, free functions,
-  variables, getters, and setters (whose JS name `wasm-bindgen` infers by
+  correct runtime name. This applies to types (other than
+  [shapes](#shapes-have-no-runtime-class), which name no JS class),
+  methods, free functions, variables, getters, and setters (whose JS name `wasm-bindgen` infers by
   stripping `set_`, so `set_0` needs no `js_name` but `set_public` for
   `$public` does). Raw identifiers already bind to their unraw name.
 * `wasm-bindgen` resolves the JS class of constructors and static members
@@ -668,6 +669,18 @@ emits a `pub type Greeter;` plus method bindings inside an
 `extern "C"` block. Constructors get `#[wasm_bindgen(constructor, catch)]`
 because JS constructors can always throw.
 
+Every constructor overload (`new`, `new_with_name`, …) binds the same
+attributes. wasm-bindgen calls `new <class>(…)` for a constructor, the
+class taken from `js_class` or the type it returns, never from the
+function's own `js_name`, so none is emitted:
+
+```rust
+#[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
+pub fn new(iso_year: f64, iso_month: f64, iso_day: f64) -> Result<PlainDate, JsValue>;
+#[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
+pub fn new_with_calendar(/* … */) -> Result<PlainDate, JsValue>;
+```
+
 `abstract` classes skip the constructor (you can't `new` an abstract
 class).
 
@@ -690,6 +703,44 @@ TypeScript, a method's overloads accumulate across the merged declarations
 (see [signature flattening](#signature-flattening)), while a property,
 getter or setter declared again stays one binding.
 
+### Shapes have no runtime class
+
+A class (including an interface merged with its `declare var`) is a JS
+constructor, and `dyn_into` / `is_instance_of` test `instanceof` it. An
+interface, dictionary or [discriminated union](#discriminated-unions)
+only describes a shape: nothing named `Temporal.RoundingOptions` exists at
+runtime, so an `instanceof` check would fail for every value, and in a
+module the check would import a class the module doesn't export. Any
+object can carry the shape, so the type checks for one instead, and drops
+the `js_name` and `js_namespace` that would only have named the missing
+class (its members are structural, so they never read them):
+
+```ts
+declare namespace Temporal {
+  interface RoundingOptions { smallestUnit?: TimeUnit; roundingIncrement?: number; }
+}
+```
+
+```rust
+#[wasm_bindgen(extends = Object, is_type_of = JsValue::is_object)]
+pub type RoundingOptions;
+```
+
+`JsValue::from(Object::new()).dyn_into::<RoundingOptions>()` succeeds;
+a primitive, `null`, `undefined` or a function does not.
+
+`is_type_of` drives `dyn_into`, `dyn_ref` and `has_type`, but not
+`JsCast::is_instance_of`, which wasm-bindgen always lowers to a literal
+`instanceof` of the type's Rust name, and no attribute overrides it.
+For a global or namespaced shape that check is `false` for every value,
+and for a shape exported from a module it imports a class the module
+doesn't export, which fails the module's load. Test shapes with
+`has_type` / `dyn_ref`, never `is_instance_of`.
+
+In a [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums)
+a shape arm would take every object listed after it, so shape arms
+dispatch last; see [Shape arms go last](#shape-arms-go-last).
+
 ### Inherited members
 
 Every `extends` parent becomes a wasm-bindgen `extends =`, but
@@ -709,7 +760,7 @@ interface Named extends Tagged, Box<string> {}
 ```
 
 ```rust
-#[wasm_bindgen(extends = Base, extends = Geo, extends = Object)]
+#[wasm_bindgen(extends = Base, extends = Geo, extends = Object, is_type_of = JsValue::is_object)]
 pub type Child;
 pub fn country(this: &Child) -> Option<String>;   // from Geo
 pub fn c(this: &Child) -> f64;
@@ -1171,12 +1222,12 @@ type D1Result<T = unknown> = D1Response & { results: T[] };
 ```
 
 ```rust
-#[wasm_bindgen(extends = R2GetOptions, extends = Object)]
+#[wasm_bindgen(extends = R2GetOptions, extends = Object, is_type_of = JsValue::is_object)]
 pub type R2BucketOptions;
 pub fn new(only_if: &R2Conditional) -> R2BucketOptions;
 pub fn new_with_headers(only_if: &Headers) -> R2BucketOptions;
 
-#[wasm_bindgen(extends = D1Response, extends = Object)]
+#[wasm_bindgen(extends = D1Response, extends = Object, is_type_of = JsValue::is_object)]
 pub type D1Result<T>;
 pub fn results<T>(this: &D1Result<T>) -> Vec<T>;
 ```
@@ -2422,7 +2473,7 @@ becomes
 ```rust
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(extends = Object)]
+    #[wasm_bindgen(extends = Object, is_type_of = JsValue::is_object)]
     pub type EvaluationDetails<T: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter, js_name = "flagKey")]
     pub fn flag_key<T: ::wasm_bindgen::JsGeneric>(this: &EvaluationDetails<T>) -> String;
@@ -2725,6 +2776,12 @@ Rules:
   is numbered in source order, first seen wins: a declared `class Other`
   is `Other2(Other)`, and `{AFault | A.Fault}` gives `AFault(AFault)` and
   `AFault2(a::Fault)`.
+* A `@throws` name that is an interface (`interface AiError extends Error
+  {}`) has no runtime class to test a thrown value against: its
+  `dyn_into` accepts [any object](#shapes-have-no-runtime-class), so its
+  arm would swallow every error. It is reported and omitted from the
+  enum; its values land in another variant (`Error`, if one is named) or
+  `Other`.
 * A `@throws` name must be declared in the input, a `js_sys` error
   class (`Error`, `TypeError`, `RangeError`, `SyntaxError`,
   `ReferenceError`, `EvalError`, `UriError`), or mapped with
@@ -3046,6 +3103,36 @@ pub enum EmailAttachmentContentKind {
 
 // inside the extern block:
 pub fn content(this: &EmailAttachment) -> EmailAttachmentContentKind;
+```
+
+#### Shape arms go last
+
+The tuple arms dispatch in order through `dyn_into`, and a
+[shape](#shapes-have-no-runtime-class) or `object` arm accepts any
+object, so it would take the values of every arm after it. Such an arm
+is moved after the others, before a trailing `JsValue` catch-all. One
+shape arm keeps its type and, as the last tuple arm, makes the enum
+`#[wasm_bindgen(fallback)]`, which wasm-bindgen recommends for an arm
+with no runtime witness: whatever the earlier arms don't take lands
+there. Two or more shape arms can't be told apart at runtime, so they
+collapse into one `Object(Object)` arm, with a warning.
+
+```ts
+declare function pick(): RoundingOptions | Ticket;
+declare function pickAny(): RoundingOptions | Init | Ticket;
+```
+
+```rust
+#[wasm_bindgen(private, fallback)]
+pub enum PickReturnKind {
+    Ticket(Ticket),
+    RoundingOptions(RoundingOptions),
+}
+#[wasm_bindgen(private, fallback)]
+pub enum PickAnyReturnKind {
+    Ticket(Ticket),
+    Object(Object),
+}
 ```
 
 #### Naming
@@ -3523,7 +3610,10 @@ namespace WebAssembly {
 ```
 
 emits a `pub mod web_assembly { ... }` (note: still `pub`) with
-`#[wasm_bindgen(js_namespace = "WebAssembly")]` on each member.
+`#[wasm_bindgen(js_namespace = "WebAssembly")]` on each member that
+names something in JS (an interface's type, which
+[names nothing](#shapes-have-no-runtime-class), and a string enum don't
+carry it).
 Namespaces describe runtime *property access* (`WebAssembly.Module`),
 not module specifiers — they're independent of the `--export`
 filter. A nested namespace nests its `pub mod`, and its members carry the
@@ -3562,7 +3652,7 @@ pub mod events {
         // Handle::emitter → super::Emitter
     }
 }
-#[wasm_bindgen(extends = events::Emitter, extends = Object)]
+#[wasm_bindgen(extends = events::Emitter, extends = Object, is_type_of = JsValue::is_object)]
 pub type Stream;
 ```
 
@@ -4053,13 +4143,20 @@ dispatched through the enum's `TryFromJsValue`.
 Generated enums describe values on the JS side, not anything the crate
 exports, so every string enum, numeric enum and dynamic union is
 `#[wasm_bindgen(private)]`: wasm-bindgen keeps it off the JS module's
-exports and lets same-named private copies coexist in one build. An enum
-inside a namespace carries the namespace's `js_namespace`, like its
-imports:
+exports and lets same-named private copies coexist in one build. A
+numeric enum inside a namespace carries the namespace's `js_namespace`,
+like its imports, since wasm-bindgen defines a JS object for it. A string
+enum is only its values: wasm-bindgen never names it in JS and carries a
+`js_namespace` through without reading it, so it has none:
 
 ```rust
 pub mod timing {
     #[wasm_bindgen(private, js_namespace = "Timing")]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[repr(u32)]
+    pub enum Level { /* ... */ }
+
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DurationUnit { /* ... */ }
 }

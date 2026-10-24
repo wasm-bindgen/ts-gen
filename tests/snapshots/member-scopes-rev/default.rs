@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Win;
     #[wasm_bindgen(method, getter)]
@@ -55,7 +55,7 @@ pub mod ix {
     use super::*;
     #[wasm_bindgen(module = "ix")]
     extern "C" {
-        # [wasm_bindgen (extends = super :: ic :: T , extends = Object)]
+        # [wasm_bindgen (extends = super :: ic :: T , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type U;
         #[wasm_bindgen(method, getter)]
@@ -123,7 +123,7 @@ pub mod ia {
     use super::*;
     #[wasm_bindgen(module = "ia")]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type T;
         #[wasm_bindgen(method, getter)]
@@ -144,7 +144,7 @@ pub mod ic {
     use super::*;
     #[wasm_bindgen(module = "ic")]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type T;
         #[wasm_bindgen(method, getter)]
@@ -162,7 +162,7 @@ pub mod ic {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ev;
     #[wasm_bindgen(method, getter)]
@@ -184,7 +184,7 @@ extern "C" {
     pub type X;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(e: &Ev) -> Result<X, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "X")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_n(e: &ia::T, n: f64) -> Result<X, JsValue>;
     # [wasm_bindgen (static_method_of = X)]
     pub fn sm(e: &ia::T);

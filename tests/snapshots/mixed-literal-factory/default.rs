@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "mixed-literal-factory")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BoolOrStrings;
     #[wasm_bindgen(method, getter)]
@@ -44,7 +44,7 @@ impl BoolOrStrings {
 }
 #[wasm_bindgen(module = "mixed-literal-factory")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type NumberOrStrings;
     #[wasm_bindgen(method, getter)]
@@ -85,7 +85,7 @@ impl NumberOrStrings {
 }
 #[wasm_bindgen(module = "mixed-literal-factory")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Mixed;
     #[wasm_bindgen(method, getter)]
@@ -141,7 +141,7 @@ impl Mixed {
 }
 #[wasm_bindgen(module = "mixed-literal-factory")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Level;
     #[wasm_bindgen(method, getter)]
@@ -177,7 +177,7 @@ impl Level {
 }
 #[wasm_bindgen(module = "mixed-literal-factory")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Open;
     #[wasm_bindgen(method, getter)]
@@ -202,7 +202,7 @@ impl Open {
 }
 #[wasm_bindgen(module = "mixed-literal-factory")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Optional;
     #[wasm_bindgen(method, getter)]

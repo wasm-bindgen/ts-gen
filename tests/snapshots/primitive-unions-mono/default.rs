@@ -283,7 +283,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Target;
     #[wasm_bindgen(method, getter)]
@@ -353,9 +353,9 @@ extern "C" {
     pub type Store;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(key: &str) -> Result<Store, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Store")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_f64(key: f64) -> Result<Store, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Store")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_symbol(key: &Symbol) -> Result<Store, JsValue>;
     #[wasm_bindgen(method)]
     pub fn get(this: &Store, key: &str) -> String;
@@ -376,7 +376,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Settings;
     #[wasm_bindgen(method, getter)]
@@ -692,9 +692,9 @@ pub enum LabelKind {
     String(String),
     Bool(bool),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum FromKind {
-    Target(Target),
     String(String),
     Bool(bool),
+    Target(Target),
 }

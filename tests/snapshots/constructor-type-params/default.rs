@@ -11,7 +11,7 @@ extern "C" {
     pub type Holder<Value: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Holder, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Holder")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_initial<Value: ::wasm_bindgen::JsGeneric>(
         initial: &Value,
     ) -> Result<Holder<Value>, JsValue>;

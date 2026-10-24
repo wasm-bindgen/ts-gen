@@ -56,6 +56,11 @@ pub(crate) struct ClassConfig<'a> {
     js_namespace: Vec<String>,
     /// Whether this is an abstract class (skip constructor).
     is_abstract: bool,
+    /// Whether a JS constructor of this name exists at runtime, so
+    /// `instanceof` can test for it: true for a class (including one merged
+    /// from an interface and its `declare var`), false for an interface or
+    /// a discriminated union, which only describe a shape.
+    runtime_class: bool,
     /// Members to generate.
     members: Vec<Member>,
     /// See [`member_names`].
@@ -338,6 +343,7 @@ impl<'a> ClassConfig<'a> {
             module,
             js_namespace: Vec::new(),
             is_abstract: decl.is_abstract,
+            runtime_class: true,
             members: decl.members.clone(),
             member_names: member_names(
                 &decl.members,
@@ -373,6 +379,7 @@ impl<'a> ClassConfig<'a> {
             module,
             js_namespace: Vec::new(),
             is_abstract: false,
+            runtime_class: false,
             member_names: member_names(&members, generated_names(&members, false, dictionary)),
             members,
             type_params: decl.type_params.clone(),
@@ -395,6 +402,7 @@ impl<'a> ClassConfig<'a> {
             module: self.module.clone(),
             js_namespace: self.js_namespace.clone(),
             is_abstract: self.is_abstract,
+            runtime_class: self.runtime_class,
             members,
             member_names: self.member_names.clone(),
             type_params: self.type_params.clone(),
@@ -426,6 +434,7 @@ impl<'a> ClassConfig<'a> {
             module,
             js_namespace: Vec::new(),
             is_abstract: false,
+            runtime_class: false,
             members: decl.members.clone(),
             member_names: member_names(&decl.members, generated_names(&decl.members, false, true)),
             type_params: decl.type_params.clone(),
@@ -1849,15 +1858,24 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
         wb_parts.push(quote! { extends = Object });
     }
 
-    // Emit `js_name` whenever the JS-side class name differs from the Rust
-    // ident we'll use — that's true after a collision rename even if the
-    // `config.rust_name` (pre-rename) matched `js_name`.
-    if super::typemap::needs_js_name(&rust_ident, js_name) {
-        wb_parts.push(quote! { js_name = #js_name });
-    }
+    if config.runtime_class {
+        // Emit `js_name` whenever the JS-side class name differs from the Rust
+        // ident we'll use — that's true after a collision rename even if the
+        // `config.rust_name` (pre-rename) matched `js_name`.
+        if super::typemap::needs_js_name(&rust_ident, js_name) {
+            wb_parts.push(quote! { js_name = #js_name });
+        }
 
-    // Namespace for types inside a JS namespace (e.g., WebAssembly.Module)
-    wb_parts.extend(super::js_namespace_attr(&config.js_namespace));
+        // Namespace for types inside a JS namespace (e.g., WebAssembly.Module)
+        wb_parts.extend(super::js_namespace_attr(&config.js_namespace));
+    } else {
+        // A type's `js_name` and `js_namespace` only name the class its
+        // `instanceof` check tests against (its members are structural), and
+        // a shape has no such class: `x instanceof Temporal.RoundingOptions`
+        // fails for every value. Any object can carry the shape, so that is
+        // what `dyn_into` checks.
+        wb_parts.push(quote! { is_type_of = JsValue::is_object });
+    }
 
     let wb_attr = if wb_parts.is_empty() {
         quote! {}
@@ -1996,12 +2014,6 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     }
     if sig.catch {
         wb_parts.push(quote! { catch });
-    }
-    // For non-"new" overloads, we need js_name so wasm_bindgen maps them
-    // to the same JS constructor.
-    if sig.rust_name != "new" {
-        let js_name = &config.js_name;
-        wb_parts.push(quote! { js_name = #js_name });
     }
 
     let mut bounds = if CodegenContext::generic_mono(config.cgctx) {

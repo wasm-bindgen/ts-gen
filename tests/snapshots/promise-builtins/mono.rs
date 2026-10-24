@@ -248,7 +248,7 @@ pub mod cloudflare {
         use super::*;
         #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type Socket;
             #[doc = " `cloudflare:` builtin method: plain."]

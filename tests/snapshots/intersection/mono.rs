@@ -10,7 +10,7 @@ use wasm_bindgen::prelude::*;
 use JsValue as Missing;
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Conditional;
     #[wasm_bindgen(method, getter)]
@@ -44,7 +44,7 @@ impl ConditionalBuilder {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GetOptions;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
@@ -86,7 +86,7 @@ impl GetOptionsBuilder {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base;
     #[wasm_bindgen(method, getter)]
@@ -105,7 +105,7 @@ impl Base {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Base , extends = Object)]
+    # [wasm_bindgen (extends = Base , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Derived;
     #[wasm_bindgen(method, getter)]
@@ -128,7 +128,7 @@ impl Derived {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Unrelated;
     #[wasm_bindgen(method, getter)]
@@ -149,7 +149,7 @@ impl Unrelated {
 pub type Str = JsString;
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
@@ -223,7 +223,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = GetOptions , extends = Object)]
+    # [wasm_bindgen (extends = GetOptions , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StoreOptions;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
@@ -255,7 +255,7 @@ impl StoreOptionsBuilder {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StoreValue;
     #[wasm_bindgen(method, getter)]
@@ -281,7 +281,7 @@ impl StoreValue {
 pub type Branded<T> = T;
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Derived , extends = Unrelated , extends = Object)]
+    # [wasm_bindgen (extends = Derived , extends = Unrelated , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Both;
     #[wasm_bindgen(method, getter)]
@@ -306,7 +306,7 @@ impl Both {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = GetOptions , extends = Object)]
+    # [wasm_bindgen (extends = GetOptions , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Refined;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
@@ -338,7 +338,7 @@ impl RefinedBuilder {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Fetcher;
     #[wasm_bindgen(method, catch)]
@@ -359,7 +359,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Fetcher , extends = Object)]
+    # [wasm_bindgen (extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stub;
     #[wasm_bindgen(method, getter)]
@@ -369,7 +369,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Provider<T = JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -379,7 +379,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Provider , extends = Fetcher , extends = Object)]
+    # [wasm_bindgen (extends = Provider , extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GenericStub<T = JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -404,7 +404,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Fetcher , extends = Object)]
+    # [wasm_bindgen (extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Unknown;
     #[wasm_bindgen(method, catch)]
@@ -429,7 +429,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Foreign , extends = Object)]
+    # [wasm_bindgen (extends = Foreign , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ext;
     #[wasm_bindgen(method, getter)]
@@ -448,7 +448,7 @@ impl Ext {
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Message;
     #[wasm_bindgen(method, getter)]
@@ -493,7 +493,7 @@ pub type ViaBranded = Base;
 pub type BaseAlias = Base;
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Base , extends = Object)]
+    # [wasm_bindgen (extends = Base , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ViaBaseAlias;
     #[wasm_bindgen(method, getter)]

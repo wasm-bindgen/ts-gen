@@ -30,7 +30,7 @@ pub enum AutoIncrement {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTarget;
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
@@ -42,7 +42,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Serializable;
     #[wasm_bindgen(method, catch, js_name = "toJSON")]
@@ -50,7 +50,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = EventTarget , extends = Serializable , extends = Object)]
+    # [wasm_bindgen (extends = EventTarget , extends = Serializable , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventEmitter;
     #[wasm_bindgen(method, catch, js_name = "toJSON")]
@@ -66,7 +66,7 @@ pub mod node_js {
     use super::*;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "NodeJS")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type EventEmitter;
         #[wasm_bindgen(method, catch)]
@@ -99,7 +99,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Duplex;
     #[wasm_bindgen(method, catch)]
@@ -119,7 +119,7 @@ pub mod intl {
     use super::*;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Intl")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Collator;
         #[wasm_bindgen(method, catch)]
@@ -131,7 +131,7 @@ pub mod intl {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Intl")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type CollatorOptions;
         #[wasm_bindgen(method, getter)]

@@ -12,7 +12,7 @@ pub enum Kind {
 }
 #[wasm_bindgen(module = "enum-args")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SendOptions;
     #[wasm_bindgen(method, getter)]

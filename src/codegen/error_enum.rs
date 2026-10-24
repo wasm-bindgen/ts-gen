@@ -142,6 +142,17 @@ fn is_bindable(path: &str, resolved: Option<TypeId>, ctx: &CodegenContext<'_>) -
     }
 }
 
+/// A declaration that only describes a shape, which `dyn_into` accepts for
+/// any object (see `generate_type_decl`), so a variant of it would swallow
+/// every thrown object.
+fn shape_kind(kind: &TypeKind) -> Option<&'static str> {
+    match kind {
+        TypeKind::Interface(_) => Some("an interface"),
+        TypeKind::DiscriminatedUnion(_) => Some("an object type"),
+        _ => None,
+    }
+}
+
 /// A declared type's variant is named by its Rust path, so `A.Fault` and
 /// `B.Fault` stay distinct (`AFault`, `BFault`).
 fn variant_ident(path: &str, resolved: Option<TypeId>, ctx: &CodegenContext<'_>) -> String {
@@ -290,6 +301,17 @@ pub fn generate_error_enum(
             ctx.error(format!(
                 "`@throws {{{path}}}` names a type that is not declared in the input, a `js_sys` \
                  error class, or mapped with --external; it is omitted from `{name}`"
+            ));
+            continue;
+        }
+        if let Some(kind) = resolved
+            .filter(|id| ctx.local_type_ids.contains(id))
+            .and_then(|id| shape_kind(&ctx.gctx.get_type(id).kind))
+        {
+            ctx.warn(format!(
+                "`@throws {{{path}}}` names {kind}, which has no runtime class to test a \
+                 thrown value against; it is omitted from `{name}`, so its values land in \
+                 another variant or `Other`"
             ));
             continue;
         }
@@ -504,6 +526,28 @@ mod tests {
                 .diagnostics
                 .iter()
                 .any(|d| d.message.contains("`@throws {Nope}`")));
+        });
+    }
+
+    #[test]
+    fn interface_throws_type_is_reported_and_skipped() {
+        let src = r#"
+            interface ShapeError extends Error {
+                code: number;
+            }
+            declare class A {
+                /** @throws {ShapeError | TypeError} */
+                f(): void;
+            }
+        "#;
+        with_ctx(src, |ctx, names| {
+            let tokens = generate_error_enum("JsException", names, ctx).to_string();
+            assert!(!tokens.contains("ShapeError ("), "{tokens}");
+            assert!(tokens.contains("TypeError (TypeError)"), "{tokens}");
+            let diags = ctx.take_diagnostics();
+            assert!(diags.diagnostics.iter().any(|d| d
+                .message
+                .contains("`@throws {ShapeError}` names an interface")));
         });
     }
 
