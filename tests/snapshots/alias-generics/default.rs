@@ -22,8 +22,6 @@ impl<Meta: ::wasm_bindgen::JsGeneric> Request<Meta> {
     }
 }
 #[allow(dead_code)]
-pub type Info = JsValue;
-#[allow(dead_code)]
 pub type Pair<A, B = JsString> = ArrayTuple<(A, B)>;
 #[allow(dead_code)]
 pub type Same<A, B = A> = ArrayTuple<(A, B)>;

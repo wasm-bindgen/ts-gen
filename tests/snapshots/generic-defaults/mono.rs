@@ -20,8 +20,6 @@ extern "C" {
         for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
         T: ::wasm_bindgen::convert::IntoWasmAbi;
 }
-#[allow(dead_code)]
-pub type Loose = JsValue;
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

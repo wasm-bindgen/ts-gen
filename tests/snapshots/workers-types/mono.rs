@@ -346,10 +346,6 @@ extern "C" {
     #[wasm_bindgen(thread_local_v2)]
     pub static console: Console;
 }
-#[allow(dead_code)]
-pub type BufferSource = JsValue;
-#[allow(dead_code)]
-pub type TypedArray = JsValue;
 pub mod web_assembly {
     #[allow(unused_imports)]
     use super::*;
@@ -445,13 +441,9 @@ pub mod web_assembly {
     }
     pub use Global_ as Global;
     #[allow(dead_code)]
-    pub type ImportValue = JsValue;
-    #[allow(dead_code)]
     pub type ModuleImports = Object;
     #[allow(dead_code)]
     pub type Imports = Object<Object>;
-    #[allow(dead_code)]
-    pub type ExportValue = JsValue;
     #[allow(dead_code)]
     pub type Exports = Object;
     #[wasm_bindgen(experimental_generic_mono)]
@@ -3614,8 +3606,6 @@ extern "C" {
     where
         EventType: ::wasm_bindgen::convert::IntoWasmAbi;
 }
-#[allow(dead_code)]
-pub type EventListenerOrEventListenerObject = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -5831,7 +5821,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey/algorithm)"]
     #[wasm_bindgen(method, getter)]
-    pub fn algorithm(this: &CryptoKey) -> AlgorithmKind;
+    pub fn algorithm(this: &CryptoKey) -> JsValue;
     #[doc = " The read-only **`usages`** property of the CryptoKey interface indicates what can be done with the key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey/usages)"]
@@ -8025,8 +8015,6 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "passThroughOnException")]
     pub fn pass_through_on_exception(this: &FetchEvent) -> Result<(), JsValue>;
 }
-#[allow(dead_code)]
-pub type HeadersInit = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -8124,8 +8112,6 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub fn values(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
 }
-#[allow(dead_code)]
-pub type BodyInit = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -8352,7 +8338,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "statusText")]
     pub fn set_status_text(this: &ResponseInit, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &ResponseInit) -> Option<JsValue>;
+    pub fn headers(this: &ResponseInit) -> Option<HeadersKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -8433,8 +8419,6 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type RequestInfo = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Body , extends = Object)]
@@ -8607,7 +8591,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_method<Cf>(this: &RequestInit<Cf>, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn headers<Cf>(this: &RequestInit<Cf>) -> Option<JsValue>;
+    pub fn headers<Cf>(this: &RequestInit<Cf>) -> Option<HeadersKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers<Cf>(this: &RequestInit<Cf>, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -8615,7 +8599,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record<Cf>(this: &RequestInit<Cf>, val: &Object<JsString>);
     #[wasm_bindgen(method, getter)]
-    pub fn body<Cf>(this: &RequestInit<Cf>) -> Option<Nullable<JsValue>>;
+    pub fn body<Cf>(this: &RequestInit<Cf>) -> Option<Nullable<BodyKind>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body<Cf>(this: &RequestInit<Cf>, val: &ReadableStream<Uint8Array>);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -13799,7 +13783,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItem;
     #[wasm_bindgen(method, getter)]
-    pub fn event(this: &TraceItem) -> Nullable<EventKind>;
+    pub fn event(this: &TraceItem) -> JsValue;
     #[wasm_bindgen(method, getter, js_name = "eventTimestamp")]
     pub fn event_timestamp(this: &TraceItem) -> Nullable<f64>;
     #[wasm_bindgen(method, getter)]
@@ -14063,9 +14047,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemHibernatableWebSocketEventInfo;
     #[wasm_bindgen(method, getter, js_name = "getWebSocketEvent")]
-    pub fn get_web_socket_event(
-        this: &TraceItemHibernatableWebSocketEventInfo,
-    ) -> GetWebSocketEventKind;
+    pub fn get_web_socket_event(this: &TraceItemHibernatableWebSocketEventInfo) -> JsValue;
 }
 impl TraceItemHibernatableWebSocketEventInfo {
     #[allow(clippy::new_without_default)]
@@ -18246,8 +18228,6 @@ impl AiTextToSpeechInputBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type AiTextToSpeechOutput = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -18258,7 +18238,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_inputs(this: &BaseAiTextToSpeech, val: &AiTextToSpeechInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &BaseAiTextToSpeech) -> JsValue;
+    pub fn post_processed_outputs(this: &BaseAiTextToSpeech) -> PostProcessedOutputsKind;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(this: &BaseAiTextToSpeech, val: &Uint8Array);
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
@@ -19606,11 +19586,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Reasoning;
     #[wasm_bindgen(method, getter)]
-    pub fn effort(this: &Reasoning) -> Option<Nullable<String>>;
-    #[wasm_bindgen(method, getter, js_name = "effort")]
-    pub fn effort_js_string(this: &Reasoning) -> Option<Nullable<JsString>>;
+    pub fn effort(this: &Reasoning) -> Option<Nullable<EffortKind>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_effort(this: &Reasoning, val: impl ::wasm_bindgen::JsStringLike);
+    pub fn set_effort(this: &Reasoning, val: EffortKind);
     #[wasm_bindgen(method, setter, js_name = "effort")]
     fn __set_effort_with_null(this: &Reasoning, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
@@ -19651,7 +19629,7 @@ pub struct ReasoningBuilder {
     inner: Reasoning,
 }
 impl ReasoningBuilder {
-    pub fn effort(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+    pub fn effort(self, val: EffortKind) -> Self {
         self.inner.set_effort(val);
         self
     }
@@ -19679,8 +19657,6 @@ impl ReasoningBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type ResponseContent = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -20064,8 +20040,6 @@ impl ResponseFormatJSONObject {
         inner
     }
 }
-#[allow(dead_code)]
-pub type ResponseFormatTextConfig = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -20295,8 +20269,6 @@ impl ResponseFunctionCallArgumentsDoneEvent {
         inner
     }
 }
-#[allow(dead_code)]
-pub type ResponseFunctionCallOutputItem = JsValue;
 #[allow(dead_code)]
 pub type ResponseFunctionCallOutputItemList = Array;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -20588,8 +20560,6 @@ impl ResponseIncompleteEvent {
 }
 #[allow(dead_code)]
 pub type ResponseInput = Array;
-#[allow(dead_code)]
-pub type ResponseInputContent = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -20766,8 +20736,6 @@ impl ResponseInputImageContentBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type ResponseInputItem = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -21167,10 +21135,6 @@ impl ResponseInputTextContent {
         inner
     }
 }
-#[allow(dead_code)]
-pub type ResponseItem = JsValue;
-#[allow(dead_code)]
-pub type ResponseOutputItem = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -21900,8 +21864,6 @@ pub enum ResponseStatus {
     Queued = "queued",
     Incomplete = "incomplete",
 }
-#[allow(dead_code)]
-pub type ResponseStreamEvent = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22377,8 +22339,6 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Baai_Bge_Base_En_V1_5_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22442,8 +22402,6 @@ extern "C" {
         val: &Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Openai_Whisper_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22510,7 +22468,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Openai_Whisper;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Openai_Whisper) -> JsValue;
+    pub fn inputs(this: &Base_Ai_Cf_Openai_Whisper) -> InputsKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_inputs(this: &Base_Ai_Cf_Openai_Whisper, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "inputs")]
@@ -22598,8 +22556,6 @@ impl Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Meta_M2M100_1_2B_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22720,8 +22676,6 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Baai_Bge_Small_En_V1_5_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22847,8 +22801,6 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Baai_Bge_Large_En_V1_5_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22912,8 +22864,6 @@ extern "C" {
         val: &Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22958,7 +22908,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M) -> JsValue;
+    pub fn inputs(this: &Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M) -> InputsKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_inputs(
         this: &Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M,
@@ -22976,8 +22926,6 @@ extern "C" {
         val: &Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Openai_Whisper_Tiny_En_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -23053,7 +23001,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Openai_Whisper_Tiny_En;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Openai_Whisper_Tiny_En) -> JsValue;
+    pub fn inputs(this: &Base_Ai_Cf_Openai_Whisper_Tiny_En) -> InputsKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_inputs(
         this: &Base_Ai_Cf_Openai_Whisper_Tiny_En,
@@ -23291,8 +23239,6 @@ extern "C" {
         val: &Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Baai_Bge_M3_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -23527,8 +23473,6 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Baai_Bge_M3_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -23868,8 +23812,6 @@ extern "C" {
         val: &Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24287,8 +24229,6 @@ extern "C" {
         val: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24825,8 +24765,6 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24895,7 +24833,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
         this: &Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast,
-    ) -> JsValue;
+    ) -> InputsKind;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(
         this: &Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast,
@@ -24977,7 +24915,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_Guard_3_8B_Output;
     #[wasm_bindgen(method, getter)]
-    pub fn response(this: &Ai_Cf_Meta_Llama_Guard_3_8B_Output) -> Option<ResponseKind>;
+    pub fn response(this: &Ai_Cf_Meta_Llama_Guard_3_8B_Output) -> Option<InputsKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_response(
         this: &Ai_Cf_Meta_Llama_Guard_3_8B_Output,
@@ -25138,8 +25076,6 @@ extern "C" {
         val: &Ai_Cf_Baai_Bge_Reranker_Base_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25630,8 +25566,6 @@ extern "C" {
         val: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Qwen_Qwq_32B_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25988,8 +25922,6 @@ extern "C" {
         val: &Ai_Cf_Qwen_Qwq_32B_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -26438,8 +26370,6 @@ extern "C" {
         val: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Google_Gemma_3_12B_It_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -26812,8 +26742,6 @@ extern "C" {
         val: &Ai_Cf_Google_Gemma_3_12B_It_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -27718,8 +27646,6 @@ extern "C" {
         val: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -28538,8 +28464,6 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -28846,7 +28770,7 @@ extern "C" {
         val: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8) -> JsValue;
+    pub fn post_processed_outputs(this: &Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8) -> InputsKind;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(
         this: &Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8,
@@ -29474,7 +29398,7 @@ extern "C" {
     pub type Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input;
     #[doc = " readable stream with audio data and content-type specified for that data"]
     #[wasm_bindgen(method, getter)]
-    pub fn audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> AudioKind;
+    pub fn audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> InputsKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "audio")]
@@ -30114,8 +30038,6 @@ extern "C" {
         val: &Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -31048,8 +30970,6 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -31392,7 +31312,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
         this: &Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It,
-    ) -> JsValue;
+    ) -> InputsKind;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(
         this: &Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It,
@@ -31671,9 +31591,9 @@ extern "C" {
     pub fn set_sequence_id(this: &Ai_Cf_Deepgram_Flux_Output, val: f64);
     #[doc = " The type of event being reported."]
     #[wasm_bindgen(method, getter)]
-    pub fn event(this: &Ai_Cf_Deepgram_Flux_Output) -> Option<Ai_Cf_Deepgram_Flux_OutputEventKind>;
+    pub fn event(this: &Ai_Cf_Deepgram_Flux_Output) -> Option<EventKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_event(this: &Ai_Cf_Deepgram_Flux_Output, val: Ai_Cf_Deepgram_Flux_OutputEventKind);
+    pub fn set_event(this: &Ai_Cf_Deepgram_Flux_Output, val: EventKind);
     #[doc = " The index of the current turn"]
     #[wasm_bindgen(method, getter)]
     pub fn turn_index(this: &Ai_Cf_Deepgram_Flux_Output) -> Option<f64>;
@@ -31733,7 +31653,7 @@ impl Ai_Cf_Deepgram_Flux_OutputBuilder {
         self.inner.set_sequence_id(val);
         self
     }
-    pub fn event(self, val: Ai_Cf_Deepgram_Flux_OutputEventKind) -> Self {
+    pub fn event(self, val: EventKind) -> Self {
         self.inner.set_event(val);
         self
     }
@@ -33634,7 +33554,7 @@ extern "C" {
         val: impl ::wasm_bindgen::JsStringLike,
     );
     #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
-    pub fn cf_aig_custom_cost(this: &AIGatewayHeaders) -> AudioKind;
+    pub fn cf_aig_custom_cost(this: &AIGatewayHeaders) -> InputsKind;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
     pub fn set_cf_aig_custom_cost(this: &AIGatewayHeaders, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
@@ -34292,7 +34212,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_query(this: &AutoRagSearchRequest, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn filters(this: &AutoRagSearchRequest) -> Option<FiltersKind>;
+    pub fn filters(this: &AutoRagSearchRequest) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_filters(this: &AutoRagSearchRequest, val: &CompoundFilter);
     #[wasm_bindgen(method, setter, js_name = "filters")]
@@ -34450,7 +34370,7 @@ extern "C" {
         val: impl ::wasm_bindgen::JsStringLike,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn filters(this: &AutoRagAiSearchRequestStreaming) -> Option<FiltersKind>;
+    pub fn filters(this: &AutoRagAiSearchRequestStreaming) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_filters(this: &AutoRagAiSearchRequestStreaming, val: &CompoundFilter);
     #[wasm_bindgen(method, setter, js_name = "filters")]
@@ -35907,7 +35827,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "tlsClientAuth")]
     pub fn tls_client_auth<HostMetadata>(
         this: &IncomingRequestCfProperties<HostMetadata>,
-    ) -> TlsClientAuthKind;
+    ) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "tlsClientAuth")]
     pub fn set_tls_client_auth<HostMetadata>(
         this: &IncomingRequestCfProperties<HostMetadata>,
@@ -36810,7 +36730,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(0.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N0);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -36880,7 +36800,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(0.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N0);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -36952,7 +36872,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(1.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N1);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -37022,7 +36942,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(1.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N1);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -37094,7 +37014,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(2.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N2);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -37164,7 +37084,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(2.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N2);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -37236,7 +37156,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(3.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N3);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -37306,7 +37226,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(3.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N3);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -37378,7 +37298,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(4.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N4);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -37448,7 +37368,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(4.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N4);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -37520,7 +37440,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(5.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N5);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -37590,7 +37510,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         let inner: IncomingRequestCfProperties<HostMetadata> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(5.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N5);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -37761,9 +37681,14 @@ extern "C" {
     #[doc = ""]
     #[doc = " @example 3"]
     #[wasm_bindgen(method, getter, js_name = "edgeRequestKeepAliveStatus")]
-    pub fn edge_request_keep_alive_status(this: &IncomingRequestCfPropertiesBase) -> f64;
+    pub fn edge_request_keep_alive_status(
+        this: &IncomingRequestCfPropertiesBase,
+    ) -> EdgeRequestKeepAliveStatusKind;
     #[wasm_bindgen(method, setter, js_name = "edgeRequestKeepAliveStatus")]
-    pub fn set_edge_request_keep_alive_status(this: &IncomingRequestCfPropertiesBase, val: f64);
+    pub fn set_edge_request_keep_alive_status(
+        this: &IncomingRequestCfPropertiesBase,
+        val: EdgeRequestKeepAliveStatusKind,
+    );
     #[doc = " The HTTP Protocol the request used."]
     #[doc = ""]
     #[doc = " @example \"HTTP/2\""]
@@ -38170,7 +38095,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(0.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N0);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -38217,7 +38142,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(1.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N1);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -38264,7 +38189,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(2.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N2);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -38311,7 +38236,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(3.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N3);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -38358,7 +38283,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(4.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N4);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -38405,7 +38330,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(5.0);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N5);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -38651,7 +38576,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "tlsClientAuth")]
     pub fn tls_client_auth(
         this: &IncomingRequestCfPropertiesCloudflareAccessOrApiShield,
-    ) -> TlsClientAuthKind;
+    ) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "tlsClientAuth")]
     pub fn set_tls_client_auth(
         this: &IncomingRequestCfPropertiesCloudflareAccessOrApiShield,
@@ -40032,8 +39957,6 @@ pub enum ContinentCode {
     Oc = "OC",
     Sa = "SA",
 }
-#[allow(dead_code)]
-pub type CfProperties = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -41490,14 +41413,6 @@ pub mod cloudflare {
             Month = "month",
             Year = "year",
         }
-        #[allow(dead_code)]
-        pub type WorkflowSleepDuration = JsValue;
-        #[allow(dead_code)]
-        pub type WorkflowDelayDuration = JsValue;
-        #[allow(dead_code)]
-        pub type WorkflowTimeoutDuration = JsValue;
-        #[allow(dead_code)]
-        pub type WorkflowRetentionDuration = JsValue;
         #[wasm_bindgen(private)]
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub enum WorkflowBackoff {
@@ -44040,12 +43955,6 @@ pub mod rpc {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkflowEntrypointBranded;
     }
-    #[allow(dead_code)]
-    pub type EntrypointBranded = JsValue;
-    #[allow(dead_code)]
-    pub type Stubable = JsValue;
-    #[allow(dead_code)]
-    pub type Serializable = JsValue;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = super :: Disposable , extends = Object , is_type_of = JsValue :: is_object)]
@@ -47770,7 +47679,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type__js_string(this: &HibernatableWebSocketEventInfo) -> JsString;
         #[wasm_bindgen(method, getter)]
-        pub fn info(this: &HibernatableWebSocketEventInfo) -> InfoKind;
+        pub fn info(this: &HibernatableWebSocketEventInfo) -> JsValue;
     }
     impl HibernatableWebSocketEventInfo {
         #[allow(clippy::new_without_default)]
@@ -47901,7 +47810,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "scriptVersion")]
         pub fn script_version(this: &Onset) -> Option<ScriptVersion>;
         #[wasm_bindgen(method, getter)]
-        pub fn info(this: &Onset) -> OnsetInfoKind;
+        pub fn info(this: &Onset) -> JsValue;
     }
     impl Onset {
         #[allow(clippy::new_without_default)]
@@ -47955,7 +47864,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "spanId")]
         pub fn span_id_js_string(this: &SpanOpen) -> JsString;
         #[wasm_bindgen(method, getter)]
-        pub fn info(this: &SpanOpen) -> Option<SpanOpenInfoKind>;
+        pub fn info(this: &SpanOpen) -> Option<JsValue>;
     }
     impl SpanOpen {
         #[allow(clippy::new_without_default)]
@@ -48171,8 +48080,6 @@ pub mod tail_stream {
             }
         }
     }
-    #[allow(dead_code)]
-    pub type EventType = JsValue;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -48380,15 +48287,7 @@ pub mod tail_stream {
             self.inner
         }
     }
-    #[allow(dead_code)]
-    pub type TailEventHandlerType = JsValue;
 }
-#[allow(dead_code)]
-pub type VectorizeVectorMetadataValue = JsValue;
-#[allow(dead_code)]
-pub type VectorizeVectorMetadata = JsValue;
-#[allow(dead_code)]
-pub type VectorFloatArray = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -49743,10 +49642,6 @@ pub enum WorkflowDurationLabel {
     Month = "month",
     Year = "year",
 }
-#[allow(dead_code)]
-pub type WorkflowSleepDuration = JsValue;
-#[allow(dead_code)]
-pub type WorkflowRetentionDuration = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -50145,7 +50040,7 @@ extern "C" {
         val: impl ::wasm_bindgen::JsStringLike,
     );
     #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
-    pub fn cf_aig_custom_cost(this: &PartialAiGatewayHeaders) -> Option<AudioKind>;
+    pub fn cf_aig_custom_cost(this: &PartialAiGatewayHeaders) -> Option<InputsKind>;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
     pub fn set_cf_aig_custom_cost(this: &PartialAiGatewayHeaders, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
@@ -50368,7 +50263,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilter2;
     #[wasm_bindgen(method, getter, js_name = "$eq")]
-    pub fn eq(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
+    pub fn eq(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     pub fn set_eq(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$eq")]
@@ -50383,7 +50278,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     fn __set_eq_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$ne")]
-    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
+    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     pub fn set_ne(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$ne")]
@@ -50398,7 +50293,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     fn __set_ne_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lt")]
-    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
+    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     pub fn set_lt(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$lt")]
@@ -50413,7 +50308,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     fn __set_lt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lte")]
-    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
+    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     pub fn set_lte(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$lte")]
@@ -50428,7 +50323,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     fn __set_lte_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gt")]
-    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
+    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     pub fn set_gt(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$gt")]
@@ -50443,7 +50338,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     fn __set_gt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gte")]
-    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
+    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
     #[wasm_bindgen(method, setter, js_name = "$gte")]
     pub fn set_gte(this: &VectorizeVectorMetadataFilter2, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "$gte")]
@@ -50671,10 +50566,6 @@ pub enum ExportKeyReturnKind {
     ArrayBuffer(ArrayBuffer),
     JsonWebKey(JsonWebKey),
 }
-#[wasm_bindgen(private, fallback)]
-pub enum AlgorithmKind {
-    Object(Object),
-}
 #[wasm_bindgen(private)]
 pub enum SaltKind {
     ArrayBuffer(ArrayBuffer),
@@ -50701,6 +50592,12 @@ pub enum TypeKind {
     Error = "error",
 }
 #[wasm_bindgen(private)]
+pub enum HeadersKind {
+    Headers(Headers),
+    Record(Object<JsString>),
+    JsValue(JsValue),
+}
+#[wasm_bindgen(private)]
 pub enum EncodeBodyKind {
     Automatic = "automatic",
     Manual = "manual",
@@ -50709,6 +50606,17 @@ pub enum EncodeBodyKind {
 pub enum CacheKind {
     NoStore = "no-store",
     NoCache = "no-cache",
+}
+#[wasm_bindgen(private)]
+pub enum BodyKind {
+    ReadableStream(ReadableStream<Uint8Array>),
+    String(String),
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+    Blob(Blob),
+    UrlSearchParams(URLSearchParams),
+    FormData(FormData),
+    JsValue(JsValue),
 }
 #[wasm_bindgen(private, fallback)]
 pub enum OnlyIfKind {
@@ -50730,14 +50638,6 @@ pub enum Md5Kind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
     String(String),
-}
-#[wasm_bindgen(private, fallback)]
-pub enum EventKind {
-    Object(Object),
-}
-#[wasm_bindgen(private, fallback)]
-pub enum GetWebSocketEventKind {
-    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum BinaryTypeKind {
@@ -50782,6 +50682,11 @@ pub enum AiTextGenerationToolInputTypeKind {
 pub enum ToolsKind {
     VecOfAiTextGenerationToolInput(Vec<AiTextGenerationToolInput>),
     VecOfAiTextGenerationToolLegacyInput(Vec<AiTextGenerationToolLegacyInput>),
+    Object(Object),
+}
+#[wasm_bindgen(private, fallback)]
+pub enum PostProcessedOutputsKind {
+    Uint8Array(Uint8Array),
     Object(Object),
 }
 #[wasm_bindgen(private, fallback)]
@@ -50833,6 +50738,13 @@ pub enum EasyInputMessageRoleKind {
 pub enum ReasonKind {
     MaxOutputTokens = "max_output_tokens",
     ContentFilter = "content_filter",
+}
+#[wasm_bindgen(private)]
+pub enum EffortKind {
+    Minimal = "minimal",
+    Low = "low",
+    Medium = "medium",
+    High = "high",
 }
 #[wasm_bindgen(private)]
 pub enum GenerateSummaryKind {
@@ -50900,6 +50812,11 @@ pub enum PoolingKind {
     Mean = "mean",
     Cls = "cls",
 }
+#[wasm_bindgen(private, fallback)]
+pub enum InputsKind {
+    String(String),
+    Object(Object),
+}
 #[wasm_bindgen(private)]
 pub enum ImageKind {
     VecOfF64(Vec<f64>),
@@ -50909,11 +50826,6 @@ pub enum ImageKind {
 pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind {
     JsonObject = "json_object",
     JsonSchema = "json_schema",
-}
-#[wasm_bindgen(private, fallback)]
-pub enum ResponseKind {
-    String(String),
-    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum CustomTopicModeKind {
@@ -50936,11 +50848,6 @@ pub enum ModeKind {
     General = "general",
     Medical = "medical",
     Finance = "finance",
-}
-#[wasm_bindgen(private, fallback)]
-pub enum AudioKind {
-    String(String),
-    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum DtypeKind {
@@ -51022,7 +50929,7 @@ pub enum MipOptOutKind {
     False = "false",
 }
 #[wasm_bindgen(private)]
-pub enum Ai_Cf_Deepgram_Flux_OutputEventKind {
+pub enum EventKind {
     Update = "Update",
     StartOfTurn = "StartOfTurn",
     EagerEndOfTurn = "EagerEndOfTurn",
@@ -51104,10 +51011,10 @@ pub enum FeedbackKind {
     Neg1 = -1,
     N1 = 1,
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum CfAigMetadataKind {
-    Record(Object),
     String(String),
+    Record(Object),
 }
 #[wasm_bindgen(private)]
 pub enum CfAigCacheTtlKind {
@@ -51143,10 +51050,6 @@ pub enum ValueKind {
 pub enum CompoundFilterTypeKind {
     And = "and",
     Or = "or",
-}
-#[wasm_bindgen(private, fallback)]
-pub enum FiltersKind {
-    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum FitKind {
@@ -51235,9 +51138,14 @@ pub enum CountryKind {
     Iso3166Alpha2Code(Iso3166Alpha2Code),
     T1 = "T1",
 }
-#[wasm_bindgen(private, fallback)]
-pub enum TlsClientAuthKind {
-    Object(Object),
+#[wasm_bindgen(private)]
+pub enum EdgeRequestKeepAliveStatusKind {
+    N0 = 0,
+    N1 = 1,
+    N2 = 2,
+    N3 = 3,
+    N4 = 4,
+    N5 = 5,
 }
 #[wasm_bindgen(private)]
 pub enum CertRevokedKind {
@@ -51262,12 +51170,12 @@ pub enum FromKind {
 }
 #[wasm_bindgen(private)]
 pub enum TailStreamReturnKind {
-    TailEventHandlerType(JsValue),
     Promise(Promise),
+    JsValue(JsValue),
 }
 #[wasm_bindgen(private)]
 pub enum TimeoutKind {
-    WorkflowTimeoutDuration(JsValue),
+    String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
@@ -51362,18 +51270,6 @@ pub enum DescriptionLanguageKind {
     Pt = "pt",
     De = "de",
 }
-#[wasm_bindgen(private, fallback)]
-pub enum InfoKind {
-    Object(Object),
-}
-#[wasm_bindgen(private, fallback)]
-pub enum OnsetInfoKind {
-    Object(Object),
-}
-#[wasm_bindgen(private, fallback)]
-pub enum SpanOpenInfoKind {
-    Object(Object),
-}
 #[wasm_bindgen(private)]
 pub enum LevelKind {
     Debug = "debug",
@@ -51400,7 +51296,8 @@ pub enum ReturnMetadataKind {
 }
 #[wasm_bindgen(private)]
 pub enum ValuesKind {
-    VectorFloatArray(JsValue),
+    Float32Array(Float32Array),
+    Float64Array(Float64Array),
     VecOfF64(Vec<f64>),
 }
 #[wasm_bindgen(private)]
@@ -51414,4 +51311,11 @@ pub enum InstanceStatusStatusKind {
     Waiting = "waiting",
     WaitingForPause = "waitingForPause",
     Unknown = "unknown",
+}
+#[wasm_bindgen(private)]
+pub enum EqKind {
+    String(String),
+    F64(f64),
+    Bool(bool),
+    VecOfString(Vec<String>),
 }

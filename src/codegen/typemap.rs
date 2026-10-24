@@ -304,6 +304,13 @@ pub struct DynamicUnionInfo {
     /// private to an ambient module.
     pub scope: ScopeId,
     pub from_module: ModuleContext,
+    /// Whether the last member is the shape arm, which accepts any object
+    /// and takes whatever the other arms don't
+    /// (`#[wasm_bindgen(fallback)]`).
+    pub fallback: bool,
+    /// The shapes sharing the `Object` arm, across every use, when more
+    /// than one; the emit pass warns about them.
+    pub merged_shapes: Vec<TypeRef>,
 }
 
 /// Claim a fresh Rust enum name for a synthesised dynamic union.
@@ -1120,19 +1127,29 @@ impl<'a> CodegenContext<'a> {
     /// First-seen wins on the bare anchor: subsequent distinct
     /// unions with the same anchor get parent-prefixed (or
     /// numeric-suffixed if that also collides).
-    pub fn synthesise_dynamic_union(
+    pub(crate) fn synthesise_dynamic_union(
         &self,
-        members: &[TypeRef],
+        arms: &ReadArms,
         anchor: &str,
         parent: Option<&str>,
         scope: ScopeId,
         from_module: &ModuleContext,
     ) -> String {
-        let key = DynamicUnionKey(members.iter().map(format_type_ref_key).collect());
-        if let Some(info) = self.dynamic_unions.borrow().by_key.get(&key) {
+        let members = &arms.members;
+        let mut key: Vec<String> = members.iter().map(format_type_ref_key).collect();
+        if arms.fallback {
+            key.push("fallback".to_string());
+        }
+        let key = DynamicUnionKey(key);
+        let mut reg = self.dynamic_unions.borrow_mut();
+        if let Some(info) = reg.by_key.get_mut(&key) {
+            for shape in &arms.merged_shapes {
+                if !info.merged_shapes.contains(shape) {
+                    info.merged_shapes.push(shape.clone());
+                }
+            }
             return info.rust_name.clone();
         }
-        let mut reg = self.dynamic_unions.borrow_mut();
         let chosen = allocate_dynamic_union_name(&mut self.names.borrow_mut(), anchor, parent);
         reg.by_key.insert(
             key,
@@ -1141,6 +1158,8 @@ impl<'a> CodegenContext<'a> {
                 members: members.to_vec(),
                 scope,
                 from_module: from_module.clone(),
+                fallback: arms.fallback,
+                merged_shapes: arms.merged_shapes.clone(),
             },
         );
         chosen
@@ -2756,7 +2775,8 @@ pub fn to_return_type(
             None => to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module),
         }
     } else {
-        match maybe_synthesise_return_union(ty, ctx, scope, from_module, anchor) {
+        let read = resolve_union_aliases(ty, ctx, scope);
+        match maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor) {
             Some(tokens) => tokens,
             None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
         }
@@ -2969,11 +2989,12 @@ pub(crate) fn has_mono_js_string_return(
     // A top-level union that becomes a dynamic-union enum has no `String`
     // leaf to swap for `JsString`. Getters synthesise under a carrier too,
     // so both shapes are excluded.
-    let top = ty
+    let read = resolve_union_aliases(ty, Some(ctx), scope);
+    let top = read
         .split_empties()
-        .map_or_else(|| ty.clone(), |(core, _)| core);
+        .map_or_else(|| read.clone(), |(core, _)| core);
     if let TypeRef::Union(u) = &top {
-        if dynamic_union_members(u.members(), Some(ctx), scope).is_some() {
+        if dynamic_union_members(u.members(), Some(ctx), scope, &ModuleContext::Global).is_some() {
             return false;
         }
     }
@@ -3103,12 +3124,13 @@ pub fn to_getter_return_type(
     from_module: &ModuleContext,
     anchor: ReturnAnchor<'_>,
 ) -> TokenStream {
-    if let Some(tokens) = maybe_synthesise_return_union(ty, ctx, scope, from_module, anchor) {
+    let read = resolve_union_aliases(ty, ctx, scope);
+    if let Some(tokens) = maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor) {
         return tokens;
     }
     // A union admitting empties still synthesises the enum for its other
     // members, wrapped in its carrier.
-    if let Some((core, n)) = ty.split_empties() {
+    if let Some((core, n)) = read.split_empties() {
         if let Some(inner_tokens) =
             maybe_synthesise_return_union(&core, ctx, scope, from_module, anchor)
         {
@@ -3141,6 +3163,56 @@ fn is_top_type(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: ScopeId) -
             .is_some_and(|(target, alias_scope)| is_top_type(&target, ctx, alias_scope)),
         _ => false,
     }
+}
+
+/// `ty` with each union alias it names, at the top level or as a union
+/// member, replaced by its target, so a read of `ZonedDateTimeLike |
+/// PlainDateLike` is the one flat union of their members, in the normal
+/// form of [`TypeRef::union`] (repeats dropped). As on the write side, an
+/// alias whose members would read differently from `scope` than from the
+/// alias's own scope (a namespace shadowing one of them) stays whole.
+/// Aliases of a single type are left to lower as usual.
+pub(crate) fn resolve_union_aliases(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> TypeRef {
+    fn expand(ty: &TypeRef, c: &CodegenContext<'_>, scope: ScopeId, out: &mut Vec<TypeRef>) {
+        let target = match ty {
+            TypeRef::Union(u) => {
+                for m in u.members() {
+                    expand(m, c, scope, out);
+                }
+                return;
+            }
+            TypeRef::Reference { .. } if ty.as_ident().is_some() => c
+                .resolve_alias(ty.as_ident().unwrap(), scope)
+                .map(|(target, alias_scope)| (target.into_owned(), alias_scope)),
+            TypeRef::Reference { .. } => c.resolve_alias_instance(ty, scope).map(|t| (t, scope)),
+            _ => None,
+        };
+        let Some((target, target_scope)) = target else {
+            out.push(ty.clone());
+            return;
+        };
+        let mut members = Vec::new();
+        expand(&target, c, target_scope, &mut members);
+        if members.len() > 1
+            && members
+                .iter()
+                .all(|m| c.resolves_alike(m, target_scope, scope))
+        {
+            out.extend(members);
+        } else {
+            out.push(ty.clone());
+        }
+    }
+    let Some(c) = ctx else {
+        return ty.clone();
+    };
+    let mut members = Vec::new();
+    expand(ty, c, scope, &mut members);
+    TypeRef::union(members)
 }
 
 /// Anchor for naming a synthesised dynamic-union enum. Carries the
@@ -3179,7 +3251,17 @@ impl<'a> ReturnAnchor<'a> {
     /// PascalCased base for the enum name, with the `Return` infix
     /// appended for callables.
     fn enum_anchor(self) -> String {
-        let pc = crate::util::naming::to_pascal_case(self.base);
+        // Symbols inside a name separate words (`$eq` is `Eq`), rather than
+        // starting one that sanitising then lowercases.
+        let base: String = match self.base.chars().any(char::is_alphanumeric) {
+            true => self
+                .base
+                .chars()
+                .map(|c| if c.is_alphanumeric() { c } else { '_' })
+                .collect(),
+            false => self.base.to_string(),
+        };
+        let pc = crate::util::naming::to_pascal_case(&base);
         match self.kind {
             ReturnAnchorKind::Getter => pc,
             ReturnAnchorKind::Callable => format!("{pc}Return"),
@@ -3219,9 +3301,9 @@ fn maybe_synthesise_return_union(
     };
     let cgctx = ctx?;
 
-    let members = dynamic_union_members(members, ctx, scope)?;
+    let arms = dynamic_union_members(members, ctx, scope, from_module)?;
     let name = cgctx.synthesise_dynamic_union(
-        &members,
+        &arms,
         &anchor.enum_anchor(),
         anchor.parent,
         scope,
@@ -3237,6 +3319,9 @@ pub(crate) struct SetterEnum {
     /// Each literal member the enum keeps as its own variant, paired with
     /// that variant's name.
     pub(crate) variants: Vec<(TypeRef, String)>,
+    /// The property's type with its union aliases resolved, as the getter
+    /// reads it.
+    read: TypeRef,
 }
 
 impl SetterEnum {
@@ -3247,14 +3332,15 @@ impl SetterEnum {
             .map(|(_, v)| v.as_str())
     }
 
-    /// `ty` with the enum first, standing for the literal members it keeps
-    /// as variants, so the unsuffixed setter takes what the getter reads.
-    /// The literals it widens into a payload (`0 | 1` into `F64(f64)`,
-    /// `true` into `Bool(bool)`) collapse into that primitive, which keeps
-    /// one `_with_f64` / `_with_bool` setter however many literals there
-    /// are, rather than overflowing the per-member fan-out.
-    pub(crate) fn param_type(&self, ty: &TypeRef) -> TypeRef {
-        match ty {
+    /// The property's type, as the getter reads it, with the enum first,
+    /// standing for the literal members it keeps as variants, so the
+    /// unsuffixed setter takes what the getter reads. The literals it widens
+    /// into a payload (`0 | 1` into `F64(f64)`, `true` into `Bool(bool)`)
+    /// collapse into that primitive, which keeps one `_with_f64` /
+    /// `_with_bool` setter however many literals there are, rather than
+    /// overflowing the per-member fan-out.
+    pub(crate) fn param_type(&self) -> TypeRef {
+        match &self.read {
             TypeRef::Union(u) => {
                 let mut out: Vec<TypeRef> = Vec::with_capacity(u.members().len());
                 out.push(TypeRef::ident(self.name.clone()));
@@ -3291,16 +3377,18 @@ pub(crate) fn setter_enum(
     anchor: ReturnAnchor<'_>,
 ) -> Option<SetterEnum> {
     let cgctx = ctx?;
-    let core = ty
+    let read = resolve_union_aliases(ty, ctx, scope);
+    let core = read
         .split_empties()
-        .map_or_else(|| ty.clone(), |(core, _)| core);
+        .map_or_else(|| read.clone(), |(core, _)| core);
     let TypeRef::Union(u) = &core else {
         return None;
     };
-    let members = dynamic_union_members(u.members(), ctx, scope)?;
-    let integer_enum = is_integer_literal_union(&members);
+    let arms = dynamic_union_members(u.members(), ctx, scope, from_module)?;
+    let members = &arms.members;
+    let integer_enum = is_integer_literal_union(members);
     let has_string = members.contains(&TypeRef::String);
-    let variant_names = crate::codegen::dynamic_union_variant_names(&members);
+    let variant_names = crate::codegen::dynamic_union_variant_names(members);
     let variants: Vec<(TypeRef, String)> = members
         .iter()
         .zip(variant_names)
@@ -3315,13 +3403,28 @@ pub(crate) fn setter_enum(
         return None;
     }
     let name = cgctx.synthesise_dynamic_union(
-        &members,
+        &arms,
         &anchor.enum_anchor(),
         anchor.parent,
         scope,
         from_module,
     );
-    Some(SetterEnum { name, variants })
+    Some(SetterEnum {
+        name,
+        variants,
+        read,
+    })
+}
+
+/// The arms of a synthesised read enum, in dispatch order.
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct ReadArms {
+    pub(crate) members: Vec<TypeRef>,
+    /// Whether the last member is the shape arm; see
+    /// [`DynamicUnionInfo::fallback`].
+    pub(crate) fallback: bool,
+    /// The shapes sharing an `Object` arm, when more than one.
+    pub(crate) merged_shapes: Vec<TypeRef>,
 }
 
 /// The members a return-position union synthesises its `<Anchor>Kind`
@@ -3339,13 +3442,22 @@ pub(crate) fn setter_enum(
 ///    dynamic union when non-literal members remain.
 /// 3. **Otherwise**, fall back to the named LUB lattice — synthesise only
 ///    when there's no useful narrowing.
+///
+/// The members then become arms the read can tell apart at runtime (see
+/// [`discriminable_arms`]); a union left with a single arm keeps its regular
+/// lowering, which erases it.
 fn dynamic_union_members(
     members: &[TypeRef],
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
-) -> Option<Vec<TypeRef>> {
+    from_module: &ModuleContext,
+) -> Option<ReadArms> {
     if is_integer_literal_union(members) {
-        return Some(members.to_vec());
+        return Some(ReadArms {
+            members: members.to_vec(),
+            fallback: false,
+            merged_shapes: Vec::new(),
+        });
     }
     let mut widened: Vec<TypeRef> = Vec::with_capacity(members.len());
     for m in members {
@@ -3364,15 +3476,106 @@ fn dynamic_union_members(
     if widened.len() < 2 {
         return None;
     }
-    if widened
+    let has_literal = widened
         .iter()
-        .any(|m| matches!(m, TypeRef::StringLiteral(_)))
-    {
-        return Some(widened);
+        .any(|m| matches!(m, TypeRef::StringLiteral(_)));
+    if !has_literal && crate::codegen::subtyping::lub_union(&widened, ctx, scope).is_some() {
+        return None;
     }
-    crate::codegen::subtyping::lub_union(&widened, ctx, scope)
-        .is_none()
-        .then_some(widened)
+    let arms = discriminable_arms(widened, ctx, scope, from_module);
+    (arms.members.len() >= 2).then_some(arms)
+}
+
+/// Turn the members of a read union into arms that dispatch can tell
+/// apart, keeping source order otherwise:
+///
+/// * Members lowering to the same Rust payload are one arm, the first.
+/// * Shape arms go last. A [shape](is_shape_ref) is checked with
+///   `JsValue::is_object` and an `Object` handle (`object`, `Record<K, V>`,
+///   an inline object type) with `instanceof Object`, which every class
+///   instance passes too, so either would take the values of the arms after
+///   it. It goes after the other arms, before a `JsValue` one. One keeps its
+///   type; several can't be told apart, so they share one `Object` arm (the
+///   emit pass warns, naming them from [`ReadArms::merged_shapes`]). As the
+///   last arm it is the enum's fallback, taking what no other arm matches.
+/// * A member lowering to `JsValue` takes anything, so it is one arm, last.
+fn discriminable_arms(
+    members: Vec<TypeRef>,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> ReadArms {
+    let mut out: Vec<TypeRef> = Vec::with_capacity(members.len());
+    let mut payloads: Vec<String> = Vec::new();
+    let mut shapes: Vec<TypeRef> = Vec::new();
+    let mut catch_all = false;
+    for m in members {
+        if matches!(m, TypeRef::StringLiteral(_)) {
+            out.push(m);
+            continue;
+        }
+        let payload = to_syn_type(&m, TypePosition::RETURN, ctx, scope, from_module).to_string();
+        if payload == "JsValue" {
+            catch_all = true;
+            continue;
+        }
+        if payloads.contains(&payload) {
+            continue;
+        }
+        let shape = payload == "Object"
+            || payload.starts_with("Object <")
+            || ctx.is_some_and(|c| is_shape_ref(&m, scope, c));
+        payloads.push(payload);
+        if shape {
+            shapes.push(m);
+        } else {
+            out.push(m);
+        }
+    }
+    let (shape, merged_shapes) = match shapes.len() {
+        0 => (None, Vec::new()),
+        1 => (shapes.pop(), Vec::new()),
+        _ => (Some(TypeRef::Object), shapes),
+    };
+    let fallback = shape.is_some() && !catch_all;
+    out.extend(shape);
+    if catch_all {
+        out.push(TypeRef::Any);
+    }
+    ReadArms {
+        members: out,
+        fallback,
+        merged_shapes,
+    }
+}
+
+/// Whether `ty` names a declaration emitted as a shape, through any
+/// aliases: an interface or discriminated union this crate declares, which
+/// has no runtime class and is checked with `JsValue::is_object`.
+fn is_shape_ref(ty: &TypeRef, scope: ScopeId, cgctx: &CodegenContext<'_>) -> bool {
+    let TypeRef::Reference { segments, .. } = ty else {
+        return false;
+    };
+    let path = segments.join(".");
+    let Some(id) = cgctx.gctx.resolve_path(scope, &path) else {
+        return false;
+    };
+    if !cgctx.local_type_ids.contains(&id)
+        || cgctx
+            .gctx
+            .external_map
+            .resolve_type(segments.last().map(String::as_str).unwrap_or_default())
+            .is_some()
+    {
+        return false;
+    }
+    match &cgctx.gctx.get_type(id).kind {
+        TypeKind::Interface(_) | TypeKind::DiscriminatedUnion(_) => true,
+        TypeKind::TypeAlias(_) if segments.len() == 1 => cgctx
+            .resolve_alias(&segments[0], scope)
+            .is_some_and(|(target, scope)| is_shape_ref(&target, scope, cgctx)),
+        _ => false,
+    }
 }
 
 /// Whether every member is a distinct-valued integer literal that fits the
@@ -3651,32 +3854,35 @@ mod tests {
 
     #[test]
     fn setter_enum_goes_first_and_widens_the_literals_it_absorbs() {
-        let e = SetterEnum {
+        let e = |read: TypeRef| SetterEnum {
             name: "ModeKind".to_string(),
             variants: vec![
                 (TypeRef::StringLiteral("x".into()), "X".to_string()),
                 (TypeRef::StringLiteral("y".into()), "Y".to_string()),
             ],
+            read,
         };
         let union = |members: Vec<TypeRef>| TypeRef::union(members);
         let x = TypeRef::StringLiteral("x".into());
         let y = TypeRef::StringLiteral("y".into());
         assert_eq!(
-            e.param_type(&union(vec![
+            e(union(vec![
                 TypeRef::BooleanLiteral(true),
                 x.clone(),
                 TypeRef::NumberLiteral(1.0),
                 y.clone(),
                 TypeRef::NumberLiteral(2.0),
-            ])),
+            ]))
+            .param_type(),
             union(vec![
                 TypeRef::ident("ModeKind"),
                 TypeRef::Boolean,
                 TypeRef::Number,
             ])
         );
+        let e = e(union(vec![x.clone(), y]).with_empties(Nullability::Undefined));
         assert_eq!(
-            e.param_type(&union(vec![x.clone(), y]).with_empties(Nullability::Undefined)),
+            e.param_type(),
             TypeRef::ident("ModeKind").with_empties(Nullability::Undefined)
         );
         assert_eq!(e.variant(&x), Some("X"));
@@ -5100,7 +5306,9 @@ mod tests {
         use TypeRef::{
             Boolean, BooleanLiteral as B, Number, NumberLiteral as N, StringLiteral as S,
         };
-        let members = |ms: &[TypeRef]| dynamic_union_members(ms, None, ScopeId(0));
+        let members = |ms: &[TypeRef]| {
+            dynamic_union_members(ms, None, ScopeId(0), &ModuleContext::Global).map(|a| a.members)
+        };
         let ab = || TypeRef::ident("ArrayBuffer");
 
         // 32-bit integer literals stay discriminants of a C-style enum.
@@ -5182,6 +5390,97 @@ mod tests {
             read(vec![TypeRef::ident("Foo"), TypeRef::Undefined]),
             "Option < Foo >"
         );
+    }
+
+    #[test]
+    fn union_aliases_flatten_into_reads() {
+        let src = r#"
+            declare class Zoned {}
+            declare class Day {}
+            interface ZonedFields { zone: string; }
+            interface DayFields { day: number; }
+            type ZonedLike = Zoned | ZonedFields | string;
+            type DayLike = Day | Zoned | DayFields | string;
+            type Chained = ZonedLike;
+            type Id = string;
+            type Recur = string | Recur[];
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let ctx = CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
+            .unwrap();
+        let scope = *module.file_scopes.first().expect("file scope");
+        let read = |members: Vec<TypeRef>| {
+            resolve_union_aliases(&TypeRef::union(members), Some(&ctx), scope)
+        };
+        let id = TypeRef::ident;
+
+        // Nested aliases are one union, each member once.
+        assert_eq!(
+            read(vec![id("ZonedLike"), id("DayLike"), TypeRef::Undefined]),
+            TypeRef::union([
+                id("Zoned"),
+                id("ZonedFields"),
+                TypeRef::String,
+                id("Day"),
+                id("DayFields"),
+                TypeRef::Undefined,
+            ])
+        );
+        // Through an alias chain, and read whole.
+        assert_eq!(
+            resolve_union_aliases(&id("Chained"), Some(&ctx), scope),
+            TypeRef::union([id("Zoned"), id("ZonedFields"), TypeRef::String])
+        );
+        // An alias of one type, and one reaching itself, keep their names.
+        assert_eq!(
+            read(vec![id("Id"), id("Recur")]),
+            TypeRef::union([id("Id"), id("Recur")])
+        );
+
+        let arms = |ty: TypeRef| {
+            let TypeRef::Union(u) = resolve_union_aliases(&ty, Some(&ctx), scope) else {
+                panic!("expected a union");
+            };
+            dynamic_union_members(u.members(), Some(&ctx), scope, &ModuleContext::Global)
+        };
+        // The dictionaries share one `Object` arm, last, as the fallback.
+        assert_eq!(
+            arms(TypeRef::union([id("ZonedLike"), id("DayLike")])),
+            Some(ReadArms {
+                members: vec![id("Zoned"), TypeRef::String, id("Day"), TypeRef::Object],
+                fallback: true,
+                merged_shapes: vec![id("ZonedFields"), id("DayFields")],
+            })
+        );
+        // A lone dictionary keeps its type.
+        assert_eq!(
+            arms(id("ZonedLike")),
+            Some(ReadArms {
+                members: vec![id("Zoned"), TypeRef::String, id("ZonedFields")],
+                fallback: true,
+                merged_shapes: vec![],
+            })
+        );
+        // Beside a `JsValue` arm too, checked with `is_object`, but no
+        // longer the fallback.
+        assert_eq!(
+            arms(TypeRef::union([
+                id("Zoned"),
+                id("ZonedFields"),
+                TypeRef::Unknown
+            ])),
+            Some(ReadArms {
+                members: vec![id("Zoned"), id("ZonedFields"), TypeRef::Any],
+                fallback: false,
+                merged_shapes: vec![],
+            })
+        );
+        // Arms sharing a payload merge, and one arm left can't be told apart.
+        assert_eq!(
+            arms(TypeRef::union([id("ZonedFields"), id("DayFields")])),
+            None
+        );
+        assert_eq!(arms(TypeRef::union([TypeRef::Unknown, TypeRef::Any])), None);
     }
 
     #[test]

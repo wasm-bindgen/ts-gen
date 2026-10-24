@@ -210,7 +210,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "statusText")]
     pub fn set_status_text(this: &ResponseInit, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &ResponseInit) -> Option<JsValue>;
+    pub fn headers(this: &ResponseInit) -> Option<HeadersKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -267,10 +267,6 @@ pub enum QueueContentType {
     Json = "json",
     V8 = "v8",
 }
-#[allow(dead_code)]
-pub type BodyInit = JsValue;
-#[allow(dead_code)]
-pub type HeadersInit = JsValue;
 pub mod cloudflare {
     #[allow(unused_imports)]
     use super::*;
@@ -513,4 +509,10 @@ extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "self")]
     pub static self_: ServiceWorkerGlobalScope;
+}
+#[wasm_bindgen(private, fallback)]
+pub enum HeadersKind {
+    Headers(Headers),
+    VecOfVecOfString(Vec<Array<JsString>>),
+    Record(Object<JsString>),
 }

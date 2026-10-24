@@ -12,9 +12,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Options;
     #[wasm_bindgen(method, getter, js_name = "keepAlive")]
-    pub fn keep_alive(this: &Options) -> f64;
+    pub fn keep_alive(this: &Options) -> KeepAliveKind;
     #[wasm_bindgen(method, setter, js_name = "keepAlive")]
-    pub fn set_keep_alive(this: &Options, val: f64);
+    pub fn set_keep_alive(this: &Options, val: KeepAliveKind);
     #[wasm_bindgen(method, getter)]
     pub fn label(this: &Options) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -44,7 +44,7 @@ impl Options {
     #[doc = " * `keepAlive: 0`"]
     pub fn builder_0() -> OptionsBuilder {
         let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_keep_alive(0.0);
+        inner.set_keep_alive(KeepAliveKind::N0);
         OptionsBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
@@ -52,7 +52,7 @@ impl Options {
     #[doc = " * `keepAlive: 1`"]
     pub fn builder_1() -> OptionsBuilder {
         let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_keep_alive(1.0);
+        inner.set_keep_alive(KeepAliveKind::N1);
         OptionsBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
@@ -60,7 +60,7 @@ impl Options {
     #[doc = " * `keepAlive: 2`"]
     pub fn builder_2() -> OptionsBuilder {
         let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_keep_alive(2.0);
+        inner.set_keep_alive(KeepAliveKind::N2);
         OptionsBuilder { inner }
     }
 }
@@ -106,12 +106,12 @@ impl Scaled {
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
-    pub fn level() -> LevelReturnKind;
+    pub fn level() -> KeepAliveKind;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "level")]
-    pub fn try_level() -> Result<LevelReturnKind, JsValue>;
+    pub fn try_level() -> Result<KeepAliveKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
@@ -194,7 +194,7 @@ extern "C" {
     pub fn try_flag() -> Result<FlagReturnKind, JsValue>;
 }
 #[wasm_bindgen(private)]
-pub enum LevelReturnKind {
+pub enum KeepAliveKind {
     N0 = 0,
     N1 = 1,
     N2 = 2,

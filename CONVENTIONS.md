@@ -81,8 +81,9 @@ and lowers exactly like `string | number | symbol`.
 
 `null` and `undefined` are ordinary union members in the IR, as in
 TypeScript. Every union is built through one constructor that keeps it
-in a canonical form: nested unions (including ones reached through a
-union alias at parse time) are flattened, repeats are dropped, `void`
+in a canonical form: nested unions are flattened (a read also resolves
+the union aliases it names, [to their members](#union-aliases-flatten-into-the-read)),
+repeats are dropped, `void`
 inside a union is `undefined`, value members keep their source order
 and the empties come last, `null` before `undefined`. A union of one
 value and an empty is still a union, so `T | null`, JSDoc `?T` and
@@ -3173,14 +3174,15 @@ pub fn content(this: &EmailAttachment) -> EmailAttachmentContentKind;
 #### Shape arms go last
 
 The tuple arms dispatch in order through `dyn_into`, and a
-[shape](#shapes-have-no-runtime-class) or `object` arm accepts any
-object, so it would take the values of every arm after it. Such an arm
+[shape](#shapes-have-no-runtime-class) or `Object` arm (`object`,
+`Record<K, V>`, an inline object type) accepts any object, so it would take the values of every arm after it. Such an arm
 is moved after the others, before a trailing `JsValue` catch-all. One
 shape arm keeps its type and, as the last tuple arm, makes the enum
 `#[wasm_bindgen(fallback)]`, which wasm-bindgen recommends for an arm
 with no runtime witness: whatever the earlier arms don't take lands
 there. Two or more shape arms can't be told apart at runtime, so they
-collapse into one `Object(Object)` arm, with a warning.
+collapse into one `Object(Object)` arm, with a warning. A union left
+with only that arm [erases](#arms-a-read-can-tell-apart) instead.
 
 ```ts
 declare function pick(): RoundingOptions | Ticket;
@@ -3255,6 +3257,68 @@ generic containers because wasm-bindgen requires `T: JsGeneric` for
 qualify. The awaited value of an `async fn` is a top-level return and
 does synthesise (`fetchValue(): Promise<32 | "foo">` →
 `Result<FetchValueReturnKind, E>`).
+
+#### Union aliases flatten into the read
+
+A read resolves each union alias it names, at the top level or as a
+union member, to the alias's members, so nested aliases are one union in
+normal form, each member once. An alias whose members would read
+differently at the use site (a namespace shadowing one of them) stays
+whole, as it does for [writes](#type-aliases-and-export--x-as-y-). A
+read of `x: Mode | Foo` with `type Mode = 0 | 1` is the same read as
+`x: 0 | 1 | Foo`.
+
+#### Arms a read can tell apart
+
+wasm-bindgen dispatches a read by trying each tuple arm's runtime check
+in order (`instanceof` for a class, `typeof` for a primitive), so the
+members become arms it can decide between:
+
+* Members lowering to the same Rust payload are one arm, the first.
+* Shapes and `Object` handles (`object`, `Record<K, V>`, an inline
+  object type) accept any object, so they are one arm, after the others,
+  as [Shape arms go last](#shape-arms-go-last) describes: one keeps its
+  type, several share an `Object` arm, with a warning, and as the last
+  arm it is the enum's `#[wasm_bindgen(fallback)]`.
+* A member lowering to `JsValue` takes anything, so it is one arm, last.
+  The shape arm before it keeps its `is_object` check and isn't the
+  fallback.
+* A union left with a single arm can't be told apart and keeps its
+  regular lowering, so a union of dictionaries reads as `JsValue`, with
+  no warning.
+
+```ts
+declare namespace Temporal {
+  type PlainDateLike = PlainDate | ZonedDateTime | PlainDateTime | DateLikeObject | string;
+  type ZonedDateTimeLike = ZonedDateTime | ZonedDateTimeLikeObject | string;
+  type TimeZoneLike = ZonedDateTime | string;
+  interface DurationRelativeToOptions {
+    relativeTo?: ZonedDateTimeLike | PlainDateLike | undefined;
+  }
+  interface InstantToStringOptions {
+    timeZone?: TimeZoneLike | undefined;
+  }
+}
+```
+
+```rust
+pub fn relative_to(this: &DurationRelativeToOptions) -> Option<RelativeToKind>;
+pub fn time_zone(this: &InstantToStringOptions) -> Option<TimeZoneKind>;
+
+#[wasm_bindgen(private, fallback)]
+pub enum RelativeToKind {
+    ZonedDateTime(temporal::ZonedDateTime),
+    String(String),
+    PlainDate(temporal::PlainDate),
+    PlainDateTime(temporal::PlainDateTime),
+    Object(Object),
+}
+#[wasm_bindgen(private)]
+pub enum TimeZoneKind {
+    ZonedDateTime(temporal::ZonedDateTime),
+    String(String),
+}
+```
 
 #### Variant kinds and naming
 
@@ -3885,7 +3949,10 @@ namespace exported under its own name as well keeps it.
   target naming something no such path reaches is not chased; the
   reference then names the alias.
 
-  The alias itself is still emitted. A Rust alias can't declare a type
+  The alias itself is still emitted, except a union alias that erases to
+  `JsValue`: every use lowers through it to its members, so `pub type
+  Like = JsValue;` would name nothing. One that reaches itself (below) is
+  named by its uses and stays. A Rust alias can't declare a type
   parameter its target doesn't use (E0091), so a parameter the lowered
   target doesn't mention is dropped from the alias. This covers a target
   that never names it as well as one lowering erases; the trailing kept
