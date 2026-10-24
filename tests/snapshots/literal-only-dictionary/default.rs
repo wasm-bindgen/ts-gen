@@ -255,26 +255,31 @@ pub enum AKind {
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BKind {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CKind {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum DKind {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum EKind {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum FKind {
     String(String),
     F64(f64),

@@ -168,16 +168,19 @@ pub mod shapes {
         pub fn try_pick_or_text(kind: f64) -> Result<PickOrTextReturnKind, JsValue>;
     }
     #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
     pub enum PickReturnKind {
         Ticket(Ticket),
         RoundingOptions(RoundingOptions),
     }
     #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
     pub enum PickAnyReturnKind {
         Ticket(Ticket),
         Object(Object),
     }
     #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
     pub enum PickOrTextReturnKind {
         String(String),
         RoundingOptions(RoundingOptions),
@@ -316,6 +319,7 @@ impl ChoiceBuilder {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KindKind {
     A = "a",
     B = "b",

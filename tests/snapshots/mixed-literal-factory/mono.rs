@@ -344,18 +344,21 @@ impl OptionalBuilder {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeKind {
     Bool(bool),
     X = "x",
     Y = "y",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeKind2 {
     F64(f64),
     X = "x",
     Y = "y",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeKind3 {
     X = "x",
     Y = "y",
@@ -363,17 +366,20 @@ pub enum ModeKind3 {
     Bool(bool),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LevelKind {
     N0 = 0,
     N1 = 1,
     N2 = 2,
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeKind4 {
     X = "x",
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModeKind5 {
     X = "x",
     Y = "y",

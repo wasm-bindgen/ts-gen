@@ -14,6 +14,62 @@ pub enum Mode {
     Fast = "fast",
     Slow = "slow",
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Source`",
+    label = "expected string or Registry"
+)]
+pub trait Source: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Source for &str {}
+impl Source for ::std::string::String {}
+impl Source for &::std::string::String {}
+impl Source for &::std::boxed::Box<str> {}
+impl Source for &::std::borrow::Cow<'_, str> {}
+impl Source for ::js_sys::JsString {}
+impl Source for &::js_sys::JsString {}
+impl Source for Registry {}
+impl Source for &Registry {}
+impl Source for SourceKind {}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum SourceKind {
+    String(String),
+    Registry(Registry),
+}
+impl ::core::convert::From<&str> for SourceKind {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for SourceKind {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for SourceKind {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for SourceKind {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for SourceKind {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<Registry> for SourceKind {
+    fn from(value: Registry) -> Self {
+        Self::Registry(value)
+    }
+}
+impl ::core::convert::From<&Registry> for SourceKind {
+    fn from(value: &Registry) -> Self {
+        Self::Registry(value.clone())
+    }
+}
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -129,20 +185,17 @@ impl Settings {
 }
 impl Settings {
     pub fn new(
-        required: Option<impl ::wasm_bindgen::JsStringLike>,
+        required: Option<&str>,
         nullable: impl ::wasm_bindgen::JsStringLike,
         empties: Option<&Null>,
     ) -> Settings {
         Self::builder(required, nullable, empties).build()
     }
-    pub fn new_with_null(
-        required: Option<impl ::wasm_bindgen::JsStringLike>,
-        empties: Option<&Null>,
-    ) -> Settings {
+    pub fn new_with_null(required: Option<&str>, empties: Option<&Null>) -> Settings {
         Self::builder_with_null(required, empties).build()
     }
     pub fn builder(
-        required: Option<impl ::wasm_bindgen::JsStringLike>,
+        required: Option<&str>,
         nullable: impl ::wasm_bindgen::JsStringLike,
         empties: Option<&Null>,
     ) -> SettingsBuilder {
@@ -156,10 +209,7 @@ impl Settings {
         }
         SettingsBuilder { inner }
     }
-    pub fn builder_with_null(
-        required: Option<impl ::wasm_bindgen::JsStringLike>,
-        empties: Option<&Null>,
-    ) -> SettingsBuilder {
+    pub fn builder_with_null(required: Option<&str>, empties: Option<&Null>) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         if let Some(val) = required {
             inner.set_required(val);
@@ -747,15 +797,12 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn leading(a: Option<impl ::wasm_bindgen::JsStringLike>, b: f64) -> Result<(), JsValue>;
+    pub fn leading(a: Option<&str>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "leadingNull")]
-    pub fn leading_null(
-        a: Option<impl ::wasm_bindgen::JsStringLike>,
-        b: f64,
-    ) -> Result<(), JsValue>;
+    pub fn leading_null(a: Option<&str>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -788,17 +835,15 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chain")]
-    pub fn chain_with_a_and_b(a: impl ::wasm_bindgen::JsStringLike, b: f64) -> Result<(), JsValue>;
+    pub fn chain_with_a_and_b(a: Option<&str>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chain")]
-    fn __chain_with_a_and_null(
-        a: impl ::wasm_bindgen::JsStringLike,
-        b: &::wasm_bindgen::JsValue,
-    ) -> Result<(), JsValue>;
+    fn __chain_with_a_and_null(a: Option<&str>, b: &::wasm_bindgen::JsValue)
+        -> Result<(), JsValue>;
 }
-pub fn chain_with_a_and_null(a: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue> {
+pub fn chain_with_a_and_null(a: Option<&str>) -> Result<(), JsValue> {
     __chain_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
@@ -814,20 +859,17 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainOptional")]
-    pub fn chain_optional_with_a_and_b(
-        a: impl ::wasm_bindgen::JsStringLike,
-        b: f64,
-    ) -> Result<(), JsValue>;
+    pub fn chain_optional_with_a_and_b(a: Option<&str>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainOptional")]
     fn __chain_optional_with_a_and_null(
-        a: impl ::wasm_bindgen::JsStringLike,
+        a: Option<&str>,
         b: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
 }
-pub fn chain_optional_with_a_and_null(a: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue> {
+pub fn chain_optional_with_a_and_null(a: Option<&str>) -> Result<(), JsValue> {
     __chain_optional_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
@@ -843,28 +885,25 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainThree")]
-    pub fn chain_three_with_a_and_b(
-        a: impl ::wasm_bindgen::JsStringLike,
-        b: f64,
-    ) -> Result<(), JsValue>;
+    pub fn chain_three_with_a_and_b(a: Option<&str>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainThree")]
     fn __chain_three_with_a_and_null(
-        a: impl ::wasm_bindgen::JsStringLike,
+        a: Option<&str>,
         b: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
 }
-pub fn chain_three_with_a_and_null(a: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue> {
+pub fn chain_three_with_a_and_null(a: Option<&str>) -> Result<(), JsValue> {
     __chain_three_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainThree")]
     pub fn chain_three_with_a_and_b_and_c(
-        a: impl ::wasm_bindgen::JsStringLike,
-        b: f64,
+        a: Option<&str>,
+        b: Option<f64>,
         c: bool,
     ) -> Result<(), JsValue>;
 }
@@ -872,16 +911,56 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainThree")]
     fn __chain_three_with_a_and_null_and_c(
-        a: impl ::wasm_bindgen::JsStringLike,
+        a: Option<&str>,
         b: &::wasm_bindgen::JsValue,
         c: bool,
     ) -> Result<(), JsValue>;
 }
-pub fn chain_three_with_a_and_null_and_c(
-    a: impl ::wasm_bindgen::JsStringLike,
-    c: bool,
-) -> Result<(), JsValue> {
+pub fn chain_three_with_a_and_null_and_c(a: Option<&str>, c: bool) -> Result<(), JsValue> {
     __chain_three_with_a_and_null_and_c(a, &::wasm_bindgen::JsValue::NULL, c)
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainUnion")]
+    pub fn chain_union() -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainUnion")]
+    pub fn chain_union_with_str(a: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainUnion")]
+    pub fn chain_union_with_slice(a: &[impl ::wasm_bindgen::JsStringLike]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainUnion")]
+    pub fn chain_union_with_str_and_b(a: Option<&str>, b: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainUnion")]
+    pub fn chain_union_with_slice_and_b(
+        a: &[impl ::wasm_bindgen::JsStringLike],
+        b: f64,
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainAlias")]
+    pub fn chain_alias() -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainAlias")]
+    pub fn chain_alias_with_a(a: impl Source) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainAlias")]
+    pub fn chain_alias_with_a_and_b(a: Option<SourceKind>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -1383,22 +1462,26 @@ extern "C" {
     pub fn cover(cover: &Cover) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum KeyKind {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DispositionKind {
     Inline = "inline",
     Attachment = "attachment",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KindKind {
     File = "file",
     None = "none",
     Skip = "skip",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KindKind2 {
     Image = "image",
     Blank = "blank",

@@ -616,6 +616,7 @@ pub enum HeadersKind {
     Record(Object<JsString>),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HeadersKind2 {
     Headers(Headers),
     VecOfTuple(Vec<ArrayTuple<(JsString, JsString)>>),

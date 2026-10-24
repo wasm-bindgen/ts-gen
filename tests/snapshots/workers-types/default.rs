@@ -20,7 +20,10 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_message(message: &str) -> Result<DOMException, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_message_and_name(message: &str, name: &str) -> Result<DOMException, JsValue>;
+    pub fn new_with_message_and_name(
+        message: Option<&str>,
+        name: &str,
+    ) -> Result<DOMException, JsValue>;
     #[doc = " The **`message`** read-only property of the a message or description associated with the given error name."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMException/message)"]
@@ -4933,7 +4936,7 @@ extern "C" {
     pub fn new_with_type(r#type: &[JsValue]) -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_type_and_options(
-        r#type: &[JsValue],
+        r#type: Option<&[JsValue]>,
         options: &BlobOptions,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`size`** read-only property of the Blob interface returns the size of the Blob or File in bytes."]
@@ -4970,21 +4973,24 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, js_name = "slice")]
-    pub fn slice_with_start_and_end(this: &Blob, start: f64, end: f64) -> Blob;
+    pub fn slice_with_start_and_end(this: &Blob, start: Option<f64>, end: f64) -> Blob;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, catch, js_name = "slice")]
-    pub fn try_slice_with_start_and_end(this: &Blob, start: f64, end: f64)
-        -> Result<Blob, JsValue>;
+    pub fn try_slice_with_start_and_end(
+        this: &Blob,
+        start: Option<f64>,
+        end: f64,
+    ) -> Result<Blob, JsValue>;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, js_name = "slice")]
     pub fn slice_with_start_and_end_and_type(
         this: &Blob,
-        start: f64,
-        end: f64,
+        start: Option<f64>,
+        end: Option<f64>,
         r#type: &str,
     ) -> Blob;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
@@ -4993,8 +4999,8 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "slice")]
     pub fn try_slice_with_start_and_end_and_type(
         this: &Blob,
-        start: f64,
-        end: f64,
+        start: Option<f64>,
+        end: Option<f64>,
         r#type: &str,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`arrayBuffer()`** method of the Blob interface returns a Promise that resolves with the contents of the blob as binary data contained in an ArrayBuffer."]
@@ -7613,7 +7619,7 @@ extern "C" {
     pub fn new_with_label(label: &str) -> Result<TextDecoder, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_label_and_options(
-        label: &str,
+        label: Option<&str>,
         options: &TextDecoderConstructorOptions,
     ) -> Result<TextDecoder, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
@@ -7658,7 +7664,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "decode")]
     pub fn decode_with_array_buffer_and_options(
         this: &TextDecoder,
-        input: &ArrayBuffer,
+        input: Option<&ArrayBuffer>,
         options: &TextDecoderDecodeOptions,
     ) -> String;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
@@ -7667,7 +7673,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn try_decode_with_array_buffer_and_options(
         this: &TextDecoder,
-        input: &ArrayBuffer,
+        input: Option<&ArrayBuffer>,
         options: &TextDecoderDecodeOptions,
     ) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
@@ -9250,7 +9256,7 @@ extern "C" {
     fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_readable_stream_and_init(
-        body: &ReadableStream<Uint8Array>,
+        body: Option<&ReadableStream<Uint8Array>>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -14382,7 +14388,7 @@ extern "C" {
     ) -> Result<WritableStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_sink_and_queuing_strategy(
-        underlying_sink: &UnderlyingSink,
+        underlying_sink: Option<&UnderlyingSink>,
         queuing_strategy: &QueuingStrategy,
     ) -> Result<WritableStream, JsValue>;
     #[doc = " The **`locked`** read-only property of the WritableStream interface returns a boolean indicating whether the `WritableStream` is locked to a writer."]
@@ -14788,7 +14794,7 @@ extern "C" {
     pub fn new_with_label(label: &str) -> Result<TextDecoderStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_label_and_options(
-        label: &str,
+        label: Option<&str>,
         options: &TextDecoderStreamTextDecoderStreamInit,
     ) -> Result<TextDecoderStream, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -15751,7 +15757,8 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init(input: &URLPatternInit) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str_and_str(input: &str, base_url: &str) -> Result<URLPattern, JsValue>;
+    pub fn new_with_str_and_str(input: Option<&str>, base_url: &str)
+        -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init_and_str(
         input: &URLPatternInit,
@@ -15759,7 +15766,7 @@ extern "C" {
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_url_pattern_options(
-        input: &str,
+        input: Option<&str>,
         base_url: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -15769,19 +15776,19 @@ extern "C" {
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_str_and_pattern_options(
-        input: &str,
-        base_url: &str,
+        input: Option<&str>,
+        base_url: Option<&str>,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init_and_str_and_pattern_options(
         input: &URLPatternInit,
-        base_url: &str,
+        base_url: Option<&str>,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_url_pattern_options_and_pattern_options(
-        input: &str,
+        input: Option<&str>,
         base_url: &URLPatternOptions,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
@@ -15825,11 +15832,15 @@ extern "C" {
         input: &URLPatternInit,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "test")]
-    pub fn test_with_str_and_base_url(this: &URLPattern, input: &str, base_url: &str) -> bool;
+    pub fn test_with_str_and_base_url(
+        this: &URLPattern,
+        input: Option<&str>,
+        base_url: &str,
+    ) -> bool;
     #[wasm_bindgen(method, catch, js_name = "test")]
     pub fn try_test_with_str_and_base_url(
         this: &URLPattern,
-        input: &str,
+        input: Option<&str>,
         base_url: &str,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "test")]
@@ -15868,13 +15879,13 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "exec")]
     pub fn exec_with_str_and_base_url(
         this: &URLPattern,
-        input: &str,
+        input: Option<&str>,
         base_url: &str,
     ) -> Nullable<URLPatternResult>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
     pub fn try_exec_with_str_and_base_url(
         this: &URLPattern,
-        input: &str,
+        input: Option<&str>,
         base_url: &str,
     ) -> Result<Nullable<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, js_name = "exec")]
@@ -16327,14 +16338,14 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)"]
     #[wasm_bindgen(method, js_name = "close")]
-    pub fn close_with_code_and_reason(this: &WebSocket, code: f64, reason: &str);
+    pub fn close_with_code_and_reason(this: &WebSocket, code: Option<f64>, reason: &str);
     #[doc = " The **`WebSocket.close()`** method closes the already `CLOSED`, this method does nothing."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)"]
     #[wasm_bindgen(method, catch, js_name = "close")]
     pub fn try_close_with_code_and_reason(
         this: &WebSocket,
-        code: f64,
+        code: Option<f64>,
         reason: &str,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "serializeAttachment")]
@@ -17351,13 +17362,13 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
     pub fn get_entrypoint_with_name_and_options(
         this: &WorkerStub,
-        name: &str,
+        name: Option<&str>,
         options: &WorkerStubEntrypointOptions,
     ) -> Fetcher;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
     pub fn try_get_entrypoint_with_name_and_options(
         this: &WorkerStub,
-        name: &str,
+        name: Option<&str>,
         options: &WorkerStubEntrypointOptions,
     ) -> Result<Fetcher, JsValue>;
 }
@@ -42429,7 +42440,7 @@ pub mod cloudflare {
             >(
                 this: &DurableObject<Env, Props>,
                 request: &super::super::Request<CfHostMetadata, Cf>,
-            ) -> super::super::FetchReturnKind;
+            ) -> FetchReturnKind3;
             #[wasm_bindgen(method, catch, js_name = "fetch")]
             pub fn try_fetch<
                 Env: ::wasm_bindgen::JsGeneric,
@@ -42439,7 +42450,7 @@ pub mod cloudflare {
             >(
                 this: &DurableObject<Env, Props>,
                 request: &super::super::Request<CfHostMetadata, Cf>,
-            ) -> Result<super::super::FetchReturnKind, JsValue>;
+            ) -> Result<FetchReturnKind3, JsValue>;
             #[wasm_bindgen(method, js_name = "webSocketMessage")]
             pub fn web_socket_message<
                 Env: ::wasm_bindgen::JsGeneric,
@@ -43039,21 +43050,31 @@ pub mod cloudflare {
             pub static exports: JsValue;
         }
         #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
         pub enum FetchReturnKind2 {
             Response(super::super::Response),
             Promise(Promise<super::super::Response>),
         }
         #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
         pub enum TailStreamReturnKind {
             Promise(Promise),
             JsValue(JsValue),
         }
         #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
+        pub enum FetchReturnKind3 {
+            Response(super::super::Response),
+            Promise(Promise<super::super::Response>),
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
         pub enum TimeoutKind {
             String(String),
             F64(f64),
         }
         #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
         pub enum TimeoutKind2 {
             String(String),
             F64(f64),
@@ -45456,8 +45477,6 @@ pub mod rpc {
     pub type Stubify = JsValue;
     #[allow(dead_code)]
     pub type Unstubify = JsValue;
-    #[allow(dead_code)]
-    pub type UnstubifyAll = JsValue;
     #[allow(dead_code)]
     pub type MaybeProvider = JsValue;
     #[allow(dead_code)]
@@ -49420,6 +49439,7 @@ pub mod tail_stream {
         }
     }
     #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum LevelKind {
         Debug = "debug",
         Error = "error",
@@ -49428,6 +49448,7 @@ pub mod tail_stream {
         Warn = "warn",
     }
     #[wasm_bindgen(private)]
+    #[derive(Clone, Debug)]
     pub enum ValueKind2 {
         String(String),
         VecOfString(Vec<String>),
@@ -50647,7 +50668,7 @@ extern "C" {
     pub fn get_with_args_and_options(
         this: &DispatchNamespace,
         name: &str,
-        args: &DispatchNamespaceArgs,
+        args: Option<&DispatchNamespaceArgs>,
         options: &DynamicDispatchOptions,
     ) -> Fetcher;
     #[doc = " * `name` - Name of the Worker script."]
@@ -50663,7 +50684,7 @@ extern "C" {
     pub fn try_get_with_args_and_options(
         this: &DispatchNamespace,
         name: &str,
-        args: &DispatchNamespaceArgs,
+        args: Option<&DispatchNamespaceArgs>,
         options: &DynamicDispatchOptions,
     ) -> Result<Fetcher, JsValue>;
 }
@@ -51675,118 +51696,141 @@ impl VectorizeVectorMetadataFilter3Builder {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum FetchReturnKind {
     Response(Response),
     Promise(Promise<Response>),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum GenerateKeyReturnKind {
     CryptoKey(CryptoKey),
     CryptoKeyPair(CryptoKeyPair),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ExportKeyReturnKind {
     ArrayBuffer(ArrayBuffer),
     JsonWebKey(JsonWebKey),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum SaltKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HashKind {
     String(String),
     SubtleCryptoHashAlgorithm(SubtleCryptoHashAlgorithm),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum InfoKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum IvKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum AdditionalDataKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CounterKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum LabelKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HashKind2 {
     String(String),
     SubtleCryptoHashAlgorithm(SubtleCryptoHashAlgorithm),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum PublicExponentKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HashKind3 {
     String(String),
     SubtleCryptoHashAlgorithm(SubtleCryptoHashAlgorithm),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HashKind4 {
     String(String),
     SubtleCryptoHashAlgorithm(SubtleCryptoHashAlgorithm),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum PublicExponentKind2 {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BytesWrittenKind {
     F64(f64),
     BigInt(BigInt),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum DataKind {
     ArrayBuffer(ArrayBuffer),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TypeKind {
     Default = "default",
     Error = "error",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum HeadersKind {
     Headers(Headers),
     Record(Object<JsString>),
     JsValue(JsValue),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncodeBodyKind {
     Automatic = "automatic",
     Manual = "manual",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CacheKind {
     NoStore = "no-store",
     NoCache = "no-cache",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum HeadersKind2 {
     Headers(Headers),
     Record(Object<JsString>),
     JsValue(JsValue),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BodyKind {
     ReadableStream(ReadableStream<Uint8Array>),
     String(String),
@@ -51798,142 +51842,169 @@ pub enum BodyKind {
     JsValue(JsValue),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum OnlyIfKind {
     Headers(Headers),
     R2Conditional(R2Conditional),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum OnlyIfKind2 {
     Headers(Headers),
     R2Conditional(R2Conditional),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum OnlyIfKind3 {
     Headers(Headers),
     R2Conditional(R2Conditional),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum RangeKind {
     Headers(Headers),
     R2Range(R2Range),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum SsecKeyKind {
     ArrayBuffer(ArrayBuffer),
     String(String),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum OnlyIfKind4 {
     Headers(Headers),
     R2Conditional(R2Conditional),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HttpMetadataKind {
     Headers(Headers),
     R2HttpMetadata(R2HTTPMetadata),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum Md5Kind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum Sha1Kind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum Sha256Kind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum Sha384Kind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum Sha512Kind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum SsecKeyKind2 {
     ArrayBuffer(ArrayBuffer),
     String(String),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HttpMetadataKind2 {
     Headers(Headers),
     R2HttpMetadata(R2HTTPMetadata),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum SsecKeyKind3 {
     ArrayBuffer(ArrayBuffer),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum SsecKeyKind4 {
     ArrayBuffer(ArrayBuffer),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum HighWaterMarkKind {
     F64(f64),
     BigInt(BigInt),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ExpectedLengthKind {
     F64(f64),
     BigInt(BigInt),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum HighWaterMarkKind2 {
     F64(f64),
     BigInt(BigInt),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryTypeKind {
     Blob = "blob",
     Arraybuffer = "arraybuffer",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecureTransportKind {
     On = "on",
     Off = "off",
     Starttls = "starttls",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum HighWaterMarkKind3 {
     F64(f64),
     BigInt(BigInt),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum HardTimeoutKind {
     F64(f64),
     BigInt(BigInt),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TypeKind2 {
     R2 = "r2",
     WebCrawler = "web-crawler",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ChatCompletionsReturnKind {
     Response(Response),
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TextKind {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum RoleKind {
     User = "user",
     Assistant = "assistant",
@@ -51942,27 +52013,32 @@ pub enum RoleKind {
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TypeKind3 {
     Function = "function",
     String(String),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ToolsKind {
     VecOfAiTextGenerationToolInput(Vec<AiTextGenerationToolInput>),
     VecOfAiTextGenerationToolLegacyInput(Vec<AiTextGenerationToolLegacyInput>),
     Object(Object),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ConversationKind {
     String(String),
     ResponseConversationParam(ResponseConversationParam),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum InputKind {
     String(String),
     ResponseInput(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceTierKind {
     Auto = "auto",
     Default = "default",
@@ -51971,31 +52047,37 @@ pub enum ServiceTierKind {
     Priority = "priority",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ToolChoiceKind {
     ToolChoiceOptions(ToolChoiceOptions),
     ToolChoiceFunction(ToolChoiceFunction),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TruncationKind {
     Auto = "auto",
     Disabled = "disabled",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum InstructionsKind {
     String(String),
     VecOfResponseInputItem(Vec<JsValue>),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ToolChoiceKind2 {
     ToolChoiceOptions(ToolChoiceOptions),
     ToolChoiceFunction(ToolChoiceFunction),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ContentKind {
     String(String),
     ResponseInputMessageContentList(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RoleKind2 {
     User = "user",
     Assistant = "assistant",
@@ -52003,11 +52085,13 @@ pub enum RoleKind2 {
     Developer = "developer",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ReasonKind {
     MaxOutputTokens = "max_output_tokens",
     ContentFilter = "content_filter",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EffortKind {
     Minimal = "minimal",
     Low = "low",
@@ -52015,17 +52099,20 @@ pub enum EffortKind {
     High = "high",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GenerateSummaryKind {
     Auto = "auto",
     Concise = "concise",
     Detailed = "detailed",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum OutputKind {
     String(String),
     VecOfJsValue(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CodeKind {
     ServerError = "server_error",
     RateLimitExceeded = "rate_limit_exceeded",
@@ -52047,105 +52134,125 @@ pub enum CodeKind {
     ImageFileNotFound = "image_file_not_found",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StatusKind {
     InProgress = "in_progress",
     Completed = "completed",
     Incomplete = "incomplete",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum OutputKind2 {
     String(String),
     VecOfJsValue(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DetailKind {
     Low = "low",
     High = "high",
     Auto = "auto",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum OutputKind3 {
     String(String),
     ResponseFunctionCallOutputItemList(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RoleKind3 {
     User = "user",
     System = "system",
     Developer = "developer",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VerbosityKind {
     Low = "low",
     Medium = "medium",
     High = "high",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TextKind2 {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PoolingKind {
     Mean = "mean",
     Cls = "cls",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TextKind3 {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TextKind4 {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TextKind5 {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TextKind6 {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ImageKind {
     VecOfF64(Vec<f64>),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ImageKind2 {
     VecOfF64(Vec<f64>),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TypeKind4 {
     JsonObject = "json_object",
     JsonSchema = "json_schema",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum PostProcessedOutputsKind {
     String(String),
     Object(Object),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ResponseKind {
     String(String),
     Object(Object),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum PostProcessedOutputsKind2 {
     String(String),
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CustomTopicModeKind {
     Extended = "extended",
     Strict = "strict",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncodingKind {
     Linear16 = "linear16",
     Flac = "flac",
@@ -52157,38 +52264,45 @@ pub enum EncodingKind {
     G729 = "g729",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModeKind {
     General = "general",
     Medical = "medical",
     Finance = "finance",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum QueriesKind {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum DocumentsKind {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TextKind7 {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum AudioKind {
     String(String),
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DtypeKind {
     Uint8 = "uint8",
     Float32 = "float32",
     Float64 = "float64",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SpeakerKind {
     Angus = "angus",
     Asteria = "asteria",
@@ -52204,6 +52318,7 @@ pub enum SpeakerKind {
     Stella = "stella",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncodingKind2 {
     Linear16 = "linear16",
     Flac = "flac",
@@ -52214,17 +52329,20 @@ pub enum EncodingKind2 {
     Aac = "aac",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerKind {
     None = "none",
     Wav = "wav",
     Ogg = "ogg",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TextKind8 {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetLanguageKind {
     AsmBeng = "asm_Beng",
     AwaDeva = "awa_Deva",
@@ -52262,21 +52380,25 @@ pub enum TargetLanguageKind {
     UnrDeva = "unr_Deva",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum PostProcessedOutputsKind3 {
     String(String),
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TextKind9 {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MipOptOutKind {
     True = "true",
     False = "false",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventKind {
     Update = "Update",
     StartOfTurn = "StartOfTurn",
@@ -52285,6 +52407,7 @@ pub enum EventKind {
     EndOfTurn = "EndOfTurn",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SpeakerKind2 {
     Amalthea = "amalthea",
     Andromeda = "andromeda",
@@ -52328,6 +52451,7 @@ pub enum SpeakerKind2 {
     Zeus = "zeus",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SpeakerKind3 {
     Sirio = "sirio",
     Nestor = "nestor",
@@ -52341,6 +52465,7 @@ pub enum SpeakerKind3 {
     Javier = "javier",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MaxAttemptsKind {
     N1 = 1,
     N2 = 2,
@@ -52349,62 +52474,74 @@ pub enum MaxAttemptsKind {
     N5 = 5,
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BackoffKind {
     Constant = "constant",
     Linear = "linear",
     Exponential = "exponential",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeedbackKind {
     Neg1 = -1,
     N1 = 1,
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum CfAigMetadataKind {
     String(String),
     Record(Object),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum CfAigCustomCostKind {
     String(String),
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigCacheTtlKind {
     F64(f64),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigSkipCacheKind {
     Bool(bool),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigRequestTimeoutKind {
     F64(f64),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigMaxAttemptsKind {
     F64(f64),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigRetryDelayKind {
     F64(f64),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigCollectLogKind {
     Bool(bool),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ProviderKind {
     AiGatewayProviders(AIGatewayProviders),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TypeKind5 {
     Eq = "eq",
     Ne = "ne",
@@ -52414,17 +52551,20 @@ pub enum TypeKind5 {
     Lte = "lte",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ValueKind {
     String(String),
     F64(f64),
     Bool(bool),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TypeKind6 {
     And = "and",
     Or = "or",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FitKind {
     ScaleDown = "scale-down",
     Contain = "contain",
@@ -52434,6 +52574,7 @@ pub enum FitKind {
     Squeeze = "squeeze",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum GravityKind {
     Face = "face",
     Left = "left",
@@ -52446,6 +52587,7 @@ pub enum GravityKind {
     BasicImageTransformationsGravityCoordinates(BasicImageTransformationsGravityCoordinates),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RotateKind {
     N0 = 0,
     N90 = 90,
@@ -52454,28 +52596,33 @@ pub enum RotateKind {
     N360 = 360,
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModeKind2 {
     Remainder = "remainder",
     BoxCenter = "box-center",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PolishKind {
     Lossy = "lossy",
     Lossless = "lossless",
     Off = "off",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum RepeatKind {
     Bool(bool),
     X = "x",
     Y = "y",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum TrimKind {
     Border = "border",
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum QualityKind {
     F64(f64),
     Low = "low",
@@ -52484,6 +52631,7 @@ pub enum QualityKind {
     High = "high",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FormatKind {
     Avif = "avif",
     Webp = "webp",
@@ -52495,23 +52643,27 @@ pub enum FormatKind {
     Svg = "svg",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MetadataKind {
     Keep = "keep",
     Copyright = "copyright",
     None = "none",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FlipKind {
     H = "h",
     V = "v",
     Hv = "hv",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CountryKind {
     Iso3166Alpha2Code(Iso3166Alpha2Code),
     T1 = "T1",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EdgeRequestKeepAliveStatusKind {
     N0 = 0,
     N1 = 1,
@@ -52521,52 +52673,62 @@ pub enum EdgeRequestKeepAliveStatusKind {
     N5 = 5,
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CertRevokedKind {
     _1 = "1",
     _0 = "0",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DispositionKind {
     Inline = "inline",
     Attachment = "attachment",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ContentKind2 {
     String(String),
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum FromKind {
     String(String),
     EmailAddress(EmailAddress),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ToKind {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ReplyToKind {
     String(String),
     EmailAddress(EmailAddress),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CcKind {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BccKind {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum FormatKind2 {
     Imagesvgxml = "image/svg+xml",
     String(String),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum GravityKind2 {
     Face = "face",
     Left = "left",
@@ -52579,6 +52741,7 @@ pub enum GravityKind2 {
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RotateKind2 {
     N0 = 0,
     N90 = 90,
@@ -52586,16 +52749,19 @@ pub enum RotateKind2 {
     N270 = 270,
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum TrimKind2 {
     Border = "border",
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum RepeatKind2 {
     Bool(bool),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FormatKind3 {
     Imagejpeg = "image/jpeg",
     Imagepng = "image/png",
@@ -52606,17 +52772,20 @@ pub enum FormatKind3 {
     Rgba = "rgba",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SortOrderKind {
     Asc = "asc",
     Desc = "desc",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FitKind2 {
     Contain = "contain",
     Cover = "cover",
     ScaleDown = "scale-down",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModeKind3 {
     Video = "video",
     Spritesheet = "spritesheet",
@@ -52624,28 +52793,33 @@ pub enum ModeKind3 {
     Audio = "audio",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FormatKind4 {
     Jpg = "jpg",
     Png = "png",
     M4A = "m4a",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum PayloadKind {
     String(String),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StatusKind2 {
     Ready = "ready",
     Inprogress = "inprogress",
     Error = "error",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FormatKind5 {
     Markdown = "markdown",
     Error = "error",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DescriptionLanguageKind {
     En = "en",
     Es = "es",
@@ -52655,23 +52829,27 @@ pub enum DescriptionLanguageKind {
     De = "de",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ReturnMetadataKind {
     Bool(bool),
     VectorizeMetadataRetrievalLevel(VectorizeMetadataRetrievalLevel),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ValuesKind {
     Float32Array(Float32Array),
     Float64Array(Float64Array),
     VecOfF64(Vec<f64>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ValuesKind2 {
     Float32Array(Float32Array),
     Float64Array(Float64Array),
     VecOfF64(Vec<f64>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StatusKind3 {
     Queued = "queued",
     Running = "running",
@@ -52684,46 +52862,55 @@ pub enum StatusKind3 {
     Unknown = "unknown",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum CfAigMetadataKind2 {
     String(String),
     Record(Object),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum CfAigCustomCostKind2 {
     String(String),
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigCacheTtlKind2 {
     F64(f64),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigSkipCacheKind2 {
     Bool(bool),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigRequestTimeoutKind2 {
     F64(f64),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigMaxAttemptsKind2 {
     F64(f64),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigRetryDelayKind2 {
     F64(f64),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigCollectLogKind2 {
     Bool(bool),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum EqKind {
     String(String),
     F64(f64),
@@ -52731,6 +52918,7 @@ pub enum EqKind {
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum NeKind {
     String(String),
     F64(f64),
@@ -52738,6 +52926,7 @@ pub enum NeKind {
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum LtKind {
     String(String),
     F64(f64),
@@ -52745,6 +52934,7 @@ pub enum LtKind {
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum LteKind {
     String(String),
     F64(f64),
@@ -52752,6 +52942,7 @@ pub enum LteKind {
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum GtKind {
     String(String),
     F64(f64),
@@ -52759,6 +52950,7 @@ pub enum GtKind {
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum GteKind {
     String(String),
     F64(f64),

@@ -140,8 +140,7 @@ fn generate_dynamic_union(cgctx: &CodegenContext, info: &DynamicUnionInfo) -> To
         .collect();
     let fallback = info.fallback.then(|| quote! { , fallback });
     let has_payload = info.members.iter().any(|m| {
-        !matches!(m, T::StringLiteral(_))
-            && !matches!(m, T::NumberLiteral(n) if n.fract() == 0.0)
+        !matches!(m, T::StringLiteral(_)) && !matches!(m, T::NumberLiteral(n) if n.fract() == 0.0)
     });
     let derives = super::enums::enum_derives(has_payload);
     quote! {

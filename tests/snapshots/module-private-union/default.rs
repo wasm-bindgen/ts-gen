@@ -52,6 +52,7 @@ pub mod x {
             pub fn try_list() -> Result<ListReturnKind, JsValue>;
         }
         #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
         pub enum ListReturnKind {
             VecOfId(Vec<String>),
             Promise(Promise<Base>),

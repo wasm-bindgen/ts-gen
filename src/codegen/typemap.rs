@@ -231,8 +231,8 @@ pub struct CodegenContext<'a> {
     /// Member scope of each namespace and declared module → the path of
     /// the `pub mod` it is emitted as.
     pub namespace_paths: HashMap<ScopeId, Vec<String>>,
-    /// Body scope of each class and interface → the name it is emitted
-    /// under, for the owner of a member written there.
+    /// Body scope of each class and interface → its
+    /// [`Self::owner_key`], for the owner of a member written there.
     owners: HashMap<ScopeId, String>,
     /// The `--lib-name` module, which is the output's own and emitted at
     /// the top level.
@@ -411,11 +411,15 @@ fn js_sys_local_name(path: &str) -> &str {
 /// args, tuple elements, and union members all recurse.
 fn format_type_ref_key(ty: &TypeRef) -> String {
     let mut buf = String::new();
-    write_type_ref_key(&mut buf, ty);
+    write_type_ref_key(&mut buf, ty, &|_| None);
     buf
 }
 
-fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
+/// Writes `ty`'s key into `buf`. `head` names the declaration a
+/// reference's path resolves to, when known, so two declarations spelled
+/// alike have different keys; an unresolved reference is keyed by its
+/// spelling.
+fn write_type_ref_key(buf: &mut String, ty: &TypeRef, head: &dyn Fn(&[String]) -> Option<String>) {
     use std::fmt::Write;
     match ty {
         TypeRef::Boolean => buf.push_str("bool"),
@@ -437,7 +441,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
         TypeRef::Array(inner) => {
             buf.push_str("Array<");
-            write_type_ref_key(buf, inner);
+            write_type_ref_key(buf, inner, head);
             buf.push('>');
         }
         TypeRef::Tuple(parts) => {
@@ -446,7 +450,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
                 if i > 0 {
                     buf.push(',');
                 }
-                write_type_ref_key(buf, p);
+                write_type_ref_key(buf, p, head);
             }
             buf.push('>');
         }
@@ -456,7 +460,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
                 if i > 0 {
                     buf.push('|');
                 }
-                write_type_ref_key(buf, m);
+                write_type_ref_key(buf, m, head);
             }
             buf.push('>');
         }
@@ -466,7 +470,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
                 if i > 0 {
                     buf.push('&');
                 }
-                write_type_ref_key(buf, p);
+                write_type_ref_key(buf, p, head);
             }
             buf.push('>');
         }
@@ -474,14 +478,17 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
             segments,
             generic_args,
         } => {
-            buf.push_str(&segments.join("."));
+            match head(segments) {
+                Some(id) => buf.push_str(&id),
+                None => buf.push_str(&segments.join(".")),
+            }
             if !generic_args.is_empty() {
                 buf.push('<');
                 for (i, a) in generic_args.iter().enumerate() {
                     if i > 0 {
                         buf.push(',');
                     }
-                    write_type_ref_key(buf, a);
+                    write_type_ref_key(buf, a, head);
                 }
                 buf.push('>');
             }
@@ -492,10 +499,10 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
                 if i > 0 {
                     buf.push(',');
                 }
-                write_type_ref_key(buf, &p.type_ref);
+                write_type_ref_key(buf, &p.type_ref, head);
             }
             buf.push_str(")->");
-            write_type_ref_key(buf, &sig.return_type);
+            write_type_ref_key(buf, &sig.return_type, head);
         }
         TypeRef::Unresolved(s) => {
             buf.push('?');
@@ -1234,7 +1241,21 @@ impl<'a> CodegenContext<'a> {
                 Some(p) => format!("owner:{p}"),
                 None => format!("module:{}", self.emit_path.borrow().join("::")),
             };
-            let mut key: Vec<String> = members.iter().map(format_type_ref_key).collect();
+            // Names resolve from the use site, so a `Foo` in each of two
+            // namespaces are two members.
+            let head = |segments: &[String]| {
+                let path = segments.join(".");
+                let id = self.gctx.resolve_path(scope, &path)?;
+                Some(format!("#{id:?}"))
+            };
+            let mut key: Vec<String> = members
+                .iter()
+                .map(|m| {
+                    let mut buf = String::new();
+                    write_type_ref_key(&mut buf, m, &head);
+                    buf
+                })
+                .collect();
             if arms.fallback {
                 key.push("fallback".to_string());
             }
@@ -1295,9 +1316,20 @@ impl<'a> CodegenContext<'a> {
         }
     }
 
-    /// The name of the class or interface whose body is `scope`.
+    /// The [`Self::owner_key`] of the class or interface whose body is
+    /// `scope`.
     pub(crate) fn owner_of(&self, scope: ScopeId) -> Option<String> {
         self.owners.get(&scope).cloned()
+    }
+
+    /// A type emitted as `name` in the `pub mod` at `path`, unique across
+    /// the output: same-named types in two namespaces are two owners.
+    pub(crate) fn owner_key(&self, path: &[String], name: &str) -> String {
+        path.iter()
+            .map(String::as_str)
+            .chain([name])
+            .collect::<Vec<_>>()
+            .join("::")
     }
 
     /// Whether `name` is a synthesised dynamic-union enum.
@@ -1949,10 +1981,12 @@ impl<'a> CodegenContext<'a> {
         let name = self.renamed_types.get(&type_id).unwrap_or(name);
         match &decl.kind {
             ir::TypeKind::Class(c) => {
-                self.owners.insert(c.body_scope, name.clone());
+                let key = self.owner_key(mod_path, name);
+                self.owners.insert(c.body_scope, key);
             }
             ir::TypeKind::Interface(i) => {
-                self.owners.insert(i.body_scope, name.clone());
+                let key = self.owner_key(mod_path, name);
+                self.owners.insert(i.body_scope, key);
             }
             _ => {}
         }

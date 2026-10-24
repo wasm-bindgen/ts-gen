@@ -207,7 +207,7 @@ pub mod clock {
             #[wasm_bindgen(method, getter)]
             pub fn limit(this: &Options) -> Option<LimitKind>;
             #[wasm_bindgen(method, setter)]
-            pub fn set_limit(this: &Options, val: LimitKind);
+            pub fn set_limit(this: &Options, val: &Foo);
             #[wasm_bindgen(method, setter, js_name = "limit")]
             pub fn set_limit_with_f64(this: &Options, val: f64);
         }
@@ -238,7 +238,7 @@ pub mod clock {
                 self.inner.set_mode(val);
                 self
             }
-            pub fn limit(self, val: LimitKind) -> Self {
+            pub fn limit(self, val: &Foo) -> Self {
                 self.inner.set_limit(val);
                 self
             }
@@ -250,43 +250,68 @@ pub mod clock {
                 self.inner
             }
         }
+        #[wasm_bindgen]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Foo;
+            #[wasm_bindgen(method, getter)]
+            pub fn zone(this: &Foo) -> String;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_zone(this: &Foo, val: &str);
+        }
+        impl Foo {
+            pub fn new(zone: &str) -> Foo {
+                let inner: Foo = JsCast::unchecked_into(js_sys::Object::new());
+                inner.set_zone(zone);
+                inner
+            }
+        }
         #[wasm_bindgen(private)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub enum ModeKind {
             Fast = "fast",
             Slow = "slow",
         }
-        #[wasm_bindgen(private)]
+        #[wasm_bindgen(private, fallback)]
+        #[derive(Clone, Debug)]
         pub enum LimitKind {
             F64(f64),
-            Auto = "auto",
+            Foo(Foo),
         }
     }
     #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum OffsetKind {
         Auto = "auto",
         Never = "never",
     }
     #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum UnitKind {
         Day = "day",
         Week = "week",
     }
     #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum StyleKind {
         Short = "short",
         Long = "long",
     }
     #[wasm_bindgen(private)]
+    #[derive(Clone, Debug)]
     pub enum PrecisionKind {
         F64(f64),
         Auto = "auto",
     }
     #[wasm_bindgen(private)]
+    #[derive(Clone, Debug)]
     pub enum PrecisionKind2 {
         F64(f64),
         Auto = "auto",
     }
     #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum OffsetKind2 {
         Use = "use",
         Ignore = "ignore",
@@ -294,6 +319,7 @@ pub mod clock {
         Reject = "reject",
     }
     #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum OverflowKind {
         Constrain = "constrain",
         Reject = "reject",
@@ -311,6 +337,12 @@ pub mod calendar {
         pub fn unit(this: &Options) -> Option<super::clock::UnitKind>;
         #[wasm_bindgen(method, setter)]
         pub fn set_unit(this: &Options, val: super::clock::UnitKind);
+        #[wasm_bindgen(method, getter)]
+        pub fn limit(this: &Options) -> Option<LimitKind2>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_limit(this: &Options, val: &Foo);
+        #[wasm_bindgen(method, setter, js_name = "limit")]
+        pub fn set_limit_with_f64(this: &Options, val: f64);
     }
     impl Options {
         pub fn new() -> Options {
@@ -335,8 +367,33 @@ pub mod calendar {
             self.inner.set_unit(val);
             self
         }
+        pub fn limit(self, val: &Foo) -> Self {
+            self.inner.set_limit(val);
+            self
+        }
+        pub fn limit_with_f64(self, val: f64) -> Self {
+            self.inner.set_limit_with_f64(val);
+            self
+        }
         pub fn build(self) -> Options {
             self.inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Foo;
+        #[wasm_bindgen(method, getter)]
+        pub fn calendar(this: &Foo) -> String;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_calendar(this: &Foo, val: &str);
+    }
+    impl Foo {
+        pub fn new(calendar: &str) -> Foo {
+            let inner: Foo = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_calendar(calendar);
+            inner
         }
     }
     #[wasm_bindgen]
@@ -420,7 +477,14 @@ pub mod calendar {
             self.inner
         }
     }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum LimitKind2 {
+        F64(f64),
+        Foo(Foo),
+    }
     #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum SepKind {
         FooBar = "foo-bar",
         FooBar2 = "foo_bar",

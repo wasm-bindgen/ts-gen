@@ -15,6 +15,10 @@ extern "C" {
     pub fn set_fractional_second_digits(this: &DigitsOptions, val: FractionalSecondDigitsKind);
     #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
     pub fn set_fractional_second_digits_with_f64(this: &DigitsOptions, val: f64);
+    #[wasm_bindgen(method, getter, js_name = "roundingMode")]
+    pub fn rounding_mode(this: &DigitsOptions) -> Option<RoundingModeKind>;
+    #[wasm_bindgen(method, setter, js_name = "roundingMode")]
+    pub fn set_rounding_mode(this: &DigitsOptions, val: RoundingModeKind);
 }
 impl DigitsOptions {
     pub fn new() -> DigitsOptions {
@@ -41,6 +45,10 @@ impl DigitsOptionsBuilder {
     }
     pub fn fractional_second_digits_with_f64(self, val: f64) -> Self {
         self.inner.set_fractional_second_digits_with_f64(val);
+        self
+    }
+    pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        self.inner.set_rounding_mode(val);
         self
     }
     pub fn build(self) -> DigitsOptions {
@@ -178,16 +186,25 @@ impl ToggleBuilder {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum FractionalSecondDigitsKind {
     Auto = "auto",
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RoundingModeKind {
+    Ceil = "ceil",
+    Floor = "floor",
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum DigitsKind {
     Auto = "auto",
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeKind {
     Bool(bool),
     X = "x",

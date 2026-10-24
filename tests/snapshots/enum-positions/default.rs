@@ -236,6 +236,7 @@ pub enum LevelOrStringReturnKind {
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeOrNumberArgReturnKind {
     Mode(Mode),
     F64(f64),

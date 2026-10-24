@@ -5,7 +5,8 @@
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::setter_matches_getter_mono::{
-    DigitsKind, DigitsOptions, FractionalSecondDigitsKind, ModeKind, RequiredDigits, RoundingModeKind, Toggle,
+    DigitsKind, DigitsOptions, FractionalSecondDigitsKind, ModeKind, RequiredDigits,
+    RoundingModeKind, Toggle,
 };
 
 fn is_f64(kind: Option<FractionalSecondDigitsKind>, expected: f64) -> bool {

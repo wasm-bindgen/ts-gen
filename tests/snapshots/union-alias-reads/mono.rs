@@ -749,6 +749,7 @@ pub enum RelativeToKind {
     Object(Object),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum RelativeToReturnKind {
     Zoned(Zoned),
     String(String),
