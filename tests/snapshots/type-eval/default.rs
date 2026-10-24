@@ -380,12 +380,8 @@ extern "C" {
 }
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {
-    pub fn fail() -> JsValue;
-}
-#[wasm_bindgen(module = "type-eval")]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "fail")]
-    pub fn try_fail() -> Result<JsValue, JsValue>;
+    pub fn try_fail() -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {

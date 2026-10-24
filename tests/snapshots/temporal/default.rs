@@ -2011,10 +2011,8 @@ pub mod temporal {
         pub fn to_json(this: &PlainDate) -> String;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn try_to_json(this: &PlainDate) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &PlainDate) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &PlainDate) -> Result<JsValue, JsValue>;
+        pub fn try_value_of(this: &PlainDate) -> Result<(), JsValue>;
     }
     #[wasm_bindgen]
     extern "C" {
@@ -2709,10 +2707,8 @@ pub mod temporal {
         pub fn to_json(this: &PlainTime) -> String;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn try_to_json(this: &PlainTime) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &PlainTime) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &PlainTime) -> Result<JsValue, JsValue>;
+        pub fn try_value_of(this: &PlainTime) -> Result<(), JsValue>;
     }
     #[wasm_bindgen]
     extern "C" {
@@ -3731,10 +3727,8 @@ pub mod temporal {
         pub fn to_json(this: &PlainDateTime) -> String;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn try_to_json(this: &PlainDateTime) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &PlainDateTime) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &PlainDateTime) -> Result<JsValue, JsValue>;
+        pub fn try_value_of(this: &PlainDateTime) -> Result<(), JsValue>;
         #[wasm_bindgen(method, js_name = "toZonedDateTime")]
         pub fn to_zoned_date_time(this: &PlainDateTime, time_zone: &ZonedDateTime)
             -> ZonedDateTime;
@@ -4520,10 +4514,8 @@ pub mod temporal {
         pub fn to_json(this: &ZonedDateTime) -> String;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn try_to_json(this: &ZonedDateTime) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &ZonedDateTime) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &ZonedDateTime) -> Result<JsValue, JsValue>;
+        pub fn try_value_of(this: &ZonedDateTime) -> Result<(), JsValue>;
         #[wasm_bindgen(method, js_name = "startOfDay")]
         pub fn start_of_day(this: &ZonedDateTime) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "startOfDay")]
@@ -5262,10 +5254,8 @@ pub mod temporal {
         pub fn to_json(this: &Duration) -> String;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn try_to_json(this: &Duration) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &Duration) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &Duration) -> Result<JsValue, JsValue>;
+        pub fn try_value_of(this: &Duration) -> Result<(), JsValue>;
     }
     #[wasm_bindgen]
     extern "C" {
@@ -5610,10 +5600,8 @@ pub mod temporal {
         pub fn to_json(this: &Instant) -> String;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn try_to_json(this: &Instant) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &Instant) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &Instant) -> Result<JsValue, JsValue>;
+        pub fn try_value_of(this: &Instant) -> Result<(), JsValue>;
         #[wasm_bindgen(method, js_name = "toZonedDateTimeISO")]
         pub fn to_zoned_date_time_iso(this: &Instant, time_zone: &ZonedDateTime) -> ZonedDateTime;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTimeISO")]
@@ -6125,10 +6113,8 @@ pub mod temporal {
         pub fn to_json(this: &PlainYearMonth) -> String;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn try_to_json(this: &PlainYearMonth) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &PlainYearMonth) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &PlainYearMonth) -> Result<JsValue, JsValue>;
+        pub fn try_value_of(this: &PlainYearMonth) -> Result<(), JsValue>;
         #[wasm_bindgen(method, js_name = "toPlainDate")]
         pub fn to_plain_date(
             this: &PlainYearMonth,
@@ -6343,10 +6329,8 @@ pub mod temporal {
         pub fn to_json(this: &PlainMonthDay) -> String;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn try_to_json(this: &PlainMonthDay) -> Result<String, JsValue>;
-        #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &PlainMonthDay) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &PlainMonthDay) -> Result<JsValue, JsValue>;
+        pub fn try_value_of(this: &PlainMonthDay) -> Result<(), JsValue>;
         #[wasm_bindgen(method, js_name = "toPlainDate")]
         pub fn to_plain_date(
             this: &PlainMonthDay,

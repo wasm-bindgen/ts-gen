@@ -355,7 +355,7 @@ extern "C" {
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn fail() -> Result<JsValue, JsValue>;
+    pub fn fail() -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {

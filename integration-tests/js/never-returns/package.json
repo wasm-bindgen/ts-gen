@@ -1,0 +1,6 @@
+{
+  "name": "never-returns",
+  "private": true,
+  "type": "module",
+  "exports": "./index.js"
+}
