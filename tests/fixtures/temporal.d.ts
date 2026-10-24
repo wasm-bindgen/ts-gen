@@ -16,7 +16,10 @@ and limitations under the License.
 // The `@throws` tags below are hand-added; the upstream declarations have
 // none. They mark the calls that throw on ordinary input (parsing, invalid
 // options, calendar units without `relativeTo`, the representable range),
-// so the output shows their typed fallible forms.
+// so the output shows their typed fallible forms. Each tag names only the
+// errors the spec can throw for input the generated Rust signature accepts:
+// a property bag missing its fields is a `TypeError`, a locale list of
+// strings never is.
 
 /// <reference lib="es2015.symbol.wellknown" />
 /// <reference lib="es2020.intl" />
@@ -186,7 +189,7 @@ declare namespace Temporal {
         toString(options?: PlainDateToStringOptions): string;
         /**
          * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
-         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         * @throws {TypeError} if the options conflict
          */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
@@ -241,7 +244,7 @@ declare namespace Temporal {
         toString(options?: PlainTimeToStringOptions): string;
         /**
          * @throws {RangeError} if the locale or options are invalid
-         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         * @throws {TypeError} if the options conflict
          */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
@@ -314,7 +317,7 @@ declare namespace Temporal {
         toString(options?: PlainDateTimeToStringOptions): string;
         /**
          * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
-         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         * @throws {TypeError} if the options conflict
          */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
@@ -405,7 +408,7 @@ declare namespace Temporal {
         toString(options?: ZonedDateTimeToStringOptions): string;
         /**
          * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
-         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         * @throws {TypeError} if the options conflict, or include `timeZone`
          */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
@@ -490,10 +493,7 @@ declare namespace Temporal {
          */
         total(totalOf: DurationTotalOptions): number;
         toString(options?: DurationToStringOptions): string;
-        /**
-         * @throws {RangeError} if the locale or options are invalid
-         * @throws {TypeError} if `locales` holds something other than a string or `Intl.Locale`
-         */
+        /** @throws {RangeError} if the locale or options are invalid */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DurationFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
@@ -546,7 +546,7 @@ declare namespace Temporal {
         toString(options?: InstantToStringOptions): string;
         /**
          * @throws {RangeError} if the locale or options are invalid
-         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         * @throws {TypeError} if the options conflict
          */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
@@ -559,10 +559,7 @@ declare namespace Temporal {
         /** @throws {RangeError} if a field is out of range */
         new (epochNanoseconds: bigint): Instant;
         readonly prototype: Instant;
-        /**
-         * @throws {RangeError} if a string does not parse, or a field is out of range
-         * @throws {TypeError} if an object is missing the fields it needs
-         */
+        /** @throws {RangeError} if the string does not parse, or the instant is out of range */
         from(item: InstantLike): Instant;
         /** @throws {RangeError} if the instant is outside the representable range */
         fromEpochMilliseconds(epochMilliseconds: number): Instant;
@@ -608,7 +605,7 @@ declare namespace Temporal {
         toString(options?: PlainDateToStringOptions): string;
         /**
          * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
-         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         * @throws {TypeError} if the options conflict
          */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
@@ -649,7 +646,7 @@ declare namespace Temporal {
         toString(options?: PlainDateToStringOptions): string;
         /**
          * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
-         * @throws {TypeError} if the options conflict, or `locales` holds something other than a string or `Intl.Locale`
+         * @throws {TypeError} if the options conflict
          */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;

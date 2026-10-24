@@ -2301,25 +2301,25 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string(this: &PlainDate) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string(this: &PlainDate) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(this: &PlainDate, locales: &str) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str(
             this: &PlainDate,
@@ -2328,13 +2328,13 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(this: &PlainDate, locales: &[String]) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &PlainDate,
@@ -2343,7 +2343,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainDate,
@@ -2353,7 +2353,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &PlainDate,
@@ -2363,7 +2363,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainDate,
@@ -2373,7 +2373,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &PlainDate,
@@ -3351,25 +3351,25 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string(this: &PlainTime) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string(this: &PlainTime) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(this: &PlainTime, locales: &str) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str(
             this: &PlainTime,
@@ -3378,13 +3378,13 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(this: &PlainTime, locales: &[String]) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &PlainTime,
@@ -3393,7 +3393,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainTime,
@@ -3403,7 +3403,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &PlainTime,
@@ -3413,7 +3413,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainTime,
@@ -3423,7 +3423,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &PlainTime,
@@ -4703,25 +4703,25 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string(this: &PlainDateTime) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string(this: &PlainDateTime) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(this: &PlainDateTime, locales: &str) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str(
             this: &PlainDateTime,
@@ -4730,13 +4730,13 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(this: &PlainDateTime, locales: &[String]) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &PlainDateTime,
@@ -4745,7 +4745,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainDateTime,
@@ -4755,7 +4755,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &PlainDateTime,
@@ -4765,7 +4765,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainDateTime,
@@ -4775,7 +4775,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &PlainDateTime,
@@ -5745,25 +5745,25 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict, or include `timeZone`"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string(this: &ZonedDateTime) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict, or include `timeZone`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string(this: &ZonedDateTime) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict, or include `timeZone`"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(this: &ZonedDateTime, locales: &str) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict, or include `timeZone`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str(
             this: &ZonedDateTime,
@@ -5772,13 +5772,13 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict, or include `timeZone`"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(this: &ZonedDateTime, locales: &[String]) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict, or include `timeZone`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &ZonedDateTime,
@@ -5787,7 +5787,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict, or include `timeZone`"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &ZonedDateTime,
@@ -5797,7 +5797,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict, or include `timeZone`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &ZonedDateTime,
@@ -5807,7 +5807,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict, or include `timeZone`"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &ZonedDateTime,
@@ -5817,7 +5817,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict, or include `timeZone`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &ZonedDateTime,
@@ -6846,49 +6846,42 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string(this: &Duration) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
-        pub fn try_to_locale_string(this: &Duration) -> Result<String, Error>;
+        pub fn try_to_locale_string(this: &Duration) -> Result<String, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(this: &Duration, locales: &str) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str(
             this: &Duration,
             locales: &str,
-        ) -> Result<String, Error>;
+        ) -> Result<String, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(this: &Duration, locales: &[String]) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &Duration,
             locales: &[String],
-        ) -> Result<String, Error>;
+        ) -> Result<String, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &Duration,
@@ -6898,17 +6891,15 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &Duration,
             locales: &str,
             options: &::js_sys::Intl::DurationFormatOptions,
-        ) -> Result<String, Error>;
+        ) -> Result<String, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &Duration,
@@ -6918,13 +6909,12 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if `locales` holds something other than a string or `Intl.Locale`"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &Duration,
             locales: &[String],
             options: &::js_sys::Intl::DurationFormatOptions,
-        ) -> Result<String, Error>;
+        ) -> Result<String, RangeError>;
         #[wasm_bindgen(method, js_name = "toJSON")]
         pub fn to_json(this: &Duration) -> String;
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
@@ -7008,40 +6998,34 @@ pub mod temporal {
         pub fn new(epoch_nanoseconds: &BigInt) -> Result<Instant, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal")]
         pub fn from(item: &Instant) -> Instant;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from(item: &Instant) -> Result<Instant, Error>;
+        pub fn try_from(item: &Instant) -> Result<Instant, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "from")]
         pub fn from_with_zoned_date_time(item: &ZonedDateTime) -> Instant;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_zoned_date_time(item: &ZonedDateTime) -> Result<Instant, Error>;
+        pub fn try_from_with_zoned_date_time(item: &ZonedDateTime) -> Result<Instant, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , js_name = "from")]
         pub fn from_with_str(item: &str) -> Instant;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, or a field is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the string does not parse, or the instant is out of range"]
         # [wasm_bindgen (static_method_of = Instant , js_namespace = "Temporal" , catch , js_name = "from")]
-        pub fn try_from_with_str(item: &str) -> Result<Instant, Error>;
+        pub fn try_from_with_str(item: &str) -> Result<Instant, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the instant is outside the representable range"]
@@ -7436,25 +7420,25 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string(this: &Instant) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string(this: &Instant) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(this: &Instant, locales: &str) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str(
             this: &Instant,
@@ -7463,13 +7447,13 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(this: &Instant, locales: &[String]) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &Instant,
@@ -7478,7 +7462,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &Instant,
@@ -7488,7 +7472,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &Instant,
@@ -7498,7 +7482,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &Instant,
@@ -7508,7 +7492,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale or options are invalid"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &Instant,
@@ -8164,25 +8148,25 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string(this: &PlainYearMonth) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string(this: &PlainYearMonth) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(this: &PlainYearMonth, locales: &str) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str(
             this: &PlainYearMonth,
@@ -8191,13 +8175,13 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(this: &PlainYearMonth, locales: &[String]) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &PlainYearMonth,
@@ -8206,7 +8190,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainYearMonth,
@@ -8216,7 +8200,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &PlainYearMonth,
@@ -8226,7 +8210,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainYearMonth,
@@ -8236,7 +8220,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &PlainYearMonth,
@@ -8504,25 +8488,25 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string(this: &PlainMonthDay) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string(this: &PlainMonthDay) -> Result<String, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str(this: &PlainMonthDay, locales: &str) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str(
             this: &PlainMonthDay,
@@ -8531,13 +8515,13 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice(this: &PlainMonthDay, locales: &[String]) -> String;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice(
             this: &PlainMonthDay,
@@ -8546,7 +8530,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainMonthDay,
@@ -8556,7 +8540,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_str_and_options(
             this: &PlainMonthDay,
@@ -8566,7 +8550,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, js_name = "toLocaleString")]
         pub fn to_locale_string_with_slice_and_options(
             this: &PlainMonthDay,
@@ -8576,7 +8560,7 @@ pub mod temporal {
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's"]
-        #[doc = " * `TypeError` — if the options conflict, or `locales` holds something other than a string or `Intl.Locale`"]
+        #[doc = " * `TypeError` — if the options conflict"]
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn try_to_locale_string_with_slice_and_options(
             this: &PlainMonthDay,
