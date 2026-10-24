@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stream;
     #[wasm_bindgen(method)]
@@ -54,7 +54,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Clock;
     #[wasm_bindgen(method)]
@@ -69,7 +69,7 @@ extern "C" {
     pub type Codec;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(id: f64) -> Result<Codec, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Codec")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_name(name: &str) -> Result<Codec, JsValue>;
     # [wasm_bindgen (static_method_of = Codec)]
     pub fn from(input: &ArrayBuffer) -> Codec;
@@ -86,7 +86,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Box;
     #[wasm_bindgen(method)]

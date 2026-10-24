@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stream;
     #[wasm_bindgen(method, catch)]
@@ -46,7 +46,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Clock;
     #[wasm_bindgen(method, catch)]
@@ -59,7 +59,7 @@ extern "C" {
     pub type Codec;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(id: f64) -> Result<Codec, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Codec")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_name(name: impl ::wasm_bindgen::JsStringLike) -> Result<Codec, JsValue>;
     # [wasm_bindgen (static_method_of = Codec , catch)]
     pub fn from(input: &ArrayBuffer) -> Result<Codec, JsValue>;
@@ -78,7 +78,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Box;
     #[wasm_bindgen(method, catch)]

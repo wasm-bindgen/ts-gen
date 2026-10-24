@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "literal-overloads")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespace;
     #[wasm_bindgen(method, catch)]
@@ -147,7 +147,7 @@ impl KVNamespace {
 }
 #[wasm_bindgen(module = "literal-overloads")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Headers;
     #[wasm_bindgen(method, js_name = "getAll")]
@@ -225,7 +225,7 @@ impl SubtleCrypto {
 }
 #[wasm_bindgen(module = "literal-overloads")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVStore<Key: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
@@ -565,7 +565,7 @@ impl Picker {
 }
 #[wasm_bindgen(module = "literal-overloads")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Clash;
     #[wasm_bindgen(method, js_name = "mode")]
@@ -651,7 +651,7 @@ impl Clash {
 }
 #[wasm_bindgen(module = "literal-overloads")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Repeats;
     #[wasm_bindgen(method, js_name = "tag")]
@@ -684,7 +684,7 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Boxed<T: ::wasm_bindgen::JsGeneric = JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Boxed")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new(kind: &str) -> Result<Boxed, JsValue>;
     # [wasm_bindgen (static_method_of = Boxed , js_name = "label")]
     fn __label(kind: &str) -> String;
@@ -825,9 +825,9 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Opener;
-    #[wasm_bindgen(constructor, catch, js_name = "Opener")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new(kind: &str, x: &ArrayBuffer) -> Result<Opener, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Opener")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new_with_null(kind: &str, x: &::wasm_bindgen::JsValue) -> Result<Opener, JsValue>;
 }
 impl Opener {

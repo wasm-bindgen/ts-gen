@@ -39,7 +39,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Factory;
     #[wasm_bindgen(method, getter)]
@@ -56,7 +56,7 @@ impl Factory {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Widget;
     #[wasm_bindgen(method, getter)]

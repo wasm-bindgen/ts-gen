@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Request<Meta = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -67,7 +67,7 @@ pub mod shapes {
     use super::*;
     #[wasm_bindgen(module = "shapes", experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type _Shape;
         #[wasm_bindgen(method, getter)]
@@ -94,7 +94,7 @@ pub mod hidden {
     use super::*;
     #[wasm_bindgen(module = "hidden", experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Hidden;
         #[wasm_bindgen(method, getter)]

@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Event;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -55,7 +55,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bag;
     #[wasm_bindgen(method, getter)]
@@ -72,7 +72,7 @@ impl Bag {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Transformer<
         I: ::wasm_bindgen::JsGeneric = JsValue,
@@ -133,7 +133,7 @@ extern "C" {
     >;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<TransformStream, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "TransformStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_transformer<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
         transformer: &Transformer<I, O>,
     ) -> Result<TransformStream<I, O>, JsValue>;
@@ -181,7 +181,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage<Props: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, catch)]

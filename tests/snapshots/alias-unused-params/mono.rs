@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Local;
     #[wasm_bindgen(method, getter)]
@@ -25,7 +25,7 @@ impl Local {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Pair<A = JsValue, B = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -84,7 +84,7 @@ pub type Chained<U> = Pair<U, U>;
 pub type Fetcher<T = Undefined> = Pair<T, T>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Inner;
     #[wasm_bindgen(method, getter)]
@@ -106,7 +106,7 @@ pub mod ns {
     use super::*;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Ns")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Inner;
         #[wasm_bindgen(method, getter)]
@@ -155,7 +155,7 @@ pub mod cf {
     use super::*;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Cf")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Env;
         #[wasm_bindgen(method, getter)]
@@ -208,7 +208,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T = JsValue>;
     #[wasm_bindgen(method, catch)]

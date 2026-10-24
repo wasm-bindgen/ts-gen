@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Pair<A: ::wasm_bindgen::JsGeneric = JsValue, B: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -34,7 +34,7 @@ impl<A: ::wasm_bindgen::JsGeneric, B: ::wasm_bindgen::JsGeneric> Pair<A, B> {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Inner;
     #[wasm_bindgen(method, getter)]
@@ -64,7 +64,7 @@ pub mod shadow {
     use super::*;
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Shadow")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Inner;
         #[wasm_bindgen(method, getter)]
@@ -153,7 +153,7 @@ pub mod shadow {
     }
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Shadow")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Mode;
         #[wasm_bindgen(method, getter)]

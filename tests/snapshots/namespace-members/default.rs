@@ -15,7 +15,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Emitter;
     #[wasm_bindgen(method)]
@@ -40,7 +40,7 @@ pub mod events {
     pub type Name = JsString;
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Events")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Emitter;
         #[wasm_bindgen(method)]
@@ -50,7 +50,7 @@ pub mod events {
     }
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Events")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Options;
         #[wasm_bindgen(method, getter)]
@@ -80,7 +80,7 @@ pub mod events {
         use super::*;
         #[wasm_bindgen]
         extern "C" {
-            # [wasm_bindgen (extends = Object , js_namespace = ["Events" , "Inner"])]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type Handle;
             #[wasm_bindgen(method, getter)]
@@ -104,7 +104,7 @@ pub mod events {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = events :: Emitter , extends = Object)]
+    # [wasm_bindgen (extends = events :: Emitter , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stream;
     #[wasm_bindgen(method)]

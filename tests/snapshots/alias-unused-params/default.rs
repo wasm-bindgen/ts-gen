@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Local;
     #[wasm_bindgen(method, getter)]
@@ -23,7 +23,7 @@ impl Local {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Pair<A: ::wasm_bindgen::JsGeneric = JsValue, B: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -92,7 +92,7 @@ pub type Chained<U> = Pair<U, U>;
 pub type Fetcher<T = Undefined> = Pair<T, T>;
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Inner;
     #[wasm_bindgen(method, getter)]
@@ -112,7 +112,7 @@ pub mod ns {
     use super::*;
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Ns")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Inner;
         #[wasm_bindgen(method, getter)]
@@ -182,7 +182,7 @@ pub mod cf {
     use super::*;
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Cf")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Env;
         #[wasm_bindgen(method, getter)]
@@ -243,7 +243,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method)]

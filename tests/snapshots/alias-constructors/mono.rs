@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stub<T = JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -50,7 +50,7 @@ extern "C" {
 pub type Label = Labelled;
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Labelled;
     #[wasm_bindgen(method, catch)]
@@ -60,7 +60,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Point;
     #[wasm_bindgen(method, getter)]
@@ -108,7 +108,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Proto;
     #[wasm_bindgen(method, catch)]
@@ -132,7 +132,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Wrapped<T = JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -160,7 +160,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CapNew;
     #[wasm_bindgen(method, catch, js_name = "New")]
@@ -183,7 +183,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Counter;
     #[wasm_bindgen(method, catch)]
@@ -203,7 +203,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MultiA;
     #[wasm_bindgen(method, catch)]
@@ -213,7 +213,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MultiB;
     #[wasm_bindgen(method, catch)]

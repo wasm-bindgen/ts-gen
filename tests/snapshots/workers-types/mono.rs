@@ -17,11 +17,11 @@ extern "C" {
     pub type DOMException;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<DOMException, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "DOMException")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_message(
         message: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<DOMException, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "DOMException")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_message_and_name(
         message: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
@@ -109,7 +109,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerGlobalScopeEventMap;
     #[wasm_bindgen(method, getter)]
@@ -162,7 +162,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Console;
     #[wasm_bindgen(method, variadic, catch)]
@@ -360,12 +360,7 @@ pub mod web_assembly {
         pub type CompileError;
         #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new() -> Result<CompileError, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "WebAssembly",
-            catch,
-            js_name = "CompileError"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new_with_message(
             message: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<CompileError, JsValue>;
@@ -377,17 +372,12 @@ pub mod web_assembly {
         pub type RuntimeError;
         #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new() -> Result<RuntimeError, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_namespace = "WebAssembly",
-            catch,
-            js_name = "RuntimeError"
-        )]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new_with_message(
             message: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<RuntimeError, JsValue>;
     }
-    #[wasm_bindgen(private, js_namespace = "WebAssembly")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ValueType {
         Anyfunc = "anyfunc",
@@ -400,7 +390,7 @@ pub mod web_assembly {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type GlobalDescriptor;
         #[wasm_bindgen(method, getter)]
@@ -441,13 +431,7 @@ pub mod web_assembly {
         pub type Global_;
         #[wasm_bindgen(constructor, js_class = "Global", js_namespace = "WebAssembly", catch)]
         pub fn new(descriptor: &GlobalDescriptor) -> Result<Global_, JsValue>;
-        #[wasm_bindgen(
-            constructor,
-            js_class = "Global",
-            js_namespace = "WebAssembly",
-            catch,
-            js_name = "Global"
-        )]
+        #[wasm_bindgen(constructor, js_class = "Global", js_namespace = "WebAssembly", catch)]
         pub fn new_with_value(
             descriptor: &GlobalDescriptor,
             value: &JsValue,
@@ -477,7 +461,7 @@ pub mod web_assembly {
         pub type Instance;
         #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new(module: &Module) -> Result<Instance, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch, js_name = "Instance")]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new_with_imports(
             module: &Module,
             imports: &Object<Object>,
@@ -487,7 +471,7 @@ pub mod web_assembly {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type MemoryDescriptor;
         #[wasm_bindgen(method, getter)]
@@ -541,7 +525,7 @@ pub mod web_assembly {
         #[wasm_bindgen(method, catch)]
         pub fn grow(this: &Memory, delta: f64) -> Result<f64, JsValue>;
     }
-    #[wasm_bindgen(private, js_namespace = "WebAssembly")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ImportExportKind {
         Function = "function",
@@ -551,7 +535,7 @@ pub mod web_assembly {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ModuleExportDescriptor;
         #[wasm_bindgen(method, getter)]
@@ -578,7 +562,7 @@ pub mod web_assembly {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ModuleImportDescriptor;
         #[wasm_bindgen(method, getter)]
@@ -626,7 +610,7 @@ pub mod web_assembly {
         # [wasm_bindgen (static_method_of = Module , js_namespace = "WebAssembly" , catch)]
         pub fn imports(module: &Module) -> Result<Vec<ModuleImportDescriptor>, JsValue>;
     }
-    #[wasm_bindgen(private, js_namespace = "WebAssembly")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum TableKind {
         Anyfunc = "anyfunc",
@@ -634,7 +618,7 @@ pub mod web_assembly {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type TableDescriptor;
         #[wasm_bindgen(method, getter)]
@@ -680,7 +664,7 @@ pub mod web_assembly {
         pub type Table;
         #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new(descriptor: &TableDescriptor) -> Result<Table, JsValue>;
-        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch, js_name = "Table")]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new_with_value(
             descriptor: &TableDescriptor,
             value: &JsValue,
@@ -737,7 +721,7 @@ pub mod web_assembly {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = WorkerGlobalScope , extends = Object)]
+    # [wasm_bindgen (extends = WorkerGlobalScope , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ServiceWorkerGlobalScope;
     #[wasm_bindgen(method, getter, js_name = "DOMException")]
@@ -1636,13 +1620,13 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TestController;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ExecutionContext<Props = JsValue>;
     #[wasm_bindgen(method, catch, js_name = "waitUntil")]
@@ -1690,7 +1674,7 @@ pub type ExportedHandlerTestHandler<Env = JsValue, Props = JsValue> =
     Function<fn(TestController, Env, ExecutionContext<Props>) -> JsOption<Promise<Undefined>>>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ExportedHandler<
         Env = JsValue,
@@ -2025,7 +2009,7 @@ impl<
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StructuredSerializeOptions;
     #[wasm_bindgen(method, getter)]
@@ -2130,7 +2114,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AlarmInvocationInfo;
     #[wasm_bindgen(method, getter, js_name = "isRetry")]
@@ -2149,7 +2133,7 @@ impl AlarmInvocationInfo {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cloudflare;
     #[wasm_bindgen(method, getter, js_name = "compatibilityFlags")]
@@ -2166,7 +2150,7 @@ impl Cloudflare {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObject;
     #[wasm_bindgen(method, catch)]
@@ -2210,7 +2194,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Fetcher , extends = Object)]
+    # [wasm_bindgen (extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectStub<T = Undefined>;
     #[wasm_bindgen(method, getter)]
@@ -2222,7 +2206,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectId;
     #[wasm_bindgen(method, catch, js_name = "toString")]
@@ -2295,7 +2279,7 @@ pub enum DurableObjectJurisdiction {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectNamespaceNewUniqueIdOptions;
     #[wasm_bindgen(method, getter)]
@@ -2350,7 +2334,7 @@ pub enum DurableObjectRoutingMode {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectNamespaceGetDurableObjectOptions;
     #[wasm_bindgen(method, getter, js_name = "locationHint")]
@@ -2400,13 +2384,13 @@ impl DurableObjectNamespaceGetDurableObjectOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectClass<_T = Undefined>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectState<Props = JsValue>;
     #[wasm_bindgen(method, catch, js_name = "waitUntil")]
@@ -2511,7 +2495,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectTransaction;
     #[wasm_bindgen(method, catch)]
@@ -2761,7 +2745,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectStorage;
     #[wasm_bindgen(method, catch)]
@@ -3105,7 +3089,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectListOptions;
     #[wasm_bindgen(method, getter)]
@@ -3201,7 +3185,7 @@ impl DurableObjectListOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectGetOptions;
     #[wasm_bindgen(method, getter, js_name = "allowConcurrency")]
@@ -3241,7 +3225,7 @@ impl DurableObjectGetOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectGetAlarmOptions;
     #[wasm_bindgen(method, getter, js_name = "allowConcurrency")]
@@ -3273,7 +3257,7 @@ impl DurableObjectGetAlarmOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectPutOptions;
     #[wasm_bindgen(method, getter, js_name = "allowConcurrency")]
@@ -3321,7 +3305,7 @@ impl DurableObjectPutOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectSetAlarmOptions;
     #[wasm_bindgen(method, getter, js_name = "allowConcurrency")]
@@ -3380,7 +3364,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AnalyticsEngineDataset;
     #[wasm_bindgen(method, catch, js_name = "writeDataPoint")]
@@ -3393,7 +3377,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AnalyticsEngineDataPoint;
     #[wasm_bindgen(method, getter)]
@@ -3449,7 +3433,7 @@ extern "C" {
     pub type Event;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(r#type: impl ::wasm_bindgen::JsStringLike) -> Result<Event, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Event")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_init(
         r#type: impl ::wasm_bindgen::JsStringLike,
         init: &EventInit,
@@ -3564,7 +3548,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventInit;
     #[wasm_bindgen(method, getter)]
@@ -3614,7 +3598,7 @@ impl EventInitBuilder {
 pub type EventListener<EventType = Event> = Function<fn(EventType) -> Undefined>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventListenerObject<EventType = Event>;
     #[wasm_bindgen(method, catch, js_name = "handleEvent")]
@@ -3779,7 +3763,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTargetEventListenerOptions;
     #[wasm_bindgen(method, getter)]
@@ -3811,7 +3795,7 @@ impl EventTargetEventListenerOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTargetAddEventListenerOptions;
     #[wasm_bindgen(method, getter)]
@@ -3867,7 +3851,7 @@ impl EventTargetAddEventListenerOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTargetHandlerObject;
     #[wasm_bindgen(method, getter, js_name = "handleEvent")]
@@ -3952,7 +3936,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Scheduler;
     #[wasm_bindgen(method, catch)]
@@ -3974,7 +3958,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SchedulerWaitOptions;
     #[wasm_bindgen(method, getter)]
@@ -4022,7 +4006,7 @@ extern "C" {
     pub type CustomEvent<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T>(r#type: impl ::wasm_bindgen::JsStringLike) -> Result<CustomEvent<T>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "CustomEvent")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_init<T>(
         r#type: impl ::wasm_bindgen::JsStringLike,
         init: &CustomEventCustomEventInit,
@@ -4037,7 +4021,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CustomEventCustomEventInit;
     #[wasm_bindgen(method, getter)]
@@ -4098,9 +4082,9 @@ extern "C" {
     pub type Blob;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Blob, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Blob")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_type(r#type: &[JsValue]) -> Result<Blob, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Blob")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_type_and_options(
         r#type: &[JsValue],
         options: &BlobOptions,
@@ -4188,7 +4172,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BlobOptions;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -4230,7 +4214,7 @@ extern "C" {
         bits: Option<&[JsValue]>,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<File, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "File")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_options(
         bits: Option<&[JsValue]>,
         name: impl ::wasm_bindgen::JsStringLike,
@@ -4254,7 +4238,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FileOptions;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -4509,7 +4493,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CacheQueryOptions;
     #[wasm_bindgen(method, getter, js_name = "ignoreMethod")]
@@ -5856,7 +5840,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CryptoKeyPair;
     #[wasm_bindgen(method, getter, js_name = "publicKey")]
@@ -5878,7 +5862,7 @@ impl CryptoKeyPair {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type JsonWebKey;
     #[wasm_bindgen(method, getter)]
@@ -6074,7 +6058,7 @@ impl JsonWebKeyBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RsaOtherPrimesInfo;
     #[wasm_bindgen(method, getter)]
@@ -6128,7 +6112,7 @@ impl RsaOtherPrimesInfoBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SubtleCryptoDeriveKeyAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6235,7 +6219,7 @@ impl SubtleCryptoDeriveKeyAlgorithmBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SubtleCryptoEncryptAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6365,7 +6349,7 @@ impl SubtleCryptoEncryptAlgorithmBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SubtleCryptoGenerateKeyAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6470,7 +6454,7 @@ impl SubtleCryptoGenerateKeyAlgorithmBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SubtleCryptoHashAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6489,7 +6473,7 @@ impl SubtleCryptoHashAlgorithm {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SubtleCryptoImportKeyAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6567,7 +6551,7 @@ impl SubtleCryptoImportKeyAlgorithmBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SubtleCryptoSignAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6630,7 +6614,7 @@ impl SubtleCryptoSignAlgorithmBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CryptoKeyKeyAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6649,7 +6633,7 @@ impl CryptoKeyKeyAlgorithm {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CryptoKeyAesKeyAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6673,7 +6657,7 @@ impl CryptoKeyAesKeyAlgorithm {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CryptoKeyHmacKeyAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6706,7 +6690,7 @@ impl CryptoKeyHmacKeyAlgorithm {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CryptoKeyRsaKeyAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6792,7 +6776,7 @@ impl CryptoKeyRsaKeyAlgorithmBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CryptoKeyEllipticKeyAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6824,7 +6808,7 @@ impl CryptoKeyEllipticKeyAlgorithm {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CryptoKeyArbitraryKeyAlgorithm;
     #[wasm_bindgen(method, getter)]
@@ -6890,7 +6874,7 @@ extern "C" {
     pub type DigestStream;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(algorithm: impl ::wasm_bindgen::JsStringLike) -> Result<DigestStream, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "DigestStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_subtle_crypto_hash_algorithm(
         algorithm: &SubtleCryptoHashAlgorithm,
     ) -> Result<DigestStream, JsValue>;
@@ -6906,10 +6890,10 @@ extern "C" {
     pub type TextDecoder;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<TextDecoder, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "TextDecoder")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_label(label: impl ::wasm_bindgen::JsStringLike)
         -> Result<TextDecoder, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "TextDecoder")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_label_and_options(
         label: impl ::wasm_bindgen::JsStringLike,
         options: &TextDecoderConstructorOptions,
@@ -7034,7 +7018,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TextDecoderConstructorOptions;
     #[wasm_bindgen(method, getter)]
@@ -7056,7 +7040,7 @@ impl TextDecoderConstructorOptions {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TextDecoderDecodeOptions;
     #[wasm_bindgen(method, getter)]
@@ -7073,7 +7057,7 @@ impl TextDecoderDecodeOptions {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TextEncoderEncodeIntoResult;
     #[wasm_bindgen(method, getter)]
@@ -7100,7 +7084,7 @@ extern "C" {
     pub type ErrorEvent;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(r#type: impl ::wasm_bindgen::JsStringLike) -> Result<ErrorEvent, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "ErrorEvent")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_init(
         r#type: impl ::wasm_bindgen::JsStringLike,
         init: &ErrorEventErrorEventInit,
@@ -7143,7 +7127,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ErrorEventErrorEventInit;
     #[wasm_bindgen(method, getter)]
@@ -7257,7 +7241,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MessageEventInit;
     #[wasm_bindgen(method, getter)]
@@ -7406,7 +7390,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ContentOptions;
     #[wasm_bindgen(method, getter)]
@@ -7459,7 +7443,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type HTMLRewriterElementContentHandlers;
     #[wasm_bindgen(method, catch)]
@@ -7480,7 +7464,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type HTMLRewriterDocumentContentHandlers;
     #[wasm_bindgen(method, catch)]
@@ -7506,7 +7490,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Doctype;
     #[wasm_bindgen(method, getter)]
@@ -7533,7 +7517,7 @@ impl Doctype {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Element;
     #[wasm_bindgen(method, getter, js_name = "tagName")]
@@ -7771,7 +7755,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EndTag;
     #[wasm_bindgen(method, getter)]
@@ -7845,7 +7829,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Comment;
     #[wasm_bindgen(method, getter)]
@@ -7894,7 +7878,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Text;
     #[wasm_bindgen(method, getter)]
@@ -7995,7 +7979,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DocumentEnd;
     #[wasm_bindgen(method, catch)]
@@ -8045,11 +8029,11 @@ extern "C" {
     pub type Headers;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Headers, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Headers")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_headers(init: &Headers) -> Result<Headers, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Headers")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_iterable(init: &JsValue) -> Result<Headers, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Headers")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_record(init: &Object<JsString>) -> Result<Headers, JsValue>;
     #[doc = " The **`get()`** method of the Headers interface returns a byte string of all the values of a header within a `Headers` object with a given name."]
     #[doc = ""]
@@ -8182,63 +8166,63 @@ extern "C" {
     pub type Response;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_readable_stream(body: &ReadableStream<Uint8Array>)
         -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(body: impl ::wasm_bindgen::JsStringLike) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_array_buffer(body: &ArrayBuffer) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_typed_array(body: &Object) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_blob(body: &Blob) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_search_params(body: &URLSearchParams) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_iterable(body: &JsValue) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_readable_stream_and_init(
         body: &ReadableStream<Uint8Array>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_init(
         body: impl ::wasm_bindgen::JsStringLike,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_array_buffer_and_init(
         body: &ArrayBuffer,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_typed_array_and_init(
         body: &Object,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_blob_and_init(body: &Blob, init: &ResponseInit) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_search_params_and_init(
         body: &URLSearchParams,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_form_data_and_init(
         body: &FormData,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_iterable_and_init(
         body: &JsValue,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new_with_null_and_init(
         body: &::wasm_bindgen::JsValue,
         init: &ResponseInit,
@@ -8349,7 +8333,7 @@ impl Response {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInit;
     #[wasm_bindgen(method, getter)]
@@ -8460,15 +8444,15 @@ extern "C" {
     >(
         input: &Request<CfHostMetadata2, Cf2>,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str<CfHostMetadata, Cf>(
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url<CfHostMetadata, Cf>(
         input: &URL,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_request_and_init<
         CfHostMetadata,
         Cf,
@@ -8478,12 +8462,12 @@ extern "C" {
         input: &Request<CfHostMetadata2, Cf2>,
         init: &RequestInit<Cf>,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_init<CfHostMetadata, Cf>(
         input: impl ::wasm_bindgen::JsStringLike,
         init: &RequestInit<Cf>,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_and_init<CfHostMetadata, Cf>(
         input: &URL,
         init: &RequestInit<Cf>,
@@ -8608,7 +8592,7 @@ impl<CfHostMetadata, Cf> Request<CfHostMetadata, Cf> {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequestInit<Cf = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -8812,7 +8796,7 @@ impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> RequestInitBuilder<Cf> {
 pub type Service = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Fetcher<T = Undefined>;
     #[wasm_bindgen(method, catch)]
@@ -8913,7 +8897,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespaceListKey<Metadata = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -8966,7 +8950,7 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListKeyBuilder<M
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespaceListResult<Metadata = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -9103,7 +9087,7 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListResultBuilde
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespace;
     #[wasm_bindgen(method, catch)]
@@ -9805,7 +9789,7 @@ impl KVNamespace {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespaceListOptions;
     #[wasm_bindgen(method, getter)]
@@ -9877,7 +9861,7 @@ impl KVNamespaceListOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespaceGetOptions<Type = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -9917,7 +9901,7 @@ impl<Type: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceGetOptionsBuilder<Ty
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespacePutOptions;
     #[wasm_bindgen(method, getter)]
@@ -9965,7 +9949,7 @@ impl KVNamespacePutOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespaceGetWithMetadataResult<Value = JsValue, Metadata = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -10132,7 +10116,7 @@ pub enum QueueContentType {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Queue<Body = JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -10178,7 +10162,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type QueueSendOptions;
     #[wasm_bindgen(method, getter, js_name = "contentType")]
@@ -10218,7 +10202,7 @@ impl QueueSendOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type QueueSendBatchOptions;
     #[wasm_bindgen(method, getter, js_name = "delaySeconds")]
@@ -10250,7 +10234,7 @@ impl QueueSendBatchOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MessageSendRequest<Body = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -10298,7 +10282,7 @@ impl<Body: ::wasm_bindgen::convert::IntoWasmAbi> MessageSendRequestBuilder<Body>
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type QueueRetryOptions;
     #[wasm_bindgen(method, getter, js_name = "delaySeconds")]
@@ -10330,7 +10314,7 @@ impl QueueRetryOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Message<Body = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -10357,7 +10341,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = ExtendableEvent , extends = Object)]
+    # [wasm_bindgen (extends = ExtendableEvent , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type QueueEvent<Body = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -10380,7 +10364,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MessageBatch<Body = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -10403,7 +10387,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2Error;
     #[wasm_bindgen(method, getter)]
@@ -10434,7 +10418,7 @@ impl R2Error {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2ListOptions;
     #[wasm_bindgen(method, getter)]
@@ -10921,7 +10905,7 @@ impl R2Bucket {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = R2GetOptions , extends = Object)]
+    # [wasm_bindgen (extends = R2GetOptions , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2BucketOptions;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
@@ -10975,7 +10959,7 @@ impl R2BucketOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = R2PutOptions , extends = Object)]
+    # [wasm_bindgen (extends = R2PutOptions , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2BucketOptions2;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
@@ -11112,7 +11096,7 @@ impl R2BucketOptions2Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2MultipartUpload;
     #[wasm_bindgen(method, getter)]
@@ -11270,7 +11254,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2UploadedPart;
     #[wasm_bindgen(method, getter, js_name = "partNumber")]
@@ -11338,7 +11322,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = R2Object , extends = Object)]
+    # [wasm_bindgen (extends = R2Object , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2ObjectBody;
     #[wasm_bindgen(method, getter)]
@@ -11372,7 +11356,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2Range;
     #[wasm_bindgen(method, getter)]
@@ -11420,7 +11404,7 @@ impl R2RangeBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2Conditional;
     #[wasm_bindgen(method, getter, js_name = "etagMatches")]
@@ -11488,7 +11472,7 @@ impl R2ConditionalBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2GetOptions;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
@@ -11554,7 +11538,7 @@ impl R2GetOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2PutOptions;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
@@ -11763,7 +11747,7 @@ impl R2PutOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2MultipartOptions;
     #[wasm_bindgen(method, getter, js_name = "httpMetadata")]
@@ -11833,7 +11817,7 @@ impl R2MultipartOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2Checksums;
     #[wasm_bindgen(method, getter)]
@@ -11851,7 +11835,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2StringChecksums;
     #[wasm_bindgen(method, getter)]
@@ -11925,7 +11909,7 @@ impl R2StringChecksumsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2HTTPMetadata;
     #[wasm_bindgen(method, getter, js_name = "contentType")]
@@ -12007,7 +11991,7 @@ impl R2HTTPMetadataBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2Objects;
     #[wasm_bindgen(method, getter)]
@@ -12091,7 +12075,7 @@ impl R2ObjectsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2UploadPartOptions;
     #[wasm_bindgen(method, getter, js_name = "ssecKey")]
@@ -12146,7 +12130,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ScheduledController;
     #[wasm_bindgen(method, getter, js_name = "scheduledTime")]
@@ -12160,7 +12144,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type QueuingStrategy<T = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "highWaterMark")]
@@ -12208,7 +12192,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> QueuingStrategyBuilder<T> {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type UnderlyingSink<W = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -12303,7 +12287,7 @@ impl<W: ::wasm_bindgen::convert::IntoWasmAbi> UnderlyingSinkBuilder<W> {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type UnderlyingByteSource;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -12392,7 +12376,7 @@ impl UnderlyingByteSourceBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type UnderlyingSource<R = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -12491,7 +12475,7 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> UnderlyingSourceBuilder<R> {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Transformer<I = JsValue, O = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "readableType")]
@@ -12624,7 +12608,7 @@ impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWa
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamPipeOptions;
     #[wasm_bindgen(method, getter, js_name = "preventAbort")]
@@ -12695,7 +12679,7 @@ impl StreamPipeOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamReadResult<R = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -12755,20 +12739,20 @@ extern "C" {
     pub type ReadableStream<R = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<R>() -> Result<ReadableStream<R>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_byte_source<R>(
         underlying_source: &UnderlyingByteSource,
     ) -> Result<ReadableStream<R>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_byte_source_and_queuing_strategy<R>(
         underlying_source: &UnderlyingByteSource,
         strategy: &QueuingStrategy<Uint8Array>,
     ) -> Result<ReadableStream<R>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_source<R>(
         underlying_source: &UnderlyingSource<R>,
     ) -> Result<ReadableStream<R>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_source_and_queuing_strategy<R>(
         underlying_source: &UnderlyingSource<R>,
         strategy: &QueuingStrategy<R>,
@@ -13001,7 +12985,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions;
     #[wasm_bindgen(method, getter)]
@@ -13033,7 +13017,7 @@ impl ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamGetReaderOptions;
     #[doc = " Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
@@ -13240,7 +13224,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableWritablePair<R = JsValue, W = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -13278,11 +13262,11 @@ extern "C" {
     pub type WritableStream<W = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<W>() -> Result<WritableStream<W>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "WritableStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_sink<W>(
         underlying_sink: &UnderlyingSink,
     ) -> Result<WritableStream<W>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "WritableStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_sink_and_queuing_strategy<W>(
         underlying_sink: &UnderlyingSink,
         queuing_strategy: &QueuingStrategy,
@@ -13439,16 +13423,16 @@ extern "C" {
     pub type TransformStream<I = JsValue, O = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<I, O>() -> Result<TransformStream<I, O>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "TransformStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_transformer<I, O>(
         transformer: &Transformer<I, O>,
     ) -> Result<TransformStream<I, O>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "TransformStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_transformer_and_writable_strategy<I, O>(
         transformer: &Transformer<I, O>,
         writable_strategy: &QueuingStrategy<I>,
     ) -> Result<TransformStream<I, O>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "TransformStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_transformer_and_writable_strategy_and_readable_strategy<I, O>(
         transformer: &Transformer<I, O>,
         writable_strategy: &QueuingStrategy<I>,
@@ -13472,14 +13456,14 @@ extern "C" {
     pub type FixedLengthStream;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(expected_length: f64) -> Result<FixedLengthStream, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "FixedLengthStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_big_int(expected_length: &BigInt) -> Result<FixedLengthStream, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "FixedLengthStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_f64_and_queuing_strategy(
         expected_length: f64,
         queuing_strategy: &IdentityTransformStreamQueuingStrategy,
     ) -> Result<FixedLengthStream, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "FixedLengthStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_big_int_and_queuing_strategy(
         expected_length: &BigInt,
         queuing_strategy: &IdentityTransformStreamQueuingStrategy,
@@ -13492,14 +13476,14 @@ extern "C" {
     pub type IdentityTransformStream;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<IdentityTransformStream, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "IdentityTransformStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_queuing_strategy(
         queuing_strategy: &IdentityTransformStreamQueuingStrategy,
     ) -> Result<IdentityTransformStream, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IdentityTransformStreamQueuingStrategy;
     #[wasm_bindgen(method, getter, js_name = "highWaterMark")]
@@ -13542,7 +13526,7 @@ impl IdentityTransformStreamQueuingStrategyBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamValuesOptions;
     #[wasm_bindgen(method, getter, js_name = "preventCancel")]
@@ -13577,7 +13561,7 @@ extern "C" {
     # [wasm_bindgen (extends = TransformStream , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CompressionStream;
-    #[wasm_bindgen(constructor, catch, js_name = "CompressionStream")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new(format: impl ::wasm_bindgen::JsStringLike) -> Result<CompressionStream, JsValue>;
 }
 impl CompressionStream {
@@ -13596,7 +13580,7 @@ extern "C" {
     # [wasm_bindgen (extends = TransformStream , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DecompressionStream;
-    #[wasm_bindgen(constructor, catch, js_name = "DecompressionStream")]
+    #[wasm_bindgen(constructor, catch)]
     fn __new(format: impl ::wasm_bindgen::JsStringLike) -> Result<DecompressionStream, JsValue>;
 }
 impl DecompressionStream {
@@ -13629,11 +13613,11 @@ extern "C" {
     pub type TextDecoderStream;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<TextDecoderStream, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "TextDecoderStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_label(
         label: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<TextDecoderStream, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "TextDecoderStream")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_label_and_options(
         label: impl ::wasm_bindgen::JsStringLike,
         options: &TextDecoderStreamTextDecoderStreamInit,
@@ -13649,7 +13633,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TextDecoderStreamTextDecoderStreamInit;
     #[wasm_bindgen(method, getter)]
@@ -13719,7 +13703,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type QueuingStrategyInit;
     #[doc = " Creates a new ByteLengthQueuingStrategy with the provided high water mark."]
@@ -13742,7 +13726,7 @@ impl QueuingStrategyInit {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ScriptVersion;
     #[wasm_bindgen(method, getter)]
@@ -13806,7 +13790,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItem;
     #[wasm_bindgen(method, getter)]
@@ -13867,7 +13851,7 @@ impl TraceItem {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemAlarmEventInfo;
     #[wasm_bindgen(method, getter, js_name = "scheduledTime")]
@@ -13884,13 +13868,13 @@ impl TraceItemAlarmEventInfo {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemCustomEventInfo;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemScheduledEventInfo;
     #[wasm_bindgen(method, getter, js_name = "scheduledTime")]
@@ -13911,7 +13895,7 @@ impl TraceItemScheduledEventInfo {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemQueueEventInfo;
     #[wasm_bindgen(method, getter)]
@@ -13932,7 +13916,7 @@ impl TraceItemQueueEventInfo {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemEmailEventInfo;
     #[wasm_bindgen(method, getter, js_name = "mailFrom")]
@@ -13957,7 +13941,7 @@ impl TraceItemEmailEventInfo {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemTailEventInfo;
     #[wasm_bindgen(method, getter, js_name = "consumedEvents")]
@@ -13974,7 +13958,7 @@ impl TraceItemTailEventInfo {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemTailEventInfoTailItem;
     #[wasm_bindgen(method, getter, js_name = "scriptName")]
@@ -13993,7 +13977,7 @@ impl TraceItemTailEventInfoTailItem {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemFetchEventInfo;
     #[wasm_bindgen(method, getter)]
@@ -14012,7 +13996,7 @@ impl TraceItemFetchEventInfo {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemFetchEventInfoRequest;
     #[wasm_bindgen(method, getter)]
@@ -14034,7 +14018,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemFetchEventInfoResponse;
     #[wasm_bindgen(method, getter)]
@@ -14051,7 +14035,7 @@ impl TraceItemFetchEventInfoResponse {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemJsRpcEventInfo;
     #[wasm_bindgen(method, getter, js_name = "rpcMethod")]
@@ -14070,7 +14054,7 @@ impl TraceItemJsRpcEventInfo {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemHibernatableWebSocketEventInfo;
     #[wasm_bindgen(method, getter, js_name = "getWebSocketEvent")]
@@ -14089,7 +14073,7 @@ impl TraceItemHibernatableWebSocketEventInfo {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemHibernatableWebSocketEventInfoMessage;
     #[wasm_bindgen(method, getter, js_name = "webSocketEventType")]
@@ -14110,7 +14094,7 @@ impl TraceItemHibernatableWebSocketEventInfoMessage {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemHibernatableWebSocketEventInfoClose;
     #[wasm_bindgen(method, getter, js_name = "webSocketEventType")]
@@ -14135,7 +14119,7 @@ impl TraceItemHibernatableWebSocketEventInfoClose {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemHibernatableWebSocketEventInfoError;
     #[wasm_bindgen(method, getter, js_name = "webSocketEventType")]
@@ -14156,7 +14140,7 @@ impl TraceItemHibernatableWebSocketEventInfoError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceLog;
     #[wasm_bindgen(method, getter)]
@@ -14179,7 +14163,7 @@ impl TraceLog {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceException;
     #[wasm_bindgen(method, getter)]
@@ -14208,7 +14192,7 @@ impl TraceException {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceDiagnosticChannelEvent;
     #[wasm_bindgen(method, getter)]
@@ -14231,7 +14215,7 @@ impl TraceDiagnosticChannelEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceMetrics;
     #[wasm_bindgen(method, getter, js_name = "cpuTime")]
@@ -14250,7 +14234,7 @@ impl TraceMetrics {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type UnsafeTraceMetrics;
     #[wasm_bindgen(method, catch, js_name = "fromTrace")]
@@ -14264,24 +14248,24 @@ extern "C" {
     pub type URL;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(url: impl ::wasm_bindgen::JsStringLike) -> Result<URL, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URL")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url(url: &URL) -> Result<URL, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URL")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_str(
         url: impl ::wasm_bindgen::JsStringLike,
         base: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URL, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URL")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_and_str(
         url: &URL,
         base: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URL, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URL")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_url(
         url: impl ::wasm_bindgen::JsStringLike,
         base: &URL,
     ) -> Result<URL, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URL")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_and_url(url: &URL, base: &URL) -> Result<URL, JsValue>;
     #[doc = " The **`origin`** read-only property of the URL interface returns a string containing the Unicode serialization of the origin of the represented URL."]
     #[doc = ""]
@@ -14521,11 +14505,11 @@ extern "C" {
     pub type URLSearchParams;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<URLSearchParams, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLSearchParams")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_iterable(init: &JsValue) -> Result<URLSearchParams, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLSearchParams")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_record(init: &Object<JsString>) -> Result<URLSearchParams, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLSearchParams")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(
         init: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URLSearchParams, JsValue>;
@@ -14656,49 +14640,49 @@ extern "C" {
     pub type URLPattern;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<URLPattern, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLPattern")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Result<URLPattern, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLPattern")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init(input: &URLPatternInit) -> Result<URLPattern, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLPattern")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_str(
         input: impl ::wasm_bindgen::JsStringLike,
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URLPattern, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLPattern")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init_and_str(
         input: &URLPatternInit,
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URLPattern, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLPattern")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_url_pattern_options(
         input: impl ::wasm_bindgen::JsStringLike,
         base_url: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLPattern")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init_and_url_pattern_options(
         input: &URLPatternInit,
         base_url: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLPattern")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_str_and_pattern_options(
         input: impl ::wasm_bindgen::JsStringLike,
         base_url: impl ::wasm_bindgen::JsStringLike,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLPattern")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init_and_str_and_pattern_options(
         input: &URLPatternInit,
         base_url: impl ::wasm_bindgen::JsStringLike,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLPattern")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_url_pattern_options_and_pattern_options(
         input: impl ::wasm_bindgen::JsStringLike,
         base_url: &URLPatternOptions,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "URLPattern")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init_and_url_pattern_options_and_pattern_options(
         input: &URLPatternInit,
         base_url: &URLPatternOptions,
@@ -14789,7 +14773,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type URLPatternInit;
     #[wasm_bindgen(method, getter)]
@@ -14903,7 +14887,7 @@ impl URLPatternInitBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type URLPatternComponentResult;
     #[wasm_bindgen(method, getter)]
@@ -14930,7 +14914,7 @@ impl URLPatternComponentResult {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type URLPatternResult;
     #[wasm_bindgen(method, getter)]
@@ -14997,7 +14981,7 @@ impl URLPatternResult {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type URLPatternOptions;
     #[wasm_bindgen(method, getter, js_name = "ignoreCase")]
@@ -15034,7 +15018,7 @@ extern "C" {
     pub type CloseEvent;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(r#type: impl ::wasm_bindgen::JsStringLike) -> Result<CloseEvent, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "CloseEvent")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_initializer(
         r#type: impl ::wasm_bindgen::JsStringLike,
         initializer: &CloseEventInit,
@@ -15062,7 +15046,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CloseEventInit;
     #[wasm_bindgen(method, getter)]
@@ -15112,7 +15096,7 @@ impl CloseEventInitBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WebSocketEventMap;
     #[wasm_bindgen(method, getter)]
@@ -15154,12 +15138,12 @@ extern "C" {
     pub type WebSocket;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(url: impl ::wasm_bindgen::JsStringLike) -> Result<WebSocket, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "WebSocket")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_slice(
         url: impl ::wasm_bindgen::JsStringLike,
         protocols: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<WebSocket, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "WebSocket")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(
         url: impl ::wasm_bindgen::JsStringLike,
         protocols: impl ::wasm_bindgen::JsStringLike,
@@ -15298,7 +15282,7 @@ impl WebSocket {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WebSocketAcceptOptions;
     #[doc = " When set to `true`, receiving a server-initiated WebSocket Close frame will not"]
@@ -15351,7 +15335,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SqlStorage;
     #[wasm_bindgen(method, variadic, catch)]
@@ -15412,7 +15396,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SqlStorageCursorNextReturn<T = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -15456,7 +15440,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> SqlStorageCursorNextReturnBuilder<
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Socket;
     #[wasm_bindgen(method, getter)]
@@ -15482,7 +15466,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SocketOptions;
     #[wasm_bindgen(method, getter, js_name = "secureTransport")]
@@ -15534,7 +15518,7 @@ impl SocketOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SocketAddress;
     #[wasm_bindgen(method, getter)]
@@ -15558,7 +15542,7 @@ impl SocketAddress {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TlsOptions;
     #[wasm_bindgen(method, getter, js_name = "expectedServerHostname")]
@@ -15592,7 +15576,7 @@ impl TlsOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SocketInfo;
     #[wasm_bindgen(method, getter, js_name = "remoteAddress")]
@@ -15641,7 +15625,7 @@ extern "C" {
     pub type EventSource;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(url: impl ::wasm_bindgen::JsStringLike) -> Result<EventSource, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "EventSource")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_init(
         url: impl ::wasm_bindgen::JsStringLike,
         init: &EventSourceEventSourceInit,
@@ -15696,7 +15680,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventSourceEventSourceInit;
     #[wasm_bindgen(method, getter, js_name = "withCredentials")]
@@ -15736,7 +15720,7 @@ impl EventSourceEventSourceInitBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Container;
     #[wasm_bindgen(method, getter)]
@@ -15804,7 +15788,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ContainerStartupOptions;
     #[wasm_bindgen(method, getter)]
@@ -15933,7 +15917,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MessagePortPostMessageOptions;
     #[wasm_bindgen(method, getter)]
@@ -15967,19 +15951,19 @@ impl MessagePortPostMessageOptionsBuilder {
 pub type LoopbackForExport = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Fetcher , extends = Object)]
+    # [wasm_bindgen (extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type LoopbackServiceStub<T = Undefined>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = DurableObjectClass , extends = Object)]
+    # [wasm_bindgen (extends = DurableObjectClass , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type LoopbackDurableObjectClass<T = Undefined>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SyncKvStorage;
     #[wasm_bindgen(method, catch)]
@@ -16012,7 +15996,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SyncKvStorageList<T = JsValue>;
     #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
@@ -16023,7 +16007,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SyncKvListOptions;
     #[wasm_bindgen(method, getter)]
@@ -16103,7 +16087,7 @@ impl SyncKvListOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerStub;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
@@ -16122,7 +16106,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerStubEntrypointOptions;
     #[wasm_bindgen(method, getter)]
@@ -16154,7 +16138,7 @@ impl WorkerStubEntrypointOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerLoader;
     #[wasm_bindgen(method, catch)]
@@ -16177,7 +16161,7 @@ impl WorkerLoader {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerLoaderModule;
     #[wasm_bindgen(method, getter)]
@@ -16265,7 +16249,7 @@ impl WorkerLoaderModuleBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerLoaderWorkerCode;
     #[wasm_bindgen(method, getter, js_name = "compatibilityDate")]
@@ -16400,25 +16384,25 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchInternalError;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchNotFoundError;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchNameNotSetError;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchSearchRequest;
     #[wasm_bindgen(method, getter)]
@@ -16454,7 +16438,7 @@ impl AiSearchSearchRequestBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchChatCompletionsRequest;
     #[wasm_bindgen(method, getter)]
@@ -16508,7 +16492,7 @@ impl AiSearchChatCompletionsRequestBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchSearchResponse;
     #[wasm_bindgen(method, getter)]
@@ -16537,7 +16521,7 @@ impl AiSearchSearchResponse {
 pub type AiSearchListResponse = Array<Object>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchConfig;
     #[doc = " Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
@@ -16691,7 +16675,7 @@ impl AiSearchConfigBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchInstance;
     #[wasm_bindgen(method, getter)]
@@ -16845,7 +16829,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiImageClassificationInput;
     #[wasm_bindgen(method, getter)]
@@ -16881,7 +16865,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiImageToTextInput;
     #[wasm_bindgen(method, getter)]
@@ -16999,7 +16983,7 @@ impl AiImageToTextInputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiImageToTextOutput;
     #[wasm_bindgen(method, getter)]
@@ -17032,7 +17016,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiImageTextToTextInput;
     #[wasm_bindgen(method, getter)]
@@ -17160,7 +17144,7 @@ impl AiImageTextToTextInputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiImageTextToTextOutput;
     #[wasm_bindgen(method, getter)]
@@ -17193,7 +17177,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiMultimodalEmbeddingsInput;
     #[wasm_bindgen(method, getter)]
@@ -17222,7 +17206,7 @@ impl AiMultimodalEmbeddingsInput {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiIMultimodalEmbeddingsOutput;
     #[wasm_bindgen(method, getter)]
@@ -17264,7 +17248,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiObjectDetectionInput;
     #[wasm_bindgen(method, getter)]
@@ -17297,7 +17281,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSentenceSimilarityInput;
     #[wasm_bindgen(method, getter)]
@@ -17348,7 +17332,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiAutomaticSpeechRecognitionInput;
     #[wasm_bindgen(method, getter)]
@@ -17369,7 +17353,7 @@ impl AiAutomaticSpeechRecognitionInput {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiAutomaticSpeechRecognitionOutput;
     #[wasm_bindgen(method, getter)]
@@ -17449,7 +17433,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSummarizationInput;
     #[wasm_bindgen(method, getter)]
@@ -17487,7 +17471,7 @@ impl AiSummarizationInputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSummarizationOutput;
     #[wasm_bindgen(method, getter)]
@@ -17520,7 +17504,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextClassificationInput;
     #[wasm_bindgen(method, getter)]
@@ -17555,7 +17539,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextEmbeddingsInput;
     #[wasm_bindgen(method, getter)]
@@ -17582,7 +17566,7 @@ impl AiTextEmbeddingsInput {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextEmbeddingsOutput;
     #[wasm_bindgen(method, getter)]
@@ -17618,7 +17602,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RoleScopedChatInput;
     #[wasm_bindgen(method, getter)]
@@ -17733,7 +17717,7 @@ impl RoleScopedChatInputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextGenerationToolLegacyInput;
     #[wasm_bindgen(method, getter)]
@@ -17787,7 +17771,7 @@ impl AiTextGenerationToolLegacyInputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextGenerationToolInput;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -17821,7 +17805,7 @@ impl AiTextGenerationToolInput {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextGenerationFunctionsInput;
     #[wasm_bindgen(method, getter)]
@@ -17850,7 +17834,7 @@ impl AiTextGenerationFunctionsInput {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextGenerationResponseFormat;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -17890,7 +17874,7 @@ impl AiTextGenerationResponseFormatBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextGenerationInput;
     #[wasm_bindgen(method, getter)]
@@ -18051,7 +18035,7 @@ impl AiTextGenerationInputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextGenerationToolLegacyOutput;
     #[wasm_bindgen(method, getter)]
@@ -18081,7 +18065,7 @@ impl AiTextGenerationToolLegacyOutput {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextGenerationToolOutput;
     #[wasm_bindgen(method, getter)]
@@ -18118,7 +18102,7 @@ impl AiTextGenerationToolOutput {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type UsageTags;
     #[wasm_bindgen(method, getter)]
@@ -18145,7 +18129,7 @@ impl UsageTags {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextGenerationOutput;
     #[wasm_bindgen(method, getter)]
@@ -18209,7 +18193,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextToSpeechInput;
     #[wasm_bindgen(method, getter)]
@@ -18267,7 +18251,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextToImageInput;
     #[wasm_bindgen(method, getter)]
@@ -18397,7 +18381,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTranslationInput;
     #[wasm_bindgen(method, getter)]
@@ -18450,7 +18434,7 @@ impl AiTranslationInputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTranslationOutput;
     #[wasm_bindgen(method, getter)]
@@ -18498,7 +18482,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponsesInput;
     #[wasm_bindgen(method, getter)]
@@ -18848,7 +18832,7 @@ impl ResponsesInputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponsesOutput;
     #[wasm_bindgen(method, getter)]
@@ -19184,7 +19168,7 @@ impl ResponsesOutputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EasyInputMessage;
     #[wasm_bindgen(method, getter)]
@@ -19344,7 +19328,7 @@ impl EasyInputMessageBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponsesFunctionTool;
     #[wasm_bindgen(method, getter)]
@@ -19503,7 +19487,7 @@ impl ResponsesFunctionToolBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseIncompleteDetails;
     #[wasm_bindgen(method, getter)]
@@ -19535,7 +19519,7 @@ impl ResponseIncompleteDetailsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponsePrompt;
     #[wasm_bindgen(method, getter)]
@@ -19603,7 +19587,7 @@ impl ResponsePromptBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Reasoning;
     #[wasm_bindgen(method, getter)]
@@ -19684,7 +19668,7 @@ impl ReasoningBuilder {
 pub type ResponseContent = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseContentReasoningText;
     #[wasm_bindgen(method, getter)]
@@ -19713,7 +19697,7 @@ impl ResponseContentReasoningText {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseConversationParam;
     #[wasm_bindgen(method, getter)]
@@ -19732,7 +19716,7 @@ impl ResponseConversationParam {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseCreatedEvent;
     #[wasm_bindgen(method, getter)]
@@ -19764,7 +19748,7 @@ impl ResponseCreatedEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseCustomToolCallOutput;
     #[wasm_bindgen(method, getter)]
@@ -19852,7 +19836,7 @@ impl ResponseCustomToolCallOutputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseError;
     #[wasm_bindgen(method, getter)]
@@ -19879,7 +19863,7 @@ impl ResponseError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseErrorEvent;
     #[wasm_bindgen(method, getter)]
@@ -19991,7 +19975,7 @@ impl ResponseErrorEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseFailedEvent;
     #[wasm_bindgen(method, getter)]
@@ -20023,7 +20007,7 @@ impl ResponseFailedEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseFormatText;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -20045,7 +20029,7 @@ impl ResponseFormatText {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseFormatJSONObject;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -20069,7 +20053,7 @@ impl ResponseFormatJSONObject {
 pub type ResponseFormatTextConfig = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseFormatTextJSONSchemaConfig;
     #[wasm_bindgen(method, getter)]
@@ -20165,7 +20149,7 @@ impl ResponseFormatTextJSONSchemaConfigBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseFunctionCallArgumentsDeltaEvent;
     #[wasm_bindgen(method, getter)]
@@ -20226,7 +20210,7 @@ impl ResponseFunctionCallArgumentsDeltaEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseFunctionCallArgumentsDoneEvent;
     #[wasm_bindgen(method, getter)]
@@ -20302,7 +20286,7 @@ pub type ResponseFunctionCallOutputItem = JsValue;
 pub type ResponseFunctionCallOutputItemList = Array;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseFunctionToolCall;
     #[wasm_bindgen(method, getter)]
@@ -20385,7 +20369,7 @@ impl ResponseFunctionToolCallBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = ResponseFunctionToolCall , extends = Object)]
+    # [wasm_bindgen (extends = ResponseFunctionToolCall , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseFunctionToolCallItem;
     #[wasm_bindgen(method, getter)]
@@ -20439,7 +20423,7 @@ impl ResponseFunctionToolCallItemBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseFunctionToolCallOutputItem;
     #[wasm_bindgen(method, getter)]
@@ -20557,7 +20541,7 @@ pub enum ResponseIncludable {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseIncompleteEvent;
     #[wasm_bindgen(method, getter)]
@@ -20593,7 +20577,7 @@ pub type ResponseInput = Array;
 pub type ResponseInputContent = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInputImage;
     #[wasm_bindgen(method, getter)]
@@ -20693,7 +20677,7 @@ impl ResponseInputImageBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInputImageContent;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -20771,7 +20755,7 @@ impl ResponseInputImageContentBuilder {
 pub type ResponseInputItem = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInputItemFunctionCallOutput;
     #[wasm_bindgen(method, getter)]
@@ -20909,7 +20893,7 @@ impl ResponseInputItemFunctionCallOutputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInputItemMessage;
     #[wasm_bindgen(method, getter)]
@@ -20998,7 +20982,7 @@ impl ResponseInputItemMessageBuilder {
 pub type ResponseInputMessageContentList = Array;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInputMessageItem;
     #[wasm_bindgen(method, getter)]
@@ -21112,7 +21096,7 @@ impl ResponseInputMessageItemBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInputText;
     #[wasm_bindgen(method, getter)]
@@ -21141,7 +21125,7 @@ impl ResponseInputText {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInputTextContent;
     #[wasm_bindgen(method, getter)]
@@ -21174,7 +21158,7 @@ pub type ResponseItem = JsValue;
 pub type ResponseOutputItem = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseOutputItemAddedEvent;
     #[wasm_bindgen(method, getter)]
@@ -21255,7 +21239,7 @@ impl ResponseOutputItemAddedEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseOutputItemDoneEvent;
     #[wasm_bindgen(method, getter)]
@@ -21336,7 +21320,7 @@ impl ResponseOutputItemDoneEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseOutputMessage;
     #[wasm_bindgen(method, getter)]
@@ -21421,7 +21405,7 @@ impl ResponseOutputMessage {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseOutputRefusal;
     #[wasm_bindgen(method, getter)]
@@ -21450,7 +21434,7 @@ impl ResponseOutputRefusal {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseOutputText;
     #[wasm_bindgen(method, getter)]
@@ -21501,7 +21485,7 @@ impl ResponseOutputTextBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseReasoningItem;
     #[wasm_bindgen(method, getter)]
@@ -21598,7 +21582,7 @@ impl ResponseReasoningItemBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseReasoningSummaryItem;
     #[wasm_bindgen(method, getter)]
@@ -21627,7 +21611,7 @@ impl ResponseReasoningSummaryItem {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseReasoningContentItem;
     #[wasm_bindgen(method, getter)]
@@ -21656,7 +21640,7 @@ impl ResponseReasoningContentItem {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseReasoningTextDeltaEvent;
     #[wasm_bindgen(method, getter)]
@@ -21719,7 +21703,7 @@ impl ResponseReasoningTextDeltaEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseReasoningTextDoneEvent;
     #[wasm_bindgen(method, getter)]
@@ -21779,7 +21763,7 @@ impl ResponseReasoningTextDoneEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseRefusalDeltaEvent;
     #[wasm_bindgen(method, getter)]
@@ -21836,7 +21820,7 @@ impl ResponseRefusalDeltaEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseRefusalDoneEvent;
     #[wasm_bindgen(method, getter)]
@@ -21905,7 +21889,7 @@ pub enum ResponseStatus {
 pub type ResponseStreamEvent = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseCompletedEvent;
     #[wasm_bindgen(method, getter)]
@@ -21937,7 +21921,7 @@ impl ResponseCompletedEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseTextConfig;
     #[wasm_bindgen(method, getter)]
@@ -22010,7 +21994,7 @@ impl ResponseTextConfigBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseTextDeltaEvent;
     #[wasm_bindgen(method, getter)]
@@ -22073,7 +22057,7 @@ impl ResponseTextDeltaEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseTextDoneEvent;
     #[wasm_bindgen(method, getter)]
@@ -22136,7 +22120,7 @@ impl ResponseTextDoneEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Logprob;
     #[wasm_bindgen(method, getter)]
@@ -22179,7 +22163,7 @@ impl LogprobBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TopLogprob;
     #[wasm_bindgen(method, getter)]
@@ -22221,7 +22205,7 @@ impl TopLogprobBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseUsage;
     #[wasm_bindgen(method, getter)]
@@ -22250,7 +22234,7 @@ impl ResponseUsage {
 pub type Tool = ResponsesFunctionTool;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ToolChoiceFunction;
     #[wasm_bindgen(method, getter)]
@@ -22286,7 +22270,7 @@ pub enum ToolChoiceOptions {
 pub type ReasoningEffort = Nullable<String>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamOptions;
     #[wasm_bindgen(method, getter)]
@@ -22318,7 +22302,7 @@ impl StreamOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Base_En_V1_5_Input;
     #[wasm_bindgen(method, getter)]
@@ -22382,7 +22366,7 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
 pub type Ai_Cf_Baai_Bge_Base_En_V1_5_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse;
     #[doc = " The async request id that can be used to obtain the results."]
@@ -22447,7 +22431,7 @@ extern "C" {
 pub type Ai_Cf_Openai_Whisper_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Openai_Whisper_Output;
     #[doc = " The transcription"]
@@ -22526,7 +22510,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_M2M100_1_2B_Input;
     #[doc = " The text to be translated"]
@@ -22603,7 +22587,7 @@ impl Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
 pub type Ai_Cf_Meta_M2M100_1_2B_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_M2M100_1_2B_AsyncResponse;
     #[doc = " The async request id that can be used to obtain the results."]
@@ -22661,7 +22645,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Small_En_V1_5_Input;
     #[wasm_bindgen(method, getter)]
@@ -22725,7 +22709,7 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
 pub type Ai_Cf_Baai_Bge_Small_En_V1_5_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse;
     #[doc = " The async request id that can be used to obtain the results."]
@@ -22788,7 +22772,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Large_En_V1_5_Input;
     #[wasm_bindgen(method, getter)]
@@ -22852,7 +22836,7 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
 pub type Ai_Cf_Baai_Bge_Large_En_V1_5_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse;
     #[doc = " The async request id that can be used to obtain the results."]
@@ -22917,7 +22901,7 @@ extern "C" {
 pub type Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output;
     #[wasm_bindgen(method, getter)]
@@ -22981,7 +22965,7 @@ extern "C" {
 pub type Ai_Cf_Openai_Whisper_Tiny_En_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Openai_Whisper_Tiny_En_Output;
     #[doc = " The transcription"]
@@ -23074,7 +23058,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input;
     #[doc = " Base64 encoded value of the audio data."]
@@ -23188,7 +23172,7 @@ impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_InputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output;
     #[wasm_bindgen(method, getter)]
@@ -23296,7 +23280,7 @@ extern "C" {
 pub type Ai_Cf_Baai_Bge_M3_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts;
     #[doc = " A query you wish to perform against the provided contexts. If no query is provided the model with respond with embeddings for contexts"]
@@ -23352,7 +23336,7 @@ impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_Input_Embedding;
     #[wasm_bindgen(method, getter)]
@@ -23413,7 +23397,7 @@ impl Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1;
     #[doc = " A query you wish to perform against the provided contexts. If no query is provided the model with respond with embeddings for contexts"]
@@ -23469,7 +23453,7 @@ impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_Input_Embedding_1;
     #[wasm_bindgen(method, getter)]
@@ -23532,7 +23516,7 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
 pub type Ai_Cf_Baai_Bge_M3_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_Ouput_Query;
     #[wasm_bindgen(method, getter)]
@@ -23564,7 +23548,7 @@ impl Ai_Cf_Baai_Bge_M3_Ouput_QueryBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts;
     #[wasm_bindgen(method, getter)]
@@ -23621,7 +23605,7 @@ impl Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_Ouput_Embedding;
     #[wasm_bindgen(method, getter)]
@@ -23674,7 +23658,7 @@ impl Ai_Cf_Baai_Bge_M3_Ouput_EmbeddingBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_AsyncResponse;
     #[doc = " The async request id that can be used to obtain the results."]
@@ -23755,7 +23739,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input;
     #[doc = " A text description of the image you want to generate."]
@@ -23806,7 +23790,7 @@ impl Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_InputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output;
     #[doc = " The generated image in Base64 format."]
@@ -23873,7 +23857,7 @@ extern "C" {
 pub type Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -24045,7 +24029,7 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages;
     #[doc = " An array of message objects representing the conversation history."]
@@ -24211,7 +24195,7 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output;
     #[doc = " The generated text response from the model"]
@@ -24292,7 +24276,7 @@ extern "C" {
 pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -24469,7 +24453,7 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -24517,7 +24501,7 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages;
     #[doc = " An array of message objects representing the conversation history."]
@@ -24695,7 +24679,7 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -24743,7 +24727,7 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch;
     #[wasm_bindgen(method, getter)]
@@ -24780,7 +24764,7 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -24830,7 +24814,7 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
 pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse;
     #[doc = " The async request id that can be used to obtain the results."]
@@ -24915,7 +24899,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_Guard_3_8B_Input;
     #[doc = " An array of message objects representing the conversation history."]
@@ -24974,7 +24958,7 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_InputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_Guard_3_8B_Output;
     #[wasm_bindgen(method, getter)]
@@ -25046,7 +25030,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Reranker_Base_Input;
     #[doc = " Number of returned results starting with the best score."]
@@ -25087,7 +25071,7 @@ impl Ai_Cf_Baai_Bge_Reranker_Base_InputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Reranker_Base_Output;
     #[wasm_bindgen(method, getter)]
@@ -25143,7 +25127,7 @@ extern "C" {
 pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -25303,7 +25287,7 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -25348,7 +25332,7 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_ModeBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages;
     #[doc = " An array of message objects representing the conversation history."]
@@ -25501,7 +25485,7 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -25546,7 +25530,7 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output;
     #[doc = " The generated text response from the model"]
@@ -25635,7 +25619,7 @@ extern "C" {
 pub type Ai_Cf_Qwen_Qwq_32B_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwq_32B_Prompt;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -25768,7 +25752,7 @@ impl Ai_Cf_Qwen_Qwq_32B_PromptBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwq_32B_Messages;
     #[doc = " An array of message objects representing the conversation history."]
@@ -25915,7 +25899,7 @@ impl Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwq_32B_Output;
     #[doc = " The generated text response from the model"]
@@ -25993,7 +25977,7 @@ extern "C" {
 pub type Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -26157,7 +26141,7 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages;
     #[doc = " An array of message objects representing the conversation history."]
@@ -26347,7 +26331,7 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output;
     #[doc = " The generated text response from the model"]
@@ -26443,7 +26427,7 @@ extern "C" {
 pub type Ai_Cf_Google_Gemma_3_12B_It_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Google_Gemma_3_12B_It_Prompt;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -26582,7 +26566,7 @@ impl Ai_Cf_Google_Gemma_3_12B_It_PromptBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Google_Gemma_3_12B_It_Messages;
     #[doc = " An array of message objects representing the conversation history."]
@@ -26730,7 +26714,7 @@ impl Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Google_Gemma_3_12B_It_Output;
     #[doc = " The generated text response from the model"]
@@ -26817,7 +26801,7 @@ extern "C" {
 pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -26982,7 +26966,7 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -27030,7 +27014,7 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_ModeBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages;
     #[doc = " An array of message objects representing the conversation history."]
@@ -27214,7 +27198,7 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch;
     #[wasm_bindgen(method, getter)]
@@ -27235,7 +27219,7 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -27417,7 +27401,7 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner;
     #[doc = " An array of message objects representing the conversation history."]
@@ -27627,7 +27611,7 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output;
     #[doc = " The generated text response from the model"]
@@ -27723,7 +27707,7 @@ extern "C" {
 pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -27881,7 +27865,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -27926,7 +27910,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_ModeBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages;
     #[doc = " An array of message objects representing the conversation history."]
@@ -28078,7 +28062,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -28123,7 +28107,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch;
     #[wasm_bindgen(method, getter)]
@@ -28141,7 +28125,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -28299,7 +28283,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -28344,7 +28328,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1;
     #[doc = " An array of message objects representing the conversation history."]
@@ -28496,7 +28480,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -28543,7 +28527,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder {
 pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response;
     #[doc = " Unique identifier for the completion"]
@@ -28678,7 +28662,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response;
     #[doc = " Unique identifier for the completion"]
@@ -28785,7 +28769,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse;
     #[doc = " The async request id that can be used to obtain the results."]
@@ -28871,7 +28855,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Deepgram_Nova_3_Input;
     #[wasm_bindgen(method, getter)]
@@ -29253,7 +29237,7 @@ impl Ai_Cf_Deepgram_Nova_3_InputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Deepgram_Nova_3_Output;
     #[wasm_bindgen(method, getter)]
@@ -29304,7 +29288,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input;
     #[wasm_bindgen(method, getter)]
@@ -29403,7 +29387,7 @@ impl Ai_Cf_Qwen_Qwen3_Embedding_0_6B_InputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output;
     #[wasm_bindgen(method, getter)]
@@ -29470,7 +29454,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input;
     #[doc = " readable stream with audio data and content-type specified for that data"]
@@ -29531,7 +29515,7 @@ impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output;
     #[doc = " if true, end-of-turn was detected"]
@@ -29625,7 +29609,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Leonardo_Phoenix_1_0_Input;
     #[doc = " A text description of the image you want to generate."]
@@ -29748,7 +29732,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Leonardo_Lucid_Origin_Input;
     #[doc = " A text description of the image you want to generate."]
@@ -29842,7 +29826,7 @@ impl Ai_Cf_Leonardo_Lucid_Origin_InputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Leonardo_Lucid_Origin_Output;
     #[doc = " The generated image in Base64 format."]
@@ -29903,7 +29887,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Deepgram_Aura_1_Input;
     #[doc = " Speaker used to produce the audio."]
@@ -30008,7 +29992,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input;
     #[doc = " Input text to translate. Can be a single string or a list of strings."]
@@ -30063,7 +30047,7 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output;
     #[doc = " Translated texts"]
@@ -30119,7 +30103,7 @@ extern "C" {
 pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -30296,7 +30280,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -30344,7 +30328,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_ModeBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages;
     #[doc = " An array of message objects representing the conversation history."]
@@ -30522,7 +30506,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -30570,7 +30554,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch;
     #[wasm_bindgen(method, getter)]
@@ -30591,7 +30575,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1;
     #[doc = " The input text prompt for the model to generate a response."]
@@ -30772,7 +30756,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -30820,7 +30804,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1;
     #[doc = " An array of message objects representing the conversation history."]
@@ -31003,7 +30987,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -31053,7 +31037,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder {
 pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response;
     #[doc = " Unique identifier for the completion"]
@@ -31204,7 +31188,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseBuilder 
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response;
     #[doc = " Unique identifier for the completion"]
@@ -31327,7 +31311,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseBuilder 
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse;
     #[doc = " The async request id that can be used to obtain the results."]
@@ -31417,7 +31401,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Pfnet_Plamo_Embedding_1B_Input;
     #[doc = " Input text to embed. Can be a single string or a list of strings."]
@@ -31454,7 +31438,7 @@ impl Ai_Cf_Pfnet_Plamo_Embedding_1B_Input {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Pfnet_Plamo_Embedding_1B_Output;
     #[doc = " Embedding vectors, where each vector is a list of floats."]
@@ -31517,7 +31501,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Deepgram_Flux_Input;
     #[doc = " Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
@@ -31651,7 +31635,7 @@ impl Ai_Cf_Deepgram_Flux_InputBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Deepgram_Flux_Output;
     #[doc = " The unique identifier of the request (uuid)"]
@@ -31785,7 +31769,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Deepgram_Aura_2_En_Input;
     #[doc = " Speaker used to produce the audio."]
@@ -31897,7 +31881,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Deepgram_Aura_2_Es_Input;
     #[doc = " Speaker used to produce the audio."]
@@ -32009,7 +31993,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiModels;
     #[wasm_bindgen(method, getter, js_name = "@cf/huggingface/distilbert-sst-2-int8")]
@@ -32648,7 +32632,7 @@ impl AiModels {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiOptions;
     #[doc = " Send requests as an asynchronous batch job, only works for supported models"]
@@ -32749,7 +32733,7 @@ impl AiOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiModelsSearchParams;
     #[wasm_bindgen(method, getter)]
@@ -32835,7 +32819,7 @@ impl AiModelsSearchParamsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiModelsSearchObject;
     #[wasm_bindgen(method, getter)]
@@ -32898,13 +32882,13 @@ impl AiModelsSearchObject {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type InferenceUpstreamError;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiInternalError;
 }
@@ -33092,7 +33076,7 @@ impl<AiModelList> Ai<AiModelList> {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GatewayRetries;
     #[wasm_bindgen(method, getter, js_name = "maxAttempts")]
@@ -33140,7 +33124,7 @@ impl GatewayRetriesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GatewayOptions;
     #[wasm_bindgen(method, getter)]
@@ -33238,7 +33222,7 @@ impl GatewayOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type UniversalGatewayOptions;
     #[doc = " * @deprecated"]
@@ -33274,7 +33258,7 @@ impl UniversalGatewayOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiGatewayPatchLog;
     #[wasm_bindgen(method, getter)]
@@ -33351,7 +33335,7 @@ impl AiGatewayPatchLogBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiGatewayLog;
     #[wasm_bindgen(method, getter)]
@@ -33622,7 +33606,7 @@ pub enum AIGatewayProviders {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AIGatewayHeaders;
     #[wasm_bindgen(method, getter, js_name = "cf-aig-metadata")]
@@ -33763,7 +33747,7 @@ impl AIGatewayHeaders {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AIGatewayUniversalRequest;
     #[wasm_bindgen(method, getter)]
@@ -33820,13 +33804,13 @@ impl AIGatewayUniversalRequest {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiGatewayInternalError;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiGatewayLogNotFound;
 }
@@ -33937,7 +33921,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiGatewayOptions;
     #[wasm_bindgen(method, getter)]
@@ -33977,31 +33961,31 @@ impl AiGatewayOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRAGInternalError;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRAGNotFoundError;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRAGUnauthorizedError;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRAGNameNotSetError;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ComparisonFilter;
     #[wasm_bindgen(method, getter)]
@@ -34249,7 +34233,7 @@ impl ComparisonFilter {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CompoundFilter;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -34283,7 +34267,7 @@ impl CompoundFilter {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRagSearchRequest;
     #[wasm_bindgen(method, getter)]
@@ -34359,7 +34343,7 @@ impl AutoRagSearchRequestBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = AutoRagSearchRequest , extends = Object)]
+    # [wasm_bindgen (extends = AutoRagSearchRequest , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRagAiSearchRequest;
     #[wasm_bindgen(method, getter)]
@@ -34425,7 +34409,7 @@ impl AutoRagAiSearchRequestBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRagAiSearchRequestStreaming;
     #[wasm_bindgen(method, getter)]
@@ -34533,7 +34517,7 @@ impl AutoRagAiSearchRequestStreamingBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRagSearchResponse;
     #[wasm_bindgen(method, getter)]
@@ -34609,7 +34593,7 @@ impl AutoRagSearchResponse {
 pub type AutoRagListResponse = Array<Object>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = AutoRagSearchResponse , extends = Object)]
+    # [wasm_bindgen (extends = AutoRagSearchResponse , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRagAiSearchResponse;
     #[wasm_bindgen(method, getter)]
@@ -34718,7 +34702,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BasicImageTransformations;
     #[doc = " Maximum width in image pixels. The value must be an integer."]
@@ -34865,7 +34849,7 @@ impl BasicImageTransformationsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BasicImageTransformationsGravityCoordinates;
     #[wasm_bindgen(method, getter)]
@@ -34918,7 +34902,7 @@ impl BasicImageTransformationsGravityCoordinatesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequestInitCfProperties;
     #[wasm_bindgen(method, getter, js_name = "cacheEverything")]
@@ -35107,7 +35091,7 @@ impl RequestInitCfPropertiesBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = BasicImageTransformations , extends = Object)]
+    # [wasm_bindgen (extends = BasicImageTransformations , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequestInitCfPropertiesImageDraw;
     #[doc = " Absolute URL of the image file to use for the drawing. It can be any of"]
@@ -35258,7 +35242,7 @@ impl RequestInitCfPropertiesImageDrawBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = BasicImageTransformations , extends = Object)]
+    # [wasm_bindgen (extends = BasicImageTransformations , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequestInitCfPropertiesImage;
     #[doc = " Device Pixel Ratio. Default 1. Multiplier for width/height that makes it"]
@@ -35564,7 +35548,7 @@ impl RequestInitCfPropertiesImageBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequestInitCfPropertiesImageMinify;
     #[wasm_bindgen(method, getter)]
@@ -35612,7 +35596,7 @@ impl RequestInitCfPropertiesImageMinifyBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequestInitCfPropertiesR2;
     #[doc = " Colo id of bucket that an object is stored in"]
@@ -35645,7 +35629,7 @@ impl RequestInitCfPropertiesR2Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = IncomingRequestCfPropertiesBase , extends = IncomingRequestCfPropertiesBotManagementEnterprise , extends = IncomingRequestCfPropertiesCloudflareForSaaSEnterprise , extends = IncomingRequestCfPropertiesGeographicInformation , extends = IncomingRequestCfPropertiesCloudflareAccessOrApiShield , extends = Object)]
+    # [wasm_bindgen (extends = IncomingRequestCfPropertiesBase , extends = IncomingRequestCfPropertiesBotManagementEnterprise , extends = IncomingRequestCfPropertiesCloudflareForSaaSEnterprise , extends = IncomingRequestCfPropertiesGeographicInformation , extends = IncomingRequestCfPropertiesCloudflareAccessOrApiShield , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfProperties<HostMetadata = JsValue>;
     #[doc = " Duplicate of `botManagement.score`."]
@@ -37691,7 +37675,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesBase;
     #[doc = " [ASN](https://www.iana.org/assignments/as-numbers/as-numbers.xhtml) of the incoming request."]
@@ -38447,7 +38431,7 @@ impl IncomingRequestCfPropertiesBaseBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesBotManagementBase;
     #[doc = " Cloudflareâ€™s [level of certainty](https://developers.cloudflare.com/bots/concepts/bot-score/) that a request comes from a bot,"]
@@ -38514,7 +38498,7 @@ impl IncomingRequestCfPropertiesBotManagementBase {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesBotManagement;
     #[doc = " Results of Cloudflare's Bot Management analysis"]
@@ -38553,7 +38537,7 @@ impl IncomingRequestCfPropertiesBotManagement {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = IncomingRequestCfPropertiesBotManagement , extends = Object)]
+    # [wasm_bindgen (extends = IncomingRequestCfPropertiesBotManagement , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesBotManagementEnterprise;
     #[doc = " Results of Cloudflare's Bot Management analysis"]
@@ -38585,7 +38569,7 @@ impl IncomingRequestCfPropertiesBotManagementEnterprise {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata = JsValue>;
     #[doc = " Custom metadata set per-host in [Cloudflare for SaaS](https://developers.cloudflare.com/cloudflare-for-platforms/cloudflare-for-saas/)."]
@@ -38634,7 +38618,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesCloudflareAccessOrApiShield;
     #[doc = " Information about the client certificate presented to Cloudflare."]
@@ -38710,7 +38694,7 @@ impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesExportedAuthenticatorMetadata;
     #[doc = " The client's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
@@ -38820,7 +38804,7 @@ impl IncomingRequestCfPropertiesExportedAuthenticatorMetadata {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesGeographicInformation;
     #[doc = " The [ISO 3166-1 Alpha 2](https://www.iso.org/iso-3166-country-codes.html) country code the request originated from."]
@@ -39083,7 +39067,7 @@ impl IncomingRequestCfPropertiesGeographicInformationBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesTLSClientAuth;
     #[doc = " Always `\"1\"`, indicating that the certificate was presented"]
@@ -39512,7 +39496,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesTLSClientAuthPlaceholder;
     #[wasm_bindgen(method, getter, js_name = "certPresented")]
@@ -40040,7 +40024,7 @@ pub enum ContinentCode {
 pub type CfProperties = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type D1Meta;
     #[wasm_bindgen(method, getter)]
@@ -40174,7 +40158,7 @@ impl D1MetaBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type D1Response;
     #[wasm_bindgen(method, getter)]
@@ -40221,7 +40205,7 @@ impl D1ResponseBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = D1Response , extends = Object)]
+    # [wasm_bindgen (extends = D1Response , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type D1Result<T = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -40265,7 +40249,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> D1ResultBuilder<T> {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type D1ExecResult;
     #[wasm_bindgen(method, getter)]
@@ -40465,7 +40449,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type D1PreparedStatementOptions;
     #[wasm_bindgen(method, getter, js_name = "columnNames")]
@@ -40485,7 +40469,7 @@ impl D1PreparedStatementOptions {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type D1PreparedStatementOptions2;
     #[wasm_bindgen(method, getter, js_name = "columnNames")]
@@ -40517,13 +40501,13 @@ impl D1PreparedStatementOptions2Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Disposable;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EmailSendResult;
     #[doc = " The Email Message ID"]
@@ -40545,7 +40529,7 @@ impl EmailSendResult {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = cloudflare :: email :: EmailMessage , extends = Object)]
+    # [wasm_bindgen (extends = cloudflare :: email :: EmailMessage , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ForwardableEmailMessage;
     #[doc = " Stream of the email message content."]
@@ -40636,7 +40620,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EmailAttachment;
     #[wasm_bindgen(method, getter)]
@@ -40823,7 +40807,7 @@ impl EmailAttachmentBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EmailAddress;
     #[wasm_bindgen(method, getter)]
@@ -40852,7 +40836,7 @@ impl EmailAddress {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SendEmail;
     #[wasm_bindgen(method, catch)]
@@ -40878,7 +40862,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SendEmailBuilder;
     #[wasm_bindgen(method, getter)]
@@ -41089,7 +41073,7 @@ pub mod cloudflare {
                 to: impl ::wasm_bindgen::JsStringLike,
                 raw: &super::super::ReadableStream<R>,
             ) -> Result<EmailMessage, JsValue>;
-            #[wasm_bindgen(constructor, catch, js_name = "EmailMessage")]
+            #[wasm_bindgen(constructor, catch)]
             pub fn new_with_str(
                 from: impl ::wasm_bindgen::JsStringLike,
                 to: impl ::wasm_bindgen::JsStringLike,
@@ -41114,7 +41098,7 @@ pub mod cloudflare {
         use super::*;
         #[wasm_bindgen(module = "cloudflare:node", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type NodeStyleServer;
             #[wasm_bindgen(method, variadic, catch)]
@@ -41125,7 +41109,7 @@ pub mod cloudflare {
         }
         #[wasm_bindgen(module = "cloudflare:node", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type NodeStyleServerAddressReturn;
             #[wasm_bindgen(method, getter)]
@@ -41251,7 +41235,7 @@ pub mod cloudflare {
         pub type PipelineRecord = Object;
         #[wasm_bindgen(module = "cloudflare:pipelines", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type PipelineBatchMetadata;
             #[wasm_bindgen(method, getter, js_name = "pipelineId")]
@@ -41286,7 +41270,7 @@ pub mod cloudflare {
         }
         #[wasm_bindgen(module = "cloudflare:pipelines", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type Pipeline<T = Object>;
             #[doc = " The Pipeline interface represents the type of a binding to a Pipeline"]
@@ -41313,13 +41297,13 @@ pub mod cloudflare {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Cloudflare")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Env;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Cloudflare")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type GlobalProps;
     }
@@ -41511,7 +41495,7 @@ pub mod cloudflare {
         }
         #[wasm_bindgen(module = "cloudflare:workers", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type WorkflowStepConfig;
             #[wasm_bindgen(method, getter)]
@@ -41557,7 +41541,7 @@ pub mod cloudflare {
         }
         #[wasm_bindgen(module = "cloudflare:workers", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type WorkflowEvent<T = JsValue>;
             #[wasm_bindgen(method, getter)]
@@ -41597,7 +41581,7 @@ pub mod cloudflare {
         }
         #[wasm_bindgen(module = "cloudflare:workers", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type WorkflowStepEvent<T = JsValue>;
             #[wasm_bindgen(method, getter)]
@@ -41634,7 +41618,7 @@ pub mod cloudflare {
         }
         #[wasm_bindgen(module = "cloudflare:workers", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type WorkflowStepContext;
             #[wasm_bindgen(method, getter)]
@@ -41719,7 +41703,7 @@ pub mod cloudflare {
         }
         #[wasm_bindgen(module = "cloudflare:workers", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type WorkflowStepOptions;
             #[wasm_bindgen(method, getter, js_name = "type")]
@@ -41894,7 +41878,7 @@ pub mod cloudflare {
             pub fn new(
                 message: impl ::wasm_bindgen::JsStringLike,
             ) -> Result<NonRetryableError, JsValue>;
-            #[wasm_bindgen(constructor, catch, js_name = "NonRetryableError")]
+            #[wasm_bindgen(constructor, catch)]
             pub fn new_with_name(
                 message: impl ::wasm_bindgen::JsStringLike,
                 name: impl ::wasm_bindgen::JsStringLike,
@@ -41904,7 +41888,7 @@ pub mod cloudflare {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type HelloWorldBinding;
     #[doc = " Retrieve the current stored value"]
@@ -41928,7 +41912,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Hyperdrive;
     #[doc = " Connect directly to Hyperdrive as if it's your database, returning a TCP socket."]
@@ -41973,7 +41957,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageInfoResponse;
     #[wasm_bindgen(method, getter)]
@@ -42039,7 +42023,7 @@ impl ImageInfoResponseBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageTransform;
     #[wasm_bindgen(method, getter)]
@@ -42207,7 +42191,7 @@ impl ImageTransformBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageDrawOptions;
     #[wasm_bindgen(method, getter)]
@@ -42285,7 +42269,7 @@ impl ImageDrawOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageInputOptions;
     #[wasm_bindgen(method, getter)]
@@ -42319,7 +42303,7 @@ impl ImageInputOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageOutputOptions;
     #[wasm_bindgen(method, getter)]
@@ -42463,7 +42447,7 @@ impl ImageOutputOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageMetadata;
     #[wasm_bindgen(method, getter)]
@@ -42559,7 +42543,7 @@ impl ImageMetadataBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageUploadOptions;
     #[wasm_bindgen(method, getter)]
@@ -42639,7 +42623,7 @@ impl ImageUploadOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageUpdateOptions;
     #[wasm_bindgen(method, getter, js_name = "requireSignedURLs")]
@@ -42689,7 +42673,7 @@ impl ImageUpdateOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageListOptions;
     #[wasm_bindgen(method, getter)]
@@ -42749,7 +42733,7 @@ impl ImageListOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageList;
     #[wasm_bindgen(method, getter)]
@@ -42792,7 +42776,7 @@ impl ImageListBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type HostedImagesBinding;
     #[doc = " Get detailed metadata for a hosted image"]
@@ -43064,7 +43048,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImagesBinding;
     #[doc = " Get image metadata (type, width and height)"]
@@ -43144,7 +43128,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageTransformer;
     #[doc = " Apply transform next, returning a transform handle."]
@@ -43219,7 +43203,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageTransformationOutputOptions;
     #[wasm_bindgen(method, getter)]
@@ -43256,7 +43240,7 @@ impl ImageTransformationOutputOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageTransformationResult;
     #[doc = " The image as a response, ready to store in cache or return to users"]
@@ -43280,7 +43264,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImagesError;
     #[wasm_bindgen(method, getter)]
@@ -43305,7 +43289,7 @@ impl ImagesError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaBinding;
     #[doc = " Creates a media transformer from an input stream."]
@@ -43321,7 +43305,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaTransformer;
     #[doc = " Applies transformation options to the media content."]
@@ -43361,7 +43345,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaTransformationGenerator;
     #[doc = " Generates the final media output with specified options."]
@@ -43386,7 +43370,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaTransformationResult;
     #[doc = " Returns the transformed media as a readable stream of bytes."]
@@ -43431,7 +43415,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaTransformationInputOptions;
     #[doc = " How the media should be resized to fit the specified dimensions"]
@@ -43487,7 +43471,7 @@ impl MediaTransformationInputOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaTransformationOutputOptions;
     #[doc = " Output mode determining the type of media to generate"]
@@ -43587,7 +43571,7 @@ impl MediaTransformationOutputOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaError;
     #[wasm_bindgen(method, getter)]
@@ -43614,7 +43598,7 @@ impl MediaError {
 pub type Params = Object;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventContext<Env = JsValue, Data = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -43713,7 +43697,7 @@ pub type PagesFunction<Env = JsValue, Data = Object> =
     Function<fn(EventContext<Env, Data>) -> JsValue>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventPluginContext<Env = JsValue, Data = JsValue, PluginArgs = JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -43853,7 +43837,7 @@ pub mod assets {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PubSubMessage;
     #[wasm_bindgen(method, getter)]
@@ -43900,7 +43884,7 @@ impl PubSubMessage {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = JsonWebKey , extends = Object)]
+    # [wasm_bindgen (extends = JsonWebKey , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type JsonWebKeyWithKid;
     #[wasm_bindgen(method, getter)]
@@ -43919,7 +43903,7 @@ impl JsonWebKeyWithKid {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RateLimitOptions;
     #[wasm_bindgen(method, getter)]
@@ -43938,7 +43922,7 @@ impl RateLimitOptions {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RateLimitOutcome;
     #[wasm_bindgen(method, getter)]
@@ -43955,7 +43939,7 @@ impl RateLimitOutcome {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RateLimit;
     #[doc = " Rate limit a request based on the provided options."]
@@ -44022,25 +44006,25 @@ pub mod rpc {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Rpc")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type RpcTargetBranded;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Rpc")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkerEntrypointBranded;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Rpc")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurableObjectBranded;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Rpc")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkflowEntrypointBranded;
     }
@@ -44052,7 +44036,7 @@ pub mod rpc {
     pub type Serializable = JsValue;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = super :: Disposable , extends = Object , js_namespace = "Rpc")]
+        # [wasm_bindgen (extends = super :: Disposable , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type StubBase<T = JsValue>;
         #[wasm_bindgen(method, catch)]
@@ -44060,7 +44044,7 @@ pub mod rpc {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Provider , extends = StubBase , extends = Object , js_namespace = "Rpc")]
+        # [wasm_bindgen (extends = Provider , extends = StubBase , extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Stub<T = JsValue>;
         #[wasm_bindgen(method, catch)]
@@ -44086,14 +44070,14 @@ pub mod rpc {
     pub type MaybeCallableProvider = JsValue;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "Rpc")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Provider<T = JsValue>;
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SecretsStoreSecret;
     #[doc = " Get a secret from the Secrets Store, returning a string of the secret value"]
@@ -44111,7 +44095,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamBinding;
     #[doc = " Returns a handle scoped to a single video for per-video operations."]
@@ -44279,7 +44263,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamVideoHandle;
     #[doc = " The unique identifier for the video."]
@@ -44402,7 +44386,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamVideo;
     #[doc = " The unique identifier for the video."]
@@ -44829,7 +44813,7 @@ impl StreamVideoBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamVideoStatus;
     #[doc = " The current processing state."]
@@ -44917,7 +44901,7 @@ impl StreamVideoStatusBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamVideoInput;
     #[doc = " The input width in pixels."]
@@ -44943,7 +44927,7 @@ impl StreamVideoInput {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamPublicDetails;
     #[doc = " The public title for the video."]
@@ -45213,7 +45197,7 @@ impl StreamPublicDetails {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamDirectUpload;
     #[doc = " The URL an unauthenticated upload can use for a single multipart request."]
@@ -45325,7 +45309,7 @@ impl StreamDirectUpload {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamDirectUploadCreateParams;
     #[doc = " The maximum duration in seconds for a video upload."]
@@ -45474,7 +45458,7 @@ impl StreamDirectUploadCreateParamsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamDirectUploadWatermark;
     #[doc = " The unique identifier for the watermark profile."]
@@ -45496,7 +45480,7 @@ impl StreamDirectUploadWatermark {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamUrlUploadParams;
     #[doc = " Lists the origins allowed to display the video. Enter allowed origin"]
@@ -45633,7 +45617,7 @@ impl StreamUrlUploadParamsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamScopedCaptions;
     #[doc = " Uploads the caption or subtitle file to the endpoint for a specific BCP47 language."]
@@ -45807,7 +45791,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamScopedDownloads;
     #[doc = " Generates a download for a video when a video is ready to view. Available"]
@@ -45965,7 +45949,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamVideos;
     #[doc = " Lists all videos in a users account."]
@@ -46017,7 +46001,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamWatermarks;
     #[doc = " Generate a new watermark profile"]
@@ -46181,7 +46165,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamUpdateVideoParams;
     #[doc = " Lists the origins allowed to display the video. Enter allowed origin"]
@@ -46319,7 +46303,7 @@ impl StreamUpdateVideoParamsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamCaption;
     #[doc = " Whether the caption was generated via AI."]
@@ -46401,7 +46385,7 @@ pub enum StreamDownloadType {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamDownload;
     #[doc = " Indicates the progress as a percentage between 0 and 100."]
@@ -46452,7 +46436,7 @@ impl StreamDownloadBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamDownloadGetResponse;
     #[doc = " The audio-only download. Only present if this download type has been created."]
@@ -46503,7 +46487,7 @@ pub enum StreamWatermarkPosition {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamWatermark;
     #[doc = " The unique identifier for a watermark profile."]
@@ -46689,7 +46673,7 @@ impl StreamWatermark {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamWatermarkCreateParams;
     #[doc = " A short description of the watermark profile."]
@@ -46769,7 +46753,7 @@ impl StreamWatermarkCreateParamsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamVideosListParams;
     #[doc = " The maximum number of videos to return."]
@@ -46859,7 +46843,7 @@ pub enum StreamPaginationComparison {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamError;
     #[wasm_bindgen(method, getter)]
@@ -46886,7 +46870,7 @@ impl StreamError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = StreamError , extends = Object)]
+    # [wasm_bindgen (extends = StreamError , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type InternalError;
     #[wasm_bindgen(method, getter)]
@@ -46907,7 +46891,7 @@ impl InternalError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = StreamError , extends = Object)]
+    # [wasm_bindgen (extends = StreamError , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BadRequestError;
     #[wasm_bindgen(method, getter)]
@@ -46928,7 +46912,7 @@ impl BadRequestError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = StreamError , extends = Object)]
+    # [wasm_bindgen (extends = StreamError , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type NotFoundError;
     #[wasm_bindgen(method, getter)]
@@ -46949,7 +46933,7 @@ impl NotFoundError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = StreamError , extends = Object)]
+    # [wasm_bindgen (extends = StreamError , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ForbiddenError;
     #[wasm_bindgen(method, getter)]
@@ -46970,7 +46954,7 @@ impl ForbiddenError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = StreamError , extends = Object)]
+    # [wasm_bindgen (extends = StreamError , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RateLimitedError;
     #[wasm_bindgen(method, getter)]
@@ -46991,7 +46975,7 @@ impl RateLimitedError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = StreamError , extends = Object)]
+    # [wasm_bindgen (extends = StreamError , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type QuotaReachedError;
     #[wasm_bindgen(method, getter)]
@@ -47012,7 +46996,7 @@ impl QuotaReachedError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = StreamError , extends = Object)]
+    # [wasm_bindgen (extends = StreamError , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MaxFileSizeError;
     #[wasm_bindgen(method, getter)]
@@ -47033,7 +47017,7 @@ impl MaxFileSizeError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = StreamError , extends = Object)]
+    # [wasm_bindgen (extends = StreamError , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type InvalidURLError;
     #[wasm_bindgen(method, getter)]
@@ -47054,7 +47038,7 @@ impl InvalidURLError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = StreamError , extends = Object)]
+    # [wasm_bindgen (extends = StreamError , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AlreadyUploadedError;
     #[wasm_bindgen(method, getter)]
@@ -47075,7 +47059,7 @@ impl AlreadyUploadedError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = StreamError , extends = Object)]
+    # [wasm_bindgen (extends = StreamError , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TooManyWatermarksError;
     #[wasm_bindgen(method, getter)]
@@ -47096,7 +47080,7 @@ impl TooManyWatermarksError {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MarkdownDocument;
     #[wasm_bindgen(method, getter)]
@@ -47120,7 +47104,7 @@ impl MarkdownDocument {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ConversionResponse;
     #[wasm_bindgen(method, getter)]
@@ -47245,7 +47229,7 @@ impl ConversionResponseBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageConversionOptions;
     #[wasm_bindgen(method, getter, js_name = "descriptionLanguage")]
@@ -47277,7 +47261,7 @@ impl ImageConversionOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = ImageConversionOptions , extends = Object)]
+    # [wasm_bindgen (extends = ImageConversionOptions , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EmbeddedImageConversionOptions;
     #[wasm_bindgen(method, getter)]
@@ -47321,7 +47305,7 @@ impl EmbeddedImageConversionOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ConversionOptions;
     #[wasm_bindgen(method, getter)]
@@ -47377,7 +47361,7 @@ impl ConversionOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ConversionRequestOptions;
     #[wasm_bindgen(method, getter)]
@@ -47425,7 +47409,7 @@ impl ConversionRequestOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SupportedFileFormat;
     #[wasm_bindgen(method, getter, js_name = "mimeType")]
@@ -47511,7 +47495,7 @@ pub mod tail_stream {
     use super::*;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Header;
         #[wasm_bindgen(method, getter)]
@@ -47534,7 +47518,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type FetchEventInfo;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47565,7 +47549,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type JsRpcEventInfo;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47584,7 +47568,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ScheduledEventInfo;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47609,7 +47593,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type AlarmEventInfo;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47630,7 +47614,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type QueueEventInfo;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47655,7 +47639,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type EmailEventInfo;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47684,7 +47668,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type TraceEventInfo;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47705,7 +47689,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type HibernatableWebSocketEventInfoMessage;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47724,7 +47708,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type HibernatableWebSocketEventInfoError;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47743,7 +47727,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type HibernatableWebSocketEventInfoClose;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47766,7 +47750,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type HibernatableWebSocketEventInfo;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47787,7 +47771,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type CustomEventInfo;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47806,7 +47790,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type FetchResponseInfo;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47825,7 +47809,7 @@ pub mod tail_stream {
             }
         }
     }
-    #[wasm_bindgen(private, js_namespace = "TailStream")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum EventOutcome {
         Ok = "ok",
@@ -47842,7 +47826,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ScriptVersion;
         #[wasm_bindgen(method, getter)]
@@ -47869,7 +47853,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Onset;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47918,7 +47902,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Outcome;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47943,7 +47927,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type SpanOpen;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47972,7 +47956,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type SpanClose;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -47993,7 +47977,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DiagnosticChannelEvent;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -48018,7 +48002,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Exception;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -48049,7 +48033,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Log;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -48072,7 +48056,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DroppedEventsDiagnostic;
         #[wasm_bindgen(method, getter, js_name = "diagnosticsType")]
@@ -48093,7 +48077,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type StreamDiagnostic;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -48114,7 +48098,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Return;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -48135,7 +48119,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Attribute;
         #[wasm_bindgen(method, getter)]
@@ -48156,7 +48140,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Attributes;
         #[wasm_bindgen(method, getter, js_name = "type")]
@@ -48179,7 +48163,7 @@ pub mod tail_stream {
     pub type EventType = JsValue;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type SpanContext;
         #[wasm_bindgen(method, getter, js_name = "traceId")]
@@ -48202,7 +48186,7 @@ pub mod tail_stream {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type TailEvent<Event = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "invocationId")]
@@ -48234,7 +48218,7 @@ pub mod tail_stream {
         Function<fn(TailEvent<Event>) -> JsOption<Promise<Undefined>>>;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type TailEventHandlerObject;
         #[wasm_bindgen(method, getter)]
@@ -48395,7 +48379,7 @@ pub type VectorizeVectorMetadata = JsValue;
 pub type VectorFloatArray = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeError;
     #[wasm_bindgen(method, getter)]
@@ -48449,7 +48433,7 @@ pub enum VectorizeVectorMetadataFilterCollectionOp {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilter;
 }
@@ -48469,7 +48453,7 @@ pub enum VectorizeMetadataRetrievalLevel {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeQueryOptions;
     #[wasm_bindgen(method, getter, js_name = "topK")]
@@ -48548,7 +48532,7 @@ impl VectorizeQueryOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeIndexConfig;
     #[wasm_bindgen(method, getter)]
@@ -48598,7 +48582,7 @@ impl VectorizeIndexConfigBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeIndexDetails;
     #[doc = " The unique ID of the index"]
@@ -48645,7 +48629,7 @@ impl VectorizeIndexDetails {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeIndexInfo;
     #[doc = " The number of records containing vectors within the index."]
@@ -48690,7 +48674,7 @@ impl VectorizeIndexInfo {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVector;
     #[doc = " The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
@@ -48801,7 +48785,7 @@ impl VectorizeVectorBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeMatch;
     #[doc = " The score or rank for similarity, when returned as a result"]
@@ -48888,7 +48872,7 @@ impl VectorizeMatchBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeMatches;
     #[wasm_bindgen(method, getter)]
@@ -48910,7 +48894,7 @@ impl VectorizeMatches {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMutation;
     #[wasm_bindgen(method, getter)]
@@ -48934,7 +48918,7 @@ impl VectorizeVectorMutation {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeAsyncMutation;
     #[doc = " The unique identifier for the async mutation operation containing the changeset."]
@@ -49465,7 +49449,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerVersionMetadata;
     #[doc = " The ID of the Worker Version using this binding"]
@@ -49511,7 +49495,7 @@ impl WorkerVersionMetadata {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DynamicDispatchLimits;
     #[doc = " Limit CPU time in milliseconds."]
@@ -49553,7 +49537,7 @@ impl DynamicDispatchLimitsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DynamicDispatchOptions;
     #[doc = " Limit resources of invoked Worker script."]
@@ -49595,7 +49579,7 @@ impl DynamicDispatchOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DispatchNamespace;
     #[doc = " * `name` - Name of the Worker script."]
@@ -49646,7 +49630,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DispatchNamespaceArgs;
 }
@@ -49753,7 +49737,7 @@ pub type WorkflowSleepDuration = JsValue;
 pub type WorkflowRetentionDuration = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkflowInstanceCreateOptions<PARAMS = JsValue>;
     #[doc = " An id for your Workflow instance. Must be unique within the Workflow."]
@@ -49815,7 +49799,7 @@ impl<PARAMS: ::wasm_bindgen::convert::IntoWasmAbi> WorkflowInstanceCreateOptions
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type InstanceStatus;
     #[wasm_bindgen(method, getter)]
@@ -49977,7 +49961,7 @@ impl InstanceStatusBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkflowError;
     #[wasm_bindgen(method, getter)]
@@ -50069,7 +50053,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkflowInstanceSendEvent;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -50096,7 +50080,7 @@ impl WorkflowInstanceSendEvent {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PartialKvNamespaceGetOptionsUndefined;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -50136,7 +50120,7 @@ impl PartialKvNamespaceGetOptionsUndefinedBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PartialAiGatewayHeaders;
     #[wasm_bindgen(method, getter, js_name = "cf-aig-metadata")]
@@ -50368,7 +50352,7 @@ pub enum ExcludeCertVerificationStatusNone {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilter2;
     #[wasm_bindgen(method, getter, js_name = "$eq")]
@@ -50622,7 +50606,7 @@ impl VectorizeVectorMetadataFilter2Builder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilter3;
     #[wasm_bindgen(method, getter, js_name = "$in")]

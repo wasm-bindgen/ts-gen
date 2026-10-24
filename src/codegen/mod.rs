@@ -594,7 +594,7 @@ fn generate_declaration(
                 decl.scope_id,
             ))
         }
-        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, &[])),
+        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e)),
         TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, &[])),
         // Evaluated into one of the above once parsing ends.
         TypeKind::TsEnum(_) => None,
@@ -936,7 +936,7 @@ fn generate_ns_declaration(
             decl.scope_id,
             value_names,
         )),
-        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, js_namespace)),
+        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e)),
         TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, js_namespace)),
         TypeKind::TsEnum(_) => None,
         TypeKind::Variable(v) => Some(functions::generate_variable(

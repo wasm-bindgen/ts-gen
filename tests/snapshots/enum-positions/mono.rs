@@ -22,7 +22,7 @@ pub enum Level {
 pub mod codes {
     #[allow(unused_imports)]
     use super::*;
-    #[wasm_bindgen(private, js_namespace = "Codes")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum Region {
         Eu = "eu",
@@ -49,7 +49,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "enum-positions", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Details<T = JsValue>;
     #[wasm_bindgen(method, getter)]

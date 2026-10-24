@@ -9,7 +9,7 @@ pub mod pc {
     use super::*;
     #[wasm_bindgen(module = "pc", experimental_generic_mono)]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type _Bar;
         #[wasm_bindgen(method, getter)]
@@ -40,7 +40,7 @@ pub mod ns {
         }
         #[wasm_bindgen(module = "ns", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object , js_namespace = "N1")]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type T;
         }
@@ -115,7 +115,7 @@ pub mod col {
         use super::*;
         #[wasm_bindgen(module = "col", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object , js_namespace = "M")]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type T;
             #[wasm_bindgen(method, getter)]
@@ -141,7 +141,7 @@ pub mod col {
         use super::*;
         #[wasm_bindgen(module = "col", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object , js_namespace = "M")]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type T;
             #[wasm_bindgen(method, getter)]
@@ -173,7 +173,7 @@ pub mod reached {
         use super::*;
         #[wasm_bindgen(module = "reached", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object , js_namespace = "M")]
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type T;
             #[wasm_bindgen(method, getter)]

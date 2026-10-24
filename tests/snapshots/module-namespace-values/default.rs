@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "module-namespace-values")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type InspectOptions;
     #[wasm_bindgen(method, getter)]
@@ -62,7 +62,7 @@ pub mod inspect {
             value: &T,
         ) -> Result<String, JsValue>;
     }
-    #[wasm_bindgen(private, js_namespace = "inspect")]
+    #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum Style {
         Plain = "plain",

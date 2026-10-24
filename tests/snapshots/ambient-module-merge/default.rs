@@ -9,7 +9,7 @@ pub mod ovi {
     use super::*;
     #[wasm_bindgen(module = "ovi")]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type I;
         #[wasm_bindgen(method, getter)]
@@ -107,7 +107,7 @@ pub mod loc {
     }
     #[wasm_bindgen(module = "loc")]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type E;
         #[wasm_bindgen(method, getter)]
@@ -147,7 +147,7 @@ pub mod ia {
     use super::*;
     #[wasm_bindgen(module = "ia")]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type T;
         #[wasm_bindgen(method, getter)]
@@ -168,7 +168,7 @@ pub mod ic {
     use super::*;
     #[wasm_bindgen(module = "ic")]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type T;
         #[wasm_bindgen(method, getter)]
@@ -240,7 +240,7 @@ pub mod dflt {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type W;
     #[wasm_bindgen(method)]
@@ -273,7 +273,7 @@ pub mod lh {
     use super::*;
     #[wasm_bindgen(module = "lh")]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_name = "H")]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type H2;
         #[wasm_bindgen(method, getter)]
@@ -299,7 +299,7 @@ pub mod lh {
     }
     #[wasm_bindgen(module = "lh")]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type H;
         #[wasm_bindgen(method, getter)]

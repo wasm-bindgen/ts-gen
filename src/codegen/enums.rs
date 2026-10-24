@@ -96,17 +96,22 @@ fn alias_impl(
 
 /// Generated enums describe JS-side values rather than anything this crate
 /// exports, so they are `private`: wasm-bindgen then keeps them off the JS
-/// module's exports and lets same-named copies coexist. One declared inside
-/// a namespace carries its `js_namespace`, like the namespace's imports.
+/// module's exports and lets same-named copies coexist. wasm-bindgen defines
+/// a JS object for a numeric enum, so one declared inside a namespace
+/// carries its `js_namespace`, which places that object.
 fn enum_attr(js_namespace: &[String]) -> TokenStream {
     let js_namespace = super::js_namespace_attr(js_namespace).map(|ns| quote! { , #ns });
     quote! { #[wasm_bindgen(private #js_namespace)] }
 }
 
 /// Generate a wasm_bindgen string enum.
-pub fn generate_string_enum(decl: &StringEnumDecl, js_namespace: &[String]) -> TokenStream {
+///
+/// A string enum is only its values; wasm-bindgen never names it in JS, and
+/// it carries a `js_namespace` through to its metadata without reading it.
+/// So one inside a namespace is emitted without one.
+pub fn generate_string_enum(decl: &StringEnumDecl) -> TokenStream {
     let name = super::typemap::make_ident(&decl.name);
-    let attr = enum_attr(js_namespace);
+    let attr = enum_attr(&[]);
 
     let (members, aliases) = split_aliases(&decl.variants, |v| v.js_value.clone());
     let variants: Vec<_> = members

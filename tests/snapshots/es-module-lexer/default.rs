@@ -31,7 +31,7 @@ pub enum ImportType {
 }
 #[wasm_bindgen(module = "es-module-lexer")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImportSpecifier;
     #[doc = " Module name"]
@@ -134,7 +134,7 @@ impl ImportSpecifier {
 }
 #[wasm_bindgen(module = "es-module-lexer")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ExportSpecifier;
     #[doc = " Exported name"]
@@ -232,7 +232,7 @@ impl ExportSpecifier {
 }
 #[wasm_bindgen(module = "es-module-lexer")]
 extern "C" {
-    # [wasm_bindgen (extends = Error , extends = Object)]
+    # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ParseError;
     #[wasm_bindgen(method, getter)]

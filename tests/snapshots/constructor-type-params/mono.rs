@@ -11,7 +11,7 @@ extern "C" {
     pub type Holder<Value = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<Value>() -> Result<Holder<Value>, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Holder")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_initial<Value>(initial: Value) -> Result<Holder<Value>, JsValue>
     where
         Value: ::wasm_bindgen::convert::IntoWasmAbi;

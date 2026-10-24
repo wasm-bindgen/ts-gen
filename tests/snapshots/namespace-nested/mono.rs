@@ -29,7 +29,7 @@ pub mod outer {
             # [wasm_bindgen (thread_local_v2 , js_name = "LIMIT" , js_namespace = ["Outer" , "Inner"])]
             pub static limit: f64;
         }
-        # [wasm_bindgen (private , js_namespace = ["Outer" , "Inner"])]
+        #[wasm_bindgen(private)]
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub enum Kind {
             A = "a",
@@ -49,7 +49,7 @@ pub mod other {
     pub mod inner {
         #[allow(unused_imports)]
         use super::*;
-        # [wasm_bindgen (private , js_namespace = ["Other" , "Inner"])]
+        #[wasm_bindgen(private)]
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub enum Kind {
             X = "x",

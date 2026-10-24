@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Win;
     #[wasm_bindgen(method, catch)]
@@ -16,7 +16,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type OnlyA;
     #[wasm_bindgen(method, getter)]
@@ -75,7 +75,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type XF;
     #[wasm_bindgen(method, getter)]
@@ -102,7 +102,7 @@ extern "C" {
     pub type XS;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<XS, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "XS")]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_n(n: f64) -> Result<XS, JsValue>;
     # [wasm_bindgen (static_method_of = XS , catch)]
     pub fn added() -> Result<XS, JsValue>;
@@ -111,7 +111,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Proc;
     #[wasm_bindgen(method, getter)]
@@ -150,7 +150,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FX;
     #[wasm_bindgen(method, getter)]

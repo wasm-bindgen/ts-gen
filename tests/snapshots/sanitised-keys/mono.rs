@@ -148,7 +148,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CollideInit;
     #[wasm_bindgen(method, getter, js_name = "fooBar")]
@@ -201,7 +201,7 @@ impl CollideInitBuilder {
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MethodCollide;
     #[wasm_bindgen(method, catch)]
@@ -232,7 +232,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SetterCollide;
     #[wasm_bindgen(method, getter, js_name = "setFoo")]
@@ -325,7 +325,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReservedInit;
     #[wasm_bindgen(method, getter, js_name = "new")]

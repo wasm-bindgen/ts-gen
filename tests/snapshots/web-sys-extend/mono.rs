@@ -12,7 +12,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = RequestInit , extends = Object)]
+    # [wasm_bindgen (extends = RequestInit , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FetchOptions;
     #[doc = " Number of times to retry on failure."]
@@ -66,7 +66,7 @@ impl FetchOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Response , extends = Object)]
+    # [wasm_bindgen (extends = Response , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseExt;
     #[doc = " Parse the body as JSON and return a typed result."]
