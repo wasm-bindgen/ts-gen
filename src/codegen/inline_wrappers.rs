@@ -231,23 +231,6 @@ fn split_generics(generics: &Generics, impl_args: &[Ident]) -> (Generics, Generi
     (on_impl, on_fn)
 }
 
-/// The generics declared on the foreign `type` of this name, defaults stripped.
-fn declared_generics(block: &ItemForeignMod, name: &Ident) -> Option<Generics> {
-    block.items.iter().find_map(|item| match item {
-        ForeignItem::Type(t) if &t.ident == name => {
-            let mut g = t.generics.clone();
-            for p in g.params.iter_mut() {
-                if let GenericParam::Type(tp) = p {
-                    tp.eq_token = None;
-                    tp.default = None;
-                }
-            }
-            Some(g)
-        }
-        _ => None,
-    })
-}
-
 fn generic_args(generics: &Generics) -> TokenStream {
     if generics.params.is_empty() {
         return quote! {};
@@ -283,7 +266,7 @@ struct Wrapper {
     item: TokenStream,
 }
 
-fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Vec<Wrapper> {
+fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
     let Some(literal) = take_literal_attr(item) else {
         return Vec::new();
     };
@@ -405,14 +388,25 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Vec<Wrapper> {
             quote! { self.#extern_name },
         )
     } else if let Some(ty) = binding.static_of {
-        // wasm-bindgen puts a static method in `impl<G> Ty<G>`, binding
-        // the type's parameters there rather than on the fn.
-        let generics = declared_generics(block, &ty).unwrap_or_default();
-        let declared: Vec<Ident> = generics.type_params().map(|t| t.ident.clone()).collect();
-        public_sig.generics = split_generics(&public_sig.generics, &declared).1;
-        let args = generic_args(&generics);
+        // A bare `static_method_of` binds the type's defaults, unless the
+        // static returns the type itself, which hoists its arguments (as
+        // in `null_arms`).
+        let args = match &public_sig.output {
+            ReturnType::Type(_, ret) => type_head(result_ok(ret))
+                .filter(|(head, _)| *head == ty)
+                .map(|(_, args)| args)
+                .unwrap_or_default(),
+            ReturnType::Default => Vec::new(),
+        };
+        let (on_impl, on_fn) = split_generics(&public_sig.generics, &args);
+        public_sig.generics = on_fn;
+        let args_tokens = generic_args(&on_impl);
         (
-            Target::Associated { ty, generics, args },
+            Target::Associated {
+                ty,
+                generics: on_impl,
+                args: args_tokens,
+            },
             quote! { Self::#extern_name },
         )
     } else if binding.constructor {
@@ -497,12 +491,11 @@ fn process_items(items: &mut Vec<Item>) {
                 out.push(item);
             }
             Item::ForeignMod(block) if mentions_literal(block) => {
-                let snapshot = block.clone();
                 let mut wrappers = Vec::new();
                 for fi in block.items.iter_mut() {
                     if let ForeignItem::Fn(f) = fi {
                         if is_literal_keyed(f) {
-                            wrappers.extend(wrap(&snapshot, f));
+                            wrappers.extend(wrap(f));
                         }
                     }
                 }
@@ -688,6 +681,9 @@ mod tests {
                 #[ts_gen_literal(binding(make_js), positions(0), arm(\"a\", make_a), arm(\"b\", make_b))]
                 #[wasm_bindgen(static_method_of = Foo, js_name = \"make\")]
                 pub fn make_a<T: ::wasm_bindgen::JsGeneric>(kind: &str) -> Foo<T>;
+                #[ts_gen_literal(binding(label_js), positions(0), arm(\"a\", label_a), arm(\"b\", label_b))]
+                #[wasm_bindgen(static_method_of = Foo, js_name = \"label\")]
+                pub fn label_a(kind: &str) -> String;
             }
             #[wasm_bindgen] extern \"C\" {
                 #[ts_gen_literal(binding(pick_js), positions(0), arm(\"x\", pick_x), arm(\"y\", pick_y))]
@@ -696,6 +692,10 @@ mod tests {
             }");
         assert!(out.contains("impl<T: ::wasm_bindgen::JsGeneric> Foo<T>"));
         assert!(out.contains("pub fn make_b() -> Foo<T> {\n        Self::make_js(\"b\")\n    }"));
+        // A static not returning its type binds the type's defaults.
+        assert!(out.contains(
+            "impl Foo {\n    pub fn label_a() -> String {\n        Self::label_js(\"a\")\n    }"
+        ), "{out}");
         assert!(
             out.contains("#[wasm_bindgen(js_name = \"pick\")]\n    fn pick_js(axis: &str) -> f64;")
         );

@@ -4,7 +4,7 @@ use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Promise};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads::{
-    Headers, KVNamespace, KVStore, Picker, Repeats, SubtleCrypto,
+    Boxed, Headers, KVNamespace, KVStore, Picker, Repeats, SubtleCrypto,
 };
 
 // No backing JavaScript module; compile-only coverage that each literal arm
@@ -61,4 +61,15 @@ fn repeated_literal_compiles(repeats: &Repeats) {
     let _: String = repeats.tag_a();
     let _: String = repeats.tag_b();
     let _: String = repeats.tag_c();
+}
+
+// A generic class: a bare static binds the type's defaults, a static
+// returning the class hoists its type arguments.
+#[allow(dead_code)]
+fn generic_class_arms_compile(obj: &Object) -> Result<(), JsValue> {
+    let _: String = Boxed::label_a();
+    let _: Boxed<Object> = Boxed::of_b(obj);
+    let _: Boxed<Object> = Boxed::of_a(obj);
+    let _: Boxed = Boxed::new_a()?;
+    Ok(())
 }

@@ -2843,7 +2843,10 @@ impl CompressionStream {
   (`describe_raw_js_string`).
 * A generic receiver (`KVStore<Key>`) gives `impl<Key: JsGeneric>
   KVStore<Key>`; the method's own type parameters stay on the wrapper
-  fn. A wrapper repeats its extern's `where` clause, since it calls the
+  fn. A static's wrappers go where wasm-bindgen puts the static: one
+  returning its own type hoists those type arguments
+  (`impl<T> Boxed<T> { pub fn of_a(value: &T) -> Boxed<T> }`), a bare one
+  binds the type's defaults (`impl Boxed { pub fn label_a() -> String }`). A wrapper repeats its extern's `where` clause, since it calls the
   extern under the same bounds: the ABI traits a generic import states
   under `--experimental-generic-mono` (`Key: IntoWasmAbi`), and an
   awaited carrier's (`ExpectedValue: NullableFromWasmAbi` on

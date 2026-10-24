@@ -55,3 +55,12 @@ export interface Repeats {
   tag(m: "a" | "b"): string;
   tag(m: "b" | "c"): string;
 }
+
+// A generic class: a static returning the class hoists its type arguments
+// onto `impl<T> Boxed<T>`, while a bare static binds the type's defaults,
+// `impl Boxed`; the constructor's wrappers land where its return puts them.
+export declare class Boxed<T = unknown> {
+  constructor(kind: "a" | "b");
+  static label(kind: "a" | "b"): string;
+  static of<T>(kind: "a" | "b", value: T): Boxed<T>;
+}

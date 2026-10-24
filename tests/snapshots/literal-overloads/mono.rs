@@ -519,3 +519,53 @@ impl Repeats {
         self.tag_js_string_js("c")
     }
 }
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Boxed<T = JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Boxed")]
+    fn new_js<T>(kind: impl ::wasm_bindgen::JsStringLike) -> Result<Boxed<T>, JsValue>;
+    # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "label")]
+    fn label_js(kind: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "label")]
+    fn label_js_string_js(kind: impl ::wasm_bindgen::JsStringLike) -> Result<JsString, JsValue>;
+    # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "of")]
+    fn of_js<T>(kind: impl ::wasm_bindgen::JsStringLike, value: T) -> Result<Boxed<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
+}
+impl<T> Boxed<T> {
+    pub fn new_a() -> Result<Boxed<T>, JsValue> {
+        Self::new_js("a")
+    }
+    pub fn new_b() -> Result<Boxed<T>, JsValue> {
+        Self::new_js("b")
+    }
+    pub fn of_a(value: T) -> Result<Boxed<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        Self::of_js("a", value)
+    }
+    pub fn of_b(value: T) -> Result<Boxed<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        Self::of_js("b", value)
+    }
+}
+impl Boxed {
+    pub fn label_a() -> Result<String, JsValue> {
+        Self::label_js("a")
+    }
+    pub fn label_b() -> Result<String, JsValue> {
+        Self::label_js("b")
+    }
+    pub fn label_a_js_string() -> Result<JsString, JsValue> {
+        Self::label_js_string_js("a")
+    }
+    pub fn label_b_js_string() -> Result<JsString, JsValue> {
+        Self::label_js_string_js("b")
+    }
+}
