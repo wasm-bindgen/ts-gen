@@ -4,6 +4,7 @@ pub mod classify;
 pub mod ctx;
 pub mod docs;
 mod enums;
+mod erased_args;
 mod eval;
 pub mod first_pass;
 pub mod literal_union;
@@ -69,6 +70,7 @@ pub fn parse_dts_files(
     )?;
     bind_constructor_vars(&mut gctx, &mut module);
     enums::evaluate_ts_enums(&mut gctx, &mut module.types);
+    erased_args::drop_erased_args(&mut gctx);
     eval::evaluate_types(&mut gctx, &mut module);
 
     Ok((module, gctx))
@@ -87,6 +89,7 @@ pub fn parse_single_source(
     module.add_file(path.to_path_buf(), file_scope, parsed);
     bind_constructor_vars(&mut gctx, &mut module);
     enums::evaluate_ts_enums(&mut gctx, &mut module.types);
+    erased_args::drop_erased_args(&mut gctx);
     eval::evaluate_types(&mut gctx, &mut module);
     Ok((module, gctx))
 }
@@ -1205,7 +1208,7 @@ fn is_overload(member: &crate::ir::Member) -> bool {
 /// Getters and setters for the same JS property name get distinct keys,
 /// since they are independent bindings that should not overwrite each other.
 #[derive(Debug, PartialEq, Eq, Hash)]
-enum MemberKey {
+pub(crate) enum MemberKey {
     Constructor,
     StaticMethod(String),
     StaticGetter(String),
@@ -1215,7 +1218,7 @@ enum MemberKey {
     ProtoSetter(String),
 }
 
-fn member_key(member: &crate::ir::Member) -> MemberKey {
+pub(crate) fn member_key(member: &crate::ir::Member) -> MemberKey {
     match member {
         crate::ir::Member::Constructor(_) => MemberKey::Constructor,
         crate::ir::Member::StaticMethod(m) => MemberKey::StaticMethod(m.name.clone()),

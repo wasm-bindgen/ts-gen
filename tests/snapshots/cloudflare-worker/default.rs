@@ -298,14 +298,17 @@ extern "C" {
     pub fn redirect_with_status(url: &str, status: f64) -> Response;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "redirect")]
     pub fn try_redirect_with_status(url: &str, status: f64) -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response)]
-    pub fn json(data: &JsValue) -> Response;
-    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn try_json(data: &JsValue) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , js_name = "json")]
-    pub fn json_with_init(data: &JsValue, init: &ResponseInit) -> Response;
+    pub fn json_static(data: &JsValue) -> Response;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn try_json_with_init(data: &JsValue, init: &ResponseInit) -> Result<Response, JsValue>;
+    pub fn try_json_static(data: &JsValue) -> Result<Response, JsValue>;
+    # [wasm_bindgen (static_method_of = Response , js_name = "json")]
+    pub fn json_static_with_init(data: &JsValue, init: &ResponseInit) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
+    pub fn try_json_static_with_init(
+        data: &JsValue,
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &Response) -> f64;
     #[wasm_bindgen(method, getter, js_name = "statusText")]
@@ -332,10 +335,10 @@ extern "C" {
     pub async fn text(this: &Response) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Response) -> Promise<JsString>;
-    #[wasm_bindgen(method, catch, js_name = "json")]
-    pub async fn json_2<T: ::wasm_bindgen::JsGeneric>(this: &Response) -> Result<T, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn json<T: ::wasm_bindgen::JsGeneric>(this: &Response) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_2_promise<T: ::wasm_bindgen::JsGeneric>(this: &Response) -> Promise<T>;
+    pub fn json_promise<T: ::wasm_bindgen::JsGeneric>(this: &Response) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Response) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, js_name = "blob")]

@@ -57,6 +57,10 @@ extern "C" {
     # [wasm_bindgen (extends = EventTarget , extends = Serializable , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventEmitter;
+    #[wasm_bindgen(method, js_name = "toJSON")]
+    pub fn to_json(this: &EventEmitter) -> JsValue;
+    #[wasm_bindgen(method, catch, js_name = "toJSON")]
+    pub fn try_to_json(this: &EventEmitter) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method)]
     pub fn emit(this: &EventEmitter, event: &str) -> bool;
     #[wasm_bindgen(method, catch, js_name = "emit")]

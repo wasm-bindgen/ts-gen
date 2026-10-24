@@ -670,7 +670,7 @@ impl<'g> Eval<'g> {
                 TypeKind::TypeAlias(a) => !a.type_params.is_empty() && self.alias_needs_eval(id),
                 _ => false,
             },
-            Some(Binding::TypeParam) => false,
+            Some(Binding::TypeParam | Binding::Erased(_)) => false,
         }
     }
 
@@ -709,7 +709,7 @@ impl<'g> Eval<'g> {
                         }
                         _ => false,
                     },
-                    Some(Binding::TypeParam) => false,
+                    Some(Binding::TypeParam | Binding::Erased(_)) => false,
                 }
             }
             _ => false,
@@ -872,6 +872,7 @@ impl<'g> Eval<'g> {
                 let bound = self.param_bound(owner, name)?;
                 self.eval(&bound, owner, &Env::default(), dest, hint, place)
             }
+            Some(Binding::Erased(erasure)) => Some(erasure.type_ref()),
             Some(Binding::Declared(id)) => {
                 if let TypeKind::TypeAlias(alias) = &self.gctx.get_type(id).kind {
                     if !alias.type_params.is_empty() && self.alias_needs_eval(id) {
@@ -1172,6 +1173,7 @@ impl<'g> Eval<'g> {
                             let bound = self.param_bound(owner, &segments[0])?;
                             return self.shape(&bound, owner, &Env::default(), dest, place);
                         }
+                        Some(Binding::Erased(_)) => return None,
                         None => {
                             let utility = Utility::parse(&segments[0])?;
                             if !utility.is_object() {
@@ -1445,7 +1447,7 @@ impl<'g> Eval<'g> {
         for s in self.gctx.scopes.chain(scope) {
             match self.gctx.scopes.get(s).get_binding(name) {
                 Some(Binding::TypeParam) => return Some(s),
-                Some(Binding::Declared(_)) => return None,
+                Some(Binding::Declared(_) | Binding::Erased(_)) => return None,
                 None => {}
             }
         }

@@ -313,10 +313,10 @@ extern "C" {
         url: impl ::wasm_bindgen::JsStringLike,
         status: f64,
     ) -> Result<Response, JsValue>;
-    # [wasm_bindgen (static_method_of = Response , catch)]
-    pub fn json(data: &JsValue) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn json_with_init(data: &JsValue, init: &ResponseInit) -> Result<Response, JsValue>;
+    pub fn json_static(data: &JsValue) -> Result<Response, JsValue>;
+    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
+    pub fn json_static_with_init(data: &JsValue, init: &ResponseInit) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &Response) -> f64;
     #[wasm_bindgen(method, getter, js_name = "statusText")]
@@ -347,12 +347,12 @@ extern "C" {
     pub async fn text_js_string(this: &Response) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Response) -> Promise<JsString>;
-    #[wasm_bindgen(method, catch, js_name = "json")]
-    pub async fn json_2<T>(this: &Response) -> Result<T, JsValue>
+    #[wasm_bindgen(method, catch)]
+    pub async fn json<T>(this: &Response) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
     #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_2_promise<T>(this: &Response) -> Promise<T>;
+    pub fn json_promise<T>(this: &Response) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Response) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, js_name = "blob")]

@@ -361,10 +361,12 @@ extern "C" {
     pub fn set_extra(this: &Extended, val: f64);
 }
 impl Extended {
-    pub fn new(extra: f64) -> Extended {
-        let inner: Extended = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_extra(extra);
-        inner
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Extended {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
     }
 }
 #[wasm_bindgen(module = "type-eval")]

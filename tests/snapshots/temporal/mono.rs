@@ -116,6 +116,96 @@ pub mod temporal {
         # [wasm_bindgen (extends = DateLikeObject , extends = TimeLikeObject , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DateTimeLikeObject;
+        #[wasm_bindgen(method, getter)]
+        pub fn hour(this: &DateTimeLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_hour(this: &DateTimeLikeObject, val: f64);
+        #[wasm_bindgen(method, getter)]
+        pub fn minute(this: &DateTimeLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_minute(this: &DateTimeLikeObject, val: f64);
+        #[wasm_bindgen(method, getter)]
+        pub fn second(this: &DateTimeLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_second(this: &DateTimeLikeObject, val: f64);
+        #[wasm_bindgen(method, getter)]
+        pub fn millisecond(this: &DateTimeLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_millisecond(this: &DateTimeLikeObject, val: f64);
+        #[wasm_bindgen(method, getter)]
+        pub fn microsecond(this: &DateTimeLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_microsecond(this: &DateTimeLikeObject, val: f64);
+        #[wasm_bindgen(method, getter)]
+        pub fn nanosecond(this: &DateTimeLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_nanosecond(this: &DateTimeLikeObject, val: f64);
+    }
+    impl DateTimeLikeObject {
+        pub fn new(day: f64) -> DateTimeLikeObject {
+            Self::builder(day).build()
+        }
+        pub fn builder(day: f64) -> DateTimeLikeObjectBuilder {
+            let inner: DateTimeLikeObject = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_day(day);
+            DateTimeLikeObjectBuilder { inner }
+        }
+    }
+    pub struct DateTimeLikeObjectBuilder {
+        inner: DateTimeLikeObject,
+    }
+    impl DateTimeLikeObjectBuilder {
+        pub fn year(self, val: f64) -> Self {
+            self.inner.set_year(val);
+            self
+        }
+        pub fn era(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+            self.inner.set_era(val);
+            self
+        }
+        pub fn era_year(self, val: f64) -> Self {
+            self.inner.set_era_year(val);
+            self
+        }
+        pub fn month(self, val: f64) -> Self {
+            self.inner.set_month(val);
+            self
+        }
+        pub fn month_code(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+            self.inner.set_month_code(val);
+            self
+        }
+        pub fn calendar(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+            self.inner.set_calendar(val);
+            self
+        }
+        pub fn hour(self, val: f64) -> Self {
+            self.inner.set_hour(val);
+            self
+        }
+        pub fn minute(self, val: f64) -> Self {
+            self.inner.set_minute(val);
+            self
+        }
+        pub fn second(self, val: f64) -> Self {
+            self.inner.set_second(val);
+            self
+        }
+        pub fn millisecond(self, val: f64) -> Self {
+            self.inner.set_millisecond(val);
+            self
+        }
+        pub fn microsecond(self, val: f64) -> Self {
+            self.inner.set_microsecond(val);
+            self
+        }
+        pub fn nanosecond(self, val: f64) -> Self {
+            self.inner.set_nanosecond(val);
+            self
+        }
+        pub fn build(self) -> DateTimeLikeObject {
+            self.inner
+        }
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -393,23 +483,27 @@ pub mod temporal {
         pub fn set_offset(this: &ZonedDateTimeLikeObject, val: impl ::wasm_bindgen::JsStringLike);
     }
     impl ZonedDateTimeLikeObject {
-        pub fn new(time_zone: &ZonedDateTime) -> ZonedDateTimeLikeObject {
-            Self::builder(time_zone).build()
+        pub fn new(day: f64, time_zone: &ZonedDateTime) -> ZonedDateTimeLikeObject {
+            Self::builder(day, time_zone).build()
         }
         pub fn new_with_str(
+            day: f64,
             time_zone: impl ::wasm_bindgen::JsStringLike,
         ) -> ZonedDateTimeLikeObject {
-            Self::builder_with_str(time_zone).build()
+            Self::builder_with_str(day, time_zone).build()
         }
-        pub fn builder(time_zone: &ZonedDateTime) -> ZonedDateTimeLikeObjectBuilder {
+        pub fn builder(day: f64, time_zone: &ZonedDateTime) -> ZonedDateTimeLikeObjectBuilder {
             let inner: ZonedDateTimeLikeObject = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_day(day);
             inner.set_time_zone(time_zone);
             ZonedDateTimeLikeObjectBuilder { inner }
         }
         pub fn builder_with_str(
+            day: f64,
             time_zone: impl ::wasm_bindgen::JsStringLike,
         ) -> ZonedDateTimeLikeObjectBuilder {
             let inner: ZonedDateTimeLikeObject = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_day(day);
             inner.set_time_zone_with_str(time_zone);
             ZonedDateTimeLikeObjectBuilder { inner }
         }
@@ -418,6 +512,54 @@ pub mod temporal {
         inner: ZonedDateTimeLikeObject,
     }
     impl ZonedDateTimeLikeObjectBuilder {
+        pub fn year(self, val: f64) -> Self {
+            self.inner.set_year(val);
+            self
+        }
+        pub fn era(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+            self.inner.set_era(val);
+            self
+        }
+        pub fn era_year(self, val: f64) -> Self {
+            self.inner.set_era_year(val);
+            self
+        }
+        pub fn month(self, val: f64) -> Self {
+            self.inner.set_month(val);
+            self
+        }
+        pub fn month_code(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+            self.inner.set_month_code(val);
+            self
+        }
+        pub fn calendar(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+            self.inner.set_calendar(val);
+            self
+        }
+        pub fn hour(self, val: f64) -> Self {
+            self.inner.set_hour(val);
+            self
+        }
+        pub fn minute(self, val: f64) -> Self {
+            self.inner.set_minute(val);
+            self
+        }
+        pub fn second(self, val: f64) -> Self {
+            self.inner.set_second(val);
+            self
+        }
+        pub fn millisecond(self, val: f64) -> Self {
+            self.inner.set_millisecond(val);
+            self
+        }
+        pub fn microsecond(self, val: f64) -> Self {
+            self.inner.set_microsecond(val);
+            self
+        }
+        pub fn nanosecond(self, val: f64) -> Self {
+            self.inner.set_nanosecond(val);
+            self
+        }
         pub fn offset(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
             self.inner.set_offset(val);
             self
@@ -637,6 +779,18 @@ pub mod temporal {
         inner: RoundingOptionsWithLargestUnit<Units>,
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> RoundingOptionsWithLargestUnitBuilder<Units> {
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn rounding_increment(self, val: f64) -> Self {
+            self.inner.set_rounding_increment(val);
+            self
+        }
+        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+            self.inner.set_rounding_mode(val);
+            self
+        }
         pub fn largest_unit(self, val: LargestUnitKind) -> Self {
             self.inner.set_largest_unit(val);
             self
@@ -724,6 +878,14 @@ pub mod temporal {
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi>
         ToStringRoundingOptionsWithFractionalSecondsBuilder<Units>
     {
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+            self.inner.set_rounding_mode(val);
+            self
+        }
         pub fn fractional_second_digits(self, val: &JsValue) -> Self {
             self.inner.set_fractional_second_digits(val);
             self
@@ -1486,6 +1648,36 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainTimeToStringOptions;
     }
+    impl PlainTimeToStringOptions {
+        pub fn new() -> PlainTimeToStringOptions {
+            Self::builder().build()
+        }
+        pub fn builder() -> PlainTimeToStringOptionsBuilder {
+            PlainTimeToStringOptionsBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    pub struct PlainTimeToStringOptionsBuilder {
+        inner: PlainTimeToStringOptions,
+    }
+    impl PlainTimeToStringOptionsBuilder {
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+            self.inner.set_rounding_mode(val);
+            self
+        }
+        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+            self.inner.set_fractional_second_digits(val);
+            self
+        }
+        pub fn build(self) -> PlainTimeToStringOptions {
+            self.inner
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
@@ -1920,6 +2112,54 @@ pub mod temporal {
         # [wasm_bindgen (extends = PlainDateToStringOptions , extends = PlainTimeToStringOptions , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainDateTimeToStringOptions;
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &PlainDateTimeToStringOptions) -> Option<PluralizeUnit>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &PlainDateTimeToStringOptions, val: PluralizeUnit);
+        #[wasm_bindgen(method, getter, js_name = "roundingMode")]
+        pub fn rounding_mode(this: &PlainDateTimeToStringOptions) -> Option<RoundingModeKind>;
+        #[wasm_bindgen(method, setter, js_name = "roundingMode")]
+        pub fn set_rounding_mode(this: &PlainDateTimeToStringOptions, val: RoundingModeKind);
+        #[wasm_bindgen(method, getter, js_name = "fractionalSecondDigits")]
+        pub fn fractional_second_digits(
+            this: &PlainDateTimeToStringOptions,
+        ) -> Option<FractionalSecondDigitsKind>;
+        #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
+        pub fn set_fractional_second_digits(this: &PlainDateTimeToStringOptions, val: &JsValue);
+    }
+    impl PlainDateTimeToStringOptions {
+        pub fn new() -> PlainDateTimeToStringOptions {
+            Self::builder().build()
+        }
+        pub fn builder() -> PlainDateTimeToStringOptionsBuilder {
+            PlainDateTimeToStringOptionsBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    pub struct PlainDateTimeToStringOptionsBuilder {
+        inner: PlainDateTimeToStringOptions,
+    }
+    impl PlainDateTimeToStringOptionsBuilder {
+        pub fn calendar_name(self, val: CalendarNameKind) -> Self {
+            self.inner.set_calendar_name(val);
+            self
+        }
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+            self.inner.set_rounding_mode(val);
+            self
+        }
+        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+            self.inner.set_fractional_second_digits(val);
+            self
+        }
+        pub fn build(self) -> PlainDateTimeToStringOptions {
+            self.inner
+        }
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -2612,6 +2852,22 @@ pub mod temporal {
         inner: ZonedDateTimeToStringOptions,
     }
     impl ZonedDateTimeToStringOptionsBuilder {
+        pub fn calendar_name(self, val: CalendarNameKind) -> Self {
+            self.inner.set_calendar_name(val);
+            self
+        }
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+            self.inner.set_rounding_mode(val);
+            self
+        }
+        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+            self.inner.set_fractional_second_digits(val);
+            self
+        }
         pub fn offset(self, val: OffsetKind) -> Self {
             self.inner.set_offset(val);
             self
@@ -2629,6 +2885,10 @@ pub mod temporal {
         # [wasm_bindgen (extends = OverflowOptions , extends = DisambiguationOptions , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ZonedDateTimeFromOptions;
+        #[wasm_bindgen(method, getter)]
+        pub fn disambiguation(this: &ZonedDateTimeFromOptions) -> Option<DisambiguationKind>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_disambiguation(this: &ZonedDateTimeFromOptions, val: DisambiguationKind);
         #[wasm_bindgen(method, getter)]
         pub fn offset(
             this: &ZonedDateTimeFromOptions,
@@ -2650,6 +2910,14 @@ pub mod temporal {
         inner: ZonedDateTimeFromOptions,
     }
     impl ZonedDateTimeFromOptionsBuilder {
+        pub fn overflow(self, val: OverflowKind) -> Self {
+            self.inner.set_overflow(val);
+            self
+        }
+        pub fn disambiguation(self, val: DisambiguationKind) -> Self {
+            self.inner.set_disambiguation(val);
+            self
+        }
         pub fn offset(self, val: ZonedDateTimeFromOptionsOffsetKind) -> Self {
             self.inner.set_offset(val);
             self
@@ -3185,12 +3453,120 @@ pub mod temporal {
         # [wasm_bindgen (extends = DurationRelativeToOptions , extends = RoundingOptionsWithLargestUnit , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurationRoundingOptions;
+        #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+        pub fn smallest_unit(this: &DurationRoundingOptions) -> Option<PluralizeUnit>;
+        #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+        pub fn set_smallest_unit(this: &DurationRoundingOptions, val: PluralizeUnit);
+        #[wasm_bindgen(method, getter, js_name = "roundingIncrement")]
+        pub fn rounding_increment(this: &DurationRoundingOptions) -> Option<f64>;
+        #[wasm_bindgen(method, setter, js_name = "roundingIncrement")]
+        pub fn set_rounding_increment(this: &DurationRoundingOptions, val: f64);
+        #[wasm_bindgen(method, getter, js_name = "roundingMode")]
+        pub fn rounding_mode(this: &DurationRoundingOptions) -> Option<RoundingModeKind>;
+        #[wasm_bindgen(method, setter, js_name = "roundingMode")]
+        pub fn set_rounding_mode(this: &DurationRoundingOptions, val: RoundingModeKind);
+        #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+        pub fn largest_unit(this: &DurationRoundingOptions) -> Option<LargestUnitKind>;
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit(this: &DurationRoundingOptions, val: LargestUnitKind);
+    }
+    impl DurationRoundingOptions {
+        pub fn new() -> DurationRoundingOptions {
+            Self::builder().build()
+        }
+        pub fn builder() -> DurationRoundingOptionsBuilder {
+            DurationRoundingOptionsBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    pub struct DurationRoundingOptionsBuilder {
+        inner: DurationRoundingOptions,
+    }
+    impl DurationRoundingOptionsBuilder {
+        pub fn relative_to(self, val: &ZonedDateTime) -> Self {
+            self.inner.set_relative_to(val);
+            self
+        }
+        pub fn relative_to_with_zoned_date_time_like_object(
+            self,
+            val: &ZonedDateTimeLikeObject,
+        ) -> Self {
+            self.inner
+                .set_relative_to_with_zoned_date_time_like_object(val);
+            self
+        }
+        pub fn relative_to_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+            self.inner.set_relative_to_with_str(val);
+            self
+        }
+        pub fn relative_to_with_plain_date(self, val: &PlainDate) -> Self {
+            self.inner.set_relative_to_with_plain_date(val);
+            self
+        }
+        pub fn relative_to_with_plain_date_time(self, val: &PlainDateTime) -> Self {
+            self.inner.set_relative_to_with_plain_date_time(val);
+            self
+        }
+        pub fn relative_to_with_date_like_object(self, val: &DateLikeObject) -> Self {
+            self.inner.set_relative_to_with_date_like_object(val);
+            self
+        }
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn rounding_increment(self, val: f64) -> Self {
+            self.inner.set_rounding_increment(val);
+            self
+        }
+        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+            self.inner.set_rounding_mode(val);
+            self
+        }
+        pub fn largest_unit(self, val: LargestUnitKind) -> Self {
+            self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn build(self) -> DurationRoundingOptions {
+            self.inner
+        }
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = ToStringRoundingOptionsWithFractionalSeconds , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurationToStringOptions;
+    }
+    impl DurationToStringOptions {
+        pub fn new() -> DurationToStringOptions {
+            Self::builder().build()
+        }
+        pub fn builder() -> DurationToStringOptionsBuilder {
+            DurationToStringOptionsBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    pub struct DurationToStringOptionsBuilder {
+        inner: DurationToStringOptions,
+    }
+    impl DurationToStringOptionsBuilder {
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+            self.inner.set_rounding_mode(val);
+            self
+        }
+        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+            self.inner.set_fractional_second_digits(val);
+            self
+        }
+        pub fn build(self) -> DurationToStringOptions {
+            self.inner
+        }
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -3204,9 +3580,48 @@ pub mod temporal {
     }
     impl DurationTotalOptions {
         pub fn new(unit: PluralizeUnit) -> DurationTotalOptions {
+            Self::builder(unit).build()
+        }
+        pub fn builder(unit: PluralizeUnit) -> DurationTotalOptionsBuilder {
             let inner: DurationTotalOptions = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_unit(unit);
-            inner
+            DurationTotalOptionsBuilder { inner }
+        }
+    }
+    pub struct DurationTotalOptionsBuilder {
+        inner: DurationTotalOptions,
+    }
+    impl DurationTotalOptionsBuilder {
+        pub fn relative_to(self, val: &ZonedDateTime) -> Self {
+            self.inner.set_relative_to(val);
+            self
+        }
+        pub fn relative_to_with_zoned_date_time_like_object(
+            self,
+            val: &ZonedDateTimeLikeObject,
+        ) -> Self {
+            self.inner
+                .set_relative_to_with_zoned_date_time_like_object(val);
+            self
+        }
+        pub fn relative_to_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+            self.inner.set_relative_to_with_str(val);
+            self
+        }
+        pub fn relative_to_with_plain_date(self, val: &PlainDate) -> Self {
+            self.inner.set_relative_to_with_plain_date(val);
+            self
+        }
+        pub fn relative_to_with_plain_date_time(self, val: &PlainDateTime) -> Self {
+            self.inner.set_relative_to_with_plain_date_time(val);
+            self
+        }
+        pub fn relative_to_with_date_like_object(self, val: &DateLikeObject) -> Self {
+            self.inner.set_relative_to_with_date_like_object(val);
+            self
+        }
+        pub fn build(self) -> DurationTotalOptions {
+            self.inner
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -3551,6 +3966,18 @@ pub mod temporal {
         inner: InstantToStringOptions,
     }
     impl InstantToStringOptionsBuilder {
+        pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_smallest_unit(val);
+            self
+        }
+        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+            self.inner.set_rounding_mode(val);
+            self
+        }
+        pub fn fractional_second_digits(self, val: &JsValue) -> Self {
+            self.inner.set_fractional_second_digits(val);
+            self
+        }
         pub fn time_zone(self, val: &ZonedDateTime) -> Self {
             self.inner.set_time_zone(val);
             self

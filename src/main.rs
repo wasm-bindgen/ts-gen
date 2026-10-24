@@ -21,13 +21,17 @@ struct Cli {
     /// `--export` is authoritative about what gets emitted as public
     /// Rust code.
     ///
-    /// Two forms:
+    /// Three forms:
     ///   - File path (e.g. `types/email.d.ts`) — emits the globals that
     ///     file declares.
     ///   - Module specifier (e.g. `cloudflare:email`) — emits that
     ///     module's declarations in a `pub mod` named by the specifier
     ///     (`cloudflare::email`). The `--lib-name` module is emitted at
     ///     the top level instead.
+    ///   - Declaration name (e.g. `Request`, `TailStream.TailEvent`) —
+    ///     emits that export of any file or module and, transitively,
+    ///     the types its bindings reference. A bare identifier is read
+    ///     as a declaration name unless it names a `declare module`.
     ///
     /// When omitted entirely, every `--input` file becomes an implicit
     /// file export. NO modules are emitted by the implicit default —
@@ -161,7 +165,8 @@ fn main() -> Result<()> {
     // Resolve `--export` into a flat set of `ExportSpec`s. A spec is
     // treated as a file path when it exists on disk (same logic as
     // `--input`, which also accepts files or directories); otherwise
-    // it's a JS module specifier.
+    // it's a declaration name when it is spelled like one and names no
+    // module, else a JS module specifier.
     let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
         std::collections::HashSet::new();
     for spec in &cli.export {
@@ -171,6 +176,12 @@ fn main() -> Result<()> {
                 let canonical = resolved.canonicalize().unwrap_or(resolved);
                 exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
             }
+        } else if gctx.find_module(spec).is_none()
+            && !gctx.ambient_module_scopes.contains_key(spec)
+            && cli.lib_name.as_deref() != Some(spec.as_str())
+            && is_declaration_name(spec)
+        {
+            exports.insert(ts_gen::codegen::ExportSpec::Decl(spec.clone()));
         } else {
             exports.insert(ts_gen::codegen::ExportSpec::Module(spec.clone()));
         }
@@ -213,6 +224,16 @@ fn main() -> Result<()> {
     eprintln!("[ts-gen] Done");
 
     Ok(())
+}
+
+/// A dotted identifier path (`Request`, `TailStream.TailEvent`) as opposed
+/// to a module specifier, which carries `:` / `/` / `*` or a leading `@`.
+fn is_declaration_name(spec: &str) -> bool {
+    spec.split('.').all(|seg| {
+        let mut chars = seg.chars();
+        matches!(chars.next(), Some(c) if c.is_alphabetic() || c == '_' || c == '$')
+            && chars.all(|c| c.is_alphanumeric() || c == '_' || c == '$')
+    })
 }
 
 /// Resolve input paths: expand directories to find all .d.ts files.

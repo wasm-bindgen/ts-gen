@@ -38,6 +38,7 @@ src/
 │   ├── error_enum.rs          # `--error-enum`: @throws types → one enum
 │   ├── signatures.rs          # parameter expansion + per-callable layer
 │   ├── subtyping.rs           # builtin parents + `lub_types` (LUB)
+│   ├── surface.rs             # output surface: export roots, `--export <Name>`, closure
 │   └── typemap.rs             # TypeRef → syn tokens, `to_return_type`, externals
 └── util/                      # naming, diagnostics, dedup helpers
 

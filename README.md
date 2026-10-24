@@ -70,6 +70,16 @@ collapsing them to their common ancestor:
 ts-gen --input types.d.ts --output src/bindings.rs --error-enum
 ```
 
+Select the output surface. `--input` defines the type universe; `--export`
+picks what is emitted: a file (its global declarations), a JS module
+specifier (its declarations, in the module's `pub mod`), or a declaration name
+(that export of any file or module, plus the types its bindings reference):
+
+```sh
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts --output src/bindings.rs \
+  --export Request --export Response --export KVNamespace --export cloudflare:workers
+```
+
 Opt generic imports into wasm-bindgen's experimental per-monomorphization
 codegen:
 
