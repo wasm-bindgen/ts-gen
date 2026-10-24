@@ -2212,6 +2212,14 @@ parameters thread through every site that mentions `Foo`:
       transformer: &Transformer<I, O>,
   ) -> Result<TransformStream<I, O>, JsValue>;
   ```
+  A default that names an earlier parameter takes that parameter's
+  argument, so an unmentioned name never reaches the signature:
+  ```ts
+  declare class Chained<A = string, B = A, C = number> { constructor(c: C); }
+  ```
+  ```rust
+  pub fn new<C: JsGeneric>(c: &C) -> Result<Chained<JsString, JsString, C>, JsValue>;
+  ```
 * `extends Foo<X>` lowers to `extends = Foo` — the attribute cannot
   carry generic arguments, and the defaults make the bare head valid.
 * A generic type derives `PartialEq, Eq` like any other imported type.

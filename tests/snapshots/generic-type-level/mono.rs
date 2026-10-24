@@ -163,6 +163,16 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Chained<A = JsString, B = A, C = Number>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new<A, B, C>(c: C) -> Result<Chained<A, B, C>, JsValue>
+    where
+        C: ::wasm_bindgen::convert::IntoWasmAbi;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage<Props = JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn get<Props, T>(

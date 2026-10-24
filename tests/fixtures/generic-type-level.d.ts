@@ -4,7 +4,9 @@
 // subclasses of generic parents extend the bare head; every type derives
 // `Eq`, generic ones and children of generic parents included. An async
 // static or free function resolving to a bare type parameter bounds it
-// `FromWasmAbi` too.
+// `FromWasmAbi` too. A constructor fills an unmentioned parameter whose
+// default names an earlier unmentioned one (`B = A`) with that one's
+// argument, never the bare name.
 
 interface Event {
   readonly type: string;
@@ -41,6 +43,10 @@ declare class Labelled<T> {
   static of<T>(value: T): Labelled<T>;
   static load<T>(): Promise<T>;
   readonly value: T;
+}
+
+declare class Chained<A = string, B = A, C = number> {
+  constructor(c: C);
 }
 
 interface Storage<Props = unknown> {

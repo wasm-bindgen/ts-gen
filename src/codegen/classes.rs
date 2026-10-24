@@ -488,9 +488,16 @@ impl<'a> ClassConfig<'a> {
     }
 
     /// The TS default of a type parameter as a `TypeRef`, `any` when
-    /// none is declared.
-    fn type_param_default_ref(&self, tp: &crate::ir::TypeParam) -> TypeRef {
-        tp.default.clone().unwrap_or(TypeRef::Any)
+    /// none is declared. Earlier parameters the default names are
+    /// replaced by the arguments `chosen` for them.
+    fn type_param_default_ref(
+        &self,
+        tp: &crate::ir::TypeParam,
+        chosen: &HashMap<&str, TypeRef>,
+    ) -> TypeRef {
+        tp.default
+            .as_ref()
+            .map_or(TypeRef::Any, |d| d.substitute(chosen))
     }
 
     /// Type-level parameters mentioned by `tys`, in declaration order.
@@ -1931,20 +1938,21 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     {
         sig.return_type.clone()
     } else {
-        TypeRef::generic(
-            config.rust_name.clone(),
-            config
-                .type_params
-                .iter()
-                .map(|tp| {
-                    if mentioned.contains(&tp.name) {
-                        TypeRef::ident(tp.name.clone())
-                    } else {
-                        config.type_param_default_ref(tp)
-                    }
-                })
-                .collect(),
-        )
+        // An unmentioned parameter's default can name an earlier one
+        // (`B = A`), so each default is read against the arguments chosen
+        // so far: the mentioned parameter itself, else its own default.
+        let mut chosen: HashMap<&str, TypeRef> = HashMap::new();
+        let mut args = Vec::with_capacity(config.type_params.len());
+        for tp in config.type_params.iter() {
+            let arg = if mentioned.contains(&tp.name) {
+                TypeRef::ident(tp.name.clone())
+            } else {
+                config.type_param_default_ref(tp, &chosen)
+            };
+            chosen.insert(&tp.name, arg.clone());
+            args.push(arg);
+        }
+        TypeRef::generic(config.rust_name.clone(), args)
     };
     // Constructors always return the constructed type, wrapped in Result
     // when `catch` (which is always-true here per `SignatureKind::Constructor`).

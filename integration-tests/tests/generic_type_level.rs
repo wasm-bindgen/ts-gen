@@ -5,7 +5,7 @@ use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::generic_type_level::{
-    load_value, Bag, Labelled, PingTarget, TransformStream,
+    load_value, Bag, Chained, Labelled, PingTarget, TransformStream,
 };
 
 fn assert_eq<T: Eq>() {}
@@ -29,6 +29,14 @@ async fn async_bare_param_returns() -> Result<(), JsValue> {
     let _: JsString = Labelled::<JsValue>::load::<JsString>().await?;
     let _: Number = load_value::<Number>().await?;
     Ok(())
+}
+
+// A constructor fills an unmentioned parameter whose default names an
+// earlier unmentioned one (`B = A`) with that one's default, so `new`
+// declares only the parameter its argument mentions.
+#[allow(dead_code)]
+fn chained_defaults_resolve(c: &Number) -> Result<Chained<JsString, JsString, Number>, JsValue> {
+    Chained::new(c)
 }
 
 #[wasm_bindgen_test]
