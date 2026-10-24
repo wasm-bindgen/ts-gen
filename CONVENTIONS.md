@@ -117,7 +117,11 @@ value of an async function use the carriers exactly. A read admits
 `x?: T` reads as `Option<T>` and `x?: T | null` as
 `Option<Nullable<T>>`, for instance and static properties alike.
 `null | undefined` with nothing else reads as `Option<Null>`. A
-`JsValue` inner stays bare, since it carries both empties in-band.
+`JsValue` inner stays bare, since it carries both empties in-band,
+except under a property that can be absent: a getter or static getter
+admitting `undefined` keeps its `Option`, so an absent field reads as
+`None` whatever its type. That `Option` would also read `null` as
+`None`, so a written `null` keeps its `Nullable` under it.
 
 | TS                                  | Rust read                                       |
 | ----------------------------------- | ----------------------------------------------- |
@@ -126,6 +130,9 @@ value of an async function use the carriers exactly. A read admits
 | `f(): Promise<number \| undefined>` | `async fn f() -> Result<Option<f64>, JsValue>`  |
 | `f<T>(): Promise<T \| null>`        | `async fn f<T>() -> Result<Nullable<T>, JsValue>` |
 | `readonly x?: string \| null`       | `fn x(&self) -> Option<Nullable<String>>`       |
+| `x?: any`                           | `fn x(&self) -> Option<JsValue>`                |
+| `x?: unknown \| null`               | `fn x(&self) -> Option<Nullable<JsValue>>`      |
+| `x: any \| null`                    | `fn x(&self) -> JsValue`                        |
 
 The awaited value [lowers like a sync return](#awaited-values-lower-like-sync-returns),
 so the carrier holds the read form (`String`, `f64`, an enum), not the

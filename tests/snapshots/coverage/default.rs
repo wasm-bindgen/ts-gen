@@ -670,7 +670,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_tag(this: &NotificationOptions, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn data(this: &NotificationOptions) -> JsValue;
+    pub fn data(this: &NotificationOptions) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &NotificationOptions, val: &JsValue);
 }

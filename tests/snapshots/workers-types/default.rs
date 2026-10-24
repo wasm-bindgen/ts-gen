@@ -4838,7 +4838,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_composed(this: &CustomEventCustomEventInit, val: bool);
     #[wasm_bindgen(method, getter)]
-    pub fn detail(this: &CustomEventCustomEventInit) -> JsValue;
+    pub fn detail(this: &CustomEventCustomEventInit) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_detail(this: &CustomEventCustomEventInit, val: &JsValue);
 }
@@ -7802,7 +7802,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_colno(this: &ErrorEventErrorEventInit, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn error(this: &ErrorEventErrorEventInit) -> JsValue;
+    pub fn error(this: &ErrorEventErrorEventInit) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_error(this: &ErrorEventErrorEventInit, val: &JsValue);
 }
@@ -9343,7 +9343,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "webSocket")]
     fn __set_web_socket_with_null(this: &Response, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn cf(this: &Response) -> JsValue;
+    pub fn cf(this: &Response) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cf(this: &Response, val: &JsValue);
     #[doc = " The **`type`** read-only property of the Response interface contains the type of the response."]
@@ -9379,7 +9379,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "statusText")]
     pub fn set_status_text(this: &ResponseInit, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &ResponseInit) -> JsValue;
+    pub fn headers(this: &ResponseInit) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -9387,7 +9387,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &ResponseInit, val: &Object<JsString>);
     #[wasm_bindgen(method, getter)]
-    pub fn cf(this: &ResponseInit) -> JsValue;
+    pub fn cf(this: &ResponseInit) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cf(this: &ResponseInit, val: &JsValue);
     #[wasm_bindgen(method, getter, js_name = "webSocket")]
@@ -9651,7 +9651,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_method<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn headers<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> JsValue;
+    pub fn headers<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -9665,7 +9665,8 @@ extern "C" {
         val: &Object<JsString>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn body<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> JsValue;
+    pub fn body<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>)
+        -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body<Cf: ::wasm_bindgen::JsGeneric>(
         this: &RequestInit<Cf>,
@@ -10898,7 +10899,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "expirationTtl")]
     pub fn set_expiration_ttl(this: &KVNamespacePutOptions, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn metadata(this: &KVNamespacePutOptions) -> JsValue;
+    pub fn metadata(this: &KVNamespacePutOptions) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata(this: &KVNamespacePutOptions, val: &JsValue);
 }
@@ -15058,7 +15059,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemFetchEventInfoRequest;
     #[wasm_bindgen(method, getter)]
-    pub fn cf(this: &TraceItemFetchEventInfoRequest) -> JsValue;
+    pub fn cf(this: &TraceItemFetchEventInfoRequest) -> Option<JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn headers(this: &TraceItemFetchEventInfoRequest) -> Object<JsString>;
     #[wasm_bindgen(method, getter)]
@@ -17195,7 +17196,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerStubEntrypointOptions;
     #[wasm_bindgen(method, getter)]
-    pub fn props(this: &WorkerStubEntrypointOptions) -> JsValue;
+    pub fn props(this: &WorkerStubEntrypointOptions) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_props(this: &WorkerStubEntrypointOptions, val: &JsValue);
 }
@@ -17277,7 +17278,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &WorkerLoaderModule, val: &ArrayBuffer);
     #[wasm_bindgen(method, getter)]
-    pub fn json(this: &WorkerLoaderModule) -> JsValue;
+    pub fn json(this: &WorkerLoaderModule) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json(this: &WorkerLoaderModule, val: &JsValue);
     #[wasm_bindgen(method, getter)]
@@ -17361,7 +17362,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_modules(this: &WorkerLoaderWorkerCode, val: &Object);
     #[wasm_bindgen(method, getter)]
-    pub fn env(this: &WorkerLoaderWorkerCode) -> JsValue;
+    pub fn env(this: &WorkerLoaderWorkerCode) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_env(this: &WorkerLoaderWorkerCode, val: &JsValue);
     #[wasm_bindgen(method, getter, js_name = "globalOutbound")]
@@ -18812,7 +18813,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &AiTextGenerationResponseFormat, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &AiTextGenerationResponseFormat) -> JsValue;
+    pub fn json_schema(this: &AiTextGenerationResponseFormat) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(this: &AiTextGenerationResponseFormat, val: &JsValue);
 }
@@ -19086,7 +19087,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_response(this: &AiTextGenerationOutput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn tool_calls(this: &AiTextGenerationOutput) -> JsValue;
+    pub fn tool_calls(this: &AiTextGenerationOutput) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_tool_calls(this: &AiTextGenerationOutput, val: &JsValue);
     #[wasm_bindgen(method, getter)]
@@ -22496,7 +22497,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseTextConfig;
     #[wasm_bindgen(method, getter)]
-    pub fn format(this: &ResponseTextConfig) -> JsValue;
+    pub fn format(this: &ResponseTextConfig) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_format(this: &ResponseTextConfig, val: &ResponseFormatText);
     #[wasm_bindgen(method, setter, js_name = "format")]
@@ -24761,7 +24762,9 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode) -> JsValue;
+    pub fn json_schema(
+        this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode,
+    ) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode,
@@ -24987,7 +24990,9 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1) -> JsValue;
+    pub fn json_schema(
+        this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1,
+    ) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1,
@@ -25072,7 +25077,9 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2) -> JsValue;
+    pub fn json_schema(
+        this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2,
+    ) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2,
@@ -25571,7 +25578,7 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode) -> JsValue;
+    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode, val: &JsValue);
 }
@@ -25769,7 +25776,8 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1) -> JsValue;
+    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1)
+        -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1, val: &JsValue);
 }
@@ -27182,7 +27190,9 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode) -> JsValue;
+    pub fn json_schema(
+        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode,
+    ) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode,
@@ -28045,7 +28055,7 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode) -> JsValue;
+    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode, val: &JsValue);
 }
@@ -28242,7 +28252,7 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1) -> JsValue;
+    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1, val: &JsValue);
 }
@@ -28449,7 +28459,7 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2) -> JsValue;
+    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2, val: &JsValue);
 }
@@ -28646,7 +28656,7 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3) -> JsValue;
+    pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3, val: &JsValue);
 }
@@ -30242,7 +30252,9 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode) -> JsValue;
+    pub fn json_schema(
+        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode,
+    ) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode,
@@ -30468,7 +30480,9 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1) -> JsValue;
+    pub fn json_schema(
+        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1,
+    ) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1,
@@ -30699,7 +30713,9 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2) -> JsValue;
+    pub fn json_schema(
+        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2,
+    ) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2,
@@ -30930,7 +30946,9 @@ extern "C" {
         val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn json_schema(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3) -> JsValue;
+    pub fn json_schema(
+        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3,
+    ) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_json_schema(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3,
@@ -48861,7 +48879,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_error(this: &InstanceStatus, val: &Object);
     #[wasm_bindgen(method, getter)]
-    pub fn output(this: &InstanceStatus) -> JsValue;
+    pub fn output(this: &InstanceStatus) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &InstanceStatus, val: &JsValue);
 }
@@ -49351,7 +49369,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilter2;
     #[wasm_bindgen(method, getter, js_name = "$eq")]
-    pub fn eq(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn eq(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     pub fn set_eq(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$eq")]
@@ -49363,7 +49381,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     fn __set_eq_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$ne")]
-    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     pub fn set_ne(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$ne")]
@@ -49375,7 +49393,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     fn __set_ne_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lt")]
-    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     pub fn set_lt(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$lt")]
@@ -49387,7 +49405,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     fn __set_lt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lte")]
-    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     pub fn set_lte(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$lte")]
@@ -49399,7 +49417,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     fn __set_lte_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gt")]
-    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     pub fn set_gt(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$gt")]
@@ -49411,7 +49429,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     fn __set_gt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gte")]
-    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> JsValue;
+    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$gte")]
     pub fn set_gte(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$gte")]

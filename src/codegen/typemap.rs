@@ -3094,6 +3094,18 @@ pub fn to_getter_return_type(
             return nullable_carrier(inner_tokens, n);
         }
     }
+    // A property that can be absent keeps its `Option` around a `JsValue`,
+    // so absence reads as `None`. The `Option` would read `null` as `None`
+    // too, so a written `null` nests a `Nullable` under it, as for any other
+    // value.
+    if let Some((core, n, core_scope)) = split_empties_in(ty, ctx, scope) {
+        if n.admits_undefined() {
+            let inner = to_syn_type(&core, TypePosition::RETURN, ctx, core_scope, from_module);
+            if is_jsvalue_arg(&inner) {
+                return nullable_carrier(inner, n);
+            }
+        }
+    }
     to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)
 }
 
@@ -4993,6 +5005,44 @@ mod tests {
         assert_eq!(
             members(&[S("auto".into()), N(0.0), N(1.0)]),
             Some(vec![S("auto".into()), Number])
+        );
+    }
+
+    #[test]
+    fn absent_getters_keep_their_option_around_js_value() {
+        let (module, gctx) = crate::parse_source("declare class Foo {}", None).unwrap();
+        let ctx = CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
+            .unwrap();
+        let scope = *module.file_scopes.first().expect("file scope");
+        let anchor = ReturnAnchor {
+            base: "x",
+            kind: ReturnAnchorKind::Getter,
+            parent: None,
+        };
+        let read = |members: Vec<TypeRef>| {
+            to_getter_return_type(
+                &TypeRef::union(members),
+                Some(&ctx),
+                scope,
+                &ModuleContext::Global,
+                anchor,
+            )
+            .to_string()
+        };
+        assert_eq!(
+            read(vec![TypeRef::Any, TypeRef::Undefined]),
+            "Option < JsValue >"
+        );
+        assert_eq!(
+            read(vec![TypeRef::Unknown, TypeRef::Null, TypeRef::Undefined]),
+            "Option < Nullable < JsValue >>"
+        );
+        // Without `undefined`, `JsValue` carries `null` in-band.
+        assert_eq!(read(vec![TypeRef::Any, TypeRef::Null]), "JsValue");
+        assert_eq!(read(vec![TypeRef::Any]), "JsValue");
+        assert_eq!(
+            read(vec![TypeRef::ident("Foo"), TypeRef::Undefined]),
+            "Option < Foo >"
         );
     }
 

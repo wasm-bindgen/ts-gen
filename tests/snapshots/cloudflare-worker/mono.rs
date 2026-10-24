@@ -142,7 +142,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_method(this: &RequestInit, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &RequestInit) -> JsValue;
+    pub fn headers(this: &RequestInit) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &RequestInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -150,7 +150,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_slice(this: &RequestInit, val: &[ArrayTuple<(JsString, JsString)>]);
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &RequestInit) -> JsValue;
+    pub fn body(this: &RequestInit) -> Option<Nullable<JsValue>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body(this: &RequestInit, val: &ReadableStream);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -386,7 +386,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "statusText")]
     pub fn set_status_text(this: &ResponseInit, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &ResponseInit) -> JsValue;
+    pub fn headers(this: &ResponseInit) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]

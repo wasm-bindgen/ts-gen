@@ -1094,7 +1094,7 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainDateToZonedDateTimeOptions;
         #[wasm_bindgen(method, getter, js_name = "plainTime")]
-        pub fn plain_time(this: &PlainDateToZonedDateTimeOptions) -> JsValue;
+        pub fn plain_time(this: &PlainDateToZonedDateTimeOptions) -> Option<JsValue>;
         #[wasm_bindgen(method, setter, js_name = "plainTime")]
         pub fn set_plain_time(this: &PlainDateToZonedDateTimeOptions, val: &PlainTime);
         #[wasm_bindgen(method, setter, js_name = "plainTime")]
@@ -5273,7 +5273,7 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type InstantToStringOptions;
         #[wasm_bindgen(method, getter, js_name = "timeZone")]
-        pub fn time_zone(this: &InstantToStringOptions) -> JsValue;
+        pub fn time_zone(this: &InstantToStringOptions) -> Option<JsValue>;
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
         pub fn set_time_zone(this: &InstantToStringOptions, val: &ZonedDateTime);
         #[wasm_bindgen(method, setter, js_name = "timeZone")]
