@@ -224,7 +224,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FormatSettings;
     #[wasm_bindgen(method, getter)]
-    pub fn locales(this: &FormatSettings) -> JsValue;
+    pub fn locales(this: &FormatSettings) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_locales(this: &FormatSettings, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "locales")]
