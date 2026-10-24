@@ -3605,8 +3605,15 @@ Identity depends on the members:
 
 A new enum is named from its first use, in source order:
 
-1. **Bare anchor** (`ContentKind`).
-2. **Numeric suffix** (`ContentKind2`, `ContentKind3`) when the bare
+1. **A `js_sys` enum.** A set of string literals that is exactly the
+   values of one of a short, explicit list of `js_sys` enums, in any
+   order, is that enum, imported under its own name rather than emitted:
+   `"ceil" | "floor" | … | "halfEven"` is `js_sys::Intl::RoundingMode`.
+   The list holds `Intl::RoundingMode`, `Intl::RoundingPriority`,
+   `Intl::TrailingZeroDisplay` and `Intl::LocaleMatcher`; `js_sys::Temporal`
+   enums are left out because they need `--cfg=js_sys_unstable_apis`.
+2. **Bare anchor** (`ContentKind`).
+3. **Numeric suffix** (`ContentKind2`, `ContentKind3`) when the bare
    anchor is taken: by a declaration, by a
    [union alias's](#named-union-aliases) `<Alias>Kind`, or by an earlier
    synthesised enum. `offset?: "auto" | "never"` and, later,
@@ -3625,7 +3632,7 @@ is `temporal::OverflowKind`. A use in any other module names it by path
 (`super::clock::UnitKind` from `calendar`). A structural union's uses
 are all on one member, so it sits with its owner (or the first type
 inheriting the member, when that is emitted first); a literal set may be
-shared across modules.
+shared across modules. A `js_sys` enum is imported at the top level.
 
 #### When synthesis fires
 

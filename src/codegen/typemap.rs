@@ -383,6 +383,9 @@ pub struct DynamicUnionInfo {
     /// The `pub mod` the enum is emitted in: its first use's. Uses in any
     /// other module name it by path.
     pub home: Vec<String>,
+    /// The `js_sys` enum with the same values that stands in for it, which
+    /// is imported under [`Self::rust_name`] rather than emitted.
+    pub js_sys: Option<&'static str>,
 }
 
 /// Claim a fresh Rust enum name for a synthesised dynamic union: the bare
@@ -393,6 +396,11 @@ pub struct DynamicUnionInfo {
 /// discriminated-enum types `<Concept>Kind`, e.g. `ContentKind`.
 fn allocate_dynamic_union_name(names: &mut LocalScope, anchor: &str) -> String {
     names.declare(&format!("{anchor}Kind"), Suffix::Pascal)
+}
+
+/// The name a `js_sys` enum is imported under: its own.
+fn js_sys_local_name(path: &str) -> &str {
+    path.rsplit("::").next().unwrap_or(path)
 }
 
 /// Stable, hash-friendly representation of a `TypeRef` used as the
@@ -1242,8 +1250,18 @@ impl<'a> CodegenContext<'a> {
             }
             return (info.rust_name.clone(), info.members.clone());
         }
-        let rust_name =
-            allocate_dynamic_union_name(&mut self.names.borrow_mut(), &use_site.enum_anchor());
+        let mut names = self.names.borrow_mut();
+        let js_sys = literal
+            .then(|| super::dynamic_unions::js_sys_enum(members))
+            .flatten()
+            .filter(|path| names.claim(js_sys_local_name(path)));
+        let rust_name = match js_sys {
+            Some(path) => {
+                self.register_external(js_sys_local_name(path), path);
+                js_sys_local_name(path).to_string()
+            }
+            None => allocate_dynamic_union_name(&mut names, &use_site.enum_anchor()),
+        };
         reg.by_key.insert(
             key,
             DynamicUnionInfo {
@@ -1254,20 +1272,22 @@ impl<'a> CodegenContext<'a> {
                 fallback: arms.fallback,
                 merged_shapes: arms.merged_shapes.clone(),
                 home: self.emit_path.borrow().clone(),
+                js_sys,
             },
         );
         (rust_name, members.to_vec())
     }
 
     /// A synthesised enum as named from the `pub mod` being emitted into:
-    /// bare in its own module, by path from any other.
+    /// bare in its own module, by path from any other. A `js_sys` enum is
+    /// imported at the top level, so it is bare everywhere.
     pub(crate) fn synthesised_enum_path(&self, name: &str) -> TokenStream {
         let ident = make_ident(name);
         let registry = self.dynamic_unions.borrow();
         let home = registry
             .by_key
             .values()
-            .find(|info| info.rust_name == name)
+            .find(|info| info.rust_name == name && info.js_sys.is_none())
             .map(|info| info.home.clone());
         match home.and_then(|home| self.path_qualifier(&home)) {
             Some(qualifier) => quote! { #qualifier #ident },
