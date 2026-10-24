@@ -37,6 +37,8 @@ export declare class SubtleCrypto {
 export interface KVStore<Key = unknown> {
   get(key: Key, type: "text"): Promise<string | null>;
   get<ExpectedValue = unknown>(key: Key, type: "json"): Promise<ExpectedValue | null>;
+  /** A `null` arm on a generic receiver keeps the receiver's `Key`. */
+  put(key: Key, kind: "a" | "b", value: string | null): void;
 }
 
 // A literal cohort with a `null` arm: the `(kind, null)` expansions form a
@@ -48,6 +50,20 @@ export declare class Picker {
   static make(kind: "a" | "b", x: string | null): Picker;
   /** The `null` arm's wrappers and extern drop `T`, which only it named. */
   put<T>(kind: "a" | "b", x: T | null): void;
+  /** Under mono, each `null` arm has a `_js_string` sibling. */
+  name(kind: "a" | "b", x: ArrayBuffer | null): string;
+  /** `_promise` forms follow per `null` arm. */
+  load(kind: "a" | "b", x: ArrayBuffer | null): Promise<string | null>;
+}
+
+// A plain `null` arm's private binding is claimed before the cohort's, so
+// the two never share a name: `mode()` binds `__mode` and the cohort
+// `__mode_2`; `f_with_null()` binds `__f_with_null` and the `null` cohort
+// `__f_with_null_2`.
+export interface Clash {
+  mode(kind: "x" | "y" | null): void;
+  f(x: ArrayBuffer | null): void;
+  f(kind: "a" | "b", x: ArrayBuffer | null): void;
 }
 
 // A literal repeated across overloads is one arm: `"b"` gets one wrapper.
@@ -63,4 +79,6 @@ export declare class Boxed<T = unknown> {
   constructor(kind: "a" | "b");
   static label(kind: "a" | "b"): string;
   static of<T>(kind: "a" | "b", value: T): Boxed<T>;
+  /** A static's `null` arm lands where its return puts it. */
+  static from<T>(kind: "a" | "b", value: T | null): Boxed<T>;
 }

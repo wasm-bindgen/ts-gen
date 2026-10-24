@@ -2842,7 +2842,10 @@ impl CompressionStream {
   `--experimental-generic-mono`, does the `_js_string` return variant
   (`describe_raw_js_string` over `__describe_js_string`). The prefix,
   rather than a suffix, keeps a private binding from reading as one of
-  these public variants.
+  these public variants. A cohort's binding steps aside for a plain
+  `null` arm's (`__<name>_2`): `mode(kind: "x" | "y" | null)` gives
+  `mode()` over `__mode`, the literal-free form, and `mode_x` /
+  `mode_y` over `__mode_2`.
 * A generic receiver (`KVStore<Key>`) gives `impl<Key: JsGeneric>
   KVStore<Key>`; the method's own type parameters stay on the wrapper
   fn. A static's wrappers go where wasm-bindgen puts the static: one

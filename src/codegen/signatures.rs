@@ -246,22 +246,18 @@ pub struct LiteralSpec {
     pub stem: String,
     /// The private binding's Rust name, `__<stem>`: the prefix keeps it
     /// apart from every public name, `_js_string` variants included.
+    /// Declared once the callable's other private names are claimed (see
+    /// [`build_signatures`]).
     pub binding: String,
 }
 
 impl LiteralSpec {
-    fn new(
-        positions: Vec<usize>,
-        arms: Vec<(Vec<String>, String)>,
-        stem: String,
-        names: &mut LocalScope,
-    ) -> Self {
-        let binding = names.declare(&format!("__{stem}"), Suffix::Snake);
+    fn new(positions: Vec<usize>, arms: Vec<(Vec<String>, String)>, stem: String) -> Self {
         Self {
             positions,
             arms,
             stem,
-            binding,
+            binding: String::new(),
         }
     }
 
@@ -274,7 +270,7 @@ impl LiteralSpec {
             .iter()
             .map(|(lits, name)| (lits.clone(), names.declare(&f(name), Suffix::Snake)))
             .collect();
-        Self::new(self.positions.clone(), arms, f(&self.stem), names)
+        Self::new(self.positions.clone(), arms, f(&self.stem))
     }
 }
 
@@ -800,7 +796,7 @@ pub fn build_signatures(
                 params: params.clone(),
                 overload,
                 primary_name: arms[0].1.clone(),
-                literal: Some(LiteralSpec::new(positions.clone(), arms, stem, names)),
+                literal: Some(LiteralSpec::new(positions.clone(), arms, stem)),
             });
         }
     }
@@ -927,6 +923,20 @@ pub fn build_signatures(
         }
     }
 
+    // A `null` arm outside a literal cohort binds `__<name>` too (see
+    // `null_arms`). Claim those first, so a cohort's binding never takes
+    // one: `f(x: T | null)` beside `f(kind: "a" | "b", x: T | null)`
+    // would otherwise bind `__f_with_null` twice.
+    for sig in &out {
+        if sig.literal.is_none() && sig.params.iter().any(|p| p.type_ref == TypeRef::Null) {
+            names.claim(format!("__{}", sig.rust_name));
+        }
+    }
+    for sig in &mut out {
+        if let Some(spec) = &mut sig.literal {
+            spec.binding = names.declare(&format!("__{}", spec.stem), Suffix::Snake);
+        }
+    }
     out
 }
 
@@ -4117,6 +4127,41 @@ mod tests {
                     vec!["try_pick_a_with_null", "try_pick_b_with_null"]
                 ),
             ]
+        );
+    }
+
+    #[test]
+    fn literal_binding_avoids_a_plain_null_arms_binding() {
+        // `f(x: Foo | null)` beside `f(kind: "a" | "b", x: Foo | null)`: the
+        // plain `f_with_null` binds `__f_with_null` in `null_arms`, so the
+        // cohort's `null` arm takes the next free name.
+        let mut used = no_used();
+        let x = || typed_param("x", TypeRef::union([TypeRef::ident("Foo"), TypeRef::Null]));
+        let kind = typed_param(
+            "kind",
+            TypeRef::union([
+                TypeRef::StringLiteral("a".into()),
+                TypeRef::StringLiteral("b".into()),
+            ]),
+        );
+        let sigs = expand_overloads(
+            "f",
+            &[&[x()], &[kind, x()]],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        let names: Vec<&str> = sigs.iter().map(|s| s.rust_name.as_str()).collect();
+        assert!(names.contains(&"f_with_null"), "{names:?}");
+        let bindings: Vec<&str> = sigs
+            .iter()
+            .filter_map(|s| s.literal.as_ref())
+            .map(|l| l.binding.as_str())
+            .collect();
+        assert_eq!(
+            bindings,
+            ["__f", "__try_f", "__f_with_null_2", "__try_f_with_null_2"]
         );
     }
 

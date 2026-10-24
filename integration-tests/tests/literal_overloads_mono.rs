@@ -2,11 +2,11 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Uint8Array};
+use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Promise, Uint8Array};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads_mono::{
-    Boxed, Headers, KVNamespace, KVStore, Picker, Repeats, SubtleCrypto,
+    Boxed, Clash, Headers, KVNamespace, KVStore, Picker, Repeats, SubtleCrypto,
 };
 
 // No backing JavaScript module; compile-only coverage that under
@@ -81,5 +81,34 @@ fn generic_class_arms_compile(obj: &Object) -> Result<(), JsValue> {
     let _: Boxed<Object> = Boxed::of_b(obj.clone());
     let _: Boxed<Object> = Boxed::of_a(obj.clone());
     let _: Boxed = Boxed::new_a()?;
+    Ok(())
+}
+
+// A `null` arm's `_js_string` and `_promise` forms, on a generic receiver
+// and on a static returning its class; and a plain `null` arm beside a
+// cohort, whose private bindings don't collide.
+#[allow(dead_code)]
+async fn null_arm_forms_compile(
+    picker: &Picker,
+    store: &KVStore<JsString>,
+    clash: &Clash,
+    buf: &ArrayBuffer,
+    obj: &Object,
+) -> Result<(), JsValue> {
+    let _: String = picker.name_a_with_null();
+    let _: JsString = picker.name_b_with_null_js_string();
+    let _: Nullable<String> = picker.load_b_with_null().await?;
+    let _: Nullable<JsString> = picker.load_a_with_null_js_string().await?;
+    let _: Promise<Nullable<JsString>> = picker.load_a_with_null_promise();
+    store.put_a(JsString::from("k"), "v");
+    store.put_b_with_null(JsString::from("k"));
+    let _: Boxed<Object> = Boxed::from_a(obj.clone());
+    let _: Boxed<Object> = Boxed::from_b_with_null();
+    clash.mode();
+    clash.mode_x();
+    clash.f(buf);
+    clash.f_with_null();
+    clash.f_a(buf);
+    clash.f_b_with_null();
     Ok(())
 }

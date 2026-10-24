@@ -257,6 +257,34 @@ extern "C" {
         key: &Key,
         r#type: &str,
     ) -> Promise<JsNullable<ExpectedValue>>;
+    #[wasm_bindgen(method, js_name = "put")]
+    fn __put<Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        kind: &str,
+        value: &str,
+    );
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    fn __try_put<Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        kind: &str,
+        value: &str,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    fn __put_with_null<Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        kind: &str,
+        value: &::wasm_bindgen::JsValue,
+    );
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    fn __try_put_with_null<Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        kind: &str,
+        value: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
 }
 impl<Key: ::wasm_bindgen::JsGeneric> KVStore<Key> {
     pub async fn get_text(&self, key: &Key) -> Result<Nullable<String>, JsValue> {
@@ -279,6 +307,38 @@ impl<Key: ::wasm_bindgen::JsGeneric> KVStore<Key> {
         key: &Key,
     ) -> Promise<JsNullable<ExpectedValue>> {
         self.__get_json_promise(key, "json")
+    }
+    #[doc = " A `null` arm on a generic receiver keeps the receiver's `Key`."]
+    pub fn put_a(&self, key: &Key, value: &str) {
+        self.__put(key, "a", value)
+    }
+    #[doc = " A `null` arm on a generic receiver keeps the receiver's `Key`."]
+    pub fn put_b(&self, key: &Key, value: &str) {
+        self.__put(key, "b", value)
+    }
+    #[doc = " A `null` arm on a generic receiver keeps the receiver's `Key`."]
+    pub fn try_put_a(&self, key: &Key, value: &str) -> Result<(), JsValue> {
+        self.__try_put(key, "a", value)
+    }
+    #[doc = " A `null` arm on a generic receiver keeps the receiver's `Key`."]
+    pub fn try_put_b(&self, key: &Key, value: &str) -> Result<(), JsValue> {
+        self.__try_put(key, "b", value)
+    }
+    #[doc = " A `null` arm on a generic receiver keeps the receiver's `Key`."]
+    pub fn put_a_with_null(&self, key: &Key) {
+        self.__put_with_null(key, "a", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " A `null` arm on a generic receiver keeps the receiver's `Key`."]
+    pub fn put_b_with_null(&self, key: &Key) {
+        self.__put_with_null(key, "b", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " A `null` arm on a generic receiver keeps the receiver's `Key`."]
+    pub fn try_put_a_with_null(&self, key: &Key) -> Result<(), JsValue> {
+        self.__try_put_with_null(key, "a", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " A `null` arm on a generic receiver keeps the receiver's `Key`."]
+    pub fn try_put_b_with_null(&self, key: &Key) -> Result<(), JsValue> {
+        self.__try_put_with_null(key, "b", &::wasm_bindgen::JsValue::NULL)
     }
 }
 #[wasm_bindgen(module = "literal-overloads")]
@@ -322,6 +382,38 @@ extern "C" {
         kind: &str,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "name")]
+    fn __name(this: &Picker, kind: &str, x: &ArrayBuffer) -> String;
+    #[wasm_bindgen(method, catch, js_name = "name")]
+    fn __try_name(this: &Picker, kind: &str, x: &ArrayBuffer) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "name")]
+    fn __name_with_null(this: &Picker, kind: &str, x: &::wasm_bindgen::JsValue) -> String;
+    #[wasm_bindgen(method, catch, js_name = "name")]
+    fn __try_name_with_null(
+        this: &Picker,
+        kind: &str,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "load")]
+    async fn __load(
+        this: &Picker,
+        kind: &str,
+        x: &ArrayBuffer,
+    ) -> Result<Nullable<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "load")]
+    fn __load_promise(this: &Picker, kind: &str, x: &ArrayBuffer) -> Promise<JsNullable<JsString>>;
+    #[wasm_bindgen(method, catch, js_name = "load")]
+    async fn __load_with_null(
+        this: &Picker,
+        kind: &str,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<Nullable<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "load")]
+    fn __load_with_null_promise(
+        this: &Picker,
+        kind: &str,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Promise<JsNullable<JsString>>;
 }
 impl Picker {
     pub fn pick_a(&self, x: &ArrayBuffer) {
@@ -404,6 +496,158 @@ impl Picker {
     pub fn try_put_b_with_null(&self) -> Result<(), JsValue> {
         self.__try_put_with_null("b", &::wasm_bindgen::JsValue::NULL)
     }
+    #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
+    pub fn name_a(&self, x: &ArrayBuffer) -> String {
+        self.__name("a", x)
+    }
+    #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
+    pub fn name_b(&self, x: &ArrayBuffer) -> String {
+        self.__name("b", x)
+    }
+    #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
+    pub fn try_name_a(&self, x: &ArrayBuffer) -> Result<String, JsValue> {
+        self.__try_name("a", x)
+    }
+    #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
+    pub fn try_name_b(&self, x: &ArrayBuffer) -> Result<String, JsValue> {
+        self.__try_name("b", x)
+    }
+    #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
+    pub fn name_a_with_null(&self) -> String {
+        self.__name_with_null("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
+    pub fn name_b_with_null(&self) -> String {
+        self.__name_with_null("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
+    pub fn try_name_a_with_null(&self) -> Result<String, JsValue> {
+        self.__try_name_with_null("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
+    pub fn try_name_b_with_null(&self) -> Result<String, JsValue> {
+        self.__try_name_with_null("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " `_promise` forms follow per `null` arm."]
+    pub async fn load_a(&self, x: &ArrayBuffer) -> Result<Nullable<String>, JsValue> {
+        self.__load("a", x).await
+    }
+    #[doc = " `_promise` forms follow per `null` arm."]
+    pub async fn load_b(&self, x: &ArrayBuffer) -> Result<Nullable<String>, JsValue> {
+        self.__load("b", x).await
+    }
+    #[doc = " `_promise` forms follow per `null` arm."]
+    pub fn load_a_promise(&self, x: &ArrayBuffer) -> Promise<JsNullable<JsString>> {
+        self.__load_promise("a", x)
+    }
+    #[doc = " `_promise` forms follow per `null` arm."]
+    pub fn load_b_promise(&self, x: &ArrayBuffer) -> Promise<JsNullable<JsString>> {
+        self.__load_promise("b", x)
+    }
+    #[doc = " `_promise` forms follow per `null` arm."]
+    pub async fn load_a_with_null(&self) -> Result<Nullable<String>, JsValue> {
+        self.__load_with_null("a", &::wasm_bindgen::JsValue::NULL)
+            .await
+    }
+    #[doc = " `_promise` forms follow per `null` arm."]
+    pub async fn load_b_with_null(&self) -> Result<Nullable<String>, JsValue> {
+        self.__load_with_null("b", &::wasm_bindgen::JsValue::NULL)
+            .await
+    }
+    #[doc = " `_promise` forms follow per `null` arm."]
+    pub fn load_a_with_null_promise(&self) -> Promise<JsNullable<JsString>> {
+        self.__load_with_null_promise("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " `_promise` forms follow per `null` arm."]
+    pub fn load_b_with_null_promise(&self) -> Promise<JsNullable<JsString>> {
+        self.__load_with_null_promise("b", &::wasm_bindgen::JsValue::NULL)
+    }
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Clash;
+    #[wasm_bindgen(method, js_name = "mode")]
+    fn __mode_2(this: &Clash, kind: &str);
+    #[wasm_bindgen(method, catch, js_name = "mode")]
+    fn __try_mode_2(this: &Clash, kind: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "mode")]
+    fn __mode(this: &Clash, kind: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, catch, js_name = "mode")]
+    fn __try_mode(this: &Clash, kind: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn f(this: &Clash, x: &ArrayBuffer);
+    #[wasm_bindgen(method, catch, js_name = "f")]
+    pub fn try_f(this: &Clash, x: &ArrayBuffer) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "f")]
+    fn __f_with_null(this: &Clash, x: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, catch, js_name = "f")]
+    fn __try_f_with_null(this: &Clash, x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "f")]
+    fn __f(this: &Clash, kind: &str, x: &ArrayBuffer);
+    #[wasm_bindgen(method, catch, js_name = "f")]
+    fn __try_f(this: &Clash, kind: &str, x: &ArrayBuffer) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "f")]
+    fn __f_with_null_2(this: &Clash, kind: &str, x: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, catch, js_name = "f")]
+    fn __try_f_with_null_2(
+        this: &Clash,
+        kind: &str,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
+}
+impl Clash {
+    pub fn mode(&self) {
+        self.__mode(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_mode(&self) -> Result<(), JsValue> {
+        self.__try_mode(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn f_with_null(&self) {
+        self.__f_with_null(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_f_with_null(&self) -> Result<(), JsValue> {
+        self.__try_f_with_null(&::wasm_bindgen::JsValue::NULL)
+    }
+}
+impl Clash {
+    pub fn mode_x(&self) {
+        self.__mode_2("x")
+    }
+    pub fn mode_y(&self) {
+        self.__mode_2("y")
+    }
+    pub fn try_mode_x(&self) -> Result<(), JsValue> {
+        self.__try_mode_2("x")
+    }
+    pub fn try_mode_y(&self) -> Result<(), JsValue> {
+        self.__try_mode_2("y")
+    }
+    pub fn f_a(&self, x: &ArrayBuffer) {
+        self.__f("a", x)
+    }
+    pub fn f_b(&self, x: &ArrayBuffer) {
+        self.__f("b", x)
+    }
+    pub fn try_f_a(&self, x: &ArrayBuffer) -> Result<(), JsValue> {
+        self.__try_f("a", x)
+    }
+    pub fn try_f_b(&self, x: &ArrayBuffer) -> Result<(), JsValue> {
+        self.__try_f("b", x)
+    }
+    pub fn f_a_with_null(&self) {
+        self.__f_with_null_2("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn f_b_with_null(&self) {
+        self.__f_with_null_2("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_f_a_with_null(&self) -> Result<(), JsValue> {
+        self.__try_f_with_null_2("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_f_b_with_null(&self) -> Result<(), JsValue> {
+        self.__try_f_with_null_2("b", &::wasm_bindgen::JsValue::NULL)
+    }
 }
 #[wasm_bindgen(module = "literal-overloads")]
 extern "C" {
@@ -450,6 +694,21 @@ extern "C" {
     fn __of<T: ::wasm_bindgen::JsGeneric>(kind: &str, value: &T) -> Boxed<T>;
     # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "of")]
     fn __try_of<T: ::wasm_bindgen::JsGeneric>(kind: &str, value: &T) -> Result<Boxed<T>, JsValue>;
+    # [wasm_bindgen (static_method_of = Boxed , js_name = "from")]
+    fn __from<T: ::wasm_bindgen::JsGeneric>(kind: &str, value: &T) -> Boxed<T>;
+    # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "from")]
+    fn __try_from<T: ::wasm_bindgen::JsGeneric>(kind: &str, value: &T)
+        -> Result<Boxed<T>, JsValue>;
+    # [wasm_bindgen (static_method_of = Boxed , js_name = "from")]
+    fn __from_with_null<T: ::wasm_bindgen::JsGeneric>(
+        kind: &str,
+        value: &::wasm_bindgen::JsValue,
+    ) -> Boxed<T>;
+    # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "from")]
+    fn __try_from_with_null<T: ::wasm_bindgen::JsGeneric>(
+        kind: &str,
+        value: &::wasm_bindgen::JsValue,
+    ) -> Result<Boxed<T>, JsValue>;
 }
 impl Boxed {
     pub fn new_a() -> Result<Boxed, JsValue> {
@@ -483,5 +742,37 @@ impl<T: ::wasm_bindgen::JsGeneric> Boxed<T> {
     }
     pub fn try_of_b(value: &T) -> Result<Boxed<T>, JsValue> {
         Self::__try_of("b", value)
+    }
+    #[doc = " A static's `null` arm lands where its return puts it."]
+    pub fn from_a(value: &T) -> Boxed<T> {
+        Self::__from("a", value)
+    }
+    #[doc = " A static's `null` arm lands where its return puts it."]
+    pub fn from_b(value: &T) -> Boxed<T> {
+        Self::__from("b", value)
+    }
+    #[doc = " A static's `null` arm lands where its return puts it."]
+    pub fn try_from_a(value: &T) -> Result<Boxed<T>, JsValue> {
+        Self::__try_from("a", value)
+    }
+    #[doc = " A static's `null` arm lands where its return puts it."]
+    pub fn try_from_b(value: &T) -> Result<Boxed<T>, JsValue> {
+        Self::__try_from("b", value)
+    }
+    #[doc = " A static's `null` arm lands where its return puts it."]
+    pub fn from_a_with_null() -> Boxed<T> {
+        Self::__from_with_null("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " A static's `null` arm lands where its return puts it."]
+    pub fn from_b_with_null() -> Boxed<T> {
+        Self::__from_with_null("b", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " A static's `null` arm lands where its return puts it."]
+    pub fn try_from_a_with_null() -> Result<Boxed<T>, JsValue> {
+        Self::__try_from_with_null("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    #[doc = " A static's `null` arm lands where its return puts it."]
+    pub fn try_from_b_with_null() -> Result<Boxed<T>, JsValue> {
+        Self::__try_from_with_null("b", &::wasm_bindgen::JsValue::NULL)
     }
 }

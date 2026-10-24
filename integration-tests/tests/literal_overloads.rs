@@ -4,7 +4,7 @@ use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Promise};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads::{
-    Boxed, Headers, KVNamespace, KVStore, Picker, Repeats, SubtleCrypto,
+    Boxed, Clash, Headers, KVNamespace, KVStore, Picker, Repeats, SubtleCrypto,
 };
 
 // No backing JavaScript module; compile-only coverage that each literal arm
@@ -71,5 +71,34 @@ fn generic_class_arms_compile(obj: &Object) -> Result<(), JsValue> {
     let _: Boxed<Object> = Boxed::of_b(obj);
     let _: Boxed<Object> = Boxed::of_a(obj);
     let _: Boxed = Boxed::new_a()?;
+    Ok(())
+}
+
+// A `null` arm's `_promise` / `try_` forms, on a generic receiver and on a
+// static returning its class; and a plain `null` arm beside a cohort,
+// whose private bindings don't collide.
+#[allow(dead_code)]
+async fn null_arm_forms_compile(
+    picker: &Picker,
+    store: &KVStore<JsString>,
+    key: &JsString,
+    clash: &Clash,
+    buf: &ArrayBuffer,
+    obj: &Object,
+) -> Result<(), JsValue> {
+    let _: String = picker.name_a_with_null();
+    let _: Result<String, JsValue> = picker.try_name_b_with_null();
+    let _: Nullable<String> = picker.load_b_with_null().await?;
+    let _: Promise<JsNullable<JsString>> = picker.load_a_with_null_promise();
+    store.put_a(key, "v");
+    store.put_b_with_null(key);
+    let _: Boxed<Object> = Boxed::from_a(obj);
+    let _: Boxed<Object> = Boxed::from_b_with_null();
+    clash.mode();
+    clash.mode_x();
+    clash.f(buf);
+    clash.f_with_null();
+    clash.f_a(buf);
+    clash.f_b_with_null();
     Ok(())
 }
