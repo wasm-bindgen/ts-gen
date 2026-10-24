@@ -271,6 +271,10 @@ pub struct CodegenContext<'a> {
     /// Whether generic imports use wasm-bindgen's experimental
     /// per-monomorphization codegen rather than type erasure.
     pub experimental_generic_mono: bool,
+    /// Whether `Promise`-returning callables are bound only as a sync
+    /// binding returning the promise. See
+    /// [`crate::codegen::GenerateOptions::promise_only`].
+    pub promise_only: bool,
     /// JS module specifiers whose declarations are emitted, each in the
     /// `pub mod` of `module_path`.
     pub exported_modules: HashSet<String>,
@@ -1118,6 +1122,7 @@ impl<'a> CodegenContext<'a> {
             fallible: options.fallible,
             error_enum: options.error_enum.clone(),
             experimental_generic_mono: options.experimental_generic_mono,
+            promise_only: options.promise_only,
             exported_modules,
             externalised_modules,
             unresolved_module_refs: RefCell::new(HashSet::new()),
@@ -1179,6 +1184,7 @@ impl<'a> CodegenContext<'a> {
             fallible: false,
             error_enum: None,
             experimental_generic_mono: false,
+            promise_only: false,
             exported_modules: HashSet::new(),
             externalised_modules: HashSet::new(),
             unresolved_module_refs: RefCell::new(HashSet::new()),
@@ -2821,6 +2827,13 @@ fn lower_reference(
     match head {
         "Promise" | "PromiseLike" => {
             let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
+            if let Some(arg) = mono_awaited_promise_arg(&inner, pos, ctx, scope, from_module) {
+                return if is_jsvalue_arg(&arg) {
+                    quote! { Promise }
+                } else {
+                    quote! { Promise<#arg> }
+                };
+            }
             if let Some(arg) = mono_promise_carrier(&inner, pos, ctx, scope, from_module) {
                 return quote! { Promise<#arg> };
             }
@@ -2921,6 +2934,86 @@ fn mono_promise_carrier(
     let (core, n, scope) = split_empties_in(inner, ctx, scope)?;
     let inner_ty = to_syn_type(&core, pos.to_inner(), ctx, scope, from_module);
     (!is_jsvalue_arg(&inner_ty)).then(|| nullable_carrier(inner_ty, n))
+}
+
+/// Under `--promise-only` with per-monomorphization, the `T` of a top-level
+/// `Promise<T>` the caller receives is the value it wants after awaiting:
+/// `Promise<String>`, `Promise<f64>`, `Promise<()>`, `Promise<Array<String>>`,
+/// with the read carriers around a `T` admitting empties
+/// (`Promise<Nullable<String>>`). Awaiting converts through
+/// `JsFuture<T: FromWasmAbi>`, which these all satisfy. One the caller
+/// passes, or nested in another type, keeps the `JsGeneric` handle as
+/// without the flag.
+fn mono_awaited_promise_arg(
+    inner: &TypeRef,
+    pos: TypePosition,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> Option<TokenStream> {
+    let ctx = ctx.filter(|c| c.experimental_generic_mono && c.promise_only)?;
+    if pos.inner || pos.is_argument() {
+        return None;
+    }
+    Some(to_mono_awaited_arg(
+        inner,
+        ctx,
+        scope,
+        from_module,
+        &mut HashSet::new(),
+    ))
+}
+
+/// The awaited value of [`mono_awaited_promise_arg`]: native leaves
+/// (primitives, enums) and locally declared generic instantiations as
+/// [`to_mono_user_generic_arg`] lowers them, `void` as `()`, the read
+/// carriers around empties, and a list as an `Array` of its awaited
+/// element. Anything else keeps its inner-position handle.
+fn to_mono_awaited_arg(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+    visited: &mut HashSet<TypeId>,
+) -> TokenStream {
+    let (peeled, peeled_scope) = peel_mono(ty, ctx, scope, visited);
+    match peeled.as_ref() {
+        TypeRef::Void | TypeRef::Undefined => quote! { () },
+        t if is_mono_native_leaf(t, ctx, peeled_scope)
+            || local_generic_args(t, ctx, peeled_scope).is_some() =>
+        {
+            to_syn_type(
+                t,
+                TypePosition::RETURN,
+                Some(ctx),
+                peeled_scope,
+                from_module,
+            )
+        }
+        t if let Some((inner, n, s)) = split_empties_in(t, Some(ctx), peeled_scope) => {
+            let inner = to_mono_awaited_arg(&inner, ctx, s, from_module, visited);
+            if is_jsvalue_arg(&inner) {
+                inner
+            } else {
+                nullable_carrier(inner, n)
+            }
+        }
+        TypeRef::Array(element) => {
+            let element = to_mono_awaited_arg(element, ctx, peeled_scope, from_module, visited);
+            if is_jsvalue_arg(&element) {
+                quote! { Array }
+            } else {
+                quote! { Array<#element> }
+            }
+        }
+        _ => to_syn_type(
+            ty,
+            TypePosition::RETURN.to_inner(),
+            Some(ctx),
+            scope,
+            from_module,
+        ),
+    }
 }
 
 /// Append `generic_args` to `base` when `name` is a locally emitted generic
@@ -5558,6 +5651,69 @@ mod tests {
                 "Array < JsString >"
             );
         });
+    }
+
+    #[test]
+    fn promise_only_mono_promises_carry_awaited_values() {
+        let (module, gctx) = crate::parse_source(MONO_SRC, None).unwrap();
+        let scope = *module.file_scopes.first().expect("file scope");
+        let lower = |mono: bool, promise_only: bool, inner: TypeRef, pos: TypePosition| {
+            let options = GenerateOptions::new()
+                .experimental_generic_mono(mono)
+                .promise_only(promise_only);
+            let ctx = CodegenContext::from_module_full(&module, &gctx, &options, None).unwrap();
+            let ty = TypeRef::generic("Promise", vec![inner]);
+            to_syn_type(&ty, pos, Some(&ctx), scope, &ModuleContext::Global).to_string()
+        };
+        let ret = |inner: TypeRef| lower(true, true, inner, TypePosition::RETURN);
+        let strings = TypeRef::Array(Box::new(TypeRef::String));
+        assert_eq!(ret(TypeRef::String), "Promise < String >");
+        assert_eq!(ret(TypeRef::ident("IdChain")), "Promise < String >");
+        assert_eq!(ret(TypeRef::Number), "Promise < f64 >");
+        assert_eq!(ret(TypeRef::Void), "Promise < () >");
+        assert_eq!(ret(TypeRef::ident("Mode")), "Promise < Mode >");
+        assert_eq!(ret(strings.clone()), "Promise < Array < String > >");
+        assert_eq!(
+            ret(TypeRef::Array(Box::new(strings.clone()))),
+            "Promise < Array < Array < String > > >"
+        );
+        assert_eq!(
+            ret(TypeRef::ident("MaybeId")),
+            "Promise < Nullable < String > >"
+        );
+        assert_eq!(
+            ret(TypeRef::union(vec![
+                TypeRef::String,
+                TypeRef::Null,
+                TypeRef::Undefined
+            ])),
+            "Promise < Option < Nullable < String >> >"
+        );
+        assert_eq!(
+            ret(holder(TypeRef::String)),
+            "Promise < Holder < String > >"
+        );
+        assert_eq!(ret(TypeRef::ident("Plain")), "Promise < Plain >");
+        assert_eq!(ret(TypeRef::Any), "Promise");
+        // An argument, an inner position, and either flag alone keep the
+        // handle.
+        let inner = TypePosition::RETURN.to_inner();
+        assert_eq!(
+            lower(true, true, TypeRef::String, TypePosition::ARGUMENT),
+            "& Promise < JsString >"
+        );
+        assert_eq!(
+            lower(true, true, TypeRef::String, inner),
+            "Promise < JsString >"
+        );
+        assert_eq!(
+            lower(true, false, strings.clone(), TypePosition::RETURN),
+            "Promise < Array < JsString > >"
+        );
+        assert_eq!(
+            lower(false, true, strings, TypePosition::RETURN),
+            "Promise < Array < JsString > >"
+        );
     }
 
     #[test]

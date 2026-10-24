@@ -1,5 +1,6 @@
 //! @ts-gen --lib-name promise-builtins --export promise-builtins --export tests/fixtures/promise-builtins.d.ts
 //! @ts-gen --export node:fs --export fs --export cloudflare:sockets --export bun:sqlite --export user-lib --export npm:lodash --export jsr:@std/path --export https://esm.sh/foo
+//! @ts-gen-variants promise-only
 
 // Fixture: under `--fallible` (the `mono` snapshot) an async callable's
 // sync `_promise` form catches a synchronous throw, except where calling
@@ -15,7 +16,9 @@
 //   context, but ts-gen parses every input, a `.ts` one included, as
 //   declarations, and the modifier comes through.
 // `@throws` on an async callable describes the rejection, which the
-// `async fn` form keeps carrying either way.
+// `async fn` form keeps carrying either way. The `-promise-only`
+// snapshots bind the `_promise` form alone, under the primary name, by
+// the same rule.
 
 /** The `--lib-name` module is the user's: `Result<Promise<JsString>, JsValue>`. */
 export declare function load(url: string): Promise<string>;

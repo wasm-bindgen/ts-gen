@@ -16,6 +16,7 @@
     "never-returns": "file:./js/never-returns",
     "node-nullable": "file:./js/node-nullable",
     "optional-reads": "file:./js/optional-reads",
+    "promise-only": "file:./js/promise-only",
     "slice-args": "file:./js/slice-args",
     "slice-hints": "file:./js/slice-hints",
     "union-alias-reads": "file:./js/union-alias-reads"

@@ -12,6 +12,10 @@
 //! flags the CLI supports (e.g. `--lib-name`, `--external`) just work. Flags
 //! owned by a configuration can't appear there.
 //!
+//! A `//! @ts-gen-variants <name>...` line opts a fixture into further
+//! renders, one per configuration with a [`VARIANTS`] entry's flags added,
+//! blessed as `tests/snapshots/<name>/<config>-<variant>.rs`.
+//!
 //! To add a new snapshot test, just drop a `.d.ts` file into `tests/fixtures/`.
 //! To update snapshots after intentional changes:
 //!
@@ -28,6 +32,12 @@ const CONFIGS: &[(&str, &[&str])] = &[
     ("default", &[]),
     ("mono", &["--experimental-generic-mono", "--fallible"]),
 ];
+
+/// Flags a fixture opts into with a `//! @ts-gen-variants <name>...` line,
+/// as `(variant name, extra CLI args)`. Each one renders the fixture again
+/// under every configuration with the variant's args added, into
+/// `<config>-<variant>.rs` beside `<config>.rs`.
+const VARIANTS: &[(&str, &[&str])] = &[("promise-only", &["--promise-only"])];
 
 /// Root of the ts-gen crate (where Cargo.toml lives).
 fn crate_root() -> PathBuf {
@@ -84,6 +94,45 @@ fn collect_directive_args(fixture: &Path) -> Vec<String> {
     }
 
     args
+}
+
+/// The variants a fixture opts into with `//! @ts-gen-variants <name>...`
+/// lines in its header, each a [`VARIANTS`] entry.
+fn collect_variants(fixture: &Path) -> Vec<&'static (&'static str, &'static [&'static str])> {
+    let content = std::fs::read_to_string(fixture).unwrap_or_default();
+    let mut variants = Vec::new();
+    for line in content.lines() {
+        let trimmed = line.trim();
+        if let Some(rest) = trimmed.strip_prefix("//! @ts-gen-variants ") {
+            for name in rest.split_whitespace() {
+                let variant = VARIANTS
+                    .iter()
+                    .find(|(v, _)| *v == name)
+                    .unwrap_or_else(|| panic!("{}: unknown variant `{name}`", fixture.display()));
+                variants.push(variant);
+            }
+        } else if !trimmed.starts_with("//") && !trimmed.is_empty() {
+            break;
+        }
+    }
+    variants
+}
+
+/// Every `(snapshot file stem, extra CLI args)` a fixture renders under:
+/// each configuration, then each configuration with each of its variants.
+fn fixture_configs(fixture: &Path) -> Vec<(String, Vec<&'static str>)> {
+    let mut configs: Vec<(String, Vec<&str>)> = CONFIGS
+        .iter()
+        .map(|(name, args)| (name.to_string(), args.to_vec()))
+        .collect();
+    for (variant, variant_args) in collect_variants(fixture) {
+        for (name, args) in CONFIGS {
+            let mut args = args.to_vec();
+            args.extend_from_slice(variant_args);
+            configs.push((format!("{name}-{variant}"), args));
+        }
+    }
+    configs
 }
 
 /// Compare `actual` against the snapshot file at `snap_path`.
@@ -161,8 +210,9 @@ fn snapshot_test(fixture_name: &str) {
 
     // Collect any extra CLI flags from directive comments
     let extra_args = collect_directive_args(&fixture);
-    for (_, config_args) in CONFIGS {
-        for flag in *config_args {
+    let configs = fixture_configs(&fixture);
+    for (_, config_args) in &configs {
+        for flag in config_args {
             assert!(
                 !extra_args.iter().any(|a| a == flag),
                 "{fixture_name}: `{flag}` is applied by the snapshot harness, \
@@ -173,7 +223,7 @@ fn snapshot_test(fixture_name: &str) {
 
     let out_dir = TempDir::new(&format!("snapshot-{base_name}"));
 
-    for (config_name, config_args) in CONFIGS {
+    for (config_name, config_args) in &configs {
         let out_file = out_dir.0.join(format!("{config_name}.rs"));
 
         // Invoke the CLI binary: ts-gen --input <fixture> --output <out_file> [extra_args...]
@@ -183,7 +233,7 @@ fn snapshot_test(fixture_name: &str) {
             .arg("--output")
             .arg(&out_file)
             .args(&extra_args)
-            .args(*config_args)
+            .args(config_args)
             .output()
             .expect("Failed to execute ts-gen binary");
 
@@ -215,10 +265,6 @@ fn snapshot_test(fixture_name: &str) {
 /// a dropped configuration can't leave stale snapshots behind.
 fn check_stale_snapshots(fixtures: &[String]) -> Vec<String> {
     let snapshots_dir = crate_root().join("tests/snapshots");
-    let expected_files: Vec<String> = CONFIGS
-        .iter()
-        .map(|(name, _)| format!("{name}.rs"))
-        .collect();
     let mut stale = Vec::new();
     for entry in std::fs::read_dir(&snapshots_dir)
         .into_iter()
@@ -231,6 +277,13 @@ fn check_stale_snapshots(fixtures: &[String]) -> Vec<String> {
             stale.push(path.display().to_string());
             continue;
         }
+        let fixture = crate_root()
+            .join("tests/fixtures")
+            .join(format!("{name}.d.ts"));
+        let expected_files: Vec<String> = fixture_configs(&fixture)
+            .into_iter()
+            .map(|(name, _)| format!("{name}.rs"))
+            .collect();
         for file in std::fs::read_dir(&path).into_iter().flatten().flatten() {
             if !expected_files.contains(&file.file_name().to_string_lossy().to_string()) {
                 stale.push(file.path().display().to_string());
