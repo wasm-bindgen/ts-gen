@@ -160,10 +160,12 @@ fn generate_expanded_free_function(
 
     let generics = render_generic_bounds(&bounds);
 
+    let literal = super::inline_wrappers::literal_attr(sig);
     quote! {
         #wb_extern_attr
         extern "C" {
             #doc
+            #literal
             #wb_attr
             pub #async_kw fn #rust_ident #generics (#params) #ret;
         }

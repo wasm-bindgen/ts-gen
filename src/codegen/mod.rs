@@ -8,6 +8,7 @@ pub mod discriminated_unions;
 pub mod enums;
 pub mod error_enum;
 pub mod functions;
+pub(crate) mod inline_wrappers;
 pub(crate) mod null_arms;
 pub mod signatures;
 pub mod subtyping;
@@ -187,6 +188,7 @@ pub fn generate_with_options(
     let mut file = syn::parse2::<syn::File>(tokens.clone()).map_err(|e| {
         anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
     })?;
+    inline_wrappers::apply(&mut file);
     split_unshared_views(&mut file.items);
     signatures::state_abi_bounds(&mut file.items);
     null_arms::apply(&mut file.items);
