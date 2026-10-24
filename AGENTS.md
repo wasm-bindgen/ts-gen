@@ -39,6 +39,7 @@ src/
 │   ├── signatures.rs          # parameter expansion + per-callable layer
 │   ├── subtyping.rs           # builtin parents + `lub_types` (LUB)
 │   ├── surface.rs             # output surface: export roots, `--export <Name>`, closure
+│   ├── type_params.rs         # erase method type params no argument infers
 │   └── typemap.rs             # TypeRef → syn tokens, `to_return_type`, externals
 └── util/                      # naming, diagnostics, dedup helpers
 

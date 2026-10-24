@@ -80,9 +80,9 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box;
+    pub type Box_;
     #[wasm_bindgen(method, catch)]
-    pub fn put(this: &Box, x: f64) -> Result<(), JsValue>;
+    pub fn put(this: &Box_, x: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub fn put_with_str(this: &Box, x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+    pub fn put_with_str(this: &Box_, x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }

@@ -82,13 +82,9 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &Store, key: &str) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn list<Metadata: ::wasm_bindgen::JsGeneric>(
-        this: &Store,
-    ) -> Result<ListResult<Metadata>, JsValue>;
+    pub async fn list(this: &Store) -> Result<ListResult, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_promise<Metadata: ::wasm_bindgen::JsGeneric>(
-        this: &Store,
-    ) -> Promise<ListResult<Metadata>>;
+    pub fn list_promise(this: &Store) -> Promise<ListResult>;
     #[wasm_bindgen(method)]
     pub fn tag(this: &Store, level: &str, count: f64);
     #[wasm_bindgen(method, catch, js_name = "tag")]

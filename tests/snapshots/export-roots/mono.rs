@@ -187,6 +187,62 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ListDefaults;
+    #[wasm_bindgen(method, getter)]
+    pub fn limit(this: &ListDefaults) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_limit(this: &ListDefaults, val: f64);
+}
+impl ListDefaults {
+    pub fn new() -> ListDefaults {
+        Self::builder().build()
+    }
+    pub fn builder() -> ListDefaultsBuilder {
+        ListDefaultsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for ListDefaults {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct ListDefaultsBuilder {
+    inner: ListDefaults,
+}
+impl ListDefaultsBuilder {
+    pub fn limit(self, val: f64) -> Self {
+        self.inner.set_limit(val);
+        self
+    }
+    pub fn build(self) -> ListDefaults {
+        self.inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "listBuckets")]
+    pub fn list_buckets() -> Result<Map<JsString, ListDefaults>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "listBuckets")]
+    pub fn list_buckets_with_prefix(
+        prefix: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Vec<String>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "listBuckets")]
+    pub fn list_buckets_with_prefix_js_string(
+        prefix: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Array<JsString>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Socket;
     #[wasm_bindgen(method, getter)]
     pub fn closed(this: &Socket) -> Promise<Undefined>;

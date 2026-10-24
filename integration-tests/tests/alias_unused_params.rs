@@ -6,7 +6,6 @@ use ts_gen_integration_tests::alias_unused_params::{
     Chained, Chosen, Color, Erased, Fetcher, Handler, Holder, Local, Pair, Partly, Skip,
     WithDefault,
 };
-use wasm_bindgen::JsValue;
 
 // This fixture has no backing JavaScript module, so it provides compile-only
 // coverage that aliases drop the type parameters their targets don't use,
@@ -34,7 +33,7 @@ fn alias_unused_params_compile(holder: &Holder<JsString>, local: Local) {
     let _: Option<Fetcher> = None::<Pair<Undefined, Undefined>>;
     let _: Branded<Local> = local;
     let _: Erased = holder.get();
-    let _: Erased = holder.entry::<JsValue>();
+    let _: Erased = holder.entry();
     let pair: Pair<JsString, JsString> = Pair::new(&JsString::from("a"), &JsString::from("b"));
     holder.take(&pair);
 }

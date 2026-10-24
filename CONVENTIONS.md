@@ -665,8 +665,11 @@ pub mod web_assembly {
 Consumers always write `web_assembly::Global`. The `_` suffix is an
 internal detail.
 
-The bindings also spell the prelude's `Option`, `Result`, `String` and
-`Vec` bare, so a declaration with one of those names is suffixed the same
+The bindings also spell the Rust prelude bare (`Result<T, JsValue>` on
+every fallible binding, `String`, `Option<T>`, `From`/`Default`/`Clone`
+in impls), so a declaration named like anything the 2021 prelude exports
+(`Result`, `Option`, `Box`, `Default`, `From`, …; the full list is
+`RUST_PRELUDE_RESERVED` in `codegen/typemap.rs`) is suffixed the same
 way. It is not re-exported, since `pub use Result_ as Result;` would
 shadow the prelude `Result` again, so consumers write `Result_`.
 
@@ -2445,7 +2448,7 @@ interface SyncKvStorage {
 becomes:
 
 ```rust
-pub type SyncKvStorageList<T: ::wasm_bindgen::JsGeneric>;
+pub type SyncKvStorageList<T: ::wasm_bindgen::JsGeneric = JsValue>;
 
 #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
 pub fn iterator<T: ::wasm_bindgen::JsGeneric>(
@@ -2453,7 +2456,7 @@ pub fn iterator<T: ::wasm_bindgen::JsGeneric>(
 ) -> Iterator<ArrayTuple<(JsString, T)>>;
 
 #[wasm_bindgen(method)]
-pub fn list<T: ::wasm_bindgen::JsGeneric>(this: &SyncKvStorage) -> SyncKvStorageList<T>;
+pub fn list(this: &SyncKvStorage) -> SyncKvStorageList;
 ```
 
 The wrapper's name follows the existing `<Parent><Member>`
@@ -2467,7 +2470,10 @@ parameter-synthesis limitation.
 
 Type parameters mentioned by the iteration item bubble up onto the
 synthesized wrapper, so `Iterable<[string, T]>` produces
-`<Parent>List<T>` rather than erasing `T`.
+`<Parent>List<T>` rather than erasing `T`. The method returning it
+still has no argument to infer `T` from, so it hands back the wrapper
+at its default (see [uninferrable type
+parameters](#uninferrable-method-type-parameters)).
 
 ## In-scope generic type parameters
 
@@ -2657,6 +2663,65 @@ Methods redeclare every type parameter mentioned in their signature,
 even those inherited from the surrounding type. `js_sys` follows the
 same convention (see `js_sys::Array::for_each<T: JsGeneric>`).
 
+### Uninferrable method type parameters
+
+A callable-level parameter that no argument mentions once lowered has
+to be named at every call. That is worth it only where the turbofish
+is itself the cast — the (awaited) return is exactly `T`, `T |
+undefined` or `T | null` — so the rule, per parameter:
+
+1. Mentioned by an argument: kept, inferred at the call. A callback
+   counts as it lowers: its parameters and its return count, but a
+   callback with a rest parameter is the untyped `Function` and
+   mentions nothing. A `Promise<T>` callback return does not count,
+   since wasm-bindgen cannot pass a `Function` returning `Promise<T>`
+   for a generic `T`. A variadic rest likewise counts as it lowers: by default
+   it is `&[JsValue]` and mentions nothing, while under
+   `--experimental-generic-mono` a rest array lowers to a slice, so
+   `of<T>(...items: T[]): Row<T>` keeps `T` (`fn of<T>(items: &[T]) ->
+   Row<T>`) where the default erases it (`fn of(items: &[JsValue]) ->
+   Row`).
+2. Not mentioned, return exactly `T` / `T | undefined` / `T | null`
+   (awaited): kept — `storage.get::<JsString>(key)`, `body.json::<Row>()`.
+3. Otherwise erased and removed from the signature. The substitute is
+   the default declared by the generic type `T` instantiates in the
+   return (`Row<T = Record<string, unknown>>` → `Object`), else the
+   method's own default (`list<T = unknown>` → `JsValue`), else `any`.
+   A type's default that names that type's own parameters (`U = Box<T>`)
+   is skipped, since those names are unbound in the method.
+   A parameter the return never mentions is simply dropped.
+
+Callers wanting a typed container `unchecked_into` it
+(`D1Result<JsValue>` → `D1Result<Row>`). `try_` companions follow the
+same signature. Each overload of a method or free function applies the
+rule to its own type parameters, and so does each arm of a
+[literal-keyed overload](#inline-wrappers): workers-types'
+`get(key, "json")` keeps `ExpectedValue` as its whole return
+(`get_json::<Row>(key)`), while `getWithMetadata(key, "json")`
+returns `KVNamespaceGetWithMetadataResult` at its defaults.
+
+```ts
+interface Store {
+  put<T>(key: string, value: T): Promise<void>;
+  get<T = unknown>(key: string): Promise<T | undefined>;
+  transaction<T>(closure: (tx: Store) => Promise<T>): Promise<T>;
+  run<T = unknown>(): Promise<Row<T>>;
+  list<T = unknown>(): Promise<Map<string, T>>;
+  schedule<Args extends unknown[]>(callback: (...args: Args) => void, ...args: Args): number;
+}
+```
+
+```rust
+pub async fn put<T: JsGeneric>(this: &Store, key: &str, value: &T) -> Result<(), JsValue>;
+pub async fn get<T: JsGeneric>(this: &Store, key: &str) -> Result<Option<T>, JsValue>
+where
+    T: OptionFromWasmAbi;
+pub async fn transaction<T: JsGeneric + FromWasmAbi>(this: &Store, closure: &Function<fn(Store) -> Promise>) -> Result<T, JsValue>;
+pub async fn run(this: &Store) -> Result<Row, JsValue>; // Row<Object>, the default
+pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
+pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> f64;
+```
+
 ### Type-level generics propagate to every binding site
 
 When the surrounding *type* declares parameters
@@ -2679,7 +2744,8 @@ parameters thread through every site that mentions `Foo`:
   arguments included. Rust accepts defaults only on the type
   definition, so dictionary builders and helper `impl`s keep the plain
   form and a builder for a defaulted dictionary is named with explicit
-  arguments (`Options::<Box<JsString>>::builder()`).
+  arguments (`Options::<Box_<JsString>>::builder()`, `Box` being in the
+  prelude).
 * Every reference to the type leaves the trailing arguments that equal
   the declared Rust defaults to them, in both modes. `fetch(input:
   RequestInfo)` instantiates `Request<unknown, CfProperties<unknown>>`,
@@ -2690,7 +2756,7 @@ parameters thread through every site that mentions `Foo`:
   argument, so `Holder<string, Box<string>>` with `U = Box<T>` is
   `Holder<JsString>`. Only the trailing run goes, as Rust can't skip a
   middle argument (`Holder<unknown, Box<string>>` stays
-  `Holder<JsValue, Box<JsString>>`), and the comparison is with the
+  `Holder<JsValue, Box_<JsString>>`), and the comparison is with the
   Rust spelling, so under `--experimental-generic-mono` a
   `Foo<String>` is kept against a declared `T = JsString`.
 * Every getter / setter / method `fn` — redeclares
@@ -2822,11 +2888,12 @@ interface Env { TYPED: KVNamespace<"a" | "b">; }
 ```rust
 pub type KVNamespace;
 pub async fn get(this: &KVNamespace, key: &str) -> Result<Nullable<String>, JsValue>;
-pub async fn list<Metadata: ::wasm_bindgen::JsGeneric>(
-    this: &KVNamespace,
-) -> Result<KVNamespaceListResult<Metadata>, JsValue>;
+pub async fn list(this: &KVNamespace) -> Result<KVNamespaceListResult, JsValue>;
 pub fn typed(this: &Env) -> KVNamespace;
 ```
+
+(`list`'s own `Metadata` erases separately, as no argument infers it;
+see [uninferrable type parameters](#uninferrable-method-type-parameters).)
 
 Method-level parameters follow the same rule
 (`tag<Level extends "info" | "warn">(level: Level)` → `level: &str`).
@@ -4579,7 +4646,7 @@ pub enum OptionKey { Name = "name", Size = "size", Fixed = "fixed" }
 // All-optional dictionaries with builders:
 pub type PartialOptions;   // name?, size?, fixed? (readonly)
 pub type PickOptionsName;  // name
-pub type Sized;            // size?
+pub type Sized_;           // size? (`Sized` is in the prelude)
 
 // `Named` has `label`, `name` and `fixed` as its own members and no parent.
 ```
@@ -4613,7 +4680,7 @@ pub type Sized;            // size?
   `PartialTemporalLike<TimeLikeObject>`, which only makes optional what
   already is, is `TimeLikeObject`.
 * **An alias to an evaluated type is promoted.** `type Sized = Pick<…>`
-  is the dictionary `Sized`; `type OptionKey = keyof Options` is the enum
+  is the dictionary `Sized_`; `type OptionKey = keyof Options` is the enum
   `OptionKey`. A utility over such an alias reads it evaluated, so
   `Exclude<Unit, Minute>` and `Pick<Options, Exclude<OptionKey, "fixed">>`
   work wherever the alias is declared.

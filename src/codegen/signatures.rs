@@ -2144,13 +2144,7 @@ pub(crate) fn render_param_type(
     from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
     let mono = cgctx.filter(|ctx| ctx.experimental_generic_mono);
-    // A per-mono variadic spreads any sequence, so its rest array lowers like
-    // any other list argument.
-    let spreads_list = |ctx: &CodegenContext<'_>| {
-        let (rest, _) = typemap::peel_mono(&param.type_ref, ctx, scope, &mut Default::default());
-        matches!(rest.as_ref(), TypeRef::Array(_))
-    };
-    if param.variadic && !mono.is_some_and(spreads_list) {
+    if param.variadic && !typemap::variadic_spreads_list(&param.type_ref, cgctx, scope) {
         return quote! { &[JsValue] };
     }
     if matches!(param.type_ref, TypeRef::Null) {

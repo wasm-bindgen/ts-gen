@@ -258,11 +258,7 @@ extern "C" {
         value: &Pair<T, JsString>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
-    pub fn entry<T: ::wasm_bindgen::JsGeneric, U: ::wasm_bindgen::JsGeneric>(
-        this: &Holder<T>,
-    ) -> JsValue;
+    pub fn entry<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> JsValue;
     #[wasm_bindgen(method, catch, js_name = "entry")]
-    pub fn try_entry<T: ::wasm_bindgen::JsGeneric, U: ::wasm_bindgen::JsGeneric>(
-        this: &Holder<T>,
-    ) -> Result<JsValue, JsValue>;
+    pub fn try_entry<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> Result<JsValue, JsValue>;
 }

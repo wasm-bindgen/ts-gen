@@ -64,21 +64,21 @@ extern "C" {
         frozen: &ReadonlyOptions,
         picked: &PickOptionsNameOrSize,
         omitted: &PickOptionsNameOrSize,
-        unchanged: &Sized,
+        unchanged: &Sized_,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Sized;
+    pub type Sized_;
     #[wasm_bindgen(method, getter)]
-    pub fn size(this: &Sized) -> Option<f64>;
+    pub fn size(this: &Sized_) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_size(this: &Sized, val: f64);
+    pub fn set_size(this: &Sized_, val: f64);
 }
-impl Sized {
-    pub fn new() -> Sized {
+impl Sized_ {
+    pub fn new() -> Sized_ {
         Self::builder().build()
     }
     pub fn builder() -> SizedBuilder {
@@ -87,20 +87,20 @@ impl Sized {
         }
     }
 }
-impl Default for Sized {
+impl Default for Sized_ {
     fn default() -> Self {
         Self::new()
     }
 }
 pub struct SizedBuilder {
-    inner: Sized,
+    inner: Sized_,
 }
 impl SizedBuilder {
     pub fn size(self, val: f64) -> Self {
         self.inner.set_size(val);
         self
     }
-    pub fn build(self) -> Sized {
+    pub fn build(self) -> Sized_ {
         self.inner
     }
 }
@@ -289,33 +289,25 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box<T = JsValue>;
+    pub type Box_<T = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T>(this: &Box<T>) -> T
+    pub fn value<T>(this: &Box_<T>) -> T
     where
-        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &Box<T>, val: T)
+    pub fn set_value<T>(this: &Box_<T>, val: T)
     where
-        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
         T: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, getter)]
-    pub fn label<T>(this: &Box<T>) -> String
-    where
-        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi;
+    pub fn label<T>(this: &Box_<T>) -> String;
     #[wasm_bindgen(method, getter, js_name = "label")]
-    pub fn label_js_string<T>(this: &Box<T>) -> JsString
-    where
-        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi;
+    pub fn label_js_string<T>(this: &Box_<T>) -> JsString;
     #[wasm_bindgen(method, setter)]
-    pub fn set_label<T>(this: &Box<T>, val: impl ::wasm_bindgen::JsStringLike)
-    where
-        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi;
+    pub fn set_label<T>(this: &Box_<T>, val: impl ::wasm_bindgen::JsStringLike);
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Box<T> {
-    pub fn new(value: T, label: impl ::wasm_bindgen::JsStringLike) -> Box<T> {
-        let inner: Box<T> = JsCast::unchecked_into(js_sys::Object::new());
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Box_<T> {
+    pub fn new(value: T, label: impl ::wasm_bindgen::JsStringLike) -> Box_<T> {
+        let inner: Box_<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         inner.set_label(label);
         inner

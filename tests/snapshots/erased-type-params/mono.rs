@@ -101,11 +101,9 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Nullable<JsString>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn list<Metadata>(this: &Store) -> Result<ListResult<Metadata>, JsValue>
-    where
-        Metadata: 'static;
+    pub async fn list(this: &Store) -> Result<ListResult, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_promise<Metadata>(this: &Store) -> Promise<ListResult<Metadata>>;
+    pub fn list_promise(this: &Store) -> Promise<ListResult>;
     #[wasm_bindgen(method, catch)]
     pub fn tag(
         this: &Store,

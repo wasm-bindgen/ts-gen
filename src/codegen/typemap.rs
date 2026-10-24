@@ -104,7 +104,45 @@ pub const JS_SYS_RESERVED: &[&str] = &[
 /// of these names is moved aside like a `js_sys` collision. Re-exporting it
 /// under its own name would shadow the prelude again, so it keeps the
 /// suffixed name.
-const RUST_PRELUDE_RESERVED: &[&str] = &["Option", "Result", "String", "Vec"];
+const RUST_PRELUDE_RESERVED: &[&str] = &[
+    "AsMut",
+    "AsRef",
+    "Box",
+    "Clone",
+    "Copy",
+    "Default",
+    "DoubleEndedIterator",
+    "Drop",
+    "Eq",
+    "Err",
+    "ExactSizeIterator",
+    "Extend",
+    "Fn",
+    "FnMut",
+    "FnOnce",
+    "From",
+    "FromIterator",
+    "Into",
+    "IntoIterator",
+    "None",
+    "Ok",
+    "Option",
+    "Ord",
+    "PartialEq",
+    "PartialOrd",
+    "Result",
+    "Send",
+    "Sized",
+    "Some",
+    "String",
+    "Sync",
+    "ToOwned",
+    "ToString",
+    "TryFrom",
+    "TryInto",
+    "Unpin",
+    "Vec",
+];
 
 pub(crate) fn is_prelude_reserved(name: &str) -> bool {
     RUST_PRELUDE_RESERVED.contains(&name)
@@ -3166,6 +3204,22 @@ pub(crate) fn peel_mono<'t>(
         }
     }
     (current, scope)
+}
+
+/// Whether a variadic rest lowers to a typed slice rather than
+/// `&[JsValue]`. Per-monomorphization spreads any sequence, so a rest
+/// array (`...items: T[]`) lowers like any other list argument (`&[T]`)
+/// and mentions its element; otherwise every rest is `&[JsValue]`.
+pub(crate) fn variadic_spreads_list(
+    rest: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> bool {
+    ctx.filter(|c| c.experimental_generic_mono)
+        .is_some_and(|c| {
+            let (rest, _) = peel_mono(rest, c, scope, &mut Default::default());
+            matches!(rest.as_ref(), TypeRef::Array(_))
+        })
 }
 
 /// Leaves that cross the ABI natively rather than as a JS handle: primitives

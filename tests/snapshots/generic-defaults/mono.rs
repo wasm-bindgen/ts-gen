@@ -8,16 +8,14 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box<T = JsValue>;
+    pub type Box_<T = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T>(this: &Box<T>) -> T
+    pub fn value<T>(this: &Box_<T>) -> T
     where
-        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, catch)]
-    pub fn set<T>(this: &Box<T>, value: T) -> Result<(), JsValue>
+    pub fn set<T>(this: &Box_<T>, value: T) -> Result<(), JsValue>
     where
-        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
         T: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 #[diagnostic::on_unimplemented(
@@ -74,7 +72,7 @@ impl ::core::convert::From<&::js_sys::JsString> for LooseKind {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T = JsValue, U = Box<T>>;
+    pub type Holder<T = JsValue, U = Box_<T>>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T, U>() -> Result<Holder<T, U>, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -85,12 +83,16 @@ extern "C" {
     pub fn boxed<T, U>(this: &Holder<T, U>) -> Result<U, JsValue>
     where
         U: ::wasm_bindgen::convert::FromWasmAbi;
+    # [wasm_bindgen (static_method_of = Holder , catch)]
+    pub fn make() -> Result<Holder<String, JsValue>, JsValue>;
+    # [wasm_bindgen (static_method_of = Holder , catch , js_name = "make")]
+    pub fn make_js_string() -> Result<Holder<JsString, JsValue>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Options<T = Box<String>>;
+    pub type Options<T = Box_<String>>;
     #[wasm_bindgen(method, getter)]
     pub fn initial<T>(this: &Options<T>) -> Option<T>
     where
@@ -130,7 +132,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> OptionsBuilder<T> {
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "looseBox")]
-    pub fn loose_box() -> Result<Box, JsValue>;
+    pub fn loose_box() -> Result<Box_, JsValue>;
 }
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {
@@ -150,10 +152,187 @@ extern "C" {
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "mixedHolder")]
-    pub fn mixed_holder() -> Result<Holder<String, Box>, JsValue>;
+    pub fn mixed_holder() -> Result<Holder<String, Box_>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "mixedHolder")]
-    pub fn mixed_holder_js_string() -> Result<Holder<JsString, Box>, JsValue>;
+    pub fn mixed_holder_js_string() -> Result<Holder<JsString, Box_>, JsValue>;
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "makeHolder")]
+    pub fn make_holder() -> Result<Holder<String, JsValue>, JsValue>;
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "makeHolder")]
+    pub fn make_holder_js_string() -> Result<Holder<JsString, JsValue>, JsValue>;
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Row<T = Object>;
+    #[wasm_bindgen(method, getter)]
+    pub fn results<T>(this: &Row<T>) -> Vec<T>
+    where
+        Vec<T>: ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_results<T>(this: &Row<T>, #[wasm_bindgen(slice = "array")] val: &[T])
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Row<T> {
+    pub fn new(results: &[T]) -> Row<T> {
+        let inner: Row<T> = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_results(results);
+        inner
+    }
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Cursor<T = JsString>;
+    #[wasm_bindgen(method, catch)]
+    pub fn next<T>(this: &Cursor<T>) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi;
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Store;
+    #[wasm_bindgen(method, catch)]
+    pub async fn put<T>(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: T,
+    ) -> Result<(), JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub fn put_promise<T>(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: T,
+    ) -> Result<Promise<Undefined>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn append<T>(this: &Store, items: &[T]) -> Result<Row<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    #[wasm_bindgen(method, catch)]
+    pub async fn get<T>(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Option<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn get_promise<T>(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Option<T>>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn first<T>(this: &Store) -> Result<Nullable<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static;
+    #[wasm_bindgen(method, catch, js_name = "first")]
+    pub fn first_promise<T>(this: &Store) -> Result<Promise<Nullable<T>>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn json<T>(this: &Store) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+    #[wasm_bindgen(method, catch, js_name = "json")]
+    pub fn json_promise<T>(this: &Store) -> Result<Promise<T>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn transaction<T>(
+        this: &Store,
+        closure: &Function<fn(Store) -> Promise>,
+    ) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+    #[wasm_bindgen(method, catch, js_name = "transaction")]
+    pub fn transaction_promise<T>(
+        this: &Store,
+        closure: &Function<fn(Store) -> Promise>,
+    ) -> Result<Promise<T>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn collect(
+        this: &Store,
+        make: &Function<fn() -> Promise>,
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "collect")]
+    pub fn collect_promise(
+        this: &Store,
+        make: &Function<fn() -> Promise>,
+    ) -> Result<Promise<Map<JsString, JsValue>>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn each<T>(
+        this: &Store,
+        r#fn: &Function<fn(T) -> Undefined>,
+    ) -> Result<Map<JsString, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, catch, js_name = "each")]
+    pub fn each_promise<T>(
+        this: &Store,
+        r#fn: &Function<fn(T) -> Undefined>,
+    ) -> Result<Promise<Map<JsString, T>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "eachRest")]
+    pub async fn each_rest(
+        this: &Store,
+        r#fn: &Function,
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "eachRest")]
+    pub fn each_rest_promise(
+        this: &Store,
+        r#fn: &Function,
+    ) -> Result<Promise<Map<JsString, JsValue>>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn run(this: &Store) -> Result<Row, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "run")]
+    pub fn run_promise(this: &Store) -> Result<Promise<Row>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub fn list_promise(this: &Store) -> Result<Promise<Map<JsString, JsValue>>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub fn scan(this: &Store) -> Result<Cursor<String>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "scan")]
+    pub fn scan_js_string(this: &Store) -> Result<Cursor, JsValue>;
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch)]
+    pub fn of<T>(items: &[T]) -> Result<Row<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "enterSpan")]
+    pub fn enter_span<T>(
+        name: impl ::wasm_bindgen::JsStringLike,
+        r#fn: &Function,
+        args: &[JsValue],
+    ) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi;
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn lookup() -> Result<Map<JsString, Number>, JsValue>;
+}
+#[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "lookup")]
+    pub fn lookup_with_key(key: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
 }

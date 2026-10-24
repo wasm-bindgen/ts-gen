@@ -74,7 +74,7 @@ extern "C" {
         frozen: &ReadonlyOptions,
         picked: &PickOptionsNameOrSize,
         omitted: &PickOptionsNameOrSize,
-        unchanged: &Sized,
+        unchanged: &Sized_,
     );
 }
 #[wasm_bindgen(module = "type-eval")]
@@ -86,21 +86,21 @@ extern "C" {
         frozen: &ReadonlyOptions,
         picked: &PickOptionsNameOrSize,
         omitted: &PickOptionsNameOrSize,
-        unchanged: &Sized,
+        unchanged: &Sized_,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Sized;
+    pub type Sized_;
     #[wasm_bindgen(method, getter)]
-    pub fn size(this: &Sized) -> Option<f64>;
+    pub fn size(this: &Sized_) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_size(this: &Sized, val: f64);
+    pub fn set_size(this: &Sized_, val: f64);
 }
-impl Sized {
-    pub fn new() -> Sized {
+impl Sized_ {
+    pub fn new() -> Sized_ {
         Self::builder().build()
     }
     pub fn builder() -> SizedBuilder {
@@ -109,20 +109,20 @@ impl Sized {
         }
     }
 }
-impl Default for Sized {
+impl Default for Sized_ {
     fn default() -> Self {
         Self::new()
     }
 }
 pub struct SizedBuilder {
-    inner: Sized,
+    inner: Sized_,
 }
 impl SizedBuilder {
     pub fn size(self, val: f64) -> Self {
         self.inner.set_size(val);
         self
     }
-    pub fn build(self) -> Sized {
+    pub fn build(self) -> Sized_ {
         self.inner
     }
 }
@@ -325,19 +325,19 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box<T: ::wasm_bindgen::JsGeneric = JsValue>;
+    pub type Box_<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>) -> T;
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>) -> T;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, val: &T);
+    pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>, val: &T);
     #[wasm_bindgen(method, getter)]
-    pub fn label<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>) -> String;
+    pub fn label<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>) -> String;
     #[wasm_bindgen(method, setter)]
-    pub fn set_label<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, val: &str);
+    pub fn set_label<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>, val: &str);
 }
-impl<T: ::wasm_bindgen::JsGeneric> Box<T> {
-    pub fn new(value: &T, label: &str) -> Box<T> {
-        let inner: Box<T> = JsCast::unchecked_into(js_sys::Object::new());
+impl<T: ::wasm_bindgen::JsGeneric> Box_<T> {
+    pub fn new(value: &T, label: &str) -> Box_<T> {
+        let inner: Box_<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         inner.set_label(label);
         inner
