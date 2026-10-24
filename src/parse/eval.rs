@@ -458,6 +458,13 @@ impl<'g> Eval<'g> {
                 for ty in &mut class.implements {
                     *ty = self.erase_literal_args(ty, body_scope);
                 }
+                if let Some(positions) = self.literal_params.get(&place.anchor) {
+                    let mut i = 0;
+                    class.type_params.retain(|_| {
+                        i += 1;
+                        !positions.contains(&(i - 1))
+                    });
+                }
             }
             TypeKind::DiscriminatedUnion(du) => {
                 let name = du.name.clone();
@@ -1816,7 +1823,8 @@ impl<'g> Eval<'g> {
         }
     }
 
-    /// Find each interface's literal-only type parameters: those whose
+    /// Find each interface's literal-only type parameters, a merged
+    /// class's included: those whose
     /// constraint evaluates to string literals, so every argument selects
     /// among them. The literal aliases such a constraint names are
     /// recorded as type-level only, as are those of a generic alias's
@@ -1829,6 +1837,12 @@ impl<'g> Eval<'g> {
             .filter_map(|(id, decl)| match &decl.kind {
                 TypeKind::Interface(i) if !i.type_params.is_empty() => {
                     Some((id, decl.scope_id, i.body_scope, i.type_params.clone(), true))
+                }
+                // An interface merged into a class (`interface Foo<S extends
+                // "a" | "b">` + `declare var Foo: { new (): Foo }`) brings
+                // its parameters along.
+                TypeKind::Class(c) if !c.type_params.is_empty() => {
+                    Some((id, decl.scope_id, c.body_scope, c.type_params.clone(), true))
                 }
                 TypeKind::TypeAlias(a) if !a.type_params.is_empty() => Some((
                     id,
@@ -2756,6 +2770,33 @@ mod tests {
         // `Unit` only constrained literal-only parameters.
         let unit = gctx.scopes.resolve(module.file_scopes[0], "Unit").unwrap();
         assert!(gctx.type_level_only.contains(&unit));
+    }
+
+    #[test]
+    fn literal_only_parameters_erase_from_a_merged_class() {
+        let (module, gctx) = parse(
+            "interface Gauge<S extends \"low\" | \"high\"> { level(): S }
+             declare var Gauge: { new (): Gauge<\"low\"> };
+             declare function f(a: Gauge<\"high\">): void;",
+        );
+        let TypeKind::Class(class) = kind(&gctx, &module, "Gauge") else {
+            panic!("Gauge is a class");
+        };
+        assert!(class.type_params.is_empty(), "{:?}", class.type_params);
+        let Some(Member::Method(level)) = class
+            .members
+            .iter()
+            .find(|m| matches!(m, Member::Method(_)))
+        else {
+            panic!("Gauge has a method");
+        };
+        assert!(
+            level.return_type.as_ident() != Some("S"),
+            "{:?}",
+            level.return_type
+        );
+        // A class isn't specialised: its instantiations are the base.
+        assert_eq!(param_type(&gctx, &module, "f", 0), &TypeRef::ident("Gauge"));
     }
 
     #[test]

@@ -7,12 +7,13 @@ use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::dictionary_polish_mono::{
     polish::{
-        Holder, HourStepping, MinuteStepping, Options, PartialBoxLikeObject,
-        PartialOmitLikeBoxLikeObject, PluralizeTimeUnit, PluralizeUnit, PluralizeUnitHour,
-        PluralizeUnitMinute, Rounder, Rounding, RoundingHour, RoundingTimeUnit, Stepped,
-        TimeLikeObject, Transition,
+        Approximate, Gauge, Holder, HourStepping, Maker, MinuteStepping, Options,
+        PartialBoxLikeObject, PartialOmitLikeBoxLikeObject, PluralizeTimeUnit, PluralizeUnit,
+        PluralizeUnitHour, PluralizeUnitMinute, Rounder, Rounding, RoundingHour, RoundingTimeUnit,
+        Stepped, TimeLikeObject, Transition,
     },
-    DirectionKind, MinuteSteppingLargestUnitKind, StepKind, SteppedLargestUnitKind,
+    DirectionKind, LevelReturnKind, MinuteSteppingLargestUnitKind, StepKind,
+    SteppedLargestUnitKind,
 };
 
 // Dictionaries need no backing module, so these run.
@@ -122,4 +123,11 @@ fn use_sites_take_their_specialisation(rounder: &Rounder) {
     rounder.snap_with_rounding(&RoundingTimeUnit::new());
     rounder.nudge(&RoundingTimeUnit::new());
     rounder.nudge_with_rounding_hour(&RoundingHour::new());
+}
+
+// Compile-only: a merged class reads its literal-only parameter at its
+// bound.
+#[allow(dead_code)]
+fn merged_classes_erase_literal_only_parameters(gauge: &Gauge) {
+    let _: LevelReturnKind = gauge.level();
 }

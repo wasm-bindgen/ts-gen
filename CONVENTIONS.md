@@ -4752,7 +4752,9 @@ pub fn until_with_options(
   different specialisation of the same base, or the base itself, each keeps
   its full name (`nudge_with_rounding_hour` beside `nudge(&RoundingTimeUnit)`).
 * **Only a dictionary is specialised at a use site.** An interface with
-  methods is still erased, but its instantiations are the base.
+  methods, or one merged into a class (`interface Gauge<S extends "low" |
+  "high">` + `declare var Gauge: { new (): Gauge }`), is still erased, but
+  its instantiations are the base.
 * **The parameter alone reads as its argument**, an enum it names or its
   literals inline: in the base, `step?: S` is the `<Field>Kind` of `S`'s
   bound; specialised at `"minute"`, it is the literal.

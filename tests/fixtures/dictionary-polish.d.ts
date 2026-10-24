@@ -91,6 +91,16 @@ declare global {
       nudge(options: Rounding<TimeUnit>): void;
       nudge(options: Rounding<"hour">): void;
     }
+
+    // An interface merged into a class erases its literal-only parameter,
+    // and the class's instantiations are the class.
+    interface Gauge<S extends "low" | "high"> {
+      level(): S;
+    }
+    var Gauge: {
+      new (): Gauge<"low">;
+    };
+
   }
 }
 
