@@ -4962,7 +4962,8 @@ pub fn until_with_options(
   across every instantiation the family reaches. An argument is its
   declaration, not its name: `Spans.Unit` and `Steps.Unit` given to one
   family are two impls, and an inherited member reads its argument in
-  the scope the `extends` clause writes it in.
+  the scope the `extends` clause writes it in, however many parents it
+  is passed on through.
 * **Parse and generate in one mode.** Evaluation lowers literal-only
   parameters for the mode `ParseOptions` selects, so
   `generate_with_options` returns an error when its

@@ -8,10 +8,10 @@ use wasm_bindgen_test::*;
 use ts_gen_integration_tests::dictionary_polish_mono::{
     polish::{
         spans::{self, HourSpan, Span},
-        steps::{self, DaySpan},
-        Approximate, Defaulted, Bounded, DayOrHour, DayOrHourMaximumUnitKind, DayOrTimeUnit, Gauge, Holder,
-        Hour, HourLargestUnitKind, HourLargestUnitKind2, HourSpanning, HourStepping, Maker, Minute,
-        MinuteLargestUnitKind, MinuteStepping, Options, PartialBoxLikeObject,
+        steps::{self, DaySpan, DaySpan2},
+        Approximate, Bounded, DayOrHour, DayOrHourMaximumUnitKind, DayOrTimeUnit, Defaulted, Gauge,
+        Holder, Hour, HourLargestUnitKind, HourLargestUnitKind2, HourSpanning, HourStepping, Maker,
+        Minute, MinuteLargestUnitKind, MinuteStepping, Options, PartialBoxLikeObject,
         PartialOmitLikeBoxLikeObject, PickedRounding, PluralizeTimeUnit, PluralizeUnit,
         PluralizeUnitDayOrHour, PluralizeUnitHour, PluralizeUnitMinute, Rounder, Rounding,
         RoundingU, Stepped, TimeLikeObject, TimePicking, TimeUnit, TimeUnitLargestUnitKind,
@@ -176,6 +176,14 @@ fn associated_types_resolve_within_their_family() {
         span.largest_unit(),
         Some(spans::UnitLargestUnitKind2::Day)
     ));
+    // Passed on through `Mid`, `Unit` is still `Steps.Unit`.
+    let day = DaySpan2::builder()
+        .largest_unit(spans::UnitLargestUnitKind2::Hours)
+        .build();
+    assert!(matches!(
+        day.largest_unit(),
+        Some(spans::UnitLargestUnitKind2::Hours)
+    ));
 }
 
 // `Rounder` has no backing module: compile-only coverage that each use site
@@ -206,6 +214,6 @@ fn merged_classes_erase_literal_only_parameters(gauge: &Gauge) {
 #[allow(dead_code)]
 fn literal_only_arguments_drop_where_evaluation_leaves_them(approx: &Approximate) {
     let _ = approx.fuzzy(&Rounding::new());
-    let _ = approx.defaulted(&Defaulted::<Approximate>::new());
-    let _: Result<Approximate, wasm_bindgen::JsValue> = Maker::new(&RoundingHour::new());
+    let _ = approx.defaulted(&Defaulted::new());
+    let _: Result<Approximate, wasm_bindgen::JsValue> = Maker::new(&Rounding::<Hour>::new());
 }

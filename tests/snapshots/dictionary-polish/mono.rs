@@ -823,6 +823,45 @@ pub mod polish {
                 self.inner
             }
         }
+        #[wasm_bindgen(experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , extends = Span :: < U > , no_deref , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Mid<U = UnitOrDay>;
+        }
+        impl<U> ::core::ops::Deref for Mid<U> {
+            type Target = Span<U>;
+            fn deref(&self) -> &Span<U> {
+                JsCast::unchecked_ref(self)
+            }
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Mid<U> {
+            pub fn new() -> Mid<U> {
+                Self::builder().build()
+            }
+            pub fn builder() -> MidBuilder<U> {
+                MidBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Default for Mid<U> {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct MidBuilder<U> {
+            inner: Mid<U>,
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> MidBuilder<U> {
+            pub fn largest_unit(self, val: U::LargestUnit) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> Mid<U> {
+                self.inner
+            }
+        }
         #[wasm_bindgen(private)]
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub enum UnitOrDay {
@@ -931,6 +970,45 @@ pub mod polish {
                 self.inner
             }
         }
+        #[wasm_bindgen(experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , extends = super :: spans :: Mid :: < Unit > , no_deref , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type DaySpan2;
+        }
+        impl ::core::ops::Deref for DaySpan2 {
+            type Target = super::spans::Mid<Unit>;
+            fn deref(&self) -> &super::spans::Mid<Unit> {
+                JsCast::unchecked_ref(self)
+            }
+        }
+        impl DaySpan2 {
+            pub fn new() -> DaySpan2 {
+                Self::builder().build()
+            }
+            pub fn builder() -> DaySpan2Builder {
+                DaySpan2Builder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl Default for DaySpan2 {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct DaySpan2Builder {
+            inner: DaySpan2,
+        }
+        impl DaySpan2Builder {
+            pub fn largest_unit(self, val: super::spans::UnitLargestUnitKind2) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> DaySpan2 {
+                self.inner
+            }
+        }
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -995,40 +1073,56 @@ pub mod polish {
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type Defaulted<T = Approximate>;
+        pub type Defaulted<S = AOrB, T = Approximate>;
         #[wasm_bindgen(method, getter)]
-        pub fn side<T>(this: &Defaulted<T>) -> Option<SideKind>;
+        pub fn side<S: DefaultedS, T>(this: &Defaulted<S, T>) -> Option<S>
+        where
+            S: ::wasm_bindgen::convert::OptionFromWasmAbi;
         #[wasm_bindgen(method, setter)]
-        pub fn set_side<T>(this: &Defaulted<T>, val: SideKind);
+        pub fn set_side<S: DefaultedS, T>(this: &Defaulted<S, T>, val: S)
+        where
+            S: ::wasm_bindgen::convert::IntoWasmAbi;
         #[wasm_bindgen(method, getter)]
-        pub fn extra<T>(this: &Defaulted<T>) -> Option<T>
+        pub fn extra<S: DefaultedS, T>(this: &Defaulted<S, T>) -> Option<T>
         where
             T: ::wasm_bindgen::convert::OptionFromWasmAbi;
         #[wasm_bindgen(method, setter)]
-        pub fn set_extra<T>(this: &Defaulted<T>, val: T)
+        pub fn set_extra<S: DefaultedS, T>(this: &Defaulted<S, T>, val: T)
         where
             T: ::wasm_bindgen::convert::IntoWasmAbi;
     }
-    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Defaulted<T> {
-        pub fn new() -> Defaulted<T> {
+    impl<
+            S: ::wasm_bindgen::convert::IntoWasmAbi + DefaultedS,
+            T: ::wasm_bindgen::convert::IntoWasmAbi,
+        > Defaulted<S, T>
+    {
+        pub fn new() -> Defaulted<S, T> {
             Self::builder().build()
         }
-        pub fn builder() -> DefaultedBuilder<T> {
+        pub fn builder() -> DefaultedBuilder<S, T> {
             DefaultedBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
-    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for Defaulted<T> {
+    impl<
+            S: ::wasm_bindgen::convert::IntoWasmAbi + DefaultedS,
+            T: ::wasm_bindgen::convert::IntoWasmAbi,
+        > Default for Defaulted<S, T>
+    {
         fn default() -> Self {
             Self::new()
         }
     }
-    pub struct DefaultedBuilder<T> {
-        inner: Defaulted<T>,
+    pub struct DefaultedBuilder<S, T> {
+        inner: Defaulted<S, T>,
     }
-    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> DefaultedBuilder<T> {
-        pub fn side(self, val: SideKind) -> Self {
+    impl<
+            S: ::wasm_bindgen::convert::IntoWasmAbi + DefaultedS,
+            T: ::wasm_bindgen::convert::IntoWasmAbi,
+        > DefaultedBuilder<S, T>
+    {
+        pub fn side(self, val: S) -> Self {
             self.inner.set_side(val);
             self
         }
@@ -1036,10 +1130,13 @@ pub mod polish {
             self.inner.set_extra(val);
             self
         }
-        pub fn build(self) -> Defaulted<T> {
+        pub fn build(self) -> Defaulted<S, T> {
             self.inner
         }
     }
+    pub trait DefaultedS {}
+    impl DefaultedS for AOrB {}
+    impl DefaultedS for A {}
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -1062,7 +1159,7 @@ pub mod polish {
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(constructor, js_class = "Maker", js_namespace = "Polish", catch)]
-        pub fn new(options: &RoundingHour) -> Result<Approximate, JsValue>;
+        pub fn new(options: &Rounding<Hour>) -> Result<Approximate, JsValue>;
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1190,6 +1287,17 @@ pub mod polish {
     pub enum DayOrHour {
         Day = "day",
         Hour = "hour",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum A {
+        A = "a",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum AOrB {
+        A = "a",
+        B = "b",
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1633,6 +1741,14 @@ pub mod polish {
             }
         }
     }
+    impl From<A> for AOrB {
+        fn from(value: A) -> AOrB {
+            match value {
+                A::A => AOrB::A,
+                A::__Invalid => AOrB::__Invalid,
+            }
+        }
+    }
     impl From<TimeUnitLargestUnitKind> for LargestUnitKind {
         fn from(value: TimeUnitLargestUnitKind) -> LargestUnitKind {
             match value {
@@ -1964,9 +2080,4 @@ pub enum DirectionKind {
 pub enum LevelReturnKind {
     Low = "low",
     High = "high",
-}
-#[wasm_bindgen(private)]
-pub enum SideKind {
-    A = "a",
-    B = "b",
 }

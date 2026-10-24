@@ -101,11 +101,14 @@ declare global {
         largestUnit?: "auto" | U;
       }
       interface HourSpan extends Span<Unit> {}
+      interface Mid<U extends Unit | "day"> extends Span<U> {}
     }
 
+    // Through `Mid` too, the argument resolving where it is written.
     namespace Steps {
       type Unit = "day" | "hours";
       interface DaySpan extends Spans.Span<Unit> {}
+      interface DaySpan2 extends Spans.Mid<Unit> {}
     }
 
     // An interface with methods can't be specialised, so its instantiations
