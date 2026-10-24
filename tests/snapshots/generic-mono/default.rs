@@ -39,10 +39,15 @@ extern "C" {
     pub type Store<T: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, catch)]
     pub async fn load<T: ::wasm_bindgen::JsGeneric>(this: &Store<T>) -> Result<T, JsValue>;
+    #[wasm_bindgen(method, js_name = "load")]
+    pub fn load_promise<T: ::wasm_bindgen::JsGeneric>(this: &Store<T>) -> Promise<T>;
     #[wasm_bindgen(method, catch, js_name = "loadHolder")]
     pub async fn load_holder<T: ::wasm_bindgen::JsGeneric>(
         this: &Store<T>,
     ) -> Result<Holder<T>, JsValue>;
+    #[wasm_bindgen(method, js_name = "loadHolder")]
+    pub fn load_holder_promise<T: ::wasm_bindgen::JsGeneric>(this: &Store<T>)
+        -> Promise<Holder<T>>;
     #[wasm_bindgen(method)]
     pub fn find<T: ::wasm_bindgen::JsGeneric>(this: &Store<T>, key: &str) -> Option<T>;
     #[wasm_bindgen(method, catch, js_name = "find")]
@@ -166,44 +171,80 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Flags;
     #[wasm_bindgen(method, catch, js_name = "getStringValue")]
-    pub async fn get_string_value(this: &Flags, default_value: &str) -> Result<JsString, JsValue>;
+    pub async fn get_string_value(this: &Flags, default_value: &str) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringValue")]
+    pub fn get_string_value_promise(this: &Flags, default_value: &str) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "getStringDetails")]
     pub async fn get_string_details(
         this: &Flags,
         default_value: &str,
     ) -> Result<EvaluationDetails<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringDetails")]
+    pub fn get_string_details_promise(
+        this: &Flags,
+        default_value: &str,
+    ) -> Promise<EvaluationDetails<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getBooleanDetails")]
     pub async fn get_boolean_details(
         this: &Flags,
         default_value: bool,
     ) -> Result<EvaluationDetails<Boolean>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getBooleanDetails")]
+    pub fn get_boolean_details_promise(
+        this: &Flags,
+        default_value: bool,
+    ) -> Promise<EvaluationDetails<Boolean>>;
     #[wasm_bindgen(method, catch, js_name = "getNumberDetails")]
     pub async fn get_number_details(
         this: &Flags,
         default_value: f64,
     ) -> Result<EvaluationDetails<Number>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getNumberDetails")]
+    pub fn get_number_details_promise(
+        this: &Flags,
+        default_value: f64,
+    ) -> Promise<EvaluationDetails<Number>>;
     #[wasm_bindgen(method, catch, js_name = "getNullableString")]
     pub async fn get_nullable_string(
         this: &Flags,
         default_value: &str,
-    ) -> Result<Option<JsString>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getNullableString")]
+    pub fn get_nullable_string_promise(
+        this: &Flags,
+        default_value: &str,
+    ) -> Promise<JsOption<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getStringPair")]
     pub async fn get_string_pair(
         this: &Flags,
         default_value: &str,
     ) -> Result<Pair<JsString, JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringPair")]
+    pub fn get_string_pair_promise(
+        this: &Flags,
+        default_value: &str,
+    ) -> Promise<Pair<JsString, JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getStringArray")]
-    pub async fn get_string_array(this: &Flags) -> Result<Array<JsString>, JsValue>;
+    pub async fn get_string_array(this: &Flags) -> Result<Vec<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringArray")]
+    pub fn get_string_array_promise(this: &Flags) -> Promise<Array<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getStringMap")]
     pub async fn get_string_map(this: &Flags) -> Result<Map<JsString, JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringMap")]
+    pub fn get_string_map_promise(this: &Flags) -> Promise<Map<JsString, JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getStringTuple")]
     pub async fn get_string_tuple(
         this: &Flags,
     ) -> Result<ArrayTuple<(JsString, JsString)>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringTuple")]
+    pub fn get_string_tuple_promise(this: &Flags) -> Promise<ArrayTuple<(JsString, JsString)>>;
     #[wasm_bindgen(method, catch, js_name = "getStringCallback")]
     pub async fn get_string_callback(
         this: &Flags,
     ) -> Result<Function<fn(JsString) -> JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringCallback")]
+    pub fn get_string_callback_promise(this: &Flags)
+        -> Promise<Function<fn(JsString) -> JsString>>;
     #[wasm_bindgen(method, js_name = "compareStrings")]
     pub fn compare_strings(this: &Flags, left: &str, right: &str) -> bool;
     #[wasm_bindgen(method, catch, js_name = "compareStrings")]

@@ -4,7 +4,7 @@
 // default initializer fires on `undefined`, `=== null` is checked. Reads
 // keep `Nullable`, including an awaited value; writes send `null` through
 // their own `_with_null` variant, and omission sends no argument.
-use js_sys::{JsString, Nullable};
+use js_sys::{JsNullable, JsString, Nullable};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::node_nullable::*;
@@ -49,8 +49,12 @@ fn optional_nullable_return_keeps_each_state() {
 
 #[wasm_bindgen_test]
 async fn awaited_value_keeps_each_state() {
-    let value = |s: &str| Some(Nullable::Value(JsString::from(s)));
+    let value = |s: &str| Some(Nullable::Value(s.to_string()));
     assert_eq!(lookup_async("known").await.unwrap(), value("value"));
+    let handle: JsNullable<JsString> = lookup_async_promise("known").await.unwrap();
+    assert_eq!(handle.as_option(), Some(JsString::from("value")));
+    let handle: JsNullable<JsString> = lookup_async_promise("other").await.unwrap();
+    assert!(handle.is_empty());
     assert_eq!(lookup_async("other").await.unwrap(), Some(Nullable::Null));
     assert_eq!(lookup_async("empty").await.unwrap(), None);
     assert!(find("other").await.unwrap().is_null());

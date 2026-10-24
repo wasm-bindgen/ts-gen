@@ -192,6 +192,7 @@ pub fn convert_function_decl(
         return_type,
         overloads: vec![],
         throws,
+        async_modifier: func.r#async,
         body_scope,
     })
 }

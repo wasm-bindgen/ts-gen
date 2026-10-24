@@ -35,7 +35,12 @@ extern "C" {
 #[wasm_bindgen(module = "generic-mono-review")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "asyncByAlias")]
-    pub async fn async_by_alias(id: &str) -> Result<JsString, JsValue>;
+    pub async fn async_by_alias(id: &str) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "generic-mono-review")]
+extern "C" {
+    #[wasm_bindgen(js_name = "asyncByAlias")]
+    pub fn async_by_alias_promise(id: &str) -> Promise<JsString>;
 }
 #[wasm_bindgen(module = "generic-mono-review")]
 extern "C" {

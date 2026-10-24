@@ -146,6 +146,11 @@ pub mod shadow {
         #[wasm_bindgen(catch, js_namespace = "Shadow")]
         pub async fn next() -> Result<super::Mode, JsValue>;
     }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        #[wasm_bindgen(js_name = "next", js_namespace = "Shadow")]
+        pub fn next_promise() -> Promise<JsString>;
+    }
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

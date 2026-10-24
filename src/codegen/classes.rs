@@ -750,6 +750,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             return_type: &void,
             body_scope: g.scope,
             throws: &crate::ir::Throws::None,
+            async_modifier: false,
             doc: &None,
         }];
         let setter_name = config.setter_name(MemberKind::Property, &g.js_name);
@@ -759,6 +760,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 rust_name: Some(&setter_name),
                 kind: SignatureKind::Setter,
                 overloads: &setter_overloads,
+                module: &config.from_module(),
             },
             &mut setter_used,
             config.cgctx,
@@ -1488,6 +1490,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
     // 2. Process all members in declaration order through the single naming pass.
     //    When we encounter the first member of a method group, expand all overloads
     //    of that group together. Skip subsequent members of the same group.
+    let module = config.from_module();
     for member in &config.members {
         match member {
             Member::Constructor(_) if !config.is_abstract => {
@@ -1518,6 +1521,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &return_type,
                         body_scope: c.scope,
                         throws: &c.throws,
+                        async_modifier: false,
                         doc: &c.doc,
                     })
                     .collect();
@@ -1527,6 +1531,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         rust_name: None,
                         kind: SignatureKind::Constructor,
                         overloads: &overloads,
+                        module: &module,
                     },
                     &mut names,
                     config.cgctx,
@@ -1549,6 +1554,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &m.return_type,
                         body_scope: m.body_scope,
                         throws: &m.throws,
+                        async_modifier: m.async_modifier,
                         doc: &m.doc,
                     })
                     .collect();
@@ -1560,6 +1566,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         rust_name: Some(&base),
                         kind: SignatureKind::Method,
                         overloads: &overloads,
+                        module: &module,
                     },
                     &mut names,
                     config.cgctx,
@@ -1582,6 +1589,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &m.return_type,
                         body_scope: m.body_scope,
                         throws: &m.throws,
+                        async_modifier: m.async_modifier,
                         doc: &m.doc,
                     })
                     .collect();
@@ -1593,6 +1601,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         rust_name: Some(&base),
                         kind: SignatureKind::StaticMethod,
                         overloads: &overloads,
+                        module: &module,
                     },
                     &mut names,
                     config.cgctx,
@@ -2069,6 +2078,7 @@ fn generate_setter(
         return_type: &void,
         body_scope: setter.scope,
         throws: &crate::ir::Throws::None,
+        async_modifier: false,
         doc: &doc,
     }];
     let setter_name = config.setter_name(MemberKind::Property, &setter.js_name);
@@ -2078,6 +2088,7 @@ fn generate_setter(
             rust_name: Some(&setter_name),
             kind: SignatureKind::Setter,
             overloads: &overloads,
+            module: &config.from_module(),
         },
         names,
         config.cgctx,
@@ -2216,6 +2227,7 @@ fn generate_static_setter(
         return_type: &void,
         body_scope: setter.scope,
         throws: &crate::ir::Throws::None,
+        async_modifier: false,
         doc: &doc,
     }];
     let setter_name = config.setter_name(MemberKind::StaticProperty, &setter.js_name);
@@ -2225,6 +2237,7 @@ fn generate_static_setter(
             rust_name: Some(&setter_name),
             kind: SignatureKind::StaticSetter,
             overloads: &overloads,
+            module: &config.from_module(),
         },
         names,
         config.cgctx,

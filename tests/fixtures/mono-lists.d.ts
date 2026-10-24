@@ -24,6 +24,7 @@ export declare function getTags(): string[];
 export declare function getMaybeTags(): Tag[] | undefined;
 export declare function getFlags(): boolean[];
 export declare function fetchTags(): Promise<string[]>;
+export declare function fetchMaybeTags(): Promise<Tag[] | null>;
 export declare class Labels {
   constructor();
   add(values: string[]): string;

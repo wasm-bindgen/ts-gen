@@ -159,6 +159,11 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn get_promise(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_store_options(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -171,6 +176,12 @@ extern "C" {
         options: &StoreOptions,
     ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn get_with_store_options_promise(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &StoreOptions,
+    ) -> Result<Promise<Nullable<JsString>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_get_options(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -182,6 +193,12 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
     ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn get_with_get_options_promise(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptions,
+    ) -> Result<Promise<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn refine(this: &Store, value: &Derived) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -281,6 +298,11 @@ extern "C" {
         this: &Fetcher,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub fn fetch_promise(
+        this: &Fetcher,
+        input: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<JsString>, JsValue>;
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {

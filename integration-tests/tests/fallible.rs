@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Number, RangeError};
+use js_sys::{Number, Promise, RangeError};
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_test::*;
 
@@ -32,8 +32,12 @@ fn typed_throws_downcasts() {
 
 #[wasm_bindgen_test]
 async fn async_and_constructor_are_unchanged() {
-    let parsed: Result<Number, JsValue> = parse_later("7").await;
-    assert_eq!(parsed.unwrap().value_of(), 7.0);
+    let parsed: Result<f64, JsValue> = parse_later("7").await;
+    assert_eq!(parsed.unwrap(), 7.0);
+    // The un-awaited form is sync, so it catches a synchronous throw;
+    // the awaited value stays inside the promise.
+    let promise: Promise<Number> = parse_later_promise("7").unwrap();
+    assert_eq!(promise.await.unwrap().value_of(), 7.0);
     let counter = Counter::new(8.0).unwrap();
     assert_eq!(counter.increment().unwrap(), 9.0);
     assert_eq!(counter.increment_with_by(1.0).unwrap(), 10.0);

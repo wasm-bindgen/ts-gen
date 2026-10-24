@@ -600,6 +600,7 @@ fn merge_function_overloads(
                         return_type: f.return_type.clone(),
                         body_scope: f.body_scope,
                         throws: f.throws.clone(),
+                        async_modifier: f.async_modifier,
                         doc: decl.doc.clone(),
                     });
                     base.overloads.extend(f.overloads.iter().cloned());
@@ -1032,6 +1033,7 @@ fn static_members(members: &[crate::ir::Member]) -> Vec<crate::ir::Member> {
                 return_type: m.return_type.clone(),
                 doc: m.doc.clone(),
                 throws: m.throws.clone(),
+                async_modifier: m.async_modifier,
                 body_scope: m.body_scope,
             })),
             _ => None,
@@ -1383,6 +1385,7 @@ mod tests {
             optional: false,
             doc: None,
             throws: crate::ir::Throws::None,
+            async_modifier: false,
             body_scope: ScopeId::DUMMY,
         })
     }

@@ -325,6 +325,7 @@ fn register_type(
             return_type: ir::TypeRef::Any,
             overloads: vec![],
             throws: ir::Throws::None,
+            async_modifier: false,
             body_scope: scope,
         }),
         ir::RegisteredKind::Variable => ir::TypeKind::Variable(ir::VariableDecl {

@@ -80,7 +80,16 @@ extern "C" {
     #[doc = " * `QuotaError` — when over quota"]
     #[doc = " * `Error` — otherwise"]
     #[wasm_bindgen(method, catch)]
-    pub async fn grow(this: &Store, bytes: f64) -> Result<Undefined, JsException>;
+    pub async fn grow(this: &Store, bytes: f64) -> Result<(), JsException>;
+    #[doc = " Multiple `@throws` lines aggregate; a user subclass sorts before its"]
+    #[doc = " parents."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `QuotaError` — when over quota"]
+    #[doc = " * `Error` — otherwise"]
+    #[wasm_bindgen(method, js_name = "grow")]
+    pub fn grow_promise(this: &Store, bytes: f64) -> Promise<Undefined>;
     #[doc = " A qualified name resolves through its namespace; the variant is named"]
     #[doc = " by its Rust path."]
     #[doc = ""]

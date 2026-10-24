@@ -11,7 +11,7 @@ async fn nested_array_signatures_compile(
     grid: &Grid,
     callback: &Function<fn(Array<Array<JsString>>) -> Undefined>,
 ) {
-    let _: Array<Array<JsString>> = grid.rows().await.unwrap();
+    let _: Vec<Array<JsString>> = grid.rows().await.unwrap();
     grid.put_rows(&[Array::<Number>::new_typed()]);
     let _: Vec<String> = grid.names();
     let tags: Vec<Array<Boolean>> = grid.tags();

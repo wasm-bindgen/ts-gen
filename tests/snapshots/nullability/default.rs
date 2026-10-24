@@ -1419,13 +1419,28 @@ extern "C" {
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
+    #[wasm_bindgen(js_name = "fetchNull")]
+    pub fn fetch_null_promise() -> Promise<JsNullable<Registry>>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchOptional")]
-    pub async fn fetch_optional() -> Result<Option<Number>, JsValue>;
+    pub async fn fetch_optional() -> Result<Option<f64>, JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetchOptional")]
+    pub fn fetch_optional_promise() -> Promise<JsOption<Number>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchBoth")]
-    pub async fn fetch_both() -> Result<Option<Nullable<JsString>>, JsValue>;
+    pub async fn fetch_both() -> Result<Option<Nullable<String>>, JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetchBoth")]
+    pub fn fetch_both_promise() -> Promise<JsNullable<JsString>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
@@ -1433,6 +1448,11 @@ extern "C" {
     pub async fn fetch_generic<T: ::wasm_bindgen::JsGeneric>() -> Result<Nullable<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::NullableFromWasmAbi;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetchGeneric")]
+    pub fn fetch_generic_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<JsNullable<T>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
