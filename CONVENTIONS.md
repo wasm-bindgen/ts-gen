@@ -2313,23 +2313,23 @@ declare class CompressionStream {
 
 ```rust
 extern "C" {
-    pub async fn get(this: &KVNamespace, key: &str) -> Result<Option<String>, JsValue>;
+    pub async fn get(this: &KVNamespace, key: &str) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_text_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Option<String>, JsValue>;
+    async fn get_text_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     async fn get_json_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn get_array_buffer_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Option<ArrayBuffer>, JsValue>;
+    async fn get_array_buffer_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<ArrayBuffer>, JsValue>;
     // …
     #[wasm_bindgen(constructor, catch)]
     fn new_gzip_js(format: &str) -> Result<CompressionStream, JsValue>;
 }
 impl KVNamespace {
-    pub async fn get_text(&self, key: &str) -> Result<Option<String>, JsValue> {
+    pub async fn get_text(&self, key: &str) -> Result<Nullable<JsString>, JsValue> {
         self.get_text_js(key, "text").await
     }
     pub async fn get_json(&self, key: &str) -> Result<JsValue, JsValue> { /* "json" */ }
-    pub async fn get_array_buffer(&self, key: &str) -> Result<Option<ArrayBuffer>, JsValue> { /* … */ }
+    pub async fn get_array_buffer(&self, key: &str) -> Result<Nullable<ArrayBuffer>, JsValue> { /* … */ }
     pub async fn get_text_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsNullable<JsString>>, JsValue> { /* … */ }
     pub async fn get_json_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsValue>, JsValue> { /* … */ }
 }
@@ -2356,8 +2356,8 @@ impl CompressionStream {
   the first arm (`get_text_js` also serves nothing else here, but
   `new_gzip_js` serves all three formats); a different return type gets
   its own, since the extern return is what wasm-bindgen converts.
-* The `_promise` and `try_` companions follow per arm
-  (`get_json_promise`, `try_describe_raw`) over their own extern.
+* The `try_` companion follows per arm (`try_describe_raw`) over its
+  own extern.
 * Setters are exempt: `set_disposition("inline")` takes the value.
 
 ## `--annotate` side files
