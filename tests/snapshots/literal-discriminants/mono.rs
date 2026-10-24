@@ -23,43 +23,31 @@ extern "C" {
     pub fn set_label(this: &Options, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl Options {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `keepAlive: 0`"]
+    #[doc = " Construct with `keepAlive: 0`."]
     pub fn new_0() -> Options {
         Self::builder_0().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `keepAlive: 1`"]
+    #[doc = " Construct with `keepAlive: 1`."]
     pub fn new_1() -> Options {
         Self::builder_1().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `keepAlive: 2`"]
+    #[doc = " Construct with `keepAlive: 2`."]
     pub fn new_2() -> Options {
         Self::builder_2().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `keepAlive: 0`"]
+    #[doc = " Start a builder with `keepAlive: 0`."]
     pub fn builder_0() -> OptionsBuilder {
         let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_keep_alive(KeepAliveKind::N0);
         OptionsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `keepAlive: 1`"]
+    #[doc = " Start a builder with `keepAlive: 1`."]
     pub fn builder_1() -> OptionsBuilder {
         let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_keep_alive(KeepAliveKind::N1);
         OptionsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `keepAlive: 2`"]
+    #[doc = " Start a builder with `keepAlive: 2`."]
     pub fn builder_2() -> OptionsBuilder {
         let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_keep_alive(KeepAliveKind::N2);
@@ -89,21 +77,37 @@ extern "C" {
     pub fn set_scale(this: &Scaled, val: f64);
 }
 impl Scaled {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `scale: -1`"]
+    #[doc = " Construct with `scale: -1`."]
     pub fn new_neg_1() -> Scaled {
+        Self::builder_neg_1().build()
+    }
+    #[doc = " Construct with `scale: 0.5`."]
+    pub fn new_0_5() -> Scaled {
+        Self::builder_0_5().build()
+    }
+    #[doc = " Start a builder with `scale: -1`."]
+    pub fn builder_neg_1() -> ScaledBuilder {
         let inner: Scaled = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_scale(-1.0);
-        inner
+        ScaledBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `scale: 0.5`"]
-    pub fn new_0_5() -> Scaled {
+    #[doc = " Start a builder with `scale: 0.5`."]
+    pub fn builder_0_5() -> ScaledBuilder {
         let inner: Scaled = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_scale(0.5);
-        inner
+        ScaledBuilder { inner }
+    }
+}
+pub struct ScaledBuilder {
+    inner: Scaled,
+}
+impl ScaledBuilder {
+    pub fn scale(self, val: f64) -> Self {
+        self.inner.set_scale(val);
+        self
+    }
+    pub fn build(self) -> Scaled {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]

@@ -889,11 +889,32 @@ emits the same shape as above, but with zero-arg `new()` and `builder()`:
 ```rust
 let init = ResponseInit::builder().status(200.0).build();
 let init = ResponseInit::new();  // empty object
+let init = ResponseInit::default();  // the same
 ```
+
+`impl Default` calls `new()`, so such a dictionary works with
+`..Default::default()`-style helpers and `#[derive(Default)]` containers.
 
 If every property is required (no optionals), the builder would carry
 only `build()` and is suppressed — only `new(reqs)` is emitted, with
-construction inlined.
+construction inlined. The exception is a dictionary with [literal
+factories](#literal-type-discriminator-collapse): each `new_<literal>`
+keeps its `builder_<literal>`, whose builder sets the fields the literals
+come from, so a value chosen at runtime can replace the inlined one.
+
+```rust
+impl TransitionOptions {
+    /// Construct with `direction: "next"`.
+    pub fn new_next() -> TransitionOptions { Self::builder_next().build() }
+    /// Start a builder with `direction: "next"`.
+    pub fn builder_next() -> TransitionOptionsBuilder { /* … */ }
+    // `new_previous` / `builder_previous` likewise
+}
+impl TransitionOptionsBuilder {
+    pub fn direction(self, val: DirectionKind) -> Self { /* … */ }
+    pub fn build(self) -> TransitionOptions { /* … */ }
+}
+```
 
 ### Required-property cartesian product across union types
 
@@ -920,17 +941,19 @@ exactly what it does. Headings use `##` (h2) and bullets use ` - ` to
 separate the field name from its description, matching the format
 used elsewhere when JSDoc is rendered to Rust:
 
-* `## Inlined fields` — bullets `` `field_name: literal_value` `` for
-  each literal discriminant baked into the function name (these don't
-  appear as parameters).
-* `## Arguments` — bullets `` `field_name` `` for each caller-supplied
-  field, in signature order.
-
-Both sections pull the field's JSDoc into the bullet when present.
+* A summary sentence naming each literal baked into the function name
+  (these don't appear as parameters): ``Construct with `direction:
+  "next"`.``, and ``Start a builder with …`` on a `builder*` variant.
+* `## Inlined fields` — bullets `` `field_name: literal_value` `` with
+  the field's JSDoc, when one of the baked-in literals' fields has any.
+* The caller-supplied fields with JSDoc, as bullets `` `field_name` ``
+  in signature order, under `## Arguments` when a section precedes them.
 
 For example:
 
 ```rust
+/// Construct with `disposition: "inline"`.
+///
 /// ## Inlined fields
 ///
 /// * `disposition: "inline"` - One of "inline" (default) or "attachment"
@@ -4343,11 +4366,25 @@ pub type Sized;            // size?
   way (`PartialOptions`). An inline union that evaluates to literals stays
   inline, so a `"auto" | Plural<U>` field still gets its own
   [`<Field>Kind`](#erased-return-position-unions-become-dynamic-union-enums).
+* **An argument filling the alias's role replaces it.** A one-argument
+  alias name is read as its first PascalCase word, the head, then the
+  role its argument plays. When the role's last word is also a word of
+  the argument's spelling, the argument names the role, and the result is
+  the head followed by the argument: `PartialTemporalLike<ZonedDateTimeLikeObject>`
+  is `PartialZonedDateTimeLikeObject` (role `TemporalLike`, argument
+  `…LikeObject`), and `PluralizeUnit<"day" | TimeUnit>` is
+  `PluralizeDayOrTimeUnit` (role `Unit`). Otherwise, or with a one-word
+  alias name (`Plural`) or several arguments, the name is the alias
+  followed by its arguments, as is a short name some declaration already
+  has.
 * **One shape is one type.** Two evaluations with the same members in the
   same scope share a declaration, under the first name given: `Omit<Options,
   "fixed">` and `Pick<Options, "name" | "size">` are the same dictionary. A
   utility that changes nothing keeps the type it was given: `Partial<T>`
-  over an all-optional `T` is `T`.
+  over an all-optional `T` is `T`. So does a mapped type over `keyof T`
+  whose result has exactly `T`'s members:
+  `PartialTemporalLike<TimeLikeObject>`, which only makes optional what
+  already is, is `TimeLikeObject`.
 * **An alias to an evaluated type is promoted.** `type Sized = Pick<…>`
   is the dictionary `Sized`; `type OptionKey = keyof Options` is the enum
   `OptionKey`. A utility over such an alias reads it evaluated, so

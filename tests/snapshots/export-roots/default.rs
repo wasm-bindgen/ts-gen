@@ -24,6 +24,11 @@ impl Checksums {
         }
     }
 }
+impl Default for Checksums {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ChecksumsBuilder {
     inner: Checksums,
 }
@@ -56,6 +61,11 @@ impl Conditional {
         }
     }
 }
+impl Default for Conditional {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ConditionalBuilder {
     inner: Conditional,
 }
@@ -86,6 +96,11 @@ impl GetOptions {
         GetOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for GetOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct GetOptionsBuilder {
@@ -200,6 +215,11 @@ impl SocketOptions {
         SocketOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for SocketOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct SocketOptionsBuilder {

@@ -1901,6 +1901,17 @@ impl<
         }
     }
 }
+impl<
+        Env: ::wasm_bindgen::convert::IntoWasmAbi,
+        QueueHandlerMessage: ::wasm_bindgen::convert::IntoWasmAbi,
+        CfHostMetadata: ::wasm_bindgen::convert::IntoWasmAbi,
+        Props: ::wasm_bindgen::convert::IntoWasmAbi,
+    > Default for ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ExportedHandlerBuilder<Env, QueueHandlerMessage, CfHostMetadata, Props> {
     inner: ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
 }
@@ -2017,6 +2028,11 @@ impl StructuredSerializeOptions {
         StructuredSerializeOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for StructuredSerializeOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct StructuredSerializeOptionsBuilder {
@@ -2299,6 +2315,11 @@ impl DurableObjectNamespaceNewUniqueIdOptions {
         }
     }
 }
+impl Default for DurableObjectNamespaceNewUniqueIdOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct DurableObjectNamespaceNewUniqueIdOptionsBuilder {
     inner: DurableObjectNamespaceNewUniqueIdOptions,
 }
@@ -2361,6 +2382,11 @@ impl DurableObjectNamespaceGetDurableObjectOptions {
         DurableObjectNamespaceGetDurableObjectOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for DurableObjectNamespaceGetDurableObjectOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct DurableObjectNamespaceGetDurableObjectOptionsBuilder {
@@ -3140,6 +3166,11 @@ impl DurableObjectListOptions {
         }
     }
 }
+impl Default for DurableObjectListOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct DurableObjectListOptionsBuilder {
     inner: DurableObjectListOptions,
 }
@@ -3204,6 +3235,11 @@ impl DurableObjectGetOptions {
         }
     }
 }
+impl Default for DurableObjectGetOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct DurableObjectGetOptionsBuilder {
     inner: DurableObjectGetOptions,
 }
@@ -3238,6 +3274,11 @@ impl DurableObjectGetAlarmOptions {
         DurableObjectGetAlarmOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for DurableObjectGetAlarmOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct DurableObjectGetAlarmOptionsBuilder {
@@ -3278,6 +3319,11 @@ impl DurableObjectPutOptions {
         DurableObjectPutOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for DurableObjectPutOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct DurableObjectPutOptionsBuilder {
@@ -3322,6 +3368,11 @@ impl DurableObjectSetAlarmOptions {
         DurableObjectSetAlarmOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for DurableObjectSetAlarmOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct DurableObjectSetAlarmOptionsBuilder {
@@ -3401,6 +3452,11 @@ impl AnalyticsEngineDataPoint {
         AnalyticsEngineDataPointBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for AnalyticsEngineDataPoint {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct AnalyticsEngineDataPointBuilder {
@@ -3569,6 +3625,11 @@ impl EventInit {
         EventInitBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for EventInit {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct EventInitBuilder {
@@ -3778,6 +3839,11 @@ impl EventTargetEventListenerOptions {
         }
     }
 }
+impl Default for EventTargetEventListenerOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct EventTargetEventListenerOptionsBuilder {
     inner: EventTargetEventListenerOptions,
 }
@@ -3820,6 +3886,11 @@ impl EventTargetAddEventListenerOptions {
         EventTargetAddEventListenerOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for EventTargetAddEventListenerOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct EventTargetAddEventListenerOptionsBuilder {
@@ -3973,6 +4044,11 @@ impl SchedulerWaitOptions {
         }
     }
 }
+impl Default for SchedulerWaitOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct SchedulerWaitOptionsBuilder {
     inner: SchedulerWaitOptions,
 }
@@ -4046,6 +4122,11 @@ impl CustomEventCustomEventInit {
         CustomEventCustomEventInitBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for CustomEventCustomEventInit {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct CustomEventCustomEventInitBuilder {
@@ -4189,6 +4270,11 @@ impl BlobOptions {
         }
     }
 }
+impl Default for BlobOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct BlobOptionsBuilder {
     inner: BlobOptions,
 }
@@ -4257,6 +4343,11 @@ impl FileOptions {
         FileOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for FileOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct FileOptionsBuilder {
@@ -4506,6 +4597,11 @@ impl CacheQueryOptions {
         CacheQueryOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for CacheQueryOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct CacheQueryOptionsBuilder {
@@ -6087,6 +6183,11 @@ impl RsaOtherPrimesInfo {
         }
     }
 }
+impl Default for RsaOtherPrimesInfo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct RsaOtherPrimesInfoBuilder {
     inner: RsaOtherPrimesInfo,
 }
@@ -7162,6 +7263,11 @@ impl ErrorEventErrorEventInit {
         }
     }
 }
+impl Default for ErrorEventErrorEventInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ErrorEventErrorEventInitBuilder {
     inner: ErrorEventErrorEventInit,
 }
@@ -7403,6 +7509,11 @@ impl ContentOptions {
         ContentOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ContentOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ContentOptionsBuilder {
@@ -8377,6 +8488,11 @@ impl ResponseInit {
         }
     }
 }
+impl Default for ResponseInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ResponseInitBuilder {
     inner: ResponseInit,
 }
@@ -8684,6 +8800,11 @@ impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> RequestInit<Cf> {
         RequestInitBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> Default for RequestInit<Cf> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct RequestInitBuilder<Cf> {
@@ -8994,9 +9115,7 @@ impl<Metadata> KVNamespaceListResult<Metadata> {
     }
 }
 impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListResult<Metadata> {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `list_complete: false`"]
+    #[doc = " Construct with `list_complete: false`."]
     pub fn new_false(
         keys: &[KVNamespaceListKey<Metadata>],
         cursor: impl ::wasm_bindgen::JsStringLike,
@@ -9009,9 +9128,7 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListResult<Metad
         inner.set_cache_status(cache_status);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `list_complete: false`"]
+    #[doc = " Construct with `list_complete: false`."]
     pub fn new_false_with_null(
         keys: &[KVNamespaceListKey<Metadata>],
         cursor: impl ::wasm_bindgen::JsStringLike,
@@ -9023,26 +9140,20 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListResult<Metad
         inner.set_cache_status_with_null();
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `list_complete: true`"]
+    #[doc = " Construct with `list_complete: true`."]
     pub fn new_true(
         keys: &[KVNamespaceListKey<Metadata>],
         cache_status: impl ::wasm_bindgen::JsStringLike,
     ) -> KVNamespaceListResult<Metadata> {
         Self::builder_true(keys, cache_status).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `list_complete: true`"]
+    #[doc = " Construct with `list_complete: true`."]
     pub fn new_true_with_null(
         keys: &[KVNamespaceListKey<Metadata>],
     ) -> KVNamespaceListResult<Metadata> {
         Self::builder_true_with_null(keys).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `list_complete: true`"]
+    #[doc = " Start a builder with `list_complete: true`."]
     pub fn builder_true(
         keys: &[KVNamespaceListKey<Metadata>],
         cache_status: impl ::wasm_bindgen::JsStringLike,
@@ -9053,9 +9164,7 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListResult<Metad
         inner.set_cache_status(cache_status);
         KVNamespaceListResultBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `list_complete: true`"]
+    #[doc = " Start a builder with `list_complete: true`."]
     pub fn builder_true_with_null(
         keys: &[KVNamespaceListKey<Metadata>],
     ) -> KVNamespaceListResultBuilder<Metadata> {
@@ -9824,6 +9933,11 @@ impl KVNamespaceListOptions {
         }
     }
 }
+impl Default for KVNamespaceListOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct KVNamespaceListOptionsBuilder {
     inner: KVNamespaceListOptions,
 }
@@ -9918,6 +10032,11 @@ impl KVNamespacePutOptions {
         KVNamespacePutOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for KVNamespacePutOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct KVNamespacePutOptionsBuilder {
@@ -10177,6 +10296,11 @@ impl QueueSendOptions {
         }
     }
 }
+impl Default for QueueSendOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct QueueSendOptionsBuilder {
     inner: QueueSendOptions,
 }
@@ -10211,6 +10335,11 @@ impl QueueSendBatchOptions {
         QueueSendBatchOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for QueueSendBatchOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct QueueSendBatchOptionsBuilder {
@@ -10291,6 +10420,11 @@ impl QueueRetryOptions {
         QueueRetryOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for QueueRetryOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct QueueRetryOptionsBuilder {
@@ -10457,6 +10591,11 @@ impl R2ListOptions {
         R2ListOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for R2ListOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct R2ListOptionsBuilder {
@@ -11375,6 +11514,11 @@ impl R2Range {
         }
     }
 }
+impl Default for R2Range {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct R2RangeBuilder {
     inner: R2Range,
 }
@@ -11433,6 +11577,11 @@ impl R2Conditional {
         R2ConditionalBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for R2Conditional {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct R2ConditionalBuilder {
@@ -11495,6 +11644,11 @@ impl R2GetOptions {
         R2GetOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for R2GetOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct R2GetOptionsBuilder {
@@ -11621,6 +11775,11 @@ impl R2PutOptions {
         R2PutOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for R2PutOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct R2PutOptionsBuilder {
@@ -11776,6 +11935,11 @@ impl R2MultipartOptions {
         }
     }
 }
+impl Default for R2MultipartOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct R2MultipartOptionsBuilder {
     inner: R2MultipartOptions,
 }
@@ -11872,6 +12036,11 @@ impl R2StringChecksums {
         }
     }
 }
+impl Default for R2StringChecksums {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct R2StringChecksumsBuilder {
     inner: R2StringChecksums,
 }
@@ -11950,6 +12119,11 @@ impl R2HTTPMetadata {
         }
     }
 }
+impl Default for R2HTTPMetadata {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct R2HTTPMetadataBuilder {
     inner: R2HTTPMetadata,
 }
@@ -12009,27 +12183,21 @@ extern "C" {
     pub fn set_delimited_prefixes(this: &R2Objects, val: &[impl ::wasm_bindgen::JsStringLike]);
 }
 impl R2Objects {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `truncated: true`"]
+    #[doc = " Construct with `truncated: true`."]
     pub fn new_true(
         objects: &[R2Object],
         delimited_prefixes: &[impl ::wasm_bindgen::JsStringLike],
     ) -> R2Objects {
         Self::builder_true(objects, delimited_prefixes).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `truncated: false`"]
+    #[doc = " Construct with `truncated: false`."]
     pub fn new_false(
         objects: &[R2Object],
         delimited_prefixes: &[impl ::wasm_bindgen::JsStringLike],
     ) -> R2Objects {
         Self::builder_false(objects, delimited_prefixes).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `truncated: true`"]
+    #[doc = " Start a builder with `truncated: true`."]
     pub fn builder_true(
         objects: &[R2Object],
         delimited_prefixes: &[impl ::wasm_bindgen::JsStringLike],
@@ -12040,9 +12208,7 @@ impl R2Objects {
         inner.set_delimited_prefixes(delimited_prefixes);
         R2ObjectsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `truncated: false`"]
+    #[doc = " Start a builder with `truncated: false`."]
     pub fn builder_false(
         objects: &[R2Object],
         delimited_prefixes: &[impl ::wasm_bindgen::JsStringLike],
@@ -12089,6 +12255,11 @@ impl R2UploadPartOptions {
         R2UploadPartOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for R2UploadPartOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct R2UploadPartOptionsBuilder {
@@ -12161,6 +12332,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> QueuingStrategy<T> {
         QueuingStrategyBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for QueuingStrategy<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct QueuingStrategyBuilder<T> {
@@ -12244,6 +12420,11 @@ impl<W: ::wasm_bindgen::convert::IntoWasmAbi> UnderlyingSink<W> {
         }
     }
 }
+impl<W: ::wasm_bindgen::convert::IntoWasmAbi> Default for UnderlyingSink<W> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct UnderlyingSinkBuilder<W> {
     inner: UnderlyingSink<W>,
 }
@@ -12322,15 +12503,11 @@ extern "C" {
     );
 }
 impl UnderlyingByteSource {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"bytes\"`"]
+    #[doc = " Construct with `type: \"bytes\"`."]
     pub fn new() -> UnderlyingByteSource {
         Self::builder().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"bytes\"`"]
+    #[doc = " Start a builder with `type: \"bytes\"`."]
     pub fn builder() -> UnderlyingByteSourceBuilder {
         let inner: UnderlyingByteSource = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("bytes");
@@ -12426,6 +12603,11 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> UnderlyingSource<R> {
         UnderlyingSourceBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl<R: ::wasm_bindgen::convert::IntoWasmAbi> Default for UnderlyingSource<R> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct UnderlyingSourceBuilder<R> {
@@ -12552,6 +12734,13 @@ impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWa
         }
     }
 }
+impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWasmAbi> Default
+    for Transformer<I, O>
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct TransformerBuilder<I, O> {
     inner: Transformer<I, O>,
 }
@@ -12646,6 +12835,11 @@ impl StreamPipeOptions {
         }
     }
 }
+impl Default for StreamPipeOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct StreamPipeOptionsBuilder {
     inner: StreamPipeOptions,
 }
@@ -12689,24 +12883,18 @@ extern "C" {
         R: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadableStreamReadResult<R> {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `done: false`"]
+    #[doc = " Construct with `done: false`."]
     pub fn new_false(value: R) -> ReadableStreamReadResult<R> {
         let inner: ReadableStreamReadResult<R> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_done(false);
         inner.set_value(value);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `done: true`"]
+    #[doc = " Construct with `done: true`."]
     pub fn new_true() -> ReadableStreamReadResult<R> {
         Self::builder_true().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `done: true`"]
+    #[doc = " Start a builder with `done: true`."]
     pub fn builder_true() -> ReadableStreamReadResultBuilder<R> {
         let inner: ReadableStreamReadResult<R> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_done(true);
@@ -12996,6 +13184,11 @@ impl ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions {
         }
     }
 }
+impl Default for ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptionsBuilder {
     inner: ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions,
 }
@@ -13027,6 +13220,8 @@ extern "C" {
     pub fn set_mode(this: &ReadableStreamGetReaderOptions, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ReadableStreamGetReaderOptions {
+    #[doc = " Construct with `mode: \"byob\"`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `mode: \"byob\"` - Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
@@ -13501,6 +13696,11 @@ impl IdentityTransformStreamQueuingStrategy {
         }
     }
 }
+impl Default for IdentityTransformStreamQueuingStrategy {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct IdentityTransformStreamQueuingStrategyBuilder {
     inner: IdentityTransformStreamQueuingStrategy,
 }
@@ -13535,6 +13735,11 @@ impl ReadableStreamValuesOptions {
         ReadableStreamValuesOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ReadableStreamValuesOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ReadableStreamValuesOptionsBuilder {
@@ -13648,6 +13853,11 @@ impl TextDecoderStreamTextDecoderStreamInit {
         }
     }
 }
+impl Default for TextDecoderStreamTextDecoderStreamInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct TextDecoderStreamTextDecoderStreamInitBuilder {
     inner: TextDecoderStreamTextDecoderStreamInit,
 }
@@ -13749,6 +13959,11 @@ impl ScriptVersion {
         ScriptVersionBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ScriptVersion {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ScriptVersionBuilder {
@@ -14842,6 +15057,11 @@ impl URLPatternInit {
         }
     }
 }
+impl Default for URLPatternInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct URLPatternInitBuilder {
     inner: URLPatternInit,
 }
@@ -15000,6 +15220,11 @@ impl URLPatternOptions {
         }
     }
 }
+impl Default for URLPatternOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct URLPatternOptionsBuilder {
     inner: URLPatternOptions,
 }
@@ -15073,6 +15298,11 @@ impl CloseEventInit {
         CloseEventInitBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for CloseEventInit {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct CloseEventInitBuilder {
@@ -15306,6 +15536,11 @@ impl WebSocketAcceptOptions {
         }
     }
 }
+impl Default for WebSocketAcceptOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct WebSocketAcceptOptionsBuilder {
     inner: WebSocketAcceptOptions,
 }
@@ -15421,6 +15656,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> SqlStorageCursorNextReturn<T> {
         SqlStorageCursorNextReturnBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for SqlStorageCursorNextReturn<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct SqlStorageCursorNextReturnBuilder<T> {
@@ -15563,6 +15803,11 @@ impl TlsOptions {
         }
     }
 }
+impl Default for TlsOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct TlsOptionsBuilder {
     inner: TlsOptions,
 }
@@ -15601,6 +15846,11 @@ impl SocketInfo {
         SocketInfoBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for SocketInfo {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct SocketInfoBuilder {
@@ -15701,6 +15951,11 @@ impl EventSourceEventSourceInit {
         EventSourceEventSourceInitBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for EventSourceEventSourceInit {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct EventSourceEventSourceInitBuilder {
@@ -15936,6 +16191,11 @@ impl MessagePortPostMessageOptions {
         }
     }
 }
+impl Default for MessagePortPostMessageOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct MessagePortPostMessageOptionsBuilder {
     inner: MessagePortPostMessageOptions,
 }
@@ -16054,6 +16314,11 @@ impl SyncKvListOptions {
         }
     }
 }
+impl Default for SyncKvListOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct SyncKvListOptionsBuilder {
     inner: SyncKvListOptions,
 }
@@ -16123,6 +16388,11 @@ impl WorkerStubEntrypointOptions {
         WorkerStubEntrypointOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for WorkerStubEntrypointOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct WorkerStubEntrypointOptionsBuilder {
@@ -16210,6 +16480,11 @@ impl WorkerLoaderModule {
         WorkerLoaderModuleBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for WorkerLoaderModule {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct WorkerLoaderModuleBuilder {
@@ -16585,9 +16860,9 @@ extern "C" {
     pub fn set_ai_search_model(this: &AiSearchConfig, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl AiSearchConfig {
-    #[doc = " ## Inlined fields"]
+    #[doc = " Construct with `type: \"r2\"`."]
     #[doc = ""]
-    #[doc = " * `type: \"r2\"`"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id` - Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     pub fn new_r2(
@@ -16596,9 +16871,9 @@ impl AiSearchConfig {
     ) -> AiSearchConfig {
         Self::builder_r2(id, source).build()
     }
-    #[doc = " ## Inlined fields"]
+    #[doc = " Construct with `type: \"web-crawler\"`."]
     #[doc = ""]
-    #[doc = " * `type: \"web-crawler\"`"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id` - Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     pub fn new_web_crawler(
@@ -16607,9 +16882,9 @@ impl AiSearchConfig {
     ) -> AiSearchConfig {
         Self::builder_web_crawler(id, source).build()
     }
-    #[doc = " ## Inlined fields"]
+    #[doc = " Start a builder with `type: \"r2\"`."]
     #[doc = ""]
-    #[doc = " * `type: \"r2\"`"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id` - Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     pub fn builder_r2(
@@ -16622,9 +16897,9 @@ impl AiSearchConfig {
         inner.set_source(source);
         AiSearchConfigBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
+    #[doc = " Start a builder with `type: \"web-crawler\"`."]
     #[doc = ""]
-    #[doc = " * `type: \"web-crawler\"`"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id` - Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     pub fn builder_web_crawler(
@@ -17390,6 +17665,11 @@ impl AiAutomaticSpeechRecognitionOutput {
         }
     }
 }
+impl Default for AiAutomaticSpeechRecognitionOutput {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct AiAutomaticSpeechRecognitionOutputBuilder {
     inner: AiAutomaticSpeechRecognitionOutput,
 }
@@ -17624,27 +17904,19 @@ extern "C" {
     pub fn set_name(this: &RoleScopedChatInput, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl RoleScopedChatInput {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Construct with `role: \"user\"`."]
     pub fn new_user(content: impl ::wasm_bindgen::JsStringLike) -> RoleScopedChatInput {
         Self::builder_user(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"assistant\"`"]
+    #[doc = " Construct with `role: \"assistant\"`."]
     pub fn new_assistant(content: impl ::wasm_bindgen::JsStringLike) -> RoleScopedChatInput {
         Self::builder_assistant(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"system\"`"]
+    #[doc = " Construct with `role: \"system\"`."]
     pub fn new_system(content: impl ::wasm_bindgen::JsStringLike) -> RoleScopedChatInput {
         Self::builder_system(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"tool\"`"]
+    #[doc = " Construct with `role: \"tool\"`."]
     pub fn new_tool(content: impl ::wasm_bindgen::JsStringLike) -> RoleScopedChatInput {
         Self::builder_tool(content).build()
     }
@@ -17654,18 +17926,14 @@ impl RoleScopedChatInput {
     ) -> RoleScopedChatInput {
         Self::builder(role, content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Start a builder with `role: \"user\"`."]
     pub fn builder_user(content: impl ::wasm_bindgen::JsStringLike) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_role("user");
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"assistant\"`"]
+    #[doc = " Start a builder with `role: \"assistant\"`."]
     pub fn builder_assistant(
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> RoleScopedChatInputBuilder {
@@ -17674,9 +17942,7 @@ impl RoleScopedChatInput {
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"system\"`"]
+    #[doc = " Start a builder with `role: \"system\"`."]
     pub fn builder_system(
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> RoleScopedChatInputBuilder {
@@ -17685,9 +17951,7 @@ impl RoleScopedChatInput {
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"tool\"`"]
+    #[doc = " Start a builder with `role: \"tool\"`."]
     pub fn builder_tool(content: impl ::wasm_bindgen::JsStringLike) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_role("tool");
@@ -17785,23 +18049,43 @@ extern "C" {
     pub fn set_function(this: &AiTextGenerationToolInput, val: &Object);
 }
 impl AiTextGenerationToolInput {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Construct with `type: \"function\"`."]
     pub fn new_function(function: &Object) -> AiTextGenerationToolInput {
-        let inner: AiTextGenerationToolInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_type("function");
-        inner.set_function(function);
-        inner
+        Self::builder_function(function).build()
     }
     pub fn new(
         r#type: impl ::wasm_bindgen::JsStringLike,
         function: &Object,
     ) -> AiTextGenerationToolInput {
+        Self::builder(r#type, function).build()
+    }
+    #[doc = " Start a builder with `type: \"function\"`."]
+    pub fn builder_function(function: &Object) -> AiTextGenerationToolInputBuilder {
+        let inner: AiTextGenerationToolInput = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_type("function");
+        inner.set_function(function);
+        AiTextGenerationToolInputBuilder { inner }
+    }
+    pub fn builder(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        function: &Object,
+    ) -> AiTextGenerationToolInputBuilder {
         let inner: AiTextGenerationToolInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type(r#type);
         inner.set_function(function);
-        inner
+        AiTextGenerationToolInputBuilder { inner }
+    }
+}
+pub struct AiTextGenerationToolInputBuilder {
+    inner: AiTextGenerationToolInput,
+}
+impl AiTextGenerationToolInputBuilder {
+    pub fn type_(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn build(self) -> AiTextGenerationToolInput {
+        self.inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -17958,6 +18242,11 @@ impl AiTextGenerationInput {
         }
     }
 }
+impl Default for AiTextGenerationInput {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct AiTextGenerationInputBuilder {
     inner: AiTextGenerationInput,
 }
@@ -18087,9 +18376,7 @@ extern "C" {
     pub fn set_function(this: &AiTextGenerationToolOutput, val: &Object);
 }
 impl AiTextGenerationToolOutput {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Construct with `type: \"function\"`."]
     pub fn new(
         id: impl ::wasm_bindgen::JsStringLike,
         function: &Object,
@@ -18156,6 +18443,11 @@ impl AiTextGenerationOutput {
         AiTextGenerationOutputBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for AiTextGenerationOutput {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct AiTextGenerationOutputBuilder {
@@ -18453,6 +18745,11 @@ impl AiTranslationOutput {
         }
     }
 }
+impl Default for AiTranslationOutput {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct AiTranslationOutputBuilder {
     inner: AiTranslationOutput,
 }
@@ -18667,6 +18964,11 @@ impl ResponsesInput {
         ResponsesInputBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ResponsesInput {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ResponsesInputBuilder {
@@ -19013,6 +19315,11 @@ impl ResponsesOutput {
         }
     }
 }
+impl Default for ResponsesOutput {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ResponsesOutputBuilder {
     inner: ResponsesOutput,
 }
@@ -19188,66 +19495,46 @@ extern "C" {
     pub fn set_type(this: &EasyInputMessage, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl EasyInputMessage {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Construct with `role: \"user\"`."]
     pub fn new_user(content: impl ::wasm_bindgen::JsStringLike) -> EasyInputMessage {
         Self::builder_user(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"assistant\"`"]
+    #[doc = " Construct with `role: \"assistant\"`."]
     pub fn new_assistant(content: impl ::wasm_bindgen::JsStringLike) -> EasyInputMessage {
         Self::builder_assistant(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"system\"`"]
+    #[doc = " Construct with `role: \"system\"`."]
     pub fn new_system(content: impl ::wasm_bindgen::JsStringLike) -> EasyInputMessage {
         Self::builder_system(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"developer\"`"]
+    #[doc = " Construct with `role: \"developer\"`."]
     pub fn new_developer(content: impl ::wasm_bindgen::JsStringLike) -> EasyInputMessage {
         Self::builder_developer(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Construct with `role: \"user\"`."]
     pub fn new_user_with_slice(content: &[JsValue]) -> EasyInputMessage {
         Self::builder_user_with_slice(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"assistant\"`"]
+    #[doc = " Construct with `role: \"assistant\"`."]
     pub fn new_assistant_with_slice(content: &[JsValue]) -> EasyInputMessage {
         Self::builder_assistant_with_slice(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"system\"`"]
+    #[doc = " Construct with `role: \"system\"`."]
     pub fn new_system_with_slice(content: &[JsValue]) -> EasyInputMessage {
         Self::builder_system_with_slice(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"developer\"`"]
+    #[doc = " Construct with `role: \"developer\"`."]
     pub fn new_developer_with_slice(content: &[JsValue]) -> EasyInputMessage {
         Self::builder_developer_with_slice(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Start a builder with `role: \"user\"`."]
     pub fn builder_user(content: impl ::wasm_bindgen::JsStringLike) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role(EasyInputMessageRoleKind::User);
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"assistant\"`"]
+    #[doc = " Start a builder with `role: \"assistant\"`."]
     pub fn builder_assistant(
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> EasyInputMessageBuilder {
@@ -19256,18 +19543,14 @@ impl EasyInputMessage {
         inner.set_role(EasyInputMessageRoleKind::Assistant);
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"system\"`"]
+    #[doc = " Start a builder with `role: \"system\"`."]
     pub fn builder_system(content: impl ::wasm_bindgen::JsStringLike) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role(EasyInputMessageRoleKind::System);
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"developer\"`"]
+    #[doc = " Start a builder with `role: \"developer\"`."]
     pub fn builder_developer(
         content: impl ::wasm_bindgen::JsStringLike,
     ) -> EasyInputMessageBuilder {
@@ -19276,36 +19559,28 @@ impl EasyInputMessage {
         inner.set_role(EasyInputMessageRoleKind::Developer);
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Start a builder with `role: \"user\"`."]
     pub fn builder_user_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_with_slice(content);
         inner.set_role(EasyInputMessageRoleKind::User);
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"assistant\"`"]
+    #[doc = " Start a builder with `role: \"assistant\"`."]
     pub fn builder_assistant_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_with_slice(content);
         inner.set_role(EasyInputMessageRoleKind::Assistant);
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"system\"`"]
+    #[doc = " Start a builder with `role: \"system\"`."]
     pub fn builder_system_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_with_slice(content);
         inner.set_role(EasyInputMessageRoleKind::System);
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"developer\"`"]
+    #[doc = " Start a builder with `role: \"developer\"`."]
     pub fn builder_developer_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_with_slice(content);
@@ -19375,9 +19650,7 @@ impl ResponsesFunctionTool {
     }
 }
 impl ResponsesFunctionTool {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Construct with `type: \"function\"`."]
     pub fn new(
         name: impl ::wasm_bindgen::JsStringLike,
         parameters: &Object,
@@ -19385,35 +19658,27 @@ impl ResponsesFunctionTool {
     ) -> ResponsesFunctionTool {
         Self::builder(name, parameters, strict).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Construct with `type: \"function\"`."]
     pub fn new_with_strict_null(
         name: impl ::wasm_bindgen::JsStringLike,
         parameters: &Object,
     ) -> ResponsesFunctionTool {
         Self::builder_with_strict_null(name, parameters).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Construct with `type: \"function\"`."]
     pub fn new_with_parameters_null(
         name: impl ::wasm_bindgen::JsStringLike,
         strict: bool,
     ) -> ResponsesFunctionTool {
         Self::builder_with_parameters_null(name, strict).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Construct with `type: \"function\"`."]
     pub fn new_with_parameters_null_and_strict_null(
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponsesFunctionTool {
         Self::builder_with_parameters_null_and_strict_null(name).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Start a builder with `type: \"function\"`."]
     pub fn builder(
         name: impl ::wasm_bindgen::JsStringLike,
         parameters: &Object,
@@ -19426,9 +19691,7 @@ impl ResponsesFunctionTool {
         inner.set_type("function");
         ResponsesFunctionToolBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Start a builder with `type: \"function\"`."]
     pub fn builder_with_strict_null(
         name: impl ::wasm_bindgen::JsStringLike,
         parameters: &Object,
@@ -19440,9 +19703,7 @@ impl ResponsesFunctionTool {
         inner.set_type("function");
         ResponsesFunctionToolBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Start a builder with `type: \"function\"`."]
     pub fn builder_with_parameters_null(
         name: impl ::wasm_bindgen::JsStringLike,
         strict: bool,
@@ -19454,9 +19715,7 @@ impl ResponsesFunctionTool {
         inner.set_type("function");
         ResponsesFunctionToolBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Start a builder with `type: \"function\"`."]
     pub fn builder_with_parameters_null_and_strict_null(
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponsesFunctionToolBuilder {
@@ -19502,6 +19761,11 @@ impl ResponseIncompleteDetails {
         ResponseIncompleteDetailsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ResponseIncompleteDetails {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ResponseIncompleteDetailsBuilder {
@@ -19629,6 +19893,11 @@ impl Reasoning {
         }
     }
 }
+impl Default for Reasoning {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ReasoningBuilder {
     inner: Reasoning,
 }
@@ -19680,9 +19949,7 @@ extern "C" {
     pub fn set_type(this: &ResponseContentReasoningText, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseContentReasoningText {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"reasoning_text\"`"]
+    #[doc = " Construct with `type: \"reasoning_text\"`."]
     pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseContentReasoningText {
         let inner: ResponseContentReasoningText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -19730,9 +19997,7 @@ extern "C" {
     pub fn set_type(this: &ResponseCreatedEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseCreatedEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.created\"`"]
+    #[doc = " Construct with `type: \"response.created\"`."]
     pub fn new(response: &Response, sequence_number: f64) -> ResponseCreatedEvent {
         let inner: ResponseCreatedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
@@ -19772,27 +20037,21 @@ extern "C" {
     pub fn set_id(this: &ResponseCustomToolCallOutput, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseCustomToolCallOutput {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"custom_tool_call_output\"`"]
+    #[doc = " Construct with `type: \"custom_tool_call_output\"`."]
     pub fn new(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponseCustomToolCallOutput {
         Self::builder(call_id, output).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"custom_tool_call_output\"`"]
+    #[doc = " Construct with `type: \"custom_tool_call_output\"`."]
     pub fn new_with_slice(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
     ) -> ResponseCustomToolCallOutput {
         Self::builder_with_slice(call_id, output).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"custom_tool_call_output\"`"]
+    #[doc = " Start a builder with `type: \"custom_tool_call_output\"`."]
     pub fn builder(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: impl ::wasm_bindgen::JsStringLike,
@@ -19803,9 +20062,7 @@ impl ResponseCustomToolCallOutput {
         inner.set_type("custom_tool_call_output");
         ResponseCustomToolCallOutputBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"custom_tool_call_output\"`"]
+    #[doc = " Start a builder with `type: \"custom_tool_call_output\"`."]
     pub fn builder_with_slice(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
@@ -19903,9 +20160,7 @@ impl ResponseErrorEvent {
     }
 }
 impl ResponseErrorEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"error\"`"]
+    #[doc = " Construct with `type: \"error\"`."]
     pub fn new(
         code: impl ::wasm_bindgen::JsStringLike,
         message: impl ::wasm_bindgen::JsStringLike,
@@ -19920,9 +20175,7 @@ impl ResponseErrorEvent {
         inner.set_type("error");
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"error\"`"]
+    #[doc = " Construct with `type: \"error\"`."]
     pub fn new_with_param_null(
         code: impl ::wasm_bindgen::JsStringLike,
         message: impl ::wasm_bindgen::JsStringLike,
@@ -19936,9 +20189,7 @@ impl ResponseErrorEvent {
         inner.set_type("error");
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"error\"`"]
+    #[doc = " Construct with `type: \"error\"`."]
     pub fn new_with_code_null(
         message: impl ::wasm_bindgen::JsStringLike,
         param: impl ::wasm_bindgen::JsStringLike,
@@ -19952,9 +20203,7 @@ impl ResponseErrorEvent {
         inner.set_type("error");
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"error\"`"]
+    #[doc = " Construct with `type: \"error\"`."]
     pub fn new_with_code_null_and_param_null(
         message: impl ::wasm_bindgen::JsStringLike,
         sequence_number: f64,
@@ -19989,9 +20238,7 @@ extern "C" {
     pub fn set_type(this: &ResponseFailedEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseFailedEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.failed\"`"]
+    #[doc = " Construct with `type: \"response.failed\"`."]
     pub fn new(response: &Response, sequence_number: f64) -> ResponseFailedEvent {
         let inner: ResponseFailedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
@@ -20013,9 +20260,7 @@ extern "C" {
     pub fn set_type(this: &ResponseFormatText, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseFormatText {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"text\"`"]
+    #[doc = " Construct with `type: \"text\"`."]
     pub fn new() -> ResponseFormatText {
         let inner: ResponseFormatText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("text");
@@ -20035,9 +20280,7 @@ extern "C" {
     pub fn set_type(this: &ResponseFormatJSONObject, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseFormatJSONObject {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"json_object\"`"]
+    #[doc = " Construct with `type: \"json_object\"`."]
     pub fn new() -> ResponseFormatJSONObject {
         let inner: ResponseFormatJSONObject = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("json_object");
@@ -20096,18 +20339,14 @@ impl ResponseFormatTextJSONSchemaConfig {
     }
 }
 impl ResponseFormatTextJSONSchemaConfig {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"json_schema\"`"]
+    #[doc = " Construct with `type: \"json_schema\"`."]
     pub fn new(
         name: impl ::wasm_bindgen::JsStringLike,
         schema: &Object,
     ) -> ResponseFormatTextJSONSchemaConfig {
         Self::builder(name, schema).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"json_schema\"`"]
+    #[doc = " Start a builder with `type: \"json_schema\"`."]
     pub fn builder(
         name: impl ::wasm_bindgen::JsStringLike,
         schema: &Object,
@@ -20182,9 +20421,7 @@ extern "C" {
     );
 }
 impl ResponseFunctionCallArgumentsDeltaEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.function_call_arguments.delta\"`"]
+    #[doc = " Construct with `type: \"response.function_call_arguments.delta\"`."]
     pub fn new(
         delta: impl ::wasm_bindgen::JsStringLike,
         item_id: impl ::wasm_bindgen::JsStringLike,
@@ -20252,9 +20489,7 @@ extern "C" {
     );
 }
 impl ResponseFunctionCallArgumentsDoneEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.function_call_arguments.done\"`"]
+    #[doc = " Construct with `type: \"response.function_call_arguments.done\"`."]
     pub fn new(
         arguments: impl ::wasm_bindgen::JsStringLike,
         item_id: impl ::wasm_bindgen::JsStringLike,
@@ -20316,9 +20551,7 @@ extern "C" {
     pub fn set_status(this: &ResponseFunctionToolCall, val: StatusKind);
 }
 impl ResponseFunctionToolCall {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call\"`"]
+    #[doc = " Construct with `type: \"function_call\"`."]
     pub fn new(
         arguments: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
@@ -20326,9 +20559,7 @@ impl ResponseFunctionToolCall {
     ) -> ResponseFunctionToolCall {
         Self::builder(arguments, call_id, name).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call\"`"]
+    #[doc = " Start a builder with `type: \"function_call\"`."]
     pub fn builder(
         arguments: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
@@ -20371,9 +20602,7 @@ extern "C" {
     pub fn set_id(this: &ResponseFunctionToolCallItem, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseFunctionToolCallItem {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call\"`"]
+    #[doc = " Construct with `type: \"function_call\"`."]
     pub fn new(
         arguments: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
@@ -20382,9 +20611,7 @@ impl ResponseFunctionToolCallItem {
     ) -> ResponseFunctionToolCallItem {
         Self::builder(arguments, call_id, name, id).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call\"`"]
+    #[doc = " Start a builder with `type: \"function_call\"`."]
     pub fn builder(
         arguments: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
@@ -20459,9 +20686,7 @@ extern "C" {
     pub fn set_status(this: &ResponseFunctionToolCallOutputItem, val: StatusKind);
 }
 impl ResponseFunctionToolCallOutputItem {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call_output\"`"]
+    #[doc = " Construct with `type: \"function_call_output\"`."]
     pub fn new(
         id: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
@@ -20469,9 +20694,7 @@ impl ResponseFunctionToolCallOutputItem {
     ) -> ResponseFunctionToolCallOutputItem {
         Self::builder(id, call_id, output).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call_output\"`"]
+    #[doc = " Construct with `type: \"function_call_output\"`."]
     pub fn new_with_slice(
         id: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
@@ -20479,9 +20702,7 @@ impl ResponseFunctionToolCallOutputItem {
     ) -> ResponseFunctionToolCallOutputItem {
         Self::builder_with_slice(id, call_id, output).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call_output\"`"]
+    #[doc = " Start a builder with `type: \"function_call_output\"`."]
     pub fn builder(
         id: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
@@ -20495,9 +20716,7 @@ impl ResponseFunctionToolCallOutputItem {
         inner.set_type("function_call_output");
         ResponseFunctionToolCallOutputItemBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call_output\"`"]
+    #[doc = " Start a builder with `type: \"function_call_output\"`."]
     pub fn builder_with_slice(
         id: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
@@ -20551,9 +20770,7 @@ extern "C" {
     pub fn set_type(this: &ResponseIncompleteEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseIncompleteEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.incomplete\"`"]
+    #[doc = " Construct with `type: \"response.incomplete\"`."]
     pub fn new(response: &Response, sequence_number: f64) -> ResponseIncompleteEvent {
         let inner: ResponseIncompleteEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
@@ -20596,51 +20813,33 @@ impl ResponseInputImage {
     }
 }
 impl ResponseInputImage {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `detail: \"low\"`"]
-    #[doc = " * `type: \"input_image\"`"]
+    #[doc = " Construct with `detail: \"low\"` and `type: \"input_image\"`."]
     pub fn new_low() -> ResponseInputImage {
         Self::builder_low().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `detail: \"high\"`"]
-    #[doc = " * `type: \"input_image\"`"]
+    #[doc = " Construct with `detail: \"high\"` and `type: \"input_image\"`."]
     pub fn new_high() -> ResponseInputImage {
         Self::builder_high().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `detail: \"auto\"`"]
-    #[doc = " * `type: \"input_image\"`"]
+    #[doc = " Construct with `detail: \"auto\"` and `type: \"input_image\"`."]
     pub fn new_auto() -> ResponseInputImage {
         Self::builder_auto().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `detail: \"low\"`"]
-    #[doc = " * `type: \"input_image\"`"]
+    #[doc = " Start a builder with `detail: \"low\"` and `type: \"input_image\"`."]
     pub fn builder_low() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::Low);
         inner.set_type("input_image");
         ResponseInputImageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `detail: \"high\"`"]
-    #[doc = " * `type: \"input_image\"`"]
+    #[doc = " Start a builder with `detail: \"high\"` and `type: \"input_image\"`."]
     pub fn builder_high() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::High);
         inner.set_type("input_image");
         ResponseInputImageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `detail: \"auto\"`"]
-    #[doc = " * `type: \"input_image\"`"]
+    #[doc = " Start a builder with `detail: \"auto\"` and `type: \"input_image\"`."]
     pub fn builder_auto() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::Auto);
@@ -20701,15 +20900,11 @@ impl ResponseInputImageContent {
     }
 }
 impl ResponseInputImageContent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"input_image\"`"]
+    #[doc = " Construct with `type: \"input_image\"`."]
     pub fn new() -> ResponseInputImageContent {
         Self::builder().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"input_image\"`"]
+    #[doc = " Start a builder with `type: \"input_image\"`."]
     pub fn builder() -> ResponseInputImageContentBuilder {
         let inner: ResponseInputImageContent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("input_image");
@@ -20807,27 +21002,21 @@ impl ResponseInputItemFunctionCallOutput {
     }
 }
 impl ResponseInputItemFunctionCallOutput {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call_output\"`"]
+    #[doc = " Construct with `type: \"function_call_output\"`."]
     pub fn new(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponseInputItemFunctionCallOutput {
         Self::builder(call_id, output).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call_output\"`"]
+    #[doc = " Construct with `type: \"function_call_output\"`."]
     pub fn new_with_slice(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
     ) -> ResponseInputItemFunctionCallOutput {
         Self::builder_with_slice(call_id, output).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call_output\"`"]
+    #[doc = " Start a builder with `type: \"function_call_output\"`."]
     pub fn builder(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: impl ::wasm_bindgen::JsStringLike,
@@ -20839,9 +21028,7 @@ impl ResponseInputItemFunctionCallOutput {
         inner.set_type("function_call_output");
         ResponseInputItemFunctionCallOutputBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function_call_output\"`"]
+    #[doc = " Start a builder with `type: \"function_call_output\"`."]
     pub fn builder_with_slice(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
@@ -20903,45 +21090,33 @@ extern "C" {
     pub fn set_type(this: &ResponseInputItemMessage, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseInputItemMessage {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Construct with `role: \"user\"`."]
     pub fn new_user(content: &[JsValue]) -> ResponseInputItemMessage {
         Self::builder_user(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"system\"`"]
+    #[doc = " Construct with `role: \"system\"`."]
     pub fn new_system(content: &[JsValue]) -> ResponseInputItemMessage {
         Self::builder_system(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"developer\"`"]
+    #[doc = " Construct with `role: \"developer\"`."]
     pub fn new_developer(content: &[JsValue]) -> ResponseInputItemMessage {
         Self::builder_developer(content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Start a builder with `role: \"user\"`."]
     pub fn builder_user(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role(ResponseInputItemMessageRoleKind::User);
         ResponseInputItemMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"system\"`"]
+    #[doc = " Start a builder with `role: \"system\"`."]
     pub fn builder_system(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role(ResponseInputItemMessageRoleKind::System);
         ResponseInputItemMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"developer\"`"]
+    #[doc = " Start a builder with `role: \"developer\"`."]
     pub fn builder_developer(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
@@ -20998,36 +21173,28 @@ extern "C" {
     pub fn set_type(this: &ResponseInputMessageItem, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseInputMessageItem {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Construct with `role: \"user\"`."]
     pub fn new_user(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
     ) -> ResponseInputMessageItem {
         Self::builder_user(id, content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"system\"`"]
+    #[doc = " Construct with `role: \"system\"`."]
     pub fn new_system(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
     ) -> ResponseInputMessageItem {
         Self::builder_system(id, content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"developer\"`"]
+    #[doc = " Construct with `role: \"developer\"`."]
     pub fn new_developer(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
     ) -> ResponseInputMessageItem {
         Self::builder_developer(id, content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"user\"`"]
+    #[doc = " Start a builder with `role: \"user\"`."]
     pub fn builder_user(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
@@ -21038,9 +21205,7 @@ impl ResponseInputMessageItem {
         inner.set_role(ResponseInputItemMessageRoleKind::User);
         ResponseInputMessageItemBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"system\"`"]
+    #[doc = " Start a builder with `role: \"system\"`."]
     pub fn builder_system(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
@@ -21051,9 +21216,7 @@ impl ResponseInputMessageItem {
         inner.set_role(ResponseInputItemMessageRoleKind::System);
         ResponseInputMessageItemBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"developer\"`"]
+    #[doc = " Start a builder with `role: \"developer\"`."]
     pub fn builder_developer(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
@@ -21100,9 +21263,7 @@ extern "C" {
     pub fn set_type(this: &ResponseInputText, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseInputText {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"input_text\"`"]
+    #[doc = " Construct with `type: \"input_text\"`."]
     pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseInputText {
         let inner: ResponseInputText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -21129,9 +21290,7 @@ extern "C" {
     pub fn set_type(this: &ResponseInputTextContent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseInputTextContent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"input_text\"`"]
+    #[doc = " Construct with `type: \"input_text\"`."]
     pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseInputTextContent {
         let inner: ResponseInputTextContent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -21174,9 +21333,7 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputItemAddedEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseOutputItemAddedEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.output_item.added\"`"]
+    #[doc = " Construct with `type: \"response.output_item.added\"`."]
     pub fn new(
         item: &ResponseOutputMessage,
         output_index: f64,
@@ -21189,9 +21346,7 @@ impl ResponseOutputItemAddedEvent {
         inner.set_type("response.output_item.added");
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.output_item.added\"`"]
+    #[doc = " Construct with `type: \"response.output_item.added\"`."]
     pub fn new_with_response_function_tool_call(
         item: &ResponseFunctionToolCall,
         output_index: f64,
@@ -21204,9 +21359,7 @@ impl ResponseOutputItemAddedEvent {
         inner.set_type("response.output_item.added");
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.output_item.added\"`"]
+    #[doc = " Construct with `type: \"response.output_item.added\"`."]
     pub fn new_with_response_reasoning_item(
         item: &ResponseReasoningItem,
         output_index: f64,
@@ -21255,9 +21408,7 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputItemDoneEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseOutputItemDoneEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.output_item.done\"`"]
+    #[doc = " Construct with `type: \"response.output_item.done\"`."]
     pub fn new(
         item: &ResponseOutputMessage,
         output_index: f64,
@@ -21270,9 +21421,7 @@ impl ResponseOutputItemDoneEvent {
         inner.set_type("response.output_item.done");
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.output_item.done\"`"]
+    #[doc = " Construct with `type: \"response.output_item.done\"`."]
     pub fn new_with_response_function_tool_call(
         item: &ResponseFunctionToolCall,
         output_index: f64,
@@ -21285,9 +21434,7 @@ impl ResponseOutputItemDoneEvent {
         inner.set_type("response.output_item.done");
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.output_item.done\"`"]
+    #[doc = " Construct with `type: \"response.output_item.done\"`."]
     pub fn new_with_response_reasoning_item(
         item: &ResponseReasoningItem,
         output_index: f64,
@@ -21334,56 +21481,77 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputMessage, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseOutputMessage {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"assistant\"`"]
-    #[doc = " * `status: \"in_progress\"`"]
-    #[doc = " * `type: \"message\"`"]
+    #[doc = " Construct with `role: \"assistant\"`, `status: \"in_progress\"` and `type: \"message\"`."]
     pub fn new_in_progress(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
     ) -> ResponseOutputMessage {
+        Self::builder_in_progress(id, content).build()
+    }
+    #[doc = " Construct with `role: \"assistant\"`, `status: \"completed\"` and `type: \"message\"`."]
+    pub fn new_completed(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[JsValue],
+    ) -> ResponseOutputMessage {
+        Self::builder_completed(id, content).build()
+    }
+    #[doc = " Construct with `role: \"assistant\"`, `status: \"incomplete\"` and `type: \"message\"`."]
+    pub fn new_incomplete(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[JsValue],
+    ) -> ResponseOutputMessage {
+        Self::builder_incomplete(id, content).build()
+    }
+    #[doc = " Start a builder with `role: \"assistant\"`, `status: \"in_progress\"` and `type: \"message\"`."]
+    pub fn builder_in_progress(
+        id: impl ::wasm_bindgen::JsStringLike,
+        content: &[JsValue],
+    ) -> ResponseOutputMessageBuilder {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
         inner.set_role("assistant");
         inner.set_status(StatusKind::InProgress);
         inner.set_type("message");
-        inner
+        ResponseOutputMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"assistant\"`"]
-    #[doc = " * `status: \"completed\"`"]
-    #[doc = " * `type: \"message\"`"]
-    pub fn new_completed(
+    #[doc = " Start a builder with `role: \"assistant\"`, `status: \"completed\"` and `type: \"message\"`."]
+    pub fn builder_completed(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
-    ) -> ResponseOutputMessage {
+    ) -> ResponseOutputMessageBuilder {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
         inner.set_role("assistant");
         inner.set_status(StatusKind::Completed);
         inner.set_type("message");
-        inner
+        ResponseOutputMessageBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `role: \"assistant\"`"]
-    #[doc = " * `status: \"incomplete\"`"]
-    #[doc = " * `type: \"message\"`"]
-    pub fn new_incomplete(
+    #[doc = " Start a builder with `role: \"assistant\"`, `status: \"incomplete\"` and `type: \"message\"`."]
+    pub fn builder_incomplete(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
-    ) -> ResponseOutputMessage {
+    ) -> ResponseOutputMessageBuilder {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
         inner.set_role("assistant");
         inner.set_status(StatusKind::Incomplete);
         inner.set_type("message");
-        inner
+        ResponseOutputMessageBuilder { inner }
+    }
+}
+pub struct ResponseOutputMessageBuilder {
+    inner: ResponseOutputMessage,
+}
+impl ResponseOutputMessageBuilder {
+    pub fn status(self, val: StatusKind) -> Self {
+        self.inner.set_status(val);
+        self
+    }
+    pub fn build(self) -> ResponseOutputMessage {
+        self.inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -21405,9 +21573,7 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputRefusal, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseOutputRefusal {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"refusal\"`"]
+    #[doc = " Construct with `type: \"refusal\"`."]
     pub fn new(refusal: impl ::wasm_bindgen::JsStringLike) -> ResponseOutputRefusal {
         let inner: ResponseOutputRefusal = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_refusal(refusal);
@@ -21438,15 +21604,11 @@ extern "C" {
     pub fn set_logprobs(this: &ResponseOutputText, val: &[Logprob]);
 }
 impl ResponseOutputText {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"output_text\"`"]
+    #[doc = " Construct with `type: \"output_text\"`."]
     pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseOutputText {
         Self::builder(text).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"output_text\"`"]
+    #[doc = " Start a builder with `type: \"output_text\"`."]
     pub fn builder(text: impl ::wasm_bindgen::JsStringLike) -> ResponseOutputTextBuilder {
         let inner: ResponseOutputText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -21516,18 +21678,14 @@ impl ResponseReasoningItem {
     }
 }
 impl ResponseReasoningItem {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"reasoning\"`"]
+    #[doc = " Construct with `type: \"reasoning\"`."]
     pub fn new(
         id: impl ::wasm_bindgen::JsStringLike,
         summary: &[ResponseReasoningSummaryItem],
     ) -> ResponseReasoningItem {
         Self::builder(id, summary).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"reasoning\"`"]
+    #[doc = " Start a builder with `type: \"reasoning\"`."]
     pub fn builder(
         id: impl ::wasm_bindgen::JsStringLike,
         summary: &[ResponseReasoningSummaryItem],
@@ -21582,9 +21740,7 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningSummaryItem, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseReasoningSummaryItem {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"summary_text\"`"]
+    #[doc = " Construct with `type: \"summary_text\"`."]
     pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseReasoningSummaryItem {
         let inner: ResponseReasoningSummaryItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -21611,9 +21767,7 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningContentItem, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseReasoningContentItem {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"reasoning_text\"`"]
+    #[doc = " Construct with `type: \"reasoning_text\"`."]
     pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseReasoningContentItem {
         let inner: ResponseReasoningContentItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -21664,9 +21818,7 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningTextDeltaEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseReasoningTextDeltaEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.reasoning_text.delta\"`"]
+    #[doc = " Construct with `type: \"response.reasoning_text.delta\"`."]
     pub fn new(
         content_index: f64,
         delta: impl ::wasm_bindgen::JsStringLike,
@@ -21724,9 +21876,7 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningTextDoneEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseReasoningTextDoneEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.reasoning_text.done\"`"]
+    #[doc = " Construct with `type: \"response.reasoning_text.done\"`."]
     pub fn new(
         content_index: f64,
         item_id: impl ::wasm_bindgen::JsStringLike,
@@ -21781,9 +21931,7 @@ extern "C" {
     pub fn set_type(this: &ResponseRefusalDeltaEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseRefusalDeltaEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.refusal.delta\"`"]
+    #[doc = " Construct with `type: \"response.refusal.delta\"`."]
     pub fn new(
         content_index: f64,
         delta: impl ::wasm_bindgen::JsStringLike,
@@ -21838,9 +21986,7 @@ extern "C" {
     pub fn set_type(this: &ResponseRefusalDoneEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseRefusalDoneEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.refusal.done\"`"]
+    #[doc = " Construct with `type: \"response.refusal.done\"`."]
     pub fn new(
         content_index: f64,
         item_id: impl ::wasm_bindgen::JsStringLike,
@@ -21889,9 +22035,7 @@ extern "C" {
     pub fn set_type(this: &ResponseCompletedEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseCompletedEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.completed\"`"]
+    #[doc = " Construct with `type: \"response.completed\"`."]
     pub fn new(response: &Response, sequence_number: f64) -> ResponseCompletedEvent {
         let inner: ResponseCompletedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
@@ -21939,6 +22083,11 @@ impl ResponseTextConfig {
         ResponseTextConfigBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ResponseTextConfig {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ResponseTextConfigBuilder {
@@ -22014,9 +22163,7 @@ extern "C" {
     pub fn set_type(this: &ResponseTextDeltaEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseTextDeltaEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.output_text.delta\"`"]
+    #[doc = " Construct with `type: \"response.output_text.delta\"`."]
     pub fn new(
         content_index: f64,
         delta: impl ::wasm_bindgen::JsStringLike,
@@ -22077,9 +22224,7 @@ extern "C" {
     pub fn set_type(this: &ResponseTextDoneEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ResponseTextDoneEvent {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"response.output_text.done\"`"]
+    #[doc = " Construct with `type: \"response.output_text.done\"`."]
     pub fn new(
         content_index: f64,
         item_id: impl ::wasm_bindgen::JsStringLike,
@@ -22168,6 +22313,11 @@ impl TopLogprob {
         }
     }
 }
+impl Default for TopLogprob {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct TopLogprobBuilder {
     inner: TopLogprob,
 }
@@ -22232,9 +22382,7 @@ extern "C" {
     pub fn set_type(this: &ToolChoiceFunction, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ToolChoiceFunction {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"function\"`"]
+    #[doc = " Construct with `type: \"function\"`."]
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> ToolChoiceFunction {
         let inner: ToolChoiceFunction = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
@@ -22267,6 +22415,11 @@ impl StreamOptions {
         StreamOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for StreamOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct StreamOptionsBuilder {
@@ -22317,6 +22470,11 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_Input {
         Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Baai_Bge_Base_En_V1_5_Input {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
@@ -22370,6 +22528,11 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse {
         Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponseBuilder {
@@ -22536,6 +22699,11 @@ impl Ai_Cf_Meta_M2M100_1_2B_Input {
         }
     }
 }
+impl Default for Ai_Cf_Meta_M2M100_1_2B_Input {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
     inner: Ai_Cf_Meta_M2M100_1_2B_Input,
 }
@@ -22585,6 +22753,11 @@ impl Ai_Cf_Meta_M2M100_1_2B_AsyncResponse {
         Ai_Cf_Meta_M2M100_1_2B_AsyncResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Meta_M2M100_1_2B_AsyncResponse {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Meta_M2M100_1_2B_AsyncResponseBuilder {
@@ -22656,6 +22829,11 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_Input {
         }
     }
 }
+impl Default for Ai_Cf_Baai_Bge_Small_En_V1_5_Input {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
     inner: Ai_Cf_Baai_Bge_Small_En_V1_5_Input,
 }
@@ -22707,6 +22885,11 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse {
         Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponseBuilder {
@@ -22781,6 +22964,11 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_Input {
         }
     }
 }
+impl Default for Ai_Cf_Baai_Bge_Large_En_V1_5_Input {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
     inner: Ai_Cf_Baai_Bge_Large_En_V1_5_Input,
 }
@@ -22832,6 +23020,11 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse {
         Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponseBuilder {
@@ -22892,6 +23085,11 @@ impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output {
         Ai_Cf_Unum_Uform_Gen2_Qwen_500M_OutputBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Unum_Uform_Gen2_Qwen_500M_OutputBuilder {
@@ -23497,6 +23695,11 @@ impl Ai_Cf_Baai_Bge_M3_Ouput_Query {
         }
     }
 }
+impl Default for Ai_Cf_Baai_Bge_M3_Ouput_Query {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Baai_Bge_M3_Ouput_QueryBuilder {
     inner: Ai_Cf_Baai_Bge_M3_Ouput_Query,
 }
@@ -23544,6 +23747,11 @@ impl Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts {
         Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsBuilder {
@@ -23599,6 +23807,11 @@ impl Ai_Cf_Baai_Bge_M3_Ouput_Embedding {
         }
     }
 }
+impl Default for Ai_Cf_Baai_Bge_M3_Ouput_Embedding {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Baai_Bge_M3_Ouput_EmbeddingBuilder {
     inner: Ai_Cf_Baai_Bge_M3_Ouput_Embedding,
 }
@@ -23644,6 +23857,11 @@ impl Ai_Cf_Baai_Bge_M3_AsyncResponse {
         Ai_Cf_Baai_Bge_M3_AsyncResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Baai_Bge_M3_AsyncResponse {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Baai_Bge_M3_AsyncResponseBuilder {
@@ -23778,6 +23996,11 @@ impl Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output {
         Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_OutputBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_OutputBuilder {
@@ -24190,6 +24413,11 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output {
         }
     }
 }
+impl Default for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputBuilder {
     inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output,
 }
@@ -24442,6 +24670,11 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode {
         }
     }
 }
+impl Default for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeBuilder {
     inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode,
 }
@@ -24668,6 +24901,11 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1 {
         }
     }
 }
+impl Default for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1Builder {
     inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1,
 }
@@ -24707,6 +24945,11 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch {
         Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchBuilder {
@@ -24751,6 +24994,11 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2 {
         Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
@@ -24798,6 +25046,11 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse {
         Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponseBuilder {
@@ -24943,6 +25196,11 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_Output {
         }
     }
 }
+impl Default for Ai_Cf_Meta_Llama_Guard_3_8B_Output {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Meta_Llama_Guard_3_8B_OutputBuilder {
     inner: Ai_Cf_Meta_Llama_Guard_3_8B_Output,
 }
@@ -25044,6 +25302,11 @@ impl Ai_Cf_Baai_Bge_Reranker_Base_Output {
         Ai_Cf_Baai_Bge_Reranker_Base_OutputBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Baai_Bge_Reranker_Base_Output {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Baai_Bge_Reranker_Base_OutputBuilder {
@@ -25269,6 +25532,11 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode {
         }
     }
 }
+impl Default for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_ModeBuilder {
     inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode,
 }
@@ -25465,6 +25733,11 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1 {
         Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1Builder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1Builder {
@@ -26943,6 +27216,11 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode {
         }
     }
 }
+impl Default for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_ModeBuilder {
     inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode,
 }
@@ -27837,6 +28115,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode {
         }
     }
 }
+impl Default for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_ModeBuilder {
     inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode,
 }
@@ -28032,6 +28315,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1 {
         Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1Builder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1Builder {
@@ -28255,6 +28543,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2 {
         }
     }
 }
+impl Default for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2Builder {
     inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2,
 }
@@ -28452,6 +28745,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3 {
         }
     }
 }
+impl Default for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder {
     inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3,
 }
@@ -28561,6 +28859,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response {
         Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseBuilder {
@@ -28678,6 +28981,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response {
         }
     }
 }
+impl Default for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseBuilder {
     inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response,
 }
@@ -28737,6 +29045,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse {
         Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponseBuilder {
@@ -29198,6 +29511,11 @@ impl Ai_Cf_Deepgram_Nova_3_Output {
         }
     }
 }
+impl Default for Ai_Cf_Deepgram_Nova_3_Output {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Deepgram_Nova_3_OutputBuilder {
     inner: Ai_Cf_Deepgram_Nova_3_Output,
 }
@@ -29292,6 +29610,11 @@ impl Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input {
         }
     }
 }
+impl Default for Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Qwen_Qwen3_Embedding_0_6B_InputBuilder {
     inner: Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input,
 }
@@ -29353,6 +29676,11 @@ impl Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output {
         Ai_Cf_Qwen_Qwen3_Embedding_0_6B_OutputBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Qwen_Qwen3_Embedding_0_6B_OutputBuilder {
@@ -29480,6 +29808,11 @@ impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output {
         Ai_Cf_Pipecat_Ai_Smart_Turn_V2_OutputBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Pipecat_Ai_Smart_Turn_V2_OutputBuilder {
@@ -29792,6 +30125,11 @@ impl Ai_Cf_Leonardo_Lucid_Origin_Output {
         Ai_Cf_Leonardo_Lucid_Origin_OutputBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Leonardo_Lucid_Origin_Output {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Leonardo_Lucid_Origin_OutputBuilder {
@@ -30251,6 +30589,11 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode {
         }
     }
 }
+impl Default for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_ModeBuilder {
     inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode,
 }
@@ -30475,6 +30818,11 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1 {
         Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1Builder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1Builder {
@@ -30727,6 +31075,11 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2 {
         }
     }
 }
+impl Default for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2Builder {
     inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2,
 }
@@ -30958,6 +31311,11 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3 {
         }
     }
 }
+impl Default for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder {
     inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3,
 }
@@ -31083,6 +31441,11 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response {
         Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseBuilder {
@@ -31216,6 +31579,11 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response {
         }
     }
 }
+impl Default for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseBuilder {
     inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response,
 }
@@ -31277,6 +31645,11 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse {
         Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponseBuilder {
@@ -31518,17 +31891,25 @@ extern "C" {
     pub fn set_tag(this: &Ai_Cf_Deepgram_Flux_Input, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl Ai_Cf_Deepgram_Flux_Input {
+    #[doc = " Construct with `encoding: \"linear16\"`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `encoding: \"linear16\"` - Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
     pub fn new(sample_rate: impl ::wasm_bindgen::JsStringLike) -> Ai_Cf_Deepgram_Flux_Input {
         Self::builder(sample_rate).build()
     }
+    #[doc = " Start a builder with `encoding: \"linear16\"`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `encoding: \"linear16\"` - Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
     pub fn builder(
@@ -31643,6 +32024,11 @@ impl Ai_Cf_Deepgram_Flux_Output {
         Ai_Cf_Deepgram_Flux_OutputBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Ai_Cf_Deepgram_Flux_Output {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct Ai_Cf_Deepgram_Flux_OutputBuilder {
@@ -32634,6 +33020,11 @@ impl AiOptions {
         }
     }
 }
+impl Default for AiOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct AiOptionsBuilder {
     inner: AiOptions,
 }
@@ -32718,6 +33109,11 @@ impl AiModelsSearchParams {
         AiModelsSearchParamsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for AiModelsSearchParams {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct AiModelsSearchParamsBuilder {
@@ -33041,6 +33437,11 @@ impl GatewayRetries {
         }
     }
 }
+impl Default for GatewayRetries {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct GatewayRetriesBuilder {
     inner: GatewayRetries,
 }
@@ -33183,6 +33584,11 @@ impl UniversalGatewayOptions {
         }
     }
 }
+impl Default for UniversalGatewayOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct UniversalGatewayOptionsBuilder {
     inner: UniversalGatewayOptions,
 }
@@ -33238,6 +33644,11 @@ impl AiGatewayPatchLog {
         AiGatewayPatchLogBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for AiGatewayPatchLog {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct AiGatewayPatchLogBuilder {
@@ -33882,6 +34293,11 @@ impl AiGatewayOptions {
         }
     }
 }
+impl Default for AiGatewayOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct AiGatewayOptionsBuilder {
     inner: AiGatewayOptions,
 }
@@ -33947,227 +34363,329 @@ extern "C" {
     pub fn set_value_with_bool(this: &ComparisonFilter, val: bool);
 }
 impl ComparisonFilter {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"eq\"`"]
+    #[doc = " Construct with `type: \"eq\"`."]
     pub fn new_eq(
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Eq);
-        inner.set_value(value);
-        inner
+        Self::builder_eq(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"eq\"`"]
+    #[doc = " Construct with `type: \"eq\"`."]
     pub fn new_eq_with_f64(key: impl ::wasm_bindgen::JsStringLike, value: f64) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Eq);
-        inner.set_value_with_f64(value);
-        inner
+        Self::builder_eq_with_f64(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"eq\"`"]
+    #[doc = " Construct with `type: \"eq\"`."]
     pub fn new_eq_with_bool(
         key: impl ::wasm_bindgen::JsStringLike,
         value: bool,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Eq);
-        inner.set_value_with_bool(value);
-        inner
+        Self::builder_eq_with_bool(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"ne\"`"]
+    #[doc = " Construct with `type: \"ne\"`."]
     pub fn new_ne(
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Ne);
-        inner.set_value(value);
-        inner
+        Self::builder_ne(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"ne\"`"]
+    #[doc = " Construct with `type: \"ne\"`."]
     pub fn new_ne_with_f64(key: impl ::wasm_bindgen::JsStringLike, value: f64) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Ne);
-        inner.set_value_with_f64(value);
-        inner
+        Self::builder_ne_with_f64(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"ne\"`"]
+    #[doc = " Construct with `type: \"ne\"`."]
     pub fn new_ne_with_bool(
         key: impl ::wasm_bindgen::JsStringLike,
         value: bool,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Ne);
-        inner.set_value_with_bool(value);
-        inner
+        Self::builder_ne_with_bool(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"gt\"`"]
+    #[doc = " Construct with `type: \"gt\"`."]
     pub fn new_gt(
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gt);
-        inner.set_value(value);
-        inner
+        Self::builder_gt(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"gt\"`"]
+    #[doc = " Construct with `type: \"gt\"`."]
     pub fn new_gt_with_f64(key: impl ::wasm_bindgen::JsStringLike, value: f64) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gt);
-        inner.set_value_with_f64(value);
-        inner
+        Self::builder_gt_with_f64(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"gt\"`"]
+    #[doc = " Construct with `type: \"gt\"`."]
     pub fn new_gt_with_bool(
         key: impl ::wasm_bindgen::JsStringLike,
         value: bool,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gt);
-        inner.set_value_with_bool(value);
-        inner
+        Self::builder_gt_with_bool(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"gte\"`"]
+    #[doc = " Construct with `type: \"gte\"`."]
     pub fn new_gte(
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gte);
-        inner.set_value(value);
-        inner
+        Self::builder_gte(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"gte\"`"]
+    #[doc = " Construct with `type: \"gte\"`."]
     pub fn new_gte_with_f64(
         key: impl ::wasm_bindgen::JsStringLike,
         value: f64,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gte);
-        inner.set_value_with_f64(value);
-        inner
+        Self::builder_gte_with_f64(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"gte\"`"]
+    #[doc = " Construct with `type: \"gte\"`."]
     pub fn new_gte_with_bool(
         key: impl ::wasm_bindgen::JsStringLike,
         value: bool,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gte);
-        inner.set_value_with_bool(value);
-        inner
+        Self::builder_gte_with_bool(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"lt\"`"]
+    #[doc = " Construct with `type: \"lt\"`."]
     pub fn new_lt(
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lt);
-        inner.set_value(value);
-        inner
+        Self::builder_lt(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"lt\"`"]
+    #[doc = " Construct with `type: \"lt\"`."]
     pub fn new_lt_with_f64(key: impl ::wasm_bindgen::JsStringLike, value: f64) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lt);
-        inner.set_value_with_f64(value);
-        inner
+        Self::builder_lt_with_f64(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"lt\"`"]
+    #[doc = " Construct with `type: \"lt\"`."]
     pub fn new_lt_with_bool(
         key: impl ::wasm_bindgen::JsStringLike,
         value: bool,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lt);
-        inner.set_value_with_bool(value);
-        inner
+        Self::builder_lt_with_bool(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"lte\"`"]
+    #[doc = " Construct with `type: \"lte\"`."]
     pub fn new_lte(
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lte);
-        inner.set_value(value);
-        inner
+        Self::builder_lte(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"lte\"`"]
+    #[doc = " Construct with `type: \"lte\"`."]
     pub fn new_lte_with_f64(
         key: impl ::wasm_bindgen::JsStringLike,
         value: f64,
     ) -> ComparisonFilter {
-        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lte);
-        inner.set_value_with_f64(value);
-        inner
+        Self::builder_lte_with_f64(key, value).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"lte\"`"]
+    #[doc = " Construct with `type: \"lte\"`."]
     pub fn new_lte_with_bool(
         key: impl ::wasm_bindgen::JsStringLike,
         value: bool,
     ) -> ComparisonFilter {
+        Self::builder_lte_with_bool(key, value).build()
+    }
+    #[doc = " Start a builder with `type: \"eq\"`."]
+    pub fn builder_eq(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Eq);
+        inner.set_value(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"eq\"`."]
+    pub fn builder_eq_with_f64(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: f64,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Eq);
+        inner.set_value_with_f64(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"eq\"`."]
+    pub fn builder_eq_with_bool(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: bool,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Eq);
+        inner.set_value_with_bool(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"ne\"`."]
+    pub fn builder_ne(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Ne);
+        inner.set_value(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"ne\"`."]
+    pub fn builder_ne_with_f64(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: f64,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Ne);
+        inner.set_value_with_f64(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"ne\"`."]
+    pub fn builder_ne_with_bool(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: bool,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Ne);
+        inner.set_value_with_bool(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"gt\"`."]
+    pub fn builder_gt(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Gt);
+        inner.set_value(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"gt\"`."]
+    pub fn builder_gt_with_f64(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: f64,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Gt);
+        inner.set_value_with_f64(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"gt\"`."]
+    pub fn builder_gt_with_bool(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: bool,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Gt);
+        inner.set_value_with_bool(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"gte\"`."]
+    pub fn builder_gte(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Gte);
+        inner.set_value(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"gte\"`."]
+    pub fn builder_gte_with_f64(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: f64,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Gte);
+        inner.set_value_with_f64(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"gte\"`."]
+    pub fn builder_gte_with_bool(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: bool,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Gte);
+        inner.set_value_with_bool(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"lt\"`."]
+    pub fn builder_lt(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Lt);
+        inner.set_value(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"lt\"`."]
+    pub fn builder_lt_with_f64(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: f64,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Lt);
+        inner.set_value_with_f64(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"lt\"`."]
+    pub fn builder_lt_with_bool(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: bool,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Lt);
+        inner.set_value_with_bool(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"lte\"`."]
+    pub fn builder_lte(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Lte);
+        inner.set_value(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"lte\"`."]
+    pub fn builder_lte_with_f64(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: f64,
+    ) -> ComparisonFilterBuilder {
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_key(key);
+        inner.set_type(ComparisonFilterTypeKind::Lte);
+        inner.set_value_with_f64(value);
+        ComparisonFilterBuilder { inner }
+    }
+    #[doc = " Start a builder with `type: \"lte\"`."]
+    pub fn builder_lte_with_bool(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: bool,
+    ) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type(ComparisonFilterTypeKind::Lte);
         inner.set_value_with_bool(value);
-        inner
+        ComparisonFilterBuilder { inner }
+    }
+}
+pub struct ComparisonFilterBuilder {
+    inner: ComparisonFilter,
+}
+impl ComparisonFilterBuilder {
+    pub fn type_(self, val: ComparisonFilterTypeKind) -> Self {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn build(self) -> ComparisonFilter {
+        self.inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -34185,23 +34703,39 @@ extern "C" {
     pub fn set_filters(this: &CompoundFilter, val: &[ComparisonFilter]);
 }
 impl CompoundFilter {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"and\"`"]
+    #[doc = " Construct with `type: \"and\"`."]
     pub fn new_and(filters: &[ComparisonFilter]) -> CompoundFilter {
+        Self::builder_and(filters).build()
+    }
+    #[doc = " Construct with `type: \"or\"`."]
+    pub fn new_or(filters: &[ComparisonFilter]) -> CompoundFilter {
+        Self::builder_or(filters).build()
+    }
+    #[doc = " Start a builder with `type: \"and\"`."]
+    pub fn builder_and(filters: &[ComparisonFilter]) -> CompoundFilterBuilder {
         let inner: CompoundFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type(CompoundFilterTypeKind::And);
         inner.set_filters(filters);
-        inner
+        CompoundFilterBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `type: \"or\"`"]
-    pub fn new_or(filters: &[ComparisonFilter]) -> CompoundFilter {
+    #[doc = " Start a builder with `type: \"or\"`."]
+    pub fn builder_or(filters: &[ComparisonFilter]) -> CompoundFilterBuilder {
         let inner: CompoundFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type(CompoundFilterTypeKind::Or);
         inner.set_filters(filters);
-        inner
+        CompoundFilterBuilder { inner }
+    }
+}
+pub struct CompoundFilterBuilder {
+    inner: CompoundFilter,
+}
+impl CompoundFilterBuilder {
+    pub fn type_(self, val: CompoundFilterTypeKind) -> Self {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn build(self) -> CompoundFilter {
+        self.inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -34400,15 +34934,11 @@ extern "C" {
     pub fn set_rewrite_query(this: &AutoRagAiSearchRequestStreaming, val: bool);
 }
 impl AutoRagAiSearchRequestStreaming {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `stream: true`"]
+    #[doc = " Construct with `stream: true`."]
     pub fn new(query: impl ::wasm_bindgen::JsStringLike) -> AutoRagAiSearchRequestStreaming {
         Self::builder(query).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `stream: true`"]
+    #[doc = " Start a builder with `stream: true`."]
     pub fn builder(
         query: impl ::wasm_bindgen::JsStringLike,
     ) -> AutoRagAiSearchRequestStreamingBuilder {
@@ -34494,9 +35024,7 @@ impl AutoRagSearchResponse {
     }
 }
 impl AutoRagSearchResponse {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `object: \"vector_store.search_results.page\"`"]
+    #[doc = " Construct with `object: \"vector_store.search_results.page\"`."]
     pub fn new(
         search_query: impl ::wasm_bindgen::JsStringLike,
         data: &[Object],
@@ -34511,9 +35039,7 @@ impl AutoRagSearchResponse {
         inner.set_next_page(next_page);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `object: \"vector_store.search_results.page\"`"]
+    #[doc = " Construct with `object: \"vector_store.search_results.page\"`."]
     pub fn new_with_null(
         search_query: impl ::wasm_bindgen::JsStringLike,
         data: &[Object],
@@ -34543,9 +35069,7 @@ extern "C" {
     pub fn set_response(this: &AutoRagAiSearchResponse, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl AutoRagAiSearchResponse {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `object: \"vector_store.search_results.page\"`"]
+    #[doc = " Construct with `object: \"vector_store.search_results.page\"`."]
     pub fn new(
         search_query: impl ::wasm_bindgen::JsStringLike,
         data: &[Object],
@@ -34562,9 +35086,7 @@ impl AutoRagAiSearchResponse {
         inner.set_response(response);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `object: \"vector_store.search_results.page\"`"]
+    #[doc = " Construct with `object: \"vector_store.search_results.page\"`."]
     pub fn new_with_null(
         search_query: impl ::wasm_bindgen::JsStringLike,
         data: &[Object],
@@ -34742,6 +35264,11 @@ impl BasicImageTransformations {
         }
     }
 }
+impl Default for BasicImageTransformations {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct BasicImageTransformationsBuilder {
     inner: BasicImageTransformations,
 }
@@ -34817,6 +35344,11 @@ impl BasicImageTransformationsGravityCoordinates {
         BasicImageTransformationsGravityCoordinatesBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for BasicImageTransformationsGravityCoordinates {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct BasicImageTransformationsGravityCoordinatesBuilder {
@@ -34966,6 +35498,11 @@ impl RequestInitCfProperties {
         RequestInitCfPropertiesBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for RequestInitCfProperties {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct RequestInitCfPropertiesBuilder {
@@ -35365,6 +35902,11 @@ impl RequestInitCfPropertiesImage {
         }
     }
 }
+impl Default for RequestInitCfPropertiesImage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct RequestInitCfPropertiesImageBuilder {
     inner: RequestInitCfPropertiesImage,
 }
@@ -35513,6 +36055,11 @@ impl RequestInitCfPropertiesImageMinify {
         }
     }
 }
+impl Default for RequestInitCfPropertiesImageMinify {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct RequestInitCfPropertiesImageMinifyBuilder {
     inner: RequestInitCfPropertiesImageMinify,
 }
@@ -35552,6 +36099,11 @@ impl RequestInitCfPropertiesR2 {
         RequestInitCfPropertiesR2Builder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for RequestInitCfPropertiesR2 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct RequestInitCfPropertiesR2Builder {
@@ -35846,6 +36398,8 @@ extern "C" {
     );
 }
 impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProperties<HostMetadata> {
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 0`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
@@ -35855,6 +36409,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -35915,6 +36471,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 0`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
@@ -35924,6 +36482,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -35984,6 +36544,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 1`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
@@ -35993,6 +36555,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36053,6 +36617,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 1`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
@@ -36062,6 +36628,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36122,6 +36690,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 2`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
@@ -36131,6 +36701,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36191,6 +36763,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 2`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
@@ -36200,6 +36774,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36260,6 +36836,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 3`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
@@ -36269,6 +36847,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36329,6 +36909,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 3`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
@@ -36338,6 +36920,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36398,6 +36982,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 4`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
@@ -36407,6 +36993,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36467,6 +37055,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 4`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
@@ -36476,6 +37066,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36536,6 +37128,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 5`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
@@ -36545,6 +37139,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36605,6 +37201,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 5`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
@@ -36614,6 +37212,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36674,6 +37274,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         )
         .build()
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 0`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
@@ -36683,6 +37285,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36744,6 +37348,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         inner.set_tls_client_auth(tls_client_auth);
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 0`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
@@ -36753,6 +37359,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36816,6 +37424,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         );
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 1`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
@@ -36825,6 +37435,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36886,6 +37498,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         inner.set_tls_client_auth(tls_client_auth);
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 1`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
@@ -36895,6 +37509,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -36958,6 +37574,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         );
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 2`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
@@ -36967,6 +37585,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37028,6 +37648,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         inner.set_tls_client_auth(tls_client_auth);
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 2`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
@@ -37037,6 +37659,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37100,6 +37724,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         );
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 3`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
@@ -37109,6 +37735,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37170,6 +37798,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         inner.set_tls_client_auth(tls_client_auth);
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 3`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
@@ -37179,6 +37809,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37242,6 +37874,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         );
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 4`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
@@ -37251,6 +37885,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37312,6 +37948,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         inner.set_tls_client_auth(tls_client_auth);
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 4`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
@@ -37321,6 +37959,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37384,6 +38024,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         );
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 5`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
@@ -37393,6 +38035,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37454,6 +38098,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         inner.set_tls_client_auth(tls_client_auth);
         IncomingRequestCfPropertiesBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 5`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
@@ -37463,6 +38109,8 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37777,6 +38425,8 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesBase {
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 0`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
@@ -37786,6 +38436,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37824,6 +38476,8 @@ impl IncomingRequestCfPropertiesBase {
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 1`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
@@ -37833,6 +38487,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37871,6 +38527,8 @@ impl IncomingRequestCfPropertiesBase {
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 2`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
@@ -37880,6 +38538,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37918,6 +38578,8 @@ impl IncomingRequestCfPropertiesBase {
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 3`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
@@ -37927,6 +38589,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -37965,6 +38629,8 @@ impl IncomingRequestCfPropertiesBase {
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 4`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
@@ -37974,6 +38640,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -38012,6 +38680,8 @@ impl IncomingRequestCfPropertiesBase {
         )
         .build()
     }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 5`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
@@ -38021,6 +38691,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -38059,6 +38731,8 @@ impl IncomingRequestCfPropertiesBase {
         )
         .build()
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 0`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
@@ -38068,6 +38742,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -38106,6 +38782,8 @@ impl IncomingRequestCfPropertiesBase {
         inner.set_tls_cipher(tls_cipher);
         IncomingRequestCfPropertiesBaseBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 1`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
@@ -38115,6 +38793,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -38153,6 +38833,8 @@ impl IncomingRequestCfPropertiesBase {
         inner.set_tls_cipher(tls_cipher);
         IncomingRequestCfPropertiesBaseBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 2`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
@@ -38162,6 +38844,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -38200,6 +38884,8 @@ impl IncomingRequestCfPropertiesBase {
         inner.set_tls_cipher(tls_cipher);
         IncomingRequestCfPropertiesBaseBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 3`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
@@ -38209,6 +38895,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -38247,6 +38935,8 @@ impl IncomingRequestCfPropertiesBase {
         inner.set_tls_cipher(tls_cipher);
         IncomingRequestCfPropertiesBaseBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 4`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
@@ -38256,6 +38946,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -38294,6 +38986,8 @@ impl IncomingRequestCfPropertiesBase {
         inner.set_tls_cipher(tls_cipher);
         IncomingRequestCfPropertiesBaseBuilder { inner }
     }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 5`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
@@ -38303,6 +38997,8 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
@@ -38544,6 +39240,13 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
         IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> Default
+    for IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>
+{
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata> {
@@ -38950,6 +39653,11 @@ impl IncomingRequestCfPropertiesGeographicInformation {
         }
     }
 }
+impl Default for IncomingRequestCfPropertiesGeographicInformation {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct IncomingRequestCfPropertiesGeographicInformationBuilder {
     inner: IncomingRequestCfPropertiesGeographicInformation,
 }
@@ -39260,6 +39968,8 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesTLSClientAuth {
+    #[doc = " Construct with `certPresented: \"1\"` and `certRevoked: \"1\"`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `certPresented: \"1\"` - Always `\"1\"`, indicating that the certificate was presented"]
@@ -39267,6 +39977,8 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cert_verified` - Result of certificate verification."]
     #[doc = ""]
@@ -39326,27 +40038,27 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         cert_not_before: impl ::wasm_bindgen::JsStringLike,
         cert_not_after: impl ::wasm_bindgen::JsStringLike,
     ) -> IncomingRequestCfPropertiesTLSClientAuth {
-        let inner: IncomingRequestCfPropertiesTLSClientAuth =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cert_presented("1");
-        inner.set_cert_verified(cert_verified);
-        inner.set_cert_revoked(CertRevokedKind::_1);
-        inner.set_cert_issuer_dn(cert_issuer_dn);
-        inner.set_cert_subject_dn(cert_subject_dn);
-        inner.set_cert_issuer_dnrfc2253(cert_issuer_dnrfc2253);
-        inner.set_cert_subject_dnrfc2253(cert_subject_dnrfc2253);
-        inner.set_cert_issuer_dn_legacy(cert_issuer_dn_legacy);
-        inner.set_cert_subject_dn_legacy(cert_subject_dn_legacy);
-        inner.set_cert_serial(cert_serial);
-        inner.set_cert_issuer_serial(cert_issuer_serial);
-        inner.set_cert_ski(cert_ski);
-        inner.set_cert_issuer_ski(cert_issuer_ski);
-        inner.set_cert_fingerprint_sha1(cert_fingerprint_sha1);
-        inner.set_cert_fingerprint_sha256(cert_fingerprint_sha256);
-        inner.set_cert_not_before(cert_not_before);
-        inner.set_cert_not_after(cert_not_after);
-        inner
+        Self::builder_1(
+            cert_verified,
+            cert_issuer_dn,
+            cert_subject_dn,
+            cert_issuer_dnrfc2253,
+            cert_subject_dnrfc2253,
+            cert_issuer_dn_legacy,
+            cert_subject_dn_legacy,
+            cert_serial,
+            cert_issuer_serial,
+            cert_ski,
+            cert_issuer_ski,
+            cert_fingerprint_sha1,
+            cert_fingerprint_sha256,
+            cert_not_before,
+            cert_not_after,
+        )
+        .build()
     }
+    #[doc = " Construct with `certPresented: \"1\"` and `certRevoked: \"0\"`."]
+    #[doc = ""]
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `certPresented: \"1\"` - Always `\"1\"`, indicating that the certificate was presented"]
@@ -39354,6 +40066,8 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cert_verified` - Result of certificate verification."]
     #[doc = ""]
@@ -39413,6 +40127,186 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         cert_not_before: impl ::wasm_bindgen::JsStringLike,
         cert_not_after: impl ::wasm_bindgen::JsStringLike,
     ) -> IncomingRequestCfPropertiesTLSClientAuth {
+        Self::builder_0(
+            cert_verified,
+            cert_issuer_dn,
+            cert_subject_dn,
+            cert_issuer_dnrfc2253,
+            cert_subject_dnrfc2253,
+            cert_issuer_dn_legacy,
+            cert_subject_dn_legacy,
+            cert_serial,
+            cert_issuer_serial,
+            cert_ski,
+            cert_issuer_ski,
+            cert_fingerprint_sha1,
+            cert_fingerprint_sha256,
+            cert_not_before,
+            cert_not_after,
+        )
+        .build()
+    }
+    #[doc = " Start a builder with `certPresented: \"1\"` and `certRevoked: \"1\"`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `certPresented: \"1\"` - Always `\"1\"`, indicating that the certificate was presented"]
+    #[doc = " * `certRevoked: \"1\"` - The presented certificate's revokation status."]
+    #[doc = ""]
+    #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
+    #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `cert_verified` - Result of certificate verification."]
+    #[doc = ""]
+    #[doc = " @example \"FAILED:self signed certificate\""]
+    #[doc = " * `cert_issuer_dn` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = ""]
+    #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
+    #[doc = " * `cert_subject_dn` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = ""]
+    #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
+    #[doc = " * `cert_issuer_dnrfc2253` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = ""]
+    #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
+    #[doc = " * `cert_subject_dnrfc2253` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = ""]
+    #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
+    #[doc = " * `cert_issuer_dn_legacy` - The certificate issuer's distinguished name (legacy policies)"]
+    #[doc = " * `cert_subject_dn_legacy` - The certificate subject's distinguished name (legacy policies)"]
+    #[doc = " * `cert_serial` - The certificate's serial number"]
+    #[doc = ""]
+    #[doc = " @example \"00936EACBE07F201DF\""]
+    #[doc = " * `cert_issuer_serial` - The certificate issuer's serial number"]
+    #[doc = ""]
+    #[doc = " @example \"2489002934BDFEA34\""]
+    #[doc = " * `cert_ski` - The certificate's Subject Key Identifier"]
+    #[doc = ""]
+    #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
+    #[doc = " * `cert_issuer_ski` - The certificate issuer's Subject Key Identifier"]
+    #[doc = ""]
+    #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
+    #[doc = " * `cert_fingerprint_sha1` - The certificate's SHA-1 fingerprint"]
+    #[doc = ""]
+    #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
+    #[doc = " * `cert_fingerprint_sha256` - The certificate's SHA-256 fingerprint"]
+    #[doc = ""]
+    #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
+    #[doc = " * `cert_not_before` - The effective starting date of the certificate"]
+    #[doc = ""]
+    #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
+    #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
+    #[doc = ""]
+    #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
+    pub fn builder_1(
+        cert_verified: ExcludeCertVerificationStatusNone,
+        cert_issuer_dn: impl ::wasm_bindgen::JsStringLike,
+        cert_subject_dn: impl ::wasm_bindgen::JsStringLike,
+        cert_issuer_dnrfc2253: impl ::wasm_bindgen::JsStringLike,
+        cert_subject_dnrfc2253: impl ::wasm_bindgen::JsStringLike,
+        cert_issuer_dn_legacy: impl ::wasm_bindgen::JsStringLike,
+        cert_subject_dn_legacy: impl ::wasm_bindgen::JsStringLike,
+        cert_serial: impl ::wasm_bindgen::JsStringLike,
+        cert_issuer_serial: impl ::wasm_bindgen::JsStringLike,
+        cert_ski: impl ::wasm_bindgen::JsStringLike,
+        cert_issuer_ski: impl ::wasm_bindgen::JsStringLike,
+        cert_fingerprint_sha1: impl ::wasm_bindgen::JsStringLike,
+        cert_fingerprint_sha256: impl ::wasm_bindgen::JsStringLike,
+        cert_not_before: impl ::wasm_bindgen::JsStringLike,
+        cert_not_after: impl ::wasm_bindgen::JsStringLike,
+    ) -> IncomingRequestCfPropertiesTLSClientAuthBuilder {
+        let inner: IncomingRequestCfPropertiesTLSClientAuth =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_cert_presented("1");
+        inner.set_cert_verified(cert_verified);
+        inner.set_cert_revoked(CertRevokedKind::_1);
+        inner.set_cert_issuer_dn(cert_issuer_dn);
+        inner.set_cert_subject_dn(cert_subject_dn);
+        inner.set_cert_issuer_dnrfc2253(cert_issuer_dnrfc2253);
+        inner.set_cert_subject_dnrfc2253(cert_subject_dnrfc2253);
+        inner.set_cert_issuer_dn_legacy(cert_issuer_dn_legacy);
+        inner.set_cert_subject_dn_legacy(cert_subject_dn_legacy);
+        inner.set_cert_serial(cert_serial);
+        inner.set_cert_issuer_serial(cert_issuer_serial);
+        inner.set_cert_ski(cert_ski);
+        inner.set_cert_issuer_ski(cert_issuer_ski);
+        inner.set_cert_fingerprint_sha1(cert_fingerprint_sha1);
+        inner.set_cert_fingerprint_sha256(cert_fingerprint_sha256);
+        inner.set_cert_not_before(cert_not_before);
+        inner.set_cert_not_after(cert_not_after);
+        IncomingRequestCfPropertiesTLSClientAuthBuilder { inner }
+    }
+    #[doc = " Start a builder with `certPresented: \"1\"` and `certRevoked: \"0\"`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `certPresented: \"1\"` - Always `\"1\"`, indicating that the certificate was presented"]
+    #[doc = " * `certRevoked: \"0\"` - The presented certificate's revokation status."]
+    #[doc = ""]
+    #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
+    #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `cert_verified` - Result of certificate verification."]
+    #[doc = ""]
+    #[doc = " @example \"FAILED:self signed certificate\""]
+    #[doc = " * `cert_issuer_dn` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = ""]
+    #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
+    #[doc = " * `cert_subject_dn` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = ""]
+    #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
+    #[doc = " * `cert_issuer_dnrfc2253` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = ""]
+    #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
+    #[doc = " * `cert_subject_dnrfc2253` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = ""]
+    #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
+    #[doc = " * `cert_issuer_dn_legacy` - The certificate issuer's distinguished name (legacy policies)"]
+    #[doc = " * `cert_subject_dn_legacy` - The certificate subject's distinguished name (legacy policies)"]
+    #[doc = " * `cert_serial` - The certificate's serial number"]
+    #[doc = ""]
+    #[doc = " @example \"00936EACBE07F201DF\""]
+    #[doc = " * `cert_issuer_serial` - The certificate issuer's serial number"]
+    #[doc = ""]
+    #[doc = " @example \"2489002934BDFEA34\""]
+    #[doc = " * `cert_ski` - The certificate's Subject Key Identifier"]
+    #[doc = ""]
+    #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
+    #[doc = " * `cert_issuer_ski` - The certificate issuer's Subject Key Identifier"]
+    #[doc = ""]
+    #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
+    #[doc = " * `cert_fingerprint_sha1` - The certificate's SHA-1 fingerprint"]
+    #[doc = ""]
+    #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
+    #[doc = " * `cert_fingerprint_sha256` - The certificate's SHA-256 fingerprint"]
+    #[doc = ""]
+    #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
+    #[doc = " * `cert_not_before` - The effective starting date of the certificate"]
+    #[doc = ""]
+    #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
+    #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
+    #[doc = ""]
+    #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
+    pub fn builder_0(
+        cert_verified: ExcludeCertVerificationStatusNone,
+        cert_issuer_dn: impl ::wasm_bindgen::JsStringLike,
+        cert_subject_dn: impl ::wasm_bindgen::JsStringLike,
+        cert_issuer_dnrfc2253: impl ::wasm_bindgen::JsStringLike,
+        cert_subject_dnrfc2253: impl ::wasm_bindgen::JsStringLike,
+        cert_issuer_dn_legacy: impl ::wasm_bindgen::JsStringLike,
+        cert_subject_dn_legacy: impl ::wasm_bindgen::JsStringLike,
+        cert_serial: impl ::wasm_bindgen::JsStringLike,
+        cert_issuer_serial: impl ::wasm_bindgen::JsStringLike,
+        cert_ski: impl ::wasm_bindgen::JsStringLike,
+        cert_issuer_ski: impl ::wasm_bindgen::JsStringLike,
+        cert_fingerprint_sha1: impl ::wasm_bindgen::JsStringLike,
+        cert_fingerprint_sha256: impl ::wasm_bindgen::JsStringLike,
+        cert_not_before: impl ::wasm_bindgen::JsStringLike,
+        cert_not_after: impl ::wasm_bindgen::JsStringLike,
+    ) -> IncomingRequestCfPropertiesTLSClientAuthBuilder {
         let inner: IncomingRequestCfPropertiesTLSClientAuth =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cert_presented("1");
@@ -39432,7 +40326,19 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         inner.set_cert_fingerprint_sha256(cert_fingerprint_sha256);
         inner.set_cert_not_before(cert_not_before);
         inner.set_cert_not_after(cert_not_after);
-        inner
+        IncomingRequestCfPropertiesTLSClientAuthBuilder { inner }
+    }
+}
+pub struct IncomingRequestCfPropertiesTLSClientAuthBuilder {
+    inner: IncomingRequestCfPropertiesTLSClientAuth,
+}
+impl IncomingRequestCfPropertiesTLSClientAuthBuilder {
+    pub fn cert_revoked(self, val: CertRevokedKind) -> Self {
+        self.inner.set_cert_revoked(val);
+        self
+    }
+    pub fn build(self) -> IncomingRequestCfPropertiesTLSClientAuth {
+        self.inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -39642,25 +40548,7 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `certPresented: \"0\"`"]
-    #[doc = " * `certVerified: \"NONE\"`"]
-    #[doc = " * `certRevoked: \"0\"`"]
-    #[doc = " * `certIssuerDN: \"\"`"]
-    #[doc = " * `certSubjectDN: \"\"`"]
-    #[doc = " * `certIssuerDNRFC2253: \"\"`"]
-    #[doc = " * `certSubjectDNRFC2253: \"\"`"]
-    #[doc = " * `certIssuerDNLegacy: \"\"`"]
-    #[doc = " * `certSubjectDNLegacy: \"\"`"]
-    #[doc = " * `certSerial: \"\"`"]
-    #[doc = " * `certIssuerSerial: \"\"`"]
-    #[doc = " * `certSKI: \"\"`"]
-    #[doc = " * `certIssuerSKI: \"\"`"]
-    #[doc = " * `certFingerprintSHA1: \"\"`"]
-    #[doc = " * `certFingerprintSHA256: \"\"`"]
-    #[doc = " * `certNotBefore: \"\"`"]
-    #[doc = " * `certNotAfter: \"\"`"]
+    #[doc = " Construct with `certPresented: \"0\"`, `certVerified: \"NONE\"`, `certRevoked: \"0\"`, `certIssuerDN: \"\"`, `certSubjectDN: \"\"`, `certIssuerDNRFC2253: \"\"`, `certSubjectDNRFC2253: \"\"`, `certIssuerDNLegacy: \"\"`, `certSubjectDNLegacy: \"\"`, `certSerial: \"\"`, `certIssuerSerial: \"\"`, `certSKI: \"\"`, `certIssuerSKI: \"\"`, `certFingerprintSHA1: \"\"`, `certFingerprintSHA256: \"\"`, `certNotBefore: \"\"` and `certNotAfter: \"\"`."]
     pub fn new() -> IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
         let inner: IncomingRequestCfPropertiesTLSClientAuthPlaceholder =
             JsCast::unchecked_into(js_sys::Object::new());
@@ -40116,15 +41004,11 @@ extern "C" {
     pub fn set_error(this: &D1Response, val: &JsValue);
 }
 impl D1Response {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `success: true`"]
+    #[doc = " Construct with `success: true`."]
     pub fn new(meta: &JsValue) -> D1Response {
         Self::builder(meta).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `success: true`"]
+    #[doc = " Start a builder with `success: true`."]
     pub fn builder(meta: &JsValue) -> D1ResponseBuilder {
         let inner: D1Response = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_success(true);
@@ -40159,15 +41043,11 @@ extern "C" {
         T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> D1Result<T> {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `success: true`"]
+    #[doc = " Construct with `success: true`."]
     pub fn new(meta: &JsValue, results: &[T]) -> D1Result<T> {
         Self::builder(meta, results).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `success: true`"]
+    #[doc = " Start a builder with `success: true`."]
     pub fn builder(meta: &JsValue, results: &[T]) -> D1ResultBuilder<T> {
         let inner: D1Result<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_success(true);
@@ -40399,9 +41279,7 @@ extern "C" {
     pub fn set_column_names(this: &D1PreparedStatementOptions, val: bool);
 }
 impl D1PreparedStatementOptions {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `columnNames: true`"]
+    #[doc = " Construct with `columnNames: true`."]
     pub fn new() -> D1PreparedStatementOptions {
         let inner: D1PreparedStatementOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_column_names(true);
@@ -40426,6 +41304,11 @@ impl D1PreparedStatementOptions2 {
         D1PreparedStatementOptions2Builder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for D1PreparedStatementOptions2 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct D1PreparedStatementOptions2Builder {
@@ -40598,9 +41481,7 @@ extern "C" {
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 impl EmailAttachment {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
+    #[doc = " Construct with `disposition: \"inline\"`."]
     pub fn new_inline(
         content_id: impl ::wasm_bindgen::JsStringLike,
         filename: impl ::wasm_bindgen::JsStringLike,
@@ -40615,9 +41496,7 @@ impl EmailAttachment {
         inner.set_content(content);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
+    #[doc = " Construct with `disposition: \"inline\"`."]
     pub fn new_inline_with_array_buffer(
         content_id: impl ::wasm_bindgen::JsStringLike,
         filename: impl ::wasm_bindgen::JsStringLike,
@@ -40632,9 +41511,7 @@ impl EmailAttachment {
         inner.set_content_with_array_buffer(content);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
+    #[doc = " Construct with `disposition: \"inline\"`."]
     pub fn new_inline_with_typed_array<T: ::js_sys::TypedArray>(
         content_id: impl ::wasm_bindgen::JsStringLike,
         filename: impl ::wasm_bindgen::JsStringLike,
@@ -40652,9 +41529,7 @@ impl EmailAttachment {
         inner.set_content_with_typed_array(content);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Construct with `disposition: \"attachment\"`."]
     pub fn new_attachment(
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -40662,9 +41537,7 @@ impl EmailAttachment {
     ) -> EmailAttachment {
         Self::builder_attachment(filename, r#type, content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Construct with `disposition: \"attachment\"`."]
     pub fn new_attachment_with_array_buffer(
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -40672,9 +41545,7 @@ impl EmailAttachment {
     ) -> EmailAttachment {
         Self::builder_attachment_with_array_buffer(filename, r#type, content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Construct with `disposition: \"attachment\"`."]
     pub fn new_attachment_with_typed_array<T: ::js_sys::TypedArray>(
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -40685,9 +41556,7 @@ impl EmailAttachment {
     {
         Self::builder_attachment_with_typed_array(filename, r#type, content).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -40700,9 +41569,7 @@ impl EmailAttachment {
         inner.set_content(content);
         EmailAttachmentBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment_with_array_buffer(
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -40715,9 +41582,7 @@ impl EmailAttachment {
         inner.set_content_with_array_buffer(content);
         EmailAttachmentBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment_with_typed_array<T: ::js_sys::TypedArray>(
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -41076,6 +41941,11 @@ pub mod cloudflare {
                 NodeStyleServerAddressReturnBuilder {
                     inner: JsCast::unchecked_into(js_sys::Object::new()),
                 }
+            }
+        }
+        impl Default for NodeStyleServerAddressReturn {
+            fn default() -> Self {
+                Self::new()
             }
         }
         pub struct NodeStyleServerAddressReturnBuilder {
@@ -41450,6 +42320,11 @@ pub mod cloudflare {
                 WorkflowStepConfigBuilder {
                     inner: JsCast::unchecked_into(js_sys::Object::new()),
                 }
+            }
+        }
+        impl Default for WorkflowStepConfig {
+            fn default() -> Self {
+                Self::new()
             }
         }
         pub struct WorkflowStepConfigBuilder {
@@ -41911,18 +42786,14 @@ extern "C" {
     pub fn set_height(this: &ImageInfoResponse, val: f64);
 }
 impl ImageInfoResponse {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/svg+xml\"`"]
+    #[doc = " Construct with `format: \"image/svg+xml\"`."]
     pub fn new_imagesvgxml() -> ImageInfoResponse {
         Self::builder_imagesvgxml().build()
     }
     pub fn new(format: impl ::wasm_bindgen::JsStringLike) -> ImageInfoResponse {
         Self::builder(format).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/svg+xml\"`"]
+    #[doc = " Start a builder with `format: \"image/svg+xml\"`."]
     pub fn builder_imagesvgxml() -> ImageInfoResponseBuilder {
         let inner: ImageInfoResponse = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("image/svg+xml");
@@ -42040,6 +42911,11 @@ impl ImageTransform {
         ImageTransformBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ImageTransform {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ImageTransformBuilder {
@@ -42164,6 +43040,11 @@ impl ImageDrawOptions {
         }
     }
 }
+impl Default for ImageDrawOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ImageDrawOptionsBuilder {
     inner: ImageDrawOptions,
 }
@@ -42222,6 +43103,11 @@ impl ImageInputOptions {
         }
     }
 }
+impl Default for ImageInputOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ImageInputOptionsBuilder {
     inner: ImageInputOptions,
 }
@@ -42259,99 +43145,71 @@ extern "C" {
     pub fn set_anim(this: &ImageOutputOptions, val: bool);
 }
 impl ImageOutputOptions {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/jpeg\"`"]
+    #[doc = " Construct with `format: \"image/jpeg\"`."]
     pub fn new_imagejpeg() -> ImageOutputOptions {
         Self::builder_imagejpeg().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/png\"`"]
+    #[doc = " Construct with `format: \"image/png\"`."]
     pub fn new_imagepng() -> ImageOutputOptions {
         Self::builder_imagepng().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/gif\"`"]
+    #[doc = " Construct with `format: \"image/gif\"`."]
     pub fn new_imagegif() -> ImageOutputOptions {
         Self::builder_imagegif().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/webp\"`"]
+    #[doc = " Construct with `format: \"image/webp\"`."]
     pub fn new_imagewebp() -> ImageOutputOptions {
         Self::builder_imagewebp().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/avif\"`"]
+    #[doc = " Construct with `format: \"image/avif\"`."]
     pub fn new_imageavif() -> ImageOutputOptions {
         Self::builder_imageavif().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"rgb\"`"]
+    #[doc = " Construct with `format: \"rgb\"`."]
     pub fn new_rgb() -> ImageOutputOptions {
         Self::builder_rgb().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"rgba\"`"]
+    #[doc = " Construct with `format: \"rgba\"`."]
     pub fn new_rgba() -> ImageOutputOptions {
         Self::builder_rgba().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/jpeg\"`"]
+    #[doc = " Start a builder with `format: \"image/jpeg\"`."]
     pub fn builder_imagejpeg() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format(ImageOutputOptionsFormatKind::Imagejpeg);
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/png\"`"]
+    #[doc = " Start a builder with `format: \"image/png\"`."]
     pub fn builder_imagepng() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format(ImageOutputOptionsFormatKind::Imagepng);
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/gif\"`"]
+    #[doc = " Start a builder with `format: \"image/gif\"`."]
     pub fn builder_imagegif() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format(ImageOutputOptionsFormatKind::Imagegif);
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/webp\"`"]
+    #[doc = " Start a builder with `format: \"image/webp\"`."]
     pub fn builder_imagewebp() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format(ImageOutputOptionsFormatKind::Imagewebp);
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"image/avif\"`"]
+    #[doc = " Start a builder with `format: \"image/avif\"`."]
     pub fn builder_imageavif() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format(ImageOutputOptionsFormatKind::Imageavif);
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"rgb\"`"]
+    #[doc = " Start a builder with `format: \"rgb\"`."]
     pub fn builder_rgb() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format(ImageOutputOptionsFormatKind::Rgb);
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"rgba\"`"]
+    #[doc = " Start a builder with `format: \"rgba\"`."]
     pub fn builder_rgba() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format(ImageOutputOptionsFormatKind::Rgba);
@@ -42522,6 +43380,11 @@ impl ImageUploadOptions {
         }
     }
 }
+impl Default for ImageUploadOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ImageUploadOptionsBuilder {
     inner: ImageUploadOptions,
 }
@@ -42584,6 +43447,11 @@ impl ImageUpdateOptions {
         }
     }
 }
+impl Default for ImageUpdateOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ImageUpdateOptionsBuilder {
     inner: ImageUpdateOptions,
 }
@@ -42638,6 +43506,11 @@ impl ImageListOptions {
         ImageListOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ImageListOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ImageListOptionsBuilder {
@@ -43159,6 +44032,11 @@ impl ImageTransformationOutputOptions {
         }
     }
 }
+impl Default for ImageTransformationOutputOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ImageTransformationOutputOptionsBuilder {
     inner: ImageTransformationOutputOptions,
 }
@@ -43382,6 +44260,11 @@ impl MediaTransformationInputOptions {
         }
     }
 }
+impl Default for MediaTransformationInputOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct MediaTransformationInputOptionsBuilder {
     inner: MediaTransformationInputOptions,
 }
@@ -43468,6 +44351,11 @@ impl MediaTransformationOutputOptions {
         MediaTransformationOutputOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for MediaTransformationOutputOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct MediaTransformationOutputOptionsBuilder {
@@ -45504,6 +46392,11 @@ impl StreamUrlUploadParams {
         }
     }
 }
+impl Default for StreamUrlUploadParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct StreamUrlUploadParamsBuilder {
     inner: StreamUrlUploadParams,
 }
@@ -46190,6 +47083,11 @@ impl StreamUpdateVideoParams {
         }
     }
 }
+impl Default for StreamUpdateVideoParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct StreamUpdateVideoParamsBuilder {
     inner: StreamUpdateVideoParams,
 }
@@ -46387,6 +47285,11 @@ impl StreamDownloadGetResponse {
         StreamDownloadGetResponseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for StreamDownloadGetResponse {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct StreamDownloadGetResponseBuilder {
@@ -46652,6 +47555,11 @@ impl StreamWatermarkCreateParams {
         }
     }
 }
+impl Default for StreamWatermarkCreateParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct StreamWatermarkCreateParamsBuilder {
     inner: StreamWatermarkCreateParams,
 }
@@ -46731,6 +47639,11 @@ impl StreamVideosListParams {
         StreamVideosListParamsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for StreamVideosListParams {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct StreamVideosListParamsBuilder {
@@ -47076,9 +47989,7 @@ extern "C" {
     pub fn set_error(this: &ConversionResponse, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl ConversionResponse {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"markdown\"`"]
+    #[doc = " Construct with `format: \"markdown\"`."]
     pub fn new_markdown(
         id: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
@@ -47088,9 +47999,7 @@ impl ConversionResponse {
     ) -> ConversionResponse {
         Self::builder_markdown(id, name, mime_type, tokens, data).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"error\"`"]
+    #[doc = " Construct with `format: \"error\"`."]
     pub fn new_error(
         id: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
@@ -47099,9 +48008,7 @@ impl ConversionResponse {
     ) -> ConversionResponse {
         Self::builder_error(id, name, mime_type, error).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"markdown\"`"]
+    #[doc = " Start a builder with `format: \"markdown\"`."]
     pub fn builder_markdown(
         id: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
@@ -47118,9 +48025,7 @@ impl ConversionResponse {
         inner.set_data(data);
         ConversionResponseBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `format: \"error\"`"]
+    #[doc = " Start a builder with `format: \"error\"`."]
     pub fn builder_error(
         id: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
@@ -47176,6 +48081,11 @@ impl ImageConversionOptions {
         }
     }
 }
+impl Default for ImageConversionOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ImageConversionOptionsBuilder {
     inner: ImageConversionOptions,
 }
@@ -47210,6 +48120,11 @@ impl EmbeddedImageConversionOptions {
         EmbeddedImageConversionOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for EmbeddedImageConversionOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct EmbeddedImageConversionOptionsBuilder {
@@ -47264,6 +48179,11 @@ impl ConversionOptions {
         }
     }
 }
+impl Default for ConversionOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ConversionOptionsBuilder {
     inner: ConversionOptions,
 }
@@ -47314,6 +48234,11 @@ impl ConversionRequestOptions {
         ConversionRequestOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ConversionRequestOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ConversionRequestOptionsBuilder {
@@ -48231,6 +49156,11 @@ pub mod tail_stream {
             }
         }
     }
+    impl Default for TailEventHandlerObject {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct TailEventHandlerObjectBuilder {
         inner: TailEventHandlerObject,
     }
@@ -48413,6 +49343,11 @@ impl VectorizeQueryOptions {
         }
     }
 }
+impl Default for VectorizeQueryOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct VectorizeQueryOptionsBuilder {
     inner: VectorizeQueryOptions,
 }
@@ -48477,6 +49412,11 @@ impl VectorizeIndexConfig {
         VectorizeIndexConfigBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for VectorizeIndexConfig {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct VectorizeIndexConfigBuilder {
@@ -49438,6 +50378,11 @@ impl DynamicDispatchLimits {
         }
     }
 }
+impl Default for DynamicDispatchLimits {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct DynamicDispatchLimitsBuilder {
     inner: DynamicDispatchLimits,
 }
@@ -49478,6 +50423,11 @@ impl DynamicDispatchOptions {
         DynamicDispatchOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for DynamicDispatchOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct DynamicDispatchOptionsBuilder {
@@ -49692,6 +50642,13 @@ impl<PARAMS: ::wasm_bindgen::convert::IntoWasmAbi> WorkflowInstanceCreateOptions
         }
     }
 }
+impl<PARAMS: ::wasm_bindgen::convert::IntoWasmAbi> Default
+    for WorkflowInstanceCreateOptions<PARAMS>
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct WorkflowInstanceCreateOptionsBuilder<PARAMS> {
     inner: WorkflowInstanceCreateOptions<PARAMS>,
 }
@@ -49731,127 +50688,91 @@ extern "C" {
     pub fn set_output(this: &InstanceStatus, val: &JsValue);
 }
 impl InstanceStatus {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"queued\"`"]
+    #[doc = " Construct with `status: \"queued\"`."]
     pub fn new_queued() -> InstanceStatus {
         Self::builder_queued().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"running\"`"]
+    #[doc = " Construct with `status: \"running\"`."]
     pub fn new_running() -> InstanceStatus {
         Self::builder_running().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"paused\"`"]
+    #[doc = " Construct with `status: \"paused\"`."]
     pub fn new_paused() -> InstanceStatus {
         Self::builder_paused().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"errored\"`"]
+    #[doc = " Construct with `status: \"errored\"`."]
     pub fn new_errored() -> InstanceStatus {
         Self::builder_errored().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"terminated\"`"]
+    #[doc = " Construct with `status: \"terminated\"`."]
     pub fn new_terminated() -> InstanceStatus {
         Self::builder_terminated().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"complete\"`"]
+    #[doc = " Construct with `status: \"complete\"`."]
     pub fn new_complete() -> InstanceStatus {
         Self::builder_complete().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"waiting\"`"]
+    #[doc = " Construct with `status: \"waiting\"`."]
     pub fn new_waiting() -> InstanceStatus {
         Self::builder_waiting().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"waitingForPause\"`"]
+    #[doc = " Construct with `status: \"waitingForPause\"`."]
     pub fn new_waiting_for_pause() -> InstanceStatus {
         Self::builder_waiting_for_pause().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"unknown\"`"]
+    #[doc = " Construct with `status: \"unknown\"`."]
     pub fn new_unknown() -> InstanceStatus {
         Self::builder_unknown().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"queued\"`"]
+    #[doc = " Start a builder with `status: \"queued\"`."]
     pub fn builder_queued() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status(InstanceStatusStatusKind::Queued);
         InstanceStatusBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"running\"`"]
+    #[doc = " Start a builder with `status: \"running\"`."]
     pub fn builder_running() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status(InstanceStatusStatusKind::Running);
         InstanceStatusBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"paused\"`"]
+    #[doc = " Start a builder with `status: \"paused\"`."]
     pub fn builder_paused() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status(InstanceStatusStatusKind::Paused);
         InstanceStatusBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"errored\"`"]
+    #[doc = " Start a builder with `status: \"errored\"`."]
     pub fn builder_errored() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status(InstanceStatusStatusKind::Errored);
         InstanceStatusBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"terminated\"`"]
+    #[doc = " Start a builder with `status: \"terminated\"`."]
     pub fn builder_terminated() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status(InstanceStatusStatusKind::Terminated);
         InstanceStatusBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"complete\"`"]
+    #[doc = " Start a builder with `status: \"complete\"`."]
     pub fn builder_complete() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status(InstanceStatusStatusKind::Complete);
         InstanceStatusBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"waiting\"`"]
+    #[doc = " Start a builder with `status: \"waiting\"`."]
     pub fn builder_waiting() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status(InstanceStatusStatusKind::Waiting);
         InstanceStatusBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"waitingForPause\"`"]
+    #[doc = " Start a builder with `status: \"waitingForPause\"`."]
     pub fn builder_waiting_for_pause() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status(InstanceStatusStatusKind::WaitingForPause);
         InstanceStatusBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `status: \"unknown\"`"]
+    #[doc = " Start a builder with `status: \"unknown\"`."]
     pub fn builder_unknown() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status(InstanceStatusStatusKind::Unknown);
@@ -50017,6 +50938,11 @@ impl PartialKvNamespaceGetOptionsUndefined {
         }
     }
 }
+impl Default for PartialKvNamespaceGetOptionsUndefined {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct PartialKvNamespaceGetOptionsUndefinedBuilder {
     inner: PartialKvNamespaceGetOptionsUndefined,
 }
@@ -50161,6 +51087,11 @@ impl PartialAiGatewayHeaders {
         PartialAiGatewayHeadersBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for PartialAiGatewayHeaders {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct PartialAiGatewayHeadersBuilder {
@@ -50391,6 +51322,11 @@ impl VectorizeVectorMetadataFilter2 {
         }
     }
 }
+impl Default for VectorizeVectorMetadataFilter2 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct VectorizeVectorMetadataFilter2Builder {
     inner: VectorizeVectorMetadataFilter2,
 }
@@ -50541,6 +51477,11 @@ impl VectorizeVectorMetadataFilter3 {
         VectorizeVectorMetadataFilter3Builder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for VectorizeVectorMetadataFilter3 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct VectorizeVectorMetadataFilter3Builder {

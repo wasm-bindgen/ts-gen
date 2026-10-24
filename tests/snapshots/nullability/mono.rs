@@ -1205,9 +1205,7 @@ extern "C" {
     pub fn set_filename(this: &Attachment, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl Attachment {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
+    #[doc = " Construct with `disposition: \"inline\"`."]
     pub fn new_inline(
         content_id: impl ::wasm_bindgen::JsStringLike,
         filename: impl ::wasm_bindgen::JsStringLike,
@@ -1218,15 +1216,11 @@ impl Attachment {
         inner.set_filename(filename);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Construct with `disposition: \"attachment\"`."]
     pub fn new_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> Attachment {
         Self::builder_attachment(filename).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"attachment\"`"]
+    #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition(DispositionKind::Attachment);
@@ -1275,38 +1269,28 @@ impl Upload {
     }
 }
 impl Upload {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"file\"`"]
+    #[doc = " Construct with `kind: \"file\"`."]
     pub fn new_file(path: impl ::wasm_bindgen::JsStringLike) -> Upload {
         let inner: Upload = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind(KindKind::File);
         inner.set_path(path);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"none\"`"]
+    #[doc = " Construct with `kind: \"none\"`."]
     pub fn new_none() -> Upload {
         Self::builder_none().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"skip\"`"]
+    #[doc = " Construct with `kind: \"skip\"`."]
     pub fn new_skip() -> Upload {
         Self::builder_skip().build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"none\"`"]
+    #[doc = " Start a builder with `kind: \"none\"`."]
     pub fn builder_none() -> UploadBuilder {
         let inner: Upload = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind(KindKind::None);
         UploadBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"skip\"`"]
+    #[doc = " Start a builder with `kind: \"skip\"`."]
     pub fn builder_skip() -> UploadBuilder {
         let inner: Upload = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind(KindKind::Skip);
@@ -1358,23 +1342,39 @@ impl Cover {
     }
 }
 impl Cover {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"image\"`"]
+    #[doc = " Construct with `kind: \"image\"`."]
     pub fn new_image(src: impl ::wasm_bindgen::JsStringLike) -> Cover {
+        Self::builder_image(src).build()
+    }
+    #[doc = " Construct with `kind: \"blank\"`."]
+    pub fn new_blank() -> Cover {
+        Self::builder_blank().build()
+    }
+    #[doc = " Start a builder with `kind: \"image\"`."]
+    pub fn builder_image(src: impl ::wasm_bindgen::JsStringLike) -> CoverBuilder {
         let inner: Cover = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind(CoverKindKind::Image);
         inner.set_src(src);
-        inner
+        CoverBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `kind: \"blank\"`"]
-    pub fn new_blank() -> Cover {
+    #[doc = " Start a builder with `kind: \"blank\"`."]
+    pub fn builder_blank() -> CoverBuilder {
         let inner: Cover = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind(CoverKindKind::Blank);
         inner.set_src_with_null();
-        inner
+        CoverBuilder { inner }
+    }
+}
+pub struct CoverBuilder {
+    inner: Cover,
+}
+impl CoverBuilder {
+    pub fn kind(self, val: CoverKindKind) -> Self {
+        self.inner.set_kind(val);
+        self
+    }
+    pub fn build(self) -> Cover {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]

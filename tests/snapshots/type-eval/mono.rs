@@ -87,6 +87,11 @@ impl Sized {
         }
     }
 }
+impl Default for Sized {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct SizedBuilder {
     inner: Sized,
 }
@@ -252,6 +257,11 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Rounding<U> {
         RoundingBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Default for Rounding<U> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct RoundingBuilder<U> {
@@ -441,6 +451,11 @@ pub mod scoped {
             }
         }
     }
+    impl Default for PartialSettings {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct PartialSettingsBuilder {
         inner: PartialSettings,
     }
@@ -522,6 +537,11 @@ impl PartialOptions {
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
         }
+    }
+}
+impl Default for PartialOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
@@ -649,6 +669,11 @@ impl LooseOptions {
         }
     }
 }
+impl Default for LooseOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -709,6 +734,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> PartialBox<T> {
         }
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for PartialBox<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct PartialBoxBuilder<T> {
     inner: PartialBox<T>,
 }
@@ -764,6 +794,11 @@ impl PartialExtended {
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
         }
+    }
+}
+impl Default for PartialExtended {
+    fn default() -> Self {
+        Self::new()
     }
 }
 #[wasm_bindgen(private)]

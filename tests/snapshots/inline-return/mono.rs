@@ -44,6 +44,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> CursorNextReturn<T> {
         }
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for CursorNextReturn<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct CursorNextReturnBuilder<T> {
     inner: CursorNextReturn<T>,
 }
@@ -102,6 +107,11 @@ impl ImageOptions {
         ImageOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for ImageOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct ImageOptionsBuilder {

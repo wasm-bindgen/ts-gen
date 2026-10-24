@@ -60,6 +60,11 @@ impl<T: ::wasm_bindgen::JsGeneric> Options<T> {
         }
     }
 }
+impl<T: ::wasm_bindgen::JsGeneric> Default for Options<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct OptionsBuilder<T: ::wasm_bindgen::JsGeneric> {
     inner: Options<T>,
 }

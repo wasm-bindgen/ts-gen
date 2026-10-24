@@ -48,6 +48,11 @@ impl<T: ::wasm_bindgen::JsGeneric> GenAbv<T> {
         }
     }
 }
+impl<T: ::wasm_bindgen::JsGeneric> Default for GenAbv<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct GenAbvBuilder<T: ::wasm_bindgen::JsGeneric> {
     inner: GenAbv<T>,
 }

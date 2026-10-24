@@ -243,6 +243,11 @@ pub mod temporal {
             }
         }
     }
+    impl Default for DurationLikeObject {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct DurationLikeObjectBuilder {
         inner: DurationLikeObject,
     }
@@ -331,6 +336,11 @@ pub mod temporal {
             }
         }
     }
+    impl Default for TimeLikeObject {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct TimeLikeObjectBuilder {
         inner: TimeLikeObject,
     }
@@ -407,6 +417,11 @@ pub mod temporal {
             YearMonthLikeObjectBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl Default for YearMonthLikeObject {
+        fn default() -> Self {
+            Self::new()
         }
     }
     pub struct YearMonthLikeObjectBuilder {
@@ -610,6 +625,11 @@ pub mod temporal {
             }
         }
     }
+    impl Default for DisambiguationOptions {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct DisambiguationOptionsBuilder {
         inner: DisambiguationOptions,
     }
@@ -642,6 +662,11 @@ pub mod temporal {
             }
         }
     }
+    impl Default for OverflowOptions {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct OverflowOptionsBuilder {
         inner: OverflowOptions,
     }
@@ -665,21 +690,37 @@ pub mod temporal {
         pub fn set_direction(this: &TransitionOptions, val: DirectionKind);
     }
     impl TransitionOptions {
-        #[doc = " ## Inlined fields"]
-        #[doc = ""]
-        #[doc = " * `direction: \"next\"`"]
+        #[doc = " Construct with `direction: \"next\"`."]
         pub fn new_next() -> TransitionOptions {
+            Self::builder_next().build()
+        }
+        #[doc = " Construct with `direction: \"previous\"`."]
+        pub fn new_previous() -> TransitionOptions {
+            Self::builder_previous().build()
+        }
+        #[doc = " Start a builder with `direction: \"next\"`."]
+        pub fn builder_next() -> TransitionOptionsBuilder {
             let inner: TransitionOptions = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_direction(DirectionKind::Next);
-            inner
+            TransitionOptionsBuilder { inner }
         }
-        #[doc = " ## Inlined fields"]
-        #[doc = ""]
-        #[doc = " * `direction: \"previous\"`"]
-        pub fn new_previous() -> TransitionOptions {
+        #[doc = " Start a builder with `direction: \"previous\"`."]
+        pub fn builder_previous() -> TransitionOptionsBuilder {
             let inner: TransitionOptions = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_direction(DirectionKind::Previous);
-            inner
+            TransitionOptionsBuilder { inner }
+        }
+    }
+    pub struct TransitionOptionsBuilder {
+        inner: TransitionOptions,
+    }
+    impl TransitionOptionsBuilder {
+        pub fn direction(self, val: DirectionKind) -> Self {
+            self.inner.set_direction(val);
+            self
+        }
+        pub fn build(self) -> TransitionOptions {
+            self.inner
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -708,6 +749,11 @@ pub mod temporal {
             RoundingOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> Default for RoundingOptions<Units> {
+        fn default() -> Self {
+            Self::new()
         }
     }
     pub struct RoundingOptionsBuilder<Units> {
@@ -753,6 +799,13 @@ pub mod temporal {
             RoundingOptionsWithLargestUnitBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> Default
+        for RoundingOptionsWithLargestUnit<Units>
+    {
+        fn default() -> Self {
+            Self::new()
         }
     }
     pub struct RoundingOptionsWithLargestUnitBuilder<Units> {
@@ -809,6 +862,11 @@ pub mod temporal {
             }
         }
     }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> Default for ToStringRoundingOptions<Units> {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct ToStringRoundingOptionsBuilder<Units> {
         inner: ToStringRoundingOptions<Units>,
     }
@@ -855,6 +913,13 @@ pub mod temporal {
             ToStringRoundingOptionsWithFractionalSecondsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> Default
+        for ToStringRoundingOptionsWithFractionalSeconds<Units>
+    {
+        fn default() -> Self {
+            Self::new()
         }
     }
     pub struct ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
@@ -996,6 +1061,11 @@ pub mod temporal {
             PlainDateToStringOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl Default for PlainDateToStringOptions {
+        fn default() -> Self {
+            Self::new()
         }
     }
     pub struct PlainDateToStringOptionsBuilder {
@@ -1427,7 +1497,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch)]
         pub fn with(
             this: &PlainDate,
-            date_like: &PartialTemporalLikeDateLikeObject,
+            date_like: &PartialDateLikeObject,
         ) -> Result<PlainDate, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -1436,7 +1506,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &PlainDate,
-            date_like: &PartialTemporalLikeDateLikeObject,
+            date_like: &PartialDateLikeObject,
             options: &OverflowOptions,
         ) -> Result<PlainDate, Error>;
         #[wasm_bindgen(method, catch, js_name = "withCalendar")]
@@ -1847,6 +1917,11 @@ pub mod temporal {
             }
         }
     }
+    impl Default for PlainTimeToStringOptions {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct PlainTimeToStringOptionsBuilder {
         inner: PlainTimeToStringOptions,
     }
@@ -2171,10 +2246,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[doc = " * `TypeError` — if the object has no recognised fields"]
         #[wasm_bindgen(method, catch)]
-        pub fn with(
-            this: &PlainTime,
-            time_like: &PartialTemporalLikeTimeLikeObject,
-        ) -> Result<PlainTime, Error>;
+        pub fn with(this: &PlainTime, time_like: &TimeLikeObject) -> Result<PlainTime, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
@@ -2182,7 +2254,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &PlainTime,
-            time_like: &PartialTemporalLikeTimeLikeObject,
+            time_like: &TimeLikeObject,
             options: &OverflowOptions,
         ) -> Result<PlainTime, Error>;
         #[doc = " ## Errors"]
@@ -2397,7 +2469,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch)]
         pub fn round(
             this: &PlainTime,
-            round_to: PluralizeUnitTimeUnit,
+            round_to: PluralizeTimeUnit,
         ) -> Result<PlainTime, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -2554,6 +2626,11 @@ pub mod temporal {
             PlainDateTimeToStringOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl Default for PlainDateTimeToStringOptions {
+        fn default() -> Self {
+            Self::new()
         }
     }
     pub struct PlainDateTimeToStringOptionsBuilder {
@@ -2947,7 +3024,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch)]
         pub fn with(
             this: &PlainDateTime,
-            date_time_like: &PartialTemporalLikeDateTimeLikeObject,
+            date_time_like: &PartialDateTimeLikeObject,
         ) -> Result<PlainDateTime, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -2956,7 +3033,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &PlainDateTime,
-            date_time_like: &PartialTemporalLikeDateTimeLikeObject,
+            date_time_like: &PartialDateTimeLikeObject,
             options: &OverflowOptions,
         ) -> Result<PlainDateTime, Error>;
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
@@ -3269,7 +3346,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch)]
         pub fn round(
             this: &PlainDateTime,
-            round_to: PluralizeUnitDayOrTimeUnit,
+            round_to: PluralizeDayOrTimeUnit,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -3465,6 +3542,11 @@ pub mod temporal {
             }
         }
     }
+    impl Default for ZonedDateTimeToStringOptions {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct ZonedDateTimeToStringOptionsBuilder {
         inner: ZonedDateTimeToStringOptions,
     }
@@ -3525,6 +3607,11 @@ pub mod temporal {
             ZonedDateTimeFromOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl Default for ZonedDateTimeFromOptions {
+        fn default() -> Self {
+            Self::new()
         }
     }
     pub struct ZonedDateTimeFromOptionsBuilder {
@@ -3736,7 +3823,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch)]
         pub fn with(
             this: &ZonedDateTime,
-            zoned_date_time_like: &PartialTemporalLikeZonedDateTimeLikeObject,
+            zoned_date_time_like: &PartialZonedDateTimeLikeObject,
         ) -> Result<ZonedDateTime, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -3745,7 +3832,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &ZonedDateTime,
-            zoned_date_time_like: &PartialTemporalLikeZonedDateTimeLikeObject,
+            zoned_date_time_like: &PartialZonedDateTimeLikeObject,
             options: &ZonedDateTimeFromOptions,
         ) -> Result<ZonedDateTime, Error>;
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
@@ -3992,7 +4079,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch)]
         pub fn round(
             this: &ZonedDateTime,
-            round_to: PluralizeUnitDayOrTimeUnit,
+            round_to: PluralizeDayOrTimeUnit,
         ) -> Result<ZonedDateTime, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -4200,6 +4287,11 @@ pub mod temporal {
             }
         }
     }
+    impl Default for DurationRelativeToOptions {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct DurationRelativeToOptionsBuilder {
         inner: DurationRelativeToOptions,
     }
@@ -4268,6 +4360,11 @@ pub mod temporal {
             }
         }
     }
+    impl Default for DurationRoundingOptions {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct DurationRoundingOptionsBuilder {
         inner: DurationRoundingOptions,
     }
@@ -4334,6 +4431,11 @@ pub mod temporal {
             DurationToStringOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl Default for DurationToStringOptions {
+        fn default() -> Self {
+            Self::new()
         }
     }
     pub struct DurationToStringOptionsBuilder {
@@ -4752,10 +4854,8 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[doc = " * `TypeError` — if the object has no recognised fields"]
         #[wasm_bindgen(method, catch)]
-        pub fn with(
-            this: &Duration,
-            duration_like: &PartialTemporalLikeDurationLikeObject,
-        ) -> Result<Duration, Error>;
+        pub fn with(this: &Duration, duration_like: &DurationLikeObject)
+            -> Result<Duration, Error>;
         #[wasm_bindgen(method, catch)]
         pub fn negated(this: &Duration) -> Result<Duration, JsValue>;
         #[wasm_bindgen(method, catch)]
@@ -4814,7 +4914,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch)]
         pub fn round(
             this: &Duration,
-            round_to: PluralizeUnitDayOrTimeUnit,
+            round_to: PluralizeDayOrTimeUnit,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -4829,10 +4929,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has calendar units, which need `relativeTo`"]
         #[wasm_bindgen(method, catch)]
-        pub fn total(
-            this: &Duration,
-            total_of: PluralizeUnitDayOrTimeUnit,
-        ) -> Result<f64, RangeError>;
+        pub fn total(this: &Duration, total_of: PluralizeDayOrTimeUnit) -> Result<f64, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has calendar units and `relativeTo` is not given"]
@@ -4979,6 +5076,11 @@ pub mod temporal {
             InstantToStringOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl Default for InstantToStringOptions {
+        fn default() -> Self {
+            Self::new()
         }
     }
     pub struct InstantToStringOptionsBuilder {
@@ -5245,10 +5347,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch)]
-        pub fn round(
-            this: &Instant,
-            round_to: PluralizeUnitTimeUnit,
-        ) -> Result<Instant, RangeError>;
+        pub fn round(this: &Instant, round_to: PluralizeTimeUnit) -> Result<Instant, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
@@ -5564,7 +5663,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch)]
         pub fn with(
             this: &PlainYearMonth,
-            year_month_like: &PartialTemporalLikeYearMonthLikeObject,
+            year_month_like: &PartialYearMonthLikeObject,
         ) -> Result<PlainYearMonth, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -5573,7 +5672,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &PlainYearMonth,
-            year_month_like: &PartialTemporalLikeYearMonthLikeObject,
+            year_month_like: &PartialYearMonthLikeObject,
             options: &OverflowOptions,
         ) -> Result<PlainYearMonth, Error>;
         #[wasm_bindgen(method, catch)]
@@ -5911,6 +6010,11 @@ pub mod temporal {
             }
         }
     }
+    impl Default for PlainMonthDayToPlainDateOptions {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
     pub struct PlainMonthDayToPlainDateOptionsBuilder {
         inner: PlainMonthDayToPlainDateOptions,
     }
@@ -6024,7 +6128,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch)]
         pub fn with(
             this: &PlainMonthDay,
-            month_day_like: &PartialTemporalLikeDateLikeObject,
+            month_day_like: &PartialDateLikeObject,
         ) -> Result<PlainMonthDay, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -6033,7 +6137,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn with_with_options(
             this: &PlainMonthDay,
-            month_day_like: &PartialTemporalLikeDateLikeObject,
+            month_day_like: &PartialDateLikeObject,
             options: &OverflowOptions,
         ) -> Result<PlainMonthDay, Error>;
         #[wasm_bindgen(method, catch)]
@@ -6171,56 +6275,55 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type PartialTemporalLikeDateLikeObject;
+        pub type PartialDateLikeObject;
         #[wasm_bindgen(method, getter)]
-        pub fn year(this: &PartialTemporalLikeDateLikeObject) -> Option<f64>;
+        pub fn year(this: &PartialDateLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_year(this: &PartialTemporalLikeDateLikeObject, val: f64);
+        pub fn set_year(this: &PartialDateLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn era(this: &PartialTemporalLikeDateLikeObject) -> Option<String>;
+        pub fn era(this: &PartialDateLikeObject) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "era")]
-        pub fn era_js_string(this: &PartialTemporalLikeDateLikeObject) -> Option<JsString>;
+        pub fn era_js_string(this: &PartialDateLikeObject) -> Option<JsString>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_era(
-            this: &PartialTemporalLikeDateLikeObject,
-            val: impl ::wasm_bindgen::JsStringLike,
-        );
+        pub fn set_era(this: &PartialDateLikeObject, val: impl ::wasm_bindgen::JsStringLike);
         #[wasm_bindgen(method, getter, js_name = "eraYear")]
-        pub fn era_year(this: &PartialTemporalLikeDateLikeObject) -> Option<f64>;
+        pub fn era_year(this: &PartialDateLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter, js_name = "eraYear")]
-        pub fn set_era_year(this: &PartialTemporalLikeDateLikeObject, val: f64);
+        pub fn set_era_year(this: &PartialDateLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn month(this: &PartialTemporalLikeDateLikeObject) -> Option<f64>;
+        pub fn month(this: &PartialDateLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_month(this: &PartialTemporalLikeDateLikeObject, val: f64);
+        pub fn set_month(this: &PartialDateLikeObject, val: f64);
         #[wasm_bindgen(method, getter, js_name = "monthCode")]
-        pub fn month_code(this: &PartialTemporalLikeDateLikeObject) -> Option<String>;
+        pub fn month_code(this: &PartialDateLikeObject) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "monthCode")]
-        pub fn month_code_js_string(this: &PartialTemporalLikeDateLikeObject) -> Option<JsString>;
+        pub fn month_code_js_string(this: &PartialDateLikeObject) -> Option<JsString>;
         #[wasm_bindgen(method, setter, js_name = "monthCode")]
-        pub fn set_month_code(
-            this: &PartialTemporalLikeDateLikeObject,
-            val: impl ::wasm_bindgen::JsStringLike,
-        );
+        pub fn set_month_code(this: &PartialDateLikeObject, val: impl ::wasm_bindgen::JsStringLike);
         #[wasm_bindgen(method, getter)]
-        pub fn day(this: &PartialTemporalLikeDateLikeObject) -> Option<f64>;
+        pub fn day(this: &PartialDateLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_day(this: &PartialTemporalLikeDateLikeObject, val: f64);
+        pub fn set_day(this: &PartialDateLikeObject, val: f64);
     }
-    impl PartialTemporalLikeDateLikeObject {
-        pub fn new() -> PartialTemporalLikeDateLikeObject {
+    impl PartialDateLikeObject {
+        pub fn new() -> PartialDateLikeObject {
             Self::builder().build()
         }
-        pub fn builder() -> PartialTemporalLikeDateLikeObjectBuilder {
-            PartialTemporalLikeDateLikeObjectBuilder {
+        pub fn builder() -> PartialDateLikeObjectBuilder {
+            PartialDateLikeObjectBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
-    pub struct PartialTemporalLikeDateLikeObjectBuilder {
-        inner: PartialTemporalLikeDateLikeObject,
+    impl Default for PartialDateLikeObject {
+        fn default() -> Self {
+            Self::new()
+        }
     }
-    impl PartialTemporalLikeDateLikeObjectBuilder {
+    pub struct PartialDateLikeObjectBuilder {
+        inner: PartialDateLikeObject,
+    }
+    impl PartialDateLikeObjectBuilder {
         pub fn year(self, val: f64) -> Self {
             self.inner.set_year(val);
             self
@@ -6245,85 +6348,13 @@ pub mod temporal {
             self.inner.set_day(val);
             self
         }
-        pub fn build(self) -> PartialTemporalLikeDateLikeObject {
-            self.inner
-        }
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type PartialTemporalLikeTimeLikeObject;
-        #[wasm_bindgen(method, getter)]
-        pub fn hour(this: &PartialTemporalLikeTimeLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_hour(this: &PartialTemporalLikeTimeLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn minute(this: &PartialTemporalLikeTimeLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_minute(this: &PartialTemporalLikeTimeLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn second(this: &PartialTemporalLikeTimeLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_second(this: &PartialTemporalLikeTimeLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn millisecond(this: &PartialTemporalLikeTimeLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_millisecond(this: &PartialTemporalLikeTimeLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn microsecond(this: &PartialTemporalLikeTimeLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_microsecond(this: &PartialTemporalLikeTimeLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn nanosecond(this: &PartialTemporalLikeTimeLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_nanosecond(this: &PartialTemporalLikeTimeLikeObject, val: f64);
-    }
-    impl PartialTemporalLikeTimeLikeObject {
-        pub fn new() -> PartialTemporalLikeTimeLikeObject {
-            Self::builder().build()
-        }
-        pub fn builder() -> PartialTemporalLikeTimeLikeObjectBuilder {
-            PartialTemporalLikeTimeLikeObjectBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
-            }
-        }
-    }
-    pub struct PartialTemporalLikeTimeLikeObjectBuilder {
-        inner: PartialTemporalLikeTimeLikeObject,
-    }
-    impl PartialTemporalLikeTimeLikeObjectBuilder {
-        pub fn hour(self, val: f64) -> Self {
-            self.inner.set_hour(val);
-            self
-        }
-        pub fn minute(self, val: f64) -> Self {
-            self.inner.set_minute(val);
-            self
-        }
-        pub fn second(self, val: f64) -> Self {
-            self.inner.set_second(val);
-            self
-        }
-        pub fn millisecond(self, val: f64) -> Self {
-            self.inner.set_millisecond(val);
-            self
-        }
-        pub fn microsecond(self, val: f64) -> Self {
-            self.inner.set_microsecond(val);
-            self
-        }
-        pub fn nanosecond(self, val: f64) -> Self {
-            self.inner.set_nanosecond(val);
-            self
-        }
-        pub fn build(self) -> PartialTemporalLikeTimeLikeObject {
+        pub fn build(self) -> PartialDateLikeObject {
             self.inner
         }
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum PluralizeUnitTimeUnit {
+    pub enum PluralizeTimeUnit {
         Hour = "hour",
         Minute = "minute",
         Second = "second",
@@ -6341,82 +6372,82 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type PartialTemporalLikeDateTimeLikeObject;
+        pub type PartialDateTimeLikeObject;
         #[wasm_bindgen(method, getter)]
-        pub fn year(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<f64>;
+        pub fn year(this: &PartialDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_year(this: &PartialTemporalLikeDateTimeLikeObject, val: f64);
+        pub fn set_year(this: &PartialDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn era(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<String>;
+        pub fn era(this: &PartialDateTimeLikeObject) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "era")]
-        pub fn era_js_string(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<JsString>;
+        pub fn era_js_string(this: &PartialDateTimeLikeObject) -> Option<JsString>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_era(
-            this: &PartialTemporalLikeDateTimeLikeObject,
-            val: impl ::wasm_bindgen::JsStringLike,
-        );
+        pub fn set_era(this: &PartialDateTimeLikeObject, val: impl ::wasm_bindgen::JsStringLike);
         #[wasm_bindgen(method, getter, js_name = "eraYear")]
-        pub fn era_year(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<f64>;
+        pub fn era_year(this: &PartialDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter, js_name = "eraYear")]
-        pub fn set_era_year(this: &PartialTemporalLikeDateTimeLikeObject, val: f64);
+        pub fn set_era_year(this: &PartialDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn month(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<f64>;
+        pub fn month(this: &PartialDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_month(this: &PartialTemporalLikeDateTimeLikeObject, val: f64);
+        pub fn set_month(this: &PartialDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter, js_name = "monthCode")]
-        pub fn month_code(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<String>;
+        pub fn month_code(this: &PartialDateTimeLikeObject) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "monthCode")]
-        pub fn month_code_js_string(
-            this: &PartialTemporalLikeDateTimeLikeObject,
-        ) -> Option<JsString>;
+        pub fn month_code_js_string(this: &PartialDateTimeLikeObject) -> Option<JsString>;
         #[wasm_bindgen(method, setter, js_name = "monthCode")]
         pub fn set_month_code(
-            this: &PartialTemporalLikeDateTimeLikeObject,
+            this: &PartialDateTimeLikeObject,
             val: impl ::wasm_bindgen::JsStringLike,
         );
         #[wasm_bindgen(method, getter)]
-        pub fn day(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<f64>;
+        pub fn day(this: &PartialDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_day(this: &PartialTemporalLikeDateTimeLikeObject, val: f64);
+        pub fn set_day(this: &PartialDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn hour(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<f64>;
+        pub fn hour(this: &PartialDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_hour(this: &PartialTemporalLikeDateTimeLikeObject, val: f64);
+        pub fn set_hour(this: &PartialDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn minute(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<f64>;
+        pub fn minute(this: &PartialDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_minute(this: &PartialTemporalLikeDateTimeLikeObject, val: f64);
+        pub fn set_minute(this: &PartialDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn second(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<f64>;
+        pub fn second(this: &PartialDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_second(this: &PartialTemporalLikeDateTimeLikeObject, val: f64);
+        pub fn set_second(this: &PartialDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn millisecond(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<f64>;
+        pub fn millisecond(this: &PartialDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_millisecond(this: &PartialTemporalLikeDateTimeLikeObject, val: f64);
+        pub fn set_millisecond(this: &PartialDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn microsecond(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<f64>;
+        pub fn microsecond(this: &PartialDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_microsecond(this: &PartialTemporalLikeDateTimeLikeObject, val: f64);
+        pub fn set_microsecond(this: &PartialDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn nanosecond(this: &PartialTemporalLikeDateTimeLikeObject) -> Option<f64>;
+        pub fn nanosecond(this: &PartialDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_nanosecond(this: &PartialTemporalLikeDateTimeLikeObject, val: f64);
+        pub fn set_nanosecond(this: &PartialDateTimeLikeObject, val: f64);
     }
-    impl PartialTemporalLikeDateTimeLikeObject {
-        pub fn new() -> PartialTemporalLikeDateTimeLikeObject {
+    impl PartialDateTimeLikeObject {
+        pub fn new() -> PartialDateTimeLikeObject {
             Self::builder().build()
         }
-        pub fn builder() -> PartialTemporalLikeDateTimeLikeObjectBuilder {
-            PartialTemporalLikeDateTimeLikeObjectBuilder {
+        pub fn builder() -> PartialDateTimeLikeObjectBuilder {
+            PartialDateTimeLikeObjectBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
-    pub struct PartialTemporalLikeDateTimeLikeObjectBuilder {
-        inner: PartialTemporalLikeDateTimeLikeObject,
+    impl Default for PartialDateTimeLikeObject {
+        fn default() -> Self {
+            Self::new()
+        }
     }
-    impl PartialTemporalLikeDateTimeLikeObjectBuilder {
+    pub struct PartialDateTimeLikeObjectBuilder {
+        inner: PartialDateTimeLikeObject,
+    }
+    impl PartialDateTimeLikeObjectBuilder {
         pub fn year(self, val: f64) -> Self {
             self.inner.set_year(val);
             self
@@ -6465,13 +6496,13 @@ pub mod temporal {
             self.inner.set_nanosecond(val);
             self
         }
-        pub fn build(self) -> PartialTemporalLikeDateTimeLikeObject {
+        pub fn build(self) -> PartialDateTimeLikeObject {
             self.inner
         }
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum PluralizeUnitDayOrTimeUnit {
+    pub enum PluralizeDayOrTimeUnit {
         Day = "day",
         Hour = "hour",
         Minute = "minute",
@@ -6491,94 +6522,94 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type PartialTemporalLikeZonedDateTimeLikeObject;
+        pub type PartialZonedDateTimeLikeObject;
         #[wasm_bindgen(method, getter)]
-        pub fn offset(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<String>;
+        pub fn offset(this: &PartialZonedDateTimeLikeObject) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "offset")]
-        pub fn offset_js_string(
-            this: &PartialTemporalLikeZonedDateTimeLikeObject,
-        ) -> Option<JsString>;
+        pub fn offset_js_string(this: &PartialZonedDateTimeLikeObject) -> Option<JsString>;
         #[wasm_bindgen(method, setter)]
         pub fn set_offset(
-            this: &PartialTemporalLikeZonedDateTimeLikeObject,
+            this: &PartialZonedDateTimeLikeObject,
             val: impl ::wasm_bindgen::JsStringLike,
         );
         #[wasm_bindgen(method, getter)]
-        pub fn year(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<f64>;
+        pub fn year(this: &PartialZonedDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_year(this: &PartialTemporalLikeZonedDateTimeLikeObject, val: f64);
+        pub fn set_year(this: &PartialZonedDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn era(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<String>;
+        pub fn era(this: &PartialZonedDateTimeLikeObject) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "era")]
-        pub fn era_js_string(this: &PartialTemporalLikeZonedDateTimeLikeObject)
-            -> Option<JsString>;
+        pub fn era_js_string(this: &PartialZonedDateTimeLikeObject) -> Option<JsString>;
         #[wasm_bindgen(method, setter)]
         pub fn set_era(
-            this: &PartialTemporalLikeZonedDateTimeLikeObject,
+            this: &PartialZonedDateTimeLikeObject,
             val: impl ::wasm_bindgen::JsStringLike,
         );
         #[wasm_bindgen(method, getter, js_name = "eraYear")]
-        pub fn era_year(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<f64>;
+        pub fn era_year(this: &PartialZonedDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter, js_name = "eraYear")]
-        pub fn set_era_year(this: &PartialTemporalLikeZonedDateTimeLikeObject, val: f64);
+        pub fn set_era_year(this: &PartialZonedDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn month(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<f64>;
+        pub fn month(this: &PartialZonedDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_month(this: &PartialTemporalLikeZonedDateTimeLikeObject, val: f64);
+        pub fn set_month(this: &PartialZonedDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter, js_name = "monthCode")]
-        pub fn month_code(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<String>;
+        pub fn month_code(this: &PartialZonedDateTimeLikeObject) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "monthCode")]
-        pub fn month_code_js_string(
-            this: &PartialTemporalLikeZonedDateTimeLikeObject,
-        ) -> Option<JsString>;
+        pub fn month_code_js_string(this: &PartialZonedDateTimeLikeObject) -> Option<JsString>;
         #[wasm_bindgen(method, setter, js_name = "monthCode")]
         pub fn set_month_code(
-            this: &PartialTemporalLikeZonedDateTimeLikeObject,
+            this: &PartialZonedDateTimeLikeObject,
             val: impl ::wasm_bindgen::JsStringLike,
         );
         #[wasm_bindgen(method, getter)]
-        pub fn day(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<f64>;
+        pub fn day(this: &PartialZonedDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_day(this: &PartialTemporalLikeZonedDateTimeLikeObject, val: f64);
+        pub fn set_day(this: &PartialZonedDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn hour(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<f64>;
+        pub fn hour(this: &PartialZonedDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_hour(this: &PartialTemporalLikeZonedDateTimeLikeObject, val: f64);
+        pub fn set_hour(this: &PartialZonedDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn minute(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<f64>;
+        pub fn minute(this: &PartialZonedDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_minute(this: &PartialTemporalLikeZonedDateTimeLikeObject, val: f64);
+        pub fn set_minute(this: &PartialZonedDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn second(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<f64>;
+        pub fn second(this: &PartialZonedDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_second(this: &PartialTemporalLikeZonedDateTimeLikeObject, val: f64);
+        pub fn set_second(this: &PartialZonedDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn millisecond(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<f64>;
+        pub fn millisecond(this: &PartialZonedDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_millisecond(this: &PartialTemporalLikeZonedDateTimeLikeObject, val: f64);
+        pub fn set_millisecond(this: &PartialZonedDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn microsecond(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<f64>;
+        pub fn microsecond(this: &PartialZonedDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_microsecond(this: &PartialTemporalLikeZonedDateTimeLikeObject, val: f64);
+        pub fn set_microsecond(this: &PartialZonedDateTimeLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn nanosecond(this: &PartialTemporalLikeZonedDateTimeLikeObject) -> Option<f64>;
+        pub fn nanosecond(this: &PartialZonedDateTimeLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_nanosecond(this: &PartialTemporalLikeZonedDateTimeLikeObject, val: f64);
+        pub fn set_nanosecond(this: &PartialZonedDateTimeLikeObject, val: f64);
     }
-    impl PartialTemporalLikeZonedDateTimeLikeObject {
-        pub fn new() -> PartialTemporalLikeZonedDateTimeLikeObject {
+    impl PartialZonedDateTimeLikeObject {
+        pub fn new() -> PartialZonedDateTimeLikeObject {
             Self::builder().build()
         }
-        pub fn builder() -> PartialTemporalLikeZonedDateTimeLikeObjectBuilder {
-            PartialTemporalLikeZonedDateTimeLikeObjectBuilder {
+        pub fn builder() -> PartialZonedDateTimeLikeObjectBuilder {
+            PartialZonedDateTimeLikeObjectBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
-    pub struct PartialTemporalLikeZonedDateTimeLikeObjectBuilder {
-        inner: PartialTemporalLikeZonedDateTimeLikeObject,
+    impl Default for PartialZonedDateTimeLikeObject {
+        fn default() -> Self {
+            Self::new()
+        }
     }
-    impl PartialTemporalLikeZonedDateTimeLikeObjectBuilder {
+    pub struct PartialZonedDateTimeLikeObjectBuilder {
+        inner: PartialZonedDateTimeLikeObject,
+    }
+    impl PartialZonedDateTimeLikeObjectBuilder {
         pub fn offset(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
             self.inner.set_offset(val);
             self
@@ -6631,7 +6662,7 @@ pub mod temporal {
             self.inner.set_nanosecond(val);
             self
         }
-        pub fn build(self) -> PartialTemporalLikeZonedDateTimeLikeObject {
+        pub fn build(self) -> PartialZonedDateTimeLikeObject {
             self.inner
         }
     }
@@ -6639,158 +6670,54 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type PartialTemporalLikeDurationLikeObject;
+        pub type PartialYearMonthLikeObject;
         #[wasm_bindgen(method, getter)]
-        pub fn years(this: &PartialTemporalLikeDurationLikeObject) -> Option<f64>;
+        pub fn year(this: &PartialYearMonthLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_years(this: &PartialTemporalLikeDurationLikeObject, val: f64);
+        pub fn set_year(this: &PartialYearMonthLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn months(this: &PartialTemporalLikeDurationLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_months(this: &PartialTemporalLikeDurationLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn weeks(this: &PartialTemporalLikeDurationLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_weeks(this: &PartialTemporalLikeDurationLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn days(this: &PartialTemporalLikeDurationLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_days(this: &PartialTemporalLikeDurationLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn hours(this: &PartialTemporalLikeDurationLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_hours(this: &PartialTemporalLikeDurationLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn minutes(this: &PartialTemporalLikeDurationLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_minutes(this: &PartialTemporalLikeDurationLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn seconds(this: &PartialTemporalLikeDurationLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_seconds(this: &PartialTemporalLikeDurationLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn milliseconds(this: &PartialTemporalLikeDurationLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_milliseconds(this: &PartialTemporalLikeDurationLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn microseconds(this: &PartialTemporalLikeDurationLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_microseconds(this: &PartialTemporalLikeDurationLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn nanoseconds(this: &PartialTemporalLikeDurationLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_nanoseconds(this: &PartialTemporalLikeDurationLikeObject, val: f64);
-    }
-    impl PartialTemporalLikeDurationLikeObject {
-        pub fn new() -> PartialTemporalLikeDurationLikeObject {
-            Self::builder().build()
-        }
-        pub fn builder() -> PartialTemporalLikeDurationLikeObjectBuilder {
-            PartialTemporalLikeDurationLikeObjectBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
-            }
-        }
-    }
-    pub struct PartialTemporalLikeDurationLikeObjectBuilder {
-        inner: PartialTemporalLikeDurationLikeObject,
-    }
-    impl PartialTemporalLikeDurationLikeObjectBuilder {
-        pub fn years(self, val: f64) -> Self {
-            self.inner.set_years(val);
-            self
-        }
-        pub fn months(self, val: f64) -> Self {
-            self.inner.set_months(val);
-            self
-        }
-        pub fn weeks(self, val: f64) -> Self {
-            self.inner.set_weeks(val);
-            self
-        }
-        pub fn days(self, val: f64) -> Self {
-            self.inner.set_days(val);
-            self
-        }
-        pub fn hours(self, val: f64) -> Self {
-            self.inner.set_hours(val);
-            self
-        }
-        pub fn minutes(self, val: f64) -> Self {
-            self.inner.set_minutes(val);
-            self
-        }
-        pub fn seconds(self, val: f64) -> Self {
-            self.inner.set_seconds(val);
-            self
-        }
-        pub fn milliseconds(self, val: f64) -> Self {
-            self.inner.set_milliseconds(val);
-            self
-        }
-        pub fn microseconds(self, val: f64) -> Self {
-            self.inner.set_microseconds(val);
-            self
-        }
-        pub fn nanoseconds(self, val: f64) -> Self {
-            self.inner.set_nanoseconds(val);
-            self
-        }
-        pub fn build(self) -> PartialTemporalLikeDurationLikeObject {
-            self.inner
-        }
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type PartialTemporalLikeYearMonthLikeObject;
-        #[wasm_bindgen(method, getter)]
-        pub fn year(this: &PartialTemporalLikeYearMonthLikeObject) -> Option<f64>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_year(this: &PartialTemporalLikeYearMonthLikeObject, val: f64);
-        #[wasm_bindgen(method, getter)]
-        pub fn era(this: &PartialTemporalLikeYearMonthLikeObject) -> Option<String>;
+        pub fn era(this: &PartialYearMonthLikeObject) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "era")]
-        pub fn era_js_string(this: &PartialTemporalLikeYearMonthLikeObject) -> Option<JsString>;
+        pub fn era_js_string(this: &PartialYearMonthLikeObject) -> Option<JsString>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_era(
-            this: &PartialTemporalLikeYearMonthLikeObject,
-            val: impl ::wasm_bindgen::JsStringLike,
-        );
+        pub fn set_era(this: &PartialYearMonthLikeObject, val: impl ::wasm_bindgen::JsStringLike);
         #[wasm_bindgen(method, getter, js_name = "eraYear")]
-        pub fn era_year(this: &PartialTemporalLikeYearMonthLikeObject) -> Option<f64>;
+        pub fn era_year(this: &PartialYearMonthLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter, js_name = "eraYear")]
-        pub fn set_era_year(this: &PartialTemporalLikeYearMonthLikeObject, val: f64);
+        pub fn set_era_year(this: &PartialYearMonthLikeObject, val: f64);
         #[wasm_bindgen(method, getter)]
-        pub fn month(this: &PartialTemporalLikeYearMonthLikeObject) -> Option<f64>;
+        pub fn month(this: &PartialYearMonthLikeObject) -> Option<f64>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_month(this: &PartialTemporalLikeYearMonthLikeObject, val: f64);
+        pub fn set_month(this: &PartialYearMonthLikeObject, val: f64);
         #[wasm_bindgen(method, getter, js_name = "monthCode")]
-        pub fn month_code(this: &PartialTemporalLikeYearMonthLikeObject) -> Option<String>;
+        pub fn month_code(this: &PartialYearMonthLikeObject) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "monthCode")]
-        pub fn month_code_js_string(
-            this: &PartialTemporalLikeYearMonthLikeObject,
-        ) -> Option<JsString>;
+        pub fn month_code_js_string(this: &PartialYearMonthLikeObject) -> Option<JsString>;
         #[wasm_bindgen(method, setter, js_name = "monthCode")]
         pub fn set_month_code(
-            this: &PartialTemporalLikeYearMonthLikeObject,
+            this: &PartialYearMonthLikeObject,
             val: impl ::wasm_bindgen::JsStringLike,
         );
     }
-    impl PartialTemporalLikeYearMonthLikeObject {
-        pub fn new() -> PartialTemporalLikeYearMonthLikeObject {
+    impl PartialYearMonthLikeObject {
+        pub fn new() -> PartialYearMonthLikeObject {
             Self::builder().build()
         }
-        pub fn builder() -> PartialTemporalLikeYearMonthLikeObjectBuilder {
-            PartialTemporalLikeYearMonthLikeObjectBuilder {
+        pub fn builder() -> PartialYearMonthLikeObjectBuilder {
+            PartialYearMonthLikeObjectBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
-    pub struct PartialTemporalLikeYearMonthLikeObjectBuilder {
-        inner: PartialTemporalLikeYearMonthLikeObject,
+    impl Default for PartialYearMonthLikeObject {
+        fn default() -> Self {
+            Self::new()
+        }
     }
-    impl PartialTemporalLikeYearMonthLikeObjectBuilder {
+    pub struct PartialYearMonthLikeObjectBuilder {
+        inner: PartialYearMonthLikeObject,
+    }
+    impl PartialYearMonthLikeObjectBuilder {
         pub fn year(self, val: f64) -> Self {
             self.inner.set_year(val);
             self
@@ -6811,7 +6738,7 @@ pub mod temporal {
             self.inner.set_month_code(val);
             self
         }
-        pub fn build(self) -> PartialTemporalLikeYearMonthLikeObject {
+        pub fn build(self) -> PartialYearMonthLikeObject {
             self.inner
         }
     }

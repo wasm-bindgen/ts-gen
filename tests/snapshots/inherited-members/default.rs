@@ -41,6 +41,11 @@ impl Geo {
         }
     }
 }
+impl Default for Geo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct GeoBuilder {
     inner: Geo,
 }
@@ -112,6 +117,11 @@ impl Destinations {
         DestinationsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Destinations {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct DestinationsBuilder {

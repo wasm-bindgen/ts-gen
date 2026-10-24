@@ -405,75 +405,51 @@ extern "C" {
     pub fn set_from_with_bool(this: &Settings, val: bool);
 }
 impl Settings {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Construct with `level: \"low\"`."]
     pub fn new_low(id: &str, from: &Target) -> Settings {
         Self::builder_low(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Construct with `level: \"low\"`."]
     pub fn new_low_with_str_and_str(id: &str, from: &str) -> Settings {
         Self::builder_low_with_str_and_str(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Construct with `level: \"low\"`."]
     pub fn new_low_with_str_and_bool(id: &str, from: bool) -> Settings {
         Self::builder_low_with_str_and_bool(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Construct with `level: \"low\"`."]
     pub fn new_low_with_f64_and_target(id: f64, from: &Target) -> Settings {
         Self::builder_low_with_f64_and_target(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Construct with `level: \"low\"`."]
     pub fn new_low_with_f64_and_str(id: f64, from: &str) -> Settings {
         Self::builder_low_with_f64_and_str(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Construct with `level: \"low\"`."]
     pub fn new_low_with_f64_and_bool(id: f64, from: bool) -> Settings {
         Self::builder_low_with_f64_and_bool(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Construct with `level: \"high\"`."]
     pub fn new_high(id: &str, from: &Target) -> Settings {
         Self::builder_high(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Construct with `level: \"high\"`."]
     pub fn new_high_with_str_and_str(id: &str, from: &str) -> Settings {
         Self::builder_high_with_str_and_str(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Construct with `level: \"high\"`."]
     pub fn new_high_with_str_and_bool(id: &str, from: bool) -> Settings {
         Self::builder_high_with_str_and_bool(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Construct with `level: \"high\"`."]
     pub fn new_high_with_f64_and_target(id: f64, from: &Target) -> Settings {
         Self::builder_high_with_f64_and_target(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Construct with `level: \"high\"`."]
     pub fn new_high_with_f64_and_str(id: f64, from: &str) -> Settings {
         Self::builder_high_with_f64_and_str(id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Construct with `level: \"high\"`."]
     pub fn new_high_with_f64_and_bool(id: f64, from: bool) -> Settings {
         Self::builder_high_with_f64_and_bool(id, from).build()
     }
@@ -495,9 +471,7 @@ impl Settings {
     pub fn new_with_f64_and_bool(level: f64, id: f64, from: bool) -> Settings {
         Self::builder_with_f64_and_bool(level, id, from).build()
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low(id: &str, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
@@ -505,9 +479,7 @@ impl Settings {
         inner.set_from(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low_with_str_and_str(id: &str, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
@@ -515,9 +487,7 @@ impl Settings {
         inner.set_from_with_str(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low_with_str_and_bool(id: &str, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
@@ -525,9 +495,7 @@ impl Settings {
         inner.set_from_with_bool(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low_with_f64_and_target(id: f64, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
@@ -535,9 +503,7 @@ impl Settings {
         inner.set_from(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low_with_f64_and_str(id: f64, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
@@ -545,9 +511,7 @@ impl Settings {
         inner.set_from_with_str(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"low\"`"]
+    #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low_with_f64_and_bool(id: f64, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::Low);
@@ -555,9 +519,7 @@ impl Settings {
         inner.set_from_with_bool(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high(id: &str, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);
@@ -565,9 +527,7 @@ impl Settings {
         inner.set_from(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high_with_str_and_str(id: &str, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);
@@ -575,9 +535,7 @@ impl Settings {
         inner.set_from_with_str(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high_with_str_and_bool(id: &str, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);
@@ -585,9 +543,7 @@ impl Settings {
         inner.set_from_with_bool(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high_with_f64_and_target(id: f64, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);
@@ -595,9 +551,7 @@ impl Settings {
         inner.set_from(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high_with_f64_and_str(id: f64, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);
@@ -605,9 +559,7 @@ impl Settings {
         inner.set_from_with_str(from);
         SettingsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: \"high\"`"]
+    #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high_with_f64_and_bool(id: f64, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::High);

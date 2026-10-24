@@ -144,6 +144,11 @@ impl Target {
         }
     }
 }
+impl Default for Target {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct TargetBuilder {
     inner: Target,
 }

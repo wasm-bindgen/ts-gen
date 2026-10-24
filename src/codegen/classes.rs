@@ -767,7 +767,19 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             false
         }
     });
+    let default_impl = quote! {
+        impl #type_decl Default for #rust_type {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+    };
     if has_readonly {
+        let all_optional = config
+            .members
+            .iter()
+            .all(|m| !matches!(m, Member::Getter(g) if !g.optional));
+        let default_impl = all_optional.then_some(&default_impl);
         return quote! {
             impl #type_decl #rust_type {
                 #[allow(clippy::new_without_default)]
@@ -776,6 +788,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     unsafe { JsValue::from(js_sys::Object::new()).unchecked_into() }
                 }
             }
+            #default_impl
         };
     }
 
@@ -1123,6 +1136,11 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         /// Lines like `` `from`: <getter doc> `` describing the
         /// caller-provided fields.
         provided_doc_bullets: Vec<String>,
+        /// `` `disposition: "inline"` `` for each literal baked in, for the
+        /// summary line.
+        inlined: Vec<String>,
+        /// Whether any baked-in literal's field has JSDoc to list.
+        inlined_documented: bool,
     }
 
     // A literal names its variant when its field offers a choice: several
@@ -1154,6 +1172,9 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // Shared across passes so a discriminator combo emitted by branch A
     // doesn't get re-emitted under the same name by branch B.
     let mut emitted_names: HashSet<String> = HashSet::new();
+    // Required fields whose literal names a factory. Without optional
+    // fields, the factories still get a builder, which can set these.
+    let mut literal_choice_fields: HashSet<String> = HashSet::new();
 
     for required_pass in &required_passes {
         // A pass that covers every merged-optional field doesn't need
@@ -1169,7 +1190,6 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         let pass_covers_optionals = optional_getters
             .iter()
             .all(|opt| required_pass.iter().any(|req| req.js_name == opt.js_name));
-        let pass_emit_builder = emit_builder && !pass_covers_optionals;
 
         let mut field_dims = build_field_dims(required_pass);
         // Each field's option count before the combo cap below truncates
@@ -1238,6 +1258,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let mut arg_idents: Vec<syn::Ident> = Vec::new();
             let mut literal_doc_bullets: Vec<String> = Vec::new();
             let mut provided_doc_bullets: Vec<String> = Vec::new();
+            let mut inlined: Vec<String> = Vec::new();
+            let mut inlined_documented = false;
             for (dim_index, opt) in combo.iter().enumerate() {
                 match opt {
                     FieldOption::Literal {
@@ -1257,9 +1279,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                                 .is_some_and(|values| values.len() > 1)
                         {
                             literal_suffix.push_str(suffix);
+                            literal_choice_fields.insert(field_js_name.clone());
                         }
                         init_calls.push(quote! { inner.#setter_ident(#literal_expr); });
                         let bullet_head = format!("`{field_js_name}: {literal_display}`");
+                        inlined.push(bullet_head.clone());
+                        inlined_documented |= field_doc.is_some();
                         literal_doc_bullets.push(match field_doc {
                             Some(doc) => format!("* {bullet_head} - {}", doc.trim()),
                             None => format!("* {bullet_head}"),
@@ -1318,8 +1343,18 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 arg_idents,
                 literal_doc_bullets,
                 provided_doc_bullets,
+                inlined,
+                inlined_documented,
             });
         }
+
+        // Without optional fields, a pass whose literals name its factories
+        // still gets a builder, whose methods set those fields.
+        let pass_emit_builder = if emit_builder {
+            !pass_covers_optionals
+        } else {
+            plans.iter().any(|p| !p.literal_suffix.is_empty())
+        };
 
         // Compute `_with_X[_and_Y]` suffixes ONLY across combos sharing
         // the same literal prefix within this pass. Combos with
@@ -1389,28 +1424,41 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let init_calls = &plan.init_calls;
             let arg_idents = &plan.arg_idents;
 
-            // Compose the doc block. `# Inlined fields` lists the
-            // literal discriminants baked into the function name (no
-            // parameter on the call). `# Parameters` lists the
-            // caller-supplied fields that show up in the actual
-            // signature. Either section is skipped when its bullet
-            // list is empty.
-            let mut doc_text = String::new();
-            if !plan.literal_doc_bullets.is_empty() {
-                doc_text.push_str("## Inlined fields\n\n");
-                doc_text.push_str(&plan.literal_doc_bullets.join("\n"));
-            }
-            if !plan.provided_doc_bullets.is_empty() {
-                if !doc_text.is_empty() {
-                    doc_text.push_str("\n\n");
+            // Compose the doc block: a summary naming the literals baked
+            // into the function name, then `## Inlined fields` when one of
+            // them has JSDoc to show, then the documented caller-supplied
+            // fields.
+            let doc_attr = |summary_verb: &str| {
+                let mut sections: Vec<String> = Vec::new();
+                if !plan.inlined.is_empty() {
+                    sections.push(format!(
+                        "{summary_verb} with {}.",
+                        join_with_and(&plan.inlined)
+                    ));
                 }
-                doc_text.push_str(&plan.provided_doc_bullets.join("\n"));
-            }
-            let doc_attr = if doc_text.is_empty() {
-                quote! {}
-            } else {
-                super::doc_tokens(&Some(doc_text))
+                if plan.inlined_documented {
+                    sections.push(format!(
+                        "## Inlined fields\n\n{}",
+                        plan.literal_doc_bullets.join("\n")
+                    ));
+                }
+                // Alone, the argument bullets need no heading.
+                if !plan.provided_doc_bullets.is_empty() {
+                    let bullets = plan.provided_doc_bullets.join("\n");
+                    sections.push(if sections.is_empty() {
+                        bullets
+                    } else {
+                        format!("## Arguments\n\n{bullets}")
+                    });
+                }
+                if sections.is_empty() {
+                    quote! {}
+                } else {
+                    super::doc_tokens(&Some(sections.join("\n\n")))
+                }
             };
+            let new_doc = doc_attr("Construct");
+            let builder_doc = doc_attr("Start a builder");
 
             if pass_emit_builder {
                 // `builder*` returns the wrapper struct so callers can
@@ -1444,7 +1492,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 };
                 let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
                 builder_variants.push(quote! {
-                    #doc_attr
+                    #builder_doc
                     pub fn #builder_ident #generics (#params_tokens) -> #builder_name
                     #helper_where_clause
                     {
@@ -1452,7 +1500,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     }
                 });
                 new_variants.push(quote! {
-                    #doc_attr
+                    #new_doc
                     pub fn #new_ident #generics (#params_tokens) -> #rust_type
                     #helper_where_clause
                     {
@@ -1478,7 +1526,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     }
                 };
                 new_variants.push(quote! {
-                    #doc_attr
+                    #new_doc
                     pub fn #new_ident #generics (#params_tokens) -> #rust_type
                     #helper_where_clause
                     {
@@ -1493,7 +1541,17 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // are intentionally absent — they're only settable through `builder`.
     // (Empty when `!emit_builder`, since there's nothing to chain.)
     let mut builder_methods: Vec<TokenStream> = Vec::new();
-    for g in &optional_getters {
+    let kept_builder = !emit_builder && !builder_variants.is_empty();
+    let builder_fields: Vec<&crate::ir::GetterMember> = if kept_builder {
+        getters
+            .iter()
+            .copied()
+            .filter(|g| literal_choice_fields.contains(&g.js_name))
+            .collect()
+    } else {
+        optional_getters.clone()
+    };
+    for g in &builder_fields {
         let base = config.member_base(MemberKind::Property, &g.js_name);
         let setter_name = config.setter_name(MemberKind::Property, &g.js_name);
         for sig in resolve_setter_sigs(g) {
@@ -1545,12 +1603,17 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         }
     }
 
-    if emit_builder {
+    let default_impl = required_passes
+        .iter()
+        .all(Vec::is_empty)
+        .then_some(default_impl);
+    if emit_builder || kept_builder {
         quote! {
             impl #type_decl #rust_type {
                 #(#new_variants)*
                 #(#builder_variants)*
             }
+            #default_impl
 
             pub struct #builder_name_ident #builder_struct_decl {
                 inner: #rust_type,
@@ -1571,7 +1634,17 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             impl #type_decl #rust_type {
                 #(#new_variants)*
             }
+            #default_impl
         }
+    }
+}
+
+/// `a`, `a and b`, `a, b and c`.
+fn join_with_and(items: &[String]) -> String {
+    match items {
+        [] => String::new(),
+        [only] => only.clone(),
+        [init @ .., last] => format!("{} and {last}", init.join(", ")),
     }
 }
 

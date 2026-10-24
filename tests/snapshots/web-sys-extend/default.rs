@@ -41,6 +41,11 @@ impl FetchOptions {
         }
     }
 }
+impl Default for FetchOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct FetchOptionsBuilder {
     inner: FetchOptions,
 }

@@ -580,6 +580,11 @@ impl FetchOptions {
         }
     }
 }
+impl Default for FetchOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct FetchOptionsBuilder {
     inner: FetchOptions,
 }
@@ -640,6 +645,11 @@ impl SimpleConfig {
         }
     }
 }
+impl Default for SimpleConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct SimpleConfigBuilder {
     inner: SimpleConfig,
 }
@@ -682,6 +692,11 @@ impl NotificationOptions {
         NotificationOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for NotificationOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct NotificationOptionsBuilder {

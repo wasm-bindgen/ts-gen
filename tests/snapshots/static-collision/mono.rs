@@ -44,6 +44,11 @@ impl ResponseInit {
         }
     }
 }
+impl Default for ResponseInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct ResponseInitBuilder {
     inner: ResponseInit,
 }

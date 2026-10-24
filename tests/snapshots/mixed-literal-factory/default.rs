@@ -17,29 +17,51 @@ extern "C" {
     pub fn set_mode_with_bool(this: &BoolOrStrings, val: bool);
 }
 impl BoolOrStrings {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: true`"]
+    #[doc = " Construct with `mode: true`."]
     pub fn new_true() -> BoolOrStrings {
+        Self::builder_true().build()
+    }
+    #[doc = " Construct with `mode: \"x\"`."]
+    pub fn new_x() -> BoolOrStrings {
+        Self::builder_x().build()
+    }
+    #[doc = " Construct with `mode: \"y\"`."]
+    pub fn new_y() -> BoolOrStrings {
+        Self::builder_y().build()
+    }
+    #[doc = " Start a builder with `mode: true`."]
+    pub fn builder_true() -> BoolOrStringsBuilder {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode_with_bool(true);
-        inner
+        BoolOrStringsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: \"x\"`"]
-    pub fn new_x() -> BoolOrStrings {
+    #[doc = " Start a builder with `mode: \"x\"`."]
+    pub fn builder_x() -> BoolOrStringsBuilder {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode(ModeKind::X);
-        inner
+        BoolOrStringsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: \"y\"`"]
-    pub fn new_y() -> BoolOrStrings {
+    #[doc = " Start a builder with `mode: \"y\"`."]
+    pub fn builder_y() -> BoolOrStringsBuilder {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode(ModeKind::Y);
-        inner
+        BoolOrStringsBuilder { inner }
+    }
+}
+pub struct BoolOrStringsBuilder {
+    inner: BoolOrStrings,
+}
+impl BoolOrStringsBuilder {
+    pub fn mode(self, val: ModeKind) -> Self {
+        self.inner.set_mode(val);
+        self
+    }
+    pub fn mode_with_bool(self, val: bool) -> Self {
+        self.inner.set_mode_with_bool(val);
+        self
+    }
+    pub fn build(self) -> BoolOrStrings {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "mixed-literal-factory")]
@@ -55,29 +77,51 @@ extern "C" {
     pub fn set_mode_with_f64(this: &NumberOrStrings, val: f64);
 }
 impl NumberOrStrings {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: 0`"]
+    #[doc = " Construct with `mode: 0`."]
     pub fn new_0() -> NumberOrStrings {
+        Self::builder_0().build()
+    }
+    #[doc = " Construct with `mode: \"x\"`."]
+    pub fn new_x() -> NumberOrStrings {
+        Self::builder_x().build()
+    }
+    #[doc = " Construct with `mode: \"y\"`."]
+    pub fn new_y() -> NumberOrStrings {
+        Self::builder_y().build()
+    }
+    #[doc = " Start a builder with `mode: 0`."]
+    pub fn builder_0() -> NumberOrStringsBuilder {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode_with_f64(0.0);
-        inner
+        NumberOrStringsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: \"x\"`"]
-    pub fn new_x() -> NumberOrStrings {
+    #[doc = " Start a builder with `mode: \"x\"`."]
+    pub fn builder_x() -> NumberOrStringsBuilder {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode(NumberOrStringsModeKind::X);
-        inner
+        NumberOrStringsBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: \"y\"`"]
-    pub fn new_y() -> NumberOrStrings {
+    #[doc = " Start a builder with `mode: \"y\"`."]
+    pub fn builder_y() -> NumberOrStringsBuilder {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode(NumberOrStringsModeKind::Y);
-        inner
+        NumberOrStringsBuilder { inner }
+    }
+}
+pub struct NumberOrStringsBuilder {
+    inner: NumberOrStrings,
+}
+impl NumberOrStringsBuilder {
+    pub fn mode(self, val: NumberOrStringsModeKind) -> Self {
+        self.inner.set_mode(val);
+        self
+    }
+    pub fn mode_with_f64(self, val: f64) -> Self {
+        self.inner.set_mode_with_f64(val);
+        self
+    }
+    pub fn build(self) -> NumberOrStrings {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "mixed-literal-factory")]
@@ -95,45 +139,75 @@ extern "C" {
     pub fn set_mode_with_bool(this: &Mixed, val: bool);
 }
 impl Mixed {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: \"x\"`"]
+    #[doc = " Construct with `mode: \"x\"`."]
     pub fn new_x() -> Mixed {
+        Self::builder_x().build()
+    }
+    #[doc = " Construct with `mode: \"y\"`."]
+    pub fn new_y() -> Mixed {
+        Self::builder_y().build()
+    }
+    #[doc = " Construct with `mode: 1`."]
+    pub fn new_1() -> Mixed {
+        Self::builder_1().build()
+    }
+    #[doc = " Construct with `mode: 2`."]
+    pub fn new_2() -> Mixed {
+        Self::builder_2().build()
+    }
+    #[doc = " Construct with `mode: false`."]
+    pub fn new_false() -> Mixed {
+        Self::builder_false().build()
+    }
+    #[doc = " Start a builder with `mode: \"x\"`."]
+    pub fn builder_x() -> MixedBuilder {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode(MixedModeKind::X);
-        inner
+        MixedBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: \"y\"`"]
-    pub fn new_y() -> Mixed {
+    #[doc = " Start a builder with `mode: \"y\"`."]
+    pub fn builder_y() -> MixedBuilder {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode(MixedModeKind::Y);
-        inner
+        MixedBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: 1`"]
-    pub fn new_1() -> Mixed {
+    #[doc = " Start a builder with `mode: 1`."]
+    pub fn builder_1() -> MixedBuilder {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode_with_f64(1.0);
-        inner
+        MixedBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: 2`"]
-    pub fn new_2() -> Mixed {
+    #[doc = " Start a builder with `mode: 2`."]
+    pub fn builder_2() -> MixedBuilder {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode_with_f64(2.0);
-        inner
+        MixedBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: false`"]
-    pub fn new_false() -> Mixed {
+    #[doc = " Start a builder with `mode: false`."]
+    pub fn builder_false() -> MixedBuilder {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode_with_bool(false);
-        inner
+        MixedBuilder { inner }
+    }
+}
+pub struct MixedBuilder {
+    inner: Mixed,
+}
+impl MixedBuilder {
+    pub fn mode(self, val: MixedModeKind) -> Self {
+        self.inner.set_mode(val);
+        self
+    }
+    pub fn mode_with_f64(self, val: f64) -> Self {
+        self.inner.set_mode_with_f64(val);
+        self
+    }
+    pub fn mode_with_bool(self, val: bool) -> Self {
+        self.inner.set_mode_with_bool(val);
+        self
+    }
+    pub fn build(self) -> Mixed {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "mixed-literal-factory")]
@@ -147,29 +221,47 @@ extern "C" {
     pub fn set_level(this: &Level, val: LevelKind);
 }
 impl Level {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: 0`"]
+    #[doc = " Construct with `level: 0`."]
     pub fn new_0() -> Level {
+        Self::builder_0().build()
+    }
+    #[doc = " Construct with `level: 1`."]
+    pub fn new_1() -> Level {
+        Self::builder_1().build()
+    }
+    #[doc = " Construct with `level: 2`."]
+    pub fn new_2() -> Level {
+        Self::builder_2().build()
+    }
+    #[doc = " Start a builder with `level: 0`."]
+    pub fn builder_0() -> LevelBuilder {
         let inner: Level = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::N0);
-        inner
+        LevelBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: 1`"]
-    pub fn new_1() -> Level {
+    #[doc = " Start a builder with `level: 1`."]
+    pub fn builder_1() -> LevelBuilder {
         let inner: Level = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::N1);
-        inner
+        LevelBuilder { inner }
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `level: 2`"]
-    pub fn new_2() -> Level {
+    #[doc = " Start a builder with `level: 2`."]
+    pub fn builder_2() -> LevelBuilder {
         let inner: Level = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_level(LevelKind::N2);
-        inner
+        LevelBuilder { inner }
+    }
+}
+pub struct LevelBuilder {
+    inner: Level,
+}
+impl LevelBuilder {
+    pub fn level(self, val: LevelKind) -> Self {
+        self.inner.set_level(val);
+        self
+    }
+    pub fn build(self) -> Level {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "mixed-literal-factory")]
@@ -183,18 +275,35 @@ extern "C" {
     pub fn set_mode(this: &Open, val: &str);
 }
 impl Open {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `mode: \"x\"`"]
+    #[doc = " Construct with `mode: \"x\"`."]
     pub fn new_x() -> Open {
-        let inner: Open = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode("x");
-        inner
+        Self::builder_x().build()
     }
     pub fn new(mode: &str) -> Open {
+        Self::builder(mode).build()
+    }
+    #[doc = " Start a builder with `mode: \"x\"`."]
+    pub fn builder_x() -> OpenBuilder {
+        let inner: Open = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_mode("x");
+        OpenBuilder { inner }
+    }
+    pub fn builder(mode: &str) -> OpenBuilder {
         let inner: Open = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode(mode);
-        inner
+        OpenBuilder { inner }
+    }
+}
+pub struct OpenBuilder {
+    inner: Open,
+}
+impl OpenBuilder {
+    pub fn mode(self, val: &str) -> Self {
+        self.inner.set_mode(val);
+        self
+    }
+    pub fn build(self) -> Open {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "mixed-literal-factory")]
@@ -215,6 +324,11 @@ impl Optional {
         OptionalBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Default for Optional {
+    fn default() -> Self {
+        Self::new()
     }
 }
 pub struct OptionalBuilder {

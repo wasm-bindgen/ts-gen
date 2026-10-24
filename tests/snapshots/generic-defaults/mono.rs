@@ -60,6 +60,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Options<T> {
         }
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for Options<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub struct OptionsBuilder<T> {
     inner: Options<T>,
 }
