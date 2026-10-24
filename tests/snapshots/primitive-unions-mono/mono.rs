@@ -591,9 +591,9 @@ pub enum LabelKind {
     String(String),
     Bool(bool),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum FromKind {
-    Target(Target),
     String(String),
     Bool(bool),
+    Target(Target),
 }

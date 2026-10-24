@@ -726,6 +726,18 @@ pub type RoundingOptions;
 `JsValue::from(Object::new()).dyn_into::<RoundingOptions>()` succeeds;
 a primitive, `null`, `undefined` or a function does not.
 
+`is_type_of` drives `dyn_into`, `dyn_ref` and `has_type`, but not
+`JsCast::is_instance_of`, which wasm-bindgen always lowers to a literal
+`instanceof` of the type's Rust name, and no attribute overrides it.
+For a global or namespaced shape that check is `false` for every value,
+and for a shape exported from a module it imports a class the module
+doesn't export, which fails the module's load. Test shapes with
+`has_type` / `dyn_ref`, never `is_instance_of`.
+
+In a [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums)
+a shape arm would take every object listed after it, so shape arms
+dispatch last; see [Shape arms go last](#shape-arms-go-last).
+
 ### Inherited members
 
 Every `extends` parent becomes a wasm-bindgen `extends =`, but
@@ -3030,6 +3042,36 @@ pub enum EmailAttachmentContentKind {
 
 // inside the extern block:
 pub fn content(this: &EmailAttachment) -> EmailAttachmentContentKind;
+```
+
+#### Shape arms go last
+
+The tuple arms dispatch in order through `dyn_into`, and a
+[shape](#shapes-have-no-runtime-class) or `object` arm accepts any
+object, so it would take the values of every arm after it. Such an arm
+is moved after the others, before a trailing `JsValue` catch-all. One
+shape arm keeps its type and, as the last tuple arm, makes the enum
+`#[wasm_bindgen(fallback)]`, which wasm-bindgen recommends for an arm
+with no runtime witness: whatever the earlier arms don't take lands
+there. Two or more shape arms can't be told apart at runtime, so they
+collapse into one `Object(Object)` arm, with a warning.
+
+```ts
+declare function pick(): RoundingOptions | Ticket;
+declare function pickAny(): RoundingOptions | Init | Ticket;
+```
+
+```rust
+#[wasm_bindgen(private, fallback)]
+pub enum PickReturnKind {
+    Ticket(Ticket),
+    RoundingOptions(RoundingOptions),
+}
+#[wasm_bindgen(private, fallback)]
+pub enum PickAnyReturnKind {
+    Ticket(Ticket),
+    Object(Object),
+}
 ```
 
 #### Naming

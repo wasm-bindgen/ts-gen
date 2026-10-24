@@ -49610,31 +49610,26 @@ pub enum FetchReturnKind {
     Response(Response),
     Promise(Promise<Response>),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum GenerateKeyReturnKind {
     CryptoKey(CryptoKey),
     CryptoKeyPair(CryptoKeyPair),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum ExportKeyReturnKind {
     ArrayBuffer(ArrayBuffer),
     JsonWebKey(JsonWebKey),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum AlgorithmKind {
-    CryptoKeyKeyAlgorithm(CryptoKeyKeyAlgorithm),
-    CryptoKeyAesKeyAlgorithm(CryptoKeyAesKeyAlgorithm),
-    CryptoKeyHmacKeyAlgorithm(CryptoKeyHmacKeyAlgorithm),
-    CryptoKeyRsaKeyAlgorithm(CryptoKeyRsaKeyAlgorithm),
-    CryptoKeyEllipticKeyAlgorithm(CryptoKeyEllipticKeyAlgorithm),
-    CryptoKeyArbitraryKeyAlgorithm(CryptoKeyArbitraryKeyAlgorithm),
+    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum SaltKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum HashKind {
     String(String),
     SubtleCryptoHashAlgorithm(SubtleCryptoHashAlgorithm),
@@ -49664,20 +49659,20 @@ pub enum CacheKind {
     NoStore = "no-store",
     NoCache = "no-cache",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum OnlyIfKind {
+    Headers(Headers),
     R2Conditional(R2Conditional),
-    Headers(Headers),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum RangeKind {
+    Headers(Headers),
     R2Range(R2Range),
-    Headers(Headers),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum HttpMetadataKind {
-    R2HttpMetadata(R2HTTPMetadata),
     Headers(Headers),
+    R2HttpMetadata(R2HTTPMetadata),
 }
 #[wasm_bindgen(private)]
 pub enum Md5Kind {
@@ -49685,23 +49680,13 @@ pub enum Md5Kind {
     Uint8Array(Uint8Array),
     String(String),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum EventKind {
-    TraceItemFetchEventInfo(TraceItemFetchEventInfo),
-    TraceItemJsRpcEventInfo(TraceItemJsRpcEventInfo),
-    TraceItemScheduledEventInfo(TraceItemScheduledEventInfo),
-    TraceItemAlarmEventInfo(TraceItemAlarmEventInfo),
-    TraceItemQueueEventInfo(TraceItemQueueEventInfo),
-    TraceItemEmailEventInfo(TraceItemEmailEventInfo),
-    TraceItemTailEventInfo(TraceItemTailEventInfo),
-    TraceItemCustomEventInfo(TraceItemCustomEventInfo),
-    TraceItemHibernatableWebSocketEventInfo(TraceItemHibernatableWebSocketEventInfo),
+    Object(Object),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum GetWebSocketEventKind {
-    TraceItemHibernatableWebSocketEventInfoMessage(TraceItemHibernatableWebSocketEventInfoMessage),
-    TraceItemHibernatableWebSocketEventInfoClose(TraceItemHibernatableWebSocketEventInfoClose),
-    TraceItemHibernatableWebSocketEventInfoError(TraceItemHibernatableWebSocketEventInfoError),
+    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum BinaryTypeKind {
@@ -49719,7 +49704,7 @@ pub enum AiSearchConfigTypeKind {
     R2 = "r2",
     WebCrawler = "web-crawler",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum ChatCompletionsReturnKind {
     Response(Response),
     Object(Object),
@@ -49742,13 +49727,13 @@ pub enum AiTextGenerationToolInputTypeKind {
     Function = "function",
     String(String),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum ToolsKind {
     VecOfAiTextGenerationToolInput(Vec<AiTextGenerationToolInput>),
     VecOfAiTextGenerationToolLegacyInput(Vec<AiTextGenerationToolLegacyInput>),
     Object(Object),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum ConversationKind {
     String(String),
     ResponseConversationParam(ResponseConversationParam),
@@ -49766,7 +49751,7 @@ pub enum ServiceTierKind {
     Scale = "scale",
     Priority = "priority",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum ToolChoiceKind {
     ToolChoiceOptions(ToolChoiceOptions),
     ToolChoiceFunction(ToolChoiceFunction),
@@ -49874,7 +49859,7 @@ pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind {
     JsonObject = "json_object",
     JsonSchema = "json_schema",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum ResponseKind {
     String(String),
     Object(Object),
@@ -49901,10 +49886,10 @@ pub enum ModeKind {
     Medical = "medical",
     Finance = "finance",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum AudioKind {
-    Object(Object),
     String(String),
+    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum DtypeKind {
@@ -50108,10 +50093,9 @@ pub enum CompoundFilterTypeKind {
     And = "and",
     Or = "or",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum FiltersKind {
-    CompoundFilter(CompoundFilter),
-    ComparisonFilter(ComparisonFilter),
+    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum FitKind {
@@ -50122,7 +50106,7 @@ pub enum FitKind {
     Pad = "pad",
     Squeeze = "squeeze",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum GravityKind {
     Face = "face",
     Left = "left",
@@ -50159,7 +50143,7 @@ pub enum RepeatKind {
     X = "x",
     Y = "y",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum TrimKind {
     Border = "border",
     Object(Object),
@@ -50200,12 +50184,9 @@ pub enum CountryKind {
     Iso3166Alpha2Code(Iso3166Alpha2Code),
     T1 = "T1",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum TlsClientAuthKind {
-    IncomingRequestCfPropertiesTlsClientAuth(IncomingRequestCfPropertiesTLSClientAuth),
-    IncomingRequestCfPropertiesTlsClientAuthPlaceholder(
-        IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
-    ),
+    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum CertRevokedKind {
@@ -50223,7 +50204,7 @@ pub enum EmailAttachmentContentKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum FromKind {
     String(String),
     EmailAddress(EmailAddress),
@@ -50252,7 +50233,7 @@ pub enum ImageTransformFitKind {
     Cover = "cover",
     Crop = "crop",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum ImageTransformGravityKind {
     Face = "face",
     Left = "left",
@@ -50330,29 +50311,17 @@ pub enum DescriptionLanguageKind {
     Pt = "pt",
     De = "de",
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum InfoKind {
-    HibernatableWebSocketEventInfoClose(tail_stream::HibernatableWebSocketEventInfoClose),
-    HibernatableWebSocketEventInfoError(tail_stream::HibernatableWebSocketEventInfoError),
-    HibernatableWebSocketEventInfoMessage(tail_stream::HibernatableWebSocketEventInfoMessage),
+    Object(Object),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum OnsetInfoKind {
-    FetchEventInfo(tail_stream::FetchEventInfo),
-    JsRpcEventInfo(tail_stream::JsRpcEventInfo),
-    ScheduledEventInfo(tail_stream::ScheduledEventInfo),
-    AlarmEventInfo(tail_stream::AlarmEventInfo),
-    QueueEventInfo(tail_stream::QueueEventInfo),
-    EmailEventInfo(tail_stream::EmailEventInfo),
-    TraceEventInfo(tail_stream::TraceEventInfo),
-    HibernatableWebSocketEventInfo(tail_stream::HibernatableWebSocketEventInfo),
-    CustomEventInfo(tail_stream::CustomEventInfo),
+    Object(Object),
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum SpanOpenInfoKind {
-    FetchEventInfo(tail_stream::FetchEventInfo),
-    JsRpcEventInfo(tail_stream::JsRpcEventInfo),
-    Attributes(tail_stream::Attributes),
+    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum LevelKind {

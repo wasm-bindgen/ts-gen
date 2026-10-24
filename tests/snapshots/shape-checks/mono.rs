@@ -79,6 +79,65 @@ pub mod shapes {
         #[wasm_bindgen(method, catch)]
         pub fn handle(this: &Span) -> Result<Handle, JsValue>;
     }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "Shapes")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Ticket;
+        #[wasm_bindgen(constructor, js_namespace = "Shapes", catch)]
+        pub fn new(id: f64) -> Result<Ticket, JsValue>;
+        #[wasm_bindgen(method, getter)]
+        pub fn id(this: &Ticket) -> f64;
+    }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Init;
+        #[wasm_bindgen(method, getter)]
+        pub fn body(this: &Init) -> Option<String>;
+        #[wasm_bindgen(method, getter, js_name = "body")]
+        pub fn body_js_string(this: &Init) -> Option<JsString>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_body(this: &Init, val: impl ::wasm_bindgen::JsStringLike);
+    }
+    impl Init {
+        pub fn new() -> Init {
+            Self::builder().build()
+        }
+        pub fn builder() -> InitBuilder {
+            InitBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    pub struct InitBuilder {
+        inner: Init,
+    }
+    impl InitBuilder {
+        pub fn body(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+            self.inner.set_body(val);
+            self
+        }
+        pub fn build(self) -> Init {
+            self.inner
+        }
+    }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        #[wasm_bindgen(catch, js_namespace = "Shapes")]
+        pub fn pick(kind: f64) -> Result<PickReturnKind, JsValue>;
+    }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "pickAny", js_namespace = "Shapes")]
+        pub fn pick_any(kind: f64) -> Result<PickAnyReturnKind, JsValue>;
+    }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "pickOrText", js_namespace = "Shapes")]
+        pub fn pick_or_text(kind: f64) -> Result<PickOrTextReturnKind, JsValue>;
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -211,6 +270,21 @@ impl ChoiceBuilder {
     pub fn build(self) -> Choice {
         self.inner
     }
+}
+#[wasm_bindgen(private, fallback)]
+pub enum PickReturnKind {
+    Ticket(shapes::Ticket),
+    RoundingOptions(shapes::RoundingOptions),
+}
+#[wasm_bindgen(private, fallback)]
+pub enum PickAnyReturnKind {
+    Ticket(shapes::Ticket),
+    Object(Object),
+}
+#[wasm_bindgen(private, fallback)]
+pub enum PickOrTextReturnKind {
+    String(String),
+    RoundingOptions(shapes::RoundingOptions),
 }
 #[wasm_bindgen(private)]
 pub enum KindKind {

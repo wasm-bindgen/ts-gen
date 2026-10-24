@@ -122,8 +122,8 @@ impl ImageOptionsBuilder {
         self.inner
     }
 }
-#[wasm_bindgen(private)]
+#[wasm_bindgen(private, fallback)]
 pub enum CostReturnKind {
-    Object(Object),
     String(String),
+    Object(Object),
 }

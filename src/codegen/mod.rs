@@ -422,10 +422,10 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
         .values()
         .map(|info| {
             let enum_ident = typemap::make_ident(&info.rust_name);
-            let variants: Vec<TokenStream> = info
-                .members
+            let (members, fallback) = arrange_shape_arms(info, cgctx);
+            let variants: Vec<TokenStream> = members
                 .iter()
-                .zip(dynamic_union_variant_names(&info.members))
+                .zip(dynamic_union_variant_names(&members))
                 .map(|(m, variant_name)| {
                     let variant_ident = typemap::make_ident(&variant_name);
                     match m {
@@ -453,8 +453,9 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
                     }
                 })
                 .collect();
+            let fallback = fallback.then(|| quote! { , fallback });
             quote! {
-                #[wasm_bindgen(private)]
+                #[wasm_bindgen(private #fallback)]
                 pub enum #enum_ident {
                     #(#variants),*
                 }
@@ -462,6 +463,82 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
         })
         .collect();
     quote! { #(#enums)* }
+}
+
+/// Order a dynamic union's members for dispatch, which tries the tuple arms
+/// in order and takes the first whose `dyn_into` succeeds.
+///
+/// A shape (an interface, dictionary or discriminated union, which
+/// accepts any object) or an `object` arm would take every object listed
+/// after it, so these arms go after
+/// the others, before a trailing `JsValue` catch-all. One such arm keeps
+/// its type and, when it is the last tuple arm, is the enum's `fallback`,
+/// as wasm-bindgen recommends for an arm with no runtime witness. Several
+/// can't be told apart at runtime, so they collapse into one `Object` arm,
+/// with a warning. Returns the members and whether the enum is `fallback`.
+fn arrange_shape_arms(
+    info: &typemap::DynamicUnionInfo,
+    cgctx: &CodegenContext,
+) -> (Vec<crate::ir::TypeRef>, bool) {
+    use crate::ir::TypeRef as T;
+    let (shapes, mut rest): (Vec<T>, Vec<T>) = info
+        .members
+        .iter()
+        .cloned()
+        .partition(|m| matches!(m, T::Object) || is_shape(m, info.scope, cgctx));
+    if shapes.is_empty() {
+        return (rest, false);
+    }
+    let shape = match shapes.as_slice() {
+        [one] => one.clone(),
+        many => {
+            let names: Vec<String> = many.iter().map(|m| m.format_ts()).collect();
+            cgctx.warn(format!(
+                "`{}` in one union can't be told apart at runtime; they share one `Object` arm \
+                 of `{}`",
+                names.join("`, `"),
+                info.rust_name
+            ));
+            T::Object
+        }
+    };
+    let catch_all = |m: &T| matches!(m, T::Any | T::Unknown);
+    let at = rest.len() - rest.iter().rev().take_while(|m| catch_all(m)).count();
+    rest.insert(at, shape);
+    let fallback = at + 1 == rest.len();
+    (rest, fallback)
+}
+
+/// Whether `ty` names a declaration emitted as a [shape](arrange_shape_arms),
+/// through any aliases.
+fn is_shape(
+    ty: &crate::ir::TypeRef,
+    scope: crate::parse::scope::ScopeId,
+    cgctx: &CodegenContext,
+) -> bool {
+    let crate::ir::TypeRef::Reference { segments, .. } = ty else {
+        return false;
+    };
+    let path = segments.join(".");
+    let Some(id) = cgctx.gctx.resolve_path(scope, &path) else {
+        return false;
+    };
+    if !cgctx.local_type_ids.contains(&id)
+        || cgctx
+            .gctx
+            .external_map
+            .resolve_type(segments.last().map(String::as_str).unwrap_or_default())
+            .is_some()
+    {
+        return false;
+    }
+    match &cgctx.gctx.get_type(id).kind {
+        TypeKind::Interface(_) | TypeKind::DiscriminatedUnion(_) => true,
+        TypeKind::TypeAlias(_) if segments.len() == 1 => cgctx
+            .resolve_alias(&segments[0], scope)
+            .is_some_and(|(target, scope)| is_shape(&target, scope, cgctx)),
+        _ => false,
+    }
 }
 
 /// Variant names for the members of a synthesised dynamic union, in member
