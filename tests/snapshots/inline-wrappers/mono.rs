@@ -148,10 +148,17 @@ extern "C" {
         T: ::wasm_bindgen::convert::FromWasmAbi;
 }
 impl<T> Box<T> {
-    pub fn length(&self) -> u64 {
+    pub fn length(&self) -> u64
+    where
+        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         self.length_js() as u64
     }
-    pub fn take(&self, n: u64) -> Result<T, JsValue> {
+    pub fn take(&self, n: u64) -> Result<T, JsValue>
+    where
+        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
+        T: ::wasm_bindgen::convert::FromWasmAbi,
+    {
         self.take_js(n as f64)
     }
 }

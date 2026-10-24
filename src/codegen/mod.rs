@@ -160,6 +160,7 @@ pub fn generate_with_options(
     inline_wrappers::apply(&mut file);
     split_unshared_views(&mut file.items);
     signatures::state_abi_bounds(&mut file.items);
+    inline_wrappers::copy_abi_bounds(&mut file.items);
     null_arms::apply(&mut file.items);
     let formatted = rustfmt(&quote::ToTokens::to_token_stream(&file).to_string())?;
     // Prepend a header comment. Line comments don't survive `quote!`

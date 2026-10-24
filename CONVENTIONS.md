@@ -2287,7 +2287,11 @@ impl R2Object {
   read carriers `Option<_>` / `Nullable<_>` (`?`, `| undefined`,
   `| null`), `Vec<_>` / `&[_]` (`T[]`) and `Result<_, E>`. A `@rust u64` on a `bigint` needs no wrapper.
 * A generic receiver (`Box<T>`) gives `impl<T: JsGeneric> Box<T>`; the
-  method's own type parameters stay on the wrapper fn.
+  method's own type parameters stay on the wrapper fn. A wrapper repeats
+  its extern's `where` clause, since it calls the extern under the same
+  bounds: the ABI traits a generic import states under
+  `--experimental-generic-mono` (`T: FromWasmAbi`), and an awaited
+  carrier's (`ExpectedValue: NullableFromWasmAbi` on `get_json`).
 * A scalar inside a callback type is handed to JS, so it keeps `f64`
   and gets no wrapper.
 * Dictionary factories and builder methods take the public scalar and

@@ -29,3 +29,11 @@ export declare class SubtleCrypto {
   static describe(format: "jwk"): string;
   static describe(format: "raw"): string;
 }
+
+// A generic receiver and a generic arm, as workers-types' `KVNamespace`:
+// each wrapper carries its extern's ABI bounds (`ExpectedValue:
+// NullableFromWasmAbi`, and under mono `Key: IntoWasmAbi`).
+export interface KVStore<Key extends string = string> {
+  get(key: Key, type: "text"): Promise<string | null>;
+  get<ExpectedValue = unknown>(key: Key, type: "json"): Promise<ExpectedValue | null>;
+}

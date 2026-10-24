@@ -7932,77 +7932,129 @@ extern "C" {
         Key: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<Key> KVNamespace<Key> {
-    pub async fn get_text(&self, key: Key) -> Result<Nullable<String>, JsValue> {
+    pub async fn get_text(&self, key: Key) -> Result<Nullable<String>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         self.get_text_js(key, "text").await
     }
-    pub async fn get_text_js_string(&self, key: Key) -> Result<Nullable<JsString>, JsValue> {
+    pub async fn get_text_js_string(&self, key: Key) -> Result<Nullable<JsString>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         self.get_text_js_string_js(key, "text").await
     }
     pub async fn get_json<ExpectedValue>(
         &self,
         key: Key,
-    ) -> Result<Nullable<ExpectedValue>, JsValue> {
+    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static,
+    {
         self.get_json_js(key, "json").await
     }
-    pub async fn get_array_buffer(&self, key: Key) -> Result<Nullable<ArrayBuffer>, JsValue> {
+    pub async fn get_array_buffer(&self, key: Key) -> Result<Nullable<ArrayBuffer>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         self.get_array_buffer_js(key, "arrayBuffer").await
     }
-    pub async fn get_stream(&self, key: Key) -> Result<Nullable<ReadableStream>, JsValue> {
+    pub async fn get_stream(&self, key: Key) -> Result<Nullable<ReadableStream>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         self.get_stream_js(key, "stream").await
     }
     pub async fn get_text_with_slice(
         &self,
         key: &[Key],
-    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue> {
+    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
+    {
         self.get_text_with_slice_js(key, "text").await
     }
     pub async fn get_json_with_slice<ExpectedValue>(
         &self,
         key: &[Key],
-    ) -> Result<Map<JsString, JsNullable<ExpectedValue>>, JsValue> {
+    ) -> Result<Map<JsString, JsNullable<ExpectedValue>>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
+        ExpectedValue: 'static,
+    {
         self.get_json_with_slice_js(key, "json").await
     }
     pub async fn get_with_metadata_text<Metadata>(
         &self,
         key: Key,
-    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue> {
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+        Metadata: 'static,
+    {
         self.get_with_metadata_text_js(key, "text").await
     }
     pub async fn get_with_metadata_text_js_string<Metadata>(
         &self,
         key: Key,
-    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue> {
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+        Metadata: 'static,
+    {
         self.get_with_metadata_text_js_string_js(key, "text").await
     }
     pub async fn get_with_metadata_json<ExpectedValue, Metadata>(
         &self,
         key: Key,
-    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue> {
+    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+        ExpectedValue: 'static,
+        Metadata: 'static,
+    {
         self.get_with_metadata_json_js(key, "json").await
     }
     pub async fn get_with_metadata_array_buffer<Metadata>(
         &self,
         key: Key,
-    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue> {
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+        Metadata: 'static,
+    {
         self.get_with_metadata_array_buffer_js(key, "arrayBuffer")
             .await
     }
     pub async fn get_with_metadata_stream<Metadata>(
         &self,
         key: Key,
-    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue> {
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+        Metadata: 'static,
+    {
         self.get_with_metadata_stream_js(key, "stream").await
     }
     pub async fn get_with_metadata_text_with_slice<Metadata>(
         &self,
         key: &[Key],
-    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue> {
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
+        Metadata: 'static,
+    {
         self.get_with_metadata_text_with_slice_js(key, "text").await
     }
     pub async fn get_with_metadata_json_with_slice<ExpectedValue, Metadata>(
         &self,
         key: &[Key],
     ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
+        ExpectedValue: 'static,
+        Metadata: 'static,
     {
         self.get_with_metadata_json_with_slice_js(key, "json").await
     }

@@ -148,3 +148,37 @@ impl SubtleCrypto {
         Self::try_describe_jwk_js("raw")
     }
 }
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type KVStore<Key: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_text_js<Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        r#type: &str,
+    ) -> Result<Nullable<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_json_js<Key: ::wasm_bindgen::JsGeneric, ExpectedValue: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        r#type: &str,
+    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    where
+        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi;
+}
+impl<Key: ::wasm_bindgen::JsGeneric> KVStore<Key> {
+    pub async fn get_text(&self, key: &Key) -> Result<Nullable<JsString>, JsValue> {
+        self.get_text_js(key, "text").await
+    }
+    pub async fn get_json<ExpectedValue: ::wasm_bindgen::JsGeneric>(
+        &self,
+        key: &Key,
+    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    where
+        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi,
+    {
+        self.get_json_js(key, "json").await
+    }
+}

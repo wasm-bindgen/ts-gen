@@ -5,11 +5,14 @@
 use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Uint8Array};
 use wasm_bindgen::JsValue;
 
-use ts_gen_integration_tests::literal_overloads_mono::{Headers, KVNamespace, SubtleCrypto};
+use ts_gen_integration_tests::literal_overloads_mono::{
+    Headers, KVNamespace, KVStore, SubtleCrypto,
+};
 
 // No backing JavaScript module; compile-only coverage that under
 // per-monomorphization each literal arm's `_js_string` sibling is a wrapper
-// of its own name beside the arm's native-string one.
+// of its own name beside the arm's native-string one, and that a generic
+// arm carries its extern's ABI bounds.
 #[allow(dead_code)]
 async fn mono_arms_compile(
     kv: &KVNamespace,
@@ -34,5 +37,13 @@ async fn mono_arms_compile(
     let _: String = SubtleCrypto::describe_raw();
     let _: JsString = SubtleCrypto::describe_jwk_js_string();
     let _: JsString = SubtleCrypto::describe_raw_js_string();
+    Ok(())
+}
+
+#[allow(dead_code)]
+async fn generic_arms_compile(store: &KVStore<JsString>) -> Result<(), JsValue> {
+    let _: Nullable<String> = store.get_text(JsString::from("k")).await?;
+    let _: Nullable<JsString> = store.get_text_js_string(JsString::from("k")).await?;
+    let _: Nullable<Object> = store.get_json::<Object>(JsString::from("k")).await?;
     Ok(())
 }

@@ -21,14 +21,16 @@ use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use syn::visit_mut::VisitMut;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, GenericArgument, GenericParam, Generics, Ident, Item,
-    ItemForeignMod, Pat, PathArguments, ReturnType, Type,
+    FnArg, ForeignItem, ForeignItemFn, GenericArgument, GenericParam, Generics, Ident, ImplItem,
+    Item, ItemForeignMod, Pat, PathArguments, ReturnType, Signature, Type, WherePredicate,
 };
 
 use crate::ir::RustScalar;
 
 const MARKER_PREFIX: &str = "__TsGenWide";
 const LITERAL_ATTR: &str = "ts_gen_literal";
+/// Names the extern a wrapper calls, so [`copy_abi_bounds`] can find it.
+const WRAPS_ATTR: &str = "ts_gen_wraps";
 
 /// The attribute the signature layer puts on a literal-keyed extern fn:
 /// `#[ts_gen_literal(positions(1), arm("text", get_text), arm("json", get_json))]`.
@@ -606,8 +608,10 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Vec<Wrapper> {
                         .map(|(_, a)| a.clone()),
                 )
                 .collect();
+            let wraps = format_ident!("{WRAPS_ATTR}");
             let item = quote! {
                 #(#doc_attrs)*
+                #[#wraps(#extern_name)]
                 pub #sig { #body }
             };
             Wrapper {
@@ -693,6 +697,80 @@ pub(crate) fn apply(file: &mut syn::File) {
     process_items(&mut file.items);
 }
 
+/// Copy each extern's final `where` predicates onto the wrappers over it.
+/// The ABI bounds (`T: FromWasmAbi`, `ExpectedValue: NullableFromWasmAbi`)
+/// are stated on the extern items by
+/// [`state_abi_bounds`](super::signatures::state_abi_bounds), which runs
+/// after the wrappers are emitted; a wrapper calling the extern needs the
+/// same bounds. Wrappers follow their extern block, so each is matched
+/// against the block before it.
+pub(crate) fn copy_abi_bounds(items: &mut [Item]) {
+    let mut bounds: Vec<(Ident, Vec<WherePredicate>)> = Vec::new();
+    for item in items {
+        match item {
+            Item::Mod(m) => {
+                if let Some((_, content)) = &mut m.content {
+                    copy_abi_bounds(content);
+                }
+            }
+            Item::ForeignMod(block) => {
+                bounds = block
+                    .items
+                    .iter()
+                    .filter_map(|fi| match fi {
+                        ForeignItem::Fn(f) => Some((
+                            f.sig.ident.clone(),
+                            f.sig
+                                .generics
+                                .where_clause
+                                .iter()
+                                .flat_map(|w| w.predicates.iter().cloned())
+                                .collect(),
+                        )),
+                        _ => None,
+                    })
+                    .collect();
+            }
+            Item::Impl(imp) => {
+                for ii in &mut imp.items {
+                    if let ImplItem::Fn(f) = ii {
+                        bound_wrapper(&mut f.attrs, &mut f.sig, &bounds);
+                    }
+                }
+            }
+            Item::Fn(f) => bound_wrapper(&mut f.attrs, &mut f.sig, &bounds),
+            _ => {}
+        }
+    }
+}
+
+fn bound_wrapper(
+    attrs: &mut Vec<syn::Attribute>,
+    sig: &mut Signature,
+    bounds: &[(Ident, Vec<WherePredicate>)],
+) {
+    let Some(idx) = attrs.iter().position(|a| a.path().is_ident(WRAPS_ATTR)) else {
+        return;
+    };
+    let Ok(extern_name) = attrs.remove(idx).parse_args::<Ident>() else {
+        return;
+    };
+    // A `view` / `copy` split repeats the extern under one name, with the
+    // same bounds.
+    let Some((_, predicates)) = bounds.iter().find(|(name, _)| *name == extern_name) else {
+        return;
+    };
+    if predicates.is_empty() {
+        return;
+    }
+    let clause = sig.generics.make_where_clause();
+    for p in predicates {
+        if !clause.predicates.iter().any(|q| q == p) {
+            clause.predicates.push(p.clone());
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -700,6 +778,7 @@ mod tests {
     fn run(src: &str) -> String {
         let mut file: syn::File = syn::parse_str(src).unwrap();
         apply(&mut file);
+        copy_abi_bounds(&mut file.items);
         prettyplease::unparse(&file)
     }
 
