@@ -664,6 +664,53 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<PluralizeUnitHour> for PluralizeUnit {
+        fn from(value: PluralizeUnitHour) -> PluralizeUnit {
+            match value {
+                PluralizeUnitHour::Hour => PluralizeUnit::Hour,
+                PluralizeUnitHour::Hours => PluralizeUnit::Hours,
+                PluralizeUnitHour::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeUnitHour> for PluralizeTimeUnit {
+        fn from(value: PluralizeUnitHour) -> PluralizeTimeUnit {
+            match value {
+                PluralizeUnitHour::Hour => PluralizeTimeUnit::Hour,
+                PluralizeUnitHour::Hours => PluralizeTimeUnit::Hours,
+                PluralizeUnitHour::__Invalid => PluralizeTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeTimeUnit> for PluralizeUnit {
+        fn from(value: PluralizeTimeUnit) -> PluralizeUnit {
+            match value {
+                PluralizeTimeUnit::Hour => PluralizeUnit::Hour,
+                PluralizeTimeUnit::Minute => PluralizeUnit::Minute,
+                PluralizeTimeUnit::Hours => PluralizeUnit::Hours,
+                PluralizeTimeUnit::Minutes => PluralizeUnit::Minutes,
+                PluralizeTimeUnit::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeUnitMinute> for PluralizeUnit {
+        fn from(value: PluralizeUnitMinute) -> PluralizeUnit {
+            match value {
+                PluralizeUnitMinute::Minute => PluralizeUnit::Minute,
+                PluralizeUnitMinute::Minutes => PluralizeUnit::Minutes,
+                PluralizeUnitMinute::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeUnitMinute> for PluralizeTimeUnit {
+        fn from(value: PluralizeUnitMinute) -> PluralizeTimeUnit {
+            match value {
+                PluralizeUnitMinute::Minute => PluralizeTimeUnit::Minute,
+                PluralizeUnitMinute::Minutes => PluralizeTimeUnit::Minutes,
+                PluralizeUnitMinute::__Invalid => PluralizeTimeUnit::__Invalid,
+            }
+        }
+    }
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

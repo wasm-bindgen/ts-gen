@@ -73,7 +73,11 @@ fn literal_only_parameters_specialise_per_instantiation() {
     assert!(matches!(base.smallest_unit(), Some(PluralizeUnit::Minutes)));
     assert_eq!(base.increment(), Some(5.0));
 
-    base.set_smallest_unit(PluralizeUnit::Hours);
+    // A narrowed unit converts into every wider one.
+    let hour: PluralizeTimeUnit = PluralizeUnitHour::Hour.into();
+    time.set_smallest_unit(hour);
+    let wide: PluralizeUnit = PluralizeTimeUnit::Hours.into();
+    base.set_smallest_unit(wide);
     assert!(matches!(
         time.smallest_unit(),
         Some(PluralizeTimeUnit::Hours)

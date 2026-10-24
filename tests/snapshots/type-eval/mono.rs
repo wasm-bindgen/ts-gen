@@ -839,6 +839,63 @@ impl Default for PartialExtended {
         Self::new()
     }
 }
+impl From<ExcludeUnitHour> for Plural {
+    fn from(value: ExcludeUnitHour) -> Plural {
+        match value {
+            ExcludeUnitHour::Minute => Plural::Minute,
+            ExcludeUnitHour::Second => Plural::Second,
+            ExcludeUnitHour::__Invalid => Plural::__Invalid,
+        }
+    }
+}
+impl From<ExcludeUnitHour> for ExtractUnitOrDayUnit {
+    fn from(value: ExcludeUnitHour) -> ExtractUnitOrDayUnit {
+        match value {
+            ExcludeUnitHour::Minute => ExtractUnitOrDayUnit::Minute,
+            ExcludeUnitHour::Second => ExtractUnitOrDayUnit::Second,
+            ExcludeUnitHour::__Invalid => ExtractUnitOrDayUnit::__Invalid,
+        }
+    }
+}
+impl From<ExtractUnitOrDayUnit> for Plural {
+    fn from(value: ExtractUnitOrDayUnit) -> Plural {
+        match value {
+            ExtractUnitOrDayUnit::Hour => Plural::Hour,
+            ExtractUnitOrDayUnit::Minute => Plural::Minute,
+            ExtractUnitOrDayUnit::Second => Plural::Second,
+            ExtractUnitOrDayUnit::__Invalid => Plural::__Invalid,
+        }
+    }
+}
+impl From<PluralHourOrMinute> for Plural {
+    fn from(value: PluralHourOrMinute) -> Plural {
+        match value {
+            PluralHourOrMinute::Hour => Plural::Hour,
+            PluralHourOrMinute::Minute => Plural::Minute,
+            PluralHourOrMinute::Hours => Plural::Hours,
+            PluralHourOrMinute::Minutes => Plural::Minutes,
+            PluralHourOrMinute::__Invalid => Plural::__Invalid,
+        }
+    }
+}
+impl From<PluralHour> for Plural {
+    fn from(value: PluralHour) -> Plural {
+        match value {
+            PluralHour::Hour => Plural::Hour,
+            PluralHour::Hours => Plural::Hours,
+            PluralHour::__Invalid => Plural::__Invalid,
+        }
+    }
+}
+impl From<PluralHour> for PluralHourOrMinute {
+    fn from(value: PluralHour) -> PluralHourOrMinute {
+        match value {
+            PluralHour::Hour => PluralHourOrMinute::Hour,
+            PluralHour::Hours => PluralHourOrMinute::Hours,
+            PluralHour::__Invalid => PluralHourOrMinute::__Invalid,
+        }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LargestUnitKind {

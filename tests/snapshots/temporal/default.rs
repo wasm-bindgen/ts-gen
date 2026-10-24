@@ -7006,6 +7006,249 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<PluralizeDateUnit> for PluralizeUnit {
+        fn from(value: PluralizeDateUnit) -> PluralizeUnit {
+            match value {
+                PluralizeDateUnit::Year => PluralizeUnit::Year,
+                PluralizeDateUnit::Month => PluralizeUnit::Month,
+                PluralizeDateUnit::Week => PluralizeUnit::Week,
+                PluralizeDateUnit::Day => PluralizeUnit::Day,
+                PluralizeDateUnit::Years => PluralizeUnit::Years,
+                PluralizeDateUnit::Months => PluralizeUnit::Months,
+                PluralizeDateUnit::Weeks => PluralizeUnit::Weeks,
+                PluralizeDateUnit::Days => PluralizeUnit::Days,
+                PluralizeDateUnit::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeExcludeTimeUnitHour> for PluralizeUnit {
+        fn from(value: PluralizeExcludeTimeUnitHour) -> PluralizeUnit {
+            match value {
+                PluralizeExcludeTimeUnitHour::Minute => PluralizeUnit::Minute,
+                PluralizeExcludeTimeUnitHour::Second => PluralizeUnit::Second,
+                PluralizeExcludeTimeUnitHour::Millisecond => PluralizeUnit::Millisecond,
+                PluralizeExcludeTimeUnitHour::Microsecond => PluralizeUnit::Microsecond,
+                PluralizeExcludeTimeUnitHour::Nanosecond => PluralizeUnit::Nanosecond,
+                PluralizeExcludeTimeUnitHour::Minutes => PluralizeUnit::Minutes,
+                PluralizeExcludeTimeUnitHour::Seconds => PluralizeUnit::Seconds,
+                PluralizeExcludeTimeUnitHour::Milliseconds => PluralizeUnit::Milliseconds,
+                PluralizeExcludeTimeUnitHour::Microseconds => PluralizeUnit::Microseconds,
+                PluralizeExcludeTimeUnitHour::Nanoseconds => PluralizeUnit::Nanoseconds,
+                PluralizeExcludeTimeUnitHour::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeExcludeTimeUnitHour> for PluralizeTimeUnit {
+        fn from(value: PluralizeExcludeTimeUnitHour) -> PluralizeTimeUnit {
+            match value {
+                PluralizeExcludeTimeUnitHour::Minute => PluralizeTimeUnit::Minute,
+                PluralizeExcludeTimeUnitHour::Second => PluralizeTimeUnit::Second,
+                PluralizeExcludeTimeUnitHour::Millisecond => PluralizeTimeUnit::Millisecond,
+                PluralizeExcludeTimeUnitHour::Microsecond => PluralizeTimeUnit::Microsecond,
+                PluralizeExcludeTimeUnitHour::Nanosecond => PluralizeTimeUnit::Nanosecond,
+                PluralizeExcludeTimeUnitHour::Minutes => PluralizeTimeUnit::Minutes,
+                PluralizeExcludeTimeUnitHour::Seconds => PluralizeTimeUnit::Seconds,
+                PluralizeExcludeTimeUnitHour::Milliseconds => PluralizeTimeUnit::Milliseconds,
+                PluralizeExcludeTimeUnitHour::Microseconds => PluralizeTimeUnit::Microseconds,
+                PluralizeExcludeTimeUnitHour::Nanoseconds => PluralizeTimeUnit::Nanoseconds,
+                PluralizeExcludeTimeUnitHour::__Invalid => PluralizeTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeExcludeTimeUnitHour> for PluralizeDayOrTimeUnit {
+        fn from(value: PluralizeExcludeTimeUnitHour) -> PluralizeDayOrTimeUnit {
+            match value {
+                PluralizeExcludeTimeUnitHour::Minute => PluralizeDayOrTimeUnit::Minute,
+                PluralizeExcludeTimeUnitHour::Second => PluralizeDayOrTimeUnit::Second,
+                PluralizeExcludeTimeUnitHour::Millisecond => PluralizeDayOrTimeUnit::Millisecond,
+                PluralizeExcludeTimeUnitHour::Microsecond => PluralizeDayOrTimeUnit::Microsecond,
+                PluralizeExcludeTimeUnitHour::Nanosecond => PluralizeDayOrTimeUnit::Nanosecond,
+                PluralizeExcludeTimeUnitHour::Minutes => PluralizeDayOrTimeUnit::Minutes,
+                PluralizeExcludeTimeUnitHour::Seconds => PluralizeDayOrTimeUnit::Seconds,
+                PluralizeExcludeTimeUnitHour::Milliseconds => PluralizeDayOrTimeUnit::Milliseconds,
+                PluralizeExcludeTimeUnitHour::Microseconds => PluralizeDayOrTimeUnit::Microseconds,
+                PluralizeExcludeTimeUnitHour::Nanoseconds => PluralizeDayOrTimeUnit::Nanoseconds,
+                PluralizeExcludeTimeUnitHour::__Invalid => PluralizeDayOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeTimeUnit> for PluralizeUnit {
+        fn from(value: PluralizeTimeUnit) -> PluralizeUnit {
+            match value {
+                PluralizeTimeUnit::Hour => PluralizeUnit::Hour,
+                PluralizeTimeUnit::Minute => PluralizeUnit::Minute,
+                PluralizeTimeUnit::Second => PluralizeUnit::Second,
+                PluralizeTimeUnit::Millisecond => PluralizeUnit::Millisecond,
+                PluralizeTimeUnit::Microsecond => PluralizeUnit::Microsecond,
+                PluralizeTimeUnit::Nanosecond => PluralizeUnit::Nanosecond,
+                PluralizeTimeUnit::Hours => PluralizeUnit::Hours,
+                PluralizeTimeUnit::Minutes => PluralizeUnit::Minutes,
+                PluralizeTimeUnit::Seconds => PluralizeUnit::Seconds,
+                PluralizeTimeUnit::Milliseconds => PluralizeUnit::Milliseconds,
+                PluralizeTimeUnit::Microseconds => PluralizeUnit::Microseconds,
+                PluralizeTimeUnit::Nanoseconds => PluralizeUnit::Nanoseconds,
+                PluralizeTimeUnit::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeTimeUnit> for PluralizeDayOrTimeUnit {
+        fn from(value: PluralizeTimeUnit) -> PluralizeDayOrTimeUnit {
+            match value {
+                PluralizeTimeUnit::Hour => PluralizeDayOrTimeUnit::Hour,
+                PluralizeTimeUnit::Minute => PluralizeDayOrTimeUnit::Minute,
+                PluralizeTimeUnit::Second => PluralizeDayOrTimeUnit::Second,
+                PluralizeTimeUnit::Millisecond => PluralizeDayOrTimeUnit::Millisecond,
+                PluralizeTimeUnit::Microsecond => PluralizeDayOrTimeUnit::Microsecond,
+                PluralizeTimeUnit::Nanosecond => PluralizeDayOrTimeUnit::Nanosecond,
+                PluralizeTimeUnit::Hours => PluralizeDayOrTimeUnit::Hours,
+                PluralizeTimeUnit::Minutes => PluralizeDayOrTimeUnit::Minutes,
+                PluralizeTimeUnit::Seconds => PluralizeDayOrTimeUnit::Seconds,
+                PluralizeTimeUnit::Milliseconds => PluralizeDayOrTimeUnit::Milliseconds,
+                PluralizeTimeUnit::Microseconds => PluralizeDayOrTimeUnit::Microseconds,
+                PluralizeTimeUnit::Nanoseconds => PluralizeDayOrTimeUnit::Nanoseconds,
+                PluralizeTimeUnit::__Invalid => PluralizeDayOrTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeDayOrTimeUnit> for PluralizeUnit {
+        fn from(value: PluralizeDayOrTimeUnit) -> PluralizeUnit {
+            match value {
+                PluralizeDayOrTimeUnit::Day => PluralizeUnit::Day,
+                PluralizeDayOrTimeUnit::Hour => PluralizeUnit::Hour,
+                PluralizeDayOrTimeUnit::Minute => PluralizeUnit::Minute,
+                PluralizeDayOrTimeUnit::Second => PluralizeUnit::Second,
+                PluralizeDayOrTimeUnit::Millisecond => PluralizeUnit::Millisecond,
+                PluralizeDayOrTimeUnit::Microsecond => PluralizeUnit::Microsecond,
+                PluralizeDayOrTimeUnit::Nanosecond => PluralizeUnit::Nanosecond,
+                PluralizeDayOrTimeUnit::Days => PluralizeUnit::Days,
+                PluralizeDayOrTimeUnit::Hours => PluralizeUnit::Hours,
+                PluralizeDayOrTimeUnit::Minutes => PluralizeUnit::Minutes,
+                PluralizeDayOrTimeUnit::Seconds => PluralizeUnit::Seconds,
+                PluralizeDayOrTimeUnit::Milliseconds => PluralizeUnit::Milliseconds,
+                PluralizeDayOrTimeUnit::Microseconds => PluralizeUnit::Microseconds,
+                PluralizeDayOrTimeUnit::Nanoseconds => PluralizeUnit::Nanoseconds,
+                PluralizeDayOrTimeUnit::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeExcludeTimeUnitHourOrMinute> for PluralizeUnit {
+        fn from(value: PluralizeExcludeTimeUnitHourOrMinute) -> PluralizeUnit {
+            match value {
+                PluralizeExcludeTimeUnitHourOrMinute::Second => PluralizeUnit::Second,
+                PluralizeExcludeTimeUnitHourOrMinute::Millisecond => PluralizeUnit::Millisecond,
+                PluralizeExcludeTimeUnitHourOrMinute::Microsecond => PluralizeUnit::Microsecond,
+                PluralizeExcludeTimeUnitHourOrMinute::Nanosecond => PluralizeUnit::Nanosecond,
+                PluralizeExcludeTimeUnitHourOrMinute::Seconds => PluralizeUnit::Seconds,
+                PluralizeExcludeTimeUnitHourOrMinute::Milliseconds => PluralizeUnit::Milliseconds,
+                PluralizeExcludeTimeUnitHourOrMinute::Microseconds => PluralizeUnit::Microseconds,
+                PluralizeExcludeTimeUnitHourOrMinute::Nanoseconds => PluralizeUnit::Nanoseconds,
+                PluralizeExcludeTimeUnitHourOrMinute::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeExcludeTimeUnitHourOrMinute> for PluralizeExcludeTimeUnitHour {
+        fn from(value: PluralizeExcludeTimeUnitHourOrMinute) -> PluralizeExcludeTimeUnitHour {
+            match value {
+                PluralizeExcludeTimeUnitHourOrMinute::Second => {
+                    PluralizeExcludeTimeUnitHour::Second
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Millisecond => {
+                    PluralizeExcludeTimeUnitHour::Millisecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Microsecond => {
+                    PluralizeExcludeTimeUnitHour::Microsecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Nanosecond => {
+                    PluralizeExcludeTimeUnitHour::Nanosecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Seconds => {
+                    PluralizeExcludeTimeUnitHour::Seconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Milliseconds => {
+                    PluralizeExcludeTimeUnitHour::Milliseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Microseconds => {
+                    PluralizeExcludeTimeUnitHour::Microseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Nanoseconds => {
+                    PluralizeExcludeTimeUnitHour::Nanoseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::__Invalid => {
+                    PluralizeExcludeTimeUnitHour::__Invalid
+                }
+            }
+        }
+    }
+    impl From<PluralizeExcludeTimeUnitHourOrMinute> for PluralizeTimeUnit {
+        fn from(value: PluralizeExcludeTimeUnitHourOrMinute) -> PluralizeTimeUnit {
+            match value {
+                PluralizeExcludeTimeUnitHourOrMinute::Second => PluralizeTimeUnit::Second,
+                PluralizeExcludeTimeUnitHourOrMinute::Millisecond => PluralizeTimeUnit::Millisecond,
+                PluralizeExcludeTimeUnitHourOrMinute::Microsecond => PluralizeTimeUnit::Microsecond,
+                PluralizeExcludeTimeUnitHourOrMinute::Nanosecond => PluralizeTimeUnit::Nanosecond,
+                PluralizeExcludeTimeUnitHourOrMinute::Seconds => PluralizeTimeUnit::Seconds,
+                PluralizeExcludeTimeUnitHourOrMinute::Milliseconds => {
+                    PluralizeTimeUnit::Milliseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Microseconds => {
+                    PluralizeTimeUnit::Microseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Nanoseconds => PluralizeTimeUnit::Nanoseconds,
+                PluralizeExcludeTimeUnitHourOrMinute::__Invalid => PluralizeTimeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeExcludeTimeUnitHourOrMinute> for PluralizeDayOrTimeUnit {
+        fn from(value: PluralizeExcludeTimeUnitHourOrMinute) -> PluralizeDayOrTimeUnit {
+            match value {
+                PluralizeExcludeTimeUnitHourOrMinute::Second => PluralizeDayOrTimeUnit::Second,
+                PluralizeExcludeTimeUnitHourOrMinute::Millisecond => {
+                    PluralizeDayOrTimeUnit::Millisecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Microsecond => {
+                    PluralizeDayOrTimeUnit::Microsecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Nanosecond => {
+                    PluralizeDayOrTimeUnit::Nanosecond
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Seconds => PluralizeDayOrTimeUnit::Seconds,
+                PluralizeExcludeTimeUnitHourOrMinute::Milliseconds => {
+                    PluralizeDayOrTimeUnit::Milliseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Microseconds => {
+                    PluralizeDayOrTimeUnit::Microseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::Nanoseconds => {
+                    PluralizeDayOrTimeUnit::Nanoseconds
+                }
+                PluralizeExcludeTimeUnitHourOrMinute::__Invalid => {
+                    PluralizeDayOrTimeUnit::__Invalid
+                }
+            }
+        }
+    }
+    impl From<PluralizeUnitYearOrMonth> for PluralizeUnit {
+        fn from(value: PluralizeUnitYearOrMonth) -> PluralizeUnit {
+            match value {
+                PluralizeUnitYearOrMonth::Year => PluralizeUnit::Year,
+                PluralizeUnitYearOrMonth::Month => PluralizeUnit::Month,
+                PluralizeUnitYearOrMonth::Years => PluralizeUnit::Years,
+                PluralizeUnitYearOrMonth::Months => PluralizeUnit::Months,
+                PluralizeUnitYearOrMonth::__Invalid => PluralizeUnit::__Invalid,
+            }
+        }
+    }
+    impl From<PluralizeUnitYearOrMonth> for PluralizeDateUnit {
+        fn from(value: PluralizeUnitYearOrMonth) -> PluralizeDateUnit {
+            match value {
+                PluralizeUnitYearOrMonth::Year => PluralizeDateUnit::Year,
+                PluralizeUnitYearOrMonth::Month => PluralizeDateUnit::Month,
+                PluralizeUnitYearOrMonth::Years => PluralizeDateUnit::Years,
+                PluralizeUnitYearOrMonth::Months => PluralizeDateUnit::Months,
+                PluralizeUnitYearOrMonth::__Invalid => PluralizeDateUnit::__Invalid,
+            }
+        }
+    }
 }
 #[wasm_bindgen(private)]
 pub enum DisambiguationKind {

@@ -51749,6 +51749,27 @@ impl VectorizeVectorMetadataFilter3Builder {
         self.inner
     }
 }
+impl From<ExcludeCertVerificationStatusNone> for CertVerificationStatus {
+    fn from(value: ExcludeCertVerificationStatusNone) -> CertVerificationStatus {
+        match value {
+            ExcludeCertVerificationStatusNone::Success => CertVerificationStatus::Success,
+            ExcludeCertVerificationStatusNone::FailedselfSignedCertificate => {
+                CertVerificationStatus::FailedselfSignedCertificate
+            }
+            ExcludeCertVerificationStatusNone::FailedunableToVerifyTheFirstCertificate => {
+                CertVerificationStatus::FailedunableToVerifyTheFirstCertificate
+            }
+            ExcludeCertVerificationStatusNone::FailedcertificateIsNotYetValid => {
+                CertVerificationStatus::FailedcertificateIsNotYetValid
+            }
+            ExcludeCertVerificationStatusNone::FailedcertificateHasExpired => {
+                CertVerificationStatus::FailedcertificateHasExpired
+            }
+            ExcludeCertVerificationStatusNone::Failed => CertVerificationStatus::Failed,
+            ExcludeCertVerificationStatusNone::__Invalid => CertVerificationStatus::__Invalid,
+        }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum FetchReturnKind {

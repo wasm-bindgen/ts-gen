@@ -966,8 +966,9 @@ struct ModTree<'d> {
 }
 
 enum ModEntry<'d> {
-    /// A declaration and the JS path of the namespaces enclosing it.
-    Item(&'d TypeDeclaration, Vec<String>),
+    /// A declaration, its id and the JS path of the namespaces enclosing
+    /// it.
+    Item(&'d TypeDeclaration, crate::context::TypeId, Vec<String>),
     /// A child `pub mod`, at the position of its first declaration.
     Mod(String),
 }
@@ -1012,7 +1013,7 @@ impl<'d> ModTree<'d> {
                     }
                 }
             }
-            _ => self.entries.push(ModEntry::Item(decl, js_namespace)),
+            _ => self.entries.push(ModEntry::Item(decl, id, js_namespace)),
         }
     }
 
@@ -1020,7 +1021,7 @@ impl<'d> ModTree<'d> {
     fn generate(&self, path: &mut Vec<String>, cgctx: &CodegenContext) -> Vec<TokenStream> {
         let mut value_names =
             functions::ValueNames::new(self.entries.iter().filter_map(|entry| match entry {
-                ModEntry::Item(decl, js_namespace) => Some((*decl, js_namespace.as_slice())),
+                ModEntry::Item(decl, _, js_namespace) => Some((*decl, js_namespace.as_slice())),
                 ModEntry::Mod(_) => None,
             }));
         // A child module's `use super::*` brings its parent's statics into
@@ -1033,7 +1034,7 @@ impl<'d> ModTree<'d> {
         let mut items = Vec::new();
         for entry in &self.entries {
             match entry {
-                ModEntry::Item(decl, js_namespace) => {
+                ModEntry::Item(decl, _, js_namespace) => {
                     cgctx.emit_path.replace(path.clone());
                     items.extend(if js_namespace.is_empty() {
                         generate_declaration(decl, cgctx, &mut value_names)
@@ -1069,6 +1070,18 @@ impl<'d> ModTree<'d> {
                 }
             }
         }
+        let enums: Vec<(&crate::ir::StringEnumDecl, bool)> = self
+            .entries
+            .iter()
+            .filter_map(|entry| match entry {
+                ModEntry::Item(decl, id, _) => match &decl.kind {
+                    TypeKind::StringEnum(e) => Some((e, cgctx.gctx.synthesised_enums.contains(id))),
+                    _ => None,
+                },
+                ModEntry::Mod(_) => None,
+            })
+            .collect();
+        items.extend(enums::generate_subset_conversions(&enums));
         cgctx.statics_in_scope.replace(outer_statics);
         items
     }

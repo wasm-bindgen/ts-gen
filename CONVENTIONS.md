@@ -4791,6 +4791,11 @@ pub type Sized_;           // size? (`Sized` is in the prelude)
   methods is `Widget`, since a method has no property type), and `keyof`,
   indexed access and mapped types erase to `JsValue`. An unconstrained
   type parameter is the usual cause.
+* **A narrower synthesised enum converts into a wider one.** An enum
+  evaluation synthesises gets `From` into each enum of the same module
+  whose values are a strict superset of its own, so `PluralizeTimeUnit`
+  passes where `PluralizeUnit` is taken (`unit.into()`). A string JS gave
+  that the narrower enum doesn't know stays unknown in the wider one.
 
 ### Literal-only type parameters specialise
 

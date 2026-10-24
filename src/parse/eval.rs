@@ -168,6 +168,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         // under the scope its blocks share.
         let listing = super::binding_scope(gctx, anchor);
         let scope = synth.place.scope;
+        let synthesised_enum = matches!(synth.kind, SynthKind::Enum(_));
         let kind = match synth.kind {
             SynthKind::Enum(literals) => TypeKind::StringEnum(string_enum(&synth.name, &literals)),
             SynthKind::Dict {
@@ -207,6 +208,9 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             doc: None,
             scope_id: scope,
         });
+        if synthesised_enum {
+            gctx.synthesised_enums.insert(id);
+        }
         gctx.scopes.insert(scope, synth.name.clone(), id);
         gctx.declare(scope, &synth.name, id);
         let exports = gctx.scopes.get(scope).exports.unwrap_or(scope);
