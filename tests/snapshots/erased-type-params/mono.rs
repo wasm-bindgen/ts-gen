@@ -200,9 +200,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_indexed(this: &Nested, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn keys(this: &Nested) -> V;
+    pub fn keys(this: &Nested) -> X;
     #[wasm_bindgen(method, setter)]
-    pub fn set_keys(this: &Nested, val: V);
+    pub fn set_keys(this: &Nested, val: X);
     #[wasm_bindgen(method, getter)]
     pub fn mapped(this: &Nested) -> NestedMapped;
     #[wasm_bindgen(method, setter)]
@@ -217,7 +217,7 @@ extern "C" {
 impl Nested {
     pub fn new(
         indexed: f64,
-        keys: V,
+        keys: X,
         mapped: &NestedMapped,
         literal: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Nested {
@@ -231,7 +231,7 @@ impl Nested {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum V {
+pub enum X {
     X = "x",
 }
 #[wasm_bindgen(experimental_generic_mono)]

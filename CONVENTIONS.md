@@ -2897,6 +2897,10 @@ see [uninferrable type parameters](#uninferrable-method-type-parameters).)
 
 Method-level parameters follow the same rule
 (`tag<Level extends "info" | "warn">(level: Level)` → `level: &str`).
+An interface's parameter constrained to string literals only (`U extends
+"hour" | "minute"`) is the exception: it stays live for evaluation, which
+[specialises it at each instantiation](#literal-only-type-parameters-specialise)
+rather than reading it as `string`.
 
 The arguments are dropped once every input is parsed, before codegen and
 before [type-level evaluation](#type-level-evaluation), wherever the
@@ -4742,11 +4746,12 @@ pub type Sized_;           // size? (`Sized` is in the prelude)
   arguments. The alias's own declaration evaluates at its parameters'
   bounds, so `type Plural<T extends Unit> = T | { … }[T]` is the enum
   `Plural` of every unit, and an instantiation at the bound shares it.
-* **A type parameter out of scope evaluates at its bound.** Inside
-  `interface Rounding<U extends Unit> { smallestUnit?: Plural<U> }` the
-  field is `Plural`, every unit: Rust can't vary an enum per
-  instantiation, and the bound is the one type every instantiation is
-  assignable to.
+* **A type parameter out of scope evaluates at its bound.** One met
+  outside the type being rewritten, as when a utility flattens a generic
+  interface's members, is read at its bound, the one type every
+  instantiation is assignable to. A literal-only parameter is read at its
+  bound in its own scope too, and specialised at each instantiation
+  (below).
 * **Mapped types** evaluate over a literal key set. Over `keyof T`
   (possibly through `Exclude`) they are homomorphic: a property keeps the
   optionality and `readonly` it has in `T` unless a `?` / `-?` /
@@ -4764,6 +4769,92 @@ pub type Sized_;           // size? (`Sized` is in the prelude)
   methods is `Widget`, since a method has no property type), and `keyof`,
   indexed access and mapped types erase to `JsValue`. An unconstrained
   type parameter is the usual cause.
+
+### Literal-only type parameters specialise
+
+An interface's type parameter whose constraint evaluates to string
+literals (`Units extends DateUnit | TimeUnit`, `S extends "hour" |
+"minute"`) only ever selects among those literals. A Rust generic can't
+carry a literal set, and reading every member at the bound lets
+`PlainTimeToStringOptions::builder().smallest_unit(PluralizeUnit::Year)`
+compile and throw `RangeError` in JS. So the parameter is erased from the
+interface, and each instantiation is specialised instead:
+
+```ts
+type DateUnit = "year" | "month" | "week" | "day";
+type TimeUnit = "hour" | "minute" | "second" | "millisecond" | "microsecond" | "nanosecond";
+type PluralizeUnit<T extends DateUnit | TimeUnit> = T | { year: "years"; /* … */ }[T];
+interface RoundingOptions<Units extends DateUnit | TimeUnit> {
+  smallestUnit?: PluralizeUnit<Units>;
+  roundingIncrement?: number;
+}
+interface RoundingOptionsWithLargestUnit<Units extends DateUnit | TimeUnit>
+  extends RoundingOptions<Units> {
+  largestUnit?: "auto" | PluralizeUnit<Units>;
+}
+interface PlainTimeToStringOptions
+  extends RoundingOptions<Exclude<TimeUnit, "hour">> {}
+interface PlainDate {
+  until(other: PlainDate, options?: RoundingOptionsWithLargestUnit<DateUnit>): Duration;
+}
+interface PlainDateTime {
+  until(other: PlainDateTime, options?: RoundingOptionsWithLargestUnit<DateUnit | TimeUnit>): Duration;
+}
+```
+
+```rust
+// The base reads `Units` at its bound, every unit, and has no parameter.
+pub type RoundingOptions;
+pub fn smallest_unit(this: &RoundingOptions) -> Option<PluralizeUnit>;
+#[wasm_bindgen(extends = RoundingOptions, extends = Object, is_type_of = JsValue::is_object)]
+pub type RoundingOptionsWithLargestUnit;
+
+// A parent instantiation keeps the erased parent and narrows the
+// interface's own members.
+#[wasm_bindgen(extends = RoundingOptions, extends = Object, is_type_of = JsValue::is_object)]
+pub type PlainTimeToStringOptions;
+pub fn smallest_unit(this: &PlainTimeToStringOptions) -> Option<PluralizeExcludeTimeUnitHour>;
+
+// A use site that narrows names a dictionary extending the base with the
+// narrowed members; one at the bound is the base.
+#[wasm_bindgen(extends = RoundingOptionsWithLargestUnit, extends = Object, is_type_of = JsValue::is_object)]
+pub type RoundingOptionsWithLargestUnitDateUnit;
+pub fn smallest_unit(this: &RoundingOptionsWithLargestUnitDateUnit) -> Option<PluralizeDateUnit>;
+pub fn until_with_options(
+    this: &PlainDate,
+    other: &PlainDate,
+    options: &RoundingOptionsWithLargestUnitDateUnit,
+) -> Duration;
+pub fn until_with_options(
+    this: &PlainDateTime,
+    other: &PlainDateTime,
+    options: &RoundingOptionsWithLargestUnit,
+) -> Duration;
+```
+
+* **The narrowed members are the specialisation's own.** Its other
+  members are the base's, reached through `Deref`, and its builder sets
+  both. A narrowed member is named like any evaluated type, by its
+  instantiation with the arguments substituted (`PluralizeUnit<DateUnit>`
+  is `PluralizeDateUnit`); a narrowed inline union keeps its own
+  `<Field>Kind`.
+* **A use site's specialisation is named after the instantiation**, the
+  interface followed by its literal-only arguments
+  (`RoundingOptionsWithLargestUnitDateUnit`, `RoundingOptionsDayOrTimeUnit`),
+  and every instantiation in the scope that narrows alike shares the first
+  name: `Rounding<TimeUnit>` and `Rounding<Exclude<"day" | TimeUnit,
+  "day">>` are one dictionary. An alias of an instantiation, `type
+  HourStepping = Stepped<"hour">`, is that specialisation under the
+  alias's name, and use sites share it.
+* **Only a dictionary is specialised at a use site.** An interface with
+  methods is still erased, but its instantiations are the base.
+* **The parameter alone reads as its argument**, an enum it names or its
+  literals inline: in the base, `step?: S` is the `<Field>Kind` of `S`'s
+  bound; specialised at `"minute"`, it is the literal.
+* **A literal alias that only constrains is type-level.** `DateUnit` and
+  `TimeUnit`, named only by literal-only constraints, have no use once
+  each instantiation is specialised: the output surface emits such an
+  alias only when a signature still reaches it, or `--export` names it.
 
 ## Multiple-context name resolution
 

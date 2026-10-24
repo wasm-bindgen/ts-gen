@@ -4,13 +4,6 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Unit {
-    Hour = "hour",
-    Minute = "minute",
-    Second = "second",
-}
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "roundTo")]
@@ -239,35 +232,35 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Rounding<U = JsValue>;
+    pub type Rounding;
     #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-    pub fn smallest_unit<U>(this: &Rounding<U>) -> Option<Plural>;
+    pub fn smallest_unit(this: &Rounding) -> Option<Plural>;
     #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-    pub fn set_smallest_unit<U>(this: &Rounding<U>, val: Plural);
+    pub fn set_smallest_unit(this: &Rounding, val: Plural);
     #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-    pub fn largest_unit<U>(this: &Rounding<U>) -> Option<LargestUnitKind>;
+    pub fn largest_unit(this: &Rounding) -> Option<LargestUnitKind>;
     #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-    pub fn set_largest_unit<U>(this: &Rounding<U>, val: LargestUnitKind);
+    pub fn set_largest_unit(this: &Rounding, val: LargestUnitKind);
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Rounding<U> {
-    pub fn new() -> Rounding<U> {
+impl Rounding {
+    pub fn new() -> Rounding {
         Self::builder().build()
     }
-    pub fn builder() -> RoundingBuilder<U> {
+    pub fn builder() -> RoundingBuilder {
         RoundingBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Default for Rounding<U> {
+impl Default for Rounding {
     fn default() -> Self {
         Self::new()
     }
 }
-pub struct RoundingBuilder<U> {
-    inner: Rounding<U>,
+pub struct RoundingBuilder {
+    inner: Rounding,
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> RoundingBuilder<U> {
+impl RoundingBuilder {
     pub fn smallest_unit(self, val: Plural) -> Self {
         self.inner.set_smallest_unit(val);
         self
@@ -276,14 +269,14 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> RoundingBuilder<U> {
         self.inner.set_largest_unit(val);
         self
     }
-    pub fn build(self) -> Rounding<U> {
+    pub fn build(self) -> Rounding {
         self.inner
     }
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn round(opts: &Rounding<String>) -> Result<(), JsValue>;
+    pub fn round(opts: &RoundingHour) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
@@ -696,6 +689,57 @@ pub enum PluralHourOrMinute {
     Hours = "hours",
     Minutes = "minutes",
 }
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PluralHour {
+    Hour = "hour",
+    Hours = "hours",
+}
+#[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Rounding , extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type RoundingHour;
+    #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
+    pub fn smallest_unit(this: &RoundingHour) -> Option<PluralHour>;
+    #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
+    pub fn set_smallest_unit(this: &RoundingHour, val: PluralHour);
+    #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+    pub fn largest_unit(this: &RoundingHour) -> Option<RoundingHourLargestUnitKind>;
+    #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+    pub fn set_largest_unit(this: &RoundingHour, val: RoundingHourLargestUnitKind);
+}
+impl RoundingHour {
+    pub fn new() -> RoundingHour {
+        Self::builder().build()
+    }
+    pub fn builder() -> RoundingHourBuilder {
+        RoundingHourBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for RoundingHour {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct RoundingHourBuilder {
+    inner: RoundingHour,
+}
+impl RoundingHourBuilder {
+    pub fn smallest_unit(self, val: PluralHour) -> Self {
+        self.inner.set_smallest_unit(val);
+        self
+    }
+    pub fn largest_unit(self, val: RoundingHourLargestUnitKind) -> Self {
+        self.inner.set_largest_unit(val);
+        self
+    }
+    pub fn build(self) -> RoundingHour {
+        self.inner
+    }
+}
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -802,4 +846,10 @@ pub enum LargestUnitKind {
     Hours = "hours",
     Minutes = "minutes",
     Seconds = "seconds",
+}
+#[wasm_bindgen(private)]
+pub enum RoundingHourLargestUnitKind {
+    Auto = "auto",
+    Hour = "hour",
+    Hours = "hours",
 }
