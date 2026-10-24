@@ -82,3 +82,10 @@ export declare class Boxed<T = unknown> {
   /** A static's `null` arm lands where its return puts it. */
   static from<T>(kind: "a" | "b", value: T | null): Boxed<T>;
 }
+
+// A free function's and a constructor's `null` cohorts; the free
+// function's `T`, named only by the `null` position, goes with it.
+export declare function pickFree<T>(kind: "a" | "b", x: T | null): void;
+export declare class Opener {
+  constructor(kind: "a" | "b", x: ArrayBuffer | null);
+}

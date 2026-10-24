@@ -841,3 +841,63 @@ impl Boxed {
         Self::__label_js_string("b")
     }
 }
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "pickFree")]
+    fn __pick_free<T>(kind: impl ::wasm_bindgen::JsStringLike, x: T) -> Result<(), JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
+}
+pub fn pick_free_a<T>(x: T) -> Result<(), JsValue>
+where
+    T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    __pick_free("a", x)
+}
+pub fn pick_free_b<T>(x: T) -> Result<(), JsValue>
+where
+    T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    __pick_free("b", x)
+}
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "pickFree")]
+    fn __pick_free_with_null(
+        kind: impl ::wasm_bindgen::JsStringLike,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
+}
+pub fn pick_free_a_with_null() -> Result<(), JsValue> {
+    __pick_free_with_null("a", &::wasm_bindgen::JsValue::NULL)
+}
+pub fn pick_free_b_with_null() -> Result<(), JsValue> {
+    __pick_free_with_null("b", &::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Opener;
+    #[wasm_bindgen(constructor, catch, js_name = "Opener")]
+    fn __new(kind: impl ::wasm_bindgen::JsStringLike, x: &ArrayBuffer) -> Result<Opener, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Opener")]
+    fn __new_with_null(
+        kind: impl ::wasm_bindgen::JsStringLike,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<Opener, JsValue>;
+}
+impl Opener {
+    pub fn new_a(x: &ArrayBuffer) -> Result<Opener, JsValue> {
+        Self::__new("a", x)
+    }
+    pub fn new_b(x: &ArrayBuffer) -> Result<Opener, JsValue> {
+        Self::__new("b", x)
+    }
+    pub fn new_a_with_null() -> Result<Opener, JsValue> {
+        Self::__new_with_null("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn new_b_with_null() -> Result<Opener, JsValue> {
+        Self::__new_with_null("b", &::wasm_bindgen::JsValue::NULL)
+    }
+}

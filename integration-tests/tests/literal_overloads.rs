@@ -4,7 +4,8 @@ use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Promise};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads::{
-    Boxed, Clash, Headers, KVNamespace, KVStore, Picker, Repeats, SubtleCrypto,
+    pick_free_a, pick_free_b_with_null, Boxed, Clash, Headers, KVNamespace, KVStore, Opener,
+    Picker, Repeats, SubtleCrypto,
 };
 
 // No backing JavaScript module; compile-only coverage that each literal arm
@@ -100,5 +101,14 @@ async fn null_arm_forms_compile(
     clash.f_with_null();
     clash.f_a(buf);
     clash.f_b_with_null();
+    Ok(())
+}
+
+#[allow(dead_code)]
+fn free_and_constructor_null_arms_compile(buf: &ArrayBuffer, obj: &Object) -> Result<(), JsValue> {
+    pick_free_a(obj);
+    pick_free_b_with_null();
+    let _: Opener = Opener::new_a(buf)?;
+    let _: Opener = Opener::new_b_with_null()?;
     Ok(())
 }

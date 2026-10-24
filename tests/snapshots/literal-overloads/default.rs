@@ -776,3 +776,71 @@ impl<T: ::wasm_bindgen::JsGeneric> Boxed<T> {
         Self::__try_from_with_null("b", &::wasm_bindgen::JsValue::NULL)
     }
 }
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    #[wasm_bindgen(js_name = "pickFree")]
+    fn __pick_free<T: ::wasm_bindgen::JsGeneric>(kind: &str, x: &T);
+}
+pub fn pick_free_a<T: ::wasm_bindgen::JsGeneric>(x: &T) {
+    __pick_free("a", x)
+}
+pub fn pick_free_b<T: ::wasm_bindgen::JsGeneric>(x: &T) {
+    __pick_free("b", x)
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "pickFree")]
+    fn __try_pick_free<T: ::wasm_bindgen::JsGeneric>(kind: &str, x: &T) -> Result<(), JsValue>;
+}
+pub fn try_pick_free_a<T: ::wasm_bindgen::JsGeneric>(x: &T) -> Result<(), JsValue> {
+    __try_pick_free("a", x)
+}
+pub fn try_pick_free_b<T: ::wasm_bindgen::JsGeneric>(x: &T) -> Result<(), JsValue> {
+    __try_pick_free("b", x)
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    #[wasm_bindgen(js_name = "pickFree")]
+    fn __pick_free_with_null(kind: &str, x: &::wasm_bindgen::JsValue);
+}
+pub fn pick_free_a_with_null() {
+    __pick_free_with_null("a", &::wasm_bindgen::JsValue::NULL)
+}
+pub fn pick_free_b_with_null() {
+    __pick_free_with_null("b", &::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "pickFree")]
+    fn __try_pick_free_with_null(kind: &str, x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+}
+pub fn try_pick_free_a_with_null() -> Result<(), JsValue> {
+    __try_pick_free_with_null("a", &::wasm_bindgen::JsValue::NULL)
+}
+pub fn try_pick_free_b_with_null() -> Result<(), JsValue> {
+    __try_pick_free_with_null("b", &::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Opener;
+    #[wasm_bindgen(constructor, catch, js_name = "Opener")]
+    fn __new(kind: &str, x: &ArrayBuffer) -> Result<Opener, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Opener")]
+    fn __new_with_null(kind: &str, x: &::wasm_bindgen::JsValue) -> Result<Opener, JsValue>;
+}
+impl Opener {
+    pub fn new_a(x: &ArrayBuffer) -> Result<Opener, JsValue> {
+        Self::__new("a", x)
+    }
+    pub fn new_b(x: &ArrayBuffer) -> Result<Opener, JsValue> {
+        Self::__new("b", x)
+    }
+    pub fn new_a_with_null() -> Result<Opener, JsValue> {
+        Self::__new_with_null("a", &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn new_b_with_null() -> Result<Opener, JsValue> {
+        Self::__new_with_null("b", &::wasm_bindgen::JsValue::NULL)
+    }
+}

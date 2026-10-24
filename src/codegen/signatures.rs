@@ -470,7 +470,9 @@ pub fn expand_signatures(
             // the kept signature rather than a dropped one.
             match (literal_arm(&deduped[pos], sig, *overload), &mut arms[pos]) {
                 // A literal repeated across overloads (`"a" | "b"` and
-                // `"b" | "c"`, or a merged declaration's copy) is one arm.
+                // `"b" | "c"`, or a merged declaration's copy) is one arm,
+                // with the first overload's return, as TypeScript resolves
+                // a call to the first overload that matches.
                 (Some(arm), Some(arms)) => {
                     if !arms.iter().any(|a| a.values == arm.values) {
                         arms.push(arm);
