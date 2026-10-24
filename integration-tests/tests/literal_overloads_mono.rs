@@ -6,7 +6,7 @@ use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Uint8Arra
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads_mono::{
-    Headers, KVNamespace, KVStore, Picker, SubtleCrypto,
+    Headers, KVNamespace, KVStore, Picker, Repeats, SubtleCrypto,
 };
 
 // No backing JavaScript module; compile-only coverage that under
@@ -62,4 +62,12 @@ fn null_arms_compile(picker: &Picker, buf: &ArrayBuffer) -> Result<(), JsValue> 
     picker.put_a(JsString::from("x"));
     picker.put_b_with_null();
     Ok(())
+}
+
+#[allow(dead_code)]
+fn repeated_literal_compiles(repeats: &Repeats) {
+    let _: String = repeats.tag_a();
+    let _: String = repeats.tag_b();
+    let _: JsString = repeats.tag_b_js_string();
+    let _: String = repeats.tag_c();
 }

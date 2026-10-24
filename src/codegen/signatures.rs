@@ -472,7 +472,13 @@ pub fn expand_signatures(
             // A duplicate that differs only in literal values is an arm of
             // the kept signature rather than a dropped one.
             match (literal_arm(&deduped[pos], sig, *overload), &mut arms[pos]) {
-                (Some(arm), Some(arms)) => arms.push(arm),
+                // A literal repeated across overloads (`"a" | "b"` and
+                // `"b" | "c"`, or a merged declaration's copy) is one arm.
+                (Some(arm), Some(arms)) => {
+                    if !arms.iter().any(|a| a.values == arm.values) {
+                        arms.push(arm);
+                    }
+                }
                 (None, slot) => *slot = None,
                 _ => {}
             }
@@ -4014,6 +4020,54 @@ mod tests {
         assert_eq!(names, ["mode", "try_mode", "mode_a", "try_mode_a"]);
         let spec = sigs[2].literal.as_ref().unwrap();
         assert_eq!(spec.binding, "mode_js");
+    }
+
+    #[test]
+    fn literal_repeated_across_overloads_is_one_arm() {
+        // `tag(m: "a" | "b")` beside `tag(m: "b" | "c")`: `"b"` is one arm,
+        // not a second `tag_b` deduplicated to `tag_b_2`.
+        let mut used = no_used();
+        let ab = [typed_param(
+            "m",
+            TypeRef::union([
+                TypeRef::StringLiteral("a".into()),
+                TypeRef::StringLiteral("b".into()),
+            ]),
+        )];
+        let bc = [typed_param(
+            "m",
+            TypeRef::union([
+                TypeRef::StringLiteral("b".into()),
+                TypeRef::StringLiteral("c".into()),
+            ]),
+        )];
+        let sigs = expand_overloads(
+            "tag",
+            &[&ab, &bc],
+            &TypeRef::String,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        let spec = sigs[0].literal.as_ref().expect("a literal cohort");
+        let arms: Vec<(&str, &str)> = spec
+            .arms
+            .iter()
+            .map(|(lits, name)| (lits[0].as_str(), name.as_str()))
+            .collect();
+        assert_eq!(arms, [("a", "tag_a"), ("b", "tag_b"), ("c", "tag_c")]);
+
+        // A merged declaration repeating the whole overload adds no arm.
+        let mut used = no_used();
+        let sigs = expand_overloads(
+            "tag",
+            &[&ab, &ab],
+            &TypeRef::String,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs[0].literal.as_ref().unwrap().arms.len(), 2);
     }
 
     #[test]

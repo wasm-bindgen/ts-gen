@@ -4,7 +4,7 @@ use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Promise};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads::{
-    Headers, KVNamespace, KVStore, Picker, SubtleCrypto,
+    Headers, KVNamespace, KVStore, Picker, Repeats, SubtleCrypto,
 };
 
 // No backing JavaScript module; compile-only coverage that each literal arm
@@ -53,4 +53,12 @@ fn null_arms_compile(picker: &Picker, buf: &ArrayBuffer, obj: &Object) -> Result
     picker.put_a(obj);
     picker.put_b_with_null();
     Ok(())
+}
+
+// A literal repeated across overloads is one arm with one wrapper.
+#[allow(dead_code)]
+fn repeated_literal_compiles(repeats: &Repeats) {
+    let _: String = repeats.tag_a();
+    let _: String = repeats.tag_b();
+    let _: String = repeats.tag_c();
 }

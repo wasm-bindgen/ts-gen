@@ -49,3 +49,9 @@ export declare class Picker {
   /** The `null` arm's wrappers and extern drop `T`, which only it named. */
   put<T>(kind: "a" | "b", x: T | null): void;
 }
+
+// A literal repeated across overloads is one arm: `"b"` gets one wrapper.
+export interface Repeats {
+  tag(m: "a" | "b"): string;
+  tag(m: "b" | "c"): string;
+}

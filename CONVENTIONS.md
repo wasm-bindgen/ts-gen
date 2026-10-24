@@ -2811,6 +2811,9 @@ impl CompressionStream {
   (`getAll(name: "Set-Cookie")`) is not a cohort and keeps the plain
   `&str` binding, as does a cohort that also absorbed a plain `string`
   arm (`"a" | "b" | string`), since the plain form already covers it.
+* A literal repeated across overloads (`tag(m: "a" | "b")` beside
+  `tag(m: "b" | "c")`, or a merged declaration's copy of an overload)
+  is one arm: `tag_a`, `tag_b`, `tag_c`.
 * Each wrapper is named `<base>_<literal>` in snake case, followed by
   the `_with_` suffix the remaining parameters earn among the plain
   expansions and the other cohorts' remaining parameters (`get_json`,

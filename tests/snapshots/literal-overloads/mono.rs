@@ -486,3 +486,36 @@ impl Picker {
         self.put_with_null_js("b", &::wasm_bindgen::JsValue::NULL)
     }
 }
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Repeats;
+    #[wasm_bindgen(method, catch, js_name = "tag")]
+    fn tag_js(this: &Repeats, m: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "tag")]
+    fn tag_js_string_js(
+        this: &Repeats,
+        m: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+}
+impl Repeats {
+    pub fn tag_a(&self) -> Result<String, JsValue> {
+        self.tag_js("a")
+    }
+    pub fn tag_b(&self) -> Result<String, JsValue> {
+        self.tag_js("b")
+    }
+    pub fn tag_c(&self) -> Result<String, JsValue> {
+        self.tag_js("c")
+    }
+    pub fn tag_a_js_string(&self) -> Result<JsString, JsValue> {
+        self.tag_js_string_js("a")
+    }
+    pub fn tag_b_js_string(&self) -> Result<JsString, JsValue> {
+        self.tag_js_string_js("b")
+    }
+    pub fn tag_c_js_string(&self) -> Result<JsString, JsValue> {
+        self.tag_js_string_js("c")
+    }
+}
