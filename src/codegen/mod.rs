@@ -1170,8 +1170,78 @@ fn generate_ns_declaration(
 
 #[cfg(test)]
 mod tests {
-    use super::{js_namespace_attr, split_unshared_views, UNSHARED_VIEW};
+    use super::{js_namespace_attr, split_unshared_views, GenerateOptions, UNSHARED_VIEW};
     use quote::{quote, ToTokens};
+
+    /// The variants of the enum the builder of `child` takes for
+    /// `largest_unit`.
+    fn largest_unit_variants(out: &str, child: &str) -> Vec<String> {
+        let builder = out
+            .split(&format!("impl {child}Builder {{"))
+            .nth(1)
+            .unwrap_or_else(|| panic!("no {child}Builder in\n{out}"));
+        let ty = builder
+            .split("pub fn largest_unit(self, val: ")
+            .nth(1)
+            .and_then(|rest| rest.split(')').next())
+            .unwrap();
+        let name = ty.rsplit("::").next().unwrap();
+        let body = out
+            .split(&format!("pub enum {name} {{"))
+            .nth(1)
+            .unwrap_or_else(|| panic!("no enum {name} in\n{out}"));
+        let body = body.split('}').next().unwrap();
+        body.split('"')
+            .skip(1)
+            .step_by(2)
+            .map(str::to_string)
+            .collect()
+    }
+
+    #[test]
+    fn projections_resolve_within_their_family_and_declaration() {
+        let src = "
+            interface Rounding<U extends \"hour\" | \"day\"> {
+              largestUnit?: \"auto\" | U | \"days\";
+            }
+            interface HourRounding extends Rounding<\"hour\"> {}
+            interface Spanning<U extends \"hour\" | \"week\"> {
+              largestUnit?: \"auto\" | U;
+            }
+            interface HourSpanning extends Spanning<\"hour\"> {}
+            declare namespace Spans {
+              type Unit = \"hour\" | \"hours\";
+              interface Span<U extends Unit | \"day\"> { largestUnit?: \"auto\" | U }
+              interface HourSpan extends Span<Unit> {}
+            }
+            declare namespace Steps {
+              type Unit = \"day\" | \"hours\";
+              interface DaySpan extends Spans.Span<Unit> {}
+            }";
+        let options = crate::parse::ParseOptions::new().experimental_generic_mono(true);
+        let (module, gctx) = crate::parse_source_with_options(src, None, &options).unwrap();
+        let options = GenerateOptions::new().experimental_generic_mono(true);
+        let out = super::generate_with_options(&module, &gctx, &options).unwrap();
+        // Both families name their associated type `LargestUnit`, and both
+        // are instantiated at the same `Hour` enum.
+        assert_eq!(
+            largest_unit_variants(&out, "HourRounding"),
+            ["auto", "hour", "days"]
+        );
+        assert_eq!(
+            largest_unit_variants(&out, "HourSpanning"),
+            ["auto", "hour"]
+        );
+        // `Spans.Unit` and `Steps.Unit` are two arguments of one family.
+        assert_eq!(
+            largest_unit_variants(&out, "HourSpan"),
+            ["auto", "hour", "hours"]
+        );
+        assert_eq!(
+            largest_unit_variants(&out, "DaySpan"),
+            ["auto", "day", "hours"]
+        );
+    }
 
     #[test]
     fn unshared_views_split_on_target_feature_atomics() {

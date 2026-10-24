@@ -397,15 +397,9 @@ pub fn collect_type_params(
         | TypeRef::ObjectLiteral(_)
         | TypeRef::Unresolved(_) => {}
         // `Units::PluralizeUnit` needs `Units` declared.
-        TypeRef::Projection { param, .. } => {
-            if matches!(
-                cgctx.gctx.scopes.resolve_binding(scope, param),
-                Some(Binding::TypeParam)
-            ) && !out.contains(param)
-            {
-                out.push(param.clone());
-            }
-        }
+        TypeRef::Projection {
+            base, base_scope, ..
+        } => collect_type_params(base, cgctx, base_scope.unwrap_or(scope), out),
     }
 }
 

@@ -7,12 +7,15 @@ use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::dictionary_polish_mono::{
     polish::{
+        spans::{self, HourSpan, Span},
+        steps::{self, DaySpan},
         Approximate, Bounded, DayOrHour, DayOrHourMaximumUnitKind, DayOrTimeUnit, Gauge, Holder,
-        Hour, HourStepping, Maker, Minute, MinuteLargestUnitKind, MinuteStepping, Options,
-        PartialBoxLikeObject, PartialOmitLikeBoxLikeObject, PickedRounding, PluralizeTimeUnit,
-        PluralizeUnit, PluralizeUnitDayOrHour, PluralizeUnitHour, PluralizeUnitMinute, Rounder,
-        Rounding, RoundingU, Stepped, TimeLikeObject, TimePicking, TimeUnit,
-        TimeUnitLargestUnitKind, Transition,
+        Hour, HourLargestUnitKind, HourLargestUnitKind2, HourSpanning, HourStepping, Maker, Minute,
+        MinuteLargestUnitKind, MinuteStepping, Options, PartialBoxLikeObject,
+        PartialOmitLikeBoxLikeObject, PickedRounding, PluralizeTimeUnit, PluralizeUnit,
+        PluralizeUnitDayOrHour, PluralizeUnitHour, PluralizeUnitMinute, Rounder, Rounding,
+        RoundingU, Stepped, TimeLikeObject, TimePicking, TimeUnit, TimeUnitLargestUnitKind,
+        Transition,
     },
     DirectionKind, LevelReturnKind,
 };
@@ -136,6 +139,43 @@ fn literal_only_parameters_stay_generic() {
         Some(PluralizeTimeUnit::Hours)
     ));
     let _: PickedRounding<DayOrTimeUnit> = PickedRounding::new();
+}
+
+#[wasm_bindgen_test]
+fn associated_types_resolve_within_their_family() {
+    // `Rounding` and `Spanning` both read a `LargestUnit` of `Hour`, each
+    // its own.
+    let rounding = Stepped::<Hour>::builder()
+        .largest_unit(HourLargestUnitKind::Hours)
+        .build();
+    assert!(matches!(
+        rounding.largest_unit(),
+        Some(HourLargestUnitKind::Hours)
+    ));
+    let spanning = HourSpanning::builder()
+        .largest_unit(HourLargestUnitKind2::Hour)
+        .build();
+    assert!(matches!(
+        spanning.largest_unit(),
+        Some(HourLargestUnitKind2::Hour)
+    ));
+
+    // `Spans.Unit` and `Steps.Unit` are two arguments of `Span`.
+    let hour = HourSpan::builder()
+        .largest_unit(spans::UnitLargestUnitKind::Hours)
+        .build();
+    assert!(matches!(
+        hour.largest_unit(),
+        Some(spans::UnitLargestUnitKind::Hours)
+    ));
+    let day = DaySpan::builder()
+        .largest_unit(spans::UnitLargestUnitKind2::Day)
+        .build();
+    let span: &Span<steps::Unit> = &day;
+    assert!(matches!(
+        span.largest_unit(),
+        Some(spans::UnitLargestUnitKind2::Day)
+    ));
 }
 
 // `Rounder` has no backing module: compile-only coverage that each use site
