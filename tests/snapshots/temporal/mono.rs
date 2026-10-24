@@ -1640,7 +1640,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json_js_string(this: &PlainDate) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn value_of(this: &PlainDate) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &PlainDate) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -2105,7 +2105,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json_js_string(this: &PlainTime) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn value_of(this: &PlainTime) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &PlainTime) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -2796,7 +2796,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json_js_string(this: &PlainDateTime) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn value_of(this: &PlainDateTime) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &PlainDateTime) -> Result<(), JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTime")]
         pub fn to_zoned_date_time(
             this: &PlainDateTime,
@@ -3348,7 +3348,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json_js_string(this: &ZonedDateTime) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn value_of(this: &ZonedDateTime) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &ZonedDateTime) -> Result<(), JsValue>;
         #[wasm_bindgen(method, catch, js_name = "startOfDay")]
         pub fn start_of_day(this: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
@@ -3945,7 +3945,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json_js_string(this: &Duration) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn value_of(this: &Duration) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &Duration) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -4211,7 +4211,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json_js_string(this: &Instant) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn value_of(this: &Instant) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &Instant) -> Result<(), JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toZonedDateTimeISO")]
         pub fn to_zoned_date_time_iso(
             this: &Instant,
@@ -4555,7 +4555,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json_js_string(this: &PlainYearMonth) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn value_of(this: &PlainYearMonth) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &PlainYearMonth) -> Result<(), JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
         pub fn to_plain_date(
             this: &PlainYearMonth,
@@ -4746,7 +4746,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toJSON")]
         pub fn to_json_js_string(this: &PlainMonthDay) -> Result<JsString, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn value_of(this: &PlainMonthDay) -> Result<JsValue, JsValue>;
+        pub fn value_of(this: &PlainMonthDay) -> Result<(), JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
         pub fn to_plain_date(
             this: &PlainMonthDay,

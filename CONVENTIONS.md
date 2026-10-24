@@ -33,6 +33,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Signature flattening](#signature-flattening)
 * [Methods + the `try_<name>` companion](#methods--the-try_name-companion)
   * [`--fallible` — single `Result` form](#--fallible--single-result-form)
+  * [`never` returns keep only the catching form](#never-returns-keep-only-the-catching-form)
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
@@ -68,7 +69,9 @@ borrowed by reference; return-position container types are owned.
 
 `never` is dropped from a union, so a merged `value: T` /
 `value?: never` property reads as `Option<T>` and is set with `&T` (see
-[Optional and nullable types](#optional-and-nullable-types)).
+[Optional and nullable types](#optional-and-nullable-types)). A callable
+returning `never` binds only its catching form, typed `()` (see
+[`never` returns](#never-returns-keep-only-the-catching-form)).
 
 TypeScript's built-in `PropertyKey` is recognised without a declaration
 and lowers exactly like `string | number | symbol`.
@@ -1850,6 +1853,61 @@ other sync primary, unless calling it
 [never throws synchronously](#builtins-globals-and-async-never-throw-synchronously).
 Without the flag, output is identical to the default.
 
+### `never` returns keep only the catching form
+
+A callable whose return type is `never` cannot complete normally: it
+throws (`valueOf(): never` on the Temporal classes), or never returns at
+all (`process.exit(): never`, an assertion helper). A plain binding
+could only trap, so a function, method or static method returning
+`never`, a variable typed as such a function included, emits only its
+catching form, and its success type is `()`. That form takes the bare
+name under every policy: `try_` marks the catching twin of a plain
+form, and here there is no plain form for it to tell apart.
+
+```ts
+declare class PlainDate {
+  valueOf(): never;
+}
+declare function rejectLater(message: string): Promise<never>;
+```
+
+```rust
+// default and --fallible alike: no plain form, no `try_value_of`
+#[wasm_bindgen(method, catch, js_name = "valueOf")]
+pub fn value_of(this: &PlainDate) -> Result<(), JsValue>;
+
+// `Promise<never>`: the usual async pair, awaiting `()`
+#[wasm_bindgen(catch, js_name = "rejectLater")]
+pub async fn reject_later(message: &str) -> Result<(), JsValue>;
+#[wasm_bindgen(js_name = "rejectLater")]
+pub fn reject_later_promise(message: &str) -> Promise<Undefined>;
+```
+
+* The callable is still bound: one that never returns without throwing
+  is still worth calling, and `Ok(())` is simply never observed.
+* The error type follows the usual rules: `@throws {T}` → `T`,
+  otherwise the `--error-type` default.
+* `@throws {never}` contradicts a `never` return. The return type wins
+  and the annotation is ignored, as it is on a constructor: the binding
+  catches with the default error type.
+* `Promise<never>` keeps its `async fn` and `_promise` forms (whose
+  `catch` follows the [usual policy](#name_promise--the-un-awaited-form)).
+  Both are typed as for `Promise<void>`: `Result<(), E>` and
+  `Promise<Undefined>`.
+* The rule applies per overload and per expansion: with
+  `check(value: string): string` and `check(value: number): never`,
+  the string form keeps `check` + `try_check`, and the number form is
+  a catching `check_with_f64` alone. The arms of a
+  [literal-keyed cohort](#inline-wrappers) follow suit: beside
+  `read(kind: "text"): string`'s `read_text` + `try_read_text`,
+  `read(kind: "fail"): never` gets only a catching `read_fail()` wrapper
+  over a catching `__read_fail` binding.
+* No `try_` name is reserved for the missing twin.
+* Only a literal `never` return counts, not an alias of it. Getters
+  and properties typed `never` are unchanged (`JsValue` reads, see
+  [Primitive types](#primitive-types)), and so are constructors, which
+  always catch.
+
 ## `Promise<T>` returns become `async fn`
 
 ```ts
@@ -2739,6 +2797,9 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
   [without the annotation](#builtins-globals-and-async-never-throw-synchronously).
 * **Constructors** always catch per JS `new` semantics —
   `@throws {never}` on a constructor is silently ignored.
+* **`never` returns** contradict the annotation and win: it is ignored
+  and the callable keeps only its catching form (see
+  [`never` returns](#never-returns-keep-only-the-catching-form)).
 * **Setters** never throw and never get `try_` variants regardless,
   so the annotation is a no-op there too.
 * **Mixed annotations** like `@throws {never | TypeError}` collapse to

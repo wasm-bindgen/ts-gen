@@ -734,6 +734,13 @@ impl CallableSpec<'_> {
 ///   (`@throws {never}`). Sync callables get *no* `try_` companion; async
 ///   callables drop `catch` and return `T` directly. Constructors ignore
 ///   this — they always catch per JS `new` semantics.
+/// * **`never` returns**: a callable returning `never` (or `Promise<never>`)
+///   never completes normally, so only its catching form is emitted, typed
+///   `()`: the primary itself catches, under every policy, with no `try_`
+///   twin; for `Promise<never>`, the `async fn` and its `Promise<void>`
+///   sibling. It
+///   overrides `@throws {never}`. Decided per expansion, so overloads that
+///   return something else keep their usual forms.
 /// * **Naming**: each surviving expansion gets `base + suffix` deduped against
 ///   `names`; `try_` variants prepend `try_` and declare again.
 pub fn build_signatures(
@@ -747,6 +754,7 @@ pub fn build_signatures(
     let expansions = expand_signatures(spec.overloads, spec.kind, cgctx);
 
     let per_mono = CodegenContext::generic_mono(cgctx);
+    let fallible = cgctx.is_some_and(|ctx| ctx.fallible);
     let mut out = Vec::with_capacity(expansions.len());
 
     // One emitted binding per expansion, except a literal-keyed cohort,
@@ -818,9 +826,6 @@ pub fn build_signatures(
         } = unit;
         let overload = spec.overloads[overload];
         let scope = overload.body_scope;
-        // `Throws::Never` suppresses every fallible form — except for
-        // constructors, which always catch (`new` can always throw in JS).
-        let nothrow = overload.throws.is_never() && !spec.kind.always_catches();
         let error_type = overload.throws.as_type();
         let (is_async, return_type) = match (
             overload.return_type.as_promise_inner(),
@@ -829,12 +834,26 @@ pub fn build_signatures(
             (Some(inner), true) => (true, inner.clone()),
             _ => (false, overload.return_type.clone()),
         };
+        // A `never` return (awaited, for `Promise<never>`) means the call
+        // never completes normally: it throws, rejects or does not return.
+        // Only the catching form is emitted, under the bare name (`try_`
+        // marks a twin, and there is none), with `()` as its success type.
+        let never_returns = spec.kind.allows_try_variant() && return_type == TypeRef::Never;
+        let return_type = if never_returns {
+            TypeRef::Void
+        } else {
+            return_type
+        };
+        // `Throws::Never` suppresses every fallible form — except for
+        // constructors, which always catch (`new` can always throw in JS),
+        // and for a `never` return, which contradicts it and wins.
+        let nothrow = overload.throws.is_never() && !spec.kind.always_catches() && !never_returns;
         // A sync callable that can throw gets a catching form: as the
         // `try_` companion by default, or as the primary itself under
-        // `--fallible`.
+        // `--fallible` or when it returns `never`.
         let sync_fallible = !is_async && !nothrow && spec.kind.allows_try_variant();
-        let fallible = cgctx.is_some_and(|ctx| ctx.fallible);
-        let allow_try = sync_fallible && !fallible;
+        let primary_is_catching = fallible || never_returns;
+        let allow_try = sync_fallible && !primary_is_catching;
         out.reserve(match (allow_try, per_mono) {
             (true, true) => 4,
             (true, false) | (false, true) => 2,
@@ -850,9 +869,10 @@ pub fn build_signatures(
         // Primary variant catches when:
         // * the kind always catches (constructors), OR
         // * it's async — *unless* `Throws::Never` opts out, OR
-        // * it's sync and can throw, under `--fallible`.
-        let primary_catches =
-            spec.kind.always_catches() || (is_async && !nothrow) || (sync_fallible && fallible);
+        // * it's sync and can throw, under `--fallible` or returning `never`.
+        let primary_catches = spec.kind.always_catches()
+            || (is_async && !nothrow)
+            || (sync_fallible && primary_is_catching);
         let primary = FunctionSignature {
             rust_name: primary_name.clone(),
             js_name: spec.js_name.to_string(),
@@ -895,7 +915,11 @@ pub fn build_signatures(
                 params: exp_params.clone(),
                 catch: promise_catches,
                 is_async: false,
-                return_type: overload.return_type.clone(),
+                return_type: if never_returns {
+                    awaiting_void(overload.return_type)
+                } else {
+                    overload.return_type.clone()
+                },
                 js_string_return: false,
                 error_type: if promise_catches {
                     error_type.cloned()
@@ -946,6 +970,18 @@ pub fn build_signatures(
         }
     }
     out
+}
+
+/// `Promise<never>` → `Promise<void>`: the `_promise` form of a
+/// `Promise<never>` callable, typed like its `async fn`'s `()`.
+fn awaiting_void(promise: &TypeRef) -> TypeRef {
+    match promise {
+        TypeRef::Reference { segments, .. } => TypeRef::Reference {
+            segments: segments.clone(),
+            generic_args: vec![TypeRef::Void],
+        },
+        other => other.clone(),
+    }
 }
 
 fn push_with_js_string_return(
@@ -3735,6 +3771,235 @@ mod tests {
                 assert_eq!(a.error_type, b.error_type, "{js}");
             }
         }
+    }
+
+    #[test]
+    fn never_return_keeps_only_the_catching_form() {
+        // Default: one form, which catches under the bare name and returns
+        // `()`; there is no twin for `try_` to tell it apart from.
+        for kind in [
+            SignatureKind::Method,
+            SignatureKind::StaticMethod,
+            SignatureKind::Function,
+        ] {
+            let mut used = no_used();
+            let sigs = expand_throws(
+                "valueOf",
+                &[],
+                &TypeRef::Never,
+                kind,
+                &Throws::None,
+                &None,
+                &mut used,
+            );
+            assert_eq!(sigs.len(), 1, "{kind:?}");
+            assert_eq!(sigs[0].rust_name, "value_of");
+            assert!(sigs[0].catch && !sigs[0].is_async);
+            assert_eq!(sigs[0].return_type, TypeRef::Void);
+            // No `try_` name is claimed.
+            assert_eq!(used.declare("try_value_of", Suffix::Snake), "try_value_of");
+        }
+        // `--fallible`: the same.
+        let sigs = expand_fallible(
+            "valueOf",
+            &[],
+            &TypeRef::Never,
+            SignatureKind::Method,
+            &Throws::None,
+            &mut no_used(),
+        );
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].rust_name, "value_of");
+        assert!(sigs[0].catch);
+        assert_eq!(sigs[0].return_type, TypeRef::Void);
+    }
+
+    #[test]
+    fn never_return_keeps_typed_error_and_overrides_throws_never() {
+        let range = TypeRef::ident("RangeError");
+        let typed = expand_throws(
+            "fail",
+            &[],
+            &TypeRef::Never,
+            SignatureKind::Function,
+            &Throws::Type(range.clone()),
+            &None,
+            &mut no_used(),
+        );
+        assert_eq!(typed.len(), 1);
+        assert_eq!(typed[0].error_type, Some(range));
+        for sigs in [
+            expand_throws(
+                "fail",
+                &[],
+                &TypeRef::Never,
+                SignatureKind::Function,
+                &Throws::Never,
+                &None,
+                &mut no_used(),
+            ),
+            expand_fallible(
+                "fail",
+                &[],
+                &TypeRef::Never,
+                SignatureKind::Function,
+                &Throws::Never,
+                &mut no_used(),
+            ),
+        ] {
+            assert_eq!(sigs.len(), 1);
+            assert!(sigs[0].catch);
+            assert_eq!(sigs[0].error_type, None);
+            assert_eq!(sigs[0].return_type, TypeRef::Void);
+        }
+    }
+
+    #[test]
+    fn promise_never_awaits_unit() {
+        let promise_never = TypeRef::generic("Promise", vec![TypeRef::Never]);
+        for throws in [Throws::None, Throws::Never] {
+            let sigs = expand_throws(
+                "rejectLater",
+                &[],
+                &promise_never,
+                SignatureKind::Function,
+                &throws,
+                &None,
+                &mut no_used(),
+            );
+            assert_eq!(sigs.len(), 2, "{throws:?}");
+            assert_eq!(sigs[0].rust_name, "reject_later");
+            assert!(sigs[0].is_async && sigs[0].catch, "{throws:?}");
+            assert_eq!(sigs[0].return_type, TypeRef::Void);
+            assert_eq!(sigs[1].rust_name, "reject_later_promise");
+            assert!(!sigs[1].is_async);
+            assert_eq!(
+                sigs[1].return_type,
+                TypeRef::generic("Promise", vec![TypeRef::Void])
+            );
+        }
+    }
+
+    #[test]
+    fn never_return_applies_per_overload() {
+        let (gctx, scope) = test_ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let s = [typed_param("value", TypeRef::String)];
+        let n = [typed_param("value", TypeRef::Number)];
+        let overload = |params, return_type| Overload {
+            params,
+            return_type,
+            body_scope: scope,
+            throws: &Throws::None,
+            async_modifier: false,
+            doc: &None,
+        };
+        let sigs = build_signatures(
+            &CallableSpec {
+                js_name: "check",
+                rust_name: None,
+                kind: SignatureKind::Function,
+                module: &ModuleContext::Global,
+                overloads: &[
+                    overload(&s, &TypeRef::String),
+                    overload(&n, &TypeRef::Never),
+                ],
+            },
+            &mut no_used(),
+            Some(&cgctx),
+        );
+        let names: Vec<_> = sigs.iter().map(|s| s.rust_name.as_str()).collect();
+        assert_eq!(names, ["check", "try_check", "check_with_f64"]);
+        assert!(sigs[2].catch);
+        assert_eq!(sigs[2].return_type, TypeRef::Void);
+    }
+
+    #[test]
+    fn never_return_literal_arms_are_catch_only() {
+        let (gctx, scope) = test_ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lit = |v: &str| [typed_param("kind", TypeRef::StringLiteral(v.to_string()))];
+        let (text, fail, soft, hard) = (lit("text"), lit("fail"), lit("soft"), lit("hard"));
+        let overload = |params, return_type| Overload {
+            params,
+            return_type,
+            body_scope: scope,
+            throws: &Throws::None,
+            async_modifier: false,
+            doc: &None,
+        };
+        let build = |overloads: &[Overload<'_>], used: &mut LocalScope| {
+            build_signatures(
+                &CallableSpec {
+                    js_name: "read",
+                    rust_name: None,
+                    kind: SignatureKind::Function,
+                    module: &ModuleContext::Global,
+                    overloads,
+                },
+                used,
+                Some(&cgctx),
+            )
+        };
+        let arm_names = |sigs: &[FunctionSignature]| -> Vec<String> {
+            sigs.iter()
+                .flat_map(|s| s.literal.as_ref().unwrap().arms.iter().map(|a| a.1.clone()))
+                .collect()
+        };
+
+        // Every arm returns `never`: one catching binding, bare wrappers.
+        let mut used = no_used();
+        let sigs = build(
+            &[
+                overload(&soft, &TypeRef::Never),
+                overload(&hard, &TypeRef::Never),
+            ],
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert!(sigs[0].catch);
+        assert_eq!(sigs[0].return_type, TypeRef::Void);
+        assert_eq!(arm_names(&sigs), ["read_soft", "read_hard"]);
+        assert_eq!(
+            used.declare("try_read_soft", Suffix::Snake),
+            "try_read_soft"
+        );
+
+        // Mixed: the returning arm keeps its pair, the `never` arm is bare.
+        let mut used = no_used();
+        let sigs = build(
+            &[
+                overload(&text, &TypeRef::String),
+                overload(&fail, &TypeRef::Never),
+            ],
+            &mut used,
+        );
+        assert_eq!(
+            arm_names(&sigs),
+            ["read_text", "try_read_text", "read_fail"]
+        );
+        assert!(sigs[2].catch);
+        assert_eq!(sigs[2].return_type, TypeRef::Void);
+        assert_eq!(
+            used.declare("try_read_fail", Suffix::Snake),
+            "try_read_fail"
+        );
+    }
+
+    #[test]
+    fn never_return_leaves_constructors_alone() {
+        let sigs = expand_throws(
+            "Foo",
+            &[],
+            &TypeRef::Never,
+            SignatureKind::Constructor,
+            &Throws::None,
+            &None,
+            &mut no_used(),
+        );
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].rust_name, "new");
+        assert_eq!(sigs[0].return_type, TypeRef::Never);
     }
 
     #[test]
