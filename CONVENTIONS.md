@@ -3301,8 +3301,10 @@ pub type Sized;            // size?
   type gives none. An `as` clause is not followed.
 * **Indexed access on an optional property admits `undefined`.**
   `Options["size"]` is `number | undefined`, so a function returning it
-  returns `Option<f64>`. `-?` and `Required` remove the `undefined` again,
-  as TypeScript does: `Required<Options>` has `size: f64`.
+  returns `Option<f64>`. `-?` and `Required` remove the `undefined` again
+  from a property they make required, as TypeScript does:
+  `Required<Options>` has `size: f64`, while a `note: string | undefined`
+  that was never optional keeps its `undefined`.
 * **`never`** is dropped from a union and erases to `JsValue` alone.
 * **What can't be evaluated keeps its old lowering**, with a warning: a
   utility is its first argument (`Partial<Widget>` over a class with

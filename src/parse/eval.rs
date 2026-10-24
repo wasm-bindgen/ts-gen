@@ -1028,8 +1028,10 @@ impl<'g> Eval<'g> {
         match utility {
             Utility::Partial => props.iter_mut().for_each(|p| p.optional = true),
             Utility::Required => props.iter_mut().for_each(|p| {
+                if p.optional {
+                    p.type_ref = without_undefined(&p.type_ref);
+                }
                 p.optional = false;
-                p.type_ref = without_undefined(&p.type_ref);
             }),
             Utility::Readonly => props.iter_mut().for_each(|p| p.readonly = true),
             Utility::Pick | Utility::Omit => {
@@ -1086,7 +1088,7 @@ impl<'g> Eval<'g> {
                 Some(Modifier::Remove) => false,
                 None => inherited,
             };
-            if mapped.optional == Some(Modifier::Remove) {
+            if mapped.optional == Some(Modifier::Remove) && from.is_some_and(|p| p.optional) {
                 type_ref = without_undefined(&type_ref);
             }
             props.push(Prop {
@@ -1571,7 +1573,7 @@ fn is_plain_alias(kind: &TypeKind) -> bool {
     matches!(kind, TypeKind::TypeAlias(a) if a.type_params.is_empty())
 }
 
-/// `-?` removes `undefined` from the property's type as well.
+/// `-?` on an optional property removes `undefined` from its type as well.
 fn without_undefined(ty: &TypeRef) -> TypeRef {
     TypeRef::union(
         union_members(ty)
@@ -2015,7 +2017,7 @@ mod tests {
     #[test]
     fn indexed_access_on_an_optional_property_admits_undefined() {
         let (module, gctx) = parse(
-            "interface Options { name: string; size?: number }
+            "interface Options { name: string; size?: number; note: string | undefined }
              type Strict = { [P in keyof Options]-?: Options[P] };
              declare function f(a: Options[\"size\"], b: Options[\"name\"], c: Required<Options>): void;",
         );
@@ -2024,9 +2026,19 @@ mod tests {
             &TypeRef::union([TypeRef::Number, TypeRef::Undefined])
         );
         assert_eq!(param_type(&gctx, &module, "f", 1), &TypeRef::String);
+        let TypeKind::Interface(strict) = kind(&gctx, &module, "Strict") else {
+            unreachable!()
+        };
+        let getter = |name: &str| {
+            strict.members.iter().find_map(|m| match m {
+                Member::Getter(g) if g.js_name == name => Some((g.type_ref.clone(), g.optional)),
+                _ => None,
+            })
+        };
+        assert_eq!(getter("size"), Some((TypeRef::Number, false)));
         assert_eq!(
-            props(kind(&gctx, &module, "Strict")),
-            [("name", false, false), ("size", false, false)]
+            getter("note"),
+            Some((TypeRef::union([TypeRef::String, TypeRef::Undefined]), false))
         );
         assert_eq!(
             param_type(&gctx, &module, "f", 2),
