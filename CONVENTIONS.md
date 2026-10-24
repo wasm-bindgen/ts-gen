@@ -1657,10 +1657,11 @@ keeps a sync binding infallible (no `catch`, plain `T`) and is the only
 way to get one under the flag. Async callables, constructors (always
 catch), setters (never catch) and property getters are not affected
 (a getter annotated `@throws {X}` catches under either policy; see
-[`@throws {X}` on getters](#throws-x-on-getters)); an async callable's
+[`@throws {X}` on getters](#throws-x-on-getters)). An async callable's
 sync `<name>_promise` form (below) catches under the flag like any
-other sync primary. Without the flag, output is identical to the
-default.
+other sync primary, unless calling it
+[never throws synchronously](#builtins-globals-and-async-never-throw-synchronously).
+Without the flag, output is identical to the default.
 
 ## `Promise<T>` returns become `async fn`
 
@@ -1703,9 +1704,61 @@ pub fn fetch_promise(url: &str) -> Promise<Response>;
   synchronous throw. Under the default policy the form is plain, like
   every other sync primary; under `--fallible` it catches and returns
   `Result<Promise<T>, E>`, typed by `@throws` like the primary, and
-  `@throws {never}` makes it plain again.
+  `@throws {never}` makes it plain again. A builtin, a global or an
+  `async`-declared callable keeps it plain under every policy (below).
 * A `Promise`-typed *property* is already a sync getter and gets no
   sibling.
+
+#### Builtins, globals and `async` never throw synchronously
+
+An async function of the host reports failure by rejecting the promise
+it returns, not by throwing, so calling it never throws synchronously.
+Its `_promise` form is a plain `Promise<T>` under `--fallible` too,
+whatever its `@throws`: on an async callable `@throws` describes the
+rejection, which the `async fn` form keeps carrying. This covers a
+callable whose binding is
+
+* **builtin**: it resolves to a module specifier containing a `:`
+  (`node:fs`, `cloudflare:sockets`, `bun:sqlite`, `workerd:…`), or to a
+  bare Node builtin (`fs`, `fs/promises`, `path`, …, Node's
+  `require("module").builtinModules`);
+* **global**: it has no module, so it lives on the global object: global
+  functions, global classes and interfaces with their methods and
+  statics, and the functions of global namespaces.
+
+A callable's module is the one its declaration is bound in, the
+`module = "…"` its extern block carries: a `declare module "…"` body's,
+the `--lib-name` module's for a module file's declarations, and none for
+a script file's or a `declare global` block's. Callables of any other
+module, such as the `--lib-name` library or a package, keep the
+`--fallible` rule.
+
+A function or method declared `async` gets the same: the modifier
+promises a rejection rather than a throw. TypeScript rejects `async` in
+an ambient context, but ts-gen parses every input, a `.ts` file passed
+by name included, as declarations, and the modifier comes through.
+
+```ts
+declare global {
+  /** @throws {TypeError} on a non-GET request */
+  function cachePut(url: string): Promise<void>;
+}
+declare module "user-lib" {
+  export function fetchText(url: string): Promise<string>;
+}
+```
+
+```rust
+// --fallible
+#[wasm_bindgen(catch, js_name = "cachePut")]
+pub async fn cache_put(url: &str) -> Result<(), TypeError>;
+#[wasm_bindgen(js_name = "cachePut")]
+pub fn cache_put_promise(url: &str) -> Promise<Undefined>;
+
+// in the `#[wasm_bindgen(module = "user-lib")]` block
+#[wasm_bindgen(catch, js_name = "fetchText")]
+pub fn fetch_text_promise(url: &str) -> Result<Promise<JsString>, JsValue>;
+```
 
 The alternative, making the primary itself return `Promise<T>` and
 relying on `IntoFuture`, was rejected: the future's error is always
@@ -2323,7 +2376,8 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 * **Async callables** (returning `Promise<T>`) drop the `Result<T, _>`
   wrapper and the `catch` attribute. The binding becomes
   `pub async fn foo() -> T`; its `foo_promise` form is plain under
-  every policy.
+  every policy, as a builtin's, a global's or an `async` callable's is
+  [without the annotation](#builtins-globals-and-async-never-throw-synchronously).
 * **Constructors** always catch per JS `new` semantics —
   `@throws {never}` on a constructor is silently ignored.
 * **Setters** never throw and never get `try_` variants regardless,

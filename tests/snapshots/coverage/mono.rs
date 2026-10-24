@@ -227,11 +227,11 @@ extern "C" {
         this: &DefaultProcessor,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "process")]
+    #[wasm_bindgen(method, js_name = "process")]
     pub fn process_promise(
         this: &DefaultProcessor,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<JsString>, JsValue>;
+    ) -> Promise<JsString>;
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &DefaultProcessor) -> String;
     #[wasm_bindgen(method, getter, js_name = "name")]
@@ -518,23 +518,23 @@ extern "C" {
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<Map<JsString, Array<JsString>>>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
+    #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<Nullable<Map<JsString, Array<JsString>>>>, JsValue>;
+    ) -> Promise<Nullable<Map<JsString, Array<JsString>>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn set(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &Map<impl ::wasm_bindgen::JsStringLike, Array<impl ::wasm_bindgen::JsStringLike>>,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "set")]
+    #[wasm_bindgen(method, js_name = "set")]
     pub fn set_promise(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &Map<impl ::wasm_bindgen::JsStringLike, Array<impl ::wasm_bindgen::JsStringLike>>,
-    ) -> Result<Promise<Undefined>, JsValue>;
+    ) -> Promise<Undefined>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

@@ -734,6 +734,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                             // Variable-as-function form (`var foo: () => T`) doesn't
                             // typically carry @throws JSDoc; leave empty.
                             throws: ir::Throws::None,
+                            async_modifier: false,
                             // Var-as-function bindings have no surface type
                             // parameters; their body scope is the enclosing.
                             body_scope: dcx.scope,
@@ -807,6 +808,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 return_type,
                 overloads: vec![],
                 throws: ir::Throws::None,
+                async_modifier: false,
                 body_scope,
             });
         }

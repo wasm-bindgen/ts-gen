@@ -64,10 +64,8 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetch")]
-    pub fn fetch_promise(
-        input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<Response>, JsValue>;
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_promise(input: impl ::wasm_bindgen::JsStringLike) -> Promise<Response>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -76,6 +74,6 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetch")]
-    pub fn fetch_with_request_promise(input: &Request) -> Result<Promise<Response>, JsValue>;
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_with_request_promise(input: &Request) -> Promise<Response>;
 }

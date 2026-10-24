@@ -61,6 +61,7 @@ fn emit_function(
         return_type: &decl.return_type,
         body_scope: decl.body_scope,
         throws: &decl.throws,
+        async_modifier: decl.async_modifier,
         doc,
     })
     .chain(decl.overloads.iter().map(|o| Overload {
@@ -68,6 +69,7 @@ fn emit_function(
         return_type: &o.return_type,
         body_scope: o.body_scope,
         throws: &o.throws,
+        async_modifier: o.async_modifier,
         doc: &o.doc,
     }))
     .collect();
@@ -77,6 +79,7 @@ fn emit_function(
             rust_name: Some(&rust_name),
             kind: SignatureKind::Function,
             overloads: &overloads,
+            module: ctx,
         },
         &mut value_names.idents,
         cgctx,
@@ -428,6 +431,7 @@ fn generate_constructs(
             return_type: &construct.return_type,
             body_scope: construct.body_scope,
             throws: &construct.throws,
+            async_modifier: false,
             doc,
         };
         match groups.iter_mut().find(|(first, _, _)| same(first)) {
@@ -444,6 +448,7 @@ fn generate_constructs(
                 rust_name: None,
                 kind: SignatureKind::Constructor,
                 overloads,
+                module: ctx,
             },
             names.entry(*target).or_default(),
             Some(cgctx),

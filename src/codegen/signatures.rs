@@ -46,7 +46,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::codegen::typemap::{self, CodegenContext, TypePosition};
-use crate::ir::{Nullability, Param, SharedMemory, Throws, TypeRef};
+use crate::ir::{ModuleContext, Nullability, Param, SharedMemory, Throws, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::naming::{ident_chars, snake_ident, to_snake_case, LocalScope, Suffix};
 
@@ -469,6 +469,8 @@ pub struct Overload<'a> {
     ///   `catch` and return `T` directly. Constructors ignore this and
     ///   still catch (per JS `new` semantics).
     pub throws: &'a Throws,
+    /// Declared `async`: see [`CallableSpec::call_never_throws`].
+    pub async_modifier: bool,
     /// Its doc comment, attached to each signature it expands to.
     pub doc: &'a Option<String>,
 }
@@ -489,6 +491,18 @@ pub struct CallableSpec<'a> {
     /// All overloads sharing this `js_name` — typically one element, but TS
     /// allows multiple overloaded declarations.
     pub overloads: &'a [Overload<'a>],
+    /// Where its binding lives: the global object or a JS module.
+    pub module: &'a ModuleContext,
+}
+
+impl CallableSpec<'_> {
+    /// Whether calling `overload` never throws synchronously. A builtin or
+    /// global callable, or one declared `async`, reports failure by
+    /// rejecting the promise it returns, so its sync `_promise` form needs
+    /// no `catch`. `@throws` on such a callable describes the rejection.
+    fn call_never_throws(&self, overload: &Overload<'_>) -> bool {
+        overload.async_modifier || self.module.is_builtin_or_global()
+    }
 }
 
 /// Resolve a [`CallableSpec`] into the full set of [`FunctionSignature`]s
@@ -500,7 +514,9 @@ pub struct CallableSpec<'a> {
 ///   type is `Promise<T>`, collapse to a single `async fn` with `catch: true`,
 ///   carrying the unwrapped `T` as `return_type`. No `try_` companion is
 ///   emitted in this case (`async + catch` is already the fallible form).
-///   A sync `<name>_promise` sibling returns the `Promise<T>` itself.
+///   A sync `<name>_promise` sibling returns the `Promise<T>` itself; it
+///   catches a synchronous throw under `--fallible`, unless the callable is
+///   a builtin or global one or declared `async`, whose calls never throw.
 /// * **`try_` companion**: for sync, non-setter, non-constructor callables,
 ///   each primary `name` gets a fallible `try_name` sibling.
 /// * **Constructor catches always**: per JS semantics; the primary signature
@@ -581,10 +597,14 @@ pub fn build_signatures(
         // to `waitUntil`, gating a constructor on it, racing it) gets
         // the un-awaited form too. Rejection travels inside the
         // returned promise; `catch` here covers only a synchronous
-        // throw, which the sync-callable policy decides.
+        // throw, which the sync-callable policy decides, unless the
+        // call cannot throw synchronously at all.
         if is_async {
             let promise_name = names.declare(&format!("{primary_name}_promise"), Suffix::Snake);
-            let promise_catches = !nothrow && fallible && spec.kind.allows_try_variant();
+            let promise_catches = !nothrow
+                && !spec.call_never_throws(&overload)
+                && fallible
+                && spec.kind.allows_try_variant();
             out.push(FunctionSignature {
                 rust_name: promise_name,
                 js_name: spec.js_name.to_string(),
@@ -2205,11 +2225,13 @@ mod tests {
                 js_name: js,
                 rust_name: None,
                 kind: SignatureKind::Function,
+                module: &ModuleContext::Global,
                 overloads: &[Overload {
                     params,
                     return_type: ret,
                     body_scope: scope,
                     throws: &Throws::None,
+                    async_modifier: false,
                     doc: &None,
                 }],
             },
@@ -2266,6 +2288,58 @@ mod tests {
         assert_eq!(typed[1].error_type, Some(TypeRef::ident("TypeError")));
         let never = op(&Throws::Never);
         assert!(!never[1].catch && never[1].error_type.is_none());
+    }
+
+    #[test]
+    fn builtin_global_and_async_promise_forms_never_catch() {
+        let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
+        let type_error = Throws::Type(TypeRef::ident("TypeError"));
+        let module = |m: &str| ModuleContext::Module(m.into());
+        for (ctx, async_modifier) in [
+            (ModuleContext::Global, false),
+            (module("node:fs"), false),
+            (module("fs"), false),
+            (module("fs/promises"), false),
+            (module("cloudflare:sockets"), false),
+            (module("bun:sqlite"), false),
+            (module("user-lib"), true),
+        ] {
+            for kind in [SignatureKind::Function, SignatureKind::Method] {
+                for throws in [&Throws::None, &type_error] {
+                    let sigs = expand_fallible_in(
+                        &ctx,
+                        async_modifier,
+                        "op",
+                        &[],
+                        &promise,
+                        kind,
+                        throws,
+                        &mut no_used(),
+                    );
+                    assert_eq!(sigs[1].rust_name, "op_promise");
+                    assert!(!sigs[1].catch, "{ctx:?} {async_modifier}");
+                    assert_eq!(sigs[1].error_type, None);
+                    // `@throws` on an async callable types the rejection,
+                    // which the `async fn` form keeps carrying.
+                    assert!(sigs[0].is_async && sigs[0].catch);
+                    assert_eq!(sigs[0].error_type.as_ref(), throws.as_type());
+                }
+            }
+        }
+        // A module that only resembles a builtin's name is the user's.
+        for name in ["fsx", "node-fetch", "@cloudflare/workers-types"] {
+            let sigs = expand_fallible_in(
+                &module(name),
+                false,
+                "op",
+                &[],
+                &promise,
+                SignatureKind::Function,
+                &Throws::None,
+                &mut no_used(),
+            );
+            assert!(sigs[1].catch, "{name}");
+        }
     }
 
     #[test]
@@ -2404,11 +2478,13 @@ mod tests {
                 js_name: js,
                 rust_name: None,
                 kind,
+                module: &ModuleContext::Global,
                 overloads: &[Overload {
                     params,
                     return_type: ret,
                     body_scope: scope,
                     throws,
+                    async_modifier: false,
                     doc,
                 }],
             },
@@ -2418,7 +2494,25 @@ mod tests {
     }
 
     /// Like [`expand_throws`] under `--fallible`.
+    /// The callable is a user module's, whose calls can throw synchronously.
     fn expand_fallible(
+        js: &str,
+        params: &[Param],
+        ret: &TypeRef,
+        kind: SignatureKind,
+        throws: &Throws,
+        used: &mut LocalScope,
+    ) -> Vec<FunctionSignature> {
+        let user = ModuleContext::Module("user-lib".into());
+        expand_fallible_in(&user, false, js, params, ret, kind, throws, used)
+    }
+
+    /// Like [`expand_fallible`], for a callable in `module`, declared
+    /// `async` or not.
+    #[allow(clippy::too_many_arguments)]
+    fn expand_fallible_in(
+        module: &ModuleContext,
+        async_modifier: bool,
         js: &str,
         params: &[Param],
         ret: &TypeRef,
@@ -2434,11 +2528,13 @@ mod tests {
                 js_name: js,
                 rust_name: None,
                 kind,
+                module,
                 overloads: &[Overload {
                     params,
                     return_type: ret,
                     body_scope: scope,
                     throws,
+                    async_modifier,
                     doc: &None,
                 }],
             },
@@ -2465,6 +2561,7 @@ mod tests {
                 return_type: ret,
                 body_scope: scope,
                 throws: &Throws::None,
+                async_modifier: false,
                 doc,
             })
             .collect();
@@ -2474,6 +2571,7 @@ mod tests {
                 rust_name: None,
                 kind,
                 overloads: &overloads,
+                module: &ModuleContext::Global,
             },
             used,
             Some(&cgctx),
@@ -2732,12 +2830,14 @@ mod tests {
                 js_name: "f",
                 rust_name: None,
                 kind: SignatureKind::Function,
+                module: &ModuleContext::Global,
                 overloads: &[
                     Overload {
                         params: &by_string,
                         return_type: &promise,
                         body_scope: outer,
                         throws: &Throws::None,
+                        async_modifier: false,
                         doc: &None,
                     },
                     Overload {
@@ -2745,6 +2845,7 @@ mod tests {
                         return_type: &TypeRef::Number,
                         body_scope: inner,
                         throws: &Throws::None,
+                        async_modifier: false,
                         doc: &None,
                     },
                 ],

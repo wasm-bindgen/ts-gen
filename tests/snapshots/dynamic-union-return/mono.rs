@@ -58,8 +58,8 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " The awaited value is a top-level return: the enum is synthesised."]
-    #[wasm_bindgen(catch, js_name = "fetchValue")]
-    pub fn fetch_value_promise() -> Result<Promise, JsValue>;
+    #[wasm_bindgen(js_name = "fetchValue")]
+    pub fn fetch_value_promise() -> Promise;
 }
 #[wasm_bindgen(private)]
 pub enum ContentKind {

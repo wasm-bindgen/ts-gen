@@ -239,6 +239,7 @@ pub(crate) fn try_synthesize_iterable_return(
             }
         )),
         throws: Throws::None,
+        async_modifier: false,
         body_scope: iter_method_body,
     });
 
@@ -776,6 +777,7 @@ fn convert_method_signature(
             optional: method.optional,
             doc,
             throws: info.throws(),
+            async_modifier: false,
             body_scope,
         })],
     }
@@ -928,6 +930,7 @@ fn convert_class_method(
                     return_type,
                     doc,
                     throws: info.throws(),
+                    async_modifier: func.r#async,
                     body_scope,
                 })]
             } else {
@@ -940,6 +943,7 @@ fn convert_class_method(
                     optional: method.optional,
                     doc,
                     throws: info.throws(),
+                    async_modifier: func.r#async,
                     body_scope,
                 })]
             }

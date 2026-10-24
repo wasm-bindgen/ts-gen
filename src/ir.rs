@@ -37,7 +37,95 @@ impl ModuleContext {
             ModuleContext::Module(module) => Some(module),
         }
     }
+
+    /// Whether a binding here belongs to the host: the global object, or a
+    /// builtin module, which is any specifier with a scheme (`node:fs`,
+    /// `cloudflare:sockets`, `bun:sqlite`) or a bare Node builtin (`fs`).
+    /// The host's async functions reject rather than throw, so calling one
+    /// never throws synchronously.
+    pub(crate) fn is_builtin_or_global(&self) -> bool {
+        match self {
+            ModuleContext::Global => true,
+            ModuleContext::Module(module) => {
+                module.contains(':') || NODE_BUILTIN_MODULES.contains(&&**module)
+            }
+        }
+    }
 }
+
+/// Node's `require("module").builtinModules` (Node 22), the bare
+/// specifiers of its builtins. The `node:`-only ones (`node:test`,
+/// `node:sqlite`, …) are not listed there and carry a colon anyway.
+const NODE_BUILTIN_MODULES: &[&str] = &[
+    "_http_agent",
+    "_http_client",
+    "_http_common",
+    "_http_incoming",
+    "_http_outgoing",
+    "_http_server",
+    "_stream_duplex",
+    "_stream_passthrough",
+    "_stream_readable",
+    "_stream_transform",
+    "_stream_wrap",
+    "_stream_writable",
+    "_tls_common",
+    "_tls_wrap",
+    "assert",
+    "assert/strict",
+    "async_hooks",
+    "buffer",
+    "child_process",
+    "cluster",
+    "console",
+    "constants",
+    "crypto",
+    "dgram",
+    "diagnostics_channel",
+    "dns",
+    "dns/promises",
+    "domain",
+    "events",
+    "fs",
+    "fs/promises",
+    "http",
+    "http2",
+    "https",
+    "inspector",
+    "inspector/promises",
+    "module",
+    "net",
+    "os",
+    "path",
+    "path/posix",
+    "path/win32",
+    "perf_hooks",
+    "process",
+    "punycode",
+    "querystring",
+    "readline",
+    "readline/promises",
+    "repl",
+    "stream",
+    "stream/consumers",
+    "stream/promises",
+    "stream/web",
+    "string_decoder",
+    "sys",
+    "timers",
+    "timers/promises",
+    "tls",
+    "trace_events",
+    "tty",
+    "url",
+    "util",
+    "util/types",
+    "v8",
+    "vm",
+    "wasi",
+    "worker_threads",
+    "zlib",
+];
 
 // ─── Type References ─────────────────────────────────────────────────
 
@@ -1030,6 +1118,8 @@ pub struct FunctionDecl {
     pub overloads: Vec<FunctionOverload>,
     /// Failure-mode info from `@throws` JSDoc. See [`Throws`].
     pub throws: Throws,
+    /// Declared `async`, so calling it never throws synchronously.
+    pub async_modifier: bool,
     /// Scope inside this function's body — see [`ClassDecl::body_scope`].
     pub body_scope: crate::parse::scope::ScopeId,
 }
@@ -1043,6 +1133,8 @@ pub struct FunctionOverload {
     /// parameters.
     pub body_scope: crate::parse::scope::ScopeId,
     pub throws: Throws,
+    /// See [`FunctionDecl::async_modifier`].
+    pub async_modifier: bool,
     pub doc: Option<String>,
 }
 
@@ -1147,6 +1239,8 @@ pub struct MethodMember {
     pub doc: Option<String>,
     /// Failure-mode info from `@throws` — see [`Throws`].
     pub throws: Throws,
+    /// See [`FunctionDecl::async_modifier`].
+    pub async_modifier: bool,
     /// Scope inside this method's body — child of the enclosing
     /// type's body scope, holding [`Binding::TypeParam`] entries for
     /// the method's own `<T, ...>`. See [`ClassDecl::body_scope`].
@@ -1229,6 +1323,8 @@ pub struct StaticMethodMember {
     pub doc: Option<String>,
     /// Failure-mode info from `@throws` — see [`Throws`].
     pub throws: Throws,
+    /// See [`FunctionDecl::async_modifier`].
+    pub async_modifier: bool,
     /// Scope inside this static method's body — see
     /// [`MethodMember::body_scope`].
     pub body_scope: crate::parse::scope::ScopeId,

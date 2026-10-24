@@ -73,6 +73,6 @@ extern "C" {
     pub type Socket;
     #[wasm_bindgen(method, catch)]
     pub async fn close(this: &Socket) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "close")]
-    pub fn close_promise(this: &Socket) -> Result<Promise<Undefined>, JsValue>;
+    #[wasm_bindgen(method, js_name = "close")]
+    pub fn close_promise(this: &Socket) -> Promise<Undefined>;
 }

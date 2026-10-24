@@ -156,6 +156,7 @@ pub fn extract_var_members(
                     return_type,
                     doc,
                     throws: info.throws(),
+                    async_modifier: false,
                     body_scope,
                 }));
             }

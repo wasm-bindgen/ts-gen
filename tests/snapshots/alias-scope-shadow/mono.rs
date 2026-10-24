@@ -148,8 +148,8 @@ pub mod shadow {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(catch, js_name = "next", js_namespace = "Shadow")]
-        pub fn next_promise() -> Result<Promise<JsString>, JsValue>;
+        #[wasm_bindgen(js_name = "next", js_namespace = "Shadow")]
+        pub fn next_promise() -> Promise<JsString>;
     }
 }
 #[wasm_bindgen(private)]
