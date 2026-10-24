@@ -1067,14 +1067,7 @@ impl<'g> Eval<'g> {
         place: Placement,
     ) -> Option<TypeRef> {
         let source = homomorphic_source(&mapped.keys)?;
-        let evaluated = self.eval(source, scope, env, dest, "", place)?;
-        let TypeRef::Reference { segments, .. } = &evaluated else {
-            return None;
-        };
-        let id = self.gctx.resolve_path(dest, &segments.join("."))?;
-        if !matches!(self.gctx.get_type(id).kind, TypeKind::Interface(_)) {
-            return None;
-        }
+        let evaluated = self.declared_interface(source, scope, env, dest)?;
         let shape = self.shape(&evaluated, dest, &Env::default(), dest, place)?;
         // An optional property admits `undefined` whether or not its type
         // spells it out.
@@ -1092,6 +1085,43 @@ impl<'g> Eval<'g> {
                 .collect()
         };
         (key(&shape) == key(props)).then_some(evaluated)
+    }
+
+    /// `ty` as a reference to a declared, non-generic interface that `dest`
+    /// names the same way, following the (already evaluated) `env`
+    /// bindings. Anything else, a utility or another computed type
+    /// included, is `None`: evaluating it here would synthesise a
+    /// dictionary for a type this path then discards.
+    fn declared_interface(
+        &self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+    ) -> Option<TypeRef> {
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = ty
+        else {
+            return None;
+        };
+        if let [name] = segments.as_slice() {
+            if let Some(bound) = env.get(name) {
+                return self.declared_interface(&bound.ty, bound.scope, &bound.env, dest);
+            }
+        }
+        if !generic_args.is_empty() {
+            return None;
+        }
+        let path = segments.join(".");
+        let id = self.gctx.resolve_path(scope, &path)?;
+        if self.gctx.resolve_path(dest, &path) != Some(id)
+            || !matches!(self.gctx.get_type(id).kind, TypeKind::Interface(_))
+        {
+            return None;
+        }
+        Some(ty.clone())
     }
 
     /// The members of an evaluated mapped type.
@@ -2233,5 +2263,24 @@ mod tests {
             param_type(&gctx, &module, "f", 1),
             &TypeRef::ident("LooseIds")
         );
+    }
+    #[test]
+    fn keyof_a_utility_synthesises_no_stray_dictionary() {
+        // The mapped type over `keyof Omit<T, "id">` is no declared
+        // interface, so the shape-reuse check must not evaluate it: that
+        // would synthesise the `Omit` result under an empty name.
+        let (module, gctx) = parse(
+            "interface Ids { id: string; a: number; }
+             type M<T> = { [K in keyof Omit<T, \"id\">]?: T[K] };
+             declare function f(m: M<Ids>): void;",
+        );
+        let names: Vec<String> = module
+            .types
+            .iter()
+            .filter_map(|&id| super::super::binding_name(&gctx.get_type(id).kind))
+            .collect();
+        assert!(!names.iter().any(String::is_empty), "{names:?}");
+        assert_eq!(names, ["Ids", "M", "f", "MIds"], "{names:?}");
+        assert_eq!(props(kind(&gctx, &module, "MIds")), [("a", true, false)]);
     }
 }

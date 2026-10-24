@@ -9,6 +9,8 @@ pub mod polish {
     use super::*;
     #[allow(dead_code)]
     pub type PartialShapeLike = JsValue;
+    #[allow(dead_code)]
+    pub type PartialOmitLike = JsValue;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -125,6 +127,10 @@ pub mod polish {
         #[wasm_bindgen(method, setter)]
         pub fn set_time(this: &Options, val: &TimeLikeObject);
         #[wasm_bindgen(method, getter)]
+        pub fn omitted(this: &Options) -> Option<PartialOmitLikeBoxLikeObject>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_omitted(this: &Options, val: &PartialOmitLikeBoxLikeObject);
+        #[wasm_bindgen(method, getter)]
         pub fn unit(this: &Options) -> Option<PluralizeTimeUnit>;
         #[wasm_bindgen(method, setter)]
         pub fn set_unit(this: &Options, val: PluralizeTimeUnit);
@@ -154,6 +160,10 @@ pub mod polish {
         }
         pub fn time(self, val: &TimeLikeObject) -> Self {
             self.inner.set_time(val);
+            self
+        }
+        pub fn omitted(self, val: &PartialOmitLikeBoxLikeObject) -> Self {
+            self.inner.set_omitted(val);
             self
         }
         pub fn unit(self, val: PluralizeTimeUnit) -> Self {
@@ -287,6 +297,51 @@ pub mod polish {
             self
         }
         pub fn build(self) -> PartialBoxLikeObject {
+            self.inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type PartialOmitLikeBoxLikeObject;
+        #[wasm_bindgen(method, getter)]
+        pub fn width(this: &PartialOmitLikeBoxLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_width(this: &PartialOmitLikeBoxLikeObject, val: f64);
+        #[wasm_bindgen(method, getter)]
+        pub fn height(this: &PartialOmitLikeBoxLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_height(this: &PartialOmitLikeBoxLikeObject, val: f64);
+    }
+    impl PartialOmitLikeBoxLikeObject {
+        pub fn new() -> PartialOmitLikeBoxLikeObject {
+            Self::builder().build()
+        }
+        pub fn builder() -> PartialOmitLikeBoxLikeObjectBuilder {
+            PartialOmitLikeBoxLikeObjectBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for PartialOmitLikeBoxLikeObject {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct PartialOmitLikeBoxLikeObjectBuilder {
+        inner: PartialOmitLikeBoxLikeObject,
+    }
+    impl PartialOmitLikeBoxLikeObjectBuilder {
+        pub fn width(self, val: f64) -> Self {
+            self.inner.set_width(val);
+            self
+        }
+        pub fn height(self, val: f64) -> Self {
+            self.inner.set_height(val);
+            self
+        }
+        pub fn build(self) -> PartialOmitLikeBoxLikeObject {
             self.inner
         }
     }

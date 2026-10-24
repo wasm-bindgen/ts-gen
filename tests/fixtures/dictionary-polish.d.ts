@@ -11,6 +11,12 @@ declare global {
       [P in Exclude<keyof T, "id">]?: T[P] | undefined;
     };
 
+    // Mapping over `keyof` a utility is no declared interface to reuse,
+    // and adds only its own dictionary.
+    type PartialOmitLike<T extends object> = {
+      [P in keyof Omit<T, "id">]?: T[P];
+    };
+
     interface BoxLikeObject {
       id: string;
       width?: number | undefined;
@@ -32,6 +38,7 @@ declare global {
     interface Options {
       box?: PartialShapeLike<BoxLikeObject>;
       time?: PartialShapeLike<TimeLikeObject>;
+      omitted?: PartialOmitLike<BoxLikeObject>;
       unit?: PluralizeUnit<TimeUnit>;
     }
 
