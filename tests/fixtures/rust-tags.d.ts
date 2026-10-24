@@ -2,8 +2,9 @@
 // return; `@rust <param>: <type>` for one parameter. The scalar
 // replaces the leaf through `?`, `| null`, `T[]` and `Promise<…>`;
 // wasm-bindgen converts the JS number at the boundary. u64/i64 cross
-// as BigInt, so they apply to `bigint` only; on a `number` (or any
-// other type) the tag is an error diagnostic.
+// natively as BigInt on a `bigint`; on a `number` they get an inline
+// wrapper (see inline-wrappers.d.ts). On any other type the tag is an
+// error diagnostic.
 
 interface Response {
   /** @rust u16 */

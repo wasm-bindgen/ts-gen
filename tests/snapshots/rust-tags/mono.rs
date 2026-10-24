@@ -34,12 +34,17 @@ extern "C" {
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn offset(this: &Response) -> u64;
-    #[wasm_bindgen(method, getter)]
-    pub fn size(this: &Response) -> f64;
+    #[wasm_bindgen(method, getter, js_name = "size")]
+    fn size_js(this: &Response) -> f64;
     #[wasm_bindgen(method, getter, js_name = "statusText")]
     pub fn status_text(this: &Response) -> String;
     #[wasm_bindgen(method, getter, js_name = "statusText")]
     pub fn status_text_js_string(this: &Response) -> JsString;
+}
+impl Response {
+    pub fn size(&self) -> u64 {
+        self.size_js() as u64
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

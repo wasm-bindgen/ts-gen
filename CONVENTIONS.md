@@ -35,6 +35,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
 * [`@rust` JSDoc → Rust scalar](#rust-jsdoc--rust-scalar)
+* [Inline wrappers](#inline-wrappers)
 * [`--annotate` side files](#--annotate-side-files)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
@@ -1487,7 +1488,10 @@ For every JS callable, `ts-gen`:
    [primitive union arguments](#primitive-union-arguments)).
 2. **Cross-overload dedup**: When multiple overloads expand to the same
    concrete parameter list, drop the duplicates. Two overloads that
-   both truncate to `(callback)` produce only one binding.
+   both truncate to `(callback)` produce only one binding. Duplicates
+   that differ only in the value of string-literal parameters are kept
+   as arms of one binding instead (see
+   [literal-keyed overloads](#inline-wrappers)).
 3. **Suffix assignment**: Across all surviving expansions, compute
    `_with_X` / `_with_X_and_Y` suffixes that disambiguate them. The
    primary variant gets `""`; the others are named after the
@@ -1622,7 +1626,7 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 
 The non-`try_` form panics on JS throw; the `try_` form returns `Result`.
 Setters and constructors don't get a `try_` companion (setters never
-catch; constructors always catch).
+catch; constructors catch unless annotated `@throws {never}`).
 
 ### `--fallible` — single `Result` form
 
@@ -1650,8 +1654,9 @@ single catching form; no `try_` name is declared. The error type is
 unchanged: `@throws {T}` → `T`, otherwise `JsValue`, or `js_sys::Error`
 under `--errors-as-error`, so the two flags compose. `@throws {never}`
 keeps a sync binding infallible (no `catch`, plain `T`) and is the only
-way to get one under the flag. Async callables, constructors (always
-catch), setters (never catch) and property getters are not affected.
+way to get one under the flag, constructors included. Async callables,
+other constructors (always catch), setters (never catch) and property
+getters are not affected.
 Without the flag, output is identical to the default.
 
 ## `Promise<T>` returns become `async fn`
@@ -2153,8 +2158,11 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 * **Async callables** (returning `Promise<T>`) drop the `Result<T, _>`
   wrapper and the `catch` attribute. The binding becomes
   `pub async fn foo() -> T`.
-* **Constructors** always catch per JS `new` semantics —
-  `@throws {never}` on a constructor is silently ignored.
+* **Constructors** catch by default (JS `new` can throw); annotated
+  `@throws {never}` the binding drops `catch` and returns the type
+  bare (`pub fn new(name: &str) -> Foo`). wasm-bindgen accepts a
+  non-`catch` constructor; a throw then aborts like any other
+  unguarded import.
 * **Setters** never throw and never get `try_` variants regardless,
   so the annotation is a no-op there too.
 * **Mixed annotations** like `@throws {never | TypeError}` collapse to
@@ -2200,13 +2208,12 @@ pub async fn count(this: &Response) -> Result<u32, JsValue>;
   optional declaration (read as `Nullable<u16>` / `Option<u16>`), `T[]`
   (`Vec<u8>` / `&[u8]`) and `Promise<…>` (`Result<u32, _>`).
 * Accepted scalars: `u8 u16 u32 u64 i8 i16 i32 i64 f32 f64 usize`.
-  wasm-bindgen crosses `u64`/`i64` as a JS `BigInt`, so they apply only
-  to a `bigint` leaf; every other scalar applies only to a `number`
-  leaf. A `@rust u64` on a `number` would make the JS glue reject the
-  value at runtime, so it is refused: sizes beyond `u32` stay `f64`
-  (exact to 2^53). An unknown scalar, an incompatible leaf, or a
-  parameter name that does not exist is an error diagnostic and the
-  tag is ignored.
+  wasm-bindgen crosses `u64`/`i64` as a JS `BigInt`, so on a `bigint`
+  leaf they are the extern type directly; on a `number` leaf the
+  extern binding stays `f64` and an [inline wrapper](#inline-wrappers)
+  converts. Every other scalar applies only to a `number` leaf. An
+  unknown scalar, an incompatible leaf, or a parameter name that does
+  not exist is an error diagnostic and the tag is ignored.
 
 Why a JSDoc tag rather than a branded alias (`type u16 = number`): the
 alias form needs the upstream declaration to *use* the alias, which an
@@ -2214,6 +2221,141 @@ upstream file never does, so annotations would still have to be
 layered on — and a tag reads as what it is, a Rust-side refinement,
 while a `u16` alias in `.d.ts` suggests a TS-level distinction that
 does not exist.
+
+## Inline wrappers
+
+Everything ts-gen emits is an `extern "C"` binding, except where the
+extern ABI cannot express the declared type. There, the extern binding
+is emitted under a private name and a non-extern `pub fn` of the public
+name converts over it. The rule is narrow on purpose: a wrapper is
+never emitted for ergonomics, only where no extern signature can carry
+the type, and the extern form stays reachable (within the module) under
+`<name>_js`. Two constructs qualify today: 64-bit integers on a JS
+number, and overloads keyed by a string literal.
+
+**`@rust u64` / `i64` on a `number`.** wasm-bindgen passes 64-bit
+integers as `BigInt`, so a `u64` extern parameter or return would make
+the glue reject a JS number. The binding keeps `f64`; the wrapper
+converts with `as`, which is exact to 2^53 (the range a JS number
+represents exactly) and saturates beyond it:
+
+```ts
+interface R2Object {
+  /** @rust u64 */
+  readonly size: number;
+  /** @rust limit: u64 */
+  list(limit: number): Promise<R2Object[]>;
+  /** @rust u64 */
+  count(): Promise<number>;
+}
+interface R2PutOptions {
+  /** @rust u64 */
+  size?: number;
+}
+```
+
+```rust
+extern "C" {
+    #[wasm_bindgen(method, getter, js_name = "size")]
+    fn size_js(this: &R2Object) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    async fn list_js(this: &R2Object, limit: f64) -> Result<Array<R2Object>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "count")]
+    async fn count_js(this: &R2Object) -> Result<f64, JsValue>;
+}
+impl R2Object {
+    pub fn size(&self) -> u64 { self.size_js() as u64 }
+    pub async fn list(&self, limit: u64) -> Result<Array<R2Object>, JsValue> {
+        self.list_js(limit as f64).await
+    }
+    pub async fn count(&self) -> Result<u64, JsValue> {
+        self.count_js().await.map(|v| v as u64)
+    }
+}
+```
+
+* Applies to getters, setters, parameters, sync and async returns,
+  static methods, constructors and free functions; the public
+  signature is exactly what the scalar would have been, through the
+  read carriers `Option<_>` / `Nullable<_>` (`?`, `| undefined`,
+  `| null`), `Vec<_>` / `&[_]` (`T[]`) and `Result<_, E>`. A `@rust u64` on a `bigint` needs no wrapper.
+* A generic receiver (`Box<T>`) gives `impl<T: JsGeneric> Box<T>`; the
+  method's own type parameters stay on the wrapper fn.
+* A scalar inside a callback type is handed to JS, so it keeps `f64`
+  and gets no wrapper.
+* Dictionary factories and builder methods take the public scalar and
+  call the wrapper setter, so `R2PutOptions::builder().size(5)` reads as
+  declared.
+* Doc comments move to the wrapper; the extern binding is not `pub`.
+
+**Overloads distinguished only by a string literal.** Rust has no
+literal types, so `get(key, type: "json")` and `get(key, type:
+"arrayBuffer")` both lower to `(key: &str, type: &str)` and used to
+collapse into one binding with the first overload's return type. The
+extern ABI cannot carry the literal; the wrapper can:
+
+```ts
+interface KVNamespace {
+  get(key: string): Promise<string | null>;
+  get(key: string, type: "text"): Promise<string | null>;
+  get(key: string, type: "json"): Promise<any>;
+  get(key: string, type: "arrayBuffer"): Promise<ArrayBuffer | null>;
+  get(key: string[], type: "text"): Promise<Map<string, string | null>>;
+  get(key: string[], type: "json"): Promise<Map<string, any>>;
+}
+declare class CompressionStream {
+  constructor(format: "gzip" | "deflate" | "deflate-raw");
+}
+```
+
+```rust
+extern "C" {
+    pub async fn get(this: &KVNamespace, key: &str) -> Result<Nullable<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_text_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_json_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_array_buffer_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<ArrayBuffer>, JsValue>;
+    // …
+    #[wasm_bindgen(constructor, catch)]
+    fn new_gzip_js(format: &str) -> Result<CompressionStream, JsValue>;
+}
+impl KVNamespace {
+    pub async fn get_text(&self, key: &str) -> Result<Nullable<JsString>, JsValue> {
+        self.get_text_js(key, "text").await
+    }
+    pub async fn get_json(&self, key: &str) -> Result<JsValue, JsValue> { /* "json" */ }
+    pub async fn get_array_buffer(&self, key: &str) -> Result<Nullable<ArrayBuffer>, JsValue> { /* … */ }
+    pub async fn get_text_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsNullable<JsString>>, JsValue> { /* … */ }
+    pub async fn get_json_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsValue>, JsValue> { /* … */ }
+}
+impl CompressionStream {
+    pub fn new_gzip() -> Result<CompressionStream, JsValue> { Self::new_gzip_js("gzip") }
+    pub fn new_deflate() -> Result<CompressionStream, JsValue> { Self::new_gzip_js("deflate") }
+    pub fn new_deflate_raw() -> Result<CompressionStream, JsValue> { /* "deflate-raw" */ }
+}
+```
+
+* A **cohort** is a set of two or more expansions that agree on every
+  parameter except string-literal ones at the same positions. The arms
+  come from separate overloads or from one overload's literal union
+  (`"gzip" | "deflate" | "deflate-raw"`); a lone literal
+  (`getAll(name: "Set-Cookie")`) is not a cohort and keeps the plain
+  `&str` binding, as does a cohort that also absorbed a plain `string`
+  arm (`"a" | "b" | string`), since the plain form already covers it.
+* Each wrapper is named `<base>_<literal>` in snake case, followed by
+  the `_with_` suffix the remaining parameters earn among the plain
+  expansions (`get_json`, `get_json_with_slice`). Every arm is named
+  explicitly; no arm takes the bare base name, which stays with the
+  literal-free overload (`get(key)`) when there is one.
+* Arms with the same return type share one extern binding, named after
+  the first arm (`get_text_js` also serves nothing else here, but
+  `new_gzip_js` serves all three formats); a different return type gets
+  its own, since the extern return is what wasm-bindgen converts.
+* The `try_` companion follows per arm (`try_describe_raw`) over its
+  own extern.
+* Setters are exempt: `set_disposition("inline")` takes the value.
 
 ## `--annotate` side files
 
