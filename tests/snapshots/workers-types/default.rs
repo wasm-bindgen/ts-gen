@@ -42429,7 +42429,7 @@ pub mod cloudflare {
             >(
                 this: &DurableObject<Env, Props>,
                 request: &super::super::Request<CfHostMetadata, Cf>,
-            ) -> super::super::FetchReturnKind;
+            ) -> FetchReturnKind3;
             #[wasm_bindgen(method, catch, js_name = "fetch")]
             pub fn try_fetch<
                 Env: ::wasm_bindgen::JsGeneric,
@@ -42439,7 +42439,7 @@ pub mod cloudflare {
             >(
                 this: &DurableObject<Env, Props>,
                 request: &super::super::Request<CfHostMetadata, Cf>,
-            ) -> Result<super::super::FetchReturnKind, JsValue>;
+            ) -> Result<FetchReturnKind3, JsValue>;
             #[wasm_bindgen(method, js_name = "webSocketMessage")]
             pub fn web_socket_message<
                 Env: ::wasm_bindgen::JsGeneric,
@@ -43047,6 +43047,11 @@ pub mod cloudflare {
         pub enum TailStreamReturnKind {
             Promise(Promise),
             JsValue(JsValue),
+        }
+        #[wasm_bindgen(private)]
+        pub enum FetchReturnKind3 {
+            Response(super::super::Response),
+            Promise(Promise<super::super::Response>),
         }
         #[wasm_bindgen(private)]
         pub enum TimeoutKind {
