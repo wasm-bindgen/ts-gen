@@ -291,7 +291,9 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
         .collect();
 
     let lib_name = entry.module_mode.then_some(entry.lib_name.as_str());
-    let (module, mut gctx) = ts_gen::parse(&path_refs, lib_name)
+    let parse_options = ts_gen::parse::ParseOptions::new()
+        .experimental_generic_mono(entry.experimental_generic_mono);
+    let (module, mut gctx) = ts_gen::parse_with_options(&path_refs, lib_name, &parse_options)
         .unwrap_or_else(|e| panic!("Failed to parse {}: {e}", entry.dts_path.display()));
 
     for mapping in &entry.externals {

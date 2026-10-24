@@ -335,6 +335,15 @@ pub enum TypeRef {
     /// or hoists to an interface.
     ObjectLiteral(Vec<ObjectProp>),
 
+    /// A type-level function of a literal-only type parameter, under
+    /// per-monomorphization: the associated type `assoc` of the trait
+    /// bounding `param` (`Units::PluralizeUnit`). Substituting the
+    /// parameter by an argument enum names that enum's impl.
+    Projection {
+        param: String,
+        assoc: String,
+    },
+
     // === Fallback ===
     /// For TS constructs we can't represent (conditional types, template
     /// literals, etc.) — erased to `JsValue`.
@@ -596,6 +605,16 @@ impl TypeRef {
     {
         let sub = |t: &TypeRef| t.substitute(map);
         match self {
+            TypeRef::Projection { param, assoc } => match map.get(param.as_str()) {
+                Some(TypeRef::Reference {
+                    segments,
+                    generic_args,
+                }) if segments.len() == 1 && generic_args.is_empty() => TypeRef::Projection {
+                    param: segments[0].clone(),
+                    assoc: assoc.clone(),
+                },
+                _ => self.clone(),
+            },
             TypeRef::Reference {
                 segments,
                 generic_args,
@@ -699,6 +718,7 @@ impl TypeRef {
                     .join(", ");
                 format!("({params}) => {}", sig.return_type.format_ts())
             }
+            TypeRef::Projection { param, assoc } => format!("{param}::{assoc}"),
             TypeRef::StringLiteral(s) => format!("\"{s}\""),
             TypeRef::NumberLiteral(n) => n.to_string(),
             TypeRef::BooleanLiteral(b) => b.to_string(),
@@ -841,6 +861,31 @@ pub struct TypeParam {
     pub constraint: Option<TypeRef>,
     /// `T = Bar` — used for default instantiation.
     pub default: Option<TypeRef>,
+    /// The trait bounding a literal-only parameter under
+    /// per-monomorphization (see [`ParamTrait`]).
+    pub trait_bound: Option<String>,
+}
+
+/// Under per-monomorphization, the trait bounding an interface's
+/// literal-only type parameter. Each member typed by a type-level function
+/// of the parameter (`PluralizeUnit<Units>`) reads an associated type, and
+/// each argument enum the parameter is instantiated with implements it:
+///
+/// ```text
+/// pub trait RoundingOptionsUnits { type PluralizeUnit; }
+/// impl RoundingOptionsUnits for DateUnit { type PluralizeUnit = PluralizeDateUnit; }
+/// ```
+#[derive(Clone, Debug, PartialEq)]
+pub struct ParamTrait {
+    pub name: String,
+    /// The traits of the interfaces the parameter is passed on to.
+    pub supertraits: Vec<String>,
+    /// The associated types it declares, beyond its supertraits'.
+    pub assoc: Vec<String>,
+    /// Each argument enum's impl: the enum, and each associated type's
+    /// target in [`Self::assoc`] order. Both resolve in [`Self::scope`].
+    pub impls: Vec<(TypeRef, Vec<TypeRef>)>,
+    pub scope: crate::parse::scope::ScopeId,
 }
 
 impl TypeParam {

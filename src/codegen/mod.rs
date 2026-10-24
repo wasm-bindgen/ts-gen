@@ -556,6 +556,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
         T::Union(_) | T::PropertyKey => "JsValue".to_string(),
         T::Intersection(_) => "JsValue".to_string(),
         T::Function(_) => "Function".to_string(),
+        T::Projection { assoc, .. } => assoc.clone(),
         T::Unresolved(_)
         | T::Never
         | T::KeyOf(_)
@@ -1026,13 +1027,22 @@ impl<'d> ModTree<'d> {
         let mut items = Vec::new();
         for entry in &self.entries {
             match entry {
-                ModEntry::Item(decl, _, js_namespace) => {
+                ModEntry::Item(decl, id, js_namespace) => {
                     cgctx.emit_path.replace(path.clone());
                     items.extend(if js_namespace.is_empty() {
                         generate_declaration(decl, cgctx, &mut value_names)
                     } else {
                         generate_ns_declaration(decl, js_namespace, cgctx, &mut value_names)
                     });
+                    if cgctx.experimental_generic_mono {
+                        for t in cgctx.gctx.param_traits.get(id).into_iter().flatten() {
+                            items.push(classes::generate_param_trait(
+                                t,
+                                cgctx,
+                                &decl.module_context,
+                            ));
+                        }
+                    }
                 }
                 ModEntry::Mod(name) => {
                     path.push(name.clone());
