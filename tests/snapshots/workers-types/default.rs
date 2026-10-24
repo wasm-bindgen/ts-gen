@@ -1407,7 +1407,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_target_add_event_listener_options(
+    pub fn add_event_listener_with_function_and_event_target_add_event_listener_options(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
@@ -1416,7 +1416,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_event_target_add_event_listener_options(
+    pub fn try_add_event_listener_with_function_and_event_target_add_event_listener_options(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
@@ -1447,7 +1447,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "addEventListener")]
-    pub fn add_event_listener_with_bool(
+    pub fn add_event_listener_with_function_and_bool(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: bool,
@@ -1456,7 +1456,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_bool(
+    pub fn try_add_event_listener_with_function_and_bool(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: bool,
@@ -1518,7 +1518,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_target_event_listener_options(
+    pub fn remove_event_listener_with_function_and_event_target_event_listener_options(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: &EventTargetEventListenerOptions,
@@ -1527,7 +1527,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_event_target_event_listener_options(
+    pub fn try_remove_event_listener_with_function_and_event_target_event_listener_options(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: &EventTargetEventListenerOptions,
@@ -1558,7 +1558,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_bool(
+    pub fn remove_event_listener_with_function_and_bool(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: bool,
@@ -1567,7 +1567,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_bool(
+    pub fn try_remove_event_listener_with_function_and_bool(
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: bool,
@@ -4317,7 +4317,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_target_add_event_listener_options<
+    pub fn add_event_listener_with_function_and_event_target_add_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
@@ -4329,7 +4329,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_event_target_add_event_listener_options<
+    pub fn try_add_event_listener_with_function_and_event_target_add_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
@@ -4367,7 +4367,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, js_name = "addEventListener")]
-    pub fn add_event_listener_with_bool<EventMap: ::wasm_bindgen::JsGeneric>(
+    pub fn add_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -4377,7 +4377,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_bool<EventMap: ::wasm_bindgen::JsGeneric>(
+    pub fn try_add_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -4455,7 +4455,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_target_event_listener_options<
+    pub fn remove_event_listener_with_function_and_event_target_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
@@ -4467,7 +4467,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_event_target_event_listener_options<
+    pub fn try_remove_event_listener_with_function_and_event_target_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
@@ -4505,7 +4505,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_bool<EventMap: ::wasm_bindgen::JsGeneric>(
+    pub fn remove_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -4515,7 +4515,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_bool<EventMap: ::wasm_bindgen::JsGeneric>(
+    pub fn try_remove_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -10256,13 +10256,13 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &KVNamespace, key: &str) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_partial_kv_namespace_get_options_undefined(
+    pub async fn get_with_str_and_partial_kv_namespace_get_options_undefined(
         this: &KVNamespace,
         key: &str,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_partial_kv_namespace_get_options_undefined_promise(
+    pub fn get_with_str_and_partial_kv_namespace_get_options_undefined_promise(
         this: &KVNamespace,
         key: &str,
         options: &PartialKvNamespaceGetOptionsUndefined,
@@ -10318,13 +10318,13 @@ extern "C" {
         r#type: &str,
     ) -> Promise<JsNullable<ReadableStream>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_kv_namespace_get_options(
+    pub async fn get_with_str_and_kv_namespace_get_options(
         this: &KVNamespace,
         key: &str,
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_kv_namespace_get_options_promise(
+    pub fn get_with_str_and_kv_namespace_get_options_promise(
         this: &KVNamespace,
         key: &str,
         options: &KVNamespaceGetOptions<JsString>,
@@ -10512,7 +10512,7 @@ extern "C" {
         key: &str,
     ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_partial_kv_namespace_get_options_undefined<
+    pub async fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined<
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace,
@@ -10520,7 +10520,7 @@ extern "C" {
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_partial_kv_namespace_get_options_undefined_promise<
+    pub fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined_promise<
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace,
@@ -10582,7 +10582,7 @@ extern "C" {
         r#type: &str,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_kv_namespace_get_options<
+    pub async fn get_with_metadata_with_str_and_kv_namespace_get_options<
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace,
@@ -10590,7 +10590,7 @@ extern "C" {
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_kv_namespace_get_options_promise<
+    pub fn get_with_metadata_with_str_and_kv_namespace_get_options_promise<
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace,
@@ -11692,14 +11692,14 @@ extern "C" {
         value: &::wasm_bindgen::JsValue,
     ) -> Promise<JsNullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_r2_bucket_options2<R: ::wasm_bindgen::JsGeneric>(
+    pub async fn put_with_readable_stream_and_r2_bucket_options2<R: ::wasm_bindgen::JsGeneric>(
         this: &R2Bucket,
         key: &str,
         value: &ReadableStream<R>,
         options: &R2BucketOptions2,
     ) -> Result<Nullable<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_r2_bucket_options2_promise<R: ::wasm_bindgen::JsGeneric>(
+    pub fn put_with_readable_stream_and_r2_bucket_options2_promise<R: ::wasm_bindgen::JsGeneric>(
         this: &R2Bucket,
         key: &str,
         value: &ReadableStream<R>,
@@ -11776,14 +11776,14 @@ extern "C" {
         options: &R2BucketOptions2,
     ) -> Promise<JsNullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_r2_put_options<R: ::wasm_bindgen::JsGeneric>(
+    pub async fn put_with_readable_stream_and_r2_put_options<R: ::wasm_bindgen::JsGeneric>(
         this: &R2Bucket,
         key: &str,
         value: &ReadableStream<R>,
         options: &R2PutOptions,
     ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_r2_put_options_promise<R: ::wasm_bindgen::JsGeneric>(
+    pub fn put_with_readable_stream_and_r2_put_options_promise<R: ::wasm_bindgen::JsGeneric>(
         this: &R2Bucket,
         key: &str,
         value: &ReadableStream<R>,
@@ -15436,7 +15436,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url(url: &URL) -> Result<URL, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str(url: &str, base: &str) -> Result<URL, JsValue>;
+    pub fn new_with_str_and_str(url: &str, base: &str) -> Result<URL, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_and_str(url: &URL, base: &str) -> Result<URL, JsValue>;
     #[wasm_bindgen(constructor, catch)]

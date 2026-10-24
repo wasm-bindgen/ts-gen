@@ -1683,11 +1683,25 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
                 from_type,
                 param_snake,
             };
-            let adds = primary.get(abs_idx).is_none_or(|p| {
-                p.name != param.name || p.type_ref != param.type_ref || p.variadic != param.variadic
-            });
-            if adds {
-                added.push(part.clone());
+            match primary.get(abs_idx) {
+                // A position the primary lacks is named by its parameter,
+                // so `str` never names different parameters in sibling
+                // names: `new_with_str(url, base: &str)` would read as the
+                // `url: &str` form.
+                None if part.from_type => added.push(SuffixPart {
+                    text: part.param_snake.clone(),
+                    from_type: false,
+                    param_snake: part.param_snake.clone(),
+                }),
+                None => added.push(part.clone()),
+                Some(p)
+                    if p.name != param.name
+                        || p.type_ref != param.type_ref
+                        || p.variadic != param.variadic =>
+                {
+                    added.push(part.clone())
+                }
+                Some(_) => {}
             }
             parts.push(part);
         }
@@ -4166,6 +4180,28 @@ mod tests {
                 "compare_with_b_and_a",
                 "compare_with_a_and_b",
                 "compare_with_b_and_b"
+            ]
+        );
+    }
+
+    #[test]
+    fn a_parameter_the_primary_lacks_is_named_by_name() {
+        // `str` in a variant name never refers to different parameters: the
+        // variants adding `base` both add `base`, so each keeps its full name.
+        let url_or_str = TypeRef::union([TypeRef::String, TypeRef::ident("URL")]);
+        let new = [
+            typed_param("url", url_or_str.clone()),
+            opt_typed_param("base", url_or_str),
+        ];
+        assert_eq!(
+            names("new", &[&new]),
+            [
+                "new",
+                "new_with_url",
+                "new_with_str_and_str",
+                "new_with_url_and_str",
+                "new_with_str_and_url",
+                "new_with_url_and_url"
             ]
         );
     }

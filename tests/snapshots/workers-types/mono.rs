@@ -1189,7 +1189,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_target_add_event_listener_options(
+    pub fn add_event_listener_with_function_and_event_target_add_event_listener_options(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
@@ -1209,7 +1209,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_bool(
+    pub fn add_event_listener_with_function_and_bool(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: bool,
@@ -1247,7 +1247,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_target_event_listener_options(
+    pub fn remove_event_listener_with_function_and_event_target_event_listener_options(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: &EventTargetEventListenerOptions,
@@ -1267,7 +1267,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_bool(
+    pub fn remove_event_listener_with_function_and_bool(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(JsValue) -> Undefined>,
         options: bool,
@@ -3695,7 +3695,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_target_add_event_listener_options<EventMap>(
+    pub fn add_event_listener_with_function_and_event_target_add_event_listener_options<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -3718,7 +3718,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_bool<EventMap>(
+    pub fn add_event_listener_with_function_and_bool<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -3762,7 +3762,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_target_event_listener_options<EventMap>(
+    pub fn remove_event_listener_with_function_and_event_target_event_listener_options<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -3785,7 +3785,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_bool<EventMap>(
+    pub fn remove_event_listener_with_function_and_bool<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(JsValue) -> Undefined>,
@@ -9198,19 +9198,19 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Nullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_partial_kv_namespace_get_options_undefined(
+    pub async fn get_with_str_and_partial_kv_namespace_get_options_undefined(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_partial_kv_namespace_get_options_undefined_js_string(
+    pub async fn get_with_str_and_partial_kv_namespace_get_options_undefined_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_partial_kv_namespace_get_options_undefined_promise(
+    pub fn get_with_str_and_partial_kv_namespace_get_options_undefined_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
@@ -9272,19 +9272,19 @@ extern "C" {
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Nullable<ReadableStream>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_kv_namespace_get_options(
+    pub async fn get_with_str_and_kv_namespace_get_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_kv_namespace_get_options_js_string(
+    pub async fn get_with_str_and_kv_namespace_get_options_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_kv_namespace_get_options_promise(
+    pub fn get_with_str_and_kv_namespace_get_options_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
@@ -9493,7 +9493,9 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_partial_kv_namespace_get_options_undefined<Metadata>(
+    pub async fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined<
+        Metadata,
+    >(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
@@ -9501,7 +9503,7 @@ extern "C" {
     where
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_partial_kv_namespace_get_options_undefined_js_string<
+    pub async fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined_js_string<
         Metadata,
     >(
         this: &KVNamespace,
@@ -9511,7 +9513,9 @@ extern "C" {
     where
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_partial_kv_namespace_get_options_undefined_promise<Metadata>(
+    pub fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined_promise<
+        Metadata,
+    >(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
@@ -9582,7 +9586,7 @@ extern "C" {
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_kv_namespace_get_options<Metadata>(
+    pub async fn get_with_metadata_with_str_and_kv_namespace_get_options<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
@@ -9590,7 +9594,7 @@ extern "C" {
     where
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_kv_namespace_get_options_js_string<Metadata>(
+    pub async fn get_with_metadata_with_str_and_kv_namespace_get_options_js_string<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
@@ -9598,7 +9602,7 @@ extern "C" {
     where
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_kv_namespace_get_options_promise<Metadata>(
+    pub fn get_with_metadata_with_str_and_kv_namespace_get_options_promise<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
@@ -10738,14 +10742,14 @@ extern "C" {
         value: &::wasm_bindgen::JsValue,
     ) -> Promise<Nullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_r2_bucket_options2<R: ::wasm_bindgen::MonoGeneric>(
+    pub async fn put_with_readable_stream_and_r2_bucket_options2<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream<R>,
         options: &R2BucketOptions2,
     ) -> Result<Nullable<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_r2_bucket_options2_promise<R: ::wasm_bindgen::MonoGeneric>(
+    pub fn put_with_readable_stream_and_r2_bucket_options2_promise<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream<R>,
@@ -10822,14 +10826,14 @@ extern "C" {
         options: &R2BucketOptions2,
     ) -> Promise<Nullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_r2_put_options<R: ::wasm_bindgen::MonoGeneric>(
+    pub async fn put_with_readable_stream_and_r2_put_options<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream<R>,
         options: &R2PutOptions,
     ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_r2_put_options_promise<R: ::wasm_bindgen::MonoGeneric>(
+    pub fn put_with_readable_stream_and_r2_put_options_promise<R: ::wasm_bindgen::MonoGeneric>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream<R>,
@@ -14443,7 +14447,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url(url: &URL) -> Result<URL, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str(
+    pub fn new_with_str_and_str(
         url: impl ::wasm_bindgen::JsStringLike,
         base: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URL, JsValue>;
