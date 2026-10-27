@@ -269,31 +269,33 @@ extern "C" {
 extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
     #[wasm_bindgen(js_name = "arity")]
-    pub fn arity_with_a_and_b(a: &str, b: f64) -> String;
+    pub fn arity_with_a_and_b(a: Option<&str>, b: f64) -> String;
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
     #[wasm_bindgen(catch, js_name = "arity")]
-    pub fn try_arity_with_a_and_b(a: &str, b: f64) -> Result<String, JsValue>;
+    pub fn try_arity_with_a_and_b(a: Option<&str>, b: f64) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {
     #[wasm_bindgen(js_name = "arity")]
-    fn __arity_with_a_and_null(a: &str, b: &::wasm_bindgen::JsValue) -> String;
+    fn __arity_with_a_and_null(a: Option<&str>, b: &::wasm_bindgen::JsValue) -> String;
 }
 #[doc = " How many arguments arrived, and what the last one was."]
-pub fn arity_with_a_and_null(a: &str) -> String {
+pub fn arity_with_a_and_null(a: Option<&str>) -> String {
     __arity_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "arity")]
-    fn __try_arity_with_a_and_null(a: &str, b: &::wasm_bindgen::JsValue)
-        -> Result<String, JsValue>;
+    fn __try_arity_with_a_and_null(
+        a: Option<&str>,
+        b: &::wasm_bindgen::JsValue,
+    ) -> Result<String, JsValue>;
 }
 #[doc = " How many arguments arrived, and what the last one was."]
-pub fn try_arity_with_a_and_null(a: &str) -> Result<String, JsValue> {
+pub fn try_arity_with_a_and_null(a: Option<&str>) -> Result<String, JsValue> {
     __try_arity_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable")]

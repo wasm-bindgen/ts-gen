@@ -18,7 +18,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn metadata<Metadata>(this: &ListKey<Metadata>) -> Option<Metadata>
     where
-        Metadata: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<Metadata>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata<Metadata>(this: &ListKey<Metadata>, val: Metadata)
     where

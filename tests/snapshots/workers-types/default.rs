@@ -3164,7 +3164,7 @@ extern "C" {
         key: &str,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
@@ -3177,7 +3177,7 @@ extern "C" {
         options: &DurableObjectGetOptions,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_options_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
@@ -3394,7 +3394,7 @@ extern "C" {
         key: &str,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
@@ -3407,7 +3407,7 @@ extern "C" {
         options: &DurableObjectGetOptions,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_options_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
@@ -10272,7 +10272,7 @@ extern "C" {
         r#type: &str,
     ) -> Result<Option<ExpectedValue>, JsValue>
     where
-        ExpectedValue: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
     fn __get_json_promise<ExpectedValue: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace,
@@ -10640,7 +10640,7 @@ impl KVNamespace {
         key: &str,
     ) -> Result<Option<ExpectedValue>, JsValue>
     where
-        ExpectedValue: ::wasm_bindgen::convert::OptionFromWasmAbi,
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
     {
         self.__get_json(key, "json").await
     }
@@ -41438,7 +41438,7 @@ extern "C" {
         this: &D1PreparedStatement,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "first")]
     pub fn first_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
@@ -41449,7 +41449,7 @@ extern "C" {
         col_name: &str,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "first")]
     pub fn first_with_col_name_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,

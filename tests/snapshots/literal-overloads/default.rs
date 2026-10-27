@@ -247,7 +247,7 @@ extern "C" {
         r#type: &str,
     ) -> Result<Option<ExpectedValue>, JsValue>
     where
-        ExpectedValue: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
     fn __get_json_promise<
         Key: ::wasm_bindgen::JsGeneric,
@@ -298,7 +298,7 @@ impl<Key: ::wasm_bindgen::JsGeneric> KVStore<Key> {
         key: &Key,
     ) -> Result<Option<ExpectedValue>, JsValue>
     where
-        ExpectedValue: ::wasm_bindgen::convert::OptionFromWasmAbi,
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
     {
         self.__get_json(key, "json").await
     }

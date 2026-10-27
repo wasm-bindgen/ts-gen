@@ -195,7 +195,7 @@ extern "C" {
         key: &str,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
         this: &Storage<Props>,

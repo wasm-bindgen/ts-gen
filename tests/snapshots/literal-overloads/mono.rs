@@ -344,7 +344,8 @@ extern "C" {
     ) -> Result<Option<ExpectedValue>, JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
-        ExpectedValue: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
+        ExpectedValue: 'static;
     #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_json_promise<Key, ExpectedValue>(
         this: &KVStore<Key>,
@@ -394,7 +395,8 @@ impl<Key> KVStore<Key> {
     pub async fn get_json<ExpectedValue>(&self, key: Key) -> Result<Option<ExpectedValue>, JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
-        ExpectedValue: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static,
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
+        ExpectedValue: 'static,
     {
         self.__get_json(key, "json").await
     }

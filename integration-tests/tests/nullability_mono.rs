@@ -51,11 +51,8 @@ fn nullability_mono_signatures_compile(
     scalar_optional_with_str(js_string);
     scalar_optional_with_null();
     let _: Option<JsString> = generic(js_string.clone());
-    // A native leaf cannot instantiate a generic `Option<T>` read on the
-    // pinned wasm-bindgen (`f64: OptionFromWasmAbi` is not implemented;
-    // `Option<f64>` converts directly), so the handle stands in.
-    let _: Option<Number> = generic(Number::from(1.0));
-    let _: Option<Number> = generic_with_null();
+    let _: Option<f64> = generic(1.0);
+    let _: Option<f64> = generic_with_null();
     let _: Option<String> = generic_both_with_x(String::from("x"));
     let _: Option<String> = generic_both_with_null();
 
@@ -101,7 +98,7 @@ async fn nullability_mono_async_compile(registry_value: &Registry) {
     let _: Result<Option<Registry>, _> = fetch_null().await;
     let _: Result<Option<f64>, _> = fetch_optional().await;
     let _: Result<Option<String>, _> = fetch_both().await;
-    let _: Result<Option<Number>, _> = fetch_generic::<Number>().await;
+    let _: Result<Option<f64>, _> = fetch_generic::<f64>().await;
     let _: Result<Option<JsString>, _> =
         wasm_bindgen_futures::JsFuture::from(registry_value.pending()).await;
     let _: Result<Option<Registry>, _> = fetch_null_promise().await;

@@ -63,7 +63,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn fallback<T>(this: &Details<T>) -> Option<T>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_fallback<T>(this: &Details<T>, val: T)
     where

@@ -162,12 +162,15 @@ a bare `JsValue`.
 The awaited value [lowers like a sync return](#awaited-values-lower-like-sync-returns),
 so the carrier holds the read form (`String`, `f64`, an enum), not the
 `JsString` / `Number` handle. An awaited carrier around a type
-parameter bounds it through the carrier's trait (`T: OptionFromWasmAbi`).
-Type arguments have no direction and keep the exact carrier
-(`Map<String, Nullable<String>>`, `Holder<Nullable<String>>`, the
-`Function<fn(..)>` signature slots), as does a nullable alias
-declaration (`type MaybeStr = string | null` is `Nullable<String>` under
-per-monomorphization, and a `Holder<MaybeStr>` reads its `T` as such).
+parameter is bounded whole (`Option<T>: FromWasmAbi`; a native such as
+`f64` has an `Option` ABI of its own without being `OptionFromWasmAbi`),
+and under `--strict-nullable` a `Nullable<T>` read bounds
+`T: NullableFromWasmAbi`, its only impl. Type arguments have no direction
+and keep the exact carrier (`Map<String, Nullable<String>>`,
+`Holder<Nullable<String>>`, the `Function<fn(..)>` signature slots), as
+does a nullable alias declaration (`type MaybeStr = string | null` is
+`Nullable<String>` under per-monomorphization, and a `Holder<MaybeStr>`
+reads its `T` as such).
 
 ### Writes
 
@@ -2580,7 +2583,7 @@ uses its native ABI representation. Each import states the ABI bounds it
 needs, so a generic caller can read them off the declaration: `IntoWasmAbi`
 for an argument (`T: RefIntoWasmAbi` for a borrowed `&T`, and
 `T: VectorRefIntoWasmAbi` for a borrowed `&[T]`), `FromWasmAbi` for a return,
-`OptionIntoWasmAbi`/`OptionFromWasmAbi` for `Option<T>`,
+`Option<T>: IntoWasmAbi`/`Option<T>: FromWasmAbi` for an `Option<T>`,
 `NullableIntoWasmAbi` for a written `Nullable<T>` (and under
 `--strict-nullable` `NullableFromWasmAbi` for a read one), and `'static`
 when awaited. Imported types such as `Holder<T>` need only `'static`:
@@ -2792,7 +2795,7 @@ interface Store {
 pub async fn put<T: JsGeneric>(this: &Store, key: &str, value: &T) -> Result<(), JsValue>;
 pub async fn get<T: JsGeneric>(this: &Store, key: &str) -> Result<Option<T>, JsValue>
 where
-    T: OptionFromWasmAbi;
+    Option<T>: FromWasmAbi;
 pub async fn transaction<T: JsGeneric + FromWasmAbi>(this: &Store, closure: &Function<fn(Store) -> Promise>) -> Result<T, JsValue>;
 pub async fn run(this: &Store) -> Result<Row, JsValue>; // Row<Object>, the default
 pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
@@ -3441,7 +3444,7 @@ impl CompressionStream {
   binds the type's defaults (`impl Boxed { pub fn label_a() -> String }`). A wrapper repeats its extern's `where` clause, since it calls the
   extern under the same bounds: the ABI traits a generic import states
   under `--experimental-generic-mono` (`Key: IntoWasmAbi`), and an
-  awaited carrier's (`ExpectedValue: OptionFromWasmAbi` on
+  awaited carrier's (`Option<ExpectedValue>: FromWasmAbi` on
   `get_json`).
 * A `null` arm beside the literal (`pick(kind: "a" | "b", x: T |
   null)`) makes a cohort of its own, named `_with_null` as a lone
