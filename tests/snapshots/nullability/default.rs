@@ -1433,7 +1433,7 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchGeneric")]
     pub async fn fetch_generic<T: ::wasm_bindgen::JsGeneric>() -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {

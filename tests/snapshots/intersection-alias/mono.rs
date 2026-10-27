@@ -223,7 +223,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value<R>(this: &ReadResult<R>) -> Option<R>
     where
-        R: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<R>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_value<R>(this: &ReadResult<R>, val: R)
     where

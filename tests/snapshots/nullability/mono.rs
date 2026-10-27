@@ -293,7 +293,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &Holder<T>) -> Option<T>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -940,18 +940,19 @@ extern "C" {
     #[wasm_bindgen(catch)]
     pub fn generic<T>(x: T) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::OptionFromWasmAbi;
+        T: ::wasm_bindgen::convert::IntoWasmAbi,
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "generic")]
     fn __generic_with_null<T>(x: &::wasm_bindgen::JsValue) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 pub fn generic_with_null<T>() -> Result<Option<T>, JsValue>
 where
-    T: ::wasm_bindgen::convert::OptionFromWasmAbi,
+    Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
 {
     __generic_with_null(&::wasm_bindgen::JsValue::NULL)
 }
@@ -960,25 +961,26 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "genericBoth")]
     pub fn generic_both<T>() -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "genericBoth")]
     pub fn generic_both_with_x<T>(x: T) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::OptionFromWasmAbi;
+        T: ::wasm_bindgen::convert::IntoWasmAbi,
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "genericBoth")]
     fn __generic_both_with_null<T>(x: &::wasm_bindgen::JsValue) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 pub fn generic_both_with_null<T>() -> Result<Option<T>, JsValue>
 where
-    T: ::wasm_bindgen::convert::OptionFromWasmAbi,
+    Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
 {
     __generic_both_with_null(&::wasm_bindgen::JsValue::NULL)
 }
@@ -1050,7 +1052,8 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchGeneric")]
     pub async fn fetch_generic<T>() -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {

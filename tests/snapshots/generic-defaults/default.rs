@@ -224,7 +224,7 @@ extern "C" {
         key: &str,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &Store,
@@ -233,7 +233,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn first<T: ::wasm_bindgen::JsGeneric>(this: &Store) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "first")]
     pub fn first_promise<T: ::wasm_bindgen::JsGeneric>(this: &Store) -> Promise<JsNullable<T>>;
     #[wasm_bindgen(method, catch)]

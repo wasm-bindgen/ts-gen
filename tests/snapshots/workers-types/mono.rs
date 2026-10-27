@@ -2491,7 +2491,8 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise<T>(
         this: &DurableObjectTransaction,
@@ -2504,7 +2505,8 @@ extern "C" {
         options: &DurableObjectGetOptions,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_options_promise<T>(
         this: &DurableObjectTransaction,
@@ -2733,7 +2735,8 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise<T>(
         this: &DurableObjectStorage,
@@ -2746,7 +2749,8 @@ extern "C" {
         options: &DurableObjectGetOptions,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_options_promise<T>(
         this: &DurableObjectStorage,
@@ -8554,7 +8558,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn cf<CfHostMetadata, Cf>(this: &Request<CfHostMetadata, Cf>) -> Option<Cf>
     where
-        Cf: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<Cf>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_cf<CfHostMetadata, Cf>(this: &Request<CfHostMetadata, Cf>, val: Cf)
     where
@@ -8650,7 +8654,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn cf<Cf>(this: &RequestInit<Cf>) -> Option<Cf>
     where
-        Cf: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<Cf>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_cf<Cf>(this: &RequestInit<Cf>, val: Cf)
     where
@@ -8909,7 +8913,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn metadata<Metadata>(this: &KVNamespaceListKey<Metadata>) -> Option<Metadata>
     where
-        Metadata: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<Metadata>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata<Metadata>(this: &KVNamespaceListKey<Metadata>, val: Metadata)
     where
@@ -9129,7 +9133,8 @@ extern "C" {
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<ExpectedValue>, JsValue>
     where
-        ExpectedValue: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
+        ExpectedValue: 'static;
     #[wasm_bindgen(method, js_name = "get")]
     fn __get_json_promise<ExpectedValue>(
         this: &KVNamespace,
@@ -9552,7 +9557,8 @@ impl KVNamespace {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<ExpectedValue>, JsValue>
     where
-        ExpectedValue: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static,
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
+        ExpectedValue: 'static,
     {
         self.__get_json(key, "json").await
     }
@@ -9870,7 +9876,7 @@ extern "C" {
         this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
     ) -> Option<Value>
     where
-        Value: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<Value>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_value<Value, Metadata>(
         this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
@@ -9887,7 +9893,7 @@ extern "C" {
         this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
     ) -> Option<Metadata>
     where
-        Metadata: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<Metadata>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata<Value, Metadata>(
         this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
@@ -12677,7 +12683,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value<R>(this: &ReadableStreamReadResult<R>) -> Option<R>
     where
-        R: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<R>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_value<R>(this: &ReadableStreamReadResult<R>, val: R)
     where
@@ -15501,7 +15507,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &SqlStorageCursorNextReturn<T>) -> Option<T>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_value<T>(this: &SqlStorageCursorNextReturn<T>, val: T)
     where
@@ -16090,7 +16096,7 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub fn list(this: &SyncKvStorage) -> Result<SyncKvStorageList, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "list")]
@@ -37570,7 +37576,7 @@ extern "C" {
         this: &IncomingRequestCfProperties<HostMetadata>,
     ) -> Option<HostMetadata>
     where
-        HostMetadata: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<HostMetadata>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "hostMetadata")]
     pub fn set_host_metadata<HostMetadata>(
         this: &IncomingRequestCfProperties<HostMetadata>,
@@ -40637,7 +40643,7 @@ extern "C" {
         this: &IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>,
     ) -> Option<HostMetadata>
     where
-        HostMetadata: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<HostMetadata>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "hostMetadata")]
     pub fn set_host_metadata<HostMetadata>(
         this: &IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>,
@@ -42622,7 +42628,8 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn first<T>(this: &D1PreparedStatement) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
     #[wasm_bindgen(method, js_name = "first")]
     pub fn first_promise<T>(this: &D1PreparedStatement) -> Promise<Option<T>>;
     #[wasm_bindgen(method, catch, js_name = "first")]
@@ -42631,7 +42638,8 @@ extern "C" {
         col_name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
     #[wasm_bindgen(method, js_name = "first")]
     pub fn first_with_col_name_promise<T>(
         this: &D1PreparedStatement,
@@ -52279,7 +52287,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn params<PARAMS>(this: &WorkflowInstanceCreateOptions<PARAMS>) -> Option<PARAMS>
     where
-        PARAMS: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<PARAMS>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_params<PARAMS>(this: &WorkflowInstanceCreateOptions<PARAMS>, val: PARAMS)
     where
