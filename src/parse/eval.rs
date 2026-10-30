@@ -37,9 +37,9 @@ use std::rc::Rc;
 
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
-    GetterMember, Heritage, InterfaceClassification, InterfaceDecl, MappedType, Member, Modifier,
-    Module, Param, SetterMember, StringEnumDecl, StringEnumVariant, Throws, TypeAliasDecl,
-    TypeDeclaration, TypeKind, TypeParam, TypeRef,
+    FunctionSig, GetterMember, Heritage, InterfaceClassification, InterfaceDecl, MappedType,
+    Member, Modifier, Module, Param, SetterMember, StringEnumDecl, StringEnumVariant, Throws,
+    TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam, TypeRef,
 };
 use crate::parse::classify::classify_interface;
 use crate::parse::scope::{Binding, ScopeId};
@@ -105,7 +105,6 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
 
     let diag = std::mem::take(&mut gctx.diagnostics);
     let gctx_type_level_only;
-    let literal_params;
     let (rewritten, synths, diag) = {
         let mut eval = Eval {
             gctx,
@@ -153,7 +152,6 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             }
         }
         gctx_type_level_only = std::mem::take(&mut eval.type_level_only);
-        literal_params = std::mem::take(&mut eval.literal_params);
         (rewritten, eval.synths, eval.diag)
     };
     gctx.diagnostics = diag;
@@ -238,7 +236,6 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             module.types.push(id);
         }
     }
-    super::erased_args::drop_literal_args(gctx, &literal_params);
 }
 
 /// The utilities with an evaluation. The rest of TypeScript's
@@ -494,15 +491,23 @@ impl<'g> Eval<'g> {
                 self.rewrite_type_params(&mut f.type_params, scope, &name, place);
                 self.rewrite_params(&mut f.params, scope, &name, place);
                 self.rewrite_type(&mut f.return_type, scope, &format!("{name}Return"), place);
+                self.rewrite_throws(&mut f.throws, scope, &name, place);
                 for o in &mut f.overloads {
                     let scope = o.body_scope;
                     self.rewrite_params(&mut o.params, scope, &name, place);
                     self.rewrite_type(&mut o.return_type, scope, &format!("{name}Return"), place);
+                    self.rewrite_throws(&mut o.throws, scope, &name, place);
                 }
             }
             TypeKind::Variable(v) => {
                 let name = to_pascal_case(&v.js_name);
                 self.rewrite_type(&mut v.type_ref, place.scope, &name, place);
+                for c in &mut v.constructs {
+                    let scope = c.body_scope;
+                    self.rewrite_params(&mut c.params, scope, &name, place);
+                    self.rewrite_type(&mut c.return_type, scope, &format!("{name}Return"), place);
+                    self.rewrite_throws(&mut c.throws, scope, &name, place);
+                }
             }
             TypeKind::StringEnum(_)
             | TypeKind::NumericEnum(_)
@@ -543,6 +548,18 @@ impl<'g> Eval<'g> {
         }
     }
 
+    fn rewrite_throws(
+        &mut self,
+        throws: &mut Throws,
+        scope: ScopeId,
+        parent: &str,
+        place: Placement,
+    ) {
+        if let Throws::Type(ty) = throws {
+            self.rewrite_type(ty, scope, &format!("{parent}Error"), place);
+        }
+    }
+
     fn rewrite_members(&mut self, members: &mut [Member], parent: &str, place: Placement) {
         for m in members {
             match m {
@@ -568,6 +585,7 @@ impl<'g> Eval<'g> {
                     self.rewrite_type_params(&mut m.type_params, scope, &name, place);
                     self.rewrite_params(&mut m.params, scope, &name, place);
                     self.rewrite_type(&mut m.return_type, scope, &format!("{name}Return"), place);
+                    self.rewrite_throws(&mut m.throws, scope, &name, place);
                 }
                 Member::StaticMethod(m) => {
                     let name = format!("{parent}{}", to_pascal_case(&m.js_name));
@@ -575,10 +593,12 @@ impl<'g> Eval<'g> {
                     self.rewrite_type_params(&mut m.type_params, scope, &name, place);
                     self.rewrite_params(&mut m.params, scope, &name, place);
                     self.rewrite_type(&mut m.return_type, scope, &format!("{name}Return"), place);
+                    self.rewrite_throws(&mut m.throws, scope, &name, place);
                 }
                 Member::Constructor(c) => {
                     let scope = c.scope;
                     self.rewrite_params(&mut c.params, scope, parent, place);
+                    self.rewrite_throws(&mut c.throws, scope, parent, place);
                 }
                 Member::IndexSignature(ix) => {
                     let scope = ix.scope;
@@ -600,7 +620,7 @@ impl<'g> Eval<'g> {
         match self.eval_named(ty, scope, &Env::default(), scope, hint, place) {
             Some(result) => *ty = result,
             None => {
-                let approx = fallback(ty);
+                let approx = self.erase_literal_args(&fallback(ty), scope);
                 self.diag.warn(format!(
                     "`{}` could not be evaluated, approximating as `{}`",
                     ty.format_ts(),
@@ -1936,27 +1956,43 @@ impl<'g> Eval<'g> {
     }
 
     /// `ty` without the arguments it passes for literal-only parameters,
-    /// when it names an interface that has them.
+    /// wherever it names an interface that has them.
     fn erase_literal_args(&self, ty: &TypeRef, scope: ScopeId) -> TypeRef {
-        let (
-            Some(id),
+        let sub = |t: &TypeRef| self.erase_literal_args(t, scope);
+        match ty {
             TypeRef::Reference {
                 segments,
                 generic_args,
-            },
-        ) = (self.literal_decl(ty, scope), ty)
-        else {
-            return ty.clone();
-        };
-        let positions = &self.literal_params[&id];
-        TypeRef::Reference {
-            segments: segments.clone(),
-            generic_args: generic_args
-                .iter()
-                .enumerate()
-                .filter(|(i, _)| !positions.contains(i))
-                .map(|(_, a)| a.clone())
-                .collect(),
+            } => {
+                let positions = self
+                    .literal_decl(ty, scope)
+                    .map(|id| &self.literal_params[&id]);
+                TypeRef::Reference {
+                    segments: segments.clone(),
+                    generic_args: generic_args
+                        .iter()
+                        .enumerate()
+                        .filter(|(i, _)| positions.is_none_or(|p| !p.contains(i)))
+                        .map(|(_, a)| sub(a))
+                        .collect(),
+                }
+            }
+            TypeRef::Array(t) => TypeRef::Array(Box::new(sub(t))),
+            TypeRef::Union(u) => TypeRef::union(u.members().iter().map(sub)),
+            TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
+            TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
+            TypeRef::Function(sig) => TypeRef::Function(FunctionSig {
+                params: sig
+                    .params
+                    .iter()
+                    .map(|p| Param {
+                        type_ref: sub(&p.type_ref),
+                        ..p.clone()
+                    })
+                    .collect(),
+                return_type: Box::new(sub(&sig.return_type)),
+            }),
+            other => other.clone(),
         }
     }
 
@@ -2823,7 +2859,9 @@ mod tests {
         let (module, gctx) = parse(
             "interface Rounding<U extends \"hour\" | \"minute\"> { smallestUnit?: U }
              interface Probe { go(): void }
+             interface Defaulted<S extends \"a\" | \"b\", T = Probe> { side?: S; extra?: T }
              declare function f(a: Rounding<\"hour\"> | keyof Missing): void;
+             declare function g(a: Defaulted<\"a\"> | keyof Missing): void;
              type Maker = Probe;
              declare const Maker: { new (options: Rounding<\"hour\">): Probe };",
         );
@@ -2844,6 +2882,7 @@ mod tests {
         }
         let mut found = Vec::new();
         args(param_type(&gctx, &module, "f", 0), &mut found);
+        args(param_type(&gctx, &module, "g", 0), &mut found);
         let maker = module
             .types
             .iter()

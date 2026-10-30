@@ -908,6 +908,7 @@ pub enum LargestUnitKind {
     Seconds = "seconds",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RoundingHourLargestUnitKind {
     Auto = "auto",
     Hour = "hour",

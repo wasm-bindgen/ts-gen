@@ -5,7 +5,8 @@ use ts_gen_integration_tests::type_eval::scoped::PartialSettings;
 use ts_gen_integration_tests::type_eval::{
     mapped, patch, ExcludeUnitHour, FlagsAOrB, Holder, KeyOfExtended, LooseOptions, Mixed, Named,
     NotMinute, OptionKey, PartialBox, PartialOptions, Patch, PickOptionsNameOrSize, Plural,
-    PluralHour, PluralHourOrMinute, ReadonlyOptions, RequiredOptions, Rounding, RoundingHour, Sized_,
+    PluralHour, PluralHourOrMinute, ReadonlyOptions, RequiredOptions, Rounding, RoundingHour,
+    Sized_,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only

@@ -5,7 +5,7 @@ use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::dictionary_polish::{
     polish::{
-        Approximate, Gauge, Holder, HourStepping, Maker, MinuteStepping, Options,
+        Approximate, Defaulted, Gauge, Holder, HourStepping, Maker, MinuteStepping, Options,
         PartialBoxLikeObject, PartialOmitLikeBoxLikeObject, PluralizeTimeUnit, PluralizeUnit,
         PluralizeUnitHour, PluralizeUnitMinute, Rounder, Rounding, RoundingHour, RoundingTimeUnit,
         Stepped, TimeLikeObject, Transition,
@@ -130,9 +130,11 @@ fn merged_classes_erase_literal_only_parameters(gauge: &Gauge) {
     let _: LevelReturnKind = gauge.level();
 }
 
-// Compile-only: a reference evaluation leaves as written takes the base.
+// Compile-only: a reference evaluation leaves as written takes the base,
+// leaving a defaulted parameter after it at its default.
 #[allow(dead_code)]
 fn literal_only_arguments_drop_where_evaluation_leaves_them(approx: &Approximate) {
     let _ = approx.fuzzy(&Rounding::new());
-    let _: Result<Approximate, wasm_bindgen::JsValue> = Maker::new(&Rounding::new());
+    let _ = approx.defaulted(&Defaulted::<Approximate>::new());
+    let _: Result<Approximate, wasm_bindgen::JsValue> = Maker::new(&RoundingHour::new());
 }
