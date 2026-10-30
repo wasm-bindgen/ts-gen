@@ -4952,8 +4952,9 @@ The spec is one of
 
 * a `.d.ts` whose export surface *is* the module's: `export function
   fetch(...)`, `export const api: { math: { add(a: number, b: number):
-  number } }` (nested object literals), `export const f: (x: T) => U`,
-  and `export default handler` where `declare const handler: T` in the
+  number } }` (nested object literals), `export const f: (x: T) => U`
+  or a function-type alias (`export const fetch:
+  ExportedHandlerFetchHandler<Env>`), and `export default handler` where `declare const handler: T` in the
   same file (`T` an interface, possibly with type arguments, or an
   object literal). Optional members of an interface default are
   selected with a JSDoc `@provides fetch, tail` on the `export default`.
@@ -4965,7 +4966,10 @@ Interface members may be methods or properties of function type,
 through type aliases including generic instantiations
 (`fetch?: ExportedHandlerFetchHandler<Env, Cf>` in workers-types). The
 interface's type parameters take the given arguments, else their
-declared defaults, else `unknown`. Required members are always
+declared defaults, else `unknown`. Members inherited through `extends`
+count as the interface's own, each clause's type arguments taken under
+that substitution (`interface MyHandler<E> extends ExportedHandler<E>`);
+a member declared nearer hides an inherited one of the same name. Required members are always
 provided; an unselected optional member is skipped with a warning
 naming it, and a selected member that is not a function is an error.
 Generic functions and non-function properties warn and skip;
