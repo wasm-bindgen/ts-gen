@@ -4861,9 +4861,10 @@ pub fn until_with_options(
 * **Only a dictionary is specialised at a use site.** An interface with
   methods, or one merged into a class (`interface Gauge<S extends "low" |
   "high">` + `declare var Gauge: { new (): Gauge }`), is still erased, but
-  its instantiations are the base. So is a reference evaluation leaves as
-  written, an unevaluable type or a variable's construct signature: its
-  literal-only arguments are dropped.
+  its instantiations are the base. So is a reference inside a type that
+  can't be evaluated (`Rounding<"hour"> | keyof T`): its literal-only
+  arguments are dropped, leaving any later defaulted parameter at its
+  default.
 * **The parameter alone reads as its argument**, an enum it names or its
   literals inline: in the base, `step?: S` is the `<Field>Kind` of `S`'s
   bound; specialised at `"minute"`, it is the literal.

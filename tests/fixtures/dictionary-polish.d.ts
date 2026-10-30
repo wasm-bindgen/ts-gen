@@ -101,10 +101,16 @@ declare global {
       new (): Gauge<"low">;
     };
 
-    // A reference evaluation leaves as written drops its literal-only
-    // arguments: an unevaluable type, a variable's construct signatures.
+    // A reference in an unevaluable type drops its literal-only arguments,
+    // ahead of a defaulted parameter too. A variable's construct
+    // signatures specialise like any other signature.
+    interface Defaulted<S extends "a" | "b", T = Approximate> {
+      side?: S;
+      extra?: T;
+    }
     interface Approximate {
       fuzzy<T>(options: Rounding<"hour"> | keyof T): void;
+      defaulted<T>(options: Defaulted<"a"> | keyof T): void;
     }
     type Maker = Approximate;
     const Maker: {

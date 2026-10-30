@@ -532,18 +532,74 @@ pub mod polish {
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Defaulted<T = Approximate>;
+        #[wasm_bindgen(method, getter)]
+        pub fn side<T>(this: &Defaulted<T>) -> Option<SideKind>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_side<T>(this: &Defaulted<T>, val: SideKind);
+        #[wasm_bindgen(method, getter)]
+        pub fn extra<T>(this: &Defaulted<T>) -> Option<T>
+        where
+            T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_extra<T>(this: &Defaulted<T>, val: T)
+        where
+            T: ::wasm_bindgen::convert::IntoWasmAbi;
+    }
+    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Defaulted<T> {
+        pub fn new() -> Defaulted<T> {
+            Self::builder().build()
+        }
+        pub fn builder() -> DefaultedBuilder<T> {
+            DefaultedBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for Defaulted<T> {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct DefaultedBuilder<T> {
+        inner: Defaulted<T>,
+    }
+    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> DefaultedBuilder<T> {
+        pub fn side(self, val: SideKind) -> Self {
+            self.inner.set_side(val);
+            self
+        }
+        pub fn extra(self, val: T) -> Self {
+            self.inner.set_extra(val);
+            self
+        }
+        pub fn build(self) -> Defaulted<T> {
+            self.inner
+        }
+    }
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Approximate;
         #[wasm_bindgen(method, catch)]
         pub fn fuzzy(this: &Approximate, options: &Rounding) -> Result<(), JsValue>;
         #[wasm_bindgen(method, catch, js_name = "fuzzy")]
         pub fn fuzzy_with_js_value(this: &Approximate, options: &JsValue) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub fn defaulted(this: &Approximate, options: &Defaulted) -> Result<(), JsValue>;
+        #[wasm_bindgen(method, catch, js_name = "defaulted")]
+        pub fn defaulted_with_js_value(
+            this: &Approximate,
+            options: &JsValue,
+        ) -> Result<(), JsValue>;
     }
     #[allow(dead_code)]
     pub type Maker = Approximate;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(constructor, js_class = "Maker", js_namespace = "Polish", catch)]
-        pub fn new(options: &Rounding) -> Result<Approximate, JsValue>;
+        pub fn new(options: &RoundingHour) -> Result<Approximate, JsValue>;
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -845,4 +901,9 @@ pub enum HourSteppingLargestUnitKind {
 pub enum LevelReturnKind {
     Low = "low",
     High = "high",
+}
+#[wasm_bindgen(private)]
+pub enum SideKind {
+    A = "a",
+    B = "b",
 }
