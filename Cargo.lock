@@ -383,7 +383,7 @@ checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 [[package]]
 name = "js-sys"
 version = "0.3.106"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-vec#518f5bad34510a3cdd591fa3c18389316bf83824"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-prototype#4beea36244d82cbcd5b8f5ea6634cbcd402a8c7d"
 dependencies = [
  "cfg-if",
  "futures-util",
@@ -1239,7 +1239,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen"
 version = "0.2.129"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-vec#518f5bad34510a3cdd591fa3c18389316bf83824"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-prototype#4beea36244d82cbcd5b8f5ea6634cbcd402a8c7d"
 dependencies = [
  "cfg-if",
  "rustversion",
@@ -1250,7 +1250,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-futures"
 version = "0.4.79"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-vec#518f5bad34510a3cdd591fa3c18389316bf83824"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-prototype#4beea36244d82cbcd5b8f5ea6634cbcd402a8c7d"
 dependencies = [
  "js-sys",
  "tokio",
@@ -1260,7 +1260,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-macro"
 version = "0.2.129"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-vec#518f5bad34510a3cdd591fa3c18389316bf83824"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-prototype#4beea36244d82cbcd5b8f5ea6634cbcd402a8c7d"
 dependencies = [
  "quote",
  "wasm-bindgen-macro-support",
@@ -1269,7 +1269,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-macro-support"
 version = "0.2.129"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-vec#518f5bad34510a3cdd591fa3c18389316bf83824"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-prototype#4beea36244d82cbcd5b8f5ea6634cbcd402a8c7d"
 dependencies = [
  "bumpalo",
  "proc-macro2",
@@ -1281,7 +1281,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-shared"
 version = "0.2.129"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-vec#518f5bad34510a3cdd591fa3c18389316bf83824"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-prototype#4beea36244d82cbcd5b8f5ea6634cbcd402a8c7d"
 dependencies = [
  "unicode-ident",
 ]
@@ -1289,7 +1289,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-test"
 version = "0.3.79"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-vec#518f5bad34510a3cdd591fa3c18389316bf83824"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-prototype#4beea36244d82cbcd5b8f5ea6634cbcd402a8c7d"
 dependencies = [
  "cast",
  "js-sys",
@@ -1309,7 +1309,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-test-macro"
 version = "0.3.79"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-vec#518f5bad34510a3cdd591fa3c18389316bf83824"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-prototype#4beea36244d82cbcd5b8f5ea6634cbcd402a8c7d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1319,7 +1319,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-test-shared"
 version = "0.2.129"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-vec#518f5bad34510a3cdd591fa3c18389316bf83824"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?branch=gbedford%2Fmono-prototype#4beea36244d82cbcd5b8f5ea6634cbcd402a8c7d"
 
 [[package]]
 name = "wasm-encoder"
