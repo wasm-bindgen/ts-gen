@@ -27,7 +27,7 @@
   ;; fromRelative(r: Rel): void
   (import "lib" "fromRelative" (func $lib:fromRelative (param $r externref)))
   ;; augmented(r: Rel): void
-  (import "lib" "augmented" (func $lib:augmented (param $r externref)))
+  (import "lib" "augmented" (func $lib:augmented (param $r f64)))
   ;; augmentedPkg(p: Pkg): void
   (import "lib" "augmentedPkg" (func $lib:augmentedPkg (param $p externref)))
 
