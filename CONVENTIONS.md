@@ -2940,9 +2940,10 @@ pub async fn fetch<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen
 pub async fn fetch_with_str(input: &str) -> Result<Response, JsValue>;
 ```
 
-Under `--experimental-generic-mono` the fresh parameters are bounded
-`::wasm_bindgen::MonoGeneric` instead, which holds for JS handles and
-native leaves alike (`Envelope<String, f64>`).
+Under `--experimental-generic-mono` the fresh parameters are unbounded,
+like the owning type's own: each mono position states the ABI bound it
+crosses at, and a handle's type arguments cross at none, so JS handles and
+native leaves alike are accepted (`Envelope<String, f64>`).
 
 * Free functions, constructors, methods and static methods hoist, sync,
   `async` and `_promise` forms alike. Only parameters do: a return keeps

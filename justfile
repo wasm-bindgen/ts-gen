@@ -1,11 +1,11 @@
 default:
     @just --list
 
-# Install wasm-bindgen-cli (test-integration's runner) at the wasm-bindgen rev patched in Cargo.toml
+# Install wasm-bindgen-cli (test-integration's runner) at the wasm-bindgen commit Cargo.lock pins
 install-wasm-bindgen-cli:
     cargo install wasm-bindgen-cli --locked \
         --git https://github.com/wasm-bindgen/wasm-bindgen \
-        --rev "$(grep -m1 '^wasm-bindgen = { git' {{justfile_directory()}}/Cargo.toml | grep -o '[0-9a-f]\{40\}')"
+        --rev "$(grep -m1 'source = "git+https://github.com/wasm-bindgen/wasm-bindgen' {{justfile_directory()}}/Cargo.lock | grep -o '#[0-9a-f]\{40\}' | tr -d '#')"
 
 # Apply formatting
 fmt:

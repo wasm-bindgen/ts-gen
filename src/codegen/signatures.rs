@@ -2097,11 +2097,10 @@ pub(crate) fn generate_callable_params(
             return candidate;
         }
     };
-    let bound = if ctx.experimental_generic_mono {
-        quote! { ::wasm_bindgen::MonoGeneric }
-    } else {
-        quote! { ::wasm_bindgen::JsGeneric }
-    };
+    // Under mono each position states the ABI bound it crosses at, and a
+    // hoisted parameter only sits inside a handle's type arguments, which
+    // need none, as the owning type's own parameters do.
+    let bound = (!ctx.experimental_generic_mono).then(|| quote! { ::wasm_bindgen::JsGeneric });
     let items = params
         .iter()
         .zip(param_idents(params, cgctx))
@@ -2114,7 +2113,10 @@ pub(crate) fn generate_callable_params(
                 Some((ty, hoisted)) => {
                     for h in hoisted {
                         let ident = typemap::make_ident(&h);
-                        bounds.push(quote! { #ident: #bound });
+                        bounds.push(match &bound {
+                            Some(bound) => quote! { #ident: #bound },
+                            None => quote! { #ident },
+                        });
                     }
                     ty
                 }
