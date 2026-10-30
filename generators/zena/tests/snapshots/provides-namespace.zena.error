@@ -1,0 +1,1 @@
+Error: ts-gen-zena cannot provide the export "api.math.add": Zena exports are identifiers, so only `default.<name>` and top-level functions that are not Zena keywords are supported

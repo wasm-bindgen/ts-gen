@@ -5023,16 +5023,17 @@ Two files are written next to the output:
   (`app.rs`), only if absent: the same signatures with the TS JSDoc as
   doc comments and placeholder bodies, for the author to fill in.
 
-## Wasm ABI (`--target wat` / `zena` / `embed`)
+## Wasm ABI (`--target wat` / `embed`)
 
 Besides the default `--target rust` output (wasm-bindgen extern
 blocks), ts-gen can emit a lower-level **Wasm ABI** suitable for
 languages that compile directly to WebAssembly without wasm-bindgen.
 `--target wat` prints it as an import template: every ABI function as
-an import from `./bindings.wasm`, with its TS declaration alongside,
-and a stub export per provided function. `--target zena` prints the
-same imports as [Zena bindings](#zena-bindings---target-zena). `ts-gen
-embed` implements the ABI for a module written against either.
+an import from `./bindings.wasm`, annotated with the rest of the model
+as [ABI.md](ABI.md) specifies, and a stub export per provided function.
+[Bindings generators](#bindings-generators) read it to write a
+language's bindings, and `ts-gen embed` implements the ABI for a module
+written against it.
 
 The ABI covers what the Rust bindings emit: each
 [export](#the-export-map) of the files and modules `--export` selects,
@@ -5088,12 +5089,13 @@ instantiated with anything and so admits both, as does a name that
 does not resolve. Discriminants are read from the value, never
 encoded in the signature, and errors cross as `externref`, one type.
 
-Two ABI functions, one global and one JSPI function exist for every
+Three ABI functions, one global and one JSPI function exist for every
 `.d.ts`:
 
 | Import                                    | Meaning                          |
 | ----------------------------------------- | -------------------------------- |
 | `"./bindings.wasm" "JsValue.is_undefined"`| `x === undefined` → `i32`        |
+| `"./bindings.wasm" "JsValue.undefined"`   | `undefined`, for a language that cannot import a global |
 | `"./bindings.wasm" "Number.value"`        | `Number(x)` → `f64`              |
 | `"./builtins.js" "undefined"`             | immutable `externref` global     |
 | `"./builtins.js" "await"`                 | JSPI suspend: promise → settled value |
@@ -5381,9 +5383,9 @@ values).
 
 ### The three artifacts
 
-`ts-gen embed` reads a language module written against the template
-(given the same `--export`s and `--external`s, so it binds the same
-surface) and produces:
+`ts-gen embed` reads a language module written against the template,
+and the template itself with `--abi` (or the same `.d.ts`, `--export`s
+and `--external`s, so it binds the same surface), and produces:
 
 1. **`bindings.wasm`** — implements each `Type.member` import using
    the JS primitives in `builtins.js`. Imports of one function under
@@ -5421,6 +5423,16 @@ bindings have no start function, so a language module's own start
 function may call them whatever order `wasm-merge` runs start
 functions in.
 
+A language that cannot import from `./bindings.wasm` names the module it
+does import ABI functions from with `--bindings-module`. Kotlin's
+`@JsFun` always imports from `js_code`, under the function's qualified
+name, which its generator makes the ABI name. Only the imports from that
+module that are ABI functions link to the bindings; the others are the
+language's own and are left to the host. `--imported-string-constants`
+names the namespace the bindings import their string constants from, so
+the merged module compiles with the one `importedStringConstants` the
+language module uses (Kotlin's is `'`).
+
 After merging, the bindings' functions and the module's raw export
 functions are stripped, leaving the published namespace globals plus
 any other exports the module had. An import from `./bindings.wasm`,
@@ -5436,88 +5448,13 @@ runtime in workerd) presents their values as the module's exports,
 so `export default` is the handler object. Instantiated by hand, read
 `exports.default.value`.
 
-### Zena bindings (`--target zena`)
+### Bindings generators
 
-`ts-gen --target zena` emits a `.zena` module importing the same ABI,
-for Zena's `-t js` target. It is compiled with `--imported-string-constants
-wasm:js/string-constants`, the namespace the merged module is loaded with.
-Three layers:
+A language's bindings are written by a program that reads the template,
+outside ts-gen: [`generators/zena`](generators/zena/README.md) for Zena,
+and the Kotlin generator in `examples/kotlin-worker/`. [ABI.md](ABI.md)
+specifies the template, the only interface between them and ts-gen.
 
-* **Flat layer**: one `@external(<module>, <name>) declare function
-  __<name>(...)` per import the `wat` template lists: each ABI function
-  under its name and under each alias, from `./bindings.wasm` or its
-  `declare module` specifier (whose identifier then prefixes the
-  declaration's name), plus the `./builtins.js` `undefined` global as
-  `declare let __undefined: externref` and `await` as `await_`. A
-  reference is `externref` where TS never admits `null` and `externref |
-  null` where it does: Zena keeps `null` out of `externref`, and both
-  lower to the template's Wasm `externref`. Scalars are `f64`, `boolean`
-  (lowers to `i32`) and `i64`. A variadic rest parameter is
-  `FixedArray<anyref> | null`, the template's `(ref null $anyrefs)`.
-  `tests/zena.rs` checks that these declarations and the template's
-  imports are the same set, with the same Wasm types.
-* **Sys layer**: wasm-bindgen's `JsValue` surface over `externref`,
-  emitted once per file: `Undefined`, `isUndefined(x)`, `isEmpty(x)`
-  (null or undefined) and `numberValue(x)`.
-* **Class layer**: one `export class Type { #ref: externref; new(ref);
-  ref(): externref; ... }` per owner, following the stdlib's host-object
-  pattern. Members forward to the flat layer: getters are accessors,
-  setters `set_x(value)`, constructors `new*` → `static create*()`,
-  static members `static`. Declared members are named first, so a
-  constructor yields `create` to a declared `static create` and becomes
-  `create_2`. An owner reached only under an alias's name is `export type
-  Alias = Type;`, so both names are one type and the static members are
-  on `Type`. Free functions and global variables get an exported
-  function of the same name. A module's owner or function whose name a
-  global or an earlier one already has takes the specifier as a prefix
-  (`declared_modules_os_constants` beside `"declared-modules/fs"`'s
-  `constants`); a function's overloads take it
-  together (`mail_send`, `mail_send_with_opt`).
-
-Positions whose TS type is an owner, or a `string`, through aliases and
-ignoring empty arms, are typed:
-
-| TS position | Argument | Result |
-| --- | --- | --- |
-| `Type` | `Type`, passing `.ref()` | `new Type(r)` |
-| `string` | `String`, passing `.handle` | `String.fromHandle(r)` |
-| admits `null` | `Type \| null`, `null` passed as `null` | `Type \| null`, `null` for `null` (and `undefined` where admitted) |
-| admits only `undefined` | `Type \| null`, `null` passed as `Undefined` | `Type \| null`, `null` for `undefined` |
-
-An owner is looked up in the function's own module first, then among the
-globals. On `-t js` a Zena `String` wraps the JS string, so strings
-cross without a copy and Zena literals are JS string constants. Zena's
-own `String` marshalling for `@external` passes the GC object, so the
-flat layer keeps `externref`. Other references stay `externref` /
-`externref | null`.
-
-Identifiers: ABI names carry TS property keys verbatim, so they are
-sanitised to `[A-Za-z0-9_]` (leading digit prefixed with `_`) and
-deduplicated, parameters within each function too. Zena keywords (`new`,
-`function`, `type`, ...) get a trailing `_`, the convention Zena's own
-WIT bindings use. A class or function named like one the bindings
-define or use (`Undefined`, `isUndefined`, `isEmpty`, `numberValue`,
-`await_`, `String`, `Error`, `FixedArray`, `__r`, or a flat declaration)
-takes a `_2` suffix.
-
-With `--provides`, `main.zena` is written next to the bindings, which it
-imports by the output's file name (so `-o` cannot be `main.zena` or
-`app.zena`): the compile entry, one raw export per handler wrapping its
-wire values as above and calling the typed `app.zena`
-(`app.fetch(new Request(request), new Env(env), new
-ExecutionContext(ctx)).ref()`). An empty argument
-reaches the app as `null`; an empty result goes back as `null`, or as
-`Undefined` where TS admits only `undefined`. An `app.zena` scaffold
-(JSDoc as comments, bodies that compile) is written only if absent. Zena
-exports are identifiers, so a nested export path, or a name that is a
-Zena keyword, is an error for this target. A `Promise<T>` handler is
-written for JSPI: the app returns `T`.
-
-Zena's `Error` imports `captureStackTrace` and `formatStackTrace` from
-`env`; `embed` leaves them to the host, as it does every import outside
-the ABI's modules.
-
-### Limitations
 
 **Variadics** (`...rest: T[]`) become a Wasm GC array parameter
 `(ref null $anyrefs)` where `$anyrefs` is `(type $anyrefs (array (mut

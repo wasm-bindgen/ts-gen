@@ -1,0 +1,23 @@
+[package]
+description = "Zena bindings for the Wasm ABI ts-gen writes as an annotated WAT template"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+name = "ts-gen-zena"
+repository = "https://github.com/wasm-bindgen/ts-gen"
+version = "0.1.0"
+
+[[bin]]
+name = "ts-gen-zena"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+ts-gen-abi = { path = "../../abi" }
+
+# The end-to-end tests embed with ts-gen; the generator itself reads only
+# the template.
+[dev-dependencies]
+ts-gen = { path = "../..", default-features = false }
+similar = "2"
+wasmparser = "0.262"
+wat = "1.259"

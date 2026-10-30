@@ -1160,9 +1160,17 @@ dependencies = [
  "similar",
  "syn 2.0.117",
  "tempfile",
+ "ts-gen-abi",
  "walkdir",
  "wasm-encoder",
  "wasmparser",
+ "wat",
+]
+
+[[package]]
+name = "ts-gen-abi"
+version = "0.1.0"
+dependencies = [
  "wat",
 ]
 
@@ -1176,6 +1184,18 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-bindgen-test",
+]
+
+[[package]]
+name = "ts-gen-zena"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "similar",
+ "ts-gen",
+ "ts-gen-abi",
+ "wasmparser",
+ "wat",
 ]
 
 [[package]]

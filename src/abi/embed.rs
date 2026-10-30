@@ -36,6 +36,25 @@ pub const MAX_ARITY: usize = 8;
 pub struct Options {
     /// Specifier `wrapper.wasm` imports the language module under.
     pub module_specifier: String,
+    /// Module the language imports global ABI functions from. A language
+    /// that cannot name its imports (Kotlin's `@JsFun` always imports from
+    /// `js_code`) matches the ABI's names under its own module; imports
+    /// from it that are not ABI functions are left to the host.
+    pub bindings_module: String,
+    /// Namespace the bindings import their string constants from, so a
+    /// merged module compiles with the one `importedStringConstants` the
+    /// language module uses.
+    pub string_constants: String,
+}
+
+impl Options {
+    pub fn new(module_specifier: impl Into<String>) -> Self {
+        Options {
+            module_specifier: module_specifier.into(),
+            bindings_module: BINDINGS_SPECIFIER.into(),
+            string_constants: STRING_CONSTANTS.into(),
+        }
+    }
 }
 
 #[derive(Debug, Default, Clone)]
@@ -86,14 +105,19 @@ struct ModuleInfo {
 }
 
 pub fn embed(abi: &Abi, module: &[u8], options: &Options) -> Result<Output> {
-    let info = inspect(abi, module)?;
+    let info = inspect(abi, module, &options.bindings_module)?;
     let mut builtins = Builtins::default();
+    let imports = || Imports {
+        string_constants: options.string_constants.clone(),
+        ..Default::default()
+    };
 
-    let bindings_wat = generate_bindings(abi, &info.used, &mut builtins)?;
+    let bindings_wat = generate_bindings(abi, &info.used, imports(), &mut builtins)?;
     let wrapper_wat = generate_wrapper(
         &info.handlers,
         info.jspi,
         &options.module_specifier,
+        imports(),
         &mut builtins,
     )?;
     if info.jspi {
@@ -222,11 +246,15 @@ fn link_imports(wasm: &[u8], links: &BTreeMap<(String, String), String>) -> Resu
 }
 
 /// Assemble WAT and validate it with the features the ABI relies on.
+/// Kotlin/Wasm emits the legacy `try`/`catch` by default.
+fn features() -> wasmparser::WasmFeatures {
+    use wasmparser::WasmFeatures;
+    WasmFeatures::default() | WasmFeatures::GC | WasmFeatures::LEGACY_EXCEPTIONS
+}
+
 pub fn assemble(wat_text: &str) -> Result<Vec<u8>> {
     let bytes = wat::parse_str(wat_text).context("assembling generated WAT")?;
-    let mut validator = wasmparser::Validator::new_with_features(
-        wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
-    );
+    let mut validator = wasmparser::Validator::new_with_features(features());
     validator
         .validate_all(&bytes)
         .context("validating generated Wasm")?;
@@ -320,16 +348,14 @@ pub fn postprocess(
     }
 
     let bytes = out.finish();
-    let mut validator = wasmparser::Validator::new_with_features(
-        wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
-    );
+    let mut validator = wasmparser::Validator::new_with_features(features());
     validator
         .validate_all(&bytes)
         .context("validating postprocessed Wasm")?;
     Ok(bytes)
 }
 
-fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
+fn inspect(abi: &Abi, module: &[u8], bindings_module: &str) -> Result<ModuleInfo> {
     use wasmparser::{Payload, TypeRef};
 
     let mut types: Vec<wasmparser::SubType> = Vec::new();
@@ -402,10 +428,18 @@ fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
     for (module_name, field, ty) in &imports {
         // A module-scoped ABI function is imported from its specifier, which
         // the module may also import other things from directly.
-        let abi_import = module_name == BINDINGS_SPECIFIER
+        // Under another bindings module, only the names the ABI has are its.
+        let aliased = module_name == bindings_module && bindings_module != BINDINGS_SPECIFIER;
+        let lookup = if aliased {
+            BINDINGS_SPECIFIER
+        } else {
+            module_name.as_str()
+        };
+        let abi_import = (module_name == bindings_module
+            && (!aliased || abi.import(BINDINGS_SPECIFIER, field).is_some()))
             || (modules.contains(&module_name.as_str()) && matches!(ty, TypeRef::Func(_)));
         if abi_import {
-            let f = abi.import(module_name, field).ok_or_else(|| {
+            let f = abi.import(lookup, field).ok_or_else(|| {
                 anyhow!("module imports {module_name:?} {field:?}, which is not in the ABI")
             })?;
             let TypeRef::Func(idx) = ty else {
@@ -424,7 +458,7 @@ fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
                 Some(spec) => format!("{spec}:{field}"),
                 None => field.clone(),
             };
-            if f.module.is_some() {
+            if f.module.is_some() || aliased {
                 links.insert((module_name.clone(), field.clone()), export.clone());
             }
             if used
@@ -851,6 +885,8 @@ struct Imports {
     anyrefs_type: bool,
     /// (specifier, export, type) imported as globals of that type.
     module_exports: IndexSet<(String, String, WasmType)>,
+    /// Namespace of the string constant imports.
+    string_constants: String,
 }
 
 impl Imports {
@@ -909,7 +945,8 @@ impl Imports {
         for s in &self.strings {
             let _ = writeln!(
                 out,
-                "  (import {STRING_CONSTANTS:?} {s:?} (global ${} externref))",
+                "  (import {:?} {s:?} (global ${} externref))",
+                self.string_constants,
                 string_ident(s)
             );
         }
@@ -1199,8 +1236,12 @@ struct FuncBody {
     value: String,
 }
 
-fn generate_bindings(abi: &Abi, used: &[UsedFunction], builtins: &mut Builtins) -> Result<String> {
-    let mut imports = Imports::default();
+fn generate_bindings(
+    abi: &Abi,
+    used: &[UsedFunction],
+    mut imports: Imports,
+    builtins: &mut Builtins,
+) -> Result<String> {
     let mut funcs = String::new();
 
     for uf in used {
@@ -1342,6 +1383,7 @@ fn function_body_inner(
                 .func("is_undefined", vec![this.1], Some(WasmType::I32));
             format!("(call ${f} {})", this.0)
         }
+        AbiOp::Undefined => body.undefined(),
         AbiOp::NumberValue => {
             let number = body.path(None, &["Number".to_string()]);
             let g = body.global();
@@ -1481,13 +1523,13 @@ fn generate_wrapper(
     handlers: &[HandlerInfo],
     jspi: bool,
     module_specifier: &str,
+    mut imports: Imports,
     builtins: &mut Builtins,
 ) -> Result<String> {
     if handlers.is_empty() {
         return Ok(";; Generated by ts-gen. No --provides: the module's own exports pass through.\n(module)\n".into());
     }
     let ns = namespace(handlers)?;
-    let mut imports = Imports::default();
     let mut init = String::new();
     let mut locals = 0usize;
     // A boolean result is an `i32` the module returns, which JS would

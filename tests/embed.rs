@@ -189,9 +189,7 @@ fn run_embed_test(fixture_name: &str) -> Result<()> {
     let module_bytes = ts_gen::abi::embed::assemble(&wat_source).context("assembling fixture")?;
 
     // Embed
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./hello.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./hello.wasm");
     let output =
         ts_gen::abi::embed::embed(&abi, &module_bytes, &options).context("running embed")?;
 
@@ -371,9 +369,7 @@ fn embed_nonnull_on_module_produced_positions() {
         (func (export "fetch") (param externref externref externref) (result (ref extern))
             unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
     let out = ts_gen::abi::embed::embed(&abi, &bytes, &options)
         .expect("narrowing own positions is sound");
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
@@ -408,9 +404,7 @@ fn embed_anyref_ctor() {
 fn embed_error(wat: &str) -> String {
     let abi = worker_abi().unwrap();
     let bytes = ts_gen::abi::embed::assemble(wat).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./bad.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./bad.wasm");
     ts_gen::abi::embed::embed(&abi, &bytes, &options)
         .err()
         .expect("embed should fail")
@@ -494,9 +488,7 @@ fn embed_non_null_anyref_follows_the_extern_rule() {
         (func (export "fetch") (param externref externref externref) (result externref)
             unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
     let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     assert!(
@@ -526,9 +518,7 @@ fn embed_error_jspi_without_provides() {
         (func (export "fetch") (param externref externref externref) (result externref)
             unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
     let err = ts_gen::abi::embed::embed(&abi, &bytes, &options)
         .err()
         .expect("nothing would be wrapped with promising")
@@ -547,9 +537,7 @@ fn embed_error_export_collides_with_published_namespace() {
         (func (export "api.math.add") (param f64 f64) (result f64) unreachable)
         (func (export "api") (result f64) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
     let err = ts_gen::abi::embed::embed(&abi, &bytes, &options)
         .err()
         .expect("collision")
@@ -572,9 +560,7 @@ fn embed_error_handler_param_message_names_the_export_side() {
     let module = r#"(module
         (func (export "fetch") (param externref (ref extern)) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
     let err = ts_gen::abi::embed::embed(&abi, &bytes, &options)
         .err()
         .expect("nullable handler param")
@@ -602,9 +588,7 @@ fn embed_module_export_globals_take_the_declared_reference_type() {
         (import "m:lib" "maybe" (func (result anyref)))
         (func (export "fetch") (param externref) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
     let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     assert!(
@@ -642,9 +626,7 @@ fn embed_beyond_the_call_family_applies_an_array() {
         (import "./bindings.wasm" "Spread.new" (func (param (ref null $anyrefs)) (result externref)))
         (func (export "fetch") (param externref) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
     let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     assert!(
@@ -678,9 +660,7 @@ fn embed_without_exports_passes_the_module_through() {
     let module = r#"(module
         (func (export "whatever") (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
     let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
     assert!(out.handlers.is_empty());
     assert!(
@@ -714,9 +694,7 @@ fn embed_binds_one_function_under_every_alias() {
         (import "m:lib" "Connection.new" (func (result (ref extern))))
         (func (export "fetch") (param externref) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
     let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     let b = &out.bindings_wat;
@@ -763,9 +741,7 @@ fn embed_links_the_same_name_from_two_modules_separately() {
         (import "m:b" "constants.MODE" (func (result externref)))
         (func (export "fetch") (param externref) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
     let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     let b = &out.bindings_wat;
@@ -805,4 +781,94 @@ fn embed_links_the_same_name_from_two_modules_separately() {
             ),
         ]
     );
+}
+
+#[test]
+fn embed_reads_the_template_it_was_written_against() {
+    // `embed --abi` reads the template instead of the `.d.ts`: the file
+    // must give back the ABI `embed` would build, and so the same bindings.
+    let abi = worker_abi().unwrap();
+    let read = ts_gen::abi::format::parse(&ts_gen::abi::format::emit(&abi)).unwrap();
+    assert_eq!(read, abi);
+    let module = r#"(module
+        (import "./bindings.wasm" "Request.url" (func (param externref) (result externref)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let from_dts = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
+    let from_file = ts_gen::abi::embed::embed(&read, &bytes, &options).unwrap();
+    assert_eq!(from_dts.bindings_wat, from_file.bindings_wat);
+    assert_eq!(from_dts.wrapper_wat, from_file.wrapper_wat);
+}
+
+#[test]
+fn embed_bindings_module_links_only_abi_names() {
+    // Kotlin's `@JsFun` imports from `js_code` under the function's
+    // qualified name. Under `--bindings-module js_code` the ABI's names
+    // link to the bindings, and the language's own snippets stay imports.
+    let abi = worker_abi().unwrap();
+    let module = r#"(module
+        (import "js_code" "Request.url" (func (param externref) (result externref)))
+        (import "js_code" "kotlin.js.stdlibSnippet" (func (param externref)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let options = ts_gen::abi::embed::Options {
+        bindings_module: "js_code".into(),
+        string_constants: "'".into(),
+        ..ts_gen::abi::embed::Options::new("./m.wasm")
+    };
+    let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
+    assert_eq!(out.used, ["Request.url"]);
+    let imports: Vec<(String, String)> = wasmparser::Parser::new(0)
+        .parse_all(&out.module)
+        .filter_map(|p| match p.unwrap() {
+            wasmparser::Payload::ImportSection(r) => Some(
+                r.into_imports()
+                    .map(|i| {
+                        let i = i.unwrap();
+                        (i.module.to_string(), i.name.to_string())
+                    })
+                    .collect::<Vec<_>>(),
+            ),
+            _ => None,
+        })
+        .flatten()
+        .collect();
+    assert_eq!(
+        imports,
+        [
+            (
+                "./bindings.wasm".into(),
+                "ts-gen:bindings.Request.url".into()
+            ),
+            ("js_code".into(), "kotlin.js.stdlibSnippet".into()),
+        ]
+    );
+    assert!(
+        out.bindings_wat.contains(r#"(import "'" "url""#),
+        "{}",
+        out.bindings_wat
+    );
+}
+
+#[test]
+fn embed_accepts_legacy_exceptions() {
+    // Kotlin/Wasm emits the legacy `try`/`catch` by default.
+    let abi = worker_abi().unwrap();
+    let module = r#"(module
+        (tag $e (param externref))
+        (import "./bindings.wasm" "Request.url" (func $url (param externref) (result externref)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            try (result externref)
+                local.get 0
+                call $url
+            catch $e
+            end))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let out =
+        ts_gen::abi::embed::embed(&abi, &bytes, &ts_gen::abi::embed::Options::new("./m.wasm"))
+            .unwrap();
+    assert_eq!(out.used, ["Request.url"]);
 }

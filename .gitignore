@@ -7,3 +7,4 @@ examples/zena-worker/out
 examples/zena-worker/bindings.zena
 examples/zena-worker/main.wasm
 examples/zena-worker/main.zena
+examples/zena-worker/worker.abi.wat

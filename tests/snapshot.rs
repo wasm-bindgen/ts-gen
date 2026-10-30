@@ -270,8 +270,20 @@ fn snapshot_test(fixture_name: &str) {
     }
 }
 
-/// Validate that WAT text assembles and passes Wasm validation.
+/// Validate that WAT text assembles and passes Wasm validation, and that it
+/// reads back as an ABI template that writes the same text: the file
+/// carries everything the writer puts in it.
 fn validate_wat(wat_text: &str, fixture_name: &str) {
+    let abi = ts_gen::abi::format::parse(wat_text)
+        .unwrap_or_else(|e| panic!("template does not read back for {fixture_name}: {e}"));
+    let rewritten = ts_gen::abi::format::emit(&abi);
+    if rewritten != wat_text {
+        let diff = similar::TextDiff::from_lines(wat_text, &rewritten);
+        panic!(
+            "template for {fixture_name} does not round-trip:\n{}",
+            diff.unified_diff().header("written", "read back")
+        );
+    }
     let bytes = match wat::parse_str(wat_text) {
         Ok(b) => b,
         Err(e) => panic!("WAT parse failed for {fixture_name}:\n{e}\n\nSource:\n{wat_text}"),
