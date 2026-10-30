@@ -9,3 +9,10 @@ interface _Foo {
 }
 declare function _helper(): void;
 export { _Foo as Foo, _Foo as Bar, _helper as a, _helper as b };
+
+declare class _Conn {
+  constructor();
+  get(): string;
+  static open(): _Conn;
+}
+export { _Conn as Conn, _Conn as Connection };

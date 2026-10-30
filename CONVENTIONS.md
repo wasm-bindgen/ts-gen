@@ -46,6 +46,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Duplicate identifiers](#duplicate-identifiers)
 * [External type mapping and web platform defaults](#external-type-mapping-and-web-platform-defaults)
 * [Provided functions (`--provides`)](#provided-functions---provides)
+* [Wasm ABI (`--target wat`)](#wasm-abi---target-wat)
 
 ---
 
@@ -634,7 +635,8 @@ the setter is named `set_<snake_case>`.
     (`val_`, with `js_name = "val"`).
   * A parameter list numbers without the underscore (`a` and `$a` give
     `a` and `a2`), since wasm-bindgen's generated code names the ABI
-    parts of a parameter `a` `a_1` to `a_4`.
+    parts of a parameter `a` `a_1` to `a_4`. A method's parameters skip
+    its receiver's `this` (`method(_this)` gives `this2`).
 * Reserved Rust keywords in fn, method, and accessor names get a trailing
   underscore (`type()` → `type_`). Elsewhere (parameters, variables) they
   are emitted as raw identifiers (`r#type`, `r#loop`), except `self`,
@@ -5020,3 +5022,286 @@ Two files are written next to the output:
 * the app scaffold, named after the last segment of `--provides-app`
   (`app.rs`), only if absent: the same signatures with the TS JSDoc as
   doc comments and placeholder bodies, for the author to fill in.
+
+## Wasm ABI (`--target wat`)
+
+Besides the default `--target rust` output (wasm-bindgen extern
+blocks), ts-gen can emit a lower-level **Wasm ABI** suitable for
+languages that compile directly to WebAssembly without wasm-bindgen.
+`--target wat` prints it as an import template: every ABI function as
+an import from `./bindings.wasm`, with its TS declaration alongside,
+and a stub export per provided function.
+
+The ABI covers what the Rust bindings emit: each
+[export](#the-export-map) of the files and modules `--export` selects,
+less externalised modules, and the types their signatures reach, a
+class reached that way with only its instance members (see
+[Global scope](#global-scope)).
+
+### Scalar mapping
+
+| TypeScript         | Wasm type    | Notes                                |
+| ------------------ | ------------ | ------------------------------------ |
+| `number`           | `f64`        |                                      |
+| `boolean`          | `i32`        | `0` = false, non-zero = true         |
+| `bigint`           | `i64`        |                                      |
+| everything else    | `externref`  | strings, objects, null, undefined, numeric enums, `never` |
+
+A reference to a type alias reads as its target, through aliases of
+aliases and generic instantiations, as the Rust bindings lower it:
+`type Millis = number` and lib.dom's `DOMHighResTimeStamp` are `f64`,
+and a `type Nothing = void` return has no result. A type parameter
+stays `externref`, unless it is constrained to a primitive, which it
+then reads as, as in the Rust bindings: `bump<N extends number>(by: N):
+N` is `(param $by f64) (result f64)`.
+
+Nullable scalars (`number | null`) cross as a nullable reference;
+there is no sentinel for "null" in `i32`/`f64`/`i64`. `Number.value`
+unboxes one that is present, and reads a numeric enum member. A
+`void`/`undefined` return has no result slot, while `null` and `never`
+returns are `(result externref)`.
+
+Arguments expand as the Rust [writes](#writes) do: an omittable
+parameter is left off the shorter arities, and one followed by another
+argument takes `undefined` in its first arm, where the Rust bindings
+take an `Option`. A scalar there crosses as a reference, `$undefined`
+passing for the omitted value: `slice(start?: number, end?: number)`
+is `Blob.slice_with_start_and_end (param $this externref) (param $start
+externref) (param $end f64)`.
+
+### Nullability and the sys surface
+
+The wire type is `externref` = wasm-bindgen's `JsValue`: values cross
+exactly as JS produced them, with no `?? null` normalisation, and
+every consumer reproduces wasm-bindgen's `sys` surface over it
+(`JsValue`, `JsNullable<T>` = `T | null | undefined`, `JsOption<T>` =
+`T | undefined`, `Null`, `Undefined`). The ABI records for each
+reference position whether its TS type admits `null` and whether it
+admits `undefined`; the template spells both `externref`. Only `null`
+is a wasm null, so a consumer may take a position that does not admit
+`null` as `(ref extern)`. The bits are computed through type aliases
+(including generic instantiations, with the arguments substituted),
+qualified paths (`NS.Inner`) and union arms; a type parameter may be
+instantiated with anything and so admits both, as does a name that
+does not resolve. Discriminants are read from the value, never
+encoded in the signature, and errors cross as `externref`, one type.
+
+Two ABI functions, one global and one JSPI function exist for every
+`.d.ts`:
+
+| Import                                    | Meaning                          |
+| ----------------------------------------- | -------------------------------- |
+| `"./bindings.wasm" "JsValue.is_undefined"`| `x === undefined` → `i32`        |
+| `"./bindings.wasm" "Number.value"`        | `Number(x)` → `f64`              |
+| `"./builtins.js" "undefined"`             | immutable `externref` global     |
+| `"./builtins.js" "await"`                 | JSPI suspend: promise → settled value |
+
+`is_null` needs nothing: `ref.is_null` in the language. `Number.value`
+is JS coercion, not a type test: `Number(null)` is `0`,
+`Number(undefined)`, non-numeric strings and plain objects are `NaN`,
+`Number("5")` is `5`, and `Number(Symbol())` throws; test
+`ref.is_null` / `is_undefined` first when the distinction matters.
+
+`await` is `(func (param externref) (result externref))`, JSPI's
+`WebAssembly.Suspending`: it suspends the module on a promise and
+returns the settled value. It is not part of the `.d.ts`'s ABI and
+the template imports it so a module can use it; importing it is
+optional and opts the module into JSPI. The wrapper that publishes
+the provided functions then wraps each with `WebAssembly.promising`,
+so a handler may suspend and JS receives a promise of its result.
+Without the import a handler returns a promise (or a plain value)
+itself, and the published functions are the raw exports.
+
+### Export naming
+
+Each callable gets an import name of the form `Type.member`, where
+`Type` is the owner's dotted JS path (`WebAssembly.Module.exports`
+for a class inside a namespace):
+
+```wat
+(import "./bindings.wasm" "Response.status" (func ...))
+(import "./bindings.wasm" "Response.clone" (func ...))
+```
+
+Overloads of one member expand together through the Rust bindings'
+signature flattening (optional truncation, union arms, `_with_<x>`
+suffixes), run without the Rust type context. A union behind a type
+alias is not resolved there and stays one parameter. Expansions whose
+parameters render alike merge into one ABI function, and without the
+context every reference outside `js_sys` renders as `JsValue`. Such a
+function takes one `externref` and makes the same JS call whichever arm
+the caller passes. Suffixes are computed from the expansions that
+remain, so ABI names match the Rust bindings only where both keep the
+same variants.
+
+A written `null` is not an arm of its own as in the Rust
+[writes](#writes): the ABI has one nullable `externref` per position. A
+`null` arm folds into each expansion that differs from it only at its
+`null` positions and has the same result, which keeps its name and
+admits `null` there; a scalar that so admits `null` crosses as a
+reference, as in [Scalar mapping](#scalar-mapping). A `null` arm with
+no such sibling stays under its Rust name (`set x(value: null)` is
+`set_x_with_null`). `new(body?: BodyInit | null, init?: ResponseInit)`
+is:
+
+```wat
+;; constructor()
+(import "./bindings.wasm" "Response.new" (func $Response.new (result externref)))
+;; constructor(body: BodyInit | null)
+(import "./bindings.wasm" "Response.new_with_body" (func $Response.new_with_body (param $body externref) (result externref)))
+;; constructor(body: BodyInit | null | undefined, init: ResponseInit)
+(import "./bindings.wasm" "Response.new_with_body_and_init" (func $Response.new_with_body_and_init (param $body externref) (param $init externref) (result externref)))
+```
+
+where the Rust bindings also have `new_with_null()` and
+`new_with_null_and_init(init)`. Inline arms that still render
+differently stay apart in both: `(x: string | number)` is `m` and
+`m_with_f64`, while `(x: Blob | FormData)` is one ABI `n` against
+Rust's `n` and `n_with_form_data`.
+
+A type or namespace exported under several names has each member under
+each name, as one function `bindings.wasm` exports under all of them.
+`Type` is first the name it binds by, the class's `js_name`, the
+interface's local name or the namespace's `js_namespace`, then each
+other public name (`export { _N as N1, _N as N2 }` gives `N1.f` and
+`N2.f`):
+
+```ts
+declare module "db" {
+  class _Conn { constructor(); get(): string; }
+  export { _Conn as Conn, _Conn as Connection };
+}
+```
+
+```wat
+(import "db" "Conn.new" (func $db:Conn.new (result externref)))
+(import "db" "Connection.new" (func $db:Connection.new (result externref)))
+(import "db" "Conn.get" (func $db:Conn.get (param $this externref) (result externref)))
+(import "db" "Connection.get" (func $db:Connection.get (param $this externref) (result externref)))
+```
+
+Parameters, a provided function's included, are named as in a Rust
+parameter list: sanitised, and numbered where they collide with each
+other or with the receiver `this`, so `collideArgs(a, $a, fooBar, foo_bar)`
+has parameters `a`, `a2`, `foo_bar` and `foo_bar2`, and `method(_this)`
+has `this` and `this2`. A non-ASCII character becomes `_`, since WAT
+identifiers are ASCII (`café` → `caf_`).
+
+### Member types
+
+| TypeScript member        | ABI function shape                           |
+| ------------------------ | -------------------------------------------- |
+| Instance method `m()`    | `(param $this externref) ...args...`         |
+| Instance getter `x`      | `(param $this externref) (result T)`         |
+| Instance setter `x=`     | `(param $this externref) (param $value T)`   |
+| Static method `M.m()`    | `...args...`                                 |
+| Static getter `M.x`      | `(result T)`                                 |
+| Static setter `M.x=`     | `(param $value T)`                           |
+| Constructor              | `...args... (result externref)`              |
+| Dictionary `new`         | `(result externref)` — creates `{}`          |
+| `declare var x: T`       | `(result T)` — reads `globalThis.x`          |
+| `declare const x: T`     | `(result T)` — reads `globalThis.x`          |
+
+`T` is the wire type of the TS type: `declare let n: number` is
+`(result f64)`.
+
+### Dictionaries
+
+Dictionaries (property-only interfaces) get a `Type.new` function
+that returns an empty JS object (`{}`). Callers then use the
+generated setters to populate fields:
+
+```wat
+(call $ResponseInit.new)
+(local.set $init)
+(call $ResponseInit.set_status (local.get $init) (f64.const 200))
+```
+
+### Global variables
+
+`declare var x: T` and `declare const x: T` generate a getter that
+reads the property from `globalThis`:
+
+```wat
+(import "./bindings.wasm" "console" (func $console (result externref)))
+```
+
+The returned object can then be used with instance methods from its
+interface type (e.g. `Console.log`).
+
+### Namespaces
+
+Namespace members use the dotted path as a prefix:
+
+```wat
+(import "./bindings.wasm" "WebAssembly.compile" (func ...))
+```
+
+Free functions (global scope) use just the function name:
+
+```wat
+(import "./bindings.wasm" "fetch" (func ...))
+```
+
+### Module-scoped declarations
+
+Declarations inside `declare module "<spec>" { ... }` keep the same
+`Type.member` names, and the template imports them from `"<spec>"`
+instead of `./bindings.wasm`. The import module and name together are
+unique, so two modules exporting the same name are two imports:
+
+```wat
+(import "node:fs" "constants.O_RDONLY" (func $node:fs:constants.O_RDONLY (result f64)))
+(import "node:os" "constants.O_RDONLY" (func $node:os:constants.O_RDONLY (result f64)))
+```
+
+Every value is reached through one of the module's exports, as
+`(<spec>, path)`: `path[0]` is the export, each further segment a
+property read, so `constants.O_RDONLY` reads `O_RDONLY` from the
+`constants` export of `"node:fs"`. A function, variable or namespace
+member is reached this way; a class's constructor and statics go
+through the class's export, and its instance members through the
+receiver as for a global class. Types (interfaces, aliases) are not
+values and import nothing. A scalar `const` or `let` that is itself an
+export takes its scalar type, as any other value does: `export const
+count: number` is `(func (result f64))`.
+
+### Provided functions in the ABI
+
+The [`--provides`](#provided-functions---provides) spec is lowered to
+handlers: one function per provided function, parameters by value,
+result the owned type. A `Promise<T>` result is `T`'s wire type, or a
+nullable `externref` for `Promise<void>`: the slot carries the promise
+itself, or the settled value where a JSPI wrapper supplies the
+promise. Only a plain `void` export has no result. The wasm export
+name is the JS path joined with `.` with a leading `default.` dropped
+unless a top-level provider has the same path: `fetch`,
+`api.math.add`, `default.add` beside `add`.
+
+The template emits a stub per provided function, annotated with its JS
+path:
+
+```wat
+;; default.fetch: fetch(request: Request, env: E, ctx: ExecutionContext): Promise<Response>
+(func (export "fetch") (param $request externref) (param $env externref) (param $ctx externref) (result externref)
+  unreachable)
+```
+
+### Limitations
+
+**Variadics** (`...rest: T[]`) become a Wasm GC array parameter
+`(ref null $anyrefs)` where `$anyrefs` is `(type $anyrefs (array (mut
+anyref)))`. The `anyref` element type lets GC languages build the
+array natively. Fixed parameters before the rest are allowed. This
+requires Wasm GC, not just reference-types.
+
+**Duplicate names.** Within one module, or among the globals, a
+declaration merged from several `.d.ts` statements contributes each
+member once. The same name in two modules, or globally and in a
+module, is two imports: a global `connect` beside `"cloudflare:sockets"`'s
+is `"./bindings.wasm" "connect"` and `"cloudflare:sockets" "connect"`. A
+global instance interface whose constructor a module exports is one
+class, as in the Rust bindings: workers-types' `interface EmailMessage`
+and `"cloudflare:email"`'s `EmailMessage` give `"cloudflare:email"
+"EmailMessage.new"` and the instance members `"cloudflare:email"
+"EmailMessage.from"` and `"EmailMessage.to"`.

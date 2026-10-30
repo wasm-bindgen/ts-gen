@@ -7,6 +7,11 @@
 //! side in one directory makes the effect of a flag on a fixture a plain
 //! `diff` between siblings.
 //!
+//! The harness also runs `--target wat` for each fixture and configuration,
+//! producing a `tests/snapshots/<name>/<config>.wat` alongside the `.rs`. The
+//! WAT output is validated with `wat::parse_str` and `wasmparser` to ensure it
+//! assembles and passes validation.
+//!
 //! Fixtures can include `//! @ts-gen <args>` directive comments at the top.
 //! The args after `//! @ts-gen` are passed **verbatim** to the CLI, so any
 //! flags the CLI supports (e.g. `--lib-name`, `--external`) just work. Flags
@@ -152,7 +157,9 @@ fn assert_snapshot(snap_path: &Path, actual: &str) {
 }
 
 /// Run the `ts-gen` CLI on a `.d.ts` fixture under every configuration and
-/// compare each generated Rust output against its blessed snapshot.
+/// compare each generated Rust output against its blessed snapshot. Also runs
+/// `--target wat` and validates the generated WAT assembles and passes Wasm
+/// validation.
 fn snapshot_test(fixture_name: &str) {
     let root = crate_root();
     let fixture = root.join("tests/fixtures").join(fixture_name);
@@ -221,6 +228,59 @@ fn snapshot_test(fixture_name: &str) {
                 assert_snapshot(&snap_dir.join(format!("{config_name}.{file}")), &code);
             }
         }
+
+        // Run --target wat
+        let out_file_wat = config_dir.join("bindings.wat");
+        let snap_path_wat = snap_dir.join(format!("{config_name}.wat"));
+        let output_wat = Command::new(ts_gen_bin())
+            .arg("--input")
+            .arg(&fixture)
+            .arg("--output")
+            .arg(&out_file_wat)
+            .arg("--target")
+            .arg("wat")
+            .args(&extra_args)
+            .args(*config_args)
+            .output()
+            .expect("Failed to execute ts-gen binary for WAT");
+
+        if !output_wat.status.success() {
+            let stderr = String::from_utf8_lossy(&output_wat.stderr);
+            let stdout = String::from_utf8_lossy(&output_wat.stdout);
+            panic!(
+                "ts-gen --target wat failed for {fixture_name} ({config_name}):\n\
+                 exit code: {:?}\n\
+                 stderr:\n{stderr}\n\
+                 stdout:\n{stdout}",
+                output_wat.status.code()
+            );
+        }
+
+        let wat_code = std::fs::read_to_string(&out_file_wat).unwrap_or_else(|e| {
+            panic!(
+                "Failed to read generated WAT output {}: {e}",
+                out_file_wat.display()
+            )
+        });
+
+        // Validate the WAT assembles and passes Wasm validation
+        validate_wat(&wat_code, fixture_name);
+
+        assert_snapshot(&snap_path_wat, &wat_code);
+    }
+}
+
+/// Validate that WAT text assembles and passes Wasm validation.
+fn validate_wat(wat_text: &str, fixture_name: &str) {
+    let bytes = match wat::parse_str(wat_text) {
+        Ok(b) => b,
+        Err(e) => panic!("WAT parse failed for {fixture_name}:\n{e}\n\nSource:\n{wat_text}"),
+    };
+    let mut validator = wasmparser::Validator::new_with_features(
+        wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
+    );
+    if let Err(e) = validator.validate_all(&bytes) {
+        panic!("Wasm validation failed for {fixture_name}:\n{e}\n\nSource:\n{wat_text}");
     }
 }
 

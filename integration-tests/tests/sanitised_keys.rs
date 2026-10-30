@@ -3,8 +3,8 @@
 use ts_gen_integration_tests::sanitised_keys::{
     ajax, ajax_2, collide_args, compare, dollar, dollar_2, dollar_dollar, each, fetch_url, inner_,
     ns, scoped, underscore_underscore, url, val_, version, Collide, CollideInit, DollarUnderscore,
-    MethodCollide, Op, Pair, ReadonlyCollide, ReservedClass, ReservedInit, ReservedMethod,
-    SetterCollide, SetterNumbers, Sigil, Store,
+    MethodCollide, Op, Pair, ReadonlyCollide, Receiver, ReservedClass, ReservedInit,
+    ReservedMethod, SetterCollide, SetterNumbers, Sigil, Store,
 };
 
 // Compile-only coverage that wasm-bindgen accepts the `js_name` / `js_class`
@@ -46,6 +46,7 @@ fn colliding_names_compile(
     methods: &MethodCollide,
     readonly: &ReadonlyCollide,
     numbers: &SetterNumbers,
+    receiver: &Receiver,
 ) {
     let _: String = collide.data();
     collide.set_data("x");
@@ -87,6 +88,7 @@ fn colliding_names_compile(
     ajax("/a");
     ajax_2("/b");
     collide_args("a", 1.0, "b", 2.0);
+    receiver.method("x", 1.0);
     dollar();
 
     let reserved: ReservedInit = ReservedInit::builder("a", "b")
