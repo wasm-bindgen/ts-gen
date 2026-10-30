@@ -364,12 +364,11 @@ enum Resolved {
     TypeParam,
 }
 
-
 /// ABI functions every language gets regardless of the `.d.ts`: the parts of
 /// wasm-bindgen's `sys` surface that need JS to answer.
 fn sys_functions() -> Vec<AbiFunction> {
-    let sys = |name: &str, op: AbiOp, param: Option<WasmType>, result: WasmType, ts: &str| {
-        AbiFunction {
+    let sys =
+        |name: &str, op: AbiOp, param: Option<WasmType>, result: WasmType, ts: &str| AbiFunction {
             name: name.into(),
             aliases: Vec::new(),
             owner: None,
@@ -388,8 +387,7 @@ fn sys_functions() -> Vec<AbiFunction> {
             doc: None,
             variadic: false,
             module: None,
-        }
-    };
+        };
     vec![
         sys(
             "JsValue.is_undefined",
@@ -533,7 +531,15 @@ fn build_declaration(
     let owner_index = abi.owners.len();
     let owner = match &decl.kind {
         TypeKind::Class(class) => {
-            push_owner(abi, path, &class.js_name, OwnerKind::Class, class.extends.iter(), decl, lower);
+            push_owner(
+                abi,
+                path,
+                &class.js_name,
+                OwnerKind::Class,
+                class.extends.iter(),
+                decl,
+                lower,
+            );
             build_class(class, path, lower, abi);
             class.js_name.as_str()
         }
@@ -543,7 +549,15 @@ fn build_declaration(
             } else {
                 OwnerKind::Interface
             };
-            push_owner(abi, path, &iface.js_name, kind, iface.extends.iter(), decl, lower);
+            push_owner(
+                abi,
+                path,
+                &iface.js_name,
+                kind,
+                iface.extends.iter(),
+                decl,
+                lower,
+            );
             build_interface(iface, path, lower, abi);
             iface.js_name.as_str()
         }
@@ -585,7 +599,15 @@ fn build_declaration(
         }
         TypeKind::Namespace(ns) => {
             let js_name = lower.surface.js_name(id, &ns.name);
-            push_owner(abi, path, js_name, OwnerKind::Namespace, [].iter(), decl, lower);
+            push_owner(
+                abi,
+                path,
+                js_name,
+                OwnerKind::Namespace,
+                [].iter(),
+                decl,
+                lower,
+            );
             let mut child = path.to_vec();
             child.push(js_name.to_string());
             for &inner in &ns.declarations {

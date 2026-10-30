@@ -206,8 +206,24 @@ enum Command {
 #[derive(clap::Args, Debug)]
 struct EmbedArgs {
     /// The .d.ts files the module was written against.
-    #[arg(short, long, required = true, num_args = 1..)]
+    #[arg(short, long, required_unless_present = "abi", num_args = 1..)]
     input: Vec<PathBuf>,
+
+    /// The ABI template the module was written against (`--target wat`
+    /// output), read in place of the `.d.ts`.
+    #[arg(long, conflicts_with_all = ["input", "provides", "lib_name"])]
+    abi: Option<PathBuf>,
+
+    /// Module the language imports global ABI functions from, when it
+    /// cannot import them from `./bindings.wasm` (Kotlin: `js_code`).
+    /// Its imports that are not ABI functions are left to the host.
+    #[arg(long, default_value = ts_gen::abi::BINDINGS_SPECIFIER)]
+    bindings_module: String,
+
+    /// Namespace the bindings import string constants from: the
+    /// `importedStringConstants` the merged module is compiled with.
+    #[arg(long, default_value = ts_gen::abi::STRING_CONSTANTS)]
+    imported_string_constants: String,
 
     /// The language's compiled Wasm module.
     #[arg(short, long)]
@@ -435,7 +451,13 @@ fn resolve_exports(
     Ok(exports)
 }
 
-fn embed(args: EmbedArgs) -> Result<()> {
+fn embed_abi(args: &EmbedArgs) -> Result<ts_gen::abi::Abi> {
+    if let Some(path) = &args.abi {
+        let text = std::fs::read_to_string(path)
+            .with_context(|| format!("Failed to read {}", path.display()))?;
+        return ts_gen::abi::format::parse(&text)
+            .map_err(|e| anyhow::anyhow!("{}: {e}", path.display()));
+    }
     let input_files = resolve_input_files(&args.input)?;
     if input_files.is_empty() {
         bail!("No .d.ts files found in the specified input paths");
@@ -451,7 +473,11 @@ fn embed(args: EmbedArgs) -> Result<()> {
     };
     gctx.diagnostics.emit();
     let options = ts_gen::codegen::GenerateOptions::new().exports(exports);
-    let abi = ts_gen::abi::build(&module, &gctx, &options, &provided);
+    Ok(ts_gen::abi::build(&module, &gctx, &options, &provided))
+}
+
+fn embed(args: EmbedArgs) -> Result<()> {
+    let abi = embed_abi(&args)?;
 
     let wasm = std::fs::read(&args.module)
         .with_context(|| format!("Failed to read {}", args.module.display()))?;
@@ -464,7 +490,11 @@ fn embed(args: EmbedArgs) -> Result<()> {
                 .unwrap_or_default()
         )
     });
-    let options = ts_gen::abi::embed::Options { module_specifier };
+    let options = ts_gen::abi::embed::Options {
+        module_specifier,
+        bindings_module: args.bindings_module.clone(),
+        string_constants: args.imported_string_constants.clone(),
+    };
     let out = ts_gen::abi::embed::embed(&abi, &wasm, &options)?;
 
     eprintln!(

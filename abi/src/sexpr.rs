@@ -123,10 +123,9 @@ impl Reader<'_> {
             Some(b'"') => self.string(),
             Some(_) => {
                 let start = self.pos;
-                while self
-                    .peek()
-                    .is_some_and(|b| !matches!(b, b' ' | b'\t' | b'\n' | b'\r' | b'(' | b')' | b'"' | b';'))
-                {
+                while self.peek().is_some_and(|b| {
+                    !matches!(b, b' ' | b'\t' | b'\n' | b'\r' | b'(' | b')' | b'"' | b';')
+                }) {
                     self.pos += 1;
                 }
                 Ok(Node::Atom(
@@ -167,8 +166,9 @@ impl Reader<'_> {
                                 .iter()
                                 .position(|&b| b == b'}')
                                 .ok_or_else(|| self.error("unterminated `\\u{`"))?;
-                            let hex = std::str::from_utf8(&self.src[self.pos + 1..self.pos + close])
-                                .map_err(|_| self.error("bad `\\u` escape"))?;
+                            let hex =
+                                std::str::from_utf8(&self.src[self.pos + 1..self.pos + close])
+                                    .map_err(|_| self.error("bad `\\u` escape"))?;
                             let c = u32::from_str_radix(&hex.replace('_', ""), 16)
                                 .ok()
                                 .and_then(char::from_u32)
@@ -181,9 +181,11 @@ impl Reader<'_> {
                             let l = self.peek().ok_or_else(|| self.error("bad escape"))?;
                             self.pos += 1;
                             let hex = [h, l];
-                            let hex = std::str::from_utf8(&hex).map_err(|_| self.error("bad escape"))?;
+                            let hex =
+                                std::str::from_utf8(&hex).map_err(|_| self.error("bad escape"))?;
                             bytes.push(
-                                u8::from_str_radix(hex, 16).map_err(|_| self.error("bad escape"))?,
+                                u8::from_str_radix(hex, 16)
+                                    .map_err(|_| self.error("bad escape"))?,
                             );
                         }
                     }
@@ -203,8 +205,9 @@ mod tests {
 
     #[test]
     fn reads_lists_atoms_strings_and_skips_comments() {
-        let n = read("(module ;; c\n (; block (; nested ;) ;) (@abi.ref \"a\\\"b\\u{e9}\\41\" null))")
-            .unwrap();
+        let n =
+            read("(module ;; c\n (; block (; nested ;) ;) (@abi.ref \"a\\\"b\\u{e9}\\41\" null))")
+                .unwrap();
         assert_eq!(
             n,
             Node::List(vec![

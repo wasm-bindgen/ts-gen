@@ -110,13 +110,21 @@ fn owner(out: &mut String, o: &AbiOwner) {
 }
 
 fn op(op: &AbiOp) -> String {
-    let path = |p: &[String]| p.iter().map(|s| format!(" {}", string(s))).collect::<String>();
+    let path = |p: &[String]| {
+        p.iter()
+            .map(|s| format!(" {}", string(s)))
+            .collect::<String>()
+    };
     match op {
         AbiOp::Get { name } => format!("(@abi.get {})", string(name)),
         AbiOp::Set { name } => format!("(@abi.set {})", string(name)),
         AbiOp::Call { name } => format!("(@abi.call {})", string(name)),
-        AbiOp::StaticGet { path: p, name } => format!("(@abi.get {} (on{}))", string(name), path(p)),
-        AbiOp::StaticSet { path: p, name } => format!("(@abi.set {} (on{}))", string(name), path(p)),
+        AbiOp::StaticGet { path: p, name } => {
+            format!("(@abi.get {} (on{}))", string(name), path(p))
+        }
+        AbiOp::StaticSet { path: p, name } => {
+            format!("(@abi.set {} (on{}))", string(name), path(p))
+        }
         AbiOp::StaticCall { path: p, name } => {
             format!("(@abi.call {} (on{}))", string(name), path(p))
         }
@@ -240,7 +248,14 @@ fn handler(out: &mut String, h: &AbiHandler) {
     if let Some(d) = &h.doc {
         let _ = write!(out, "\n      (@abi.doc {})", string(d));
     }
-    positions(out, &h.params, false, h.result, h.result_head.as_ref(), true);
+    positions(
+        out,
+        &h.params,
+        false,
+        h.result,
+        h.result_head.as_ref(),
+        true,
+    );
     out.push_str("\n    unreachable)\n");
 }
 
@@ -283,12 +298,18 @@ pub fn parse(src: &str) -> Result<Abi, String> {
                     .and_then(Node::list)
                     .ok_or_else(|| format!("import {name:?} is not a function"))?;
                 if let Some(primary) = annotation(func, "@abi.alias") {
-                    aliases.push((module.into(), name.into(), str_at(primary, 0, "alias")?.into()));
+                    aliases.push((
+                        module.into(),
+                        name.into(),
+                        str_at(primary, 0, "alias")?.into(),
+                    ));
                     continue;
                 }
                 abi.functions.push(read_function(module, name, func)?);
             }
-            "func" => abi.handlers.push(read_handler(item.list().unwrap_or_default())?),
+            "func" => abi
+                .handlers
+                .push(read_handler(item.list().unwrap_or_default())?),
             h if h.starts_with("@abi.") => {
                 if let Some(kind) = OwnerKind::from_keyword(&h["@abi.".len()..]) {
                     abi.owners.push(read_owner(kind, args)?);
@@ -329,7 +350,11 @@ fn annotation<'a>(items: &'a [Node], name: &str) -> Option<&'a [Node]> {
 
 fn strings(args: &[Node]) -> Result<Vec<String>, String> {
     args.iter()
-        .map(|n| n.str().map(String::from).ok_or_else(|| "expected a string".into()))
+        .map(|n| {
+            n.str()
+                .map(String::from)
+                .ok_or_else(|| "expected a string".into())
+        })
         .collect()
 }
 
@@ -369,15 +394,24 @@ fn read_op(items: &[Node]) -> Result<AbiOp, String> {
         let name = || str_at(args, 0, "operation's name").map(String::from);
         return Ok(match head {
             "@abi.get" => match on()? {
-                Some(path) => AbiOp::StaticGet { path, name: name()? },
+                Some(path) => AbiOp::StaticGet {
+                    path,
+                    name: name()?,
+                },
                 None => AbiOp::Get { name: name()? },
             },
             "@abi.set" => match on()? {
-                Some(path) => AbiOp::StaticSet { path, name: name()? },
+                Some(path) => AbiOp::StaticSet {
+                    path,
+                    name: name()?,
+                },
                 None => AbiOp::Set { name: name()? },
             },
             "@abi.call" => match on()? {
-                Some(path) => AbiOp::StaticCall { path, name: name()? },
+                Some(path) => AbiOp::StaticCall {
+                    path,
+                    name: name()?,
+                },
                 None => AbiOp::Call { name: name()? },
             },
             "@abi.new" => AbiOp::Construct {
@@ -438,7 +472,10 @@ fn read_positions(
 
 /// A value type and its optional `(@abi.ref ...)`.
 fn position(items: &[Node]) -> Result<(WasmType, Option<Head>), String> {
-    let ty = items.first().and_then(Node::atom).ok_or("expected a type")?;
+    let ty = items
+        .first()
+        .and_then(Node::atom)
+        .ok_or("expected a type")?;
     let (null, undefined, head) = match annotation(items, "@abi.ref") {
         Some(args) => {
             let mut head = None;
@@ -489,7 +526,9 @@ fn read_function(module: &str, name: &str, func: &[Node]) -> Result<AbiFunction,
         params,
         result,
         result_head,
-        ts: optional_str(func, "@abi.ts").map_err(err)?.unwrap_or_default(),
+        ts: optional_str(func, "@abi.ts")
+            .map_err(err)?
+            .unwrap_or_default(),
         doc: optional_str(func, "@abi.doc").map_err(err)?,
         variadic,
         module: (module != BINDINGS_SPECIFIER).then(|| module.into()),
@@ -505,13 +544,17 @@ fn read_handler(func: &[Node]) -> Result<AbiHandler, String> {
     let (params, _, result, result_head) = read_positions(func).map_err(err)?;
     Ok(AbiHandler {
         name: name.into(),
-        path: strings(annotation(func, "@abi.provide").ok_or_else(|| err("no `@abi.provide`".into()))?)
-            .map_err(err)?,
+        path: strings(
+            annotation(func, "@abi.provide").ok_or_else(|| err("no `@abi.provide`".into()))?,
+        )
+        .map_err(err)?,
         params,
         result,
         result_head,
         promise: annotation(func, "@abi.promise").is_some(),
-        ts: optional_str(func, "@abi.ts").map_err(err)?.unwrap_or_default(),
+        ts: optional_str(func, "@abi.ts")
+            .map_err(err)?
+            .unwrap_or_default(),
         doc: optional_str(func, "@abi.doc").map_err(err)?,
     })
 }
@@ -646,8 +689,12 @@ mod tests {
 
     #[test]
     fn rejects_other_versions_and_unknown_operations() {
-        assert!(parse("(module (@abi.version 2))").unwrap_err().contains("version 2"));
-        assert!(parse("(module)").unwrap_err().contains("not an ABI template"));
+        assert!(parse("(module (@abi.version 2))")
+            .unwrap_err()
+            .contains("version 2"));
+        assert!(parse("(module)")
+            .unwrap_err()
+            .contains("not an ABI template"));
         let unknown = r#"(module (@abi.version 1)
             (import "./bindings.wasm" "x" (func $x (@abi.teleport "x"))))"#;
         assert!(parse(unknown).unwrap_err().contains("no operation"));

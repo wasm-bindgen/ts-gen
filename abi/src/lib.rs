@@ -31,13 +31,18 @@ pub enum WasmType {
     /// admits; the wire type is `externref` either way. Only `null` is a
     /// wasm null, so `embed` lets a module take any position that does not
     /// admit `null` as `(ref extern)`.
-    ExternRef { null: bool, undefined: bool },
+    ExternRef {
+        null: bool,
+        undefined: bool,
+    },
     /// Only used by the wrapper to hand a Wasm function to JS as a function object.
     FuncRef,
     /// A JS value a GC language holds as `anyref`: variadic array elements
     /// in the ABI, and any reference position of a module written that
     /// way. `null` as for [`WasmType::ExternRef`].
-    AnyRef { null: bool },
+    AnyRef {
+        null: bool,
+    },
 }
 
 impl WasmType {
@@ -331,7 +336,8 @@ impl Abi {
             self.functions
                 .iter()
                 .position(|f| {
-                    f.owner.as_deref() == Some(&o.path) && f.module.as_deref() == o.module.as_deref()
+                    f.owner.as_deref() == Some(&o.path)
+                        && f.module.as_deref() == o.module.as_deref()
                 })
                 .unwrap_or(usize::MAX)
         };
