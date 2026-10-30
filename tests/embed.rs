@@ -852,3 +852,23 @@ fn embed_bindings_module_links_only_abi_names() {
         out.bindings_wat
     );
 }
+
+#[test]
+fn embed_accepts_legacy_exceptions() {
+    // Kotlin/Wasm emits the legacy `try`/`catch` by default.
+    let abi = worker_abi().unwrap();
+    let module = r#"(module
+        (tag $e (param externref))
+        (import "./bindings.wasm" "Request.url" (func $url (param externref) (result externref)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            try (result externref)
+                local.get 0
+                call $url
+            catch $e
+            end))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let out =
+        ts_gen::abi::embed::embed(&abi, &bytes, &ts_gen::abi::embed::Options::new("./m.wasm"))
+            .unwrap();
+    assert_eq!(out.used, ["Request.url"]);
+}

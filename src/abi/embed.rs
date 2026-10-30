@@ -246,11 +246,15 @@ fn link_imports(wasm: &[u8], links: &BTreeMap<(String, String), String>) -> Resu
 }
 
 /// Assemble WAT and validate it with the features the ABI relies on.
+/// Kotlin/Wasm emits the legacy `try`/`catch` by default.
+fn features() -> wasmparser::WasmFeatures {
+    use wasmparser::WasmFeatures;
+    WasmFeatures::default() | WasmFeatures::GC | WasmFeatures::LEGACY_EXCEPTIONS
+}
+
 pub fn assemble(wat_text: &str) -> Result<Vec<u8>> {
     let bytes = wat::parse_str(wat_text).context("assembling generated WAT")?;
-    let mut validator = wasmparser::Validator::new_with_features(
-        wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
-    );
+    let mut validator = wasmparser::Validator::new_with_features(features());
     validator
         .validate_all(&bytes)
         .context("validating generated Wasm")?;
@@ -344,9 +348,7 @@ pub fn postprocess(
     }
 
     let bytes = out.finish();
-    let mut validator = wasmparser::Validator::new_with_features(
-        wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
-    );
+    let mut validator = wasmparser::Validator::new_with_features(features());
     validator
         .validate_all(&bytes)
         .context("validating postprocessed Wasm")?;

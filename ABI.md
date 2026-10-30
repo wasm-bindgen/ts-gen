@@ -45,9 +45,9 @@ to this model; this document describes the file.
 All annotations are named `@abi.<name>`. Their placement is part of
 their meaning, as below. A consumer ignores annotations under other
 names, and should ignore `@abi.*` fields it does not know, so later
-versions can add information. A consumer that meets an operation it
-does not know cannot implement or present the function, and should
-reject the file.
+versions can add information. The operations are a closed set per
+version: a new one changes the version, so an import carrying none of
+the operations of its version is malformed, and a consumer rejects it.
 
 ### Version
 
@@ -58,7 +58,8 @@ reject the file.
 ```
 
 The first field of the module. The version changes when a consumer of
-the previous version would misread the file; additions do not change it.
+the previous version would misread the file, as with a new operation;
+other additions do not change it.
 
 ### Owners
 
@@ -203,9 +204,13 @@ Inside each `externref` parameter or result, `(@abi.ref <head>?
 
 * **Head**, at most one: what the position names once `null` and
   `undefined` are set aside, through type aliases.
-  * `"<path>" (module "<spec>")?`: an owner, by its identity. A
-    reference inside `declare module "db"` to a global `Conn` is `"Conn"`,
-    and to `"db"`'s own is `"Conn" (module "db")`;
+  * `"<path>" (module "<spec>")?`: a declared type, by its identity as
+    an owner. A reference inside `declare module "db"` to a global
+    `Conn` is `"Conn"`, and to `"db"`'s own is `"Conn" (module "db")`.
+    Every type the input declares has an owner record, but a head may
+    also name one the input only references, such as `Promise` from
+    TypeScript's lib, or a namespace. A generator presents a head with
+    no class, interface or dictionary record as it would no head;
   * `string`: a JS string;
   * `number`, `boolean`, `bigint`: a scalar that crosses as a reference
     because the position admits an empty value; `Number.value` reads a
