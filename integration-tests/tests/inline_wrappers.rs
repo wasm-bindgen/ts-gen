@@ -20,6 +20,10 @@ async fn wrappers_compile(obj: &R2Object, boxed: &JsBox<R2Object>) -> Result<(),
     let _: Promise<Number> = obj.count_promise();
     let _: Vec<u64> = obj.sizes();
     obj.upload(&[1, 2, 3]);
+    obj.upload_maybe(&[1, 2, 3]);
+    obj.upload_maybe_with_null();
+    obj.upload_unset(Some(&[1, 2, 3]), "t");
+    obj.upload_unset(None, "t");
     let _: i64 = obj.seek(-1);
     let _: Promise<Number> = obj.settled();
     let _: Vec<Array<Number>> = obj.matrix();

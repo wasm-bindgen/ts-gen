@@ -22,6 +22,13 @@ export interface R2Object {
   sizes(): number[];
   /** @rust parts: u64 */
   upload(parts: number[]): void;
+  // `| null` splits into a slice form and a `_with_null` one; a
+  // non-trailing `| undefined` stays one `Option<&[u64]>` parameter,
+  // collected inside the `map` and borrowed outside it.
+  /** @rust parts: u64 */
+  uploadMaybe(parts: number[] | null): void;
+  /** @rust parts: u64 */
+  uploadUnset(parts: number[] | undefined, tag: string): void;
   /**
    * @rust offset: i64
    * @rust i64

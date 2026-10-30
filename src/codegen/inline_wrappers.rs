@@ -255,6 +255,16 @@ fn shape(ty: &Type) -> Shape {
 fn to_extern(expr: TokenStream, shape: &Shape) -> TokenStream {
     match shape {
         Shape::Marker(_) => quote! { #expr as f64 },
+        // `Option<&[T]>`: the converted `Vec` is collected inside the
+        // closure and borrowed outside it, as a borrow taken inside would
+        // not outlive the closure.
+        Shape::Option(inner) if matches!(**inner, Shape::Slice(_)) => {
+            let Shape::Slice(elem) = &**inner else {
+                unreachable!()
+            };
+            let body = to_extern(quote! { *v }, elem);
+            quote! { #expr.map(|v| v.iter().map(|v| #body).collect::<Vec<_>>()).as_deref() }
+        }
         Shape::Option(inner) => {
             let body = to_extern(quote! { v }, inner);
             quote! { #expr.map(|v| #body) }
@@ -927,11 +937,20 @@ mod tests {
         let out = run("#[wasm_bindgen] extern \"C\" {
                 pub type Foo;
                 #[wasm_bindgen(method, catch)]
-                pub fn sizes(this: &Foo, parts: &[__TsGenWideI64], n: Option<__TsGenWideU64>)
+                pub fn sizes(this: &Foo, parts: &[__TsGenWideI64], n: Option<__TsGenWideU64>,
+                    maybe: Option<&[__TsGenWideU64]>)
                     -> Result<Vec<__TsGenWideU64>, JsValue>;
             }");
-        assert!(out.contains("parts: &[f64], n: Option<f64>"));
-        assert!(out.contains("parts: &[i64], n: Option<u64>"));
+        assert!(
+            out.contains("parts: &[f64],\n        n: Option<f64>,\n        maybe: Option<&[f64]>,"),
+            "{out}"
+        );
+        assert!(
+            out.contains("parts: &[i64],\n        n: Option<u64>,\n        maybe: Option<&[u64]>,"),
+            "{out}"
+        );
+        assert!(out
+            .contains("maybe.map(|v| v.iter().map(|v| *v as f64).collect::<Vec<_>>()).as_deref()"));
         assert!(out.contains("&parts.iter().map(|v| *v as f64).collect::<Vec<_>>()"));
         assert!(out.contains("n.map(|v| v as f64)"));
         assert!(out.contains(".map(|v| v.into_iter().map(|v| v as u64).collect::<Vec<_>>())"));

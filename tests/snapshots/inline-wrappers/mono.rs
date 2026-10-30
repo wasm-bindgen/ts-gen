@@ -40,12 +40,33 @@ extern "C" {
         this: &R2Object,
         #[wasm_bindgen(slice = "array")] parts: &[f64],
     ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "uploadMaybe")]
+    fn __upload_maybe(
+        this: &R2Object,
+        #[wasm_bindgen(slice = "array")] parts: &[f64],
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "uploadMaybe")]
+    fn __upload_maybe_with_null(
+        this: &R2Object,
+        parts: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "uploadUnset")]
+    fn __upload_unset(
+        this: &R2Object,
+        #[wasm_bindgen(slice = "array")] parts: Option<&[f64]>,
+        tag: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "seek")]
     fn __seek(this: &R2Object, offset: f64) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn settled(this: &R2Object) -> Promise<Number>;
     #[wasm_bindgen(method, catch)]
     pub fn matrix(this: &R2Object) -> Result<Vec<Array<Number>>, JsValue>;
+}
+impl R2Object {
+    pub fn upload_maybe_with_null(&self) -> Result<(), JsValue> {
+        self.__upload_maybe_with_null(&::wasm_bindgen::JsValue::NULL)
+    }
 }
 impl R2Object {
     #[doc = " Size in bytes."]
@@ -84,6 +105,21 @@ impl R2Object {
     }
     pub fn upload(&self, parts: &[u64]) -> Result<(), JsValue> {
         self.__upload(&parts.iter().map(|v| *v as f64).collect::<Vec<_>>())
+    }
+    pub fn upload_maybe(&self, parts: &[u64]) -> Result<(), JsValue> {
+        self.__upload_maybe(&parts.iter().map(|v| *v as f64).collect::<Vec<_>>())
+    }
+    pub fn upload_unset(
+        &self,
+        parts: Option<&[u64]>,
+        tag: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue> {
+        self.__upload_unset(
+            parts
+                .map(|v| v.iter().map(|v| *v as f64).collect::<Vec<_>>())
+                .as_deref(),
+            tag,
+        )
     }
     pub fn seek(&self, offset: i64) -> Result<i64, JsValue> {
         self.__seek(offset as f64).map(|v| v as i64)
