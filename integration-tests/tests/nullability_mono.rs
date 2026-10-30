@@ -28,7 +28,7 @@ fn nullability_mono_signatures_compile(
     settings.set_key_with_f64(1.0);
     settings.set_key_with_null();
     let _: Settings = Settings::new(Some("r"), "x", None);
-    let _: Settings = Settings::builder(None::<&str>, js_string, None)
+    let _: Settings = Settings::builder(None, js_string, None)
         .key_with_f64(2.0)
         .key_with_null()
         .both_with_null()
@@ -58,10 +58,19 @@ fn nullability_mono_signatures_compile(
 
     pair(js_string);
     pair_with_f64(1.0);
-    leading(Some(js_string), 1.0);
-    leading(None::<&str>, 1.0);
-    chain_with_a_and_b(js_string, 1.0);
-    chain_with_a_and_null(String::from("a"));
+    // `None` needs no turbofish: a string that can be `None` is `&str`.
+    leading(Some("a"), 1.0);
+    leading(None, 1.0);
+    chain_with_a_and_b(None, 1.0);
+    chain_with_a_and_null(Some("a"));
+    chain_three_with_a_and_b_and_c(None, Some(1.0), true);
+    chain_union_with_str(js_string);
+    chain_union_with_str_and_b(None, 1.0);
+    chain_union_with_str_and_b(Some("a"), 1.0);
+    chain_alias_with_a(js_string);
+    chain_alias_with_a_and_b(Some("a".into()), 1.0);
+    chain_alias_with_a_and_b(Some(registry_value.into()), 1.0);
+    chain_alias_with_a_and_b(None, 1.0);
 
     let _: Upload = Upload::new_file("path");
     let _: Cover = Cover::new_image(js_string);

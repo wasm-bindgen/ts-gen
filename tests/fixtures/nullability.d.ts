@@ -3,12 +3,14 @@
 // Every combination of `null` and `undefined` a declaration can admit, at
 // top-level and inner positions. Reads keep exact carriers; writes take
 // `null` as an arm of its own (`f(x)` and `f_with_null()`), and `undefined`
-// in an omittable parameter as omission (`f()`). The mono fixture shares
-// this file, so the names match across modes.
+// in an omittable parameter as omission (`f()`), or as `None` on its first
+// arm when a later argument follows it. The mono fixture shares this file,
+// so the names match across modes.
 
 type MaybeStr = string | null;
 type OptStr = string | undefined;
 type Mode = "fast" | "slow";
+type Source = string | Registry;
 
 export interface Settings {
   plain?: string;
@@ -68,6 +70,8 @@ export declare function trailing(a: number, b: string | undefined): void;
 export declare function chain(a: string | undefined, b: number | null | undefined): void;
 export declare function chainOptional(a?: string, b?: number | null): void;
 export declare function chainThree(a?: string, b?: number | null, c?: boolean): void;
+export declare function chainUnion(a?: string | string[], b?: number): void;
+export declare function chainAlias(a?: Source, b?: number): void;
 export declare function modeArg(m: Mode | null): Mode | null;
 export declare function modeBoth(m: Mode | null | undefined): Mode | null | undefined;
 export declare function modeOptional(m?: Mode | null): void;

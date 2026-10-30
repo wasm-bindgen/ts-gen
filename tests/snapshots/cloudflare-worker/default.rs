@@ -356,7 +356,10 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    fn __new_with_body_and_init(body: BodyInit, init: &ResponseInit) -> Result<Response, JsValue>;
+    pub fn new_with_body_and_init(
+        body: Option<BodyInit>,
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     fn __new_with_null_and_init(
         body: &::wasm_bindgen::JsValue,
@@ -428,12 +431,6 @@ impl Response {
     }
     pub fn new_with_null() -> Result<Response, JsValue> {
         Self::__new_with_null(&::wasm_bindgen::JsValue::NULL)
-    }
-    pub fn new_with_body_and_init(
-        body: impl ::core::convert::Into<BodyInit>,
-        init: &ResponseInit,
-    ) -> Result<Response, JsValue> {
-        Self::__new_with_body_and_init(body.into(), init)
     }
     pub fn new_with_null_and_init(init: &ResponseInit) -> Result<Response, JsValue> {
         Self::__new_with_null_and_init(&::wasm_bindgen::JsValue::NULL, init)

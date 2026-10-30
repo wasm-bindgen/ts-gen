@@ -109,7 +109,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_stderr_and_ignore_errors(
         stdout: &Object,
-        stderr: &Object,
+        stderr: Option<&Object>,
         ignore_errors: bool,
     ) -> Result<Console, JsValue>;
     #[doc = " A simple assertion test. If `condition` is falsy, an `AssertionError` is"]

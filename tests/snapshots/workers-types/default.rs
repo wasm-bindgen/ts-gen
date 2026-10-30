@@ -20,7 +20,10 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_message(message: &str) -> Result<DOMException, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_message_and_name(message: &str, name: &str) -> Result<DOMException, JsValue>;
+    pub fn new_with_message_and_name(
+        message: Option<&str>,
+        name: &str,
+    ) -> Result<DOMException, JsValue>;
     #[doc = " The **`message`** read-only property of the a message or description associated with the given error name."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMException/message)"]
@@ -4933,7 +4936,7 @@ extern "C" {
     pub fn new_with_type(r#type: &[JsValue]) -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_type_and_options(
-        r#type: &[JsValue],
+        r#type: Option<&[JsValue]>,
         options: &BlobOptions,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`size`** read-only property of the Blob interface returns the size of the Blob or File in bytes."]
@@ -4970,21 +4973,24 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, js_name = "slice")]
-    pub fn slice_with_start_and_end(this: &Blob, start: f64, end: f64) -> Blob;
+    pub fn slice_with_start_and_end(this: &Blob, start: Option<f64>, end: f64) -> Blob;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, catch, js_name = "slice")]
-    pub fn try_slice_with_start_and_end(this: &Blob, start: f64, end: f64)
-        -> Result<Blob, JsValue>;
+    pub fn try_slice_with_start_and_end(
+        this: &Blob,
+        start: Option<f64>,
+        end: f64,
+    ) -> Result<Blob, JsValue>;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, js_name = "slice")]
     pub fn slice_with_start_and_end_and_type(
         this: &Blob,
-        start: f64,
-        end: f64,
+        start: Option<f64>,
+        end: Option<f64>,
         r#type: &str,
     ) -> Blob;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
@@ -4993,8 +4999,8 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "slice")]
     pub fn try_slice_with_start_and_end_and_type(
         this: &Blob,
-        start: f64,
-        end: f64,
+        start: Option<f64>,
+        end: Option<f64>,
         r#type: &str,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`arrayBuffer()`** method of the Blob interface returns a Promise that resolves with the contents of the blob as binary data contained in an ArrayBuffer."]
@@ -7613,7 +7619,7 @@ extern "C" {
     pub fn new_with_label(label: &str) -> Result<TextDecoder, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_label_and_options(
-        label: &str,
+        label: Option<&str>,
         options: &TextDecoderConstructorOptions,
     ) -> Result<TextDecoder, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
@@ -7658,7 +7664,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "decode")]
     pub fn decode_with_array_buffer_and_options(
         this: &TextDecoder,
-        input: &ArrayBuffer,
+        input: Option<&ArrayBuffer>,
         options: &TextDecoderDecodeOptions,
     ) -> String;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
@@ -7667,7 +7673,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn try_decode_with_array_buffer_and_options(
         this: &TextDecoder,
-        input: &ArrayBuffer,
+        input: Option<&ArrayBuffer>,
         options: &TextDecoderDecodeOptions,
     ) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
@@ -9250,7 +9256,7 @@ extern "C" {
     fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_readable_stream_and_init(
-        body: &ReadableStream<Uint8Array>,
+        body: Option<&ReadableStream<Uint8Array>>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -14382,7 +14388,7 @@ extern "C" {
     ) -> Result<WritableStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_sink_and_queuing_strategy(
-        underlying_sink: &UnderlyingSink,
+        underlying_sink: Option<&UnderlyingSink>,
         queuing_strategy: &QueuingStrategy,
     ) -> Result<WritableStream, JsValue>;
     #[doc = " The **`locked`** read-only property of the WritableStream interface returns a boolean indicating whether the `WritableStream` is locked to a writer."]
@@ -14788,7 +14794,7 @@ extern "C" {
     pub fn new_with_label(label: &str) -> Result<TextDecoderStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_label_and_options(
-        label: &str,
+        label: Option<&str>,
         options: &TextDecoderStreamTextDecoderStreamInit,
     ) -> Result<TextDecoderStream, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -15751,7 +15757,8 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init(input: &URLPatternInit) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str_and_str(input: &str, base_url: &str) -> Result<URLPattern, JsValue>;
+    pub fn new_with_str_and_str(input: Option<&str>, base_url: &str)
+        -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init_and_str(
         input: &URLPatternInit,
@@ -15759,7 +15766,7 @@ extern "C" {
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_url_pattern_options(
-        input: &str,
+        input: Option<&str>,
         base_url: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -15769,19 +15776,19 @@ extern "C" {
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_str_and_pattern_options(
-        input: &str,
-        base_url: &str,
+        input: Option<&str>,
+        base_url: Option<&str>,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init_and_str_and_pattern_options(
         input: &URLPatternInit,
-        base_url: &str,
+        base_url: Option<&str>,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_url_pattern_options_and_pattern_options(
-        input: &str,
+        input: Option<&str>,
         base_url: &URLPatternOptions,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
@@ -15825,11 +15832,15 @@ extern "C" {
         input: &URLPatternInit,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "test")]
-    pub fn test_with_str_and_base_url(this: &URLPattern, input: &str, base_url: &str) -> bool;
+    pub fn test_with_str_and_base_url(
+        this: &URLPattern,
+        input: Option<&str>,
+        base_url: &str,
+    ) -> bool;
     #[wasm_bindgen(method, catch, js_name = "test")]
     pub fn try_test_with_str_and_base_url(
         this: &URLPattern,
-        input: &str,
+        input: Option<&str>,
         base_url: &str,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "test")]
@@ -15868,13 +15879,13 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "exec")]
     pub fn exec_with_str_and_base_url(
         this: &URLPattern,
-        input: &str,
+        input: Option<&str>,
         base_url: &str,
     ) -> Nullable<URLPatternResult>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
     pub fn try_exec_with_str_and_base_url(
         this: &URLPattern,
-        input: &str,
+        input: Option<&str>,
         base_url: &str,
     ) -> Result<Nullable<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, js_name = "exec")]
@@ -16327,14 +16338,14 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)"]
     #[wasm_bindgen(method, js_name = "close")]
-    pub fn close_with_code_and_reason(this: &WebSocket, code: f64, reason: &str);
+    pub fn close_with_code_and_reason(this: &WebSocket, code: Option<f64>, reason: &str);
     #[doc = " The **`WebSocket.close()`** method closes the already `CLOSED`, this method does nothing."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)"]
     #[wasm_bindgen(method, catch, js_name = "close")]
     pub fn try_close_with_code_and_reason(
         this: &WebSocket,
-        code: f64,
+        code: Option<f64>,
         reason: &str,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "serializeAttachment")]
@@ -17351,13 +17362,13 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
     pub fn get_entrypoint_with_name_and_options(
         this: &WorkerStub,
-        name: &str,
+        name: Option<&str>,
         options: &WorkerStubEntrypointOptions,
     ) -> Fetcher;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
     pub fn try_get_entrypoint_with_name_and_options(
         this: &WorkerStub,
-        name: &str,
+        name: Option<&str>,
         options: &WorkerStubEntrypointOptions,
     ) -> Result<Fetcher, JsValue>;
 }
@@ -50713,7 +50724,7 @@ extern "C" {
     pub fn get_with_args_and_options(
         this: &DispatchNamespace,
         name: &str,
-        args: &DispatchNamespaceArgs,
+        args: Option<&DispatchNamespaceArgs>,
         options: &DynamicDispatchOptions,
     ) -> Fetcher;
     #[doc = " * `name` - Name of the Worker script."]
@@ -50729,7 +50740,7 @@ extern "C" {
     pub fn try_get_with_args_and_options(
         this: &DispatchNamespace,
         name: &str,
-        args: &DispatchNamespaceArgs,
+        args: Option<&DispatchNamespaceArgs>,
         options: &DynamicDispatchOptions,
     ) -> Result<Fetcher, JsValue>;
 }

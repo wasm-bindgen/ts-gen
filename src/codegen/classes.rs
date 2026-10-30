@@ -1002,6 +1002,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     type_ref: target.clone(),
                     variadic: false,
                     slice_mode: None,
+                    omittable_first: false,
                 });
                 setters
                     .iter()
@@ -1105,6 +1106,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     type_ref,
                     variadic: false,
                     slice_mode: None,
+                    omittable_first: false,
                 };
                 options.push(FieldOption::Value {
                     field_doc: g.doc.clone(),

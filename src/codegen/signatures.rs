@@ -196,6 +196,10 @@ pub struct ConcreteParam {
     /// where this alternative's lowering is slice-shaped (see
     /// [`crate::codegen::typemap::param_slice_mode`]).
     pub slice_mode: Option<crate::ir::SliceModeHint>,
+    /// Whether this is the first arm of an omittable parameter, which takes
+    /// `undefined` as `None` when a later argument follows it (see
+    /// [`take_leading_undefined`]).
+    pub omittable_first: bool,
 }
 
 /// One concrete parameter-list variant produced by overload expansion,
@@ -494,6 +498,30 @@ pub fn expand_signatures(
     }
     let mut arms: Vec<Vec<LiteralArm>> = arms.into_iter().map(Option::unwrap_or_default).collect();
 
+    // An expansion that takes a leading `undefined` as `None` (see
+    // [`take_leading_undefined`]) can coincide with an earlier one, which
+    // then stands for both: `f(a?: string, b?)` beside `f(a: string |
+    // undefined, b)`. The rest are named as written, and take it after.
+    let leading = |sig: &[ConcreteParam], overload: usize| {
+        take_leading_undefined(sig, overloads[overload].body_scope, cgctx)
+    };
+    let taken: Vec<Vec<ConcreteParam>> = deduped
+        .iter()
+        .zip(&origins)
+        .map(|(sig, &o)| leading(sig, o))
+        .collect();
+    let keep: Vec<bool> = (0..taken.len())
+        .map(|i| !taken[..i].iter().any(|t| concrete_params_eq(t, &taken[i])))
+        .collect();
+    first_overload_len = keep[..first_overload_len].iter().filter(|&&k| k).count();
+    fn retain_kept<T>(items: &mut Vec<T>, keep: &[bool]) {
+        let mut keep = keep.iter();
+        items.retain(|_| keep.next().is_some_and(|&k| k));
+    }
+    retain_kept(&mut deduped, &keep);
+    retain_kept(&mut origins, &keep);
+    retain_kept(&mut arms, &keep);
+
     // Phase 3: Suffix — compute `_with_X` disambiguators across the cohort.
     // The base name goes to the first overload's shortest expansion, or to
     // a shorter expansion that is a prefix of it: with
@@ -568,11 +596,59 @@ pub fn expand_signatures(
             ExpandedSignature {
                 overload,
                 name_suffix,
-                params,
+                params: leading(&params, overload),
                 literal_arms,
             }
         })
         .collect()
+}
+
+/// An omittable parameter followed by another argument in the same
+/// expansion cannot be omitted, so its first arm takes `undefined` as
+/// `None`: `f(a?: string | string[], b?: Opts)` gives
+/// `f_with_str_and_b(a: Option<&str>, b)` beside `f_with_slice_and_b(a,
+/// b)`. A trailing one is still omitted, and one naming a type parameter
+/// keeps its plain type, as `None` would leave it to infer.
+fn take_leading_undefined(
+    sig: &[ConcreteParam],
+    scope: ScopeId,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<ConcreteParam> {
+    let mut sig = sig.to_vec();
+    let last = sig.iter().rposition(|p| !p.variadic).unwrap_or(0);
+    let generic = |ty: &TypeRef| {
+        cgctx.is_some_and(|ctx| {
+            let mut found = Vec::new();
+            collect_type_params(ty, ctx, scope, &mut found);
+            !found.is_empty()
+        })
+    };
+    for p in &mut sig[..last] {
+        if p.omittable_first && !generic(&p.type_ref) {
+            let ty = std::mem::replace(&mut p.type_ref, TypeRef::Undefined);
+            p.type_ref = ty.with_empties(Nullability::Undefined);
+            p.omittable_first = false;
+        }
+    }
+    sig
+}
+
+/// Whether an arm can take `undefined` as `None`: a value with no empty of
+/// its own, other than a literal (whose arms bake it in) or the top type
+/// (which takes `undefined` in-band).
+fn takes_undefined_as_none(alt: &TypeRef) -> bool {
+    alt.split_empties().is_none()
+        && !matches!(
+            alt,
+            TypeRef::Null
+                | TypeRef::Undefined
+                | TypeRef::Void
+                | TypeRef::Any
+                | TypeRef::Unknown
+                | TypeRef::StringLiteral(_)
+                | TypeRef::NumberLiteral(_)
+                | TypeRef::BooleanLiteral(_)
+        )
 }
 
 /// The suffix each of `extras` gets beside `cohort`: its sibling's when a
@@ -1171,11 +1247,13 @@ fn expand_single_overload(
 
             let cur = extendable.len();
             for (j, alt) in type_alternatives.into_iter().enumerate() {
+                let omittable_first = j == 0 && takes_undefined_as_none(&alt);
                 let concrete = ConcreteParam {
                     name: param.name.clone(),
                     type_ref: alt,
                     variadic: false,
                     slice_mode: param.slice_mode,
+                    omittable_first,
                 };
                 if j == 0 {
                     for sig in extendable.iter_mut().take(cur) {
@@ -1203,6 +1281,7 @@ fn expand_single_overload(
                     type_ref: alt,
                     variadic: false,
                     slice_mode: param.slice_mode,
+                    omittable_first: false,
                 };
                 if j == 0 {
                     for sig in sigs.iter_mut().take(cur) {
@@ -1228,6 +1307,7 @@ fn expand_single_overload(
                 type_ref: vp.type_ref.clone(),
                 variadic: true,
                 slice_mode: None,
+                omittable_first: false,
             });
         }
     }
@@ -2174,11 +2254,12 @@ pub(crate) fn render_param_type(
 }
 
 /// Per-monomorphization argument bounds: a string becomes `impl
-/// JsStringLike`, inside its carrier where one is admitted. Each occurrence
-/// is an independent anonymous type parameter.
+/// JsStringLike`. Each occurrence is an independent anonymous type
+/// parameter, so a string inside a carrier stays `&str`: a caller passing
+/// `None` would have nothing to infer it from.
 fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
     if let Some((core, n)) = ty.split_empties() {
-        return mono_argument_type(&core).map(|marker| typemap::nullable_carrier(marker, n));
+        return mono_argument_type(&core).map(|_| typemap::nullable_carrier(quote! { &str }, n));
     }
     match ty {
         TypeRef::String | TypeRef::StringLiteral(_) => {
@@ -2700,13 +2781,13 @@ mod tests {
             mono_argument_type(&TypeRef::String.with_empties(Nullability::Undefined))
                 .unwrap()
                 .to_string(),
-            "Option < impl :: wasm_bindgen :: JsStringLike >"
+            "Option < & str >"
         );
         assert_eq!(
             mono_argument_type(&TypeRef::String.with_empties(Nullability::Null))
                 .unwrap()
                 .to_string(),
-            "Nullable < impl :: wasm_bindgen :: JsStringLike >"
+            "Nullable < & str >"
         );
         assert!(mono_argument_type(&TypeRef::Number).is_none());
     }
@@ -2737,6 +2818,7 @@ mod tests {
             name: name.into(),
             type_ref,
             variadic,
+            omittable_first: false,
         }
     }
 
@@ -4284,6 +4366,69 @@ mod tests {
         assert_eq!(join_suffix("set_with", "_with_str"), "set_with_and_str");
         assert_eq!(join_suffix("without", "_with_str"), "without_with_str");
         assert_eq!(join_suffix("with", "_2"), "with_2");
+    }
+
+    /// `(rust_name, [param types])` of each non-catching binding.
+    fn shapes(js: &str, overloads: &[&[Param]]) -> Vec<(String, Vec<TypeRef>)> {
+        let mut used = no_used();
+        expand_overloads(
+            js,
+            overloads,
+            &TypeRef::Void,
+            SignatureKind::Function,
+            &None,
+            &mut used,
+        )
+        .into_iter()
+        .filter(|s| !s.catch)
+        .map(|s| {
+            (
+                s.rust_name,
+                s.params.into_iter().map(|p| p.type_ref).collect(),
+            )
+        })
+        .collect()
+    }
+
+    #[test]
+    fn a_leading_omittable_takes_undefined_as_none_on_its_first_arm() {
+        let opt = |t: TypeRef| t.with_empties(Nullability::Undefined);
+        let opts = TypeRef::ident("Opts");
+        let slice = TypeRef::Array(Box::new(TypeRef::String));
+        let f = [
+            opt_typed_param("a", TypeRef::union([TypeRef::String, slice.clone()])),
+            opt_typed_param("b", opts.clone()),
+        ];
+        assert_eq!(
+            shapes("f", &[&f]),
+            [
+                ("f".into(), vec![]),
+                ("f_with_str".into(), vec![TypeRef::String]),
+                ("f_with_slice".into(), vec![slice.clone()]),
+                (
+                    "f_with_str_and_b".into(),
+                    vec![opt(TypeRef::String), opts.clone()]
+                ),
+                ("f_with_slice_and_b".into(), vec![slice, opts.clone()]),
+            ]
+        );
+        // A later overload taking `undefined` itself is the same binding.
+        let g = [
+            opt_typed_param("a", TypeRef::String),
+            opt_typed_param("b", opts.clone()),
+        ];
+        let explicit = [
+            typed_param("a", opt(TypeRef::String)),
+            typed_param("b", opts.clone()),
+        ];
+        assert_eq!(
+            shapes("g", &[&g, &explicit]),
+            [
+                ("g".into(), vec![]),
+                ("g_with_a".into(), vec![TypeRef::String]),
+                ("g_with_a_and_b".into(), vec![opt(TypeRef::String), opts]),
+            ]
+        );
     }
 
     #[test]

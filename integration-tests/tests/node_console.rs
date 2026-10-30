@@ -145,5 +145,6 @@ fn test_try_variants() {
 fn test_constructor_overloads() {
     let _c1 = Console::new(&stdout()).unwrap();
     let _c2 = Console::new_with_stderr(&stdout(), &stderr()).unwrap();
-    let _c3 = Console::new_with_stderr_and_ignore_errors(&stdout(), &stderr(), true).unwrap();
+    let _c3 = Console::new_with_stderr_and_ignore_errors(&stdout(), Some(&stderr()), true).unwrap();
+    let _c4 = Console::new_with_stderr_and_ignore_errors(&stdout(), None, true).unwrap();
 }

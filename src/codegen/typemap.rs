@@ -4497,6 +4497,7 @@ mod tests {
             type_ref: ty,
             variadic: false,
             slice_mode: None,
+            omittable_first: false,
         }
     }
 
