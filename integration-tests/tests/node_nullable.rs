@@ -88,8 +88,8 @@ fn optional_nullable_field_setter_assigns_null_or_a_value() {
 fn trailing_undefined_is_omitted() {
     assert_eq!(arity(), "0:-");
     assert_eq!(arity_with_a("x"), "1:x");
-    assert_eq!(arity_with_a_and_b("x", 2.0), "2:2");
-    assert_eq!(arity_with_a_and_null("x"), "2:null");
+    assert_eq!(arity_with_a_and_b(Some("x"), 2.0), "2:2");
+    assert_eq!(arity_with_a_and_null(Some("x")), "2:null");
 }
 
 #[wasm_bindgen_test]

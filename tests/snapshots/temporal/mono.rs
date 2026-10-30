@@ -2105,7 +2105,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainDate,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -2115,7 +2115,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &PlainDate,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
@@ -2214,14 +2214,17 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
-        pub fn new_with_hour_and_minute(hour: f64, minute: f64) -> Result<PlainTime, RangeError>;
+        pub fn new_with_hour_and_minute(
+            hour: Option<f64>,
+            minute: f64,
+        ) -> Result<PlainTime, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second(
-            hour: f64,
-            minute: f64,
+            hour: Option<f64>,
+            minute: Option<f64>,
             second: f64,
         ) -> Result<PlainTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2229,9 +2232,9 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond(
-            hour: f64,
-            minute: f64,
-            second: f64,
+            hour: Option<f64>,
+            minute: Option<f64>,
+            second: Option<f64>,
             millisecond: f64,
         ) -> Result<PlainTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2239,10 +2242,10 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond_and_microsecond(
-            hour: f64,
-            minute: f64,
-            second: f64,
-            millisecond: f64,
+            hour: Option<f64>,
+            minute: Option<f64>,
+            second: Option<f64>,
+            millisecond: Option<f64>,
             microsecond: f64,
         ) -> Result<PlainTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2250,11 +2253,11 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond(
-            hour: f64,
-            minute: f64,
-            second: f64,
-            millisecond: f64,
-            microsecond: f64,
+            hour: Option<f64>,
+            minute: Option<f64>,
+            second: Option<f64>,
+            millisecond: Option<f64>,
+            microsecond: Option<f64>,
             nanosecond: f64,
         ) -> Result<PlainTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2428,7 +2431,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainTime,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -2438,7 +2441,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &PlainTime,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
@@ -2573,7 +2576,7 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: f64,
+            hour: Option<f64>,
             minute: f64,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2584,8 +2587,8 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: f64,
-            minute: f64,
+            hour: Option<f64>,
+            minute: Option<f64>,
             second: f64,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2596,9 +2599,9 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: f64,
-            minute: f64,
-            second: f64,
+            hour: Option<f64>,
+            minute: Option<f64>,
+            second: Option<f64>,
             millisecond: f64,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2609,10 +2612,10 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: f64,
-            minute: f64,
-            second: f64,
-            millisecond: f64,
+            hour: Option<f64>,
+            minute: Option<f64>,
+            second: Option<f64>,
+            millisecond: Option<f64>,
             microsecond: f64,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2623,11 +2626,11 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: f64,
-            minute: f64,
-            second: f64,
-            millisecond: f64,
-            microsecond: f64,
+            hour: Option<f64>,
+            minute: Option<f64>,
+            second: Option<f64>,
+            millisecond: Option<f64>,
+            microsecond: Option<f64>,
             nanosecond: f64,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2638,12 +2641,12 @@ pub mod temporal {
             iso_year: f64,
             iso_month: f64,
             iso_day: f64,
-            hour: f64,
-            minute: f64,
-            second: f64,
-            millisecond: f64,
-            microsecond: f64,
-            nanosecond: f64,
+            hour: Option<f64>,
+            minute: Option<f64>,
+            second: Option<f64>,
+            millisecond: Option<f64>,
+            microsecond: Option<f64>,
+            nanosecond: Option<f64>,
             calendar: impl ::wasm_bindgen::JsStringLike,
         ) -> Result<PlainDateTime, RangeError>;
         #[doc = " ## Errors"]
@@ -2895,7 +2898,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainDateTime,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -2905,7 +2908,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &PlainDateTime,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
@@ -3366,7 +3369,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &ZonedDateTime,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -3376,7 +3379,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &ZonedDateTime,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
@@ -3656,14 +3659,17 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
-        pub fn new_with_years_and_months(years: f64, months: f64) -> Result<Duration, RangeError>;
+        pub fn new_with_years_and_months(
+            years: Option<f64>,
+            months: f64,
+        ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks(
-            years: f64,
-            months: f64,
+            years: Option<f64>,
+            months: Option<f64>,
             weeks: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -3671,9 +3677,9 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days(
-            years: f64,
-            months: f64,
-            weeks: f64,
+            years: Option<f64>,
+            months: Option<f64>,
+            weeks: Option<f64>,
             days: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -3681,10 +3687,10 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours(
-            years: f64,
-            months: f64,
-            weeks: f64,
-            days: f64,
+            years: Option<f64>,
+            months: Option<f64>,
+            weeks: Option<f64>,
+            days: Option<f64>,
             hours: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -3692,11 +3698,11 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes(
-            years: f64,
-            months: f64,
-            weeks: f64,
-            days: f64,
-            hours: f64,
+            years: Option<f64>,
+            months: Option<f64>,
+            weeks: Option<f64>,
+            days: Option<f64>,
+            hours: Option<f64>,
             minutes: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -3704,12 +3710,12 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds(
-            years: f64,
-            months: f64,
-            weeks: f64,
-            days: f64,
-            hours: f64,
-            minutes: f64,
+            years: Option<f64>,
+            months: Option<f64>,
+            weeks: Option<f64>,
+            days: Option<f64>,
+            hours: Option<f64>,
+            minutes: Option<f64>,
             seconds: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -3717,13 +3723,13 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds(
-            years: f64,
-            months: f64,
-            weeks: f64,
-            days: f64,
-            hours: f64,
-            minutes: f64,
-            seconds: f64,
+            years: Option<f64>,
+            months: Option<f64>,
+            weeks: Option<f64>,
+            days: Option<f64>,
+            hours: Option<f64>,
+            minutes: Option<f64>,
+            seconds: Option<f64>,
             milliseconds: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -3731,14 +3737,14 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds(
-            years: f64,
-            months: f64,
-            weeks: f64,
-            days: f64,
-            hours: f64,
-            minutes: f64,
-            seconds: f64,
-            milliseconds: f64,
+            years: Option<f64>,
+            months: Option<f64>,
+            weeks: Option<f64>,
+            days: Option<f64>,
+            hours: Option<f64>,
+            minutes: Option<f64>,
+            seconds: Option<f64>,
+            milliseconds: Option<f64>,
             microseconds: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -3746,15 +3752,15 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[wasm_bindgen(constructor, js_namespace = "Temporal", catch)]
         pub fn new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds_and_nanoseconds(
-            years: f64,
-            months: f64,
-            weeks: f64,
-            days: f64,
-            hours: f64,
-            minutes: f64,
-            seconds: f64,
-            milliseconds: f64,
-            microseconds: f64,
+            years: Option<f64>,
+            months: Option<f64>,
+            weeks: Option<f64>,
+            days: Option<f64>,
+            hours: Option<f64>,
+            minutes: Option<f64>,
+            seconds: Option<f64>,
+            milliseconds: Option<f64>,
+            microseconds: Option<f64>,
             nanoseconds: f64,
         ) -> Result<Duration, RangeError>;
         #[doc = " ## Errors"]
@@ -3919,7 +3925,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &Duration,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DurationFormatOptions,
         ) -> Result<String, RangeError>;
         #[doc = " ## Errors"]
@@ -3928,7 +3934,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &Duration,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DurationFormatOptions,
         ) -> Result<JsString, RangeError>;
         #[doc = " ## Errors"]
@@ -4169,7 +4175,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &Instant,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -4179,7 +4185,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &Instant,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
@@ -4263,7 +4269,7 @@ pub mod temporal {
         pub fn new_with_calendar_and_reference_iso_day(
             iso_year: f64,
             iso_month: f64,
-            calendar: impl ::wasm_bindgen::JsStringLike,
+            calendar: Option<&str>,
             reference_iso_day: f64,
         ) -> Result<PlainYearMonth, RangeError>;
         #[doc = " ## Errors"]
@@ -4465,7 +4471,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainYearMonth,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -4475,7 +4481,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &PlainYearMonth,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]
@@ -4599,7 +4605,7 @@ pub mod temporal {
         pub fn new_with_calendar_and_reference_iso_year(
             iso_month: f64,
             iso_day: f64,
-            calendar: impl ::wasm_bindgen::JsStringLike,
+            calendar: Option<&str>,
             reference_iso_year: f64,
         ) -> Result<PlainMonthDay, RangeError>;
         #[doc = " ## Errors"]
@@ -4718,7 +4724,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options(
             this: &PlainMonthDay,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<String, Error>;
         #[doc = " ## Errors"]
@@ -4728,7 +4734,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "toLocaleString")]
         pub fn to_locale_string_with_str_and_options_js_string(
             this: &PlainMonthDay,
-            locales: impl ::wasm_bindgen::JsStringLike,
+            locales: Option<&str>,
             options: &::js_sys::Intl::DateTimeFormatOptions,
         ) -> Result<JsString, Error>;
         #[doc = " ## Errors"]

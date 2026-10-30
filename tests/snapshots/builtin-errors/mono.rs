@@ -83,7 +83,7 @@ extern "C" {
     ) -> Result<Formatter, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_options(
-        locales: impl ::wasm_bindgen::JsStringLike,
+        locales: Option<&str>,
         options: &::js_sys::Intl::DateTimeFormatOptions,
     ) -> Result<Formatter, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -122,13 +122,13 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "format")]
     pub fn format_with_str_and_options(
         this: &Formatter,
-        locales: impl ::wasm_bindgen::JsStringLike,
+        locales: Option<&str>,
         options: &::js_sys::Object,
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "format")]
     pub fn format_with_str_and_options_js_string(
         this: &Formatter,
-        locales: impl ::wasm_bindgen::JsStringLike,
+        locales: Option<&str>,
         options: &::js_sys::Object,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "format")]
@@ -190,7 +190,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describe")]
     pub fn describe_with_str_and_options(
-        locales: impl ::wasm_bindgen::JsStringLike,
+        locales: Option<&str>,
         options: &::js_sys::Intl::DateTimeFormatOptions,
     ) -> Result<String, JsValue>;
 }
@@ -198,7 +198,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describe")]
     pub fn describe_with_str_and_options_js_string(
-        locales: impl ::wasm_bindgen::JsStringLike,
+        locales: Option<&str>,
         options: &::js_sys::Intl::DateTimeFormatOptions,
     ) -> Result<JsString, JsValue>;
 }

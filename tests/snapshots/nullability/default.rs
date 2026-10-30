@@ -1007,27 +1007,30 @@ extern "C" {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "chain")]
-    pub fn chain_with_a_and_b(a: &str, b: f64);
+    pub fn chain_with_a_and_b(a: Option<&str>, b: f64);
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chain")]
-    pub fn try_chain_with_a_and_b(a: &str, b: f64) -> Result<(), JsValue>;
+    pub fn try_chain_with_a_and_b(a: Option<&str>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "chain")]
-    fn __chain_with_a_and_null(a: &str, b: &::wasm_bindgen::JsValue);
+    fn __chain_with_a_and_null(a: Option<&str>, b: &::wasm_bindgen::JsValue);
 }
-pub fn chain_with_a_and_null(a: &str) {
+pub fn chain_with_a_and_null(a: Option<&str>) {
     __chain_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chain")]
-    fn __try_chain_with_a_and_null(a: &str, b: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __try_chain_with_a_and_null(
+        a: Option<&str>,
+        b: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
 }
-pub fn try_chain_with_a_and_null(a: &str) -> Result<(), JsValue> {
+pub fn try_chain_with_a_and_null(a: Option<&str>) -> Result<(), JsValue> {
     __try_chain_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
@@ -1053,30 +1056,30 @@ extern "C" {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "chainOptional")]
-    pub fn chain_optional_with_a_and_b(a: &str, b: f64);
+    pub fn chain_optional_with_a_and_b(a: Option<&str>, b: f64);
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainOptional")]
-    pub fn try_chain_optional_with_a_and_b(a: &str, b: f64) -> Result<(), JsValue>;
+    pub fn try_chain_optional_with_a_and_b(a: Option<&str>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "chainOptional")]
-    fn __chain_optional_with_a_and_null(a: &str, b: &::wasm_bindgen::JsValue);
+    fn __chain_optional_with_a_and_null(a: Option<&str>, b: &::wasm_bindgen::JsValue);
 }
-pub fn chain_optional_with_a_and_null(a: &str) {
+pub fn chain_optional_with_a_and_null(a: Option<&str>) {
     __chain_optional_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainOptional")]
     fn __try_chain_optional_with_a_and_null(
-        a: &str,
+        a: Option<&str>,
         b: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
 }
-pub fn try_chain_optional_with_a_and_null(a: &str) -> Result<(), JsValue> {
+pub fn try_chain_optional_with_a_and_null(a: Option<&str>) -> Result<(), JsValue> {
     __try_chain_optional_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
@@ -1102,61 +1105,115 @@ extern "C" {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "chainThree")]
-    pub fn chain_three_with_a_and_b(a: &str, b: f64);
+    pub fn chain_three_with_a_and_b(a: Option<&str>, b: f64);
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainThree")]
-    pub fn try_chain_three_with_a_and_b(a: &str, b: f64) -> Result<(), JsValue>;
+    pub fn try_chain_three_with_a_and_b(a: Option<&str>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "chainThree")]
-    fn __chain_three_with_a_and_null(a: &str, b: &::wasm_bindgen::JsValue);
+    fn __chain_three_with_a_and_null(a: Option<&str>, b: &::wasm_bindgen::JsValue);
 }
-pub fn chain_three_with_a_and_null(a: &str) {
+pub fn chain_three_with_a_and_null(a: Option<&str>) {
     __chain_three_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainThree")]
     fn __try_chain_three_with_a_and_null(
-        a: &str,
+        a: Option<&str>,
         b: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
 }
-pub fn try_chain_three_with_a_and_null(a: &str) -> Result<(), JsValue> {
+pub fn try_chain_three_with_a_and_null(a: Option<&str>) -> Result<(), JsValue> {
     __try_chain_three_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "chainThree")]
-    pub fn chain_three_with_a_and_b_and_c(a: &str, b: f64, c: bool);
+    pub fn chain_three_with_a_and_b_and_c(a: Option<&str>, b: Option<f64>, c: bool);
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainThree")]
-    pub fn try_chain_three_with_a_and_b_and_c(a: &str, b: f64, c: bool) -> Result<(), JsValue>;
+    pub fn try_chain_three_with_a_and_b_and_c(
+        a: Option<&str>,
+        b: Option<f64>,
+        c: bool,
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "chainThree")]
-    fn __chain_three_with_a_and_null_and_c(a: &str, b: &::wasm_bindgen::JsValue, c: bool);
+    fn __chain_three_with_a_and_null_and_c(a: Option<&str>, b: &::wasm_bindgen::JsValue, c: bool);
 }
-pub fn chain_three_with_a_and_null_and_c(a: &str, c: bool) {
+pub fn chain_three_with_a_and_null_and_c(a: Option<&str>, c: bool) {
     __chain_three_with_a_and_null_and_c(a, &::wasm_bindgen::JsValue::NULL, c)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainThree")]
     fn __try_chain_three_with_a_and_null_and_c(
-        a: &str,
+        a: Option<&str>,
         b: &::wasm_bindgen::JsValue,
         c: bool,
     ) -> Result<(), JsValue>;
 }
-pub fn try_chain_three_with_a_and_null_and_c(a: &str, c: bool) -> Result<(), JsValue> {
+pub fn try_chain_three_with_a_and_null_and_c(a: Option<&str>, c: bool) -> Result<(), JsValue> {
     __try_chain_three_with_a_and_null_and_c(a, &::wasm_bindgen::JsValue::NULL, c)
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "chainUnion")]
+    pub fn chain_union();
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainUnion")]
+    pub fn try_chain_union() -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "chainUnion")]
+    pub fn chain_union_with_str(a: &str);
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainUnion")]
+    pub fn try_chain_union_with_str(a: &str) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "chainUnion")]
+    pub fn chain_union_with_slice(a: &[String]);
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainUnion")]
+    pub fn try_chain_union_with_slice(a: &[String]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "chainUnion")]
+    pub fn chain_union_with_str_and_b(a: Option<&str>, b: f64);
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainUnion")]
+    pub fn try_chain_union_with_str_and_b(a: Option<&str>, b: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "chainUnion")]
+    pub fn chain_union_with_slice_and_b(a: &[String], b: f64);
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainUnion")]
+    pub fn try_chain_union_with_slice_and_b(a: &[String], b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {

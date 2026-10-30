@@ -31,8 +31,13 @@ fn functions_take_a_locale_or_a_list() {
     let locales = ["en-GB".to_string(), "fr".to_string()];
     assert_eq!(describe_with_slice(&locales), "list(en-GB,fr) none");
     assert_eq!(
-        describe_with_str_and_options("de", &date_options()),
+        describe_with_str_and_options(Some("de"), &date_options()),
         format!("string(de) {DATE_OPTIONS}")
+    );
+    // `None` sends `undefined`, the default locale, beside the options.
+    assert_eq!(
+        describe_with_str_and_options(None, &date_options()),
+        format!("none {DATE_OPTIONS}")
     );
     assert_eq!(
         describe_with_slice_and_options(&locales, &date_options()),
@@ -50,6 +55,8 @@ fn constructors_take_intl_options() {
     let formatter =
         Formatter::new_with_slice_and_options(&["es".to_string()], &date_options()).unwrap();
     assert_eq!(formatter.received(), format!("list(es) {DATE_OPTIONS}"));
+    let formatter = Formatter::new_with_str_and_options(None, &date_options()).unwrap();
+    assert_eq!(formatter.received(), format!("none {DATE_OPTIONS}"));
 }
 
 #[wasm_bindgen_test]
@@ -62,7 +69,7 @@ fn methods_take_intl_options_and_return_intl_types() {
     // `::js_sys::Intl` default.
     let mapped: &Object = &options;
     assert_eq!(
-        formatter.format_with_str_and_options("fr", mapped),
+        formatter.format_with_str_and_options(Some("fr"), mapped),
         r#"string(fr) Object{"style":"currency","currency":"EUR"}"#
     );
     assert_eq!(

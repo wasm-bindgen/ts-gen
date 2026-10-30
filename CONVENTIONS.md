@@ -167,6 +167,28 @@ factories expand the union instead: each empty is an arm.
   parameter after it can be omitted too. An omittable parameter drops
   `undefined` from its value arms, which take the plain type; one that
   cannot be omitted keeps `Option<T>`.
+* An omitted parameter is only expressible at the end of a call. Where
+  an omittable parameter is followed by another argument in the same
+  variant (a value, or the `null` of a later parameter's `null` arm; a
+  trailing variadic, which can be empty, does not count), its
+  first arm takes `Option<T>` instead, `None` passing `undefined`, so one
+  binding serves both the value and the default:
+  `toLocaleString(locales?: string | string[], options?: Opts)` gives
+  `to_locale_string_with_str_and_options(locales: Option<&str>, options)`,
+  and `to_locale_string(undefined, options)` is
+  `to_locale_string_with_str_and_options(None, options)`. Only the first
+  arm of the parameter's fan-out takes the `Option` (the slice arm stays
+  `&[String]`), so no two bindings make the same call. The variant keeps
+  its name, and replaces nothing: before, the default could not be passed
+  at all. A trailing omittable parameter is still omitted. A
+  parameter's `null` arm stays as it is (`f(a?: T | null, b?: U)` gives
+  `f_with_a_and_b(a: Option<&T>, b)` beside `f_with_null_and_b(b)`), and
+  a parameter admitting only `null` keeps its `null` arm, with no
+  `Option`. The `Option` is left out where `None` would leave something
+  to infer or nothing to add: an arm naming a type parameter, a literal
+  arm, and `any` or `unknown`, whose `&JsValue` takes `undefined` itself.
+  A variant that then coincides with another overload's (`f(a?: T, b?: U)`
+  beside `f(a: T | undefined, b: U)`) is one binding.
 * A setter or builder method expresses `undefined` by not being called,
   so `x?: T`, `x?: T | undefined` and `x: T | undefined` all give
   `set_x(&T)`. A setter whose only arm is `null` is `set_x_with_null()`,
@@ -179,8 +201,9 @@ factories expand the union instead: each empty is an arm.
 | `f(x?: T \| null)`                  | `f()`, `f_with_x(x: &T)`, `f_with_null()`                            |
 | `f(x: string \| number \| null \| undefined)` | `f()`, `f_with_str(x: &str)`, `f_with_f64(x: f64)`, `f_with_null()` |
 | `f(a: T \| undefined, b: number)`   | `f(a: Option<&T>, b: f64)`                                           |
-| `f(a: T \| undefined, b?: number)`  | `f()`, `f_with_a(a: &T)`, `f_with_a_and_b(a: &T, b: f64)`            |
-| `f(a?: T, b?: U \| null, c?: V)`    | `f()`, `f_with_a`, `f_with_a_and_b`, `f_with_a_and_null`, `f_with_a_and_b_and_c`, `f_with_a_and_null_and_c` |
+| `f(a: T \| undefined, b?: number)`  | `f()`, `f_with_a(a: &T)`, `f_with_a_and_b(a: Option<&T>, b: f64)`    |
+| `f(a?: T, b?: U \| null, c?: V)`    | `f()`, `f_with_a(a: &T)`, `f_with_a_and_b(a: Option<&T>, b: &U)`, `f_with_a_and_null(a: Option<&T>)`, `f_with_a_and_b_and_c(a: Option<&T>, b: Option<&U>, c: &V)`, `f_with_a_and_null_and_c(a: Option<&T>, c: &V)` |
+| `f(a?: string \| string[], b?: U)`  | `f()`, `f_with_str(a: &str)`, `f_with_slice(a: &[String])`, `f_with_str_and_b(a: Option<&str>, b: &U)`, `f_with_slice_and_b(a: &[String], b: &U)` |
 | `x?: T \| null` (setter)            | `set_x(&T)`, `set_x_with_null()`                                     |
 | `x?: T \| null` (builder)           | `.x(&T)`, `.x_with_null()`                                           |
 | `f(x: null)`                        | `f_with_null()`                                                      |
@@ -230,8 +253,10 @@ A nullable alias declaration (`type MaybeStr = string | null`) is
 ### Per-monomorphization
 
 `experimental_generic_mono` expands writes identically, with the same
-names; a string argument takes `impl JsStringLike`
-(`Option<impl JsStringLike>` where it cannot be omitted). Inner
+names; a string argument takes `impl JsStringLike`, but `Option<&str>`
+where it cannot be omitted, since a caller passing `None` would leave the
+`impl` type with nothing to infer it from (and `Nullable<&str>` likewise).
+Inner
 positions use the carriers where wasm-bindgen accepts them:
 
 | Position                                    | Mono                                  |
@@ -1765,7 +1790,9 @@ For every JS callable, `ts-gen`:
    `Array<A | B>` and `Record<K, A | B>` are each one parameter shape,
    not `Array<A> | Array<B>` or `Record<K, A> | Record<K, B>`.
    A trailing parameter admitting `undefined` truncates like an
-   optional one. A parameter typed by a named union alias does not
+   optional one, and an omittable parameter followed by another argument
+   takes `Option` on its first arm (see [writes](#writes)). A parameter
+   typed by a named union alias does not
    expand: it takes the alias's enum, or its trait under
    `--experimental-generic-mono` (see
    [named union aliases](#named-union-aliases)). The
@@ -1818,7 +1845,7 @@ Optional truncation:
 ```rust
 pub fn f(a: &str);
 pub fn f_with_b(a: &str, b: f64);
-pub fn f_with_b_and_c(a: &str, b: f64, c: bool);
+pub fn f_with_b_and_c(a: &str, b: Option<f64>, c: bool); // `None` passes `undefined`
 ```
 
 Union-typed parameters:
@@ -4868,7 +4895,7 @@ pub fn to_locale_string_with_str(this: &PlainDate, locales: &str) -> String;
 pub fn to_locale_string_with_slice(this: &PlainDate, locales: &[String]) -> String;
 pub fn to_locale_string_with_str_and_options(
     this: &PlainDate,
-    locales: &str,
+    locales: Option<&str>, // `None` is the default locale
     options: &::js_sys::Intl::DateTimeFormatOptions,
 ) -> String;
 pub fn to_locale_string_with_slice_and_options(
@@ -4880,4 +4907,5 @@ pub fn to_locale_string_with_slice_and_options(
 
 Under [per-monomorphization](#in-scope-generic-type-parameters) the single
 locale takes `impl JsStringLike` and the list `&[impl JsStringLike]`, as
-every `string` and `string[]` argument does.
+every `string` and `string[]` argument does, and the locale before options
+`Option<&str>`.

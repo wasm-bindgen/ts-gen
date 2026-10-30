@@ -41,7 +41,7 @@ extern "C" {
     ) -> Result<DOMException, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_message_and_name(
-        message: impl ::wasm_bindgen::JsStringLike,
+        message: Option<&str>,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<DOMException, JsValue>;
     #[doc = " The error message."]
@@ -70,7 +70,7 @@ extern "C" {
     fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_body_and_init(
-        body: impl BodyInit,
+        body: Option<BodyInitKind>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]

@@ -23,7 +23,7 @@ extern "C" {
     ) -> Result<DOMException, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_message_and_name(
-        message: impl ::wasm_bindgen::JsStringLike,
+        message: Option<&str>,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<DOMException, JsValue>;
     #[doc = " The **`message`** read-only property of the a message or description associated with the given error name."]
@@ -4100,7 +4100,7 @@ extern "C" {
     pub fn new_with_type(r#type: &[JsValue]) -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_type_and_options(
-        r#type: &[JsValue],
+        r#type: Option<&[JsValue]>,
         options: &BlobOptions,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`size`** read-only property of the Blob interface returns the size of the Blob or File in bytes."]
@@ -4132,15 +4132,19 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, catch, js_name = "slice")]
-    pub fn slice_with_start_and_end(this: &Blob, start: f64, end: f64) -> Result<Blob, JsValue>;
+    pub fn slice_with_start_and_end(
+        this: &Blob,
+        start: Option<f64>,
+        end: f64,
+    ) -> Result<Blob, JsValue>;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, catch, js_name = "slice")]
     pub fn slice_with_start_and_end_and_type(
         this: &Blob,
-        start: f64,
-        end: f64,
+        start: Option<f64>,
+        end: Option<f64>,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`arrayBuffer()`** method of the Blob interface returns a Promise that resolves with the contents of the blob as binary data contained in an ArrayBuffer."]
@@ -6898,7 +6902,7 @@ extern "C" {
         -> Result<TextDecoder, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_label_and_options(
-        label: impl ::wasm_bindgen::JsStringLike,
+        label: Option<&str>,
         options: &TextDecoderConstructorOptions,
     ) -> Result<TextDecoder, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
@@ -6946,7 +6950,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn decode_with_array_buffer_and_options(
         this: &TextDecoder,
-        input: &ArrayBuffer,
+        input: Option<&ArrayBuffer>,
         options: &TextDecoderDecodeOptions,
     ) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
@@ -6955,7 +6959,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn decode_with_array_buffer_and_options_js_string(
         this: &TextDecoder,
-        input: &ArrayBuffer,
+        input: Option<&ArrayBuffer>,
         options: &TextDecoderDecodeOptions,
     ) -> Result<JsString, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
@@ -8196,7 +8200,7 @@ extern "C" {
     fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_readable_stream_and_init(
-        body: &ReadableStream<Uint8Array>,
+        body: Option<&ReadableStream<Uint8Array>>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -13255,7 +13259,7 @@ extern "C" {
     ) -> Result<WritableStream<W>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_sink_and_queuing_strategy<W>(
-        underlying_sink: &UnderlyingSink,
+        underlying_sink: Option<&UnderlyingSink>,
         queuing_strategy: &QueuingStrategy,
     ) -> Result<WritableStream<W>, JsValue>;
     #[doc = " The **`locked`** read-only property of the WritableStream interface returns a boolean indicating whether the `WritableStream` is locked to a writer."]
@@ -13616,7 +13620,7 @@ extern "C" {
     ) -> Result<TextDecoderStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_label_and_options(
-        label: impl ::wasm_bindgen::JsStringLike,
+        label: Option<&str>,
         options: &TextDecoderStreamTextDecoderStreamInit,
     ) -> Result<TextDecoderStream, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -14661,7 +14665,7 @@ extern "C" {
     pub fn new_with_url_pattern_init(input: &URLPatternInit) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_str(
-        input: impl ::wasm_bindgen::JsStringLike,
+        input: Option<&str>,
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -14671,7 +14675,7 @@ extern "C" {
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_url_pattern_options(
-        input: impl ::wasm_bindgen::JsStringLike,
+        input: Option<&str>,
         base_url: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -14681,19 +14685,19 @@ extern "C" {
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_str_and_pattern_options(
-        input: impl ::wasm_bindgen::JsStringLike,
-        base_url: impl ::wasm_bindgen::JsStringLike,
+        input: Option<&str>,
+        base_url: Option<&str>,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_pattern_init_and_str_and_pattern_options(
         input: &URLPatternInit,
-        base_url: impl ::wasm_bindgen::JsStringLike,
+        base_url: Option<&str>,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_url_pattern_options_and_pattern_options(
-        input: impl ::wasm_bindgen::JsStringLike,
+        input: Option<&str>,
         base_url: &URLPatternOptions,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
@@ -14752,7 +14756,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "test")]
     pub fn test_with_str_and_base_url(
         this: &URLPattern,
-        input: impl ::wasm_bindgen::JsStringLike,
+        input: Option<&str>,
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "test")]
@@ -14776,7 +14780,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "exec")]
     pub fn exec_with_str_and_base_url(
         this: &URLPattern,
-        input: impl ::wasm_bindgen::JsStringLike,
+        input: Option<&str>,
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
@@ -15235,7 +15239,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "close")]
     pub fn close_with_code_and_reason(
         this: &WebSocket,
-        code: f64,
+        code: Option<f64>,
         reason: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "serializeAttachment")]
@@ -16224,7 +16228,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
     pub fn get_entrypoint_with_name_and_options(
         this: &WorkerStub,
-        name: impl ::wasm_bindgen::JsStringLike,
+        name: Option<&str>,
         options: &WorkerStubEntrypointOptions,
     ) -> Result<Fetcher, JsValue>;
 }
@@ -52060,7 +52064,7 @@ extern "C" {
     pub fn get_with_args_and_options(
         this: &DispatchNamespace,
         name: impl ::wasm_bindgen::JsStringLike,
-        args: &DispatchNamespaceArgs,
+        args: Option<&DispatchNamespaceArgs>,
         options: &DynamicDispatchOptions,
     ) -> Result<Fetcher, JsValue>;
 }

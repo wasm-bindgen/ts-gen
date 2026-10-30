@@ -302,60 +302,49 @@ extern "C" {
 extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
     #[wasm_bindgen(catch, js_name = "arity")]
-    pub fn arity_with_a_and_b(
-        a: impl ::wasm_bindgen::JsStringLike,
-        b: f64,
-    ) -> Result<String, JsValue>;
+    pub fn arity_with_a_and_b(a: Option<&str>, b: f64) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
     #[wasm_bindgen(catch, js_name = "arity")]
-    pub fn arity_with_a_and_b_js_string(
-        a: impl ::wasm_bindgen::JsStringLike,
-        b: f64,
-    ) -> Result<JsString, JsValue>;
+    pub fn arity_with_a_and_b_js_string(a: Option<&str>, b: f64) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "arity")]
     fn __arity_with_a_and_null(
-        a: impl ::wasm_bindgen::JsStringLike,
+        a: Option<&str>,
         b: &::wasm_bindgen::JsValue,
     ) -> Result<String, JsValue>;
 }
 #[doc = " How many arguments arrived, and what the last one was."]
-pub fn arity_with_a_and_null(a: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue> {
+pub fn arity_with_a_and_null(a: Option<&str>) -> Result<String, JsValue> {
     __arity_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "arity")]
     fn __arity_with_a_and_null_js_string(
-        a: impl ::wasm_bindgen::JsStringLike,
+        a: Option<&str>,
         b: &::wasm_bindgen::JsValue,
     ) -> Result<JsString, JsValue>;
 }
 #[doc = " How many arguments arrived, and what the last one was."]
-pub fn arity_with_a_and_null_js_string(
-    a: impl ::wasm_bindgen::JsStringLike,
-) -> Result<JsString, JsValue> {
+pub fn arity_with_a_and_null_js_string(a: Option<&str>) -> Result<JsString, JsValue> {
     __arity_with_a_and_null_js_string(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " A non-trailing `undefined` is passed, not omitted."]
     #[wasm_bindgen(catch)]
-    pub fn pick(a: Option<impl ::wasm_bindgen::JsStringLike>, b: f64) -> Result<String, JsValue>;
+    pub fn pick(a: Option<&str>, b: f64) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " A non-trailing `undefined` is passed, not omitted."]
     #[wasm_bindgen(catch, js_name = "pick")]
-    pub fn pick_js_string(
-        a: Option<impl ::wasm_bindgen::JsStringLike>,
-        b: f64,
-    ) -> Result<JsString, JsValue>;
+    pub fn pick_js_string(a: Option<&str>, b: f64) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
