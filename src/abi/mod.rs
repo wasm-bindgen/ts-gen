@@ -1206,7 +1206,7 @@ mod tests {
     }
 
     #[test]
-    fn dictionary_new_and_module_constructor_are_two_imports() {
+    fn global_interface_collapses_into_module_constructor() {
         let abi = abi(r#"
             interface Email { readonly from: string; }
             declare module "cloudflare:email" {

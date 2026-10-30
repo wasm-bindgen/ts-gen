@@ -5298,8 +5298,10 @@ requires Wasm GC, not just reference-types.
 **Duplicate names.** Within one module, or among the globals, a
 declaration merged from several `.d.ts` statements contributes each
 member once. The same name in two modules, or globally and in a
-module, is two imports. `workers-types` declares `interface
-EmailMessage` globally, a dictionary, and its constructor in
-`"cloudflare:email"`, so `"./bindings.wasm" "EmailMessage.new"`
-creates `{}` and `"cloudflare:email" "EmailMessage.new"` constructs
-the class.
+module, is two imports: a global `connect` beside `"cloudflare:sockets"`'s
+is `"./bindings.wasm" "connect"` and `"cloudflare:sockets" "connect"`. A
+global instance interface whose constructor a module exports is one
+class, as in the Rust bindings: workers-types' `interface EmailMessage`
+and `"cloudflare:email"`'s `EmailMessage` give `"cloudflare:email"
+"EmailMessage.new"` and the instance members `"cloudflare:email"
+"EmailMessage.from"` and `"EmailMessage.to"`.
