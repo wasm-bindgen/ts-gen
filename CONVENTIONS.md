@@ -3560,8 +3560,11 @@ impl R2Object {
   static methods, constructors and free functions; the public
   signature is exactly what the scalar would have been, through the
   read carriers `Option<_>` / `Nullable<_>` (`?`, `| undefined`,
-  `| null`), `Vec<_>` / `&[_]` (`T[]`) and `Result<_, E>`. A `@rust u64`
-  on a `bigint` needs no wrapper.
+  `| null`), `Vec<_>` / `&[_]` (`T[]`) and `Result<_, E>`. A slice
+  argument is converted into a `Vec<f64>` the call borrows; an
+  `Option<&[u64]>` one collects inside the `map` and borrows outside it
+  (`parts.map(|v| v.iter().map(|v| *v as f64).collect::<Vec<_>>())
+  .as_deref()`). A `@rust u64` on a `bigint` needs no wrapper.
 * A generic receiver (`Box<T>`) gives `impl<T: JsGeneric> Box<T>`; the
   method's own type parameters stay on the wrapper fn.
 * The `_promise` companion is handed to JS (`waitUntil`, `Promise.race`),

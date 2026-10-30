@@ -44,6 +44,32 @@ extern "C" {
         this: &R2Object,
         #[wasm_bindgen(slice = "array")] parts: &[f64],
     ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "uploadMaybe")]
+    fn __upload_maybe(this: &R2Object, #[wasm_bindgen(slice = "array")] parts: &[f64]);
+    #[wasm_bindgen(method, catch, js_name = "uploadMaybe")]
+    fn __try_upload_maybe(
+        this: &R2Object,
+        #[wasm_bindgen(slice = "array")] parts: &[f64],
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "uploadMaybe")]
+    fn __upload_maybe_with_null(this: &R2Object, parts: &::wasm_bindgen::JsValue);
+    #[wasm_bindgen(method, catch, js_name = "uploadMaybe")]
+    fn __try_upload_maybe_with_null(
+        this: &R2Object,
+        parts: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "uploadUnset")]
+    fn __upload_unset(
+        this: &R2Object,
+        #[wasm_bindgen(slice = "array")] parts: Option<&[f64]>,
+        tag: &str,
+    );
+    #[wasm_bindgen(method, catch, js_name = "uploadUnset")]
+    fn __try_upload_unset(
+        this: &R2Object,
+        #[wasm_bindgen(slice = "array")] parts: Option<&[f64]>,
+        tag: &str,
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "seek")]
     fn __seek(this: &R2Object, offset: f64) -> f64;
     #[wasm_bindgen(method, catch, js_name = "seek")]
@@ -54,6 +80,14 @@ extern "C" {
     pub fn matrix(this: &R2Object) -> Vec<Array<Number>>;
     #[wasm_bindgen(method, catch, js_name = "matrix")]
     pub fn try_matrix(this: &R2Object) -> Result<Vec<Array<Number>>, JsValue>;
+}
+impl R2Object {
+    pub fn upload_maybe_with_null(&self) {
+        self.__upload_maybe_with_null(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_upload_maybe_with_null(&self) -> Result<(), JsValue> {
+        self.__try_upload_maybe_with_null(&::wasm_bindgen::JsValue::NULL)
+    }
 }
 impl R2Object {
     #[doc = " Size in bytes."]
@@ -97,6 +131,28 @@ impl R2Object {
     }
     pub fn try_upload(&self, parts: &[u64]) -> Result<(), JsValue> {
         self.__try_upload(&parts.iter().map(|v| *v as f64).collect::<Vec<_>>())
+    }
+    pub fn upload_maybe(&self, parts: &[u64]) {
+        self.__upload_maybe(&parts.iter().map(|v| *v as f64).collect::<Vec<_>>())
+    }
+    pub fn try_upload_maybe(&self, parts: &[u64]) -> Result<(), JsValue> {
+        self.__try_upload_maybe(&parts.iter().map(|v| *v as f64).collect::<Vec<_>>())
+    }
+    pub fn upload_unset(&self, parts: Option<&[u64]>, tag: &str) {
+        self.__upload_unset(
+            parts
+                .map(|v| v.iter().map(|v| *v as f64).collect::<Vec<_>>())
+                .as_deref(),
+            tag,
+        )
+    }
+    pub fn try_upload_unset(&self, parts: Option<&[u64]>, tag: &str) -> Result<(), JsValue> {
+        self.__try_upload_unset(
+            parts
+                .map(|v| v.iter().map(|v| *v as f64).collect::<Vec<_>>())
+                .as_deref(),
+            tag,
+        )
     }
     pub fn seek(&self, offset: i64) -> i64 {
         self.__seek(offset as f64) as i64

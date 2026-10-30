@@ -37,6 +37,12 @@
   (import "inline-wrappers" "R2Object.sizes" (func $inline-wrappers:R2Object.sizes (param $this externref) (result externref)))
   ;; upload(parts: u64[]): void
   (import "inline-wrappers" "R2Object.upload" (func $inline-wrappers:R2Object.upload (param $this externref) (param $parts externref)))
+  ;; uploadMaybe(parts: u64[]): void
+  (import "inline-wrappers" "R2Object.upload_maybe" (func $inline-wrappers:R2Object.upload_maybe (param $this externref) (param $parts externref)))
+  ;; uploadMaybe(parts: null): void
+  (import "inline-wrappers" "R2Object.upload_maybe_with_null" (func $inline-wrappers:R2Object.upload_maybe_with_null (param $this externref) (param $parts externref)))
+  ;; uploadUnset(parts: u64[] | undefined, tag: string): void
+  (import "inline-wrappers" "R2Object.upload_unset" (func $inline-wrappers:R2Object.upload_unset (param $this externref) (param $parts externref) (param $tag externref)))
   ;; seek(offset: i64): i64
   (import "inline-wrappers" "R2Object.seek" (func $inline-wrappers:R2Object.seek (param $this externref) (param $offset externref) (result externref)))
   ;; settled: Promise<u64>
