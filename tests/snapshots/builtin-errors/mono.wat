@@ -35,7 +35,7 @@
   (import "builtin-errors" "Formatter.new" (func $builtin-errors:Formatter.new (result externref)))
   ;; constructor(locales: Intl.LocalesArgument)
   (import "builtin-errors" "Formatter.new_with_locales" (func $builtin-errors:Formatter.new_with_locales (param $locales externref) (result externref)))
-  ;; constructor(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions)
+  ;; constructor(locales: Intl.LocalesArgument | undefined, options: Intl.DateTimeFormatOptions)
   (import "builtin-errors" "Formatter.new_with_locales_and_options" (func $builtin-errors:Formatter.new_with_locales_and_options (param $locales externref) (param $options externref) (result externref)))
   ;; received: string
   (import "builtin-errors" "Formatter.received" (func $builtin-errors:Formatter.received (param $this externref) (result externref)))
@@ -43,7 +43,7 @@
   (import "builtin-errors" "Formatter.format" (func $builtin-errors:Formatter.format (param $this externref) (result externref)))
   ;; format(locales: Intl.LocalesArgument): string
   (import "builtin-errors" "Formatter.format_with_locales" (func $builtin-errors:Formatter.format_with_locales (param $this externref) (param $locales externref) (result externref)))
-  ;; format(locales: Intl.LocalesArgument, options: Intl.NumberFormatOptions): string
+  ;; format(locales: Intl.LocalesArgument | undefined, options: Intl.NumberFormatOptions): string
   (import "builtin-errors" "Formatter.format_with_locales_and_options" (func $builtin-errors:Formatter.format_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
   ;; locale(tag: Intl.UnicodeBCP47LocaleIdentifier): Intl.Locale
   (import "builtin-errors" "Formatter.locale" (func $builtin-errors:Formatter.locale (param $this externref) (param $tag externref) (result externref)))
@@ -52,7 +52,7 @@
   (import "builtin-errors" "describe" (func $builtin-errors:describe (result externref)))
   ;; describe(locales: Intl.LocalesArgument): string
   (import "builtin-errors" "describe_with_locales" (func $builtin-errors:describe_with_locales (param $locales externref) (result externref)))
-  ;; describe(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions): string
+  ;; describe(locales: Intl.LocalesArgument | undefined, options: Intl.DateTimeFormatOptions): string
   (import "builtin-errors" "describe_with_locales_and_options" (func $builtin-errors:describe_with_locales_and_options (param $locales externref) (param $options externref) (result externref)))
 
   ;; FormatSettings

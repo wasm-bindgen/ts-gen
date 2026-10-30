@@ -32,7 +32,7 @@
   (import "./bindings.wasm" "DOMException.new" (func $DOMException.new (result externref)))
   ;; constructor(message: string)
   (import "./bindings.wasm" "DOMException.new_with_message" (func $DOMException.new_with_message (param $message externref) (result externref)))
-  ;; constructor(message: string, name: string)
+  ;; constructor(message: string | undefined, name: string)
   (import "./bindings.wasm" "DOMException.new_with_message_and_name" (func $DOMException.new_with_message_and_name (param $message externref) (param $name externref) (result externref)))
   ;; message: string
   (import "./bindings.wasm" "DOMException.message" (func $DOMException.message (param $this externref) (result externref)))
@@ -1356,7 +1356,7 @@
   (import "./bindings.wasm" "Blob.new" (func $Blob.new (result externref)))
   ;; constructor(type: (ArrayBuffer | ArrayBufferView | string | Blob)[])
   (import "./bindings.wasm" "Blob.new_with_type" (func $Blob.new_with_type (param $type externref) (result externref)))
-  ;; constructor(type: (ArrayBuffer | ArrayBufferView | string | Blob)[], options: BlobOptions)
+  ;; constructor(type: (ArrayBuffer | ArrayBufferView | string | Blob)[] | undefined, options: BlobOptions)
   (import "./bindings.wasm" "Blob.new_with_type_and_options" (func $Blob.new_with_type_and_options (param $type externref) (param $options externref) (result externref)))
   ;; size: number
   (import "./bindings.wasm" "Blob.size" (func $Blob.size (param $this externref) (result f64)))
@@ -1366,10 +1366,10 @@
   (import "./bindings.wasm" "Blob.slice" (func $Blob.slice (param $this externref) (result externref)))
   ;; slice(start: number): Blob
   (import "./bindings.wasm" "Blob.slice_with_start" (func $Blob.slice_with_start (param $this externref) (param $start f64) (result externref)))
-  ;; slice(start: number, end: number): Blob
-  (import "./bindings.wasm" "Blob.slice_with_start_and_end" (func $Blob.slice_with_start_and_end (param $this externref) (param $start f64) (param $end f64) (result externref)))
-  ;; slice(start: number, end: number, type: string): Blob
-  (import "./bindings.wasm" "Blob.slice_with_start_and_end_and_type" (func $Blob.slice_with_start_and_end_and_type (param $this externref) (param $start f64) (param $end f64) (param $type externref) (result externref)))
+  ;; slice(start: number | undefined, end: number): Blob
+  (import "./bindings.wasm" "Blob.slice_with_start_and_end" (func $Blob.slice_with_start_and_end (param $this externref) (param $start externref) (param $end f64) (result externref)))
+  ;; slice(start: number | undefined, end: number | undefined, type: string): Blob
+  (import "./bindings.wasm" "Blob.slice_with_start_and_end_and_type" (func $Blob.slice_with_start_and_end_and_type (param $this externref) (param $start externref) (param $end externref) (param $type externref) (result externref)))
   ;; arrayBuffer(): Promise<ArrayBuffer>
   (import "./bindings.wasm" "Blob.array_buffer" (func $Blob.array_buffer (param $this externref) (result externref)))
   ;; bytes(): Promise<Uint8Array>
@@ -1944,7 +1944,7 @@
   (import "./bindings.wasm" "TextDecoder.new" (func $TextDecoder.new (result externref)))
   ;; constructor(label: string)
   (import "./bindings.wasm" "TextDecoder.new_with_label" (func $TextDecoder.new_with_label (param $label externref) (result externref)))
-  ;; constructor(label: string, options: TextDecoderConstructorOptions)
+  ;; constructor(label: string | undefined, options: TextDecoderConstructorOptions)
   (import "./bindings.wasm" "TextDecoder.new_with_label_and_options" (func $TextDecoder.new_with_label_and_options (param $label externref) (param $options externref) (result externref)))
   ;; decode(): string
   (import "./bindings.wasm" "TextDecoder.decode" (func $TextDecoder.decode (param $this externref) (result externref)))
@@ -1952,7 +1952,7 @@
   (import "./bindings.wasm" "TextDecoder.decode_with_array_buffer" (func $TextDecoder.decode_with_array_buffer (param $this externref) (param $input externref) (result externref)))
   ;; decode(input: ArrayBufferView): string
   (import "./bindings.wasm" "TextDecoder.decode_with_typed_array" (func $TextDecoder.decode_with_typed_array (param $this externref) (param $input externref) (result externref)))
-  ;; decode(input: ArrayBuffer, options: TextDecoderDecodeOptions): string
+  ;; decode(input: ArrayBuffer | undefined, options: TextDecoderDecodeOptions): string
   (import "./bindings.wasm" "TextDecoder.decode_with_array_buffer_and_options" (func $TextDecoder.decode_with_array_buffer_and_options (param $this externref) (param $input externref) (param $options externref) (result externref)))
   ;; decode(input: ArrayBufferView, options: TextDecoderDecodeOptions): string
   (import "./bindings.wasm" "TextDecoder.decode_with_typed_array_and_options" (func $TextDecoder.decode_with_typed_array_and_options (param $this externref) (param $input externref) (param $options externref) (result externref)))
@@ -2382,7 +2382,7 @@
   (import "./bindings.wasm" "Response.new_with_body" (func $Response.new_with_body (param $body externref) (result externref)))
   ;; constructor(body: null)
   (import "./bindings.wasm" "Response.new_with_null" (func $Response.new_with_null (param $body externref) (result externref)))
-  ;; constructor(body: BodyInit, init: ResponseInit)
+  ;; constructor(body: BodyInit | undefined, init: ResponseInit)
   (import "./bindings.wasm" "Response.new_with_body_and_init" (func $Response.new_with_body_and_init (param $body externref) (param $init externref) (result externref)))
   ;; constructor(body: null, init: ResponseInit)
   (import "./bindings.wasm" "Response.new_with_null_and_init" (func $Response.new_with_null_and_init (param $body externref) (param $init externref) (result externref)))
@@ -3542,7 +3542,7 @@
   (import "./bindings.wasm" "WritableStream.new" (func $WritableStream.new (result externref)))
   ;; constructor(underlying_sink: UnderlyingSink)
   (import "./bindings.wasm" "WritableStream.new_with_underlying_sink" (func $WritableStream.new_with_underlying_sink (param $underlying_sink externref) (result externref)))
-  ;; constructor(underlying_sink: UnderlyingSink, queuing_strategy: QueuingStrategy)
+  ;; constructor(underlying_sink: UnderlyingSink | undefined, queuing_strategy: QueuingStrategy)
   (import "./bindings.wasm" "WritableStream.new_with_underlying_sink_and_queuing_strategy" (func $WritableStream.new_with_underlying_sink_and_queuing_strategy (param $underlying_sink externref) (param $queuing_strategy externref) (result externref)))
   ;; locked: boolean
   (import "./bindings.wasm" "WritableStream.locked" (func $WritableStream.locked (param $this externref) (result i32)))
@@ -3582,9 +3582,9 @@
   (import "./bindings.wasm" "TransformStream.new" (func $TransformStream.new (result externref)))
   ;; constructor(transformer: Transformer<I, O>)
   (import "./bindings.wasm" "TransformStream.new_with_transformer" (func $TransformStream.new_with_transformer (param $transformer externref) (result externref)))
-  ;; constructor(transformer: Transformer<I, O>, writable_strategy: QueuingStrategy<I>)
+  ;; constructor(transformer: Transformer<I, O> | undefined, writable_strategy: QueuingStrategy<I>)
   (import "./bindings.wasm" "TransformStream.new_with_transformer_and_writable_strategy" (func $TransformStream.new_with_transformer_and_writable_strategy (param $transformer externref) (param $writable_strategy externref) (result externref)))
-  ;; constructor(transformer: Transformer<I, O>, writable_strategy: QueuingStrategy<I>, readable_strategy: QueuingStrategy<O>)
+  ;; constructor(transformer: Transformer<I, O> | undefined, writable_strategy: QueuingStrategy<I> | undefined, readable_strategy: QueuingStrategy<O>)
   (import "./bindings.wasm" "TransformStream.new_with_transformer_and_writable_strategy_and_readable_strategy" (func $TransformStream.new_with_transformer_and_writable_strategy_and_readable_strategy (param $transformer externref) (param $writable_strategy externref) (param $readable_strategy externref) (result externref)))
   ;; readable: ReadableStream<O>
   (import "./bindings.wasm" "TransformStream.readable" (func $TransformStream.readable (param $this externref) (result externref)))
@@ -3644,7 +3644,7 @@
   (import "./bindings.wasm" "TextDecoderStream.new" (func $TextDecoderStream.new (result externref)))
   ;; constructor(label: string)
   (import "./bindings.wasm" "TextDecoderStream.new_with_label" (func $TextDecoderStream.new_with_label (param $label externref) (result externref)))
-  ;; constructor(label: string, options: TextDecoderStreamTextDecoderStreamInit)
+  ;; constructor(label: string | undefined, options: TextDecoderStreamTextDecoderStreamInit)
   (import "./bindings.wasm" "TextDecoderStream.new_with_label_and_options" (func $TextDecoderStream.new_with_label_and_options (param $label externref) (param $options externref) (result externref)))
   ;; encoding: string
   (import "./bindings.wasm" "TextDecoderStream.encoding" (func $TextDecoderStream.encoding (param $this externref) (result externref)))
@@ -4018,19 +4018,19 @@
   (import "./bindings.wasm" "URLPattern.new_with_str" (func $URLPattern.new_with_str (param $input externref) (result externref)))
   ;; constructor(input: URLPatternInit)
   (import "./bindings.wasm" "URLPattern.new_with_url_pattern_init" (func $URLPattern.new_with_url_pattern_init (param $input externref) (result externref)))
-  ;; constructor(input: string, base_url: string)
+  ;; constructor(input: string | undefined, base_url: string)
   (import "./bindings.wasm" "URLPattern.new_with_str_and_str" (func $URLPattern.new_with_str_and_str (param $input externref) (param $base_url externref) (result externref)))
   ;; constructor(input: URLPatternInit, base_url: string)
   (import "./bindings.wasm" "URLPattern.new_with_url_pattern_init_and_str" (func $URLPattern.new_with_url_pattern_init_and_str (param $input externref) (param $base_url externref) (result externref)))
-  ;; constructor(input: string, base_url: URLPatternOptions)
+  ;; constructor(input: string | undefined, base_url: URLPatternOptions)
   (import "./bindings.wasm" "URLPattern.new_with_str_and_url_pattern_options" (func $URLPattern.new_with_str_and_url_pattern_options (param $input externref) (param $base_url externref) (result externref)))
   ;; constructor(input: URLPatternInit, base_url: URLPatternOptions)
   (import "./bindings.wasm" "URLPattern.new_with_url_pattern_init_and_url_pattern_options" (func $URLPattern.new_with_url_pattern_init_and_url_pattern_options (param $input externref) (param $base_url externref) (result externref)))
-  ;; constructor(input: string, base_url: string, pattern_options: URLPatternOptions)
+  ;; constructor(input: string | undefined, base_url: string | undefined, pattern_options: URLPatternOptions)
   (import "./bindings.wasm" "URLPattern.new_with_str_and_str_and_pattern_options" (func $URLPattern.new_with_str_and_str_and_pattern_options (param $input externref) (param $base_url externref) (param $pattern_options externref) (result externref)))
-  ;; constructor(input: URLPatternInit, base_url: string, pattern_options: URLPatternOptions)
+  ;; constructor(input: URLPatternInit, base_url: string | undefined, pattern_options: URLPatternOptions)
   (import "./bindings.wasm" "URLPattern.new_with_url_pattern_init_and_str_and_pattern_options" (func $URLPattern.new_with_url_pattern_init_and_str_and_pattern_options (param $input externref) (param $base_url externref) (param $pattern_options externref) (result externref)))
-  ;; constructor(input: string, base_url: URLPatternOptions, pattern_options: URLPatternOptions)
+  ;; constructor(input: string | undefined, base_url: URLPatternOptions, pattern_options: URLPatternOptions)
   (import "./bindings.wasm" "URLPattern.new_with_str_and_url_pattern_options_and_pattern_options" (func $URLPattern.new_with_str_and_url_pattern_options_and_pattern_options (param $input externref) (param $base_url externref) (param $pattern_options externref) (result externref)))
   ;; constructor(input: URLPatternInit, base_url: URLPatternOptions, pattern_options: URLPatternOptions)
   (import "./bindings.wasm" "URLPattern.new_with_url_pattern_init_and_url_pattern_options_and_pattern_options" (func $URLPattern.new_with_url_pattern_init_and_url_pattern_options_and_pattern_options (param $input externref) (param $base_url externref) (param $pattern_options externref) (result externref)))
@@ -4058,7 +4058,7 @@
   (import "./bindings.wasm" "URLPattern.test_with_str" (func $URLPattern.test_with_str (param $this externref) (param $input externref) (result i32)))
   ;; test(input: URLPatternInit): boolean
   (import "./bindings.wasm" "URLPattern.test_with_url_pattern_init" (func $URLPattern.test_with_url_pattern_init (param $this externref) (param $input externref) (result i32)))
-  ;; test(input: string, base_url: string): boolean
+  ;; test(input: string | undefined, base_url: string): boolean
   (import "./bindings.wasm" "URLPattern.test_with_str_and_base_url" (func $URLPattern.test_with_str_and_base_url (param $this externref) (param $input externref) (param $base_url externref) (result i32)))
   ;; test(input: URLPatternInit, base_url: string): boolean
   (import "./bindings.wasm" "URLPattern.test_with_url_pattern_init_and_base_url" (func $URLPattern.test_with_url_pattern_init_and_base_url (param $this externref) (param $input externref) (param $base_url externref) (result i32)))
@@ -4068,7 +4068,7 @@
   (import "./bindings.wasm" "URLPattern.exec_with_str" (func $URLPattern.exec_with_str (param $this externref) (param $input externref) (result externref)))
   ;; exec(input: URLPatternInit): URLPatternResult | null
   (import "./bindings.wasm" "URLPattern.exec_with_url_pattern_init" (func $URLPattern.exec_with_url_pattern_init (param $this externref) (param $input externref) (result externref)))
-  ;; exec(input: string, base_url: string): URLPatternResult | null
+  ;; exec(input: string | undefined, base_url: string): URLPatternResult | null
   (import "./bindings.wasm" "URLPattern.exec_with_str_and_base_url" (func $URLPattern.exec_with_str_and_base_url (param $this externref) (param $input externref) (param $base_url externref) (result externref)))
   ;; exec(input: URLPatternInit, base_url: string): URLPatternResult | null
   (import "./bindings.wasm" "URLPattern.exec_with_url_pattern_init_and_base_url" (func $URLPattern.exec_with_url_pattern_init_and_base_url (param $this externref) (param $input externref) (param $base_url externref) (result externref)))
@@ -4258,8 +4258,8 @@
   (import "./bindings.wasm" "WebSocket.close" (func $WebSocket.close (param $this externref)))
   ;; close(code: number): void
   (import "./bindings.wasm" "WebSocket.close_with_code" (func $WebSocket.close_with_code (param $this externref) (param $code f64)))
-  ;; close(code: number, reason: string): void
-  (import "./bindings.wasm" "WebSocket.close_with_code_and_reason" (func $WebSocket.close_with_code_and_reason (param $this externref) (param $code f64) (param $reason externref)))
+  ;; close(code: number | undefined, reason: string): void
+  (import "./bindings.wasm" "WebSocket.close_with_code_and_reason" (func $WebSocket.close_with_code_and_reason (param $this externref) (param $code externref) (param $reason externref)))
   ;; serializeAttachment(attachment: any): void
   (import "./bindings.wasm" "WebSocket.serialize_attachment" (func $WebSocket.serialize_attachment (param $this externref) (param $attachment externref)))
   ;; deserializeAttachment(): any | null
@@ -4602,7 +4602,7 @@
   (import "./bindings.wasm" "WorkerStub.get_entrypoint" (func $WorkerStub.get_entrypoint (param $this externref) (result externref)))
   ;; getEntrypoint(name: string): Fetcher<T>
   (import "./bindings.wasm" "WorkerStub.get_entrypoint_with_name" (func $WorkerStub.get_entrypoint_with_name (param $this externref) (param $name externref) (result externref)))
-  ;; getEntrypoint(name: string, options: WorkerStubEntrypointOptions): Fetcher<T>
+  ;; getEntrypoint(name: string | undefined, options: WorkerStubEntrypointOptions): Fetcher<T>
   (import "./bindings.wasm" "WorkerStub.get_entrypoint_with_name_and_options" (func $WorkerStub.get_entrypoint_with_name_and_options (param $this externref) (param $name externref) (param $options externref) (result externref)))
 
   ;; WorkerStubEntrypointOptions
@@ -13625,7 +13625,7 @@
   (import "./bindings.wasm" "DispatchNamespace.get" (func $DispatchNamespace.get (param $this externref) (param $name externref) (result externref)))
   ;; get(name: string, args: DispatchNamespaceArgs): Fetcher
   (import "./bindings.wasm" "DispatchNamespace.get_with_args" (func $DispatchNamespace.get_with_args (param $this externref) (param $name externref) (param $args externref) (result externref)))
-  ;; get(name: string, args: DispatchNamespaceArgs, options: DynamicDispatchOptions): Fetcher
+  ;; get(name: string, args: DispatchNamespaceArgs | undefined, options: DynamicDispatchOptions): Fetcher
   (import "./bindings.wasm" "DispatchNamespace.get_with_args_and_options" (func $DispatchNamespace.get_with_args_and_options (param $this externref) (param $name externref) (param $args externref) (param $options externref) (result externref)))
 
   ;; NonRetryableError

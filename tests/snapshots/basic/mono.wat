@@ -27,7 +27,7 @@
   (import "./bindings.wasm" "DOMException.new" (func $DOMException.new (result externref)))
   ;; constructor(message: string)
   (import "./bindings.wasm" "DOMException.new_with_message" (func $DOMException.new_with_message (param $message externref) (result externref)))
-  ;; constructor(message: string, name: string)
+  ;; constructor(message: string | undefined, name: string)
   (import "./bindings.wasm" "DOMException.new_with_message_and_name" (func $DOMException.new_with_message_and_name (param $message externref) (param $name externref) (result externref)))
   ;; message: string
   (import "./bindings.wasm" "DOMException.message" (func $DOMException.message (param $this externref) (result externref)))
@@ -43,7 +43,7 @@
   (import "./bindings.wasm" "Response.new_with_body" (func $Response.new_with_body (param $body externref) (result externref)))
   ;; constructor(body: null)
   (import "./bindings.wasm" "Response.new_with_null" (func $Response.new_with_null (param $body externref) (result externref)))
-  ;; constructor(body: BodyInit, init: ResponseInit)
+  ;; constructor(body: BodyInit | undefined, init: ResponseInit)
   (import "./bindings.wasm" "Response.new_with_body_and_init" (func $Response.new_with_body_and_init (param $body externref) (param $init externref) (result externref)))
   ;; constructor(body: null, init: ResponseInit)
   (import "./bindings.wasm" "Response.new_with_null_and_init" (func $Response.new_with_null_and_init (param $body externref) (param $init externref) (result externref)))

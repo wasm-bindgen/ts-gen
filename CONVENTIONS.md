@@ -5059,6 +5059,14 @@ unboxes one that is present, and reads a numeric enum member. A
 `void`/`undefined` return has no result slot, while `null` and `never`
 returns are `(result externref)`.
 
+Arguments expand as the Rust [writes](#writes) do: an omittable
+parameter is left off the shorter arities, and one followed by another
+argument takes `undefined` in its first arm, where the Rust bindings
+take an `Option`. A scalar there crosses as a reference, `$undefined`
+passing for the omitted value: `slice(start?: number, end?: number)`
+is `Blob.slice_with_start_and_end (param $this externref) (param $start
+externref) (param $end f64)`.
+
 ### Nullability and the sys surface
 
 The wire type is `externref` = wasm-bindgen's `JsValue`: values cross

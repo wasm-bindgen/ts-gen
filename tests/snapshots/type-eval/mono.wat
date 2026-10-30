@@ -83,8 +83,10 @@
   ;; set size(value: number)
   (import "type-eval" "Mixed.set_size" (func $type-eval:Mixed.set_size (param $this externref) (param $value f64)))
 
-  ;; mapped(loose: LooseOptions, strict: RequiredOptions, flags: FlagsAOrB): void
-  (import "type-eval" "mapped" (func $type-eval:mapped (param $loose externref) (param $strict externref) (param $flags externref)))
+  ;; mapped(loose: LooseOptions, strict: RequiredOptions, flags: FlagsAOrB, patch: PartialOptions): void
+  (import "type-eval" "mapped" (func $type-eval:mapped (param $loose externref) (param $strict externref) (param $flags externref) (param $patch externref)))
+  ;; patch(open: Patch<T>): void
+  (import "type-eval" "patch" (func $type-eval:patch (param $open externref)))
   ;; size(opts: Options): number | undefined
   (import "type-eval" "size" (func $type-eval:size (param $opts externref) (result externref)))
   ;; plural(all: Plural, some: PluralHourOrMinute): void

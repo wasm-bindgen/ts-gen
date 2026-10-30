@@ -107,7 +107,7 @@
   (import "./bindings.wasm" "Response.new_with_body" (func $Response.new_with_body (param $body externref) (result externref)))
   ;; constructor(body: null)
   (import "./bindings.wasm" "Response.new_with_null" (func $Response.new_with_null (param $body externref) (result externref)))
-  ;; constructor(body: BodyInit, init: ResponseInit)
+  ;; constructor(body: BodyInit | undefined, init: ResponseInit)
   (import "./bindings.wasm" "Response.new_with_body_and_init" (func $Response.new_with_body_and_init (param $body externref) (param $init externref) (result externref)))
   ;; constructor(body: null, init: ResponseInit)
   (import "./bindings.wasm" "Response.new_with_null_and_init" (func $Response.new_with_null_and_init (param $body externref) (param $init externref) (result externref)))

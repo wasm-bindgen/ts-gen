@@ -47,9 +47,9 @@
   (import "./bindings.wasm" "Temporal.DateLikeObject.day" (func $Temporal.DateLikeObject.day (param $this externref) (result f64)))
   ;; set day(value: number)
   (import "./bindings.wasm" "Temporal.DateLikeObject.set_day" (func $Temporal.DateLikeObject.set_day (param $this externref) (param $value f64)))
-  ;; calendar?: string
+  ;; calendar?: CalendarLike
   (import "./bindings.wasm" "Temporal.DateLikeObject.calendar" (func $Temporal.DateLikeObject.calendar (param $this externref) (result externref)))
-  ;; set calendar(value: string)
+  ;; set calendar(value: CalendarLike)
   (import "./bindings.wasm" "Temporal.DateLikeObject.set_calendar" (func $Temporal.DateLikeObject.set_calendar (param $this externref) (param $value externref)))
 
   ;; Temporal.DurationLikeObject
@@ -147,9 +147,9 @@
   (import "./bindings.wasm" "Temporal.YearMonthLikeObject.month_code" (func $Temporal.YearMonthLikeObject.month_code (param $this externref) (result externref)))
   ;; set monthCode(value: string)
   (import "./bindings.wasm" "Temporal.YearMonthLikeObject.set_month_code" (func $Temporal.YearMonthLikeObject.set_month_code (param $this externref) (param $value externref)))
-  ;; calendar?: string
+  ;; calendar?: CalendarLike
   (import "./bindings.wasm" "Temporal.YearMonthLikeObject.calendar" (func $Temporal.YearMonthLikeObject.calendar (param $this externref) (result externref)))
-  ;; set calendar(value: string)
+  ;; set calendar(value: CalendarLike)
   (import "./bindings.wasm" "Temporal.YearMonthLikeObject.set_calendar" (func $Temporal.YearMonthLikeObject.set_calendar (param $this externref) (param $value externref)))
 
   ;; Temporal.ZonedDateTimeLikeObject
@@ -203,6 +203,14 @@
   (import "./bindings.wasm" "Temporal.RoundingOptions.rounding_mode" (func $Temporal.RoundingOptions.rounding_mode (param $this externref) (result externref)))
   ;; set roundingMode(value: "ceil")
   (import "./bindings.wasm" "Temporal.RoundingOptions.set_rounding_mode" (func $Temporal.RoundingOptions.set_rounding_mode (param $this externref) (param $value externref)))
+
+  ;; Temporal.RoundToOptions
+  ;; {} as Temporal.RoundToOptions
+  (import "./bindings.wasm" "Temporal.RoundToOptions.new" (func $Temporal.RoundToOptions.new (result externref)))
+  ;; smallestUnit: PluralizeUnit
+  (import "./bindings.wasm" "Temporal.RoundToOptions.smallest_unit" (func $Temporal.RoundToOptions.smallest_unit (param $this externref) (result externref)))
+  ;; set smallestUnit(value: PluralizeUnit)
+  (import "./bindings.wasm" "Temporal.RoundToOptions.set_smallest_unit" (func $Temporal.RoundToOptions.set_smallest_unit (param $this externref) (param $value externref)))
 
   ;; Temporal.RoundingOptionsWithLargestUnit
   ;; {} as Temporal.RoundingOptionsWithLargestUnit
@@ -361,7 +369,7 @@
   (import "./bindings.wasm" "Temporal.PlainDate.to_locale_string" (func $Temporal.PlainDate.to_locale_string (param $this externref) (result externref)))
   ;; toLocaleString(locales: Intl.LocalesArgument): string
   (import "./bindings.wasm" "Temporal.PlainDate.to_locale_string_with_locales" (func $Temporal.PlainDate.to_locale_string_with_locales (param $this externref) (param $locales externref) (result externref)))
-  ;; toLocaleString(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions): string
+  ;; toLocaleString(locales: Intl.LocalesArgument | undefined, options: Intl.DateTimeFormatOptions): string
   (import "./bindings.wasm" "Temporal.PlainDate.to_locale_string_with_locales_and_options" (func $Temporal.PlainDate.to_locale_string_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
   ;; toJSON(): string
   (import "./bindings.wasm" "Temporal.PlainDate.to_json" (func $Temporal.PlainDate.to_json (param $this externref) (result externref)))
@@ -373,16 +381,16 @@
   (import "./bindings.wasm" "Temporal.PlainTime.new" (func $Temporal.PlainTime.new (result externref)))
   ;; constructor(hour: number)
   (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour" (func $Temporal.PlainTime.new_with_hour (param $hour f64) (result externref)))
-  ;; constructor(hour: number, minute: number)
-  (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour_and_minute" (func $Temporal.PlainTime.new_with_hour_and_minute (param $hour f64) (param $minute f64) (result externref)))
-  ;; constructor(hour: number, minute: number, second: number)
-  (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour_and_minute_and_second" (func $Temporal.PlainTime.new_with_hour_and_minute_and_second (param $hour f64) (param $minute f64) (param $second f64) (result externref)))
-  ;; constructor(hour: number, minute: number, second: number, millisecond: number)
-  (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond" (func $Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond (param $hour f64) (param $minute f64) (param $second f64) (param $millisecond f64) (result externref)))
-  ;; constructor(hour: number, minute: number, second: number, millisecond: number, microsecond: number)
-  (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond" (func $Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond (param $hour f64) (param $minute f64) (param $second f64) (param $millisecond f64) (param $microsecond f64) (result externref)))
-  ;; constructor(hour: number, minute: number, second: number, millisecond: number, microsecond: number, nanosecond: number)
-  (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond" (func $Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond (param $hour f64) (param $minute f64) (param $second f64) (param $millisecond f64) (param $microsecond f64) (param $nanosecond f64) (result externref)))
+  ;; constructor(hour: number | undefined, minute: number)
+  (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour_and_minute" (func $Temporal.PlainTime.new_with_hour_and_minute (param $hour externref) (param $minute f64) (result externref)))
+  ;; constructor(hour: number | undefined, minute: number | undefined, second: number)
+  (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour_and_minute_and_second" (func $Temporal.PlainTime.new_with_hour_and_minute_and_second (param $hour externref) (param $minute externref) (param $second f64) (result externref)))
+  ;; constructor(hour: number | undefined, minute: number | undefined, second: number | undefined, millisecond: number)
+  (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond" (func $Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond (param $hour externref) (param $minute externref) (param $second externref) (param $millisecond f64) (result externref)))
+  ;; constructor(hour: number | undefined, minute: number | undefined, second: number | undefined, millisecond: number | undefined, microsecond: number)
+  (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond" (func $Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond (param $hour externref) (param $minute externref) (param $second externref) (param $millisecond externref) (param $microsecond f64) (result externref)))
+  ;; constructor(hour: number | undefined, minute: number | undefined, second: number | undefined, millisecond: number | undefined, microsecond: number | undefined, nanosecond: number)
+  (import "./bindings.wasm" "Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond" (func $Temporal.PlainTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond (param $hour externref) (param $minute externref) (param $second externref) (param $millisecond externref) (param $microsecond externref) (param $nanosecond f64) (result externref)))
   ;; from(item: PlainTimeLike): PlainTime
   (import "./bindings.wasm" "Temporal.PlainTime.from" (func $Temporal.PlainTime.from (param $item externref) (result externref)))
   ;; from(item: PlainTimeLike, options: OverflowOptions): PlainTime
@@ -429,7 +437,7 @@
   (import "./bindings.wasm" "Temporal.PlainTime.to_locale_string" (func $Temporal.PlainTime.to_locale_string (param $this externref) (result externref)))
   ;; toLocaleString(locales: Intl.LocalesArgument): string
   (import "./bindings.wasm" "Temporal.PlainTime.to_locale_string_with_locales" (func $Temporal.PlainTime.to_locale_string_with_locales (param $this externref) (param $locales externref) (result externref)))
-  ;; toLocaleString(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions): string
+  ;; toLocaleString(locales: Intl.LocalesArgument | undefined, options: Intl.DateTimeFormatOptions): string
   (import "./bindings.wasm" "Temporal.PlainTime.to_locale_string_with_locales_and_options" (func $Temporal.PlainTime.to_locale_string_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
   ;; toJSON(): string
   (import "./bindings.wasm" "Temporal.PlainTime.to_json" (func $Temporal.PlainTime.to_json (param $this externref) (result externref)))
@@ -441,18 +449,18 @@
   (import "./bindings.wasm" "Temporal.PlainDateTime.new" (func $Temporal.PlainDateTime.new (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (result externref)))
   ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number)
   (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour" (func $Temporal.PlainDateTime.new_with_hour (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour f64) (result externref)))
-  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number, minute: number)
-  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute" (func $Temporal.PlainDateTime.new_with_hour_and_minute (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour f64) (param $minute f64) (result externref)))
-  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number, minute: number, second: number)
-  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute_and_second" (func $Temporal.PlainDateTime.new_with_hour_and_minute_and_second (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour f64) (param $minute f64) (param $second f64) (result externref)))
-  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number, minute: number, second: number, millisecond: number)
-  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond" (func $Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour f64) (param $minute f64) (param $second f64) (param $millisecond f64) (result externref)))
-  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number, minute: number, second: number, millisecond: number, microsecond: number)
-  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond" (func $Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour f64) (param $minute f64) (param $second f64) (param $millisecond f64) (param $microsecond f64) (result externref)))
-  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number, minute: number, second: number, millisecond: number, microsecond: number, nanosecond: number)
-  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond" (func $Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour f64) (param $minute f64) (param $second f64) (param $millisecond f64) (param $microsecond f64) (param $nanosecond f64) (result externref)))
-  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number, minute: number, second: number, millisecond: number, microsecond: number, nanosecond: number, calendar: string)
-  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond_and_calendar" (func $Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond_and_calendar (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour f64) (param $minute f64) (param $second f64) (param $millisecond f64) (param $microsecond f64) (param $nanosecond f64) (param $calendar externref) (result externref)))
+  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number | undefined, minute: number)
+  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute" (func $Temporal.PlainDateTime.new_with_hour_and_minute (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour externref) (param $minute f64) (result externref)))
+  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number | undefined, minute: number | undefined, second: number)
+  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute_and_second" (func $Temporal.PlainDateTime.new_with_hour_and_minute_and_second (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour externref) (param $minute externref) (param $second f64) (result externref)))
+  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number | undefined, minute: number | undefined, second: number | undefined, millisecond: number)
+  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond" (func $Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour externref) (param $minute externref) (param $second externref) (param $millisecond f64) (result externref)))
+  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number | undefined, minute: number | undefined, second: number | undefined, millisecond: number | undefined, microsecond: number)
+  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond" (func $Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour externref) (param $minute externref) (param $second externref) (param $millisecond externref) (param $microsecond f64) (result externref)))
+  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number | undefined, minute: number | undefined, second: number | undefined, millisecond: number | undefined, microsecond: number | undefined, nanosecond: number)
+  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond" (func $Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour externref) (param $minute externref) (param $second externref) (param $millisecond externref) (param $microsecond externref) (param $nanosecond f64) (result externref)))
+  ;; constructor(iso_year: number, iso_month: number, iso_day: number, hour: number | undefined, minute: number | undefined, second: number | undefined, millisecond: number | undefined, microsecond: number | undefined, nanosecond: number | undefined, calendar: string)
+  (import "./bindings.wasm" "Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond_and_calendar" (func $Temporal.PlainDateTime.new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond_and_calendar (param $iso_year f64) (param $iso_month f64) (param $iso_day f64) (param $hour externref) (param $minute externref) (param $second externref) (param $millisecond externref) (param $microsecond externref) (param $nanosecond externref) (param $calendar externref) (result externref)))
   ;; from(item: PlainDateTimeLike): PlainDateTime
   (import "./bindings.wasm" "Temporal.PlainDateTime.from" (func $Temporal.PlainDateTime.from (param $item externref) (result externref)))
   ;; from(item: PlainDateTimeLike, options: OverflowOptions): PlainDateTime
@@ -541,7 +549,7 @@
   (import "./bindings.wasm" "Temporal.PlainDateTime.to_locale_string" (func $Temporal.PlainDateTime.to_locale_string (param $this externref) (result externref)))
   ;; toLocaleString(locales: Intl.LocalesArgument): string
   (import "./bindings.wasm" "Temporal.PlainDateTime.to_locale_string_with_locales" (func $Temporal.PlainDateTime.to_locale_string_with_locales (param $this externref) (param $locales externref) (result externref)))
-  ;; toLocaleString(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions): string
+  ;; toLocaleString(locales: Intl.LocalesArgument | undefined, options: Intl.DateTimeFormatOptions): string
   (import "./bindings.wasm" "Temporal.PlainDateTime.to_locale_string_with_locales_and_options" (func $Temporal.PlainDateTime.to_locale_string_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
   ;; toJSON(): string
   (import "./bindings.wasm" "Temporal.PlainDateTime.to_json" (func $Temporal.PlainDateTime.to_json (param $this externref) (result externref)))
@@ -683,7 +691,7 @@
   (import "./bindings.wasm" "Temporal.ZonedDateTime.to_locale_string" (func $Temporal.ZonedDateTime.to_locale_string (param $this externref) (result externref)))
   ;; toLocaleString(locales: Intl.LocalesArgument): string
   (import "./bindings.wasm" "Temporal.ZonedDateTime.to_locale_string_with_locales" (func $Temporal.ZonedDateTime.to_locale_string_with_locales (param $this externref) (param $locales externref) (result externref)))
-  ;; toLocaleString(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions): string
+  ;; toLocaleString(locales: Intl.LocalesArgument | undefined, options: Intl.DateTimeFormatOptions): string
   (import "./bindings.wasm" "Temporal.ZonedDateTime.to_locale_string_with_locales_and_options" (func $Temporal.ZonedDateTime.to_locale_string_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
   ;; toJSON(): string
   (import "./bindings.wasm" "Temporal.ZonedDateTime.to_json" (func $Temporal.ZonedDateTime.to_json (param $this externref) (result externref)))
@@ -725,24 +733,24 @@
   (import "./bindings.wasm" "Temporal.Duration.new" (func $Temporal.Duration.new (result externref)))
   ;; constructor(years: number)
   (import "./bindings.wasm" "Temporal.Duration.new_with_years" (func $Temporal.Duration.new_with_years (param $years f64) (result externref)))
-  ;; constructor(years: number, months: number)
-  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months" (func $Temporal.Duration.new_with_years_and_months (param $years f64) (param $months f64) (result externref)))
-  ;; constructor(years: number, months: number, weeks: number)
-  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks" (func $Temporal.Duration.new_with_years_and_months_and_weeks (param $years f64) (param $months f64) (param $weeks f64) (result externref)))
-  ;; constructor(years: number, months: number, weeks: number, days: number)
-  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days (param $years f64) (param $months f64) (param $weeks f64) (param $days f64) (result externref)))
-  ;; constructor(years: number, months: number, weeks: number, days: number, hours: number)
-  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours (param $years f64) (param $months f64) (param $weeks f64) (param $days f64) (param $hours f64) (result externref)))
-  ;; constructor(years: number, months: number, weeks: number, days: number, hours: number, minutes: number)
-  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes (param $years f64) (param $months f64) (param $weeks f64) (param $days f64) (param $hours f64) (param $minutes f64) (result externref)))
-  ;; constructor(years: number, months: number, weeks: number, days: number, hours: number, minutes: number, seconds: number)
-  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds (param $years f64) (param $months f64) (param $weeks f64) (param $days f64) (param $hours f64) (param $minutes f64) (param $seconds f64) (result externref)))
-  ;; constructor(years: number, months: number, weeks: number, days: number, hours: number, minutes: number, seconds: number, milliseconds: number)
-  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds (param $years f64) (param $months f64) (param $weeks f64) (param $days f64) (param $hours f64) (param $minutes f64) (param $seconds f64) (param $milliseconds f64) (result externref)))
-  ;; constructor(years: number, months: number, weeks: number, days: number, hours: number, minutes: number, seconds: number, milliseconds: number, microseconds: number)
-  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds (param $years f64) (param $months f64) (param $weeks f64) (param $days f64) (param $hours f64) (param $minutes f64) (param $seconds f64) (param $milliseconds f64) (param $microseconds f64) (result externref)))
-  ;; constructor(years: number, months: number, weeks: number, days: number, hours: number, minutes: number, seconds: number, milliseconds: number, microseconds: number, nanoseconds: number)
-  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds_and_nanoseconds" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds_and_nanoseconds (param $years f64) (param $months f64) (param $weeks f64) (param $days f64) (param $hours f64) (param $minutes f64) (param $seconds f64) (param $milliseconds f64) (param $microseconds f64) (param $nanoseconds f64) (result externref)))
+  ;; constructor(years: number | undefined, months: number)
+  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months" (func $Temporal.Duration.new_with_years_and_months (param $years externref) (param $months f64) (result externref)))
+  ;; constructor(years: number | undefined, months: number | undefined, weeks: number)
+  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks" (func $Temporal.Duration.new_with_years_and_months_and_weeks (param $years externref) (param $months externref) (param $weeks f64) (result externref)))
+  ;; constructor(years: number | undefined, months: number | undefined, weeks: number | undefined, days: number)
+  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days (param $years externref) (param $months externref) (param $weeks externref) (param $days f64) (result externref)))
+  ;; constructor(years: number | undefined, months: number | undefined, weeks: number | undefined, days: number | undefined, hours: number)
+  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours (param $years externref) (param $months externref) (param $weeks externref) (param $days externref) (param $hours f64) (result externref)))
+  ;; constructor(years: number | undefined, months: number | undefined, weeks: number | undefined, days: number | undefined, hours: number | undefined, minutes: number)
+  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes (param $years externref) (param $months externref) (param $weeks externref) (param $days externref) (param $hours externref) (param $minutes f64) (result externref)))
+  ;; constructor(years: number | undefined, months: number | undefined, weeks: number | undefined, days: number | undefined, hours: number | undefined, minutes: number | undefined, seconds: number)
+  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds (param $years externref) (param $months externref) (param $weeks externref) (param $days externref) (param $hours externref) (param $minutes externref) (param $seconds f64) (result externref)))
+  ;; constructor(years: number | undefined, months: number | undefined, weeks: number | undefined, days: number | undefined, hours: number | undefined, minutes: number | undefined, seconds: number | undefined, milliseconds: number)
+  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds (param $years externref) (param $months externref) (param $weeks externref) (param $days externref) (param $hours externref) (param $minutes externref) (param $seconds externref) (param $milliseconds f64) (result externref)))
+  ;; constructor(years: number | undefined, months: number | undefined, weeks: number | undefined, days: number | undefined, hours: number | undefined, minutes: number | undefined, seconds: number | undefined, milliseconds: number | undefined, microseconds: number)
+  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds (param $years externref) (param $months externref) (param $weeks externref) (param $days externref) (param $hours externref) (param $minutes externref) (param $seconds externref) (param $milliseconds externref) (param $microseconds f64) (result externref)))
+  ;; constructor(years: number | undefined, months: number | undefined, weeks: number | undefined, days: number | undefined, hours: number | undefined, minutes: number | undefined, seconds: number | undefined, milliseconds: number | undefined, microseconds: number | undefined, nanoseconds: number)
+  (import "./bindings.wasm" "Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds_and_nanoseconds" (func $Temporal.Duration.new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds_and_nanoseconds (param $years externref) (param $months externref) (param $weeks externref) (param $days externref) (param $hours externref) (param $minutes externref) (param $seconds externref) (param $milliseconds externref) (param $microseconds externref) (param $nanoseconds f64) (result externref)))
   ;; from(item: DurationLike): Duration
   (import "./bindings.wasm" "Temporal.Duration.from" (func $Temporal.Duration.from (param $item externref) (result externref)))
   ;; compare(one: DurationLike, two: DurationLike): number
@@ -795,7 +803,7 @@
   (import "./bindings.wasm" "Temporal.Duration.to_locale_string" (func $Temporal.Duration.to_locale_string (param $this externref) (result externref)))
   ;; toLocaleString(locales: Intl.LocalesArgument): string
   (import "./bindings.wasm" "Temporal.Duration.to_locale_string_with_locales" (func $Temporal.Duration.to_locale_string_with_locales (param $this externref) (param $locales externref) (result externref)))
-  ;; toLocaleString(locales: Intl.LocalesArgument, options: Intl.DurationFormatOptions): string
+  ;; toLocaleString(locales: Intl.LocalesArgument | undefined, options: Intl.DurationFormatOptions): string
   (import "./bindings.wasm" "Temporal.Duration.to_locale_string_with_locales_and_options" (func $Temporal.Duration.to_locale_string_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
   ;; toJSON(): string
   (import "./bindings.wasm" "Temporal.Duration.to_json" (func $Temporal.Duration.to_json (param $this externref) (result externref)))
@@ -849,7 +857,7 @@
   (import "./bindings.wasm" "Temporal.Instant.to_locale_string" (func $Temporal.Instant.to_locale_string (param $this externref) (result externref)))
   ;; toLocaleString(locales: Intl.LocalesArgument): string
   (import "./bindings.wasm" "Temporal.Instant.to_locale_string_with_locales" (func $Temporal.Instant.to_locale_string_with_locales (param $this externref) (param $locales externref) (result externref)))
-  ;; toLocaleString(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions): string
+  ;; toLocaleString(locales: Intl.LocalesArgument | undefined, options: Intl.DateTimeFormatOptions): string
   (import "./bindings.wasm" "Temporal.Instant.to_locale_string_with_locales_and_options" (func $Temporal.Instant.to_locale_string_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
   ;; toJSON(): string
   (import "./bindings.wasm" "Temporal.Instant.to_json" (func $Temporal.Instant.to_json (param $this externref) (result externref)))
@@ -871,7 +879,7 @@
   (import "./bindings.wasm" "Temporal.PlainYearMonth.new" (func $Temporal.PlainYearMonth.new (param $iso_year f64) (param $iso_month f64) (result externref)))
   ;; constructor(iso_year: number, iso_month: number, calendar: string)
   (import "./bindings.wasm" "Temporal.PlainYearMonth.new_with_calendar" (func $Temporal.PlainYearMonth.new_with_calendar (param $iso_year f64) (param $iso_month f64) (param $calendar externref) (result externref)))
-  ;; constructor(iso_year: number, iso_month: number, calendar: string, reference_iso_day: number)
+  ;; constructor(iso_year: number, iso_month: number, calendar: string | undefined, reference_iso_day: number)
   (import "./bindings.wasm" "Temporal.PlainYearMonth.new_with_calendar_and_reference_iso_day" (func $Temporal.PlainYearMonth.new_with_calendar_and_reference_iso_day (param $iso_year f64) (param $iso_month f64) (param $calendar externref) (param $reference_iso_day f64) (result externref)))
   ;; from(item: PlainYearMonthLike): PlainYearMonth
   (import "./bindings.wasm" "Temporal.PlainYearMonth.from" (func $Temporal.PlainYearMonth.from (param $item externref) (result externref)))
@@ -929,7 +937,7 @@
   (import "./bindings.wasm" "Temporal.PlainYearMonth.to_locale_string" (func $Temporal.PlainYearMonth.to_locale_string (param $this externref) (result externref)))
   ;; toLocaleString(locales: Intl.LocalesArgument): string
   (import "./bindings.wasm" "Temporal.PlainYearMonth.to_locale_string_with_locales" (func $Temporal.PlainYearMonth.to_locale_string_with_locales (param $this externref) (param $locales externref) (result externref)))
-  ;; toLocaleString(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions): string
+  ;; toLocaleString(locales: Intl.LocalesArgument | undefined, options: Intl.DateTimeFormatOptions): string
   (import "./bindings.wasm" "Temporal.PlainYearMonth.to_locale_string_with_locales_and_options" (func $Temporal.PlainYearMonth.to_locale_string_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
   ;; toJSON(): string
   (import "./bindings.wasm" "Temporal.PlainYearMonth.to_json" (func $Temporal.PlainYearMonth.to_json (param $this externref) (result externref)))
@@ -959,7 +967,7 @@
   (import "./bindings.wasm" "Temporal.PlainMonthDay.new" (func $Temporal.PlainMonthDay.new (param $iso_month f64) (param $iso_day f64) (result externref)))
   ;; constructor(iso_month: number, iso_day: number, calendar: string)
   (import "./bindings.wasm" "Temporal.PlainMonthDay.new_with_calendar" (func $Temporal.PlainMonthDay.new_with_calendar (param $iso_month f64) (param $iso_day f64) (param $calendar externref) (result externref)))
-  ;; constructor(iso_month: number, iso_day: number, calendar: string, reference_iso_year: number)
+  ;; constructor(iso_month: number, iso_day: number, calendar: string | undefined, reference_iso_year: number)
   (import "./bindings.wasm" "Temporal.PlainMonthDay.new_with_calendar_and_reference_iso_year" (func $Temporal.PlainMonthDay.new_with_calendar_and_reference_iso_year (param $iso_month f64) (param $iso_day f64) (param $calendar externref) (param $reference_iso_year f64) (result externref)))
   ;; from(item: PlainMonthDayLike): PlainMonthDay
   (import "./bindings.wasm" "Temporal.PlainMonthDay.from" (func $Temporal.PlainMonthDay.from (param $item externref) (result externref)))
@@ -985,7 +993,7 @@
   (import "./bindings.wasm" "Temporal.PlainMonthDay.to_locale_string" (func $Temporal.PlainMonthDay.to_locale_string (param $this externref) (result externref)))
   ;; toLocaleString(locales: Intl.LocalesArgument): string
   (import "./bindings.wasm" "Temporal.PlainMonthDay.to_locale_string_with_locales" (func $Temporal.PlainMonthDay.to_locale_string_with_locales (param $this externref) (param $locales externref) (result externref)))
-  ;; toLocaleString(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions): string
+  ;; toLocaleString(locales: Intl.LocalesArgument | undefined, options: Intl.DateTimeFormatOptions): string
   (import "./bindings.wasm" "Temporal.PlainMonthDay.to_locale_string_with_locales_and_options" (func $Temporal.PlainMonthDay.to_locale_string_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
   ;; toJSON(): string
   (import "./bindings.wasm" "Temporal.PlainMonthDay.to_json" (func $Temporal.PlainMonthDay.to_json (param $this externref) (result externref)))

@@ -27,6 +27,10 @@
   (import "./bindings.wasm" "DigitsOptions.fractional_second_digits" (func $DigitsOptions.fractional_second_digits (param $this externref) (result externref)))
   ;; set fractionalSecondDigits(value: any)
   (import "./bindings.wasm" "DigitsOptions.set_fractional_second_digits" (func $DigitsOptions.set_fractional_second_digits (param $this externref) (param $value externref)))
+  ;; roundingMode?: "ceil" | "floor"
+  (import "./bindings.wasm" "DigitsOptions.rounding_mode" (func $DigitsOptions.rounding_mode (param $this externref) (result externref)))
+  ;; set roundingMode(value: "ceil")
+  (import "./bindings.wasm" "DigitsOptions.set_rounding_mode" (func $DigitsOptions.set_rounding_mode (param $this externref) (param $value externref)))
 
   ;; RequiredDigits
   ;; {} as RequiredDigits

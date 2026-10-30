@@ -66,9 +66,9 @@
   (import "node-nullable" "arity" (func $node-nullable:arity (result externref)))
   ;; arity(a: string): string
   (import "node-nullable" "arity_with_a" (func $node-nullable:arity_with_a (param $a externref) (result externref)))
-  ;; arity(a: string, b: number): string
+  ;; arity(a: string | undefined, b: number): string
   (import "node-nullable" "arity_with_a_and_b" (func $node-nullable:arity_with_a_and_b (param $a externref) (param $b f64) (result externref)))
-  ;; arity(a: string, b: null): string
+  ;; arity(a: string | undefined, b: null): string
   (import "node-nullable" "arity_with_a_and_null" (func $node-nullable:arity_with_a_and_null (param $a externref) (param $b externref) (result externref)))
   ;; pick(a: string | undefined, b: number): string
   (import "node-nullable" "pick" (func $node-nullable:pick (param $a externref) (param $b f64) (result externref)))

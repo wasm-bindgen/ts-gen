@@ -248,30 +248,46 @@
   (import "nullability" "chain" (func $nullability:chain))
   ;; chain(a: string): void
   (import "nullability" "chain_with_a" (func $nullability:chain_with_a (param $a externref)))
-  ;; chain(a: string, b: number): void
+  ;; chain(a: string | undefined, b: number): void
   (import "nullability" "chain_with_a_and_b" (func $nullability:chain_with_a_and_b (param $a externref) (param $b f64)))
-  ;; chain(a: string, b: null): void
+  ;; chain(a: string | undefined, b: null): void
   (import "nullability" "chain_with_a_and_null" (func $nullability:chain_with_a_and_null (param $a externref) (param $b externref)))
   ;; chainOptional(): void
   (import "nullability" "chainOptional" (func $nullability:chainOptional))
   ;; chainOptional(a: string): void
   (import "nullability" "chainOptional_with_a" (func $nullability:chainOptional_with_a (param $a externref)))
-  ;; chainOptional(a: string, b: number): void
+  ;; chainOptional(a: string | undefined, b: number): void
   (import "nullability" "chainOptional_with_a_and_b" (func $nullability:chainOptional_with_a_and_b (param $a externref) (param $b f64)))
-  ;; chainOptional(a: string, b: null): void
+  ;; chainOptional(a: string | undefined, b: null): void
   (import "nullability" "chainOptional_with_a_and_null" (func $nullability:chainOptional_with_a_and_null (param $a externref) (param $b externref)))
   ;; chainThree(): void
   (import "nullability" "chainThree" (func $nullability:chainThree))
   ;; chainThree(a: string): void
   (import "nullability" "chainThree_with_a" (func $nullability:chainThree_with_a (param $a externref)))
-  ;; chainThree(a: string, b: number): void
+  ;; chainThree(a: string | undefined, b: number): void
   (import "nullability" "chainThree_with_a_and_b" (func $nullability:chainThree_with_a_and_b (param $a externref) (param $b f64)))
-  ;; chainThree(a: string, b: null): void
+  ;; chainThree(a: string | undefined, b: null): void
   (import "nullability" "chainThree_with_a_and_null" (func $nullability:chainThree_with_a_and_null (param $a externref) (param $b externref)))
-  ;; chainThree(a: string, b: number, c: boolean): void
-  (import "nullability" "chainThree_with_a_and_b_and_c" (func $nullability:chainThree_with_a_and_b_and_c (param $a externref) (param $b f64) (param $c i32)))
-  ;; chainThree(a: string, b: null, c: boolean): void
+  ;; chainThree(a: string | undefined, b: number | undefined, c: boolean): void
+  (import "nullability" "chainThree_with_a_and_b_and_c" (func $nullability:chainThree_with_a_and_b_and_c (param $a externref) (param $b externref) (param $c i32)))
+  ;; chainThree(a: string | undefined, b: null, c: boolean): void
   (import "nullability" "chainThree_with_a_and_null_and_c" (func $nullability:chainThree_with_a_and_null_and_c (param $a externref) (param $b externref) (param $c i32)))
+  ;; chainUnion(): void
+  (import "nullability" "chainUnion" (func $nullability:chainUnion))
+  ;; chainUnion(a: string): void
+  (import "nullability" "chainUnion_with_str" (func $nullability:chainUnion_with_str (param $a externref)))
+  ;; chainUnion(a: string[]): void
+  (import "nullability" "chainUnion_with_slice" (func $nullability:chainUnion_with_slice (param $a externref)))
+  ;; chainUnion(a: string | undefined, b: number): void
+  (import "nullability" "chainUnion_with_str_and_b" (func $nullability:chainUnion_with_str_and_b (param $a externref) (param $b f64)))
+  ;; chainUnion(a: string[], b: number): void
+  (import "nullability" "chainUnion_with_slice_and_b" (func $nullability:chainUnion_with_slice_and_b (param $a externref) (param $b f64)))
+  ;; chainAlias(): void
+  (import "nullability" "chainAlias" (func $nullability:chainAlias))
+  ;; chainAlias(a: Source): void
+  (import "nullability" "chainAlias_with_a" (func $nullability:chainAlias_with_a (param $a externref)))
+  ;; chainAlias(a: Source | undefined, b: number): void
+  (import "nullability" "chainAlias_with_a_and_b" (func $nullability:chainAlias_with_a_and_b (param $a externref) (param $b f64)))
   ;; modeArg(m: Mode): Mode | null
   (import "nullability" "modeArg" (func $nullability:modeArg (param $m externref) (result externref)))
   ;; modeArg(m: null): Mode | null

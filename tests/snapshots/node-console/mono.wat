@@ -55,7 +55,7 @@
   (import "node:console" "Console.new" (func $node:console:Console.new (param $stdout externref) (result externref)))
   ;; constructor(stdout: object, stderr: object)
   (import "node:console" "Console.new_with_stderr" (func $node:console:Console.new_with_stderr (param $stdout externref) (param $stderr externref) (result externref)))
-  ;; constructor(stdout: object, stderr: object, ignore_errors: boolean)
+  ;; constructor(stdout: object, stderr: object | undefined, ignore_errors: boolean)
   (import "node:console" "Console.new_with_stderr_and_ignore_errors" (func $node:console:Console.new_with_stderr_and_ignore_errors (param $stdout externref) (param $stderr externref) (param $ignore_errors i32) (result externref)))
   ;; assert(...data: any[]): void
   (import "node:console" "Console.assert" (func $node:console:Console.assert (param $this externref) (param $data (ref null $anyrefs))))
