@@ -120,10 +120,8 @@
   (import "./bindings.wasm" "LinkedList.set_data" (func $LinkedList.set_data (param $this externref) (param $value externref)))
   ;; next: LinkedList | null
   (import "./bindings.wasm" "LinkedList.next" (func $LinkedList.next (param $this externref) (result externref)))
-  ;; set next(value: LinkedList)
+  ;; set next(value: LinkedList | null)
   (import "./bindings.wasm" "LinkedList.set_next" (func $LinkedList.set_next (param $this externref) (param $value externref)))
-  ;; set next(value: null)
-  (import "./bindings.wasm" "LinkedList.set_next_with_null" (func $LinkedList.set_next_with_null (param $this externref) (param $value externref)))
 
   ;; parse(input: string): object
   (import "./bindings.wasm" "parse" (func $parse (param $input externref) (result externref)))
@@ -201,12 +199,10 @@
   (import "./bindings.wasm" "FetchOptions.set_headers_with_record" (func $FetchOptions.set_headers_with_record (param $this externref) (param $value externref)))
   ;; body?: string | ArrayBuffer | null
   (import "./bindings.wasm" "FetchOptions.body" (func $FetchOptions.body (param $this externref) (result externref)))
-  ;; set body(value: string)
+  ;; set body(value: string | null)
   (import "./bindings.wasm" "FetchOptions.set_body" (func $FetchOptions.set_body (param $this externref) (param $value externref)))
-  ;; set body(value: ArrayBuffer)
+  ;; set body(value: ArrayBuffer | null)
   (import "./bindings.wasm" "FetchOptions.set_body_with_array_buffer" (func $FetchOptions.set_body_with_array_buffer (param $this externref) (param $value externref)))
-  ;; set body(value: null)
-  (import "./bindings.wasm" "FetchOptions.set_body_with_null" (func $FetchOptions.set_body_with_null (param $this externref) (param $value externref)))
   ;; redirect?: string
   (import "./bindings.wasm" "FetchOptions.redirect" (func $FetchOptions.redirect (param $this externref) (result externref)))
   ;; set redirect(value: string)

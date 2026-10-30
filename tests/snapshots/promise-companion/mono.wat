@@ -29,10 +29,8 @@
   (import "./bindings.wasm" "State.fetch_with_init" (func $State.fetch_with_init (param $this externref) (param $url externref) (param $init externref) (result externref)))
   ;; get(key: string): Promise<string | null>
   (import "./bindings.wasm" "State.get" (func $State.get (param $this externref) (param $key externref) (result externref)))
-  ;; put(key: string, value: string): Promise<void>
+  ;; put(key: string, value: string | null): Promise<void>
   (import "./bindings.wasm" "State.put" (func $State.put (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: string, value: null): Promise<void>
-  (import "./bindings.wasm" "State.put_with_null" (func $State.put_with_null (param $this externref) (param $key externref) (param $value externref) (result externref)))
   ;; delete(key: string): Promise<boolean>
   (import "./bindings.wasm" "State.delete" (func $State.delete (param $this externref) (param $key externref) (result externref)))
   ;; ready(): Promise<boolean>

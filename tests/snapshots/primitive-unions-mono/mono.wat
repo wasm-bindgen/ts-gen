@@ -48,12 +48,10 @@
   (import "primitive-unions-mono" "setLevel" (func $primitive-unions-mono:setLevel (param $level f64)))
   ;; setLevel(level: "auto"): void
   (import "primitive-unions-mono" "setLevel_with_str" (func $primitive-unions-mono:setLevel_with_str (param $level externref)))
-  ;; setNullable(value: string): void
+  ;; setNullable(value: string | null): void
   (import "primitive-unions-mono" "setNullable" (func $primitive-unions-mono:setNullable (param $value externref)))
-  ;; setNullable(value: number): void
-  (import "primitive-unions-mono" "setNullable_with_f64" (func $primitive-unions-mono:setNullable_with_f64 (param $value f64)))
-  ;; setNullable(value: null): void
-  (import "primitive-unions-mono" "setNullable_with_null" (func $primitive-unions-mono:setNullable_with_null (param $value externref)))
+  ;; setNullable(value: number | null): void
+  (import "primitive-unions-mono" "setNullable_with_f64" (func $primitive-unions-mono:setNullable_with_f64 (param $value externref)))
   ;; setMaybe(): void
   (import "primitive-unions-mono" "setMaybe" (func $primitive-unions-mono:setMaybe))
   ;; setMaybe(value: string): void

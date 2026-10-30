@@ -39,14 +39,10 @@
   ;; Response
   ;; constructor()
   (import "./bindings.wasm" "Response.new" (func $Response.new (result externref)))
-  ;; constructor(body: BodyInit)
+  ;; constructor(body: BodyInit | null)
   (import "./bindings.wasm" "Response.new_with_body" (func $Response.new_with_body (param $body externref) (result externref)))
-  ;; constructor(body: null)
-  (import "./bindings.wasm" "Response.new_with_null" (func $Response.new_with_null (param $body externref) (result externref)))
-  ;; constructor(body: BodyInit | undefined, init: ResponseInit)
+  ;; constructor(body: BodyInit | null | undefined, init: ResponseInit)
   (import "./bindings.wasm" "Response.new_with_body_and_init" (func $Response.new_with_body_and_init (param $body externref) (param $init externref) (result externref)))
-  ;; constructor(body: null, init: ResponseInit)
-  (import "./bindings.wasm" "Response.new_with_null_and_init" (func $Response.new_with_null_and_init (param $body externref) (param $init externref) (result externref)))
   ;; error(): Response
   (import "./bindings.wasm" "Response.error" (func $Response.error (result externref)))
   ;; redirect(url: string): Response

@@ -27,25 +27,19 @@
   (import "node-nullable" "Options.new" (func $node-nullable:Options.new (result externref)))
   ;; label?: string | null
   (import "node-nullable" "Options.label" (func $node-nullable:Options.label (param $this externref) (result externref)))
-  ;; set label(value: string)
+  ;; set label(value: string | null)
   (import "node-nullable" "Options.set_label" (func $node-nullable:Options.set_label (param $this externref) (param $value externref)))
-  ;; set label(value: null)
-  (import "node-nullable" "Options.set_label_with_null" (func $node-nullable:Options.set_label_with_null (param $this externref) (param $value externref)))
 
-  ;; describe(name: string): string
+  ;; describe(name: string | null): string
   (import "node-nullable" "describe" (func $node-nullable:describe (param $name externref) (result externref)))
-  ;; describe(name: null): string
-  (import "node-nullable" "describe_with_null" (func $node-nullable:describe_with_null (param $name externref) (result externref)))
   ;; repeat(): string
   (import "node-nullable" "repeat" (func $node-nullable:repeat (result externref)))
   ;; repeat(count: number): string
   (import "node-nullable" "repeat_with_count" (func $node-nullable:repeat_with_count (param $count f64) (result externref)))
   ;; greet(): string
   (import "node-nullable" "greet" (func $node-nullable:greet (result externref)))
-  ;; greet(name: string): string
+  ;; greet(name: string | null): string
   (import "node-nullable" "greet_with_name" (func $node-nullable:greet_with_name (param $name externref) (result externref)))
-  ;; greet(name: null): string
-  (import "node-nullable" "greet_with_null" (func $node-nullable:greet_with_null (param $name externref) (result externref)))
   ;; lookup(key: string): string | null | undefined
   (import "node-nullable" "lookup" (func $node-nullable:lookup (param $key externref) (result externref)))
   ;; lookupAsync(key: string): Promise<string | null | undefined>
@@ -54,10 +48,8 @@
   (import "node-nullable" "find" (func $node-nullable:find (param $key externref) (result externref)))
   ;; classify(): string
   (import "node-nullable" "classify" (func $node-nullable:classify (result externref)))
-  ;; classify(value: string): string
+  ;; classify(value: string | null): string
   (import "node-nullable" "classify_with_value" (func $node-nullable:classify_with_value (param $value externref) (result externref)))
-  ;; classify(value: null): string
-  (import "node-nullable" "classify_with_null" (func $node-nullable:classify_with_null (param $value externref) (result externref)))
   ;; options(label: string): Options
   (import "node-nullable" "options" (func $node-nullable:options (param $label externref) (result externref)))
   ;; configure(options: Options): string
@@ -66,10 +58,8 @@
   (import "node-nullable" "arity" (func $node-nullable:arity (result externref)))
   ;; arity(a: string): string
   (import "node-nullable" "arity_with_a" (func $node-nullable:arity_with_a (param $a externref) (result externref)))
-  ;; arity(a: string | undefined, b: number): string
-  (import "node-nullable" "arity_with_a_and_b" (func $node-nullable:arity_with_a_and_b (param $a externref) (param $b f64) (result externref)))
-  ;; arity(a: string | undefined, b: null): string
-  (import "node-nullable" "arity_with_a_and_null" (func $node-nullable:arity_with_a_and_null (param $a externref) (param $b externref) (result externref)))
+  ;; arity(a: string | undefined, b: number | null): string
+  (import "node-nullable" "arity_with_a_and_b" (func $node-nullable:arity_with_a_and_b (param $a externref) (param $b externref) (result externref)))
   ;; pick(a: string | undefined, b: number): string
   (import "node-nullable" "pick" (func $node-nullable:pick (param $a externref) (param $b f64) (result externref)))
   ;; onlyNull(value: null): string

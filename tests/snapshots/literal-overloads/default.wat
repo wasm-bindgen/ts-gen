@@ -45,46 +45,28 @@
   ;; KVStore
   ;; get(key: Key, type: "text"): Promise<string | null>
   (import "literal-overloads" "KVStore.get" (func $literal-overloads:KVStore.get (param $this externref) (param $key externref) (param $type externref) (result externref)))
-  ;; put(key: Key, kind: "a", value: string): void
+  ;; put(key: Key, kind: "a", value: string | null): void
   (import "literal-overloads" "KVStore.put" (func $literal-overloads:KVStore.put (param $this externref) (param $key externref) (param $kind externref) (param $value externref)))
-  ;; put(key: Key, kind: "a", value: null): void
-  (import "literal-overloads" "KVStore.put_with_null" (func $literal-overloads:KVStore.put_with_null (param $this externref) (param $key externref) (param $kind externref) (param $value externref)))
 
   ;; Picker
-  ;; pick(kind: "a", x: ArrayBuffer): void
+  ;; pick(kind: "a", x: ArrayBuffer | null): void
   (import "literal-overloads" "Picker.pick" (func $literal-overloads:Picker.pick (param $this externref) (param $kind externref) (param $x externref)))
-  ;; pick(kind: "a", x: null): void
-  (import "literal-overloads" "Picker.pick_with_null" (func $literal-overloads:Picker.pick_with_null (param $this externref) (param $kind externref) (param $x externref)))
-  ;; make(kind: "a", x: string): Picker
+  ;; make(kind: "a", x: string | null): Picker
   (import "literal-overloads" "Picker.make" (func $literal-overloads:Picker.make (param $kind externref) (param $x externref) (result externref)))
-  ;; make(kind: "a", x: null): Picker
-  (import "literal-overloads" "Picker.make_with_null" (func $literal-overloads:Picker.make_with_null (param $kind externref) (param $x externref) (result externref)))
-  ;; put(kind: "a", x: T): void
+  ;; put(kind: "a", x: T | null): void
   (import "literal-overloads" "Picker.put" (func $literal-overloads:Picker.put (param $this externref) (param $kind externref) (param $x externref)))
-  ;; put(kind: "a", x: null): void
-  (import "literal-overloads" "Picker.put_with_null" (func $literal-overloads:Picker.put_with_null (param $this externref) (param $kind externref) (param $x externref)))
-  ;; name(kind: "a", x: ArrayBuffer): string
+  ;; name(kind: "a", x: ArrayBuffer | null): string
   (import "literal-overloads" "Picker.name" (func $literal-overloads:Picker.name (param $this externref) (param $kind externref) (param $x externref) (result externref)))
-  ;; name(kind: "a", x: null): string
-  (import "literal-overloads" "Picker.name_with_null" (func $literal-overloads:Picker.name_with_null (param $this externref) (param $kind externref) (param $x externref) (result externref)))
-  ;; load(kind: "a", x: ArrayBuffer): Promise<string | null>
+  ;; load(kind: "a", x: ArrayBuffer | null): Promise<string | null>
   (import "literal-overloads" "Picker.load" (func $literal-overloads:Picker.load (param $this externref) (param $kind externref) (param $x externref) (result externref)))
-  ;; load(kind: "a", x: null): Promise<string | null>
-  (import "literal-overloads" "Picker.load_with_null" (func $literal-overloads:Picker.load_with_null (param $this externref) (param $kind externref) (param $x externref) (result externref)))
 
   ;; Clash
-  ;; mode(kind: "x"): void
+  ;; mode(kind: "x" | null): void
   (import "literal-overloads" "Clash.mode" (func $literal-overloads:Clash.mode (param $this externref) (param $kind externref)))
-  ;; mode(kind: null): void
-  (import "literal-overloads" "Clash.mode_with_null" (func $literal-overloads:Clash.mode_with_null (param $this externref) (param $kind externref)))
-  ;; f(x: ArrayBuffer): void
+  ;; f(x: ArrayBuffer | null): void
   (import "literal-overloads" "Clash.f" (func $literal-overloads:Clash.f (param $this externref) (param $x externref)))
-  ;; f(x: null): void
-  (import "literal-overloads" "Clash.f_with_null" (func $literal-overloads:Clash.f_with_null (param $this externref) (param $x externref)))
-  ;; f(kind: "a", x: ArrayBuffer): void
+  ;; f(kind: "a", x: ArrayBuffer | null): void
   (import "literal-overloads" "Clash.f_2" (func $literal-overloads:Clash.f_2 (param $this externref) (param $kind externref) (param $x externref)))
-  ;; f(kind: "a", x: null): void
-  (import "literal-overloads" "Clash.f_with_null_2" (func $literal-overloads:Clash.f_with_null_2 (param $this externref) (param $kind externref) (param $x externref)))
 
   ;; Repeats
   ;; tag(m: "a"): string
@@ -97,21 +79,15 @@
   (import "literal-overloads" "Boxed.label" (func $literal-overloads:Boxed.label (param $kind externref) (result externref)))
   ;; of(kind: "a", value: T): Boxed<T>
   (import "literal-overloads" "Boxed.of" (func $literal-overloads:Boxed.of (param $kind externref) (param $value externref) (result externref)))
-  ;; from(kind: "a", value: T): Boxed<T>
+  ;; from(kind: "a", value: T | null): Boxed<T>
   (import "literal-overloads" "Boxed.from" (func $literal-overloads:Boxed.from (param $kind externref) (param $value externref) (result externref)))
-  ;; from(kind: "a", value: null): Boxed<T>
-  (import "literal-overloads" "Boxed.from_with_null" (func $literal-overloads:Boxed.from_with_null (param $kind externref) (param $value externref) (result externref)))
 
-  ;; pickFree(kind: "a", x: T): void
+  ;; pickFree(kind: "a", x: T | null): void
   (import "literal-overloads" "pickFree" (func $literal-overloads:pickFree (param $kind externref) (param $x externref)))
-  ;; pickFree(kind: "a", x: null): void
-  (import "literal-overloads" "pickFree_with_null" (func $literal-overloads:pickFree_with_null (param $kind externref) (param $x externref)))
 
   ;; Opener
-  ;; constructor(kind: "a", x: ArrayBuffer)
+  ;; constructor(kind: "a", x: ArrayBuffer | null)
   (import "literal-overloads" "Opener.new" (func $literal-overloads:Opener.new (param $kind externref) (param $x externref) (result externref)))
-  ;; constructor(kind: "a", x: null)
-  (import "literal-overloads" "Opener.new_with_null" (func $literal-overloads:Opener.new_with_null (param $kind externref) (param $x externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

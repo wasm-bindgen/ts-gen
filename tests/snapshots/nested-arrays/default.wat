@@ -44,10 +44,8 @@
   (import "nested-arrays" "genericRows" (func $nested-arrays:genericRows (param $rows externref) (result externref)))
   ;; aliasRows(rows: Row[]): Row[]
   (import "nested-arrays" "aliasRows" (func $nested-arrays:aliasRows (param $rows externref) (result externref)))
-  ;; maybeRows(rows: string[][]): string[][] | null
+  ;; maybeRows(rows: string[][] | null): string[][] | null
   (import "nested-arrays" "maybeRows" (func $nested-arrays:maybeRows (param $rows externref) (result externref)))
-  ;; maybeRows(rows: null): string[][] | null
-  (import "nested-arrays" "maybeRows_with_null" (func $nested-arrays:maybeRows_with_null (param $rows externref) (result externref)))
   ;; forEachRow(callback: (rows: string[][]) => void): void
   (import "nested-arrays" "forEachRow" (func $nested-arrays:forEachRow (param $callback externref)))
   ;; nullableStrings(values: (string | null)[]): (string | null)[]

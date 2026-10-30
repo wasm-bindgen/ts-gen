@@ -5130,20 +5130,32 @@ context every reference outside `js_sys` renders as `JsValue`. Such a
 function takes one `externref` and makes the same JS call whichever arm
 the caller passes. Suffixes are computed from the expansions that
 remain, so ABI names match the Rust bindings only where both keep the
-same variants. `new(body?: BodyInit | null, init?: ResponseInit)` is:
+same variants.
+
+A written `null` is not an arm of its own as in the Rust
+[writes](#writes): the ABI has one nullable `externref` per position. A
+`null` arm folds into each expansion that differs from it only at its
+`null` positions and has the same result, which keeps its name and
+admits `null` there; a scalar that so admits `null` crosses as a
+reference, as in [Scalar mapping](#scalar-mapping). A `null` arm with
+no such sibling stays under its Rust name (`set x(value: null)` is
+`set_x_with_null`). `new(body?: BodyInit | null, init?: ResponseInit)`
+is:
 
 ```wat
-(import "./bindings.wasm" "Response.new" (func ...))
-(import "./bindings.wasm" "Response.new_with_body" (func ...))
-(import "./bindings.wasm" "Response.new_with_body_and_init" (func ...))
+;; constructor()
+(import "./bindings.wasm" "Response.new" (func $Response.new (result externref)))
+;; constructor(body: BodyInit | null)
+(import "./bindings.wasm" "Response.new_with_body" (func $Response.new_with_body (param $body externref) (result externref)))
+;; constructor(body: BodyInit | null | undefined, init: ResponseInit)
+(import "./bindings.wasm" "Response.new_with_body_and_init" (func $Response.new_with_body_and_init (param $body externref) (param $init externref) (result externref)))
 ```
 
-named from the parameter, where the Rust bindings have one constructor
-per `BodyInit` arm (`new_with_str`, `new_with_array_buffer`,
-`new_with_blob`, …). Inline arms that still render differently stay
-apart in both: `(x: string | number)` is `m` and `m_with_f64`, while
-`(x: Blob | FormData)` is one ABI `n` against Rust's `n` and
-`n_with_form_data`.
+where the Rust bindings also have `new_with_null()` and
+`new_with_null_and_init(init)`. Inline arms that still render
+differently stay apart in both: `(x: string | number)` is `m` and
+`m_with_f64`, while `(x: Blob | FormData)` is one ABI `n` against
+Rust's `n` and `n_with_form_data`.
 
 A type or namespace exported under several names has each member under
 each name, as one function `bindings.wasm` exports under all of them.

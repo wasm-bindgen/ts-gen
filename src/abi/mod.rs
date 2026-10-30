@@ -9,7 +9,8 @@ pub mod wat;
 use std::collections::{HashMap, HashSet};
 
 use crate::codegen::signatures::{
-    base_rust_name, expand_signatures, param_names, Overload, SignatureKind,
+    base_rust_name, expand_signatures, param_names, ConcreteParam, ExpandedSignature, Overload,
+    SignatureKind,
 };
 use crate::codegen::surface::Surface;
 use crate::codegen::GenerateOptions;
@@ -1026,7 +1027,7 @@ fn push_callable(
     // Without a codegen context, expansion keeps a type alias as one
     // parameter and renders every reference outside `js_sys` as `JsValue`,
     // so arms that differ only there are one function taking any of them.
-    for sig in expand_signatures(overloads, kind, None) {
+    for sig in fold_null_arms(expand_signatures(overloads, kind, None), overloads, lower) {
         let Overload {
             return_type,
             body_scope: scope,
@@ -1086,6 +1087,63 @@ fn push_callable(
             module: None,
         });
     }
+}
+
+/// Expansion gives a written `null` its own arm, a parameter typed `null`.
+/// The ABI keeps one nullable `externref` per position instead: a `null`
+/// arm folds into each arm that differs from it only at its `null`
+/// positions, with the same result, and those take `T | null` there (a
+/// scalar `number | null` crosses as `externref`). One with no such arm stays.
+fn fold_null_arms(
+    sigs: Vec<ExpandedSignature>,
+    overloads: &[Overload],
+    lower: &Lower,
+) -> Vec<ExpandedSignature> {
+    let is_null = |p: &ConcreteParam| matches!(p.type_ref, TypeRef::Null);
+    let result = |s: &ExpandedSignature| {
+        let o = &overloads[s.overload];
+        lower.result(o.return_type, o.body_scope)
+    };
+    let mut nulled: Vec<Vec<bool>> = sigs.iter().map(|s| vec![false; s.params.len()]).collect();
+    let mut folded = vec![false; sigs.len()];
+    for (i, arm) in sigs.iter().enumerate() {
+        if !arm.params.iter().any(is_null) {
+            continue;
+        }
+        for (j, base) in sigs.iter().enumerate() {
+            let sibling = !base.params.iter().any(is_null)
+                && base.params.len() == arm.params.len()
+                && base.params.iter().zip(&arm.params).all(|(b, a)| {
+                    is_null(a) || (b.type_ref == a.type_ref && b.variadic == a.variadic)
+                })
+                && result(base) == result(arm);
+            if sibling {
+                folded[i] = true;
+                for (k, a) in arm.params.iter().enumerate() {
+                    nulled[j][k] |= is_null(a);
+                }
+            }
+        }
+    }
+    sigs.into_iter()
+        .zip(nulled)
+        .zip(folded)
+        .filter(|(_, folded)| !folded)
+        .map(|((mut sig, nulled), _)| {
+            for (p, nulled) in sig.params.iter_mut().zip(nulled) {
+                if nulled {
+                    let (core, n) = p
+                        .type_ref
+                        .split_empties()
+                        .map_or((p.type_ref.clone(), Nullability::Null), |(core, n)| {
+                            (core, n.with(Nullability::Null))
+                        });
+                    p.type_ref = core.with_empties(n);
+                }
+            }
+            sig
+        })
+        .collect()
 }
 
 fn format_method_ts(name: &str, params: &[Param], names: &[String], ret: &TypeRef) -> String {
@@ -1419,6 +1477,47 @@ mod tests {
         assert_eq!(f("Init.both").result, Some(both));
         assert_eq!(f("f").params[0].ty, nul);
         assert_eq!(f("f").result, Some(WasmType::JS_NON_NULL));
+    }
+
+    #[test]
+    fn null_arms_fold_into_one_nullable_position() {
+        let abi = abi(r#"
+            declare class Body { constructor(); }
+            declare class Response {
+                constructor(body?: Body | null, init?: string);
+            }
+            interface Init { body?: Body | null; limit?: number | null; empties?: null; }
+            declare function key(x: string | number | null): void;
+        "#);
+        let names: Vec<&str> = abi.functions.iter().map(|f| f.name.as_str()).collect();
+        let f = |n: &str| abi.function(n).unwrap();
+        let ty = |n: &str, i: usize| f(n).params[i].ty;
+        let nul = WasmType::ExternRef {
+            null: true,
+            undefined: false,
+        };
+        for gone in [
+            "Response.new_with_null",
+            "Response.new_with_null_and_init",
+            "Init.set_body_with_null",
+            "Init.set_limit_with_null",
+            "key_with_null",
+        ] {
+            assert!(!names.contains(&gone), "{gone} folds into its sibling");
+        }
+        assert_eq!(ty("Response.new_with_body", 0), nul);
+        assert_eq!(ty("Response.new_with_body_and_init", 0), WasmType::JS);
+        assert_eq!(
+            f("Response.new_with_body").ts,
+            "constructor(body: Body | null)"
+        );
+        assert_eq!(ty("Init.set_body", 1), nul);
+        // A scalar admitting `null` crosses as a nullable reference.
+        assert_eq!(ty("Init.set_limit", 1), nul);
+        assert_eq!(ty("key", 0), nul);
+        assert_eq!(ty("key_with_f64", 0), nul);
+        // A `null` arm with no sibling keeps its name.
+        assert_eq!(ty("Init.set_empties_with_null", 1), nul);
     }
 
     #[test]

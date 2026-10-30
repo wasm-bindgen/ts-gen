@@ -47,10 +47,8 @@
   (import "optional-reads" "Settings.set_stamp" (func $optional-reads:Settings.set_stamp (param $this externref) (param $value externref)))
   ;; cleared?: Moment & Tagged | null
   (import "optional-reads" "Settings.cleared" (func $optional-reads:Settings.cleared (param $this externref) (result externref)))
-  ;; set cleared(value: Moment & Tagged)
+  ;; set cleared(value: Moment & Tagged | null)
   (import "optional-reads" "Settings.set_cleared" (func $optional-reads:Settings.set_cleared (param $this externref) (param $value externref)))
-  ;; set cleared(value: null)
-  (import "optional-reads" "Settings.set_cleared_with_null" (func $optional-reads:Settings.set_cleared_with_null (param $this externref) (param $value externref)))
   ;; maybe: Moment & Tagged | undefined
   (import "optional-reads" "Settings.maybe" (func $optional-reads:Settings.maybe (param $this externref) (result externref)))
   ;; set maybe(value: Moment & Tagged)
@@ -67,10 +65,8 @@
   (import "optional-reads" "Registry.set_missing" (func $optional-reads:Registry.set_missing (param $value externref)))
   ;; static cleared: Moment & Tagged | null
   (import "optional-reads" "Registry.cleared" (func $optional-reads:Registry.cleared (result externref)))
-  ;; set cleared(value: Moment & Tagged)
+  ;; set cleared(value: Moment & Tagged | null)
   (import "optional-reads" "Registry.set_cleared" (func $optional-reads:Registry.set_cleared (param $value externref)))
-  ;; set cleared(value: null)
-  (import "optional-reads" "Registry.set_cleared_with_null" (func $optional-reads:Registry.set_cleared_with_null (param $value externref)))
   ;; static anything: any
   (import "optional-reads" "Registry.anything" (func $optional-reads:Registry.anything (result externref)))
   ;; set anything(value: any)

@@ -74,12 +74,10 @@
   (import "slice-args" "pixels_with_uint8_clamped_array" (func $slice-args:pixels_with_uint8_clamped_array (param $values externref) (result externref)))
   ;; floats(): string
   (import "slice-args" "floats" (func $slice-args:floats (result externref)))
-  ;; floats(values: number[]): string
+  ;; floats(values: number[] | null): string
   (import "slice-args" "floats_with_slice" (func $slice-args:floats_with_slice (param $values externref) (result externref)))
-  ;; floats(values: Float64Array): string
+  ;; floats(values: Float64Array | null): string
   (import "slice-args" "floats_with_float64_array" (func $slice-args:floats_with_float64_array (param $values externref) (result externref)))
-  ;; floats(values: null): string
-  (import "slice-args" "floats_with_null" (func $slice-args:floats_with_null (param $values externref) (result externref)))
   ;; maybeBytes(): string
   (import "slice-args" "maybeBytes" (func $slice-args:maybeBytes (result externref)))
   ;; maybeBytes(values: number[]): string

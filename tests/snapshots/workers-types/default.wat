@@ -359,10 +359,8 @@
   (import "./bindings.wasm" "ServiceWorkerGlobalScope.set_timeout_with_function_and_args" (func $ServiceWorkerGlobalScope.set_timeout_with_function_and_args (param $this externref) (param $callback externref) (param $args (ref null $anyrefs)) (result f64)))
   ;; setTimeout(callback: (...args: Args) => void, ms_delay: number, ...args: Args): number
   (import "./bindings.wasm" "ServiceWorkerGlobalScope.set_timeout_with_function_and_ms_delay_and_args" (func $ServiceWorkerGlobalScope.set_timeout_with_function_and_ms_delay_and_args (param $this externref) (param $callback externref) (param $ms_delay f64) (param $args (ref null $anyrefs)) (result f64)))
-  ;; clearTimeout(timeout_id: number): void
-  (import "./bindings.wasm" "ServiceWorkerGlobalScope.clear_timeout" (func $ServiceWorkerGlobalScope.clear_timeout (param $this externref) (param $timeout_id f64)))
-  ;; clearTimeout(timeout_id: null): void
-  (import "./bindings.wasm" "ServiceWorkerGlobalScope.clear_timeout_with_null" (func $ServiceWorkerGlobalScope.clear_timeout_with_null (param $this externref) (param $timeout_id externref)))
+  ;; clearTimeout(timeout_id: number | null): void
+  (import "./bindings.wasm" "ServiceWorkerGlobalScope.clear_timeout" (func $ServiceWorkerGlobalScope.clear_timeout (param $this externref) (param $timeout_id externref)))
   ;; setInterval(callback: (...args: any[]) => void): number
   (import "./bindings.wasm" "ServiceWorkerGlobalScope.set_interval" (func $ServiceWorkerGlobalScope.set_interval (param $this externref) (param $callback externref) (result f64)))
   ;; setInterval(callback: (...args: any[]) => void, ms_delay: number): number
@@ -371,10 +369,8 @@
   (import "./bindings.wasm" "ServiceWorkerGlobalScope.set_interval_with_function_and_args" (func $ServiceWorkerGlobalScope.set_interval_with_function_and_args (param $this externref) (param $callback externref) (param $args (ref null $anyrefs)) (result f64)))
   ;; setInterval(callback: (...args: Args) => void, ms_delay: number, ...args: Args): number
   (import "./bindings.wasm" "ServiceWorkerGlobalScope.set_interval_with_function_and_ms_delay_and_args" (func $ServiceWorkerGlobalScope.set_interval_with_function_and_ms_delay_and_args (param $this externref) (param $callback externref) (param $ms_delay f64) (param $args (ref null $anyrefs)) (result f64)))
-  ;; clearInterval(timeout_id: number): void
-  (import "./bindings.wasm" "ServiceWorkerGlobalScope.clear_interval" (func $ServiceWorkerGlobalScope.clear_interval (param $this externref) (param $timeout_id f64)))
-  ;; clearInterval(timeout_id: null): void
-  (import "./bindings.wasm" "ServiceWorkerGlobalScope.clear_interval_with_null" (func $ServiceWorkerGlobalScope.clear_interval_with_null (param $this externref) (param $timeout_id externref)))
+  ;; clearInterval(timeout_id: number | null): void
+  (import "./bindings.wasm" "ServiceWorkerGlobalScope.clear_interval" (func $ServiceWorkerGlobalScope.clear_interval (param $this externref) (param $timeout_id externref)))
   ;; queueMicrotask(task: () => any): void
   (import "./bindings.wasm" "ServiceWorkerGlobalScope.queue_microtask" (func $ServiceWorkerGlobalScope.queue_microtask (param $this externref) (param $task externref)))
   ;; structuredClone(value: T): T
@@ -672,10 +668,8 @@
   (import "./bindings.wasm" "setTimeout_with_function_and_args" (func $setTimeout_with_function_and_args (param $callback externref) (param $args (ref null $anyrefs)) (result f64)))
   ;; setTimeout(callback: (...args: Args) => void, ms_delay: number, ...args: Args): number
   (import "./bindings.wasm" "setTimeout_with_function_and_ms_delay_and_args" (func $setTimeout_with_function_and_ms_delay_and_args (param $callback externref) (param $ms_delay f64) (param $args (ref null $anyrefs)) (result f64)))
-  ;; clearTimeout(timeout_id: number): void
-  (import "./bindings.wasm" "clearTimeout" (func $clearTimeout (param $timeout_id f64)))
-  ;; clearTimeout(timeout_id: null): void
-  (import "./bindings.wasm" "clearTimeout_with_null" (func $clearTimeout_with_null (param $timeout_id externref)))
+  ;; clearTimeout(timeout_id: number | null): void
+  (import "./bindings.wasm" "clearTimeout" (func $clearTimeout (param $timeout_id externref)))
   ;; setInterval(callback: (...args: any[]) => void): number
   (import "./bindings.wasm" "setInterval" (func $setInterval (param $callback externref) (result f64)))
   ;; setInterval(callback: (...args: any[]) => void, ms_delay: number): number
@@ -684,10 +678,8 @@
   (import "./bindings.wasm" "setInterval_with_function_and_args" (func $setInterval_with_function_and_args (param $callback externref) (param $args (ref null $anyrefs)) (result f64)))
   ;; setInterval(callback: (...args: Args) => void, ms_delay: number, ...args: Args): number
   (import "./bindings.wasm" "setInterval_with_function_and_ms_delay_and_args" (func $setInterval_with_function_and_ms_delay_and_args (param $callback externref) (param $ms_delay f64) (param $args (ref null $anyrefs)) (result f64)))
-  ;; clearInterval(timeout_id: number): void
-  (import "./bindings.wasm" "clearInterval" (func $clearInterval (param $timeout_id f64)))
-  ;; clearInterval(timeout_id: null): void
-  (import "./bindings.wasm" "clearInterval_with_null" (func $clearInterval_with_null (param $timeout_id externref)))
+  ;; clearInterval(timeout_id: number | null): void
+  (import "./bindings.wasm" "clearInterval" (func $clearInterval (param $timeout_id externref)))
   ;; queueMicrotask(task: () => any): void
   (import "./bindings.wasm" "queueMicrotask" (func $queueMicrotask (param $task externref)))
   ;; structuredClone(value: T): T
@@ -1512,14 +1504,10 @@
   (import "./bindings.wasm" "SubtleCrypto.derive_bits" (func $SubtleCrypto.derive_bits (param $this externref) (param $algorithm externref) (param $base_key externref) (result externref)))
   ;; deriveBits(algorithm: SubtleCryptoDeriveKeyAlgorithm, base_key: CryptoKey): Promise<ArrayBuffer>
   (import "./bindings.wasm" "SubtleCrypto.derive_bits_with_subtle_crypto_derive_key_algorithm" (func $SubtleCrypto.derive_bits_with_subtle_crypto_derive_key_algorithm (param $this externref) (param $algorithm externref) (param $base_key externref) (result externref)))
-  ;; deriveBits(algorithm: string, base_key: CryptoKey, length: number): Promise<ArrayBuffer>
-  (import "./bindings.wasm" "SubtleCrypto.derive_bits_with_length" (func $SubtleCrypto.derive_bits_with_length (param $this externref) (param $algorithm externref) (param $base_key externref) (param $length f64) (result externref)))
-  ;; deriveBits(algorithm: SubtleCryptoDeriveKeyAlgorithm, base_key: CryptoKey, length: number): Promise<ArrayBuffer>
-  (import "./bindings.wasm" "SubtleCrypto.derive_bits_with_subtle_crypto_derive_key_algorithm_and_length" (func $SubtleCrypto.derive_bits_with_subtle_crypto_derive_key_algorithm_and_length (param $this externref) (param $algorithm externref) (param $base_key externref) (param $length f64) (result externref)))
-  ;; deriveBits(algorithm: string, base_key: CryptoKey, length: null): Promise<ArrayBuffer>
-  (import "./bindings.wasm" "SubtleCrypto.derive_bits_with_null" (func $SubtleCrypto.derive_bits_with_null (param $this externref) (param $algorithm externref) (param $base_key externref) (param $length externref) (result externref)))
-  ;; deriveBits(algorithm: SubtleCryptoDeriveKeyAlgorithm, base_key: CryptoKey, length: null): Promise<ArrayBuffer>
-  (import "./bindings.wasm" "SubtleCrypto.derive_bits_with_subtle_crypto_derive_key_algorithm_and_null" (func $SubtleCrypto.derive_bits_with_subtle_crypto_derive_key_algorithm_and_null (param $this externref) (param $algorithm externref) (param $base_key externref) (param $length externref) (result externref)))
+  ;; deriveBits(algorithm: string, base_key: CryptoKey, length: number | null): Promise<ArrayBuffer>
+  (import "./bindings.wasm" "SubtleCrypto.derive_bits_with_length" (func $SubtleCrypto.derive_bits_with_length (param $this externref) (param $algorithm externref) (param $base_key externref) (param $length externref) (result externref)))
+  ;; deriveBits(algorithm: SubtleCryptoDeriveKeyAlgorithm, base_key: CryptoKey, length: number | null): Promise<ArrayBuffer>
+  (import "./bindings.wasm" "SubtleCrypto.derive_bits_with_subtle_crypto_derive_key_algorithm_and_length" (func $SubtleCrypto.derive_bits_with_subtle_crypto_derive_key_algorithm_and_length (param $this externref) (param $algorithm externref) (param $base_key externref) (param $length externref) (result externref)))
   ;; importKey(format: string, key_data: ArrayBuffer, algorithm: string, extractable: boolean, key_usages: string[]): Promise<CryptoKey>
   (import "./bindings.wasm" "SubtleCrypto.import_key" (func $SubtleCrypto.import_key (param $this externref) (param $format externref) (param $key_data externref) (param $algorithm externref) (param $extractable i32) (param $key_usages externref) (result externref)))
   ;; importKey(format: string, key_data: ArrayBufferView, algorithm: string, extractable: boolean, key_usages: string[]): Promise<CryptoKey>
@@ -2378,14 +2366,10 @@
   ;; Response
   ;; constructor()
   (import "./bindings.wasm" "Response.new" (func $Response.new (result externref)))
-  ;; constructor(body: BodyInit)
+  ;; constructor(body: BodyInit | null)
   (import "./bindings.wasm" "Response.new_with_body" (func $Response.new_with_body (param $body externref) (result externref)))
-  ;; constructor(body: null)
-  (import "./bindings.wasm" "Response.new_with_null" (func $Response.new_with_null (param $body externref) (result externref)))
-  ;; constructor(body: BodyInit | undefined, init: ResponseInit)
+  ;; constructor(body: BodyInit | null | undefined, init: ResponseInit)
   (import "./bindings.wasm" "Response.new_with_body_and_init" (func $Response.new_with_body_and_init (param $body externref) (param $init externref) (result externref)))
-  ;; constructor(body: null, init: ResponseInit)
-  (import "./bindings.wasm" "Response.new_with_null_and_init" (func $Response.new_with_null_and_init (param $body externref) (param $init externref) (result externref)))
   ;; error(): Response
   (import "./bindings.wasm" "Response.error" (func $Response.error (result externref)))
   ;; redirect(url: string): Response
@@ -2424,10 +2408,8 @@
   (import "./bindings.wasm" "Response.set_url" (func $Response.set_url (param $this externref) (param $value externref)))
   ;; webSocket: WebSocket | null
   (import "./bindings.wasm" "Response.web_socket" (func $Response.web_socket (param $this externref) (result externref)))
-  ;; set webSocket(value: WebSocket)
+  ;; set webSocket(value: WebSocket | null)
   (import "./bindings.wasm" "Response.set_web_socket" (func $Response.set_web_socket (param $this externref) (param $value externref)))
-  ;; set webSocket(value: null)
-  (import "./bindings.wasm" "Response.set_web_socket_with_null" (func $Response.set_web_socket_with_null (param $this externref) (param $value externref)))
   ;; cf: any | undefined
   (import "./bindings.wasm" "Response.cf" (func $Response.cf (param $this externref) (result externref)))
   ;; set cf(value: any)
@@ -2458,10 +2440,8 @@
   (import "./bindings.wasm" "ResponseInit.set_cf" (func $ResponseInit.set_cf (param $this externref) (param $value externref)))
   ;; webSocket?: WebSocket | null
   (import "./bindings.wasm" "ResponseInit.web_socket" (func $ResponseInit.web_socket (param $this externref) (result externref)))
-  ;; set webSocket(value: WebSocket)
+  ;; set webSocket(value: WebSocket | null)
   (import "./bindings.wasm" "ResponseInit.set_web_socket" (func $ResponseInit.set_web_socket (param $this externref) (param $value externref)))
-  ;; set webSocket(value: null)
-  (import "./bindings.wasm" "ResponseInit.set_web_socket_with_null" (func $ResponseInit.set_web_socket_with_null (param $this externref) (param $value externref)))
   ;; encodeBody?: "automatic" | "manual"
   (import "./bindings.wasm" "ResponseInit.encode_body" (func $ResponseInit.encode_body (param $this externref) (result externref)))
   ;; set encodeBody(value: "automatic")
@@ -2492,10 +2472,8 @@
   (import "./bindings.wasm" "Request.set_redirect" (func $Request.set_redirect (param $this externref) (param $value externref)))
   ;; fetcher: Fetcher | null
   (import "./bindings.wasm" "Request.fetcher" (func $Request.fetcher (param $this externref) (result externref)))
-  ;; set fetcher(value: Fetcher)
+  ;; set fetcher(value: Fetcher | null)
   (import "./bindings.wasm" "Request.set_fetcher" (func $Request.set_fetcher (param $this externref) (param $value externref)))
-  ;; set fetcher(value: null)
-  (import "./bindings.wasm" "Request.set_fetcher_with_null" (func $Request.set_fetcher_with_null (param $this externref) (param $value externref)))
   ;; signal: AbortSignal
   (import "./bindings.wasm" "Request.signal" (func $Request.signal (param $this externref) (result externref)))
   ;; set signal(value: AbortSignal)
@@ -2530,20 +2508,16 @@
   (import "./bindings.wasm" "RequestInit.set_headers" (func $RequestInit.set_headers (param $this externref) (param $value externref)))
   ;; body?: BodyInit | null
   (import "./bindings.wasm" "RequestInit.body" (func $RequestInit.body (param $this externref) (result externref)))
-  ;; set body(value: BodyInit)
+  ;; set body(value: BodyInit | null)
   (import "./bindings.wasm" "RequestInit.set_body" (func $RequestInit.set_body (param $this externref) (param $value externref)))
-  ;; set body(value: null)
-  (import "./bindings.wasm" "RequestInit.set_body_with_null" (func $RequestInit.set_body_with_null (param $this externref) (param $value externref)))
   ;; redirect?: string
   (import "./bindings.wasm" "RequestInit.redirect" (func $RequestInit.redirect (param $this externref) (result externref)))
   ;; set redirect(value: string)
   (import "./bindings.wasm" "RequestInit.set_redirect" (func $RequestInit.set_redirect (param $this externref) (param $value externref)))
   ;; fetcher?: Fetcher | null
   (import "./bindings.wasm" "RequestInit.fetcher" (func $RequestInit.fetcher (param $this externref) (result externref)))
-  ;; set fetcher(value: Fetcher)
+  ;; set fetcher(value: Fetcher | null)
   (import "./bindings.wasm" "RequestInit.set_fetcher" (func $RequestInit.set_fetcher (param $this externref) (param $value externref)))
-  ;; set fetcher(value: null)
-  (import "./bindings.wasm" "RequestInit.set_fetcher_with_null" (func $RequestInit.set_fetcher_with_null (param $this externref) (param $value externref)))
   ;; cf?: Cf
   (import "./bindings.wasm" "RequestInit.cf" (func $RequestInit.cf (param $this externref) (result externref)))
   ;; set cf(value: Cf)
@@ -2558,10 +2532,8 @@
   (import "./bindings.wasm" "RequestInit.set_integrity" (func $RequestInit.set_integrity (param $this externref) (param $value externref)))
   ;; signal?: AbortSignal | null
   (import "./bindings.wasm" "RequestInit.signal" (func $RequestInit.signal (param $this externref) (result externref)))
-  ;; set signal(value: AbortSignal)
+  ;; set signal(value: AbortSignal | null)
   (import "./bindings.wasm" "RequestInit.set_signal" (func $RequestInit.set_signal (param $this externref) (param $value externref)))
-  ;; set signal(value: null)
-  (import "./bindings.wasm" "RequestInit.set_signal_with_null" (func $RequestInit.set_signal_with_null (param $this externref) (param $value externref)))
   ;; encodeResponseBody?: "automatic" | "manual"
   (import "./bindings.wasm" "RequestInit.encode_response_body" (func $RequestInit.encode_response_body (param $this externref) (result externref)))
   ;; set encodeResponseBody(value: "automatic")
@@ -2654,16 +2626,12 @@
   (import "./bindings.wasm" "KVNamespaceListOptions.set_limit" (func $KVNamespaceListOptions.set_limit (param $this externref) (param $value f64)))
   ;; prefix?: string | null
   (import "./bindings.wasm" "KVNamespaceListOptions.prefix" (func $KVNamespaceListOptions.prefix (param $this externref) (result externref)))
-  ;; set prefix(value: string)
+  ;; set prefix(value: string | null)
   (import "./bindings.wasm" "KVNamespaceListOptions.set_prefix" (func $KVNamespaceListOptions.set_prefix (param $this externref) (param $value externref)))
-  ;; set prefix(value: null)
-  (import "./bindings.wasm" "KVNamespaceListOptions.set_prefix_with_null" (func $KVNamespaceListOptions.set_prefix_with_null (param $this externref) (param $value externref)))
   ;; cursor?: string | null
   (import "./bindings.wasm" "KVNamespaceListOptions.cursor" (func $KVNamespaceListOptions.cursor (param $this externref) (result externref)))
-  ;; set cursor(value: string)
+  ;; set cursor(value: string | null)
   (import "./bindings.wasm" "KVNamespaceListOptions.set_cursor" (func $KVNamespaceListOptions.set_cursor (param $this externref) (param $value externref)))
-  ;; set cursor(value: null)
-  (import "./bindings.wasm" "KVNamespaceListOptions.set_cursor_with_null" (func $KVNamespaceListOptions.set_cursor_with_null (param $this externref) (param $value externref)))
 
   ;; KVNamespaceGetOptions
   ;; {} as KVNamespaceGetOptions
@@ -2698,22 +2666,16 @@
   (import "./bindings.wasm" "KVNamespaceGetWithMetadataResult.new" (func $KVNamespaceGetWithMetadataResult.new (result externref)))
   ;; value: Value | null
   (import "./bindings.wasm" "KVNamespaceGetWithMetadataResult.value" (func $KVNamespaceGetWithMetadataResult.value (param $this externref) (result externref)))
-  ;; set value(value: Value)
+  ;; set value(value: Value | null)
   (import "./bindings.wasm" "KVNamespaceGetWithMetadataResult.set_value" (func $KVNamespaceGetWithMetadataResult.set_value (param $this externref) (param $value externref)))
-  ;; set value(value: null)
-  (import "./bindings.wasm" "KVNamespaceGetWithMetadataResult.set_value_with_null" (func $KVNamespaceGetWithMetadataResult.set_value_with_null (param $this externref) (param $value externref)))
   ;; metadata: Metadata | null
   (import "./bindings.wasm" "KVNamespaceGetWithMetadataResult.metadata" (func $KVNamespaceGetWithMetadataResult.metadata (param $this externref) (result externref)))
-  ;; set metadata(value: Metadata)
+  ;; set metadata(value: Metadata | null)
   (import "./bindings.wasm" "KVNamespaceGetWithMetadataResult.set_metadata" (func $KVNamespaceGetWithMetadataResult.set_metadata (param $this externref) (param $value externref)))
-  ;; set metadata(value: null)
-  (import "./bindings.wasm" "KVNamespaceGetWithMetadataResult.set_metadata_with_null" (func $KVNamespaceGetWithMetadataResult.set_metadata_with_null (param $this externref) (param $value externref)))
   ;; cacheStatus: string | null
   (import "./bindings.wasm" "KVNamespaceGetWithMetadataResult.cache_status" (func $KVNamespaceGetWithMetadataResult.cache_status (param $this externref) (result externref)))
-  ;; set cacheStatus(value: string)
+  ;; set cacheStatus(value: string | null)
   (import "./bindings.wasm" "KVNamespaceGetWithMetadataResult.set_cache_status" (func $KVNamespaceGetWithMetadataResult.set_cache_status (param $this externref) (param $value externref)))
-  ;; set cacheStatus(value: null)
-  (import "./bindings.wasm" "KVNamespaceGetWithMetadataResult.set_cache_status_with_null" (func $KVNamespaceGetWithMetadataResult.set_cache_status_with_null (param $this externref) (param $value externref)))
 
   ;; Queue
   ;; send(message: Body): Promise<void>
@@ -2858,26 +2820,22 @@
   (import "./bindings.wasm" "R2Bucket.get" (func $R2Bucket.get (param $this externref) (param $key externref) (result externref)))
   ;; get(key: string, options: R2BucketOptions): Promise<R2ObjectBody | R2Object | null>
   (import "./bindings.wasm" "R2Bucket.get_with_options" (func $R2Bucket.get_with_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
-  ;; put(key: string, value: ReadableStream): Promise<R2Object | null>
+  ;; put(key: string, value: ReadableStream | null): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put" (func $R2Bucket.put (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: string, value: ArrayBuffer): Promise<R2Object | null>
+  ;; put(key: string, value: ArrayBuffer | null): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_array_buffer" (func $R2Bucket.put_with_array_buffer (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: string, value: ArrayBufferView): Promise<R2Object | null>
+  ;; put(key: string, value: ArrayBufferView | null): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_typed_array" (func $R2Bucket.put_with_typed_array (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: string, value: string): Promise<R2Object | null>
+  ;; put(key: string, value: string | null): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_str" (func $R2Bucket.put_with_str (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: string, value: null): Promise<R2Object | null>
-  (import "./bindings.wasm" "R2Bucket.put_with_null" (func $R2Bucket.put_with_null (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: string, value: ReadableStream, options: R2BucketOptions2): Promise<R2Object | null>
+  ;; put(key: string, value: ReadableStream | null, options: R2BucketOptions2): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_options" (func $R2Bucket.put_with_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: string, value: ArrayBuffer, options: R2BucketOptions2): Promise<R2Object | null>
+  ;; put(key: string, value: ArrayBuffer | null, options: R2BucketOptions2): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_array_buffer_and_options" (func $R2Bucket.put_with_array_buffer_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: string, value: ArrayBufferView, options: R2BucketOptions2): Promise<R2Object | null>
+  ;; put(key: string, value: ArrayBufferView | null, options: R2BucketOptions2): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_typed_array_and_options" (func $R2Bucket.put_with_typed_array_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: string, value: string, options: R2BucketOptions2): Promise<R2Object | null>
+  ;; put(key: string, value: string | null, options: R2BucketOptions2): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_str_and_options" (func $R2Bucket.put_with_str_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: string, value: null, options: R2BucketOptions2): Promise<R2Object | null>
-  (import "./bindings.wasm" "R2Bucket.put_with_null_and_options" (func $R2Bucket.put_with_null_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
   ;; createMultipartUpload(key: string): Promise<R2MultipartUpload>
   (import "./bindings.wasm" "R2Bucket.create_multipart_upload" (func $R2Bucket.create_multipart_upload (param $this externref) (param $key externref) (result externref)))
   ;; createMultipartUpload(key: string, options: R2MultipartOptions): Promise<R2MultipartUpload>
@@ -4270,22 +4228,16 @@
   (import "./bindings.wasm" "WebSocket.set_ready_state" (func $WebSocket.set_ready_state (param $this externref) (param $value f64)))
   ;; url: string | null
   (import "./bindings.wasm" "WebSocket.url" (func $WebSocket.url (param $this externref) (result externref)))
-  ;; set url(value: string)
+  ;; set url(value: string | null)
   (import "./bindings.wasm" "WebSocket.set_url" (func $WebSocket.set_url (param $this externref) (param $value externref)))
-  ;; set url(value: null)
-  (import "./bindings.wasm" "WebSocket.set_url_with_null" (func $WebSocket.set_url_with_null (param $this externref) (param $value externref)))
   ;; protocol: string | null
   (import "./bindings.wasm" "WebSocket.protocol" (func $WebSocket.protocol (param $this externref) (result externref)))
-  ;; set protocol(value: string)
+  ;; set protocol(value: string | null)
   (import "./bindings.wasm" "WebSocket.set_protocol" (func $WebSocket.set_protocol (param $this externref) (param $value externref)))
-  ;; set protocol(value: null)
-  (import "./bindings.wasm" "WebSocket.set_protocol_with_null" (func $WebSocket.set_protocol_with_null (param $this externref) (param $value externref)))
   ;; extensions: string | null
   (import "./bindings.wasm" "WebSocket.extensions" (func $WebSocket.extensions (param $this externref) (result externref)))
-  ;; set extensions(value: string)
+  ;; set extensions(value: string | null)
   (import "./bindings.wasm" "WebSocket.set_extensions" (func $WebSocket.set_extensions (param $this externref) (param $value externref)))
-  ;; set extensions(value: null)
-  (import "./bindings.wasm" "WebSocket.set_extensions_with_null" (func $WebSocket.set_extensions_with_null (param $this externref) (param $value externref)))
   ;; binaryType: "blob" | "arraybuffer"
   (import "./bindings.wasm" "WebSocket.binary_type" (func $WebSocket.binary_type (param $this externref) (result externref)))
   ;; set binaryType(value: "blob")
@@ -4614,10 +4566,8 @@
   (import "./bindings.wasm" "WorkerStubEntrypointOptions.set_props" (func $WorkerStubEntrypointOptions.set_props (param $this externref) (param $value externref)))
 
   ;; WorkerLoader
-  ;; get(name: string, get_code: () => WorkerLoaderWorkerCode | Promise<WorkerLoaderWorkerCode>): WorkerStub
+  ;; get(name: string | null, get_code: () => WorkerLoaderWorkerCode | Promise<WorkerLoaderWorkerCode>): WorkerStub
   (import "./bindings.wasm" "WorkerLoader.get" (func $WorkerLoader.get (param $this externref) (param $name externref) (param $get_code externref) (result externref)))
-  ;; get(name: null, get_code: () => WorkerLoaderWorkerCode | Promise<WorkerLoaderWorkerCode>): WorkerStub
-  (import "./bindings.wasm" "WorkerLoader.get_with_null" (func $WorkerLoader.get_with_null (param $this externref) (param $name externref) (param $get_code externref) (result externref)))
 
   ;; WorkerLoaderModule
   ;; {} as WorkerLoaderModule
@@ -4680,10 +4630,8 @@
   (import "./bindings.wasm" "WorkerLoaderWorkerCode.set_env" (func $WorkerLoaderWorkerCode.set_env (param $this externref) (param $value externref)))
   ;; globalOutbound?: Fetcher | null
   (import "./bindings.wasm" "WorkerLoaderWorkerCode.global_outbound" (func $WorkerLoaderWorkerCode.global_outbound (param $this externref) (result externref)))
-  ;; set globalOutbound(value: Fetcher)
+  ;; set globalOutbound(value: Fetcher | null)
   (import "./bindings.wasm" "WorkerLoaderWorkerCode.set_global_outbound" (func $WorkerLoaderWorkerCode.set_global_outbound (param $this externref) (param $value externref)))
-  ;; set globalOutbound(value: null)
-  (import "./bindings.wasm" "WorkerLoaderWorkerCode.set_global_outbound_with_null" (func $WorkerLoaderWorkerCode.set_global_outbound_with_null (param $this externref) (param $value externref)))
   ;; tails?: Fetcher[]
   (import "./bindings.wasm" "WorkerLoaderWorkerCode.tails" (func $WorkerLoaderWorkerCode.tails (param $this externref) (result externref)))
   ;; set tails(value: Fetcher[])
@@ -5498,24 +5446,18 @@
   (import "./bindings.wasm" "ResponsesInput.new" (func $ResponsesInput.new (result externref)))
   ;; background?: boolean | null
   (import "./bindings.wasm" "ResponsesInput.background" (func $ResponsesInput.background (param $this externref) (result externref)))
-  ;; set background(value: boolean)
-  (import "./bindings.wasm" "ResponsesInput.set_background" (func $ResponsesInput.set_background (param $this externref) (param $value i32)))
-  ;; set background(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_background_with_null" (func $ResponsesInput.set_background_with_null (param $this externref) (param $value externref)))
+  ;; set background(value: boolean | null)
+  (import "./bindings.wasm" "ResponsesInput.set_background" (func $ResponsesInput.set_background (param $this externref) (param $value externref)))
   ;; conversation?: string | ResponseConversationParam | null
   (import "./bindings.wasm" "ResponsesInput.conversation" (func $ResponsesInput.conversation (param $this externref) (result externref)))
-  ;; set conversation(value: string)
+  ;; set conversation(value: string | null)
   (import "./bindings.wasm" "ResponsesInput.set_conversation" (func $ResponsesInput.set_conversation (param $this externref) (param $value externref)))
-  ;; set conversation(value: ResponseConversationParam)
+  ;; set conversation(value: ResponseConversationParam | null)
   (import "./bindings.wasm" "ResponsesInput.set_conversation_with_response_conversation_param" (func $ResponsesInput.set_conversation_with_response_conversation_param (param $this externref) (param $value externref)))
-  ;; set conversation(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_conversation_with_null" (func $ResponsesInput.set_conversation_with_null (param $this externref) (param $value externref)))
   ;; include?: ResponseIncludable[] | null
   (import "./bindings.wasm" "ResponsesInput.include" (func $ResponsesInput.include (param $this externref) (result externref)))
-  ;; set include(value: ResponseIncludable[])
+  ;; set include(value: ResponseIncludable[] | null)
   (import "./bindings.wasm" "ResponsesInput.set_include" (func $ResponsesInput.set_include (param $this externref) (param $value externref)))
-  ;; set include(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_include_with_null" (func $ResponsesInput.set_include_with_null (param $this externref) (param $value externref)))
   ;; input?: string | ResponseInput
   (import "./bindings.wasm" "ResponsesInput.input" (func $ResponsesInput.input (param $this externref) (result externref)))
   ;; set input(value: string)
@@ -5524,66 +5466,48 @@
   (import "./bindings.wasm" "ResponsesInput.set_input_with_response_input" (func $ResponsesInput.set_input_with_response_input (param $this externref) (param $value externref)))
   ;; instructions?: string | null
   (import "./bindings.wasm" "ResponsesInput.instructions" (func $ResponsesInput.instructions (param $this externref) (result externref)))
-  ;; set instructions(value: string)
+  ;; set instructions(value: string | null)
   (import "./bindings.wasm" "ResponsesInput.set_instructions" (func $ResponsesInput.set_instructions (param $this externref) (param $value externref)))
-  ;; set instructions(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_instructions_with_null" (func $ResponsesInput.set_instructions_with_null (param $this externref) (param $value externref)))
   ;; max_output_tokens?: number | null
   (import "./bindings.wasm" "ResponsesInput.max_output_tokens" (func $ResponsesInput.max_output_tokens (param $this externref) (result externref)))
-  ;; set max_output_tokens(value: number)
-  (import "./bindings.wasm" "ResponsesInput.set_max_output_tokens" (func $ResponsesInput.set_max_output_tokens (param $this externref) (param $value f64)))
-  ;; set max_output_tokens(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_max_output_tokens_with_null" (func $ResponsesInput.set_max_output_tokens_with_null (param $this externref) (param $value externref)))
+  ;; set max_output_tokens(value: number | null)
+  (import "./bindings.wasm" "ResponsesInput.set_max_output_tokens" (func $ResponsesInput.set_max_output_tokens (param $this externref) (param $value externref)))
   ;; parallel_tool_calls?: boolean | null
   (import "./bindings.wasm" "ResponsesInput.parallel_tool_calls" (func $ResponsesInput.parallel_tool_calls (param $this externref) (result externref)))
-  ;; set parallel_tool_calls(value: boolean)
-  (import "./bindings.wasm" "ResponsesInput.set_parallel_tool_calls" (func $ResponsesInput.set_parallel_tool_calls (param $this externref) (param $value i32)))
-  ;; set parallel_tool_calls(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_parallel_tool_calls_with_null" (func $ResponsesInput.set_parallel_tool_calls_with_null (param $this externref) (param $value externref)))
+  ;; set parallel_tool_calls(value: boolean | null)
+  (import "./bindings.wasm" "ResponsesInput.set_parallel_tool_calls" (func $ResponsesInput.set_parallel_tool_calls (param $this externref) (param $value externref)))
   ;; previous_response_id?: string | null
   (import "./bindings.wasm" "ResponsesInput.previous_response_id" (func $ResponsesInput.previous_response_id (param $this externref) (result externref)))
-  ;; set previous_response_id(value: string)
+  ;; set previous_response_id(value: string | null)
   (import "./bindings.wasm" "ResponsesInput.set_previous_response_id" (func $ResponsesInput.set_previous_response_id (param $this externref) (param $value externref)))
-  ;; set previous_response_id(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_previous_response_id_with_null" (func $ResponsesInput.set_previous_response_id_with_null (param $this externref) (param $value externref)))
   ;; prompt_cache_key?: string
   (import "./bindings.wasm" "ResponsesInput.prompt_cache_key" (func $ResponsesInput.prompt_cache_key (param $this externref) (result externref)))
   ;; set prompt_cache_key(value: string)
   (import "./bindings.wasm" "ResponsesInput.set_prompt_cache_key" (func $ResponsesInput.set_prompt_cache_key (param $this externref) (param $value externref)))
   ;; reasoning?: Reasoning | null
   (import "./bindings.wasm" "ResponsesInput.reasoning" (func $ResponsesInput.reasoning (param $this externref) (result externref)))
-  ;; set reasoning(value: Reasoning)
+  ;; set reasoning(value: Reasoning | null)
   (import "./bindings.wasm" "ResponsesInput.set_reasoning" (func $ResponsesInput.set_reasoning (param $this externref) (param $value externref)))
-  ;; set reasoning(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_reasoning_with_null" (func $ResponsesInput.set_reasoning_with_null (param $this externref) (param $value externref)))
   ;; safety_identifier?: string
   (import "./bindings.wasm" "ResponsesInput.safety_identifier" (func $ResponsesInput.safety_identifier (param $this externref) (result externref)))
   ;; set safety_identifier(value: string)
   (import "./bindings.wasm" "ResponsesInput.set_safety_identifier" (func $ResponsesInput.set_safety_identifier (param $this externref) (param $value externref)))
   ;; service_tier?: "auto" | "default" | "flex" | "scale" | "priority" | null
   (import "./bindings.wasm" "ResponsesInput.service_tier" (func $ResponsesInput.service_tier (param $this externref) (result externref)))
-  ;; set service_tier(value: "auto")
+  ;; set service_tier(value: "auto" | null)
   (import "./bindings.wasm" "ResponsesInput.set_service_tier" (func $ResponsesInput.set_service_tier (param $this externref) (param $value externref)))
-  ;; set service_tier(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_service_tier_with_null" (func $ResponsesInput.set_service_tier_with_null (param $this externref) (param $value externref)))
   ;; stream?: boolean | null
   (import "./bindings.wasm" "ResponsesInput.stream" (func $ResponsesInput.stream (param $this externref) (result externref)))
-  ;; set stream(value: boolean)
-  (import "./bindings.wasm" "ResponsesInput.set_stream" (func $ResponsesInput.set_stream (param $this externref) (param $value i32)))
-  ;; set stream(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_stream_with_null" (func $ResponsesInput.set_stream_with_null (param $this externref) (param $value externref)))
+  ;; set stream(value: boolean | null)
+  (import "./bindings.wasm" "ResponsesInput.set_stream" (func $ResponsesInput.set_stream (param $this externref) (param $value externref)))
   ;; stream_options?: StreamOptions | null
   (import "./bindings.wasm" "ResponsesInput.stream_options" (func $ResponsesInput.stream_options (param $this externref) (result externref)))
-  ;; set stream_options(value: StreamOptions)
+  ;; set stream_options(value: StreamOptions | null)
   (import "./bindings.wasm" "ResponsesInput.set_stream_options" (func $ResponsesInput.set_stream_options (param $this externref) (param $value externref)))
-  ;; set stream_options(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_stream_options_with_null" (func $ResponsesInput.set_stream_options_with_null (param $this externref) (param $value externref)))
   ;; temperature?: number | null
   (import "./bindings.wasm" "ResponsesInput.temperature" (func $ResponsesInput.temperature (param $this externref) (result externref)))
-  ;; set temperature(value: number)
-  (import "./bindings.wasm" "ResponsesInput.set_temperature" (func $ResponsesInput.set_temperature (param $this externref) (param $value f64)))
-  ;; set temperature(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_temperature_with_null" (func $ResponsesInput.set_temperature_with_null (param $this externref) (param $value externref)))
+  ;; set temperature(value: number | null)
+  (import "./bindings.wasm" "ResponsesInput.set_temperature" (func $ResponsesInput.set_temperature (param $this externref) (param $value externref)))
   ;; text?: ResponseTextConfig
   (import "./bindings.wasm" "ResponsesInput.text" (func $ResponsesInput.text (param $this externref) (result externref)))
   ;; set text(value: ResponseTextConfig)
@@ -5598,16 +5522,12 @@
   (import "./bindings.wasm" "ResponsesInput.set_tools" (func $ResponsesInput.set_tools (param $this externref) (param $value externref)))
   ;; top_p?: number | null
   (import "./bindings.wasm" "ResponsesInput.top_p" (func $ResponsesInput.top_p (param $this externref) (result externref)))
-  ;; set top_p(value: number)
-  (import "./bindings.wasm" "ResponsesInput.set_top_p" (func $ResponsesInput.set_top_p (param $this externref) (param $value f64)))
-  ;; set top_p(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_top_p_with_null" (func $ResponsesInput.set_top_p_with_null (param $this externref) (param $value externref)))
+  ;; set top_p(value: number | null)
+  (import "./bindings.wasm" "ResponsesInput.set_top_p" (func $ResponsesInput.set_top_p (param $this externref) (param $value externref)))
   ;; truncation?: "auto" | "disabled" | null
   (import "./bindings.wasm" "ResponsesInput.truncation" (func $ResponsesInput.truncation (param $this externref) (result externref)))
-  ;; set truncation(value: "auto")
+  ;; set truncation(value: "auto" | null)
   (import "./bindings.wasm" "ResponsesInput.set_truncation" (func $ResponsesInput.set_truncation (param $this externref) (param $value externref)))
-  ;; set truncation(value: null)
-  (import "./bindings.wasm" "ResponsesInput.set_truncation_with_null" (func $ResponsesInput.set_truncation_with_null (param $this externref) (param $value externref)))
 
   ;; ResponsesOutput
   ;; {} as ResponsesOutput
@@ -5626,24 +5546,18 @@
   (import "./bindings.wasm" "ResponsesOutput.set_output_text" (func $ResponsesOutput.set_output_text (param $this externref) (param $value externref)))
   ;; error?: ResponseError | null
   (import "./bindings.wasm" "ResponsesOutput.error" (func $ResponsesOutput.error (param $this externref) (result externref)))
-  ;; set error(value: ResponseError)
+  ;; set error(value: ResponseError | null)
   (import "./bindings.wasm" "ResponsesOutput.set_error" (func $ResponsesOutput.set_error (param $this externref) (param $value externref)))
-  ;; set error(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_error_with_null" (func $ResponsesOutput.set_error_with_null (param $this externref) (param $value externref)))
   ;; incomplete_details?: ResponseIncompleteDetails | null
   (import "./bindings.wasm" "ResponsesOutput.incomplete_details" (func $ResponsesOutput.incomplete_details (param $this externref) (result externref)))
-  ;; set incomplete_details(value: ResponseIncompleteDetails)
+  ;; set incomplete_details(value: ResponseIncompleteDetails | null)
   (import "./bindings.wasm" "ResponsesOutput.set_incomplete_details" (func $ResponsesOutput.set_incomplete_details (param $this externref) (param $value externref)))
-  ;; set incomplete_details(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_incomplete_details_with_null" (func $ResponsesOutput.set_incomplete_details_with_null (param $this externref) (param $value externref)))
   ;; instructions?: string | ResponseInputItem[] | null
   (import "./bindings.wasm" "ResponsesOutput.instructions" (func $ResponsesOutput.instructions (param $this externref) (result externref)))
-  ;; set instructions(value: string)
+  ;; set instructions(value: string | null)
   (import "./bindings.wasm" "ResponsesOutput.set_instructions" (func $ResponsesOutput.set_instructions (param $this externref) (param $value externref)))
-  ;; set instructions(value: ResponseInputItem[])
+  ;; set instructions(value: ResponseInputItem[] | null)
   (import "./bindings.wasm" "ResponsesOutput.set_instructions_with_slice" (func $ResponsesOutput.set_instructions_with_slice (param $this externref) (param $value externref)))
-  ;; set instructions(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_instructions_with_null" (func $ResponsesOutput.set_instructions_with_null (param $this externref) (param $value externref)))
   ;; object?: "response"
   (import "./bindings.wasm" "ResponsesOutput.object" (func $ResponsesOutput.object (param $this externref) (result externref)))
   ;; set object(value: "response")
@@ -5658,10 +5572,8 @@
   (import "./bindings.wasm" "ResponsesOutput.set_parallel_tool_calls" (func $ResponsesOutput.set_parallel_tool_calls (param $this externref) (param $value i32)))
   ;; temperature?: number | null
   (import "./bindings.wasm" "ResponsesOutput.temperature" (func $ResponsesOutput.temperature (param $this externref) (result externref)))
-  ;; set temperature(value: number)
-  (import "./bindings.wasm" "ResponsesOutput.set_temperature" (func $ResponsesOutput.set_temperature (param $this externref) (param $value f64)))
-  ;; set temperature(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_temperature_with_null" (func $ResponsesOutput.set_temperature_with_null (param $this externref) (param $value externref)))
+  ;; set temperature(value: number | null)
+  (import "./bindings.wasm" "ResponsesOutput.set_temperature" (func $ResponsesOutput.set_temperature (param $this externref) (param $value externref)))
   ;; tool_choice?: ToolChoiceOptions | ToolChoiceFunction
   (import "./bindings.wasm" "ResponsesOutput.tool_choice" (func $ResponsesOutput.tool_choice (param $this externref) (result externref)))
   ;; set tool_choice(value: ToolChoiceOptions)
@@ -5672,44 +5584,32 @@
   (import "./bindings.wasm" "ResponsesOutput.set_tools" (func $ResponsesOutput.set_tools (param $this externref) (param $value externref)))
   ;; top_p?: number | null
   (import "./bindings.wasm" "ResponsesOutput.top_p" (func $ResponsesOutput.top_p (param $this externref) (result externref)))
-  ;; set top_p(value: number)
-  (import "./bindings.wasm" "ResponsesOutput.set_top_p" (func $ResponsesOutput.set_top_p (param $this externref) (param $value f64)))
-  ;; set top_p(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_top_p_with_null" (func $ResponsesOutput.set_top_p_with_null (param $this externref) (param $value externref)))
+  ;; set top_p(value: number | null)
+  (import "./bindings.wasm" "ResponsesOutput.set_top_p" (func $ResponsesOutput.set_top_p (param $this externref) (param $value externref)))
   ;; max_output_tokens?: number | null
   (import "./bindings.wasm" "ResponsesOutput.max_output_tokens" (func $ResponsesOutput.max_output_tokens (param $this externref) (result externref)))
-  ;; set max_output_tokens(value: number)
-  (import "./bindings.wasm" "ResponsesOutput.set_max_output_tokens" (func $ResponsesOutput.set_max_output_tokens (param $this externref) (param $value f64)))
-  ;; set max_output_tokens(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_max_output_tokens_with_null" (func $ResponsesOutput.set_max_output_tokens_with_null (param $this externref) (param $value externref)))
+  ;; set max_output_tokens(value: number | null)
+  (import "./bindings.wasm" "ResponsesOutput.set_max_output_tokens" (func $ResponsesOutput.set_max_output_tokens (param $this externref) (param $value externref)))
   ;; previous_response_id?: string | null
   (import "./bindings.wasm" "ResponsesOutput.previous_response_id" (func $ResponsesOutput.previous_response_id (param $this externref) (result externref)))
-  ;; set previous_response_id(value: string)
+  ;; set previous_response_id(value: string | null)
   (import "./bindings.wasm" "ResponsesOutput.set_previous_response_id" (func $ResponsesOutput.set_previous_response_id (param $this externref) (param $value externref)))
-  ;; set previous_response_id(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_previous_response_id_with_null" (func $ResponsesOutput.set_previous_response_id_with_null (param $this externref) (param $value externref)))
   ;; prompt?: ResponsePrompt | null
   (import "./bindings.wasm" "ResponsesOutput.prompt" (func $ResponsesOutput.prompt (param $this externref) (result externref)))
-  ;; set prompt(value: ResponsePrompt)
+  ;; set prompt(value: ResponsePrompt | null)
   (import "./bindings.wasm" "ResponsesOutput.set_prompt" (func $ResponsesOutput.set_prompt (param $this externref) (param $value externref)))
-  ;; set prompt(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_prompt_with_null" (func $ResponsesOutput.set_prompt_with_null (param $this externref) (param $value externref)))
   ;; reasoning?: Reasoning | null
   (import "./bindings.wasm" "ResponsesOutput.reasoning" (func $ResponsesOutput.reasoning (param $this externref) (result externref)))
-  ;; set reasoning(value: Reasoning)
+  ;; set reasoning(value: Reasoning | null)
   (import "./bindings.wasm" "ResponsesOutput.set_reasoning" (func $ResponsesOutput.set_reasoning (param $this externref) (param $value externref)))
-  ;; set reasoning(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_reasoning_with_null" (func $ResponsesOutput.set_reasoning_with_null (param $this externref) (param $value externref)))
   ;; safety_identifier?: string
   (import "./bindings.wasm" "ResponsesOutput.safety_identifier" (func $ResponsesOutput.safety_identifier (param $this externref) (result externref)))
   ;; set safety_identifier(value: string)
   (import "./bindings.wasm" "ResponsesOutput.set_safety_identifier" (func $ResponsesOutput.set_safety_identifier (param $this externref) (param $value externref)))
   ;; service_tier?: "auto" | "default" | "flex" | "scale" | "priority" | null
   (import "./bindings.wasm" "ResponsesOutput.service_tier" (func $ResponsesOutput.service_tier (param $this externref) (result externref)))
-  ;; set service_tier(value: "auto")
+  ;; set service_tier(value: "auto" | null)
   (import "./bindings.wasm" "ResponsesOutput.set_service_tier" (func $ResponsesOutput.set_service_tier (param $this externref) (param $value externref)))
-  ;; set service_tier(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_service_tier_with_null" (func $ResponsesOutput.set_service_tier_with_null (param $this externref) (param $value externref)))
   ;; status?: ResponseStatus
   (import "./bindings.wasm" "ResponsesOutput.status" (func $ResponsesOutput.status (param $this externref) (result externref)))
   ;; set status(value: ResponseStatus)
@@ -5720,10 +5620,8 @@
   (import "./bindings.wasm" "ResponsesOutput.set_text" (func $ResponsesOutput.set_text (param $this externref) (param $value externref)))
   ;; truncation?: "auto" | "disabled" | null
   (import "./bindings.wasm" "ResponsesOutput.truncation" (func $ResponsesOutput.truncation (param $this externref) (result externref)))
-  ;; set truncation(value: "auto")
+  ;; set truncation(value: "auto" | null)
   (import "./bindings.wasm" "ResponsesOutput.set_truncation" (func $ResponsesOutput.set_truncation (param $this externref) (param $value externref)))
-  ;; set truncation(value: null)
-  (import "./bindings.wasm" "ResponsesOutput.set_truncation_with_null" (func $ResponsesOutput.set_truncation_with_null (param $this externref) (param $value externref)))
   ;; usage?: ResponseUsage
   (import "./bindings.wasm" "ResponsesOutput.usage" (func $ResponsesOutput.usage (param $this externref) (result externref)))
   ;; set usage(value: ResponseUsage)
@@ -5756,26 +5654,20 @@
   (import "./bindings.wasm" "ResponsesFunctionTool.set_name" (func $ResponsesFunctionTool.set_name (param $this externref) (param $value externref)))
   ;; parameters: object | null
   (import "./bindings.wasm" "ResponsesFunctionTool.parameters" (func $ResponsesFunctionTool.parameters (param $this externref) (result externref)))
-  ;; set parameters(value: object)
+  ;; set parameters(value: object | null)
   (import "./bindings.wasm" "ResponsesFunctionTool.set_parameters" (func $ResponsesFunctionTool.set_parameters (param $this externref) (param $value externref)))
-  ;; set parameters(value: null)
-  (import "./bindings.wasm" "ResponsesFunctionTool.set_parameters_with_null" (func $ResponsesFunctionTool.set_parameters_with_null (param $this externref) (param $value externref)))
   ;; strict: boolean | null
   (import "./bindings.wasm" "ResponsesFunctionTool.strict" (func $ResponsesFunctionTool.strict (param $this externref) (result externref)))
-  ;; set strict(value: boolean)
-  (import "./bindings.wasm" "ResponsesFunctionTool.set_strict" (func $ResponsesFunctionTool.set_strict (param $this externref) (param $value i32)))
-  ;; set strict(value: null)
-  (import "./bindings.wasm" "ResponsesFunctionTool.set_strict_with_null" (func $ResponsesFunctionTool.set_strict_with_null (param $this externref) (param $value externref)))
+  ;; set strict(value: boolean | null)
+  (import "./bindings.wasm" "ResponsesFunctionTool.set_strict" (func $ResponsesFunctionTool.set_strict (param $this externref) (param $value externref)))
   ;; type: "function"
   (import "./bindings.wasm" "ResponsesFunctionTool.type" (func $ResponsesFunctionTool.type (param $this externref) (result externref)))
   ;; set type(value: "function")
   (import "./bindings.wasm" "ResponsesFunctionTool.set_type" (func $ResponsesFunctionTool.set_type (param $this externref) (param $value externref)))
   ;; description?: string | null
   (import "./bindings.wasm" "ResponsesFunctionTool.description" (func $ResponsesFunctionTool.description (param $this externref) (result externref)))
-  ;; set description(value: string)
+  ;; set description(value: string | null)
   (import "./bindings.wasm" "ResponsesFunctionTool.set_description" (func $ResponsesFunctionTool.set_description (param $this externref) (param $value externref)))
-  ;; set description(value: null)
-  (import "./bindings.wasm" "ResponsesFunctionTool.set_description_with_null" (func $ResponsesFunctionTool.set_description_with_null (param $this externref) (param $value externref)))
 
   ;; ResponseIncompleteDetails
   ;; {} as ResponseIncompleteDetails
@@ -5794,38 +5686,28 @@
   (import "./bindings.wasm" "ResponsePrompt.set_id" (func $ResponsePrompt.set_id (param $this externref) (param $value externref)))
   ;; variables?: object | null
   (import "./bindings.wasm" "ResponsePrompt.variables" (func $ResponsePrompt.variables (param $this externref) (result externref)))
-  ;; set variables(value: object)
+  ;; set variables(value: object | null)
   (import "./bindings.wasm" "ResponsePrompt.set_variables" (func $ResponsePrompt.set_variables (param $this externref) (param $value externref)))
-  ;; set variables(value: null)
-  (import "./bindings.wasm" "ResponsePrompt.set_variables_with_null" (func $ResponsePrompt.set_variables_with_null (param $this externref) (param $value externref)))
   ;; version?: string | null
   (import "./bindings.wasm" "ResponsePrompt.version" (func $ResponsePrompt.version (param $this externref) (result externref)))
-  ;; set version(value: string)
+  ;; set version(value: string | null)
   (import "./bindings.wasm" "ResponsePrompt.set_version" (func $ResponsePrompt.set_version (param $this externref) (param $value externref)))
-  ;; set version(value: null)
-  (import "./bindings.wasm" "ResponsePrompt.set_version_with_null" (func $ResponsePrompt.set_version_with_null (param $this externref) (param $value externref)))
 
   ;; Reasoning
   ;; {} as Reasoning
   (import "./bindings.wasm" "Reasoning.new" (func $Reasoning.new (result externref)))
   ;; effort?: ReasoningEffort | null
   (import "./bindings.wasm" "Reasoning.effort" (func $Reasoning.effort (param $this externref) (result externref)))
-  ;; set effort(value: ReasoningEffort)
+  ;; set effort(value: ReasoningEffort | null)
   (import "./bindings.wasm" "Reasoning.set_effort" (func $Reasoning.set_effort (param $this externref) (param $value externref)))
-  ;; set effort(value: null)
-  (import "./bindings.wasm" "Reasoning.set_effort_with_null" (func $Reasoning.set_effort_with_null (param $this externref) (param $value externref)))
   ;; generate_summary?: "auto" | "concise" | "detailed" | null
   (import "./bindings.wasm" "Reasoning.generate_summary" (func $Reasoning.generate_summary (param $this externref) (result externref)))
-  ;; set generate_summary(value: "auto")
+  ;; set generate_summary(value: "auto" | null)
   (import "./bindings.wasm" "Reasoning.set_generate_summary" (func $Reasoning.set_generate_summary (param $this externref) (param $value externref)))
-  ;; set generate_summary(value: null)
-  (import "./bindings.wasm" "Reasoning.set_generate_summary_with_null" (func $Reasoning.set_generate_summary_with_null (param $this externref) (param $value externref)))
   ;; summary?: "auto" | "concise" | "detailed" | null
   (import "./bindings.wasm" "Reasoning.summary" (func $Reasoning.summary (param $this externref) (result externref)))
-  ;; set summary(value: "auto")
+  ;; set summary(value: "auto" | null)
   (import "./bindings.wasm" "Reasoning.set_summary" (func $Reasoning.set_summary (param $this externref) (param $value externref)))
-  ;; set summary(value: null)
-  (import "./bindings.wasm" "Reasoning.set_summary_with_null" (func $Reasoning.set_summary_with_null (param $this externref) (param $value externref)))
 
   ;; ResponseContentReasoningText
   ;; {} as ResponseContentReasoningText
@@ -5902,20 +5784,16 @@
   (import "./bindings.wasm" "ResponseErrorEvent.new" (func $ResponseErrorEvent.new (result externref)))
   ;; code: string | null
   (import "./bindings.wasm" "ResponseErrorEvent.code" (func $ResponseErrorEvent.code (param $this externref) (result externref)))
-  ;; set code(value: string)
+  ;; set code(value: string | null)
   (import "./bindings.wasm" "ResponseErrorEvent.set_code" (func $ResponseErrorEvent.set_code (param $this externref) (param $value externref)))
-  ;; set code(value: null)
-  (import "./bindings.wasm" "ResponseErrorEvent.set_code_with_null" (func $ResponseErrorEvent.set_code_with_null (param $this externref) (param $value externref)))
   ;; message: string
   (import "./bindings.wasm" "ResponseErrorEvent.message" (func $ResponseErrorEvent.message (param $this externref) (result externref)))
   ;; set message(value: string)
   (import "./bindings.wasm" "ResponseErrorEvent.set_message" (func $ResponseErrorEvent.set_message (param $this externref) (param $value externref)))
   ;; param: string | null
   (import "./bindings.wasm" "ResponseErrorEvent.param" (func $ResponseErrorEvent.param (param $this externref) (result externref)))
-  ;; set param(value: string)
+  ;; set param(value: string | null)
   (import "./bindings.wasm" "ResponseErrorEvent.set_param" (func $ResponseErrorEvent.set_param (param $this externref) (param $value externref)))
-  ;; set param(value: null)
-  (import "./bindings.wasm" "ResponseErrorEvent.set_param_with_null" (func $ResponseErrorEvent.set_param_with_null (param $this externref) (param $value externref)))
   ;; sequence_number: number
   (import "./bindings.wasm" "ResponseErrorEvent.sequence_number" (func $ResponseErrorEvent.sequence_number (param $this externref) (result f64)))
   ;; set sequence_number(value: number)
@@ -5978,10 +5856,8 @@
   (import "./bindings.wasm" "ResponseFormatTextJSONSchemaConfig.set_description" (func $ResponseFormatTextJSONSchemaConfig.set_description (param $this externref) (param $value externref)))
   ;; strict?: boolean | null
   (import "./bindings.wasm" "ResponseFormatTextJSONSchemaConfig.strict" (func $ResponseFormatTextJSONSchemaConfig.strict (param $this externref) (result externref)))
-  ;; set strict(value: boolean)
-  (import "./bindings.wasm" "ResponseFormatTextJSONSchemaConfig.set_strict" (func $ResponseFormatTextJSONSchemaConfig.set_strict (param $this externref) (param $value i32)))
-  ;; set strict(value: null)
-  (import "./bindings.wasm" "ResponseFormatTextJSONSchemaConfig.set_strict_with_null" (func $ResponseFormatTextJSONSchemaConfig.set_strict_with_null (param $this externref) (param $value externref)))
+  ;; set strict(value: boolean | null)
+  (import "./bindings.wasm" "ResponseFormatTextJSONSchemaConfig.set_strict" (func $ResponseFormatTextJSONSchemaConfig.set_strict (param $this externref) (param $value externref)))
 
   ;; ResponseFunctionCallArgumentsDeltaEvent
   ;; {} as ResponseFunctionCallArgumentsDeltaEvent
@@ -6126,10 +6002,8 @@
   (import "./bindings.wasm" "ResponseInputImage.set_type" (func $ResponseInputImage.set_type (param $this externref) (param $value externref)))
   ;; image_url?: string | null
   (import "./bindings.wasm" "ResponseInputImage.image_url" (func $ResponseInputImage.image_url (param $this externref) (result externref)))
-  ;; set image_url(value: string)
+  ;; set image_url(value: string | null)
   (import "./bindings.wasm" "ResponseInputImage.set_image_url" (func $ResponseInputImage.set_image_url (param $this externref) (param $value externref)))
-  ;; set image_url(value: null)
-  (import "./bindings.wasm" "ResponseInputImage.set_image_url_with_null" (func $ResponseInputImage.set_image_url_with_null (param $this externref) (param $value externref)))
 
   ;; ResponseInputImageContent
   ;; {} as ResponseInputImageContent
@@ -6140,16 +6014,12 @@
   (import "./bindings.wasm" "ResponseInputImageContent.set_type" (func $ResponseInputImageContent.set_type (param $this externref) (param $value externref)))
   ;; detail?: "low" | "high" | "auto" | null
   (import "./bindings.wasm" "ResponseInputImageContent.detail" (func $ResponseInputImageContent.detail (param $this externref) (result externref)))
-  ;; set detail(value: "low")
+  ;; set detail(value: "low" | null)
   (import "./bindings.wasm" "ResponseInputImageContent.set_detail" (func $ResponseInputImageContent.set_detail (param $this externref) (param $value externref)))
-  ;; set detail(value: null)
-  (import "./bindings.wasm" "ResponseInputImageContent.set_detail_with_null" (func $ResponseInputImageContent.set_detail_with_null (param $this externref) (param $value externref)))
   ;; image_url?: string | null
   (import "./bindings.wasm" "ResponseInputImageContent.image_url" (func $ResponseInputImageContent.image_url (param $this externref) (result externref)))
-  ;; set image_url(value: string)
+  ;; set image_url(value: string | null)
   (import "./bindings.wasm" "ResponseInputImageContent.set_image_url" (func $ResponseInputImageContent.set_image_url (param $this externref) (param $value externref)))
-  ;; set image_url(value: null)
-  (import "./bindings.wasm" "ResponseInputImageContent.set_image_url_with_null" (func $ResponseInputImageContent.set_image_url_with_null (param $this externref) (param $value externref)))
 
   ;; ResponseInputItemFunctionCallOutput
   ;; {} as ResponseInputItemFunctionCallOutput
@@ -6170,16 +6040,12 @@
   (import "./bindings.wasm" "ResponseInputItemFunctionCallOutput.set_type" (func $ResponseInputItemFunctionCallOutput.set_type (param $this externref) (param $value externref)))
   ;; id?: string | null
   (import "./bindings.wasm" "ResponseInputItemFunctionCallOutput.id" (func $ResponseInputItemFunctionCallOutput.id (param $this externref) (result externref)))
-  ;; set id(value: string)
+  ;; set id(value: string | null)
   (import "./bindings.wasm" "ResponseInputItemFunctionCallOutput.set_id" (func $ResponseInputItemFunctionCallOutput.set_id (param $this externref) (param $value externref)))
-  ;; set id(value: null)
-  (import "./bindings.wasm" "ResponseInputItemFunctionCallOutput.set_id_with_null" (func $ResponseInputItemFunctionCallOutput.set_id_with_null (param $this externref) (param $value externref)))
   ;; status?: "in_progress" | "completed" | "incomplete" | null
   (import "./bindings.wasm" "ResponseInputItemFunctionCallOutput.status" (func $ResponseInputItemFunctionCallOutput.status (param $this externref) (result externref)))
-  ;; set status(value: "in_progress")
+  ;; set status(value: "in_progress" | null)
   (import "./bindings.wasm" "ResponseInputItemFunctionCallOutput.set_status" (func $ResponseInputItemFunctionCallOutput.set_status (param $this externref) (param $value externref)))
-  ;; set status(value: null)
-  (import "./bindings.wasm" "ResponseInputItemFunctionCallOutput.set_status_with_null" (func $ResponseInputItemFunctionCallOutput.set_status_with_null (param $this externref) (param $value externref)))
 
   ;; ResponseInputItemMessage
   ;; {} as ResponseInputItemMessage
@@ -6362,10 +6228,8 @@
   (import "./bindings.wasm" "ResponseReasoningItem.set_content" (func $ResponseReasoningItem.set_content (param $this externref) (param $value externref)))
   ;; encrypted_content?: string | null
   (import "./bindings.wasm" "ResponseReasoningItem.encrypted_content" (func $ResponseReasoningItem.encrypted_content (param $this externref) (result externref)))
-  ;; set encrypted_content(value: string)
+  ;; set encrypted_content(value: string | null)
   (import "./bindings.wasm" "ResponseReasoningItem.set_encrypted_content" (func $ResponseReasoningItem.set_encrypted_content (param $this externref) (param $value externref)))
-  ;; set encrypted_content(value: null)
-  (import "./bindings.wasm" "ResponseReasoningItem.set_encrypted_content_with_null" (func $ResponseReasoningItem.set_encrypted_content_with_null (param $this externref) (param $value externref)))
   ;; status?: "in_progress" | "completed" | "incomplete"
   (import "./bindings.wasm" "ResponseReasoningItem.status" (func $ResponseReasoningItem.status (param $this externref) (result externref)))
   ;; set status(value: "in_progress")
@@ -6532,10 +6396,8 @@
   (import "./bindings.wasm" "ResponseTextConfig.set_format" (func $ResponseTextConfig.set_format (param $this externref) (param $value externref)))
   ;; verbosity?: "low" | "medium" | "high" | null
   (import "./bindings.wasm" "ResponseTextConfig.verbosity" (func $ResponseTextConfig.verbosity (param $this externref) (result externref)))
-  ;; set verbosity(value: "low")
+  ;; set verbosity(value: "low" | null)
   (import "./bindings.wasm" "ResponseTextConfig.set_verbosity" (func $ResponseTextConfig.set_verbosity (param $this externref) (param $value externref)))
-  ;; set verbosity(value: null)
-  (import "./bindings.wasm" "ResponseTextConfig.set_verbosity_with_null" (func $ResponseTextConfig.set_verbosity_with_null (param $this externref) (param $value externref)))
 
   ;; ResponseTextDeltaEvent
   ;; {} as ResponseTextDeltaEvent
@@ -8672,10 +8534,8 @@
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response.set_usage" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response.set_usage (param $this externref) (param $value externref)))
   ;; prompt_logprobs?: object | null
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response.prompt_logprobs" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response.prompt_logprobs (param $this externref) (result externref)))
-  ;; set prompt_logprobs(value: object)
+  ;; set prompt_logprobs(value: object | null)
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response.set_prompt_logprobs" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response.set_prompt_logprobs (param $this externref) (param $value externref)))
-  ;; set prompt_logprobs(value: null)
-  (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response.set_prompt_logprobs_with_null" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response.set_prompt_logprobs_with_null (param $this externref) (param $value externref)))
 
   ;; Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response
   ;; {} as Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response
@@ -9472,10 +9332,8 @@
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response.set_usage" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response.set_usage (param $this externref) (param $value externref)))
   ;; prompt_logprobs?: object | null
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response.prompt_logprobs" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response.prompt_logprobs (param $this externref) (result externref)))
-  ;; set prompt_logprobs(value: object)
+  ;; set prompt_logprobs(value: object | null)
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response.set_prompt_logprobs" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response.set_prompt_logprobs (param $this externref) (param $value externref)))
-  ;; set prompt_logprobs(value: null)
-  (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response.set_prompt_logprobs_with_null" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response.set_prompt_logprobs_with_null (param $this externref) (param $value externref)))
 
   ;; Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response
   ;; {} as Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response
@@ -10156,10 +10014,8 @@
   ;; Ai
   ;; aiGatewayLogId: string | null
   (import "./bindings.wasm" "Ai.ai_gateway_log_id" (func $Ai.ai_gateway_log_id (param $this externref) (result externref)))
-  ;; set aiGatewayLogId(value: string)
+  ;; set aiGatewayLogId(value: string | null)
   (import "./bindings.wasm" "Ai.set_ai_gateway_log_id" (func $Ai.set_ai_gateway_log_id (param $this externref) (param $value externref)))
-  ;; set aiGatewayLogId(value: null)
-  (import "./bindings.wasm" "Ai.set_ai_gateway_log_id_with_null" (func $Ai.set_ai_gateway_log_id_with_null (param $this externref) (param $value externref)))
   ;; gateway(gateway_id: string): AiGateway
   (import "./bindings.wasm" "Ai.gateway" (func $Ai.gateway (param $this externref) (param $gateway_id externref) (result externref)))
   ;; aiSearch(): AiSearchAccountService
@@ -10254,22 +10110,16 @@
   (import "./bindings.wasm" "AiGatewayPatchLog.new" (func $AiGatewayPatchLog.new (result externref)))
   ;; score?: number | null
   (import "./bindings.wasm" "AiGatewayPatchLog.score" (func $AiGatewayPatchLog.score (param $this externref) (result externref)))
-  ;; set score(value: number)
-  (import "./bindings.wasm" "AiGatewayPatchLog.set_score" (func $AiGatewayPatchLog.set_score (param $this externref) (param $value f64)))
-  ;; set score(value: null)
-  (import "./bindings.wasm" "AiGatewayPatchLog.set_score_with_null" (func $AiGatewayPatchLog.set_score_with_null (param $this externref) (param $value externref)))
+  ;; set score(value: number | null)
+  (import "./bindings.wasm" "AiGatewayPatchLog.set_score" (func $AiGatewayPatchLog.set_score (param $this externref) (param $value externref)))
   ;; feedback?: -1 | 1 | null
   (import "./bindings.wasm" "AiGatewayPatchLog.feedback" (func $AiGatewayPatchLog.feedback (param $this externref) (result externref)))
-  ;; set feedback(value: -1)
-  (import "./bindings.wasm" "AiGatewayPatchLog.set_feedback" (func $AiGatewayPatchLog.set_feedback (param $this externref) (param $value f64)))
-  ;; set feedback(value: null)
-  (import "./bindings.wasm" "AiGatewayPatchLog.set_feedback_with_null" (func $AiGatewayPatchLog.set_feedback_with_null (param $this externref) (param $value externref)))
+  ;; set feedback(value: -1 | null)
+  (import "./bindings.wasm" "AiGatewayPatchLog.set_feedback" (func $AiGatewayPatchLog.set_feedback (param $this externref) (param $value externref)))
   ;; metadata?: Record<string, number | string | boolean | bigint | null> | null
   (import "./bindings.wasm" "AiGatewayPatchLog.metadata" (func $AiGatewayPatchLog.metadata (param $this externref) (result externref)))
-  ;; set metadata(value: Record<string, number | string | boolean | bigint | null>)
+  ;; set metadata(value: Record<string, number | string | boolean | bigint | null> | null)
   (import "./bindings.wasm" "AiGatewayPatchLog.set_metadata" (func $AiGatewayPatchLog.set_metadata (param $this externref) (param $value externref)))
-  ;; set metadata(value: null)
-  (import "./bindings.wasm" "AiGatewayPatchLog.set_metadata_with_null" (func $AiGatewayPatchLog.set_metadata_with_null (param $this externref) (param $value externref)))
 
   ;; AiGatewayLog
   ;; {} as AiGatewayLog
@@ -10630,10 +10480,8 @@
   (import "./bindings.wasm" "AutoRagSearchResponse.set_has_more" (func $AutoRagSearchResponse.set_has_more (param $this externref) (param $value i32)))
   ;; next_page: string | null
   (import "./bindings.wasm" "AutoRagSearchResponse.next_page" (func $AutoRagSearchResponse.next_page (param $this externref) (result externref)))
-  ;; set next_page(value: string)
+  ;; set next_page(value: string | null)
   (import "./bindings.wasm" "AutoRagSearchResponse.set_next_page" (func $AutoRagSearchResponse.set_next_page (param $this externref) (param $value externref)))
-  ;; set next_page(value: null)
-  (import "./bindings.wasm" "AutoRagSearchResponse.set_next_page_with_null" (func $AutoRagSearchResponse.set_next_page_with_null (param $this externref) (param $value externref)))
 
   ;; AutoRagAiSearchResponse
   ;; {} as AutoRagAiSearchResponse
@@ -11918,10 +11766,8 @@
   (import "cloudflare:node" "NodeStyleServerAddressReturn.new" (func $cloudflare:node:NodeStyleServerAddressReturn.new (result externref)))
   ;; port?: number | null
   (import "cloudflare:node" "NodeStyleServerAddressReturn.port" (func $cloudflare:node:NodeStyleServerAddressReturn.port (param $this externref) (result externref)))
-  ;; set port(value: number)
-  (import "cloudflare:node" "NodeStyleServerAddressReturn.set_port" (func $cloudflare:node:NodeStyleServerAddressReturn.set_port (param $this externref) (param $value f64)))
-  ;; set port(value: null)
-  (import "cloudflare:node" "NodeStyleServerAddressReturn.set_port_with_null" (func $cloudflare:node:NodeStyleServerAddressReturn.set_port_with_null (param $this externref) (param $value externref)))
+  ;; set port(value: number | null)
+  (import "cloudflare:node" "NodeStyleServerAddressReturn.set_port" (func $cloudflare:node:NodeStyleServerAddressReturn.set_port (param $this externref) (param $value externref)))
 
   ;; httpServerHandler(port: number): ExportedHandler
   (import "cloudflare:node" "httpServerHandler" (func $cloudflare:node:httpServerHandler (param $port f64) (result externref)))
@@ -12339,10 +12185,8 @@
   (import "./bindings.wasm" "StreamVideo.set_id" (func $StreamVideo.set_id (param $this externref) (param $value externref)))
   ;; creator: string | null
   (import "./bindings.wasm" "StreamVideo.creator" (func $StreamVideo.creator (param $this externref) (result externref)))
-  ;; set creator(value: string)
+  ;; set creator(value: string | null)
   (import "./bindings.wasm" "StreamVideo.set_creator" (func $StreamVideo.set_creator (param $this externref) (param $value externref)))
-  ;; set creator(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_creator_with_null" (func $StreamVideo.set_creator_with_null (param $this externref) (param $value externref)))
   ;; thumbnail: string
   (import "./bindings.wasm" "StreamVideo.thumbnail" (func $StreamVideo.thumbnail (param $this externref) (result externref)))
   ;; set thumbnail(value: string)
@@ -12357,10 +12201,8 @@
   (import "./bindings.wasm" "StreamVideo.set_ready_to_stream" (func $StreamVideo.set_ready_to_stream (param $this externref) (param $value i32)))
   ;; readyToStreamAt: string | null
   (import "./bindings.wasm" "StreamVideo.ready_to_stream_at" (func $StreamVideo.ready_to_stream_at (param $this externref) (result externref)))
-  ;; set readyToStreamAt(value: string)
+  ;; set readyToStreamAt(value: string | null)
   (import "./bindings.wasm" "StreamVideo.set_ready_to_stream_at" (func $StreamVideo.set_ready_to_stream_at (param $this externref) (param $value externref)))
-  ;; set readyToStreamAt(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_ready_to_stream_at_with_null" (func $StreamVideo.set_ready_to_stream_at_with_null (param $this externref) (param $value externref)))
   ;; status: StreamVideoStatus
   (import "./bindings.wasm" "StreamVideo.status" (func $StreamVideo.status (param $this externref) (result externref)))
   ;; set status(value: StreamVideoStatus)
@@ -12379,10 +12221,8 @@
   (import "./bindings.wasm" "StreamVideo.set_modified" (func $StreamVideo.set_modified (param $this externref) (param $value externref)))
   ;; scheduledDeletion: string | null
   (import "./bindings.wasm" "StreamVideo.scheduled_deletion" (func $StreamVideo.scheduled_deletion (param $this externref) (result externref)))
-  ;; set scheduledDeletion(value: string)
+  ;; set scheduledDeletion(value: string | null)
   (import "./bindings.wasm" "StreamVideo.set_scheduled_deletion" (func $StreamVideo.set_scheduled_deletion (param $this externref) (param $value externref)))
-  ;; set scheduledDeletion(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_scheduled_deletion_with_null" (func $StreamVideo.set_scheduled_deletion_with_null (param $this externref) (param $value externref)))
   ;; size: number
   (import "./bindings.wasm" "StreamVideo.size" (func $StreamVideo.size (param $this externref) (result f64)))
   ;; set size(value: number)
@@ -12397,34 +12237,24 @@
   (import "./bindings.wasm" "StreamVideo.set_allowed_origins" (func $StreamVideo.set_allowed_origins (param $this externref) (param $value externref)))
   ;; requireSignedURLs: boolean | null
   (import "./bindings.wasm" "StreamVideo.require_signed_ur_ls" (func $StreamVideo.require_signed_ur_ls (param $this externref) (result externref)))
-  ;; set requireSignedURLs(value: boolean)
-  (import "./bindings.wasm" "StreamVideo.set_require_signed_ur_ls" (func $StreamVideo.set_require_signed_ur_ls (param $this externref) (param $value i32)))
-  ;; set requireSignedURLs(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_require_signed_ur_ls_with_null" (func $StreamVideo.set_require_signed_ur_ls_with_null (param $this externref) (param $value externref)))
+  ;; set requireSignedURLs(value: boolean | null)
+  (import "./bindings.wasm" "StreamVideo.set_require_signed_ur_ls" (func $StreamVideo.set_require_signed_ur_ls (param $this externref) (param $value externref)))
   ;; uploaded: string | null
   (import "./bindings.wasm" "StreamVideo.uploaded" (func $StreamVideo.uploaded (param $this externref) (result externref)))
-  ;; set uploaded(value: string)
+  ;; set uploaded(value: string | null)
   (import "./bindings.wasm" "StreamVideo.set_uploaded" (func $StreamVideo.set_uploaded (param $this externref) (param $value externref)))
-  ;; set uploaded(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_uploaded_with_null" (func $StreamVideo.set_uploaded_with_null (param $this externref) (param $value externref)))
   ;; uploadExpiry: string | null
   (import "./bindings.wasm" "StreamVideo.upload_expiry" (func $StreamVideo.upload_expiry (param $this externref) (result externref)))
-  ;; set uploadExpiry(value: string)
+  ;; set uploadExpiry(value: string | null)
   (import "./bindings.wasm" "StreamVideo.set_upload_expiry" (func $StreamVideo.set_upload_expiry (param $this externref) (param $value externref)))
-  ;; set uploadExpiry(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_upload_expiry_with_null" (func $StreamVideo.set_upload_expiry_with_null (param $this externref) (param $value externref)))
   ;; maxSizeBytes: number | null
   (import "./bindings.wasm" "StreamVideo.max_size_bytes" (func $StreamVideo.max_size_bytes (param $this externref) (result externref)))
-  ;; set maxSizeBytes(value: number)
-  (import "./bindings.wasm" "StreamVideo.set_max_size_bytes" (func $StreamVideo.set_max_size_bytes (param $this externref) (param $value f64)))
-  ;; set maxSizeBytes(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_max_size_bytes_with_null" (func $StreamVideo.set_max_size_bytes_with_null (param $this externref) (param $value externref)))
+  ;; set maxSizeBytes(value: number | null)
+  (import "./bindings.wasm" "StreamVideo.set_max_size_bytes" (func $StreamVideo.set_max_size_bytes (param $this externref) (param $value externref)))
   ;; maxDurationSeconds: number | null
   (import "./bindings.wasm" "StreamVideo.max_duration_seconds" (func $StreamVideo.max_duration_seconds (param $this externref) (result externref)))
-  ;; set maxDurationSeconds(value: number)
-  (import "./bindings.wasm" "StreamVideo.set_max_duration_seconds" (func $StreamVideo.set_max_duration_seconds (param $this externref) (param $value f64)))
-  ;; set maxDurationSeconds(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_max_duration_seconds_with_null" (func $StreamVideo.set_max_duration_seconds_with_null (param $this externref) (param $value externref)))
+  ;; set maxDurationSeconds(value: number | null)
+  (import "./bindings.wasm" "StreamVideo.set_max_duration_seconds" (func $StreamVideo.set_max_duration_seconds (param $this externref) (param $value externref)))
   ;; duration: number
   (import "./bindings.wasm" "StreamVideo.duration" (func $StreamVideo.duration (param $this externref) (result f64)))
   ;; set duration(value: number)
@@ -12443,28 +12273,20 @@
   (import "./bindings.wasm" "StreamVideo.set_dash_playback_url" (func $StreamVideo.set_dash_playback_url (param $this externref) (param $value externref)))
   ;; watermark: StreamWatermark | null
   (import "./bindings.wasm" "StreamVideo.watermark" (func $StreamVideo.watermark (param $this externref) (result externref)))
-  ;; set watermark(value: StreamWatermark)
+  ;; set watermark(value: StreamWatermark | null)
   (import "./bindings.wasm" "StreamVideo.set_watermark" (func $StreamVideo.set_watermark (param $this externref) (param $value externref)))
-  ;; set watermark(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_watermark_with_null" (func $StreamVideo.set_watermark_with_null (param $this externref) (param $value externref)))
   ;; liveInputId?: string | null
   (import "./bindings.wasm" "StreamVideo.live_input_id" (func $StreamVideo.live_input_id (param $this externref) (result externref)))
-  ;; set liveInputId(value: string)
+  ;; set liveInputId(value: string | null)
   (import "./bindings.wasm" "StreamVideo.set_live_input_id" (func $StreamVideo.set_live_input_id (param $this externref) (param $value externref)))
-  ;; set liveInputId(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_live_input_id_with_null" (func $StreamVideo.set_live_input_id_with_null (param $this externref) (param $value externref)))
   ;; clippedFromId: string | null
   (import "./bindings.wasm" "StreamVideo.clipped_from_id" (func $StreamVideo.clipped_from_id (param $this externref) (result externref)))
-  ;; set clippedFromId(value: string)
+  ;; set clippedFromId(value: string | null)
   (import "./bindings.wasm" "StreamVideo.set_clipped_from_id" (func $StreamVideo.set_clipped_from_id (param $this externref) (param $value externref)))
-  ;; set clippedFromId(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_clipped_from_id_with_null" (func $StreamVideo.set_clipped_from_id_with_null (param $this externref) (param $value externref)))
   ;; publicDetails: StreamPublicDetails | null
   (import "./bindings.wasm" "StreamVideo.public_details" (func $StreamVideo.public_details (param $this externref) (result externref)))
-  ;; set publicDetails(value: StreamPublicDetails)
+  ;; set publicDetails(value: StreamPublicDetails | null)
   (import "./bindings.wasm" "StreamVideo.set_public_details" (func $StreamVideo.set_public_details (param $this externref) (param $value externref)))
-  ;; set publicDetails(value: null)
-  (import "./bindings.wasm" "StreamVideo.set_public_details_with_null" (func $StreamVideo.set_public_details_with_null (param $this externref) (param $value externref)))
 
   ;; StreamVideoStatus
   ;; {} as StreamVideoStatus
@@ -12507,28 +12329,20 @@
   (import "./bindings.wasm" "StreamPublicDetails.new" (func $StreamPublicDetails.new (result externref)))
   ;; title: string | null
   (import "./bindings.wasm" "StreamPublicDetails.title" (func $StreamPublicDetails.title (param $this externref) (result externref)))
-  ;; set title(value: string)
+  ;; set title(value: string | null)
   (import "./bindings.wasm" "StreamPublicDetails.set_title" (func $StreamPublicDetails.set_title (param $this externref) (param $value externref)))
-  ;; set title(value: null)
-  (import "./bindings.wasm" "StreamPublicDetails.set_title_with_null" (func $StreamPublicDetails.set_title_with_null (param $this externref) (param $value externref)))
   ;; share_link: string | null
   (import "./bindings.wasm" "StreamPublicDetails.share_link" (func $StreamPublicDetails.share_link (param $this externref) (result externref)))
-  ;; set share_link(value: string)
+  ;; set share_link(value: string | null)
   (import "./bindings.wasm" "StreamPublicDetails.set_share_link" (func $StreamPublicDetails.set_share_link (param $this externref) (param $value externref)))
-  ;; set share_link(value: null)
-  (import "./bindings.wasm" "StreamPublicDetails.set_share_link_with_null" (func $StreamPublicDetails.set_share_link_with_null (param $this externref) (param $value externref)))
   ;; channel_link: string | null
   (import "./bindings.wasm" "StreamPublicDetails.channel_link" (func $StreamPublicDetails.channel_link (param $this externref) (result externref)))
-  ;; set channel_link(value: string)
+  ;; set channel_link(value: string | null)
   (import "./bindings.wasm" "StreamPublicDetails.set_channel_link" (func $StreamPublicDetails.set_channel_link (param $this externref) (param $value externref)))
-  ;; set channel_link(value: null)
-  (import "./bindings.wasm" "StreamPublicDetails.set_channel_link_with_null" (func $StreamPublicDetails.set_channel_link_with_null (param $this externref) (param $value externref)))
   ;; logo: string | null
   (import "./bindings.wasm" "StreamPublicDetails.logo" (func $StreamPublicDetails.logo (param $this externref) (result externref)))
-  ;; set logo(value: string)
+  ;; set logo(value: string | null)
   (import "./bindings.wasm" "StreamPublicDetails.set_logo" (func $StreamPublicDetails.set_logo (param $this externref) (param $value externref)))
-  ;; set logo(value: null)
-  (import "./bindings.wasm" "StreamPublicDetails.set_logo_with_null" (func $StreamPublicDetails.set_logo_with_null (param $this externref) (param $value externref)))
 
   ;; StreamDirectUpload
   ;; {} as StreamDirectUpload
@@ -12543,16 +12357,12 @@
   (import "./bindings.wasm" "StreamDirectUpload.set_id" (func $StreamDirectUpload.set_id (param $this externref) (param $value externref)))
   ;; watermark: StreamWatermark | null
   (import "./bindings.wasm" "StreamDirectUpload.watermark" (func $StreamDirectUpload.watermark (param $this externref) (result externref)))
-  ;; set watermark(value: StreamWatermark)
+  ;; set watermark(value: StreamWatermark | null)
   (import "./bindings.wasm" "StreamDirectUpload.set_watermark" (func $StreamDirectUpload.set_watermark (param $this externref) (param $value externref)))
-  ;; set watermark(value: null)
-  (import "./bindings.wasm" "StreamDirectUpload.set_watermark_with_null" (func $StreamDirectUpload.set_watermark_with_null (param $this externref) (param $value externref)))
   ;; scheduledDeletion: string | null
   (import "./bindings.wasm" "StreamDirectUpload.scheduled_deletion" (func $StreamDirectUpload.scheduled_deletion (param $this externref) (result externref)))
-  ;; set scheduledDeletion(value: string)
+  ;; set scheduledDeletion(value: string | null)
   (import "./bindings.wasm" "StreamDirectUpload.set_scheduled_deletion" (func $StreamDirectUpload.set_scheduled_deletion (param $this externref) (param $value externref)))
-  ;; set scheduledDeletion(value: null)
-  (import "./bindings.wasm" "StreamDirectUpload.set_scheduled_deletion_with_null" (func $StreamDirectUpload.set_scheduled_deletion_with_null (param $this externref) (param $value externref)))
 
   ;; StreamDirectUploadCreateParams
   ;; {} as StreamDirectUploadCreateParams
@@ -12587,10 +12397,8 @@
   (import "./bindings.wasm" "StreamDirectUploadCreateParams.set_thumbnail_timestamp_pct" (func $StreamDirectUploadCreateParams.set_thumbnail_timestamp_pct (param $this externref) (param $value f64)))
   ;; scheduledDeletion?: string | null
   (import "./bindings.wasm" "StreamDirectUploadCreateParams.scheduled_deletion" (func $StreamDirectUploadCreateParams.scheduled_deletion (param $this externref) (result externref)))
-  ;; set scheduledDeletion(value: string)
+  ;; set scheduledDeletion(value: string | null)
   (import "./bindings.wasm" "StreamDirectUploadCreateParams.set_scheduled_deletion" (func $StreamDirectUploadCreateParams.set_scheduled_deletion (param $this externref) (param $value externref)))
-  ;; set scheduledDeletion(value: null)
-  (import "./bindings.wasm" "StreamDirectUploadCreateParams.set_scheduled_deletion_with_null" (func $StreamDirectUploadCreateParams.set_scheduled_deletion_with_null (param $this externref) (param $value externref)))
   ;; watermark?: StreamDirectUploadWatermark
   (import "./bindings.wasm" "StreamDirectUploadCreateParams.watermark" (func $StreamDirectUploadCreateParams.watermark (param $this externref) (result externref)))
   ;; set watermark(value: StreamDirectUploadWatermark)
@@ -12625,10 +12433,8 @@
   (import "./bindings.wasm" "StreamUrlUploadParams.set_require_signed_ur_ls" (func $StreamUrlUploadParams.set_require_signed_ur_ls (param $this externref) (param $value i32)))
   ;; scheduledDeletion?: string | null
   (import "./bindings.wasm" "StreamUrlUploadParams.scheduled_deletion" (func $StreamUrlUploadParams.scheduled_deletion (param $this externref) (result externref)))
-  ;; set scheduledDeletion(value: string)
+  ;; set scheduledDeletion(value: string | null)
   (import "./bindings.wasm" "StreamUrlUploadParams.set_scheduled_deletion" (func $StreamUrlUploadParams.set_scheduled_deletion (param $this externref) (param $value externref)))
-  ;; set scheduledDeletion(value: null)
-  (import "./bindings.wasm" "StreamUrlUploadParams.set_scheduled_deletion_with_null" (func $StreamUrlUploadParams.set_scheduled_deletion_with_null (param $this externref) (param $value externref)))
   ;; thumbnailTimestampPct?: number
   (import "./bindings.wasm" "StreamUrlUploadParams.thumbnail_timestamp_pct" (func $StreamUrlUploadParams.thumbnail_timestamp_pct (param $this externref) (result externref)))
   ;; set thumbnailTimestampPct(value: number)
@@ -12705,10 +12511,8 @@
   (import "./bindings.wasm" "StreamUpdateVideoParams.set_require_signed_ur_ls" (func $StreamUpdateVideoParams.set_require_signed_ur_ls (param $this externref) (param $value i32)))
   ;; scheduledDeletion?: string | null
   (import "./bindings.wasm" "StreamUpdateVideoParams.scheduled_deletion" (func $StreamUpdateVideoParams.scheduled_deletion (param $this externref) (result externref)))
-  ;; set scheduledDeletion(value: string)
+  ;; set scheduledDeletion(value: string | null)
   (import "./bindings.wasm" "StreamUpdateVideoParams.set_scheduled_deletion" (func $StreamUpdateVideoParams.set_scheduled_deletion (param $this externref) (param $value externref)))
-  ;; set scheduledDeletion(value: null)
-  (import "./bindings.wasm" "StreamUpdateVideoParams.set_scheduled_deletion_with_null" (func $StreamUpdateVideoParams.set_scheduled_deletion_with_null (param $this externref) (param $value externref)))
   ;; thumbnailTimestampPct?: number
   (import "./bindings.wasm" "StreamUpdateVideoParams.thumbnail_timestamp_pct" (func $StreamUpdateVideoParams.thumbnail_timestamp_pct (param $this externref) (result externref)))
   ;; set thumbnailTimestampPct(value: number)
@@ -12787,10 +12591,8 @@
   (import "./bindings.wasm" "StreamWatermark.set_created" (func $StreamWatermark.set_created (param $this externref) (param $value externref)))
   ;; downloadedFrom: string | null
   (import "./bindings.wasm" "StreamWatermark.downloaded_from" (func $StreamWatermark.downloaded_from (param $this externref) (result externref)))
-  ;; set downloadedFrom(value: string)
+  ;; set downloadedFrom(value: string | null)
   (import "./bindings.wasm" "StreamWatermark.set_downloaded_from" (func $StreamWatermark.set_downloaded_from (param $this externref) (param $value externref)))
-  ;; set downloadedFrom(value: null)
-  (import "./bindings.wasm" "StreamWatermark.set_downloaded_from_with_null" (func $StreamWatermark.set_downloaded_from_with_null (param $this externref) (param $value externref)))
   ;; name: string
   (import "./bindings.wasm" "StreamWatermark.name" (func $StreamWatermark.name (param $this externref) (result externref)))
   ;; set name(value: string)
@@ -13807,40 +13609,28 @@
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.new" (func $VectorizeVectorMetadataFilter2.new (result externref)))
   ;; $eq?: VectorizeVectorMetadataValue | null
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.eq" (func $VectorizeVectorMetadataFilter2.eq (param $this externref) (result externref)))
-  ;; set $eq(value: VectorizeVectorMetadataValue)
+  ;; set $eq(value: VectorizeVectorMetadataValue | null)
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_eq" (func $VectorizeVectorMetadataFilter2.set_eq (param $this externref) (param $value externref)))
-  ;; set $eq(value: null)
-  (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_eq_with_null" (func $VectorizeVectorMetadataFilter2.set_eq_with_null (param $this externref) (param $value externref)))
   ;; $ne?: VectorizeVectorMetadataValue | null
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.ne" (func $VectorizeVectorMetadataFilter2.ne (param $this externref) (result externref)))
-  ;; set $ne(value: VectorizeVectorMetadataValue)
+  ;; set $ne(value: VectorizeVectorMetadataValue | null)
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_ne" (func $VectorizeVectorMetadataFilter2.set_ne (param $this externref) (param $value externref)))
-  ;; set $ne(value: null)
-  (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_ne_with_null" (func $VectorizeVectorMetadataFilter2.set_ne_with_null (param $this externref) (param $value externref)))
   ;; $lt?: VectorizeVectorMetadataValue | null
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.lt" (func $VectorizeVectorMetadataFilter2.lt (param $this externref) (result externref)))
-  ;; set $lt(value: VectorizeVectorMetadataValue)
+  ;; set $lt(value: VectorizeVectorMetadataValue | null)
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_lt" (func $VectorizeVectorMetadataFilter2.set_lt (param $this externref) (param $value externref)))
-  ;; set $lt(value: null)
-  (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_lt_with_null" (func $VectorizeVectorMetadataFilter2.set_lt_with_null (param $this externref) (param $value externref)))
   ;; $lte?: VectorizeVectorMetadataValue | null
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.lte" (func $VectorizeVectorMetadataFilter2.lte (param $this externref) (result externref)))
-  ;; set $lte(value: VectorizeVectorMetadataValue)
+  ;; set $lte(value: VectorizeVectorMetadataValue | null)
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_lte" (func $VectorizeVectorMetadataFilter2.set_lte (param $this externref) (param $value externref)))
-  ;; set $lte(value: null)
-  (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_lte_with_null" (func $VectorizeVectorMetadataFilter2.set_lte_with_null (param $this externref) (param $value externref)))
   ;; $gt?: VectorizeVectorMetadataValue | null
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.gt" (func $VectorizeVectorMetadataFilter2.gt (param $this externref) (result externref)))
-  ;; set $gt(value: VectorizeVectorMetadataValue)
+  ;; set $gt(value: VectorizeVectorMetadataValue | null)
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_gt" (func $VectorizeVectorMetadataFilter2.set_gt (param $this externref) (param $value externref)))
-  ;; set $gt(value: null)
-  (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_gt_with_null" (func $VectorizeVectorMetadataFilter2.set_gt_with_null (param $this externref) (param $value externref)))
   ;; $gte?: VectorizeVectorMetadataValue | null
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.gte" (func $VectorizeVectorMetadataFilter2.gte (param $this externref) (result externref)))
-  ;; set $gte(value: VectorizeVectorMetadataValue)
+  ;; set $gte(value: VectorizeVectorMetadataValue | null)
   (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_gte" (func $VectorizeVectorMetadataFilter2.set_gte (param $this externref) (param $value externref)))
-  ;; set $gte(value: null)
-  (import "./bindings.wasm" "VectorizeVectorMetadataFilter2.set_gte_with_null" (func $VectorizeVectorMetadataFilter2.set_gte_with_null (param $this externref) (param $value externref)))
 
   ;; VectorizeVectorMetadataFilter3
   ;; {} as VectorizeVectorMetadataFilter3

@@ -39,56 +39,42 @@
   (import "nullability" "Settings.set_required" (func $nullability:Settings.set_required (param $this externref) (param $value externref)))
   ;; nullable: string | null
   (import "nullability" "Settings.nullable" (func $nullability:Settings.nullable (param $this externref) (result externref)))
-  ;; set nullable(value: string)
+  ;; set nullable(value: string | null)
   (import "nullability" "Settings.set_nullable" (func $nullability:Settings.set_nullable (param $this externref) (param $value externref)))
-  ;; set nullable(value: null)
-  (import "nullability" "Settings.set_nullable_with_null" (func $nullability:Settings.set_nullable_with_null (param $this externref) (param $value externref)))
   ;; both?: string | null
   (import "nullability" "Settings.both" (func $nullability:Settings.both (param $this externref) (result externref)))
-  ;; set both(value: string)
+  ;; set both(value: string | null)
   (import "nullability" "Settings.set_both" (func $nullability:Settings.set_both (param $this externref) (param $value externref)))
-  ;; set both(value: null)
-  (import "nullability" "Settings.set_both_with_null" (func $nullability:Settings.set_both_with_null (param $this externref) (param $value externref)))
   ;; aliased?: MaybeStr
   (import "nullability" "Settings.aliased" (func $nullability:Settings.aliased (param $this externref) (result externref)))
   ;; set aliased(value: MaybeStr)
   (import "nullability" "Settings.set_aliased" (func $nullability:Settings.set_aliased (param $this externref) (param $value externref)))
   ;; mode?: Mode | null
   (import "nullability" "Settings.mode" (func $nullability:Settings.mode (param $this externref) (result externref)))
-  ;; set mode(value: Mode)
+  ;; set mode(value: Mode | null)
   (import "nullability" "Settings.set_mode" (func $nullability:Settings.set_mode (param $this externref) (param $value externref)))
-  ;; set mode(value: null)
-  (import "nullability" "Settings.set_mode_with_null" (func $nullability:Settings.set_mode_with_null (param $this externref) (param $value externref)))
   ;; empties: null | undefined
   (import "nullability" "Settings.empties" (func $nullability:Settings.empties (param $this externref) (result externref)))
   ;; set empties(value: null)
   (import "nullability" "Settings.set_empties_with_null" (func $nullability:Settings.set_empties_with_null (param $this externref) (param $value externref)))
   ;; limit?: number | null
   (import "nullability" "Settings.limit" (func $nullability:Settings.limit (param $this externref) (result externref)))
-  ;; set limit(value: number)
-  (import "nullability" "Settings.set_limit" (func $nullability:Settings.set_limit (param $this externref) (param $value f64)))
-  ;; set limit(value: null)
-  (import "nullability" "Settings.set_limit_with_null" (func $nullability:Settings.set_limit_with_null (param $this externref) (param $value externref)))
+  ;; set limit(value: number | null)
+  (import "nullability" "Settings.set_limit" (func $nullability:Settings.set_limit (param $this externref) (param $value externref)))
   ;; owner?: Registry | null
   (import "nullability" "Settings.owner" (func $nullability:Settings.owner (param $this externref) (result externref)))
-  ;; set owner(value: Registry)
+  ;; set owner(value: Registry | null)
   (import "nullability" "Settings.set_owner" (func $nullability:Settings.set_owner (param $this externref) (param $value externref)))
-  ;; set owner(value: null)
-  (import "nullability" "Settings.set_owner_with_null" (func $nullability:Settings.set_owner_with_null (param $this externref) (param $value externref)))
   ;; values?: number[] | null
   (import "nullability" "Settings.values" (func $nullability:Settings.values (param $this externref) (result externref)))
-  ;; set values(value: number[])
+  ;; set values(value: number[] | null)
   (import "nullability" "Settings.set_values" (func $nullability:Settings.set_values (param $this externref) (param $value externref)))
-  ;; set values(value: null)
-  (import "nullability" "Settings.set_values_with_null" (func $nullability:Settings.set_values_with_null (param $this externref) (param $value externref)))
   ;; key?: string | number | null
   (import "nullability" "Settings.key" (func $nullability:Settings.key (param $this externref) (result externref)))
-  ;; set key(value: string)
+  ;; set key(value: string | null)
   (import "nullability" "Settings.set_key" (func $nullability:Settings.set_key (param $this externref) (param $value externref)))
-  ;; set key(value: number)
-  (import "nullability" "Settings.set_key_with_f64" (func $nullability:Settings.set_key_with_f64 (param $this externref) (param $value f64)))
-  ;; set key(value: null)
-  (import "nullability" "Settings.set_key_with_null" (func $nullability:Settings.set_key_with_null (param $this externref) (param $value externref)))
+  ;; set key(value: number | null)
+  (import "nullability" "Settings.set_key_with_f64" (func $nullability:Settings.set_key_with_f64 (param $this externref) (param $value externref)))
 
   ;; Registry
   ;; static current: Registry
@@ -97,16 +83,12 @@
   (import "nullability" "Registry.set_current" (func $nullability:Registry.set_current (param $value externref)))
   ;; static fallback: Registry | null
   (import "nullability" "Registry.fallback" (func $nullability:Registry.fallback (result externref)))
-  ;; set fallback(value: Registry)
+  ;; set fallback(value: Registry | null)
   (import "nullability" "Registry.set_fallback" (func $nullability:Registry.set_fallback (param $value externref)))
-  ;; set fallback(value: null)
-  (import "nullability" "Registry.set_fallback_with_null" (func $nullability:Registry.set_fallback_with_null (param $value externref)))
   ;; static last: Registry | null
   (import "nullability" "Registry.last" (func $nullability:Registry.last (result externref)))
-  ;; set last(value: Registry)
+  ;; set last(value: Registry | null)
   (import "nullability" "Registry.set_last" (func $nullability:Registry.set_last (param $value externref)))
-  ;; set last(value: null)
-  (import "nullability" "Registry.set_last_with_null" (func $nullability:Registry.set_last_with_null (param $value externref)))
   ;; pending: Promise<string | null>
   (import "nullability" "Registry.pending" (func $nullability:Registry.pending (param $this externref) (result externref)))
   ;; settled: Promise<number | undefined>
@@ -119,127 +101,83 @@
   (import "nullability" "Holder.value" (func $nullability:Holder.value (param $this externref) (result externref)))
 
   ;; Body
-  ;; constructor(body: string)
+  ;; constructor(body: string | null)
   (import "nullability" "Body.new" (func $nullability:Body.new (param $body externref) (result externref)))
-  ;; constructor(body: null)
-  (import "nullability" "Body.new_with_body_null" (func $nullability:Body.new_with_body_null (param $body externref) (result externref)))
-  ;; constructor(body: string, length: number)
-  (import "nullability" "Body.new_with_length" (func $nullability:Body.new_with_length (param $body externref) (param $length f64) (result externref)))
-  ;; constructor(body: null, length: number)
-  (import "nullability" "Body.new_with_body_null_and_length" (func $nullability:Body.new_with_body_null_and_length (param $body externref) (param $length f64) (result externref)))
-  ;; constructor(body: string, length: null)
-  (import "nullability" "Body.new_with_length_null" (func $nullability:Body.new_with_length_null (param $body externref) (param $length externref) (result externref)))
-  ;; constructor(body: null, length: null)
-  (import "nullability" "Body.new_with_body_null_and_length_null" (func $nullability:Body.new_with_body_null_and_length_null (param $body externref) (param $length externref) (result externref)))
-  ;; put(value: string): void
+  ;; constructor(body: string | null, length: number | null)
+  (import "nullability" "Body.new_with_length" (func $nullability:Body.new_with_length (param $body externref) (param $length externref) (result externref)))
+  ;; put(value: string | null): void
   (import "nullability" "Body.put" (func $nullability:Body.put (param $this externref) (param $value externref)))
-  ;; put(value: null): void
-  (import "nullability" "Body.put_with_null" (func $nullability:Body.put_with_null (param $this externref) (param $value externref)))
-  ;; from(owner: Registry): Body
+  ;; from(owner: Registry | null): Body
   (import "nullability" "Body.from" (func $nullability:Body.from (param $owner externref) (result externref)))
-  ;; from(owner: null): Body
-  (import "nullability" "Body.from_with_null" (func $nullability:Body.from_with_null (param $owner externref) (result externref)))
 
   ;; optional(): void
   (import "nullability" "optional" (func $nullability:optional))
   ;; optional(x: string): void
   (import "nullability" "optional_with_x" (func $nullability:optional_with_x (param $x externref)))
-  ;; nullable(x: string): void
+  ;; nullable(x: string | null): void
   (import "nullability" "nullable" (func $nullability:nullable (param $x externref)))
-  ;; nullable(x: null): void
-  (import "nullability" "nullable_with_null" (func $nullability:nullable_with_null (param $x externref)))
   ;; both(): string | null | undefined
   (import "nullability" "both" (func $nullability:both (result externref)))
-  ;; both(x: string): string | null | undefined
+  ;; both(x: string | null): string | null | undefined
   (import "nullability" "both_with_x" (func $nullability:both_with_x (param $x externref) (result externref)))
-  ;; both(x: null): string | null | undefined
-  (import "nullability" "both_with_null" (func $nullability:both_with_null (param $x externref) (result externref)))
   ;; optionalBoth(): void
   (import "nullability" "optionalBoth" (func $nullability:optionalBoth))
-  ;; optionalBoth(x: string): void
+  ;; optionalBoth(x: string | null): void
   (import "nullability" "optionalBoth_with_x" (func $nullability:optionalBoth_with_x (param $x externref)))
-  ;; optionalBoth(x: null): void
-  (import "nullability" "optionalBoth_with_null" (func $nullability:optionalBoth_with_null (param $x externref)))
   ;; aliased(): MaybeStr | undefined
   (import "nullability" "aliased" (func $nullability:aliased (result externref)))
   ;; aliased(x: MaybeStr): MaybeStr | undefined
   (import "nullability" "aliased_with_x" (func $nullability:aliased_with_x (param $x externref) (result externref)))
-  ;; aliasedNull(x: MaybeStr): MaybeStr | null
+  ;; aliasedNull(x: MaybeStr | null): MaybeStr | null
   (import "nullability" "aliasedNull" (func $nullability:aliasedNull (param $x externref) (result externref)))
-  ;; aliasedNull(x: null): MaybeStr | null
-  (import "nullability" "aliasedNull_with_null" (func $nullability:aliasedNull_with_null (param $x externref) (result externref)))
-  ;; optAliasedNull(x: OptStr): OptStr | null
+  ;; optAliasedNull(x: OptStr | null): OptStr | null
   (import "nullability" "optAliasedNull" (func $nullability:optAliasedNull (param $x externref) (result externref)))
-  ;; optAliasedNull(x: null): OptStr | null
-  (import "nullability" "optAliasedNull_with_null" (func $nullability:optAliasedNull_with_null (param $x externref) (result externref)))
   ;; count(): number | null | undefined
   (import "nullability" "count" (func $nullability:count (result externref)))
-  ;; count(x: number): number | null | undefined
-  (import "nullability" "count_with_x" (func $nullability:count_with_x (param $x f64) (result externref)))
-  ;; count(x: null): number | null | undefined
-  (import "nullability" "count_with_null" (func $nullability:count_with_null (param $x externref) (result externref)))
-  ;; countNull(x: number): void
-  (import "nullability" "countNull" (func $nullability:countNull (param $x f64)))
-  ;; countNull(x: null): void
-  (import "nullability" "countNull_with_null" (func $nullability:countNull_with_null (param $x externref)))
+  ;; count(x: number | null): number | null | undefined
+  (import "nullability" "count_with_x" (func $nullability:count_with_x (param $x externref) (result externref)))
+  ;; countNull(x: number | null): void
+  (import "nullability" "countNull" (func $nullability:countNull (param $x externref)))
   ;; countOptional(): void
   (import "nullability" "countOptional" (func $nullability:countOptional))
-  ;; countOptional(x: number): void
-  (import "nullability" "countOptional_with_x" (func $nullability:countOptional_with_x (param $x f64)))
-  ;; countOptional(x: null): void
-  (import "nullability" "countOptional_with_null" (func $nullability:countOptional_with_null (param $x externref)))
-  ;; flag(x: boolean): boolean | null
-  (import "nullability" "flag" (func $nullability:flag (param $x i32) (result externref)))
-  ;; flag(x: null): boolean | null
-  (import "nullability" "flag_with_null" (func $nullability:flag_with_null (param $x externref) (result externref)))
+  ;; countOptional(x: number | null): void
+  (import "nullability" "countOptional_with_x" (func $nullability:countOptional_with_x (param $x externref)))
+  ;; flag(x: boolean | null): boolean | null
+  (import "nullability" "flag" (func $nullability:flag (param $x externref) (result externref)))
   ;; registry(): Registry | null | undefined
   (import "nullability" "registry" (func $nullability:registry (result externref)))
-  ;; registry(r: Registry): Registry | null | undefined
+  ;; registry(r: Registry | null): Registry | null | undefined
   (import "nullability" "registry_with_r" (func $nullability:registry_with_r (param $r externref) (result externref)))
-  ;; registry(r: null): Registry | null | undefined
-  (import "nullability" "registry_with_null" (func $nullability:registry_with_null (param $r externref) (result externref)))
-  ;; registryNull(r: Registry): void
+  ;; registryNull(r: Registry | null): void
   (import "nullability" "registryNull" (func $nullability:registryNull (param $r externref)))
-  ;; registryNull(r: null): void
-  (import "nullability" "registryNull_with_null" (func $nullability:registryNull_with_null (param $r externref)))
   ;; registryOptional(): void
   (import "nullability" "registryOptional" (func $nullability:registryOptional))
-  ;; registryOptional(r: Registry): void
+  ;; registryOptional(r: Registry | null): void
   (import "nullability" "registryOptional_with_r" (func $nullability:registryOptional_with_r (param $r externref)))
-  ;; registryOptional(r: null): void
-  (import "nullability" "registryOptional_with_null" (func $nullability:registryOptional_with_null (param $r externref)))
   ;; scalar(): void
   (import "nullability" "scalar" (func $nullability:scalar))
-  ;; scalar(x: string): void
+  ;; scalar(x: string | null): void
   (import "nullability" "scalar_with_str" (func $nullability:scalar_with_str (param $x externref)))
-  ;; scalar(x: number): void
-  (import "nullability" "scalar_with_f64" (func $nullability:scalar_with_f64 (param $x f64)))
-  ;; scalar(x: null): void
-  (import "nullability" "scalar_with_null" (func $nullability:scalar_with_null (param $x externref)))
-  ;; scalarNull(x: string): void
+  ;; scalar(x: number | null): void
+  (import "nullability" "scalar_with_f64" (func $nullability:scalar_with_f64 (param $x externref)))
+  ;; scalarNull(x: string | null): void
   (import "nullability" "scalarNull" (func $nullability:scalarNull (param $x externref)))
-  ;; scalarNull(x: number): void
-  (import "nullability" "scalarNull_with_f64" (func $nullability:scalarNull_with_f64 (param $x f64)))
-  ;; scalarNull(x: null): void
-  (import "nullability" "scalarNull_with_null" (func $nullability:scalarNull_with_null (param $x externref)))
+  ;; scalarNull(x: number | null): void
+  (import "nullability" "scalarNull_with_f64" (func $nullability:scalarNull_with_f64 (param $x externref)))
   ;; scalarOptional(): void
   (import "nullability" "scalarOptional" (func $nullability:scalarOptional))
-  ;; scalarOptional(x: string): void
+  ;; scalarOptional(x: string | null): void
   (import "nullability" "scalarOptional_with_str" (func $nullability:scalarOptional_with_str (param $x externref)))
-  ;; scalarOptional(x: number): void
-  (import "nullability" "scalarOptional_with_f64" (func $nullability:scalarOptional_with_f64 (param $x f64)))
-  ;; scalarOptional(x: null): void
-  (import "nullability" "scalarOptional_with_null" (func $nullability:scalarOptional_with_null (param $x externref)))
+  ;; scalarOptional(x: number | null): void
+  (import "nullability" "scalarOptional_with_f64" (func $nullability:scalarOptional_with_f64 (param $x externref)))
   ;; pair(x: string): void
   (import "nullability" "pair" (func $nullability:pair (param $x externref)))
   ;; pair(x: number): void
   (import "nullability" "pair_with_f64" (func $nullability:pair_with_f64 (param $x f64)))
   ;; leading(a: string | undefined, b: number): void
   (import "nullability" "leading" (func $nullability:leading (param $a externref) (param $b f64)))
-  ;; leadingNull(a: string | undefined, b: number): void
+  ;; leadingNull(a: string | null | undefined, b: number): void
   (import "nullability" "leadingNull" (func $nullability:leadingNull (param $a externref) (param $b f64)))
-  ;; leadingNull(a: null, b: number): void
-  (import "nullability" "leadingNull_with_null" (func $nullability:leadingNull_with_null (param $a externref) (param $b f64)))
   ;; trailing(a: number): void
   (import "nullability" "trailing" (func $nullability:trailing (param $a f64)))
   ;; trailing(a: number, b: string): void
@@ -248,30 +186,22 @@
   (import "nullability" "chain" (func $nullability:chain))
   ;; chain(a: string): void
   (import "nullability" "chain_with_a" (func $nullability:chain_with_a (param $a externref)))
-  ;; chain(a: string | undefined, b: number): void
-  (import "nullability" "chain_with_a_and_b" (func $nullability:chain_with_a_and_b (param $a externref) (param $b f64)))
-  ;; chain(a: string | undefined, b: null): void
-  (import "nullability" "chain_with_a_and_null" (func $nullability:chain_with_a_and_null (param $a externref) (param $b externref)))
+  ;; chain(a: string | undefined, b: number | null): void
+  (import "nullability" "chain_with_a_and_b" (func $nullability:chain_with_a_and_b (param $a externref) (param $b externref)))
   ;; chainOptional(): void
   (import "nullability" "chainOptional" (func $nullability:chainOptional))
   ;; chainOptional(a: string): void
   (import "nullability" "chainOptional_with_a" (func $nullability:chainOptional_with_a (param $a externref)))
-  ;; chainOptional(a: string | undefined, b: number): void
-  (import "nullability" "chainOptional_with_a_and_b" (func $nullability:chainOptional_with_a_and_b (param $a externref) (param $b f64)))
-  ;; chainOptional(a: string | undefined, b: null): void
-  (import "nullability" "chainOptional_with_a_and_null" (func $nullability:chainOptional_with_a_and_null (param $a externref) (param $b externref)))
+  ;; chainOptional(a: string | undefined, b: number | null): void
+  (import "nullability" "chainOptional_with_a_and_b" (func $nullability:chainOptional_with_a_and_b (param $a externref) (param $b externref)))
   ;; chainThree(): void
   (import "nullability" "chainThree" (func $nullability:chainThree))
   ;; chainThree(a: string): void
   (import "nullability" "chainThree_with_a" (func $nullability:chainThree_with_a (param $a externref)))
-  ;; chainThree(a: string | undefined, b: number): void
-  (import "nullability" "chainThree_with_a_and_b" (func $nullability:chainThree_with_a_and_b (param $a externref) (param $b f64)))
-  ;; chainThree(a: string | undefined, b: null): void
-  (import "nullability" "chainThree_with_a_and_null" (func $nullability:chainThree_with_a_and_null (param $a externref) (param $b externref)))
-  ;; chainThree(a: string | undefined, b: number | undefined, c: boolean): void
+  ;; chainThree(a: string | undefined, b: number | null): void
+  (import "nullability" "chainThree_with_a_and_b" (func $nullability:chainThree_with_a_and_b (param $a externref) (param $b externref)))
+  ;; chainThree(a: string | undefined, b: number | null | undefined, c: boolean): void
   (import "nullability" "chainThree_with_a_and_b_and_c" (func $nullability:chainThree_with_a_and_b_and_c (param $a externref) (param $b externref) (param $c i32)))
-  ;; chainThree(a: string | undefined, b: null, c: boolean): void
-  (import "nullability" "chainThree_with_a_and_null_and_c" (func $nullability:chainThree_with_a_and_null_and_c (param $a externref) (param $b externref) (param $c i32)))
   ;; chainUnion(): void
   (import "nullability" "chainUnion" (func $nullability:chainUnion))
   ;; chainUnion(a: string): void
@@ -288,36 +218,26 @@
   (import "nullability" "chainAlias_with_a" (func $nullability:chainAlias_with_a (param $a externref)))
   ;; chainAlias(a: Source | undefined, b: number): void
   (import "nullability" "chainAlias_with_a_and_b" (func $nullability:chainAlias_with_a_and_b (param $a externref) (param $b f64)))
-  ;; modeArg(m: Mode): Mode | null
+  ;; modeArg(m: Mode | null): Mode | null
   (import "nullability" "modeArg" (func $nullability:modeArg (param $m externref) (result externref)))
-  ;; modeArg(m: null): Mode | null
-  (import "nullability" "modeArg_with_null" (func $nullability:modeArg_with_null (param $m externref) (result externref)))
   ;; modeBoth(): Mode | null | undefined
   (import "nullability" "modeBoth" (func $nullability:modeBoth (result externref)))
-  ;; modeBoth(m: Mode): Mode | null | undefined
+  ;; modeBoth(m: Mode | null): Mode | null | undefined
   (import "nullability" "modeBoth_with_m" (func $nullability:modeBoth_with_m (param $m externref) (result externref)))
-  ;; modeBoth(m: null): Mode | null | undefined
-  (import "nullability" "modeBoth_with_null" (func $nullability:modeBoth_with_null (param $m externref) (result externref)))
   ;; modeOptional(): void
   (import "nullability" "modeOptional" (func $nullability:modeOptional))
-  ;; modeOptional(m: Mode): void
+  ;; modeOptional(m: Mode | null): void
   (import "nullability" "modeOptional_with_m" (func $nullability:modeOptional_with_m (param $m externref)))
-  ;; modeOptional(m: null): void
-  (import "nullability" "modeOptional_with_null" (func $nullability:modeOptional_with_null (param $m externref)))
   ;; emptiesOnly(): null | undefined
   (import "nullability" "emptiesOnly" (func $nullability:emptiesOnly (result externref)))
   ;; emptiesOnly(x: null): null | undefined
   (import "nullability" "emptiesOnly_with_null" (func $nullability:emptiesOnly_with_null (param $x externref) (result externref)))
-  ;; generic(x: T): T | null
+  ;; generic(x: T | null): T | null
   (import "nullability" "generic" (func $nullability:generic (param $x externref) (result externref)))
-  ;; generic(x: null): T | null
-  (import "nullability" "generic_with_null" (func $nullability:generic_with_null (param $x externref) (result externref)))
   ;; genericBoth(): T | null | undefined
   (import "nullability" "genericBoth" (func $nullability:genericBoth (result externref)))
-  ;; genericBoth(x: T): T | null | undefined
+  ;; genericBoth(x: T | null): T | null | undefined
   (import "nullability" "genericBoth_with_x" (func $nullability:genericBoth_with_x (param $x externref) (result externref)))
-  ;; genericBoth(x: null): T | null | undefined
-  (import "nullability" "genericBoth_with_null" (func $nullability:genericBoth_with_null (param $x externref) (result externref)))
   ;; inner(xs: Promise<string | null>, ys: (number | undefined)[]): void
   (import "nullability" "inner" (func $nullability:inner (param $xs externref) (param $ys externref)))
   ;; innerBoth(xs: Promise<string | null | undefined>): void
@@ -336,40 +256,28 @@
   (import "nullability" "fetchBoth" (func $nullability:fetchBoth (result externref)))
   ;; fetchGeneric(): Promise<T | null>
   (import "nullability" "fetchGeneric" (func $nullability:fetchGeneric (result externref)))
-  ;; numbers(xs: number[]): number[] | null
+  ;; numbers(xs: number[] | null): number[] | null
   (import "nullability" "numbers" (func $nullability:numbers (param $xs externref) (result externref)))
-  ;; numbers(xs: null): number[] | null
-  (import "nullability" "numbers_with_null" (func $nullability:numbers_with_null (param $xs externref) (result externref)))
   ;; numbersBoth(): number[] | null | undefined
   (import "nullability" "numbersBoth" (func $nullability:numbersBoth (result externref)))
-  ;; numbersBoth(xs: number[]): number[] | null | undefined
+  ;; numbersBoth(xs: number[] | null): number[] | null | undefined
   (import "nullability" "numbersBoth_with_xs" (func $nullability:numbersBoth_with_xs (param $xs externref) (result externref)))
-  ;; numbersBoth(xs: null): number[] | null | undefined
-  (import "nullability" "numbersBoth_with_null" (func $nullability:numbersBoth_with_null (param $xs externref) (result externref)))
   ;; numbersOptional(): void
   (import "nullability" "numbersOptional" (func $nullability:numbersOptional))
-  ;; numbersOptional(xs: number[]): void
+  ;; numbersOptional(xs: number[] | null): void
   (import "nullability" "numbersOptional_with_xs" (func $nullability:numbersOptional_with_xs (param $xs externref)))
-  ;; numbersOptional(xs: null): void
-  (import "nullability" "numbersOptional_with_null" (func $nullability:numbersOptional_with_null (param $xs externref)))
-  ;; bytes(xs: number[]): void
+  ;; bytes(xs: number[] | null): void
   (import "nullability" "bytes" (func $nullability:bytes (param $xs externref)))
-  ;; bytes(xs: Uint8Array): void
+  ;; bytes(xs: Uint8Array | null): void
   (import "nullability" "bytes_with_uint8_array" (func $nullability:bytes_with_uint8_array (param $xs externref)))
-  ;; bytes(xs: null): void
-  (import "nullability" "bytes_with_null" (func $nullability:bytes_with_null (param $xs externref)))
   ;; bytesBoth(): void
   (import "nullability" "bytesBoth" (func $nullability:bytesBoth))
-  ;; bytesBoth(xs: number[]): void
+  ;; bytesBoth(xs: number[] | null): void
   (import "nullability" "bytesBoth_with_slice" (func $nullability:bytesBoth_with_slice (param $xs externref)))
-  ;; bytesBoth(xs: Uint8Array): void
+  ;; bytesBoth(xs: Uint8Array | null): void
   (import "nullability" "bytesBoth_with_uint8_array" (func $nullability:bytesBoth_with_uint8_array (param $xs externref)))
-  ;; bytesBoth(xs: null): void
-  (import "nullability" "bytesBoth_with_null" (func $nullability:bytesBoth_with_null (param $xs externref)))
-  ;; jsdoc(x: string): void
+  ;; jsdoc(x: string | null): void
   (import "nullability" "jsdoc" (func $nullability:jsdoc (param $x externref)))
-  ;; jsdoc(x: null): void
-  (import "nullability" "jsdoc_with_null" (func $nullability:jsdoc_with_null (param $x externref)))
   ;; send(attachment: Attachment): void
   (import "nullability" "send" (func $nullability:send (param $attachment externref)))
   ;; upload(upload: Upload): void
