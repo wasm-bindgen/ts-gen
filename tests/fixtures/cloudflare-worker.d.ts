@@ -98,3 +98,41 @@ interface ScheduledController {
 
 // === Global fetch ===
 declare function fetch(input: RequestInfo, init?: RequestInit): Promise<Response>;
+
+// === Console (variadic, rest-only) ===
+interface Console {
+  log(...args: any[]): void;
+}
+declare var console: Console;
+
+// === Variadic with fixed args ===
+declare function joinAll(sep: string, ...parts: string[]): string;
+
+// === Variadic parameters named like the bindings' locals ===
+declare function restLog(...rest: string[]): void;
+declare function arrLog(arr: string, ...args: string[]): void;
+
+// === Boolean writes (dictionary field and call argument) ===
+interface Flags {
+  verbose?: boolean;
+}
+declare function describeFlags(flags: Flags, strict: boolean): string;
+
+// === Module-scoped declarations, reached through the module's ESM imports ===
+declare module "cloudflare:sockets" {
+  function connect(address: string): Socket;
+  class Socket {
+    static readonly PROTOCOL: string;
+    readonly closed: Promise<void>;
+    startTls(): Socket;
+  }
+}
+
+// === Scalar module exports, and a module function's `this` ===
+declare module "embed:values" {
+  const count: number;
+  const enabled: boolean;
+  const disabled: boolean;
+  const big: bigint;
+  function receiver(): string;
+}

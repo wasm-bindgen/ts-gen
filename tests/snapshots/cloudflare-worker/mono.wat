@@ -2,15 +2,17 @@
 ;;
 ;; Scalars: number -> f64, boolean -> i32, bigint -> i64.
 ;; All other values (strings, objects, null/undefined) are externref,
-;; as JS produced them. A position whose TS type never admits null
-;; may be taken as (ref extern).
+;; as JS produced them. Per position, embed also accepts anyref, and
+;; (ref extern) / (ref any) where the TS type never admits null.
 ;;
 ;; Import names: Type.member with _with_x suffixes for overloads.
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Import only what you use; unused entries need not be deleted.
+;; Unused imports need not be deleted; embed prunes to what you use.
 (module
+  ;; GC array type for variadic parameters (anyref for GC language compat).
+  (type $anyrefs (array (mut anyref)))
 
   ;; JsValue
   ;; x === undefined
@@ -181,14 +183,38 @@
   ;; fetch(input: RequestInfo, init: RequestInit): Promise<Response>
   (import "./bindings.wasm" "fetch_with_init" (func $fetch_with_init (param $input externref) (param $init externref) (result externref)))
 
+  ;; Console
+  ;; log(...args: any[]): void
+  (import "./bindings.wasm" "Console.log" (func $Console.log (param $this externref) (param $args (ref null $anyrefs))))
+
+  ;; var console: Console
+  (import "./bindings.wasm" "console" (func $console (result externref)))
+  ;; joinAll(sep: string, ...parts: string[]): string
+  (import "./bindings.wasm" "joinAll" (func $joinAll (param $sep externref) (param $parts (ref null $anyrefs)) (result externref)))
+  ;; restLog(...rest: string[]): void
+  (import "./bindings.wasm" "restLog" (func $restLog (param $rest (ref null $anyrefs))))
+  ;; arrLog(arr: string, ...args: string[]): void
+  (import "./bindings.wasm" "arrLog" (func $arrLog (param $arr externref) (param $args (ref null $anyrefs))))
+
+  ;; Flags
+  ;; {} as Flags
+  (import "./bindings.wasm" "Flags.new" (func $Flags.new (result externref)))
+  ;; verbose?: boolean
+  (import "./bindings.wasm" "Flags.verbose" (func $Flags.verbose (param $this externref) (result externref)))
+  ;; set verbose(value: boolean)
+  (import "./bindings.wasm" "Flags.set_verbose" (func $Flags.set_verbose (param $this externref) (param $value i32)))
+
+  ;; describeFlags(flags: Flags, strict: boolean): string
+  (import "./bindings.wasm" "describeFlags" (func $describeFlags (param $flags externref) (param $strict i32) (result externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 
-  ;; JSPI: suspends on a Promise and returns its value. A module that
-  ;; imports this has its provided functions wrapped with promising.
+  ;; JSPI: suspends on a Promise and returns its value. Importing this
+  ;; selects JSPI mode in `embed`, which wraps the handlers with promising.
   (import "./builtins.js" "await" (func $await (param externref) (result externref)))
 
-  ;; --provides: fill these in; they are published at their JS paths.
+  ;; --provides: fill these in; embed publishes them at their JS paths.
 
   ;; default.fetch: fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response>
   (func (export "fetch") (param $request externref) (param $env externref) (param $ctx externref) (result externref)

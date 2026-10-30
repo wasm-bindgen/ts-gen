@@ -626,6 +626,96 @@ extern "C" {
         init: &RequestInit,
     ) -> Promise<Response>;
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Console;
+    #[wasm_bindgen(method, variadic, catch)]
+    pub fn log(this: &Console, args: &[JsValue]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[allow(non_upper_case_globals)]
+    #[wasm_bindgen(thread_local_v2)]
+    pub static console: Console;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "joinAll")]
+    pub fn join_all(
+        sep: impl ::wasm_bindgen::JsStringLike,
+        parts: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "joinAll")]
+    pub fn join_all_js_string(
+        sep: impl ::wasm_bindgen::JsStringLike,
+        parts: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "restLog")]
+    pub fn rest_log(rest: &[impl ::wasm_bindgen::JsStringLike]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "arrLog")]
+    pub fn arr_log(
+        arr: impl ::wasm_bindgen::JsStringLike,
+        args: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Flags;
+    #[wasm_bindgen(method, getter)]
+    pub fn verbose(this: &Flags) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_verbose(this: &Flags, val: bool);
+}
+impl Flags {
+    pub fn new() -> Flags {
+        Self::builder().build()
+    }
+    pub fn builder() -> FlagsBuilder {
+        FlagsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for Flags {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct FlagsBuilder {
+    inner: Flags,
+}
+impl FlagsBuilder {
+    pub fn verbose(self, val: bool) -> Self {
+        self.inner.set_verbose(val);
+        self
+    }
+    pub fn build(self) -> Flags {
+        self.inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeFlags")]
+    pub fn describe_flags(flags: &Flags, strict: bool) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeFlags")]
+    pub fn describe_flags_js_string(flags: &Flags, strict: bool) -> Result<JsString, JsValue>;
+}
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
 pub enum HeadersKind {
