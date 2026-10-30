@@ -1,7 +1,8 @@
 # Zena Worker
 
 A Cloudflare Worker in [Zena](https://github.com/elematic/zena), built against
-`ts-gen --target zena` bindings and embedded with `ts-gen embed`. It
+bindings `ts-gen-zena` writes from the ABI template, and embedded with
+`ts-gen embed`. It
 replies with the request's method, URL, `x-zena` header and body, and the
 `GREETING` binding from `config.capnp`.
 
@@ -10,8 +11,9 @@ Files:
 - `app.zena`: the worker, against the typed classes in `bindings.zena`.
 - `env.d.ts`: the worker's bindings, merged into the `Env` of
   `tests/fixtures/cloudflare-worker.d.ts`.
-- `bindings.zena`, `main.zena` (generated, not committed): the bindings
-  and the compile entry, whose raw `fetch` export wraps `app.fetch`.
+- `worker.abi.wat`, `bindings.zena`, `main.zena` (generated, not
+  committed): the ABI template, the bindings, and the compile entry,
+  whose raw `fetch` export wraps `app.fetch`.
 - `loader.js`: instantiates the merged module and publishes its `default`
   export. App-independent.
 - `config.capnp`: workerd config loading `loader.js`, `builtins.js` and
@@ -32,19 +34,21 @@ From the repository root:
 ```sh
 EX=examples/zena-worker
 
-# Bindings plus main.zena, the compile entry: `--provides` names the
-# handler the default export implements. app.zena is committed; ts-gen
-# would scaffold it if it were absent.
+# The ABI template: `--provides` names the handler the default export
+# implements. Everything after this step reads only the template.
 cargo run -- -i tests/fixtures/cloudflare-worker.d.ts -i $EX/env.d.ts \
-  -o $EX/bindings.zena --target zena --provides ExportedHandler.fetch
+  -o $EX/worker.abi.wat --target wat --provides ExportedHandler.fetch
+
+# Bindings plus main.zena, the compile entry. app.zena is committed;
+# ts-gen-zena would scaffold it if it were absent.
+cargo run -p ts-gen-zena -- $EX/worker.abi.wat -o $EX/bindings.zena
 
 # Compile. String literals become `wasm:js/string-constants` imports.
 (cd $EX && $ZENA build main.zena -t js \
   --imported-string-constants wasm:js/string-constants -o main.wasm)
 
-# Embed: writes the merged out/main.wasm and out/builtins.js.
-cargo run -- embed -i tests/fixtures/cloudflare-worker.d.ts -i $EX/env.d.ts \
-  --provides ExportedHandler.fetch -m $EX/main.wasm -o $EX/out
+# Embed against the same template: writes out/main.wasm and out/builtins.js.
+cargo run -- embed --abi $EX/worker.abi.wat -m $EX/main.wasm -o $EX/out
 cp $EX/loader.js $EX/config.capnp $EX/out/
 ```
 
@@ -61,8 +65,8 @@ curl -H 'x-zena: hi' -d 'Hello!' http://127.0.0.1:8788/echo
 
 ## Test
 
-`cargo test --test zena zena_worker` runs the same build and calls the
-worker's `fetch` in node (`tests/zena-worker.mjs`). It runs when `ZENA`
+`cargo test -p ts-gen-zena zena_worker` runs the same build and calls the
+worker's `fetch` in node (`generators/zena/tests/worker.mjs`). It runs when `ZENA`
 names the `zena` CLI and is skipped otherwise; with `ZENA` set it needs
 `wasm-merge` and node 24+ as the embed tests do.
 

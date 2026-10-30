@@ -1,12 +1,11 @@
 //! The Wasm-level ABI derived from a `.d.ts`: one function per member, all
 //! JS values as `externref`, scalars as Wasm numeric types.
 //!
-//! Three emitters consume this model:
+//! The model and its file format live in the `ts-gen-abi` crate; this
+//! module lowers a `.d.ts` to it. Two consumers are in ts-gen:
 //!
-//! * [`wat`] prints the ABI as an import template a language module is
-//!   written against (`--target wat`).
-//! * [`zena`] prints Zena declarations that import the same ABI functions
-//!   (`--target zena`).
+//! * [`wat`] prints the ABI as the annotated import template `ABI.md`
+//!   specifies (`--target wat`), which bindings generators read.
 //! * [`embed`] implements the ABI for a given language module: a
 //!   `bindings.wasm` built on a fixed set of JS primitives, a
 //!   `wrapper.wasm` that presents the module's handlers as a Worker, and
@@ -14,7 +13,6 @@
 
 pub mod embed;
 pub mod wat;
-pub mod zena;
 
 use std::collections::{HashMap, HashSet};
 

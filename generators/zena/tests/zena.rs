@@ -1,25 +1,26 @@
-//! Tests for `--target zena`.
+//! Tests for `ts-gen-zena`, which reads only ABI templates.
 //!
-//! Every `.d.ts` file in `tests/fixtures/` generates Zena bindings compared
-//! against `tests/snapshots/<name>/default.zena` (plus `default.main.zena`
-//! and `default.app.zena` with `--provides`), beside the snapshot harness's
-//! outputs. The ABI is the same under every snapshot configuration, so the
-//! Zena target is rendered under the default one. The `@external` declarations of
-//! each output must be exactly the imports `--target wat` lists for the
-//! same input, with the same Wasm types.
+//! Its inputs are the templates ts-gen's snapshot harness writes for every
+//! fixture, `tests/snapshots/<name>/default.wat` at the repository root,
+//! so this crate tests the generator the way any consumer of the format
+//! runs it. Each generates Zena bindings compared against
+//! `tests/snapshots/<name>.zena` here (plus `.main.zena` and `.app.zena`
+//! for a template with handlers). The `@external` declarations of each
+//! output must be exactly the template's imports, with the same Wasm types.
 //!
 //! With `ZENA` set to a `zena` CLI binary, every output is also compiled
-//! with `-t js`, and the compiled module is embedded with `ts-gen embed`,
+//! with `-t js`, and the compiled module is embedded against the template,
 //! which validates its imports against the ABI and merges it. The worker
-//! in `examples/zena-worker/` is compiled, embedded and run in node. The
-//! merge needs `wasm-merge` (`WASM_MERGE` or `PATH`) and the run node 24+
-//! (`NODE` or `PATH`); a missing tool skips its step locally and fails
-//! under `CI`. Without `ZENA` these steps are skipped with a note.
+//! in `examples/zena-worker/` is built through ts-gen, this generator,
+//! Zena and `ts-gen embed --abi`, and run in node. The merge needs
+//! `wasm-merge` (`WASM_MERGE` or `PATH`) and the run node 24+ (`NODE` or
+//! `PATH`); a missing tool skips its step locally and fails under `CI`.
+//! Without `ZENA` these steps are skipped with a note.
 //!
 //! To update snapshots:
 //!
 //! ```sh
-//! BLESS=1 cargo test -p ts-gen --test zena
+//! BLESS=1 cargo test -p ts-gen-zena
 //! ```
 
 use std::collections::BTreeSet;
@@ -30,8 +31,8 @@ fn crate_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).to_path_buf()
 }
 
-fn ts_gen_bin() -> PathBuf {
-    PathBuf::from(env!("CARGO_BIN_EXE_ts-gen"))
+fn repo_root() -> PathBuf {
+    crate_root().join("../..").canonicalize().unwrap()
 }
 
 /// A fresh output directory, removed on drop.
@@ -53,20 +54,6 @@ impl Drop for TempDir {
     }
 }
 
-fn collect_directive_args(fixture: &Path) -> Vec<String> {
-    let content = std::fs::read_to_string(fixture).unwrap_or_default();
-    let mut args = Vec::new();
-    for line in content.lines() {
-        let trimmed = line.trim();
-        if let Some(rest) = trimmed.strip_prefix("//! @ts-gen ") {
-            args.extend(rest.split_whitespace().map(String::from));
-        } else if !trimmed.starts_with("//") && !trimmed.is_empty() {
-            break;
-        }
-    }
-    args
-}
-
 fn bless_enabled() -> bool {
     std::env::var("BLESS").is_ok_and(|v| v == "1" || v == "true")
 }
@@ -85,7 +72,7 @@ fn assert_snapshot(snap_path: &Path, actual: &str) {
     let expected = std::fs::read_to_string(snap_path).unwrap_or_else(|e| {
         panic!(
             "Snapshot file not found: {}\n\
-             Run `BLESS=1 cargo test -p ts-gen --test zena` to create it.\n\
+             Run `BLESS=1 cargo test -p ts-gen-zena` to create it.\n\
              Error: {e}",
             snap_path.display()
         )
@@ -119,7 +106,7 @@ fn assert_snapshot(snap_path: &Path, actual: &str) {
     }
     panic!(
         "Snapshot mismatch for {}\n\
-         Run `BLESS=1 cargo test -p ts-gen --test zena` to update.\n\
+         Run `BLESS=1 cargo test -p ts-gen-zena` to update.\n\
          {diff_output}",
         snap_path.display()
     );
@@ -218,44 +205,6 @@ fn compile(zena: &Path, dir: &Path, entry: &str, out: &Path) {
             .arg(out),
         &format!("zena build {}", dir.join(entry).display()),
     );
-}
-
-/// `ts-gen embed` the compiled `module` against `fixture` with the
-/// directive's selection flags, and validate the merged module.
-fn embed(fixture: &Path, args: &[String], module: &Path, out_dir: &Path, wasm_merge: &Path) {
-    let mut selection = Vec::new();
-    let mut args = args.iter();
-    while let Some(arg) = args.next() {
-        match arg.as_str() {
-            "--input" | "--lib-name" | "--export" | "--external" | "--provides" => {
-                selection.push(arg.clone());
-                selection.push(args.next().expect("flag value").clone());
-            }
-            _ => {}
-        }
-    }
-    run(
-        Command::new(ts_gen_bin())
-            .current_dir(crate_root())
-            .arg("embed")
-            .arg("--input")
-            .arg(fixture)
-            .args(&selection)
-            .arg("--module")
-            .arg(module)
-            .arg("--out-dir")
-            .arg(out_dir)
-            .arg("--wasm-merge")
-            .arg(wasm_merge),
-        &format!("ts-gen embed {}", module.display()),
-    );
-    let merged = std::fs::read(out_dir.join(module.file_name().unwrap())).unwrap();
-    let mut validator = wasmparser::Validator::new_with_features(
-        wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
-    );
-    validator
-        .validate_all(&merged)
-        .unwrap_or_else(|e| panic!("merged {} does not validate: {e}", module.display()));
 }
 
 /// A Wasm import as `module`, `name` and its type in WAT, ref type
@@ -376,75 +325,79 @@ fn quoted(s: &str) -> (String, &str) {
     panic!("unterminated string literal: {s}");
 }
 
-fn snapshot_test(fixture_name: &str) {
-    let root = crate_root();
-    let fixture = root.join("tests/fixtures").join(fixture_name);
-    let base_name = fixture_name.replace(".d.ts", "");
-    let snapshots = root.join("tests/snapshots").join(&base_name);
-    let extra_args = collect_directive_args(&fixture);
+/// `ts-gen embed` the compiled `module` against `abi`, as `embed --abi`
+/// does, and validate the merged module.
+fn embed(abi: &ts_gen_abi::Abi, module: &Path, out_dir: &Path, wasm_merge: &Path) {
+    use ts_gen::abi::embed;
+    let bytes = std::fs::read(module).unwrap();
+    let specifier = format!("./{}", module.file_name().unwrap().to_string_lossy());
+    let options = embed::Options::new(&specifier);
+    let out = embed::embed(abi, &bytes, &options)
+        .unwrap_or_else(|e| panic!("embed {}: {e:#}", module.display()));
+    let bindings = embed::assemble(&out.bindings_wat).expect("bindings.wasm");
+    let wrapper = embed::assemble(&out.wrapper_wat).expect("wrapper.wasm");
+    let merged = embed::merge(wasm_merge, &out.module, &specifier, &bindings, &wrapper)
+        .unwrap_or_else(|e| panic!("merge {}: {e:#}", module.display()));
+    let merged = embed::postprocess(&merged, &out.handlers, &specifier).expect("postprocess");
+    let mut validator = wasmparser::Validator::new_with_features(
+        wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
+    );
+    validator
+        .validate_all(&merged)
+        .unwrap_or_else(|e| panic!("merged {} does not validate: {e}", module.display()));
+    std::fs::create_dir_all(out_dir).unwrap();
+    std::fs::write(out_dir.join(module.file_name().unwrap()), &merged).unwrap();
+    std::fs::write(out_dir.join("builtins.js"), &out.builtins_js).unwrap();
+}
 
-    let out_dir = TempDir::new(&format!("zena-{base_name}"));
-    let out_file = out_dir.0.join("bindings.zena");
-    let output = Command::new(ts_gen_bin())
-        .current_dir(&root)
-        .arg("--input")
-        .arg(&fixture)
-        .arg("--output")
-        .arg(&out_file)
-        .args(["--target", "zena"])
-        .args(&extra_args)
-        .output()
-        .expect("Failed to execute ts-gen binary");
+/// Generate into `dir` as the CLI does, returning the bindings.
+fn generate(abi: &ts_gen_abi::Abi, dir: &Path) -> anyhow::Result<String> {
+    let zena = ts_gen_zena::generate(abi, "bindings.zena")?;
+    std::fs::write(dir.join("bindings.zena"), &zena.bindings).unwrap();
+    if let Some((main, app)) = &zena.provides {
+        std::fs::write(dir.join("main.zena"), main).unwrap();
+        std::fs::write(dir.join("app.zena"), app).unwrap();
+    }
+    Ok(zena.bindings)
+}
 
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        // A fixture the Zena target rejects by design (nested `--provides`
+fn snapshot_test(name: &str, template: &Path) {
+    let snapshots = crate_root().join("tests/snapshots");
+    let text = std::fs::read_to_string(template).unwrap();
+    let abi = ts_gen_abi::format::parse(&text).unwrap_or_else(|e| panic!("{name}: {e}"));
+
+    let out_dir = TempDir::new(&format!("zena-{name}"));
+    let zena_code = match generate(&abi, &out_dir.0) {
+        Ok(code) => code,
+        // A template the generator rejects by design (nested provided
         // paths) pins the error instead of an output.
-        let error_snap = snapshots.join("default.zena.error");
-        if error_snap.is_file() || (bless_enabled() && stderr.contains("--target zena cannot")) {
-            let message = stderr
-                .lines()
-                .find(|l| l.starts_with("Error:"))
-                .unwrap_or_default()
-                .to_string();
-            assert_snapshot(&error_snap, &format!("{message}\n"));
+        Err(e) => {
+            assert_snapshot(
+                &snapshots.join(format!("{name}.zena.error")),
+                &format!("Error: {e}\n"),
+            );
             return;
         }
-        panic!("ts-gen --target zena failed for {fixture_name}:\n{stderr}");
-    }
+    };
+    assert_snapshot(&snapshots.join(format!("{name}.zena")), &zena_code);
 
-    let zena_code = std::fs::read_to_string(&out_file).unwrap();
-    assert_snapshot(&snapshots.join("default.zena"), &zena_code);
-
-    let wat_file = out_dir.0.join("bindings.wat");
-    run(
-        Command::new(ts_gen_bin())
-            .current_dir(&root)
-            .arg("--input")
-            .arg(&fixture)
-            .arg("--output")
-            .arg(&wat_file)
-            .args(["--target", "wat"])
-            .args(&extra_args),
-        "ts-gen --target wat",
-    );
-    let wat = wat::parse_file(&wat_file).expect("template assembles");
-    let template = wasm_imports(&wat);
+    let template_imports = wasm_imports(&wat::parse_str(&text).expect("template assembles"));
     let declared = zena_imports(&zena_code);
-    let missing: Vec<_> = template.difference(&declared).collect();
-    let extra: Vec<_> = declared.difference(&template).collect();
+    let missing: Vec<_> = template_imports.difference(&declared).collect();
+    let extra: Vec<_> = declared.difference(&template_imports).collect();
     assert!(
         missing.is_empty() && extra.is_empty(),
-        "{fixture_name}: the Zena imports differ from the template\n\
+        "{name}: the Zena imports differ from the template\n\
          only in the template: {missing:#?}\nonly in the Zena bindings: {extra:#?}"
     );
 
-    // `--provides` adds the compile entry and an app scaffold; compiling
+    // With handlers, the compile entry and an app scaffold; compiling
     // `main.zena` type-checks all three together.
     let entry = if out_dir.0.join("main.zena").is_file() {
         for file in ["main.zena", "app.zena"] {
             let code = std::fs::read_to_string(out_dir.0.join(file)).unwrap();
-            assert_snapshot(&snapshots.join(format!("default.{file}")), &code);
+            let suffix = file.trim_end_matches(".zena");
+            assert_snapshot(&snapshots.join(format!("{name}.{suffix}.zena")), &code);
         }
         "main.zena"
     } else {
@@ -454,61 +407,60 @@ fn snapshot_test(fixture_name: &str) {
     let Some(zena) = zena() else {
         return;
     };
+    let out_file = out_dir.0.join("bindings.zena");
     if entry == "bindings.zena" {
         // Compiled as the entry, every export is kept, `await_` included,
         // and `embed` rejects JSPI without a handler to wrap.
         let decl = "@external(\"./builtins.js\", \"await\")\nexport declare function await_(p: externref): externref | null;\n";
-        assert!(
-            zena_code.contains(decl),
-            "{fixture_name}: no await_ declaration"
-        );
+        assert!(zena_code.contains(decl), "{name}: no await_ declaration");
         std::fs::write(&out_file, zena_code.replace(decl, "")).unwrap();
     }
     let module = out_dir.0.join("module.wasm");
     compile(&zena, &out_dir.0, entry, &module);
     // Imports from other modules are the language's own (`wasm:js-string`,
     // Zena's `env` hooks), which `embed` leaves to the host.
-    let abi_modules: BTreeSet<&str> = template.iter().map(|(m, ..)| m.as_str()).collect();
+    let abi_modules: BTreeSet<&str> = template_imports.iter().map(|(m, ..)| m.as_str()).collect();
     let compiled = wasm_imports(&std::fs::read(&module).unwrap());
     let stray: Vec<_> = compiled
         .iter()
         .filter(|(m, ..)| abi_modules.contains(m.as_str()))
-        .filter(|i| !template.contains(i))
+        .filter(|i| !template_imports.contains(i))
         .collect();
     assert!(
         stray.is_empty(),
-        "{fixture_name}: compiled imports not in the template: {stray:#?}"
+        "{name}: compiled imports not in the template: {stray:#?}"
     );
     let Some(wasm_merge) = find_tool("WASM_MERGE", "wasm-merge") else {
         return;
     };
-    embed(
-        &fixture,
-        &extra_args,
-        &module,
-        &out_dir.0.join("out"),
-        &wasm_merge,
-    );
+    embed(&abi, &module, &out_dir.0.join("out"), &wasm_merge);
+}
+
+/// Every fixture's template, by fixture name.
+fn templates() -> Vec<(String, PathBuf)> {
+    let dir = repo_root().join("tests/snapshots");
+    let mut out: Vec<_> = std::fs::read_dir(&dir)
+        .unwrap_or_else(|e| panic!("Failed to read {}: {e}", dir.display()))
+        .filter_map(|entry| {
+            let entry = entry.ok()?;
+            let template = entry.path().join("default.wat");
+            template
+                .is_file()
+                .then(|| (entry.file_name().to_string_lossy().into_owned(), template))
+        })
+        .collect();
+    out.sort();
+    out
 }
 
 #[test]
 fn zena_snapshots() {
-    let fixtures_dir = crate_root().join("tests/fixtures");
-    let mut fixtures: Vec<_> = std::fs::read_dir(&fixtures_dir)
-        .unwrap_or_else(|e| panic!("Failed to read {}: {e}", fixtures_dir.display()))
-        .filter_map(|entry| {
-            let name = entry.ok()?.file_name().to_string_lossy().to_string();
-            // `<fixture>.provides.d.ts` is a fixture's `--provides` surface,
-            // not an input of its own.
-            (name.ends_with(".d.ts") && !name.ends_with(".provides.d.ts")).then_some(name)
-        })
-        .collect();
-    fixtures.sort();
-    assert!(!fixtures.is_empty(), "No .d.ts fixtures found");
+    let templates = templates();
+    assert!(!templates.is_empty(), "No templates found");
 
     let mut failures = Vec::new();
-    for fixture in &fixtures {
-        if let Err(e) = std::panic::catch_unwind(|| snapshot_test(fixture)) {
+    for (name, template) in &templates {
+        if let Err(e) = std::panic::catch_unwind(|| snapshot_test(name, template)) {
             let msg = if let Some(s) = e.downcast_ref::<String>() {
                 s.clone()
             } else if let Some(s) = e.downcast_ref::<&str>() {
@@ -516,7 +468,7 @@ fn zena_snapshots() {
             } else {
                 "unknown panic".to_string()
             };
-            failures.push((fixture.clone(), msg));
+            failures.push((name.clone(), msg));
         }
     }
     if !failures.is_empty() {
@@ -526,7 +478,17 @@ fn zena_snapshots() {
         }
         panic!("{report}");
     }
-    eprintln!("All {} zena snapshot tests passed.", fixtures.len());
+    // A snapshot whose template is gone is stale.
+    let names: BTreeSet<&str> = templates.iter().map(|(n, _)| n.as_str()).collect();
+    for entry in std::fs::read_dir(crate_root().join("tests/snapshots")).unwrap() {
+        let file = entry.unwrap().file_name().to_string_lossy().into_owned();
+        let stem = file.split('.').next().unwrap_or_default();
+        assert!(
+            names.contains(stem),
+            "stale snapshot {file}: no template {stem}"
+        );
+    }
+    eprintln!("All {} zena snapshot tests passed.", templates.len());
 }
 
 /// `examples/zena-worker/`, built as its README does and run in node.
@@ -535,44 +497,53 @@ fn zena_worker() {
     let Some(zena) = zena() else {
         return;
     };
-    let root = crate_root();
+    let root = repo_root();
     let example = root.join("examples/zena-worker");
-    let fixture = root.join("tests/fixtures/cloudflare-worker.d.ts");
-    let args: Vec<String> = [
-        "--input",
-        example.join("env.d.ts").to_str().unwrap(),
-        "--provides",
-        "ExportedHandler.fetch",
-    ]
-    .map(String::from)
-    .into();
     let dir = TempDir::new("zena-worker");
+    let template = dir.0.join("worker.abi.wat");
+    run(
+        Command::new(env!("CARGO"))
+            .current_dir(&root)
+            .args(["run", "-q", "-p", "ts-gen", "--"])
+            .arg("--input")
+            .arg(root.join("tests/fixtures/cloudflare-worker.d.ts"))
+            .arg("--input")
+            .arg(example.join("env.d.ts"))
+            .args([
+                "--provides",
+                "ExportedHandler.fetch",
+                "--target",
+                "wat",
+                "--output",
+            ])
+            .arg(&template),
+        "ts-gen --target wat",
+    );
     std::fs::copy(example.join("app.zena"), dir.0.join("app.zena")).unwrap();
     run(
-        Command::new(ts_gen_bin())
-            .arg("--input")
-            .arg(&fixture)
-            .args(&args)
-            .args(["--target", "zena", "--output"])
+        Command::new(env!("CARGO_BIN_EXE_ts-gen-zena"))
+            .arg(&template)
+            .arg("-o")
             .arg(dir.0.join("bindings.zena")),
-        "ts-gen --target zena",
+        "ts-gen-zena",
     );
     let module = dir.0.join("main.wasm");
     compile(&zena, &dir.0, "main.zena", &module);
     let Some(wasm_merge) = find_tool("WASM_MERGE", "wasm-merge") else {
         return;
     };
+    let abi = ts_gen_abi::format::parse(&std::fs::read_to_string(&template).unwrap()).unwrap();
     let out = dir.0.join("out");
-    embed(&fixture, &args, &module, &out, &wasm_merge);
+    embed(&abi, &module, &out, &wasm_merge);
     let Some(node) = find_node() else {
         return;
     };
     run(
         Command::new(node)
-            .arg(root.join("tests/zena-worker.mjs"))
+            .arg(crate_root().join("tests/worker.mjs"))
             .arg(out.join("main.wasm"))
             .arg(out.join("builtins.js")),
-        "node zena-worker.mjs",
+        "node worker.mjs",
     );
 }
 
@@ -580,22 +551,18 @@ fn zena_worker() {
 /// name, which therefore cannot be either of theirs.
 #[test]
 fn provides_entry_imports_the_output_file() {
-    let root = crate_root();
-    let fixture = root.join("tests/fixtures/cloudflare-worker.d.ts");
+    let template = repo_root().join("tests/snapshots/cloudflare-worker/default.wat");
     let dir = TempDir::new("zena-output-name");
-    let ts_gen = |output: &str, target: &str, extra: &[&str]| {
-        Command::new(ts_gen_bin())
-            .arg("--input")
-            .arg(&fixture)
-            .args(["--provides", "ExportedHandler.fetch", "--target", target])
-            .args(extra)
-            .arg("--output")
+    let generate = |output: &str| {
+        Command::new(env!("CARGO_BIN_EXE_ts-gen-zena"))
+            .arg(&template)
+            .arg("-o")
             .arg(dir.0.join(output))
             .output()
-            .expect("Failed to execute ts-gen binary")
+            .expect("Failed to execute ts-gen-zena")
     };
 
-    let out = ts_gen("types.zena", "zena", &[]);
+    let out = generate("types.zena");
     assert!(
         out.status.success(),
         "{}",
@@ -608,38 +575,12 @@ fn provides_entry_imports_the_output_file() {
     if let Some(zena) = zena() {
         compile(&zena, &dir.0, "main.zena", &dir.0.join("main.wasm"));
     }
-
-    for (output, target, extra, message) in [
-        (
-            "main.zena",
-            "zena",
-            &[][..],
-            "-o main.zena: --provides writes main.zena and app.zena",
-        ),
-        (
-            "app.zena",
-            "zena",
-            &[][..],
-            "-o app.zena: --provides writes main.zena and app.zena",
-        ),
-        (
-            "types.zena",
-            "zena",
-            &["--provides-app", "super::app"][..],
-            "--provides-app and --provides-bindings apply to --target rust only",
-        ),
-        (
-            "types.wat",
-            "wat",
-            &["--provides-bindings", "super::b"][..],
-            "--provides-app and --provides-bindings apply to --target rust only",
-        ),
-    ] {
-        let out = ts_gen(output, target, extra);
+    for output in ["main.zena", "app.zena"] {
+        let out = generate(output);
         let stderr = String::from_utf8_lossy(&out.stderr);
         assert!(
-            !out.status.success() && stderr.contains(message),
-            "-o {output} --target {target} {extra:?}: {stderr}"
+            !out.status.success() && stderr.contains("writes main.zena and app.zena"),
+            "-o {output}: {stderr}"
         );
     }
 }

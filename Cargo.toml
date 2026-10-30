@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "generators/zena",
     "abi",
     "integration-tests",
 ]

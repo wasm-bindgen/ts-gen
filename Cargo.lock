@@ -1187,6 +1187,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "ts-gen-zena"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "similar",
+ "ts-gen",
+ "ts-gen-abi",
+ "wasmparser",
+ "wat",
+]
+
+[[package]]
 name = "unicode-id-start"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

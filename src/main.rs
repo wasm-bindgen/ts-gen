@@ -109,8 +109,7 @@ struct Cli {
     /// implements, with optional members listed to include them. Writes
     /// `provides.rs` (wasm-bindgen exports delegating to the app module)
     /// and, if absent, the app module's scaffold, next to the output;
-    /// `--target wat` emits a stub per provided function; `--target zena`
-    /// writes `main.zena` and an `app.zena` scaffold.
+    /// `--target wat` emits a stub per provided function.
     #[arg(long)]
     provides: Option<String>,
 
@@ -189,10 +188,9 @@ impl Selection {
 enum Target {
     /// wasm-bindgen extern declarations.
     Rust,
-    /// Import template for the externref Wasm ABI; see `embed`.
+    /// The externref Wasm ABI as an annotated import template (ABI.md),
+    /// which bindings generators and `embed` read.
     Wat,
-    /// Zena declarations for the same ABI.
-    Zena,
 }
 
 #[derive(clap::Subcommand, Debug)]
@@ -317,28 +315,6 @@ fn main() -> Result<()> {
         Target::Rust => ts_gen::codegen::generate_with_options(&module, &gctx, &options)?,
         Target::Wat => {
             ts_gen::abi::wat::generate(&ts_gen::abi::build(&module, &gctx, &options, &provided))
-        }
-        Target::Zena => {
-            let abi = ts_gen::abi::build(&module, &gctx, &options, &provided);
-            let file = output
-                .file_name()
-                .and_then(|f| f.to_str())
-                .with_context(|| format!("{} has no file name", output.display()))?;
-            if !provided.is_empty() && matches!(file, "main.zena" | "app.zena") {
-                bail!("-o {file}: --provides writes main.zena and app.zena next to the output");
-            }
-            let zena = ts_gen::abi::zena::generate(&abi, file)?;
-            if let Some((main, app)) = &zena.provides {
-                let dir = output.parent().map(Path::to_path_buf).unwrap_or_default();
-                write_file(&dir.join("main.zena"), main)?;
-                let app_file = dir.join("app.zena");
-                if app_file.exists() {
-                    eprintln!("[ts-gen] Kept existing {}", app_file.display());
-                } else {
-                    write_file(&app_file, app)?;
-                }
-            }
-            zena.bindings
         }
     };
 

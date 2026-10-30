@@ -1,18 +1,17 @@
-//! `--target zena`: Zena bindings for the Wasm ABI, compiled with Zena's
-//! `-t js`.
+//! Zena bindings for the Wasm ABI, read from the template `ts-gen --target
+//! wat` writes and compiled with Zena's `-t js`.
 //!
-//! A flat layer of `@external` declarations, one per import the `--target
-//! wat` template lists; a sys layer with wasm-bindgen's `JsValue` helpers
-//! over `externref`; and an exported class per owner holding the host
+//! A flat layer of `@external` declarations, one per import the template
+//! lists; a sys layer with wasm-bindgen's `JsValue` helpers over
+//! `externref`; and an exported class per owner holding the host
 //! reference in `#ref`. TS strings are Zena `String`s, which on `-t js`
-//! wrap the JS string itself. See "Zena bindings" in CONVENTIONS.md for
-//! the full mapping.
+//! wrap the JS string itself. See the README for the full mapping.
 
 use std::collections::{HashMap, HashSet};
 use std::fmt::Write;
 use std::hash::Hash;
 
-use super::{
+use ts_gen_abi::{
     Abi, AbiFunction, AbiHandler, AbiOp, AbiParam, Head, WasmType, BUILTINS_SPECIFIER,
     UNDEFINED_GLOBAL,
 };
@@ -571,7 +570,7 @@ export function numberValue(x: externref): f64 {{ return {number_value}(x); }}
         for h in &self.abi.handlers {
             if !is_plain_ident(&h.name) || ident(&h.name) != h.name {
                 anyhow::bail!(
-                    "--target zena cannot provide the export {:?}: Zena exports are identifiers, so only `default.<name>` and top-level functions that are not Zena keywords are supported",
+                    "ts-gen-zena cannot provide the export {:?}: Zena exports are identifiers, so only `default.<name>` and top-level functions that are not Zena keywords are supported",
                     h.name
                 );
             }

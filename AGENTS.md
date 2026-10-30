@@ -43,10 +43,9 @@ src/
 │   ├── surface.rs             # output surface: export roots, `--export <Name>`, closure
 │   ├── type_params.rs         # erase method type params no argument infers
 │   └── typemap.rs             # TypeRef → syn tokens, `to_return_type`, externals
-├── abi/                       # Wasm ABI layer (--target wat / zena, embed)
-│   ├── mod.rs                 # ABI model, `build()`
-│   ├── wat.rs                 # import template generator
-│   ├── zena.rs                # Zena declarations + wrapper classes (--target zena)
+├── abi/                       # Wasm ABI layer (--target wat, embed)
+│   ├── mod.rs                 # `build()`: .d.ts IR → the ts-gen-abi model
+│   ├── wat.rs                 # --target wat, through the ts-gen-abi writer
 │   └── embed.rs               # bindings.wasm / wrapper.wasm emitter
 └── util/                      # naming, diagnostics, dedup helpers
 
@@ -55,17 +54,23 @@ tests/
 ├── fixtures/embed/*.wat       # language modules for the embed tests
 ├── snapshots/<name>/*.rs      # expected output per CLI configuration (default, mono)
 ├── snapshots/<name>/*.wat     # --target wat output per configuration
-├── snapshots/<name>/*.zena    # --target zena output, default configuration only
 ├── snapshots/embed/           # embed artifacts per fixture
 ├── snapshot.rs                # the Rust and WAT snapshot harness
 ├── embed.rs                   # embed end-to-end on the fixtures/embed modules
 ├── embed.mjs                  # node run of each merged embed fixture
-├── zena.rs                    # --target zena snapshots, imports vs. wat, compile + embed
-└── zena-worker.mjs            # node run of the examples/zena-worker build
 
 examples/
 ├── cloudflare-worker/         # Rust worker against generated bindings
-└── zena-worker/               # Zena worker through --target zena and embed
+├── zena-worker/               # Zena worker through ts-gen-zena and embed
+└── kotlin-worker/             # Kotlin/Wasm worker, with a generator written in Kotlin
+
+abi/                           # ts-gen-abi: the ABI model and its template format (ABI.md)
+├── src/format.rs              # reference writer and reader of the template
+└── src/sexpr.rs               # the S-expression reader the format needs
+
+generators/zena/               # ts-gen-zena: Zena bindings from a template, outside ts-gen
+├── src/lib.rs                 # flat @external layer, sys layer, a class per owner
+└── tests/zena.rs              # every fixture template → snapshots, imports vs. template
 
 integration-tests/
 ├── tests/*.rs                 # hand-written integration tests
@@ -141,14 +146,20 @@ with binaryen's `wasm-merge` (`WASM_MERGE` or `PATH`) and run the
 result in node 24+ (`NODE` or `PATH`); a missing tool skips its step
 locally and fails under `CI`.
 
-The Zena tests (`cargo test --test zena`) check each fixture's `.zena`
-imports against its `wat` template. With `ZENA` set to a `zena` CLI
-binary they also compile each output with `-t js`, embed it, and build
-and run `examples/zena-worker/` in node, with the same tool rules; without
-`ZENA` those steps are skipped, in CI too, since no Zena release compiles
-the bindings yet (they need `declare let` value imports and `ref.null`
-emission for `externref | null`). CI runs only the snapshots and the
-import check.
+The Zena tests (`cargo test -p ts-gen-zena`) read every fixture's
+`default.wat` template from `tests/snapshots/`, as any consumer of the
+format does, and check each `.zena` output's imports against it. With
+`ZENA` set to a `zena` CLI binary they also compile each output with
+`-t js`, embed it, and build and run `examples/zena-worker/` in node,
+with the same tool rules; without `ZENA` those steps are skipped, in CI
+too, since no Zena release compiles the bindings yet (they need `declare
+let` value imports and `ref.null` emission for `externref | null`). CI
+runs only the snapshots and the import check.
+
+A change to the ABI or the template format is a change to [ABI.md](ABI.md),
+the contract with generators outside this repository: an addition keeps
+`@abi.version`, a change a reader of the previous version would misread
+bumps it.
 
 ## Pipeline
 

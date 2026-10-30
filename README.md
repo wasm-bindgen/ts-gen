@@ -119,21 +119,27 @@ Flags:
 | Value  | Output |
 |--------|--------|
 | `rust` | wasm-bindgen extern blocks (the default) |
-| `wat`  | The Wasm ABI as a WAT import template |
-| `zena` | The Wasm ABI as Zena declarations, with a class per type |
+| `wat`  | The Wasm ABI as an annotated WAT import template ([ABI.md](ABI.md)) |
 
 ### Wasm ABI template (`--target wat`)
 
-Generate a WAT import template for languages that compile directly to Wasm:
+Generate the Wasm ABI for languages that compile directly to Wasm:
 
 ```sh
-ts-gen --input types.d.ts --output template.wat --target wat
+ts-gen --input types.d.ts --output types.abi.wat --target wat
 ```
 
 The template lists every ABI function as an import, from `./bindings.wasm`
 for a global and from its specifier for a `declare module` declaration,
-and, with `--provides`, a stub export per provided function. Write your
-module against it, then use `embed` to generate the runtime artifacts.
+and, with `--provides`, a stub export per provided function. `@abi.*`
+annotations, which WAT tools ignore, carry the rest of the model: each
+import's owner and JS operation, what each reference position names and
+whether it may be `null` or `undefined`, and the owners' heritage and
+docs. [ABI.md](ABI.md) specifies the format.
+
+Write a module against the template by hand, or have a bindings generator
+read it, then use `embed` to generate the runtime artifacts. A generator
+needs nothing from ts-gen but the file.
 
 ### Provided functions (`--provides`)
 
@@ -153,32 +159,34 @@ ts-gen --input worker.d.ts --output src/bindings.rs --provides ExportedHandler.f
 | `--provides-app` | Module path the wrapper delegates to; its last segment names the scaffold (default `super::app`). `--target rust` only |
 | `--provides-bindings` | Module path of the bindings (default `super::<output stem>`, with `-` and `.` replaced by `_`). `--target rust` only |
 
-### Zena bindings (`--target zena`)
+### Bindings generators
 
-For [Zena](https://github.com/elematic/zena), emit the ABI as `@external`
-declarations, one per import the `wat` template lists, plus a wrapper class
-per type with TS strings as Zena `String`s. With `--provides`, `main.zena`
-(the compile entry, importing the bindings by the output's file name) and
-an `app.zena` scaffold are written next to the output. Compile the entry
-and embed it:
+Language bindings are written by separate programs that read the template:
+
+* [`generators/zena`](generators/zena/README.md): Zena, a Rust crate that
+  depends only on [`ts-gen-abi`](abi/), the model and its reader.
+  `examples/zena-worker/` is a worker built with it.
+* [`examples/kotlin-worker`](examples/kotlin-worker/README.md): Kotlin/Wasm,
+  with a generator written in Kotlin and its own reader.
 
 ```sh
-ts-gen --input worker.d.ts --output bindings.zena --target zena --provides ExportedHandler.fetch
+ts-gen --input worker.d.ts --output worker.abi.wat --target wat --provides ExportedHandler.fetch
+ts-gen-zena worker.abi.wat -o bindings.zena
 zena build main.zena -t js --imported-string-constants wasm:js/string-constants -o main.wasm
-ts-gen embed -i worker.d.ts --provides ExportedHandler.fetch -m main.wasm -o out/
+ts-gen embed --abi worker.abi.wat -m main.wasm -o out/
 ```
-
-The bindings need a Zena compiler with `declare let` value imports and
-`ref.null` emission for `externref | null`, which no Zena release has yet.
-See `examples/zena-worker/` for a worker run in workerd.
 
 ### Embedding (`ts-gen embed`)
 
 Given a module written against the template, produce the bridging modules:
 
 ```sh
-ts-gen embed -i types.d.ts --provides ExportedHandler.fetch -m hello.wasm -o out/
+ts-gen embed --abi types.abi.wat -m hello.wasm -o out/
 ```
+
+`--abi` reads the ABI from the template the module was written against.
+`embed` can instead derive it again from the same `.d.ts` and flags, with
+`-i types.d.ts --provides ExportedHandler.fetch`.
 
 This creates `out/hello.wasm` (merged), `out/builtins.js`, and optionally
 `out/bindings.wat` / `out/wrapper.wat` with `--text`. The merged module
@@ -189,8 +197,11 @@ Flags:
 
 | Flag | Description |
 |------|-------------|
+| `--abi` | The template the module was written against, in place of `-i` |
 | `-i`, `--input` | The `.d.ts` files the module was written against |
 | `-m`, `--module` | The compiled language module |
+| `--bindings-module` | Module the language imports global ABI functions from (default `./bindings.wasm`). Its imports that are not ABI functions are left to the host |
+| `--imported-string-constants` | Namespace the bindings import string constants from (default `wasm:js/string-constants`): the one the merged module is compiled with |
 | `-o`, `--out-dir` | Output directory |
 | `--text` | Also write `.wat` text for debugging |
 | `--wasm-merge` | Path to binaryen's `wasm-merge` (required; defaults to `$WASM_MERGE`, then `PATH`) |
@@ -204,14 +215,14 @@ Hello-world flow:
 
 ```sh
 # 1. Generate the template
-ts-gen --input worker.d.ts --output template.wat --target wat --provides ExportedHandler.fetch
+ts-gen --input worker.d.ts --output worker.abi.wat --target wat --provides ExportedHandler.fetch
 
 # 2. Write your module against it (e.g. hello.wat)
 # 3. Assemble it
 wasm-tools parse hello.wat -o hello.wasm
 
 # 4. Embed
-ts-gen embed -i worker.d.ts --provides ExportedHandler.fetch -m hello.wasm -o out/
+ts-gen embed --abi worker.abi.wat -m hello.wasm -o out/
 
 # 5. Run (e.g. with workerd)
 workerd serve config.capnp
