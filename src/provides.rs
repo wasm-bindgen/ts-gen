@@ -15,7 +15,9 @@ use oxc_parser::Parser;
 use oxc_span::SourceType;
 
 use crate::context::GlobalContext;
-use crate::ir::{InterfaceDecl, Member, Module, Nullability, Param, TypeKind, TypeRef};
+use crate::ir::{
+    Heritage, InterfaceDecl, Member, Module, Nullability, Param, TypeKind, TypeParam, TypeRef,
+};
 use crate::parse::docs::DocComments;
 use crate::parse::scope::ScopeId;
 use crate::parse::types::{convert_formal_params_with_arena, convert_ts_type_with_arena};
@@ -193,16 +195,24 @@ struct Members<'a> {
 }
 
 impl Members<'_> {
-    /// The function members of `iface`, as providers under `path`. Each
-    /// selected member must be providable, otherwise it is an error.
+    /// The function members of `iface`, including those it inherits
+    /// through `extends`, as providers under `path`. Each selected member
+    /// must be providable, otherwise it is an error.
     fn provide(
         &mut self,
         path: &[String],
         iface: &InterfaceDecl,
         out: &mut Vec<ProvidedFn>,
     ) -> Result<()> {
+        let members = self.members(
+            &iface.type_params,
+            &iface.members,
+            &iface.extends,
+            self.type_args,
+            &mut Vec::new(),
+        );
         for sel in self.selected {
-            if !iface.members.iter().any(|m| member_name(m) == Some(*sel)) {
+            if !members.iter().any(|m| member_name(m) == Some(*sel)) {
                 bail!(
                     "--provides: {}.{sel} is not a member of {}",
                     iface.js_name,
@@ -210,23 +220,7 @@ impl Members<'_> {
                 );
             }
         }
-        // The interface's own type parameters: the given arguments, else
-        // the declared default, else `unknown`.
-        let subst: HashMap<&str, TypeRef> = iface
-            .type_params
-            .iter()
-            .enumerate()
-            .map(|(i, p)| {
-                let ty = self
-                    .type_args
-                    .get(i)
-                    .cloned()
-                    .or_else(|| p.default.clone())
-                    .unwrap_or(TypeRef::Unknown);
-                (p.name.as_str(), ty)
-            })
-            .collect();
-        for m in &iface.members {
+        for m in &members {
             let (js_name, optional, doc, ty, params, ret, scope) = match m {
                 Member::Method(m) => {
                     if !m.type_params.is_empty() {
@@ -286,7 +280,7 @@ impl Members<'_> {
                         Some((inner, _)) if optional => inner,
                         _ => ty.clone(),
                     };
-                    match self.function_type(&ty, scope) {
+                    match function_type(self.gctx, &ty, scope) {
                         Some(sig) => sig,
                         None if selected => bail!(
                             "--provides: {} is not a function (`{}`)",
@@ -304,17 +298,10 @@ impl Members<'_> {
                 }
                 _ => unreachable!(),
             };
-            let params = params
-                .iter()
-                .map(|p| Param {
-                    type_ref: p.type_ref.substitute(&subst),
-                    ..p.clone()
-                })
-                .collect();
             out.push(ProvidedFn {
                 path: child,
                 params,
-                return_type: normalise_result(ret.substitute(&subst)),
+                return_type: normalise_result(ret),
                 doc: doc.clone(),
                 scope,
                 rust_name: String::new(),
@@ -323,37 +310,124 @@ impl Members<'_> {
         Ok(())
     }
 
-    /// The signature a type denotes, through aliases including generic
-    /// instantiations (`Handler<Env>` for `type Handler<E> = (..) => ..`).
-    fn function_type(&self, ty: &TypeRef, scope: ScopeId) -> Option<(Vec<Param>, TypeRef)> {
-        match ty {
-            TypeRef::Function(sig) => Some((sig.params.clone(), (*sig.return_type).clone())),
-            TypeRef::Reference {
+    /// A declaration's members with its type parameters replaced (the
+    /// given arguments, else the declared default, else `unknown`),
+    /// followed by those it inherits through `extends`: each clause
+    /// resolves in its own scope and takes its type arguments under this
+    /// substitution. A name declared nearer hides an inherited one.
+    fn members(
+        &mut self,
+        type_params: &[TypeParam],
+        own: &[Member],
+        extends: &[Heritage],
+        type_args: &[TypeRef],
+        seen: &mut Vec<crate::context::TypeId>,
+    ) -> Vec<Member> {
+        let subst: HashMap<String, TypeRef> = type_params
+            .iter()
+            .enumerate()
+            .map(|(i, p)| {
+                let ty = type_args
+                    .get(i)
+                    .cloned()
+                    .or_else(|| p.default.clone())
+                    .unwrap_or(TypeRef::Unknown);
+                (p.name.clone(), ty)
+            })
+            .collect();
+        let mut out: Vec<Member> = own.iter().map(|m| m.substitute(&subst)).collect();
+        let mut names: Vec<String> = out
+            .iter()
+            .filter_map(member_name)
+            .map(str::to_string)
+            .collect();
+        for heritage in extends {
+            let TypeRef::Reference {
                 segments,
                 generic_args,
-            } if segments.len() == 1 => {
-                let type_id = self.gctx.scopes.resolve(scope, &segments[0])?;
-                let TypeKind::TypeAlias(alias) = &self.gctx.get_type(type_id).kind else {
-                    return None;
-                };
-                let subst: HashMap<&str, TypeRef> = alias
-                    .type_params
-                    .iter()
-                    .enumerate()
-                    .map(|(i, p)| {
-                        let ty = generic_args
-                            .get(i)
-                            .cloned()
-                            .or_else(|| p.default.clone())
-                            .unwrap_or(TypeRef::Unknown);
-                        (p.name.as_str(), ty)
-                    })
-                    .collect();
-                let target = alias.target.substitute(&subst);
-                self.function_type(&target, alias.body_scope)
+            } = &heritage.type_ref
+            else {
+                continue;
+            };
+            let Some(type_id) = self.gctx.resolve_path(heritage.scope, &segments.join(".")) else {
+                self.gctx.warn(format!(
+                    "provides: cannot resolve `{}` in an extends clause, skipping its members",
+                    heritage.type_ref.format_ts()
+                ));
+                continue;
+            };
+            if seen.contains(&type_id) {
+                continue;
             }
-            _ => None,
+            seen.push(type_id);
+            let args: Vec<TypeRef> = generic_args.iter().map(|a| a.substitute(&subst)).collect();
+            let (params, members, parents) = match &self.gctx.get_type(type_id).kind {
+                TypeKind::Interface(i) => {
+                    (i.type_params.clone(), i.members.clone(), i.extends.clone())
+                }
+                TypeKind::Class(c) => (
+                    c.type_params.clone(),
+                    c.members
+                        .iter()
+                        .filter(|m| {
+                            matches!(m, Member::Method(_) | Member::Getter(_) | Member::Setter(_))
+                        })
+                        .cloned()
+                        .collect(),
+                    c.extends.iter().cloned().collect(),
+                ),
+                _ => continue,
+            };
+            let inherited = self.members(&params, &members, &parents, &args, seen);
+            let mut added = Vec::new();
+            for m in inherited {
+                let name = member_name(&m).map(str::to_string);
+                if name.as_ref().is_some_and(|n| names.contains(n)) {
+                    continue;
+                }
+                added.extend(name);
+                out.push(m);
+            }
+            names.extend(added);
         }
+        out
+    }
+}
+
+/// The signature a type denotes, through aliases including generic
+/// instantiations (`Handler<Env>` for `type Handler<E> = (..) => ..`).
+fn function_type(
+    gctx: &GlobalContext,
+    ty: &TypeRef,
+    scope: ScopeId,
+) -> Option<(Vec<Param>, TypeRef)> {
+    match ty {
+        TypeRef::Function(sig) => Some((sig.params.clone(), (*sig.return_type).clone())),
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => {
+            let type_id = gctx.resolve_path(scope, &segments.join("."))?;
+            let TypeKind::TypeAlias(alias) = &gctx.get_type(type_id).kind else {
+                return None;
+            };
+            let subst: HashMap<&str, TypeRef> = alias
+                .type_params
+                .iter()
+                .enumerate()
+                .map(|(i, p)| {
+                    let ty = generic_args
+                        .get(i)
+                        .cloned()
+                        .or_else(|| p.default.clone())
+                        .unwrap_or(TypeRef::Unknown);
+                    (p.name.as_str(), ty)
+                })
+                .collect();
+            let target = alias.target.substitute(&subst);
+            function_type(gctx, &target, alias.body_scope)
+        }
+        _ => None,
     }
 }
 
@@ -592,7 +666,9 @@ impl Walker<'_, '_> {
                     &f.params,
                     Some(&f.return_type.type_annotation),
                     doc.map(str::to_string),
-                    false,
+                    !f.type_parameters
+                        .as_ref()
+                        .is_none_or(|t| t.params.is_empty()),
                 );
                 Ok(())
             }
@@ -650,12 +726,16 @@ impl Walker<'_, '_> {
                 let Some(type_id) = self.gctx.scopes.resolve(self.scope, &id.name) else {
                     bail!("--provides: `{}`: unknown type {}", path.join("."), id.name);
                 };
-                let TypeKind::Interface(iface) = &self.gctx.get_type(type_id).kind else {
-                    bail!(
+                let iface = match &self.gctx.get_type(type_id).kind {
+                    TypeKind::Interface(iface) => iface,
+                    // A function type through an alias, as an interface
+                    // member's may be (`ExportedHandlerFetchHandler<Env>`).
+                    TypeKind::TypeAlias(_) => return self.aliased_function(path, ty, doc),
+                    _ => bail!(
                         "--provides: `{}`: {} is not an interface",
                         path.join("."),
                         id.name
-                    );
+                    ),
                 };
                 let iface = iface.clone();
                 let mut diag = std::mem::take(&mut self.gctx.diagnostics);
@@ -707,6 +787,35 @@ impl Walker<'_, '_> {
             }
         }
     }
+
+    /// A typed value export whose type is an alias: provided when the
+    /// alias denotes a function type.
+    fn aliased_function(
+        &mut self,
+        path: Vec<String>,
+        ty: &ast::TSType<'_>,
+        doc: Option<&str>,
+    ) -> Result<()> {
+        let mut diag = std::mem::take(&mut self.gctx.diagnostics);
+        let ty = convert_ts_type_with_arena(ty, self.scope, &mut self.gctx.scopes, &mut diag);
+        self.gctx.diagnostics = diag;
+        let Some((params, ret)) = function_type(self.gctx, &ty, self.scope) else {
+            bail!(
+                "--provides: `{}`: `{}` is neither an interface nor a function type",
+                path.join("."),
+                ty.format_ts()
+            );
+        };
+        self.out.push(ProvidedFn {
+            path,
+            params,
+            return_type: normalise_result(ret),
+            doc: strip_provides_tag(doc.map(str::to_string)),
+            scope: self.scope,
+            rust_name: String::new(),
+        });
+        Ok(())
+    }
 }
 
 /// Drop `@provides` lines from a doc comment kept for the scaffold.
@@ -744,6 +853,12 @@ mod tests {
         }
         interface ScheduledController { readonly cron: string; }
         interface TraceItem { readonly outcome: string; }
+        interface MyHandler<E = unknown> extends ExportedHandler<E, string> {
+            /** Shadows the inherited one. */
+            health(): number;
+            custom(): void;
+        }
+        type Label = string;
     "#;
 
     fn with_spec(spec: &str) -> Result<(Vec<ProvidedFn>, GlobalContext)> {
@@ -797,6 +912,61 @@ mod tests {
         assert!(
             warnings.contains("default.name: not a function"),
             "{warnings}"
+        );
+    }
+
+    #[test]
+    fn shorthand_walks_extends() {
+        let (fns, gctx) = with_spec("MyHandler.fetch").unwrap();
+        // Own members first, then the inherited ones not hidden by them.
+        assert_eq!(
+            paths(&fns),
+            ["default.health", "default.custom", "default.fetch"]
+        );
+        // The nearer `health` wins.
+        assert_eq!(fns[0].return_type, TypeRef::Number);
+        // `extends ExportedHandler<E, string>`: E stays MyHandler's own
+        // (defaulted to `unknown`), Cf takes the clause's `string`.
+        assert_eq!(fns[2].params[0].type_ref.format_ts(), "Request<string>");
+        assert_eq!(fns[2].params[1].type_ref, TypeRef::Unknown);
+        let warnings = format!("{:?}", gctx.diagnostics);
+        assert!(warnings.contains("MyHandler.tail"), "{warnings}");
+
+        // Through the file form, the derived interface's argument reaches
+        // the inherited members.
+        let (fns, _) = with_file(
+            r#"
+            /** @provides fetch */
+            declare const handler: MyHandler<MyEnv>;
+            export default handler;
+            "#,
+        )
+        .unwrap();
+        assert_eq!(fns[2].params[1].type_ref.format_ts(), "MyEnv");
+    }
+
+    #[test]
+    fn file_const_through_a_function_alias() {
+        let (fns, _) = with_file(
+            r#"
+            /** Proxies. */
+            export const fetch: FetchHandler<MyEnv>;
+            "#,
+        )
+        .unwrap();
+        assert_eq!(paths(&fns), ["fetch"]);
+        assert_eq!(fns[0].params[1].type_ref.format_ts(), "MyEnv");
+        assert_eq!(
+            fns[0].promise_inner().map(TypeRef::format_ts).as_deref(),
+            Some("Response")
+        );
+        assert_eq!(fns[0].doc.as_deref(), Some("Proxies."));
+        let err = with_file("export const label: Label;")
+            .unwrap_err()
+            .to_string();
+        assert!(
+            err.contains("neither an interface nor a function type"),
+            "{err}"
         );
     }
 
@@ -923,6 +1093,7 @@ mod tests {
         let (fns, gctx) = with_file(
             r#"
             export function g<T>(x: T): T;
+            export const h: <T>(x: T) => T;
             export const n: number;
             export const maybe: ((x: number) => Promise<number>) | undefined;
             export const fetch: (r: Request) => Promise<Response>;
@@ -931,7 +1102,14 @@ mod tests {
         .unwrap();
         assert_eq!(paths(&fns), ["fetch"]);
         let warnings = format!("{:?}", gctx.diagnostics);
-        assert!(warnings.contains("generic functions"), "{warnings}");
+        assert!(
+            warnings.contains("provides g: generic functions"),
+            "{warnings}"
+        );
+        assert!(
+            warnings.contains("provides h: generic functions"),
+            "{warnings}"
+        );
         assert!(warnings.contains("provides n"), "{warnings}");
         assert!(warnings.contains("nullable function type"), "{warnings}");
     }
