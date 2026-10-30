@@ -858,6 +858,56 @@ pub mod polish {
                 self.inner
             }
         }
+        #[wasm_bindgen(experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Spanned<U = Unit>;
+            #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+            pub fn largest_unit<U: SpannedU>(this: &Spanned<U>) -> Option<U::LargestUnit>
+            where
+                Option<U::LargestUnit>: ::wasm_bindgen::convert::FromWasmAbi;
+            #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+            pub fn set_largest_unit<U: SpannedU>(this: &Spanned<U>, val: U::LargestUnit)
+            where
+                U::LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi;
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpannedU> Spanned<U> {
+            pub fn new() -> Spanned<U> {
+                Self::builder().build()
+            }
+            pub fn builder() -> SpannedBuilder<U> {
+                SpannedBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpannedU> Default for Spanned<U> {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct SpannedBuilder<U> {
+            inner: Spanned<U>,
+        }
+        impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpannedU> SpannedBuilder<U> {
+            pub fn largest_unit(self, val: U::LargestUnit) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> Spanned<U> {
+                self.inner
+            }
+        }
+        pub trait SpannedU {
+            type LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi
+                + ::wasm_bindgen::convert::FromWasmAbi
+                + ::wasm_bindgen::convert::OptionIntoWasmAbi
+                + ::wasm_bindgen::convert::OptionFromWasmAbi;
+        }
+        impl SpannedU for Unit {
+            type LargestUnit = UnitLargestUnitKind;
+        }
         #[wasm_bindgen(private)]
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub enum UnitOrDay {
@@ -1002,6 +1052,39 @@ pub mod polish {
                 self
             }
             pub fn build(self) -> DaySpan2 {
+                self.inner
+            }
+        }
+        #[wasm_bindgen(experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = super :: spans :: Spanned , extends = Object , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type AnySpan;
+        }
+        impl AnySpan {
+            pub fn new() -> AnySpan {
+                Self::builder().build()
+            }
+            pub fn builder() -> AnySpanBuilder {
+                AnySpanBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl Default for AnySpan {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct AnySpanBuilder {
+            inner: AnySpan,
+        }
+        impl AnySpanBuilder {
+            pub fn largest_unit(self, val: super::spans::UnitLargestUnitKind) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> AnySpan {
                 self.inner
             }
         }

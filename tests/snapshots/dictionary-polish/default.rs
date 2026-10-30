@@ -788,6 +788,43 @@ pub mod polish {
                 self.inner
             }
         }
+        #[wasm_bindgen]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Spanned;
+            #[wasm_bindgen(method, getter, js_name = "largestUnit")]
+            pub fn largest_unit(this: &Spanned) -> Option<HourSteppingLargestUnitKind>;
+            #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+            pub fn set_largest_unit(this: &Spanned, val: HourSteppingLargestUnitKind);
+        }
+        impl Spanned {
+            pub fn new() -> Spanned {
+                Self::builder().build()
+            }
+            pub fn builder() -> SpannedBuilder {
+                SpannedBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl Default for Spanned {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct SpannedBuilder {
+            inner: Spanned,
+        }
+        impl SpannedBuilder {
+            pub fn largest_unit(self, val: HourSteppingLargestUnitKind) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> Spanned {
+                self.inner
+            }
+        }
     }
     pub mod steps {
         #[allow(unused_imports)]
@@ -861,6 +898,39 @@ pub mod polish {
                 self
             }
             pub fn build(self) -> DaySpan2 {
+                self.inner
+            }
+        }
+        #[wasm_bindgen]
+        extern "C" {
+            # [wasm_bindgen (extends = super :: spans :: Spanned , extends = Object , is_type_of = JsValue :: is_object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type AnySpan;
+        }
+        impl AnySpan {
+            pub fn new() -> AnySpan {
+                Self::builder().build()
+            }
+            pub fn builder() -> AnySpanBuilder {
+                AnySpanBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        impl Default for AnySpan {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        pub struct AnySpanBuilder {
+            inner: AnySpan,
+        }
+        impl AnySpanBuilder {
+            pub fn largest_unit(self, val: HourSteppingLargestUnitKind) -> Self {
+                self.inner.set_largest_unit(val);
+                self
+            }
+            pub fn build(self) -> AnySpan {
                 self.inner
             }
         }

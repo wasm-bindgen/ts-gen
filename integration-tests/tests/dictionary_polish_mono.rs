@@ -8,7 +8,7 @@ use wasm_bindgen_test::*;
 use ts_gen_integration_tests::dictionary_polish_mono::{
     polish::{
         spans::{self, HourSpan, Span},
-        steps::{self, DaySpan, DaySpan2},
+        steps::{self, AnySpan, DaySpan, DaySpan2},
         Approximate, Bounded, DayOrHour, DayOrHourMaximumUnitKind, DayOrTimeUnit, Defaulted, Gauge,
         Holder, Hour, HourLargestUnitKind, HourLargestUnitKind2, HourSpanning, HourStepping, Maker,
         Minute, MinuteLargestUnitKind, MinuteStepping, Options, PartialBoxLikeObject,
@@ -183,6 +183,14 @@ fn associated_types_resolve_within_their_family() {
     assert!(matches!(
         day.largest_unit(),
         Some(spans::UnitLargestUnitKind2::Hours)
+    ));
+    // Left to its default, `Unit` is `Spans.Unit`, where `Spanned` declares it.
+    let any = AnySpan::builder()
+        .largest_unit(spans::UnitLargestUnitKind::Hour)
+        .build();
+    assert!(matches!(
+        any.largest_unit(),
+        Some(spans::UnitLargestUnitKind::Hour)
     ));
 }
 

@@ -102,6 +102,9 @@ declare global {
       }
       interface HourSpan extends Span<Unit> {}
       interface Mid<U extends Unit | "day"> extends Span<U> {}
+      interface Spanned<U extends Unit = Unit> {
+        largestUnit?: "auto" | U;
+      }
     }
 
     // Through `Mid` too, the argument resolving where it is written.
@@ -109,6 +112,8 @@ declare global {
       type Unit = "day" | "hours";
       interface DaySpan extends Spans.Span<Unit> {}
       interface DaySpan2 extends Spans.Mid<Unit> {}
+      // A default resolves where the parent declares it.
+      interface AnySpan extends Spans.Spanned {}
     }
 
     // An interface with methods can't be specialised, so its instantiations

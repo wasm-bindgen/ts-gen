@@ -2975,12 +2975,13 @@ fn collect_parent_members(
     if !visited.insert(id) {
         return;
     }
-    let (type_params, parent_extends, members) = match &c.gctx.get_type(id).kind {
-        TypeKind::Interface(i) => (&i.type_params, i.extends.clone(), &i.members),
+    let (type_params, parent_extends, members, body_scope) = match &c.gctx.get_type(id).kind {
+        TypeKind::Interface(i) => (&i.type_params, i.extends.clone(), &i.members, i.body_scope),
         TypeKind::Class(k) => (
             &k.type_params,
             k.extends.iter().cloned().collect(),
             &k.members,
+            k.body_scope,
         ),
         _ => return,
     };
@@ -2996,14 +2997,18 @@ fn collect_parent_members(
             (tp.name.clone(), arg)
         })
         .collect();
+    // A given argument resolves where it was written; a parameter left to
+    // its default, where the parent declares it.
     let written: HashMap<&str, ScopeId> = type_params
         .iter()
         .enumerate()
         .map(|(i, tp)| {
-            (
-                tp.name.as_str(),
-                arg_scopes.get(i).copied().unwrap_or(scope),
-            )
+            let at = if i < generic_args.len() {
+                arg_scopes.get(i).copied().unwrap_or(scope)
+            } else {
+                body_scope
+            };
+            (tp.name.as_str(), at)
         })
         .collect();
     // Ancestors first so a parent's redeclaration overrides theirs.
