@@ -67,6 +67,10 @@ fn nullability_mono_signatures_compile(
     chain_union_with_str(js_string);
     chain_union_with_str_and_b(None, 1.0);
     chain_union_with_str_and_b(Some("a"), 1.0);
+    chain_alias_with_a(js_string);
+    chain_alias_with_a_and_b(Some("a".into()), 1.0);
+    chain_alias_with_a_and_b(Some(registry_value.into()), 1.0);
+    chain_alias_with_a_and_b(None, 1.0);
 
     let _: Upload = Upload::new_file("path");
     let _: Cover = Cover::new_image(js_string);

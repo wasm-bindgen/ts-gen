@@ -130,6 +130,10 @@ fn nullability_signatures_compile(
     chain_union_with_slice(&["a".to_string()]);
     chain_union_with_str_and_b(None, 1.0);
     chain_union_with_slice_and_b(&["a".to_string()], 1.0);
+    chain_alias_with_a("a");
+    chain_alias_with_a_and_b(Some("a".into()), 1.0);
+    chain_alias_with_a_and_b(Some(registry_value.into()), 1.0);
+    chain_alias_with_a_and_b(None, 1.0);
     let _: Object<JsOption<Number>> = record(&Object::new().unchecked_into());
 
     let _: Upload = Upload::new_file("path");

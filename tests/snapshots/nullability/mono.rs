@@ -14,6 +14,62 @@ pub enum Mode {
     Fast = "fast",
     Slow = "slow",
 }
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `Source`",
+    label = "expected string or Registry"
+)]
+pub trait Source: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl Source for &str {}
+impl Source for ::std::string::String {}
+impl Source for &::std::string::String {}
+impl Source for &::std::boxed::Box<str> {}
+impl Source for &::std::borrow::Cow<'_, str> {}
+impl Source for ::js_sys::JsString {}
+impl Source for &::js_sys::JsString {}
+impl Source for Registry {}
+impl Source for &Registry {}
+impl Source for SourceKind {}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum SourceKind {
+    String(String),
+    Registry(Registry),
+}
+impl ::core::convert::From<&str> for SourceKind {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for SourceKind {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for SourceKind {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for SourceKind {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for SourceKind {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<Registry> for SourceKind {
+    fn from(value: Registry) -> Self {
+        Self::Registry(value)
+    }
+}
+impl ::core::convert::From<&Registry> for SourceKind {
+    fn from(value: &Registry) -> Self {
+        Self::Registry(value.clone())
+    }
+}
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -890,6 +946,21 @@ extern "C" {
         a: &[impl ::wasm_bindgen::JsStringLike],
         b: f64,
     ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainAlias")]
+    pub fn chain_alias() -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainAlias")]
+    pub fn chain_alias_with_a(a: impl Source) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainAlias")]
+    pub fn chain_alias_with_a_and_b(a: Option<SourceKind>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {

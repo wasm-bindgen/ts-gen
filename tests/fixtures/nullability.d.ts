@@ -10,6 +10,7 @@
 type MaybeStr = string | null;
 type OptStr = string | undefined;
 type Mode = "fast" | "slow";
+type Source = string | Registry;
 
 export interface Settings {
   plain?: string;
@@ -70,6 +71,7 @@ export declare function chain(a: string | undefined, b: number | null | undefine
 export declare function chainOptional(a?: string, b?: number | null): void;
 export declare function chainThree(a?: string, b?: number | null, c?: boolean): void;
 export declare function chainUnion(a?: string | string[], b?: number): void;
+export declare function chainAlias(a?: Source, b?: number): void;
 export declare function modeArg(m: Mode | null): Mode | null;
 export declare function modeBoth(m: Mode | null | undefined): Mode | null | undefined;
 export declare function modeOptional(m?: Mode | null): void;

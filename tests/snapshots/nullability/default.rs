@@ -14,6 +14,47 @@ pub enum Mode {
     Fast = "fast",
     Slow = "slow",
 }
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Source {
+    String(String),
+    Registry(Registry),
+}
+impl ::core::convert::From<&str> for Source {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for Source {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for Source {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for Source {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for Source {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<Registry> for Source {
+    fn from(value: Registry) -> Self {
+        Self::Registry(value)
+    }
+}
+impl ::core::convert::From<&Registry> for Source {
+    fn from(value: &Registry) -> Self {
+        Self::Registry(value.clone())
+    }
+}
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -1214,6 +1255,42 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "chainUnion")]
     pub fn try_chain_union_with_slice_and_b(a: &[String], b: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "chainAlias")]
+    pub fn chain_alias();
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainAlias")]
+    pub fn try_chain_alias() -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "chainAlias")]
+    fn __chain_alias_with_a(a: Source);
+}
+pub fn chain_alias_with_a(a: impl ::core::convert::Into<Source>) {
+    __chain_alias_with_a(a.into())
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainAlias")]
+    fn __try_chain_alias_with_a(a: Source) -> Result<(), JsValue>;
+}
+pub fn try_chain_alias_with_a(a: impl ::core::convert::Into<Source>) -> Result<(), JsValue> {
+    __try_chain_alias_with_a(a.into())
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "chainAlias")]
+    pub fn chain_alias_with_a_and_b(a: Option<Source>, b: f64);
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "chainAlias")]
+    pub fn try_chain_alias_with_a_and_b(a: Option<Source>, b: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
