@@ -4084,22 +4084,22 @@ pub mod temporal {
         fn __get_time_zone_transition(
             this: &ZonedDateTime,
             direction: &str,
-        ) -> Nullable<ZonedDateTime>;
+        ) -> Option<ZonedDateTime>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
         fn __try_get_time_zone_transition(
             this: &ZonedDateTime,
             direction: &str,
-        ) -> Result<Nullable<ZonedDateTime>, JsValue>;
+        ) -> Result<Option<ZonedDateTime>, JsValue>;
         #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
         pub fn get_time_zone_transition(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
-        ) -> Nullable<ZonedDateTime>;
+        ) -> Option<ZonedDateTime>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
         pub fn try_get_time_zone_transition(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
-        ) -> Result<Nullable<ZonedDateTime>, JsValue>;
+        ) -> Result<Option<ZonedDateTime>, JsValue>;
         #[wasm_bindgen(method, js_name = "toInstant")]
         pub fn to_instant(this: &ZonedDateTime) -> Instant;
         #[wasm_bindgen(method, catch, js_name = "toInstant")]
@@ -4340,20 +4340,18 @@ pub mod temporal {
         }
     }
     impl ZonedDateTime {
-        pub fn get_time_zone_transition_next(&self) -> Nullable<ZonedDateTime> {
+        pub fn get_time_zone_transition_next(&self) -> Option<ZonedDateTime> {
             self.__get_time_zone_transition("next")
         }
-        pub fn get_time_zone_transition_previous(&self) -> Nullable<ZonedDateTime> {
+        pub fn get_time_zone_transition_previous(&self) -> Option<ZonedDateTime> {
             self.__get_time_zone_transition("previous")
         }
-        pub fn try_get_time_zone_transition_next(
-            &self,
-        ) -> Result<Nullable<ZonedDateTime>, JsValue> {
+        pub fn try_get_time_zone_transition_next(&self) -> Result<Option<ZonedDateTime>, JsValue> {
             self.__try_get_time_zone_transition("next")
         }
         pub fn try_get_time_zone_transition_previous(
             &self,
-        ) -> Result<Nullable<ZonedDateTime>, JsValue> {
+        ) -> Result<Option<ZonedDateTime>, JsValue> {
             self.__try_get_time_zone_transition("previous")
         }
     }

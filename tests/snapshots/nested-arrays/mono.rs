@@ -66,16 +66,16 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "maybeRows")]
     pub fn maybe_rows(
         rows: &[Array<impl ::wasm_bindgen::JsStringLike>],
-    ) -> Result<Nullable<Vec<Array<JsString>>>, JsValue>;
+    ) -> Result<Option<Vec<Array<JsString>>>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "maybeRows")]
     fn __maybe_rows_with_null(
         rows: &::wasm_bindgen::JsValue,
-    ) -> Result<Nullable<Vec<Array<JsString>>>, JsValue>;
+    ) -> Result<Option<Vec<Array<JsString>>>, JsValue>;
 }
-pub fn maybe_rows_with_null() -> Result<Nullable<Vec<Array<JsString>>>, JsValue> {
+pub fn maybe_rows_with_null() -> Result<Option<Vec<Array<JsString>>>, JsValue> {
     __maybe_rows_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]

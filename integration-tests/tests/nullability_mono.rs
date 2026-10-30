@@ -16,8 +16,8 @@ fn nullability_mono_signatures_compile(
     registry_value: &Registry,
     holder_value: &Holder<Nullable<String>>,
 ) {
-    let _: Option<Nullable<String>> = settings.both();
-    let _: Option<Nullable<JsString>> = settings.both_js_string();
+    let _: Option<String> = settings.both();
+    let _: Option<JsString> = settings.both_js_string();
     settings.set_both("x");
     settings.set_both(js_string);
     settings.set_both_with_null();
@@ -37,10 +37,10 @@ fn nullability_mono_signatures_compile(
     optional_with_x("x");
     nullable(String::from("x"));
     nullable_with_null();
-    let _: Option<Nullable<String>> = both_with_x(js_string);
-    let _: Option<Nullable<JsString>> = both_js_string();
-    let _: Option<Nullable<JsString>> = both_with_null_js_string();
-    let _: Option<Nullable<String>> = opt_aliased_null_with_null();
+    let _: Option<String> = both_with_x(js_string);
+    let _: Option<JsString> = both_js_string();
+    let _: Option<JsString> = both_with_null_js_string();
+    let _: Option<String> = opt_aliased_null_with_null();
     scalar();
     scalar_with_str("x");
     scalar_with_str(js_string);
@@ -50,11 +50,14 @@ fn nullability_mono_signatures_compile(
     scalar_null("x");
     scalar_optional_with_str(js_string);
     scalar_optional_with_null();
-    let _: Nullable<JsString> = generic(js_string.clone());
-    let _: Nullable<f64> = generic(1.0);
-    let _: Nullable<f64> = generic_with_null();
-    let _: Option<Nullable<String>> = generic_both_with_x(String::from("x"));
-    let _: Option<Nullable<String>> = generic_both_with_null();
+    let _: Option<JsString> = generic(js_string.clone());
+    // A native leaf cannot instantiate a generic `Option<T>` read on the
+    // pinned wasm-bindgen (`f64: OptionFromWasmAbi` is not implemented;
+    // `Option<f64>` converts directly), so the handle stands in.
+    let _: Option<Number> = generic(Number::from(1.0));
+    let _: Option<Number> = generic_with_null();
+    let _: Option<String> = generic_both_with_x(String::from("x"));
+    let _: Option<String> = generic_both_with_null();
 
     pair(js_string);
     pair_with_f64(1.0);
@@ -68,10 +71,10 @@ fn nullability_mono_signatures_compile(
     let _: Cover = Cover::new_blank();
     let _: Attachment = Attachment::new_inline(js_string, "name");
 
-    // Inner positions: a received `Promise` and a generic user type take the
-    // carriers; `js_sys` containers and callbacks keep the `JsGeneric`
-    // handles their `T: JsGeneric` APIs need.
-    let _: Promise<Nullable<JsString>> = registry_value.pending();
+    // Inner positions: a received `Promise` takes the read carrier and a
+    // generic user type the exact one; `js_sys` containers and callbacks
+    // keep the `JsGeneric` handles their `T: JsGeneric` APIs need.
+    let _: Promise<Option<JsString>> = registry_value.pending();
     let _: Promise<Option<Number>> = registry_value.settled();
     let _: Nullable<String> = holder_value.get();
     let _: Holder<Option<f64>> = holder(holder_value);
@@ -86,14 +89,14 @@ fn nullability_mono_signatures_compile(
 // its read carrier.
 #[allow(dead_code)]
 async fn nullability_mono_async_compile(registry_value: &Registry) {
-    let _: Result<Nullable<Registry>, _> = fetch_null().await;
+    let _: Result<Option<Registry>, _> = fetch_null().await;
     let _: Result<Option<f64>, _> = fetch_optional().await;
-    let _: Result<Option<Nullable<String>>, _> = fetch_both().await;
-    let _: Result<Nullable<f64>, _> = fetch_generic::<f64>().await;
-    let _: Result<Nullable<JsString>, _> =
+    let _: Result<Option<String>, _> = fetch_both().await;
+    let _: Result<Option<Number>, _> = fetch_generic::<Number>().await;
+    let _: Result<Option<JsString>, _> =
         wasm_bindgen_futures::JsFuture::from(registry_value.pending()).await;
-    let _: Result<Nullable<Registry>, _> = fetch_null_promise().await;
+    let _: Result<Option<Registry>, _> = fetch_null_promise().await;
     let _: Promise<Option<Number>> = fetch_optional_promise();
-    let _: Promise<Option<Nullable<JsString>>> = fetch_both_promise();
-    let _: Promise<Nullable<JsString>> = fetch_generic_promise::<JsString>();
+    let _: Promise<Option<JsString>> = fetch_both_promise();
+    let _: Promise<Option<JsString>> = fetch_generic_promise::<JsString>();
 }

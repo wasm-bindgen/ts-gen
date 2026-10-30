@@ -135,9 +135,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub fn next_mode_promise(this: &Probe) -> Result<Promise<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "maybeMode")]
-    pub async fn maybe_mode(this: &Probe) -> Result<Nullable<Mode>, JsValue>;
+    pub async fn maybe_mode(this: &Probe) -> Result<Option<Mode>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "maybeMode")]
-    pub fn maybe_mode_promise(this: &Probe) -> Result<Promise<Nullable<JsString>>, JsValue>;
+    pub fn maybe_mode_promise(this: &Probe) -> Result<Promise<Option<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "modeMap")]
     pub fn mode_map(this: &Probe) -> Result<Map<JsString, JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "modeRecord")]

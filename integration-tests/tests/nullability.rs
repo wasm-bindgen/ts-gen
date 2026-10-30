@@ -1,12 +1,13 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{JsNullable, JsOption, JsString, Nullable, Number, Object, Promise, Uint8Array};
+use js_sys::{JsNullable, JsOption, JsString, Number, Object, Promise, Uint8Array};
 use wasm_bindgen::JsCast;
 
 use ts_gen_integration_tests::nullability::*;
 
 // This fixture has no backing JavaScript module, so it provides compile-only
-// coverage of each read carrier and each write expansion.
+// coverage of each read carrier (`Option<T>` whichever empties a read admits)
+// and each write expansion, which keeps `null` as an arm of its own.
 #[allow(dead_code)]
 fn nullability_signatures_compile(
     settings: &Settings,
@@ -15,11 +16,11 @@ fn nullability_signatures_compile(
     holder_value: &Holder<JsNullable<JsString>>,
 ) {
     let _: Option<String> = settings.plain();
-    let _: Nullable<String> = settings.nullable();
-    let _: Option<Nullable<String>> = settings.both();
-    let _: Option<Nullable<Mode>> = settings.mode();
-    let _: Option<Nullable<f64>> = settings.limit();
-    let _: Option<Nullable<Vec<f64>>> = settings.values();
+    let _: Option<String> = settings.nullable();
+    let _: Option<String> = settings.both();
+    let _: Option<Mode> = settings.mode();
+    let _: Option<f64> = settings.limit();
+    let _: Option<Vec<f64>> = settings.values();
     settings.set_both("x");
     settings.set_both_with_null();
     settings.set_mode(Mode::Fast);
@@ -46,7 +47,7 @@ fn nullability_signatures_compile(
         .key_with_f64(2.0)
         .build();
 
-    let _: Option<Nullable<Registry>> = Registry::last();
+    let _: Option<Registry> = Registry::last();
     let _: Option<Registry> = Registry::current();
     let _: Promise<JsNullable<JsString>> = registry_value.pending();
     let _: Promise<JsOption<Number>> = registry_value.settled();
@@ -68,21 +69,21 @@ fn nullability_signatures_compile(
     optional_with_x("x");
     nullable("x");
     nullable_with_null();
-    let _: Option<Nullable<String>> = both();
-    let _: Option<Nullable<String>> = both_with_x("x");
-    let _: Option<Nullable<String>> = both_with_null();
+    let _: Option<String> = both();
+    let _: Option<String> = both_with_x("x");
+    let _: Option<String> = both_with_null();
     optional_both();
     optional_both_with_x("x");
     optional_both_with_null();
-    let _: Nullable<String> = aliased_null("x");
-    let _: Option<Nullable<String>> = opt_aliased_null();
-    let _: Option<Nullable<f64>> = count_with_x(1.0);
-    let _: Option<Nullable<f64>> = count_with_null();
+    let _: Option<String> = aliased_null("x");
+    let _: Option<String> = opt_aliased_null();
+    let _: Option<f64> = count_with_x(1.0);
+    let _: Option<f64> = count_with_null();
     count_null(1.0);
     count_optional_with_null();
-    let _: Nullable<bool> = flag(true);
-    let _: Option<Nullable<Registry>> = registry_with_r(registry_value);
-    let _: Option<Nullable<Registry>> = registry_with_null();
+    let _: Option<bool> = flag(true);
+    let _: Option<Registry> = registry_with_r(registry_value);
+    let _: Option<Registry> = registry_with_null();
     registry_null_with_null();
     registry_optional_with_null();
     scalar();
@@ -92,14 +93,14 @@ fn nullability_signatures_compile(
     scalar_null_with_f64(1.0);
     scalar_optional_with_str("x");
     scalar_optional_with_null();
-    let _: Option<Nullable<Mode>> = mode_both_with_m(Mode::Slow);
+    let _: Option<Mode> = mode_both_with_m(Mode::Slow);
     mode_optional_with_null();
-    let _: Nullable<JsString> = generic(&JsString::from("x"));
-    let _: Nullable<JsString> = generic_with_null();
-    let _: Option<Nullable<JsString>> = generic_both_with_x(&JsString::from("x"));
-    let _: Option<Nullable<JsString>> = generic_both_with_null();
-    let _: Option<Nullable<Vec<f64>>> = numbers_both_with_xs(&[1.0]);
-    let _: Option<Nullable<Vec<f64>>> = numbers_both_with_null();
+    let _: Option<JsString> = generic(&JsString::from("x"));
+    let _: Option<JsString> = generic_with_null();
+    let _: Option<JsString> = generic_both_with_x(&JsString::from("x"));
+    let _: Option<JsString> = generic_both_with_null();
+    let _: Option<Vec<f64>> = numbers_both_with_xs(&[1.0]);
+    let _: Option<Vec<f64>> = numbers_both_with_null();
     numbers_optional_with_xs(&[1.0]);
     numbers_optional_with_null();
     bytes(&[1]);
@@ -130,7 +131,7 @@ fn nullability_signatures_compile(
     let _: Upload = Upload::builder_skip().path("p").build();
     let _: Cover = Cover::new_image("src");
     let _: Cover = Cover::new_blank();
-    let _: Nullable<JsNullable<JsString>> = holder_value.value();
+    let _: Option<JsNullable<JsString>> = holder_value.value();
     let _: Holder<JsOption<Number>> = holder(holder_value);
 }
 
@@ -138,10 +139,10 @@ fn nullability_signatures_compile(
 // the sync return form; the `_promise` form's is an inner position.
 #[allow(dead_code)]
 async fn nullability_async_compile() {
-    let _: Result<Nullable<Registry>, _> = fetch_null().await;
+    let _: Result<Option<Registry>, _> = fetch_null().await;
     let _: Result<Option<f64>, _> = fetch_optional().await;
-    let _: Result<Option<Nullable<String>>, _> = fetch_both().await;
-    let _: Result<Nullable<JsString>, _> = fetch_generic::<JsString>().await;
+    let _: Result<Option<String>, _> = fetch_both().await;
+    let _: Result<Option<JsString>, _> = fetch_generic::<JsString>().await;
     let _: Result<JsNullable<Registry>, _> = fetch_null_promise().await;
     let _: Result<JsOption<Number>, _> = fetch_optional_promise().await;
     let _: Result<JsNullable<JsString>, _> = fetch_both_promise().await;

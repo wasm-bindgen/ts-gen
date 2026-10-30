@@ -95,6 +95,15 @@ primary plus a `try_<name>` companion:
 ts-gen --input types.d.ts --output src/bindings.rs --fallible
 ```
 
+Keep the exact carrier for each empty on reads. By default a return, awaited
+value or getter admitting `null`, `undefined` or both reads as `Option<T>`;
+with the flag `T | null` reads as `Nullable<T>` and `T | null | undefined` as
+`Option<Nullable<T>>`. Writes are exact either way:
+
+```sh
+ts-gen --input types.d.ts --output src/bindings.rs --strict-nullable
+```
+
 ### Library API
 
 ```rust
@@ -118,7 +127,8 @@ private):
 ```rust
 let options = codegen::GenerateOptions::new()
     .error_type("crate::Error")
-    .experimental_generic_mono(true);
+    .experimental_generic_mono(true)
+    .strict_nullable(false);
 let rust_code = codegen::generate_with_options(&module, &gctx, &options)?;
 ```
 

@@ -271,6 +271,10 @@ pub struct CodegenContext<'a> {
     /// Whether generic imports use wasm-bindgen's experimental
     /// per-monomorphization codegen rather than type erasure.
     pub experimental_generic_mono: bool,
+    /// Whether a read keeps the exact carrier for each empty
+    /// (`Nullable<T>` for `T | null`) rather than folding every empty
+    /// into `Option<T>`. See [`read_carrier`].
+    pub strict_nullable: bool,
     /// JS module specifiers whose declarations are emitted, each in the
     /// `pub mod` of `module_path`.
     pub exported_modules: HashSet<String>,
@@ -662,6 +666,12 @@ impl<'a> CodegenContext<'a> {
     /// most emitters carry an optional context; no context means default mode.
     pub(crate) fn generic_mono(ctx: Option<&CodegenContext<'_>>) -> bool {
         ctx.is_some_and(|ctx| ctx.experimental_generic_mono)
+    }
+
+    /// Whether reads keep the exact carrier for each empty
+    /// (`--strict-nullable`). No context means the default, folded reads.
+    pub(crate) fn strict_nullable(ctx: Option<&CodegenContext<'_>>) -> bool {
+        ctx.is_some_and(|ctx| ctx.strict_nullable)
     }
 
     /// One type-parameter declaration: bare `T` under per-monomorphization
@@ -1118,6 +1128,7 @@ impl<'a> CodegenContext<'a> {
             fallible: options.fallible,
             error_enum: options.error_enum.clone(),
             experimental_generic_mono: options.experimental_generic_mono,
+            strict_nullable: options.strict_nullable,
             exported_modules,
             externalised_modules,
             unresolved_module_refs: RefCell::new(HashSet::new()),
@@ -1179,6 +1190,7 @@ impl<'a> CodegenContext<'a> {
             fallible: false,
             error_enum: None,
             experimental_generic_mono: false,
+            strict_nullable: false,
             exported_modules: HashSet::new(),
             externalised_modules: HashSet::new(),
             unresolved_module_refs: RefCell::new(HashSet::new()),
@@ -2054,12 +2066,28 @@ pub fn to_syn_type(
             pos
         };
         let inner_ty = to_syn_type(&core, core_pos, ctx, scope, from_module);
-        // `JsValue` carries both empties in-band.
-        let bare = inner_ty.to_string();
-        if bare == "JsValue" || (bare == "& JsValue" && n.admits_null()) {
+        if pos.is_argument() {
+            // `&JsValue` carries both empties in-band: a written `any | null`
+            // passes `JsValue::NULL`.
+            let bare = inner_ty.to_string();
+            if bare == "JsValue" || (bare == "& JsValue" && n.admits_null()) {
+                return inner_ty;
+            }
+            return nullable_carrier(inner_ty, n);
+        }
+        // A read of the top type stays bare: `any` and `unknown` already
+        // admit both empties in-band (`is_null`, `is_undefined`), and
+        // TypeScript itself erases a `| null` or `| undefined` on them. Any
+        // other read that erases to `JsValue` (an unrelated intersection, a
+        // union with no useful bound) takes the read carrier, so an empty
+        // reads as `None` as it does for every other type. Under
+        // `--strict-nullable` every `JsValue` read stays bare, as before.
+        if is_jsvalue_arg(&inner_ty)
+            && (CodegenContext::strict_nullable(ctx) || is_top_type(&core, ctx, scope))
+        {
             return inner_ty;
         }
-        return nullable_carrier(inner_ty, n);
+        return read_carrier(inner_ty, n, ctx);
     }
 
     // Helper: should this type get `&` in argument position?
@@ -2453,9 +2481,7 @@ pub(crate) fn split_empties_in(
     scope: ScopeId,
 ) -> Option<(TypeRef, ir::Nullability, ScopeId)> {
     let (core, n) = ty.split_empties()?;
-    let alias = core
-        .as_ident()
-        .and_then(|name| ctx?.resolve_alias(name, scope));
+    let alias = alias_path(&core).and_then(|name| ctx?.resolve_alias(&name, scope));
     if let Some((target, target_scope)) = alias {
         if let Some((inner, m, s)) = split_empties_in(&target, ctx, target_scope) {
             return Some((inner, n.with(m), s));
@@ -2517,7 +2543,7 @@ fn union_alias_read(
             .chain(alias.nullability)
             .reduce(|a, b| a.with(b))
         {
-            Some(n) => nullable_carrier(path, n),
+            Some(n) => read_carrier(path, n, Some(ctx)),
             None => path,
         },
     )
@@ -2542,14 +2568,35 @@ fn union_alias_enum_path(alias: &UnionAlias, path: TokenStream) -> TokenStream {
     }
 }
 
-/// The read carrier: `Option<T>` is `T | undefined`, `Nullable<T>` is
-/// `T | null`, and `Option<Nullable<T>>` admits both.
+/// The exact carrier, which a write and a type argument take: `Option<T>`
+/// is `T | undefined`, `Nullable<T>` is `T | null`, and
+/// `Option<Nullable<T>>` admits both. `IntoWasmAbi` has to choose what an
+/// empty crosses as, so on a write each carrier owns one empty; a type
+/// argument has no direction and names the union as written.
 pub(crate) fn nullable_carrier(inner: TokenStream, n: ir::Nullability) -> TokenStream {
     match n {
         ir::Nullability::Both => quote! { Option<Nullable<#inner>> },
         ir::Nullability::Null => quote! { Nullable<#inner> },
         ir::Nullability::Undefined => quote! { Option<#inner> },
     }
+}
+
+/// The read carrier of a return, an awaited value or a getter: `Option<T>`
+/// whichever empties the type admits. `FromWasmAbi` chooses nothing, and
+/// `Option<T>` reads `null` and `undefined` alike as `None`
+/// (wasm-bindgen#5428), so a read loses nothing by folding them; the Rust
+/// side receiving a value has no use for the distinction, where a write
+/// must pick one (see [`nullable_carrier`]). `--strict-nullable` keeps the
+/// exact carrier on reads too.
+pub(crate) fn read_carrier(
+    inner: TokenStream,
+    n: ir::Nullability,
+    ctx: Option<&CodegenContext<'_>>,
+) -> TokenStream {
+    if CodegenContext::strict_nullable(ctx) {
+        return nullable_carrier(inner, n);
+    }
+    quote! { Option<#inner> }
 }
 
 /// Inner-position nullability follows wasm-bindgen's `sys` split:
@@ -2904,8 +2951,9 @@ fn lower_reference(
 }
 
 /// Under per-monomorphization, a top-level `Promise<T>` the caller receives
-/// takes the carrier of a `T` admitting empties (`Promise<Nullable<JsString>>`),
-/// as awaiting it converts through `JsFuture<T: FromWasmAbi>`. One the caller
+/// takes the read carrier of a `T` admitting empties
+/// (`Promise<Option<JsString>>`), as awaiting it converts through
+/// `JsFuture<T: FromWasmAbi>`. One the caller
 /// passes, or nested in another type, keeps the `JsGeneric` handle that the
 /// `js_sys` containers and constructors (`Promise::resolve`) require.
 fn mono_promise_carrier(
@@ -2920,7 +2968,7 @@ fn mono_promise_carrier(
     }
     let (core, n, scope) = split_empties_in(inner, ctx, scope)?;
     let inner_ty = to_syn_type(&core, pos.to_inner(), ctx, scope, from_module);
-    (!is_jsvalue_arg(&inner_ty)).then(|| nullable_carrier(inner_ty, n))
+    (!is_jsvalue_arg(&inner_ty)).then(|| read_carrier(inner_ty, n, ctx))
 }
 
 /// Append `generic_args` to `base` when `name` is a locally emitted generic
@@ -3082,7 +3130,7 @@ pub fn to_return_type(
         // The list keeps its `Array<T>` handle; the awaited value's own
         // empties still take the read carriers around it.
         match split_empties_in(ty, ctx, scope) {
-            Some((core, n, scope)) => nullable_carrier(
+            Some((core, n, scope)) => read_carrier(
                 to_syn_type(
                     &core,
                     TypePosition::RETURN.to_inner(),
@@ -3091,6 +3139,7 @@ pub fn to_return_type(
                     from_module,
                 ),
                 n,
+                ctx,
             ),
             None => to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module),
         }
@@ -3371,14 +3420,17 @@ pub(crate) fn to_mono_js_string_return_type(
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
-    to_mono_js_string_return_type_impl(ty, ctx, scope, from_module, &mut HashSet::new())
+    to_mono_js_string_return_type_impl(ty, ctx, scope, from_module, true, &mut HashSet::new())
 }
 
+/// `read` is the top-level return, which takes the read carrier; a type
+/// argument below it keeps the exact one.
 fn to_mono_js_string_return_type_impl(
     ty: &TypeRef,
     ctx: &CodegenContext<'_>,
     scope: ScopeId,
     from_module: &ModuleContext,
+    read: bool,
     visited: &mut HashSet<TypeId>,
 ) -> TokenStream {
     let (peeled, peeled_scope) = peel_mono(ty, ctx, scope, visited);
@@ -3388,8 +3440,13 @@ fn to_mono_js_string_return_type_impl(
             quote! { Array<JsString> }
         }
         t if let Some((inner, n, s)) = split_empties_in(t, Some(ctx), peeled_scope) => {
-            let inner = to_mono_js_string_return_type_impl(&inner, ctx, s, from_module, visited);
-            nullable_carrier(inner, n)
+            let inner =
+                to_mono_js_string_return_type_impl(&inner, ctx, s, from_module, read, visited);
+            if read {
+                read_carrier(inner, n, Some(ctx))
+            } else {
+                nullable_carrier(inner, n)
+            }
         }
         t @ TypeRef::Reference { segments, .. }
             if local_generic_args(t, ctx, peeled_scope).is_some() =>
@@ -3410,6 +3467,7 @@ fn to_mono_js_string_return_type_impl(
                             ctx,
                             peeled_scope,
                             from_module,
+                            false,
                             &mut visited,
                         )
                     } else {
@@ -3475,16 +3533,19 @@ pub fn to_getter_return_type(
         if let Some(inner_tokens) =
             maybe_synthesise_return_union(&core, ctx, scope, from_module, anchor)
         {
-            return nullable_carrier(inner_tokens, n);
+            return read_carrier(inner_tokens, n, ctx);
         }
     }
-    // A property that can be absent keeps its `Option` around a type that
-    // erases to `JsValue`, so absence reads as `None`. The `Option` would
-    // read `null` as `None` too, so a written `null` nests a `Nullable`
-    // under it, as for any other value. The top type already holds both
-    // empties in-band, where an `Option` would only lose `null`, so it
-    // stays bare.
-    if let Some((core, n, core_scope)) = split_empties_in(ty, ctx, scope) {
+    // Under `--strict-nullable` a `JsValue` read stays bare, except a
+    // property that can be absent: it keeps its `Option` around a type that
+    // erases to `JsValue`, so absence reads as `None`, and a written `null`
+    // nests a `Nullable` under that `Option`, which would read `null` as
+    // `None`. The top type already holds both empties in-band, so it stays
+    // bare. (Without the flag `to_syn_type` gives every such read
+    // `Option<JsValue>`.)
+    if let Some((core, n, core_scope)) =
+        split_empties_in(ty, ctx, scope).filter(|_| CodegenContext::strict_nullable(ctx))
+    {
         if n.admits_undefined() && !is_top_type(&core, ctx, core_scope) {
             let inner = to_syn_type(&core, TypePosition::RETURN, ctx, core_scope, from_module);
             if is_jsvalue_arg(&inner) {
@@ -3499,10 +3560,23 @@ pub fn to_getter_return_type(
 fn is_top_type(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
     match ty {
         TypeRef::Any | TypeRef::Unknown => true,
-        TypeRef::Reference { .. } if let Some(name) = ty.as_ident() => ctx
-            .and_then(|c| c.resolve_alias(name, scope))
+        TypeRef::Reference { .. } if let Some(name) = alias_path(ty) => ctx
+            .and_then(|c| c.resolve_alias(&name, scope))
             .is_some_and(|(target, alias_scope)| is_top_type(&target, ctx, alias_scope)),
         _ => false,
+    }
+}
+
+/// The path of a non-generic reference, which
+/// [`CodegenContext::resolve_alias`] chases through aliases: `MaybeStr`,
+/// or a qualified `Intl.LocalesArgument`.
+fn alias_path(ty: &TypeRef) -> Option<String> {
+    match ty {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if generic_args.is_empty() => Some(segments.join(".")),
+        _ => None,
     }
 }
 
@@ -4356,7 +4430,12 @@ mod tests {
     #[test]
     fn test_nullable() {
         let ty = TypeRef::String.with_empties(Nullability::Null);
-        assert_eq!(ret_type(&ty), "Nullable < String >");
+        assert_eq!(ret_type(&ty), "Option < String >");
+        // The top type stays bare under any empties.
+        let ty = TypeRef::Any.with_empties(Nullability::Null);
+        assert_eq!(ret_type(&ty), "JsValue");
+        let ty = TypeRef::Unknown.with_empties(Nullability::Both);
+        assert_eq!(ret_type(&ty), "JsValue");
     }
 
     #[test]
@@ -4408,10 +4487,11 @@ mod tests {
     fn test_nullable_named_type_unresolved() {
         // Without ctx, `Foo` is unresolved → `JsValue`, which carries
         // `null` in-band: a `T | null` argument is `&JsValue` (pass
-        // `JsValue::NULL`), a return collapses to bare `JsValue`.
+        // `JsValue::NULL`); a read is `Option<JsValue>` like any other
+        // `null` read, as only the top type stays bare.
         let ty = TypeRef::ident("Foo").with_empties(Nullability::Null);
         assert_eq!(arg_type(&ty), "& JsValue");
-        assert_eq!(ret_type(&ty), "JsValue");
+        assert_eq!(ret_type(&ty), "Option < JsValue >");
         // `T | undefined` keeps `Option` so `None` can cross as `undefined`.
         let ty = TypeRef::ident("Foo").with_empties(Nullability::Undefined);
         assert_eq!(arg_type(&ty), "Option < & JsValue >");
@@ -4435,14 +4515,56 @@ mod tests {
             ret_type(&nullable(Nullability::Undefined)),
             "Option < String >"
         );
+        // A read folds every empty into `Option`.
+        assert_eq!(ret_type(&nullable(Nullability::Null)), "Option < String >");
+        assert_eq!(ret_type(&nullable(Nullability::Both)), "Option < String >");
+    }
+
+    #[test]
+    fn strict_nullable_reads_keep_the_exact_carriers() {
+        let src = "declare class Foo {} declare class Bar {}";
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let options = GenerateOptions::new().strict_nullable(true);
+        let ctx = CodegenContext::from_module_full(&module, &gctx, &options, None).unwrap();
+        let scope = *module.file_scopes.first().expect("file scope");
+        assert!(CodegenContext::strict_nullable(Some(&ctx)));
+        assert!(!CodegenContext::strict_nullable(None));
+        let read = |ty: &TypeRef| {
+            to_syn_type(
+                ty,
+                TypePosition::RETURN,
+                Some(&ctx),
+                scope,
+                &ModuleContext::Global,
+            )
+            .to_string()
+        };
+        let nullable = |n| TypeRef::String.with_empties(n);
+        assert_eq!(read(&nullable(Nullability::Undefined)), "Option < String >");
+        assert_eq!(read(&nullable(Nullability::Null)), "Nullable < String >");
         assert_eq!(
-            ret_type(&nullable(Nullability::Null)),
-            "Nullable < String >"
-        );
-        assert_eq!(
-            ret_type(&nullable(Nullability::Both)),
+            read(&nullable(Nullability::Both)),
             "Option < Nullable < String >>"
         );
+        // Every `JsValue` read stays bare, as before the fold.
+        let erased = TypeRef::Intersection(vec![TypeRef::ident("Foo"), TypeRef::ident("Bar")]);
+        assert_eq!(read(&erased.with_empties(Nullability::Null)), "JsValue");
+        assert_eq!(
+            read(&TypeRef::Any.with_empties(Nullability::Null)),
+            "JsValue"
+        );
+        // Writes are the same under either setting.
+        let write = |ty: &TypeRef| {
+            to_syn_type(
+                ty,
+                TypePosition::ARGUMENT,
+                Some(&ctx),
+                scope,
+                &ModuleContext::Global,
+            )
+            .to_string()
+        };
+        assert_eq!(write(&nullable(Nullability::Null)), "Nullable < & str >");
     }
 
     #[test]
@@ -5594,7 +5716,7 @@ mod tests {
             );
             assert_eq!(
                 js_string_ret(&TypeRef::ident("MaybeId"), ctx, scope),
-                "Nullable < JsString >"
+                "Option < JsString >"
             );
             assert_eq!(
                 js_string_ret(&holder(lits(&["a", "b"])), ctx, scope),
@@ -5688,48 +5810,65 @@ mod tests {
     fn absent_getters_keep_their_option_around_js_value() {
         let src = "declare class Foo {} declare class Bar {} type Anything = unknown;";
         let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
-            .unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
         let anchor = ReturnAnchor {
             base: "x",
             kind: ReturnAnchorKind::Getter,
             parent: None,
         };
-        let read = |members: Vec<TypeRef>| {
-            to_getter_return_type(
-                &TypeRef::union(members),
-                Some(&ctx),
-                scope,
-                &ModuleContext::Global,
-                anchor,
-            )
-            .to_string()
-        };
         let erased = || TypeRef::Intersection(vec![TypeRef::ident("Foo"), TypeRef::ident("Bar")]);
+        let reads = |strict: bool| {
+            let options = GenerateOptions::new().strict_nullable(strict);
+            let ctx = CodegenContext::from_module_full(&module, &gctx, &options, None).unwrap();
+            let read = |members: Vec<TypeRef>| {
+                to_getter_return_type(
+                    &TypeRef::union(members),
+                    Some(&ctx),
+                    scope,
+                    &ModuleContext::Global,
+                    anchor,
+                )
+                .to_string()
+            };
+            [
+                read(vec![erased(), TypeRef::Undefined]),
+                read(vec![erased(), TypeRef::Null, TypeRef::Undefined]),
+                read(vec![erased(), TypeRef::Null]),
+                read(vec![TypeRef::Any, TypeRef::Undefined]),
+                read(vec![TypeRef::Unknown, TypeRef::Null, TypeRef::Undefined]),
+                read(vec![TypeRef::ident("Anything"), TypeRef::Undefined]),
+                read(vec![TypeRef::ident("Foo"), TypeRef::Undefined]),
+            ]
+        };
+        // A read erasing to `JsValue` takes the read carrier whichever
+        // empties it admits; the top type holds both empties in-band and
+        // stays bare.
         assert_eq!(
-            read(vec![erased(), TypeRef::Undefined]),
-            "Option < JsValue >"
+            reads(false),
+            [
+                "Option < JsValue >",
+                "Option < JsValue >",
+                "Option < JsValue >",
+                "JsValue",
+                "JsValue",
+                "JsValue",
+                "Option < Foo >",
+            ]
         );
+        // Under `--strict-nullable` only a property that can be absent
+        // keeps its `Option`, with a written `null` as the `Nullable`
+        // under it; without `undefined` any `JsValue` stays bare.
         assert_eq!(
-            read(vec![erased(), TypeRef::Null, TypeRef::Undefined]),
-            "Option < Nullable < JsValue >>"
-        );
-        // The top type holds both empties in-band, and without `undefined`
-        // so does any `JsValue`.
-        assert_eq!(read(vec![TypeRef::Any, TypeRef::Undefined]), "JsValue");
-        assert_eq!(
-            read(vec![TypeRef::Unknown, TypeRef::Null, TypeRef::Undefined]),
-            "JsValue"
-        );
-        assert_eq!(
-            read(vec![TypeRef::ident("Anything"), TypeRef::Undefined]),
-            "JsValue"
-        );
-        assert_eq!(read(vec![erased(), TypeRef::Null]), "JsValue");
-        assert_eq!(
-            read(vec![TypeRef::ident("Foo"), TypeRef::Undefined]),
-            "Option < Foo >"
+            reads(true),
+            [
+                "Option < JsValue >",
+                "Option < Nullable < JsValue >>",
+                "JsValue",
+                "JsValue",
+                "JsValue",
+                "JsValue",
+                "Option < Foo >",
+            ]
         );
     }
 

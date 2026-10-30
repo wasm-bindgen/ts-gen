@@ -3,7 +3,6 @@
 #![cfg(target_arch = "wasm32")]
 
 // `optional_reads.rs` against the per-monomorphization bindings.
-use js_sys::Nullable;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_test::*;
 
@@ -19,11 +18,11 @@ fn absent_fields_read_as_none() {
 }
 
 #[wasm_bindgen_test]
-fn null_reads_apart() {
+fn null_reads_as_none_off_an_erased_field() {
     let settings = settings("null");
     assert_eq!(settings.data(), JsValue::NULL);
-    assert_eq!(settings.cleared(), Some(Nullable::Null));
+    assert_eq!(settings.cleared(), None);
     assert_eq!(Registry::missing(), None);
-    assert_eq!(Registry::cleared(), Some(Nullable::Null));
+    assert_eq!(Registry::cleared(), None);
     assert_eq!(Registry::anything(), JsValue::NULL);
 }

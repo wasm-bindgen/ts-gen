@@ -1,10 +1,13 @@
 #![cfg(target_arch = "wasm32")]
 
 // `null` and `undefined` reach a Node-style module as distinct values: a
-// default initializer fires on `undefined`, `=== null` is checked. Reads
-// keep `Nullable`, including an awaited value; writes send `null` through
-// their own `_with_null` variant, and omission sends no argument.
-use js_sys::{JsNullable, JsString, Nullable};
+// default initializer fires on `undefined`, `=== null` is checked. Writes
+// send `null` through their own `_with_null` variant, and omission sends no
+// argument. Reads, an awaited value included, are `Option<T>`: a received
+// `null` is `None` like a received `undefined`, while the `_promise` form's
+// `JsNullable` handle still tells them apart.
+use js_sys::{JsNullable, JsString};
+use wasm_bindgen::JsValue;
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::node_nullable::*;
@@ -36,38 +39,35 @@ fn optional_nullable_argument_sends_each_state() {
 }
 
 #[wasm_bindgen_test]
-fn optional_nullable_return_keeps_each_state() {
-    assert_eq!(lookup("known"), Some(Nullable::Value("value".to_string())));
-    assert_eq!(lookup("other"), Some(Nullable::Null));
+fn optional_nullable_return_reads_either_empty_as_none() {
+    assert_eq!(lookup("known").as_deref(), Some("value"));
+    assert_eq!(lookup("other"), None);
     assert_eq!(lookup("empty"), None);
-    assert_eq!(
-        lookup("known").and_then(Nullable::value).as_deref(),
-        Some("value")
-    );
-    assert_eq!(lookup("other").and_then(Nullable::value), None);
 }
 
 #[wasm_bindgen_test]
-async fn awaited_value_keeps_each_state() {
-    let value = |s: &str| Some(Nullable::Value(s.to_string()));
+async fn awaited_value_reads_either_empty_as_none() {
+    let value = |s: &str| Some(s.to_string());
     assert_eq!(lookup_async("known").await.unwrap(), value("value"));
     let handle: JsNullable<JsString> = lookup_async_promise("known").await.unwrap();
     assert_eq!(handle.as_option(), Some(JsString::from("value")));
     let handle: JsNullable<JsString> = lookup_async_promise("other").await.unwrap();
-    assert!(handle.is_empty());
-    assert_eq!(lookup_async("other").await.unwrap(), Some(Nullable::Null));
+    assert!(JsValue::is_null(&handle));
+    let handle: JsNullable<JsString> = lookup_async_promise("empty").await.unwrap();
+    assert!(JsValue::is_undefined(&handle));
+    assert_eq!(lookup_async("other").await.unwrap(), None);
     assert_eq!(lookup_async("empty").await.unwrap(), None);
-    assert!(find("other").await.unwrap().is_null());
+    assert!(find("other").await.unwrap().is_none());
     let found = find("known").await.unwrap().unwrap();
-    assert_eq!(found.label(), Some(Nullable::Value("found".to_string())));
+    assert_eq!(found.label(), value("found"));
 }
 
 #[wasm_bindgen_test]
-fn optional_nullable_field_reads_each_state() {
+fn optional_nullable_field_reads_either_empty_as_none() {
     assert_eq!(options("missing").label(), None);
     assert_eq!(options("undefined").label(), None);
-    assert_eq!(options("null").label(), Some(Nullable::Null));
-    assert_eq!(options("x").label(), Some(Nullable::Value("x".to_string())));
+    assert_eq!(options("null").label(), None);
+    assert_eq!(options("x").label(), Some("x".to_string()));
 }
 
 #[wasm_bindgen_test]
@@ -81,7 +81,7 @@ fn optional_nullable_field_setter_assigns_null_or_a_value() {
     let options = Options::new();
     options.set_label_with_null();
     assert_eq!(configure(&options), "unlabelled");
-    assert_eq!(options.label(), Some(Nullable::Null));
+    assert_eq!(options.label(), None);
 }
 
 #[wasm_bindgen_test]

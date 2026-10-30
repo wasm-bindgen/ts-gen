@@ -17,6 +17,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 
 * [Primitive types](#primitive-types)
 * [Optional and nullable types](#optional-and-nullable-types)
+  * [`--strict-nullable` — exact read carriers](#--strict-nullable--exact-read-carriers)
 * [Array and slice types](#array-and-slice-types)
 * [Function types](#function-types)
 * [Outer-type ABI fan-out](#outer-type-abi-fan-out)
@@ -94,61 +95,79 @@ parameter with a default initializer (`f(x = 1)`) is optional too.
 
 Lowering reads the empties off a union (merging empties held by
 aliases, so `MaybeStr | undefined` with `type MaybeStr = string | null`
-admits both) and picks a carrier for each top-level position. Two Rust
-carriers, each owning one empty, nest for the union:
+admits both, as does a qualified `Intl.LocalesArgument` carrying its own
+`undefined`) and picks a carrier for each top-level position. The
+direction decides the carrier. A write has to choose what an empty
+crosses as: `IntoWasmAbi` sends `None` as `undefined`, so `Nullable<T>`
+carries `null`, and the two carriers, each owning one empty, nest for the
+union. A read chooses nothing: `FromWasmAbi` receives whatever JS sent,
+and `Option<T>` reads `null` and `undefined` alike as `None`, so every
+empty-admitting read is `Option<T>` and loses nothing by it. A type
+argument has no direction and names the union as written.
 
-| TS                       | Rust                  | JS → Rust                                     | Rust → JS             |
-| ------------------------ | --------------------- | --------------------------------------------- | --------------------- |
-| `T \| undefined`         | `Option<T>`           | `undefined` is `None`                         | `None` is `undefined` |
-| `T \| null`              | `Nullable<T>`         | `null` is `Null`                              | `Null` is `null`      |
-| `T \| null \| undefined` | `Option<Nullable<T>>` | `undefined` is `None`, `null` is `Some(Null)` | each state as itself  |
+| TS                       | Write / type argument | Read        | JS → Rust                                     | Rust → JS             |
+| ------------------------ | --------------------- | ----------- | --------------------------------------------- | --------------------- |
+| `T \| undefined`         | `Option<T>`           | `Option<T>` | `undefined` is `None`                         | `None` is `undefined` |
+| `T \| null`              | `Nullable<T>`         | `Option<T>` | `null` is `Null` written, `None` read         | `Null` is `null`      |
+| `T \| null \| undefined` | `Option<Nullable<T>>` | `Option<T>` | `undefined` is `None`, `null` is `Some(Null)` written, `None` read | each state as itself |
 
 `Nullable<T>` is wasm-bindgen's two-state `enum Nullable<T> { Null,
 Value(T) }` (in the prelude, and re-exported as `js_sys::Nullable`), so a
 Node-style `fn(x: T | null)` that checks `x === null`, or a
 default-parameter initializer that fires on `undefined`, receives exactly
 the empty passed. The `Option` layer over a `Nullable` is always strict,
-so `null` reaches the `Nullable`; a bare `Option<T>` also reads `null` as
-`None` for most `T` unless built with
-`--cfg wasm_bindgen_unstable_strict_option`. `opt.and_then(Nullable::value)`
-collapses the union to `Option<T>`. `Nullable<Nullable<T>>`,
-`Nullable<Option<T>>` and `Option<Option<T>>` are never emitted.
+so `null` reaches the `Nullable`; a bare `Option<T>` reads `null` as
+`None` under either cfg (wasm-bindgen#5428) while its `None` still
+crosses as `undefined`, which is why it is the read carrier and not the
+write one. wasm-bindgen has `From<Option<T>> for Nullable<T>` and
+`From<Nullable<T>> for Option<T>`, so a value read as `Option<T>` is
+written back through a `Nullable<T>` argument with `.into()`, and
+`opt.and_then(Nullable::value)` collapses a written union to `Option<T>`.
+`Nullable<Nullable<T>>`, `Nullable<Option<T>>` and `Option<Option<T>>`
+are never emitted.
 
 ### Reads
 
-Getters, static getters, function and method returns, and the awaited
-value of an async function use the carriers exactly. A read admits
-`undefined` when its type does or when its declaration is optional, so
-`x?: T` reads as `Option<T>` and `x?: T | null` as
-`Option<Nullable<T>>`, for instance and static properties alike.
-`null | undefined` with nothing else reads as `Option<Null>`. A
-`JsValue` inner stays bare, since it carries both empties in-band,
-except under a property that can be absent: a getter or static getter
-admitting `undefined` whose type erases to `JsValue` (an unrelated
-intersection, a union with no useful bound) keeps its `Option`, so an
-absent field reads as `None`. That `Option` would also read `null` as
-`None`, so a written `null` keeps its `Nullable` under it. The top type is
-different: `any` and `unknown` already admit `undefined` and `null`
-in-band, so an `Option` would add nothing and lose a stored `null`, and
-`x?: any` stays a bare `JsValue`.
+Getters, static getters, function and method returns (the `Ok` of a
+`catch` `Result` included), the awaited value of an async function and
+a [named union alias](#named-union-aliases) read whole are reads:
+`T | null`, `T | undefined` and `T | null | undefined` are all
+`Option<T>`. A read admits `undefined` when its type does or when its
+declaration is optional, so `x?: T` and `x?: T | null` both read as
+`Option<T>`, for instance and static properties alike. `null |
+undefined` with nothing else reads as `Option<Null>`. A read whose type
+erases to `JsValue` (an unrelated intersection, a union with no useful
+bound, an unresolved name) takes the same `Option<JsValue>` when it
+admits an empty, so an absent field or a stored `null` reads as `None`
+there too. The top type is the one exception: `any` and `unknown`
+already admit `undefined` and `null` in-band (`is_undefined`,
+`is_null`), TypeScript itself erases a `| null` or `| undefined` on
+them, and an `Option` would only fold what the `JsValue` already tells
+apart, so `x?: any`, `any | null` and `unknown | null | undefined` stay
+a bare `JsValue`.
 
 | TS                                  | Rust read                                       |
 | ----------------------------------- | ----------------------------------------------- |
-| `get(key): Promise<R2ObjectBody \| null>` | `async fn get(..) -> Result<Nullable<R2ObjectBody>, JsValue>` |
-| `get(key): Promise<string \| null>` | `async fn get(..) -> Result<Nullable<String>, JsValue>` |
+| `get(key): Promise<R2ObjectBody \| null>` | `async fn get(..) -> Result<Option<R2ObjectBody>, JsValue>` |
+| `get(key): Promise<string \| null>` | `async fn get(..) -> Result<Option<String>, JsValue>` |
 | `f(): Promise<number \| undefined>` | `async fn f() -> Result<Option<f64>, JsValue>`  |
-| `f<T>(): Promise<T \| null>`        | `async fn f<T>() -> Result<Nullable<T>, JsValue>` |
-| `readonly x?: string \| null`       | `fn x(&self) -> Option<Nullable<String>>`       |
+| `f<T>(): Promise<T \| null>`        | `async fn f<T>() -> Result<Option<T>, JsValue>` |
+| `lookup(): string \| null \| undefined` | `fn lookup() -> Option<String>`            |
+| `readonly x?: string \| null`       | `fn x(&self) -> Option<String>`                 |
 | `x?: A & B` (erased)                | `fn x(&self) -> Option<JsValue>`                |
-| `x?: (A & B) \| null` (erased)      | `fn x(&self) -> Option<Nullable<JsValue>>`      |
-| `x: (A & B) \| null` (erased)       | `fn x(&self) -> JsValue`                        |
+| `x: (A & B) \| null` (erased)       | `fn x(&self) -> Option<JsValue>`                |
 | `x?: any`, `x?: unknown \| null`    | `fn x(&self) -> JsValue`                        |
+| `deserializeAttachment(): any \| null` | `fn deserialize_attachment(&self) -> JsValue` |
 
 The awaited value [lowers like a sync return](#awaited-values-lower-like-sync-returns),
 so the carrier holds the read form (`String`, `f64`, an enum), not the
 `JsString` / `Number` handle. An awaited carrier around a type
-parameter bounds it through the carrier's trait
-(`T: NullableFromWasmAbi`, `T: OptionFromWasmAbi`).
+parameter bounds it through the carrier's trait (`T: OptionFromWasmAbi`).
+Type arguments have no direction and keep the exact carrier
+(`Map<String, Nullable<String>>`, `Holder<Nullable<String>>`, the
+`Function<fn(..)>` signature slots), as does a nullable alias
+declaration (`type MaybeStr = string | null` is `Nullable<String>` under
+per-monomorphization, and a `Holder<MaybeStr>` reads its `T` as such).
 
 ### Writes
 
@@ -232,11 +251,14 @@ A nullable alias declaration (`type MaybeStr = string | null`) is
 `experimental_generic_mono` expands writes identically, with the same
 names; a string argument takes `impl JsStringLike`
 (`Option<impl JsStringLike>` where it cannot be omitted). Inner
-positions use the carriers where wasm-bindgen accepts them:
+positions use the carriers where wasm-bindgen accepts them (a returned
+`Promise<T>` is awaited through `JsFuture<T: FromWasmAbi>`, so its `T`
+takes the read carrier; a user generic's argument is a type argument and
+keeps the exact one):
 
 | Position                                    | Mono                                  |
 | ------------------------------------------- | ------------------------------------- |
-| returned `Promise<string \| null>`          | `Promise<Nullable<JsString>>`         |
+| returned `Promise<string \| null>`          | `Promise<Option<JsString>>`           |
 | user generic `Holder<string \| null>`       | `Holder<Nullable<String>>`            |
 | `type MaybeStr = string \| null`            | `pub type MaybeStr = Nullable<String>` |
 | `Promise<T \| null>` argument               | `&Promise<JsNullable<T>>`             |
@@ -249,6 +271,35 @@ JsValue>` and `JsCast` on its signature types, slices need
 `VectorRefIntoWasmAbi`, and the js-sys `Array`, `Map` and `Object`
 APIs (and `Promise::resolve`) need `ErasableGeneric<Repr = JsValue>` on
 the element.
+
+### `--strict-nullable` — exact read carriers
+
+`--strict-nullable` (`GenerateOptions::strict_nullable(true)`) gives
+reads the write column of [the carrier table](#optional-and-nullable-types):
+`T | null` reads as `Nullable<T>`, `T | undefined` as `Option<T>` and
+`T | null | undefined` as `Option<Nullable<T>>`, so a caller that must
+tell a received `null` from a received `undefined` (a Node-style
+`lookup(): string | null | undefined` returning `null` for an unknown
+key and `undefined` for a known empty one) gets each state as itself,
+in both modes. A read erasing to `JsValue` stays bare under the flag,
+except a property that can be absent, which keeps its `Option` so
+absence reads as `None`, with a written `null` as the `Nullable` under
+it (`x?: (A & B) | null` is `Option<Nullable<JsValue>>`); the top type
+stays bare as always. Writes, type arguments and inner positions are the
+same under either setting, as is every name.
+
+| TS                                        | Default                  | `--strict-nullable`              |
+| ----------------------------------------- | ------------------------ | -------------------------------- |
+| `get(): string \| null`                   | `Option<String>`         | `Nullable<String>`               |
+| `lookup(): string \| null \| undefined`   | `Option<String>`         | `Option<Nullable<String>>`       |
+| `readonly x?: string \| null`             | `Option<String>`         | `Option<Nullable<String>>`       |
+| `f(): Promise<T \| null>` (awaited)       | `Result<Option<T>, _>`   | `Result<Nullable<T>, _>`         |
+| `x: (A & B) \| null` (erased)             | `Option<JsValue>`        | `JsValue`                        |
+| `f(x: string \| null)` (write)            | `f(&str)`, `f_with_null()` | the same                       |
+
+The `nullability`, `node-nullable`, `optional-reads` and
+`promise-companion` fixtures carry a `strict.rs` snapshot beside their
+`default.rs` and `mono.rs`.
 
 ## Array and slice types
 
@@ -2388,17 +2439,17 @@ out the JS promise object itself, keeps the inside-generic wrappers:
 | `Promise<number>`               | `Result<f64, E>`              | `Promise<Number>`            |
 | `Promise<string>`               | `Result<String, E>`           | `Promise<JsString>`          |
 | `Promise<void>`                 | `Result<(), E>`               | `Promise<Undefined>`         |
-| `Promise<string \| null>`       | `Result<Nullable<String>, E>` | `Promise<JsNullable<JsString>>` |
+| `Promise<string \| null>`       | `Result<Option<String>, E>`   | `Promise<JsNullable<JsString>>` |
 | `Promise<number \| undefined>`  | `Result<Option<f64>, E>`      | `Promise<JsOption<Number>>`  |
 | `Promise<Foo[]>`                | `Result<Vec<Foo>, E>`         | `Promise<Array<Foo>>`        |
 | `Promise<A \| B>` (erased)      | `Result<<name>ReturnKind, E>` | `Promise<JsValue>`           |
 | `Promise<Foo>` (named JS type)  | `Result<Foo, E>`              | `Promise<Foo>`               |
 
-The awaited value's own empties use the exact [read carriers](#reads)
-(`Option<T>`, `Nullable<T>`, `Option<Nullable<T>>`) around that form;
-the `_promise` form's are an [inner position](#inner-positions), which
-per-monomorphization gives the carrier (`Promise<Nullable<JsString>>`,
-see [the table](#per-monomorphization)). The
+The awaited value's own empties use the [read carrier](#reads)
+(`Option<T>`) around that form; the `_promise` form's are an
+[inner position](#inner-positions), which per-monomorphization gives
+the read carrier too (`Promise<Option<JsString>>`, see
+[the table](#per-monomorphization)). The
 exception is a list over an in-scope type parameter: `get<T>():
 Promise<T[]>` stays `Result<Array<T>, E>`, because an `async` import
 converts the awaited value through `<Vec<T> as FromWasmAbi>`, which
@@ -2504,9 +2555,9 @@ needs, so a generic caller can read them off the declaration: `IntoWasmAbi`
 for an argument (`T: RefIntoWasmAbi` for a borrowed `&T`, and
 `T: VectorRefIntoWasmAbi` for a borrowed `&[T]`), `FromWasmAbi` for a return,
 `OptionIntoWasmAbi`/`OptionFromWasmAbi` for `Option<T>`,
-`NullableIntoWasmAbi`/`NullableFromWasmAbi` for `Nullable<T>` and
-`Option<Nullable<T>>`, and `'static` when
-awaited. Imported types such as `Holder<T>` need only `'static`:
+`NullableIntoWasmAbi` for a written `Nullable<T>` (and under
+`--strict-nullable` `NullableFromWasmAbi` for a read one), and `'static`
+when awaited. Imported types such as `Holder<T>` need only `'static`:
 
 ```rust
 #[wasm_bindgen(experimental_generic_mono)]
@@ -2612,7 +2663,7 @@ handles accept `JsString` elements, and also `String` under
 included, lowers like any other list argument (`...parts: string[]` takes
 `&[impl JsStringLike]`, `...values: number[]` takes `&[f64]`), since
 wasm-bindgen spreads any sequence. A string list return, sync or awaited,
-and its carriers (`Option<Vec<String>>`, `Nullable<Vec<String>>`) get a
+and its carrier (`Option<Vec<String>>`) get a
 `_js_string` variant returning the list as one handle rather than decoding
 every element:
 
@@ -2640,10 +2691,10 @@ only adds the `_js_string` variant, on the same terms as a sync return:
 | `Promise<string \| undefined>` | `Result<Option<String>, _>` | `Result<Option<String>, _>` + `_js_string` |
 | `Promise<Details<string>>` | `Result<Details<JsString>, _>` | `Result<Details<String>, _>` + `_js_string` |
 | `Promise<Array<string>>` | `Result<Vec<String>, _>` | `Result<Vec<String>, _>` + `_js_string` |
-| `Promise<string[] \| null>` | `Result<Nullable<Vec<String>>, _>` | `Result<Nullable<Vec<String>>, _>` + `_js_string` |
+| `Promise<string[] \| null>` | `Result<Option<Vec<String>>, _>` | `Result<Option<Vec<String>>, _>` + `_js_string` |
 
 The `_js_string` variant of an awaited value resolves the `JsString` form
-(`Result<Array<JsString>, _>`, `Result<Nullable<Array<JsString>>, _>`). The
+(`Result<Array<JsString>, _>`, `Result<Option<Array<JsString>>, _>`). The
 `_promise` form gets no variant: its string leaves are already inside the
 `Promise` handle (`Promise<Array<JsString>>`).
 
@@ -2887,7 +2938,7 @@ interface Env { TYPED: KVNamespace<"a" | "b">; }
 
 ```rust
 pub type KVNamespace;
-pub async fn get(this: &KVNamespace, key: &str) -> Result<Nullable<String>, JsValue>;
+pub async fn get(this: &KVNamespace, key: &str) -> Result<Option<String>, JsValue>;
 pub async fn list(this: &KVNamespace) -> Result<KVNamespaceListResult, JsValue>;
 pub fn typed(this: &Env) -> KVNamespace;
 ```
@@ -3286,23 +3337,23 @@ declare class CompressionStream {
 
 ```rust
 extern "C" {
-    pub async fn get(this: &KVNamespace, key: &str) -> Result<Nullable<String>, JsValue>;
+    pub async fn get(this: &KVNamespace, key: &str) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn __get_text(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<String>, JsValue>;
+    async fn __get_text(this: &KVNamespace, key: &str, r#type: &str) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     async fn __get_json(this: &KVNamespace, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn __get_array_buffer(this: &KVNamespace, key: &str, r#type: &str) -> Result<Nullable<ArrayBuffer>, JsValue>;
+    async fn __get_array_buffer(this: &KVNamespace, key: &str, r#type: &str) -> Result<Option<ArrayBuffer>, JsValue>;
     // …
     #[wasm_bindgen(constructor, catch)]
     fn __new(format: &str) -> Result<CompressionStream, JsValue>;
 }
 impl KVNamespace {
-    pub async fn get_text(&self, key: &str) -> Result<Nullable<String>, JsValue> {
+    pub async fn get_text(&self, key: &str) -> Result<Option<String>, JsValue> {
         self.__get_text(key, "text").await
     }
     pub async fn get_json(&self, key: &str) -> Result<JsValue, JsValue> { /* "json" */ }
-    pub async fn get_array_buffer(&self, key: &str) -> Result<Nullable<ArrayBuffer>, JsValue> { /* … */ }
+    pub async fn get_array_buffer(&self, key: &str) -> Result<Option<ArrayBuffer>, JsValue> { /* … */ }
     pub async fn get_text_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsNullable<JsString>>, JsValue> { /* … */ }
     pub async fn get_json_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsValue>, JsValue> { /* … */ }
 }
@@ -3364,7 +3415,7 @@ impl CompressionStream {
   binds the type's defaults (`impl Boxed { pub fn label_a() -> String }`). A wrapper repeats its extern's `where` clause, since it calls the
   extern under the same bounds: the ABI traits a generic import states
   under `--experimental-generic-mono` (`Key: IntoWasmAbi`), and an
-  awaited carrier's (`ExpectedValue: NullableFromWasmAbi` on
+  awaited carrier's (`ExpectedValue: OptionFromWasmAbi` on
   `get_json`).
 * A `null` arm beside the literal (`pick(kind: "a" | "b", x: T |
   null)`) makes a cohort of its own, named `_with_null` as a lone
