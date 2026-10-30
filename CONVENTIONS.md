@@ -5040,6 +5040,12 @@ class reached that way with only its instance members (see
 | `bigint`           | `i64`        |                                      |
 | everything else    | `externref`  | strings, objects, null, undefined, numeric enums, `never` |
 
+A reference to a type alias reads as its target, through aliases of
+aliases and generic instantiations, as the Rust bindings lower it:
+`type Millis = number` and lib.dom's `DOMHighResTimeStamp` are `f64`,
+and a `type Nothing = void` return has no result. A type parameter
+stays `externref`.
+
 Nullable scalars (`number | null`) cross as a nullable reference;
 there is no sentinel for "null" in `i32`/`f64`/`i64`. `Number.value`
 unboxes one that is present, and reads a numeric enum member. A
@@ -5063,19 +5069,31 @@ instantiated with anything and so admits both, as does a name that
 does not resolve. Discriminants are read from the value, never
 encoded in the signature, and errors cross as `externref`, one type.
 
-Two ABI functions and one global exist for every `.d.ts`:
+Two ABI functions, one global and one JSPI function exist for every
+`.d.ts`:
 
 | Import                                    | Meaning                          |
 | ----------------------------------------- | -------------------------------- |
 | `"./bindings.wasm" "JsValue.is_undefined"`| `x === undefined` → `i32`        |
 | `"./bindings.wasm" "Number.value"`        | `Number(x)` → `f64`              |
 | `"./builtins.js" "undefined"`             | immutable `externref` global     |
+| `"./builtins.js" "await"`                 | JSPI suspend: promise → settled value |
 
 `is_null` needs nothing: `ref.is_null` in the language. `Number.value`
 is JS coercion, not a type test: `Number(null)` is `0`,
 `Number(undefined)`, non-numeric strings and plain objects are `NaN`,
 `Number("5")` is `5`, and `Number(Symbol())` throws; test
 `ref.is_null` / `is_undefined` first when the distinction matters.
+
+`await` is `(func (param externref) (result externref))`, JSPI's
+`WebAssembly.Suspending`: it suspends the module on a promise and
+returns the settled value. It is not part of the `.d.ts`'s ABI and
+the template imports it so a module can use it; importing it is
+optional and opts the module into JSPI. The wrapper that publishes
+the provided functions then wraps each with `WebAssembly.promising`,
+so a handler may suspend and JS receives a promise of its result.
+Without the import a handler returns a promise (or a plain value)
+itself, and the published functions are the raw exports.
 
 ### Export naming
 

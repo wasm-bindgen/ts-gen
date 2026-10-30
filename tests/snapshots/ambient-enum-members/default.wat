@@ -23,7 +23,7 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; useAll(computed: Computed, mixed: Mixed, numbered: Numbered, after_string: AfterString): void
-  (import "ambient-enum-members" "useAll" (func $ambient-enum-members:useAll (param $computed externref) (param $mixed externref) (param $numbered externref) (param $after_string externref)))
+  (import "ambient-enum-members" "useAll" (func $ambient-enum-members:useAll (param $computed f64) (param $mixed externref) (param $numbered externref) (param $after_string externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

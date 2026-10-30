@@ -106,18 +106,42 @@ const BOUND_PREFIX: &str = "#bound:";
 
 impl Lower<'_> {
     fn of(&self, ty: &TypeRef, scope: ScopeId) -> WasmType {
+        let (ty, scope) = self.target(ty, scope);
         match ty {
             TypeRef::Boolean | TypeRef::BooleanLiteral(_) => WasmType::I32,
             TypeRef::Number | TypeRef::NumberLiteral(_) => WasmType::F64,
             TypeRef::BigInt => WasmType::I64,
             _ => {
-                let n = self.admits_empty(ty, scope);
+                let n = self.admits_empty(&ty, scope);
                 WasmType::ExternRef {
                     null: n.is_some_and(Nullability::admits_null),
                     undefined: n.is_some_and(Nullability::admits_undefined),
                 }
             }
         }
+    }
+
+    /// What `ty` finally names through aliases and substituted type
+    /// arguments, with the scope it reads in. Type parameters stay as
+    /// they are. The Rust bindings lower a plain alias reference to its
+    /// target, so `type Millis = number` crosses as `f64`.
+    fn target(&self, ty: &TypeRef, scope: ScopeId) -> (TypeRef, ScopeId) {
+        let (mut ty, mut scope) = (ty.clone(), scope);
+        // Bounded: a cyclic alias is a TS error, not a reason to hang.
+        for _ in 0..64 {
+            let TypeRef::Reference {
+                segments,
+                generic_args,
+            } = &ty
+            else {
+                break;
+            };
+            match self.resolve(segments, generic_args, scope) {
+                Some(Resolved::Alias(t, s) | Resolved::Bound(t, s)) => (ty, scope) = (t, s),
+                _ => break,
+            }
+        }
+        (ty, scope)
     }
 
     /// Follow a (possibly qualified) reference to what it names. Type
@@ -183,9 +207,9 @@ impl Lower<'_> {
     }
 
     fn result(&self, ty: &TypeRef, scope: ScopeId) -> Option<WasmType> {
-        match ty {
-            TypeRef::Void | TypeRef::Undefined => None,
-            other => Some(self.of(other, scope)),
+        match self.target(ty, scope) {
+            (TypeRef::Void | TypeRef::Undefined, _) => None,
+            (other, scope) => Some(self.of(&other, scope)),
         }
     }
 
@@ -1173,6 +1197,33 @@ mod tests {
         assert_eq!(abi.function("clone").unwrap().params[0].ty, WasmType::JS);
         assert_eq!(result("unknownName"), WasmType::JS, "unresolved name");
         assert_eq!(result("Event.detail"), WasmType::JS, "class type parameter");
+    }
+
+    #[test]
+    fn scalars_through_aliases() {
+        let abi = abi(r#"
+            type Millis = number;
+            type Stamp = Millis;
+            type Flag = boolean;
+            type Big = bigint;
+            type Nothing = void;
+            type Id<T> = T;
+            declare function now(): Stamp;
+            declare function enabled(): Flag;
+            declare function big(): Big;
+            declare function reset(): Nothing;
+            declare function wrapped(): Id<number>;
+            declare function wait(ms: Millis): void;
+            declare function same<T>(value: T): T;
+        "#);
+        let result = |n: &str| abi.function(n).unwrap().result;
+        assert_eq!(result("now"), Some(WasmType::F64), "alias of an alias");
+        assert_eq!(result("enabled"), Some(WasmType::I32));
+        assert_eq!(result("big"), Some(WasmType::I64));
+        assert_eq!(result("reset"), None, "alias of void");
+        assert_eq!(result("wrapped"), Some(WasmType::F64), "type argument");
+        assert_eq!(abi.function("wait").unwrap().params[0].ty, WasmType::F64);
+        assert_eq!(result("same"), Some(WasmType::JS), "type parameter");
     }
 
     #[test]
