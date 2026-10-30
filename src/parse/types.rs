@@ -58,7 +58,7 @@ pub fn convert_ts_type_scoped(
 /// Public converters route through this so they can be called either
 /// with a full `ParseCtx` (production paths) or with a throwaway
 /// arena (the bare `convert_ts_type` helper).
-fn convert_ts_type_with_arena(
+pub(crate) fn convert_ts_type_with_arena(
     ts_type: &TSType<'_>,
     scope: ScopeId,
     scopes: &mut ScopeArena,
@@ -453,7 +453,7 @@ pub fn convert_formal_params_scoped(
     convert_formal_params_with_arena(params, scope, ctx.scopes, ctx.diag)
 }
 
-fn convert_formal_params_with_arena(
+pub(crate) fn convert_formal_params_with_arena(
     params: &FormalParameters<'_>,
     scope: ScopeId,
     scopes: &mut ScopeArena,
