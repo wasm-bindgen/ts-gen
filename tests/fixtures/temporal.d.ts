@@ -19,7 +19,9 @@ and limitations under the License.
 // so the output shows their typed fallible forms. Each tag names only the
 // errors the spec can throw for input the generated Rust signature accepts:
 // a property bag missing its fields is a `TypeError`, a locale list of
-// strings never is.
+// strings never is. Where the form without an argument throws less (or
+// nothing), the declaration is split into overloads so each form carries
+// only its own tags.
 
 /// <reference lib="es2015.symbol.wellknown" />
 /// <reference lib="es2020.intl" />
@@ -48,7 +50,7 @@ declare namespace Temporal {
         month?: number | undefined;
         monthCode?: string | undefined;
         day: number;
-        calendar?: string | undefined;
+        calendar?: CalendarLike | undefined;
     }
 
     interface DateTimeLikeObject extends DateLikeObject, TimeLikeObject {}
@@ -117,6 +119,10 @@ declare namespace Temporal {
         roundingMode?: "ceil" | "floor" | "expand" | "trunc" | "halfCeil" | "halfFloor" | "halfExpand" | "halfTrunc" | "halfEven" | undefined;
     }
 
+    interface RoundToOptions<Units extends DateUnit | TimeUnit> extends RoundingOptions<Units> {
+        smallestUnit: PluralizeUnit<Units>;
+    }
+
     interface RoundingOptionsWithLargestUnit<Units extends DateUnit | TimeUnit> extends RoundingOptions<Units> {
         largestUnit?: "auto" | PluralizeUnit<Units> | undefined;
     }
@@ -130,10 +136,18 @@ declare namespace Temporal {
     namespace Now {
         function timeZoneId(): string;
         function instant(): Instant;
-        function plainDateTimeISO(timeZone?: TimeZoneLike): PlainDateTime;
-        function zonedDateTimeISO(timeZone?: TimeZoneLike): ZonedDateTime;
-        function plainDateISO(timeZone?: TimeZoneLike): PlainDate;
-        function plainTimeISO(timeZone?: TimeZoneLike): PlainTime;
+        function plainDateTimeISO(): PlainDateTime;
+        /** @throws {RangeError} if the time zone is unknown */
+        function plainDateTimeISO(timeZone: TimeZoneLike): PlainDateTime;
+        function zonedDateTimeISO(): ZonedDateTime;
+        /** @throws {RangeError} if the time zone is unknown */
+        function zonedDateTimeISO(timeZone: TimeZoneLike): ZonedDateTime;
+        function plainDateISO(): PlainDate;
+        /** @throws {RangeError} if the time zone is unknown */
+        function plainDateISO(timeZone: TimeZoneLike): PlainDate;
+        function plainTimeISO(): PlainTime;
+        /** @throws {RangeError} if the time zone is unknown */
+        function plainTimeISO(timeZone: TimeZoneLike): PlainTime;
     }
 
     interface PlainDateToStringOptions {
@@ -164,13 +178,22 @@ declare namespace Temporal {
         readonly inLeapYear: boolean;
         toPlainYearMonth(): PlainYearMonth;
         toPlainMonthDay(): PlainMonthDay;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         add(duration: DurationLike, options?: OverflowOptions): PlainDate;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         subtract(duration: DurationLike, options?: OverflowOptions): PlainDate;
         /**
          * @throws {RangeError} if a field is out of range
          * @throws {TypeError} if the object has no recognised fields
          */
         with(dateLike: PartialTemporalLike<DateLikeObject>, options?: OverflowOptions): PlainDate;
+        /** @throws {RangeError} if the calendar is unknown */
         withCalendar(calendarLike: CalendarLike): PlainDate;
         /**
          * @throws {RangeError} if the calendars differ, or the options are invalid
@@ -182,9 +205,24 @@ declare namespace Temporal {
          * @throws {TypeError} if an object is missing the fields it needs
          */
         since(other: PlainDateLike, options?: RoundingOptionsWithLargestUnit<DateUnit>): Duration;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, or the calendar is unknown
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         equals(other: PlainDateLike): boolean;
-        toPlainDateTime(time?: PlainTimeLike): PlainDateTime;
+        /** @throws {RangeError} if the result is out of range */
+        toPlainDateTime(): PlainDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
+        toPlainDateTime(time: PlainTimeLike): PlainDateTime;
+        /** @throws {RangeError} if the time zone is unknown, or the result is out of range */
         toZonedDateTime(timeZone: TimeZoneLike): ZonedDateTime;
+        /**
+         * @throws {RangeError} if the time zone is unknown, a string does not parse, a field is out of range, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         toZonedDateTime(item: PlainDateToZonedDateTimeOptions): ZonedDateTime;
         toString(options?: PlainDateToStringOptions): string;
         /**
@@ -206,6 +244,10 @@ declare namespace Temporal {
          * @throws {TypeError} if an object is missing the fields it needs
          */
         from(item: PlainDateLike, options?: OverflowOptions): PlainDate;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, or the calendar is unknown
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         compare(one: PlainDateLike, two: PlainDateLike): number;
     }
     var PlainDate: PlainDateConstructor;
@@ -219,7 +261,15 @@ declare namespace Temporal {
         readonly millisecond: number;
         readonly microsecond: number;
         readonly nanosecond: number;
+        /**
+         * @throws {RangeError} if a string does not parse, or a field is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         add(duration: DurationLike): PlainTime;
+        /**
+         * @throws {RangeError} if a string does not parse, or a field is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         subtract(duration: DurationLike): PlainTime;
         /**
          * @throws {RangeError} if a field is out of range
@@ -236,12 +286,18 @@ declare namespace Temporal {
          * @throws {TypeError} if an object is missing the fields it needs
          */
         since(other: PlainTimeLike, options?: RoundingOptionsWithLargestUnit<TimeUnit>): Duration;
+        /**
+         * @throws {RangeError} if a string does not parse, or a field is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         equals(other: PlainTimeLike): boolean;
         /** @throws {RangeError} if the rounding options are invalid */
         round(roundTo: PluralizeUnit<TimeUnit>): PlainTime;
         /** @throws {RangeError} if the rounding options are invalid */
-        round(roundTo: RoundingOptions<TimeUnit>): PlainTime;
-        toString(options?: PlainTimeToStringOptions): string;
+        round(roundTo: RoundToOptions<TimeUnit>): PlainTime;
+        toString(): string;
+        /** @throws {RangeError} if the options are invalid */
+        toString(options: PlainTimeToStringOptions): string;
         /**
          * @throws {RangeError} if the locale or options are invalid
          * @throws {TypeError} if the options conflict
@@ -261,6 +317,10 @@ declare namespace Temporal {
          * @throws {TypeError} if an object is missing the fields it needs
          */
         from(item: PlainTimeLike, options?: OverflowOptions): PlainTime;
+        /**
+         * @throws {RangeError} if a string does not parse, or a field is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         compare(one: PlainTimeLike, two: PlainTimeLike): number;
     }
     var PlainTime: PlainTimeConstructor;
@@ -295,9 +355,24 @@ declare namespace Temporal {
          * @throws {TypeError} if the object has no recognised fields
          */
         with(dateTimeLike: PartialTemporalLike<DateTimeLikeObject>, options?: OverflowOptions): PlainDateTime;
-        withPlainTime(plainTime?: PlainTimeLike): PlainDateTime;
+        /** @throws {RangeError} if the result is out of range */
+        withPlainTime(): PlainDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
+        withPlainTime(plainTime: PlainTimeLike): PlainDateTime;
+        /** @throws {RangeError} if the calendar is unknown */
         withCalendar(calendar: CalendarLike): PlainDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         add(duration: DurationLike, options?: OverflowOptions): PlainDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         subtract(duration: DurationLike, options?: OverflowOptions): PlainDateTime;
         /**
          * @throws {RangeError} if the calendars differ, or the options are invalid
@@ -312,9 +387,15 @@ declare namespace Temporal {
         /** @throws {RangeError} if the rounding options are invalid */
         round(roundTo: PluralizeUnit<"day" | TimeUnit>): PlainDateTime;
         /** @throws {RangeError} if the rounding options are invalid */
-        round(roundTo: RoundingOptions<"day" | TimeUnit>): PlainDateTime;
+        round(roundTo: RoundToOptions<"day" | TimeUnit>): PlainDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, or the calendar is unknown
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         equals(other: PlainDateTimeLike): boolean;
-        toString(options?: PlainDateTimeToStringOptions): string;
+        toString(): string;
+        /** @throws {RangeError} if the options are invalid, or the rounded result is out of range */
+        toString(options: PlainDateTimeToStringOptions): string;
         /**
          * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
          * @throws {TypeError} if the options conflict
@@ -322,6 +403,7 @@ declare namespace Temporal {
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
+        /** @throws {RangeError} if the time zone is unknown, the wall-clock time is ambiguous or skipped under `disambiguation: 'reject'`, or the result is out of range */
         toZonedDateTime(timeZone: TimeZoneLike, options?: DisambiguationOptions): ZonedDateTime;
         toPlainDate(): PlainDate;
         toPlainTime(): PlainTime;
@@ -337,6 +419,10 @@ declare namespace Temporal {
          * @throws {TypeError} if an object is missing the fields it needs
          */
         from(item: PlainDateTimeLike, options?: OverflowOptions): PlainDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, or the calendar is unknown
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         compare(one: PlainDateTimeLike, two: PlainDateTimeLike): number;
     }
     var PlainDateTime: PlainDateTimeConstructor;
@@ -385,10 +471,26 @@ declare namespace Temporal {
          * @throws {TypeError} if the object has no recognised fields
          */
         with(zonedDateTimeLike: PartialTemporalLike<ZonedDateTimeLikeObject>, options?: ZonedDateTimeFromOptions): ZonedDateTime;
-        withPlainTime(plainTime?: PlainTimeLike): ZonedDateTime;
+        /** @throws {RangeError} if the result is out of range */
+        withPlainTime(): ZonedDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
+        withPlainTime(plainTime: PlainTimeLike): ZonedDateTime;
+        /** @throws {RangeError} if the time zone is unknown */
         withTimeZone(timeZone: TimeZoneLike): ZonedDateTime;
+        /** @throws {RangeError} if the calendar is unknown */
         withCalendar(calendar: CalendarLike): ZonedDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         add(duration: DurationLike, options?: OverflowOptions): ZonedDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         subtract(duration: DurationLike, options?: OverflowOptions): ZonedDateTime;
         /**
          * @throws {RangeError} if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid
@@ -403,9 +505,15 @@ declare namespace Temporal {
         /** @throws {RangeError} if the rounding options are invalid */
         round(roundTo: PluralizeUnit<"day" | TimeUnit>): ZonedDateTime;
         /** @throws {RangeError} if the rounding options are invalid */
-        round(roundTo: RoundingOptions<"day" | TimeUnit>): ZonedDateTime;
+        round(roundTo: RoundToOptions<"day" | TimeUnit>): ZonedDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, the offset does not match the time zone, or the time zone or calendar is unknown
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         equals(other: ZonedDateTimeLike): boolean;
-        toString(options?: ZonedDateTimeToStringOptions): string;
+        toString(): string;
+        /** @throws {RangeError} if the options are invalid */
+        toString(options: ZonedDateTimeToStringOptions): string;
         /**
          * @throws {RangeError} if the locale is invalid, or the calendar differs from the formatter's
          * @throws {TypeError} if the options conflict, or include `timeZone`
@@ -413,6 +521,7 @@ declare namespace Temporal {
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
+        /** @throws {RangeError} if the day starts outside the representable range */
         startOfDay(): ZonedDateTime;
         getTimeZoneTransition(direction: "next" | "previous"): ZonedDateTime | null;
         getTimeZoneTransition(direction: TransitionOptions): ZonedDateTime | null;
@@ -432,6 +541,10 @@ declare namespace Temporal {
          * @throws {TypeError} if an object is missing the fields it needs
          */
         from(item: ZonedDateTimeLike, options?: ZonedDateTimeFromOptions): ZonedDateTime;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, the offset does not match the time zone, or the time zone or calendar is unknown
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         compare(one: ZonedDateTimeLike, two: ZonedDateTimeLike): number;
     }
     var ZonedDateTime: ZonedDateTimeConstructor;
@@ -492,7 +605,9 @@ declare namespace Temporal {
          * @throws {TypeError} if `relativeTo` is an object missing the fields it needs
          */
         total(totalOf: DurationTotalOptions): number;
-        toString(options?: DurationToStringOptions): string;
+        toString(): string;
+        /** @throws {RangeError} if the options are invalid, or the rounded result is out of range */
+        toString(options: DurationToStringOptions): string;
         /** @throws {RangeError} if the locale or options are invalid */
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DurationFormatOptions): string;
         toJSON(): string;
@@ -510,7 +625,7 @@ declare namespace Temporal {
          */
         from(item: DurationLike): Duration;
         /**
-         * @throws {RangeError} if either duration has calendar units and `relativeTo` is not given
+         * @throws {RangeError} if a string does not parse, a field is out of range, or either duration has calendar units and `relativeTo` is not given
          * @throws {TypeError} if an object is missing the fields it needs
          */
         compare(one: DurationLike, two: DurationLike, options?: DurationRelativeToOptions): number;
@@ -541,9 +656,12 @@ declare namespace Temporal {
         /** @throws {RangeError} if the rounding options are invalid */
         round(roundTo: PluralizeUnit<TimeUnit>): Instant;
         /** @throws {RangeError} if the rounding options are invalid */
-        round(roundTo: RoundingOptions<TimeUnit>): Instant;
+        round(roundTo: RoundToOptions<TimeUnit>): Instant;
+        /** @throws {RangeError} if the string does not parse, or the instant is out of range */
         equals(other: InstantLike): boolean;
-        toString(options?: InstantToStringOptions): string;
+        toString(): string;
+        /** @throws {RangeError} if the options are invalid, or the time zone is unknown */
+        toString(options: InstantToStringOptions): string;
         /**
          * @throws {RangeError} if the locale or options are invalid
          * @throws {TypeError} if the options conflict
@@ -551,6 +669,7 @@ declare namespace Temporal {
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
+        /** @throws {RangeError} if the time zone is unknown */
         toZonedDateTimeISO(timeZone: TimeZoneLike): ZonedDateTime;
         readonly [Symbol.toStringTag]: "Temporal.Instant";
     }
@@ -565,6 +684,7 @@ declare namespace Temporal {
         fromEpochMilliseconds(epochMilliseconds: number): Instant;
         /** @throws {RangeError} if the instant is outside the representable range */
         fromEpochNanoseconds(epochNanoseconds: bigint): Instant;
+        /** @throws {RangeError} if a string does not parse, or an instant is out of range */
         compare(one: InstantLike, two: InstantLike): number;
     }
     var Instant: InstantConstructor;
@@ -589,7 +709,15 @@ declare namespace Temporal {
          * @throws {TypeError} if the object has no recognised fields
          */
         with(yearMonthLike: PartialTemporalLike<YearMonthLikeObject>, options?: OverflowOptions): PlainYearMonth;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         add(duration: DurationLike, options?: OverflowOptions): PlainYearMonth;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         subtract(duration: DurationLike, options?: OverflowOptions): PlainYearMonth;
         /**
          * @throws {RangeError} if the calendars differ, or the options are invalid
@@ -601,6 +729,10 @@ declare namespace Temporal {
          * @throws {TypeError} if an object is missing the fields it needs
          */
         since(other: PlainYearMonthLike, options?: RoundingOptionsWithLargestUnit<"year" | "month">): Duration;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, or the calendar is unknown
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         equals(other: PlainYearMonthLike): boolean;
         toString(options?: PlainDateToStringOptions): string;
         /**
@@ -610,6 +742,7 @@ declare namespace Temporal {
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
+        /** @throws {RangeError} if the day is not finite, or the date is out of range */
         toPlainDate(item: PlainYearMonthToPlainDateOptions): PlainDate;
         readonly [Symbol.toStringTag]: "Temporal.PlainYearMonth";
     }
@@ -623,6 +756,10 @@ declare namespace Temporal {
          * @throws {TypeError} if an object is missing the fields it needs
          */
         from(item: PlainYearMonthLike, options?: OverflowOptions): PlainYearMonth;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, or the calendar is unknown
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         compare(one: PlainYearMonthLike, two: PlainYearMonthLike): number;
     }
     var PlainYearMonth: PlainYearMonthConstructor;
@@ -642,6 +779,10 @@ declare namespace Temporal {
          * @throws {TypeError} if the object has no recognised fields
          */
         with(monthDayLike: PartialTemporalLike<DateLikeObject>, options?: OverflowOptions): PlainMonthDay;
+        /**
+         * @throws {RangeError} if a string does not parse, a field is out of range, or the calendar is unknown
+         * @throws {TypeError} if an object is missing the fields it needs
+         */
         equals(other: PlainMonthDayLike): boolean;
         toString(options?: PlainDateToStringOptions): string;
         /**
@@ -651,6 +792,10 @@ declare namespace Temporal {
         toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string;
         toJSON(): string;
         valueOf(): never;
+        /**
+         * @throws {RangeError} if a field is out of range, or the date is out of range
+         * @throws {TypeError} if the object has no year for the calendar
+         */
         toPlainDate(item: PlainMonthDayToPlainDateOptions): PlainDate;
         readonly [Symbol.toStringTag]: "Temporal.PlainMonthDay";
     }
