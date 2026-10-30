@@ -5044,7 +5044,7 @@ class reached that way with only its instance members (see
 | TypeScript         | Wasm type    | Notes                                |
 | ------------------ | ------------ | ------------------------------------ |
 | `number`           | `f64`        |                                      |
-| `boolean`          | `i32`        | `0` = false, non-zero = true; `embed` writes them to JS through `Boolean()` so JS sees `true`/`false`, not `1`/`0` |
+| `boolean`          | `i32`        | `0` = false, non-zero = true; `embed` hands them to JS through `Boolean()` so JS sees `true`/`false`, not `1`/`0` |
 | `bigint`           | `i64`        |                                      |
 | everything else    | `externref`  | strings, objects, null, undefined, numeric enums, `never` |
 
@@ -5289,7 +5289,9 @@ export takes its scalar type, as any other value does: `export const
 count: number` is `(func (result f64))`.
 
 `embed` links the language module's imports from `"<spec>"` to
-bindings functions, exported as `<spec>:<name>`, before the merge:
+bindings functions, exported as `<spec>:<name>` (under the bindings'
+private prefix, see [Single-module output](#single-module-output)),
+before the merge:
 `wasm-merge` links by module name, and the bindings themselves import
 the real `"<spec>"`. They reach each value through the merged module's
 own ESM imports, one immutable global per export, an `externref`
@@ -5313,8 +5315,8 @@ per-position reference rule above (`anyref` converts, `(ref extern)`
 narrows). A scalar one is a global of its type, `(global f64)` for a
 `number` and `(global i64)` for a `bigint`. The JS API rejects a
 boolean for an `i32` global, so a `boolean` stays an `externref`
-global, read as `i32` through a call to `Boolean` whose import returns
-`i32`:
+global, read as `i32` through `Boolean` imported from `builtins.js` as
+`(func (param externref) (result i32))`:
 
 ```wat
 (import "embed:values" "count" (global $m:embed:values:count_f f64))
@@ -5349,8 +5351,11 @@ path:
 `embed` publishes the module namespace: each distinct first path
 segment becomes an exported externref global holding the function
 itself (`version`) or an object tree (`default.fetch`,
-`api.math.add`), built with `reflect_set` at start. The module's raw
-function exports are stripped after the merge; any other module
+`api.math.add`), built with `reflect_set` at start. A handler with a
+`boolean` result (an `i32`) is published through a trampoline that
+passes it to `Boolean()`, so JS receives `true`/`false` as from
+the bindings; every other result reaches JS as the module returns
+it. The module's raw function exports are stripped after the merge; any other module
 export named like a published segment (a raw `version` beside
 `version.get`, a raw `default`) would survive it as a duplicate and
 is an error. Without `--provides` the wrapper is empty and the
@@ -5382,8 +5387,9 @@ surface) and produces:
 1. **`bindings.wasm`** — implements each `Type.member` import using
    the JS primitives in `builtins.js`. Imports of one function under
    several of its names with the same signature share one bindings
-   function, exported under each (`(func (export "Conn.get") (export
-   "Connection.get") ...)`).
+   function, exported under each (`(func (export
+   "ts-gen:bindings.Conn.get") (export "ts-gen:bindings.Connection.get")
+   ...)`).
 2. **`wrapper.wasm`** — imports the language module's provided
    functions and publishes the module namespace: one exported
    externref global per first path segment (`default`, `version`,
@@ -5391,7 +5397,8 @@ surface) and produces:
 3. **`builtins.js`** — the fixed primitive set both modules import:
    `global` (globalThis), `reflect_get`, `reflect_set`,
    `reflect_apply`, `call0..8`, `call_new0..8`, `is_undefined`,
-   `undefined`, and `await`. Beyond eight arguments, and for
+   `boolean` (`Boolean`, imported as a function so a boolean
+   conversion needs no start function), `undefined`, and `await`. Beyond eight arguments, and for
    variadics, the arguments are gathered into a JS array for
    `Reflect.apply` / `Reflect.construct`.
 
@@ -5403,9 +5410,21 @@ and each `declare module` specifier the module uses. Binaryen's
 `wasm-merge` is required for this step: `--wasm-merge`, then
 `$WASM_MERGE`, then `PATH`.
 
-After merging, the bindings' `Type.member` functions and the module's
-raw export functions are stripped, leaving the published namespace
-globals plus any other exports the module had.
+Every bindings export carries a private prefix (`ts-gen:bindings.`),
+and `embed` points every module import from `./bindings.wasm` at it,
+as the wrapper's globals carry `ts-gen:export.`. No export of the
+three can clash, so the global `fetch` the module imports and the
+`fetch` handler it exports are both linked; a clash `wasm-merge`
+still found would be an error rather than a dropped export. The
+bindings have no start function, so a language module's own start
+function may call them whatever order `wasm-merge` runs start
+functions in.
+
+After merging, the bindings' functions and the module's raw export
+functions are stripped, leaving the published namespace globals plus
+any other exports the module had. An import from `./bindings.wasm`,
+the wrapper or the module's specifier left in the merged module is an
+error.
 
 The result is loaded as an ES module: compiled with
 `importedStringConstants: "wasm:js/string-constants"` and the

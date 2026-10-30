@@ -6,8 +6,8 @@
   (import "wasm:js/string-constants" "url" (global $s:url externref))
   (import "wasm:js/string-constants" "Response" (global $s:Response externref))
 
-  (func (export "Request.url") (param $this externref) (result externref)
+  (func (export "ts-gen:bindings.Request.url") (param $this externref) (result externref)
     (call $reflect_get (local.get $this) (global.get $s:url)))
-  (func (export "Response.new_with_body") (param $body externref) (result externref)
+  (func (export "ts-gen:bindings.Response.new_with_body") (param $body externref) (result externref)
     (call $call_new1 (call $reflect_get (global.get $global) (global.get $s:Response)) (local.get $body)))
 )

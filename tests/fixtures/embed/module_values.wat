@@ -8,8 +8,8 @@
   (import "embed:values" "receiver" (func $receiver (result externref)))
 
   (func (export "count") (result f64) (call $count))
-  (func (export "enabled") (result f64) (f64.convert_i32_u (call $enabled)))
-  (func (export "disabled") (result f64) (f64.convert_i32_u (call $disabled)))
+  (func (export "enabled") (result i32) (call $enabled))
+  (func (export "disabled") (result i32) (call $disabled))
   (func (export "big") (result i64) (call $big))
   (func (export "receiver") (result externref) (call $receiver))
 )

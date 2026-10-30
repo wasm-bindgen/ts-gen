@@ -1,7 +1,8 @@
 // Hands back the scalar exports of "embed:values" as the module read them,
-// a boolean as the number it reads as, and what `receiver` saw as `this`.
+// and what `receiver` saw as `this`. A boolean result reaches JS as a
+// boolean, not the `i32` the module returns.
 export function count(): number;
-export function enabled(): number;
-export function disabled(): number;
+export function enabled(): boolean;
+export function disabled(): boolean;
 export function big(): bigint;
 export function receiver(): string;

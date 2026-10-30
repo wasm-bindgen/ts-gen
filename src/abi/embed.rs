@@ -13,9 +13,10 @@
 //!   be derived from Wasm for two things, reading a property and
 //!   invoking a function value, so `reflect_get` and the fixed-arity
 //!   `call`/`call_new` families are the core; `reflect_set`,
-//!   `reflect_apply` and `is_undefined` are shortcuts for what every
-//!   module needs, and everything else (`Array`, `Reflect.construct`,
-//!   `WebAssembly.promising`) is reached through `reflect_get` + `call`.
+//!   `reflect_apply`, `is_undefined` and `boolean` are shortcuts for
+//!   what every module needs, and everything else (`Array`,
+//!   `Reflect.construct`, `WebAssembly.promising`) is reached through
+//!   `reflect_get` + `call`.
 
 use std::collections::BTreeMap;
 use std::fmt::Write;
@@ -125,11 +126,12 @@ pub fn merge(
     wrapper: &[u8],
 ) -> Result<Vec<u8>> {
     let dir = tempfile::tempdir().context("creating temp dir for wasm-merge")?;
-    // The wrapper goes first: with `--skip-export-conflicts` the earlier
-    // export wins, and a published global (`version`) must beat the raw
-    // module function of the same name, which `postprocess` strips.
+    // The wrapper's and the bindings' exports carry private prefixes, so
+    // none can clash with the module's and wasm-merge links every import.
+    // The bindings have no start function, so the module's own may call
+    // them, whatever order wasm-merge runs start functions in.
     let paths = [
-        (dir.path().join("wrapper.wasm"), wrapper, "./wrapper.wasm"),
+        (dir.path().join("wrapper.wasm"), wrapper, WRAPPER_SPECIFIER),
         (dir.path().join("module.wasm"), module, module_specifier),
         (
             dir.path().join("bindings.wasm"),
@@ -149,7 +151,6 @@ pub fn merge(
         "--all-features",
         "--disable-compact-imports",
         "--disable-custom-descriptors",
-        "--skip-export-conflicts",
     ]);
     for (path, _, spec) in &paths {
         cmd.arg(path).arg(spec);
@@ -171,18 +172,16 @@ pub fn merge(
     std::fs::read(&out).context("reading wasm-merge output")
 }
 
-/// Point the module's imports of module-scoped ABI functions at the
-/// bindings exports implementing them. `wasm-merge` links by module name,
-/// and the bindings import the real specifier themselves, so these imports
-/// cannot keep it.
+/// Point the module's ABI imports at the bindings exports implementing
+/// them, under the bindings' private prefix: those from `./bindings.wasm`
+/// and those of module-scoped ABI functions. `wasm-merge` links by module
+/// name, and the bindings import the real specifier themselves, so the
+/// latter cannot keep it.
 fn link_imports(wasm: &[u8], links: &BTreeMap<(String, String), String>) -> Result<Vec<u8>> {
     use wasm_encoder::reencode::{Reencode, RoundtripReencoder};
     use wasm_encoder::RawSection;
     use wasmparser::Payload;
 
-    if links.is_empty() {
-        return Ok(wasm.to_vec());
-    }
     let mut out = wasm_encoder::Module::new();
     for payload in wasmparser::Parser::new(0).parse_all(wasm) {
         let payload = payload?;
@@ -192,10 +191,16 @@ fn link_imports(wasm: &[u8], links: &BTreeMap<(String, String), String>) -> Resu
                 for import in reader.clone().into_imports() {
                     let import = import?;
                     let key = (import.module.to_string(), import.name.to_string());
-                    let (module, name) = match links.get(&key) {
-                        Some(export) => (BINDINGS_SPECIFIER, export.as_str()),
-                        None => (import.module, import.name),
+                    let linked = match links.get(&key) {
+                        Some(export) => Some(export.as_str()),
+                        None if import.module == BINDINGS_SPECIFIER => Some(import.name),
+                        None => None,
                     };
+                    let (module, name) = match linked {
+                        Some(export) => (BINDINGS_SPECIFIER, format!("{BINDINGS_PREFIX}{export}")),
+                        None => (import.module, import.name.to_string()),
+                    };
+                    let name = name.as_str();
                     let ty = RoundtripReencoder
                         .entity_type(import.ty)
                         .map_err(|e| anyhow!("re-encoding import {name:?}: {e:?}"))?;
@@ -228,29 +233,47 @@ pub fn assemble(wat_text: &str) -> Result<Vec<u8>> {
     Ok(bytes)
 }
 
-/// Clean up a merged module: strip the raw function exports the wrapper
-/// republished (the bindings' `Type.member`s and the module's `--provides`
-/// functions), leaving the published globals and whatever else the module
-/// exported.
+/// Clean up a merged module: strip the bindings' exports and the raw
+/// `--provides` functions the wrapper republished, leaving the published
+/// globals and whatever else the module exported. An import left from
+/// the bindings, the wrapper or the module is an error: `wasm-merge`
+/// failed to link it.
 pub fn postprocess(
     wasm: &[u8],
-    bindings_exports: &[String],
     handler_exports: &[String],
+    module_specifier: &str,
 ) -> Result<Vec<u8>> {
     use wasm_encoder::RawSection;
     use wasmparser::{ExternalKind, Payload};
 
-    let strip: std::collections::HashSet<&str> = bindings_exports
-        .iter()
-        .chain(handler_exports.iter())
-        .map(String::as_str)
-        .collect();
+    let strip: std::collections::HashSet<&str> =
+        handler_exports.iter().map(String::as_str).collect();
 
     let mut out = wasm_encoder::Module::new();
 
     for payload in wasmparser::Parser::new(0).parse_all(wasm) {
         let payload = payload?;
         match &payload {
+            Payload::ImportSection(reader) => {
+                for import in reader.clone().into_imports() {
+                    let import = import?;
+                    if [BINDINGS_SPECIFIER, WRAPPER_SPECIFIER, module_specifier]
+                        .contains(&import.module)
+                    {
+                        bail!(
+                            "the merged module still imports {:?} {:?}",
+                            import.module,
+                            import.name
+                        );
+                    }
+                }
+                if let Some((id, range)) = payload.as_section() {
+                    out.section(&RawSection {
+                        id,
+                        data: &wasm[range.start as usize..range.end as usize],
+                    });
+                }
+            }
             Payload::ExportSection(reader) => {
                 let mut exports = wasm_encoder::ExportSection::new();
                 for export in reader.clone() {
@@ -259,7 +282,9 @@ pub fn postprocess(
                     // published globals may share their names.
                     let raw_function =
                         matches!(export.kind, ExternalKind::Func | ExternalKind::FuncExact);
-                    if !(raw_function && strip.contains(export.name)) {
+                    let internal = export.name.starts_with(BINDINGS_PREFIX)
+                        || (raw_function && strip.contains(export.name));
+                    if !internal {
                         // The wrapper's globals carry a prefix so a top-level
                         // function export (`version`) does not collide with its
                         // raw function during the merge; it comes off here.
@@ -754,6 +779,10 @@ struct Builtins {
     /// primitive is a module/name change.
     is_undefined: bool,
     undefined: bool,
+    /// `Boolean`, imported as a function under each signature it is
+    /// called with: `i32` to a JS boolean for writes, a JS value to `i32`
+    /// for a boolean module export.
+    boolean: bool,
 }
 
 impl Builtins {
@@ -793,6 +822,9 @@ impl Builtins {
         if self.is_undefined {
             js.push_str("export const is_undefined = (x) => x === undefined;\n");
         }
+        if self.boolean {
+            js.push_str("export const boolean = Boolean;\n");
+        }
         if self.undefined {
             js.push_str("const undefined_ = undefined;\nexport { undefined_ as undefined };\n");
         }
@@ -817,8 +849,6 @@ struct Imports {
     global: bool,
     undefined: bool,
     anyrefs_type: bool,
-    /// `globalThis.Boolean`, fetched once at start for boolean writes.
-    boolean: bool,
     /// (specifier, export, type) imported as globals of that type.
     module_exports: IndexSet<(String, String, WasmType)>,
 }
@@ -1045,10 +1075,20 @@ impl Body<'_> {
         }
     }
 
+    /// `Boolean(value)`, called through the builtin under the signature
+    /// `(param from) (result to)`: an `i32` to a JS boolean, or a JS value
+    /// to `i32`. An import rather than a value fetched at start, so it
+    /// works before any start function has run.
+    fn boolean(&mut self, value: &str, from: WasmType, to: WasmType) -> String {
+        self.builtins.boolean = true;
+        let f = self.imports.func("boolean", vec![from], Some(to));
+        format!("(call ${f} {value})")
+    }
+
     /// The module export `name` as `ty`. The JS API links a Number or
     /// BigInt export as a numeric global but rejects a boolean for `i32`,
     /// so a boolean is linked as a reference and read through `Boolean`
-    /// called with an `i32` result.
+    /// imported with an `i32` result.
     fn export_value(&mut self, spec: &str, name: &str, ty: WasmType) -> String {
         let global = |body: &mut Self, ty| {
             format!(
@@ -1060,9 +1100,7 @@ impl Body<'_> {
             WasmType::F64 | WasmType::I64 => global(self, ty),
             WasmType::I32 => {
                 let export = global(self, R);
-                self.imports.boolean = true;
-                let g = self.global();
-                self.call("(global.get $Boolean)", (&g, R), &[(export, R)], Some(ty))
+                self.boolean(&export, R, ty)
             }
             WasmType::AnyRef { .. } => format!("(any.convert_extern {})", global(self, R)),
             _ => global(self, R),
@@ -1191,7 +1229,7 @@ fn generate_bindings(abi: &Abi, used: &[UsedFunction], builtins: &mut Builtins) 
         let exports: String = uf
             .names
             .iter()
-            .map(|n| format!(" (export {n:?})"))
+            .map(|n| format!(" (export {:?})", format!("{BINDINGS_PREFIX}{n}")))
             .collect();
         let _ = writeln!(
             funcs,
@@ -1200,22 +1238,8 @@ fn generate_bindings(abi: &Abi, used: &[UsedFunction], builtins: &mut Builtins) 
         );
     }
 
-    let mut start = String::new();
-    if imports.boolean {
-        let mut body = Body {
-            imports: &mut imports,
-            builtins,
-        };
-        let g = body.global();
-        let boolean = body.get((&g, R), "Boolean", R);
-        let _ = writeln!(
-            start,
-            "  (global $Boolean (mut externref) (ref.null extern))\n  (start $init)\n  (func $init\n    (global.set $Boolean {boolean}))"
-        );
-    }
-
     Ok(format!(
-        ";; Generated by ts-gen. Wasm implementation of the ABI over the JS primitives in builtins.js.\n(module\n{}\n{start}{funcs})\n",
+        ";; Generated by ts-gen. Wasm implementation of the ABI over the JS primitives in builtins.js.\n(module\n{}\n{funcs})\n",
         imports.render()
     ))
 }
@@ -1230,17 +1254,10 @@ fn function_body(f: &AbiFunction, uf: &UsedFunction, body: &mut Body) -> Result<
         .zip(&uf.param_types)
         .skip(skip_receiver)
         .map(|(p, ty)| match ty {
-            WasmType::I32 => {
-                body.imports.boolean = true;
-                let g = body.global();
-                let call = body.call(
-                    "(global.get $Boolean)",
-                    (&g, R),
-                    &[(format!("(local.get ${})", p.name), WasmType::I32)],
-                    Some(R),
-                );
-                (call, R)
-            }
+            WasmType::I32 => (
+                body.boolean(&format!("(local.get ${})", p.name), WasmType::I32, R),
+                R,
+            ),
             _ => (format!("(local.get ${})", p.name), *ty),
         })
         .collect();
@@ -1473,6 +1490,30 @@ fn generate_wrapper(
     let mut imports = Imports::default();
     let mut init = String::new();
     let mut locals = 0usize;
+    // A boolean result is an `i32` the module returns, which JS would
+    // receive as the Number 1/0: such a handler is published through a
+    // trampoline that hands its result to `Boolean()`.
+    let mut trampolines = String::new();
+    for h in handlers
+        .iter()
+        .filter(|h| h.result_type == Some(WasmType::I32))
+    {
+        let mut body = Body {
+            imports: &mut imports,
+            builtins,
+        };
+        let args: String = (0..h.param_types.len())
+            .map(|i| format!(" (local.get $p{i})"))
+            .collect();
+        let call = format!("(call ${}{args})", handler_ident(&h.name));
+        let _ = writeln!(
+            trampolines,
+            "  (func ${}{} (result externref)\n    {})",
+            boolean_ident(&h.name),
+            handler_params(h),
+            body.boolean(&call, WasmType::I32, R)
+        );
+    }
     {
         let mut body = Body {
             imports: &mut imports,
@@ -1483,10 +1524,11 @@ fn generate_wrapper(
         // namespace and `promising` need.
         let mut func_value =
             |body: &mut Body, h: &HandlerInfo, top_level: bool| -> (String, WasmType) {
-                let value = (
-                    format!("(ref.func ${})", handler_ident(&h.name)),
-                    WasmType::FuncRef,
-                );
+                let func = match h.result_type {
+                    Some(WasmType::I32) => boolean_ident(&h.name),
+                    _ => handler_ident(&h.name),
+                };
+                let value = (format!("(ref.func ${func})"), WasmType::FuncRef);
                 if jspi {
                     let wa = body.path(None, &["WebAssembly".to_string()]);
                     let promising = body.get((&wa, R), "promising", R);
@@ -1536,12 +1578,7 @@ fn generate_wrapper(
 
     let mut handler_imports = String::new();
     for h in handlers {
-        let params: String = h
-            .param_types
-            .iter()
-            .enumerate()
-            .map(|(i, ty)| format!(" (param $p{} {})", i, wire_wat(*ty)))
-            .collect();
+        let params = handler_params(h);
         let result = h
             .result_type
             .map(|t| format!(" (result {})", wire_wat(t)))
@@ -1557,7 +1594,10 @@ fn generate_wrapper(
     }
     let declared = handlers
         .iter()
-        .map(|h| format!(" ${}", handler_ident(&h.name)))
+        .map(|h| match h.result_type {
+            Some(WasmType::I32) => format!(" ${}", boolean_ident(&h.name)),
+            _ => format!(" ${}", handler_ident(&h.name)),
+        })
         .collect::<String>();
     let globals: String = ns
         .children
@@ -1574,7 +1614,7 @@ fn generate_wrapper(
         .collect();
 
     Ok(format!(
-        ";; Generated by ts-gen. Publishes the module's exports at their JS paths{}.\n(module\n{}{handler_imports}  (elem declare func{declared})\n{globals}  (start $init)\n  (func $init{local_decls}\n{}))\n",
+        ";; Generated by ts-gen. Publishes the module's exports at their JS paths{}.\n(module\n{}{handler_imports}  (elem declare func{declared})\n{globals}{trampolines}  (start $init)\n  (func $init{local_decls}\n{}))\n",
         if jspi { " through WebAssembly.promising" } else { "" },
         imports.render(),
         init.trim_end(),
@@ -1583,6 +1623,13 @@ fn generate_wrapper(
 
 /// Export-name prefix on the wrapper's published globals until `postprocess`.
 const PUBLISHED_PREFIX: &str = "ts-gen:export.";
+/// Export-name prefix on every bindings export; `postprocess` strips them.
+/// The module imports `./bindings.wasm` `fetch` as `ts-gen:bindings.fetch`
+/// after [`link_imports`], so the global `fetch` and a `fetch` handler
+/// never meet.
+const BINDINGS_PREFIX: &str = "ts-gen:bindings.";
+/// What `merge` registers the wrapper under.
+const WRAPPER_SPECIFIER: &str = "./wrapper.wasm";
 
 fn export_ident(name: &str) -> String {
     format!("export.{}", ident(name))
@@ -1590,6 +1637,20 @@ fn export_ident(name: &str) -> String {
 
 fn handler_ident(name: &str) -> String {
     format!("handler.{}", ident(name))
+}
+
+/// The trampoline publishing a boolean handler's result as a JS boolean.
+fn boolean_ident(name: &str) -> String {
+    format!("boolean.{}", ident(name))
+}
+
+/// A handler's parameters as the module declared them, `$p0`, `$p1`, ...
+fn handler_params(h: &HandlerInfo) -> String {
+    h.param_types
+        .iter()
+        .enumerate()
+        .map(|(i, ty)| format!(" (param $p{i} {})", wire_wat(*ty)))
+        .collect()
 }
 
 /// Group names by owner for diagnostics and listings.
