@@ -219,14 +219,15 @@ impl MixedBuilder {
     }
 }
 #[allow(dead_code)]
-pub type Loose = JsValue;
-#[allow(dead_code)]
-pub type Strict = JsValue;
-#[allow(dead_code)]
-pub type Flags = JsValue;
+pub type Patch = JsValue;
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {
-    pub fn mapped(loose: &LooseOptions, strict: &RequiredOptions, flags: &FlagsAOrB);
+    pub fn mapped(
+        loose: &LooseOptions,
+        strict: &RequiredOptions,
+        flags: &FlagsAOrB,
+        patch: &PartialOptions,
+    );
 }
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {
@@ -235,7 +236,17 @@ extern "C" {
         loose: &LooseOptions,
         strict: &RequiredOptions,
         flags: &FlagsAOrB,
+        patch: &PartialOptions,
     ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    pub fn patch(open: &JsValue);
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "patch")]
+    pub fn try_patch(open: &JsValue) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {

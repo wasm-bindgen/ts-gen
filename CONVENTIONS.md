@@ -4704,6 +4704,14 @@ pub type Sized_;           // size? (`Sized` is in the prelude)
   arguments. The alias's own declaration evaluates at its parameters'
   bounds, so `type Plural<T extends Unit> = T | { … }[T]` is the enum
   `Plural` of every unit, and an instantiation at the bound shares it.
+* **An alias every use instantiates isn't emitted.** A use of a generic
+  alias like `type PartialLike<T> = { [P in keyof T]?: T[P] }` is
+  replaced by its instantiation, so nothing in the output names the
+  alias, and its own declaration would only be `pub type PartialLike =
+  JsValue`. Its export isn't a root of the output surface: it is emitted
+  when a signature still reaches it (a use that couldn't be evaluated
+  keeps naming it), or when `--export` selects it. An alias promoted to
+  its own enum, like `Plural` above, is a type of its own and stays.
 * **A type parameter out of scope evaluates at its bound.** Inside
   `interface Rounding<U extends Unit> { smallestUnit?: Plural<U> }` the
   field is `Plural`, every unit: Rust can't vary an enum per

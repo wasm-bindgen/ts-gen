@@ -43,15 +43,21 @@ export interface Named extends Omit<Options, "size"> {
 }
 export interface Mixed extends Pick<Options, "name">, Partial<Pick<Options, "size">> {}
 
-// Mapped types over a literal key set, homomorphic or not.
+// Mapped types over a literal key set, homomorphic or not. Every use of
+// these generic aliases is instantiated in its place, so none names the
+// alias and it isn't emitted; a use that can't evaluate still reaches
+// `Patch`, which stays.
 export type Loose<T> = { [P in keyof T]?: T[P] | undefined };
 export type Strict<T> = { [P in keyof T]-?: T[P] };
 export type Flags<K extends string> = { [P in K]: boolean };
+export type Patch<T> = { [P in keyof T]?: T[P] };
 export declare function mapped(
   loose: Loose<Options>,
   strict: Strict<Options>,
   flags: Flags<"a" | "b">,
+  patch: Patch<Options>,
 ): void;
+export declare function patch<T>(open: Patch<T>): void;
 
 // Indexed access distributes over a literal key union; an optional
 // property's type admits `undefined`, which `-?` and `Required` remove.

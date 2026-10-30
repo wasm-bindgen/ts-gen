@@ -46516,8 +46516,6 @@ pub mod rpc {
     #[allow(dead_code)]
     pub type Unstubify = JsValue;
     #[allow(dead_code)]
-    pub type UnstubifyAll = JsValue;
-    #[allow(dead_code)]
     pub type MaybeProvider = JsValue;
     #[allow(dead_code)]
     pub type MaybeDisposable = JsValue;
