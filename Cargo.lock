@@ -1160,9 +1160,17 @@ dependencies = [
  "similar",
  "syn 2.0.117",
  "tempfile",
+ "ts-gen-abi",
  "walkdir",
  "wasm-encoder",
  "wasmparser",
+ "wat",
+]
+
+[[package]]
+name = "ts-gen-abi"
+version = "0.1.0"
+dependencies = [
  "wat",
 ]
 

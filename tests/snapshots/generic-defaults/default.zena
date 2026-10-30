@@ -12,6 +12,10 @@
 @external("./bindings.wasm", "JsValue.is_undefined")
 declare function __JsValue_is_undefined(x: externref | null): boolean;
 
+// undefined
+@external("./bindings.wasm", "JsValue.undefined")
+declare function __JsValue_undefined(): externref;
+
 // Number
 // Number(x)
 @external("./bindings.wasm", "Number.value")

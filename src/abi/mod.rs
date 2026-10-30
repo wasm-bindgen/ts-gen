@@ -33,69 +33,10 @@ use crate::parse::scope::{Binding, ScopeId};
 use crate::provides::ProvidedFn;
 use crate::util::naming::{LocalScope, Suffix};
 
-/// Specifier a language module imports the bindings under.
-pub const BINDINGS_SPECIFIER: &str = "./bindings.wasm";
-/// Specifier for the fixed JS primitive module.
-pub const BUILTINS_SPECIFIER: &str = "./builtins.js";
-/// Import namespace for imported string constants (js-string builtins).
-pub const STRING_CONSTANTS: &str = "wasm:js/string-constants";
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum WasmType {
-    /// Only ever a TS `boolean`; `embed` relies on that to wrap writes in `Boolean()`.
-    I32,
-    I64,
-    F64,
-    /// A JS value. `null` / `undefined` record which empties the TS type
-    /// admits; the wire type is `externref` either way. Only `null` is a
-    /// wasm null, so `embed` lets a module take any position that does not
-    /// admit `null` as `(ref extern)`.
-    ExternRef {
-        null: bool,
-        undefined: bool,
-    },
-    /// Only used by the wrapper to hand a Wasm function to JS as a function object.
-    FuncRef,
-    /// A JS value a GC language holds as `anyref`: variadic array elements
-    /// in the ABI, and any reference position of a module written that
-    /// way. `null` as for [`WasmType::ExternRef`].
-    AnyRef {
-        null: bool,
-    },
-}
-
-impl WasmType {
-    pub fn wat(self) -> &'static str {
-        match self {
-            WasmType::I32 => "i32",
-            WasmType::I64 => "i64",
-            WasmType::F64 => "f64",
-            WasmType::ExternRef { .. } => "externref",
-            WasmType::FuncRef => "funcref",
-            WasmType::AnyRef { .. } => "anyref",
-        }
-    }
-
-    /// A JS value position with no nullability claim: intermediates in
-    /// the bindings, `any`, type parameters.
-    pub const JS: WasmType = WasmType::ExternRef {
-        null: true,
-        undefined: true,
-    };
-    /// A JS value position the TS type says is never `null`/`undefined`.
-    pub const JS_NON_NULL: WasmType = WasmType::ExternRef {
-        null: false,
-        undefined: false,
-    };
-
-    /// A reference position that may hold wasm `null`.
-    pub fn admits_null(self) -> bool {
-        matches!(
-            self,
-            WasmType::ExternRef { null: true, .. } | WasmType::AnyRef { null: true }
-        )
-    }
-}
+pub use ts_gen_abi::{
+    format, Abi, AbiFunction, AbiHandler, AbiOp, AbiOwner, AbiParam, Head, OwnerKind, WasmType,
+    BINDINGS_SPECIFIER, BUILTINS_SPECIFIER, STRING_CONSTANTS, UNDEFINED_GLOBAL,
+};
 
 /// Lowers TS types to ABI types with the scope needed to see through type
 /// aliases: `type Foo = string | null` is nullable, and `embed` would
@@ -168,6 +109,9 @@ impl Lower<'_> {
     fn head(&self, ty: &TypeRef, scope: ScopeId) -> Option<Head> {
         match ty {
             TypeRef::String | TypeRef::StringLiteral(_) => Some(Head::String),
+            TypeRef::Number | TypeRef::NumberLiteral(_) => Some(Head::Number),
+            TypeRef::Boolean | TypeRef::BooleanLiteral(_) => Some(Head::Boolean),
+            TypeRef::BigInt => Some(Head::BigInt),
             TypeRef::Union(union) => {
                 let mut heads = union.values().iter().map(|m| self.head(m, scope));
                 let first = heads.next()??;
@@ -252,11 +196,11 @@ impl Lower<'_> {
     }
 
     fn param(&self, name: &str, ty: &TypeRef, scope: ScopeId) -> AbiParam {
+        let wasm = self.of(ty, scope);
         AbiParam {
             name: name.into(),
-            ty: self.of(ty, scope),
-            head: self.head(ty, scope),
-            ts: ty.format_ts(),
+            ty: wasm,
+            head: self.head(ty, scope).filter(|_| wasm.is_ref()),
         }
     }
 
@@ -420,182 +364,54 @@ enum Resolved {
     TypeParam,
 }
 
-/// What a reference position names, ignoring empty arms, for a target
-/// to wrap.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum Head {
-    /// A class or interface, as its dotted JS path (`WebAssembly.Module`),
-    /// matching the owner names.
-    Declared(String),
-    /// A TS `string`.
-    String,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct AbiParam {
-    pub name: String,
-    pub ty: WasmType,
-    /// The reference's [`Head`] (`Headers` for `Headers | null`).
-    pub head: Option<Head>,
-    /// TS spelling, for the template's comments.
-    pub ts: String,
-}
-
-/// What the bridge has to do to implement a function.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum AbiOp {
-    /// `receiver[name]`
-    Get { name: String },
-    /// `receiver[name] = value`
-    Set { name: String },
-    /// `receiver[name](...args)`
-    Call { name: String },
-    /// `new path(...args)`
-    Construct { path: Vec<String> },
-    /// `path[name]`, where `path` is a global object such as a class or
-    /// namespace.
-    StaticGet { path: Vec<String>, name: String },
-    /// `path[name] = value`
-    StaticSet { path: Vec<String>, name: String },
-    /// `path[name](...args)` with `path` as the receiver.
-    StaticCall { path: Vec<String>, name: String },
-    /// `{}`
-    NewObject,
-    /// `x === undefined`; `null` needs nothing, `ref.is_null` in the language.
-    IsUndefined,
-    /// `Number(x)`: unboxes a `number` that crossed as a reference
-    /// (a nullable scalar, or a union arm) to `f64`.
-    NumberValue,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct AbiFunction {
-    /// Export name in `bindings.wasm` and import field in the language
-    /// module: `Type.member` with wasm-bindgen's variant suffixes.
-    pub name: String,
-    /// Further names `bindings.wasm` exports the same function under: a
-    /// type exported under several names has each member under each.
-    pub aliases: Vec<String>,
-    pub op: AbiOp,
-    /// Includes the receiver as the first parameter for instance ops.
-    pub params: Vec<AbiParam>,
-    pub result: Option<WasmType>,
-    /// As [`AbiParam::head`], for the result.
-    pub result_head: Option<Head>,
-    /// TS declaration this came from, for the template's comments.
-    pub ts: String,
-    /// Trailing parameter is a JS array spread into the call.
-    pub variadic: bool,
-    /// For declarations inside `declare module "spec"`: the specifier whose
-    /// export roots the op's path (or is the callee itself when the path is
-    /// empty), and which the language module imports the function from.
-    /// `None` roots at `globalThis` and imports from `./bindings.wasm`.
-    pub module: Option<String>,
-}
-
-impl AbiFunction {
-    /// The module a language module imports this function from.
-    pub fn import_module(&self) -> &str {
-        self.module.as_deref().unwrap_or(BINDINGS_SPECIFIER)
-    }
-}
-
-/// A function the module provides, lowered from a [`ProvidedFn`]: the
-/// reverse of an [`AbiFunction`]. Parameters arrive by value (the language
-/// owns them), results are owned.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct AbiHandler {
-    /// Wasm export name the module provides: the JS path joined with `.`,
-    /// with a leading `default.` dropped unless a top-level provider has
-    /// the same path (`fetch`, `foo.bar.baz`, `default.add` beside `add`).
-    pub name: String,
-    /// JS path from the module namespace, which the wrapper synthesises
-    /// (`["default", "fetch"]`, `["foo", "bar", "baz"]`).
-    pub path: Vec<String>,
-    pub params: Vec<AbiParam>,
-    /// Wasm type of the result; for a `Promise<T>` result this is `T`'s,
-    /// a nullable reference when `T` is `void`.
-    pub result: Option<WasmType>,
-    pub result_head: Option<Head>,
-    /// The TS result was `Promise<T>`: under JSPI the module returns `T`
-    /// and the wrapper's `promising` supplies the promise; otherwise the
-    /// module returns the promise itself.
-    pub promise: bool,
-    pub ts: String,
-    pub doc: Option<String>,
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct Abi {
-    pub functions: Vec<AbiFunction>,
-    pub handlers: Vec<AbiHandler>,
-}
-
-impl Abi {
-    /// The first function named `name`, its own or an alias, from any
-    /// module.
-    pub fn function(&self, name: &str) -> Option<&AbiFunction> {
-        self.functions
-            .iter()
-            .find(|f| f.name == name || f.aliases.iter().any(|a| a == name))
-    }
-
-    /// The function a language module imports as `name` from `module`:
-    /// its own name or an alias.
-    pub fn import(&self, module: &str, name: &str) -> Option<&AbiFunction> {
-        self.functions.iter().find(|f| {
-            f.import_module() == module && (f.name == name || f.aliases.iter().any(|a| a == name))
-        })
-    }
-
-    /// Module specifiers the ABI imports from, sorted and deduplicated.
-    pub fn modules(&self) -> Vec<&str> {
-        let mut specs: Vec<&str> = self
-            .functions
-            .iter()
-            .filter_map(|f| f.module.as_deref())
-            .collect();
-        specs.sort_unstable();
-        specs.dedup();
-        specs
-    }
-}
-
-/// Name the language module imports `undefined` under from `builtins.js`,
-/// as an immutable `externref` global.
-pub const UNDEFINED_GLOBAL: &str = "undefined";
 
 /// ABI functions every language gets regardless of the `.d.ts`: the parts of
 /// wasm-bindgen's `sys` surface that need JS to answer.
 fn sys_functions() -> Vec<AbiFunction> {
-    let sys = |name: &str, op: AbiOp, param: WasmType, result: WasmType, ts: &str| AbiFunction {
-        name: name.into(),
-        aliases: Vec::new(),
-        op,
-        params: vec![AbiParam {
-            name: "x".into(),
-            ty: param,
-            head: None,
+    let sys = |name: &str, op: AbiOp, param: Option<WasmType>, result: WasmType, ts: &str| {
+        AbiFunction {
+            name: name.into(),
+            aliases: Vec::new(),
+            owner: None,
+            op,
+            params: param
+                .map(|ty| AbiParam {
+                    name: "x".into(),
+                    ty,
+                    head: None,
+                })
+                .into_iter()
+                .collect(),
+            result: Some(result),
+            result_head: None,
             ts: ts.into(),
-        }],
-        result: Some(result),
-        result_head: None,
-        ts: ts.into(),
-        variadic: false,
-        module: None,
+            doc: None,
+            variadic: false,
+            module: None,
+        }
     };
     vec![
         sys(
             "JsValue.is_undefined",
             AbiOp::IsUndefined,
-            WasmType::JS,
+            Some(WasmType::JS),
             WasmType::I32,
             "x === undefined",
         ),
         sys(
+            "JsValue.undefined",
+            AbiOp::Undefined,
+            None,
+            WasmType::ExternRef {
+                null: false,
+                undefined: true,
+            },
+            "undefined",
+        ),
+        sys(
             "Number.value",
             AbiOp::NumberValue,
-            WasmType::JS_NON_NULL,
+            Some(WasmType::JS_NON_NULL),
             WasmType::F64,
             "Number(x)",
         ),
@@ -634,6 +450,7 @@ pub fn build(
     for &id in &module.types {
         for decl in lower.surface.get(id) {
             let start = abi.functions.len();
+            let owners_start = abi.owners.len();
             build_declaration(id, decl, &[], &lower, &mut abi);
             // The specifier is a property of the declaration, so it is stamped
             // on everything the declaration produced rather than threaded
@@ -641,6 +458,9 @@ pub fn build(
             if let ModuleContext::Module(spec) = &decl.module_context {
                 for f in &mut abi.functions[start..] {
                     f.module = Some(spec.to_string());
+                }
+                for o in &mut abi.owners[owners_start..] {
+                    o.module = Some(spec.to_string());
                 }
             }
         }
@@ -661,6 +481,44 @@ pub fn build(
         kept.push(f);
     }
     abi.functions = kept;
+    // A merged declaration is one owner, inheriting from every base and
+    // exported under every name its parts are.
+    let mut owners: Vec<AbiOwner> = Vec::new();
+    for o in std::mem::take(&mut abi.owners) {
+        match owners
+            .iter_mut()
+            .find(|p| p.path == o.path && p.module == o.module)
+        {
+            Some(p) => {
+                for e in o.extends {
+                    if !p.extends.contains(&e) {
+                        p.extends.push(e);
+                    }
+                }
+                for a in o.aliases {
+                    if !p.aliases.contains(&a) {
+                        p.aliases.push(a);
+                    }
+                }
+                if p.doc.is_none() {
+                    p.doc = o.doc;
+                }
+            }
+            None => owners.push(o),
+        }
+    }
+    abi.owners = owners;
+    for f in &mut abi.functions {
+        if !f.result.is_some_and(WasmType::is_ref) {
+            f.result_head = None;
+        }
+    }
+    for h in &mut abi.handlers {
+        if !h.result.is_some_and(WasmType::is_ref) {
+            h.result_head = None;
+        }
+    }
+    abi.canonicalize();
     abi
 }
 
@@ -672,12 +530,20 @@ fn build_declaration(
     abi: &mut Abi,
 ) {
     let start = abi.functions.len();
+    let owner_index = abi.owners.len();
     let owner = match &decl.kind {
         TypeKind::Class(class) => {
+            push_owner(abi, path, &class.js_name, OwnerKind::Class, class.extends.iter(), decl, lower);
             build_class(class, path, lower, abi);
             class.js_name.as_str()
         }
         TypeKind::Interface(iface) => {
+            let kind = if iface.classification == InterfaceClassification::Dictionary {
+                OwnerKind::Dictionary
+            } else {
+                OwnerKind::Interface
+            };
+            push_owner(abi, path, &iface.js_name, kind, iface.extends.iter(), decl, lower);
             build_interface(iface, path, lower, abi);
             iface.js_name.as_str()
         }
@@ -719,6 +585,7 @@ fn build_declaration(
         }
         TypeKind::Namespace(ns) => {
             let js_name = lower.surface.js_name(id, &ns.name);
+            push_owner(abi, path, js_name, OwnerKind::Namespace, [].iter(), decl, lower);
             let mut child = path.to_vec();
             child.push(js_name.to_string());
             for &inner in &ns.declarations {
@@ -733,6 +600,8 @@ fn build_declaration(
             abi.functions.push(AbiFunction {
                 name: join_name(path, &var.js_name),
                 aliases: Vec::new(),
+                owner: (!path.is_empty()).then(|| path.join(".")),
+                doc: decl.doc.clone(),
                 op: AbiOp::StaticGet {
                     path: path.to_vec(),
                     name: var.js_name.clone(),
@@ -768,6 +637,7 @@ fn build_declaration(
         .filter(|&n| n != owner)
         .map(|n| join_name(path, n))
         .collect();
+    abi.owners[owner_index].aliases = others.clone();
     for f in &mut abi.functions[start..] {
         let names: Vec<String> = std::iter::once(&f.name)
             .chain(&f.aliases)
@@ -779,6 +649,32 @@ fn build_declaration(
             }
         }
     }
+}
+
+/// Record the owner a class, interface or namespace declaration binds
+/// members under. Its aliases are set once its other names are known.
+fn push_owner<'h>(
+    abi: &mut Abi,
+    path: &[String],
+    js_name: &str,
+    kind: OwnerKind,
+    extends: impl Iterator<Item = &'h crate::ir::Heritage>,
+    decl: &TypeDeclaration,
+    lower: &Lower,
+) {
+    abi.owners.push(AbiOwner {
+        path: join_name(path, js_name),
+        kind,
+        module: None,
+        aliases: Vec::new(),
+        extends: extends
+            .filter_map(|h| match lower.head(&h.type_ref, h.scope) {
+                Some(Head::Declared(p)) => Some(p),
+                _ => None,
+            })
+            .collect(),
+        doc: decl.doc.clone(),
+    });
 }
 
 /// The property's type as declared: the `?` already says `| undefined`.
@@ -880,13 +776,14 @@ fn build_members(
         name: "this".into(),
         ty: WasmType::JS_NON_NULL,
         head: Some(Head::Declared(type_name.to_string())),
-        ts: type_name.to_string(),
     };
 
     if dictionary {
         abi.functions.push(AbiFunction {
             name: format!("{type_name}.new"),
             aliases: Vec::new(),
+            owner: Some(type_name.to_string()),
+            doc: None,
             op: AbiOp::NewObject,
             params: vec![],
             result: Some(WasmType::JS_NON_NULL),
@@ -960,6 +857,8 @@ fn build_members(
                 abi.functions.push(AbiFunction {
                     name: format!("{type_name}.{name}"),
                     aliases: Vec::new(),
+                    owner: Some(type_name.to_string()),
+                    doc: g.doc.clone(),
                     op: AbiOp::Get {
                         name: g.js_name.clone(),
                     },
@@ -997,7 +896,7 @@ fn build_members(
                         body_scope: s.scope,
                         throws: &Throws::None,
                         async_modifier: false,
-                        doc: &None,
+                        doc: &s.doc,
                     }],
                     std::slice::from_ref(&this),
                     AbiOp::Set {
@@ -1052,6 +951,8 @@ fn build_members(
                 abi.functions.push(AbiFunction {
                     name: format!("{type_name}.{name}"),
                     aliases: Vec::new(),
+                    owner: Some(type_name.to_string()),
+                    doc: g.doc.clone(),
                     op: AbiOp::StaticGet {
                         path: js_path.to_vec(),
                         name: g.js_name.clone(),
@@ -1085,7 +986,7 @@ fn build_members(
                         body_scope: s.scope,
                         throws: &Throws::None,
                         async_modifier: false,
-                        doc: &None,
+                        doc: &s.doc,
                     }],
                     &[],
                     AbiOp::StaticSet {
@@ -1168,7 +1069,6 @@ fn push_callable(
                     name: name.clone(),
                     ty: WasmType::JS,
                     head: None,
-                    ts: format!("...{}", p.type_ref.format_ts()),
                 }
             } else {
                 lower.param(name, &p.type_ref, scope)
@@ -1196,6 +1096,8 @@ fn push_callable(
         abi.functions.push(AbiFunction {
             name,
             aliases: Vec::new(),
+            owner: owner.map(String::from),
+            doc: overloads[sig.overload].doc.clone(),
             op: op.clone(),
             params,
             result: match kind {

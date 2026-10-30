@@ -125,7 +125,7 @@ fn constructs(f: &AbiFunction) -> bool {
 }
 
 fn is_sys(f: &AbiFunction) -> bool {
-    matches!(f.op, AbiOp::IsUndefined | AbiOp::NumberValue)
+    f.op.is_sys()
 }
 
 /// Names for keys in order, globals first so that a module's name only
@@ -271,6 +271,7 @@ impl<'a> Ctx<'a> {
                 let key = self.class_key(module, path)?;
                 Some(Wrap::Class(self.classes[&key].clone()))
             }
+            Head::Number | Head::Boolean | Head::BigInt => None,
         }
     }
 
@@ -445,7 +446,8 @@ export function numberValue(x: externref): f64 {{ return {number_value}(x); }}
                 | AbiOp::StaticSet { .. }
                 | AbiOp::StaticCall { .. }
                 | AbiOp::IsUndefined
-                | AbiOp::NumberValue => {
+                | AbiOp::NumberValue
+                | AbiOp::Undefined => {
                     writeln!(out, "  static {name}({sig}): {ret} {{ {body} }}")
                 }
             };

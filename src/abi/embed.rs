@@ -1342,6 +1342,7 @@ fn function_body_inner(
                 .func("is_undefined", vec![this.1], Some(WasmType::I32));
             format!("(call ${f} {})", this.0)
         }
+        AbiOp::Undefined => body.undefined(),
         AbiOp::NumberValue => {
             let number = body.path(None, &["Number".to_string()]);
             let g = body.global();
