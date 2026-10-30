@@ -3603,12 +3603,12 @@ pub mod temporal {
         fn __get_time_zone_transition(
             this: &ZonedDateTime,
             direction: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Nullable<ZonedDateTime>, JsValue>;
+        ) -> Result<Option<ZonedDateTime>, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
         pub fn get_time_zone_transition(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
-        ) -> Result<Nullable<ZonedDateTime>, JsValue>;
+        ) -> Result<Option<ZonedDateTime>, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toInstant")]
         pub fn to_instant(this: &ZonedDateTime) -> Result<Instant, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "toPlainDate")]
@@ -3619,12 +3619,10 @@ pub mod temporal {
         pub fn to_plain_date_time(this: &ZonedDateTime) -> Result<PlainDateTime, JsValue>;
     }
     impl ZonedDateTime {
-        pub fn get_time_zone_transition_next(&self) -> Result<Nullable<ZonedDateTime>, JsValue> {
+        pub fn get_time_zone_transition_next(&self) -> Result<Option<ZonedDateTime>, JsValue> {
             self.__get_time_zone_transition("next")
         }
-        pub fn get_time_zone_transition_previous(
-            &self,
-        ) -> Result<Nullable<ZonedDateTime>, JsValue> {
+        pub fn get_time_zone_transition_previous(&self) -> Result<Option<ZonedDateTime>, JsValue> {
             self.__get_time_zone_transition("previous")
         }
     }

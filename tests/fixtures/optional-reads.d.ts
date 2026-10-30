@@ -1,8 +1,10 @@
 //! @ts-gen --lib-name optional-reads --export optional-reads
-// A property that can be absent reads as `Option` when its type erases to
-// `JsValue`, and a written `null` as the `Nullable` under it. The top type
-// already holds both empties in-band, so `any` and `unknown` stay bare.
-// Exercised against a real JS module in the integration tests.
+// A property that erases to `JsValue` reads as `Option` when it admits an
+// empty: an absent field and a written `null` are both `None` (the `strict`
+// snapshot keeps the `Option` for absence only, with a written `null` as the
+// `Nullable` under it). The top type already holds both empties in-band, so
+// `any` and `unknown` stay bare. Exercised against a real JS module in the
+// integration tests.
 
 export declare class Moment {
   constructor();

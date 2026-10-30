@@ -11,7 +11,7 @@ extern "C" {
     pub type Options;
     #[doc = " `undefined` takes the default; `null` means \"no label\"."]
     #[wasm_bindgen(method, getter)]
-    pub fn label(this: &Options) -> Option<Nullable<String>>;
+    pub fn label(this: &Options) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_label(this: &Options, val: &str);
     #[wasm_bindgen(method, setter, js_name = "label")]
@@ -149,19 +149,19 @@ pub fn try_greet_with_null() -> Result<String, JsValue> {
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {
     #[doc = " Returns `null` for an unknown key and `undefined` for a known empty one."]
-    pub fn lookup(key: &str) -> Option<Nullable<String>>;
+    pub fn lookup(key: &str) -> Option<String>;
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {
     #[doc = " Returns `null` for an unknown key and `undefined` for a known empty one."]
     #[wasm_bindgen(catch, js_name = "lookup")]
-    pub fn try_lookup(key: &str) -> Result<Option<Nullable<String>>, JsValue>;
+    pub fn try_lookup(key: &str) -> Result<Option<String>, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {
     #[doc = " `lookup`, resolved asynchronously."]
     #[wasm_bindgen(catch, js_name = "lookupAsync")]
-    pub async fn lookup_async(key: &str) -> Result<Option<Nullable<String>>, JsValue>;
+    pub async fn lookup_async(key: &str) -> Result<Option<String>, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {
@@ -173,7 +173,7 @@ extern "C" {
 extern "C" {
     #[doc = " Resolves to `null` for an unknown key."]
     #[wasm_bindgen(catch)]
-    pub async fn find(key: &str) -> Result<Nullable<Options>, JsValue>;
+    pub async fn find(key: &str) -> Result<Option<Options>, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {

@@ -182,19 +182,19 @@ extern "C" {
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &StoreOptions,
-    ) -> Result<Nullable<String>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_store_options_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &StoreOptions,
-    ) -> Result<Nullable<JsString>, JsValue>;
+    ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_store_options_promise(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &StoreOptions,
-    ) -> Result<Promise<Nullable<JsString>>, JsValue>;
+    ) -> Result<Promise<Option<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_get_options(
         this: &Store,

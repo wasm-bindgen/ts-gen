@@ -1,7 +1,8 @@
 //! @ts-gen --lib-name nullability --export nullability
 
 // Every combination of `null` and `undefined` a declaration can admit, at
-// top-level and inner positions. Reads keep exact carriers; writes take
+// top-level and inner positions. Reads are `Option<T>` whichever empties
+// they admit (the `strict` snapshot keeps the exact carriers); writes take
 // `null` as an arm of its own (`f(x)` and `f_with_null()`), and `undefined`
 // in an omittable parameter as omission (`f()`), or as `None` on its first
 // arm when a later argument follows it. The mono fixture shares this file,

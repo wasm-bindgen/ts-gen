@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Promise};
+use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Object, Promise};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads::{
@@ -19,10 +19,10 @@ async fn arms_compile(
     headers: &Headers,
     crypto: &SubtleCrypto,
 ) -> Result<(), JsValue> {
-    let _: Nullable<String> = kv.get("k").await?;
-    let _: Nullable<String> = kv.get_text("k").await?;
+    let _: Option<String> = kv.get("k").await?;
+    let _: Option<String> = kv.get_text("k").await?;
     let _: JsValue = kv.get_json("k").await?;
-    let _: Nullable<ArrayBuffer> = kv.get_array_buffer("k").await?;
+    let _: Option<ArrayBuffer> = kv.get_array_buffer("k").await?;
     let _: Promise<JsNullable<JsString>> = kv.get_text_promise("k");
     let _: Map<JsString, JsValue> = kv.get_json_with_slice(&["a".to_string()]).await?;
     let _: bool = kv.mode_fast();
@@ -36,8 +36,8 @@ async fn arms_compile(
 
 #[allow(dead_code)]
 async fn generic_arms_compile(store: &KVStore<JsString>, key: &JsString) -> Result<(), JsValue> {
-    let _: Nullable<String> = store.get_text(key).await?;
-    let _: Nullable<Object> = store.get_json::<Object>(key).await?;
+    let _: Option<String> = store.get_text(key).await?;
+    let _: Option<Object> = store.get_json::<Object>(key).await?;
     Ok(())
 }
 
@@ -89,7 +89,7 @@ async fn null_arm_forms_compile(
 ) -> Result<(), JsValue> {
     let _: String = picker.name_a_with_null();
     let _: Result<String, JsValue> = picker.try_name_b_with_null();
-    let _: Nullable<String> = picker.load_b_with_null().await?;
+    let _: Option<String> = picker.load_b_with_null().await?;
     let _: Promise<JsNullable<JsString>> = picker.load_a_with_null_promise();
     store.put_a(key, "v");
     store.put_b_with_null(key);

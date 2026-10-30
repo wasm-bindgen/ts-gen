@@ -220,17 +220,17 @@ extern "C" {
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchMaybeTags")]
-    pub async fn fetch_maybe_tags() -> Result<Nullable<Vec<String>>, JsValue>;
+    pub async fn fetch_maybe_tags() -> Result<Option<Vec<String>>, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchMaybeTags")]
-    pub async fn fetch_maybe_tags_js_string() -> Result<Nullable<Array<JsString>>, JsValue>;
+    pub async fn fetch_maybe_tags_js_string() -> Result<Option<Array<JsString>>, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchMaybeTags")]
-    pub fn fetch_maybe_tags_promise() -> Result<Promise<Nullable<Array<JsString>>>, JsValue>;
+    pub fn fetch_maybe_tags_promise() -> Result<Promise<Option<Array<JsString>>>, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {

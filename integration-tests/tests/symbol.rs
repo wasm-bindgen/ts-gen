@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Function, Nullable, Symbol, Undefined};
+use js_sys::{Function, Symbol, Undefined};
 
 use ts_gen_integration_tests::symbol::{
     all, create, describe, find, for_each, lookup, set_key, set_key_with_symbol, LookupReturnKind,
@@ -13,7 +13,7 @@ use ts_gen_integration_tests::symbol::{
 fn symbol_signatures_compile(symbol: &Symbol, callback: &Function<fn(Symbol) -> Undefined>) {
     let _: String = describe(symbol);
     let _: Symbol = create();
-    let _: Nullable<Symbol> = find("name");
+    let _: Option<Symbol> = find("name");
     let _: Vec<Symbol> = all();
     for_each(callback);
 

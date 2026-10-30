@@ -18,13 +18,13 @@ extern "C" {
     pub fn get(
         this: &Headers,
         name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<String>, crate::Error>;
+    ) -> Result<Option<String>, crate::Error>;
     #[doc = " Sync method — `Result<Nullable<String>, crate::Error>`, no `try_get`."]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_js_string(
         this: &Headers,
         name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<JsString>, crate::Error>;
+    ) -> Result<Option<JsString>, crate::Error>;
     #[doc = " Sync void method with a typed throws — `Result<(), TypeError>`."]
     #[doc = ""]
     #[doc = " ## Errors"]

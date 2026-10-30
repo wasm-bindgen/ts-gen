@@ -29,7 +29,7 @@ extern "C" {
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn find(name: impl ::wasm_bindgen::JsStringLike) -> Result<Nullable<Symbol>, JsValue>;
+    pub fn find(name: impl ::wasm_bindgen::JsStringLike) -> Result<Option<Symbol>, JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {

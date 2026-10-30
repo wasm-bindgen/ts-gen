@@ -3081,21 +3081,21 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "getWebSocketAutoResponse")]
     pub fn get_web_socket_auto_response<Props: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectState<Props>,
-    ) -> Nullable<WebSocketRequestResponsePair>;
+    ) -> Option<WebSocketRequestResponsePair>;
     #[wasm_bindgen(method, catch, js_name = "getWebSocketAutoResponse")]
     pub fn try_get_web_socket_auto_response<Props: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectState<Props>,
-    ) -> Result<Nullable<WebSocketRequestResponsePair>, JsValue>;
+    ) -> Result<Option<WebSocketRequestResponsePair>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWebSocketAutoResponseTimestamp")]
     pub fn get_web_socket_auto_response_timestamp<Props: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectState<Props>,
         ws: &WebSocket,
-    ) -> Nullable<Date>;
+    ) -> Option<Date>;
     #[wasm_bindgen(method, catch, js_name = "getWebSocketAutoResponseTimestamp")]
     pub fn try_get_web_socket_auto_response_timestamp<Props: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectState<Props>,
         ws: &WebSocket,
-    ) -> Result<Nullable<Date>, JsValue>;
+    ) -> Result<Option<Date>, JsValue>;
     #[wasm_bindgen(method, js_name = "setHibernatableWebSocketEventTimeout")]
     pub fn set_hibernatable_web_socket_event_timeout<Props: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectState<Props>,
@@ -3121,11 +3121,11 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "getHibernatableWebSocketEventTimeout")]
     pub fn get_hibernatable_web_socket_event_timeout<Props: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectState<Props>,
-    ) -> Nullable<f64>;
+    ) -> Option<f64>;
     #[wasm_bindgen(method, catch, js_name = "getHibernatableWebSocketEventTimeout")]
     pub fn try_get_hibernatable_web_socket_event_timeout<Props: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectState<Props>,
-    ) -> Result<Nullable<f64>, JsValue>;
+    ) -> Result<Option<f64>, JsValue>;
     #[wasm_bindgen(method, js_name = "getTags")]
     pub fn get_tags<Props: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectState<Props>,
@@ -3311,14 +3311,14 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "rollback")]
     pub fn try_rollback(this: &DurableObjectTransaction) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getAlarm")]
-    pub async fn get_alarm(this: &DurableObjectTransaction) -> Result<Nullable<f64>, JsValue>;
+    pub async fn get_alarm(this: &DurableObjectTransaction) -> Result<Option<f64>, JsValue>;
     #[wasm_bindgen(method, js_name = "getAlarm")]
     pub fn get_alarm_promise(this: &DurableObjectTransaction) -> Promise<JsNullable<Number>>;
     #[wasm_bindgen(method, catch, js_name = "getAlarm")]
     pub async fn get_alarm_with_options(
         this: &DurableObjectTransaction,
         options: &DurableObjectGetAlarmOptions,
-    ) -> Result<Nullable<f64>, JsValue>;
+    ) -> Result<Option<f64>, JsValue>;
     #[wasm_bindgen(method, js_name = "getAlarm")]
     pub fn get_alarm_with_options_promise(
         this: &DurableObjectTransaction,
@@ -3561,14 +3561,14 @@ extern "C" {
         closure: &Function<fn(DurableObjectTransaction) -> Promise>,
     ) -> Promise<T>;
     #[wasm_bindgen(method, catch, js_name = "getAlarm")]
-    pub async fn get_alarm(this: &DurableObjectStorage) -> Result<Nullable<f64>, JsValue>;
+    pub async fn get_alarm(this: &DurableObjectStorage) -> Result<Option<f64>, JsValue>;
     #[wasm_bindgen(method, js_name = "getAlarm")]
     pub fn get_alarm_promise(this: &DurableObjectStorage) -> Promise<JsNullable<Number>>;
     #[wasm_bindgen(method, catch, js_name = "getAlarm")]
     pub async fn get_alarm_with_options(
         this: &DurableObjectStorage,
         options: &DurableObjectGetAlarmOptions,
-    ) -> Result<Nullable<f64>, JsValue>;
+    ) -> Result<Option<f64>, JsValue>;
     #[wasm_bindgen(method, js_name = "getAlarm")]
     pub fn get_alarm_with_options_promise(
         this: &DurableObjectStorage,
@@ -7933,7 +7933,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/origin)"]
     #[wasm_bindgen(method, getter)]
-    pub fn origin(this: &MessageEvent) -> Nullable<String>;
+    pub fn origin(this: &MessageEvent) -> Option<String>;
     #[doc = " The **`lastEventId`** read-only property of the unique ID for the event."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/lastEventId)"]
@@ -7943,7 +7943,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/source)"]
     #[wasm_bindgen(method, getter)]
-    pub fn source(this: &MessageEvent) -> Nullable<MessagePort>;
+    pub fn source(this: &MessageEvent) -> Option<MessagePort>;
     #[doc = " The **`ports`** read-only property of the containing all MessagePort objects sent with the message, in order."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/ports)"]
@@ -8046,12 +8046,12 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/get)"]
     #[wasm_bindgen(method)]
-    pub fn get(this: &FormData, name: &str) -> JsValue;
+    pub fn get(this: &FormData, name: &str) -> Option<JsValue>;
     #[doc = " The **`get()`** method of the FormData interface returns the first value associated with a given key from within a `FormData` object."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/get)"]
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(this: &FormData, name: &str) -> Result<JsValue, JsValue>;
+    pub fn try_get(this: &FormData, name: &str) -> Result<Option<JsValue>, JsValue>;
     #[doc = " The **`getAll()`** method of the FormData interface returns all the values associated with a given key from within a `FormData` object."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/getAll)"]
@@ -8303,11 +8303,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Doctype;
     #[wasm_bindgen(method, getter)]
-    pub fn name(this: &Doctype) -> Nullable<String>;
+    pub fn name(this: &Doctype) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "publicId")]
-    pub fn public_id(this: &Doctype) -> Nullable<String>;
+    pub fn public_id(this: &Doctype) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "systemId")]
-    pub fn system_id(this: &Doctype) -> Nullable<String>;
+    pub fn system_id(this: &Doctype) -> Option<String>;
 }
 impl Doctype {
     #[allow(clippy::new_without_default)]
@@ -8334,9 +8334,9 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "namespaceURI")]
     pub fn namespace_uri(this: &Element) -> String;
     #[wasm_bindgen(method, js_name = "getAttribute")]
-    pub fn get_attribute(this: &Element, name: &str) -> Nullable<String>;
+    pub fn get_attribute(this: &Element, name: &str) -> Option<String>;
     #[wasm_bindgen(method, catch, js_name = "getAttribute")]
-    pub fn try_get_attribute(this: &Element, name: &str) -> Result<Nullable<String>, JsValue>;
+    pub fn try_get_attribute(this: &Element, name: &str) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "hasAttribute")]
     pub fn has_attribute(this: &Element, name: &str) -> bool;
     #[wasm_bindgen(method, catch, js_name = "hasAttribute")]
@@ -9095,12 +9095,12 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/get)"]
     #[wasm_bindgen(method)]
-    pub fn get(this: &Headers, name: &str) -> Nullable<String>;
+    pub fn get(this: &Headers, name: &str) -> Option<String>;
     #[doc = " The **`get()`** method of the Headers interface returns a byte string of all the values of a header within a `Headers` object with a given name."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/get)"]
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(this: &Headers, name: &str) -> Result<Nullable<String>, JsValue>;
+    pub fn try_get(this: &Headers, name: &str) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "getAll")]
     pub fn get_all(this: &Headers, name: &str) -> Vec<String>;
     #[wasm_bindgen(method, catch, js_name = "getAll")]
@@ -9198,7 +9198,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Body;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &Body) -> Nullable<ReadableStream>;
+    pub fn body(this: &Body) -> Option<ReadableStream>;
     #[wasm_bindgen(method, getter, js_name = "bodyUsed")]
     pub fn body_used(this: &Body) -> bool;
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
@@ -9376,7 +9376,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_url(this: &Response, val: &str);
     #[wasm_bindgen(method, getter, js_name = "webSocket")]
-    pub fn web_socket(this: &Response) -> Nullable<WebSocket>;
+    pub fn web_socket(this: &Response) -> Option<WebSocket>;
     #[wasm_bindgen(method, setter, js_name = "webSocket")]
     pub fn set_web_socket(this: &Response, val: &WebSocket);
     #[wasm_bindgen(method, setter, js_name = "webSocket")]
@@ -9430,7 +9430,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_cf(this: &ResponseInit, val: &JsValue);
     #[wasm_bindgen(method, getter, js_name = "webSocket")]
-    pub fn web_socket(this: &ResponseInit) -> Option<Nullable<WebSocket>>;
+    pub fn web_socket(this: &ResponseInit) -> Option<WebSocket>;
     #[wasm_bindgen(method, setter, js_name = "webSocket")]
     pub fn set_web_socket(this: &ResponseInit, val: &WebSocket);
     #[wasm_bindgen(method, setter, js_name = "webSocket")]
@@ -9606,7 +9606,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn fetcher<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
         this: &Request<CfHostMetadata, Cf>,
-    ) -> Nullable<Fetcher>;
+    ) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter)]
     pub fn set_fetcher<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
         this: &Request<CfHostMetadata, Cf>,
@@ -9709,9 +9709,7 @@ extern "C" {
         val: &Object<JsString>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn body<Cf: ::wasm_bindgen::JsGeneric>(
-        this: &RequestInit<Cf>,
-    ) -> Option<Nullable<BodyKind>>;
+    pub fn body<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<BodyKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body<Cf: ::wasm_bindgen::JsGeneric>(
         this: &RequestInit<Cf>,
@@ -9756,9 +9754,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_redirect<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn fetcher<Cf: ::wasm_bindgen::JsGeneric>(
-        this: &RequestInit<Cf>,
-    ) -> Option<Nullable<Fetcher>>;
+    pub fn fetcher<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter)]
     pub fn set_fetcher<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &Fetcher);
     #[wasm_bindgen(method, setter, js_name = "fetcher")]
@@ -9779,9 +9775,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_integrity<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn signal<Cf: ::wasm_bindgen::JsGeneric>(
-        this: &RequestInit<Cf>,
-    ) -> Option<Nullable<AbortSignal>>;
+    pub fn signal<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<AbortSignal>;
     #[wasm_bindgen(method, setter)]
     pub fn set_signal<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &AbortSignal);
     #[wasm_bindgen(method, setter, js_name = "signal")]
@@ -10148,7 +10142,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "cacheStatus")]
     pub fn cache_status<Metadata: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceListResult<Metadata>,
-    ) -> Nullable<String>;
+    ) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
     pub fn set_cache_status<Metadata: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceListResult<Metadata>,
@@ -10244,7 +10238,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespace;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &KVNamespace, key: &str) -> Result<Nullable<String>, JsValue>;
+    pub async fn get(this: &KVNamespace, key: &str) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &KVNamespace, key: &str) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
@@ -10252,7 +10246,7 @@ extern "C" {
         this: &KVNamespace,
         key: &str,
         options: &PartialKvNamespaceGetOptionsUndefined,
-    ) -> Result<Nullable<String>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_str_and_partial_kv_namespace_get_options_undefined_promise(
         this: &KVNamespace,
@@ -10264,7 +10258,7 @@ extern "C" {
         this: &KVNamespace,
         key: &str,
         r#type: &str,
-    ) -> Result<Nullable<String>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     fn __get_text_promise(
         this: &KVNamespace,
@@ -10276,9 +10270,9 @@ extern "C" {
         this: &KVNamespace,
         key: &str,
         r#type: &str,
-    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    ) -> Result<Option<ExpectedValue>, JsValue>
     where
-        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi;
+        ExpectedValue: ::wasm_bindgen::convert::OptionFromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
     fn __get_json_promise<ExpectedValue: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace,
@@ -10290,7 +10284,7 @@ extern "C" {
         this: &KVNamespace,
         key: &str,
         r#type: &str,
-    ) -> Result<Nullable<ArrayBuffer>, JsValue>;
+    ) -> Result<Option<ArrayBuffer>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     fn __get_array_buffer_promise(
         this: &KVNamespace,
@@ -10302,7 +10296,7 @@ extern "C" {
         this: &KVNamespace,
         key: &str,
         r#type: &str,
-    ) -> Result<Nullable<ReadableStream>, JsValue>;
+    ) -> Result<Option<ReadableStream>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     fn __get_stream_promise(
         this: &KVNamespace,
@@ -10314,7 +10308,7 @@ extern "C" {
         this: &KVNamespace,
         key: &str,
         options: &KVNamespaceGetOptions<JsString>,
-    ) -> Result<Nullable<String>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_str_and_kv_namespace_get_options_promise(
         this: &KVNamespace,
@@ -10635,7 +10629,7 @@ extern "C" {
     pub fn delete_promise(this: &KVNamespace, key: &str) -> Promise<Undefined>;
 }
 impl KVNamespace {
-    pub async fn get_text(&self, key: &str) -> Result<Nullable<String>, JsValue> {
+    pub async fn get_text(&self, key: &str) -> Result<Option<String>, JsValue> {
         self.__get_text(key, "text").await
     }
     pub fn get_text_promise(&self, key: &str) -> Promise<JsNullable<JsString>> {
@@ -10644,9 +10638,9 @@ impl KVNamespace {
     pub async fn get_json<ExpectedValue: ::wasm_bindgen::JsGeneric>(
         &self,
         key: &str,
-    ) -> Result<Nullable<ExpectedValue>, JsValue>
+    ) -> Result<Option<ExpectedValue>, JsValue>
     where
-        ExpectedValue: ::wasm_bindgen::convert::NullableFromWasmAbi,
+        ExpectedValue: ::wasm_bindgen::convert::OptionFromWasmAbi,
     {
         self.__get_json(key, "json").await
     }
@@ -10656,13 +10650,13 @@ impl KVNamespace {
     ) -> Promise<JsNullable<ExpectedValue>> {
         self.__get_json_promise(key, "json")
     }
-    pub async fn get_array_buffer(&self, key: &str) -> Result<Nullable<ArrayBuffer>, JsValue> {
+    pub async fn get_array_buffer(&self, key: &str) -> Result<Option<ArrayBuffer>, JsValue> {
         self.__get_array_buffer(key, "arrayBuffer").await
     }
     pub fn get_array_buffer_promise(&self, key: &str) -> Promise<JsNullable<ArrayBuffer>> {
         self.__get_array_buffer_promise(key, "arrayBuffer")
     }
-    pub async fn get_stream(&self, key: &str) -> Result<Nullable<ReadableStream>, JsValue> {
+    pub async fn get_stream(&self, key: &str) -> Result<Option<ReadableStream>, JsValue> {
         self.__get_stream(key, "stream").await
     }
     pub fn get_stream_promise(&self, key: &str) -> Promise<JsNullable<ReadableStream>> {
@@ -10773,13 +10767,13 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_limit(this: &KVNamespaceListOptions, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn prefix(this: &KVNamespaceListOptions) -> Option<Nullable<String>>;
+    pub fn prefix(this: &KVNamespaceListOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_prefix(this: &KVNamespaceListOptions, val: &str);
     #[wasm_bindgen(method, setter, js_name = "prefix")]
     fn __set_prefix_with_null(this: &KVNamespaceListOptions, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn cursor(this: &KVNamespaceListOptions) -> Option<Nullable<String>>;
+    pub fn cursor(this: &KVNamespaceListOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cursor(this: &KVNamespaceListOptions, val: &str);
     #[wasm_bindgen(method, setter, js_name = "cursor")]
@@ -10944,7 +10938,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
-    ) -> Nullable<Value>;
+    ) -> Option<Value>;
     #[wasm_bindgen(method, setter)]
     pub fn set_value<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
@@ -10961,7 +10955,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn metadata<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
-    ) -> Nullable<Metadata>;
+    ) -> Option<Metadata>;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
@@ -10978,7 +10972,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "cacheStatus")]
     pub fn cache_status<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
-    ) -> Nullable<String>;
+    ) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
     pub fn set_cache_status<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
@@ -11532,11 +11526,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2Bucket;
     #[wasm_bindgen(method, catch)]
-    pub async fn head(this: &R2Bucket, key: &str) -> Result<Nullable<R2Object>, JsValue>;
+    pub async fn head(this: &R2Bucket, key: &str) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "head")]
     pub fn head_promise(this: &R2Bucket, key: &str) -> Promise<JsNullable<R2Object>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &R2Bucket, key: &str) -> Result<Nullable<R2ObjectBody>, JsValue>;
+    pub async fn get(this: &R2Bucket, key: &str) -> Result<Option<R2ObjectBody>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &R2Bucket, key: &str) -> Promise<JsNullable<R2ObjectBody>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
@@ -11544,7 +11538,7 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         options: &R2BucketOptions,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_r2_bucket_options_promise(
         this: &R2Bucket,
@@ -11556,7 +11550,7 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         options: &R2GetOptions,
-    ) -> Result<Nullable<R2ObjectBody>, JsValue>;
+    ) -> Result<Option<R2ObjectBody>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_r2_get_options_promise(
         this: &R2Bucket,
@@ -11568,7 +11562,7 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         value: &ReadableStream<R>,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_promise<R: ::wasm_bindgen::JsGeneric>(
         this: &R2Bucket,
@@ -11580,7 +11574,7 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         value: &ArrayBuffer,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_array_buffer_promise(
         this: &R2Bucket,
@@ -11592,7 +11586,7 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         value: &Object,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_typed_array_promise(
         this: &R2Bucket,
@@ -11604,7 +11598,7 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         value: &str,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_str_promise(
         this: &R2Bucket,
@@ -11616,7 +11610,7 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         value: &Blob,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_blob_promise(
         this: &R2Bucket,
@@ -11628,7 +11622,7 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         value: &::wasm_bindgen::JsValue,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     fn __put_with_null_promise(
         this: &R2Bucket,
@@ -11641,7 +11635,7 @@ extern "C" {
         key: &str,
         value: &ReadableStream<R>,
         options: &R2BucketOptions2,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_readable_stream_and_r2_bucket_options2_promise<R: ::wasm_bindgen::JsGeneric>(
         this: &R2Bucket,
@@ -11655,7 +11649,7 @@ extern "C" {
         key: &str,
         value: &ArrayBuffer,
         options: &R2BucketOptions2,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_array_buffer_and_r2_bucket_options2_promise(
         this: &R2Bucket,
@@ -11669,7 +11663,7 @@ extern "C" {
         key: &str,
         value: &Object,
         options: &R2BucketOptions2,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_typed_array_and_r2_bucket_options2_promise(
         this: &R2Bucket,
@@ -11683,7 +11677,7 @@ extern "C" {
         key: &str,
         value: &str,
         options: &R2BucketOptions2,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_str_and_r2_bucket_options2_promise(
         this: &R2Bucket,
@@ -11697,7 +11691,7 @@ extern "C" {
         key: &str,
         value: &Blob,
         options: &R2BucketOptions2,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_blob_and_r2_bucket_options2_promise(
         this: &R2Bucket,
@@ -11711,7 +11705,7 @@ extern "C" {
         key: &str,
         value: &::wasm_bindgen::JsValue,
         options: &R2BucketOptions2,
-    ) -> Result<Nullable<R2Object>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     fn __put_with_null_and_r2_bucket_options2_promise(
         this: &R2Bucket,
@@ -11861,7 +11855,7 @@ extern "C" {
     ) -> Promise<R2Objects>;
 }
 impl R2Bucket {
-    pub async fn put_with_null(&self, key: &str) -> Result<Nullable<R2Object>, JsValue> {
+    pub async fn put_with_null(&self, key: &str) -> Result<Option<R2Object>, JsValue> {
         self.__put_with_null(key, &::wasm_bindgen::JsValue::NULL)
             .await
     }
@@ -11872,7 +11866,7 @@ impl R2Bucket {
         &self,
         key: &str,
         options: &R2BucketOptions2,
-    ) -> Result<Nullable<R2Object>, JsValue> {
+    ) -> Result<Option<R2Object>, JsValue> {
         self.__put_with_null_and_r2_bucket_options2(key, &::wasm_bindgen::JsValue::NULL, options)
             .await
     }
@@ -14055,7 +14049,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/view)"]
     #[wasm_bindgen(method, getter)]
-    pub fn view(this: &ReadableStreamBYOBRequest) -> Nullable<Uint8Array>;
+    pub fn view(this: &ReadableStreamBYOBRequest) -> Option<Uint8Array>;
     #[doc = " The **`respond()`** method of the ReadableStreamBYOBRequest interface is used to signal to the associated readable byte stream that the specified number of bytes were written into the ReadableStreamBYOBRequest.view."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respond)"]
@@ -14094,7 +14088,7 @@ extern "C" {
         view: &Object,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter, js_name = "atLeast")]
-    pub fn at_least(this: &ReadableStreamBYOBRequest) -> Nullable<f64>;
+    pub fn at_least(this: &ReadableStreamBYOBRequest) -> Option<f64>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -14107,7 +14101,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
     pub fn desired_size<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStreamDefaultController<R>,
-    ) -> Nullable<f64>;
+    ) -> Option<f64>;
     #[doc = " The **`close()`** method of the ReadableStreamDefaultController interface closes the associated stream."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/close)"]
@@ -14174,13 +14168,12 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/byobRequest)"]
     #[wasm_bindgen(method, getter, js_name = "byobRequest")]
-    pub fn byob_request(this: &ReadableByteStreamController)
-        -> Nullable<ReadableStreamBYOBRequest>;
+    pub fn byob_request(this: &ReadableByteStreamController) -> Option<ReadableStreamBYOBRequest>;
     #[doc = " The **`desiredSize`** read-only property of the ReadableByteStreamController interface returns the number of bytes required to fill the stream's internal queue to its 'desired size'."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/desiredSize)"]
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
-    pub fn desired_size(this: &ReadableByteStreamController) -> Nullable<f64>;
+    pub fn desired_size(this: &ReadableByteStreamController) -> Option<f64>;
     #[doc = " The **`close()`** method of the ReadableByteStreamController interface closes the associated stream."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/close)"]
@@ -14273,7 +14266,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
     pub fn desired_size<O: ::wasm_bindgen::JsGeneric>(
         this: &TransformStreamDefaultController<O>,
-    ) -> Nullable<f64>;
+    ) -> Option<f64>;
     #[doc = " The **`enqueue()`** method of the TransformStreamDefaultController interface enqueues the given chunk in the readable side of the stream."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/enqueue)"]
@@ -14484,7 +14477,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
     pub fn desired_size<W: ::wasm_bindgen::JsGeneric>(
         this: &WritableStreamDefaultWriter<W>,
-    ) -> Nullable<f64>;
+    ) -> Option<f64>;
     #[doc = " The **`abort()`** method of the the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort)"]
@@ -14971,9 +14964,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItem;
     #[wasm_bindgen(method, getter)]
-    pub fn event(this: &TraceItem) -> JsValue;
+    pub fn event(this: &TraceItem) -> Option<JsValue>;
     #[wasm_bindgen(method, getter, js_name = "eventTimestamp")]
-    pub fn event_timestamp(this: &TraceItem) -> Nullable<f64>;
+    pub fn event_timestamp(this: &TraceItem) -> Option<f64>;
     #[wasm_bindgen(method, getter)]
     pub fn logs(this: &TraceItem) -> Vec<TraceLog>;
     #[wasm_bindgen(method, getter)]
@@ -14981,7 +14974,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "diagnosticsChannelEvents")]
     pub fn diagnostics_channel_events(this: &TraceItem) -> Vec<TraceDiagnosticChannelEvent>;
     #[wasm_bindgen(method, getter, js_name = "scriptName")]
-    pub fn script_name(this: &TraceItem) -> Nullable<String>;
+    pub fn script_name(this: &TraceItem) -> Option<String>;
     #[wasm_bindgen(method, getter)]
     pub fn entrypoint(this: &TraceItem) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "scriptVersion")]
@@ -15117,7 +15110,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TraceItemTailEventInfoTailItem;
     #[wasm_bindgen(method, getter, js_name = "scriptName")]
-    pub fn script_name(this: &TraceItemTailEventInfoTailItem) -> Nullable<String>;
+    pub fn script_name(this: &TraceItemTailEventInfoTailItem) -> Option<String>;
 }
 impl TraceItemTailEventInfoTailItem {
     #[allow(clippy::new_without_default)]
@@ -15533,22 +15526,22 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/parse_static)"]
     # [wasm_bindgen (static_method_of = URL)]
-    pub fn parse(url: &str) -> Nullable<URL>;
+    pub fn parse(url: &str) -> Option<URL>;
     #[doc = " The **`URL.parse()`** static method of the URL interface returns a newly created URL object representing the URL defined by the parameters."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/parse_static)"]
     # [wasm_bindgen (static_method_of = URL , catch , js_name = "parse")]
-    pub fn try_parse(url: &str) -> Result<Nullable<URL>, JsValue>;
+    pub fn try_parse(url: &str) -> Result<Option<URL>, JsValue>;
     #[doc = " The **`URL.parse()`** static method of the URL interface returns a newly created URL object representing the URL defined by the parameters."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/parse_static)"]
     # [wasm_bindgen (static_method_of = URL , js_name = "parse")]
-    pub fn parse_with_base(url: &str, base: &str) -> Nullable<URL>;
+    pub fn parse_with_base(url: &str, base: &str) -> Option<URL>;
     #[doc = " The **`URL.parse()`** static method of the URL interface returns a newly created URL object representing the URL defined by the parameters."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/parse_static)"]
     # [wasm_bindgen (static_method_of = URL , catch , js_name = "parse")]
-    pub fn try_parse_with_base(url: &str, base: &str) -> Result<Nullable<URL>, JsValue>;
+    pub fn try_parse_with_base(url: &str, base: &str) -> Result<Option<URL>, JsValue>;
     #[doc = " The **`createObjectURL()`** static method of the URL interface creates a string containing a URL representing the object given in the parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/createObjectURL_static)"]
@@ -15641,12 +15634,12 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/get)"]
     #[wasm_bindgen(method)]
-    pub fn get(this: &URLSearchParams, name: &str) -> Nullable<String>;
+    pub fn get(this: &URLSearchParams, name: &str) -> Option<String>;
     #[doc = " The **`get()`** method of the URLSearchParams interface returns the first value associated to the given search parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/get)"]
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(this: &URLSearchParams, name: &str) -> Result<Nullable<String>, JsValue>;
+    pub fn try_get(this: &URLSearchParams, name: &str) -> Result<Option<String>, JsValue>;
     #[doc = " The **`getAll()`** method of the URLSearchParams interface returns all the values associated with a given search parameter as an array."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/getAll)"]
@@ -15856,50 +15849,50 @@ extern "C" {
         base_url: &str,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn exec(this: &URLPattern) -> Nullable<URLPatternResult>;
+    pub fn exec(this: &URLPattern) -> Option<URLPatternResult>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
-    pub fn try_exec(this: &URLPattern) -> Result<Nullable<URLPatternResult>, JsValue>;
+    pub fn try_exec(this: &URLPattern) -> Result<Option<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, js_name = "exec")]
-    pub fn exec_with_str(this: &URLPattern, input: &str) -> Nullable<URLPatternResult>;
+    pub fn exec_with_str(this: &URLPattern, input: &str) -> Option<URLPatternResult>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
     pub fn try_exec_with_str(
         this: &URLPattern,
         input: &str,
-    ) -> Result<Nullable<URLPatternResult>, JsValue>;
+    ) -> Result<Option<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, js_name = "exec")]
     pub fn exec_with_url_pattern_init(
         this: &URLPattern,
         input: &URLPatternInit,
-    ) -> Nullable<URLPatternResult>;
+    ) -> Option<URLPatternResult>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
     pub fn try_exec_with_url_pattern_init(
         this: &URLPattern,
         input: &URLPatternInit,
-    ) -> Result<Nullable<URLPatternResult>, JsValue>;
+    ) -> Result<Option<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, js_name = "exec")]
     pub fn exec_with_str_and_base_url(
         this: &URLPattern,
         input: Option<&str>,
         base_url: &str,
-    ) -> Nullable<URLPatternResult>;
+    ) -> Option<URLPatternResult>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
     pub fn try_exec_with_str_and_base_url(
         this: &URLPattern,
         input: Option<&str>,
         base_url: &str,
-    ) -> Result<Nullable<URLPatternResult>, JsValue>;
+    ) -> Result<Option<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, js_name = "exec")]
     pub fn exec_with_url_pattern_init_and_base_url(
         this: &URLPattern,
         input: &URLPatternInit,
         base_url: &str,
-    ) -> Nullable<URLPatternResult>;
+    ) -> Option<URLPatternResult>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
     pub fn try_exec_with_url_pattern_init_and_base_url(
         this: &URLPattern,
         input: &URLPatternInit,
         base_url: &str,
-    ) -> Result<Nullable<URLPatternResult>, JsValue>;
+    ) -> Result<Option<URLPatternResult>, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -16367,7 +16360,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/url)"]
     #[wasm_bindgen(method, getter)]
-    pub fn url(this: &WebSocket) -> Nullable<String>;
+    pub fn url(this: &WebSocket) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_url(this: &WebSocket, val: &str);
     #[wasm_bindgen(method, setter, js_name = "url")]
@@ -16376,7 +16369,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/protocol)"]
     #[wasm_bindgen(method, getter)]
-    pub fn protocol(this: &WebSocket) -> Nullable<String>;
+    pub fn protocol(this: &WebSocket) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_protocol(this: &WebSocket, val: &str);
     #[wasm_bindgen(method, setter, js_name = "protocol")]
@@ -16385,7 +16378,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/extensions)"]
     #[wasm_bindgen(method, getter)]
-    pub fn extensions(this: &WebSocket) -> Nullable<String>;
+    pub fn extensions(this: &WebSocket) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_extensions(this: &WebSocket, val: &str);
     #[wasm_bindgen(method, setter, js_name = "extensions")]
@@ -17558,7 +17551,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_env(this: &WorkerLoaderWorkerCode, val: &JsValue);
     #[wasm_bindgen(method, getter, js_name = "globalOutbound")]
-    pub fn global_outbound(this: &WorkerLoaderWorkerCode) -> Option<Nullable<Fetcher>>;
+    pub fn global_outbound(this: &WorkerLoaderWorkerCode) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter, js_name = "globalOutbound")]
     pub fn set_global_outbound(this: &WorkerLoaderWorkerCode, val: &Fetcher);
     #[wasm_bindgen(method, setter, js_name = "globalOutbound")]
@@ -19651,13 +19644,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponsesInput;
     #[wasm_bindgen(method, getter)]
-    pub fn background(this: &ResponsesInput) -> Option<Nullable<bool>>;
+    pub fn background(this: &ResponsesInput) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
     pub fn set_background(this: &ResponsesInput, val: bool);
     #[wasm_bindgen(method, setter, js_name = "background")]
     fn __set_background_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn conversation(this: &ResponsesInput) -> Option<Nullable<ConversationKind>>;
+    pub fn conversation(this: &ResponsesInput) -> Option<ConversationKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_conversation(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "conversation")]
@@ -19668,7 +19661,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "conversation")]
     fn __set_conversation_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn include(this: &ResponsesInput) -> Option<Nullable<Vec<String>>>;
+    pub fn include(this: &ResponsesInput) -> Option<Vec<String>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_include(this: &ResponsesInput, val: &[String]);
     #[wasm_bindgen(method, setter, js_name = "include")]
@@ -19680,25 +19673,25 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "input")]
     pub fn set_input_with_slice(this: &ResponsesInput, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
-    pub fn instructions(this: &ResponsesInput) -> Option<Nullable<String>>;
+    pub fn instructions(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_instructions(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "instructions")]
     fn __set_instructions_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn max_output_tokens(this: &ResponsesInput) -> Option<Nullable<f64>>;
+    pub fn max_output_tokens(this: &ResponsesInput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_max_output_tokens(this: &ResponsesInput, val: f64);
     #[wasm_bindgen(method, setter, js_name = "max_output_tokens")]
     fn __set_max_output_tokens_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn parallel_tool_calls(this: &ResponsesInput) -> Option<Nullable<bool>>;
+    pub fn parallel_tool_calls(this: &ResponsesInput) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
     pub fn set_parallel_tool_calls(this: &ResponsesInput, val: bool);
     #[wasm_bindgen(method, setter, js_name = "parallel_tool_calls")]
     fn __set_parallel_tool_calls_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn previous_response_id(this: &ResponsesInput) -> Option<Nullable<String>>;
+    pub fn previous_response_id(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_previous_response_id(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "previous_response_id")]
@@ -19708,7 +19701,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_prompt_cache_key(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn reasoning(this: &ResponsesInput) -> Option<Nullable<Reasoning>>;
+    pub fn reasoning(this: &ResponsesInput) -> Option<Reasoning>;
     #[wasm_bindgen(method, setter)]
     pub fn set_reasoning(this: &ResponsesInput, val: &Reasoning);
     #[wasm_bindgen(method, setter, js_name = "reasoning")]
@@ -19718,25 +19711,25 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_safety_identifier(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn service_tier(this: &ResponsesInput) -> Option<Nullable<ServiceTierKind>>;
+    pub fn service_tier(this: &ResponsesInput) -> Option<ServiceTierKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_service_tier(this: &ResponsesInput, val: ServiceTierKind);
     #[wasm_bindgen(method, setter, js_name = "service_tier")]
     fn __set_service_tier_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn stream(this: &ResponsesInput) -> Option<Nullable<bool>>;
+    pub fn stream(this: &ResponsesInput) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
     pub fn set_stream(this: &ResponsesInput, val: bool);
     #[wasm_bindgen(method, setter, js_name = "stream")]
     fn __set_stream_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn stream_options(this: &ResponsesInput) -> Option<Nullable<StreamOptions>>;
+    pub fn stream_options(this: &ResponsesInput) -> Option<StreamOptions>;
     #[wasm_bindgen(method, setter)]
     pub fn set_stream_options(this: &ResponsesInput, val: &StreamOptions);
     #[wasm_bindgen(method, setter, js_name = "stream_options")]
     fn __set_stream_options_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn temperature(this: &ResponsesInput) -> Option<Nullable<f64>>;
+    pub fn temperature(this: &ResponsesInput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_temperature(this: &ResponsesInput, val: f64);
     #[wasm_bindgen(method, setter, js_name = "temperature")]
@@ -19759,13 +19752,13 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &ResponsesInput, val: &[ResponsesFunctionTool]);
     #[wasm_bindgen(method, getter)]
-    pub fn top_p(this: &ResponsesInput) -> Option<Nullable<f64>>;
+    pub fn top_p(this: &ResponsesInput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_top_p(this: &ResponsesInput, val: f64);
     #[wasm_bindgen(method, setter, js_name = "top_p")]
     fn __set_top_p_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn truncation(this: &ResponsesInput) -> Option<Nullable<TruncationKind>>;
+    pub fn truncation(this: &ResponsesInput) -> Option<TruncationKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_truncation(this: &ResponsesInput, val: TruncationKind);
     #[wasm_bindgen(method, setter, js_name = "truncation")]
@@ -20008,21 +20001,19 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output_text(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn error(this: &ResponsesOutput) -> Option<Nullable<ResponseError>>;
+    pub fn error(this: &ResponsesOutput) -> Option<ResponseError>;
     #[wasm_bindgen(method, setter)]
     pub fn set_error(this: &ResponsesOutput, val: &ResponseError);
     #[wasm_bindgen(method, setter, js_name = "error")]
     fn __set_error_with_null(this: &ResponsesOutput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn incomplete_details(
-        this: &ResponsesOutput,
-    ) -> Option<Nullable<ResponseIncompleteDetails>>;
+    pub fn incomplete_details(this: &ResponsesOutput) -> Option<ResponseIncompleteDetails>;
     #[wasm_bindgen(method, setter)]
     pub fn set_incomplete_details(this: &ResponsesOutput, val: &ResponseIncompleteDetails);
     #[wasm_bindgen(method, setter, js_name = "incomplete_details")]
     fn __set_incomplete_details_with_null(this: &ResponsesOutput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn instructions(this: &ResponsesOutput) -> Option<Nullable<InstructionsKind>>;
+    pub fn instructions(this: &ResponsesOutput) -> Option<InstructionsKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_instructions(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "instructions")]
@@ -20042,7 +20033,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_parallel_tool_calls(this: &ResponsesOutput, val: bool);
     #[wasm_bindgen(method, getter)]
-    pub fn temperature(this: &ResponsesOutput) -> Option<Nullable<f64>>;
+    pub fn temperature(this: &ResponsesOutput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_temperature(this: &ResponsesOutput, val: f64);
     #[wasm_bindgen(method, setter, js_name = "temperature")]
@@ -20061,31 +20052,31 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &ResponsesOutput, val: &[ResponsesFunctionTool]);
     #[wasm_bindgen(method, getter)]
-    pub fn top_p(this: &ResponsesOutput) -> Option<Nullable<f64>>;
+    pub fn top_p(this: &ResponsesOutput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_top_p(this: &ResponsesOutput, val: f64);
     #[wasm_bindgen(method, setter, js_name = "top_p")]
     fn __set_top_p_with_null(this: &ResponsesOutput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn max_output_tokens(this: &ResponsesOutput) -> Option<Nullable<f64>>;
+    pub fn max_output_tokens(this: &ResponsesOutput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_max_output_tokens(this: &ResponsesOutput, val: f64);
     #[wasm_bindgen(method, setter, js_name = "max_output_tokens")]
     fn __set_max_output_tokens_with_null(this: &ResponsesOutput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn previous_response_id(this: &ResponsesOutput) -> Option<Nullable<String>>;
+    pub fn previous_response_id(this: &ResponsesOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_previous_response_id(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "previous_response_id")]
     fn __set_previous_response_id_with_null(this: &ResponsesOutput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn prompt(this: &ResponsesOutput) -> Option<Nullable<ResponsePrompt>>;
+    pub fn prompt(this: &ResponsesOutput) -> Option<ResponsePrompt>;
     #[wasm_bindgen(method, setter)]
     pub fn set_prompt(this: &ResponsesOutput, val: &ResponsePrompt);
     #[wasm_bindgen(method, setter, js_name = "prompt")]
     fn __set_prompt_with_null(this: &ResponsesOutput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn reasoning(this: &ResponsesOutput) -> Option<Nullable<Reasoning>>;
+    pub fn reasoning(this: &ResponsesOutput) -> Option<Reasoning>;
     #[wasm_bindgen(method, setter)]
     pub fn set_reasoning(this: &ResponsesOutput, val: &Reasoning);
     #[wasm_bindgen(method, setter, js_name = "reasoning")]
@@ -20095,7 +20086,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_safety_identifier(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn service_tier(this: &ResponsesOutput) -> Option<Nullable<ServiceTierKind>>;
+    pub fn service_tier(this: &ResponsesOutput) -> Option<ServiceTierKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_service_tier(this: &ResponsesOutput, val: ServiceTierKind);
     #[wasm_bindgen(method, setter, js_name = "service_tier")]
@@ -20109,7 +20100,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &ResponsesOutput, val: &ResponseTextConfig);
     #[wasm_bindgen(method, getter)]
-    pub fn truncation(this: &ResponsesOutput) -> Option<Nullable<TruncationKind>>;
+    pub fn truncation(this: &ResponsesOutput) -> Option<TruncationKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_truncation(this: &ResponsesOutput, val: TruncationKind);
     #[wasm_bindgen(method, setter, js_name = "truncation")]
@@ -20453,13 +20444,13 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &ResponsesFunctionTool, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn parameters(this: &ResponsesFunctionTool) -> Nullable<Object>;
+    pub fn parameters(this: &ResponsesFunctionTool) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_parameters(this: &ResponsesFunctionTool, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "parameters")]
     fn __set_parameters_with_null(this: &ResponsesFunctionTool, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn strict(this: &ResponsesFunctionTool) -> Nullable<bool>;
+    pub fn strict(this: &ResponsesFunctionTool) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
     pub fn set_strict(this: &ResponsesFunctionTool, val: bool);
     #[wasm_bindgen(method, setter, js_name = "strict")]
@@ -20469,7 +20460,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponsesFunctionTool, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn description(this: &ResponsesFunctionTool) -> Option<Nullable<String>>;
+    pub fn description(this: &ResponsesFunctionTool) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_description(this: &ResponsesFunctionTool, val: &str);
     #[wasm_bindgen(method, setter, js_name = "description")]
@@ -20608,13 +20599,13 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ResponsePrompt, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn variables(this: &ResponsePrompt) -> Option<Nullable<Object>>;
+    pub fn variables(this: &ResponsePrompt) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_variables(this: &ResponsePrompt, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "variables")]
     fn __set_variables_with_null(this: &ResponsePrompt, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn version(this: &ResponsePrompt) -> Option<Nullable<String>>;
+    pub fn version(this: &ResponsePrompt) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_version(this: &ResponsePrompt, val: &str);
     #[wasm_bindgen(method, setter, js_name = "version")]
@@ -20668,19 +20659,19 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Reasoning;
     #[wasm_bindgen(method, getter)]
-    pub fn effort(this: &Reasoning) -> Option<Nullable<EffortKind>>;
+    pub fn effort(this: &Reasoning) -> Option<EffortKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_effort(this: &Reasoning, val: EffortKind);
     #[wasm_bindgen(method, setter, js_name = "effort")]
     fn __set_effort_with_null(this: &Reasoning, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn generate_summary(this: &Reasoning) -> Option<Nullable<GenerateSummaryKind>>;
+    pub fn generate_summary(this: &Reasoning) -> Option<GenerateSummaryKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_generate_summary(this: &Reasoning, val: GenerateSummaryKind);
     #[wasm_bindgen(method, setter, js_name = "generate_summary")]
     fn __set_generate_summary_with_null(this: &Reasoning, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn summary(this: &Reasoning) -> Option<Nullable<GenerateSummaryKind>>;
+    pub fn summary(this: &Reasoning) -> Option<GenerateSummaryKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_summary(this: &Reasoning, val: GenerateSummaryKind);
     #[wasm_bindgen(method, setter, js_name = "summary")]
@@ -20964,7 +20955,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseErrorEvent;
     #[wasm_bindgen(method, getter)]
-    pub fn code(this: &ResponseErrorEvent) -> Nullable<String>;
+    pub fn code(this: &ResponseErrorEvent) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_code(this: &ResponseErrorEvent, val: &str);
     #[wasm_bindgen(method, setter, js_name = "code")]
@@ -20974,7 +20965,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_message(this: &ResponseErrorEvent, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn param(this: &ResponseErrorEvent) -> Nullable<String>;
+    pub fn param(this: &ResponseErrorEvent) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_param(this: &ResponseErrorEvent, val: &str);
     #[wasm_bindgen(method, setter, js_name = "param")]
@@ -21172,7 +21163,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_description(this: &ResponseFormatTextJSONSchemaConfig, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn strict(this: &ResponseFormatTextJSONSchemaConfig) -> Option<Nullable<bool>>;
+    pub fn strict(this: &ResponseFormatTextJSONSchemaConfig) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
     pub fn set_strict(this: &ResponseFormatTextJSONSchemaConfig, val: bool);
     #[wasm_bindgen(method, setter, js_name = "strict")]
@@ -21611,7 +21602,7 @@ extern "C" {
     pub fn set_type(this: &ResponseInputImage, val: &str);
     #[doc = " Base64 encoded image"]
     #[wasm_bindgen(method, getter)]
-    pub fn image_url(this: &ResponseInputImage) -> Option<Nullable<String>>;
+    pub fn image_url(this: &ResponseInputImage) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_image_url(this: &ResponseInputImage, val: &str);
     #[wasm_bindgen(method, setter, js_name = "image_url")]
@@ -21683,14 +21674,14 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseInputImageContent, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn detail(this: &ResponseInputImageContent) -> Option<Nullable<DetailKind>>;
+    pub fn detail(this: &ResponseInputImageContent) -> Option<DetailKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_detail(this: &ResponseInputImageContent, val: DetailKind);
     #[wasm_bindgen(method, setter, js_name = "detail")]
     fn __set_detail_with_null(this: &ResponseInputImageContent, val: &::wasm_bindgen::JsValue);
     #[doc = " Base64 encoded image"]
     #[wasm_bindgen(method, getter)]
-    pub fn image_url(this: &ResponseInputImageContent) -> Option<Nullable<String>>;
+    pub fn image_url(this: &ResponseInputImageContent) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_image_url(this: &ResponseInputImageContent, val: &str);
     #[wasm_bindgen(method, setter, js_name = "image_url")]
@@ -21832,7 +21823,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseInputItemFunctionCallOutput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn id(this: &ResponseInputItemFunctionCallOutput) -> Option<Nullable<String>>;
+    pub fn id(this: &ResponseInputItemFunctionCallOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ResponseInputItemFunctionCallOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "id")]
@@ -21841,7 +21832,7 @@ extern "C" {
         val: &::wasm_bindgen::JsValue,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &ResponseInputItemFunctionCallOutput) -> Option<Nullable<StatusKind>>;
+    pub fn status(this: &ResponseInputItemFunctionCallOutput) -> Option<StatusKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &ResponseInputItemFunctionCallOutput, val: StatusKind);
     #[wasm_bindgen(method, setter, js_name = "status")]
@@ -22456,7 +22447,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &ResponseReasoningItem, val: &[ResponseReasoningContentItem]);
     #[wasm_bindgen(method, getter)]
-    pub fn encrypted_content(this: &ResponseReasoningItem) -> Option<Nullable<String>>;
+    pub fn encrypted_content(this: &ResponseReasoningItem) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_encrypted_content(this: &ResponseReasoningItem, val: &str);
     #[wasm_bindgen(method, setter, js_name = "encrypted_content")]
@@ -22805,7 +22796,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "format")]
     fn __set_format(this: &ResponseTextConfig, val: ResponseFormatTextConfig);
     #[wasm_bindgen(method, getter)]
-    pub fn verbosity(this: &ResponseTextConfig) -> Option<Nullable<VerbosityKind>>;
+    pub fn verbosity(this: &ResponseTextConfig) -> Option<VerbosityKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_verbosity(this: &ResponseTextConfig, val: VerbosityKind);
     #[wasm_bindgen(method, setter, js_name = "verbosity")]
@@ -29944,7 +29935,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn prompt_logprobs(
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response,
-    ) -> Option<Nullable<Object>>;
+    ) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_prompt_logprobs(
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response,
@@ -32443,7 +32434,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn prompt_logprobs(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response,
-    ) -> Option<Nullable<Object>>;
+    ) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_prompt_logprobs(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response,
@@ -34133,7 +34124,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "aiGatewayLogId")]
     pub fn ai_gateway_log_id<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
-    ) -> Nullable<String>;
+    ) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "aiGatewayLogId")]
     pub fn set_ai_gateway_log_id<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
@@ -34563,19 +34554,19 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiGatewayPatchLog;
     #[wasm_bindgen(method, getter)]
-    pub fn score(this: &AiGatewayPatchLog) -> Option<Nullable<f64>>;
+    pub fn score(this: &AiGatewayPatchLog) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_score(this: &AiGatewayPatchLog, val: f64);
     #[wasm_bindgen(method, setter, js_name = "score")]
     fn __set_score_with_null(this: &AiGatewayPatchLog, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn feedback(this: &AiGatewayPatchLog) -> Option<Nullable<FeedbackKind>>;
+    pub fn feedback(this: &AiGatewayPatchLog) -> Option<FeedbackKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_feedback(this: &AiGatewayPatchLog, val: FeedbackKind);
     #[wasm_bindgen(method, setter, js_name = "feedback")]
     fn __set_feedback_with_null(this: &AiGatewayPatchLog, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn metadata(this: &AiGatewayPatchLog) -> Option<Nullable<Object>>;
+    pub fn metadata(this: &AiGatewayPatchLog) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata(this: &AiGatewayPatchLog, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "metadata")]
@@ -35765,7 +35756,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_has_more(this: &AutoRagSearchResponse, val: bool);
     #[wasm_bindgen(method, getter)]
-    pub fn next_page(this: &AutoRagSearchResponse) -> Nullable<String>;
+    pub fn next_page(this: &AutoRagSearchResponse) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_next_page(this: &AutoRagSearchResponse, val: &str);
     #[wasm_bindgen(method, setter, js_name = "next_page")]
@@ -41423,12 +41414,12 @@ extern "C" {
     #[doc = ""]
     #[doc = " Returns: The latest session bookmark across all executed queries on the session."]
     #[wasm_bindgen(method, js_name = "getBookmark")]
-    pub fn get_bookmark(this: &D1DatabaseSession) -> Nullable<String>;
+    pub fn get_bookmark(this: &D1DatabaseSession) -> Option<String>;
     #[doc = "          If no query has been executed yet, `null` is returned."]
     #[doc = ""]
     #[doc = " Returns: The latest session bookmark across all executed queries on the session."]
     #[wasm_bindgen(method, catch, js_name = "getBookmark")]
-    pub fn try_get_bookmark(this: &D1DatabaseSession) -> Result<Nullable<String>, JsValue>;
+    pub fn try_get_bookmark(this: &D1DatabaseSession) -> Result<Option<String>, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -41445,9 +41436,9 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn first<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
-    ) -> Result<Nullable<T>, JsValue>
+    ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::NullableFromWasmAbi;
+        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
     #[wasm_bindgen(method, js_name = "first")]
     pub fn first_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
@@ -41456,9 +41447,9 @@ extern "C" {
     pub async fn first_with_col_name<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
         col_name: &str,
-    ) -> Result<Nullable<T>, JsValue>
+    ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::NullableFromWasmAbi;
+        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
     #[wasm_bindgen(method, js_name = "first")]
     pub fn first_with_col_name_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
@@ -42095,7 +42086,7 @@ pub mod cloudflare {
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type NodeStyleServerAddressReturn;
             #[wasm_bindgen(method, getter)]
-            pub fn port(this: &NodeStyleServerAddressReturn) -> Option<Nullable<f64>>;
+            pub fn port(this: &NodeStyleServerAddressReturn) -> Option<f64>;
             #[wasm_bindgen(method, setter)]
             pub fn set_port(this: &NodeStyleServerAddressReturn, val: f64);
             #[wasm_bindgen(method, setter, js_name = "port")]
@@ -44070,7 +44061,7 @@ extern "C" {
     pub async fn details(
         this: &HostedImagesBinding,
         image_id: &str,
-    ) -> Result<Nullable<ImageMetadata>, JsValue>;
+    ) -> Result<Option<ImageMetadata>, JsValue>;
     #[doc = " Get detailed metadata for a hosted image"]
     #[doc = ""]
     #[doc = " * `imageId` - The ID of the image (UUID or custom ID)"]
@@ -44090,7 +44081,7 @@ extern "C" {
     pub async fn image(
         this: &HostedImagesBinding,
         image_id: &str,
-    ) -> Result<Nullable<ReadableStream<Uint8Array>>, JsValue>;
+    ) -> Result<Option<ReadableStream<Uint8Array>>, JsValue>;
     #[doc = " Get the raw image data for a hosted image"]
     #[doc = ""]
     #[doc = " * `imageId` - The ID of the image (UUID or custom ID)"]
@@ -45875,7 +45866,7 @@ extern "C" {
     pub fn set_id(this: &StreamVideo, val: &str);
     #[doc = " A user-defined identifier for the media creator."]
     #[wasm_bindgen(method, getter)]
-    pub fn creator(this: &StreamVideo) -> Nullable<String>;
+    pub fn creator(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_creator(this: &StreamVideo, val: &str);
     #[wasm_bindgen(method, setter, js_name = "creator")]
@@ -45897,7 +45888,7 @@ extern "C" {
     pub fn set_ready_to_stream(this: &StreamVideo, val: bool);
     #[doc = " The date and time the video became ready to stream."]
     #[wasm_bindgen(method, getter, js_name = "readyToStreamAt")]
-    pub fn ready_to_stream_at(this: &StreamVideo) -> Nullable<String>;
+    pub fn ready_to_stream_at(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "readyToStreamAt")]
     pub fn set_ready_to_stream_at(this: &StreamVideo, val: &str);
     #[wasm_bindgen(method, setter, js_name = "readyToStreamAt")]
@@ -45924,7 +45915,7 @@ extern "C" {
     pub fn set_modified(this: &StreamVideo, val: &str);
     #[doc = " The date and time at which the video will be deleted."]
     #[wasm_bindgen(method, getter, js_name = "scheduledDeletion")]
-    pub fn scheduled_deletion(this: &StreamVideo) -> Nullable<String>;
+    pub fn scheduled_deletion(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
     pub fn set_scheduled_deletion(this: &StreamVideo, val: &str);
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
@@ -45946,35 +45937,35 @@ extern "C" {
     pub fn set_allowed_origins(this: &StreamVideo, val: &[String]);
     #[doc = " Indicates whether signed URLs are required."]
     #[wasm_bindgen(method, getter, js_name = "requireSignedURLs")]
-    pub fn require_signed_ur_ls(this: &StreamVideo) -> Nullable<bool>;
+    pub fn require_signed_ur_ls(this: &StreamVideo) -> Option<bool>;
     #[wasm_bindgen(method, setter, js_name = "requireSignedURLs")]
     pub fn set_require_signed_ur_ls(this: &StreamVideo, val: bool);
     #[wasm_bindgen(method, setter, js_name = "requireSignedURLs")]
     fn __set_require_signed_ur_ls_with_null(this: &StreamVideo, val: &::wasm_bindgen::JsValue);
     #[doc = " The date and time the video was uploaded."]
     #[wasm_bindgen(method, getter)]
-    pub fn uploaded(this: &StreamVideo) -> Nullable<String>;
+    pub fn uploaded(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_uploaded(this: &StreamVideo, val: &str);
     #[wasm_bindgen(method, setter, js_name = "uploaded")]
     fn __set_uploaded_with_null(this: &StreamVideo, val: &::wasm_bindgen::JsValue);
     #[doc = " The date and time when the upload URL expires."]
     #[wasm_bindgen(method, getter, js_name = "uploadExpiry")]
-    pub fn upload_expiry(this: &StreamVideo) -> Nullable<String>;
+    pub fn upload_expiry(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "uploadExpiry")]
     pub fn set_upload_expiry(this: &StreamVideo, val: &str);
     #[wasm_bindgen(method, setter, js_name = "uploadExpiry")]
     fn __set_upload_expiry_with_null(this: &StreamVideo, val: &::wasm_bindgen::JsValue);
     #[doc = " The maximum size in bytes for direct uploads."]
     #[wasm_bindgen(method, getter, js_name = "maxSizeBytes")]
-    pub fn max_size_bytes(this: &StreamVideo) -> Nullable<f64>;
+    pub fn max_size_bytes(this: &StreamVideo) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "maxSizeBytes")]
     pub fn set_max_size_bytes(this: &StreamVideo, val: f64);
     #[wasm_bindgen(method, setter, js_name = "maxSizeBytes")]
     fn __set_max_size_bytes_with_null(this: &StreamVideo, val: &::wasm_bindgen::JsValue);
     #[doc = " The maximum duration in seconds for direct uploads."]
     #[wasm_bindgen(method, getter, js_name = "maxDurationSeconds")]
-    pub fn max_duration_seconds(this: &StreamVideo) -> Nullable<f64>;
+    pub fn max_duration_seconds(this: &StreamVideo) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "maxDurationSeconds")]
     pub fn set_max_duration_seconds(this: &StreamVideo, val: f64);
     #[wasm_bindgen(method, setter, js_name = "maxDurationSeconds")]
@@ -46000,28 +45991,28 @@ extern "C" {
     pub fn set_dash_playback_url(this: &StreamVideo, val: &str);
     #[doc = " The watermark applied to the video, if any."]
     #[wasm_bindgen(method, getter)]
-    pub fn watermark(this: &StreamVideo) -> Nullable<StreamWatermark>;
+    pub fn watermark(this: &StreamVideo) -> Option<StreamWatermark>;
     #[wasm_bindgen(method, setter)]
     pub fn set_watermark(this: &StreamVideo, val: &StreamWatermark);
     #[wasm_bindgen(method, setter, js_name = "watermark")]
     fn __set_watermark_with_null(this: &StreamVideo, val: &::wasm_bindgen::JsValue);
     #[doc = " The live input id associated with the video, if any."]
     #[wasm_bindgen(method, getter, js_name = "liveInputId")]
-    pub fn live_input_id(this: &StreamVideo) -> Option<Nullable<String>>;
+    pub fn live_input_id(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "liveInputId")]
     pub fn set_live_input_id(this: &StreamVideo, val: &str);
     #[wasm_bindgen(method, setter, js_name = "liveInputId")]
     fn __set_live_input_id_with_null(this: &StreamVideo, val: &::wasm_bindgen::JsValue);
     #[doc = " The source video id if this is a clip."]
     #[wasm_bindgen(method, getter, js_name = "clippedFromId")]
-    pub fn clipped_from_id(this: &StreamVideo) -> Nullable<String>;
+    pub fn clipped_from_id(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "clippedFromId")]
     pub fn set_clipped_from_id(this: &StreamVideo, val: &str);
     #[wasm_bindgen(method, setter, js_name = "clippedFromId")]
     fn __set_clipped_from_id_with_null(this: &StreamVideo, val: &::wasm_bindgen::JsValue);
     #[doc = " Public details associated with the video."]
     #[wasm_bindgen(method, getter, js_name = "publicDetails")]
-    pub fn public_details(this: &StreamVideo) -> Nullable<StreamPublicDetails>;
+    pub fn public_details(this: &StreamVideo) -> Option<StreamPublicDetails>;
     #[wasm_bindgen(method, setter, js_name = "publicDetails")]
     pub fn set_public_details(this: &StreamVideo, val: &StreamPublicDetails);
     #[wasm_bindgen(method, setter, js_name = "publicDetails")]
@@ -46348,28 +46339,28 @@ extern "C" {
     pub type StreamPublicDetails;
     #[doc = " The public title for the video."]
     #[wasm_bindgen(method, getter)]
-    pub fn title(this: &StreamPublicDetails) -> Nullable<String>;
+    pub fn title(this: &StreamPublicDetails) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_title(this: &StreamPublicDetails, val: &str);
     #[wasm_bindgen(method, setter, js_name = "title")]
     fn __set_title_with_null(this: &StreamPublicDetails, val: &::wasm_bindgen::JsValue);
     #[doc = " The public share link."]
     #[wasm_bindgen(method, getter)]
-    pub fn share_link(this: &StreamPublicDetails) -> Nullable<String>;
+    pub fn share_link(this: &StreamPublicDetails) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_share_link(this: &StreamPublicDetails, val: &str);
     #[wasm_bindgen(method, setter, js_name = "share_link")]
     fn __set_share_link_with_null(this: &StreamPublicDetails, val: &::wasm_bindgen::JsValue);
     #[doc = " The public channel link."]
     #[wasm_bindgen(method, getter)]
-    pub fn channel_link(this: &StreamPublicDetails) -> Nullable<String>;
+    pub fn channel_link(this: &StreamPublicDetails) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_channel_link(this: &StreamPublicDetails, val: &str);
     #[wasm_bindgen(method, setter, js_name = "channel_link")]
     fn __set_channel_link_with_null(this: &StreamPublicDetails, val: &::wasm_bindgen::JsValue);
     #[doc = " The public logo URL."]
     #[wasm_bindgen(method, getter)]
-    pub fn logo(this: &StreamPublicDetails) -> Nullable<String>;
+    pub fn logo(this: &StreamPublicDetails) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_logo(this: &StreamPublicDetails, val: &str);
     #[wasm_bindgen(method, setter, js_name = "logo")]
@@ -46616,14 +46607,14 @@ extern "C" {
     pub fn set_id(this: &StreamDirectUpload, val: &str);
     #[doc = " The watermark profile applied to the upload."]
     #[wasm_bindgen(method, getter)]
-    pub fn watermark(this: &StreamDirectUpload) -> Nullable<StreamWatermark>;
+    pub fn watermark(this: &StreamDirectUpload) -> Option<StreamWatermark>;
     #[wasm_bindgen(method, setter)]
     pub fn set_watermark(this: &StreamDirectUpload, val: &StreamWatermark);
     #[wasm_bindgen(method, setter, js_name = "watermark")]
     fn __set_watermark_with_null(this: &StreamDirectUpload, val: &::wasm_bindgen::JsValue);
     #[doc = " The scheduled deletion time, if any."]
     #[wasm_bindgen(method, getter, js_name = "scheduledDeletion")]
-    pub fn scheduled_deletion(this: &StreamDirectUpload) -> Nullable<String>;
+    pub fn scheduled_deletion(this: &StreamDirectUpload) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
     pub fn set_scheduled_deletion(this: &StreamDirectUpload, val: &str);
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
@@ -46744,7 +46735,7 @@ extern "C" {
     #[doc = " The date and time at which the video will be deleted. Include `null` to remove"]
     #[doc = " a scheduled deletion."]
     #[wasm_bindgen(method, getter, js_name = "scheduledDeletion")]
-    pub fn scheduled_deletion(this: &StreamDirectUploadCreateParams) -> Option<Nullable<String>>;
+    pub fn scheduled_deletion(this: &StreamDirectUploadCreateParams) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
     pub fn set_scheduled_deletion(this: &StreamDirectUploadCreateParams, val: &str);
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
@@ -46873,7 +46864,7 @@ extern "C" {
     #[doc = " existing scheduled deletion. If specified, must be at least 30 days from upload"]
     #[doc = " time."]
     #[wasm_bindgen(method, getter, js_name = "scheduledDeletion")]
-    pub fn scheduled_deletion(this: &StreamUrlUploadParams) -> Option<Nullable<String>>;
+    pub fn scheduled_deletion(this: &StreamUrlUploadParams) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
     pub fn set_scheduled_deletion(this: &StreamUrlUploadParams, val: &str);
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
@@ -47529,7 +47520,7 @@ extern "C" {
     #[doc = " existing scheduled deletion. If specified, must be at least 30 days from upload"]
     #[doc = " time."]
     #[wasm_bindgen(method, getter, js_name = "scheduledDeletion")]
-    pub fn scheduled_deletion(this: &StreamUpdateVideoParams) -> Option<Nullable<String>>;
+    pub fn scheduled_deletion(this: &StreamUpdateVideoParams) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
     pub fn set_scheduled_deletion(this: &StreamUpdateVideoParams, val: &str);
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
@@ -47814,7 +47805,7 @@ extern "C" {
     #[doc = " The source URL for a downloaded image. If the watermark profile was created via"]
     #[doc = " direct upload, this field is null."]
     #[wasm_bindgen(method, getter, js_name = "downloadedFrom")]
-    pub fn downloaded_from(this: &StreamWatermark) -> Nullable<String>;
+    pub fn downloaded_from(this: &StreamWatermark) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "downloadedFrom")]
     pub fn set_downloaded_from(this: &StreamWatermark, val: &str);
     #[wasm_bindgen(method, setter, js_name = "downloadedFrom")]
@@ -51469,7 +51460,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilter2;
     #[wasm_bindgen(method, getter, js_name = "$eq")]
-    pub fn eq(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn eq(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     pub fn set_eq(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$eq")]
@@ -51481,7 +51472,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     fn __set_eq_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$ne")]
-    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     pub fn set_ne(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$ne")]
@@ -51493,7 +51484,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     fn __set_ne_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lt")]
-    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     pub fn set_lt(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$lt")]
@@ -51505,7 +51496,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     fn __set_lt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lte")]
-    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     pub fn set_lte(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$lte")]
@@ -51517,7 +51508,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     fn __set_lte_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gt")]
-    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     pub fn set_gt(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$gt")]
@@ -51529,7 +51520,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     fn __set_gt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gte")]
-    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$gte")]
     pub fn set_gte(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$gte")]

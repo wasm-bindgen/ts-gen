@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, JsString, Map, Nullable, Number, Set};
+use js_sys::{Array, JsString, Map, Number, Set};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::mono_lists::*;
@@ -75,10 +75,10 @@ async fn awaited_string_lists_have_a_handle_variant() {
     assert_eq!(handle.length(), 1);
     let handle: Array<JsString> = fetch_tags_promise().await.unwrap();
     assert_eq!(handle.length(), 1);
-    let maybe: Nullable<Vec<String>> = fetch_maybe_tags().await.unwrap();
-    assert_eq!(maybe.value(), Some(vec!["y".to_string(), "z".to_string()]));
-    let maybe: Nullable<Array<JsString>> = fetch_maybe_tags_js_string().await.unwrap();
-    assert_eq!(maybe.value().map(|a| a.length()), Some(2));
+    let maybe: Option<Vec<String>> = fetch_maybe_tags().await.unwrap();
+    assert_eq!(maybe, Some(vec!["y".to_string(), "z".to_string()]));
+    let maybe: Option<Array<JsString>> = fetch_maybe_tags_js_string().await.unwrap();
+    assert_eq!(maybe.map(|a| a.length()), Some(2));
 }
 
 #[wasm_bindgen_test]

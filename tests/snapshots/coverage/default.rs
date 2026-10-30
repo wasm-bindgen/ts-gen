@@ -288,7 +288,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &LinkedList, val: &JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn next(this: &LinkedList) -> Nullable<LinkedList>;
+    pub fn next(this: &LinkedList) -> Option<LinkedList>;
     #[wasm_bindgen(method, setter)]
     pub fn set_next(this: &LinkedList, val: &LinkedList);
     #[wasm_bindgen(method, setter, js_name = "next")]
@@ -484,9 +484,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage;
     #[wasm_bindgen(method, js_name = "getItem")]
-    pub fn get_item(this: &Storage, key: &str) -> Nullable<String>;
+    pub fn get_item(this: &Storage, key: &str) -> Option<String>;
     #[wasm_bindgen(method, catch, js_name = "getItem")]
-    pub fn try_get_item(this: &Storage, key: &str) -> Result<Nullable<String>, JsValue>;
+    pub fn try_get_item(this: &Storage, key: &str) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "setItem")]
     pub fn set_item(this: &Storage, key: &str, value: &str);
     #[wasm_bindgen(method, catch, js_name = "setItem")]
@@ -511,7 +511,7 @@ extern "C" {
     pub async fn get(
         this: &Cache,
         key: &str,
-    ) -> Result<Nullable<Map<JsString, Array<JsString>>>, JsValue>;
+    ) -> Result<Option<Map<JsString, Array<JsString>>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(
         this: &Cache,
@@ -546,7 +546,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &FetchOptions, val: &Object<JsString>);
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &FetchOptions) -> Option<Nullable<BodyKind>>;
+    pub fn body(this: &FetchOptions) -> Option<BodyKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body(this: &FetchOptions, val: &str);
     #[wasm_bindgen(method, setter, js_name = "body")]

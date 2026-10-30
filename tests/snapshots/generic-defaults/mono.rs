@@ -238,11 +238,11 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Option<T>>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn first<T>(this: &Store) -> Result<Nullable<T>, JsValue>
+    pub async fn first<T>(this: &Store) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static;
+        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
     #[wasm_bindgen(method, catch, js_name = "first")]
-    pub fn first_promise<T>(this: &Store) -> Result<Promise<Nullable<T>>, JsValue>;
+    pub fn first_promise<T>(this: &Store) -> Result<Promise<Option<T>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn json<T>(this: &Store) -> Result<T, JsValue>
     where
