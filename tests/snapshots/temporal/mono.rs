@@ -801,8 +801,6 @@ pub mod temporal {
             Self::ZonedDateTimeLikeObject(value.clone())
         }
     }
-    #[allow(dead_code)]
-    pub type PartialTemporalLike = JsValue;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]

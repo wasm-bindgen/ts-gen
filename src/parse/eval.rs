@@ -97,6 +97,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         .collect();
 
     let diag = std::mem::take(&mut gctx.diagnostics);
+    let mut type_level_only = HashSet::new();
     let (rewritten, synths, diag) = {
         let mut eval = Eval {
             gctx,
@@ -123,13 +124,24 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
                 scope: decl.scope_id,
             };
             let mut kind = decl.kind.clone();
-            if eval.rewrite_kind(&mut kind, place) {
+            let changed = eval.rewrite_kind(&mut kind, place);
+            // A use of a generic alias whose target needs evaluation is
+            // instantiated in its place, so nothing names the alias unless
+            // a use couldn't be evaluated. One promoted to an enum is a
+            // type of its own.
+            if matches!(&kind, TypeKind::TypeAlias(a) if !a.type_params.is_empty())
+                && eval.alias_needs_eval(id)
+            {
+                type_level_only.insert(id);
+            }
+            if changed {
                 rewritten.push((id, kind));
             }
         }
         (rewritten, eval.synths, eval.diag)
     };
     gctx.diagnostics = diag;
+    gctx.type_level_only.extend(type_level_only);
 
     for (id, kind) in rewritten {
         gctx.get_type_mut(id).kind = kind;
@@ -2092,6 +2104,12 @@ mod tests {
             panic!("Loose should stay an alias");
         };
         assert!(matches!(loose.target, TypeRef::Unresolved(_)));
+        // Every use is instantiated in its place, so the surface emits the
+        // alias only if a signature still reaches it; `Plural` is an enum.
+        let id = |name| gctx.scopes.resolve(module.file_scopes[0], name).unwrap();
+        assert!(gctx.type_level_only.contains(&id("Loose")));
+        assert!(gctx.type_level_only.contains(&id("Flags")));
+        assert!(!gctx.type_level_only.contains(&id("Plural")));
     }
 
     #[test]
