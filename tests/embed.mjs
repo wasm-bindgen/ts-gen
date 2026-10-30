@@ -101,8 +101,8 @@ switch (fixture) {
   }
   case 'module_values': {
     assert.equal(published.count(), 42);
-    assert.equal(published.enabled(), 1);
-    assert.equal(published.disabled(), 0);
+    assert.equal(published.enabled(), true);
+    assert.equal(published.disabled(), false);
     assert.equal(published.big(), 7n);
     assert.equal(published.receiver(), 'undefined');
     break;
@@ -128,6 +128,13 @@ switch (fixture) {
     assert.equal(published.api.describe(get), 'http://example.com/path');
     assert.equal(await fetch(get).text(), 'ok');
     assert.deepEqual(Object.keys(exports).sort(), ['api', 'default', 'version']);
+    break;
+  }
+  case 'proxy': {
+    // The module's `fetch` handler calls the global `fetch`.
+    globalThis.fetch = async (req) => new Response(`proxied ${req.url}`);
+    assert.equal(await (await fetch(get)).text(), 'proxied http://example.com/path');
+    assert.deepEqual(Object.keys(exports), ['default']);
     break;
   }
   case 'anyref_ctor': {

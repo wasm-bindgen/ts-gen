@@ -217,8 +217,9 @@ fn run_embed_test(fixture_name: &str) -> Result<()> {
         &wrapper_bytes,
     )
     .context("wasm-merge")?;
-    let cleaned = ts_gen::abi::embed::postprocess(&merged, &output.used, &output.handlers)
-        .context("postprocess")?;
+    let cleaned =
+        ts_gen::abi::embed::postprocess(&merged, &output.handlers, &options.module_specifier)
+            .context("postprocess")?;
     let mut validator = wasmparser::Validator::new_with_features(
         wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
     );
@@ -310,6 +311,13 @@ fn embed_module_imports() {
 fn embed_module_values() {
     if let Err(e) = run_embed_test("module_values") {
         panic!("module_values failed: {e:#}");
+    }
+}
+
+#[test]
+fn embed_proxy() {
+    if let Err(e) = run_embed_test("proxy") {
+        panic!("proxy failed: {e:#}");
     }
 }
 
@@ -713,15 +721,17 @@ fn embed_binds_one_function_under_every_alias() {
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     let b = &out.bindings_wat;
     assert!(
-        b.contains(r#"(func (export "m:lib:Conn.get") (export "m:lib:Connection.get")"#),
+        b.contains(r#"(func (export "ts-gen:bindings.m:lib:Conn.get") (export "ts-gen:bindings.m:lib:Connection.get")"#),
         "{b}"
     );
     assert!(
-        b.contains(r#"(func (export "m:lib:Conn.new") (result externref)"#),
+        b.contains(r#"(func (export "ts-gen:bindings.m:lib:Conn.new") (result externref)"#),
         "{b}"
     );
     assert!(
-        b.contains(r#"(func (export "m:lib:Connection.new") (result (ref extern))"#),
+        b.contains(
+            r#"(func (export "ts-gen:bindings.m:lib:Connection.new") (result (ref extern))"#
+        ),
         "{b}"
     );
     assert_eq!(
@@ -767,7 +777,9 @@ fn embed_links_the_same_name_from_two_modules_separately() {
             "{b}"
         );
         assert!(
-            b.contains(&format!(r#"(func (export "{spec}:constants.MODE")"#)),
+            b.contains(&format!(
+                r#"(func (export "ts-gen:bindings.{spec}:constants.MODE")"#
+            )),
             "{b}"
         );
     }
@@ -785,11 +797,11 @@ fn embed_links_the_same_name_from_two_modules_separately() {
         [
             (
                 "./bindings.wasm".to_string(),
-                "m:a:constants.MODE".to_string()
+                "ts-gen:bindings.m:a:constants.MODE".to_string()
             ),
             (
                 "./bindings.wasm".to_string(),
-                "m:b:constants.MODE".to_string()
+                "ts-gen:bindings.m:b:constants.MODE".to_string()
             ),
         ]
     );

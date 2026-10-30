@@ -3,5 +3,6 @@ export const global = globalThis;
 export const reflect_get = Reflect.get;
 export const call0 = (f, t) => f.call(t);
 export const call1 = (f, t, a0) => f.call(t, a0);
+export const boolean = Boolean;
 const undefined_ = undefined;
 export { undefined_ as undefined };

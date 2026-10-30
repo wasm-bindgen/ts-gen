@@ -473,7 +473,8 @@ fn embed(args: EmbedArgs) -> Result<()> {
         &bindings,
         &wrapper,
     )?;
-    let merged = ts_gen::abi::embed::postprocess(&merged, &out.used, &out.handlers)?;
+    let merged =
+        ts_gen::abi::embed::postprocess(&merged, &out.handlers, &options.module_specifier)?;
     let file_name = args
         .module
         .file_name()
