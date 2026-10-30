@@ -1944,9 +1944,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cover;
     #[wasm_bindgen(method, getter)]
-    pub fn kind(this: &Cover) -> CoverKindKind;
+    pub fn kind(this: &Cover) -> KindKind2;
     #[wasm_bindgen(method, setter)]
-    pub fn set_kind(this: &Cover, val: CoverKindKind);
+    pub fn set_kind(this: &Cover, val: KindKind2);
     #[wasm_bindgen(method, getter)]
     pub fn src(this: &Cover) -> Nullable<String>;
     #[wasm_bindgen(method, setter)]
@@ -1971,14 +1971,14 @@ impl Cover {
     #[doc = " Start a builder with `kind: \"image\"`."]
     pub fn builder_image(src: &str) -> CoverBuilder {
         let inner: Cover = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(CoverKindKind::Image);
+        inner.set_kind(KindKind2::Image);
         inner.set_src(src);
         CoverBuilder { inner }
     }
     #[doc = " Start a builder with `kind: \"blank\"`."]
     pub fn builder_blank() -> CoverBuilder {
         let inner: Cover = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(CoverKindKind::Blank);
+        inner.set_kind(KindKind2::Blank);
         inner.set_src_with_null();
         CoverBuilder { inner }
     }
@@ -1987,7 +1987,7 @@ pub struct CoverBuilder {
     inner: Cover,
 }
 impl CoverBuilder {
-    pub fn kind(self, val: CoverKindKind) -> Self {
+    pub fn kind(self, val: KindKind2) -> Self {
         self.inner.set_kind(val);
         self
     }
@@ -2025,7 +2025,7 @@ pub enum KindKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CoverKindKind {
+pub enum KindKind2 {
     Image = "image",
     Blank = "blank",
 }

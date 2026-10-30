@@ -6971,7 +6971,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$public")]
     pub fn set_public(this: &SubtleCryptoDeriveKeyAlgorithm, val: &CryptoKey);
     #[wasm_bindgen(method, getter)]
-    pub fn info(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<SaltKind>;
+    pub fn info(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<InfoKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_info(this: &SubtleCryptoDeriveKeyAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "info")]
@@ -7040,7 +7040,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &SubtleCryptoEncryptAlgorithm, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn iv(this: &SubtleCryptoEncryptAlgorithm) -> Option<SaltKind>;
+    pub fn iv(this: &SubtleCryptoEncryptAlgorithm) -> Option<IvKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_iv(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "iv")]
@@ -7049,7 +7049,7 @@ extern "C" {
         val: &T,
     );
     #[wasm_bindgen(method, getter, js_name = "additionalData")]
-    pub fn additional_data(this: &SubtleCryptoEncryptAlgorithm) -> Option<SaltKind>;
+    pub fn additional_data(this: &SubtleCryptoEncryptAlgorithm) -> Option<AdditionalDataKind>;
     #[wasm_bindgen(method, setter, js_name = "additionalData")]
     pub fn set_additional_data(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "additionalData")]
@@ -7062,7 +7062,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "tagLength")]
     pub fn set_tag_length(this: &SubtleCryptoEncryptAlgorithm, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn counter(this: &SubtleCryptoEncryptAlgorithm) -> Option<SaltKind>;
+    pub fn counter(this: &SubtleCryptoEncryptAlgorithm) -> Option<CounterKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_counter(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "counter")]
@@ -7075,7 +7075,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_length(this: &SubtleCryptoEncryptAlgorithm, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn label(this: &SubtleCryptoEncryptAlgorithm) -> Option<SaltKind>;
+    pub fn label(this: &SubtleCryptoEncryptAlgorithm) -> Option<LabelKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_label(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "label")]
@@ -7152,7 +7152,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &SubtleCryptoGenerateKeyAlgorithm, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn hash(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<HashKind>;
+    pub fn hash(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<HashKind2>;
     #[wasm_bindgen(method, setter)]
     pub fn set_hash(this: &SubtleCryptoGenerateKeyAlgorithm, val: &str);
     #[wasm_bindgen(method, setter, js_name = "hash")]
@@ -7165,7 +7165,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "modulusLength")]
     pub fn set_modulus_length(this: &SubtleCryptoGenerateKeyAlgorithm, val: f64);
     #[wasm_bindgen(method, getter, js_name = "publicExponent")]
-    pub fn public_exponent(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<SaltKind>;
+    pub fn public_exponent(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<PublicExponentKind>;
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
     pub fn set_public_exponent(this: &SubtleCryptoGenerateKeyAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
@@ -7255,7 +7255,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &SubtleCryptoImportKeyAlgorithm, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn hash(this: &SubtleCryptoImportKeyAlgorithm) -> Option<HashKind>;
+    pub fn hash(this: &SubtleCryptoImportKeyAlgorithm) -> Option<HashKind3>;
     #[wasm_bindgen(method, setter)]
     pub fn set_hash(this: &SubtleCryptoImportKeyAlgorithm, val: &str);
     #[wasm_bindgen(method, setter, js_name = "hash")]
@@ -7324,7 +7324,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &SubtleCryptoSignAlgorithm, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn hash(this: &SubtleCryptoSignAlgorithm) -> Option<HashKind>;
+    pub fn hash(this: &SubtleCryptoSignAlgorithm) -> Option<HashKind4>;
     #[wasm_bindgen(method, setter)]
     pub fn set_hash(this: &SubtleCryptoSignAlgorithm, val: &str);
     #[wasm_bindgen(method, setter, js_name = "hash")]
@@ -7455,7 +7455,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "modulusLength")]
     pub fn set_modulus_length(this: &CryptoKeyRsaKeyAlgorithm, val: f64);
     #[wasm_bindgen(method, getter, js_name = "publicExponent")]
-    pub fn public_exponent(this: &CryptoKeyRsaKeyAlgorithm) -> SaltKind;
+    pub fn public_exponent(this: &CryptoKeyRsaKeyAlgorithm) -> PublicExponentKind2;
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
     pub fn set_public_exponent(this: &CryptoKeyRsaKeyAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
@@ -9695,7 +9695,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_method<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn headers<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<HeadersKind>;
+    pub fn headers<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<HeadersKind2>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
@@ -11967,7 +11967,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2BucketOptions2;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
-    pub fn only_if(this: &R2BucketOptions2) -> OnlyIfKind;
+    pub fn only_if(this: &R2BucketOptions2) -> OnlyIfKind2;
     #[wasm_bindgen(method, setter, js_name = "onlyIf")]
     pub fn set_only_if(this: &R2BucketOptions2, val: &R2Conditional);
     #[wasm_bindgen(method, setter, js_name = "onlyIf")]
@@ -12453,7 +12453,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2GetOptions;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
-    pub fn only_if(this: &R2GetOptions) -> Option<OnlyIfKind>;
+    pub fn only_if(this: &R2GetOptions) -> Option<OnlyIfKind3>;
     #[wasm_bindgen(method, setter, js_name = "onlyIf")]
     pub fn set_only_if(this: &R2GetOptions, val: &R2Conditional);
     #[wasm_bindgen(method, setter, js_name = "onlyIf")]
@@ -12465,7 +12465,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "range")]
     pub fn set_range_with_headers(this: &R2GetOptions, val: &Headers);
     #[wasm_bindgen(method, getter, js_name = "ssecKey")]
-    pub fn ssec_key(this: &R2GetOptions) -> Option<DataKind>;
+    pub fn ssec_key(this: &R2GetOptions) -> Option<SsecKeyKind>;
     #[wasm_bindgen(method, setter, js_name = "ssecKey")]
     pub fn set_ssec_key(this: &R2GetOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "ssecKey")]
@@ -12524,7 +12524,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2PutOptions;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
-    pub fn only_if(this: &R2PutOptions) -> Option<OnlyIfKind>;
+    pub fn only_if(this: &R2PutOptions) -> Option<OnlyIfKind4>;
     #[wasm_bindgen(method, setter, js_name = "onlyIf")]
     pub fn set_only_if(this: &R2PutOptions, val: &R2Conditional);
     #[wasm_bindgen(method, setter, js_name = "onlyIf")]
@@ -12548,7 +12548,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "md5")]
     pub fn set_md5_with_str(this: &R2PutOptions, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn sha1(this: &R2PutOptions) -> Option<Md5Kind>;
+    pub fn sha1(this: &R2PutOptions) -> Option<Sha1Kind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_sha1(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "sha1")]
@@ -12556,7 +12556,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "sha1")]
     pub fn set_sha1_with_str(this: &R2PutOptions, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn sha256(this: &R2PutOptions) -> Option<Md5Kind>;
+    pub fn sha256(this: &R2PutOptions) -> Option<Sha256Kind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_sha256(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "sha256")]
@@ -12564,7 +12564,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "sha256")]
     pub fn set_sha256_with_str(this: &R2PutOptions, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn sha384(this: &R2PutOptions) -> Option<Md5Kind>;
+    pub fn sha384(this: &R2PutOptions) -> Option<Sha384Kind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_sha384(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "sha384")]
@@ -12572,7 +12572,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "sha384")]
     pub fn set_sha384_with_str(this: &R2PutOptions, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn sha512(this: &R2PutOptions) -> Option<Md5Kind>;
+    pub fn sha512(this: &R2PutOptions) -> Option<Sha512Kind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_sha512(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "sha512")]
@@ -12584,7 +12584,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "storageClass")]
     pub fn set_storage_class(this: &R2PutOptions, val: &str);
     #[wasm_bindgen(method, getter, js_name = "ssecKey")]
-    pub fn ssec_key(this: &R2PutOptions) -> Option<DataKind>;
+    pub fn ssec_key(this: &R2PutOptions) -> Option<SsecKeyKind2>;
     #[wasm_bindgen(method, setter, js_name = "ssecKey")]
     pub fn set_ssec_key(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "ssecKey")]
@@ -12711,7 +12711,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2MultipartOptions;
     #[wasm_bindgen(method, getter, js_name = "httpMetadata")]
-    pub fn http_metadata(this: &R2MultipartOptions) -> Option<HttpMetadataKind>;
+    pub fn http_metadata(this: &R2MultipartOptions) -> Option<HttpMetadataKind2>;
     #[wasm_bindgen(method, setter, js_name = "httpMetadata")]
     pub fn set_http_metadata(this: &R2MultipartOptions, val: &R2HTTPMetadata);
     #[wasm_bindgen(method, setter, js_name = "httpMetadata")]
@@ -12725,7 +12725,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "storageClass")]
     pub fn set_storage_class(this: &R2MultipartOptions, val: &str);
     #[wasm_bindgen(method, getter, js_name = "ssecKey")]
-    pub fn ssec_key(this: &R2MultipartOptions) -> Option<DataKind>;
+    pub fn ssec_key(this: &R2MultipartOptions) -> Option<SsecKeyKind3>;
     #[wasm_bindgen(method, setter, js_name = "ssecKey")]
     pub fn set_ssec_key(this: &R2MultipartOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "ssecKey")]
@@ -13010,7 +13010,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2UploadPartOptions;
     #[wasm_bindgen(method, getter, js_name = "ssecKey")]
-    pub fn ssec_key(this: &R2UploadPartOptions) -> Option<DataKind>;
+    pub fn ssec_key(this: &R2UploadPartOptions) -> Option<SsecKeyKind4>;
     #[wasm_bindgen(method, setter, js_name = "ssecKey")]
     pub fn set_ssec_key(this: &R2UploadPartOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "ssecKey")]
@@ -13083,7 +13083,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "highWaterMark")]
     pub fn high_water_mark<T: ::wasm_bindgen::JsGeneric>(
         this: &QueuingStrategy<T>,
-    ) -> Option<BytesWrittenKind>;
+    ) -> Option<HighWaterMarkKind>;
     #[wasm_bindgen(method, setter, js_name = "highWaterMark")]
     pub fn set_high_water_mark<T: ::wasm_bindgen::JsGeneric>(this: &QueuingStrategy<T>, val: f64);
     #[wasm_bindgen(method, setter, js_name = "highWaterMark")]
@@ -13353,7 +13353,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "expectedLength")]
     pub fn expected_length<R: ::wasm_bindgen::JsGeneric>(
         this: &UnderlyingSource<R>,
-    ) -> Option<BytesWrittenKind>;
+    ) -> Option<ExpectedLengthKind>;
     #[wasm_bindgen(method, setter, js_name = "expectedLength")]
     pub fn set_expected_length<R: ::wasm_bindgen::JsGeneric>(this: &UnderlyingSource<R>, val: f64);
     #[wasm_bindgen(method, setter, js_name = "expectedLength")]
@@ -14658,7 +14658,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "highWaterMark")]
     pub fn high_water_mark(
         this: &IdentityTransformStreamQueuingStrategy,
-    ) -> Option<BytesWrittenKind>;
+    ) -> Option<HighWaterMarkKind2>;
     #[wasm_bindgen(method, setter, js_name = "highWaterMark")]
     pub fn set_high_water_mark(this: &IdentityTransformStreamQueuingStrategy, val: f64);
     #[wasm_bindgen(method, setter, js_name = "highWaterMark")]
@@ -16678,7 +16678,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "allowHalfOpen")]
     pub fn set_allow_half_open(this: &SocketOptions, val: bool);
     #[wasm_bindgen(method, getter, js_name = "highWaterMark")]
-    pub fn high_water_mark(this: &SocketOptions) -> Option<BytesWrittenKind>;
+    pub fn high_water_mark(this: &SocketOptions) -> Option<HighWaterMarkKind3>;
     #[wasm_bindgen(method, setter, js_name = "highWaterMark")]
     pub fn set_high_water_mark(this: &SocketOptions, val: f64);
     #[wasm_bindgen(method, setter, js_name = "highWaterMark")]
@@ -17019,7 +17019,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_env(this: &ContainerStartupOptions, val: &Object<JsString>);
     #[wasm_bindgen(method, getter, js_name = "hardTimeout")]
-    pub fn hard_timeout(this: &ContainerStartupOptions) -> Option<BytesWrittenKind>;
+    pub fn hard_timeout(this: &ContainerStartupOptions) -> Option<HardTimeoutKind>;
     #[wasm_bindgen(method, setter, js_name = "hardTimeout")]
     pub fn set_hard_timeout(this: &ContainerStartupOptions, val: f64);
     #[wasm_bindgen(method, setter, js_name = "hardTimeout")]
@@ -17799,9 +17799,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &AiSearchConfig, val: &str);
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &AiSearchConfig) -> AiSearchConfigTypeKind;
+    pub fn type_(this: &AiSearchConfig) -> TypeKind2;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &AiSearchConfig, val: AiSearchConfigTypeKind);
+    pub fn set_type(this: &AiSearchConfig, val: TypeKind2);
     #[wasm_bindgen(method, getter)]
     pub fn source(this: &AiSearchConfig) -> String;
     #[wasm_bindgen(method, setter)]
@@ -17863,7 +17863,7 @@ impl AiSearchConfig {
     pub fn builder_r2(id: &str, source: &str) -> AiSearchConfigBuilder {
         let inner: AiSearchConfig = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
-        inner.set_type(AiSearchConfigTypeKind::R2);
+        inner.set_type(TypeKind2::R2);
         inner.set_source(source);
         AiSearchConfigBuilder { inner }
     }
@@ -17875,7 +17875,7 @@ impl AiSearchConfig {
     pub fn builder_web_crawler(id: &str, source: &str) -> AiSearchConfigBuilder {
         let inner: AiSearchConfig = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
-        inner.set_type(AiSearchConfigTypeKind::WebCrawler);
+        inner.set_type(TypeKind2::WebCrawler);
         inner.set_source(source);
         AiSearchConfigBuilder { inner }
     }
@@ -17930,9 +17930,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_enable(this: &AiSearchInstance, val: bool);
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &AiSearchInstance) -> Option<AiSearchConfigTypeKind>;
+    pub fn type_(this: &AiSearchInstance) -> Option<TypeKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &AiSearchInstance, val: AiSearchConfigTypeKind);
+    pub fn set_type(this: &AiSearchInstance, val: TypeKind2);
     #[wasm_bindgen(method, getter)]
     pub fn source(this: &AiSearchInstance) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -17956,7 +17956,7 @@ impl AiSearchInstanceBuilder {
         self.inner.set_enable(val);
         self
     }
-    pub fn type_(self, val: AiSearchConfigTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind2) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -18937,7 +18937,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiTextGenerationToolInput;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &AiTextGenerationToolInput) -> AiTextGenerationToolInputTypeKind;
+    pub fn type_(this: &AiTextGenerationToolInput) -> TypeKind3;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &AiTextGenerationToolInput, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -20048,7 +20048,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "temperature")]
     fn __set_temperature_with_null(this: &ResponsesOutput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn tool_choice(this: &ResponsesOutput) -> Option<ToolChoiceKind>;
+    pub fn tool_choice(this: &ResponsesOutput) -> Option<ToolChoiceKind2>;
     #[wasm_bindgen(method, setter)]
     pub fn set_tool_choice(this: &ResponsesOutput, val: ToolChoiceOptions);
     #[wasm_bindgen(method, setter, js_name = "tool_choice")]
@@ -20333,9 +20333,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "content")]
     pub fn set_content_with_slice(this: &EasyInputMessage, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
-    pub fn role(this: &EasyInputMessage) -> EasyInputMessageRoleKind;
+    pub fn role(this: &EasyInputMessage) -> RoleKind2;
     #[wasm_bindgen(method, setter)]
-    pub fn set_role(this: &EasyInputMessage, val: EasyInputMessageRoleKind);
+    pub fn set_role(this: &EasyInputMessage, val: RoleKind2);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &EasyInputMessage) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -20378,56 +20378,56 @@ impl EasyInputMessage {
     pub fn builder_user(content: &str) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
-        inner.set_role(EasyInputMessageRoleKind::User);
+        inner.set_role(RoleKind2::User);
         EasyInputMessageBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"assistant\"`."]
     pub fn builder_assistant(content: &str) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
-        inner.set_role(EasyInputMessageRoleKind::Assistant);
+        inner.set_role(RoleKind2::Assistant);
         EasyInputMessageBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"system\"`."]
     pub fn builder_system(content: &str) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
-        inner.set_role(EasyInputMessageRoleKind::System);
+        inner.set_role(RoleKind2::System);
         EasyInputMessageBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"developer\"`."]
     pub fn builder_developer(content: &str) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
-        inner.set_role(EasyInputMessageRoleKind::Developer);
+        inner.set_role(RoleKind2::Developer);
         EasyInputMessageBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"user\"`."]
     pub fn builder_user_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_with_slice(content);
-        inner.set_role(EasyInputMessageRoleKind::User);
+        inner.set_role(RoleKind2::User);
         EasyInputMessageBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"assistant\"`."]
     pub fn builder_assistant_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_with_slice(content);
-        inner.set_role(EasyInputMessageRoleKind::Assistant);
+        inner.set_role(RoleKind2::Assistant);
         EasyInputMessageBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"system\"`."]
     pub fn builder_system_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_with_slice(content);
-        inner.set_role(EasyInputMessageRoleKind::System);
+        inner.set_role(RoleKind2::System);
         EasyInputMessageBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"developer\"`."]
     pub fn builder_developer_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_with_slice(content);
-        inner.set_role(EasyInputMessageRoleKind::Developer);
+        inner.set_role(RoleKind2::Developer);
         EasyInputMessageBuilder { inner }
     }
 }
@@ -21466,7 +21466,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_call_id(this: &ResponseFunctionToolCallOutputItem, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn output(this: &ResponseFunctionToolCallOutputItem) -> OutputKind;
+    pub fn output(this: &ResponseFunctionToolCallOutputItem) -> OutputKind2;
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseFunctionToolCallOutputItem, val: &str);
     #[wasm_bindgen(method, setter, js_name = "output")]
@@ -21820,9 +21820,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_call_id(this: &ResponseInputItemFunctionCallOutput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn output(
-        this: &ResponseInputItemFunctionCallOutput,
-    ) -> ResponseInputItemFunctionCallOutputOutputKind;
+    pub fn output(this: &ResponseInputItemFunctionCallOutput) -> OutputKind3;
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseInputItemFunctionCallOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "output")]
@@ -21926,9 +21924,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &ResponseInputItemMessage, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
-    pub fn role(this: &ResponseInputItemMessage) -> ResponseInputItemMessageRoleKind;
+    pub fn role(this: &ResponseInputItemMessage) -> RoleKind3;
     #[wasm_bindgen(method, setter)]
-    pub fn set_role(this: &ResponseInputItemMessage, val: ResponseInputItemMessageRoleKind);
+    pub fn set_role(this: &ResponseInputItemMessage, val: RoleKind3);
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &ResponseInputItemMessage) -> Option<StatusKind>;
     #[wasm_bindgen(method, setter)]
@@ -21955,21 +21953,21 @@ impl ResponseInputItemMessage {
     pub fn builder_user(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
-        inner.set_role(ResponseInputItemMessageRoleKind::User);
+        inner.set_role(RoleKind3::User);
         ResponseInputItemMessageBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"system\"`."]
     pub fn builder_system(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
-        inner.set_role(ResponseInputItemMessageRoleKind::System);
+        inner.set_role(RoleKind3::System);
         ResponseInputItemMessageBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"developer\"`."]
     pub fn builder_developer(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
-        inner.set_role(ResponseInputItemMessageRoleKind::Developer);
+        inner.set_role(RoleKind3::Developer);
         ResponseInputItemMessageBuilder { inner }
     }
 }
@@ -22005,9 +22003,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &ResponseInputMessageItem, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
-    pub fn role(this: &ResponseInputMessageItem) -> ResponseInputItemMessageRoleKind;
+    pub fn role(this: &ResponseInputMessageItem) -> RoleKind3;
     #[wasm_bindgen(method, setter)]
-    pub fn set_role(this: &ResponseInputMessageItem, val: ResponseInputItemMessageRoleKind);
+    pub fn set_role(this: &ResponseInputMessageItem, val: RoleKind3);
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &ResponseInputMessageItem) -> Option<StatusKind>;
     #[wasm_bindgen(method, setter)]
@@ -22035,7 +22033,7 @@ impl ResponseInputMessageItem {
         let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
-        inner.set_role(ResponseInputItemMessageRoleKind::User);
+        inner.set_role(RoleKind3::User);
         ResponseInputMessageItemBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"system\"`."]
@@ -22043,7 +22041,7 @@ impl ResponseInputMessageItem {
         let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
-        inner.set_role(ResponseInputItemMessageRoleKind::System);
+        inner.set_role(RoleKind3::System);
         ResponseInputMessageItemBuilder { inner }
     }
     #[doc = " Start a builder with `role: \"developer\"`."]
@@ -22051,7 +22049,7 @@ impl ResponseInputMessageItem {
         let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
-        inner.set_role(ResponseInputItemMessageRoleKind::Developer);
+        inner.set_role(RoleKind3::Developer);
         ResponseInputMessageItemBuilder { inner }
     }
 }
@@ -23152,7 +23150,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Base_En_V1_5_Input;
     #[wasm_bindgen(method, getter)]
-    pub fn text(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<TextKind>;
+    pub fn text(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<TextKind2>;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
@@ -23583,7 +23581,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Small_En_V1_5_Input;
     #[wasm_bindgen(method, getter)]
-    pub fn text(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<TextKind>;
+    pub fn text(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<TextKind3>;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
@@ -23740,7 +23738,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_Large_En_V1_5_Input;
     #[wasm_bindgen(method, getter)]
-    pub fn text(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<TextKind>;
+    pub fn text(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<TextKind4>;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
@@ -24385,7 +24383,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_Input_Embedding;
     #[wasm_bindgen(method, getter)]
-    pub fn text(this: &Ai_Cf_Baai_Bge_M3_Input_Embedding) -> TextKind;
+    pub fn text(this: &Ai_Cf_Baai_Bge_M3_Input_Embedding) -> TextKind5;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Baai_Bge_M3_Input_Embedding, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
@@ -24484,7 +24482,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_Input_Embedding_1;
     #[wasm_bindgen(method, getter)]
-    pub fn text(this: &Ai_Cf_Baai_Bge_M3_Input_Embedding_1) -> TextKind;
+    pub fn text(this: &Ai_Cf_Baai_Bge_M3_Input_Embedding_1) -> TextKind6;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Baai_Bge_M3_Input_Embedding_1, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
@@ -25098,7 +25096,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
-    pub fn image(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Option<ImageKind>;
+    pub fn image(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Option<ImageKind2>;
     #[wasm_bindgen(method, setter)]
     pub fn set_image(
         this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages,
@@ -25545,14 +25543,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(
-        this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    pub fn type_(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -25580,7 +25573,7 @@ pub struct Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeBuilder {
     inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode,
 }
 impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeBuilder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -25778,12 +25771,9 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    ) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -25811,7 +25801,7 @@ pub struct Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1Builder {
     inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1,
 }
 impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1Builder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -25873,12 +25863,9 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    ) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -25906,7 +25893,7 @@ pub struct Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
     inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2,
 }
 impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -26128,7 +26115,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_Guard_3_8B_Output;
     #[wasm_bindgen(method, getter)]
-    pub fn response(this: &Ai_Cf_Meta_Llama_Guard_3_8B_Output) -> Option<PostProcessedOutputsKind>;
+    pub fn response(this: &Ai_Cf_Meta_Llama_Guard_3_8B_Output) -> Option<ResponseKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_response(this: &Ai_Cf_Meta_Llama_Guard_3_8B_Output, val: &str);
     #[wasm_bindgen(method, setter, js_name = "response")]
@@ -26480,14 +26467,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(
-        this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -26512,7 +26494,7 @@ pub struct Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_ModeBuilder {
     inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode,
 }
 impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_ModeBuilder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -26683,14 +26665,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(
-        this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -26715,7 +26692,7 @@ pub struct Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1Builder {
     inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1,
 }
 impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1Builder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -28248,14 +28225,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(
-        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    pub fn type_(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -28283,7 +28255,7 @@ pub struct Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_ModeBuilder {
     inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode,
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_ModeBuilder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -29161,14 +29133,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -29193,7 +29160,7 @@ pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_ModeBuilder {
     inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode,
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_ModeBuilder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -29363,14 +29330,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -29395,7 +29357,7 @@ pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1Builder {
     inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1,
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1Builder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -29575,14 +29537,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -29607,7 +29564,7 @@ pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2Builder {
     inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2,
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2Builder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -29777,14 +29734,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -29809,7 +29761,7 @@ pub struct Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder {
     inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3,
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -30157,7 +30109,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
         this: &Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8,
-    ) -> PostProcessedOutputsKind;
+    ) -> PostProcessedOutputsKind2;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     fn __set_post_processed_outputs(
         this: &Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8,
@@ -30580,7 +30532,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input;
     #[wasm_bindgen(method, getter)]
-    pub fn queries(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input) -> Option<TextKind>;
+    pub fn queries(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input) -> Option<QueriesKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_queries(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "queries")]
@@ -30591,13 +30543,13 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_instruction(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn documents(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input) -> Option<TextKind>;
+    pub fn documents(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input) -> Option<DocumentsKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_documents(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "documents")]
     pub fn set_documents_with_slice(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input, val: &[String]);
     #[wasm_bindgen(method, getter)]
-    pub fn text(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input) -> Option<TextKind>;
+    pub fn text(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input) -> Option<TextKind7>;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
@@ -30733,7 +30685,7 @@ extern "C" {
     pub type Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input;
     #[doc = " readable stream with audio data and content-type specified for that data"]
     #[wasm_bindgen(method, getter)]
-    pub fn audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> PostProcessedOutputsKind;
+    pub fn audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> AudioKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "audio")]
@@ -31141,14 +31093,9 @@ extern "C" {
     pub fn set_speaker(this: &Ai_Cf_Deepgram_Aura_1_Input, val: SpeakerKind);
     #[doc = " Encoding of the output audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn encoding(
-        this: &Ai_Cf_Deepgram_Aura_1_Input,
-    ) -> Option<Ai_Cf_Deepgram_Aura_1_InputEncodingKind>;
+    pub fn encoding(this: &Ai_Cf_Deepgram_Aura_1_Input) -> Option<EncodingKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_encoding(
-        this: &Ai_Cf_Deepgram_Aura_1_Input,
-        val: Ai_Cf_Deepgram_Aura_1_InputEncodingKind,
-    );
+    pub fn set_encoding(this: &Ai_Cf_Deepgram_Aura_1_Input, val: EncodingKind2);
     #[doc = " Container specifies the file format wrapper for the output audio. The available options depend on the encoding type.."]
     #[wasm_bindgen(method, getter)]
     pub fn container(this: &Ai_Cf_Deepgram_Aura_1_Input) -> Option<ContainerKind>;
@@ -31190,7 +31137,7 @@ impl Ai_Cf_Deepgram_Aura_1_InputBuilder {
         self.inner.set_speaker(val);
         self
     }
-    pub fn encoding(self, val: Ai_Cf_Deepgram_Aura_1_InputEncodingKind) -> Self {
+    pub fn encoding(self, val: EncodingKind2) -> Self {
         self.inner.set_encoding(val);
         self
     }
@@ -31233,7 +31180,7 @@ extern "C" {
     pub type Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input;
     #[doc = " Input text to translate. Can be a single string or a list of strings."]
     #[wasm_bindgen(method, getter)]
-    pub fn text(this: &Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input) -> TextKind;
+    pub fn text(this: &Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input) -> TextKind8;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
@@ -31535,14 +31482,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    pub fn type_(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -31570,7 +31512,7 @@ pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_ModeBuilder {
     inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode,
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_ModeBuilder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -31768,12 +31710,9 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    ) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -31801,7 +31740,7 @@ pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1Builder {
     inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1,
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1Builder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -32004,12 +31943,9 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    ) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -32037,7 +31973,7 @@ pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2Builder {
     inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2,
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2Builder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -32240,12 +32176,9 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3,
-    ) -> Option<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind>;
+    ) -> Option<TypeKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3,
-        val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind,
-    );
+    pub fn set_type(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3, val: TypeKind4);
     #[wasm_bindgen(method, getter)]
     pub fn json_schema(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -32273,7 +32206,7 @@ pub struct Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder {
     inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3,
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder {
-    pub fn type_(self, val: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind4) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -32686,7 +32619,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
         this: &Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It,
-    ) -> PostProcessedOutputsKind;
+    ) -> PostProcessedOutputsKind3;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     fn __set_post_processed_outputs(
         this: &Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It,
@@ -32714,7 +32647,7 @@ extern "C" {
     pub type Ai_Cf_Pfnet_Plamo_Embedding_1B_Input;
     #[doc = " Input text to embed. Can be a single string or a list of strings."]
     #[wasm_bindgen(method, getter)]
-    pub fn text(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Input) -> TextKind;
+    pub fn text(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Input) -> TextKind9;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
@@ -33040,24 +32973,14 @@ extern "C" {
     pub type Ai_Cf_Deepgram_Aura_2_En_Input;
     #[doc = " Speaker used to produce the audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn speaker(
-        this: &Ai_Cf_Deepgram_Aura_2_En_Input,
-    ) -> Option<Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind>;
+    pub fn speaker(this: &Ai_Cf_Deepgram_Aura_2_En_Input) -> Option<SpeakerKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_speaker(
-        this: &Ai_Cf_Deepgram_Aura_2_En_Input,
-        val: Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind,
-    );
+    pub fn set_speaker(this: &Ai_Cf_Deepgram_Aura_2_En_Input, val: SpeakerKind2);
     #[doc = " Encoding of the output audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn encoding(
-        this: &Ai_Cf_Deepgram_Aura_2_En_Input,
-    ) -> Option<Ai_Cf_Deepgram_Aura_1_InputEncodingKind>;
+    pub fn encoding(this: &Ai_Cf_Deepgram_Aura_2_En_Input) -> Option<EncodingKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_encoding(
-        this: &Ai_Cf_Deepgram_Aura_2_En_Input,
-        val: Ai_Cf_Deepgram_Aura_1_InputEncodingKind,
-    );
+    pub fn set_encoding(this: &Ai_Cf_Deepgram_Aura_2_En_Input, val: EncodingKind2);
     #[doc = " Container specifies the file format wrapper for the output audio. The available options depend on the encoding type.."]
     #[wasm_bindgen(method, getter)]
     pub fn container(this: &Ai_Cf_Deepgram_Aura_2_En_Input) -> Option<ContainerKind>;
@@ -33095,11 +33018,11 @@ pub struct Ai_Cf_Deepgram_Aura_2_En_InputBuilder {
     inner: Ai_Cf_Deepgram_Aura_2_En_Input,
 }
 impl Ai_Cf_Deepgram_Aura_2_En_InputBuilder {
-    pub fn speaker(self, val: Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind) -> Self {
+    pub fn speaker(self, val: SpeakerKind2) -> Self {
         self.inner.set_speaker(val);
         self
     }
-    pub fn encoding(self, val: Ai_Cf_Deepgram_Aura_1_InputEncodingKind) -> Self {
+    pub fn encoding(self, val: EncodingKind2) -> Self {
         self.inner.set_encoding(val);
         self
     }
@@ -33142,24 +33065,14 @@ extern "C" {
     pub type Ai_Cf_Deepgram_Aura_2_Es_Input;
     #[doc = " Speaker used to produce the audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn speaker(
-        this: &Ai_Cf_Deepgram_Aura_2_Es_Input,
-    ) -> Option<Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind>;
+    pub fn speaker(this: &Ai_Cf_Deepgram_Aura_2_Es_Input) -> Option<SpeakerKind3>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_speaker(
-        this: &Ai_Cf_Deepgram_Aura_2_Es_Input,
-        val: Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind,
-    );
+    pub fn set_speaker(this: &Ai_Cf_Deepgram_Aura_2_Es_Input, val: SpeakerKind3);
     #[doc = " Encoding of the output audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn encoding(
-        this: &Ai_Cf_Deepgram_Aura_2_Es_Input,
-    ) -> Option<Ai_Cf_Deepgram_Aura_1_InputEncodingKind>;
+    pub fn encoding(this: &Ai_Cf_Deepgram_Aura_2_Es_Input) -> Option<EncodingKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_encoding(
-        this: &Ai_Cf_Deepgram_Aura_2_Es_Input,
-        val: Ai_Cf_Deepgram_Aura_1_InputEncodingKind,
-    );
+    pub fn set_encoding(this: &Ai_Cf_Deepgram_Aura_2_Es_Input, val: EncodingKind2);
     #[doc = " Container specifies the file format wrapper for the output audio. The available options depend on the encoding type.."]
     #[wasm_bindgen(method, getter)]
     pub fn container(this: &Ai_Cf_Deepgram_Aura_2_Es_Input) -> Option<ContainerKind>;
@@ -33197,11 +33110,11 @@ pub struct Ai_Cf_Deepgram_Aura_2_Es_InputBuilder {
     inner: Ai_Cf_Deepgram_Aura_2_Es_Input,
 }
 impl Ai_Cf_Deepgram_Aura_2_Es_InputBuilder {
-    pub fn speaker(self, val: Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind) -> Self {
+    pub fn speaker(self, val: SpeakerKind3) -> Self {
         self.inner.set_speaker(val);
         self
     }
-    pub fn encoding(self, val: Ai_Cf_Deepgram_Aura_1_InputEncodingKind) -> Self {
+    pub fn encoding(self, val: EncodingKind2) -> Self {
         self.inner.set_encoding(val);
         self
     }
@@ -34902,7 +34815,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
     pub fn set_cf_aig_metadata_with_str(this: &AIGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
-    pub fn cf_aig_custom_cost(this: &AIGatewayHeaders) -> PostProcessedOutputsKind;
+    pub fn cf_aig_custom_cost(this: &AIGatewayHeaders) -> CfAigCustomCostKind;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
     pub fn set_cf_aig_custom_cost(this: &AIGatewayHeaders, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
@@ -34928,19 +34841,19 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "cf-aig-event-id")]
     pub fn set_cf_aig_event_id(this: &AIGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-request-timeout")]
-    pub fn cf_aig_request_timeout(this: &AIGatewayHeaders) -> CfAigCacheTtlKind;
+    pub fn cf_aig_request_timeout(this: &AIGatewayHeaders) -> CfAigRequestTimeoutKind;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-request-timeout")]
     pub fn set_cf_aig_request_timeout(this: &AIGatewayHeaders, val: f64);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-request-timeout")]
     pub fn set_cf_aig_request_timeout_with_str(this: &AIGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-max-attempts")]
-    pub fn cf_aig_max_attempts(this: &AIGatewayHeaders) -> CfAigCacheTtlKind;
+    pub fn cf_aig_max_attempts(this: &AIGatewayHeaders) -> CfAigMaxAttemptsKind;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-max-attempts")]
     pub fn set_cf_aig_max_attempts(this: &AIGatewayHeaders, val: f64);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-max-attempts")]
     pub fn set_cf_aig_max_attempts_with_str(this: &AIGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-retry-delay")]
-    pub fn cf_aig_retry_delay(this: &AIGatewayHeaders) -> CfAigCacheTtlKind;
+    pub fn cf_aig_retry_delay(this: &AIGatewayHeaders) -> CfAigRetryDelayKind;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-retry-delay")]
     pub fn set_cf_aig_retry_delay(this: &AIGatewayHeaders, val: f64);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-retry-delay")]
@@ -34950,7 +34863,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "cf-aig-backoff")]
     pub fn set_cf_aig_backoff(this: &AIGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-collect-log")]
-    pub fn cf_aig_collect_log(this: &AIGatewayHeaders) -> CfAigSkipCacheKind;
+    pub fn cf_aig_collect_log(this: &AIGatewayHeaders) -> CfAigCollectLogKind;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-collect-log")]
     pub fn set_cf_aig_collect_log(this: &AIGatewayHeaders, val: bool);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-collect-log")]
@@ -35221,9 +35134,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_key(this: &ComparisonFilter, val: &str);
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &ComparisonFilter) -> ComparisonFilterTypeKind;
+    pub fn type_(this: &ComparisonFilter) -> TypeKind5;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &ComparisonFilter, val: ComparisonFilterTypeKind);
+    pub fn set_type(this: &ComparisonFilter, val: TypeKind5);
     #[wasm_bindgen(method, getter)]
     pub fn value(this: &ComparisonFilter) -> ValueKind;
     #[wasm_bindgen(method, setter)]
@@ -35310,7 +35223,7 @@ impl ComparisonFilter {
     pub fn builder_eq(key: &str, value: &str) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Eq);
+        inner.set_type(TypeKind5::Eq);
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35318,7 +35231,7 @@ impl ComparisonFilter {
     pub fn builder_eq_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Eq);
+        inner.set_type(TypeKind5::Eq);
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35326,7 +35239,7 @@ impl ComparisonFilter {
     pub fn builder_eq_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Eq);
+        inner.set_type(TypeKind5::Eq);
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35334,7 +35247,7 @@ impl ComparisonFilter {
     pub fn builder_ne(key: &str, value: &str) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Ne);
+        inner.set_type(TypeKind5::Ne);
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35342,7 +35255,7 @@ impl ComparisonFilter {
     pub fn builder_ne_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Ne);
+        inner.set_type(TypeKind5::Ne);
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35350,7 +35263,7 @@ impl ComparisonFilter {
     pub fn builder_ne_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Ne);
+        inner.set_type(TypeKind5::Ne);
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35358,7 +35271,7 @@ impl ComparisonFilter {
     pub fn builder_gt(key: &str, value: &str) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gt);
+        inner.set_type(TypeKind5::Gt);
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35366,7 +35279,7 @@ impl ComparisonFilter {
     pub fn builder_gt_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gt);
+        inner.set_type(TypeKind5::Gt);
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35374,7 +35287,7 @@ impl ComparisonFilter {
     pub fn builder_gt_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gt);
+        inner.set_type(TypeKind5::Gt);
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35382,7 +35295,7 @@ impl ComparisonFilter {
     pub fn builder_gte(key: &str, value: &str) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gte);
+        inner.set_type(TypeKind5::Gte);
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35390,7 +35303,7 @@ impl ComparisonFilter {
     pub fn builder_gte_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gte);
+        inner.set_type(TypeKind5::Gte);
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35398,7 +35311,7 @@ impl ComparisonFilter {
     pub fn builder_gte_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Gte);
+        inner.set_type(TypeKind5::Gte);
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35406,7 +35319,7 @@ impl ComparisonFilter {
     pub fn builder_lt(key: &str, value: &str) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lt);
+        inner.set_type(TypeKind5::Lt);
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35414,7 +35327,7 @@ impl ComparisonFilter {
     pub fn builder_lt_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lt);
+        inner.set_type(TypeKind5::Lt);
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35422,7 +35335,7 @@ impl ComparisonFilter {
     pub fn builder_lt_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lt);
+        inner.set_type(TypeKind5::Lt);
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35430,7 +35343,7 @@ impl ComparisonFilter {
     pub fn builder_lte(key: &str, value: &str) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lte);
+        inner.set_type(TypeKind5::Lte);
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35438,7 +35351,7 @@ impl ComparisonFilter {
     pub fn builder_lte_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lte);
+        inner.set_type(TypeKind5::Lte);
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35446,7 +35359,7 @@ impl ComparisonFilter {
     pub fn builder_lte_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
         let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
-        inner.set_type(ComparisonFilterTypeKind::Lte);
+        inner.set_type(TypeKind5::Lte);
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
@@ -35455,7 +35368,7 @@ pub struct ComparisonFilterBuilder {
     inner: ComparisonFilter,
 }
 impl ComparisonFilterBuilder {
-    pub fn type_(self, val: ComparisonFilterTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind5) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -35469,9 +35382,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CompoundFilter;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &CompoundFilter) -> CompoundFilterTypeKind;
+    pub fn type_(this: &CompoundFilter) -> TypeKind6;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &CompoundFilter, val: CompoundFilterTypeKind);
+    pub fn set_type(this: &CompoundFilter, val: TypeKind6);
     #[wasm_bindgen(method, getter)]
     pub fn filters(this: &CompoundFilter) -> Vec<ComparisonFilter>;
     #[wasm_bindgen(method, setter)]
@@ -35489,14 +35402,14 @@ impl CompoundFilter {
     #[doc = " Start a builder with `type: \"and\"`."]
     pub fn builder_and(filters: &[ComparisonFilter]) -> CompoundFilterBuilder {
         let inner: CompoundFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_type(CompoundFilterTypeKind::And);
+        inner.set_type(TypeKind6::And);
         inner.set_filters(filters);
         CompoundFilterBuilder { inner }
     }
     #[doc = " Start a builder with `type: \"or\"`."]
     pub fn builder_or(filters: &[ComparisonFilter]) -> CompoundFilterBuilder {
         let inner: CompoundFilter = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_type(CompoundFilterTypeKind::Or);
+        inner.set_type(TypeKind6::Or);
         inner.set_filters(filters);
         CompoundFilterBuilder { inner }
     }
@@ -35505,7 +35418,7 @@ pub struct CompoundFilterBuilder {
     inner: CompoundFilter,
 }
 impl CompoundFilterBuilder {
-    pub fn type_(self, val: CompoundFilterTypeKind) -> Self {
+    pub fn type_(self, val: TypeKind6) -> Self {
         self.inner.set_type(val);
         self
     }
@@ -36068,14 +35981,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_y(this: &BasicImageTransformationsGravityCoordinates, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn mode(
-        this: &BasicImageTransformationsGravityCoordinates,
-    ) -> Option<BasicImageTransformationsGravityCoordinatesModeKind>;
+    pub fn mode(this: &BasicImageTransformationsGravityCoordinates) -> Option<ModeKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(
-        this: &BasicImageTransformationsGravityCoordinates,
-        val: BasicImageTransformationsGravityCoordinatesModeKind,
-    );
+    pub fn set_mode(this: &BasicImageTransformationsGravityCoordinates, val: ModeKind2);
 }
 impl BasicImageTransformationsGravityCoordinates {
     pub fn new() -> BasicImageTransformationsGravityCoordinates {
@@ -36104,7 +36012,7 @@ impl BasicImageTransformationsGravityCoordinatesBuilder {
         self.inner.set_y(val);
         self
     }
-    pub fn mode(self, val: BasicImageTransformationsGravityCoordinatesModeKind) -> Self {
+    pub fn mode(self, val: ModeKind2) -> Self {
         self.inner.set_mode(val);
         self
     }
@@ -41694,7 +41602,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &EmailAttachment, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &EmailAttachment) -> EmailAttachmentContentKind;
+    pub fn content(this: &EmailAttachment) -> ContentKind2;
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &EmailAttachment, val: &str);
     #[wasm_bindgen(method, setter, js_name = "content")]
@@ -41880,7 +41788,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "from")]
     pub fn set_from_with_email_address(this: &SendEmailBuilder, val: &EmailAddress);
     #[wasm_bindgen(method, getter)]
-    pub fn to(this: &SendEmailBuilder) -> TextKind;
+    pub fn to(this: &SendEmailBuilder) -> ToKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_to(this: &SendEmailBuilder, val: &str);
     #[wasm_bindgen(method, setter, js_name = "to")]
@@ -41890,19 +41798,19 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_subject(this: &SendEmailBuilder, val: &str);
     #[wasm_bindgen(method, getter, js_name = "replyTo")]
-    pub fn reply_to(this: &SendEmailBuilder) -> Option<FromKind>;
+    pub fn reply_to(this: &SendEmailBuilder) -> Option<ReplyToKind>;
     #[wasm_bindgen(method, setter, js_name = "replyTo")]
     pub fn set_reply_to(this: &SendEmailBuilder, val: &str);
     #[wasm_bindgen(method, setter, js_name = "replyTo")]
     pub fn set_reply_to_with_email_address(this: &SendEmailBuilder, val: &EmailAddress);
     #[wasm_bindgen(method, getter)]
-    pub fn cc(this: &SendEmailBuilder) -> Option<TextKind>;
+    pub fn cc(this: &SendEmailBuilder) -> Option<CcKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cc(this: &SendEmailBuilder, val: &str);
     #[wasm_bindgen(method, setter, js_name = "cc")]
     pub fn set_cc_with_slice(this: &SendEmailBuilder, val: &[String]);
     #[wasm_bindgen(method, getter)]
-    pub fn bcc(this: &SendEmailBuilder) -> Option<TextKind>;
+    pub fn bcc(this: &SendEmailBuilder) -> Option<BccKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_bcc(this: &SendEmailBuilder, val: &str);
     #[wasm_bindgen(method, setter, js_name = "bcc")]
@@ -42390,7 +42298,7 @@ pub mod cloudflare {
             >(
                 this: &WorkerEntrypoint<Env, Props>,
                 request: &super::super::Request<CfHostMetadata, Cf>,
-            ) -> FetchReturnKind;
+            ) -> FetchReturnKind2;
             #[wasm_bindgen(method, catch, js_name = "fetch")]
             pub fn try_fetch<
                 Env: ::wasm_bindgen::JsGeneric,
@@ -42400,7 +42308,7 @@ pub mod cloudflare {
             >(
                 this: &WorkerEntrypoint<Env, Props>,
                 request: &super::super::Request<CfHostMetadata, Cf>,
-            ) -> Result<FetchReturnKind, JsValue>;
+            ) -> Result<FetchReturnKind2, JsValue>;
             #[wasm_bindgen(method)]
             pub fn queue<
                 Env: ::wasm_bindgen::JsGeneric,
@@ -42532,7 +42440,7 @@ pub mod cloudflare {
             >(
                 this: &DurableObject<Env, Props>,
                 request: &super::super::Request<CfHostMetadata, Cf>,
-            ) -> FetchReturnKind;
+            ) -> FetchReturnKind3;
             #[wasm_bindgen(method, catch, js_name = "fetch")]
             pub fn try_fetch<
                 Env: ::wasm_bindgen::JsGeneric,
@@ -42542,7 +42450,7 @@ pub mod cloudflare {
             >(
                 this: &DurableObject<Env, Props>,
                 request: &super::super::Request<CfHostMetadata, Cf>,
-            ) -> Result<FetchReturnKind, JsValue>;
+            ) -> Result<FetchReturnKind3, JsValue>;
             #[wasm_bindgen(method, js_name = "webSocketMessage")]
             pub fn web_socket_message<
                 Env: ::wasm_bindgen::JsGeneric,
@@ -42989,7 +42897,7 @@ pub mod cloudflare {
             #[wasm_bindgen(method, setter)]
             pub fn set_type(this: &WorkflowStepOptions, val: &str);
             #[wasm_bindgen(method, getter)]
-            pub fn timeout(this: &WorkflowStepOptions) -> Option<TimeoutKind>;
+            pub fn timeout(this: &WorkflowStepOptions) -> Option<TimeoutKind2>;
             #[wasm_bindgen(method, setter, js_name = "timeout")]
             fn __set_timeout(this: &WorkflowStepOptions, val: WorkflowTimeoutDuration);
             #[wasm_bindgen(method, setter, js_name = "timeout")]
@@ -43141,6 +43049,36 @@ pub mod cloudflare {
             #[wasm_bindgen(thread_local_v2)]
             pub static exports: JsValue;
         }
+        #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
+        pub enum FetchReturnKind2 {
+            Response(super::super::Response),
+            Promise(Promise<super::super::Response>),
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
+        pub enum TailStreamReturnKind {
+            Promise(Promise),
+            JsValue(JsValue),
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
+        pub enum FetchReturnKind3 {
+            Response(super::super::Response),
+            Promise(Promise<super::super::Response>),
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
+        pub enum TimeoutKind {
+            String(String),
+            F64(f64),
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Clone, Debug)]
+        pub enum TimeoutKind2 {
+            String(String),
+            F64(f64),
+        }
     }
     pub mod sockets {
         #[allow(unused_imports)]
@@ -43283,7 +43221,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageInfoResponse;
     #[wasm_bindgen(method, getter)]
-    pub fn format(this: &ImageInfoResponse) -> ImageInfoResponseFormatKind;
+    pub fn format(this: &ImageInfoResponse) -> FormatKind2;
     #[wasm_bindgen(method, setter)]
     pub fn set_format(this: &ImageInfoResponse, val: &str);
     #[wasm_bindgen(method, getter, js_name = "fileSize")]
@@ -43373,9 +43311,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_contrast(this: &ImageTransform, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn fit(this: &ImageTransform) -> Option<ImageTransformFitKind>;
+    pub fn fit(this: &ImageTransform) -> Option<FitKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fit(this: &ImageTransform, val: ImageTransformFitKind);
+    pub fn set_fit(this: &ImageTransform, val: FitKind);
     #[wasm_bindgen(method, getter)]
     pub fn flip(this: &ImageTransform) -> Option<FlipKind>;
     #[wasm_bindgen(method, setter)]
@@ -43389,15 +43327,15 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_segment(this: &ImageTransform, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn gravity(this: &ImageTransform) -> Option<ImageTransformGravityKind>;
+    pub fn gravity(this: &ImageTransform) -> Option<GravityKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_gravity(this: &ImageTransform, val: ImageTransformGravityKind);
+    pub fn set_gravity(this: &ImageTransform, val: GravityKind2);
     #[wasm_bindgen(method, setter, js_name = "gravity")]
     pub fn set_gravity_with_object(this: &ImageTransform, val: &Object);
     #[wasm_bindgen(method, getter)]
-    pub fn rotate(this: &ImageTransform) -> Option<ImageTransformRotateKind>;
+    pub fn rotate(this: &ImageTransform) -> Option<RotateKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_rotate(this: &ImageTransform, val: ImageTransformRotateKind);
+    pub fn set_rotate(this: &ImageTransform, val: RotateKind2);
     #[wasm_bindgen(method, getter)]
     pub fn saturation(this: &ImageTransform) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -43407,9 +43345,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_sharpen(this: &ImageTransform, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn trim(this: &ImageTransform) -> Option<TrimKind>;
+    pub fn trim(this: &ImageTransform) -> Option<TrimKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_trim(this: &ImageTransform, val: TrimKind);
+    pub fn set_trim(this: &ImageTransform, val: TrimKind2);
     #[wasm_bindgen(method, setter, js_name = "trim")]
     pub fn set_trim_with_object(this: &ImageTransform, val: &Object);
 }
@@ -43460,7 +43398,7 @@ impl ImageTransformBuilder {
         self.inner.set_contrast(val);
         self
     }
-    pub fn fit(self, val: ImageTransformFitKind) -> Self {
+    pub fn fit(self, val: FitKind) -> Self {
         self.inner.set_fit(val);
         self
     }
@@ -43476,7 +43414,7 @@ impl ImageTransformBuilder {
         self.inner.set_segment(val);
         self
     }
-    pub fn gravity(self, val: ImageTransformGravityKind) -> Self {
+    pub fn gravity(self, val: GravityKind2) -> Self {
         self.inner.set_gravity(val);
         self
     }
@@ -43484,7 +43422,7 @@ impl ImageTransformBuilder {
         self.inner.set_gravity_with_object(val);
         self
     }
-    pub fn rotate(self, val: ImageTransformRotateKind) -> Self {
+    pub fn rotate(self, val: RotateKind2) -> Self {
         self.inner.set_rotate(val);
         self
     }
@@ -43496,7 +43434,7 @@ impl ImageTransformBuilder {
         self.inner.set_sharpen(val);
         self
     }
-    pub fn trim(self, val: TrimKind) -> Self {
+    pub fn trim(self, val: TrimKind2) -> Self {
         self.inner.set_trim(val);
         self
     }
@@ -43518,7 +43456,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_opacity(this: &ImageDrawOptions, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn repeat(this: &ImageDrawOptions) -> Option<CfAigSkipCacheKind>;
+    pub fn repeat(this: &ImageDrawOptions) -> Option<RepeatKind2>;
     #[wasm_bindgen(method, setter)]
     pub fn set_repeat(this: &ImageDrawOptions, val: bool);
     #[wasm_bindgen(method, setter, js_name = "repeat")]
@@ -43634,9 +43572,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageOutputOptions;
     #[wasm_bindgen(method, getter)]
-    pub fn format(this: &ImageOutputOptions) -> ImageOutputOptionsFormatKind;
+    pub fn format(this: &ImageOutputOptions) -> FormatKind3;
     #[wasm_bindgen(method, setter)]
-    pub fn set_format(this: &ImageOutputOptions, val: ImageOutputOptionsFormatKind);
+    pub fn set_format(this: &ImageOutputOptions, val: FormatKind3);
     #[wasm_bindgen(method, getter)]
     pub fn quality(this: &ImageOutputOptions) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -43682,43 +43620,43 @@ impl ImageOutputOptions {
     #[doc = " Start a builder with `format: \"image/jpeg\"`."]
     pub fn builder_imagejpeg() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_format(ImageOutputOptionsFormatKind::Imagejpeg);
+        inner.set_format(FormatKind3::Imagejpeg);
         ImageOutputOptionsBuilder { inner }
     }
     #[doc = " Start a builder with `format: \"image/png\"`."]
     pub fn builder_imagepng() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_format(ImageOutputOptionsFormatKind::Imagepng);
+        inner.set_format(FormatKind3::Imagepng);
         ImageOutputOptionsBuilder { inner }
     }
     #[doc = " Start a builder with `format: \"image/gif\"`."]
     pub fn builder_imagegif() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_format(ImageOutputOptionsFormatKind::Imagegif);
+        inner.set_format(FormatKind3::Imagegif);
         ImageOutputOptionsBuilder { inner }
     }
     #[doc = " Start a builder with `format: \"image/webp\"`."]
     pub fn builder_imagewebp() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_format(ImageOutputOptionsFormatKind::Imagewebp);
+        inner.set_format(FormatKind3::Imagewebp);
         ImageOutputOptionsBuilder { inner }
     }
     #[doc = " Start a builder with `format: \"image/avif\"`."]
     pub fn builder_imageavif() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_format(ImageOutputOptionsFormatKind::Imageavif);
+        inner.set_format(FormatKind3::Imageavif);
         ImageOutputOptionsBuilder { inner }
     }
     #[doc = " Start a builder with `format: \"rgb\"`."]
     pub fn builder_rgb() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_format(ImageOutputOptionsFormatKind::Rgb);
+        inner.set_format(FormatKind3::Rgb);
         ImageOutputOptionsBuilder { inner }
     }
     #[doc = " Start a builder with `format: \"rgba\"`."]
     pub fn builder_rgba() -> ImageOutputOptionsBuilder {
         let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_format(ImageOutputOptionsFormatKind::Rgba);
+        inner.set_format(FormatKind3::Rgba);
         ImageOutputOptionsBuilder { inner }
     }
 }
@@ -44820,14 +44758,9 @@ extern "C" {
     pub type MediaTransformationInputOptions;
     #[doc = " How the media should be resized to fit the specified dimensions"]
     #[wasm_bindgen(method, getter)]
-    pub fn fit(
-        this: &MediaTransformationInputOptions,
-    ) -> Option<MediaTransformationInputOptionsFitKind>;
+    pub fn fit(this: &MediaTransformationInputOptions) -> Option<FitKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fit(
-        this: &MediaTransformationInputOptions,
-        val: MediaTransformationInputOptionsFitKind,
-    );
+    pub fn set_fit(this: &MediaTransformationInputOptions, val: FitKind2);
     #[doc = " Target width in pixels"]
     #[wasm_bindgen(method, getter)]
     pub fn width(this: &MediaTransformationInputOptions) -> Option<f64>;
@@ -44858,7 +44791,7 @@ pub struct MediaTransformationInputOptionsBuilder {
     inner: MediaTransformationInputOptions,
 }
 impl MediaTransformationInputOptionsBuilder {
-    pub fn fit(self, val: MediaTransformationInputOptionsFitKind) -> Self {
+    pub fn fit(self, val: FitKind2) -> Self {
         self.inner.set_fit(val);
         self
     }
@@ -44881,14 +44814,9 @@ extern "C" {
     pub type MediaTransformationOutputOptions;
     #[doc = " Output mode determining the type of media to generate"]
     #[wasm_bindgen(method, getter)]
-    pub fn mode(
-        this: &MediaTransformationOutputOptions,
-    ) -> Option<MediaTransformationOutputOptionsModeKind>;
+    pub fn mode(this: &MediaTransformationOutputOptions) -> Option<ModeKind3>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(
-        this: &MediaTransformationOutputOptions,
-        val: MediaTransformationOutputOptionsModeKind,
-    );
+    pub fn set_mode(this: &MediaTransformationOutputOptions, val: ModeKind3);
     #[doc = " Whether to include audio in the output"]
     #[wasm_bindgen(method, getter)]
     pub fn audio(this: &MediaTransformationOutputOptions) -> Option<bool>;
@@ -44911,14 +44839,9 @@ extern "C" {
     pub fn set_image_count(this: &MediaTransformationOutputOptions, val: f64);
     #[doc = " Output format for the generated media."]
     #[wasm_bindgen(method, getter)]
-    pub fn format(
-        this: &MediaTransformationOutputOptions,
-    ) -> Option<MediaTransformationOutputOptionsFormatKind>;
+    pub fn format(this: &MediaTransformationOutputOptions) -> Option<FormatKind4>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_format(
-        this: &MediaTransformationOutputOptions,
-        val: MediaTransformationOutputOptionsFormatKind,
-    );
+    pub fn set_format(this: &MediaTransformationOutputOptions, val: FormatKind4);
 }
 impl MediaTransformationOutputOptions {
     pub fn new() -> MediaTransformationOutputOptions {
@@ -44939,7 +44862,7 @@ pub struct MediaTransformationOutputOptionsBuilder {
     inner: MediaTransformationOutputOptions,
 }
 impl MediaTransformationOutputOptionsBuilder {
-    pub fn mode(self, val: MediaTransformationOutputOptionsModeKind) -> Self {
+    pub fn mode(self, val: ModeKind3) -> Self {
         self.inner.set_mode(val);
         self
     }
@@ -44959,7 +44882,7 @@ impl MediaTransformationOutputOptionsBuilder {
         self.inner.set_image_count(val);
         self
     }
-    pub fn format(self, val: MediaTransformationOutputOptionsFormatKind) -> Self {
+    pub fn format(self, val: FormatKind4) -> Self {
         self.inner.set_format(val);
         self
     }
@@ -47629,9 +47552,9 @@ extern "C" {
     pub fn set_language(this: &StreamCaption, val: &str);
     #[doc = " The status of a generated caption."]
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &StreamCaption) -> Option<StreamCaptionStatusKind>;
+    pub fn status(this: &StreamCaption) -> Option<StatusKind2>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_status(this: &StreamCaption, val: StreamCaptionStatusKind);
+    pub fn set_status(this: &StreamCaption, val: StatusKind2);
 }
 impl StreamCaption {
     #[doc = " * `label` - The language label displayed in the native language to users."]
@@ -47656,7 +47579,7 @@ impl StreamCaptionBuilder {
         self.inner.set_generated(val);
         self
     }
-    pub fn status(self, val: StreamCaptionStatusKind) -> Self {
+    pub fn status(self, val: StatusKind2) -> Self {
         self.inner.set_status(val);
         self
     }
@@ -48376,9 +48299,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "mimeType")]
     pub fn set_mime_type(this: &ConversionResponse, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn format(this: &ConversionResponse) -> ConversionResponseFormatKind;
+    pub fn format(this: &ConversionResponse) -> FormatKind5;
     #[wasm_bindgen(method, setter)]
-    pub fn set_format(this: &ConversionResponse, val: ConversionResponseFormatKind);
+    pub fn set_format(this: &ConversionResponse, val: FormatKind5);
     #[wasm_bindgen(method, getter)]
     pub fn tokens(this: &ConversionResponse) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -48419,7 +48342,7 @@ impl ConversionResponse {
         inner.set_id(id);
         inner.set_name(name);
         inner.set_mime_type(mime_type);
-        inner.set_format(ConversionResponseFormatKind::Markdown);
+        inner.set_format(FormatKind5::Markdown);
         inner.set_tokens(tokens);
         inner.set_data(data);
         ConversionResponseBuilder { inner }
@@ -48435,7 +48358,7 @@ impl ConversionResponse {
         inner.set_id(id);
         inner.set_name(name);
         inner.set_mime_type(mime_type);
-        inner.set_format(ConversionResponseFormatKind::Error);
+        inner.set_format(FormatKind5::Error);
         inner.set_error(error);
         ConversionResponseBuilder { inner }
     }
@@ -49279,7 +49202,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter)]
         pub fn name(this: &Attribute) -> String;
         #[wasm_bindgen(method, getter)]
-        pub fn value(this: &Attribute) -> AttributeValueKind;
+        pub fn value(this: &Attribute) -> ValueKind2;
     }
     impl Attribute {
         #[allow(clippy::new_without_default)]
@@ -49514,6 +49437,27 @@ pub mod tail_stream {
         pub fn build(self) -> TailEventHandlerObject {
             self.inner
         }
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum LevelKind {
+        Debug = "debug",
+        Error = "error",
+        Info = "info",
+        Log = "log",
+        Warn = "warn",
+    }
+    #[wasm_bindgen(private)]
+    #[derive(Clone, Debug)]
+    pub enum ValueKind2 {
+        String(String),
+        VecOfString(Vec<String>),
+        Bool(bool),
+        VecOfBool(Vec<bool>),
+        F64(f64),
+        VecOfF64(Vec<f64>),
+        BigInt(BigInt),
+        VecOfBigInt(Vec<BigInt>),
     }
 }
 #[wasm_bindgen(private)]
@@ -49927,7 +49871,7 @@ extern "C" {
     pub fn set_score(this: &VectorizeMatch, val: f64);
     #[doc = " The vector values"]
     #[wasm_bindgen(method, getter)]
-    pub fn values(this: &VectorizeMatch) -> Option<ValuesKind>;
+    pub fn values(this: &VectorizeMatch) -> Option<ValuesKind2>;
     #[wasm_bindgen(method, setter, js_name = "values")]
     fn __set_values(this: &VectorizeMatch, val: VectorFloatArray);
     #[wasm_bindgen(method, setter, js_name = "values")]
@@ -50997,9 +50941,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type InstanceStatus;
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &InstanceStatus) -> InstanceStatusStatusKind;
+    pub fn status(this: &InstanceStatus) -> StatusKind3;
     #[wasm_bindgen(method, setter)]
-    pub fn set_status(this: &InstanceStatus, val: InstanceStatusStatusKind);
+    pub fn set_status(this: &InstanceStatus, val: StatusKind3);
     #[wasm_bindgen(method, getter)]
     pub fn error(this: &InstanceStatus) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
@@ -51049,55 +50993,55 @@ impl InstanceStatus {
     #[doc = " Start a builder with `status: \"queued\"`."]
     pub fn builder_queued() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_status(InstanceStatusStatusKind::Queued);
+        inner.set_status(StatusKind3::Queued);
         InstanceStatusBuilder { inner }
     }
     #[doc = " Start a builder with `status: \"running\"`."]
     pub fn builder_running() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_status(InstanceStatusStatusKind::Running);
+        inner.set_status(StatusKind3::Running);
         InstanceStatusBuilder { inner }
     }
     #[doc = " Start a builder with `status: \"paused\"`."]
     pub fn builder_paused() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_status(InstanceStatusStatusKind::Paused);
+        inner.set_status(StatusKind3::Paused);
         InstanceStatusBuilder { inner }
     }
     #[doc = " Start a builder with `status: \"errored\"`."]
     pub fn builder_errored() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_status(InstanceStatusStatusKind::Errored);
+        inner.set_status(StatusKind3::Errored);
         InstanceStatusBuilder { inner }
     }
     #[doc = " Start a builder with `status: \"terminated\"`."]
     pub fn builder_terminated() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_status(InstanceStatusStatusKind::Terminated);
+        inner.set_status(StatusKind3::Terminated);
         InstanceStatusBuilder { inner }
     }
     #[doc = " Start a builder with `status: \"complete\"`."]
     pub fn builder_complete() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_status(InstanceStatusStatusKind::Complete);
+        inner.set_status(StatusKind3::Complete);
         InstanceStatusBuilder { inner }
     }
     #[doc = " Start a builder with `status: \"waiting\"`."]
     pub fn builder_waiting() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_status(InstanceStatusStatusKind::Waiting);
+        inner.set_status(StatusKind3::Waiting);
         InstanceStatusBuilder { inner }
     }
     #[doc = " Start a builder with `status: \"waitingForPause\"`."]
     pub fn builder_waiting_for_pause() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_status(InstanceStatusStatusKind::WaitingForPause);
+        inner.set_status(StatusKind3::WaitingForPause);
         InstanceStatusBuilder { inner }
     }
     #[doc = " Start a builder with `status: \"unknown\"`."]
     pub fn builder_unknown() -> InstanceStatusBuilder {
         let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_status(InstanceStatusStatusKind::Unknown);
+        inner.set_status(StatusKind3::Unknown);
         InstanceStatusBuilder { inner }
     }
 }
@@ -51278,25 +51222,25 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PartialAiGatewayHeaders;
     #[wasm_bindgen(method, getter, js_name = "cf-aig-metadata")]
-    pub fn cf_aig_metadata(this: &PartialAiGatewayHeaders) -> Option<CfAigMetadataKind>;
+    pub fn cf_aig_metadata(this: &PartialAiGatewayHeaders) -> Option<CfAigMetadataKind2>;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
     pub fn set_cf_aig_metadata(this: &PartialAiGatewayHeaders, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
     pub fn set_cf_aig_metadata_with_str(this: &PartialAiGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
-    pub fn cf_aig_custom_cost(this: &PartialAiGatewayHeaders) -> Option<PostProcessedOutputsKind>;
+    pub fn cf_aig_custom_cost(this: &PartialAiGatewayHeaders) -> Option<CfAigCustomCostKind2>;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
     pub fn set_cf_aig_custom_cost(this: &PartialAiGatewayHeaders, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
     pub fn set_cf_aig_custom_cost_with_str(this: &PartialAiGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-cache-ttl")]
-    pub fn cf_aig_cache_ttl(this: &PartialAiGatewayHeaders) -> Option<CfAigCacheTtlKind>;
+    pub fn cf_aig_cache_ttl(this: &PartialAiGatewayHeaders) -> Option<CfAigCacheTtlKind2>;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-cache-ttl")]
     pub fn set_cf_aig_cache_ttl(this: &PartialAiGatewayHeaders, val: f64);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-cache-ttl")]
     pub fn set_cf_aig_cache_ttl_with_str(this: &PartialAiGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-skip-cache")]
-    pub fn cf_aig_skip_cache(this: &PartialAiGatewayHeaders) -> Option<CfAigSkipCacheKind>;
+    pub fn cf_aig_skip_cache(this: &PartialAiGatewayHeaders) -> Option<CfAigSkipCacheKind2>;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-skip-cache")]
     pub fn set_cf_aig_skip_cache(this: &PartialAiGatewayHeaders, val: bool);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-skip-cache")]
@@ -51310,19 +51254,21 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "cf-aig-event-id")]
     pub fn set_cf_aig_event_id(this: &PartialAiGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-request-timeout")]
-    pub fn cf_aig_request_timeout(this: &PartialAiGatewayHeaders) -> Option<CfAigCacheTtlKind>;
+    pub fn cf_aig_request_timeout(
+        this: &PartialAiGatewayHeaders,
+    ) -> Option<CfAigRequestTimeoutKind2>;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-request-timeout")]
     pub fn set_cf_aig_request_timeout(this: &PartialAiGatewayHeaders, val: f64);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-request-timeout")]
     pub fn set_cf_aig_request_timeout_with_str(this: &PartialAiGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-max-attempts")]
-    pub fn cf_aig_max_attempts(this: &PartialAiGatewayHeaders) -> Option<CfAigCacheTtlKind>;
+    pub fn cf_aig_max_attempts(this: &PartialAiGatewayHeaders) -> Option<CfAigMaxAttemptsKind2>;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-max-attempts")]
     pub fn set_cf_aig_max_attempts(this: &PartialAiGatewayHeaders, val: f64);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-max-attempts")]
     pub fn set_cf_aig_max_attempts_with_str(this: &PartialAiGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-retry-delay")]
-    pub fn cf_aig_retry_delay(this: &PartialAiGatewayHeaders) -> Option<CfAigCacheTtlKind>;
+    pub fn cf_aig_retry_delay(this: &PartialAiGatewayHeaders) -> Option<CfAigRetryDelayKind2>;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-retry-delay")]
     pub fn set_cf_aig_retry_delay(this: &PartialAiGatewayHeaders, val: f64);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-retry-delay")]
@@ -51332,7 +51278,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "cf-aig-backoff")]
     pub fn set_cf_aig_backoff(this: &PartialAiGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-collect-log")]
-    pub fn cf_aig_collect_log(this: &PartialAiGatewayHeaders) -> Option<CfAigSkipCacheKind>;
+    pub fn cf_aig_collect_log(this: &PartialAiGatewayHeaders) -> Option<CfAigCollectLogKind2>;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-collect-log")]
     pub fn set_cf_aig_collect_log(this: &PartialAiGatewayHeaders, val: bool);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-collect-log")]
@@ -51481,7 +51427,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     fn __set_eq_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$ne")]
-    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<NeKind>>;
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     pub fn set_ne(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$ne")]
@@ -51493,7 +51439,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     fn __set_ne_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lt")]
-    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<LtKind>>;
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     pub fn set_lt(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$lt")]
@@ -51505,7 +51451,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     fn __set_lt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lte")]
-    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<LteKind>>;
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     pub fn set_lte(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$lte")]
@@ -51517,7 +51463,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     fn __set_lte_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gt")]
-    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<GtKind>>;
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     pub fn set_gt(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$gt")]
@@ -51529,7 +51475,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     fn __set_gt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gte")]
-    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<EqKind>>;
+    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> Option<Nullable<GteKind>>;
     #[wasm_bindgen(method, setter, js_name = "$gte")]
     pub fn set_gte(this: &VectorizeVectorMetadataFilter2, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$gte")]
@@ -51781,6 +51727,66 @@ pub enum HashKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
+pub enum InfoKind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum IvKind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum AdditionalDataKind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CounterKind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum LabelKind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum HashKind2 {
+    String(String),
+    SubtleCryptoHashAlgorithm(SubtleCryptoHashAlgorithm),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum PublicExponentKind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum HashKind3 {
+    String(String),
+    SubtleCryptoHashAlgorithm(SubtleCryptoHashAlgorithm),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum HashKind4 {
+    String(String),
+    SubtleCryptoHashAlgorithm(SubtleCryptoHashAlgorithm),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum PublicExponentKind2 {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BytesWrittenKind {
     F64(f64),
     BigInt(BigInt),
@@ -51818,6 +51824,13 @@ pub enum CacheKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
+pub enum HeadersKind2 {
+    Headers(Headers),
+    Record(Object<JsString>),
+    JsValue(JsValue),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BodyKind {
     ReadableStream(ReadableStream<Uint8Array>),
     String(String),
@@ -51836,9 +51849,33 @@ pub enum OnlyIfKind {
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
+pub enum OnlyIfKind2 {
+    Headers(Headers),
+    R2Conditional(R2Conditional),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum OnlyIfKind3 {
+    Headers(Headers),
+    R2Conditional(R2Conditional),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum RangeKind {
     Headers(Headers),
     R2Range(R2Range),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum SsecKeyKind {
+    ArrayBuffer(ArrayBuffer),
+    String(String),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum OnlyIfKind4 {
+    Headers(Headers),
+    R2Conditional(R2Conditional),
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
@@ -51854,6 +51891,76 @@ pub enum Md5Kind {
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Sha1Kind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Sha256Kind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Sha384Kind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum Sha512Kind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum SsecKeyKind2 {
+    ArrayBuffer(ArrayBuffer),
+    String(String),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum HttpMetadataKind2 {
+    Headers(Headers),
+    R2HttpMetadata(R2HTTPMetadata),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum SsecKeyKind3 {
+    ArrayBuffer(ArrayBuffer),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum SsecKeyKind4 {
+    ArrayBuffer(ArrayBuffer),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum HighWaterMarkKind {
+    F64(f64),
+    BigInt(BigInt),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum ExpectedLengthKind {
+    F64(f64),
+    BigInt(BigInt),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum HighWaterMarkKind2 {
+    F64(f64),
+    BigInt(BigInt),
+}
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryTypeKind {
     Blob = "blob",
@@ -51867,8 +51974,20 @@ pub enum SecureTransportKind {
     Starttls = "starttls",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum HighWaterMarkKind3 {
+    F64(f64),
+    BigInt(BigInt),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum HardTimeoutKind {
+    F64(f64),
+    BigInt(BigInt),
+}
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AiSearchConfigTypeKind {
+pub enum TypeKind2 {
     R2 = "r2",
     WebCrawler = "web-crawler",
 }
@@ -51895,7 +52014,7 @@ pub enum RoleKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum AiTextGenerationToolInputTypeKind {
+pub enum TypeKind3 {
     Function = "function",
     String(String),
 }
@@ -51945,6 +52064,12 @@ pub enum InstructionsKind {
     String(String),
     VecOfResponseInputItem(Vec<JsValue>),
 }
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum ToolChoiceKind2 {
+    ToolChoiceOptions(ToolChoiceOptions),
+    ToolChoiceFunction(ToolChoiceFunction),
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum ContentKind {
@@ -51953,7 +52078,7 @@ pub enum ContentKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum EasyInputMessageRoleKind {
+pub enum RoleKind2 {
     User = "user",
     Assistant = "assistant",
     System = "system",
@@ -52016,6 +52141,12 @@ pub enum StatusKind {
     Incomplete = "incomplete",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum OutputKind2 {
+    String(String),
+    VecOfJsValue(Vec<JsValue>),
+}
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DetailKind {
     Low = "low",
@@ -52024,13 +52155,13 @@ pub enum DetailKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ResponseInputItemFunctionCallOutputOutputKind {
+pub enum OutputKind3 {
     String(String),
     ResponseFunctionCallOutputItemList(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ResponseInputItemMessageRoleKind {
+pub enum RoleKind3 {
     User = "user",
     System = "system",
     Developer = "developer",
@@ -52043,10 +52174,40 @@ pub enum VerbosityKind {
     High = "high",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum TextKind2 {
+    String(String),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PoolingKind {
     Mean = "mean",
     Cls = "cls",
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum TextKind3 {
+    String(String),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum TextKind4 {
+    String(String),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum TextKind5 {
+    String(String),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum TextKind6 {
+    String(String),
+    VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
@@ -52055,14 +52216,32 @@ pub enum ImageKind {
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum ImageKind2 {
+    VecOfF64(Vec<f64>),
+    String(String),
+}
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind {
+pub enum TypeKind4 {
     JsonObject = "json_object",
     JsonSchema = "json_schema",
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
 pub enum PostProcessedOutputsKind {
+    String(String),
+    Object(Object),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum ResponseKind {
+    String(String),
+    Object(Object),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum PostProcessedOutputsKind2 {
     String(String),
     Object(Object),
 }
@@ -52092,6 +52271,30 @@ pub enum ModeKind {
     Finance = "finance",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum QueriesKind {
+    String(String),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum DocumentsKind {
+    String(String),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum TextKind7 {
+    String(String),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum AudioKind {
+    String(String),
+    Object(Object),
+}
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DtypeKind {
     Uint8 = "uint8",
@@ -52116,7 +52319,7 @@ pub enum SpeakerKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Ai_Cf_Deepgram_Aura_1_InputEncodingKind {
+pub enum EncodingKind2 {
     Linear16 = "linear16",
     Flac = "flac",
     Mulaw = "mulaw",
@@ -52131,6 +52334,12 @@ pub enum ContainerKind {
     None = "none",
     Wav = "wav",
     Ogg = "ogg",
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum TextKind8 {
+    String(String),
+    VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -52170,6 +52379,18 @@ pub enum TargetLanguageKind {
     UrdArab = "urd_Arab",
     UnrDeva = "unr_Deva",
 }
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum PostProcessedOutputsKind3 {
+    String(String),
+    Object(Object),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum TextKind9 {
+    String(String),
+    VecOfString(Vec<String>),
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MipOptOutKind {
@@ -52187,7 +52408,7 @@ pub enum EventKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind {
+pub enum SpeakerKind2 {
     Amalthea = "amalthea",
     Andromeda = "andromeda",
     Apollo = "apollo",
@@ -52231,7 +52452,7 @@ pub enum Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind {
+pub enum SpeakerKind3 {
     Sirio = "sirio",
     Nestor = "nestor",
     Carina = "carina",
@@ -52271,6 +52492,12 @@ pub enum CfAigMetadataKind {
     String(String),
     Record(Object),
 }
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum CfAigCustomCostKind {
+    String(String),
+    Object(Object),
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum CfAigCacheTtlKind {
@@ -52285,13 +52512,37 @@ pub enum CfAigSkipCacheKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
+pub enum CfAigRequestTimeoutKind {
+    F64(f64),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CfAigMaxAttemptsKind {
+    F64(f64),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CfAigRetryDelayKind {
+    F64(f64),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CfAigCollectLogKind {
+    Bool(bool),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ProviderKind {
     AiGatewayProviders(AIGatewayProviders),
     String(String),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ComparisonFilterTypeKind {
+pub enum TypeKind5 {
     Eq = "eq",
     Ne = "ne",
     Gt = "gt",
@@ -52308,7 +52559,7 @@ pub enum ValueKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CompoundFilterTypeKind {
+pub enum TypeKind6 {
     And = "and",
     Or = "or",
 }
@@ -52346,7 +52597,7 @@ pub enum RotateKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BasicImageTransformationsGravityCoordinatesModeKind {
+pub enum ModeKind2 {
     Remainder = "remainder",
     BoxCenter = "box-center",
 }
@@ -52435,7 +52686,7 @@ pub enum DispositionKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum EmailAttachmentContentKind {
+pub enum ContentKind2 {
     String(String),
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
@@ -52448,35 +52699,37 @@ pub enum FromKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum TailStreamReturnKind {
-    Promise(Promise),
-    JsValue(JsValue),
-}
-#[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
-pub enum TimeoutKind {
+pub enum ToKind {
     String(String),
-    F64(f64),
-}
-#[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
-pub enum ImageInfoResponseFormatKind {
-    Imagesvgxml = "image/svg+xml",
-    String(String),
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ImageTransformFitKind {
-    ScaleDown = "scale-down",
-    Contain = "contain",
-    Pad = "pad",
-    Squeeze = "squeeze",
-    Cover = "cover",
-    Crop = "crop",
+    VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum ImageTransformGravityKind {
+pub enum ReplyToKind {
+    String(String),
+    EmailAddress(EmailAddress),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CcKind {
+    String(String),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum BccKind {
+    String(String),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum FormatKind2 {
+    Imagesvgxml = "image/svg+xml",
+    String(String),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum GravityKind2 {
     Face = "face",
     Left = "left",
     Right = "right",
@@ -52489,15 +52742,27 @@ pub enum ImageTransformGravityKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ImageTransformRotateKind {
+pub enum RotateKind2 {
     N0 = 0,
     N90 = 90,
     N180 = 180,
     N270 = 270,
 }
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum TrimKind2 {
+    Border = "border",
+    Object(Object),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum RepeatKind2 {
+    Bool(bool),
+    String(String),
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ImageOutputOptionsFormatKind {
+pub enum FormatKind3 {
     Imagejpeg = "image/jpeg",
     Imagepng = "image/png",
     Imagegif = "image/gif",
@@ -52514,14 +52779,14 @@ pub enum SortOrderKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MediaTransformationInputOptionsFitKind {
+pub enum FitKind2 {
     Contain = "contain",
     Cover = "cover",
     ScaleDown = "scale-down",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MediaTransformationOutputOptionsModeKind {
+pub enum ModeKind3 {
     Video = "video",
     Spritesheet = "spritesheet",
     Frame = "frame",
@@ -52529,7 +52794,7 @@ pub enum MediaTransformationOutputOptionsModeKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MediaTransformationOutputOptionsFormatKind {
+pub enum FormatKind4 {
     Jpg = "jpg",
     Png = "png",
     M4A = "m4a",
@@ -52542,14 +52807,14 @@ pub enum PayloadKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum StreamCaptionStatusKind {
+pub enum StatusKind2 {
     Ready = "ready",
     Inprogress = "inprogress",
     Error = "error",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ConversionResponseFormatKind {
+pub enum FormatKind5 {
     Markdown = "markdown",
     Error = "error",
 }
@@ -52562,27 +52827,6 @@ pub enum DescriptionLanguageKind {
     It = "it",
     Pt = "pt",
     De = "de",
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LevelKind {
-    Debug = "debug",
-    Error = "error",
-    Info = "info",
-    Log = "log",
-    Warn = "warn",
-}
-#[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
-pub enum AttributeValueKind {
-    String(String),
-    VecOfString(Vec<String>),
-    Bool(bool),
-    VecOfBool(Vec<bool>),
-    F64(f64),
-    VecOfF64(Vec<f64>),
-    BigInt(BigInt),
-    VecOfBigInt(Vec<BigInt>),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
@@ -52598,8 +52842,15 @@ pub enum ValuesKind {
     VecOfF64(Vec<f64>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum ValuesKind2 {
+    Float32Array(Float32Array),
+    Float64Array(Float64Array),
+    VecOfF64(Vec<f64>),
+}
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum InstanceStatusStatusKind {
+pub enum StatusKind3 {
     Queued = "queued",
     Running = "running",
     Paused = "paused",
@@ -52610,9 +52861,97 @@ pub enum InstanceStatusStatusKind {
     WaitingForPause = "waitingForPause",
     Unknown = "unknown",
 }
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum CfAigMetadataKind2 {
+    String(String),
+    Record(Object),
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum CfAigCustomCostKind2 {
+    String(String),
+    Object(Object),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CfAigCacheTtlKind2 {
+    F64(f64),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CfAigSkipCacheKind2 {
+    Bool(bool),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CfAigRequestTimeoutKind2 {
+    F64(f64),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CfAigMaxAttemptsKind2 {
+    F64(f64),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CfAigRetryDelayKind2 {
+    F64(f64),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CfAigCollectLogKind2 {
+    Bool(bool),
+    String(String),
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum EqKind {
+    String(String),
+    F64(f64),
+    Bool(bool),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum NeKind {
+    String(String),
+    F64(f64),
+    Bool(bool),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum LtKind {
+    String(String),
+    F64(f64),
+    Bool(bool),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum LteKind {
+    String(String),
+    F64(f64),
+    Bool(bool),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum GtKind {
+    String(String),
+    F64(f64),
+    Bool(bool),
+    VecOfString(Vec<String>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum GteKind {
     String(String),
     F64(f64),
     Bool(bool),

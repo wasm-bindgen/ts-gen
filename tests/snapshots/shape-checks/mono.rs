@@ -148,6 +148,24 @@ pub mod shapes {
         #[wasm_bindgen(catch, js_name = "pickOrText", js_namespace = "Shapes")]
         pub fn pick_or_text(kind: f64) -> Result<PickOrTextReturnKind, JsValue>;
     }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum PickReturnKind {
+        Ticket(Ticket),
+        RoundingOptions(RoundingOptions),
+    }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum PickAnyReturnKind {
+        Ticket(Ticket),
+        Object(Object),
+    }
+    #[wasm_bindgen(private, fallback)]
+    #[derive(Clone, Debug)]
+    pub enum PickOrTextReturnKind {
+        String(String),
+        RoundingOptions(RoundingOptions),
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -282,24 +300,6 @@ impl ChoiceBuilder {
     pub fn build(self) -> Choice {
         self.inner
     }
-}
-#[wasm_bindgen(private, fallback)]
-#[derive(Clone, Debug)]
-pub enum PickReturnKind {
-    Ticket(shapes::Ticket),
-    RoundingOptions(shapes::RoundingOptions),
-}
-#[wasm_bindgen(private, fallback)]
-#[derive(Clone, Debug)]
-pub enum PickAnyReturnKind {
-    Ticket(shapes::Ticket),
-    Object(Object),
-}
-#[wasm_bindgen(private, fallback)]
-#[derive(Clone, Debug)]
-pub enum PickOrTextReturnKind {
-    String(String),
-    RoundingOptions(shapes::RoundingOptions),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

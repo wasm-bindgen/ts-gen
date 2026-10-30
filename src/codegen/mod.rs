@@ -5,6 +5,7 @@
 
 pub mod classes;
 pub mod discriminated_unions;
+pub(crate) mod dynamic_unions;
 pub mod enums;
 pub mod error_enum;
 pub mod functions;
@@ -389,11 +390,11 @@ fn generate_tokens(
         ));
     }
 
-    // Dynamic-union enums synthesised during the per-declaration
-    // emit pass. Lowering their payloads can record externals (a
-    // `Worker` reachable only through a `<Name>Kind` arm), so they
-    // are built before the `use` statements are collected.
-    let dynamic_unions = generate_dynamic_unions(&cgctx);
+    // Synthesised enums whose first use is at the top level; a namespace's
+    // are emitted at the end of its `pub mod`. Lowering their payloads can
+    // record externals (a `Worker` reachable only through a `<Name>Kind`
+    // arm), so they are built before the `use` statements are collected.
+    let dynamic_unions = dynamic_unions::generate_dynamic_unions_in(&cgctx, &[]);
 
     let external_uses = cgctx.external_use_tokens();
 
@@ -403,82 +404,9 @@ fn generate_tokens(
         #preamble
         #external_uses
         #(#global_items)*
-        #dynamic_unions
+        #(#dynamic_unions)*
         #error_enum
     })
-}
-
-/// Emit the synthesised dynamic-union enums collected on `cgctx`
-/// during the per-declaration pass. Each enum lowers each member
-/// type via the regular return-position path, resolved from the
-/// scope and module of the union's first use site.
-fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
-    use crate::ir::TypeRef as T;
-    let registry = cgctx.dynamic_unions.borrow();
-    if registry.by_key.is_empty() {
-        return quote! {};
-    }
-    let enums: Vec<TokenStream> = registry
-        .by_key
-        .values()
-        .map(|info| {
-            let enum_ident = typemap::make_ident(&info.rust_name);
-            if info.merged_shapes.len() > 1 {
-                let names: Vec<String> = info.merged_shapes.iter().map(|m| m.format_ts()).collect();
-                cgctx.warn(format!(
-                    "`{}` in one union can't be told apart at runtime; they share one `Object` arm \
-                     of `{}`",
-                    names.join("`, `"),
-                    info.rust_name
-                ));
-            }
-            let members = &info.members;
-            let variants: Vec<TokenStream> = members
-                .iter()
-                .zip(dynamic_union_variant_names(members))
-                .map(|(m, variant_name)| {
-                    let variant_ident = typemap::make_ident(&variant_name);
-                    match m {
-                        // Literal members become discriminant variants.
-                        // `typemap::dynamic_union_members` only keeps
-                        // number literals when every member is a 32-bit
-                        // integer literal (a C-style enum), and widens
-                        // boolean literals to `boolean`.
-                        T::StringLiteral(s) => quote! { #variant_ident = #s },
-                        T::NumberLiteral(n) if n.fract() == 0.0 => {
-                            let lit = proc_macro2::Literal::i64_unsuffixed(n.abs() as i64);
-                            let sign = (*n < 0.0).then(|| quote! { - });
-                            quote! { #variant_ident = #sign #lit }
-                        }
-                        _ => {
-                            let payload = typemap::to_syn_type(
-                                m,
-                                typemap::TypePosition::RETURN,
-                                Some(cgctx),
-                                info.scope,
-                                &info.from_module,
-                            );
-                            quote! { #variant_ident(#payload) }
-                        }
-                    }
-                })
-                .collect();
-            let fallback = info.fallback.then(|| quote! { , fallback });
-            let has_payload = members.iter().any(|m| {
-                !matches!(m, T::StringLiteral(_))
-                    && !matches!(m, T::NumberLiteral(n) if n.fract() == 0.0)
-            });
-            let derives = enums::enum_derives(has_payload);
-            quote! {
-                #[wasm_bindgen(private #fallback)]
-                #derives
-                pub enum #enum_ident {
-                    #(#variants),*
-                }
-            }
-        })
-        .collect();
-    quote! { #(#enums)* }
 }
 
 /// Variant names for the members of a synthesised dynamic union, in member
@@ -1070,6 +998,12 @@ impl<'d> ModTree<'d> {
             }
         }
         cgctx.statics_in_scope.replace(outer_statics);
+        // The synthesised enums first used in this namespace, all of whose
+        // uses have been emitted by now. The top level's follow the rest of
+        // the output instead.
+        if !path.is_empty() {
+            items.extend(dynamic_unions::generate_dynamic_unions_in(cgctx, path));
+        }
         items
     }
 }
