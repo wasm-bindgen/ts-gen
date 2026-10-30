@@ -95,6 +95,24 @@ primary plus a `try_<name>` companion:
 ts-gen --input types.d.ts --output src/bindings.rs --fallible
 ```
 
+### Provided functions (`--provides`)
+
+The reverse direction: what the module provides to JS, as a `.d.ts` export
+surface or an interface shorthand such as `ExportedHandler.fetch`. Writes
+`provides.rs` (wasm-bindgen exports delegating to `super::app`) and an
+`app.rs` scaffold next to the output; see "Provided functions" in
+[CONVENTIONS.md](CONVENTIONS.md).
+
+```sh
+ts-gen --input worker.d.ts --output src/bindings.rs --provides ExportedHandler.fetch
+```
+
+| Flag | Description |
+|------|-------------|
+| `--provides` | A `.d.ts` export surface, or `Name[.member,...]` |
+| `--provides-app` | Module path the wrapper delegates to; its last segment names the scaffold (default `super::app`) |
+| `--provides-bindings` | Module path of the bindings (default `super::<output stem>`, with `-` and `.` replaced by `_`) |
+
 ### Library API
 
 ```rust

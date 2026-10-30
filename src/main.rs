@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
@@ -130,6 +130,25 @@ struct Cli {
     /// generic imports instead of erasing their type parameters to JsValue.
     #[arg(long = "experimental-generic-mono")]
     experimental_generic_mono: bool,
+
+    /// What the module provides to JS, the reverse of the bindings. Either
+    /// a `.d.ts` whose exports are the module's exports, or
+    /// `Name[.member,...]`: an input interface the default export
+    /// implements, with optional members listed to include them. Writes
+    /// `provides.rs` (wasm-bindgen exports delegating to the app module)
+    /// and, if absent, the app module's scaffold, next to the output.
+    #[arg(long)]
+    provides: Option<String>,
+
+    /// Module path the `--provides` wrapper delegates to, relative to the
+    /// wrapper's parent; its last segment names the scaffold file.
+    #[arg(long, default_value = "super::app")]
+    provides_app: String,
+
+    /// Module path of the generated bindings, for the `--provides` wrapper.
+    /// Defaults to `super::<output file stem>`, with `-` and `.` replaced by `_`.
+    #[arg(long)]
+    provides_bindings: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -155,6 +174,10 @@ fn main() -> Result<()> {
         gctx.external_map.add_mappings(mapping);
     }
 
+    let provided = match &cli.provides {
+        Some(spec) => ts_gen::provides::resolve(spec, &module, &mut gctx)?,
+        None => Vec::new(),
+    };
     gctx.diagnostics.emit();
 
     if cli.verbose {
@@ -210,22 +233,85 @@ fn main() -> Result<()> {
     if let Some(name) = &cli.error_enum {
         options = options.error_enum(name);
     }
-    let rust_source = ts_gen::codegen::generate_with_options(&module, &gctx, &options)?;
+    let source = ts_gen::codegen::generate_with_options(&module, &gctx, &options)?;
 
-    // Write output file, creating parent directories if needed
-    if let Some(parent) = cli.output.parent() {
+    write_file(&cli.output, &source)?;
+
+    if !provided.is_empty() {
+        let bindings = cli
+            .provides_bindings
+            .clone()
+            .unwrap_or_else(|| default_bindings_path(&cli.output));
+        let app: syn::Path = syn::parse_str(&cli.provides_app)
+            .with_context(|| format!("--provides-app {:?} is not a path", cli.provides_app))?;
+        let app_file_stem = app
+            .segments
+            .last()
+            .map(|s| s.ident.to_string())
+            .unwrap_or_else(|| "app".into());
+        let paths = ts_gen::codegen::provides::ProvidesPaths {
+            bindings: syn::parse_str(&bindings)
+                .with_context(|| format!("--provides-bindings {bindings:?} is not a path"))?,
+            app,
+        };
+        let (wrapper, scaffold) =
+            ts_gen::codegen::generate_provides(&module, &gctx, &options, &provided, &paths)?;
+        let dir = cli
+            .output
+            .parent()
+            .map(Path::to_path_buf)
+            .unwrap_or_default();
+        write_file(&dir.join("provides.rs"), &wrapper)?;
+        let app_file = dir.join(format!("{app_file_stem}.rs"));
+        if app_file.exists() {
+            eprintln!("[ts-gen] Kept existing {}", app_file.display());
+        } else {
+            write_file(&app_file, &scaffold)?;
+        }
+    }
+    eprintln!("[ts-gen] Done");
+
+    Ok(())
+}
+
+/// `super::<output stem>`, with characters that can't appear in an
+/// identifier replaced by `_` (`my-bindings.rs` is declared as
+/// `#[path = "my-bindings.rs"] mod my_bindings;`) and a keyword stem
+/// raw (`type.rs` → `r#type`).
+fn default_bindings_path(output: &Path) -> String {
+    let stem = output
+        .file_stem()
+        .map(|s| s.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "bindings".into());
+    let ident: String = stem
+        .chars()
+        .map(|c| {
+            if c.is_alphanumeric() || c == '_' {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect();
+    let raw = format!("r#{ident}");
+    let is_ident = |s: &str| syn::parse_str::<syn::Ident>(s).is_ok();
+    if !is_ident(&ident) && is_ident(&raw) {
+        format!("super::{raw}")
+    } else {
+        format!("super::{ident}")
+    }
+}
+
+fn write_file(path: &std::path::Path, contents: impl AsRef<[u8]>) -> Result<()> {
+    if let Some(parent) = path.parent() {
         if !parent.as_os_str().is_empty() {
             std::fs::create_dir_all(parent)
                 .with_context(|| format!("Failed to create directory: {}", parent.display()))?;
         }
     }
-
-    std::fs::write(&cli.output, &rust_source)
-        .with_context(|| format!("Failed to write {}", cli.output.display()))?;
-
-    eprintln!("[ts-gen] Wrote {}", cli.output.display());
-    eprintln!("[ts-gen] Done");
-
+    std::fs::write(path, contents)
+        .with_context(|| format!("Failed to write {}", path.display()))?;
+    eprintln!("[ts-gen] Wrote {}", path.display());
     Ok(())
 }
 
@@ -411,6 +497,26 @@ fn print_member(member: &ts_gen::ir::Member, indent: usize) {
                 params.join(", "),
                 m.return_type
             );
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_bindings_path_is_a_rust_path() {
+        for (output, path) in [
+            ("src/bindings.rs", "super::bindings"),
+            ("src/my-bindings.rs", "super::my_bindings"),
+            ("src/my.bindings.rs", "super::my_bindings"),
+            ("src/bindings_2.rs", "super::bindings_2"),
+            ("src/MyBindings.rs", "super::MyBindings"),
+            ("src/type.rs", "super::r#type"),
+        ] {
+            assert_eq!(default_bindings_path(Path::new(output)), path);
+            assert!(syn::parse_str::<syn::Path>(path).is_ok(), "{path}");
         }
     }
 }
