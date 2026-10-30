@@ -5,6 +5,7 @@
 
 pub mod classes;
 pub mod discriminated_unions;
+pub(crate) mod dynamic_unions;
 pub mod enums;
 pub mod error_enum;
 pub mod functions;
@@ -179,11 +180,24 @@ pub fn generate(module: &Module, gctx: &crate::context::GlobalContext) -> anyhow
 }
 
 /// Generate Rust source code with explicit options.
+///
+/// `options.experimental_generic_mono` has to match the
+/// [`ParseOptions`](crate::parse::ParseOptions) the IR was parsed with:
+/// evaluation already lowered literal-only type parameters for one mode.
 pub fn generate_with_options(
     module: &Module,
     gctx: &crate::context::GlobalContext,
     options: &GenerateOptions,
 ) -> anyhow::Result<String> {
+    if gctx.experimental_generic_mono != options.experimental_generic_mono {
+        let mode = |mono: bool| if mono { "with" } else { "without" };
+        anyhow::bail!(
+            "the IR was parsed {} `experimental_generic_mono` but is generated {} it; \
+             parse and generate in the same mode",
+            mode(gctx.experimental_generic_mono),
+            mode(options.experimental_generic_mono),
+        );
+    }
     let tokens = generate_tokens(module, gctx, options)?;
     // Validate that the tokens are valid Rust syntax.
     let mut file = syn::parse2::<syn::File>(tokens.clone()).map_err(|e| {
@@ -389,11 +403,11 @@ fn generate_tokens(
         ));
     }
 
-    // Dynamic-union enums synthesised during the per-declaration
-    // emit pass. Lowering their payloads can record externals (a
-    // `Worker` reachable only through a `<Name>Kind` arm), so they
-    // are built before the `use` statements are collected.
-    let dynamic_unions = generate_dynamic_unions(&cgctx);
+    // Synthesised enums whose first use is at the top level; a namespace's
+    // are emitted at the end of its `pub mod`. Lowering their payloads can
+    // record externals (a `Worker` reachable only through a `<Name>Kind`
+    // arm), so they are built before the `use` statements are collected.
+    let dynamic_unions = dynamic_unions::generate_dynamic_unions_in(&cgctx, &[]);
 
     let external_uses = cgctx.external_use_tokens();
 
@@ -403,76 +417,9 @@ fn generate_tokens(
         #preamble
         #external_uses
         #(#global_items)*
-        #dynamic_unions
+        #(#dynamic_unions)*
         #error_enum
     })
-}
-
-/// Emit the synthesised dynamic-union enums collected on `cgctx`
-/// during the per-declaration pass. Each enum lowers each member
-/// type via the regular return-position path, resolved from the
-/// scope and module of the union's first use site.
-fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
-    use crate::ir::TypeRef as T;
-    let registry = cgctx.dynamic_unions.borrow();
-    if registry.by_key.is_empty() {
-        return quote! {};
-    }
-    let enums: Vec<TokenStream> = registry
-        .by_key
-        .values()
-        .map(|info| {
-            let enum_ident = typemap::make_ident(&info.rust_name);
-            if info.merged_shapes.len() > 1 {
-                let names: Vec<String> = info.merged_shapes.iter().map(|m| m.format_ts()).collect();
-                cgctx.warn(format!(
-                    "`{}` in one union can't be told apart at runtime; they share one `Object` arm \
-                     of `{}`",
-                    names.join("`, `"),
-                    info.rust_name
-                ));
-            }
-            let members = &info.members;
-            let variants: Vec<TokenStream> = members
-                .iter()
-                .zip(dynamic_union_variant_names(members))
-                .map(|(m, variant_name)| {
-                    let variant_ident = typemap::make_ident(&variant_name);
-                    match m {
-                        // Literal members become discriminant variants.
-                        // `typemap::dynamic_union_members` only keeps
-                        // number literals when every member is a 32-bit
-                        // integer literal (a C-style enum), and widens
-                        // boolean literals to `boolean`.
-                        T::StringLiteral(s) => quote! { #variant_ident = #s },
-                        T::NumberLiteral(n) if n.fract() == 0.0 => {
-                            let lit = proc_macro2::Literal::i64_unsuffixed(n.abs() as i64);
-                            let sign = (*n < 0.0).then(|| quote! { - });
-                            quote! { #variant_ident = #sign #lit }
-                        }
-                        _ => {
-                            let payload = typemap::to_syn_type(
-                                m,
-                                typemap::TypePosition::RETURN,
-                                Some(cgctx),
-                                info.scope,
-                                &info.from_module,
-                            );
-                            quote! { #variant_ident(#payload) }
-                        }
-                    }
-                })
-                .collect();
-            let fallback = info.fallback.then(|| quote! { , fallback });
-            quote! {
-                #[wasm_bindgen(private #fallback)]
-                pub enum #enum_ident {
-                    #(#variants),*
-                }
-            }
-        })
-        .collect();
-    quote! { #(#enums)* }
 }
 
 /// Variant names for the members of a synthesised dynamic union, in member
@@ -557,6 +504,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
         T::Union(_) | T::PropertyKey => "JsValue".to_string(),
         T::Intersection(_) => "JsValue".to_string(),
         T::Function(_) => "Function".to_string(),
+        T::Projection { assoc, .. } => assoc.clone(),
         T::Unresolved(_)
         | T::Never
         | T::KeyOf(_)
@@ -959,8 +907,9 @@ struct ModTree<'d> {
 }
 
 enum ModEntry<'d> {
-    /// A declaration and the JS path of the namespaces enclosing it.
-    Item(&'d TypeDeclaration, Vec<String>),
+    /// A declaration, its id and the JS path of the namespaces enclosing
+    /// it.
+    Item(&'d TypeDeclaration, crate::context::TypeId, Vec<String>),
     /// A child `pub mod`, at the position of its first declaration.
     Mod(String),
 }
@@ -1005,7 +954,7 @@ impl<'d> ModTree<'d> {
                     }
                 }
             }
-            _ => self.entries.push(ModEntry::Item(decl, js_namespace)),
+            _ => self.entries.push(ModEntry::Item(decl, id, js_namespace)),
         }
     }
 
@@ -1013,7 +962,7 @@ impl<'d> ModTree<'d> {
     fn generate(&self, path: &mut Vec<String>, cgctx: &CodegenContext) -> Vec<TokenStream> {
         let mut value_names =
             functions::ValueNames::new(self.entries.iter().filter_map(|entry| match entry {
-                ModEntry::Item(decl, js_namespace) => Some((*decl, js_namespace.as_slice())),
+                ModEntry::Item(decl, _, js_namespace) => Some((*decl, js_namespace.as_slice())),
                 ModEntry::Mod(_) => None,
             }));
         // A child module's `use super::*` brings its parent's statics into
@@ -1026,13 +975,22 @@ impl<'d> ModTree<'d> {
         let mut items = Vec::new();
         for entry in &self.entries {
             match entry {
-                ModEntry::Item(decl, js_namespace) => {
+                ModEntry::Item(decl, id, js_namespace) => {
                     cgctx.emit_path.replace(path.clone());
                     items.extend(if js_namespace.is_empty() {
                         generate_declaration(decl, cgctx, &mut value_names)
                     } else {
                         generate_ns_declaration(decl, js_namespace, cgctx, &mut value_names)
                     });
+                    if cgctx.experimental_generic_mono {
+                        for t in cgctx.gctx.param_traits.get(id).into_iter().flatten() {
+                            items.push(classes::generate_param_trait(
+                                t,
+                                cgctx,
+                                &decl.module_context,
+                            ));
+                        }
+                    }
                 }
                 ModEntry::Mod(name) => {
                     path.push(name.clone());
@@ -1062,7 +1020,25 @@ impl<'d> ModTree<'d> {
                 }
             }
         }
+        let enums: Vec<(&crate::ir::StringEnumDecl, bool)> = self
+            .entries
+            .iter()
+            .filter_map(|entry| match entry {
+                ModEntry::Item(decl, id, _) => match &decl.kind {
+                    TypeKind::StringEnum(e) => Some((e, cgctx.gctx.synthesised_enums.contains(id))),
+                    _ => None,
+                },
+                ModEntry::Mod(_) => None,
+            })
+            .collect();
+        items.extend(enums::generate_subset_conversions(&enums));
         cgctx.statics_in_scope.replace(outer_statics);
+        // The synthesised enums first used in this namespace, all of whose
+        // uses have been emitted by now. The top level's follow the rest of
+        // the output instead.
+        if !path.is_empty() {
+            items.extend(dynamic_unions::generate_dynamic_unions_in(cgctx, path));
+        }
         items
     }
 }
@@ -1148,8 +1124,104 @@ fn generate_ns_declaration(
 
 #[cfg(test)]
 mod tests {
-    use super::{js_namespace_attr, split_unshared_views, UNSHARED_VIEW};
+    use super::{js_namespace_attr, split_unshared_views, GenerateOptions, UNSHARED_VIEW};
     use quote::{quote, ToTokens};
+
+    /// The variants of the enum the builder of `child` takes for
+    /// `largest_unit`.
+    fn largest_unit_variants(out: &str, child: &str) -> Vec<String> {
+        let builder = out
+            .split(&format!("impl {child}Builder {{"))
+            .nth(1)
+            .unwrap_or_else(|| panic!("no {child}Builder in\n{out}"));
+        let ty = builder
+            .split("pub fn largest_unit(self, val: ")
+            .nth(1)
+            .and_then(|rest| rest.split(')').next())
+            .unwrap();
+        let name = ty.rsplit("::").next().unwrap();
+        let body = out
+            .split(&format!("pub enum {name} {{"))
+            .nth(1)
+            .unwrap_or_else(|| panic!("no enum {name} in\n{out}"));
+        let body = body.split('}').next().unwrap();
+        body.split('"')
+            .skip(1)
+            .step_by(2)
+            .map(str::to_string)
+            .collect()
+    }
+
+    #[test]
+    fn projections_resolve_within_their_family_and_declaration() {
+        let src = "
+            interface Rounding<U extends \"hour\" | \"day\"> {
+              largestUnit?: \"auto\" | U | \"days\";
+            }
+            interface HourRounding extends Rounding<\"hour\"> {}
+            interface Spanning<U extends \"hour\" | \"week\"> {
+              largestUnit?: \"auto\" | U;
+            }
+            interface HourSpanning extends Spanning<\"hour\"> {}
+            declare namespace Spans {
+              type Unit = \"hour\" | \"hours\";
+              interface Span<U extends Unit | \"day\"> { largestUnit?: \"auto\" | U }
+              interface HourSpan extends Span<Unit> {}
+              interface Mid<U extends Unit | \"day\"> extends Span<U> {}
+            }
+            declare namespace Steps {
+              type Unit = \"day\" | \"hours\";
+              interface DaySpan extends Spans.Span<Unit> {}
+              interface DaySpan2 extends Spans.Mid<Unit> {}
+            }";
+        let options = crate::parse::ParseOptions::new().experimental_generic_mono(true);
+        let (module, gctx) = crate::parse_source_with_options(src, None, &options).unwrap();
+        let options = GenerateOptions::new().experimental_generic_mono(true);
+        let out = super::generate_with_options(&module, &gctx, &options).unwrap();
+        // Both families name their associated type `LargestUnit`, and both
+        // are instantiated at the same `Hour` enum.
+        assert_eq!(
+            largest_unit_variants(&out, "HourRounding"),
+            ["auto", "hour", "days"]
+        );
+        assert_eq!(
+            largest_unit_variants(&out, "HourSpanning"),
+            ["auto", "hour"]
+        );
+        // `Spans.Unit` and `Steps.Unit` are two arguments of one family.
+        assert_eq!(
+            largest_unit_variants(&out, "HourSpan"),
+            ["auto", "hour", "hours"]
+        );
+        assert_eq!(
+            largest_unit_variants(&out, "DaySpan"),
+            ["auto", "day", "hours"]
+        );
+        // Inherited through `Mid`, `Unit` still resolves where it's written.
+        assert_eq!(
+            largest_unit_variants(&out, "DaySpan2"),
+            ["auto", "day", "hours"]
+        );
+    }
+
+    #[test]
+    fn generating_in_another_mode_than_parsed_is_an_error() {
+        let src = "interface Rounding<U extends \"hour\" | \"minute\"> { unit?: U }";
+        for parsed in [false, true] {
+            let options = crate::parse::ParseOptions::new().experimental_generic_mono(parsed);
+            let (module, gctx) = crate::parse_source_with_options(src, None, &options).unwrap();
+            for generated in [false, true] {
+                let options = GenerateOptions::new().experimental_generic_mono(generated);
+                let result = super::generate_with_options(&module, &gctx, &options);
+                if parsed == generated {
+                    result.unwrap();
+                } else {
+                    let err = result.unwrap_err().to_string();
+                    assert!(err.contains("same mode"), "{err}");
+                }
+            }
+        }
+    }
 
     #[test]
     fn unshared_views_split_on_target_feature_atomics() {

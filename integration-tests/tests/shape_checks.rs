@@ -5,8 +5,8 @@ use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::shape_checks::{
-    shapes, Choice, GlobalInit, ModuleOptions, PickAnyReturnKind, PickOrTextReturnKind,
-    PickReturnKind,
+    shapes::{self, PickAnyReturnKind, PickOrTextReturnKind, PickReturnKind},
+    Choice, GlobalInit, ModuleOptions,
 };
 
 // The fixture has no backing module, so the namespace is installed before

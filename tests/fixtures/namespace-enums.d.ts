@@ -19,4 +19,70 @@ declare global {
       Fine = 2,
     }
   }
+
+  // A synthesised enum is emitted in the module of its first use; uses in
+  // other modules name it by path. A set of literals is shared by every use
+  // of the same values; any other union belongs to the member declaring it.
+  // Names are `<Anchor>Kind`, numbered when taken.
+  namespace Clock {
+    interface ToStringOptions {
+      // `OffsetKind`; `FromOptions.offset` is another set, `OffsetKind2`.
+      offset?: "auto" | "never";
+      // The values of `js_sys::Intl::RoundingMode`, which stands in.
+      roundingMode?: "ceil" | "floor" | "expand" | "trunc" | "halfCeil" | "halfFloor" | "halfExpand" | "halfTrunc" | "halfEven";
+      // Emitted in `clock`; `Calendar.Options`, a sibling namespace, names
+      // it by path.
+      unit?: "day" | "week";
+      // Also `FromOptions.display`, under this name.
+      style?: "short" | "long";
+      // Not a literal set: one enum per owner and member, so
+      // `FromOptions.precision` is `PrecisionKind2`.
+      precision?: number | "auto";
+    }
+
+    interface FromOptions {
+      display?: "short" | "long";
+      precision?: number | "auto";
+      offset?: "use" | "ignore" | "prefer" | "reject";
+      // Shared with `Clock.Zone.Options`.
+      overflow?: "constrain" | "reject";
+    }
+
+    namespace Zone {
+      interface Options {
+        overflow?: "constrain" | "reject";
+        // Only used here: emitted in `clock::zone`.
+        mode?: "fast" | "slow";
+        // `Calendar.Options.limit` is spelled the same, on an owner of the
+        // same name, but its `Foo` is another type: its own enum.
+        limit?: Foo | number;
+      }
+
+      interface Foo {
+        zone: string;
+      }
+    }
+  }
+
+  namespace Calendar {
+    interface Options {
+      unit?: "day" | "week";
+      limit?: Foo | number;
+    }
+
+    interface Foo {
+      calendar: string;
+    }
+
+    // One set in two orders, whose values give the same variant name: the
+    // enum numbers them in its first use's order, which every setter,
+    // builder and literal factory names them by.
+    interface Separator {
+      sep?: "foo-bar" | "foo_bar";
+    }
+
+    interface ReversedSeparator {
+      sep: "foo_bar" | "foo-bar";
+    }
+  }
 }

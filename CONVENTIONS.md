@@ -2068,7 +2068,7 @@ extern "C" {
   `Option<AliasKind>`: the trait asks only `IntoWasmAbi` of its
   implementations, since `f64` has no `OptionIntoWasmAbi`.
 * `<Alias>Kind` claims its name before any read enum is named, so a
-  getter-named enum that would collide is the one prefixed.
+  getter-named enum that would collide is the one numbered.
 
 ### `_with_<type>` suffix vocabulary
 
@@ -2897,6 +2897,10 @@ see [uninferrable type parameters](#uninferrable-method-type-parameters).)
 
 Method-level parameters follow the same rule
 (`tag<Level extends "info" | "warn">(level: Level)` → `level: &str`).
+An interface's parameter constrained to string literals only (`U extends
+"hour" | "minute"`) is the exception: it stays live for evaluation, which
+[specialises it at each instantiation](#literal-only-type-parameters-specialise)
+rather than reading it as `string`.
 
 The arguments are dropped once every input is parsed, before codegen and
 before [type-level evaluation](#type-level-evaluation), wherever the
@@ -3479,14 +3483,14 @@ emits:
 
 ```rust
 #[wasm_bindgen(private)]
-pub enum EmailAttachmentContentKind {
+pub enum ContentKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
     ArrayBufferView(Uint8Array),
 }
 
 // inside the extern block:
-pub fn content(this: &EmailAttachment) -> EmailAttachmentContentKind;
+pub fn content(this: &EmailAttachment) -> ContentKind;
 ```
 
 #### Shape arms go last
@@ -3530,22 +3534,61 @@ types). The base name is built from:
   `FetchReturnKind` (the `Return` infix disambiguates from the
   callable's own name).
 
-Identity is the **ordered member list**, so two erasing unions with
-the same member set in the same order share a single synthesised
-enum (and hence a single name). Order matters at runtime — the
-wasm-bindgen dispatch tries variants in source order, so two unions
-that differ in order are distinct types.
+Identity depends on the members:
 
-Collisions resolve in three steps, most-simple to most-qualified:
+* **A set of literals**, string literals (`"auto" | "never"`) or the
+  integer literals of a C-style enum (`0 | 1 | 2`), is keyed by its
+  values, in any order, so every use of the same values shares a single
+  synthesised enum (and hence a single name), wherever it is used: a
+  `keepAlive: KeepAlive` field and a `level(): 0 | 1 | 2` return are one
+  enum. Matching a value against the variants is exact, so order carries
+  no meaning at runtime; the enum takes the order of its first use in
+  source order. Variant names that collide are numbered in that order
+  (`"foo_bar" | "foo-bar"` is `FooBar = "foo_bar", FooBar2 = "foo-bar"`),
+  and every getter, setter, builder and literal factory using the set
+  names its values by those variants, so a value is never sent as
+  another's variant.
+* **Any other union**, one with a class, dictionary or primitive arm
+  (`number | "auto"`, `string | string[]`, `true | "x"`), is keyed by
+  its ordered member list *and* the member declaring it (owner and JS
+  name). Two such unions only share an enum when they are the same
+  member reached twice: a getter, its setter and its builder method.
+  Owners and member types are compared as declarations, not names, so
+  `limit?: Foo | number` on an `Options` in each of two namespaces, each
+  with its own `Foo`, is two enums.
+  Structural matches on unrelated members stay apart, since a payload
+  union named after one of them misleads at every other use.
 
-1. Bare anchor (`ContentKind`).
-2. Parent-prefixed (`EmailAttachmentContentKind`) — when a different
-   identity already claimed the bare anchor.
-3. Numeric suffix (`ContentKind2`, `EmailAttachmentContentKind2`) —
-   when both bare and parent-prefixed are taken.
+A new enum is named from its first use, in source order:
 
-First-seen wins on the bare anchor; subsequent distinct unions get
-parent-prefixed (or numeric-suffixed if that also collides).
+1. **A `js_sys` enum.** A set of string literals that is exactly the
+   values of one of a short, explicit list of `js_sys` enums, in any
+   order, is that enum, imported under its own name rather than emitted:
+   `"ceil" | "floor" | … | "halfEven"` is `js_sys::Intl::RoundingMode`.
+   The list holds `Intl::RoundingMode`, `Intl::RoundingPriority`,
+   `Intl::TrailingZeroDisplay` and `Intl::LocaleMatcher`; `js_sys::Temporal`
+   enums are left out because they need `--cfg=js_sys_unstable_apis`.
+2. **Bare anchor** (`ContentKind`).
+3. **Numeric suffix** (`ContentKind2`, `ContentKind3`) when the bare
+   anchor is taken: by a declaration, by a
+   [union alias's](#named-union-aliases) `<Alias>Kind`, or by an earlier
+   synthesised enum. `offset?: "auto" | "never"` and, later,
+   `offset?: "use" | "ignore" | "prefer" | "reject"` are `OffsetKind`
+   and `OffsetKind2`.
+
+Synthesised names are unique across the whole output, not only within
+their module: a nested `pub mod` glob-imports its parent, so a nested
+`OffsetKind` would shadow an outer one.
+
+#### Placement
+
+An enum is emitted in the `pub mod` of its first use, after that
+module's declarations, so an enum first used inside `namespace Temporal`
+is `temporal::OverflowKind`. A use in any other module names it by path
+(`super::clock::UnitKind` from `calendar`). A structural union's uses
+are all on one member, so it sits with its owner (or the first type
+inheriting the member, when that is emitted first); a literal set may be
+shared across modules. A `js_sys` enum is imported at the top level.
 
 #### When synthesis fires
 
@@ -4704,11 +4747,12 @@ pub type Sized_;           // size? (`Sized` is in the prelude)
   arguments. The alias's own declaration evaluates at its parameters'
   bounds, so `type Plural<T extends Unit> = T | { … }[T]` is the enum
   `Plural` of every unit, and an instantiation at the bound shares it.
-* **A type parameter out of scope evaluates at its bound.** Inside
-  `interface Rounding<U extends Unit> { smallestUnit?: Plural<U> }` the
-  field is `Plural`, every unit: Rust can't vary an enum per
-  instantiation, and the bound is the one type every instantiation is
-  assignable to.
+* **A type parameter out of scope evaluates at its bound.** One met
+  outside the type being rewritten, as when a utility flattens a generic
+  interface's members, is read at its bound, the one type every
+  instantiation is assignable to. A literal-only parameter is read at its
+  bound in its own scope too, and specialised at each instantiation
+  (below).
 * **Mapped types** evaluate over a literal key set. Over `keyof T`
   (possibly through `Exclude`) they are homomorphic: a property keeps the
   optionality and `readonly` it has in `T` unless a `?` / `-?` /
@@ -4726,6 +4770,211 @@ pub type Sized_;           // size? (`Sized` is in the prelude)
   methods is `Widget`, since a method has no property type), and `keyof`,
   indexed access and mapped types erase to `JsValue`. An unconstrained
   type parameter is the usual cause.
+* **A narrower synthesised enum converts into a wider one.** An enum
+  evaluation synthesises gets `From` into each enum of the same module
+  whose values are a strict superset of its own, so `PluralizeTimeUnit`
+  passes where `PluralizeUnit` is taken (`unit.into()`). A string JS gave
+  that the narrower enum doesn't know stays unknown in the wider one.
+
+### Literal-only type parameters specialise
+
+An interface's type parameter whose constraint evaluates to string
+literals (`Units extends DateUnit | TimeUnit`, `S extends "hour" |
+"minute"`) only ever selects among those literals. A Rust generic can't
+carry a literal set, and reading every member at the bound lets
+`PlainTimeToStringOptions::builder().smallest_unit(PluralizeUnit::Year)`
+compile and throw `RangeError` in JS. So the parameter is erased from the
+interface, and each instantiation is specialised instead:
+
+```ts
+type DateUnit = "year" | "month" | "week" | "day";
+type TimeUnit = "hour" | "minute" | "second" | "millisecond" | "microsecond" | "nanosecond";
+type PluralizeUnit<T extends DateUnit | TimeUnit> = T | { year: "years"; /* … */ }[T];
+interface RoundingOptions<Units extends DateUnit | TimeUnit> {
+  smallestUnit?: PluralizeUnit<Units>;
+  roundingIncrement?: number;
+}
+interface RoundingOptionsWithLargestUnit<Units extends DateUnit | TimeUnit>
+  extends RoundingOptions<Units> {
+  largestUnit?: "auto" | PluralizeUnit<Units>;
+}
+interface PlainTimeToStringOptions
+  extends RoundingOptions<Exclude<TimeUnit, "hour">> {}
+interface PlainDate {
+  until(other: PlainDate, options?: RoundingOptionsWithLargestUnit<DateUnit>): Duration;
+}
+interface PlainDateTime {
+  until(other: PlainDateTime, options?: RoundingOptionsWithLargestUnit<DateUnit | TimeUnit>): Duration;
+}
+```
+
+```rust
+// The base reads `Units` at its bound, every unit, and has no parameter.
+pub type RoundingOptions;
+pub fn smallest_unit(this: &RoundingOptions) -> Option<PluralizeUnit>;
+#[wasm_bindgen(extends = RoundingOptions, extends = Object, is_type_of = JsValue::is_object)]
+pub type RoundingOptionsWithLargestUnit;
+
+// A parent instantiation keeps the erased parent and narrows the
+// interface's own members.
+#[wasm_bindgen(extends = RoundingOptions, extends = Object, is_type_of = JsValue::is_object)]
+pub type PlainTimeToStringOptions;
+pub fn smallest_unit(this: &PlainTimeToStringOptions) -> Option<PluralizeExcludeTimeUnitHour>;
+
+// A use site that narrows names a dictionary extending the base with the
+// narrowed members; one at the bound is the base.
+#[wasm_bindgen(extends = RoundingOptionsWithLargestUnit, extends = Object, is_type_of = JsValue::is_object)]
+pub type RoundingOptionsWithLargestUnitDateUnit;
+pub fn smallest_unit(this: &RoundingOptionsWithLargestUnitDateUnit) -> Option<PluralizeDateUnit>;
+pub fn until_with_options(
+    this: &PlainDate,
+    other: &PlainDate,
+    options: &RoundingOptionsWithLargestUnitDateUnit,
+) -> Duration;
+pub fn until_with_options(
+    this: &PlainDateTime,
+    other: &PlainDateTime,
+    options: &RoundingOptionsWithLargestUnit,
+) -> Duration;
+```
+
+* **The narrowed members are the specialisation's own.** Its other
+  members are the base's, reached through `Deref`, and its builder sets
+  both. A narrowed member is named like any evaluated type, by its
+  instantiation with the arguments substituted (`PluralizeUnit<DateUnit>`
+  is `PluralizeDateUnit`); a narrowed inline union keeps its own
+  `<Field>Kind`.
+* **A use site's specialisation is named after the instantiation**, the
+  interface followed by its literal-only arguments
+  (`RoundingOptionsWithLargestUnitDateUnit`, `RoundingOptionsDayOrTimeUnit`),
+  and every instantiation in the scope that narrows alike shares the first
+  name: `Rounding<TimeUnit>` and `Rounding<Exclude<"day" | TimeUnit,
+  "day">>` are one dictionary. An alias of an instantiation, `type
+  HourStepping = Stepped<"hour">`, is that specialisation under the
+  alias's name, and use sites share it.
+* **A variant's `_with_` suffix names the base**, not the specialisation:
+  `round(roundTo: RoundingOptions<TimeUnit>)` beside
+  `round(roundTo: PluralizeUnit<TimeUnit>)` is `round_with_rounding_options`,
+  as it would be without specialising. Where another overload takes a
+  different specialisation of the same base, or the base itself, each keeps
+  its full name (`nudge_with_rounding_hour` beside `nudge(&RoundingTimeUnit)`).
+* **Only a dictionary is specialised at a use site.** An interface with
+  methods, or one merged into a class (`interface Gauge<S extends "low" |
+  "high">` + `declare var Gauge: { new (): Gauge }`), is still erased, but
+  its instantiations are the base. So is a reference inside a type that
+  can't be evaluated (`Rounding<"hour"> | keyof T`): its literal-only
+  arguments are dropped, leaving any later defaulted parameter at its
+  default.
+* **The parameter alone reads as its argument**, an enum it names or its
+  literals inline: in the base, `step?: S` is the `<Field>Kind` of `S`'s
+  bound; specialised at `"minute"`, it is the literal.
+* **A literal alias that only constrains is type-level.** `DateUnit` and
+  `TimeUnit`, named only by literal-only constraints, have no use once
+  each instantiation is specialised: the output surface emits such an
+  alias only when a signature still reaches it, or `--export` names it.
+
+#### Under `--experimental-generic-mono`
+
+Mono output can express what a literal-only parameter selects, so the
+parameter stays a Rust generic and nothing is specialised. Each argument
+becomes a string enum, and each type-level function of the parameter an
+associated type of a trait bounding it:
+
+```rust
+#[wasm_bindgen(extends = Object, is_type_of = JsValue::is_object)]
+pub type RoundingOptions<Units = DateUnitOrTimeUnit>;
+pub fn smallest_unit<Units: RoundingOptionsUnits>(
+    this: &RoundingOptions<Units>,
+) -> Option<Units::PluralizeUnit>
+where
+    Option<Units::PluralizeUnit>: FromWasmAbi;
+
+pub trait RoundingOptionsUnits {
+    type PluralizeUnit: IntoWasmAbi + FromWasmAbi + OptionIntoWasmAbi + OptionFromWasmAbi;
+}
+impl RoundingOptionsUnits for DateUnitOrTimeUnit {
+    type PluralizeUnit = PluralizeUnit;
+}
+impl RoundingOptionsUnits for DateUnit {
+    type PluralizeUnit = PluralizeDateUnit;
+}
+
+#[wasm_bindgen(
+    extends = Object,
+    extends = RoundingOptions::<Units>,
+    no_deref,
+    is_type_of = JsValue::is_object,
+)]
+pub type RoundingOptionsWithLargestUnit<Units = DateUnitOrTimeUnit>;
+pub trait RoundingOptionsWithLargestUnitUnits: RoundingOptionsUnits {
+    type LargestUnit: IntoWasmAbi + FromWasmAbi + OptionIntoWasmAbi + OptionFromWasmAbi;
+}
+impl RoundingOptionsWithLargestUnitUnits for DateUnit {
+    type LargestUnit = DateUnitLargestUnitKind;
+}
+
+#[wasm_bindgen(
+    extends = Object,
+    extends = ToStringRoundingOptionsWithFractionalSeconds::<ExcludeTimeUnitHour>,
+    no_deref,
+    is_type_of = JsValue::is_object,
+)]
+pub type PlainTimeToStringOptions;
+
+pub fn until_with_options(
+    this: &PlainDate,
+    other: impl PlainDateLike,
+    options: &RoundingOptionsWithLargestUnit<DateUnit>,
+) -> Result<Duration, Error>;
+```
+
+* **An argument is a string enum**: the enum it names (`DateUnit`), an
+  existing one with the same literals, or one named like any evaluated
+  type (`ExcludeTimeUnitHour`, `YearOrMonth`, `Hour`). The parameter
+  defaults to its bound's enum, and a trailing argument equal to the
+  default is elided (`&RoundingOptionsWithLargestUnit` at the bound).
+* **A member typed exactly `U` reads `U`**; any other function of `U`
+  reads through the trait (`U::PluralizeUnit`), with the where clauses
+  generic members already carry. Builders are generic too, bounded by
+  `IntoWasmAbi` and the trait.
+* **Parameters passed on form a family.** An interface passing its
+  parameter to a parent, through `extends` or a flattened `Pick`, or to
+  a member's reference, shares a trait with it. An interface reading no
+  function its parent's trait lacks reuses that trait
+  (`ToStringRoundingOptions` and `RoundingOptions` both bound by
+  `RoundingOptionsUnits`); one reading new functions gets its own trait,
+  `{Interface}{Param}`, extending the parents'
+  (`RoundingOptionsWithLargestUnitUnits: RoundingOptionsUnits`). Reusing
+  keeps one bound across the family, so a generic helper over
+  `RoundingOptions<U>` accepts every child instantiation through `Deref`;
+  extending keeps a parent's impls free of associated types it never
+  reads.
+* **An associated type is named for its function**, within its family:
+  the alias it instantiates (`PluralizeUnit`), or the member it types for
+  an inline one (`LargestUnit`, `MaximumUnit`). Two families may both
+  read a `LargestUnit`; a projection names its family, so each reads its
+  own. Each impl's target is named like
+  any evaluated type, by the instantiation (`PluralizeDateUnit`) or the
+  `<Field>Kind` with the argument's spelling before it
+  (`DateUnitLargestUnitKind`); at the default it is the base's own
+  (`LargestUnitKind`).
+* **There is one impl per argument enum plus the default**, collected
+  across every instantiation the family reaches. An argument is its
+  declaration, not its name: `Spans.Unit` and `Steps.Unit` given to one
+  family are two impls, and an inherited member reads its argument in
+  the scope the `extends` clause writes it in, however many parents it
+  is passed on through.
+* **Parse and generate in one mode.** Evaluation lowers literal-only
+  parameters for the mode `ParseOptions` selects, so
+  `generate_with_options` returns an error when its
+  `experimental_generic_mono` differs.
+* **A generic parent comes after `Object`.** wasm-bindgen builds the
+  first `extends` from a `JsValue`, which only a parent at its defaults
+  has, so a parent with arguments follows `extends = Object`, is written
+  with a turbofish, and `Deref` is implemented by hand through
+  `JsCast::unchecked_ref`.
+* **Classes are unchanged.** A merged class still erases the parameter,
+  and its instantiations are the base, as in default output.
 
 ## Multiple-context name resolution
 

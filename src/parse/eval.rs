@@ -18,9 +18,24 @@
 //!
 //! A generic alias is instantiated only when its target needs evaluation;
 //! otherwise `Foo<Bar>` stays a Rust generic alias. A type parameter met
-//! outside the scope of the type being rewritten is read at its bound, so
-//! `PluralizeUnit<Units>` inside `RoundingOptions<Units extends DateUnit |
-//! TimeUnit>` is every unit: Rust can't vary an enum per instantiation.
+//! outside the scope of the type being rewritten is read at its bound.
+//!
+//! An interface's literal-only type parameter (`Units extends DateUnit |
+//! TimeUnit`) has no Rust form, so it is erased: `PluralizeUnit<Units>`
+//! inside `RoundingOptions` is every unit. Each instantiation is
+//! specialised instead. A parent instantiation narrows the extending
+//! interface's own members, and a use site that narrows names a dictionary
+//! extending the erased base with the narrowed members
+//! (`RoundingOptionsWithLargestUnitDateUnit`).
+//!
+//! Under `--experimental-generic-mono` the parameter stays instead. Each
+//! argument becomes a string enum, and each type-level function of the
+//! parameter an associated type of a trait bounding it, one trait per
+//! family of interfaces passing the parameter on (`RoundingOptionsUnits`,
+//! with `type PluralizeUnit` and an impl per argument enum). Members read
+//! through the trait (`Units::PluralizeUnit`), and instantiations keep
+//! their arguments.
+//!
 //! Anything that can't be evaluated keeps the lowering it had before, with
 //! a warning.
 
@@ -30,7 +45,8 @@ use std::rc::Rc;
 
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
-    GetterMember, InterfaceDecl, MappedType, Member, Modifier, Module, Param, SetterMember,
+    FunctionSig, GetterMember, Heritage, InterfaceClassification, InterfaceDecl, MappedType,
+    Member, Modifier, Module, Param, ParamFamily, ParamImpl, ParamTrait, SetterMember,
     StringEnumDecl, StringEnumVariant, Throws, TypeAliasDecl, TypeDeclaration, TypeKind, TypeParam,
     TypeRef,
 };
@@ -97,6 +113,8 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         .collect();
 
     let diag = std::mem::take(&mut gctx.diagnostics);
+    let gctx_type_level_only;
+    let gctx_param_traits;
     let (rewritten, synths, diag) = {
         let mut eval = Eval {
             gctx,
@@ -109,7 +127,22 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             used: LocalScope::with_claimed(names),
             diag,
             depth: 0,
+            literal_params: HashMap::new(),
+            literal_scopes: HashMap::new(),
+            spec_names: HashMap::new(),
+            naming: true,
+            type_level_only: HashSet::new(),
+            mono: gctx.experimental_generic_mono,
+            param_args: HashMap::new(),
+            nodes: Vec::new(),
+            node_index: HashMap::new(),
+            families: Vec::new(),
+            arg_enums: Vec::new(),
+            member_name: None,
+            param_traits: HashMap::new(),
+            param_bounds: HashMap::new(),
         };
+        eval.find_literal_params();
         let mut rewritten = Vec::new();
         for id in ids {
             let decl = eval.gctx.get_type(id);
@@ -127,9 +160,37 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
                 rewritten.push((id, kind));
             }
         }
+        if eval.mono {
+            eval.build_param_traits();
+            // Each literal-only parameter defaults to its enum, bounded by
+            // its trait.
+            for (id, bounds) in std::mem::take(&mut eval.param_bounds) {
+                let index = match rewritten.iter().position(|(r, _)| *r == id) {
+                    Some(i) => i,
+                    None => {
+                        rewritten.push((id, eval.gctx.get_type(id).kind.clone()));
+                        rewritten.len() - 1
+                    }
+                };
+                if let TypeKind::Interface(iface) = &mut rewritten[index].1 {
+                    for (param, bound, default) in bounds {
+                        if let Some(tp) = iface.type_params.iter_mut().find(|p| p.name == param) {
+                            tp.trait_bound = Some(bound);
+                            tp.default = default;
+                        }
+                    }
+                }
+            }
+            gctx_param_traits = std::mem::take(&mut eval.param_traits);
+        } else {
+            gctx_param_traits = HashMap::new();
+        }
+        gctx_type_level_only = std::mem::take(&mut eval.type_level_only);
         (rewritten, eval.synths, eval.diag)
     };
     gctx.diagnostics = diag;
+    gctx.type_level_only.extend(gctx_type_level_only);
+    gctx.param_traits.extend(gctx_param_traits);
 
     for (id, kind) in rewritten {
         gctx.get_type_mut(id).kind = kind;
@@ -142,9 +203,23 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         // under the scope its blocks share.
         let listing = super::binding_scope(gctx, anchor);
         let scope = synth.place.scope;
+        let synthesised_enum = matches!(synth.kind, SynthKind::Enum(_));
+        // Only a use-site specialisation extends a base.
+        let specialises = match &synth.kind {
+            SynthKind::Dict { extends, .. } => match extends.first() {
+                Some(TypeRef::Reference { segments, .. }) => Some(segments.clone()),
+                _ => None,
+            },
+            SynthKind::Enum(_) => None,
+        };
         let kind = match synth.kind {
             SynthKind::Enum(literals) => TypeKind::StringEnum(string_enum(&synth.name, &literals)),
-            SynthKind::Dict { props, type_params } => {
+            SynthKind::Dict {
+                props,
+                type_params,
+                extends,
+                ..
+            } => {
                 let body_scope = gctx.scopes.create_child(scope);
                 for p in &type_params {
                     gctx.scopes
@@ -157,7 +232,13 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
                     name: synth.name.clone(),
                     js_name: synth.name.clone(),
                     type_params,
-                    extends: Vec::new(),
+                    extends: extends
+                        .into_iter()
+                        .map(|type_ref| Heritage {
+                            type_ref,
+                            scope: body_scope,
+                        })
+                        .collect(),
                     members,
                     construct: Vec::new(),
                     body_scope,
@@ -170,6 +251,12 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             doc: None,
             scope_id: scope,
         });
+        if synthesised_enum {
+            gctx.synthesised_enums.insert(id);
+        }
+        if let Some(base) = specialises {
+            gctx.specialisations.insert(id, base);
+        }
         gctx.scopes.insert(scope, synth.name.clone(), id);
         gctx.declare(scope, &synth.name, id);
         let exports = gctx.scopes.get(scope).exports.unwrap_or(scope);
@@ -235,11 +322,31 @@ struct Placement {
 enum SynthKind {
     Enum(Vec<String>),
     /// A dictionary is generic over the type parameters its members
-    /// capture from the use site.
+    /// capture from the use site. A specialisation extends its generic
+    /// base and declares only the members it narrows; `inherited` are the
+    /// base's, for reading its whole shape before it is declared.
     Dict {
         props: Vec<Prop>,
         type_params: Vec<TypeParam>,
+        extends: Vec<TypeRef>,
+        inherited: Vec<Prop>,
     },
+}
+
+/// An instantiation of an interface with literal-only parameters (see
+/// [`Eval::specialise`]).
+struct Specialised {
+    /// The interface with the literal-only arguments dropped.
+    base: TypeRef,
+    /// The properties the arguments narrow.
+    narrowed: Vec<Prop>,
+    /// The rest, as the base has them.
+    inherited: Vec<Prop>,
+    /// The interface's name followed by the literal-only arguments.
+    name: String,
+    /// Whether the interface is a dictionary, which a use site can
+    /// specialise with a dictionary of its own.
+    dictionary: bool,
 }
 
 struct Synth {
@@ -312,6 +419,40 @@ struct Eval<'g> {
     used: LocalScope,
     diag: DiagnosticCollector,
     depth: u32,
+    /// Each interface's literal-only type parameters, by position. They
+    /// are erased from the declaration, which reads them at their bound,
+    /// and specialised at each instantiation.
+    literal_params: HashMap<TypeId, Vec<usize>>,
+    /// The names of those parameters, by the body scope declaring them.
+    literal_scopes: HashMap<ScopeId, HashSet<String>>,
+    /// Specialisations declared so far, by scope, base and narrowed
+    /// members.
+    spec_names: HashMap<(ScopeId, String, DictKey), String>,
+    /// Whether a result named by a reference is materialised. Off while
+    /// a specialisation is compared with its base, so that comparing
+    /// declares nothing.
+    naming: bool,
+    /// See [`GlobalContext::type_level_only`].
+    type_level_only: HashSet<TypeId>,
+    /// Whether to evaluate for per-monomorphization, where a literal-only
+    /// parameter stays generic instead of specialising (see
+    /// [`Eval::generic_use`] and [`Eval::project`]).
+    mono: bool,
+    /// Literal-only parameters, by owner and name, bound to an argument
+    /// enum while an associated type's impl target is read.
+    param_args: HashMap<(ScopeId, String), (TypeRef, ScopeId, Env)>,
+    nodes: Vec<ParamNode>,
+    node_index: HashMap<(ScopeId, String), usize>,
+    /// Each family's associated functions, by the family's node.
+    families: Vec<Vec<AssocFn>>,
+    /// Argument enums by their sorted values, with their scopes.
+    arg_enums: Vec<(Vec<String>, ScopeId, TypeRef)>,
+    /// The member whose type is being evaluated, naming an inline
+    /// associated function.
+    member_name: Option<String>,
+    param_traits: HashMap<TypeId, Vec<ParamTrait>>,
+    /// Each interface's literal-only parameters' traits and default enums.
+    param_bounds: HashMap<TypeId, Vec<(String, String, Option<TypeRef>)>>,
 }
 
 const MAX_DEPTH: u32 = 64;
@@ -359,12 +500,39 @@ impl<'g> Eval<'g> {
                     self.rewrite_params(&mut c.params, scope, &name, place);
                 }
                 self.flatten_heritage(iface, place);
+                if let Some(positions) = self
+                    .literal_params
+                    .get(&place.anchor)
+                    .filter(|_| !self.mono)
+                {
+                    let mut i = 0;
+                    iface.type_params.retain(|_| {
+                        i += 1;
+                        !positions.contains(&(i - 1))
+                    });
+                }
             }
             TypeKind::Class(class) => {
                 let name = class.name.clone();
                 let body_scope = class.body_scope;
                 self.rewrite_type_params(&mut class.type_params, body_scope, &name, place);
                 self.rewrite_members(&mut class.members, &name, place);
+                // A class can't be specialised per instantiation, so its
+                // parents read an interface's literal-only parameters at
+                // their bound.
+                if let Some(parent) = &mut class.extends {
+                    parent.type_ref = self.erase_literal_args(&parent.type_ref, parent.scope);
+                }
+                for ty in &mut class.implements {
+                    *ty = self.erase_literal_args(ty, body_scope);
+                }
+                if let Some(positions) = self.literal_params.get(&place.anchor) {
+                    let mut i = 0;
+                    class.type_params.retain(|_| {
+                        i += 1;
+                        !positions.contains(&(i - 1))
+                    });
+                }
             }
             TypeKind::DiscriminatedUnion(du) => {
                 let name = du.name.clone();
@@ -381,15 +549,23 @@ impl<'g> Eval<'g> {
                 self.rewrite_type_params(&mut f.type_params, scope, &name, place);
                 self.rewrite_params(&mut f.params, scope, &name, place);
                 self.rewrite_type(&mut f.return_type, scope, &format!("{name}Return"), place);
+                self.rewrite_throws(&mut f.throws, scope, &name, place);
                 for o in &mut f.overloads {
                     let scope = o.body_scope;
                     self.rewrite_params(&mut o.params, scope, &name, place);
                     self.rewrite_type(&mut o.return_type, scope, &format!("{name}Return"), place);
+                    self.rewrite_throws(&mut o.throws, scope, &name, place);
                 }
             }
             TypeKind::Variable(v) => {
                 let name = to_pascal_case(&v.js_name);
                 self.rewrite_type(&mut v.type_ref, place.scope, &name, place);
+                for c in &mut v.constructs {
+                    let scope = c.body_scope;
+                    self.rewrite_params(&mut c.params, scope, &name, place);
+                    self.rewrite_type(&mut c.return_type, scope, &format!("{name}Return"), place);
+                    self.rewrite_throws(&mut c.throws, scope, &name, place);
+                }
             }
             TypeKind::StringEnum(_)
             | TypeKind::NumericEnum(_)
@@ -430,16 +606,32 @@ impl<'g> Eval<'g> {
         }
     }
 
+    fn rewrite_throws(
+        &mut self,
+        throws: &mut Throws,
+        scope: ScopeId,
+        parent: &str,
+        place: Placement,
+    ) {
+        if let Throws::Type(ty) = throws {
+            self.rewrite_type(ty, scope, &format!("{parent}Error"), place);
+        }
+    }
+
     fn rewrite_members(&mut self, members: &mut [Member], parent: &str, place: Placement) {
         for m in members {
             match m {
                 Member::Getter(g) => {
                     let hint = format!("{parent}{}", to_pascal_case(&g.js_name));
+                    self.member_name = Some(g.js_name.clone());
                     self.rewrite_type(&mut g.type_ref, g.scope, &hint, place);
+                    self.member_name = None;
                 }
                 Member::Setter(s) => {
                     let hint = format!("{parent}{}", to_pascal_case(&s.js_name));
+                    self.member_name = Some(s.js_name.clone());
                     self.rewrite_type(&mut s.type_ref, s.scope, &hint, place);
+                    self.member_name = None;
                 }
                 Member::StaticGetter(g) => {
                     let hint = format!("{parent}{}", to_pascal_case(&g.js_name));
@@ -452,9 +644,12 @@ impl<'g> Eval<'g> {
                 Member::Method(m) => {
                     let name = format!("{parent}{}", to_pascal_case(&m.js_name));
                     let scope = m.body_scope;
+                    self.member_name = Some(m.js_name.clone());
                     self.rewrite_type_params(&mut m.type_params, scope, &name, place);
                     self.rewrite_params(&mut m.params, scope, &name, place);
                     self.rewrite_type(&mut m.return_type, scope, &format!("{name}Return"), place);
+                    self.rewrite_throws(&mut m.throws, scope, &name, place);
+                    self.member_name = None;
                 }
                 Member::StaticMethod(m) => {
                     let name = format!("{parent}{}", to_pascal_case(&m.js_name));
@@ -462,10 +657,12 @@ impl<'g> Eval<'g> {
                     self.rewrite_type_params(&mut m.type_params, scope, &name, place);
                     self.rewrite_params(&mut m.params, scope, &name, place);
                     self.rewrite_type(&mut m.return_type, scope, &format!("{name}Return"), place);
+                    self.rewrite_throws(&mut m.throws, scope, &name, place);
                 }
                 Member::Constructor(c) => {
                     let scope = c.scope;
                     self.rewrite_params(&mut c.params, scope, parent, place);
+                    self.rewrite_throws(&mut c.throws, scope, parent, place);
                 }
                 Member::IndexSignature(ix) => {
                     let scope = ix.scope;
@@ -487,7 +684,7 @@ impl<'g> Eval<'g> {
         match self.eval_named(ty, scope, &Env::default(), scope, hint, place) {
             Some(result) => *ty = result,
             None => {
-                let approx = fallback(ty);
+                let approx = self.strip_literal_args(&fallback(ty), scope, self.mono);
                 self.diag.warn(format!(
                     "`{}` could not be evaluated, approximating as `{}`",
                     ty.format_ts(),
@@ -515,6 +712,42 @@ impl<'g> Eval<'g> {
             Some((value, _)) => value,
             None => ty.clone(),
         };
+        if self.mono && self.naming {
+            let empties = |t: TypeRef| match ty.split_empties() {
+                Some((_, n)) => t.with_empties(n),
+                None => t,
+            };
+            // Per-monomorphization keeps the parameter: alone it is itself,
+            // and a function of it reads an associated type of its trait.
+            if let Some(param) = self.passed_param(&value, scope, env, dest) {
+                return Some(empties(TypeRef::ident(param)));
+            }
+            if let Some(projection) = self.project(&value, scope, env, dest, place) {
+                return Some(empties(projection));
+            }
+        }
+        // A literal-only parameter standing alone is its argument or bound,
+        // read as written: an enum it names, else its literals inline.
+        if value
+            .as_ident()
+            .is_some_and(|n| self.is_literal_param(scope, n))
+        {
+            let result = self.eval(ty, scope, env, dest, hint, place)?;
+            let (values, empties) = match result.split_empties() {
+                Some((values, n)) => (values, Some(n)),
+                None => (result, None),
+            };
+            let values = match self.string_literals(&values, dest) {
+                Some(literals) if union_members(&values).len() > 1 => {
+                    TypeRef::union(literals.into_iter().map(TypeRef::StringLiteral))
+                }
+                _ => values,
+            };
+            return Some(match empties {
+                Some(n) => values.with_empties(n),
+                None => values,
+            });
+        }
         let named = matches!(
             value,
             TypeRef::Reference { .. } | TypeRef::KeyOf(_) | TypeRef::IndexedAccess(..)
@@ -525,7 +758,7 @@ impl<'g> Eval<'g> {
             hint.to_string()
         };
         let result = self.eval(ty, scope, env, dest, &hint, place)?;
-        Some(if named {
+        Some(if named && self.naming {
             self.materialize(result, &hint, dest, place)
         } else {
             result
@@ -540,6 +773,71 @@ impl<'g> Eval<'g> {
         let scope = alias.body_scope;
         if !self.needs_eval(&alias.target, scope) {
             return None;
+        }
+        // An alias of a specialisation is that specialisation, by its name.
+        if let (
+            Some(id),
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            },
+            true,
+        ) = (
+            self.literal_decl(&alias.target, scope),
+            &alias.target,
+            alias.type_params.is_empty(),
+        ) {
+            self.depth = 0;
+            let (segments, generic_args) = (segments.clone(), generic_args.clone());
+            // Per-monomorphization keeps the alias, of the instantiation.
+            if self.mono && matches!(self.gctx.get_type(id).kind, TypeKind::Interface(_)) {
+                let target = self.generic_use(
+                    id,
+                    &segments,
+                    &generic_args,
+                    scope,
+                    &Env::default(),
+                    scope,
+                    &alias.name.clone(),
+                    place,
+                );
+                alias.target =
+                    target.unwrap_or_else(|| self.erase_literal_args(&alias.target, scope));
+                return None;
+            }
+            let name = alias.name.clone();
+            let spec = self.specialise(
+                id,
+                &segments,
+                &generic_args,
+                scope,
+                &Env::default(),
+                scope,
+                &name,
+                place,
+            );
+            let Some(spec) = spec.filter(|s| !s.narrowed.is_empty() && s.dictionary) else {
+                alias.target = self.erase_literal_args(&alias.target, scope);
+                return None;
+            };
+            self.spec_names.insert(
+                (place.scope, spec.base.format_ts(), dict_key(&spec.narrowed)),
+                name.clone(),
+            );
+            let members = props_to_members(&spec.narrowed, scope);
+            return Some(TypeKind::Interface(InterfaceDecl {
+                classification: classify_interface(&members),
+                name: name.clone(),
+                js_name: name,
+                type_params: Vec::new(),
+                extends: vec![Heritage {
+                    type_ref: spec.base,
+                    scope,
+                }],
+                members,
+                construct: Vec::new(),
+                body_scope: scope,
+            }));
         }
         let mut env = Env::default();
         for p in &alias.type_params {
@@ -604,6 +902,62 @@ impl<'g> Eval<'g> {
         let mut flattened: Vec<Prop> = Vec::new();
         let mut kept = Vec::new();
         for heritage in std::mem::take(&mut iface.extends) {
+            // A parent with literal-only parameters stays the parent, erased;
+            // the members its arguments narrow become the interface's own.
+            if let (
+                Some(id),
+                TypeRef::Reference {
+                    segments,
+                    generic_args,
+                },
+            ) = (
+                self.literal_decl(&heritage.type_ref, heritage.scope),
+                &heritage.type_ref,
+            ) {
+                self.depth = 0;
+                let hint = iface.name.clone();
+                if self.mono && matches!(self.gctx.get_type(id).kind, TypeKind::Interface(_)) {
+                    let (segments, generic_args) = (segments.clone(), generic_args.clone());
+                    let parent = self.generic_use(
+                        id,
+                        &segments,
+                        &generic_args,
+                        heritage.scope,
+                        &Env::default(),
+                        body_scope,
+                        &hint,
+                        place,
+                    );
+                    kept.push(Heritage {
+                        type_ref: parent.unwrap_or_else(|| {
+                            self.erase_literal_args(&heritage.type_ref, heritage.scope)
+                        }),
+                        scope: heritage.scope,
+                    });
+                    continue;
+                }
+                let base = match self.specialise(
+                    id,
+                    segments,
+                    generic_args,
+                    heritage.scope,
+                    &Env::default(),
+                    body_scope,
+                    &hint,
+                    place,
+                ) {
+                    Some(spec) => {
+                        flattened.extend(spec.narrowed);
+                        spec.base
+                    }
+                    None => self.erase_literal_args(&heritage.type_ref, heritage.scope),
+                };
+                kept.push(Heritage {
+                    type_ref: base,
+                    scope: heritage.scope,
+                });
+                continue;
+            }
             if !self.flattens(&heritage.type_ref, heritage.scope) {
                 kept.push(heritage);
                 continue;
@@ -700,7 +1054,9 @@ impl<'g> Eval<'g> {
                 segments,
                 generic_args,
             } => {
-                if generic_args.iter().any(|a| self.needs_eval(a, scope)) {
+                if generic_args.iter().any(|a| self.needs_eval(a, scope))
+                    || self.literal_decl(ty, scope).is_some()
+                {
                     return true;
                 }
                 if segments.len() != 1 {
@@ -714,7 +1070,8 @@ impl<'g> Eval<'g> {
                         }
                         _ => false,
                     },
-                    Some(Binding::TypeParam | Binding::Erased(_)) => false,
+                    Some(Binding::TypeParam) => self.is_literal_param(scope, &segments[0]),
+                    Some(Binding::Erased(_)) => false,
                 }
             }
             _ => false,
@@ -855,6 +1212,17 @@ impl<'g> Eval<'g> {
                 .map(|a| this.eval(a, scope, env, dest, hint, place))
                 .collect::<Option<Vec<_>>>()
         };
+        let reference = TypeRef::Reference {
+            segments: segments.to_vec(),
+            generic_args: generic_args.to_vec(),
+        };
+        let shadowed = segments.len() == 1 && env.get(&segments[0]).is_some();
+        if let Some(id) = self.literal_decl(&reference, scope).filter(|_| !shadowed) {
+            if self.mono && matches!(self.gctx.get_type(id).kind, TypeKind::Interface(_)) {
+                return self.generic_use(id, segments, generic_args, scope, env, dest, hint, place);
+            }
+            return self.specialise_use(id, segments, generic_args, scope, env, dest, hint, place);
+        }
         if segments.len() != 1 {
             let path = segments.join(".");
             let from = self.gctx.resolve_path(scope, &path);
@@ -874,7 +1242,13 @@ impl<'g> Eval<'g> {
         match self.gctx.scopes.resolve_binding(scope, name) {
             Some(Binding::TypeParam) => {
                 let owner = self.param_owner(scope, name)?;
-                if self.param_owner(dest, name) == Some(owner) {
+                if let Some((ty, s, e)) = self.param_args.get(&(owner, name.clone())).cloned() {
+                    return self.eval(&ty, s, &e, dest, hint, place);
+                }
+                // A literal-only parameter is erased, even in its own scope.
+                if self.param_owner(dest, name) == Some(owner)
+                    && !self.is_literal_param(scope, name)
+                {
                     return Some(TypeRef::ident(name));
                 }
                 let bound = self.param_bound(owner, name)?;
@@ -1250,6 +1624,11 @@ impl<'g> Eval<'g> {
                     match self.gctx.scopes.resolve_binding(scope, &segments[0]) {
                         Some(Binding::TypeParam) => {
                             let owner = self.param_owner(scope, &segments[0])?;
+                            if let Some((ty, s, e)) =
+                                self.param_args.get(&(owner, segments[0].clone())).cloned()
+                            {
+                                return self.shape(&ty, s, &e, dest, place);
+                            }
                             let bound = self.param_bound(owner, &segments[0])?;
                             return self.shape(&bound, owner, &Env::default(), dest, place);
                         }
@@ -1316,6 +1695,26 @@ impl<'g> Eval<'g> {
                 (None, None) => {}
             }
         }
+        self.props_in(id, &bound_env, dest, place)
+    }
+
+    /// The properties of the declaration `id`, inherited ones included,
+    /// with its type parameters bound in `bound_env`.
+    fn props_in(
+        &mut self,
+        id: TypeId,
+        bound_env: &Env,
+        dest: ScopeId,
+        place: Placement,
+    ) -> Option<Vec<Prop>> {
+        let kind = self.evaluated(id);
+        let body_scope = match &*kind {
+            TypeKind::Interface(i) => i.body_scope,
+            TypeKind::Class(c) => c.body_scope,
+            TypeKind::TypeAlias(a) => a.body_scope,
+            _ => return None,
+        };
+        let bound_env = bound_env.clone();
         let (members, extends): (&[Member], Vec<crate::ir::Heritage>) = match &*kind {
             TypeKind::Interface(i) => (&i.members, i.extends.clone()),
             TypeKind::Class(c) => (&c.members, c.extends.iter().cloned().collect()),
@@ -1350,16 +1749,13 @@ impl<'g> Eval<'g> {
             let readonly = !members
                 .iter()
                 .any(|m| matches!(m, Member::Setter(s) if &s.js_name == js_name));
+            let member = self.member_name.replace(js_name.clone());
+            let type_ref =
+                self.eval_named(type_ref, member_scope, &bound_env, dest, js_name, place);
+            self.member_name = member;
             props.push(Prop {
                 js_name: js_name.clone(),
-                type_ref: self.eval_named(
-                    type_ref,
-                    member_scope,
-                    &bound_env,
-                    dest,
-                    js_name,
-                    place,
-                )?,
+                type_ref: type_ref?,
                 optional,
                 readonly,
                 doc: doc.clone(),
@@ -1483,7 +1879,18 @@ impl<'g> Eval<'g> {
 
     fn synth_props(&self, scope: ScopeId, segments: &[String]) -> Option<Vec<Prop>> {
         match &self.synth(scope, segments)?.kind {
-            SynthKind::Dict { props, .. } => Some(props.clone()),
+            SynthKind::Dict {
+                props, inherited, ..
+            } => {
+                let mut all = props.clone();
+                all.extend(
+                    inherited
+                        .iter()
+                        .filter(|p| !props.iter().any(|q| q.js_name == p.js_name))
+                        .cloned(),
+                );
+                Some(all)
+            }
             SynthKind::Enum(_) => None,
         }
     }
@@ -1507,6 +1914,7 @@ impl<'g> Eval<'g> {
     /// type, is left out: `Partial<Box<T>>` is `PartialBox`, generic over
     /// `T`, while `Partial<T>` evaluates at `T`'s bound and is `PartialT`.
     fn spell_at(&self, ty: &TypeRef, scope: ScopeId, env: &Env, dest: ScopeId) -> String {
+        let ty = &self.spelled_as(ty, scope, env);
         let mut names = Vec::new();
         idents(ty, &mut names);
         let kept: HashSet<String> = names
@@ -1541,6 +1949,432 @@ impl<'g> Eval<'g> {
             .find(|p| p.name == name)?
             .constraint
             .clone()
+    }
+
+    /// `ty`, written in `scope`, with the type parameters bound in `env`
+    /// replaced by their arguments and the literal-only ones by their
+    /// bounds, for spelling an instantiation by what it is given.
+    fn spelled_as(&self, ty: &TypeRef, scope: ScopeId, env: &Env) -> TypeRef {
+        let mut names = Vec::new();
+        idents(ty, &mut names);
+        let map: HashMap<String, TypeRef> = names
+            .into_iter()
+            .filter_map(|n| {
+                if let Some(bound) = env.get(&n) {
+                    return Some((n, self.spelled_as(&bound.ty, bound.scope, &bound.env)));
+                }
+                if !self.is_literal_param(scope, &n) {
+                    return None;
+                }
+                let owner = self.param_owner(scope, &n)?;
+                if let Some((ty, s, e)) = self.param_args.get(&(owner, n.clone())) {
+                    return Some((n, self.spelled_as(ty, *s, e)));
+                }
+                let bound = self.param_bound(owner, &n)?;
+                Some((n, self.spelled_as(&bound, owner, &Env::default())))
+            })
+            .collect();
+        if map.is_empty() {
+            ty.clone()
+        } else {
+            ty.substitute(&map)
+        }
+    }
+
+    /// Find each interface's literal-only type parameters, a merged
+    /// class's included: those whose
+    /// constraint evaluates to string literals, so every argument selects
+    /// among them. The literal aliases such a constraint names are
+    /// recorded as type-level only, as are those of a generic alias's
+    /// literal-only constraint.
+    fn find_literal_params(&mut self) {
+        let candidates: Vec<(TypeId, ScopeId, ScopeId, Vec<TypeParam>, bool)> = self
+            .gctx
+            .iter_types()
+            .filter(|(id, _)| !self.gctx.builtin_type_ids.contains(id))
+            .filter_map(|(id, decl)| match &decl.kind {
+                TypeKind::Interface(i) if !i.type_params.is_empty() => {
+                    Some((id, decl.scope_id, i.body_scope, i.type_params.clone(), true))
+                }
+                // An interface merged into a class (`interface Foo<S extends
+                // "a" | "b">` + `declare var Foo: { new (): Foo }`) brings
+                // its parameters along.
+                TypeKind::Class(c) if !c.type_params.is_empty() => {
+                    Some((id, decl.scope_id, c.body_scope, c.type_params.clone(), true))
+                }
+                TypeKind::TypeAlias(a) if !a.type_params.is_empty() => Some((
+                    id,
+                    decl.scope_id,
+                    a.body_scope,
+                    a.type_params.clone(),
+                    false,
+                )),
+                _ => None,
+            })
+            .collect();
+        // Reading a constraint declares nothing.
+        let naming = std::mem::replace(&mut self.naming, false);
+        for (id, scope, body_scope, params, interface) in candidates {
+            let place = Placement { anchor: id, scope };
+            let mut positions = Vec::new();
+            for (i, p) in params.iter().enumerate() {
+                let Some(constraint) = &p.constraint else {
+                    continue;
+                };
+                if self.gctx.scopes.get(body_scope).get_binding(&p.name) != Some(Binding::TypeParam)
+                {
+                    continue;
+                }
+                self.depth = 0;
+                let literal = self
+                    .literal_set(constraint, body_scope, &Env::default(), body_scope, place)
+                    .is_some_and(|literals| !literals.is_empty());
+                if !literal {
+                    continue;
+                }
+                let mut names = Vec::new();
+                // Per-monomorphization names each argument by its enum.
+                if !self.mono {
+                    idents(constraint, &mut names);
+                }
+                for name in names {
+                    if let Some(Binding::Declared(alias)) =
+                        self.gctx.scopes.resolve_binding(body_scope, &name)
+                    {
+                        if matches!(
+                            self.gctx.get_type(alias).kind,
+                            TypeKind::TypeAlias(_) | TypeKind::StringEnum(_)
+                        ) {
+                            self.type_level_only.insert(alias);
+                        }
+                    }
+                }
+                if interface {
+                    positions.push(i);
+                    self.literal_scopes
+                        .entry(body_scope)
+                        .or_default()
+                        .insert(p.name.clone());
+                    let decl = self.gctx.get_type(id);
+                    if let (true, TypeKind::Interface(iface)) = (self.mono, &decl.kind) {
+                        self.node_index
+                            .insert((body_scope, p.name.clone()), self.nodes.len());
+                        self.nodes.push(ParamNode {
+                            iface: id,
+                            name: iface.name.clone(),
+                            param: p.name.clone(),
+                            owner: body_scope,
+                            place,
+                            parents: Vec::new(),
+                            family: 0,
+                            functions: Vec::new(),
+                            args: Vec::new(),
+                            default_enum: None,
+                        });
+                        // A declared enum among the bound's members names
+                        // an argument of its values.
+                        for member in union_members(constraint) {
+                            let TypeRef::Reference { segments, .. } = &member else {
+                                continue;
+                            };
+                            let Some(enum_id) =
+                                self.gctx.resolve_path(body_scope, &segments.join("."))
+                            else {
+                                continue;
+                            };
+                            if let Some(mut values) = self.string_literals(&member, body_scope) {
+                                values.sort();
+                                let s = self.gctx.get_type(enum_id).scope_id;
+                                self.arg_enums.push((values, s, member.clone()));
+                            }
+                        }
+                    }
+                }
+            }
+            if !positions.is_empty() {
+                self.literal_params.insert(id, positions);
+            }
+        }
+        self.naming = naming;
+        if self.mono {
+            self.link_param_nodes();
+        }
+    }
+
+    /// The interface with literal-only parameters that `ty`, a reference
+    /// written in `scope`, names.
+    fn literal_decl(&self, ty: &TypeRef, scope: ScopeId) -> Option<TypeId> {
+        let TypeRef::Reference { segments, .. } = ty else {
+            return None;
+        };
+        let id = self.gctx.resolve_path(scope, &segments.join("."))?;
+        self.literal_params.contains_key(&id).then_some(id)
+    }
+
+    /// Whether `name`, visible from `scope`, is a literal-only parameter.
+    fn is_literal_param(&self, scope: ScopeId, name: &str) -> bool {
+        self.param_owner(scope, name).is_some_and(|owner| {
+            self.literal_scopes
+                .get(&owner)
+                .is_some_and(|names| names.contains(name))
+        })
+    }
+
+    /// `ty` without the arguments it passes for literal-only parameters,
+    /// wherever it names an interface that has them.
+    fn erase_literal_args(&self, ty: &TypeRef, scope: ScopeId) -> TypeRef {
+        self.strip_literal_args(ty, scope, false)
+    }
+
+    /// [`Self::erase_literal_args`], unless `keep_named`: then an interface
+    /// keeps its literal-only parameters, as under mono, where an argument
+    /// for one is the enum evaluation names. A literal left as written cuts
+    /// the arguments there, and the parameters from it on take their
+    /// defaults.
+    fn strip_literal_args(&self, ty: &TypeRef, scope: ScopeId, keep_named: bool) -> TypeRef {
+        let sub = |t: &TypeRef| self.strip_literal_args(t, scope, keep_named);
+        match ty {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => {
+                let id = self.literal_decl(ty, scope);
+                let positions = id.map(|id| &self.literal_params[&id]);
+                if let (true, Some(id), Some(positions)) = (keep_named, id, positions) {
+                    if matches!(self.gctx.get_type(id).kind, TypeKind::Interface(_)) {
+                        let cut = generic_args
+                            .iter()
+                            .enumerate()
+                            .position(|(i, a)| positions.contains(&i) && a.as_ident().is_none())
+                            .unwrap_or(generic_args.len());
+                        return TypeRef::Reference {
+                            segments: segments.clone(),
+                            generic_args: generic_args[..cut].iter().map(sub).collect(),
+                        };
+                    }
+                }
+                TypeRef::Reference {
+                    segments: segments.clone(),
+                    generic_args: generic_args
+                        .iter()
+                        .enumerate()
+                        .filter(|(i, _)| positions.is_none_or(|p| !p.contains(i)))
+                        .map(|(_, a)| sub(a))
+                        .collect(),
+                }
+            }
+            TypeRef::Array(t) => TypeRef::Array(Box::new(sub(t))),
+            TypeRef::Union(u) => TypeRef::union(u.members().iter().map(sub)),
+            TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
+            TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
+            TypeRef::Function(sig) => TypeRef::Function(FunctionSig {
+                params: sig
+                    .params
+                    .iter()
+                    .map(|p| Param {
+                        type_ref: sub(&p.type_ref),
+                        ..p.clone()
+                    })
+                    .collect(),
+                return_type: Box::new(sub(&sig.return_type)),
+            }),
+            other => other.clone(),
+        }
+    }
+
+    /// Specialise the interface `id` at `generic_args`, written in `scope`
+    /// under `env`, for `dest`. The base is the interface with its
+    /// literal-only parameters erased, which reads them at their bound;
+    /// the narrowed properties are those the arguments give another type
+    /// than the base has, typed in `dest`.
+    #[allow(clippy::too_many_arguments)]
+    fn specialise(
+        &mut self,
+        id: TypeId,
+        segments: &[String],
+        generic_args: &[TypeRef],
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        hint: &str,
+        place: Placement,
+    ) -> Option<Specialised> {
+        let TypeKind::Interface(iface) = &self.gctx.get_type(id).kind else {
+            return None;
+        };
+        let (params, body_scope) = (iface.type_params.clone(), iface.body_scope);
+        let dictionary = iface.classification == InterfaceClassification::Dictionary;
+        let literal = self.literal_params[&id].clone();
+        let mut base_env = Env::default();
+        let mut spec_env = Env::default();
+        let mut kept_args = Vec::new();
+        let mut spelled = Vec::new();
+        for (i, p) in params.iter().enumerate() {
+            let arg = generic_args.get(i);
+            if literal.contains(&i) {
+                let constraint = p.constraint.clone()?;
+                base_env = base_env.bind(
+                    p.name.clone(),
+                    constraint.clone(),
+                    body_scope,
+                    Env::default(),
+                );
+                spec_env = match (arg, &p.default) {
+                    (Some(arg), _) => {
+                        spelled.push(self.spell_at(arg, scope, env, dest));
+                        spec_env.bind(p.name.clone(), arg.clone(), scope, env.clone())
+                    }
+                    (None, Some(default)) => {
+                        spelled.push(spell(default));
+                        let outer = spec_env.clone();
+                        spec_env.bind(p.name.clone(), default.clone(), body_scope, outer)
+                    }
+                    (None, None) => {
+                        spec_env.bind(p.name.clone(), constraint, body_scope, Env::default())
+                    }
+                };
+                continue;
+            }
+            match (arg, &p.default) {
+                (Some(arg), _) => {
+                    let evaluated = self.eval(arg, scope, env, dest, hint, place);
+                    kept_args.push(evaluated.unwrap_or_else(|| fallback(arg)));
+                    base_env = base_env.bind(p.name.clone(), arg.clone(), scope, env.clone());
+                    spec_env = spec_env.bind(p.name.clone(), arg.clone(), scope, env.clone());
+                }
+                (None, Some(default)) => {
+                    let outer = base_env.clone();
+                    base_env = base_env.bind(p.name.clone(), default.clone(), body_scope, outer);
+                    let outer = spec_env.clone();
+                    spec_env = spec_env.bind(p.name.clone(), default.clone(), body_scope, outer);
+                }
+                (None, None) => {}
+            }
+        }
+        let base = TypeRef::Reference {
+            segments: segments.to_vec(),
+            generic_args: kept_args,
+        };
+        // Compare the evaluations unnamed, then name only what narrows.
+        let naming = std::mem::replace(&mut self.naming, false);
+        let base_props = self.props_in(id, &base_env, dest, place);
+        let spec_props = self.props_in(id, &spec_env, dest, place);
+        self.naming = naming;
+        let (base_props, spec_props) = (base_props?, spec_props?);
+        let narrows = |p: &Prop| {
+            !p.method
+                && !base_props
+                    .iter()
+                    .any(|b| b.js_name == p.js_name && b.type_ref == p.type_ref)
+        };
+        let narrowed: HashSet<String> = spec_props
+            .iter()
+            .filter(|p| narrows(p))
+            .map(|p| p.js_name.clone())
+            .collect();
+        let props = if narrowed.is_empty() || !self.naming {
+            spec_props
+        } else {
+            self.props_in(id, &spec_env, dest, place)?
+        };
+        let (narrowed, inherited) = props
+            .into_iter()
+            .partition(|p| narrowed.contains(&p.js_name));
+        Some(Specialised {
+            base,
+            narrowed,
+            inherited,
+            name: format!(
+                "{}{}",
+                to_pascal_case(segments.last().unwrap()),
+                spelled.concat()
+            ),
+            dictionary,
+        })
+    }
+
+    /// An instantiation of an interface with literal-only parameters, at a
+    /// use site: its erased base when the arguments narrow nothing, else
+    /// a dictionary extending the base with the narrowed properties,
+    /// named after the instantiation and shared by every instantiation
+    /// that narrows the same way.
+    #[allow(clippy::too_many_arguments)]
+    fn specialise_use(
+        &mut self,
+        id: TypeId,
+        segments: &[String],
+        generic_args: &[TypeRef],
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        hint: &str,
+        place: Placement,
+    ) -> Option<TypeRef> {
+        if !self.naming {
+            // Comparing: the evaluated arguments tell instantiations apart.
+            return Some(TypeRef::Reference {
+                segments: segments.to_vec(),
+                generic_args: generic_args
+                    .iter()
+                    .map(|a| self.eval(a, scope, env, dest, hint, place))
+                    .collect::<Option<Vec<_>>>()?,
+            });
+        }
+        let Some(spec) = self.specialise(id, segments, generic_args, scope, env, dest, hint, place)
+        else {
+            // Unevaluable arguments name the base.
+            let reference = TypeRef::Reference {
+                segments: segments.to_vec(),
+                generic_args: generic_args.iter().map(fallback).collect(),
+            };
+            return Some(self.erase_literal_args(&reference, scope));
+        };
+        let path = segments.join(".");
+        let visible = self.gctx.scopes.chain(dest).contains(&place.scope)
+            && self.gctx.resolve_path(place.scope, &path) == Some(id);
+        if spec.narrowed.is_empty() || !spec.dictionary || !visible {
+            return Some(spec.base);
+        }
+        let mut captured = self.captured_params(&spec.narrowed, dest);
+        let mut names = Vec::new();
+        idents(&spec.base, &mut names);
+        for n in names {
+            if self.gctx.scopes.resolve_binding(dest, &n) == Some(Binding::TypeParam)
+                && !captured.contains(&n)
+            {
+                captured.push(n);
+            }
+        }
+        let reference = |name: String| TypeRef::Reference {
+            segments: vec![name],
+            generic_args: captured.iter().map(TypeRef::ident).collect(),
+        };
+        let key = (place.scope, spec.base.format_ts(), dict_key(&spec.narrowed));
+        if let Some(name) = self.spec_names.get(&key) {
+            return Some(reference(name.clone()));
+        }
+        let name = self.used.declare(&spec.name, Suffix::Pascal);
+        self.spec_names.insert(key, name.clone());
+        let type_params = captured
+            .iter()
+            .map(|name| TypeParam {
+                name: name.clone(),
+                constraint: None,
+                default: None,
+                trait_bound: None,
+            })
+            .collect();
+        self.synths.push(Synth {
+            name: name.clone(),
+            place,
+            kind: SynthKind::Dict {
+                props: spec.narrowed,
+                type_params,
+                extends: vec![spec.base],
+                inherited: spec.inherited,
+            },
+        });
+        Some(reference(name))
     }
 
     /// Name an evaluated type that has no name of its own: string literals
@@ -1610,6 +2444,10 @@ impl<'g> Eval<'g> {
         if !self.gctx.scopes.chain(dest).contains(&place.scope) {
             return None;
         }
+        // Comparing: a stand-in that tells shapes apart.
+        if !self.naming {
+            return Some(TypeRef::Unresolved(format!("{:?}", dict_key(&props))));
+        }
         let captured = self.captured_params(&props, dest);
         let reference = |name: String| TypeRef::Reference {
             segments: vec![name],
@@ -1627,14 +2465,688 @@ impl<'g> Eval<'g> {
                 name: name.clone(),
                 constraint: None,
                 default: None,
+                trait_bound: None,
             })
             .collect();
         self.synths.push(Synth {
             name: name.clone(),
             place,
-            kind: SynthKind::Dict { props, type_params },
+            kind: SynthKind::Dict {
+                props,
+                type_params,
+                extends: Vec::new(),
+                inherited: Vec::new(),
+            },
         });
         Some(reference(name))
+    }
+}
+
+/// Under per-monomorphization, an interface's literal-only type parameter.
+/// It stays generic, bounded by a trait with an associated type per
+/// type-level function of it the members read (see [`Eval::project`]).
+struct ParamNode {
+    iface: TypeId,
+    name: String,
+    param: String,
+    /// The interface's body scope, declaring the parameter.
+    owner: ScopeId,
+    place: Placement,
+    /// The literal-only parameters this one is passed on to as written:
+    /// `RoundingOptionsWithLargestUnit<Units> extends
+    /// RoundingOptions<Units>`. Their traits are its supertraits.
+    parents: Vec<usize>,
+    /// The node whose parameters it is connected to through `parents`,
+    /// which name associated types alike.
+    family: usize,
+    /// The associated types its members read, by index in the family.
+    functions: Vec<usize>,
+    /// The argument enums it is instantiated with, and their scopes.
+    args: Vec<(TypeRef, ScopeId)>,
+    /// The enum it defaults to, once computed.
+    default_enum: Option<(TypeRef, ScopeId)>,
+}
+
+/// A type-level function of a literal-only parameter that members read as
+/// an associated type of the parameter's trait.
+struct AssocFn {
+    /// The function with the parameter as `$`, which identifies it.
+    key: String,
+    name: String,
+    ty: TypeRef,
+    scope: ScopeId,
+    env: Env,
+    owner: ScopeId,
+    param: String,
+    member: String,
+    /// A reference (`PluralizeUnit<Units>`) names each impl's target by its
+    /// instantiation; an inline type after the argument and the member.
+    named: bool,
+}
+
+impl<'g> Eval<'g> {
+    /// Record each literal-only parameter of an interface as a node, and
+    /// connect the parameters passed on to another's.
+    fn link_param_nodes(&mut self) {
+        for n in 0..self.nodes.len() {
+            let TypeKind::Interface(iface) = &self.gctx.get_type(self.nodes[n].iface).kind else {
+                continue;
+            };
+            let mut refs: Vec<(TypeRef, ScopeId)> = iface
+                .extends
+                .iter()
+                .map(|h| (h.type_ref.clone(), h.scope))
+                .collect();
+            for m in &iface.members {
+                match m {
+                    Member::Getter(g) => refs.push((g.type_ref.clone(), g.scope)),
+                    Member::Setter(s) => refs.push((s.type_ref.clone(), s.scope)),
+                    Member::Method(m) => {
+                        for p in &m.params {
+                            refs.push((p.type_ref.clone(), m.body_scope));
+                        }
+                        refs.push((m.return_type.clone(), m.body_scope));
+                    }
+                    _ => {}
+                }
+            }
+            let mut parents = Vec::new();
+            for (ty, scope) in &refs {
+                self.pass_throughs(ty, *scope, n, &mut parents);
+            }
+            parents.retain(|&p| p != n);
+            parents.dedup();
+            self.nodes[n].parents = parents;
+        }
+        // One family per connected set of parameters.
+        let mut root: Vec<usize> = (0..self.nodes.len()).collect();
+        fn find(root: &mut [usize], i: usize) -> usize {
+            let mut i = i;
+            while root[i] != i {
+                root[i] = root[root[i]];
+                i = root[i];
+            }
+            i
+        }
+        for n in 0..self.nodes.len() {
+            for p in self.nodes[n].parents.clone() {
+                let (a, b) = (find(&mut root, n), find(&mut root, p));
+                root[a.max(b)] = a.min(b);
+            }
+        }
+        for n in 0..self.nodes.len() {
+            self.nodes[n].family = find(&mut root, n);
+        }
+        self.families = (0..self.nodes.len()).map(|_| Vec::new()).collect();
+    }
+
+    /// The nodes `ty`, written in `scope`, passes node `n`'s parameter on
+    /// to, as an argument by itself.
+    fn pass_throughs(&self, ty: &TypeRef, scope: ScopeId, n: usize, out: &mut Vec<usize>) {
+        match ty {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => {
+                let target = self
+                    .gctx
+                    .resolve_path(scope, &segments.join("."))
+                    .and_then(|id| match &self.gctx.get_type(id).kind {
+                        TypeKind::Interface(i) => Some(i),
+                        _ => None,
+                    });
+                if let Some(target) = target {
+                    let (param, owner) = (&self.nodes[n].param, self.nodes[n].owner);
+                    for (q, arg) in generic_args.iter().enumerate() {
+                        if arg.as_ident() != Some(param.as_str())
+                            || self.param_owner(scope, param) != Some(owner)
+                        {
+                            continue;
+                        }
+                        let Some(tp) = target.type_params.get(q) else {
+                            continue;
+                        };
+                        if let Some(&j) = self.node_index.get(&(target.body_scope, tp.name.clone()))
+                        {
+                            out.push(j);
+                        }
+                    }
+                }
+                for a in generic_args {
+                    self.pass_throughs(a, scope, n, out);
+                }
+            }
+            TypeRef::Array(t) => self.pass_throughs(t, scope, n, out),
+            TypeRef::Union(u) => u
+                .members()
+                .iter()
+                .for_each(|m| self.pass_throughs(m, scope, n, out)),
+            TypeRef::Intersection(v) | TypeRef::Tuple(v) => {
+                v.iter().for_each(|m| self.pass_throughs(m, scope, n, out))
+            }
+            _ => {}
+        }
+    }
+
+    fn node_of(&self, owner: ScopeId, param: &str) -> Option<usize> {
+        self.node_index.get(&(owner, param.to_string())).copied()
+    }
+
+    /// The literal-only parameters `ty`, written in `scope` under `env`,
+    /// mentions, each with its owner, following the bindings.
+    fn literal_params_in(
+        &self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        out: &mut Vec<(ScopeId, String)>,
+    ) {
+        let mut names = Vec::new();
+        idents(ty, &mut names);
+        for n in names {
+            if let Some(bound) = env.get(&n) {
+                self.literal_params_in(&bound.ty, bound.scope, &bound.env, out);
+            } else if self.is_literal_param(scope, &n) {
+                if let Some(owner) = self.param_owner(scope, &n) {
+                    if !out.iter().any(|(o, p)| *o == owner && *p == n) {
+                        out.push((owner, n));
+                    }
+                }
+            }
+        }
+    }
+
+    /// The literal-only parameter of `dest` that `ty` is a function of,
+    /// when it mentions no other and isn't bound to an argument.
+    fn projected_param(
+        &self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+    ) -> Option<(ScopeId, String)> {
+        let mut found = Vec::new();
+        self.literal_params_in(ty, scope, env, &mut found);
+        let [(owner, param)] = found.as_slice() else {
+            return None;
+        };
+        (self.param_owner(dest, param) == Some(*owner)
+            && !self.param_args.contains_key(&(*owner, param.clone()))
+            && self.node_of(*owner, param).is_some())
+        .then(|| (*owner, param.clone()))
+    }
+
+    /// The literal-only parameter of `dest` that `ty` is by itself.
+    fn passed_param(
+        &self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+    ) -> Option<String> {
+        let name = ty.as_ident()?;
+        if let Some(bound) = env.get(name) {
+            return self.passed_param(&bound.ty, bound.scope, &bound.env, dest);
+        }
+        let owner = self.param_owner(scope, name)?;
+        (self.param_owner(dest, name) == Some(owner)
+            && self.node_of(owner, name).is_some()
+            && !self.param_args.contains_key(&(owner, name.to_string())))
+        .then(|| name.to_string())
+    }
+
+    /// `ty`, written in `scope`, with the type parameters bound in `env`
+    /// replaced by their arguments.
+    fn substituted(&self, ty: &TypeRef, env: &Env) -> TypeRef {
+        let mut names = Vec::new();
+        idents(ty, &mut names);
+        let map: HashMap<String, TypeRef> = names
+            .into_iter()
+            .filter_map(|n| {
+                let bound = env.get(&n)?;
+                Some((n, self.substituted(&bound.ty, &bound.env)))
+            })
+            .collect();
+        if map.is_empty() {
+            ty.clone()
+        } else {
+            ty.substitute(&map)
+        }
+    }
+
+    /// A member type that is a string-literal function of a literal-only
+    /// parameter of `dest`, under per-monomorphization: the associated
+    /// type of the parameter's trait that reads it (`Units::PluralizeUnit`).
+    fn project(
+        &mut self,
+        value: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        place: Placement,
+    ) -> Option<TypeRef> {
+        let (owner, param) = self.projected_param(value, scope, env, dest)?;
+        // Only an enum crosses as an associated type: read at the bound,
+        // the function must be string literals.
+        let naming = std::mem::replace(&mut self.naming, false);
+        let at_bound = self.eval(value, scope, env, dest, "", place);
+        self.naming = naming;
+        if !at_bound
+            .and_then(|t| self.string_literals(&t, dest))
+            .is_some_and(|l| !l.is_empty())
+        {
+            return None;
+        }
+        let node = self.node_of(owner, &param)?;
+        let family = self.nodes[node].family;
+        let generic = HashMap::from([(param.clone(), TypeRef::ident("$"))]);
+        let key = self
+            .substituted(value, env)
+            .substitute(&generic)
+            .format_ts();
+        let index = match self.families[family].iter().position(|f| f.key == key) {
+            Some(i) => i,
+            None => {
+                let member = self.member_name.clone().unwrap_or_default();
+                let named = matches!(value, TypeRef::Reference { .. });
+                let base = match value {
+                    TypeRef::Reference { segments, .. } => to_pascal_case(segments.last().unwrap()),
+                    _ if !member.is_empty() => to_pascal_case(&member),
+                    _ => "Kind".to_string(),
+                };
+                let taken = |name: &str, fns: &[AssocFn]| fns.iter().any(|f| f.name == name);
+                let mut name = base.clone();
+                let mut k = 2;
+                while taken(&name, &self.families[family]) {
+                    name = format!("{base}{k}");
+                    k += 1;
+                }
+                self.families[family].push(AssocFn {
+                    key,
+                    name,
+                    ty: value.clone(),
+                    scope,
+                    env: env.clone(),
+                    owner,
+                    param: param.clone(),
+                    member,
+                    named,
+                });
+                self.families[family].len() - 1
+            }
+        };
+        if !self.nodes[node].functions.contains(&index) {
+            self.nodes[node].functions.push(index);
+        }
+        Some(TypeRef::Projection {
+            base: Box::new(TypeRef::ident(param)),
+            base_scope: None,
+            family: self.family_of(family),
+            assoc: self.families[family][index].name.clone(),
+        })
+    }
+
+    /// The string enum an argument for a literal-only parameter is, with
+    /// the scope it resolves in: a declared one it names, else one of the
+    /// same values seen before, else one synthesised under its spelling.
+    fn arg_enum(
+        &mut self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        place: Placement,
+    ) -> Option<(TypeRef, ScopeId)> {
+        let evaluated = self.eval(ty, scope, env, dest, "", place)?;
+        let literals = self.string_literals(&evaluated, dest)?;
+        if literals.is_empty() {
+            return None;
+        }
+        let mut set = literals.clone();
+        set.sort();
+        let chain = self.gctx.scopes.chain(dest);
+        if let Some((_, s, r)) = self
+            .arg_enums
+            .iter()
+            .find(|(values, s, _)| *values == set && chain.contains(s))
+        {
+            return Some((r.clone(), *s));
+        }
+        let declared = match &evaluated {
+            TypeRef::Reference { segments, .. } => self
+                .gctx
+                .resolve_path(dest, &segments.join("."))
+                .map(|id| self.gctx.get_type(id).scope_id),
+            _ => None,
+        };
+        let found = match declared {
+            Some(s) => (evaluated, s),
+            None => {
+                let hint = self.spell_at(ty, scope, env, dest);
+                let r = self.synth_enum(literals, &hint, dest, place);
+                r.as_ident()?;
+                (r, place.scope)
+            }
+        };
+        self.arg_enums.push((set, found.1, found.0.clone()));
+        Some(found)
+    }
+
+    /// The enum a node's parameter defaults to: its declared default's,
+    /// else its bound's.
+    fn node_default(&mut self, n: usize) -> Option<(TypeRef, ScopeId)> {
+        if let Some(d) = &self.nodes[n].default_enum {
+            return Some(d.clone());
+        }
+        let (owner, param, place) = (
+            self.nodes[n].owner,
+            self.nodes[n].param.clone(),
+            self.nodes[n].place,
+        );
+        let p = self
+            .params_of
+            .get(&owner)?
+            .iter()
+            .find(|p| p.name == param)?
+            .clone();
+        let ty = p.default.or(p.constraint)?;
+        let depth = std::mem::replace(&mut self.depth, 0);
+        let found = self.arg_enum(&ty, owner, &Env::default(), place.scope, place);
+        self.depth = depth;
+        let found = found?;
+        self.nodes[n].default_enum = Some(found.clone());
+        Some(found)
+    }
+
+    /// An instantiation of an interface with literal-only parameters under
+    /// per-monomorphization: the interface, each literal-only argument its
+    /// enum (or the parameter of `dest` passed on by itself).
+    #[allow(clippy::too_many_arguments)]
+    fn generic_use(
+        &mut self,
+        id: TypeId,
+        segments: &[String],
+        generic_args: &[TypeRef],
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        hint: &str,
+        place: Placement,
+    ) -> Option<TypeRef> {
+        let TypeKind::Interface(iface) = &self.gctx.get_type(id).kind else {
+            return None;
+        };
+        let (params, body_scope) = (iface.type_params.clone(), iface.body_scope);
+        let mut args = Vec::new();
+        for (i, p) in params.iter().enumerate() {
+            let Some(arg) = generic_args.get(i) else {
+                break;
+            };
+            let Some(node) = self.node_of(body_scope, &p.name) else {
+                let evaluated = self.eval(arg, scope, env, dest, hint, place);
+                args.push(evaluated.unwrap_or_else(|| fallback(arg)));
+                continue;
+            };
+            if let Some(param) = self.passed_param(arg, scope, env, dest) {
+                args.push(TypeRef::ident(param));
+                continue;
+            }
+            let mut live = Vec::new();
+            self.literal_params_in(arg, scope, env, &mut live);
+            let live = live.iter().any(|(owner, n)| {
+                self.param_owner(dest, n) == Some(*owner)
+                    && !self.param_args.contains_key(&(*owner, n.clone()))
+            });
+            let found = if !self.naming || live {
+                None
+            } else {
+                self.arg_enum(arg, scope, env, dest, place)
+            };
+            let found = match found {
+                Some(found) => {
+                    if !self.nodes[node].args.contains(&found) {
+                        self.nodes[node].args.push(found.clone());
+                    }
+                    Some(found)
+                }
+                None if self.naming => self.node_default(node),
+                None => None,
+            };
+            match found {
+                Some((r, _)) => args.push(r),
+                None => args.push(fallback(arg)),
+            }
+        }
+        // Trailing arguments that are the parameters' default enums go,
+        // as the bare name already means them.
+        while let Some(last) = args.last() {
+            let i = args.len() - 1;
+            let default = match self.node_of(body_scope, &params[i].name) {
+                Some(node) if self.naming => self.node_default(node),
+                _ => None,
+            };
+            if default.is_some_and(|(d, _)| &d == last) {
+                args.pop();
+            } else {
+                break;
+            }
+        }
+        Some(TypeRef::Reference {
+            segments: segments.to_vec(),
+            generic_args: args,
+        })
+    }
+
+    /// The type an associated function gives at `arg`, bound to its
+    /// parameter, or at the bound when `arg` is `None`.
+    fn assoc_target(
+        &mut self,
+        f: usize,
+        family: usize,
+        arg: Option<&(TypeRef, ScopeId)>,
+        home: Placement,
+    ) -> Option<TypeRef> {
+        let (ty, scope, env, owner, param, member, named) = {
+            let f = &self.families[family][f];
+            (
+                f.ty.clone(),
+                f.scope,
+                f.env.clone(),
+                f.owner,
+                f.param.clone(),
+                f.member.clone(),
+                f.named,
+            )
+        };
+        if let Some((a, s)) = arg {
+            // An enum the impl's scope can't name reads as its literals.
+            let path = a.format_ts();
+            let read = match self.gctx.resolve_path(*s, &path) {
+                Some(id) if self.gctx.resolve_path(home.scope, &path) != Some(id) => self
+                    .string_literals(a, *s)
+                    .map(|l| TypeRef::union(l.into_iter().map(TypeRef::StringLiteral)))
+                    .unwrap_or_else(|| a.clone()),
+                _ => a.clone(),
+            };
+            self.param_args
+                .insert((owner, param.clone()), (read, *s, Env::default()));
+        }
+        self.depth = 0;
+        let dest = home.scope;
+        let result = if named {
+            self.eval_named(&ty, scope, &env, dest, &member, home)
+        } else {
+            let hint = match arg {
+                Some((a, _)) => format!("{}{}Kind", spell(a), to_pascal_case(&member)),
+                None => format!("{}Kind", to_pascal_case(&member)),
+            };
+            self.eval(&ty, scope, &env, dest, &hint, home)
+                .and_then(|t| {
+                    let literals = self.string_literals(&t, dest)?;
+                    Some(self.synth_enum(literals, &hint, dest, home))
+                })
+        };
+        self.param_args.remove(&(owner, param));
+        result
+    }
+
+    /// The IR identity of the family rooted at node `family`.
+    fn family_of(&self, family: usize) -> ParamFamily {
+        ParamFamily {
+            iface: self.nodes[family].iface,
+            param: self.nodes[family].param.clone(),
+        }
+    }
+
+    /// Resolve each node's trait, parents first, and each trait's impls.
+    /// A node whose members read nothing its one parent's trait doesn't
+    /// already has that trait; any other declares the rest beside its
+    /// interface, extending its parents' traits.
+    fn build_param_traits(&mut self) {
+        struct Built {
+            name: String,
+            supertraits: Vec<usize>,
+            assoc: Vec<usize>,
+            family: usize,
+            home: usize,
+            args: Vec<(TypeRef, ScopeId)>,
+        }
+        let mut traits: Vec<Built> = Vec::new();
+        let mut trait_of: Vec<Option<usize>> = vec![None; self.nodes.len()];
+        fn closure(traits: &[Built], t: usize, out: &mut Vec<usize>) {
+            for &a in &traits[t].assoc {
+                if !out.contains(&a) {
+                    out.push(a);
+                }
+            }
+            for &s in &traits[t].supertraits {
+                closure(traits, s, out);
+            }
+        }
+        let mut visiting = vec![false; self.nodes.len()];
+        fn order(nodes: &[ParamNode], n: usize, visiting: &mut [bool], out: &mut Vec<usize>) {
+            if visiting[n] {
+                return;
+            }
+            visiting[n] = true;
+            for &p in &nodes[n].parents {
+                order(nodes, p, visiting, out);
+            }
+            out.push(n);
+        }
+        let mut sorted = Vec::new();
+        for n in 0..self.nodes.len() {
+            order(&self.nodes, n, &mut visiting, &mut sorted);
+        }
+        for n in sorted {
+            let mut supers: Vec<usize> = Vec::new();
+            for &p in &self.nodes[n].parents {
+                if let Some(t) = trait_of[p] {
+                    if !supers.contains(&t) {
+                        supers.push(t);
+                    }
+                }
+            }
+            let mut inherited = Vec::new();
+            for &s in &supers {
+                closure(&traits, s, &mut inherited);
+            }
+            let own: Vec<usize> = self.nodes[n]
+                .functions
+                .iter()
+                .copied()
+                .filter(|f| !inherited.contains(f))
+                .collect();
+            if own.is_empty() && supers.len() == 1 {
+                trait_of[n] = Some(supers[0]);
+                continue;
+            }
+            let candidate = format!(
+                "{}{}",
+                self.nodes[n].name,
+                to_pascal_case(&self.nodes[n].param)
+            );
+            let name = self.used.declare(&candidate, Suffix::Pascal);
+            traits.push(Built {
+                name,
+                supertraits: supers,
+                assoc: own,
+                family: self.nodes[n].family,
+                home: n,
+                args: Vec::new(),
+            });
+            trait_of[n] = Some(traits.len() - 1);
+        }
+        // Each argument implements the trait of every node it is given to,
+        // and their supertraits.
+        for (n, t) in trait_of.iter().enumerate() {
+            let Some(t) = *t else { continue };
+            let mut args = self.nodes[n].args.clone();
+            if let Some(d) = self.node_default(n) {
+                if !args.contains(&d) {
+                    args.insert(0, d);
+                }
+            }
+            let mut stack = vec![t];
+            while let Some(t) = stack.pop() {
+                for a in &args {
+                    if !traits[t].args.contains(a) {
+                        traits[t].args.push(a.clone());
+                    }
+                }
+                stack.extend(traits[t].supertraits.iter().copied());
+            }
+        }
+        for t in 0..traits.len() {
+            let home = traits[t].home;
+            let place = self.nodes[home].place;
+            let mut impls = Vec::new();
+            for arg in traits[t].args.clone() {
+                // The home's own default reads the function at the bound,
+                // as the specialising lowering's base does.
+                let at_bound = Some(&arg) == self.nodes[home].default_enum.as_ref();
+                let mut targets = Vec::new();
+                for &f in &traits[t].assoc.clone() {
+                    let target = self
+                        .assoc_target(f, traits[t].family, (!at_bound).then_some(&arg), place)
+                        .unwrap_or_else(|| TypeRef::ident("JsValue"));
+                    targets.push(target);
+                }
+                impls.push(ParamImpl {
+                    arg: arg.0,
+                    arg_scope: arg.1,
+                    targets,
+                });
+            }
+            let built = ParamTrait {
+                name: traits[t].name.clone(),
+                family: self.family_of(traits[t].family),
+                supertraits: traits[t]
+                    .supertraits
+                    .iter()
+                    .map(|&s| traits[s].name.clone())
+                    .collect(),
+                assoc: traits[t]
+                    .assoc
+                    .iter()
+                    .map(|&f| self.families[traits[t].family][f].name.clone())
+                    .collect(),
+                impls,
+                scope: place.scope,
+            };
+            self.param_traits
+                .entry(self.nodes[home].iface)
+                .or_default()
+                .push(built);
+        }
+        for (n, t) in trait_of.iter().enumerate() {
+            let Some(t) = *t else { continue };
+            let default = self.nodes[n].default_enum.clone().map(|(r, _)| r);
+            self.param_bounds
+                .entry(self.nodes[n].iface)
+                .or_default()
+                .push((self.nodes[n].param.clone(), traits[t].name.clone(), default));
+        }
     }
 }
 
@@ -2108,6 +3620,221 @@ mod tests {
             unreachable!()
         };
         assert_eq!(g.type_ref, TypeRef::ident("Plural"));
+        // `U` only selects among literals, so it is erased.
+        assert!(rounding.type_params.is_empty());
+    }
+
+    #[test]
+    fn literal_only_parameters_specialise_at_each_instantiation() {
+        let (module, gctx) = parse(
+            "type Unit = \"hour\" | \"minute\";
+             type Plural<T extends Unit> = T | { hour: \"hours\"; minute: \"minutes\" }[T];
+             interface Rounding<U extends Unit> { smallestUnit?: Plural<U>; increment?: number }
+             interface HourRounding extends Rounding<\"hour\"> {}
+             declare function f(a: Rounding<\"minute\">, b: Rounding<Unit>, c: Rounding<Exclude<Unit, \"hour\">>): void;",
+        );
+        let parent = |name: &str| match kind(&gctx, &module, name) {
+            TypeKind::Interface(i) => i.extends[0].type_ref.clone(),
+            other => panic!("{name} is {other:?}"),
+        };
+        // A parent narrows the members it changes into the child's own.
+        assert_eq!(parent("HourRounding"), TypeRef::ident("Rounding"));
+        assert_eq!(
+            props(kind(&gctx, &module, "HourRounding")),
+            [("smallestUnit", true, false)]
+        );
+        // A use site names a dictionary extending the base; one at the
+        // bound is the base, and one narrowing alike shares the first.
+        assert_eq!(
+            param_type(&gctx, &module, "f", 0),
+            &TypeRef::ident("RoundingMinute")
+        );
+        assert_eq!(parent("RoundingMinute"), TypeRef::ident("Rounding"));
+        assert_eq!(
+            props(kind(&gctx, &module, "RoundingMinute")),
+            [("smallestUnit", true, false)]
+        );
+        assert_eq!(
+            param_type(&gctx, &module, "f", 1),
+            &TypeRef::ident("Rounding")
+        );
+        assert_eq!(
+            param_type(&gctx, &module, "f", 2),
+            &TypeRef::ident("RoundingMinute")
+        );
+        let TypeKind::Interface(minute) = kind(&gctx, &module, "RoundingMinute") else {
+            unreachable!()
+        };
+        let Member::Getter(g) = &minute.members[0] else {
+            unreachable!()
+        };
+        assert_eq!(
+            variants(kind(&gctx, &module, g.type_ref.as_ident().unwrap())),
+            ["minute", "minutes"]
+        );
+        // `Unit` only constrained literal-only parameters.
+        let unit = gctx.scopes.resolve(module.file_scopes[0], "Unit").unwrap();
+        assert!(gctx.type_level_only.contains(&unit));
+    }
+
+    #[test]
+    fn literal_only_parameters_stay_generic_under_mono() {
+        let (module, gctx) = super::super::parse_single_source_with(
+            "type Unit = \"hour\" | \"minute\";
+             type Plural<T extends Unit> = T | { hour: \"hours\"; minute: \"minutes\" }[T];
+             interface Rounding<U extends Unit> { smallestUnit?: Plural<U>; unit?: U }
+             interface HourRounding extends Rounding<\"hour\"> {}
+             interface Bounded<U extends Unit> extends Rounding<U> { maximumUnit?: \"none\" | U }
+             declare function f(a: Rounding<\"minute\">, b: Rounding<Unit>): void;",
+            None,
+            &super::super::ParseOptions::new().experimental_generic_mono(true),
+        )
+        .unwrap();
+        let interface = |name: &str| match kind(&gctx, &module, name) {
+            TypeKind::Interface(i) => i.clone(),
+            other => panic!("{name} is {other:?}"),
+        };
+        // The parameter stays, bounded by its family's trait and defaulting
+        // to the bound's enum; members read through the trait, and one
+        // typed exactly `U` reads `U`.
+        let rounding = interface("Rounding");
+        let u = &rounding.type_params[0];
+        assert_eq!(u.trait_bound.as_deref(), Some("RoundingU"));
+        assert_eq!(u.default, Some(TypeRef::ident("Unit")));
+        let reads: Vec<_> = rounding
+            .members
+            .iter()
+            .filter_map(|m| match m {
+                Member::Getter(g) => Some(g.type_ref.clone()),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(
+            reads,
+            [
+                TypeRef::Projection {
+                    base: Box::new(TypeRef::ident("U")),
+                    base_scope: None,
+                    family: ParamFamily {
+                        iface: gctx
+                            .scopes
+                            .resolve(module.file_scopes[0], "Rounding")
+                            .unwrap(),
+                        param: "U".into(),
+                    },
+                    assoc: "Plural".into()
+                },
+                TypeRef::ident("U"),
+            ]
+        );
+        // An instantiation keeps its chain, and a use site at the bound
+        // elides the argument.
+        assert_eq!(
+            interface("HourRounding").extends[0].type_ref,
+            TypeRef::generic("Rounding", vec![TypeRef::ident("Hour")])
+        );
+        assert_eq!(
+            param_type(&gctx, &module, "f", 0),
+            &TypeRef::generic("Rounding", vec![TypeRef::ident("Minute")])
+        );
+        assert_eq!(
+            param_type(&gctx, &module, "f", 1),
+            &TypeRef::ident("Rounding")
+        );
+        // One impl per argument enum plus the default; a child reading a
+        // function its parent doesn't extends the parent's trait.
+        let traits: Vec<_> = gctx.param_traits.values().flatten().collect();
+        let trait_named = |name: &str| *traits.iter().find(|t| t.name == name).unwrap();
+        let base = trait_named("RoundingU");
+        assert_eq!(base.assoc, ["Plural"]);
+        let args: Vec<_> = base.impls.iter().map(|im| im.arg.clone()).collect();
+        assert_eq!(
+            args,
+            [
+                TypeRef::ident("Hour"),
+                TypeRef::ident("Minute"),
+                TypeRef::ident("Unit")
+            ]
+        );
+        let bounded = trait_named("BoundedU");
+        assert_eq!(bounded.supertraits, ["RoundingU"]);
+        assert_eq!(bounded.assoc, ["MaximumUnit"]);
+        assert_eq!(
+            interface("Bounded").extends[0].type_ref,
+            TypeRef::generic("Rounding", vec![TypeRef::ident("U")])
+        );
+    }
+
+    #[test]
+    fn literal_only_parameters_erase_from_a_merged_class() {
+        let (module, gctx) = parse(
+            "interface Gauge<S extends \"low\" | \"high\"> { level(): S }
+             declare var Gauge: { new (): Gauge<\"low\"> };
+             declare function f(a: Gauge<\"high\">): void;",
+        );
+        let TypeKind::Class(class) = kind(&gctx, &module, "Gauge") else {
+            panic!("Gauge is a class");
+        };
+        assert!(class.type_params.is_empty(), "{:?}", class.type_params);
+        let Some(Member::Method(level)) = class
+            .members
+            .iter()
+            .find(|m| matches!(m, Member::Method(_)))
+        else {
+            panic!("Gauge has a method");
+        };
+        assert!(
+            level.return_type.as_ident() != Some("S"),
+            "{:?}",
+            level.return_type
+        );
+        // A class isn't specialised: its instantiations are the base.
+        assert_eq!(param_type(&gctx, &module, "f", 0), &TypeRef::ident("Gauge"));
+    }
+
+    #[test]
+    fn unrewritten_references_drop_literal_only_arguments() {
+        let (module, gctx) = parse(
+            "interface Rounding<U extends \"hour\" | \"minute\"> { smallestUnit?: U }
+             interface Probe { go(): void }
+             interface Defaulted<S extends \"a\" | \"b\", T = Probe> { side?: S; extra?: T }
+             declare function f(a: Rounding<\"hour\"> | keyof Missing): void;
+             declare function g(a: Defaulted<\"a\"> | keyof Missing): void;
+             type Maker = Probe;
+             declare const Maker: { new (options: Rounding<\"hour\">): Probe };",
+        );
+        fn args(ty: &TypeRef, out: &mut Vec<String>) {
+            match ty {
+                TypeRef::Reference {
+                    segments,
+                    generic_args,
+                } => {
+                    if !generic_args.is_empty() {
+                        out.push(segments.join("."));
+                    }
+                    generic_args.iter().for_each(|a| args(a, out));
+                }
+                TypeRef::Union(u) => u.members().iter().for_each(|m| args(m, out)),
+                _ => {}
+            }
+        }
+        let mut found = Vec::new();
+        args(param_type(&gctx, &module, "f", 0), &mut found);
+        args(param_type(&gctx, &module, "g", 0), &mut found);
+        let maker = module
+            .types
+            .iter()
+            .find_map(|&id| match &gctx.get_type(id).kind {
+                TypeKind::Variable(v) if v.js_name == "Maker" => Some(v),
+                _ => None,
+            })
+            .expect("Maker has a variable");
+        for c in &maker.constructs {
+            for p in &c.params {
+                args(&p.type_ref, &mut found);
+            }
+        }
+        assert!(found.is_empty(), "{found:?}");
     }
 
     #[test]
