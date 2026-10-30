@@ -5051,7 +5051,9 @@ A reference to a type alias reads as its target, through aliases of
 aliases and generic instantiations, as the Rust bindings lower it:
 `type Millis = number` and lib.dom's `DOMHighResTimeStamp` are `f64`,
 and a `type Nothing = void` return has no result. A type parameter
-stays `externref`.
+stays `externref`, unless it is constrained to a primitive, which it
+then reads as, as in the Rust bindings: `bump<N extends number>(by: N):
+N` is `(param $by f64) (result f64)`.
 
 Nullable scalars (`number | null`) cross as a nullable reference;
 there is no sentinel for "null" in `i32`/`f64`/`i64`. `Number.value`
