@@ -99,11 +99,22 @@ pub struct GlobalContext {
     /// the instance of, whose construct signature's return type
     /// `bind_constructor_vars` may find to be a global instance interface.
     pub(crate) constructor_classes: Vec<TypeId>,
-    /// Generic aliases type-level evaluation instantiates at every use
-    /// (`PartialLike<T> = { [P in keyof T]?: T[P] }`), so a use names the
-    /// instantiation rather than the alias. The output surface emits one
-    /// only when a signature still reaches it.
+    /// Aliases type-level evaluation reads through, so a use names
+    /// something else: generic aliases instantiated at every use
+    /// (`PartialLike<T> = { [P in keyof T]?: T[P] }`), and literal aliases
+    /// that only constrain literal-only type parameters (`Units extends
+    /// DateUnit | TimeUnit`). The output surface emits one only when a
+    /// signature still reaches it.
     pub(crate) type_level_only: std::collections::HashSet<TypeId>,
+    /// String enums type-level evaluation synthesised for a result with no
+    /// name of its own (`PluralizeUnit<TimeUnit>`), which convert into an
+    /// enum of the same module with more values.
+    pub(crate) synthesised_enums: std::collections::HashSet<TypeId>,
+    /// Dictionaries type-level evaluation synthesised for an instantiation
+    /// that narrows a literal-only parameter (`RoundingOptions<TimeUnit>`),
+    /// with the generic base each extends, which names them in a
+    /// variant's `_with_` suffix.
+    pub(crate) specialisations: std::collections::HashMap<TypeId, Vec<String>>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -212,6 +223,8 @@ impl GlobalContext {
             declared: std::collections::HashMap::new(),
             constructor_classes: Vec::new(),
             type_level_only: std::collections::HashSet::new(),
+            synthesised_enums: std::collections::HashSet::new(),
+            specialisations: std::collections::HashMap::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),

@@ -229,3 +229,61 @@ pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: &[String]) ->
         #aliases
     }
 }
+
+/// `From` conversions from each synthesised string enum into every other
+/// enum of the same module whose values are a strict superset of its own:
+/// `PluralizeTimeUnit` into `PluralizeUnit`, so a narrowed value passes
+/// where the wider type is taken. `enums` pairs each enum with whether
+/// type-level evaluation synthesised it; only those convert from, since a
+/// declared enum naming a subset is a type of its own. A string JS gave
+/// that the narrower enum doesn't know (wasm-bindgen's hidden `__Invalid`)
+/// stays unknown.
+pub fn generate_subset_conversions(enums: &[(&StringEnumDecl, bool)]) -> Vec<TokenStream> {
+    let values = |decl: &StringEnumDecl| -> Vec<String> {
+        let mut out: Vec<String> = Vec::new();
+        for v in &decl.variants {
+            if !out.contains(&v.js_value) {
+                out.push(v.js_value.clone());
+            }
+        }
+        out
+    };
+    let mut out = Vec::new();
+    for &(sub, synthesised) in enums {
+        if !synthesised {
+            continue;
+        }
+        let sub_values = values(sub);
+        for &(sup, _) in enums {
+            let sup_values = values(sup);
+            if sup.name == sub.name
+                || sup_values.len() <= sub_values.len()
+                || !sub_values.iter().all(|v| sup_values.contains(v))
+            {
+                continue;
+            }
+            let variant = |decl: &StringEnumDecl, value: &str| {
+                let v = decl.variants.iter().find(|v| v.js_value == value).unwrap();
+                super::typemap::make_ident(&v.rust_name)
+            };
+            let sub_name = super::typemap::make_ident(&sub.name);
+            let sup_name = super::typemap::make_ident(&sup.name);
+            let arms = sub_values.iter().map(|value| {
+                let from = variant(sub, value);
+                let to = variant(sup, value);
+                quote! { #sub_name::#from => #sup_name::#to }
+            });
+            out.push(quote! {
+                impl From<#sub_name> for #sup_name {
+                    fn from(value: #sub_name) -> #sup_name {
+                        match value {
+                            #(#arms,)*
+                            #sub_name::__Invalid => #sup_name::__Invalid,
+                        }
+                    }
+                }
+            });
+        }
+    }
+    out
+}
