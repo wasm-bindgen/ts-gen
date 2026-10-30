@@ -3556,17 +3556,20 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
   module), since names are matched without scope.
 * A side declaration's type-parameter defaults replace the input's, by
   parameter name; a default for a parameter the input lacks fails the
-  run. The output changes where a default is read, which is an alias's
-  expansion. The `annotate` fixture's `RequestInfo<Meta = unknown, Cf =
-  CfProperties> = Request<Meta, Cf> | string`, modelled on
-  workers-types, defaults `Cf` to a union of the incoming
-  and outgoing shapes (`CfProperties = Incoming | Outgoing`), which
-  erases, so a `RequestInfo` argument lowers to `&Request<JsValue,
-  JsValue>`; the side file's `type RequestInfo<Meta = unknown, Cf =
-  Incoming> = …` (whose target is ignored) makes it `&Request<JsValue,
-  Incoming>`. A class or interface default is replaced as well, but the
-  emitted `Request<Meta, Cf>` has no Rust default, so a bare `Request`
-  is unchanged.
+  run. The output changes wherever a default is read: a class or
+  interface default becomes the emitted Rust default, and an alias's
+  expansion takes it. The `annotate` fixture, modelled on
+  workers-types, declares `Request<Meta = unknown, Cf = CfProperties>`
+  and `RequestInfo<Meta = unknown, Cf = CfProperties> = Request<Meta,
+  Cf> | string`, where `Cf` defaults to a union of the incoming and
+  outgoing shapes (`CfProperties = Incoming | Outgoing`), which erases.
+  The side file's `interface Request<Meta = unknown, Cf = Incoming>`
+  makes the emitted type `Request<Meta: JsGeneric = JsValue, Cf:
+  JsGeneric = Incoming>`, so a bare `Request` reads `cf()` as
+  `Incoming`. Its `type RequestInfo<Meta = unknown, Cf = Incoming> = …`
+  (whose target is ignored) makes the expansion `Request<JsValue,
+  Incoming>`, which is now `Request`'s defaults and so collapses to the
+  bare name: `fetch(input: &Request)`.
 * The side file may use `interface` for a class and need not repeat
   type parameters or parameter types other than tagged ones; only names
   matter.

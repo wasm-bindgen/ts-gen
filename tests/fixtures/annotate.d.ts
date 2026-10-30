@@ -41,9 +41,10 @@ declare function size(key: string): number;
 declare function size(keys: string[], n: number): number;
 
 // A side declaration's type-parameter defaults replace the input's. The
-// side alias's default changes `fetch`'s argument from `&Request<JsValue,
-// JsValue>` (the erased union) to `&Request<JsValue, Incoming>`; the
-// side interface's default leaves the bare `Request` return unchanged.
+// side interface's default makes the emitted `Request<Meta = JsValue, Cf =
+// Incoming>`, so a bare `Request` reads `cf()` as `Incoming` rather than
+// the erased union; the side alias's default expands `fetch`'s argument to
+// `Request<JsValue, Incoming>`, which collapses to `&Request`.
 interface Incoming {
   readonly colo: string;
 }
