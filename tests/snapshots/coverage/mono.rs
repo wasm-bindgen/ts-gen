@@ -777,16 +777,19 @@ impl MutableWidget {
     }
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HeadersKind {
     Headers(Headers),
     Record(Object<JsString>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BodyKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum LabelKind {
     String(String),
     F64(f64),

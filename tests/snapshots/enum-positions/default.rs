@@ -210,21 +210,25 @@ extern "C" {
     pub fn try_mode_or_number_or_string_with_str(this: &Probe, x: &str) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeOrNumberReturnKind {
     Mode(Mode),
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeOrStringReturnKind {
     Mode(Mode),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeOrRegionReturnKind {
     Mode(Mode),
     Region(codes::Region),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum LevelOrStringReturnKind {
     Level(Level),
     String(String),

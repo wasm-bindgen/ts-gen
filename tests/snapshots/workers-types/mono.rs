@@ -53168,62 +53168,74 @@ impl VectorizeVectorMetadataFilter3Builder {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum FetchReturnKind {
     Response(Response),
     Promise(Promise<Response>),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum GenerateKeyReturnKind {
     CryptoKey(CryptoKey),
     CryptoKeyPair(CryptoKeyPair),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ExportKeyReturnKind {
     ArrayBuffer(ArrayBuffer),
     JsonWebKey(JsonWebKey),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum SaltKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HashKind {
     String(String),
     SubtleCryptoHashAlgorithm(SubtleCryptoHashAlgorithm),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BytesWrittenKind {
     F64(f64),
     BigInt(BigInt),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum DataKind {
     ArrayBuffer(ArrayBuffer),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TypeKind {
     Default = "default",
     Error = "error",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum HeadersKind {
     Headers(Headers),
     Record(Object<JsString>),
     JsValue(JsValue),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncodeBodyKind {
     Automatic = "automatic",
     Manual = "manual",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CacheKind {
     NoStore = "no-store",
     NoCache = "no-cache",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BodyKind {
     ReadableStream(ReadableStream<Uint8Array>),
     String(String),
@@ -53235,53 +53247,63 @@ pub enum BodyKind {
     JsValue(JsValue),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum OnlyIfKind {
     Headers(Headers),
     R2Conditional(R2Conditional),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum RangeKind {
     Headers(Headers),
     R2Range(R2Range),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HttpMetadataKind {
     Headers(Headers),
     R2HttpMetadata(R2HTTPMetadata),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum Md5Kind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryTypeKind {
     Blob = "blob",
     Arraybuffer = "arraybuffer",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecureTransportKind {
     On = "on",
     Off = "off",
     Starttls = "starttls",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AiSearchConfigTypeKind {
     R2 = "r2",
     WebCrawler = "web-crawler",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ChatCompletionsReturnKind {
     Response(Response),
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TextKind {
     String(String),
     VecOfString(Vec<String>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum RoleKind {
     User = "user",
     Assistant = "assistant",
@@ -53290,27 +53312,32 @@ pub enum RoleKind {
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum AiTextGenerationToolInputTypeKind {
     Function = "function",
     String(String),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ToolsKind {
     VecOfAiTextGenerationToolInput(Vec<AiTextGenerationToolInput>),
     VecOfAiTextGenerationToolLegacyInput(Vec<AiTextGenerationToolLegacyInput>),
     Object(Object),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ConversationKind {
     String(String),
     ResponseConversationParam(ResponseConversationParam),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum InputKind {
     String(String),
     ResponseInput(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceTierKind {
     Auto = "auto",
     Default = "default",
@@ -53319,26 +53346,31 @@ pub enum ServiceTierKind {
     Priority = "priority",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ToolChoiceKind {
     ToolChoiceOptions(ToolChoiceOptions),
     ToolChoiceFunction(ToolChoiceFunction),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TruncationKind {
     Auto = "auto",
     Disabled = "disabled",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum InstructionsKind {
     String(String),
     VecOfResponseInputItem(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ContentKind {
     String(String),
     ResponseInputMessageContentList(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EasyInputMessageRoleKind {
     User = "user",
     Assistant = "assistant",
@@ -53346,11 +53378,13 @@ pub enum EasyInputMessageRoleKind {
     Developer = "developer",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ReasonKind {
     MaxOutputTokens = "max_output_tokens",
     ContentFilter = "content_filter",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EffortKind {
     Minimal = "minimal",
     Low = "low",
@@ -53358,17 +53392,20 @@ pub enum EffortKind {
     High = "high",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GenerateSummaryKind {
     Auto = "auto",
     Concise = "concise",
     Detailed = "detailed",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum OutputKind {
     String(String),
     VecOfJsValue(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CodeKind {
     ServerError = "server_error",
     RateLimitExceeded = "rate_limit_exceeded",
@@ -53390,60 +53427,71 @@ pub enum CodeKind {
     ImageFileNotFound = "image_file_not_found",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StatusKind {
     InProgress = "in_progress",
     Completed = "completed",
     Incomplete = "incomplete",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DetailKind {
     Low = "low",
     High = "high",
     Auto = "auto",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ResponseInputItemFunctionCallOutputOutputKind {
     String(String),
     ResponseFunctionCallOutputItemList(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResponseInputItemMessageRoleKind {
     User = "user",
     System = "system",
     Developer = "developer",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VerbosityKind {
     Low = "low",
     Medium = "medium",
     High = "high",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PoolingKind {
     Mean = "mean",
     Cls = "cls",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ImageKind {
     VecOfF64(Vec<f64>),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind {
     JsonObject = "json_object",
     JsonSchema = "json_schema",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum PostProcessedOutputsKind {
     String(String),
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CustomTopicModeKind {
     Extended = "extended",
     Strict = "strict",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncodingKind {
     Linear16 = "linear16",
     Flac = "flac",
@@ -53455,18 +53503,21 @@ pub enum EncodingKind {
     G729 = "g729",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModeKind {
     General = "general",
     Medical = "medical",
     Finance = "finance",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DtypeKind {
     Uint8 = "uint8",
     Float32 = "float32",
     Float64 = "float64",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SpeakerKind {
     Angus = "angus",
     Asteria = "asteria",
@@ -53482,6 +53533,7 @@ pub enum SpeakerKind {
     Stella = "stella",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Ai_Cf_Deepgram_Aura_1_InputEncodingKind {
     Linear16 = "linear16",
     Flac = "flac",
@@ -53492,12 +53544,14 @@ pub enum Ai_Cf_Deepgram_Aura_1_InputEncodingKind {
     Aac = "aac",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerKind {
     None = "none",
     Wav = "wav",
     Ogg = "ogg",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetLanguageKind {
     AsmBeng = "asm_Beng",
     AwaDeva = "awa_Deva",
@@ -53535,11 +53589,13 @@ pub enum TargetLanguageKind {
     UnrDeva = "unr_Deva",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MipOptOutKind {
     True = "true",
     False = "false",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventKind {
     Update = "Update",
     StartOfTurn = "StartOfTurn",
@@ -53548,6 +53604,7 @@ pub enum EventKind {
     EndOfTurn = "EndOfTurn",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind {
     Amalthea = "amalthea",
     Andromeda = "andromeda",
@@ -53591,6 +53648,7 @@ pub enum Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind {
     Zeus = "zeus",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind {
     Sirio = "sirio",
     Nestor = "nestor",
@@ -53604,6 +53662,7 @@ pub enum Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind {
     Javier = "javier",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MaxAttemptsKind {
     N1 = 1,
     N2 = 2,
@@ -53612,37 +53671,44 @@ pub enum MaxAttemptsKind {
     N5 = 5,
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BackoffKind {
     Constant = "constant",
     Linear = "linear",
     Exponential = "exponential",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeedbackKind {
     Neg1 = -1,
     N1 = 1,
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum CfAigMetadataKind {
     String(String),
     Record(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigCacheTtlKind {
     F64(f64),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CfAigSkipCacheKind {
     Bool(bool),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ProviderKind {
     AiGatewayProviders(AIGatewayProviders),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComparisonFilterTypeKind {
     Eq = "eq",
     Ne = "ne",
@@ -53652,17 +53718,20 @@ pub enum ComparisonFilterTypeKind {
     Lte = "lte",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ValueKind {
     String(String),
     F64(f64),
     Bool(bool),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompoundFilterTypeKind {
     And = "and",
     Or = "or",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FitKind {
     ScaleDown = "scale-down",
     Contain = "contain",
@@ -53672,6 +53741,7 @@ pub enum FitKind {
     Squeeze = "squeeze",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum GravityKind {
     Face = "face",
     Left = "left",
@@ -53684,6 +53754,7 @@ pub enum GravityKind {
     BasicImageTransformationsGravityCoordinates(BasicImageTransformationsGravityCoordinates),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RotateKind {
     N0 = 0,
     N90 = 90,
@@ -53692,28 +53763,33 @@ pub enum RotateKind {
     N360 = 360,
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BasicImageTransformationsGravityCoordinatesModeKind {
     Remainder = "remainder",
     BoxCenter = "box-center",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PolishKind {
     Lossy = "lossy",
     Lossless = "lossless",
     Off = "off",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum RepeatKind {
     Bool(bool),
     X = "x",
     Y = "y",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum TrimKind {
     Border = "border",
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum QualityKind {
     F64(f64),
     Low = "low",
@@ -53722,6 +53798,7 @@ pub enum QualityKind {
     High = "high",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FormatKind {
     Avif = "avif",
     Webp = "webp",
@@ -53733,23 +53810,27 @@ pub enum FormatKind {
     Svg = "svg",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MetadataKind {
     Keep = "keep",
     Copyright = "copyright",
     None = "none",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FlipKind {
     H = "h",
     V = "v",
     Hv = "hv",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CountryKind {
     Iso3166Alpha2Code(Iso3166Alpha2Code),
     T1 = "T1",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EdgeRequestKeepAliveStatusKind {
     N0 = 0,
     N1 = 1,
@@ -53759,42 +53840,50 @@ pub enum EdgeRequestKeepAliveStatusKind {
     N5 = 5,
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CertRevokedKind {
     _1 = "1",
     _0 = "0",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DispositionKind {
     Inline = "inline",
     Attachment = "attachment",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum EmailAttachmentContentKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum FromKind {
     String(String),
     EmailAddress(EmailAddress),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TailStreamReturnKind {
     Promise(Promise),
     JsValue(JsValue),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum TimeoutKind {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ImageInfoResponseFormatKind {
     Imagesvgxml = "image/svg+xml",
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageTransformFitKind {
     ScaleDown = "scale-down",
     Contain = "contain",
@@ -53804,6 +53893,7 @@ pub enum ImageTransformFitKind {
     Crop = "crop",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum ImageTransformGravityKind {
     Face = "face",
     Left = "left",
@@ -53816,6 +53906,7 @@ pub enum ImageTransformGravityKind {
     Object(Object),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageTransformRotateKind {
     N0 = 0,
     N90 = 90,
@@ -53823,6 +53914,7 @@ pub enum ImageTransformRotateKind {
     N270 = 270,
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageOutputOptionsFormatKind {
     Imagejpeg = "image/jpeg",
     Imagepng = "image/png",
@@ -53833,17 +53925,20 @@ pub enum ImageOutputOptionsFormatKind {
     Rgba = "rgba",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SortOrderKind {
     Asc = "asc",
     Desc = "desc",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MediaTransformationInputOptionsFitKind {
     Contain = "contain",
     Cover = "cover",
     ScaleDown = "scale-down",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MediaTransformationOutputOptionsModeKind {
     Video = "video",
     Spritesheet = "spritesheet",
@@ -53851,28 +53946,33 @@ pub enum MediaTransformationOutputOptionsModeKind {
     Audio = "audio",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MediaTransformationOutputOptionsFormatKind {
     Jpg = "jpg",
     Png = "png",
     M4A = "m4a",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum PayloadKind {
     String(String),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamCaptionStatusKind {
     Ready = "ready",
     Inprogress = "inprogress",
     Error = "error",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConversionResponseFormatKind {
     Markdown = "markdown",
     Error = "error",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DescriptionLanguageKind {
     En = "en",
     Es = "es",
@@ -53882,6 +53982,7 @@ pub enum DescriptionLanguageKind {
     De = "de",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LevelKind {
     Debug = "debug",
     Error = "error",
@@ -53890,6 +53991,7 @@ pub enum LevelKind {
     Warn = "warn",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum AttributeValueKind {
     String(String),
     VecOfString(Vec<String>),
@@ -53901,17 +54003,20 @@ pub enum AttributeValueKind {
     VecOfBigInt(Vec<BigInt>),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ReturnMetadataKind {
     Bool(bool),
     VectorizeMetadataRetrievalLevel(VectorizeMetadataRetrievalLevel),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ValuesKind {
     Float32Array(Float32Array),
     Float64Array(Float64Array),
     VecOfF64(Vec<f64>),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InstanceStatusStatusKind {
     Queued = "queued",
     Running = "running",
@@ -53924,6 +54029,7 @@ pub enum InstanceStatusStatusKind {
     Unknown = "unknown",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum EqKind {
     String(String),
     F64(f64),

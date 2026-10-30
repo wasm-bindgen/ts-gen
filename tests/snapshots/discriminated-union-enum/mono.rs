@@ -186,21 +186,25 @@ extern "C" {
     pub fn send(attachment: &Attachment, reply: &Reply, payload: &Payload) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DispositionKind {
     Inline = "inline",
     Attachment = "attachment",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CodeKind {
     N200 = 200,
     N404 = 404,
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KindKind {
     Text = "text",
     Binary = "binary",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum DataKind {
     String(String),
     ArrayBuffer(ArrayBuffer),

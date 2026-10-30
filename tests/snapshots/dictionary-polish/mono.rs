@@ -361,6 +361,7 @@ pub mod polish {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectionKind {
     Next = "next",
     Previous = "previous",

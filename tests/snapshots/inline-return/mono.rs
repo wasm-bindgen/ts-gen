@@ -127,6 +127,7 @@ impl ImageOptionsBuilder {
     }
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum CostReturnKind {
     String(String),
     Object(Object),

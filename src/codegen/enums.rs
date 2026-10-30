@@ -104,6 +104,18 @@ fn enum_attr(js_namespace: &[String]) -> TokenStream {
     quote! { #[wasm_bindgen(private #js_namespace)] }
 }
 
+/// The derives of every generated enum. One of only unit variants (string
+/// or integer discriminants) is a plain value, copied and compared like any
+/// other; one with a tuple variant holds a `String` or a JS handle, so it is
+/// cloned instead.
+pub(crate) fn enum_derives(has_payload: bool) -> TokenStream {
+    if has_payload {
+        quote! { #[derive(Clone, Debug)] }
+    } else {
+        quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq)] }
+    }
+}
+
 /// Generate a wasm_bindgen string enum.
 ///
 /// A string enum is only its values; wasm-bindgen never names it in JS, and
@@ -112,6 +124,7 @@ fn enum_attr(js_namespace: &[String]) -> TokenStream {
 pub fn generate_string_enum(decl: &StringEnumDecl) -> TokenStream {
     let name = super::typemap::make_ident(&decl.name);
     let attr = enum_attr(&[]);
+    let derives = enum_derives(false);
 
     let (members, aliases) = split_aliases(&decl.variants, |v| v.js_value.clone());
     let variants: Vec<_> = members
@@ -137,7 +150,7 @@ pub fn generate_string_enum(decl: &StringEnumDecl) -> TokenStream {
 
     quote! {
         #attr
-        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        #derives
         pub enum #name {
             #(#variants,)*
         }
@@ -165,6 +178,7 @@ fn numeric_enum_repr(decl: &NumericEnumDecl) -> TokenStream {
 pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: &[String]) -> TokenStream {
     let name = super::typemap::make_ident(&decl.name);
     let attr = enum_attr(js_namespace);
+    let derives = enum_derives(false);
     let repr = numeric_enum_repr(decl);
 
     let has_negative = decl.variants.iter().any(|v| v.value < 0);
@@ -207,7 +221,7 @@ pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: &[String]) ->
 
     quote! {
         #attr
-        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        #derives
         #[repr(#repr)]
         pub enum #name {
             #(#variants,)*

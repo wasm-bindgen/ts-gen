@@ -325,6 +325,7 @@ pub mod cloudflare {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecureTransportKind {
     Off = "off",
     On = "on",

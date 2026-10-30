@@ -464,8 +464,14 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
                 })
                 .collect();
             let fallback = info.fallback.then(|| quote! { , fallback });
+            let has_payload = members.iter().any(|m| {
+                !matches!(m, T::StringLiteral(_))
+                    && !matches!(m, T::NumberLiteral(n) if n.fract() == 0.0)
+            });
+            let derives = enums::enum_derives(has_payload);
             quote! {
                 #[wasm_bindgen(private #fallback)]
+                #derives
                 pub enum #enum_ident {
                     #(#variants),*
                 }
@@ -908,9 +914,10 @@ fn generate_union_alias_enum(
         }
     }
     let fallback = union.fallback.then(|| quote! { , fallback });
+    let derives = enums::enum_derives(true);
     let item = quote! {
         #[wasm_bindgen(private #fallback)]
-        #[derive(Clone, Debug)]
+        #derives
         pub enum #enum_name {
             #(#variants),*
         }

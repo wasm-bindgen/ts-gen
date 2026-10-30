@@ -5,7 +5,7 @@
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::setter_matches_getter_mono::{
-    DigitsOptions, FractionalSecondDigitsKind, ModeKind, RequiredDigits, Toggle,
+    DigitsOptions, FractionalSecondDigitsKind, ModeKind, RequiredDigits, RoundingModeKind, Toggle,
 };
 
 fn is_f64(kind: Option<FractionalSecondDigitsKind>, expected: f64) -> bool {
@@ -44,4 +44,26 @@ fn mixed_literal_enum_round_trips() {
     toggle.set_mode(ModeKind::Y);
     toggle.set_mode(toggle.mode());
     assert!(matches!(toggle.mode(), ModeKind::Y));
+}
+
+// A synthesised enum is a value like any declared one: a literal-only read
+// compares, prints and copies, and one with a payload clones and prints.
+#[wasm_bindgen_test]
+fn synthesised_enum_derives() {
+    let options = DigitsOptions::builder()
+        .rounding_mode(RoundingModeKind::Floor)
+        .build();
+    let read = options.rounding_mode();
+    assert_eq!(read, Some(RoundingModeKind::Floor));
+    assert_ne!(read, Some(RoundingModeKind::Ceil));
+    assert_eq!(format!("{read:?}"), "Some(Floor)");
+    let mode = read.unwrap();
+    options.set_rounding_mode(mode);
+    assert_eq!(options.rounding_mode(), Some(mode));
+
+    let toggle = Toggle::new_x();
+    let mode = toggle.mode();
+    toggle.set_mode(mode.clone());
+    assert_eq!(format!("{mode:?}"), "X");
+    assert!(matches!(toggle.mode(), ModeKind::X));
 }

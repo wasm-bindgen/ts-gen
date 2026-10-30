@@ -548,6 +548,7 @@ pub type ProviderOf<T> = Provider<Array<T>>;
 #[allow(dead_code)]
 pub type ViaProviderOf = Provider<Array<JsString>>;
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum RoleKind {
     User = "user",
     Assistant = "assistant",

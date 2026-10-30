@@ -301,21 +301,25 @@ impl ChoiceBuilder {
     }
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum PickReturnKind {
     Ticket(shapes::Ticket),
     RoundingOptions(shapes::RoundingOptions),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum PickAnyReturnKind {
     Ticket(shapes::Ticket),
     Object(Object),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum PickOrTextReturnKind {
     String(String),
     RoundingOptions(shapes::RoundingOptions),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KindKind {
     A = "a",
     B = "b",

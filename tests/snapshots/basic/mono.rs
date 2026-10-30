@@ -597,6 +597,7 @@ extern "C" {
     pub static self_: ServiceWorkerGlobalScope;
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HeadersKind {
     Headers(Headers),
     VecOfVecOfString(Vec<Array<JsString>>),
