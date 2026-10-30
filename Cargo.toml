@@ -18,17 +18,16 @@ wasm-bindgen = "0.2.128"
 wasm-bindgen-futures = "0.4.78"
 wasm-bindgen-test = "0.3.78"
 
-# Temporarily track wasm-bindgen/wasm-bindgen#5390 (real-generic js-sys
-# element types under `js_sys_unstable_apis`) on top of main, which includes
-# #5410 (`Nullable<T>`), #5385 (explicit ABI bounds on
-# experimental_generic_mono imports), #5384 (`slice = view | array | copy`
-# import argument modes), #5383, #5381, #5376, #5377 and #5341, until these
-# ship in a release. All four crates must come from the same source.
+# Temporarily track the wasm-bindgen/wasm-bindgen#5433 branch (generic
+# sequences over the element ABI, stacked on #5390's real-generic js-sys
+# element types and on main with #5428 and #5437) until these ship in a
+# release. Cargo.lock pins the commit; `cargo update -p wasm-bindgen` moves
+# it. All four crates must come from the same source.
 [patch.crates-io]
-js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "7563114d3485600a4f68a6bf69fb42ee86f7298d" }
-wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "7563114d3485600a4f68a6bf69fb42ee86f7298d" }
-wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "7563114d3485600a4f68a6bf69fb42ee86f7298d" }
-wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "7563114d3485600a4f68a6bf69fb42ee86f7298d" }
+js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "gbedford/mono-vec" }
+wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "gbedford/mono-vec" }
+wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "gbedford/mono-vec" }
+wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "gbedford/mono-vec" }
 
 [package]
 categories = ["wasm", "development-tools::ffi"]
