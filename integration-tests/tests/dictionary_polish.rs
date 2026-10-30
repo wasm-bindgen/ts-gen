@@ -3,15 +3,12 @@
 use js_sys::JsString;
 use wasm_bindgen_test::*;
 
-use ts_gen_integration_tests::dictionary_polish::{
-    polish::{
-        Approximate, BoundedDayOrHour, Defaulted, Gauge, Holder, HourStepping, Maker,
-        MinuteStepping, Options, PartialBoxLikeObject, PartialOmitLikeBoxLikeObject,
-        PluralizeTimeUnit, PluralizeUnit, PluralizeUnitHour, PluralizeUnitMinute, Rounder,
-        Rounding, RoundingHour, RoundingTimeUnit, Stepped, TimeLikeObject, Transition,
-    },
-    DirectionKind, LevelReturnKind, MinuteSteppingLargestUnitKind, StepKind,
-    SteppedLargestUnitKind,
+use ts_gen_integration_tests::dictionary_polish::polish::{
+    Approximate, BoundedDayOrHour, Defaulted, DirectionKind, Gauge, Holder, HourStepping,
+    LargestUnitKind2, LargestUnitKind3, LevelReturnKind, Maker, MinuteStepping, Options,
+    PartialBoxLikeObject, PartialOmitLikeBoxLikeObject, PluralizeTimeUnit, PluralizeUnit,
+    PluralizeUnitHour, PluralizeUnitMinute, Rounder, Rounding, RoundingHour, RoundingTimeUnit,
+    StepKind, Stepped, TimeLikeObject, Transition,
 };
 
 // Dictionaries need no backing module, so these run.
@@ -61,7 +58,7 @@ fn literal_only_parameters_specialise_per_instantiation() {
     // `Rounding<TimeUnit>` narrows its units and derefs to the base.
     let time = RoundingTimeUnit::builder()
         .smallest_unit(PluralizeTimeUnit::Minutes)
-        .largest_unit(SteppedLargestUnitKind::Hour)
+        .largest_unit(LargestUnitKind2::Hour)
         .increment(5.0)
         .build();
     assert!(matches!(
@@ -87,7 +84,7 @@ fn literal_only_parameters_specialise_per_instantiation() {
     let minute = MinuteStepping::builder()
         .step("minute")
         .smallest_unit(PluralizeUnitMinute::Minute)
-        .largest_unit(MinuteSteppingLargestUnitKind::Auto)
+        .largest_unit(LargestUnitKind3::Auto)
         .build();
     assert_eq!(minute.step().as_deref(), Some("minute"));
     let stepped: &Stepped = &minute;

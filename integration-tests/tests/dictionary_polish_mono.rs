@@ -5,19 +5,16 @@
 use js_sys::JsString;
 use wasm_bindgen_test::*;
 
-use ts_gen_integration_tests::dictionary_polish_mono::{
-    polish::{
-        spans::{self, HourSpan, Span},
-        steps::{self, DaySpan, DaySpan2},
-        Approximate, Bounded, DayOrHour, DayOrHourMaximumUnitKind, DayOrTimeUnit, Defaulted, Gauge,
-        Holder, Hour, HourLargestUnitKind, HourLargestUnitKind2, HourSpanning, HourStepping, Maker,
-        Minute, MinuteLargestUnitKind, MinuteStepping, Options, PartialBoxLikeObject,
-        PartialOmitLikeBoxLikeObject, PickedRounding, PluralizeTimeUnit, PluralizeUnit,
-        PluralizeUnitDayOrHour, PluralizeUnitHour, PluralizeUnitMinute, Rounder, Rounding,
-        RoundingU, Stepped, TimeLikeObject, TimePicking, TimeUnit, TimeUnitLargestUnitKind,
-        Transition,
-    },
-    DirectionKind, LevelReturnKind,
+use ts_gen_integration_tests::dictionary_polish_mono::polish::{
+    spans::{self, HourSpan, Span},
+    steps::{self, DaySpan, DaySpan2},
+    Approximate, Bounded, DayOrHour, DayOrHourMaximumUnitKind, DayOrTimeUnit, Defaulted,
+    DirectionKind, Gauge, Holder, Hour, HourLargestUnitKind, HourLargestUnitKind2, HourSpanning,
+    HourStepping, LevelReturnKind, Maker, Minute, MinuteLargestUnitKind, MinuteStepping, Options,
+    PartialBoxLikeObject, PartialOmitLikeBoxLikeObject, PickedRounding, PluralizeTimeUnit,
+    PluralizeUnit, PluralizeUnitDayOrHour, PluralizeUnitHour, PluralizeUnitMinute, Rounder,
+    Rounding, RoundingU, Stepped, TimeLikeObject, TimePicking, TimeUnit, TimeUnitLargestUnitKind,
+    Transition,
 };
 
 // Dictionaries need no backing module, so these run.

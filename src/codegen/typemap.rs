@@ -510,7 +510,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef, head: &dyn Fn(&[String]) -
             assoc,
             ..
         } => {
-            write_type_ref_key(buf, base);
+            write_type_ref_key(buf, base, head);
             let _ = write!(buf, "::{}.{}#{assoc}", family.iface.index(), family.param);
         }
         TypeRef::Unresolved(s) => {
