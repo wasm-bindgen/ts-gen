@@ -150,6 +150,11 @@ impl R2PutOptionsBuilder {
         self.inner
     }
 }
+impl From<R2PutOptions> for R2PutOptionsBuilder {
+    fn from(inner: R2PutOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "inline-wrappers", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "now")]

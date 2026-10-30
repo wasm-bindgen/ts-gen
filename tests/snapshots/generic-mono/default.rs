@@ -99,6 +99,11 @@ impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::JsGeneric> From<EvaluationDetails<T>> for EvaluationDetailsBuilder<T> {
+    fn from(inner: EvaluationDetails<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "generic-mono")]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -165,6 +170,11 @@ impl TypedArrayOptionsBuilder {
     }
     pub fn build(self) -> TypedArrayOptions {
         self.inner
+    }
+}
+impl From<TypedArrayOptions> for TypedArrayOptionsBuilder {
+    fn from(inner: TypedArrayOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "generic-mono")]

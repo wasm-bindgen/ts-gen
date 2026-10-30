@@ -64,6 +64,11 @@ impl OptionsBuilder {
         self.inner
     }
 }
+impl From<Options> for OptionsBuilder {
+    fn from(inner: Options) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -106,6 +111,11 @@ impl ScaledBuilder {
     }
     pub fn build(self) -> Scaled {
         self.inner
+    }
+}
+impl From<Scaled> for ScaledBuilder {
+    fn from(inner: Scaled) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "literal-discriminants")]

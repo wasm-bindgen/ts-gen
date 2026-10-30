@@ -60,6 +60,11 @@ impl SendOptionsBuilder {
         self.inner
     }
 }
+impl From<SendOptions> for SendOptionsBuilder {
+    fn from(inner: SendOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "enum-args", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
