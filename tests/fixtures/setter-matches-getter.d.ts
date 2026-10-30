@@ -8,6 +8,8 @@ declare global {
   // `_with_f64` overload rather than overflowing the fan-out to `&JsValue`.
   interface DigitsOptions {
     fractionalSecondDigits?: "auto" | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | undefined;
+    // Literals alone: a plain value the getter's read compares and prints.
+    roundingMode?: "ceil" | "floor";
   }
 
   // A required field: each literal is a factory.

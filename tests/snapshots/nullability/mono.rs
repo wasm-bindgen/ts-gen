@@ -1383,22 +1383,26 @@ extern "C" {
     pub fn cover(cover: &Cover) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum KeyKind {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DispositionKind {
     Inline = "inline",
     Attachment = "attachment",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KindKind {
     File = "file",
     None = "none",
     Skip = "skip",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CoverKindKind {
     Image = "image",
     Blank = "blank",

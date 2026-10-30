@@ -304,6 +304,7 @@ extern "C" {
     pub fn value(this: &Total) -> f64;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum GetValueReturnKind {
     String(String),
     VecOfBool(Vec<bool>),

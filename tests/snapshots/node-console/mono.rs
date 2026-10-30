@@ -317,6 +317,7 @@ extern "C" {
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ColorModeKind {
     Bool(bool),
     String(String),

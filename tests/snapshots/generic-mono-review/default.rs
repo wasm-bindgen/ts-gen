@@ -117,6 +117,7 @@ extern "C" {
     ) -> Result<Holder<Id>, JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LiteralUnionReturnKind {
     A = "a",
     B = "b",

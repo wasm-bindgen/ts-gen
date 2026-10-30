@@ -235,6 +235,7 @@ extern "C" {
     pub fn try_describe_target(target: &Target) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BufferKind {
     Float64Array(Float64Array),
     VecOfF64(Vec<f64>),

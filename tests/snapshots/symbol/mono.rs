@@ -107,6 +107,7 @@ impl TaggedBuilder {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum LookupReturnKind {
     String(String),
     Symbol(Symbol),

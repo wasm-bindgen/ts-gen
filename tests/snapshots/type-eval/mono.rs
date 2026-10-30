@@ -794,6 +794,7 @@ impl Default for PartialExtended {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LargestUnitKind {
     Auto = "auto",
     Hour = "hour",

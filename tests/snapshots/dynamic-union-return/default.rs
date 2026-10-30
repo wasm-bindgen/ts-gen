@@ -59,17 +59,20 @@ extern "C" {
     pub fn fetch_value_promise() -> Promise;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ContentKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VariantKind {
     A = "a",
     B = "b",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum FetchValueReturnKind {
     F64(f64),
     Foo = "foo",

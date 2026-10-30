@@ -176,6 +176,7 @@ extern "C" {
     pub fn describe_target_js_string(target: &Target) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum BufferKind {
     Float64Array(Float64Array),
     VecOfF64(Vec<f64>),

@@ -473,6 +473,7 @@ extern "C" {
     pub fn try_time_stamp_with_label(this: &Console, label: &str) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ColorModeKind {
     Bool(bool),
     String(String),

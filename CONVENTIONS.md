@@ -3479,6 +3479,7 @@ emits:
 
 ```rust
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum EmailAttachmentContentKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
@@ -3487,6 +3488,27 @@ pub enum EmailAttachmentContentKind {
 
 // inside the extern block:
 pub fn content(this: &EmailAttachment) -> EmailAttachmentContentKind;
+```
+
+#### Derives
+
+A synthesised enum derives what a declared one does, so a read can be
+compared, printed and kept. One of only literal variants (`"a" | "b"`,
+`0 | 1 | 2`) is a plain value like a
+[string or numeric enum](#string-and-numeric-enums), deriving
+`Debug, Clone, Copy, PartialEq, Eq`; one with a tuple variant holds a
+`String` or a JS handle, so it derives `Clone, Debug`, as a
+[named union alias](#named-union-aliases) does.
+
+```rust
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OverflowKind {
+    Constrain = "constrain",
+    Reject = "reject",
+}
+
+assert_eq!(options.overflow(), Some(OverflowKind::Constrain));
 ```
 
 #### Shape arms go last
@@ -3509,11 +3531,13 @@ declare function pickAny(): RoundingOptions | Init | Ticket;
 
 ```rust
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum PickReturnKind {
     Ticket(Ticket),
     RoundingOptions(RoundingOptions),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum PickAnyReturnKind {
     Ticket(Ticket),
     Object(Object),
@@ -3627,6 +3651,7 @@ pub fn relative_to(this: &DurationRelativeToOptions) -> Option<RelativeToKind>;
 pub fn time_zone(this: &InstantToStringOptions) -> Option<TimeZoneLike>;
 
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum RelativeToKind {
     ZonedDateTime(temporal::ZonedDateTime),
     String(String),

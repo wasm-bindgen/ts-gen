@@ -6702,6 +6702,7 @@ pub mod temporal {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DisambiguationKind {
     Compatible = "compatible",
     Earlier = "earlier",
@@ -6709,16 +6710,19 @@ pub enum DisambiguationKind {
     Reject = "reject",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OverflowKind {
     Constrain = "constrain",
     Reject = "reject",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectionKind {
     Next = "next",
     Previous = "previous",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RoundingModeKind {
     Ceil = "ceil",
     Floor = "floor",
@@ -6731,6 +6735,7 @@ pub enum RoundingModeKind {
     HalfEven = "halfEven",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LargestUnitKind {
     Auto = "auto",
     Year = "year",
@@ -6755,11 +6760,13 @@ pub enum LargestUnitKind {
     Nanoseconds = "nanoseconds",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum FractionalSecondDigitsKind {
     Auto = "auto",
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CalendarNameKind {
     Auto = "auto",
     Always = "always",
@@ -6767,17 +6774,20 @@ pub enum CalendarNameKind {
     Critical = "critical",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OffsetKind {
     Auto = "auto",
     Never = "never",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TimeZoneNameKind {
     Auto = "auto",
     Never = "never",
     Critical = "critical",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ZonedDateTimeFromOptionsOffsetKind {
     Use = "use",
     Ignore = "ignore",
@@ -6785,6 +6795,7 @@ pub enum ZonedDateTimeFromOptionsOffsetKind {
     Reject = "reject",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum RelativeToKind {
     ZonedDateTime(temporal::ZonedDateTime),
     String(String),

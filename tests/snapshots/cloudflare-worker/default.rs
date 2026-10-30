@@ -612,6 +612,7 @@ pub fn fetch_with_init_promise(
     __fetch_with_init_promise(input.into(), init)
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HeadersKind {
     Headers(Headers),
     VecOfTuple(Vec<ArrayTuple<(JsString, JsString)>>),

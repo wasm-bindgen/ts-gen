@@ -243,11 +243,13 @@ impl CappedAttachmentBuilder {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DispositionKind {
     Inline = "inline",
     Attachment = "attachment",
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum AKind {
     String(String),
     F64(f64),

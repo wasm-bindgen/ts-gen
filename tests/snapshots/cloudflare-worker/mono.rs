@@ -627,6 +627,7 @@ extern "C" {
     ) -> Promise<Response>;
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum HeadersKind {
     Headers(Headers),
     VecOfTuple(Vec<ArrayTuple<(JsString, JsString)>>),

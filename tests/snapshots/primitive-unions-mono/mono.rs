@@ -565,22 +565,26 @@ impl SettingsBuilder {
     }
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum CurrentReturnKind {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum LevelKind {
     Low = "low",
     High = "high",
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum LabelKind {
     String(String),
     Bool(bool),
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum FromKind {
     String(String),
     Bool(bool),

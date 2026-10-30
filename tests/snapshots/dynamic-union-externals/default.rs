@@ -23,11 +23,13 @@ extern "C" {
     pub fn try_widget(this: &Foo) -> Result<WidgetReturnKind, JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum WorkerReturnKind {
     Worker(Worker),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum WidgetReturnKind {
     Widget(Widget),
     F64(f64),

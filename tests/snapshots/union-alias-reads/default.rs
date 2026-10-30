@@ -778,11 +778,13 @@ extern "C" {
     pub fn try_either_with_str(item: &str) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OverflowKind {
     Constrain = "constrain",
     Reject = "reject",
 }
 #[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
 pub enum RelativeToKind {
     Zoned(Zoned),
     String(String),

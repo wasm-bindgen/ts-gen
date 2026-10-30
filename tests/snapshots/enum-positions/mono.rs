@@ -184,21 +184,25 @@ extern "C" {
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeOrNumberReturnKind {
     Mode(Mode),
     F64(f64),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeOrStringReturnKind {
     Mode(Mode),
     String(String),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum ModeOrRegionReturnKind {
     Mode(Mode),
     Region(codes::Region),
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum LevelOrStringReturnKind {
     Level(Level),
     String(String),

@@ -40,6 +40,7 @@ extern "C" {
     pub fn set_value_with_f64(value: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
 pub enum FirstKeyReturnKind {
     String(String),
     F64(f64),
