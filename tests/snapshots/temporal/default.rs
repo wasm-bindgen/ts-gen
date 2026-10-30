@@ -2052,16 +2052,14 @@ pub mod temporal {
         fn __try_equals(this: &PlainDate, other: PlainDateLike) -> Result<bool, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, js_name = "toPlainDateTime")]
         pub fn to_plain_date_time(this: &PlainDate) -> PlainDateTime;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
-        pub fn try_to_plain_date_time(this: &PlainDate) -> Result<PlainDateTime, Error>;
+        pub fn try_to_plain_date_time(this: &PlainDate) -> Result<PlainDateTime, RangeError>;
         #[wasm_bindgen(method, js_name = "toPlainDateTime")]
         fn __to_plain_date_time_with_time(this: &PlainDate, time: PlainTimeLike) -> PlainDateTime;
         #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
@@ -3298,16 +3296,14 @@ pub mod temporal {
         ) -> Result<PlainDateTime, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, js_name = "withPlainTime")]
         pub fn with_plain_time(this: &PlainDateTime) -> PlainDateTime;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time(this: &PlainDateTime) -> Result<PlainDateTime, Error>;
+        pub fn try_with_plain_time(this: &PlainDateTime) -> Result<PlainDateTime, RangeError>;
         #[wasm_bindgen(method, js_name = "withPlainTime")]
         fn __with_plain_time_with_plain_time(
             this: &PlainDateTime,
@@ -4129,16 +4125,14 @@ pub mod temporal {
         ) -> Result<ZonedDateTime, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, js_name = "withPlainTime")]
         pub fn with_plain_time(this: &ZonedDateTime) -> ZonedDateTime;
         #[doc = " ## Errors"]
         #[doc = ""]
-        #[doc = " * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range"]
-        #[doc = " * `TypeError` — if an object is missing the fields it needs"]
+        #[doc = " * `RangeError` — if the result is out of range"]
         #[wasm_bindgen(method, catch, js_name = "withPlainTime")]
-        pub fn try_with_plain_time(this: &ZonedDateTime) -> Result<ZonedDateTime, Error>;
+        pub fn try_with_plain_time(this: &ZonedDateTime) -> Result<ZonedDateTime, RangeError>;
         #[wasm_bindgen(method, js_name = "withPlainTime")]
         fn __with_plain_time_with_plain_time(
             this: &ZonedDateTime,

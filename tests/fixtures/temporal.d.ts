@@ -19,9 +19,9 @@ and limitations under the License.
 // so the output shows their typed fallible forms. Each tag names only the
 // errors the spec can throw for input the generated Rust signature accepts:
 // a property bag missing its fields is a `TypeError`, a locale list of
-// strings never is. Where only the form with an argument can throw, the
-// declaration is split into overloads so that the tag covers that form
-// alone.
+// strings never is. Where the form without an argument throws less (or
+// nothing), the declaration is split into overloads so each form carries
+// only its own tags.
 
 /// <reference lib="es2015.symbol.wellknown" />
 /// <reference lib="es2020.intl" />
@@ -210,11 +210,13 @@ declare namespace Temporal {
          * @throws {TypeError} if an object is missing the fields it needs
          */
         equals(other: PlainDateLike): boolean;
+        /** @throws {RangeError} if the result is out of range */
+        toPlainDateTime(): PlainDateTime;
         /**
          * @throws {RangeError} if a string does not parse, a field is out of range, or the result is out of range
          * @throws {TypeError} if an object is missing the fields it needs
          */
-        toPlainDateTime(time?: PlainTimeLike): PlainDateTime;
+        toPlainDateTime(time: PlainTimeLike): PlainDateTime;
         /** @throws {RangeError} if the time zone is unknown, or the result is out of range */
         toZonedDateTime(timeZone: TimeZoneLike): ZonedDateTime;
         /**
@@ -353,11 +355,13 @@ declare namespace Temporal {
          * @throws {TypeError} if the object has no recognised fields
          */
         with(dateTimeLike: PartialTemporalLike<DateTimeLikeObject>, options?: OverflowOptions): PlainDateTime;
+        /** @throws {RangeError} if the result is out of range */
+        withPlainTime(): PlainDateTime;
         /**
          * @throws {RangeError} if a string does not parse, a field is out of range, or the result is out of range
          * @throws {TypeError} if an object is missing the fields it needs
          */
-        withPlainTime(plainTime?: PlainTimeLike): PlainDateTime;
+        withPlainTime(plainTime: PlainTimeLike): PlainDateTime;
         /** @throws {RangeError} if the calendar is unknown */
         withCalendar(calendar: CalendarLike): PlainDateTime;
         /**
@@ -467,11 +471,13 @@ declare namespace Temporal {
          * @throws {TypeError} if the object has no recognised fields
          */
         with(zonedDateTimeLike: PartialTemporalLike<ZonedDateTimeLikeObject>, options?: ZonedDateTimeFromOptions): ZonedDateTime;
+        /** @throws {RangeError} if the result is out of range */
+        withPlainTime(): ZonedDateTime;
         /**
          * @throws {RangeError} if a string does not parse, a field is out of range, or the result is out of range
          * @throws {TypeError} if an object is missing the fields it needs
          */
-        withPlainTime(plainTime?: PlainTimeLike): ZonedDateTime;
+        withPlainTime(plainTime: PlainTimeLike): ZonedDateTime;
         /** @throws {RangeError} if the time zone is unknown */
         withTimeZone(timeZone: TimeZoneLike): ZonedDateTime;
         /** @throws {RangeError} if the calendar is unknown */
