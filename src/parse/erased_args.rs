@@ -219,6 +219,7 @@ impl Pass<'_> {
             ),
             // Leaves: nothing nested to visit.
             TypeRef::Reference { .. }
+            | TypeRef::RustScalar(_)
             | TypeRef::Boolean
             | TypeRef::Number
             | TypeRef::String

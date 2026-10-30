@@ -37,6 +37,8 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
   * [`toString()` is `Display`](#tostring-is-display)
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
+* [`@rust` JSDoc → Rust scalar](#rust-jsdoc--rust-scalar)
+* [`--annotate` side files](#--annotate-side-files)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
 * [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-)
@@ -3415,6 +3417,132 @@ impl CompressionStream {
 * Setters are exempt: `set_disposition("inline")` takes the value. A
   setter taking a named union alias is wrapped like any binding
   (`set_relative_to(&self, val: impl Into<ZonedDateTimeLike>)`).
+
+## `@rust` JSDoc → Rust scalar
+
+TS `number` lowers to `f64`, which is wrong-shaped for most of the
+numbers a platform API actually carries (`status: number` is a `u16`,
+`port: number` a `u16`, `limit: number` a `u32`). A `@rust` tag forces
+the Rust scalar; wasm-bindgen converts the JS number at the boundary:
+
+```ts
+interface Response {
+  /** @rust u16 */
+  readonly status: number;
+  /**
+   * @rust status: u16
+   * @rust u32
+   */
+  withStatus(status: number, reason?: string): number;
+  /** @rust u32 */
+  count(): Promise<number>;
+}
+```
+
+```rust
+pub fn status(this: &Response) -> u16;
+pub fn with_status(this: &Response, status: u16) -> u32;
+pub async fn count(this: &Response) -> Result<u32, JsValue>;
+```
+
+* `@rust <type>` applies to the member's own type: a property (getter,
+  setter and builder method alike) or a callable's return.
+* `@rust <param>: <type>` applies to the named parameter of a method,
+  constructor or function; several tags may be stacked.
+* The scalar replaces the leaf through `| null` / `| undefined` and an
+  optional declaration (read as `Nullable<u16>` / `Option<u16>`), `T[]`
+  (`Vec<u8>` / `&[u8]`) and an async return's `Promise<…>`
+  (`Result<u32, _>`).
+* A generic handle's argument must be a JS type, so inside one the
+  tagged leaf keeps the JS number it narrows: `Number`, or `BigInt` for
+  `u64`/`i64`. A `Promise<number>` getter or argument is
+  `Promise<Number>`, `number[][]` is `Vec<Array<Number>>` and
+  `(number | null)[]` is `Vec<JsNullable<Number>>`; the tag still
+  applies where the leaf reaches a Rust position.
+* Accepted scalars: `u8 u16 u32 u64 i8 i16 i32 i64 f32 f64 usize`.
+  wasm-bindgen crosses `u64`/`i64` as a JS `BigInt`, so they apply only
+  to a `bigint` leaf; every other scalar applies only to a `number`
+  leaf. A `@rust u64` on a `number` would make the JS glue reject the
+  value at runtime, so it is refused: sizes beyond `u32` stay `f64`
+  (exact to 2^53). An unknown scalar, an incompatible leaf, or a
+  parameter name that does not exist is an error diagnostic and the
+  tag is ignored.
+
+Why a JSDoc tag rather than a branded alias (`type u16 = number`): the
+alias form needs the upstream declaration to *use* the alias, which an
+upstream file never does, so annotations would still have to be
+layered on — and a tag reads as what it is, a Rust-side refinement,
+while a `u16` alias in `.d.ts` suggests a TS-level distinction that
+does not exist.
+
+## `--annotate` side files
+
+Upstream declaration files (`@cloudflare/workers-types`,
+`lib.dom.d.ts`) carry no `@rust` or `@throws` tags, and editing a
+vendored copy does not survive an upgrade. `--annotate` takes side
+`.d.ts` files that re-declare **only the members they tag**; the tags
+are applied to the input's declarations by declaration name and member
+name, and the side file is otherwise not emitted:
+
+```ts
+// annotations.d.ts
+interface Response {
+  /** @rust u16 */
+  readonly status: number;
+  /** @throws {TypeError} if the body has already been used */
+  clone(): Response;
+}
+interface Console { /** @throws {never} */ log(...data: any[]): void; }
+declare abstract class Cache { /** @rust ttl: u32 */ put(url: string, ttl?: number): Promise<void>; }
+```
+
+```sh
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
+       --annotate annotations.d.ts …
+```
+
+* `@rust` applies as if written on the input member; a property's tag
+  reaches its setter too. Parameters match by name.
+* `@throws` replaces the input member's failure mode. Getters are
+  infallible, so on a property it contributes only its doc.
+* A side member applies to every overload of the input method or
+  function, and the `## Errors` section its `@throws` renders is
+  appended to the input's doc once. The rest of the side doc is not
+  carried over, so a member copied from upstream with its description
+  does not repeat it. Overloads may differ in return
+  type (`delete(key): Promise<boolean>`, `delete(keys: string[]):
+  Promise<number>`), so a return `@rust` applies to the overloads that
+  can carry it.
+* A declaration, member or parameter named in the side file that does
+  not exist in the input fails the run, so a typo cannot silently miss
+  a binding; so does an invalid `@rust` tag, or one whose scalar the
+  input's type cannot carry. Side members without tags are ignored,
+  whatever their description.
+* Only classes, interfaces and functions can be annotated: a
+  `declare namespace`, `declare module`, variable, or alias that sets no
+  type-parameter default (see below) in the side file fails the run
+  rather than being skipped, as does a bare name
+  that the input declares more than once (globally and inside a
+  module), since names are matched without scope.
+* A side declaration's type-parameter defaults replace the input's, by
+  parameter name; a default for a parameter the input lacks fails the
+  run. The output changes wherever a default is read: a class or
+  interface default becomes the emitted Rust default, and an alias's
+  expansion takes it. The `annotate` fixture, modelled on
+  workers-types, declares `Request<Meta = unknown, Cf = CfProperties>`
+  and `RequestInfo<Meta = unknown, Cf = CfProperties> = Request<Meta,
+  Cf> | string`, where `Cf` defaults to a union of the incoming and
+  outgoing shapes (`CfProperties = Incoming | Outgoing`), which erases.
+  The side file's `interface Request<Meta = unknown, Cf = Incoming>`
+  makes the emitted type `Request<Meta: JsGeneric = JsValue, Cf:
+  JsGeneric = Incoming>`, so a bare `Request` reads `cf()` as
+  `Incoming`. Its `type RequestInfo<Meta = unknown, Cf = Incoming> = …`
+  (whose target is ignored) makes the expansion `Request<JsValue,
+  Incoming>`, which is now `Request`'s defaults and so collapses to the
+  bare name: `fetch(input: &Request)`.
+* The side file may use `interface` for a class and need not repeat
+  type parameters or parameter types other than tagged ones; only names
+  matter.
 
 ## Subtyping LUB across unions
 

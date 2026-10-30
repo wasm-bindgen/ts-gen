@@ -270,6 +270,11 @@ pub enum TypeRef {
     /// flattening, never parsed.
     TypedSlice(TypedArrayElement, SharedMemory),
 
+    /// A Rust scalar forced by a `@rust <type>` JSDoc tag. TS `number`
+    /// is `f64`; declarations that know better (`status: number` is a
+    /// `u16`) say so here, and wasm-bindgen converts at the boundary.
+    RustScalar(RustScalar),
+
     // === Syntactic constructs ===
     /// `T[]` — the syntactic array shortcut. Distinct from
     /// `Array<T>` (which is a [`TypeRef::Reference`] to the global
@@ -458,6 +463,73 @@ impl TypedArrayElement {
     }
 }
 
+/// The scalar set a `@rust` tag may name.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RustScalar {
+    U8,
+    U16,
+    U32,
+    U64,
+    I8,
+    I16,
+    I32,
+    I64,
+    F32,
+    F64,
+    Usize,
+}
+
+impl RustScalar {
+    pub fn parse(name: &str) -> Option<Self> {
+        Some(match name {
+            "u8" => Self::U8,
+            "u16" => Self::U16,
+            "u32" => Self::U32,
+            "u64" => Self::U64,
+            "i8" => Self::I8,
+            "i16" => Self::I16,
+            "i32" => Self::I32,
+            "i64" => Self::I64,
+            "f32" => Self::F32,
+            "f64" => Self::F64,
+            "usize" => Self::Usize,
+            _ => return None,
+        })
+    }
+
+    /// Whether wasm-bindgen crosses this scalar as a JS `BigInt`.
+    pub fn is_bigint(self) -> bool {
+        matches!(self, Self::U64 | Self::I64)
+    }
+
+    /// Whether a TS leaf type can cross the boundary as this scalar.
+    /// wasm-bindgen passes `u64`/`i64` as `BigInt`, so they need a
+    /// `bigint`; every other scalar is a JS `number`.
+    pub fn accepts(self, leaf: &TypeRef) -> bool {
+        if self.is_bigint() {
+            matches!(leaf, TypeRef::BigInt)
+        } else {
+            matches!(leaf, TypeRef::Number)
+        }
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::U8 => "u8",
+            Self::U16 => "u16",
+            Self::U32 => "u32",
+            Self::U64 => "u64",
+            Self::I8 => "i8",
+            Self::I16 => "i16",
+            Self::I32 => "i32",
+            Self::I64 => "i64",
+            Self::F32 => "f32",
+            Self::F64 => "f64",
+            Self::Usize => "usize",
+        }
+    }
+}
+
 impl TypeRef {
     /// The union of `members` in normal form (see [`Union`]). A single
     /// surviving member is returned bare, so this is also how a union is
@@ -530,6 +602,43 @@ impl TypeRef {
 
     fn is_empty_type(&self) -> bool {
         matches!(self, TypeRef::Null | TypeRef::Undefined)
+    }
+
+    /// Replace the scalar leaf of `self` (through `| null` / `| undefined`,
+    /// `Promise`, and `T[]`) with `scalar`, i.e. what a `@rust` tag applies
+    /// to. `None` when the leaf cannot carry `scalar` (see
+    /// [`RustScalar::accepts`]).
+    pub fn with_rust_scalar(&self, scalar: RustScalar) -> Option<TypeRef> {
+        if let Some((core, n)) = self.split_empties() {
+            return Some(core.with_rust_scalar(scalar)?.with_empties(n));
+        }
+        Some(match self {
+            TypeRef::Array(inner) => TypeRef::Array(Box::new(inner.with_rust_scalar(scalar)?)),
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } if segments.len() == 1 && segments[0] == "Promise" && generic_args.len() == 1 => {
+                TypeRef::generic("Promise", vec![generic_args[0].with_rust_scalar(scalar)?])
+            }
+            leaf if scalar.accepts(leaf) => TypeRef::RustScalar(scalar),
+            _ => return None,
+        })
+    }
+
+    /// Whether a `@rust` scalar appears anywhere in `self`.
+    pub fn has_rust_scalar(&self) -> bool {
+        match self {
+            TypeRef::RustScalar(_) => true,
+            TypeRef::Array(inner) => inner.has_rust_scalar(),
+            TypeRef::Reference { generic_args, .. } => {
+                generic_args.iter().any(TypeRef::has_rust_scalar)
+            }
+            TypeRef::Union(u) => u.members().iter().any(TypeRef::has_rust_scalar),
+            TypeRef::Intersection(items) | TypeRef::Tuple(items) => {
+                items.iter().any(TypeRef::has_rust_scalar)
+            }
+            _ => false,
+        }
     }
 
     /// Construct a single-segment, non-generic reference: `Foo`.
@@ -655,6 +764,7 @@ impl TypeRef {
             TypeRef::PropertyKey => "PropertyKey".into(),
             TypeRef::TypedSlice(e, _) if e.is_bigint() => "bigint[]".into(),
             TypeRef::TypedSlice(..) => "number[]".into(),
+            TypeRef::RustScalar(s) => s.as_str().into(),
             TypeRef::Array(inner) => {
                 // Wrap composite inner types in parens so e.g.
                 // `(A | B)[]` doesn't render as the wrong-precedence
