@@ -5,10 +5,10 @@ use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::dictionary_polish::{
     polish::{
-        Approximate, Defaulted, Gauge, Holder, HourStepping, Maker, MinuteStepping, Options,
-        PartialBoxLikeObject, PartialOmitLikeBoxLikeObject, PluralizeTimeUnit, PluralizeUnit,
-        PluralizeUnitHour, PluralizeUnitMinute, Rounder, Rounding, RoundingHour, RoundingTimeUnit,
-        Stepped, TimeLikeObject, Transition,
+        Approximate, BoundedDayOrHour, Defaulted, Gauge, Holder, HourStepping, Maker,
+        MinuteStepping, Options, PartialBoxLikeObject, PartialOmitLikeBoxLikeObject,
+        PluralizeTimeUnit, PluralizeUnit, PluralizeUnitHour, PluralizeUnitMinute, Rounder,
+        Rounding, RoundingHour, RoundingTimeUnit, Stepped, TimeLikeObject, Transition,
     },
     DirectionKind, LevelReturnKind, MinuteSteppingLargestUnitKind, StepKind,
     SteppedLargestUnitKind,
@@ -115,6 +115,7 @@ fn use_sites_take_their_specialisation(rounder: &Rounder) {
     rounder.round_time(&RoundingTimeUnit::new());
     rounder.round_again(&RoundingTimeUnit::new());
     rounder.step(&HourStepping::new());
+    rounder.bound(&BoundedDayOrHour::new());
     let _: PluralizeTimeUnit = rounder.clock().now();
     // A variant is named for the base its specialisation extends.
     rounder.snap(PluralizeTimeUnit::Hours);
@@ -135,6 +136,6 @@ fn merged_classes_erase_literal_only_parameters(gauge: &Gauge) {
 #[allow(dead_code)]
 fn literal_only_arguments_drop_where_evaluation_leaves_them(approx: &Approximate) {
     let _ = approx.fuzzy(&Rounding::new());
-    let _ = approx.defaulted(&Defaulted::<Approximate>::new());
+    let _ = approx.defaulted(&Defaulted::new());
     let _: Result<Approximate, wasm_bindgen::JsValue> = Maker::new(&RoundingHour::new());
 }

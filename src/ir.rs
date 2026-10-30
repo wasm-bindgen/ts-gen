@@ -335,6 +335,20 @@ pub enum TypeRef {
     /// or hoists to an interface.
     ObjectLiteral(Vec<ObjectProp>),
 
+    /// A type-level function of a literal-only type parameter, under
+    /// per-monomorphization: the associated type `assoc`, declared in
+    /// `family`, of the trait bounding `base` (`Units::PluralizeUnit`).
+    /// `base` is the parameter, or once substituted the argument enum,
+    /// whose impl in that family names the type. An argument substituted
+    /// for an inherited member's parameter keeps `base_scope`, the scope
+    /// it is written in.
+    Projection {
+        base: Box<TypeRef>,
+        base_scope: Option<ScopeId>,
+        family: ParamFamily,
+        assoc: String,
+    },
+
     // === Fallback ===
     /// For TS constructs we can't represent (conditional types, template
     /// literals, etc.) — erased to `JsValue`.
@@ -594,8 +608,39 @@ impl TypeRef {
     where
         K: std::borrow::Borrow<str> + Eq + std::hash::Hash,
     {
-        let sub = |t: &TypeRef| t.substitute(map);
+        self.substitute_from(map, &|_| None)
+    }
+
+    /// [`Self::substitute`], each parameter's substitute written in the
+    /// scope `from` gives it: a projection of a substituted parameter
+    /// resolves its argument there.
+    pub fn substitute_from<K>(
+        &self,
+        map: &HashMap<K, TypeRef>,
+        from: &dyn Fn(&str) -> Option<ScopeId>,
+    ) -> TypeRef
+    where
+        K: std::borrow::Borrow<str> + Eq + std::hash::Hash,
+    {
+        let sub = |t: &TypeRef| t.substitute_from(map, from);
         match self {
+            TypeRef::Projection {
+                base,
+                base_scope,
+                family,
+                assoc,
+            } => {
+                let substituted = base.as_ident().filter(|n| map.contains_key(*n));
+                TypeRef::Projection {
+                    base: Box::new(sub(base)),
+                    base_scope: match (substituted, base_scope) {
+                        (Some(param), None) => from(param),
+                        _ => *base_scope,
+                    },
+                    family: family.clone(),
+                    assoc: assoc.clone(),
+                }
+            }
             TypeRef::Reference {
                 segments,
                 generic_args,
@@ -699,6 +744,7 @@ impl TypeRef {
                     .join(", ");
                 format!("({params}) => {}", sig.return_type.format_ts())
             }
+            TypeRef::Projection { base, assoc, .. } => format!("{}::{assoc}", base.format_ts()),
             TypeRef::StringLiteral(s) => format!("\"{s}\""),
             TypeRef::NumberLiteral(n) => n.to_string(),
             TypeRef::BooleanLiteral(b) => b.to_string(),
@@ -841,6 +887,52 @@ pub struct TypeParam {
     pub constraint: Option<TypeRef>,
     /// `T = Bar` — used for default instantiation.
     pub default: Option<TypeRef>,
+    /// The trait bounding a literal-only parameter under
+    /// per-monomorphization (see [`ParamTrait`]).
+    pub trait_bound: Option<String>,
+}
+
+/// Under per-monomorphization, the trait bounding an interface's
+/// literal-only type parameter. Each member typed by a type-level function
+/// of the parameter (`PluralizeUnit<Units>`) reads an associated type, and
+/// each argument enum the parameter is instantiated with implements it:
+///
+/// ```text
+/// pub trait RoundingOptionsUnits { type PluralizeUnit; }
+/// impl RoundingOptionsUnits for DateUnit { type PluralizeUnit = PluralizeDateUnit; }
+/// ```
+#[derive(Clone, Debug, PartialEq)]
+pub struct ParamTrait {
+    pub name: String,
+    /// The family of parameters passed on to one another it bounds one
+    /// of. Associated types are named within a family.
+    pub family: ParamFamily,
+    /// The traits of the interfaces the parameter is passed on to.
+    pub supertraits: Vec<String>,
+    /// The associated types it declares, beyond its supertraits'.
+    pub assoc: Vec<String>,
+    pub impls: Vec<ParamImpl>,
+    /// Where the trait and its impls' targets resolve.
+    pub scope: crate::parse::scope::ScopeId,
+}
+
+/// The parameters connected by passing one on to another
+/// (`RoundingOptionsWithLargestUnit<Units> extends RoundingOptions<Units>`),
+/// named by the interface and parameter at its root.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct ParamFamily {
+    pub iface: TypeId,
+    pub param: String,
+}
+
+/// An argument enum's impl of a [`ParamTrait`].
+#[derive(Clone, Debug, PartialEq)]
+pub struct ParamImpl {
+    /// The enum, resolving in `arg_scope`.
+    pub arg: TypeRef,
+    pub arg_scope: crate::parse::scope::ScopeId,
+    /// Each associated type's target, in [`ParamTrait::assoc`] order.
+    pub targets: Vec<TypeRef>,
 }
 
 impl TypeParam {
@@ -1281,26 +1373,37 @@ impl Member {
     /// The member with the parent's type parameters replaced, for
     /// inheriting it through `extends Parent<Arg>`.
     pub fn substitute(&self, map: &HashMap<String, TypeRef>) -> Member {
+        self.substitute_from(map, &|_| None)
+    }
+
+    /// [`Self::substitute`], each substitute written in the scope `from`
+    /// gives it (see [`TypeRef::substitute_from`]).
+    pub fn substitute_from(
+        &self,
+        map: &HashMap<String, TypeRef>,
+        from: &dyn Fn(&str) -> Option<ScopeId>,
+    ) -> Member {
+        let ty = |t: &TypeRef| t.substitute_from(map, from);
         let params = |ps: &[Param]| -> Vec<Param> {
             ps.iter()
                 .map(|p| Param {
-                    type_ref: p.type_ref.substitute(map),
+                    type_ref: ty(&p.type_ref),
                     ..p.clone()
                 })
                 .collect()
         };
         match self {
             Member::Getter(g) => Member::Getter(GetterMember {
-                type_ref: g.type_ref.substitute(map),
+                type_ref: ty(&g.type_ref),
                 ..g.clone()
             }),
             Member::Setter(st) => Member::Setter(SetterMember {
-                type_ref: st.type_ref.substitute(map),
+                type_ref: ty(&st.type_ref),
                 ..st.clone()
             }),
             Member::Method(m) => Member::Method(MethodMember {
                 params: params(&m.params),
-                return_type: m.return_type.substitute(map),
+                return_type: ty(&m.return_type),
                 ..m.clone()
             }),
             Member::Constructor(c) => Member::Constructor(ConstructorMember {
@@ -1308,21 +1411,21 @@ impl Member {
                 ..c.clone()
             }),
             Member::IndexSignature(i) => Member::IndexSignature(IndexSigMember {
-                key_type: i.key_type.substitute(map),
-                value_type: i.value_type.substitute(map),
+                key_type: ty(&i.key_type),
+                value_type: ty(&i.value_type),
                 ..i.clone()
             }),
             Member::StaticGetter(g) => Member::StaticGetter(StaticGetterMember {
-                type_ref: g.type_ref.substitute(map),
+                type_ref: ty(&g.type_ref),
                 ..g.clone()
             }),
             Member::StaticSetter(st) => Member::StaticSetter(StaticSetterMember {
-                type_ref: st.type_ref.substitute(map),
+                type_ref: ty(&st.type_ref),
                 ..st.clone()
             }),
             Member::StaticMethod(m) => Member::StaticMethod(StaticMethodMember {
                 params: params(&m.params),
-                return_type: m.return_type.substitute(map),
+                return_type: ty(&m.return_type),
                 ..m.clone()
             }),
         }

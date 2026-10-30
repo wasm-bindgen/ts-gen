@@ -72,6 +72,50 @@ declare global {
 
     type HourStepping = Stepped<"hour">;
 
+    // Under `--experimental-generic-mono` the parameter stays generic,
+    // bounded by a trait per family: an interface passing it on through
+    // `extends`, even a flattened `Pick`, shares its parent's trait, and
+    // one reading a function of it its parent doesn't extends that trait.
+    interface Bounded<U extends "day" | TimeUnit> extends Rounding<U> {
+      maximumUnit?: "none" | PluralizeUnit<U>;
+    }
+
+    interface PickedRounding<U extends "day" | TimeUnit>
+      extends Pick<Rounding<U>, "smallestUnit" | "increment"> {}
+
+    interface TimePicking extends PickedRounding<TimeUnit> {}
+
+    // An associated type is named within its family, so another family
+    // reading an inline `largestUnit` keeps its own, at the same argument.
+    interface Spanning<U extends "hour" | "week"> {
+      largestUnit?: "auto" | U;
+    }
+
+    interface HourSpanning extends Spanning<"hour"> {}
+
+    // An argument enum is its declaration, not its name: `Spans.Unit` and
+    // `Steps.Unit` are two arguments of `Span`.
+    namespace Spans {
+      type Unit = "hour" | "hours";
+      interface Span<U extends Unit | "day"> {
+        largestUnit?: "auto" | U;
+      }
+      interface HourSpan extends Span<Unit> {}
+      interface Mid<U extends Unit | "day"> extends Span<U> {}
+      interface Spanned<U extends Unit = Unit> {
+        largestUnit?: "auto" | U;
+      }
+    }
+
+    // Through `Mid` too, the argument resolving where it is written.
+    namespace Steps {
+      type Unit = "day" | "hours";
+      interface DaySpan extends Spans.Span<Unit> {}
+      interface DaySpan2 extends Spans.Mid<Unit> {}
+      // A default resolves where the parent declares it.
+      interface AnySpan extends Spans.Spanned {}
+    }
+
     // An interface with methods can't be specialised, so its instantiations
     // are the base.
     interface Clock<U extends TimeUnit> {
@@ -83,6 +127,7 @@ declare global {
       roundTime(options: Rounding<TimeUnit>): void;
       roundAgain(options: Rounding<Exclude<"day" | TimeUnit, "day">>): void;
       step(options: Stepped<"hour">): void;
+      bound(options: Bounded<"day" | "hour">): void;
       clock(): Clock<"hour">;
       // A variant names the generic base its specialisation extends,
       // unless another specialisation of the base is beside it.

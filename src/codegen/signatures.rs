@@ -400,6 +400,10 @@ pub fn collect_type_params(
         | TypeRef::Mapped(_)
         | TypeRef::ObjectLiteral(_)
         | TypeRef::Unresolved(_) => {}
+        // `Units::PluralizeUnit` needs `Units` declared.
+        TypeRef::Projection {
+            base, base_scope, ..
+        } => collect_type_params(base, cgctx, base_scope.unwrap_or(scope), out),
     }
 }
 
@@ -2440,8 +2444,8 @@ pub fn generate_dictionary_params_in(
 /// `VectorRefIntoWasmAbi` on the element of a borrowed `&[T]`),
 /// `FromWasmAbi` for a return, and `'static` for an awaited one. An
 /// imported type implements its ABI for any arguments, so it is bounded
-/// only by `'static`; bare parameters and std containers of them are
-/// bounded in full.
+/// only by `'static`; bare parameters, their associated types
+/// (`U::PluralizeUnit`) and std containers of them are bounded in full.
 ///
 /// An erased import's type parameter is a `JsGeneric` handle, but an
 /// awaited carrier of one (`Nullable<T>`) converts through the carrier's
@@ -2525,8 +2529,12 @@ fn abi_shape(ty: &syn::Type, params: &std::collections::HashSet<String>) -> AbiS
             let last = p.path.segments.last().map(|s| s.ident.to_string());
             let bare = p.path.segments.len() == 1
                 && matches!(p.path.segments[0].arguments, syn::PathArguments::None);
+            // `U::PluralizeUnit`, an associated type of a parameter.
+            let projected =
+                p.path.segments.len() > 1 && params.contains(&p.path.segments[0].ident.to_string());
             match last.as_deref() {
                 Some(name) if bare && params.contains(name) => AbiShape::Dependent,
+                _ if projected => AbiShape::Dependent,
                 Some("Option" | "Nullable" | "Vec" | "Box") => AbiShape::Dependent,
                 _ => AbiShape::Imported,
             }
