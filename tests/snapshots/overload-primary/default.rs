@@ -92,7 +92,7 @@ extern "C" {
         this: &Store,
         key: &str,
         options: &Conditional,
-    ) -> Result<Nullable<String>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_conditional_promise(
         this: &Store,
@@ -112,12 +112,11 @@ extern "C" {
         options: &GetOptions,
     ) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn first(this: &Store) -> Result<Nullable<String>, JsValue>;
+    pub async fn first(this: &Store) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "first")]
     pub fn first_promise(this: &Store) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "first")]
-    pub async fn first_with_column(this: &Store, column: &str)
-        -> Result<Nullable<String>, JsValue>;
+    pub async fn first_with_column(this: &Store, column: &str) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "first")]
     pub fn first_with_column_promise(this: &Store, column: &str) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch)]

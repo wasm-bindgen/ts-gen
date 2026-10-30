@@ -96,7 +96,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn initial<T>(this: &Options<T>) -> Option<T>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_initial<T>(this: &Options<T>, val: T)
     where
@@ -231,18 +231,20 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_promise<T>(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Option<T>>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn first<T>(this: &Store) -> Result<Nullable<T>, JsValue>
+    pub async fn first<T>(this: &Store) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::NullableFromWasmAbi + 'static;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
     #[wasm_bindgen(method, catch, js_name = "first")]
-    pub fn first_promise<T>(this: &Store) -> Result<Promise<Nullable<T>>, JsValue>;
+    pub fn first_promise<T>(this: &Store) -> Result<Promise<Option<T>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn json<T>(this: &Store) -> Result<T, JsValue>
     where

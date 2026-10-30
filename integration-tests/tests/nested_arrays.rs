@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, BigInt, Boolean, Function, JsNullable, JsString, Nullable, Number, Undefined};
+use js_sys::{Array, BigInt, Boolean, Function, JsNullable, JsString, Number, Undefined};
 
 use ts_gen_integration_tests::nested_arrays::*;
 
@@ -23,8 +23,8 @@ async fn nested_array_signatures_compile(
     let rows: Vec<Array<JsString>> = readonly_rows(&[]);
     let _: Vec<Array<JsString>> = generic_rows(&rows);
     let _: Vec<Row> = alias_rows(&rows);
-    let _: Nullable<Vec<Array<JsString>>> = maybe_rows(&rows);
-    let _: Nullable<Vec<Array<JsString>>> = maybe_rows_with_null();
+    let _: Option<Vec<Array<JsString>>> = maybe_rows(&rows);
+    let _: Option<Vec<Array<JsString>>> = maybe_rows_with_null();
     for_each_row(callback);
 
     let strings: Vec<JsNullable<JsString>> = nullable_strings(&[]);

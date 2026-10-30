@@ -63,7 +63,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn fallback<T>(this: &Details<T>) -> Option<T>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_fallback<T>(this: &Details<T>, val: T)
     where
@@ -135,9 +135,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub fn next_mode_promise(this: &Probe) -> Result<Promise<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "maybeMode")]
-    pub async fn maybe_mode(this: &Probe) -> Result<Nullable<Mode>, JsValue>;
+    pub async fn maybe_mode(this: &Probe) -> Result<Option<Mode>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "maybeMode")]
-    pub fn maybe_mode_promise(this: &Probe) -> Result<Promise<Nullable<JsString>>, JsValue>;
+    pub fn maybe_mode_promise(this: &Probe) -> Result<Promise<Option<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "modeMap")]
     pub fn mode_map(this: &Probe) -> Result<Map<JsString, JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "modeRecord")]
