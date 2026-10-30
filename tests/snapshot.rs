@@ -12,11 +12,6 @@
 //! WAT output is validated with `wat::parse_str` and `wasmparser` to ensure it
 //! assembles and passes validation.
 //!
-//! The harness also runs `--target wat` for each fixture, producing a
-//! `tests/snapshots/<name>.wat` alongside the `.rs`. The WAT output is
-//! validated with `wat::parse_str` and `wasmparser` to ensure it assembles
-//! and passes validation.
-//!
 //! Fixtures can include `//! @ts-gen <args>` directive comments at the top.
 //! The args after `//! @ts-gen` are passed **verbatim** to the CLI, so any
 //! flags the CLI supports (e.g. `--lib-name`, `--external`) just work. Flags
