@@ -36,6 +36,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
   * [`never` returns keep only the catching form](#never-returns-keep-only-the-catching-form)
   * [`toString()` is `Display`](#tostring-is-display)
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
+  * [`--promise-only` — the promise form alone](#--promise-only--the-promise-form-alone)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
@@ -261,7 +262,7 @@ positions use the carriers where wasm-bindgen accepts them:
 
 | Position                                    | Mono                                  |
 | ------------------------------------------- | ------------------------------------- |
-| returned `Promise<string \| null>`          | `Promise<Nullable<JsString>>`         |
+| returned `Promise<string \| null>`          | `Promise<Nullable<JsString>>` (`Promise<Nullable<String>>` under [`--promise-only`](#--promise-only--the-promise-form-alone)) |
 | user generic `Holder<string \| null>`       | `Holder<Nullable<String>>`            |
 | `type MaybeStr = string \| null`            | `pub type MaybeStr = Nullable<String>` |
 | `Promise<T \| null>` argument               | `&Promise<JsNullable<T>>`             |
@@ -2187,9 +2188,11 @@ catch), setters (never catch) and property getters are not affected
 [`@throws {X}` on getters](#throws-x-on-getters)). An async callable's
 sync `<name>_promise` form (below) catches under the flag like any
 other sync primary, unless calling it
-[never throws synchronously](#builtins-globals-and-async-never-throw-synchronously).
-A parameterless `toString()` keeps its `try_to_string` name, since
-`to_string` is [`ToString`'s](#tostring-is-display).
+[never throws synchronously](#builtins-globals-and-async-never-throw-synchronously);
+under [`--promise-only`](#--promise-only--the-promise-form-alone) that
+form is the async callable's only binding. A parameterless `toString()`
+keeps its `try_to_string` name, since `to_string` is
+[`ToString`'s](#tostring-is-display).
 Without the flag, output is identical to the default.
 
 ### `never` returns keep only the catching form
@@ -2300,7 +2303,9 @@ function fetch(url: string): Promise<Response>;
 ```
 
 emits an async signature with `catch` (beside the sync
-[`_promise` form](#name_promise--the-un-awaited-form)):
+[`_promise` form](#name_promise--the-un-awaited-form); under
+[`--promise-only`](#--promise-only--the-promise-form-alone) the sync
+form alone, under the primary name):
 
 ```rust
 #[wasm_bindgen(catch)]
@@ -2394,11 +2399,12 @@ pub fn cache_put_promise(url: &str) -> Promise<Undefined>;
 pub fn fetch_text_promise(url: &str) -> Result<Promise<JsString>, JsValue>;
 ```
 
-The alternative, making the primary itself return `Promise<T>` and
-relying on `IntoFuture`, was rejected: the future's error is always
+Making the primary itself return `Promise<T>` and relying on
+`IntoFuture` is not the default: the future's error is always
 `JsValue`, discarding `--errors-as-error` and `@throws` on every
-async binding, and under `--fallible` a sync throw and a rejection would need
-`?.await?`.
+async binding, and under `--fallible` a sync throw and a rejection need
+`?.await?`. It is available as
+[`--promise-only`](#--promise-only--the-promise-form-alone).
 
 ### Awaited values lower like sync returns
 
@@ -2438,6 +2444,80 @@ The `_promise` form keeps JS-typed parameters because the promise is a
 JS object that flows into JS APIs (`waitUntil`, `Promise.race`), which
 need `T: JsGeneric` to upcast it to `Promise<JsValue>`; `Promise<String>`
 would await fine but could not be handed back to JS as a typed promise.
+
+### `--promise-only` — the promise form alone
+
+`--promise-only` (`GenerateOptions::promise_only(true)`) binds every
+`Promise`-returning method and function once, as the sync promise form
+under the primary name. No `async fn` and no `<name>_promise` name are
+emitted:
+
+```rust
+// default
+#[wasm_bindgen(catch)]
+pub async fn fetch(url: &str) -> Result<Response, JsValue>;
+#[wasm_bindgen(js_name = "fetch")]
+pub fn fetch_promise(url: &str) -> Promise<Response>;
+
+// --promise-only
+pub fn fetch(url: &str) -> Promise<Response>;
+```
+
+Callers write `fetch(url).await`: js-sys implements `IntoFuture` for
+`Promise<T: FromWasmAbi>` (`Output = Result<T, JsValue>`), under the
+stable API and `js_sys_unstable_apis` alike, and `JsFuture::from` does the
+same explicitly. The JS call happens when `fetch(url)` is called, as in
+JS, so the promise can go straight to `waitUntil` or `Promise.race`.
+
+* `catch` follows the [`_promise` rule](#name_promise--the-un-awaited-form):
+  plain under the default policy; under `--fallible`
+  `Result<Promise<T>, E>`, typed by `@throws`, for a synchronous throw,
+  except for `@throws {never}` and a callable that
+  [never throws synchronously](#builtins-globals-and-async-never-throw-synchronously).
+  A rejection comes out of the `await` as `Err(JsValue)` whatever the
+  `@throws`, so a fallible call reads `fetch(url)?.await?` and needs both
+  errors to convert into the caller's.
+* Overloads, `_with_X` forms and [`null` argument arms](#writes) each get
+  one promise-returning binding (`fetch_with_init`, `put_with_null`).
+* No `_js_string` variant is emitted for an awaited string or string list.
+* A `Promise`-typed property, a callback's `Promise` and a `Promise`
+  argument are unchanged.
+
+Without `--experimental-generic-mono`, the `T` is the `js_sys` handle of
+the [`_promise` form](#awaited-values-lower-like-sync-returns)
+(`Promise<JsString>`, `Promise<JsNullable<JsString>>`, `Promise<Array<JsString>>`),
+so awaiting yields the handle. With it, a returned `Promise<T>`, the
+promise-typed properties included, carries the value a caller wants after
+awaiting:
+
+| TypeScript                         | default + `--promise-only`        | mono + `--promise-only`              |
+| ---------------------------------- | --------------------------------- | ------------------------------------ |
+| `Promise<string>`                  | `Promise<JsString>`               | `Promise<String>`                    |
+| `Promise<number>`                  | `Promise<Number>`                 | `Promise<f64>`                       |
+| `Promise<boolean>`                 | `Promise<Boolean>`                | `Promise<bool>`                      |
+| `Promise<void>`                    | `Promise<Undefined>`              | `Promise<()>`                        |
+| `Promise<"a" \| "b">` (enum)       | `Promise<JsString>`               | `Promise<Mode>`                      |
+| `Promise<string[]>`                | `Promise<Array<JsString>>`        | `Promise<Array<String>>`             |
+| `Promise<string[][]>`              | `Promise<Array<Array<JsString>>>` | `Promise<Array<Array<String>>>`      |
+| `Promise<string \| null>`          | `Promise<JsNullable<JsString>>`   | `Promise<Nullable<String>>`          |
+| `Promise<string \| undefined>`     | `Promise<JsOption<JsString>>`     | `Promise<Option<String>>`            |
+| `Promise<string \| null \| undefined>` | `Promise<JsNullable<JsString>>` | `Promise<Option<Nullable<String>>>` |
+| `Promise<Holder<string>>`          | `Promise<Holder<JsString>>`       | `Promise<Holder<String>>`            |
+| `Promise<Foo>`, `Promise<Foo[]>`   | `Promise<Foo>`, `Promise<Array<Foo>>` | the same                         |
+| `Promise<any>`                     | `Promise`                         | `Promise`                            |
+
+The mono leaves follow
+[user generic arguments](#per-monomorphization) (primitives, enums and
+local generic instantiations at their native types), the empties take
+the exact [read carriers](#reads), and a list is an `Array` of its
+awaited element. Each satisfies `FromWasmAbi`, so it awaits under either
+js-sys API; only what the `Array<String>` handle offers afterwards
+(`get`, iteration) differs, as for any [container handle](#array-and-slice-types).
+The promise is still a JS object: `Promise<Array<String>>` upcasts for
+free to `Promise<Array<JsString>>`, and `Promise<bool>`, `Promise<f64>`
+and `Promise<()>` to `Promise<JsValue>`. A `Promise<String>` reaches
+`Promise<JsValue>` through `Promise<JsString>`, since wasm-bindgen has no
+`UpcastFrom<String> for JsValue` yet.
 
 ## `Iterator<T>` / `IterableIterator<T>` map to `js_sys::Iterator<T>`
 

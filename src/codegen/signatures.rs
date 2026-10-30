@@ -802,6 +802,8 @@ impl CallableSpec<'_> {
 ///   A sync `<name>_promise` sibling returns the `Promise<T>` itself; it
 ///   catches a synchronous throw under `--fallible`, unless the callable is
 ///   a builtin or global one or declared `async`, whose calls never throw.
+///   Under `--promise-only` that sync form is the only binding, under the
+///   primary name, and no `async fn` is emitted.
 /// * **`try_` companion**: for sync, non-setter, non-constructor callables,
 ///   each primary `name` gets a fallible `try_name` sibling.
 /// * **Constructor catches always**: per JS semantics; the primary signature
@@ -942,6 +944,44 @@ pub fn build_signatures(
         };
         let primary_literal = literal.clone();
 
+        // The sync form of an async callable returns the `Promise<T>`
+        // itself. Rejection travels inside the promise; `catch` covers
+        // only a synchronous throw, which the sync-callable policy
+        // decides, unless the call cannot throw synchronously at all.
+        let promise_catches = !nothrow
+            && !spec.call_never_throws(&overload)
+            && fallible
+            && spec.kind.allows_try_variant();
+        let promise_form = |rust_name: String, literal| FunctionSignature {
+            rust_name,
+            js_name: spec.js_name.to_string(),
+            params: exp_params.clone(),
+            catch: promise_catches,
+            is_async: false,
+            return_type: if never_returns {
+                awaiting_void(overload.return_type)
+            } else {
+                overload.return_type.clone()
+            },
+            js_string_return: false,
+            error_type: if promise_catches {
+                error_type.cloned()
+            } else {
+                None
+            },
+            doc: overload.doc.clone(),
+            body_scope: scope,
+            literal,
+        };
+
+        // `--promise-only`: the promise form is the only binding, under the
+        // primary name. Callers await it (`name().await`), and the JS call
+        // happens when `name()` is called, as in JS.
+        if is_async && cgctx.is_some_and(|ctx| ctx.promise_only) {
+            out.push(promise_form(primary_name, primary_literal));
+            continue;
+        }
+
         // Primary variant catches when:
         // * the kind always catches (constructors), OR
         // * it's async — *unless* `Throws::Never` opts out, OR
@@ -971,41 +1011,14 @@ pub fn build_signatures(
         // An `async fn` import only calls JS when first polled, so a
         // caller that needs the call started now (handing the promise
         // to `waitUntil`, gating a constructor on it, racing it) gets
-        // the un-awaited form too. Rejection travels inside the
-        // returned promise; `catch` here covers only a synchronous
-        // throw, which the sync-callable policy decides, unless the
-        // call cannot throw synchronously at all.
+        // the un-awaited form too.
         if is_async {
             let promise_literal = derive(names, &|n| format!("{n}_promise"));
             let promise_name = match &promise_literal {
                 Some(l) => l.arms[0].1.clone(),
                 None => names.declare(&format!("{primary_name}_promise"), Suffix::Snake),
             };
-            let promise_catches = !nothrow
-                && !spec.call_never_throws(&overload)
-                && fallible
-                && spec.kind.allows_try_variant();
-            out.push(FunctionSignature {
-                rust_name: promise_name,
-                js_name: spec.js_name.to_string(),
-                params: exp_params.clone(),
-                catch: promise_catches,
-                is_async: false,
-                return_type: if never_returns {
-                    awaiting_void(overload.return_type)
-                } else {
-                    overload.return_type.clone()
-                },
-                js_string_return: false,
-                error_type: if promise_catches {
-                    error_type.cloned()
-                } else {
-                    None
-                },
-                doc: overload.doc.clone(),
-                body_scope: scope,
-                literal: promise_literal,
-            });
+            out.push(promise_form(promise_name, promise_literal));
         }
 
         if allow_try {
@@ -2966,6 +2979,63 @@ mod tests {
                 &mut no_used(),
             );
             assert!(sigs[1].catch, "{name}");
+        }
+    }
+
+    #[test]
+    fn promise_only_binds_the_promise_form_under_the_primary_name() {
+        let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
+        let user = ModuleContext::Module("user-lib".into());
+        let type_error = Throws::Type(TypeRef::ident("TypeError"));
+        // (mono, fallible, module, async modifier, throws) → catches.
+        let cases = [
+            (false, false, &user, false, &Throws::None, false),
+            (true, false, &user, false, &Throws::None, false),
+            (false, true, &user, false, &Throws::None, true),
+            (true, true, &user, false, &type_error, true),
+            (true, true, &user, false, &Throws::Never, false),
+            (true, true, &user, true, &Throws::None, false),
+            (
+                true,
+                true,
+                &ModuleContext::Global,
+                false,
+                &type_error,
+                false,
+            ),
+        ];
+        for (mono, fallible, module, async_modifier, throws, catches) in cases {
+            let (gctx, scope) = test_ctx();
+            let mut cgctx = CodegenContext::empty(&gctx, scope);
+            cgctx.experimental_generic_mono = mono;
+            cgctx.fallible = fallible;
+            cgctx.promise_only = true;
+            let sigs = build_signatures(
+                &CallableSpec {
+                    js_name: "op",
+                    rust_name: None,
+                    kind: SignatureKind::Method,
+                    module,
+                    overloads: &[Overload {
+                        params: &[],
+                        return_type: &promise,
+                        body_scope: scope,
+                        throws,
+                        async_modifier,
+                        doc: &None,
+                    }],
+                },
+                &mut no_used(),
+                Some(&cgctx),
+            );
+            let case = format!("{mono} {fallible} {module:?} {async_modifier} {throws:?}");
+            assert_eq!(sigs.len(), 1, "{case}");
+            assert_eq!(sigs[0].rust_name, "op", "{case}");
+            assert!(!sigs[0].is_async && !sigs[0].js_string_return, "{case}");
+            assert_eq!(sigs[0].return_type, promise, "{case}");
+            assert_eq!(sigs[0].catch, catches, "{case}");
+            let error_type = if catches { throws.as_type() } else { None };
+            assert_eq!(sigs[0].error_type.as_ref(), error_type, "{case}");
         }
     }
 
