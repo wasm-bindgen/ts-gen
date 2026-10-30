@@ -748,7 +748,7 @@ impl<'g> Eval<'g> {
         let mut env = Env::default();
         for p in &alias.type_params {
             let Some(bound) = &p.constraint else {
-                alias.target = fallback(&alias.target);
+                alias.target = self.erase_literal_args(&fallback(&alias.target), scope);
                 return None;
             };
             env = env.bind(p.name.clone(), bound.clone(), scope, Env::default());
@@ -776,7 +776,7 @@ impl<'g> Eval<'g> {
         let Some(result) = self.eval(&alias.target, scope, &env, scope, &alias.name, place) else {
             // A generic alias evaluates at each instantiation; its own
             // declaration erasing is expected and codegen reports it.
-            let approx = fallback(&alias.target);
+            let approx = self.erase_literal_args(&fallback(&alias.target), scope);
             if alias.type_params.is_empty() {
                 self.diag.warn(format!(
                     "`{}` could not be evaluated, approximating as `{}`",
@@ -2863,7 +2863,9 @@ mod tests {
              declare function f(a: Rounding<\"hour\"> | keyof Missing): void;
              declare function g(a: Defaulted<\"a\"> | keyof Missing): void;
              type Maker = Probe;
-             declare const Maker: { new (options: Rounding<\"hour\">): Probe };",
+             declare const Maker: { new (options: Rounding<\"hour\">): Probe };
+             type Wrap<T> = Rounding<\"hour\">;
+             type WrapBy<T extends object> = Rounding<\"hour\"> | keyof T;",
         );
         fn args(ty: &TypeRef, out: &mut Vec<String>) {
             match ty {
@@ -2894,6 +2896,15 @@ mod tests {
         for c in &maker.constructs {
             for p in &c.params {
                 args(&p.type_ref, &mut found);
+            }
+        }
+        // A generic alias's own declaration, for `--export` or a use that
+        // can't be evaluated.
+        for &id in &module.types {
+            if let TypeKind::TypeAlias(a) = &gctx.get_type(id).kind {
+                if a.name.starts_with("Wrap") {
+                    args(&a.target, &mut found);
+                }
             }
         }
         assert!(found.is_empty(), "{found:?}");
