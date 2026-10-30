@@ -49,14 +49,14 @@
     (func $promise-builtins:Store.get (@abi.call "get") (@abi.owner "Store")
       (@abi.ts "get(key: string): Promise<string>")
       (@abi.doc "User module: `Result<Promise<JsString>, JsValue>`.")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "promise-builtins")))
       (param $key externref (@abi.ref string))
       (result externref (@abi.ref "Promise"))))
   (import "promise-builtins" "Store.put"
     (func $promise-builtins:Store.put (@abi.call "put") (@abi.owner "Store")
       (@abi.ts "put(key: string, value: string): Promise<void>")
       (@abi.doc "Declared `async`: plain.")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "promise-builtins")))
       (param $key externref (@abi.ref string))
       (param $value externref (@abi.ref string))
       (result externref (@abi.ref "Promise"))))
@@ -124,7 +124,7 @@
     (func $cloudflare:sockets:Socket.close (@abi.call "close") (@abi.owner "Socket")
       (@abi.ts "close(): Promise<void>")
       (@abi.doc "`cloudflare:` builtin method: plain.")
-      (param $this externref (@abi.ref "Socket"))
+      (param $this externref (@abi.ref "Socket" (module "cloudflare:sockets")))
       (result externref (@abi.ref "Promise"))))
 
   (import "cloudflare:sockets" "connect"

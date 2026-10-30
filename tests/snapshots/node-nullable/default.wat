@@ -29,17 +29,17 @@
   (import "node-nullable" "Options.new"
     (func $node-nullable:Options.new (@abi.object) (@abi.owner "Options")
       (@abi.ts "{} as Options")
-      (result externref (@abi.ref "Options"))))
+      (result externref (@abi.ref "Options" (module "node-nullable")))))
   (import "node-nullable" "Options.label"
     (func $node-nullable:Options.label (@abi.get "label") (@abi.owner "Options")
       (@abi.ts "label?: string | null")
       (@abi.doc "`undefined` takes the default; `null` means \"no label\".")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "node-nullable")))
       (result externref (@abi.ref string null undefined))))
   (import "node-nullable" "Options.set_label"
     (func $node-nullable:Options.set_label (@abi.set "label") (@abi.owner "Options")
       (@abi.ts "set label(value: string | null)")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "node-nullable")))
       (param $value externref (@abi.ref string null))))
 
   (import "node-nullable" "describe"
@@ -104,11 +104,11 @@
       (@abi.ts "options(label: string): Options")
       (@abi.doc "An `Options` whose `label` is missing, `undefined`, `null` or `\"x\"`.")
       (param $label externref (@abi.ref string))
-      (result externref (@abi.ref "Options"))))
+      (result externref (@abi.ref "Options" (module "node-nullable")))))
   (import "node-nullable" "configure"
     (func $node-nullable:configure (@abi.call "configure" (on))
       (@abi.ts "configure(options: Options): string")
-      (param $options externref (@abi.ref "Options"))
+      (param $options externref (@abi.ref "Options" (module "node-nullable")))
       (result externref (@abi.ref string))))
   (import "node-nullable" "arity"
     (func $node-nullable:arity (@abi.call "arity" (on))

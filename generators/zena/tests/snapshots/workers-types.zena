@@ -33410,7 +33410,7 @@ export class ForwardableEmailMessage {
   set_reject(reason: String): void { __ForwardableEmailMessage_set_reject(this.#ref, reason.handle); }
   forward(rcpt_to: String): externref { return __ForwardableEmailMessage_forward(this.#ref, rcpt_to.handle); }
   forward_with_headers(rcpt_to: String, headers: Headers): externref { return __ForwardableEmailMessage_forward_with_headers(this.#ref, rcpt_to.handle, headers.ref()); }
-  reply(message: externref): externref { return __ForwardableEmailMessage_reply(this.#ref, message); }
+  reply(message: EmailMessage): externref { return __ForwardableEmailMessage_reply(this.#ref, message.ref()); }
 }
 
 export class EmailAddress {
@@ -33428,7 +33428,7 @@ export class SendEmail {
   #ref: externref;
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
-  send(message: externref): externref { return __SendEmail_send(this.#ref, message); }
+  send(message: EmailMessage): externref { return __SendEmail_send(this.#ref, message.ref()); }
   send_with_builder(builder: SendEmailBuilder): externref { return __SendEmail_send_with_builder(this.#ref, builder.ref()); }
 }
 

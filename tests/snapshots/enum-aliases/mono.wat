@@ -29,36 +29,36 @@
   (import "enum-aliases" "Api.new"
     (func $enum-aliases:Api.new (@abi.object) (@abi.owner "Api")
       (@abi.ts "{} as Api")
-      (result externref (@abi.ref "Api"))))
+      (result externref (@abi.ref "Api" (module "enum-aliases")))))
   (import "enum-aliases" "Api.version"
     (func $enum-aliases:Api.version (@abi.get "version") (@abi.owner "Api")
       (@abi.ts "version: Version")
-      (param $this externref (@abi.ref "Api"))
+      (param $this externref (@abi.ref "Api" (module "enum-aliases")))
       (result externref (@abi.ref "Version"))))
   (import "enum-aliases" "Api.set_version"
     (func $enum-aliases:Api.set_version (@abi.set "version") (@abi.owner "Api")
       (@abi.ts "set version(value: Version)")
-      (param $this externref (@abi.ref "Api"))
+      (param $this externref (@abi.ref "Api" (module "enum-aliases")))
       (param $value externref (@abi.ref "Version"))))
   (import "enum-aliases" "Api.flags"
     (func $enum-aliases:Api.flags (@abi.get "flags") (@abi.owner "Api")
       (@abi.ts "flags: Flags")
-      (param $this externref (@abi.ref "Api"))
+      (param $this externref (@abi.ref "Api" (module "enum-aliases")))
       (result externref (@abi.ref "Flags"))))
   (import "enum-aliases" "Api.set_flags"
     (func $enum-aliases:Api.set_flags (@abi.set "flags") (@abi.owner "Api")
       (@abi.ts "set flags(value: Flags)")
-      (param $this externref (@abi.ref "Api"))
+      (param $this externref (@abi.ref "Api" (module "enum-aliases")))
       (param $value externref (@abi.ref "Flags"))))
   (import "enum-aliases" "Api.kind"
     (func $enum-aliases:Api.kind (@abi.get "kind") (@abi.owner "Api")
       (@abi.ts "kind: Kind")
-      (param $this externref (@abi.ref "Api"))
+      (param $this externref (@abi.ref "Api" (module "enum-aliases")))
       (result externref (@abi.ref "Kind"))))
   (import "enum-aliases" "Api.set_kind"
     (func $enum-aliases:Api.set_kind (@abi.set "kind") (@abi.owner "Api")
       (@abi.ts "set kind(value: Kind)")
-      (param $this externref (@abi.ref "Api"))
+      (param $this externref (@abi.ref "Api" (module "enum-aliases")))
       (param $value externref (@abi.ref "Kind"))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

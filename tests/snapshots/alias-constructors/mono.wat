@@ -29,7 +29,7 @@
   (import "alias-constructors" "Stub.get"
     (func $alias-constructors:Stub.get (@abi.call "get") (@abi.owner "Stub")
       (@abi.ts "get(): T")
-      (param $this externref (@abi.ref "Stub"))
+      (param $this externref (@abi.ref "Stub" (module "alias-constructors")))
       (result externref (@abi.ref null undefined))))
 
   (import "alias-constructors" "Wrap"
@@ -39,7 +39,7 @@
   (import "alias-constructors" "unwrapText"
     (func $alias-constructors:unwrapText (@abi.call "unwrapText" (on))
       (@abi.ts "unwrapText(stub: Wrap<string>): string")
-      (param $stub externref (@abi.ref "Stub"))
+      (param $stub externref (@abi.ref "Stub" (module "alias-constructors")))
       (result externref (@abi.ref string))))
   (import "alias-constructors" "Label"
     (func $alias-constructors:Label (@abi.get "Label" (on))
@@ -50,23 +50,23 @@
   (import "alias-constructors" "Labelled.text"
     (func $alias-constructors:Labelled.text (@abi.call "text") (@abi.owner "Labelled")
       (@abi.ts "text(): string")
-      (param $this externref (@abi.ref "Labelled"))
+      (param $this externref (@abi.ref "Labelled" (module "alias-constructors")))
       (result externref (@abi.ref string))))
 
   (@abi.dictionary "Point" (module "alias-constructors"))
   (import "alias-constructors" "Point.new"
     (func $alias-constructors:Point.new (@abi.object) (@abi.owner "Point")
       (@abi.ts "{} as Point")
-      (result externref (@abi.ref "Point"))))
+      (result externref (@abi.ref "Point" (module "alias-constructors")))))
   (import "alias-constructors" "Point.x"
     (func $alias-constructors:Point.x (@abi.get "x") (@abi.owner "Point")
       (@abi.ts "x?: number")
-      (param $this externref (@abi.ref "Point"))
+      (param $this externref (@abi.ref "Point" (module "alias-constructors")))
       (result externref (@abi.ref number undefined))))
   (import "alias-constructors" "Point.set_x"
     (func $alias-constructors:Point.set_x (@abi.set "x") (@abi.owner "Point")
       (@abi.ts "set x(value: number)")
-      (param $this externref (@abi.ref "Point"))
+      (param $this externref (@abi.ref "Point" (module "alias-constructors")))
       (param $value f64)))
 
   (import "alias-constructors" "Pt"
@@ -82,7 +82,7 @@
   (import "alias-constructors" "Proto.p"
     (func $alias-constructors:Proto.p (@abi.call "p") (@abi.owner "Proto")
       (@abi.ts "p(): void")
-      (param $this externref (@abi.ref "Proto"))))
+      (param $this externref (@abi.ref "Proto" (module "alias-constructors")))))
 
   (import "alias-constructors" "ProtoOnly"
     (func $alias-constructors:ProtoOnly (@abi.get "ProtoOnly" (on))
@@ -97,18 +97,18 @@
   (import "alias-constructors" "Wrapped.get"
     (func $alias-constructors:Wrapped.get (@abi.call "get") (@abi.owner "Wrapped")
       (@abi.ts "get(): T")
-      (param $this externref (@abi.ref "Wrapped"))
+      (param $this externref (@abi.ref "Wrapped" (module "alias-constructors")))
       (result externref (@abi.ref null undefined))))
 
   (@abi.class "StaticNew" (module "alias-constructors"))
   (import "alias-constructors" "StaticNew.new"
     (func $alias-constructors:StaticNew.new (@abi.call "new" (on "StaticNew")) (@abi.owner "StaticNew")
       (@abi.ts "new(): StaticNew")
-      (result externref (@abi.ref "StaticNew"))))
+      (result externref (@abi.ref "StaticNew" (module "alias-constructors")))))
   (import "alias-constructors" "StaticNew.y"
     (func $alias-constructors:StaticNew.y (@abi.call "y") (@abi.owner "StaticNew")
       (@abi.ts "y(): void")
-      (param $this externref (@abi.ref "StaticNew"))))
+      (param $this externref (@abi.ref "StaticNew" (module "alias-constructors")))))
 
   (import "alias-constructors" "SN"
     (func $alias-constructors:SN (@abi.get "SN" (on))
@@ -119,7 +119,7 @@
   (import "alias-constructors" "CapNew.new"
     (func $alias-constructors:CapNew.new (@abi.call "New") (@abi.owner "CapNew")
       (@abi.ts "New(): void")
-      (param $this externref (@abi.ref "CapNew"))))
+      (param $this externref (@abi.ref "CapNew" (module "alias-constructors")))))
 
   (import "alias-constructors" "CN"
     (func $alias-constructors:CN (@abi.get "CN" (on))
@@ -134,7 +134,7 @@
   (import "alias-constructors" "Counter.count"
     (func $alias-constructors:Counter.count (@abi.call "count") (@abi.owner "Counter")
       (@abi.ts "count(): number")
-      (param $this externref (@abi.ref "Counter"))
+      (param $this externref (@abi.ref "Counter" (module "alias-constructors")))
       (result f64)))
 
   (import "alias-constructors" "Multi"
@@ -146,14 +146,14 @@
   (import "alias-constructors" "MultiA.a"
     (func $alias-constructors:MultiA.a (@abi.call "a") (@abi.owner "MultiA")
       (@abi.ts "a(): string")
-      (param $this externref (@abi.ref "MultiA"))
+      (param $this externref (@abi.ref "MultiA" (module "alias-constructors")))
       (result externref (@abi.ref string))))
 
   (@abi.interface "MultiB" (module "alias-constructors"))
   (import "alias-constructors" "MultiB.b"
     (func $alias-constructors:MultiB.b (@abi.call "b") (@abi.owner "MultiB")
       (@abi.ts "b(): number")
-      (param $this externref (@abi.ref "MultiB"))
+      (param $this externref (@abi.ref "MultiB" (module "alias-constructors")))
       (result f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

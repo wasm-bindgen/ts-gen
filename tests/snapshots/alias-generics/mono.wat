@@ -67,7 +67,7 @@
   (import "shapes" "_Shape.new"
     (func $shapes:_Shape.new (@abi.object) (@abi.owner "_Shape")
       (@abi.ts "{} as _Shape")
-      (result externref (@abi.ref "_Shape"))))
+      (result externref (@abi.ref "_Shape" (module "shapes")))))
   (import "shapes" "Shape.new"
     (func $shapes:Shape.new (@abi.alias "_Shape.new")
       (result externref)))
@@ -77,7 +77,7 @@
   (import "shapes" "_Shape.sides"
     (func $shapes:_Shape.sides (@abi.get "sides") (@abi.owner "_Shape")
       (@abi.ts "sides: number")
-      (param $this externref (@abi.ref "_Shape"))
+      (param $this externref (@abi.ref "_Shape" (module "shapes")))
       (result f64)))
   (import "shapes" "Shape.sides"
     (func $shapes:Shape.sides (@abi.alias "_Shape.sides")
@@ -92,11 +92,11 @@
   (import "hidden" "Hidden.new"
     (func $hidden:Hidden.new (@abi.object) (@abi.owner "Hidden")
       (@abi.ts "{} as Hidden")
-      (result externref (@abi.ref "Hidden"))))
+      (result externref (@abi.ref "Hidden" (module "hidden")))))
   (import "hidden" "Hidden.h"
     (func $hidden:Hidden.h (@abi.get "h") (@abi.owner "Hidden")
       (@abi.ts "h: number")
-      (param $this externref (@abi.ref "Hidden"))
+      (param $this externref (@abi.ref "Hidden" (module "hidden")))
       (result f64)))
 
   (import "uses" "tag"

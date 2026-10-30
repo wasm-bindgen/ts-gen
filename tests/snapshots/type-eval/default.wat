@@ -42,131 +42,131 @@
   (import "type-eval" "Options.new"
     (func $type-eval:Options.new (@abi.object) (@abi.owner "Options")
       (@abi.ts "{} as Options")
-      (result externref (@abi.ref "Options"))))
+      (result externref (@abi.ref "Options" (module "type-eval")))))
   (import "type-eval" "Options.name"
     (func $type-eval:Options.name (@abi.get "name") (@abi.owner "Options")
       (@abi.ts "name: string")
       (@abi.doc "The name.")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "type-eval")))
       (result externref (@abi.ref string))))
   (import "type-eval" "Options.set_name"
     (func $type-eval:Options.set_name (@abi.set "name") (@abi.owner "Options")
       (@abi.ts "set name(value: string)")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "type-eval")))
       (param $value externref (@abi.ref string))))
   (import "type-eval" "Options.size"
     (func $type-eval:Options.size (@abi.get "size") (@abi.owner "Options")
       (@abi.ts "size?: number")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "Options.set_size"
     (func $type-eval:Options.set_size (@abi.set "size") (@abi.owner "Options")
       (@abi.ts "set size(value: number)")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "type-eval")))
       (param $value f64)))
   (import "type-eval" "Options.fixed"
     (func $type-eval:Options.fixed (@abi.get "fixed") (@abi.owner "Options")
       (@abi.ts "fixed: boolean")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "type-eval")))
       (result i32)))
 
   (import "type-eval" "configure"
     (func $type-eval:configure (@abi.call "configure" (on))
       (@abi.ts "configure(partial: PartialOptions, required: RequiredOptions, frozen: ReadonlyOptions, picked: PickOptionsNameOrSize, omitted: PickOptionsNameOrSize, unchanged: Sized): void")
-      (param $partial externref (@abi.ref "PartialOptions"))
-      (param $required externref (@abi.ref "RequiredOptions"))
-      (param $frozen externref (@abi.ref "ReadonlyOptions"))
-      (param $picked externref (@abi.ref "PickOptionsNameOrSize"))
-      (param $omitted externref (@abi.ref "PickOptionsNameOrSize"))
-      (param $unchanged externref (@abi.ref "Sized"))))
+      (param $partial externref (@abi.ref "PartialOptions" (module "type-eval")))
+      (param $required externref (@abi.ref "RequiredOptions" (module "type-eval")))
+      (param $frozen externref (@abi.ref "ReadonlyOptions" (module "type-eval")))
+      (param $picked externref (@abi.ref "PickOptionsNameOrSize" (module "type-eval")))
+      (param $omitted externref (@abi.ref "PickOptionsNameOrSize" (module "type-eval")))
+      (param $unchanged externref (@abi.ref "Sized" (module "type-eval")))))
 
   (@abi.dictionary "Sized" (module "type-eval"))
   (import "type-eval" "Sized.new"
     (func $type-eval:Sized.new (@abi.object) (@abi.owner "Sized")
       (@abi.ts "{} as Sized")
-      (result externref (@abi.ref "Sized"))))
+      (result externref (@abi.ref "Sized" (module "type-eval")))))
   (import "type-eval" "Sized.size"
     (func $type-eval:Sized.size (@abi.get "size") (@abi.owner "Sized")
       (@abi.ts "size?: number")
-      (param $this externref (@abi.ref "Sized"))
+      (param $this externref (@abi.ref "Sized" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "Sized.set_size"
     (func $type-eval:Sized.set_size (@abi.set "size") (@abi.owner "Sized")
       (@abi.ts "set size(value: number)")
-      (param $this externref (@abi.ref "Sized"))
+      (param $this externref (@abi.ref "Sized" (module "type-eval")))
       (param $value f64)))
 
   (import "type-eval" "keyed"
     (func $type-eval:keyed (@abi.call "keyed" (on))
       (@abi.ts "keyed(picked: PickOptionsNameOrSize): void")
-      (param $picked externref (@abi.ref "PickOptionsNameOrSize"))))
+      (param $picked externref (@abi.ref "PickOptionsNameOrSize" (module "type-eval")))))
 
   (@abi.dictionary "Named" (module "type-eval"))
   (import "type-eval" "Named.new"
     (func $type-eval:Named.new (@abi.object) (@abi.owner "Named")
       (@abi.ts "{} as Named")
-      (result externref (@abi.ref "Named"))))
+      (result externref (@abi.ref "Named" (module "type-eval")))))
   (import "type-eval" "Named.label"
     (func $type-eval:Named.label (@abi.get "label") (@abi.owner "Named")
       (@abi.ts "label?: string")
-      (param $this externref (@abi.ref "Named"))
+      (param $this externref (@abi.ref "Named" (module "type-eval")))
       (result externref (@abi.ref string undefined))))
   (import "type-eval" "Named.set_label"
     (func $type-eval:Named.set_label (@abi.set "label") (@abi.owner "Named")
       (@abi.ts "set label(value: string)")
-      (param $this externref (@abi.ref "Named"))
+      (param $this externref (@abi.ref "Named" (module "type-eval")))
       (param $value externref (@abi.ref string))))
   (import "type-eval" "Named.name"
     (func $type-eval:Named.name (@abi.get "name") (@abi.owner "Named")
       (@abi.ts "name: string")
       (@abi.doc "The name.")
-      (param $this externref (@abi.ref "Named"))
+      (param $this externref (@abi.ref "Named" (module "type-eval")))
       (result externref (@abi.ref string))))
   (import "type-eval" "Named.set_name"
     (func $type-eval:Named.set_name (@abi.set "name") (@abi.owner "Named")
       (@abi.ts "set name(value: string)")
-      (param $this externref (@abi.ref "Named"))
+      (param $this externref (@abi.ref "Named" (module "type-eval")))
       (param $value externref (@abi.ref string))))
   (import "type-eval" "Named.fixed"
     (func $type-eval:Named.fixed (@abi.get "fixed") (@abi.owner "Named")
       (@abi.ts "fixed: boolean")
-      (param $this externref (@abi.ref "Named"))
+      (param $this externref (@abi.ref "Named" (module "type-eval")))
       (result i32)))
 
   (@abi.dictionary "Mixed" (module "type-eval"))
   (import "type-eval" "Mixed.new"
     (func $type-eval:Mixed.new (@abi.object) (@abi.owner "Mixed")
       (@abi.ts "{} as Mixed")
-      (result externref (@abi.ref "Mixed"))))
+      (result externref (@abi.ref "Mixed" (module "type-eval")))))
   (import "type-eval" "Mixed.name"
     (func $type-eval:Mixed.name (@abi.get "name") (@abi.owner "Mixed")
       (@abi.ts "name: string")
       (@abi.doc "The name.")
-      (param $this externref (@abi.ref "Mixed"))
+      (param $this externref (@abi.ref "Mixed" (module "type-eval")))
       (result externref (@abi.ref string))))
   (import "type-eval" "Mixed.set_name"
     (func $type-eval:Mixed.set_name (@abi.set "name") (@abi.owner "Mixed")
       (@abi.ts "set name(value: string)")
-      (param $this externref (@abi.ref "Mixed"))
+      (param $this externref (@abi.ref "Mixed" (module "type-eval")))
       (param $value externref (@abi.ref string))))
   (import "type-eval" "Mixed.size"
     (func $type-eval:Mixed.size (@abi.get "size") (@abi.owner "Mixed")
       (@abi.ts "size?: number")
-      (param $this externref (@abi.ref "Mixed"))
+      (param $this externref (@abi.ref "Mixed" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "Mixed.set_size"
     (func $type-eval:Mixed.set_size (@abi.set "size") (@abi.owner "Mixed")
       (@abi.ts "set size(value: number)")
-      (param $this externref (@abi.ref "Mixed"))
+      (param $this externref (@abi.ref "Mixed" (module "type-eval")))
       (param $value f64)))
 
   (import "type-eval" "mapped"
     (func $type-eval:mapped (@abi.call "mapped" (on))
       (@abi.ts "mapped(loose: LooseOptions, strict: RequiredOptions, flags: FlagsAOrB, patch: PartialOptions): void")
-      (param $loose externref (@abi.ref "LooseOptions"))
-      (param $strict externref (@abi.ref "RequiredOptions"))
-      (param $flags externref (@abi.ref "FlagsAOrB"))
-      (param $patch externref (@abi.ref "PartialOptions"))))
+      (param $loose externref (@abi.ref "LooseOptions" (module "type-eval")))
+      (param $strict externref (@abi.ref "RequiredOptions" (module "type-eval")))
+      (param $flags externref (@abi.ref "FlagsAOrB" (module "type-eval")))
+      (param $patch externref (@abi.ref "PartialOptions" (module "type-eval")))))
   (import "type-eval" "patch"
     (func $type-eval:patch (@abi.call "patch" (on))
       (@abi.ts "patch(open: Patch<T>): void")
@@ -174,7 +174,7 @@
   (import "type-eval" "size"
     (func $type-eval:size (@abi.call "size" (on))
       (@abi.ts "size(opts: Options): number | undefined")
-      (param $opts externref (@abi.ref "Options"))
+      (param $opts externref (@abi.ref "Options" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "plural"
     (func $type-eval:plural (@abi.call "plural" (on))
@@ -186,96 +186,96 @@
   (import "type-eval" "Rounding.new"
     (func $type-eval:Rounding.new (@abi.object) (@abi.owner "Rounding")
       (@abi.ts "{} as Rounding")
-      (result externref (@abi.ref "Rounding"))))
+      (result externref (@abi.ref "Rounding" (module "type-eval")))))
   (import "type-eval" "Rounding.smallest_unit"
     (func $type-eval:Rounding.smallest_unit (@abi.get "smallestUnit") (@abi.owner "Rounding")
       (@abi.ts "smallestUnit?: Plural")
-      (param $this externref (@abi.ref "Rounding"))
+      (param $this externref (@abi.ref "Rounding" (module "type-eval")))
       (result externref (@abi.ref "Plural" undefined))))
   (import "type-eval" "Rounding.set_smallest_unit"
     (func $type-eval:Rounding.set_smallest_unit (@abi.set "smallestUnit") (@abi.owner "Rounding")
       (@abi.ts "set smallestUnit(value: Plural)")
-      (param $this externref (@abi.ref "Rounding"))
+      (param $this externref (@abi.ref "Rounding" (module "type-eval")))
       (param $value externref (@abi.ref "Plural"))))
   (import "type-eval" "Rounding.largest_unit"
     (func $type-eval:Rounding.largest_unit (@abi.get "largestUnit") (@abi.owner "Rounding")
       (@abi.ts "largestUnit?: \"auto\" | \"hour\" | \"minute\" | \"second\" | \"hours\" | \"minutes\" | \"seconds\"")
-      (param $this externref (@abi.ref "Rounding"))
+      (param $this externref (@abi.ref "Rounding" (module "type-eval")))
       (result externref (@abi.ref string undefined))))
   (import "type-eval" "Rounding.set_largest_unit"
     (func $type-eval:Rounding.set_largest_unit (@abi.set "largestUnit") (@abi.owner "Rounding")
       (@abi.ts "set largestUnit(value: \"auto\")")
-      (param $this externref (@abi.ref "Rounding"))
+      (param $this externref (@abi.ref "Rounding" (module "type-eval")))
       (param $value externref (@abi.ref string))))
 
   (import "type-eval" "round"
     (func $type-eval:round (@abi.call "round" (on))
       (@abi.ts "round(opts: Rounding<\"hour\">): void")
-      (param $opts externref (@abi.ref "Rounding"))))
+      (param $opts externref (@abi.ref "Rounding" (module "type-eval")))))
 
   (@abi.dictionary "Box" (module "type-eval"))
   (import "type-eval" "Box.new"
     (func $type-eval:Box.new (@abi.object) (@abi.owner "Box")
       (@abi.ts "{} as Box")
-      (result externref (@abi.ref "Box"))))
+      (result externref (@abi.ref "Box" (module "type-eval")))))
   (import "type-eval" "Box.value"
     (func $type-eval:Box.value (@abi.get "value") (@abi.owner "Box")
       (@abi.ts "value: T")
-      (param $this externref (@abi.ref "Box"))
+      (param $this externref (@abi.ref "Box" (module "type-eval")))
       (result externref (@abi.ref null undefined))))
   (import "type-eval" "Box.set_value"
     (func $type-eval:Box.set_value (@abi.set "value") (@abi.owner "Box")
       (@abi.ts "set value(value: T)")
-      (param $this externref (@abi.ref "Box"))
+      (param $this externref (@abi.ref "Box" (module "type-eval")))
       (param $value externref (@abi.ref null undefined))))
   (import "type-eval" "Box.label"
     (func $type-eval:Box.label (@abi.get "label") (@abi.owner "Box")
       (@abi.ts "label: string")
-      (param $this externref (@abi.ref "Box"))
+      (param $this externref (@abi.ref "Box" (module "type-eval")))
       (result externref (@abi.ref string))))
   (import "type-eval" "Box.set_label"
     (func $type-eval:Box.set_label (@abi.set "label") (@abi.owner "Box")
       (@abi.ts "set label(value: string)")
-      (param $this externref (@abi.ref "Box"))
+      (param $this externref (@abi.ref "Box" (module "type-eval")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "Holder" (module "type-eval"))
   (import "type-eval" "Holder.new"
     (func $type-eval:Holder.new (@abi.object) (@abi.owner "Holder")
       (@abi.ts "{} as Holder")
-      (result externref (@abi.ref "Holder"))))
+      (result externref (@abi.ref "Holder" (module "type-eval")))))
   (import "type-eval" "Holder.partial"
     (func $type-eval:Holder.partial (@abi.get "partial") (@abi.owner "Holder")
       (@abi.ts "partial: PartialBox<T>")
-      (param $this externref (@abi.ref "Holder"))
-      (result externref (@abi.ref "PartialBox"))))
+      (param $this externref (@abi.ref "Holder" (module "type-eval")))
+      (result externref (@abi.ref "PartialBox" (module "type-eval")))))
   (import "type-eval" "Holder.set_partial"
     (func $type-eval:Holder.set_partial (@abi.set "partial") (@abi.owner "Holder")
       (@abi.ts "set partial(value: PartialBox<T>)")
-      (param $this externref (@abi.ref "Holder"))
-      (param $value externref (@abi.ref "PartialBox"))))
+      (param $this externref (@abi.ref "Holder" (module "type-eval")))
+      (param $value externref (@abi.ref "PartialBox" (module "type-eval")))))
 
-  (@abi.dictionary "Extended" (module "type-eval") (extends "Options"))
+  (@abi.dictionary "Extended" (module "type-eval") (extends "Options" (module "type-eval")))
   (import "type-eval" "Extended.new"
     (func $type-eval:Extended.new (@abi.object) (@abi.owner "Extended")
       (@abi.ts "{} as Extended")
-      (result externref (@abi.ref "Extended"))))
+      (result externref (@abi.ref "Extended" (module "type-eval")))))
   (import "type-eval" "Extended.extra"
     (func $type-eval:Extended.extra (@abi.get "extra") (@abi.owner "Extended")
       (@abi.ts "extra: number")
-      (param $this externref (@abi.ref "Extended"))
+      (param $this externref (@abi.ref "Extended" (module "type-eval")))
       (result f64)))
   (import "type-eval" "Extended.set_extra"
     (func $type-eval:Extended.set_extra (@abi.set "extra") (@abi.owner "Extended")
       (@abi.ts "set extra(value: number)")
-      (param $this externref (@abi.ref "Extended"))
+      (param $this externref (@abi.ref "Extended" (module "type-eval")))
       (param $value f64)))
 
   (import "type-eval" "extended"
     (func $type-eval:extended (@abi.call "extended" (on))
       (@abi.ts "extended(keys: KeyOfExtended, partial: PartialExtended): void")
       (param $keys externref (@abi.ref "KeyOfExtended"))
-      (param $partial externref (@abi.ref "PartialExtended"))))
+      (param $partial externref (@abi.ref "PartialExtended" (module "type-eval")))))
   (import "type-eval" "fail"
     (func $type-eval:fail (@abi.call "fail" (on))
       (@abi.ts "fail(): never")
@@ -289,26 +289,26 @@
   (import "type-eval" "Scoped.Settings.new"
     (func $type-eval:Scoped.Settings.new (@abi.object) (@abi.owner "Scoped.Settings")
       (@abi.ts "{} as Scoped.Settings")
-      (result externref (@abi.ref "Scoped.Settings"))))
+      (result externref (@abi.ref "Scoped.Settings" (module "type-eval")))))
   (import "type-eval" "Scoped.Settings.mode"
     (func $type-eval:Scoped.Settings.mode (@abi.get "mode") (@abi.owner "Scoped.Settings")
       (@abi.ts "mode?: Mode")
-      (param $this externref (@abi.ref "Scoped.Settings"))
+      (param $this externref (@abi.ref "Scoped.Settings" (module "type-eval")))
       (result externref (@abi.ref "Mode" undefined))))
   (import "type-eval" "Scoped.Settings.set_mode"
     (func $type-eval:Scoped.Settings.set_mode (@abi.set "mode") (@abi.owner "Scoped.Settings")
       (@abi.ts "set mode(value: Mode)")
-      (param $this externref (@abi.ref "Scoped.Settings"))
+      (param $this externref (@abi.ref "Scoped.Settings" (module "type-eval")))
       (param $value externref (@abi.ref "Mode"))))
   (import "type-eval" "Scoped.Settings.depth"
     (func $type-eval:Scoped.Settings.depth (@abi.get "depth") (@abi.owner "Scoped.Settings")
       (@abi.ts "depth: number")
-      (param $this externref (@abi.ref "Scoped.Settings"))
+      (param $this externref (@abi.ref "Scoped.Settings" (module "type-eval")))
       (result f64)))
   (import "type-eval" "Scoped.Settings.set_depth"
     (func $type-eval:Scoped.Settings.set_depth (@abi.set "depth") (@abi.owner "Scoped.Settings")
       (@abi.ts "set depth(value: number)")
-      (param $this externref (@abi.ref "Scoped.Settings"))
+      (param $this externref (@abi.ref "Scoped.Settings" (module "type-eval")))
       (param $value f64)))
 
   (@abi.namespace "Scoped" (module "type-eval"))
@@ -322,48 +322,48 @@
   (import "type-eval" "Scoped.PartialSettings.new"
     (func $type-eval:Scoped.PartialSettings.new (@abi.object) (@abi.owner "Scoped.PartialSettings")
       (@abi.ts "{} as Scoped.PartialSettings")
-      (result externref (@abi.ref "Scoped.PartialSettings"))))
+      (result externref (@abi.ref "Scoped.PartialSettings" (module "type-eval")))))
   (import "type-eval" "Scoped.PartialSettings.mode"
     (func $type-eval:Scoped.PartialSettings.mode (@abi.get "mode") (@abi.owner "Scoped.PartialSettings")
       (@abi.ts "mode?: Mode")
-      (param $this externref (@abi.ref "Scoped.PartialSettings"))
+      (param $this externref (@abi.ref "Scoped.PartialSettings" (module "type-eval")))
       (result externref (@abi.ref "Mode" undefined))))
   (import "type-eval" "Scoped.PartialSettings.set_mode"
     (func $type-eval:Scoped.PartialSettings.set_mode (@abi.set "mode") (@abi.owner "Scoped.PartialSettings")
       (@abi.ts "set mode(value: Mode)")
-      (param $this externref (@abi.ref "Scoped.PartialSettings"))
+      (param $this externref (@abi.ref "Scoped.PartialSettings" (module "type-eval")))
       (param $value externref (@abi.ref "Mode"))))
   (import "type-eval" "Scoped.PartialSettings.depth"
     (func $type-eval:Scoped.PartialSettings.depth (@abi.get "depth") (@abi.owner "Scoped.PartialSettings")
       (@abi.ts "depth?: number")
-      (param $this externref (@abi.ref "Scoped.PartialSettings"))
+      (param $this externref (@abi.ref "Scoped.PartialSettings" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "Scoped.PartialSettings.set_depth"
     (func $type-eval:Scoped.PartialSettings.set_depth (@abi.set "depth") (@abi.owner "Scoped.PartialSettings")
       (@abi.ts "set depth(value: number)")
-      (param $this externref (@abi.ref "Scoped.PartialSettings"))
+      (param $this externref (@abi.ref "Scoped.PartialSettings" (module "type-eval")))
       (param $value f64)))
 
   (@abi.class "Widget" (module "type-eval"))
   (import "type-eval" "Widget.size"
     (func $type-eval:Widget.size (@abi.get "size") (@abi.owner "Widget")
       (@abi.ts "size: number")
-      (param $this externref (@abi.ref "Widget"))
+      (param $this externref (@abi.ref "Widget" (module "type-eval")))
       (result f64)))
   (import "type-eval" "Widget.set_size"
     (func $type-eval:Widget.set_size (@abi.set "size") (@abi.owner "Widget")
       (@abi.ts "set size(value: number)")
-      (param $this externref (@abi.ref "Widget"))
+      (param $this externref (@abi.ref "Widget" (module "type-eval")))
       (param $value f64)))
   (import "type-eval" "Widget.render"
     (func $type-eval:Widget.render (@abi.call "render") (@abi.owner "Widget")
       (@abi.ts "render(): void")
-      (param $this externref (@abi.ref "Widget"))))
+      (param $this externref (@abi.ref "Widget" (module "type-eval")))))
 
   (import "type-eval" "widget"
     (func $type-eval:widget (@abi.call "widget" (on))
       (@abi.ts "widget(partial: Widget): void")
-      (param $partial externref (@abi.ref "Widget"))))
+      (param $partial externref (@abi.ref "Widget" (module "type-eval")))))
   (import "type-eval" "unbound"
     (func $type-eval:unbound (@abi.call "unbound" (on))
       (@abi.ts "unbound(keys: keyof, partial: T): void")
@@ -374,239 +374,239 @@
   (import "type-eval" "PartialOptions.new"
     (func $type-eval:PartialOptions.new (@abi.object) (@abi.owner "PartialOptions")
       (@abi.ts "{} as PartialOptions")
-      (result externref (@abi.ref "PartialOptions"))))
+      (result externref (@abi.ref "PartialOptions" (module "type-eval")))))
   (import "type-eval" "PartialOptions.name"
     (func $type-eval:PartialOptions.name (@abi.get "name") (@abi.owner "PartialOptions")
       (@abi.ts "name?: string")
       (@abi.doc "The name.")
-      (param $this externref (@abi.ref "PartialOptions"))
+      (param $this externref (@abi.ref "PartialOptions" (module "type-eval")))
       (result externref (@abi.ref string undefined))))
   (import "type-eval" "PartialOptions.set_name"
     (func $type-eval:PartialOptions.set_name (@abi.set "name") (@abi.owner "PartialOptions")
       (@abi.ts "set name(value: string)")
-      (param $this externref (@abi.ref "PartialOptions"))
+      (param $this externref (@abi.ref "PartialOptions" (module "type-eval")))
       (param $value externref (@abi.ref string))))
   (import "type-eval" "PartialOptions.size"
     (func $type-eval:PartialOptions.size (@abi.get "size") (@abi.owner "PartialOptions")
       (@abi.ts "size?: number")
-      (param $this externref (@abi.ref "PartialOptions"))
+      (param $this externref (@abi.ref "PartialOptions" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "PartialOptions.set_size"
     (func $type-eval:PartialOptions.set_size (@abi.set "size") (@abi.owner "PartialOptions")
       (@abi.ts "set size(value: number)")
-      (param $this externref (@abi.ref "PartialOptions"))
+      (param $this externref (@abi.ref "PartialOptions" (module "type-eval")))
       (param $value f64)))
   (import "type-eval" "PartialOptions.fixed"
     (func $type-eval:PartialOptions.fixed (@abi.get "fixed") (@abi.owner "PartialOptions")
       (@abi.ts "fixed?: boolean")
-      (param $this externref (@abi.ref "PartialOptions"))
+      (param $this externref (@abi.ref "PartialOptions" (module "type-eval")))
       (result externref (@abi.ref boolean undefined))))
 
   (@abi.dictionary "RequiredOptions" (module "type-eval"))
   (import "type-eval" "RequiredOptions.new"
     (func $type-eval:RequiredOptions.new (@abi.object) (@abi.owner "RequiredOptions")
       (@abi.ts "{} as RequiredOptions")
-      (result externref (@abi.ref "RequiredOptions"))))
+      (result externref (@abi.ref "RequiredOptions" (module "type-eval")))))
   (import "type-eval" "RequiredOptions.name"
     (func $type-eval:RequiredOptions.name (@abi.get "name") (@abi.owner "RequiredOptions")
       (@abi.ts "name: string")
       (@abi.doc "The name.")
-      (param $this externref (@abi.ref "RequiredOptions"))
+      (param $this externref (@abi.ref "RequiredOptions" (module "type-eval")))
       (result externref (@abi.ref string))))
   (import "type-eval" "RequiredOptions.set_name"
     (func $type-eval:RequiredOptions.set_name (@abi.set "name") (@abi.owner "RequiredOptions")
       (@abi.ts "set name(value: string)")
-      (param $this externref (@abi.ref "RequiredOptions"))
+      (param $this externref (@abi.ref "RequiredOptions" (module "type-eval")))
       (param $value externref (@abi.ref string))))
   (import "type-eval" "RequiredOptions.size"
     (func $type-eval:RequiredOptions.size (@abi.get "size") (@abi.owner "RequiredOptions")
       (@abi.ts "size: number")
-      (param $this externref (@abi.ref "RequiredOptions"))
+      (param $this externref (@abi.ref "RequiredOptions" (module "type-eval")))
       (result f64)))
   (import "type-eval" "RequiredOptions.set_size"
     (func $type-eval:RequiredOptions.set_size (@abi.set "size") (@abi.owner "RequiredOptions")
       (@abi.ts "set size(value: number)")
-      (param $this externref (@abi.ref "RequiredOptions"))
+      (param $this externref (@abi.ref "RequiredOptions" (module "type-eval")))
       (param $value f64)))
   (import "type-eval" "RequiredOptions.fixed"
     (func $type-eval:RequiredOptions.fixed (@abi.get "fixed") (@abi.owner "RequiredOptions")
       (@abi.ts "fixed: boolean")
-      (param $this externref (@abi.ref "RequiredOptions"))
+      (param $this externref (@abi.ref "RequiredOptions" (module "type-eval")))
       (result i32)))
 
   (@abi.dictionary "ReadonlyOptions" (module "type-eval"))
   (import "type-eval" "ReadonlyOptions.new"
     (func $type-eval:ReadonlyOptions.new (@abi.object) (@abi.owner "ReadonlyOptions")
       (@abi.ts "{} as ReadonlyOptions")
-      (result externref (@abi.ref "ReadonlyOptions"))))
+      (result externref (@abi.ref "ReadonlyOptions" (module "type-eval")))))
   (import "type-eval" "ReadonlyOptions.name"
     (func $type-eval:ReadonlyOptions.name (@abi.get "name") (@abi.owner "ReadonlyOptions")
       (@abi.ts "name: string")
       (@abi.doc "The name.")
-      (param $this externref (@abi.ref "ReadonlyOptions"))
+      (param $this externref (@abi.ref "ReadonlyOptions" (module "type-eval")))
       (result externref (@abi.ref string))))
   (import "type-eval" "ReadonlyOptions.size"
     (func $type-eval:ReadonlyOptions.size (@abi.get "size") (@abi.owner "ReadonlyOptions")
       (@abi.ts "size?: number")
-      (param $this externref (@abi.ref "ReadonlyOptions"))
+      (param $this externref (@abi.ref "ReadonlyOptions" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "ReadonlyOptions.fixed"
     (func $type-eval:ReadonlyOptions.fixed (@abi.get "fixed") (@abi.owner "ReadonlyOptions")
       (@abi.ts "fixed: boolean")
-      (param $this externref (@abi.ref "ReadonlyOptions"))
+      (param $this externref (@abi.ref "ReadonlyOptions" (module "type-eval")))
       (result i32)))
 
   (@abi.dictionary "PickOptionsNameOrSize" (module "type-eval"))
   (import "type-eval" "PickOptionsNameOrSize.new"
     (func $type-eval:PickOptionsNameOrSize.new (@abi.object) (@abi.owner "PickOptionsNameOrSize")
       (@abi.ts "{} as PickOptionsNameOrSize")
-      (result externref (@abi.ref "PickOptionsNameOrSize"))))
+      (result externref (@abi.ref "PickOptionsNameOrSize" (module "type-eval")))))
   (import "type-eval" "PickOptionsNameOrSize.name"
     (func $type-eval:PickOptionsNameOrSize.name (@abi.get "name") (@abi.owner "PickOptionsNameOrSize")
       (@abi.ts "name: string")
       (@abi.doc "The name.")
-      (param $this externref (@abi.ref "PickOptionsNameOrSize"))
+      (param $this externref (@abi.ref "PickOptionsNameOrSize" (module "type-eval")))
       (result externref (@abi.ref string))))
   (import "type-eval" "PickOptionsNameOrSize.set_name"
     (func $type-eval:PickOptionsNameOrSize.set_name (@abi.set "name") (@abi.owner "PickOptionsNameOrSize")
       (@abi.ts "set name(value: string)")
-      (param $this externref (@abi.ref "PickOptionsNameOrSize"))
+      (param $this externref (@abi.ref "PickOptionsNameOrSize" (module "type-eval")))
       (param $value externref (@abi.ref string))))
   (import "type-eval" "PickOptionsNameOrSize.size"
     (func $type-eval:PickOptionsNameOrSize.size (@abi.get "size") (@abi.owner "PickOptionsNameOrSize")
       (@abi.ts "size?: number")
-      (param $this externref (@abi.ref "PickOptionsNameOrSize"))
+      (param $this externref (@abi.ref "PickOptionsNameOrSize" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "PickOptionsNameOrSize.set_size"
     (func $type-eval:PickOptionsNameOrSize.set_size (@abi.set "size") (@abi.owner "PickOptionsNameOrSize")
       (@abi.ts "set size(value: number)")
-      (param $this externref (@abi.ref "PickOptionsNameOrSize"))
+      (param $this externref (@abi.ref "PickOptionsNameOrSize" (module "type-eval")))
       (param $value f64)))
 
   (@abi.dictionary "LooseOptions" (module "type-eval"))
   (import "type-eval" "LooseOptions.new"
     (func $type-eval:LooseOptions.new (@abi.object) (@abi.owner "LooseOptions")
       (@abi.ts "{} as LooseOptions")
-      (result externref (@abi.ref "LooseOptions"))))
+      (result externref (@abi.ref "LooseOptions" (module "type-eval")))))
   (import "type-eval" "LooseOptions.name"
     (func $type-eval:LooseOptions.name (@abi.get "name") (@abi.owner "LooseOptions")
       (@abi.ts "name?: string")
       (@abi.doc "The name.")
-      (param $this externref (@abi.ref "LooseOptions"))
+      (param $this externref (@abi.ref "LooseOptions" (module "type-eval")))
       (result externref (@abi.ref string undefined))))
   (import "type-eval" "LooseOptions.set_name"
     (func $type-eval:LooseOptions.set_name (@abi.set "name") (@abi.owner "LooseOptions")
       (@abi.ts "set name(value: string)")
-      (param $this externref (@abi.ref "LooseOptions"))
+      (param $this externref (@abi.ref "LooseOptions" (module "type-eval")))
       (param $value externref (@abi.ref string))))
   (import "type-eval" "LooseOptions.size"
     (func $type-eval:LooseOptions.size (@abi.get "size") (@abi.owner "LooseOptions")
       (@abi.ts "size?: number")
-      (param $this externref (@abi.ref "LooseOptions"))
+      (param $this externref (@abi.ref "LooseOptions" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "LooseOptions.set_size"
     (func $type-eval:LooseOptions.set_size (@abi.set "size") (@abi.owner "LooseOptions")
       (@abi.ts "set size(value: number)")
-      (param $this externref (@abi.ref "LooseOptions"))
+      (param $this externref (@abi.ref "LooseOptions" (module "type-eval")))
       (param $value f64)))
   (import "type-eval" "LooseOptions.fixed"
     (func $type-eval:LooseOptions.fixed (@abi.get "fixed") (@abi.owner "LooseOptions")
       (@abi.ts "fixed?: boolean")
-      (param $this externref (@abi.ref "LooseOptions"))
+      (param $this externref (@abi.ref "LooseOptions" (module "type-eval")))
       (result externref (@abi.ref boolean undefined))))
 
   (@abi.dictionary "FlagsAOrB" (module "type-eval"))
   (import "type-eval" "FlagsAOrB.new"
     (func $type-eval:FlagsAOrB.new (@abi.object) (@abi.owner "FlagsAOrB")
       (@abi.ts "{} as FlagsAOrB")
-      (result externref (@abi.ref "FlagsAOrB"))))
+      (result externref (@abi.ref "FlagsAOrB" (module "type-eval")))))
   (import "type-eval" "FlagsAOrB.a"
     (func $type-eval:FlagsAOrB.a (@abi.get "a") (@abi.owner "FlagsAOrB")
       (@abi.ts "a: boolean")
-      (param $this externref (@abi.ref "FlagsAOrB"))
+      (param $this externref (@abi.ref "FlagsAOrB" (module "type-eval")))
       (result i32)))
   (import "type-eval" "FlagsAOrB.set_a"
     (func $type-eval:FlagsAOrB.set_a (@abi.set "a") (@abi.owner "FlagsAOrB")
       (@abi.ts "set a(value: boolean)")
-      (param $this externref (@abi.ref "FlagsAOrB"))
+      (param $this externref (@abi.ref "FlagsAOrB" (module "type-eval")))
       (param $value i32)))
   (import "type-eval" "FlagsAOrB.b"
     (func $type-eval:FlagsAOrB.b (@abi.get "b") (@abi.owner "FlagsAOrB")
       (@abi.ts "b: boolean")
-      (param $this externref (@abi.ref "FlagsAOrB"))
+      (param $this externref (@abi.ref "FlagsAOrB" (module "type-eval")))
       (result i32)))
   (import "type-eval" "FlagsAOrB.set_b"
     (func $type-eval:FlagsAOrB.set_b (@abi.set "b") (@abi.owner "FlagsAOrB")
       (@abi.ts "set b(value: boolean)")
-      (param $this externref (@abi.ref "FlagsAOrB"))
+      (param $this externref (@abi.ref "FlagsAOrB" (module "type-eval")))
       (param $value i32)))
 
   (@abi.dictionary "PartialBox" (module "type-eval"))
   (import "type-eval" "PartialBox.new"
     (func $type-eval:PartialBox.new (@abi.object) (@abi.owner "PartialBox")
       (@abi.ts "{} as PartialBox")
-      (result externref (@abi.ref "PartialBox"))))
+      (result externref (@abi.ref "PartialBox" (module "type-eval")))))
   (import "type-eval" "PartialBox.value"
     (func $type-eval:PartialBox.value (@abi.get "value") (@abi.owner "PartialBox")
       (@abi.ts "value?: T")
-      (param $this externref (@abi.ref "PartialBox"))
+      (param $this externref (@abi.ref "PartialBox" (module "type-eval")))
       (result externref (@abi.ref null undefined))))
   (import "type-eval" "PartialBox.set_value"
     (func $type-eval:PartialBox.set_value (@abi.set "value") (@abi.owner "PartialBox")
       (@abi.ts "set value(value: T)")
-      (param $this externref (@abi.ref "PartialBox"))
+      (param $this externref (@abi.ref "PartialBox" (module "type-eval")))
       (param $value externref (@abi.ref null undefined))))
   (import "type-eval" "PartialBox.label"
     (func $type-eval:PartialBox.label (@abi.get "label") (@abi.owner "PartialBox")
       (@abi.ts "label?: string")
-      (param $this externref (@abi.ref "PartialBox"))
+      (param $this externref (@abi.ref "PartialBox" (module "type-eval")))
       (result externref (@abi.ref string undefined))))
   (import "type-eval" "PartialBox.set_label"
     (func $type-eval:PartialBox.set_label (@abi.set "label") (@abi.owner "PartialBox")
       (@abi.ts "set label(value: string)")
-      (param $this externref (@abi.ref "PartialBox"))
+      (param $this externref (@abi.ref "PartialBox" (module "type-eval")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "PartialExtended" (module "type-eval"))
   (import "type-eval" "PartialExtended.new"
     (func $type-eval:PartialExtended.new (@abi.object) (@abi.owner "PartialExtended")
       (@abi.ts "{} as PartialExtended")
-      (result externref (@abi.ref "PartialExtended"))))
+      (result externref (@abi.ref "PartialExtended" (module "type-eval")))))
   (import "type-eval" "PartialExtended.extra"
     (func $type-eval:PartialExtended.extra (@abi.get "extra") (@abi.owner "PartialExtended")
       (@abi.ts "extra?: number")
-      (param $this externref (@abi.ref "PartialExtended"))
+      (param $this externref (@abi.ref "PartialExtended" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "PartialExtended.set_extra"
     (func $type-eval:PartialExtended.set_extra (@abi.set "extra") (@abi.owner "PartialExtended")
       (@abi.ts "set extra(value: number)")
-      (param $this externref (@abi.ref "PartialExtended"))
+      (param $this externref (@abi.ref "PartialExtended" (module "type-eval")))
       (param $value f64)))
   (import "type-eval" "PartialExtended.name"
     (func $type-eval:PartialExtended.name (@abi.get "name") (@abi.owner "PartialExtended")
       (@abi.ts "name?: string")
       (@abi.doc "The name.")
-      (param $this externref (@abi.ref "PartialExtended"))
+      (param $this externref (@abi.ref "PartialExtended" (module "type-eval")))
       (result externref (@abi.ref string undefined))))
   (import "type-eval" "PartialExtended.set_name"
     (func $type-eval:PartialExtended.set_name (@abi.set "name") (@abi.owner "PartialExtended")
       (@abi.ts "set name(value: string)")
-      (param $this externref (@abi.ref "PartialExtended"))
+      (param $this externref (@abi.ref "PartialExtended" (module "type-eval")))
       (param $value externref (@abi.ref string))))
   (import "type-eval" "PartialExtended.size"
     (func $type-eval:PartialExtended.size (@abi.get "size") (@abi.owner "PartialExtended")
       (@abi.ts "size?: number")
-      (param $this externref (@abi.ref "PartialExtended"))
+      (param $this externref (@abi.ref "PartialExtended" (module "type-eval")))
       (result externref (@abi.ref number undefined))))
   (import "type-eval" "PartialExtended.set_size"
     (func $type-eval:PartialExtended.set_size (@abi.set "size") (@abi.owner "PartialExtended")
       (@abi.ts "set size(value: number)")
-      (param $this externref (@abi.ref "PartialExtended"))
+      (param $this externref (@abi.ref "PartialExtended" (module "type-eval")))
       (param $value f64)))
   (import "type-eval" "PartialExtended.fixed"
     (func $type-eval:PartialExtended.fixed (@abi.get "fixed") (@abi.owner "PartialExtended")
       (@abi.ts "fixed?: boolean")
-      (param $this externref (@abi.ref "PartialExtended"))
+      (param $this externref (@abi.ref "PartialExtended" (module "type-eval")))
       (result externref (@abi.ref boolean undefined))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

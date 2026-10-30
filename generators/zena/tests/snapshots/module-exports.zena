@@ -93,7 +93,7 @@ export class Holder {
 }
 
 export function makeFoo(): Foo { return new Foo(__dep_makeFoo()); }
-export function take(f: externref, a: externref, h: externref, d: externref, da: externref, m: externref): externref { return __main_take(f, a, h, d, da, m); }
+export function take(f: Foo, a: Foo, h: Holder, d: Foo, da: Foo, m: externref): Foo { return new Foo(__main_take(f.ref(), a.ref(), h.ref(), d.ref(), da.ref(), m)); }
 
 // JSPI: suspends on a Promise and returns its value. Importing this
 // selects JSPI mode in `embed`, which wraps the handlers with promising.

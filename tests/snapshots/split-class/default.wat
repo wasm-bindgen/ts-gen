@@ -25,12 +25,12 @@
       (param $x externref)
       (result f64)))
 
-  (@abi.interface "ForwardableEmailMessage" (extends "EmailMessage"))
+  (@abi.interface "ForwardableEmailMessage" (extends "EmailMessage" (module "cloudflare:email")))
   (import "./bindings.wasm" "ForwardableEmailMessage.reply"
     (func $ForwardableEmailMessage.reply (@abi.call "reply") (@abi.owner "ForwardableEmailMessage")
       (@abi.ts "reply(message: EmailMessage): Promise<void>")
       (param $this externref (@abi.ref "ForwardableEmailMessage"))
-      (param $message externref (@abi.ref "EmailMessage"))
+      (param $message externref (@abi.ref "EmailMessage" (module "cloudflare:email")))
       (result externref (@abi.ref "Promise"))))
 
   (@abi.class "EmailMessage" (module "cloudflare:email"))
@@ -40,16 +40,16 @@
       (param $from externref (@abi.ref string))
       (param $to externref (@abi.ref string))
       (param $raw externref (@abi.ref string))
-      (result externref (@abi.ref "EmailMessage"))))
+      (result externref (@abi.ref "EmailMessage" (module "cloudflare:email")))))
   (import "cloudflare:email" "EmailMessage.from"
     (func $cloudflare:email:EmailMessage.from (@abi.get "from") (@abi.owner "EmailMessage")
       (@abi.ts "from: string")
-      (param $this externref (@abi.ref "EmailMessage"))
+      (param $this externref (@abi.ref "EmailMessage" (module "cloudflare:email")))
       (result externref (@abi.ref string))))
   (import "cloudflare:email" "EmailMessage.to"
     (func $cloudflare:email:EmailMessage.to (@abi.get "to") (@abi.owner "EmailMessage")
       (@abi.ts "to: string")
-      (param $this externref (@abi.ref "EmailMessage"))
+      (param $this externref (@abi.ref "EmailMessage" (module "cloudflare:email")))
       (result externref (@abi.ref string))))
 
   (@abi.class "Msg" (module "msg:a"))
@@ -57,49 +57,49 @@
     (func $msg:a:Msg.new (@abi.new "Msg") (@abi.owner "Msg")
       (@abi.ts "constructor(from: string)")
       (param $from externref (@abi.ref string))
-      (result externref (@abi.ref "Msg"))))
+      (result externref (@abi.ref "Msg" (module "msg:a")))))
   (import "msg:a" "Msg.from"
     (func $msg:a:Msg.from (@abi.get "from") (@abi.owner "Msg")
       (@abi.ts "from: string")
-      (param $this externref (@abi.ref "Msg"))
+      (param $this externref (@abi.ref "Msg" (module "msg:a")))
       (result externref (@abi.ref string))))
 
   (@abi.dictionary "Msg" (module "msg:b"))
   (import "msg:b" "Msg.new"
     (func $msg:b:Msg.new (@abi.object) (@abi.owner "Msg")
       (@abi.ts "{} as Msg")
-      (result externref (@abi.ref "Msg"))))
+      (result externref (@abi.ref "Msg" (module "msg:b")))))
   (import "msg:b" "Msg.other"
     (func $msg:b:Msg.other (@abi.get "other") (@abi.owner "Msg")
       (@abi.ts "other: number")
-      (param $this externref (@abi.ref "Msg"))
+      (param $this externref (@abi.ref "Msg" (module "msg:b")))
       (result f64)))
   (import "msg:b" "Msg.set_other"
     (func $msg:b:Msg.set_other (@abi.set "other") (@abi.owner "Msg")
       (@abi.ts "set other(value: number)")
-      (param $this externref (@abi.ref "Msg"))
+      (param $this externref (@abi.ref "Msg" (module "msg:b")))
       (param $value f64)))
 
   (import "msg:b" "use"
     (func $msg:b:use (@abi.call "use" (on))
       (@abi.ts "use(m: Msg): void")
-      (param $m externref (@abi.ref "Msg"))))
+      (param $m externref (@abi.ref "Msg" (module "msg:b")))))
 
   (@abi.class "Late" (module "late"))
   (import "late" "Late.new"
     (func $late:Late.new (@abi.new "Late") (@abi.owner "Late")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Late"))))
+      (result externref (@abi.ref "Late" (module "late")))))
   (import "late" "Late.at"
     (func $late:Late.at (@abi.get "at") (@abi.owner "Late")
       (@abi.ts "at: number")
-      (param $this externref (@abi.ref "Late"))
+      (param $this externref (@abi.ref "Late" (module "late")))
       (result f64)))
 
   (import "./bindings.wasm" "arrival"
     (func $arrival (@abi.call "arrival" (on))
       (@abi.ts "arrival(): Late")
-      (result externref (@abi.ref "Late"))))
+      (result externref (@abi.ref "Late" (module "late")))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

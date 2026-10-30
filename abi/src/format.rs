@@ -8,7 +8,7 @@ use std::fmt::Write;
 use crate::sexpr::{self, Node};
 use crate::wat::{ident, string, ANYREFS};
 use crate::{
-    Abi, AbiFunction, AbiHandler, AbiOp, AbiOwner, AbiParam, Head, OwnerKind, WasmType,
+    Abi, AbiFunction, AbiHandler, AbiOp, AbiOwner, AbiParam, Head, OwnerKind, OwnerRef, WasmType,
     BINDINGS_SPECIFIER, BUILTINS_SPECIFIER, UNDEFINED_GLOBAL,
 };
 
@@ -101,12 +101,20 @@ fn owner(out: &mut String, o: &AbiOwner) {
         let _ = write!(out, " (alias {})", string(a));
     }
     for e in &o.extends {
-        let _ = write!(out, " (extends {})", string(e));
+        let _ = write!(out, " (extends {})", owner_ref(e));
     }
     if let Some(d) = &o.doc {
         let _ = write!(out, " (doc {})", string(d));
     }
     out.push_str(")\n");
+}
+
+/// `"<path>"`, followed by `(module "<spec>")` for a module's owner.
+fn owner_ref(r: &OwnerRef) -> String {
+    match &r.module {
+        Some(m) => format!("{} (module {})", string(&r.path), string(m)),
+        None => string(&r.path),
+    }
 }
 
 fn op(op: &AbiOp) -> String {
@@ -143,7 +151,7 @@ fn reference(ty: WasmType, head: Option<&Head>) -> String {
     };
     let mut parts: Vec<String> = Vec::new();
     match head {
-        Some(Head::Declared(p)) => parts.push(string(p)),
+        Some(Head::Declared(r)) => parts.push(owner_ref(r)),
         Some(Head::String) => parts.push("string".into()),
         Some(Head::Number) => parts.push("number".into()),
         Some(Head::Boolean) => parts.push("boolean".into()),
@@ -373,12 +381,22 @@ fn read_owner(kind: OwnerKind, args: &[Node]) -> Result<AbiOwner, String> {
         match field.head() {
             Some("module") => o.module = Some(value()?),
             Some("alias") => o.aliases.push(value()?),
-            Some("extends") => o.extends.push(value()?),
+            Some("extends") => o.extends.push(read_owner_ref(&l[1..])?),
             Some("doc") => o.doc = Some(value()?),
             _ => {}
         }
     }
     Ok(o)
+}
+
+/// `"<path>" (module "<spec>")?`.
+fn read_owner_ref(args: &[Node]) -> Result<OwnerRef, String> {
+    Ok(OwnerRef {
+        path: str_at(args, 0, "owner path")?.into(),
+        module: annotation(args, "module")
+            .map(|m| str_at(m, 0, "owner module").map(String::from))
+            .transpose()?,
+    })
 }
 
 fn read_op(items: &[Node]) -> Result<AbiOp, String> {
@@ -480,9 +498,9 @@ fn position(items: &[Node]) -> Result<(WasmType, Option<Head>), String> {
         Some(args) => {
             let mut head = None;
             let (mut null, mut undefined) = (false, false);
-            for a in args {
+            for (i, a) in args.iter().enumerate() {
                 match a {
-                    Node::Str(p) => head = Some(Head::Declared(p.clone())),
+                    Node::Str(_) => head = Some(Head::Declared(read_owner_ref(&args[i..])?)),
                     Node::Atom(a) => match a.as_str() {
                         "null" => null = true,
                         "undefined" => undefined = true,
@@ -573,7 +591,7 @@ mod tests {
 
     #[test]
     fn round_trips() {
-        let headers = || Some(Head::Declared("Headers".into()));
+        let headers = || Some(Head::Declared(OwnerRef::global("Headers")));
         let mut abi = Abi {
             owners: vec![
                 AbiOwner {
@@ -581,7 +599,10 @@ mod tests {
                     kind: OwnerKind::Class,
                     module: None,
                     aliases: vec![],
-                    extends: vec!["Base".into()],
+                    extends: vec![OwnerRef {
+                        module: Some("base".into()),
+                        path: "Base".into(),
+                    }],
                     doc: Some("Line one.\nSays \"hi\" \\ é".into()),
                 },
                 AbiOwner {
@@ -626,7 +647,14 @@ mod tests {
                     aliases: vec!["Connection.get".into()],
                     owner: Some("Conn".into()),
                     op: AbiOp::Call { name: "get".into() },
-                    params: vec![param("this", WasmType::JS_NON_NULL, None)],
+                    params: vec![param(
+                        "this",
+                        WasmType::JS_NON_NULL,
+                        Some(Head::Declared(OwnerRef {
+                            module: Some("db".into()),
+                            path: "Conn".into(),
+                        })),
+                    )],
                     result: Some(WasmType::F64),
                     result_head: None,
                     ts: "get(): number".into(),
@@ -662,7 +690,7 @@ mod tests {
                     },
                     params: vec![param("bytes", WasmType::JS, Some(Head::Number))],
                     result: Some(WasmType::JS_NON_NULL),
-                    result_head: Some(Head::Declared("WebAssembly.Module".into())),
+                    result_head: Some(Head::Declared(OwnerRef::global("WebAssembly.Module"))),
                     ts: "constructor(bytes)".into(),
                     doc: None,
                     variadic: false,

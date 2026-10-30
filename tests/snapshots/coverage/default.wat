@@ -107,26 +107,26 @@
   (import "my-module" "WorkResult.new"
     (func $my-module:WorkResult.new (@abi.object) (@abi.owner "WorkResult")
       (@abi.ts "{} as WorkResult")
-      (result externref (@abi.ref "WorkResult"))))
+      (result externref (@abi.ref "WorkResult" (module "my-module")))))
   (import "my-module" "WorkResult.success"
     (func $my-module:WorkResult.success (@abi.get "success") (@abi.owner "WorkResult")
       (@abi.ts "success: boolean")
-      (param $this externref (@abi.ref "WorkResult"))
+      (param $this externref (@abi.ref "WorkResult" (module "my-module")))
       (result i32)))
   (import "my-module" "WorkResult.set_success"
     (func $my-module:WorkResult.set_success (@abi.set "success") (@abi.owner "WorkResult")
       (@abi.ts "set success(value: boolean)")
-      (param $this externref (@abi.ref "WorkResult"))
+      (param $this externref (@abi.ref "WorkResult" (module "my-module")))
       (param $value i32)))
   (import "my-module" "WorkResult.data"
     (func $my-module:WorkResult.data (@abi.get "data") (@abi.owner "WorkResult")
       (@abi.ts "data?: string")
-      (param $this externref (@abi.ref "WorkResult"))
+      (param $this externref (@abi.ref "WorkResult" (module "my-module")))
       (result externref (@abi.ref string undefined))))
   (import "my-module" "WorkResult.set_data"
     (func $my-module:WorkResult.set_data (@abi.set "data") (@abi.owner "WorkResult")
       (@abi.ts "set data(value: string)")
-      (param $this externref (@abi.ref "WorkResult"))
+      (param $this externref (@abi.ref "WorkResult" (module "my-module")))
       (param $value externref (@abi.ref string))))
 
   (@abi.interface "GlobalMixin")

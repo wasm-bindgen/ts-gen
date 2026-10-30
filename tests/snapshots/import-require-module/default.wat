@@ -29,33 +29,33 @@
   (import "import-require-module" "Walker.new"
     (func $import-require-module:Walker.new (@abi.new "Walker") (@abi.owner "Walker")
       (@abi.ts "constructor(o: dep.Options)")
-      (param $o externref (@abi.ref "Options"))
-      (result externref (@abi.ref "Walker"))))
+      (param $o externref (@abi.ref "Options" (module "dep")))
+      (result externref (@abi.ref "Walker" (module "import-require-module")))))
   (import "import-require-module" "Walker.walk"
     (func $import-require-module:Walker.walk (@abi.call "walk") (@abi.owner "Walker")
       (@abi.ts "walk(): void")
-      (param $this externref (@abi.ref "Walker"))))
+      (param $this externref (@abi.ref "Walker" (module "import-require-module")))))
 
   (import "import-require-module" "walk"
     (func $import-require-module:walk (@abi.call "walk" (on))
       (@abi.ts "walk(o: dep.Options): Walker")
-      (param $o externref (@abi.ref "Options"))
-      (result externref (@abi.ref "Walker"))))
+      (param $o externref (@abi.ref "Options" (module "dep")))
+      (result externref (@abi.ref "Walker" (module "import-require-module")))))
 
   (@abi.dictionary "Options" (module "dep"))
   (import "dep" "Options.new"
     (func $dep:Options.new (@abi.object) (@abi.owner "Options")
       (@abi.ts "{} as Options")
-      (result externref (@abi.ref "Options"))))
+      (result externref (@abi.ref "Options" (module "dep")))))
   (import "dep" "Options.depth"
     (func $dep:Options.depth (@abi.get "depth") (@abi.owner "Options")
       (@abi.ts "depth: number")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "dep")))
       (result f64)))
   (import "dep" "Options.set_depth"
     (func $dep:Options.set_depth (@abi.set "depth") (@abi.owner "Options")
       (@abi.ts "set depth(value: number)")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "dep")))
       (param $value f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

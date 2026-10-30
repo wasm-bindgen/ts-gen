@@ -29,11 +29,11 @@
   (import "dep" "Foo.new"
     (func $dep:Foo.new (@abi.new "Foo") (@abi.owner "Foo")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Foo"))))
+      (result externref (@abi.ref "Foo" (module "dep")))))
   (import "dep" "Foo.bar"
     (func $dep:Foo.bar (@abi.call "bar") (@abi.owner "Foo")
       (@abi.ts "bar(): void")
-      (param $this externref (@abi.ref "Foo"))))
+      (param $this externref (@abi.ref "Foo" (module "dep")))))
   (import "dep" "Foo.helper"
     (func $dep:Foo.helper (@abi.call "helper" (on "Foo")) (@abi.owner "Foo")
       (@abi.ts "helper(): void")))
@@ -41,47 +41,47 @@
   (import "dep" "makeFoo"
     (func $dep:makeFoo (@abi.call "makeFoo" (on))
       (@abi.ts "makeFoo(): _Foo")
-      (result externref (@abi.ref "Foo"))))
+      (result externref (@abi.ref "Foo" (module "dep")))))
 
   (@abi.dictionary "Holder" (module "dep"))
   (import "dep" "Holder.new"
     (func $dep:Holder.new (@abi.object) (@abi.owner "Holder")
       (@abi.ts "{} as Holder")
-      (result externref (@abi.ref "Holder"))))
+      (result externref (@abi.ref "Holder" (module "dep")))))
   (import "dep" "Holder.foo"
     (func $dep:Holder.foo (@abi.get "foo") (@abi.owner "Holder")
       (@abi.ts "foo: _Foo")
-      (param $this externref (@abi.ref "Holder"))
-      (result externref (@abi.ref "Foo"))))
+      (param $this externref (@abi.ref "Holder" (module "dep")))
+      (result externref (@abi.ref "Foo" (module "dep")))))
   (import "dep" "Holder.set_foo"
     (func $dep:Holder.set_foo (@abi.set "foo") (@abi.owner "Holder")
       (@abi.ts "set foo(value: _Foo)")
-      (param $this externref (@abi.ref "Holder"))
-      (param $value externref (@abi.ref "Foo"))))
+      (param $this externref (@abi.ref "Holder" (module "dep")))
+      (param $value externref (@abi.ref "Foo" (module "dep")))))
   (import "dep" "Holder.alias"
     (func $dep:Holder.alias (@abi.get "alias") (@abi.owner "Holder")
       (@abi.ts "alias: Alias")
-      (param $this externref (@abi.ref "Holder"))
-      (result externref (@abi.ref "Foo"))))
+      (param $this externref (@abi.ref "Holder" (module "dep")))
+      (result externref (@abi.ref "Foo" (module "dep")))))
   (import "dep" "Holder.set_alias"
     (func $dep:Holder.set_alias (@abi.set "alias") (@abi.owner "Holder")
       (@abi.ts "set alias(value: Alias)")
-      (param $this externref (@abi.ref "Holder"))
-      (param $value externref (@abi.ref "Foo"))))
+      (param $this externref (@abi.ref "Holder" (module "dep")))
+      (param $value externref (@abi.ref "Foo" (module "dep")))))
 
   (import "main" "take"
     (func $main:take (@abi.call "take" (on))
       (@abi.ts "take(f: Foo, a: Alias, h: Holder, d: D.Foo, da: D.Alias, m: Foo.Mode): Foo")
-      (param $f externref (@abi.ref "Foo"))
-      (param $a externref (@abi.ref "Foo"))
-      (param $h externref (@abi.ref "Holder"))
-      (param $d externref (@abi.ref "Foo"))
-      (param $da externref (@abi.ref "Foo"))
+      (param $f externref (@abi.ref "Foo" (module "dep")))
+      (param $a externref (@abi.ref "Foo" (module "dep")))
+      (param $h externref (@abi.ref "Holder" (module "dep")))
+      (param $d externref (@abi.ref "Foo" (module "dep")))
+      (param $da externref (@abi.ref "Foo" (module "dep")))
       (param $m externref (@abi.ref "Foo.Mode"))
-      (result externref (@abi.ref "Foo"))))
+      (result externref (@abi.ref "Foo" (module "dep")))))
 
   ;; Owners with no functions of their own.
-  (@abi.class "Sub" (module "main") (extends "Foo"))
+  (@abi.class "Sub" (module "main") (extends "Foo" (module "dep")))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

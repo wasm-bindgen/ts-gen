@@ -290,7 +290,7 @@ export class mm2_W {
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
   static create(): mm2_W { return new mm2_W(__mm2_W_new()); }
-  static make(): mm2_W { return new mm2_W(__mm2_W_make()); }
+  static make(): W { return new W(__mm2_W_make()); }
   w(): void { __mm2_W_w(this.#ref); }
 }
 
@@ -324,17 +324,17 @@ export class mm_W {
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
   static create(): mm_W { return new mm_W(__mm_W_new()); }
-  static make(): mm_W { return new mm_W(__mm_W_make()); }
+  static make(): W { return new W(__mm_W_make()); }
   w(): void { __mm_W_w(this.#ref); }
 }
 
 export function k(x: String): void { __ovi_k(x.handle); }
 export function k_with_f64(x: f64): void { __ovi_k_with_f64(x); }
 export function k_with_bool(x: boolean): void { __ovi_k_with_bool(x); }
-export function fa(t: externref): void { __ib_fa(t); }
+export function fa(t: T): void { __ib_fa(t.ref()); }
 export function u(h: H): void { __lh_u(h.ref()); }
 export function v(h: H): void { __lh_v(h.ref()); }
-export function fb(t: externref): void { __ib_fb(t); }
+export function fb(t: ic_T): void { __ib_fb(t.ref()); }
 
 // JSPI: suspends on a Promise and returns its value. Importing this
 // selects JSPI mode in `embed`, which wraps the handlers with promising.

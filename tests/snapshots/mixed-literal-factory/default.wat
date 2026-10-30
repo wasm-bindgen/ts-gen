@@ -29,116 +29,116 @@
   (import "mixed-literal-factory" "BoolOrStrings.new"
     (func $mixed-literal-factory:BoolOrStrings.new (@abi.object) (@abi.owner "BoolOrStrings")
       (@abi.ts "{} as BoolOrStrings")
-      (result externref (@abi.ref "BoolOrStrings"))))
+      (result externref (@abi.ref "BoolOrStrings" (module "mixed-literal-factory")))))
   (import "mixed-literal-factory" "BoolOrStrings.mode"
     (func $mixed-literal-factory:BoolOrStrings.mode (@abi.get "mode") (@abi.owner "BoolOrStrings")
       (@abi.ts "mode: true | \"x\" | \"y\"")
-      (param $this externref (@abi.ref "BoolOrStrings"))
+      (param $this externref (@abi.ref "BoolOrStrings" (module "mixed-literal-factory")))
       (result externref)))
   (import "mixed-literal-factory" "BoolOrStrings.set_mode"
     (func $mixed-literal-factory:BoolOrStrings.set_mode (@abi.set "mode") (@abi.owner "BoolOrStrings")
       (@abi.ts "set mode(value: true)")
-      (param $this externref (@abi.ref "BoolOrStrings"))
+      (param $this externref (@abi.ref "BoolOrStrings" (module "mixed-literal-factory")))
       (param $value i32)))
   (import "mixed-literal-factory" "BoolOrStrings.set_mode_with_str"
     (func $mixed-literal-factory:BoolOrStrings.set_mode_with_str (@abi.set "mode") (@abi.owner "BoolOrStrings")
       (@abi.ts "set mode(value: \"x\")")
-      (param $this externref (@abi.ref "BoolOrStrings"))
+      (param $this externref (@abi.ref "BoolOrStrings" (module "mixed-literal-factory")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "NumberOrStrings" (module "mixed-literal-factory"))
   (import "mixed-literal-factory" "NumberOrStrings.new"
     (func $mixed-literal-factory:NumberOrStrings.new (@abi.object) (@abi.owner "NumberOrStrings")
       (@abi.ts "{} as NumberOrStrings")
-      (result externref (@abi.ref "NumberOrStrings"))))
+      (result externref (@abi.ref "NumberOrStrings" (module "mixed-literal-factory")))))
   (import "mixed-literal-factory" "NumberOrStrings.mode"
     (func $mixed-literal-factory:NumberOrStrings.mode (@abi.get "mode") (@abi.owner "NumberOrStrings")
       (@abi.ts "mode: 0 | \"x\" | \"y\"")
-      (param $this externref (@abi.ref "NumberOrStrings"))
+      (param $this externref (@abi.ref "NumberOrStrings" (module "mixed-literal-factory")))
       (result externref)))
   (import "mixed-literal-factory" "NumberOrStrings.set_mode"
     (func $mixed-literal-factory:NumberOrStrings.set_mode (@abi.set "mode") (@abi.owner "NumberOrStrings")
       (@abi.ts "set mode(value: 0)")
-      (param $this externref (@abi.ref "NumberOrStrings"))
+      (param $this externref (@abi.ref "NumberOrStrings" (module "mixed-literal-factory")))
       (param $value f64)))
   (import "mixed-literal-factory" "NumberOrStrings.set_mode_with_str"
     (func $mixed-literal-factory:NumberOrStrings.set_mode_with_str (@abi.set "mode") (@abi.owner "NumberOrStrings")
       (@abi.ts "set mode(value: \"x\")")
-      (param $this externref (@abi.ref "NumberOrStrings"))
+      (param $this externref (@abi.ref "NumberOrStrings" (module "mixed-literal-factory")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "Mixed" (module "mixed-literal-factory"))
   (import "mixed-literal-factory" "Mixed.new"
     (func $mixed-literal-factory:Mixed.new (@abi.object) (@abi.owner "Mixed")
       (@abi.ts "{} as Mixed")
-      (result externref (@abi.ref "Mixed"))))
+      (result externref (@abi.ref "Mixed" (module "mixed-literal-factory")))))
   (import "mixed-literal-factory" "Mixed.mode"
     (func $mixed-literal-factory:Mixed.mode (@abi.get "mode") (@abi.owner "Mixed")
       (@abi.ts "mode: \"x\" | \"y\" | 1 | 2 | false")
-      (param $this externref (@abi.ref "Mixed"))
+      (param $this externref (@abi.ref "Mixed" (module "mixed-literal-factory")))
       (result externref)))
   (import "mixed-literal-factory" "Mixed.set_mode"
     (func $mixed-literal-factory:Mixed.set_mode (@abi.set "mode") (@abi.owner "Mixed")
       (@abi.ts "set mode(value: \"x\")")
-      (param $this externref (@abi.ref "Mixed"))
+      (param $this externref (@abi.ref "Mixed" (module "mixed-literal-factory")))
       (param $value externref (@abi.ref string))))
   (import "mixed-literal-factory" "Mixed.set_mode_with_f64"
     (func $mixed-literal-factory:Mixed.set_mode_with_f64 (@abi.set "mode") (@abi.owner "Mixed")
       (@abi.ts "set mode(value: 1)")
-      (param $this externref (@abi.ref "Mixed"))
+      (param $this externref (@abi.ref "Mixed" (module "mixed-literal-factory")))
       (param $value f64)))
   (import "mixed-literal-factory" "Mixed.set_mode_with_bool"
     (func $mixed-literal-factory:Mixed.set_mode_with_bool (@abi.set "mode") (@abi.owner "Mixed")
       (@abi.ts "set mode(value: false)")
-      (param $this externref (@abi.ref "Mixed"))
+      (param $this externref (@abi.ref "Mixed" (module "mixed-literal-factory")))
       (param $value i32)))
 
   (@abi.dictionary "Level" (module "mixed-literal-factory"))
   (import "mixed-literal-factory" "Level.new"
     (func $mixed-literal-factory:Level.new (@abi.object) (@abi.owner "Level")
       (@abi.ts "{} as Level")
-      (result externref (@abi.ref "Level"))))
+      (result externref (@abi.ref "Level" (module "mixed-literal-factory")))))
   (import "mixed-literal-factory" "Level.level"
     (func $mixed-literal-factory:Level.level (@abi.get "level") (@abi.owner "Level")
       (@abi.ts "level: 0 | 1 | 2")
-      (param $this externref (@abi.ref "Level"))
+      (param $this externref (@abi.ref "Level" (module "mixed-literal-factory")))
       (result externref (@abi.ref number))))
   (import "mixed-literal-factory" "Level.set_level"
     (func $mixed-literal-factory:Level.set_level (@abi.set "level") (@abi.owner "Level")
       (@abi.ts "set level(value: 0)")
-      (param $this externref (@abi.ref "Level"))
+      (param $this externref (@abi.ref "Level" (module "mixed-literal-factory")))
       (param $value f64)))
 
   (@abi.dictionary "Open" (module "mixed-literal-factory"))
   (import "mixed-literal-factory" "Open.new"
     (func $mixed-literal-factory:Open.new (@abi.object) (@abi.owner "Open")
       (@abi.ts "{} as Open")
-      (result externref (@abi.ref "Open"))))
+      (result externref (@abi.ref "Open" (module "mixed-literal-factory")))))
   (import "mixed-literal-factory" "Open.mode"
     (func $mixed-literal-factory:Open.mode (@abi.get "mode") (@abi.owner "Open")
       (@abi.ts "mode: \"x\" | string")
-      (param $this externref (@abi.ref "Open"))
+      (param $this externref (@abi.ref "Open" (module "mixed-literal-factory")))
       (result externref (@abi.ref string))))
   (import "mixed-literal-factory" "Open.set_mode"
     (func $mixed-literal-factory:Open.set_mode (@abi.set "mode") (@abi.owner "Open")
       (@abi.ts "set mode(value: \"x\")")
-      (param $this externref (@abi.ref "Open"))
+      (param $this externref (@abi.ref "Open" (module "mixed-literal-factory")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "Optional" (module "mixed-literal-factory"))
   (import "mixed-literal-factory" "Optional.new"
     (func $mixed-literal-factory:Optional.new (@abi.object) (@abi.owner "Optional")
       (@abi.ts "{} as Optional")
-      (result externref (@abi.ref "Optional"))))
+      (result externref (@abi.ref "Optional" (module "mixed-literal-factory")))))
   (import "mixed-literal-factory" "Optional.mode"
     (func $mixed-literal-factory:Optional.mode (@abi.get "mode") (@abi.owner "Optional")
       (@abi.ts "mode?: \"x\" | \"y\"")
-      (param $this externref (@abi.ref "Optional"))
+      (param $this externref (@abi.ref "Optional" (module "mixed-literal-factory")))
       (result externref (@abi.ref string undefined))))
   (import "mixed-literal-factory" "Optional.set_mode"
     (func $mixed-literal-factory:Optional.set_mode (@abi.set "mode") (@abi.owner "Optional")
       (@abi.ts "set mode(value: \"x\")")
-      (param $this externref (@abi.ref "Optional"))
+      (param $this externref (@abi.ref "Optional" (module "mixed-literal-factory")))
       (param $value externref (@abi.ref string))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

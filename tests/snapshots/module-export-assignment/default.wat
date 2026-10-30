@@ -51,16 +51,16 @@
     (func $module-export-assignment/counter:default.new (@abi.new "default") (@abi.owner "default")
       (@abi.ts "constructor(start: number)")
       (param $start f64)
-      (result externref (@abi.ref "default"))))
+      (result externref (@abi.ref "default" (module "module-export-assignment/counter")))))
   (import "module-export-assignment/counter" "default.value"
     (func $module-export-assignment/counter:default.value (@abi.get "value") (@abi.owner "default")
       (@abi.ts "value: number")
-      (param $this externref (@abi.ref "default"))
+      (param $this externref (@abi.ref "default" (module "module-export-assignment/counter")))
       (result f64)))
   (import "module-export-assignment/counter" "default.increment"
     (func $module-export-assignment/counter:default.increment (@abi.call "increment") (@abi.owner "default")
       (@abi.ts "increment(): void")
-      (param $this externref (@abi.ref "default"))))
+      (param $this externref (@abi.ref "default" (module "module-export-assignment/counter")))))
 
   (import "module-export-assignment/global" "greet"
     (func $module-export-assignment/global:greet (@abi.call "greet" (on))
@@ -73,11 +73,11 @@
     (func $module-export-assignment/global:Greeter.new (@abi.new "Greeter") (@abi.owner "Greeter")
       (@abi.ts "constructor(prefix: string)")
       (param $prefix externref (@abi.ref string))
-      (result externref (@abi.ref "Greeter"))))
+      (result externref (@abi.ref "Greeter" (module "module-export-assignment/global")))))
   (import "module-export-assignment/global" "Greeter.greet"
     (func $module-export-assignment/global:Greeter.greet (@abi.call "greet") (@abi.owner "Greeter")
       (@abi.ts "greet(name: string): string")
-      (param $this externref (@abi.ref "Greeter"))
+      (param $this externref (@abi.ref "Greeter" (module "module-export-assignment/global")))
       (param $name externref (@abi.ref string))
       (result externref (@abi.ref string))))
 

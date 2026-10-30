@@ -30,11 +30,11 @@
     (func $union-alias-reads:Zoned.new (@abi.new "Zoned") (@abi.owner "Zoned")
       (@abi.ts "constructor(zone: string)")
       (param $zone externref (@abi.ref string))
-      (result externref (@abi.ref "Zoned"))))
+      (result externref (@abi.ref "Zoned" (module "union-alias-reads")))))
   (import "union-alias-reads" "Zoned.zone"
     (func $union-alias-reads:Zoned.zone (@abi.get "zone") (@abi.owner "Zoned")
       (@abi.ts "zone: string")
-      (param $this externref (@abi.ref "Zoned"))
+      (param $this externref (@abi.ref "Zoned" (module "union-alias-reads")))
       (result externref (@abi.ref string))))
 
   (@abi.class "Day" (module "union-alias-reads"))
@@ -42,23 +42,23 @@
     (func $union-alias-reads:Day.new (@abi.new "Day") (@abi.owner "Day")
       (@abi.ts "constructor(day: number)")
       (param $day f64)
-      (result externref (@abi.ref "Day"))))
+      (result externref (@abi.ref "Day" (module "union-alias-reads")))))
   (import "union-alias-reads" "Day.day"
     (func $union-alias-reads:Day.day (@abi.get "day") (@abi.owner "Day")
       (@abi.ts "day: number")
-      (param $this externref (@abi.ref "Day"))
+      (param $this externref (@abi.ref "Day" (module "union-alias-reads")))
       (result f64)))
   (import "union-alias-reads" "Day.from"
     (func $union-alias-reads:Day.from (@abi.call "from" (on "Day")) (@abi.owner "Day")
       (@abi.ts "from(item: DayLike): Day")
       (param $item externref)
-      (result externref (@abi.ref "Day"))))
+      (result externref (@abi.ref "Day" (module "union-alias-reads")))))
   (import "union-alias-reads" "Day.from_with_options"
     (func $union-alias-reads:Day.from_with_options (@abi.call "from" (on "Day")) (@abi.owner "Day")
       (@abi.ts "from(item: DayLike, options: FromOptions): Day")
       (param $item externref)
-      (param $options externref (@abi.ref "FromOptions"))
-      (result externref (@abi.ref "Day"))))
+      (param $options externref (@abi.ref "FromOptions" (module "union-alias-reads")))
+      (result externref (@abi.ref "Day" (module "union-alias-reads")))))
   (import "union-alias-reads" "Day.compare"
     (func $union-alias-reads:Day.compare (@abi.call "compare" (on "Day")) (@abi.owner "Day")
       (@abi.ts "compare(one: DayLike, two: DayLike): number")
@@ -68,57 +68,57 @@
   (import "union-alias-reads" "Day.equals"
     (func $union-alias-reads:Day.equals (@abi.call "equals") (@abi.owner "Day")
       (@abi.ts "equals(other: DayLike): boolean")
-      (param $this externref (@abi.ref "Day"))
+      (param $this externref (@abi.ref "Day" (module "union-alias-reads")))
       (param $other externref)
       (result i32)))
   (import "union-alias-reads" "Day.until"
     (func $union-alias-reads:Day.until (@abi.call "until") (@abi.owner "Day")
       (@abi.ts "until(other: DayLike): number")
-      (param $this externref (@abi.ref "Day"))
+      (param $this externref (@abi.ref "Day" (module "union-alias-reads")))
       (param $other externref)
       (result f64)))
   (import "union-alias-reads" "Day.until_with_options"
     (func $union-alias-reads:Day.until_with_options (@abi.call "until") (@abi.owner "Day")
       (@abi.ts "until(other: DayLike, options: FromOptions): number")
-      (param $this externref (@abi.ref "Day"))
+      (param $this externref (@abi.ref "Day" (module "union-alias-reads")))
       (param $other externref)
-      (param $options externref (@abi.ref "FromOptions"))
+      (param $options externref (@abi.ref "FromOptions" (module "union-alias-reads")))
       (result f64)))
   (import "union-alias-reads" "Day.shift"
     (func $union-alias-reads:Day.shift (@abi.call "shift") (@abi.owner "Day")
       (@abi.ts "shift(offset: Offset): Day")
-      (param $this externref (@abi.ref "Day"))
+      (param $this externref (@abi.ref "Day" (module "union-alias-reads")))
       (param $offset externref)
-      (result externref (@abi.ref "Day"))))
+      (result externref (@abi.ref "Day" (module "union-alias-reads")))))
   (import "union-alias-reads" "Day.step"
     (func $union-alias-reads:Day.step (@abi.call "step") (@abi.owner "Day")
       (@abi.ts "step(direction: \"next\", other: DayLike): string")
-      (param $this externref (@abi.ref "Day"))
+      (param $this externref (@abi.ref "Day" (module "union-alias-reads")))
       (param $direction externref (@abi.ref string))
       (param $other externref)
       (result externref (@abi.ref string))))
   (import "union-alias-reads" "Day.pick"
     (func $union-alias-reads:Day.pick (@abi.call "pick") (@abi.owner "Day")
       (@abi.ts "pick(): string")
-      (param $this externref (@abi.ref "Day"))
+      (param $this externref (@abi.ref "Day" (module "union-alias-reads")))
       (result externref (@abi.ref string))))
   (import "union-alias-reads" "Day.pick_with_other"
     (func $union-alias-reads:Day.pick_with_other (@abi.call "pick") (@abi.owner "Day")
       (@abi.ts "pick(other: MaybeDay): string")
-      (param $this externref (@abi.ref "Day"))
+      (param $this externref (@abi.ref "Day" (module "union-alias-reads")))
       (param $other externref (@abi.ref null undefined))
       (result externref (@abi.ref string))))
   (import "union-alias-reads" "Day.between"
     (func $union-alias-reads:Day.between (@abi.call "between") (@abi.owner "Day")
       (@abi.ts "between(start: DayLike | undefined, end: DayLike): string")
-      (param $this externref (@abi.ref "Day"))
+      (param $this externref (@abi.ref "Day" (module "union-alias-reads")))
       (param $start externref (@abi.ref undefined))
       (param $end externref)
       (result externref (@abi.ref string))))
   (import "union-alias-reads" "Day.later"
     (func $union-alias-reads:Day.later (@abi.call "later") (@abi.owner "Day")
       (@abi.ts "later(other: DayLike): Promise<string>")
-      (param $this externref (@abi.ref "Day"))
+      (param $this externref (@abi.ref "Day" (module "union-alias-reads")))
       (param $other externref)
       (result externref (@abi.ref "Promise"))))
 
@@ -126,124 +126,124 @@
   (import "union-alias-reads" "ZonedFields.new"
     (func $union-alias-reads:ZonedFields.new (@abi.object) (@abi.owner "ZonedFields")
       (@abi.ts "{} as ZonedFields")
-      (result externref (@abi.ref "ZonedFields"))))
+      (result externref (@abi.ref "ZonedFields" (module "union-alias-reads")))))
   (import "union-alias-reads" "ZonedFields.zone"
     (func $union-alias-reads:ZonedFields.zone (@abi.get "zone") (@abi.owner "ZonedFields")
       (@abi.ts "zone: string")
-      (param $this externref (@abi.ref "ZonedFields"))
+      (param $this externref (@abi.ref "ZonedFields" (module "union-alias-reads")))
       (result externref (@abi.ref string))))
   (import "union-alias-reads" "ZonedFields.set_zone"
     (func $union-alias-reads:ZonedFields.set_zone (@abi.set "zone") (@abi.owner "ZonedFields")
       (@abi.ts "set zone(value: string)")
-      (param $this externref (@abi.ref "ZonedFields"))
+      (param $this externref (@abi.ref "ZonedFields" (module "union-alias-reads")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "DayFields" (module "union-alias-reads"))
   (import "union-alias-reads" "DayFields.new"
     (func $union-alias-reads:DayFields.new (@abi.object) (@abi.owner "DayFields")
       (@abi.ts "{} as DayFields")
-      (result externref (@abi.ref "DayFields"))))
+      (result externref (@abi.ref "DayFields" (module "union-alias-reads")))))
   (import "union-alias-reads" "DayFields.day"
     (func $union-alias-reads:DayFields.day (@abi.get "day") (@abi.owner "DayFields")
       (@abi.ts "day: number")
-      (param $this externref (@abi.ref "DayFields"))
+      (param $this externref (@abi.ref "DayFields" (module "union-alias-reads")))
       (result f64)))
   (import "union-alias-reads" "DayFields.set_day"
     (func $union-alias-reads:DayFields.set_day (@abi.set "day") (@abi.owner "DayFields")
       (@abi.ts "set day(value: number)")
-      (param $this externref (@abi.ref "DayFields"))
+      (param $this externref (@abi.ref "DayFields" (module "union-alias-reads")))
       (param $value f64)))
 
   (@abi.dictionary "FromOptions" (module "union-alias-reads"))
   (import "union-alias-reads" "FromOptions.new"
     (func $union-alias-reads:FromOptions.new (@abi.object) (@abi.owner "FromOptions")
       (@abi.ts "{} as FromOptions")
-      (result externref (@abi.ref "FromOptions"))))
+      (result externref (@abi.ref "FromOptions" (module "union-alias-reads")))))
   (import "union-alias-reads" "FromOptions.overflow"
     (func $union-alias-reads:FromOptions.overflow (@abi.get "overflow") (@abi.owner "FromOptions")
       (@abi.ts "overflow?: \"constrain\" | \"reject\"")
-      (param $this externref (@abi.ref "FromOptions"))
+      (param $this externref (@abi.ref "FromOptions" (module "union-alias-reads")))
       (result externref (@abi.ref string undefined))))
   (import "union-alias-reads" "FromOptions.set_overflow"
     (func $union-alias-reads:FromOptions.set_overflow (@abi.set "overflow") (@abi.owner "FromOptions")
       (@abi.ts "set overflow(value: \"constrain\")")
-      (param $this externref (@abi.ref "FromOptions"))
+      (param $this externref (@abi.ref "FromOptions" (module "union-alias-reads")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "RelativeOptions" (module "union-alias-reads"))
   (import "union-alias-reads" "RelativeOptions.new"
     (func $union-alias-reads:RelativeOptions.new (@abi.object) (@abi.owner "RelativeOptions")
       (@abi.ts "{} as RelativeOptions")
-      (result externref (@abi.ref "RelativeOptions"))))
+      (result externref (@abi.ref "RelativeOptions" (module "union-alias-reads")))))
   (import "union-alias-reads" "RelativeOptions.relative_to"
     (func $union-alias-reads:RelativeOptions.relative_to (@abi.get "relativeTo") (@abi.owner "RelativeOptions")
       (@abi.ts "relativeTo?: ZonedLike | DayLike")
       (@abi.doc "Two aliases sharing `Zoned` and `string`, with a dictionary each.")
-      (param $this externref (@abi.ref "RelativeOptions"))
+      (param $this externref (@abi.ref "RelativeOptions" (module "union-alias-reads")))
       (result externref (@abi.ref undefined))))
   (import "union-alias-reads" "RelativeOptions.set_relative_to"
     (func $union-alias-reads:RelativeOptions.set_relative_to (@abi.set "relativeTo") (@abi.owner "RelativeOptions")
       (@abi.ts "set relativeTo(value: ZonedLike)")
-      (param $this externref (@abi.ref "RelativeOptions"))
+      (param $this externref (@abi.ref "RelativeOptions" (module "union-alias-reads")))
       (param $value externref)))
   (import "union-alias-reads" "RelativeOptions.zone"
     (func $union-alias-reads:RelativeOptions.zone (@abi.get "zone") (@abi.owner "RelativeOptions")
       (@abi.ts "zone: Zone")
       (@abi.doc "A union alias read whole.")
-      (param $this externref (@abi.ref "RelativeOptions"))
+      (param $this externref (@abi.ref "RelativeOptions" (module "union-alias-reads")))
       (result externref)))
   (import "union-alias-reads" "RelativeOptions.set_zone"
     (func $union-alias-reads:RelativeOptions.set_zone (@abi.set "zone") (@abi.owner "RelativeOptions")
       (@abi.ts "set zone(value: Zone)")
-      (param $this externref (@abi.ref "RelativeOptions"))
+      (param $this externref (@abi.ref "RelativeOptions" (module "union-alias-reads")))
       (param $value externref)))
   (import "union-alias-reads" "RelativeOptions.zoned"
     (func $union-alias-reads:RelativeOptions.zoned (@abi.get "zoned") (@abi.owner "RelativeOptions")
       (@abi.ts "zoned?: ZonedLike")
       (@abi.doc "Its dictionary arm is the read's fallback.")
-      (param $this externref (@abi.ref "RelativeOptions"))
+      (param $this externref (@abi.ref "RelativeOptions" (module "union-alias-reads")))
       (result externref (@abi.ref undefined))))
   (import "union-alias-reads" "RelativeOptions.set_zoned"
     (func $union-alias-reads:RelativeOptions.set_zoned (@abi.set "zoned") (@abi.owner "RelativeOptions")
       (@abi.ts "set zoned(value: ZonedLike)")
-      (param $this externref (@abi.ref "RelativeOptions"))
+      (param $this externref (@abi.ref "RelativeOptions" (module "union-alias-reads")))
       (param $value externref)))
   (import "union-alias-reads" "RelativeOptions.fields"
     (func $union-alias-reads:RelativeOptions.fields (@abi.get "fields") (@abi.owner "RelativeOptions")
       (@abi.ts "fields: Fields")
       (@abi.doc "Only dictionaries.")
-      (param $this externref (@abi.ref "RelativeOptions"))
+      (param $this externref (@abi.ref "RelativeOptions" (module "union-alias-reads")))
       (result externref)))
   (import "union-alias-reads" "RelativeOptions.set_fields"
     (func $union-alias-reads:RelativeOptions.set_fields (@abi.set "fields") (@abi.owner "RelativeOptions")
       (@abi.ts "set fields(value: Fields)")
-      (param $this externref (@abi.ref "RelativeOptions"))
+      (param $this externref (@abi.ref "RelativeOptions" (module "union-alias-reads")))
       (param $value externref)))
 
   (@abi.dictionary "Span" (module "union-alias-reads"))
   (import "union-alias-reads" "Span.new"
     (func $union-alias-reads:Span.new (@abi.object) (@abi.owner "Span")
       (@abi.ts "{} as Span")
-      (result externref (@abi.ref "Span"))))
+      (result externref (@abi.ref "Span" (module "union-alias-reads")))))
   (import "union-alias-reads" "Span.start"
     (func $union-alias-reads:Span.start (@abi.get "start") (@abi.owner "Span")
       (@abi.ts "start: DayLike")
-      (param $this externref (@abi.ref "Span"))
+      (param $this externref (@abi.ref "Span" (module "union-alias-reads")))
       (result externref)))
   (import "union-alias-reads" "Span.set_start"
     (func $union-alias-reads:Span.set_start (@abi.set "start") (@abi.owner "Span")
       (@abi.ts "set start(value: DayLike)")
-      (param $this externref (@abi.ref "Span"))
+      (param $this externref (@abi.ref "Span" (module "union-alias-reads")))
       (param $value externref)))
   (import "union-alias-reads" "Span.relative_to"
     (func $union-alias-reads:Span.relative_to (@abi.get "relativeTo") (@abi.owner "Span")
       (@abi.ts "relativeTo?: DayLike")
-      (param $this externref (@abi.ref "Span"))
+      (param $this externref (@abi.ref "Span" (module "union-alias-reads")))
       (result externref (@abi.ref undefined))))
   (import "union-alias-reads" "Span.set_relative_to"
     (func $union-alias-reads:Span.set_relative_to (@abi.set "relativeTo") (@abi.owner "Span")
       (@abi.ts "set relativeTo(value: DayLike)")
-      (param $this externref (@abi.ref "Span"))
+      (param $this externref (@abi.ref "Span" (module "union-alias-reads")))
       (param $value externref)))
 
   (import "union-alias-reads" "options"
@@ -251,7 +251,7 @@
       (@abi.ts "options(kind: string): RelativeOptions")
       (@abi.doc "Options whose `relativeTo` holds the kind of value named.")
       (param $kind externref (@abi.ref string))
-      (result externref (@abi.ref "RelativeOptions"))))
+      (result externref (@abi.ref "RelativeOptions" (module "union-alias-reads")))))
   (import "union-alias-reads" "relativeTo"
     (func $union-alias-reads:relativeTo (@abi.call "relativeTo" (on))
       (@abi.ts "relativeTo(kind: string): ZonedLike | DayLike")
@@ -267,7 +267,7 @@
   (import "union-alias-reads" "describeSpan"
     (func $union-alias-reads:describeSpan (@abi.call "describeSpan" (on))
       (@abi.ts "describeSpan(span: Span): string")
-      (param $span externref (@abi.ref "Span"))
+      (param $span externref (@abi.ref "Span" (module "union-alias-reads")))
       (result externref (@abi.ref string))))
   (import "union-alias-reads" "describeFields"
     (func $union-alias-reads:describeFields (@abi.call "describeFields" (on))
@@ -277,7 +277,7 @@
   (import "union-alias-reads" "either"
     (func $union-alias-reads:either (@abi.call "either" (on))
       (@abi.ts "either(item: Day): string")
-      (param $item externref (@abi.ref "Day"))
+      (param $item externref (@abi.ref "Day" (module "union-alias-reads")))
       (result externref (@abi.ref string))))
   (import "union-alias-reads" "either_with_str"
     (func $union-alias-reads:either_with_str (@abi.call "either" (on))

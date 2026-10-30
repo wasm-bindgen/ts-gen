@@ -29,84 +29,84 @@
   (import "optional-reads" "Moment.new"
     (func $optional-reads:Moment.new (@abi.new "Moment") (@abi.owner "Moment")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Moment"))))
+      (result externref (@abi.ref "Moment" (module "optional-reads")))))
 
   (@abi.class "Tagged" (module "optional-reads"))
   (import "optional-reads" "Tagged.new"
     (func $optional-reads:Tagged.new (@abi.new "Tagged") (@abi.owner "Tagged")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Tagged"))))
+      (result externref (@abi.ref "Tagged" (module "optional-reads")))))
 
   (@abi.dictionary "Settings" (module "optional-reads"))
   (import "optional-reads" "Settings.new"
     (func $optional-reads:Settings.new (@abi.object) (@abi.owner "Settings")
       (@abi.ts "{} as Settings")
-      (result externref (@abi.ref "Settings"))))
+      (result externref (@abi.ref "Settings" (module "optional-reads")))))
   (import "optional-reads" "Settings.data"
     (func $optional-reads:Settings.data (@abi.get "data") (@abi.owner "Settings")
       (@abi.ts "data?: any")
       (@abi.doc "Anything, `null`, or absent: all in-band.")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (result externref (@abi.ref null undefined))))
   (import "optional-reads" "Settings.set_data"
     (func $optional-reads:Settings.set_data (@abi.set "data") (@abi.owner "Settings")
       (@abi.ts "set data(value: any)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (param $value externref (@abi.ref null undefined))))
   (import "optional-reads" "Settings.detail"
     (func $optional-reads:Settings.detail (@abi.get "detail") (@abi.owner "Settings")
       (@abi.ts "detail?: unknown")
       (@abi.doc "Anything, `null`, or absent: all in-band.")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (result externref (@abi.ref null undefined))))
   (import "optional-reads" "Settings.set_detail"
     (func $optional-reads:Settings.set_detail (@abi.set "detail") (@abi.owner "Settings")
       (@abi.ts "set detail(value: unknown)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (param $value externref (@abi.ref null undefined))))
   (import "optional-reads" "Settings.stamp"
     (func $optional-reads:Settings.stamp (@abi.get "stamp") (@abi.owner "Settings")
       (@abi.ts "stamp?: Moment & Tagged")
       (@abi.doc "No member subtypes the other, so it erases.")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (result externref (@abi.ref undefined))))
   (import "optional-reads" "Settings.set_stamp"
     (func $optional-reads:Settings.set_stamp (@abi.set "stamp") (@abi.owner "Settings")
       (@abi.ts "set stamp(value: Moment & Tagged)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (param $value externref)))
   (import "optional-reads" "Settings.cleared"
     (func $optional-reads:Settings.cleared (@abi.get "cleared") (@abi.owner "Settings")
       (@abi.ts "cleared?: Moment & Tagged | null")
       (@abi.doc "Erased, `null`, or absent.")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (result externref (@abi.ref null undefined))))
   (import "optional-reads" "Settings.set_cleared"
     (func $optional-reads:Settings.set_cleared (@abi.set "cleared") (@abi.owner "Settings")
       (@abi.ts "set cleared(value: Moment & Tagged | null)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (param $value externref (@abi.ref null))))
   (import "optional-reads" "Settings.maybe"
     (func $optional-reads:Settings.maybe (@abi.get "maybe") (@abi.owner "Settings")
       (@abi.ts "maybe: Moment & Tagged | undefined")
       (@abi.doc "Required, but admitting `undefined`.")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (result externref (@abi.ref undefined))))
   (import "optional-reads" "Settings.set_maybe"
     (func $optional-reads:Settings.set_maybe (@abi.set "maybe") (@abi.owner "Settings")
       (@abi.ts "set maybe(value: Moment & Tagged)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (param $value externref)))
   (import "optional-reads" "Settings.value"
     (func $optional-reads:Settings.value (@abi.get "value") (@abi.owner "Settings")
       (@abi.ts "value: Moment & Tagged")
       (@abi.doc "Always present, so bare.")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (result externref)))
   (import "optional-reads" "Settings.set_value"
     (func $optional-reads:Settings.set_value (@abi.set "value") (@abi.owner "Settings")
       (@abi.ts "set value(value: Moment & Tagged)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "optional-reads")))
       (param $value externref)))
 
   (@abi.class "Registry" (module "optional-reads"))
@@ -143,7 +143,7 @@
       (@abi.ts "settings(kind: string): Settings")
       (@abi.doc "Settings with every field set (`\"full\"`), none (`\"empty\"`) or `null`s.")
       (param $kind externref (@abi.ref string))
-      (result externref (@abi.ref "Settings"))))
+      (result externref (@abi.ref "Settings" (module "optional-reads")))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

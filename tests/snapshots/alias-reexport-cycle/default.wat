@@ -29,20 +29,20 @@
   (import "alias-reexport-cycle" "Position.line_number"
     (func $alias-reexport-cycle:Position.line_number (@abi.get "lineNumber") (@abi.owner "Position")
       (@abi.ts "lineNumber: number")
-      (param $this externref (@abi.ref "Position"))
+      (param $this externref (@abi.ref "Position" (module "alias-reexport-cycle")))
       (result f64)))
   (import "alias-reexport-cycle" "Position.set_line_number"
     (func $alias-reexport-cycle:Position.set_line_number (@abi.set "lineNumber") (@abi.owner "Position")
       (@abi.ts "set lineNumber(value: number)")
-      (param $this externref (@abi.ref "Position"))
+      (param $this externref (@abi.ref "Position" (module "alias-reexport-cycle")))
       (param $value f64)))
 
   (@abi.namespace "m" (module "alias-reexport-cycle"))
   (import "alias-reexport-cycle" "m.at"
     (func $alias-reexport-cycle:m.at (@abi.call "at" (on "m")) (@abi.owner "m")
       (@abi.ts "at(p: Position): Position")
-      (param $p externref (@abi.ref "Position"))
-      (result externref (@abi.ref "Position"))))
+      (param $p externref (@abi.ref "Position" (module "alias-reexport-cycle")))
+      (result externref (@abi.ref "Position" (module "alias-reexport-cycle")))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

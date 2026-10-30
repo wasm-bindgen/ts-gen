@@ -156,16 +156,16 @@
   (import "shape-checks" "ModuleOptions.new"
     (func $shape-checks:ModuleOptions.new (@abi.object) (@abi.owner "ModuleOptions")
       (@abi.ts "{} as ModuleOptions")
-      (result externref (@abi.ref "ModuleOptions"))))
+      (result externref (@abi.ref "ModuleOptions" (module "shape-checks")))))
   (import "shape-checks" "ModuleOptions.verbose"
     (func $shape-checks:ModuleOptions.verbose (@abi.get "verbose") (@abi.owner "ModuleOptions")
       (@abi.ts "verbose?: boolean")
-      (param $this externref (@abi.ref "ModuleOptions"))
+      (param $this externref (@abi.ref "ModuleOptions" (module "shape-checks")))
       (result externref (@abi.ref boolean undefined))))
   (import "shape-checks" "ModuleOptions.set_verbose"
     (func $shape-checks:ModuleOptions.set_verbose (@abi.set "verbose") (@abi.owner "ModuleOptions")
       (@abi.ts "set verbose(value: boolean)")
-      (param $this externref (@abi.ref "ModuleOptions"))
+      (param $this externref (@abi.ref "ModuleOptions" (module "shape-checks")))
       (param $value i32)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

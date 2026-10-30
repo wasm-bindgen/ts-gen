@@ -60,7 +60,7 @@ export class Walker {
   #ref: externref;
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
-  static create(o: externref): Walker { return new Walker(__import_require_module_Walker_new(o)); }
+  static create(o: Options): Walker { return new Walker(__import_require_module_Walker_new(o.ref())); }
   walk(): void { __import_require_module_Walker_walk(this.#ref); }
 }
 
@@ -73,7 +73,7 @@ export class Options {
   set_depth(value: f64): void { __dep_Options_set_depth(this.#ref, value); }
 }
 
-export function walk(o: externref): Walker { return new Walker(__import_require_module_walk(o)); }
+export function walk(o: Options): Walker { return new Walker(__import_require_module_walk(o.ref())); }
 
 // JSPI: suspends on a Promise and returns its value. Importing this
 // selects JSPI mode in `embed`, which wraps the handlers with promising.

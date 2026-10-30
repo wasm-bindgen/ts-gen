@@ -29,298 +29,298 @@
   (import "intersection" "Conditional.new"
     (func $intersection:Conditional.new (@abi.object) (@abi.owner "Conditional")
       (@abi.ts "{} as Conditional")
-      (result externref (@abi.ref "Conditional"))))
+      (result externref (@abi.ref "Conditional" (module "intersection")))))
   (import "intersection" "Conditional.etag"
     (func $intersection:Conditional.etag (@abi.get "etag") (@abi.owner "Conditional")
       (@abi.ts "etag?: string")
-      (param $this externref (@abi.ref "Conditional"))
+      (param $this externref (@abi.ref "Conditional" (module "intersection")))
       (result externref (@abi.ref string undefined))))
   (import "intersection" "Conditional.set_etag"
     (func $intersection:Conditional.set_etag (@abi.set "etag") (@abi.owner "Conditional")
       (@abi.ts "set etag(value: string)")
-      (param $this externref (@abi.ref "Conditional"))
+      (param $this externref (@abi.ref "Conditional" (module "intersection")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "GetOptions" (module "intersection"))
   (import "intersection" "GetOptions.new"
     (func $intersection:GetOptions.new (@abi.object) (@abi.owner "GetOptions")
       (@abi.ts "{} as GetOptions")
-      (result externref (@abi.ref "GetOptions"))))
+      (result externref (@abi.ref "GetOptions" (module "intersection")))))
   (import "intersection" "GetOptions.only_if"
     (func $intersection:GetOptions.only_if (@abi.get "onlyIf") (@abi.owner "GetOptions")
       (@abi.ts "onlyIf?: Conditional")
-      (param $this externref (@abi.ref "GetOptions"))
-      (result externref (@abi.ref "Conditional" undefined))))
+      (param $this externref (@abi.ref "GetOptions" (module "intersection")))
+      (result externref (@abi.ref "Conditional" (module "intersection") undefined))))
   (import "intersection" "GetOptions.set_only_if"
     (func $intersection:GetOptions.set_only_if (@abi.set "onlyIf") (@abi.owner "GetOptions")
       (@abi.ts "set onlyIf(value: Conditional)")
-      (param $this externref (@abi.ref "GetOptions"))
-      (param $value externref (@abi.ref "Conditional"))))
+      (param $this externref (@abi.ref "GetOptions" (module "intersection")))
+      (param $value externref (@abi.ref "Conditional" (module "intersection")))))
   (import "intersection" "GetOptions.range"
     (func $intersection:GetOptions.range (@abi.get "range") (@abi.owner "GetOptions")
       (@abi.ts "range?: string")
-      (param $this externref (@abi.ref "GetOptions"))
+      (param $this externref (@abi.ref "GetOptions" (module "intersection")))
       (result externref (@abi.ref string undefined))))
   (import "intersection" "GetOptions.set_range"
     (func $intersection:GetOptions.set_range (@abi.set "range") (@abi.owner "GetOptions")
       (@abi.ts "set range(value: string)")
-      (param $this externref (@abi.ref "GetOptions"))
+      (param $this externref (@abi.ref "GetOptions" (module "intersection")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "Base" (module "intersection"))
   (import "intersection" "Base.new"
     (func $intersection:Base.new (@abi.object) (@abi.owner "Base")
       (@abi.ts "{} as Base")
-      (result externref (@abi.ref "Base"))))
+      (result externref (@abi.ref "Base" (module "intersection")))))
   (import "intersection" "Base.id"
     (func $intersection:Base.id (@abi.get "id") (@abi.owner "Base")
       (@abi.ts "id: string")
-      (param $this externref (@abi.ref "Base"))
+      (param $this externref (@abi.ref "Base" (module "intersection")))
       (result externref (@abi.ref string))))
   (import "intersection" "Base.set_id"
     (func $intersection:Base.set_id (@abi.set "id") (@abi.owner "Base")
       (@abi.ts "set id(value: string)")
-      (param $this externref (@abi.ref "Base"))
+      (param $this externref (@abi.ref "Base" (module "intersection")))
       (param $value externref (@abi.ref string))))
 
-  (@abi.dictionary "Derived" (module "intersection") (extends "Base"))
+  (@abi.dictionary "Derived" (module "intersection") (extends "Base" (module "intersection")))
   (import "intersection" "Derived.new"
     (func $intersection:Derived.new (@abi.object) (@abi.owner "Derived")
       (@abi.ts "{} as Derived")
-      (result externref (@abi.ref "Derived"))))
+      (result externref (@abi.ref "Derived" (module "intersection")))))
   (import "intersection" "Derived.extra"
     (func $intersection:Derived.extra (@abi.get "extra") (@abi.owner "Derived")
       (@abi.ts "extra: string")
-      (param $this externref (@abi.ref "Derived"))
+      (param $this externref (@abi.ref "Derived" (module "intersection")))
       (result externref (@abi.ref string))))
   (import "intersection" "Derived.set_extra"
     (func $intersection:Derived.set_extra (@abi.set "extra") (@abi.owner "Derived")
       (@abi.ts "set extra(value: string)")
-      (param $this externref (@abi.ref "Derived"))
+      (param $this externref (@abi.ref "Derived" (module "intersection")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "Unrelated" (module "intersection"))
   (import "intersection" "Unrelated.new"
     (func $intersection:Unrelated.new (@abi.object) (@abi.owner "Unrelated")
       (@abi.ts "{} as Unrelated")
-      (result externref (@abi.ref "Unrelated"))))
+      (result externref (@abi.ref "Unrelated" (module "intersection")))))
   (import "intersection" "Unrelated.other"
     (func $intersection:Unrelated.other (@abi.get "other") (@abi.owner "Unrelated")
       (@abi.ts "other: string")
-      (param $this externref (@abi.ref "Unrelated"))
+      (param $this externref (@abi.ref "Unrelated" (module "intersection")))
       (result externref (@abi.ref string))))
   (import "intersection" "Unrelated.set_other"
     (func $intersection:Unrelated.set_other (@abi.set "other") (@abi.owner "Unrelated")
       (@abi.ts "set other(value: string)")
-      (param $this externref (@abi.ref "Unrelated"))
+      (param $this externref (@abi.ref "Unrelated" (module "intersection")))
       (param $value externref (@abi.ref string))))
 
   (@abi.interface "Store" (module "intersection"))
   (import "intersection" "Store.get"
     (func $intersection:Store.get (@abi.call "get") (@abi.owner "Store")
       (@abi.ts "get(key: string): Promise<string>")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "intersection")))
       (param $key externref (@abi.ref string))
       (result externref (@abi.ref "Promise"))))
   (import "intersection" "Store.get_with_options"
     (func $intersection:Store.get_with_options (@abi.call "get") (@abi.owner "Store")
       (@abi.ts "get(key: string, options: StoreOptions): Promise<string | null>")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "intersection")))
       (param $key externref (@abi.ref string))
-      (param $options externref (@abi.ref "StoreOptions"))
+      (param $options externref (@abi.ref "StoreOptions" (module "intersection")))
       (result externref (@abi.ref "Promise"))))
   (import "intersection" "Store.refine"
     (func $intersection:Store.refine (@abi.call "refine") (@abi.owner "Store")
       (@abi.ts "refine(value: Derived & Base): void")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "intersection")))
       (param $value externref)))
   (import "intersection" "Store.same"
     (func $intersection:Store.same (@abi.call "same") (@abi.owner "Store")
       (@abi.ts "same(value: Derived): void")
-      (param $this externref (@abi.ref "Store"))
-      (param $value externref (@abi.ref "Derived"))))
+      (param $this externref (@abi.ref "Store" (module "intersection")))
+      (param $value externref (@abi.ref "Derived" (module "intersection")))))
   (import "intersection" "Store.unrelated"
     (func $intersection:Store.unrelated (@abi.call "unrelated") (@abi.owner "Store")
       (@abi.ts "unrelated(value: Derived & Unrelated): void")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "intersection")))
       (param $value externref)))
   (import "intersection" "Store.shape"
     (func $intersection:Store.shape (@abi.call "shape") (@abi.owner "Store")
       (@abi.ts "shape(value: StoreValue): void")
-      (param $this externref (@abi.ref "Store"))
-      (param $value externref (@abi.ref "StoreValue"))))
+      (param $this externref (@abi.ref "Store" (module "intersection")))
+      (param $value externref (@abi.ref "StoreValue" (module "intersection")))))
   (import "intersection" "Store.generic"
     (func $intersection:Store.generic (@abi.call "generic") (@abi.owner "Store")
       (@abi.ts "generic(value: T): void")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "intersection")))
       (param $value externref (@abi.ref null undefined))))
   (import "intersection" "Store.primitive"
     (func $intersection:Store.primitive (@abi.call "primitive") (@abi.owner "Store")
       (@abi.ts "primitive(value: Str): void")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "intersection")))
       (param $value externref (@abi.ref string))))
   (import "intersection" "Store.anything"
     (func $intersection:Store.anything (@abi.call "anything") (@abi.owner "Store")
       (@abi.ts "anything(value: any): void")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "intersection")))
       (param $value externref (@abi.ref null undefined))))
 
-  (@abi.dictionary "StoreOptions" (module "intersection") (extends "GetOptions"))
+  (@abi.dictionary "StoreOptions" (module "intersection") (extends "GetOptions" (module "intersection")))
   (import "intersection" "StoreOptions.new"
     (func $intersection:StoreOptions.new (@abi.object) (@abi.owner "StoreOptions")
       (@abi.ts "{} as StoreOptions")
-      (result externref (@abi.ref "StoreOptions"))))
+      (result externref (@abi.ref "StoreOptions" (module "intersection")))))
   (import "intersection" "StoreOptions.only_if"
     (func $intersection:StoreOptions.only_if (@abi.get "onlyIf") (@abi.owner "StoreOptions")
       (@abi.ts "onlyIf: Conditional")
-      (param $this externref (@abi.ref "StoreOptions"))
-      (result externref (@abi.ref "Conditional"))))
+      (param $this externref (@abi.ref "StoreOptions" (module "intersection")))
+      (result externref (@abi.ref "Conditional" (module "intersection")))))
   (import "intersection" "StoreOptions.set_only_if"
     (func $intersection:StoreOptions.set_only_if (@abi.set "onlyIf") (@abi.owner "StoreOptions")
       (@abi.ts "set onlyIf(value: Conditional)")
-      (param $this externref (@abi.ref "StoreOptions"))
-      (param $value externref (@abi.ref "Conditional"))))
+      (param $this externref (@abi.ref "StoreOptions" (module "intersection")))
+      (param $value externref (@abi.ref "Conditional" (module "intersection")))))
 
   (@abi.dictionary "StoreValue" (module "intersection"))
   (import "intersection" "StoreValue.new"
     (func $intersection:StoreValue.new (@abi.object) (@abi.owner "StoreValue")
       (@abi.ts "{} as StoreValue")
-      (result externref (@abi.ref "StoreValue"))))
+      (result externref (@abi.ref "StoreValue" (module "intersection")))))
   (import "intersection" "StoreValue.a"
     (func $intersection:StoreValue.a (@abi.get "a") (@abi.owner "StoreValue")
       (@abi.ts "a: string")
-      (param $this externref (@abi.ref "StoreValue"))
+      (param $this externref (@abi.ref "StoreValue" (module "intersection")))
       (result externref (@abi.ref string))))
   (import "intersection" "StoreValue.set_a"
     (func $intersection:StoreValue.set_a (@abi.set "a") (@abi.owner "StoreValue")
       (@abi.ts "set a(value: string)")
-      (param $this externref (@abi.ref "StoreValue"))
+      (param $this externref (@abi.ref "StoreValue" (module "intersection")))
       (param $value externref (@abi.ref string))))
   (import "intersection" "StoreValue.b"
     (func $intersection:StoreValue.b (@abi.get "b") (@abi.owner "StoreValue")
       (@abi.ts "b: number")
-      (param $this externref (@abi.ref "StoreValue"))
+      (param $this externref (@abi.ref "StoreValue" (module "intersection")))
       (result f64)))
   (import "intersection" "StoreValue.set_b"
     (func $intersection:StoreValue.set_b (@abi.set "b") (@abi.owner "StoreValue")
       (@abi.ts "set b(value: number)")
-      (param $this externref (@abi.ref "StoreValue"))
+      (param $this externref (@abi.ref "StoreValue" (module "intersection")))
       (param $value f64)))
 
-  (@abi.dictionary "Refined" (module "intersection") (extends "GetOptions"))
+  (@abi.dictionary "Refined" (module "intersection") (extends "GetOptions" (module "intersection")))
   (import "intersection" "Refined.new"
     (func $intersection:Refined.new (@abi.object) (@abi.owner "Refined")
       (@abi.ts "{} as Refined")
-      (result externref (@abi.ref "Refined"))))
+      (result externref (@abi.ref "Refined" (module "intersection")))))
   (import "intersection" "Refined.only_if"
     (func $intersection:Refined.only_if (@abi.get "onlyIf") (@abi.owner "Refined")
       (@abi.ts "onlyIf: Conditional")
-      (param $this externref (@abi.ref "Refined"))
-      (result externref (@abi.ref "Conditional"))))
+      (param $this externref (@abi.ref "Refined" (module "intersection")))
+      (result externref (@abi.ref "Conditional" (module "intersection")))))
   (import "intersection" "Refined.set_only_if"
     (func $intersection:Refined.set_only_if (@abi.set "onlyIf") (@abi.owner "Refined")
       (@abi.ts "set onlyIf(value: Conditional)")
-      (param $this externref (@abi.ref "Refined"))
-      (param $value externref (@abi.ref "Conditional"))))
+      (param $this externref (@abi.ref "Refined" (module "intersection")))
+      (param $value externref (@abi.ref "Conditional" (module "intersection")))))
 
   (@abi.interface "Fetcher" (module "intersection"))
   (import "intersection" "Fetcher.fetch"
     (func $intersection:Fetcher.fetch (@abi.call "fetch") (@abi.owner "Fetcher")
       (@abi.ts "fetch(input: string): Promise<string>")
-      (param $this externref (@abi.ref "Fetcher"))
+      (param $this externref (@abi.ref "Fetcher" (module "intersection")))
       (param $input externref (@abi.ref string))
       (result externref (@abi.ref "Promise"))))
 
-  (@abi.dictionary "Stub" (module "intersection") (extends "Fetcher"))
+  (@abi.dictionary "Stub" (module "intersection") (extends "Fetcher" (module "intersection")))
   (import "intersection" "Stub.new"
     (func $intersection:Stub.new (@abi.object) (@abi.owner "Stub")
       (@abi.ts "{} as Stub")
-      (result externref (@abi.ref "Stub"))))
+      (result externref (@abi.ref "Stub" (module "intersection")))))
   (import "intersection" "Stub.id"
     (func $intersection:Stub.id (@abi.get "id") (@abi.owner "Stub")
       (@abi.ts "id: string")
-      (param $this externref (@abi.ref "Stub"))
+      (param $this externref (@abi.ref "Stub" (module "intersection")))
       (result externref (@abi.ref string))))
 
   (@abi.interface "Provider" (module "intersection"))
   (import "intersection" "Provider.call"
     (func $intersection:Provider.call (@abi.call "call") (@abi.owner "Provider")
       (@abi.ts "call(): T")
-      (param $this externref (@abi.ref "Provider"))
+      (param $this externref (@abi.ref "Provider" (module "intersection")))
       (result externref (@abi.ref null undefined))))
 
-  (@abi.dictionary "GenericStub" (module "intersection") (extends "Provider") (extends "Fetcher"))
+  (@abi.dictionary "GenericStub" (module "intersection") (extends "Provider" (module "intersection")) (extends "Fetcher" (module "intersection")))
   (import "intersection" "GenericStub.new"
     (func $intersection:GenericStub.new (@abi.object) (@abi.owner "GenericStub")
       (@abi.ts "{} as GenericStub")
-      (result externref (@abi.ref "GenericStub"))))
+      (result externref (@abi.ref "GenericStub" (module "intersection")))))
   (import "intersection" "GenericStub.id"
     (func $intersection:GenericStub.id (@abi.get "id") (@abi.owner "GenericStub")
       (@abi.ts "id: string")
-      (param $this externref (@abi.ref "GenericStub"))
+      (param $this externref (@abi.ref "GenericStub" (module "intersection")))
       (result externref (@abi.ref string))))
 
-  (@abi.dictionary "Unknown" (module "intersection") (extends "Fetcher"))
+  (@abi.dictionary "Unknown" (module "intersection") (extends "Fetcher" (module "intersection")))
   (import "intersection" "Unknown.new"
     (func $intersection:Unknown.new (@abi.object) (@abi.owner "Unknown")
       (@abi.ts "{} as Unknown")
-      (result externref (@abi.ref "Unknown"))))
+      (result externref (@abi.ref "Unknown" (module "intersection")))))
   (import "intersection" "Unknown.id"
     (func $intersection:Unknown.id (@abi.get "id") (@abi.owner "Unknown")
       (@abi.ts "id: string")
-      (param $this externref (@abi.ref "Unknown"))
+      (param $this externref (@abi.ref "Unknown" (module "intersection")))
       (result externref (@abi.ref string))))
 
   (@abi.dictionary "Ext" (module "intersection"))
   (import "intersection" "Ext.new"
     (func $intersection:Ext.new (@abi.object) (@abi.owner "Ext")
       (@abi.ts "{} as Ext")
-      (result externref (@abi.ref "Ext"))))
+      (result externref (@abi.ref "Ext" (module "intersection")))))
   (import "intersection" "Ext.extra"
     (func $intersection:Ext.extra (@abi.get "extra") (@abi.owner "Ext")
       (@abi.ts "extra: string")
-      (param $this externref (@abi.ref "Ext"))
+      (param $this externref (@abi.ref "Ext" (module "intersection")))
       (result externref (@abi.ref string))))
   (import "intersection" "Ext.set_extra"
     (func $intersection:Ext.set_extra (@abi.set "extra") (@abi.owner "Ext")
       (@abi.ts "set extra(value: string)")
-      (param $this externref (@abi.ref "Ext"))
+      (param $this externref (@abi.ref "Ext" (module "intersection")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "Message" (module "intersection"))
   (import "intersection" "Message.new"
     (func $intersection:Message.new (@abi.object) (@abi.owner "Message")
       (@abi.ts "{} as Message")
-      (result externref (@abi.ref "Message"))))
+      (result externref (@abi.ref "Message" (module "intersection")))))
   (import "intersection" "Message.role"
     (func $intersection:Message.role (@abi.get "role") (@abi.owner "Message")
       (@abi.ts "role: \"user\" | \"assistant\" | string")
-      (param $this externref (@abi.ref "Message"))
+      (param $this externref (@abi.ref "Message" (module "intersection")))
       (result externref (@abi.ref string))))
   (import "intersection" "Message.set_role"
     (func $intersection:Message.set_role (@abi.set "role") (@abi.owner "Message")
       (@abi.ts "set role(value: \"user\")")
-      (param $this externref (@abi.ref "Message"))
+      (param $this externref (@abi.ref "Message" (module "intersection")))
       (param $value externref (@abi.ref string))))
 
-  (@abi.dictionary "ViaBaseAlias" (module "intersection") (extends "Base"))
+  (@abi.dictionary "ViaBaseAlias" (module "intersection") (extends "Base" (module "intersection")))
   (import "intersection" "ViaBaseAlias.new"
     (func $intersection:ViaBaseAlias.new (@abi.object) (@abi.owner "ViaBaseAlias")
       (@abi.ts "{} as ViaBaseAlias")
-      (result externref (@abi.ref "ViaBaseAlias"))))
+      (result externref (@abi.ref "ViaBaseAlias" (module "intersection")))))
   (import "intersection" "ViaBaseAlias.w"
     (func $intersection:ViaBaseAlias.w (@abi.get "w") (@abi.owner "ViaBaseAlias")
       (@abi.ts "w: string")
-      (param $this externref (@abi.ref "ViaBaseAlias"))
+      (param $this externref (@abi.ref "ViaBaseAlias" (module "intersection")))
       (result externref (@abi.ref string))))
   (import "intersection" "ViaBaseAlias.set_w"
     (func $intersection:ViaBaseAlias.set_w (@abi.set "w") (@abi.owner "ViaBaseAlias")
       (@abi.ts "set w(value: string)")
-      (param $this externref (@abi.ref "ViaBaseAlias"))
+      (param $this externref (@abi.ref "ViaBaseAlias" (module "intersection")))
       (param $value externref (@abi.ref string))))
 
   ;; Owners with no functions of their own.
-  (@abi.interface "Both" (module "intersection") (extends "Derived") (extends "Unrelated"))
+  (@abi.interface "Both" (module "intersection") (extends "Derived" (module "intersection")) (extends "Unrelated" (module "intersection")))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

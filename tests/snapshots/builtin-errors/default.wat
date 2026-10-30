@@ -30,21 +30,21 @@
     (func $builtin-errors:Codec.decode (@abi.call "decode") (@abi.owner "Codec")
       (@abi.ts "decode(input: string): string")
       (@abi.doc "## Errors\n\n* `URIError` — on a malformed escape sequence")
-      (param $this externref (@abi.ref "Codec"))
+      (param $this externref (@abi.ref "Codec" (module "builtin-errors")))
       (param $input externref (@abi.ref string))
       (result externref (@abi.ref string))))
   (import "builtin-errors" "Codec.decode_all"
     (func $builtin-errors:Codec.decode_all (@abi.call "decodeAll") (@abi.owner "Codec")
       (@abi.ts "decodeAll(input: string): string")
       (@abi.doc "## Errors\n\n* `AggregateError` — when several escape sequences are malformed")
-      (param $this externref (@abi.ref "Codec"))
+      (param $this externref (@abi.ref "Codec" (module "builtin-errors")))
       (param $input externref (@abi.ref string))
       (result externref (@abi.ref string))))
   (import "builtin-errors" "Codec.parse"
     (func $builtin-errors:Codec.parse (@abi.call "parse") (@abi.owner "Codec")
       (@abi.ts "parse(input: string): Promise<string>")
       (@abi.doc "## Errors\n\n* `URIError | TypeError`")
-      (param $this externref (@abi.ref "Codec"))
+      (param $this externref (@abi.ref "Codec" (module "builtin-errors")))
       (param $input externref (@abi.ref string))
       (result externref (@abi.ref "Promise"))))
 
@@ -52,45 +52,45 @@
   (import "builtin-errors" "Formatter.new"
     (func $builtin-errors:Formatter.new (@abi.new "Formatter") (@abi.owner "Formatter")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Formatter"))))
+      (result externref (@abi.ref "Formatter" (module "builtin-errors")))))
   (import "builtin-errors" "Formatter.new_with_locales"
     (func $builtin-errors:Formatter.new_with_locales (@abi.new "Formatter") (@abi.owner "Formatter")
       (@abi.ts "constructor(locales: Intl.LocalesArgument)")
       (param $locales externref (@abi.ref undefined))
-      (result externref (@abi.ref "Formatter"))))
+      (result externref (@abi.ref "Formatter" (module "builtin-errors")))))
   (import "builtin-errors" "Formatter.new_with_locales_and_options"
     (func $builtin-errors:Formatter.new_with_locales_and_options (@abi.new "Formatter") (@abi.owner "Formatter")
       (@abi.ts "constructor(locales: Intl.LocalesArgument | undefined, options: Intl.DateTimeFormatOptions)")
       (param $locales externref (@abi.ref undefined))
       (param $options externref (@abi.ref null undefined))
-      (result externref (@abi.ref "Formatter"))))
+      (result externref (@abi.ref "Formatter" (module "builtin-errors")))))
   (import "builtin-errors" "Formatter.received"
     (func $builtin-errors:Formatter.received (@abi.get "received") (@abi.owner "Formatter")
       (@abi.ts "received: string")
-      (param $this externref (@abi.ref "Formatter"))
+      (param $this externref (@abi.ref "Formatter" (module "builtin-errors")))
       (result externref (@abi.ref string))))
   (import "builtin-errors" "Formatter.format"
     (func $builtin-errors:Formatter.format (@abi.call "format") (@abi.owner "Formatter")
       (@abi.ts "format(): string")
-      (param $this externref (@abi.ref "Formatter"))
+      (param $this externref (@abi.ref "Formatter" (module "builtin-errors")))
       (result externref (@abi.ref string))))
   (import "builtin-errors" "Formatter.format_with_locales"
     (func $builtin-errors:Formatter.format_with_locales (@abi.call "format") (@abi.owner "Formatter")
       (@abi.ts "format(locales: Intl.LocalesArgument): string")
-      (param $this externref (@abi.ref "Formatter"))
+      (param $this externref (@abi.ref "Formatter" (module "builtin-errors")))
       (param $locales externref (@abi.ref undefined))
       (result externref (@abi.ref string))))
   (import "builtin-errors" "Formatter.format_with_locales_and_options"
     (func $builtin-errors:Formatter.format_with_locales_and_options (@abi.call "format") (@abi.owner "Formatter")
       (@abi.ts "format(locales: Intl.LocalesArgument | undefined, options: Intl.NumberFormatOptions): string")
-      (param $this externref (@abi.ref "Formatter"))
+      (param $this externref (@abi.ref "Formatter" (module "builtin-errors")))
       (param $locales externref (@abi.ref undefined))
       (param $options externref (@abi.ref null undefined))
       (result externref (@abi.ref string))))
   (import "builtin-errors" "Formatter.locale"
     (func $builtin-errors:Formatter.locale (@abi.call "locale") (@abi.owner "Formatter")
       (@abi.ts "locale(tag: Intl.UnicodeBCP47LocaleIdentifier): Intl.Locale")
-      (param $this externref (@abi.ref "Formatter"))
+      (param $this externref (@abi.ref "Formatter" (module "builtin-errors")))
       (param $tag externref (@abi.ref string))
       (result externref (@abi.ref null undefined))))
 
@@ -114,32 +114,32 @@
   (import "builtin-errors" "FormatSettings.new"
     (func $builtin-errors:FormatSettings.new (@abi.object) (@abi.owner "FormatSettings")
       (@abi.ts "{} as FormatSettings")
-      (result externref (@abi.ref "FormatSettings"))))
+      (result externref (@abi.ref "FormatSettings" (module "builtin-errors")))))
   (import "builtin-errors" "FormatSettings.locales"
     (func $builtin-errors:FormatSettings.locales (@abi.get "locales") (@abi.owner "FormatSettings")
       (@abi.ts "locales?: Intl.LocalesArgument")
-      (param $this externref (@abi.ref "FormatSettings"))
+      (param $this externref (@abi.ref "FormatSettings" (module "builtin-errors")))
       (result externref (@abi.ref undefined))))
   (import "builtin-errors" "FormatSettings.set_locales"
     (func $builtin-errors:FormatSettings.set_locales (@abi.set "locales") (@abi.owner "FormatSettings")
       (@abi.ts "set locales(value: Intl.LocalesArgument)")
-      (param $this externref (@abi.ref "FormatSettings"))
+      (param $this externref (@abi.ref "FormatSettings" (module "builtin-errors")))
       (param $value externref (@abi.ref undefined))))
   (import "builtin-errors" "FormatSettings.date_time"
     (func $builtin-errors:FormatSettings.date_time (@abi.get "dateTime") (@abi.owner "FormatSettings")
       (@abi.ts "dateTime?: Intl.DateTimeFormatOptions")
-      (param $this externref (@abi.ref "FormatSettings"))
+      (param $this externref (@abi.ref "FormatSettings" (module "builtin-errors")))
       (result externref (@abi.ref null undefined))))
   (import "builtin-errors" "FormatSettings.set_date_time"
     (func $builtin-errors:FormatSettings.set_date_time (@abi.set "dateTime") (@abi.owner "FormatSettings")
       (@abi.ts "set dateTime(value: Intl.DateTimeFormatOptions)")
-      (param $this externref (@abi.ref "FormatSettings"))
+      (param $this externref (@abi.ref "FormatSettings" (module "builtin-errors")))
       (param $value externref (@abi.ref null undefined))))
 
   (import "builtin-errors" "settings"
     (func $builtin-errors:settings (@abi.call "settings" (on))
       (@abi.ts "settings(value: FormatSettings): string")
-      (param $value externref (@abi.ref "FormatSettings"))
+      (param $value externref (@abi.ref "FormatSettings" (module "builtin-errors")))
       (result externref (@abi.ref string))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

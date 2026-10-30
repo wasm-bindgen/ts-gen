@@ -51,11 +51,11 @@
     (func $node:thing:Server.new (@abi.new "Server") (@abi.owner "Server")
       (@abi.ts "constructor(port: number)")
       (param $port f64)
-      (result externref (@abi.ref "Server"))))
+      (result externref (@abi.ref "Server" (module "node:thing")))))
   (import "node:thing" "Server.stop"
     (func $node:thing:Server.stop (@abi.call "stop") (@abi.owner "Server")
       (@abi.ts "stop(): void")
-      (param $this externref (@abi.ref "Server"))))
+      (param $this externref (@abi.ref "Server" (module "node:thing")))))
 
   (import "./bindings.wasm" "_listen"
     (func $_listen (@abi.call "_listen" (on))

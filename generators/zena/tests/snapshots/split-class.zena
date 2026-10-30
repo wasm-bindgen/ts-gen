@@ -90,7 +90,7 @@ export class ForwardableEmailMessage {
   #ref: externref;
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
-  reply(message: externref): externref { return __ForwardableEmailMessage_reply(this.#ref, message); }
+  reply(message: EmailMessage): externref { return __ForwardableEmailMessage_reply(this.#ref, message.ref()); }
 }
 
 export class EmailMessage {
@@ -128,7 +128,7 @@ export class Late {
 }
 
 export function use(m: msg_b_Msg): void { __msg_b_use(m.ref()); }
-export function arrival(): externref { return __arrival(); }
+export function arrival(): Late { return new Late(__arrival()); }
 
 // JSPI: suspends on a Promise and returns its value. Importing this
 // selects JSPI mode in `embed`, which wraps the handlers with promising.

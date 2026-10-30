@@ -30,19 +30,19 @@
     (func $x:foo:Bar.new (@abi.new "Bar") (@abi.owner "Bar")
       (@abi.ts "constructor(name: string)")
       (param $name externref (@abi.ref string))
-      (result externref (@abi.ref "Bar"))))
+      (result externref (@abi.ref "Bar" (module "x:foo")))))
   (import "x:foo" "Bar.name"
     (func $x:foo:Bar.name (@abi.call "name") (@abi.owner "Bar")
       (@abi.ts "name(): string")
-      (param $this externref (@abi.ref "Bar"))
+      (param $this externref (@abi.ref "Bar" (module "x:foo")))
       (result externref (@abi.ref string))))
 
   (@abi.interface "UsesBar" (module "x:uses"))
   (import "x:uses" "UsesBar.method"
     (func $x:uses:UsesBar.method (@abi.call "method") (@abi.owner "UsesBar")
       (@abi.ts "method(b: Bar): void")
-      (param $this externref (@abi.ref "UsesBar"))
-      (param $b externref (@abi.ref "Bar"))))
+      (param $this externref (@abi.ref "UsesBar" (module "x:uses")))
+      (param $b externref (@abi.ref "Bar" (module "x:foo")))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

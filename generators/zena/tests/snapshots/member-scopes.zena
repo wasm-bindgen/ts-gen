@@ -306,30 +306,30 @@ export class U {
   #ref: externref;
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
-  ua: externref { get { return __ix_U_ua(this.#ref); } }
-  set_ua(value: externref): void { __ix_U_set_ua(this.#ref, value); }
-  ma(): externref { return __ix_U_ma(this.#ref); }
-  ub: externref { get { return __ix_U_ub(this.#ref); } }
-  set_ub(value: externref): void { __ix_U_set_ub(this.#ref, value); }
-  mb(): externref { return __ix_U_mb(this.#ref); }
+  ua: T { get { return new T(__ix_U_ua(this.#ref)); } }
+  set_ua(value: T): void { __ix_U_set_ua(this.#ref, value.ref()); }
+  ma(): T { return new T(__ix_U_ma(this.#ref)); }
+  ub: ic_T { get { return new ic_T(__ix_U_ub(this.#ref)); } }
+  set_ub(value: ic_T): void { __ix_U_set_ub(this.#ref, value.ref()); }
+  mb(): ic_T { return new ic_T(__ix_U_mb(this.#ref)); }
 }
 
 export class K {
   #ref: externref;
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
-  ka: externref { get { return __ix_K_ka(this.#ref); } }
-  set_ka(value: externref): void { __ix_K_set_ka(this.#ref, value); }
-  kb: externref { get { return __ix_K_kb(this.#ref); } }
-  set_kb(value: externref): void { __ix_K_set_kb(this.#ref, value); }
+  ka: T { get { return new T(__ix_K_ka(this.#ref)); } }
+  set_ka(value: T): void { __ix_K_set_ka(this.#ref, value.ref()); }
+  kb: ic_T { get { return new ic_T(__ix_K_kb(this.#ref)); } }
+  set_kb(value: ic_T): void { __ix_K_set_kb(this.#ref, value.ref()); }
 }
 
 export class NS {
   #ref: externref;
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
-  static ga(t: externref): void { __ib2_NS_ga(t); }
-  static gb(t: externref): void { __ib2_NS_gb(t); }
+  static ga(t: T): void { __ib2_NS_ga(t.ref()); }
+  static gb(t: ic_T): void { __ib2_NS_gb(t.ref()); }
 }
 
 export class Ev {
@@ -348,9 +348,9 @@ export class Win {
   a: Ev { get { return new Ev(__Win_a(this.#ref)); } }
   set_a(value: Ev): void { __Win_set_a(this.#ref, value.ref()); }
   l(): Ev { return new Ev(__Win_l(this.#ref)); }
-  b: externref { get { return __Win_b(this.#ref); } }
-  set_b(value: externref): void { __Win_set_b(this.#ref, value); }
-  m(): externref { return __Win_m(this.#ref); }
+  b: T { get { return new T(__Win_b(this.#ref)); } }
+  set_b(value: T): void { __Win_set_b(this.#ref, value.ref()); }
+  m(): T { return new T(__Win_m(this.#ref)); }
 }
 
 export class GN {
@@ -358,7 +358,7 @@ export class GN {
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
   static gl(e: Ev): void { __GN_gl(e.ref()); }
-  static gm(e: externref): void { __GN_gm(e); }
+  static gm(e: T): void { __GN_gm(e.ref()); }
 }
 
 export class X {
@@ -366,9 +366,9 @@ export class X {
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
   static create(e: Ev): X { return new X(__X_new(e.ref())); }
-  static create_with_n(e: externref, n: f64): X { return new X(__X_new_with_n(e, n)); }
+  static create_with_n(e: T, n: f64): X { return new X(__X_new_with_n(e.ref(), n)); }
   static sl(e: Ev): void { __X_sl(e.ref()); }
-  static sm(e: externref): void { __X_sm(e); }
+  static sm(e: T): void { __X_sm(e.ref()); }
   x(): void { __X_x(this.#ref); }
 }
 

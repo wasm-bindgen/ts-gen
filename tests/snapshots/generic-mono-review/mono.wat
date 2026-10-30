@@ -29,14 +29,14 @@
   (import "generic-mono-review" "S.x"
     (func $generic-mono-review:S.x (@abi.get "x") (@abi.owner "S")
       (@abi.ts "x: number")
-      (param $this externref (@abi.ref "S"))
+      (param $this externref (@abi.ref "S" (module "generic-mono-review")))
       (result f64)))
 
   (@abi.class "S2" (module "generic-mono-review"))
   (import "generic-mono-review" "S2.x"
     (func $generic-mono-review:S2.x (@abi.get "x") (@abi.owner "S2")
       (@abi.ts "x: number")
-      (param $this externref (@abi.ref "S2"))
+      (param $this externref (@abi.ref "S2" (module "generic-mono-review")))
       (result f64)))
 
   (import "generic-mono-review" "byAlias"
@@ -52,8 +52,8 @@
   (import "generic-mono-review" "withS"
     (func $generic-mono-review:withS (@abi.call "withS" (on))
       (@abi.ts "withS(s: S, s2: S2, name: string): void")
-      (param $s externref (@abi.ref "S"))
-      (param $s2 externref (@abi.ref "S2"))
+      (param $s externref (@abi.ref "S" (module "generic-mono-review")))
+      (param $s2 externref (@abi.ref "S2" (module "generic-mono-review")))
       (param $name externref (@abi.ref string))))
 
   (@abi.class "Holder" (module "generic-mono-review"))
@@ -61,26 +61,26 @@
     (func $generic-mono-review:Holder.new (@abi.new "Holder") (@abi.owner "Holder")
       (@abi.ts "constructor(value: T)")
       (param $value externref (@abi.ref null undefined))
-      (result externref (@abi.ref "Holder"))))
+      (result externref (@abi.ref "Holder" (module "generic-mono-review")))))
   (import "generic-mono-review" "Holder.get"
     (func $generic-mono-review:Holder.get (@abi.call "get") (@abi.owner "Holder")
       (@abi.ts "get(): T")
-      (param $this externref (@abi.ref "Holder"))
+      (param $this externref (@abi.ref "Holder" (module "generic-mono-review")))
       (result externref (@abi.ref null undefined))))
 
   (import "generic-mono-review" "takesHolder"
     (func $generic-mono-review:takesHolder (@abi.call "takesHolder" (on))
       (@abi.ts "takesHolder(h: Holder<Id>, g: Holder<string>): void")
-      (param $h externref (@abi.ref "Holder"))
-      (param $g externref (@abi.ref "Holder"))))
+      (param $h externref (@abi.ref "Holder" (module "generic-mono-review")))
+      (param $g externref (@abi.ref "Holder" (module "generic-mono-review")))))
   (import "generic-mono-review" "holderOfId"
     (func $generic-mono-review:holderOfId (@abi.call "holderOfId" (on))
       (@abi.ts "holderOfId(): Holder<Id>")
-      (result externref (@abi.ref "Holder"))))
+      (result externref (@abi.ref "Holder" (module "generic-mono-review")))))
   (import "generic-mono-review" "literalHolder"
     (func $generic-mono-review:literalHolder (@abi.call "literalHolder" (on))
       (@abi.ts "literalHolder(): Holder<\"a\" | \"b\">")
-      (result externref (@abi.ref "Holder"))))
+      (result externref (@abi.ref "Holder" (module "generic-mono-review")))))
   (import "generic-mono-review" "literalUnion"
     (func $generic-mono-review:literalUnion (@abi.call "literalUnion" (on))
       (@abi.ts "literalUnion(): \"a\" | \"b\"")
@@ -88,8 +88,8 @@
   (import "generic-mono-review" "shadowsAlias"
     (func $generic-mono-review:shadowsAlias (@abi.call "shadowsAlias" (on))
       (@abi.ts "shadowsAlias(h: Holder<Id>): Holder<Id>")
-      (param $h externref (@abi.ref "Holder"))
-      (result externref (@abi.ref "Holder"))))
+      (param $h externref (@abi.ref "Holder" (module "generic-mono-review")))
+      (result externref (@abi.ref "Holder" (module "generic-mono-review")))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

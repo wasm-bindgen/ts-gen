@@ -168,7 +168,7 @@ export class m_W {
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
   static create(): m_W { return new m_W(__m_W_new()); }
-  static make(): m_W { return new m_W(__m_W_make()); }
+  static make(): W { return new W(__m_W_make()); }
 }
 
 export class Multi {

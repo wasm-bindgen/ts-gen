@@ -29,22 +29,22 @@
   (import "declared-modules" "Options.new"
     (func $declared-modules:Options.new (@abi.object) (@abi.owner "Options")
       (@abi.ts "{} as Options")
-      (result externref (@abi.ref "Options"))))
+      (result externref (@abi.ref "Options" (module "declared-modules")))))
   (import "declared-modules" "Options.depth"
     (func $declared-modules:Options.depth (@abi.get "depth") (@abi.owner "Options")
       (@abi.ts "depth: number")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "declared-modules")))
       (result f64)))
   (import "declared-modules" "Options.set_depth"
     (func $declared-modules:Options.set_depth (@abi.set "depth") (@abi.owner "Options")
       (@abi.ts "set depth(value: number)")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "declared-modules")))
       (param $value f64)))
 
   (import "declared-modules" "options"
     (func $declared-modules:options (@abi.call "options" (on))
       (@abi.ts "options(): Options")
-      (result externref (@abi.ref "Options"))))
+      (result externref (@abi.ref "Options" (module "declared-modules")))))
 
   (@abi.namespace "constants" (module "declared-modules/fs"))
   (import "declared-modules/fs" "constants.O_RDONLY"

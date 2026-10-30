@@ -29,16 +29,16 @@
   (import "module-namespace-values" "InspectOptions.new"
     (func $module-namespace-values:InspectOptions.new (@abi.object) (@abi.owner "InspectOptions")
       (@abi.ts "{} as InspectOptions")
-      (result externref (@abi.ref "InspectOptions"))))
+      (result externref (@abi.ref "InspectOptions" (module "module-namespace-values")))))
   (import "module-namespace-values" "InspectOptions.depth"
     (func $module-namespace-values:InspectOptions.depth (@abi.get "depth") (@abi.owner "InspectOptions")
       (@abi.ts "depth: number")
-      (param $this externref (@abi.ref "InspectOptions"))
+      (param $this externref (@abi.ref "InspectOptions" (module "module-namespace-values")))
       (result f64)))
   (import "module-namespace-values" "InspectOptions.set_depth"
     (func $module-namespace-values:InspectOptions.set_depth (@abi.set "depth") (@abi.owner "InspectOptions")
       (@abi.ts "set depth(value: number)")
-      (param $this externref (@abi.ref "InspectOptions"))
+      (param $this externref (@abi.ref "InspectOptions" (module "module-namespace-values")))
       (param $value f64)))
 
   (import "module-namespace-values" "inspect"
@@ -51,18 +51,18 @@
   (import "module-namespace-values" "inspect.defaultOptions"
     (func $module-namespace-values:inspect.defaultOptions (@abi.get "defaultOptions" (on "inspect")) (@abi.owner "inspect")
       (@abi.ts "const defaultOptions: InspectOptions")
-      (result externref (@abi.ref "InspectOptions"))))
+      (result externref (@abi.ref "InspectOptions" (module "module-namespace-values")))))
   (import "module-namespace-values" "inspect.withDepth"
     (func $module-namespace-values:inspect.withDepth (@abi.call "withDepth" (on "inspect")) (@abi.owner "inspect")
       (@abi.ts "withDepth(depth: number): Formatter<string>")
       (param $depth f64)
-      (result externref (@abi.ref "inspect.Formatter"))))
+      (result externref (@abi.ref "inspect.Formatter" (module "module-namespace-values")))))
 
   (@abi.class "inspect.Formatter" (module "module-namespace-values"))
   (import "module-namespace-values" "inspect.Formatter.format"
     (func $module-namespace-values:inspect.Formatter.format (@abi.call "format") (@abi.owner "inspect.Formatter")
       (@abi.ts "format(value: T): string")
-      (param $this externref (@abi.ref "inspect.Formatter"))
+      (param $this externref (@abi.ref "inspect.Formatter" (module "module-namespace-values")))
       (param $value externref (@abi.ref null undefined))
       (result externref (@abi.ref string))))
 

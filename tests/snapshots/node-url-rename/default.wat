@@ -30,11 +30,11 @@
     (func $node:url:URL.new (@abi.new "URL") (@abi.owner "URL")
       (@abi.ts "constructor(input: string)")
       (param $input externref (@abi.ref string))
-      (result externref (@abi.ref "URL"))))
+      (result externref (@abi.ref "URL" (module "node:url")))))
   (import "node:url" "URL.href"
     (func $node:url:URL.href (@abi.get "href") (@abi.owner "URL")
       (@abi.ts "href: string")
-      (param $this externref (@abi.ref "URL"))
+      (param $this externref (@abi.ref "URL" (module "node:url")))
       (result externref (@abi.ref string))))
   (import "node:url" "URL.can_parse"
     (func $node:url:URL.can_parse (@abi.call "canParse" (on "URL")) (@abi.owner "URL")

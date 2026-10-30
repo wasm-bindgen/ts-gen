@@ -56,7 +56,7 @@ export class UsesBar {
   #ref: externref;
   new(ref: externref) : #ref = ref;
   ref(): externref { return this.#ref; }
-  method(b: externref): void { __x_uses_UsesBar_method(this.#ref, b); }
+  method(b: Bar): void { __x_uses_UsesBar_method(this.#ref, b.ref()); }
 }
 
 // JSPI: suspends on a Promise and returns its value. Importing this

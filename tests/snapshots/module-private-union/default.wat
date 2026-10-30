@@ -29,19 +29,19 @@
   (import "x:shapes" "Base.base"
     (func $x:shapes:Base.base (@abi.call "base") (@abi.owner "Base")
       (@abi.ts "base(): void")
-      (param $this externref (@abi.ref "Base"))))
+      (param $this externref (@abi.ref "Base" (module "x:shapes")))))
 
-  (@abi.class "A" (module "x:shapes") (extends "Base"))
+  (@abi.class "A" (module "x:shapes") (extends "Base" (module "x:shapes")))
   (import "x:shapes" "A.a"
     (func $x:shapes:A.a (@abi.call "a") (@abi.owner "A")
       (@abi.ts "a(): void")
-      (param $this externref (@abi.ref "A"))))
+      (param $this externref (@abi.ref "A" (module "x:shapes")))))
 
-  (@abi.class "B" (module "x:shapes") (extends "Base"))
+  (@abi.class "B" (module "x:shapes") (extends "Base" (module "x:shapes")))
   (import "x:shapes" "B.b"
     (func $x:shapes:B.b (@abi.call "b") (@abi.owner "B")
       (@abi.ts "b(): void")
-      (param $this externref (@abi.ref "B"))))
+      (param $this externref (@abi.ref "B" (module "x:shapes")))))
 
   (import "x:shapes" "list"
     (func $x:shapes:list (@abi.call "list" (on))

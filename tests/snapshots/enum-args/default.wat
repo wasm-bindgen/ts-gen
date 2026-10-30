@@ -29,44 +29,44 @@
   (import "enum-args" "SendOptions.new"
     (func $enum-args:SendOptions.new (@abi.object) (@abi.owner "SendOptions")
       (@abi.ts "{} as SendOptions")
-      (result externref (@abi.ref "SendOptions"))))
+      (result externref (@abi.ref "SendOptions" (module "enum-args")))))
   (import "enum-args" "SendOptions.kind"
     (func $enum-args:SendOptions.kind (@abi.get "kind") (@abi.owner "SendOptions")
       (@abi.ts "kind?: Kind")
-      (param $this externref (@abi.ref "SendOptions"))
+      (param $this externref (@abi.ref "SendOptions" (module "enum-args")))
       (result externref (@abi.ref "Kind" undefined))))
   (import "enum-args" "SendOptions.set_kind"
     (func $enum-args:SendOptions.set_kind (@abi.set "kind") (@abi.owner "SendOptions")
       (@abi.ts "set kind(value: Kind)")
-      (param $this externref (@abi.ref "SendOptions"))
+      (param $this externref (@abi.ref "SendOptions" (module "enum-args")))
       (param $value externref (@abi.ref "Kind"))))
   (import "enum-args" "SendOptions.payload"
     (func $enum-args:SendOptions.payload (@abi.get "payload") (@abi.owner "SendOptions")
       (@abi.ts "payload?: ArrayBufferView")
-      (param $this externref (@abi.ref "SendOptions"))
+      (param $this externref (@abi.ref "SendOptions" (module "enum-args")))
       (result externref (@abi.ref undefined))))
   (import "enum-args" "SendOptions.set_payload"
     (func $enum-args:SendOptions.set_payload (@abi.set "payload") (@abi.owner "SendOptions")
       (@abi.ts "set payload(value: ArrayBufferView)")
-      (param $this externref (@abi.ref "SendOptions"))
+      (param $this externref (@abi.ref "SendOptions" (module "enum-args")))
       (param $value externref)))
 
   (@abi.class "Sender" (module "enum-args"))
   (import "enum-args" "Sender.send"
     (func $enum-args:Sender.send (@abi.call "send") (@abi.owner "Sender")
       (@abi.ts "send(kind: Kind): void")
-      (param $this externref (@abi.ref "Sender"))
+      (param $this externref (@abi.ref "Sender" (module "enum-args")))
       (param $kind externref (@abi.ref "Kind"))))
   (import "enum-args" "Sender.send_with_options"
     (func $enum-args:Sender.send_with_options (@abi.call "send") (@abi.owner "Sender")
       (@abi.ts "send(kind: Kind, options: SendOptions): void")
-      (param $this externref (@abi.ref "Sender"))
+      (param $this externref (@abi.ref "Sender" (module "enum-args")))
       (param $kind externref (@abi.ref "Kind"))
-      (param $options externref (@abi.ref "SendOptions"))))
+      (param $options externref (@abi.ref "SendOptions" (module "enum-args")))))
   (import "enum-args" "Sender.kind"
     (func $enum-args:Sender.kind (@abi.get "kind") (@abi.owner "Sender")
       (@abi.ts "kind: Kind")
-      (param $this externref (@abi.ref "Sender"))
+      (param $this externref (@abi.ref "Sender" (module "enum-args")))
       (result externref (@abi.ref "Kind"))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

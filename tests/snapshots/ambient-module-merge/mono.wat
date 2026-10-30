@@ -29,36 +29,36 @@
   (import "ovi" "I.new"
     (func $ovi:I.new (@abi.object) (@abi.owner "I")
       (@abi.ts "{} as I")
-      (result externref (@abi.ref "I"))))
+      (result externref (@abi.ref "I" (module "ovi")))))
   (import "ovi" "I.a"
     (func $ovi:I.a (@abi.get "a") (@abi.owner "I")
       (@abi.ts "a: number")
-      (param $this externref (@abi.ref "I"))
+      (param $this externref (@abi.ref "I" (module "ovi")))
       (result f64)))
   (import "ovi" "I.set_a"
     (func $ovi:I.set_a (@abi.set "a") (@abi.owner "I")
       (@abi.ts "set a(value: number)")
-      (param $this externref (@abi.ref "I"))
+      (param $this externref (@abi.ref "I" (module "ovi")))
       (param $value f64)))
   (import "ovi" "I.b"
     (func $ovi:I.b (@abi.get "b") (@abi.owner "I")
       (@abi.ts "b: number")
-      (param $this externref (@abi.ref "I"))
+      (param $this externref (@abi.ref "I" (module "ovi")))
       (result f64)))
   (import "ovi" "I.set_b"
     (func $ovi:I.set_b (@abi.set "b") (@abi.owner "I")
       (@abi.ts "set b(value: number)")
-      (param $this externref (@abi.ref "I"))
+      (param $this externref (@abi.ref "I" (module "ovi")))
       (param $value f64)))
   (import "ovi" "I.c"
     (func $ovi:I.c (@abi.get "c") (@abi.owner "I")
       (@abi.ts "c: number")
-      (param $this externref (@abi.ref "I"))
+      (param $this externref (@abi.ref "I" (module "ovi")))
       (result f64)))
   (import "ovi" "I.set_c"
     (func $ovi:I.set_c (@abi.set "c") (@abi.owner "I")
       (@abi.ts "set c(value: number)")
-      (param $this externref (@abi.ref "I"))
+      (param $this externref (@abi.ref "I" (module "ovi")))
       (param $value f64)))
 
   (import "ovi" "k"
@@ -93,64 +93,64 @@
   (import "loc" "E.new"
     (func $loc:E.new (@abi.object) (@abi.owner "E")
       (@abi.ts "{} as E")
-      (result externref (@abi.ref "E"))))
+      (result externref (@abi.ref "E" (module "loc")))))
   (import "loc" "E.a"
     (func $loc:E.a (@abi.get "a") (@abi.owner "E")
       (@abi.ts "a: number")
-      (param $this externref (@abi.ref "E"))
+      (param $this externref (@abi.ref "E" (module "loc")))
       (result f64)))
   (import "loc" "E.set_a"
     (func $loc:E.set_a (@abi.set "a") (@abi.owner "E")
       (@abi.ts "set a(value: number)")
-      (param $this externref (@abi.ref "E"))
+      (param $this externref (@abi.ref "E" (module "loc")))
       (param $value f64)))
   (import "loc" "E.b"
     (func $loc:E.b (@abi.get "b") (@abi.owner "E")
       (@abi.ts "b: number")
-      (param $this externref (@abi.ref "E"))
+      (param $this externref (@abi.ref "E" (module "loc")))
       (result f64)))
   (import "loc" "E.set_b"
     (func $loc:E.set_b (@abi.set "b") (@abi.owner "E")
       (@abi.ts "set b(value: number)")
-      (param $this externref (@abi.ref "E"))
+      (param $this externref (@abi.ref "E" (module "loc")))
       (param $value f64)))
 
   (@abi.dictionary "T" (module "ia"))
   (import "ia" "T.new"
     (func $ia:T.new (@abi.object) (@abi.owner "T")
       (@abi.ts "{} as T")
-      (result externref (@abi.ref "T"))))
+      (result externref (@abi.ref "T" (module "ia")))))
   (import "ia" "T.a"
     (func $ia:T.a (@abi.get "a") (@abi.owner "T")
       (@abi.ts "a: number")
-      (param $this externref (@abi.ref "T"))
+      (param $this externref (@abi.ref "T" (module "ia")))
       (result f64)))
   (import "ia" "T.set_a"
     (func $ia:T.set_a (@abi.set "a") (@abi.owner "T")
       (@abi.ts "set a(value: number)")
-      (param $this externref (@abi.ref "T"))
+      (param $this externref (@abi.ref "T" (module "ia")))
       (param $value f64)))
 
   (@abi.dictionary "T" (module "ic"))
   (import "ic" "T.new"
     (func $ic:T.new (@abi.object) (@abi.owner "T")
       (@abi.ts "{} as T")
-      (result externref (@abi.ref "T"))))
+      (result externref (@abi.ref "T" (module "ic")))))
   (import "ic" "T.c"
     (func $ic:T.c (@abi.get "c") (@abi.owner "T")
       (@abi.ts "c: number")
-      (param $this externref (@abi.ref "T"))
+      (param $this externref (@abi.ref "T" (module "ic")))
       (result f64)))
   (import "ic" "T.set_c"
     (func $ic:T.set_c (@abi.set "c") (@abi.owner "T")
       (@abi.ts "set c(value: number)")
-      (param $this externref (@abi.ref "T"))
+      (param $this externref (@abi.ref "T" (module "ic")))
       (param $value f64)))
 
   (import "ib" "fa"
     (func $ib:fa (@abi.call "fa" (on))
       (@abi.ts "fa(t: T): void")
-      (param $t externref (@abi.ref "T"))))
+      (param $t externref (@abi.ref "T" (module "ia")))))
 
   (@abi.namespace "default" (module "dflt"))
   (import "dflt" "default.f"
@@ -167,7 +167,7 @@
   (import "mm2" "W.new"
     (func $mm2:W.new (@abi.new "W") (@abi.owner "W")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "W"))))
+      (result externref (@abi.ref "W" (module "mm2")))))
   (import "mm2" "W.make"
     (func $mm2:W.make (@abi.call "make" (on "W")) (@abi.owner "W")
       (@abi.ts "make(): W")
@@ -175,44 +175,44 @@
   (import "mm2" "W.w"
     (func $mm2:W.w (@abi.call "w") (@abi.owner "W")
       (@abi.ts "w(): void")
-      (param $this externref (@abi.ref "W"))))
+      (param $this externref (@abi.ref "W" (module "mm2")))))
 
   (@abi.dictionary "H" (module "lh"))
   (import "lh" "H.new"
     (func $lh:H.new (@abi.object) (@abi.owner "H")
       (@abi.ts "{} as H")
-      (result externref (@abi.ref "H"))))
+      (result externref (@abi.ref "H" (module "lh")))))
   (import "lh" "H.x"
     (func $lh:H.x (@abi.get "x") (@abi.owner "H")
       (@abi.ts "x: number")
-      (param $this externref (@abi.ref "H"))
+      (param $this externref (@abi.ref "H" (module "lh")))
       (result f64)))
   (import "lh" "H.set_x"
     (func $lh:H.set_x (@abi.set "x") (@abi.owner "H")
       (@abi.ts "set x(value: number)")
-      (param $this externref (@abi.ref "H"))
+      (param $this externref (@abi.ref "H" (module "lh")))
       (param $value f64)))
 
   (import "lh" "u"
     (func $lh:u (@abi.call "u" (on))
       (@abi.ts "u(h: H): void")
-      (param $h externref (@abi.ref "H"))))
+      (param $h externref (@abi.ref "H" (module "lh")))))
 
   (import "lh" "H.y"
     (func $lh:H.y (@abi.get "y") (@abi.owner "H")
       (@abi.ts "y: number")
-      (param $this externref (@abi.ref "H"))
+      (param $this externref (@abi.ref "H" (module "lh")))
       (result f64)))
   (import "lh" "H.set_y"
     (func $lh:H.set_y (@abi.set "y") (@abi.owner "H")
       (@abi.ts "set y(value: number)")
-      (param $this externref (@abi.ref "H"))
+      (param $this externref (@abi.ref "H" (module "lh")))
       (param $value f64)))
 
   (import "lh" "v"
     (func $lh:v (@abi.call "v" (on))
       (@abi.ts "v(h: H): void")
-      (param $h externref (@abi.ref "H"))))
+      (param $h externref (@abi.ref "H" (module "lh")))))
 
   (@abi.namespace "N" (module "loc"))
   (import "loc" "N.g"
@@ -222,7 +222,7 @@
   (import "ib" "fb"
     (func $ib:fb (@abi.call "fb" (on))
       (@abi.ts "fb(t: T): void")
-      (param $t externref (@abi.ref "T"))))
+      (param $t externref (@abi.ref "T" (module "ic")))))
 
   (@abi.namespace "N" (module "dflt"))
   (import "dflt" "N.g"
@@ -233,7 +233,7 @@
   (import "mm" "W.new"
     (func $mm:W.new (@abi.new "W") (@abi.owner "W")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "W"))))
+      (result externref (@abi.ref "W" (module "mm")))))
   (import "mm" "W.make"
     (func $mm:W.make (@abi.call "make" (on "W")) (@abi.owner "W")
       (@abi.ts "make(): W")
@@ -241,7 +241,7 @@
   (import "mm" "W.w"
     (func $mm:W.w (@abi.call "w") (@abi.owner "W")
       (@abi.ts "w(): void")
-      (param $this externref (@abi.ref "W"))))
+      (param $this externref (@abi.ref "W" (module "mm")))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

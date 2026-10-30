@@ -74,7 +74,10 @@ A module field, written before the owner's functions. The string is
 the owner's dotted JS path (`WebAssembly.Module`); with `(module
 "<spec>")` the owner is declared in `declare module "<spec>"`, and
 `(module, path)` is its identity, so `"db"`'s `Conn` and a global `Conn`
-are two owners.
+are two owners. Everywhere else an owner is named, by `extends` or a
+reference head, it is named by that identity: `"<path>"` for a global
+owner and `"<path>" (module "<spec>")` for a module's, whatever module
+the naming import is in.
 
 | Kind | Meaning |
 | --- | --- |
@@ -85,9 +88,9 @@ are two owners.
 
 Fields:
 
-* `(extends "<path>")`, repeated: the owners this one inherits from,
-  as written in the `.d.ts`. Inherited members are not repeated on the
-  derived owner. A generator presents `request.text()` by following
+* `(extends "<path>" (module "<spec>")?)`, repeated: the owners this
+  one inherits from, as written in the `.d.ts`. Inherited members are
+  not repeated on the derived owner. A generator presents `request.text()` by following
   `Request`'s `extends` to `Body.text`, and may pass any derived owner
   where a base is expected.
 * `(alias "<name>")`, repeated: other names the owner is exported under.
@@ -200,8 +203,9 @@ Inside each `externref` parameter or result, `(@abi.ref <head>?
 
 * **Head**, at most one: what the position names once `null` and
   `undefined` are set aside, through type aliases.
-  * a string, `"<path>"`: an owner, in the import's module if it has one
-    by that path, otherwise global;
+  * `"<path>" (module "<spec>")?`: an owner, by its identity. A
+    reference inside `declare module "db"` to a global `Conn` is `"Conn"`,
+    and to `"db"`'s own is `"Conn" (module "db")`;
   * `string`: a JS string;
   * `number`, `boolean`, `bigint`: a scalar that crosses as a reference
     because the position admits an empty value; `Number.value` reads a
@@ -270,7 +274,7 @@ field     ::= owner | import | handler | type | builtin
 owner     ::= '(' ('@abi.class' | '@abi.interface' | '@abi.dictionary' | '@abi.namespace')
                   string ownerfield* ')'
 ownerfield::= '(' 'module' string ')' | '(' 'alias' string ')'
-            | '(' 'extends' string ')' | '(' 'doc' string ')'
+            | '(' 'extends' ownerref ')' | '(' 'doc' string ')'
 import    ::= '(' 'import' string string '(' 'func' id annot* param* result? ')' ')'
 handler   ::= '(' 'func' '(' 'export' string ')' annot* param* result? 'unreachable' ')'
 type      ::= '(' 'type' '$anyrefs' '(' 'array' '(' 'mut' 'anyref' ')' ')' ')'
@@ -279,7 +283,8 @@ param     ::= '(' 'param' id valtype ref? ')'
 result    ::= '(' 'result' valtype ref? ')'
 valtype   ::= 'i32' | 'i64' | 'f64' | 'externref' | '(' 'ref' 'null' '$anyrefs' ')'
 ref       ::= '(' '@abi.ref' head? ('null' | 'undefined')* ')'
-head      ::= string | 'string' | 'number' | 'boolean' | 'bigint'
+head      ::= ownerref | 'string' | 'number' | 'boolean' | 'bigint'
+ownerref  ::= string ('(' 'module' string ')')?
 ```
 
 `annot` is any `(@abi.<name> ...)` list. Comments (`;; ...` to end of

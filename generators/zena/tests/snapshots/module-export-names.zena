@@ -222,7 +222,7 @@ export function plain_create(): void { __plain_create(); }
 export function own_make(): void { __own_make(); }
 export function own_create(): void { __own_create(); }
 export function col_g(t: M_T): void { __col_g(t.ref()); }
-export function use(x: externref): void { __user_use(x); }
+export function use(x: reached_M_T): void { __user_use(x.ref()); }
 
 // JSPI: suspends on a Promise and returns its value. Importing this
 // selects JSPI mode in `embed`, which wraps the handlers with promising.

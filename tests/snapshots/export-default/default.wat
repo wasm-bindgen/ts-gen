@@ -30,17 +30,17 @@
     (func $export-default:default.new (@abi.new "default") (@abi.owner "default")
       (@abi.ts "constructor(name: string)")
       (param $name externref (@abi.ref string))
-      (result externref (@abi.ref "default"))))
+      (result externref (@abi.ref "default" (module "export-default")))))
   (import "export-default" "default.name"
     (func $export-default:default.name (@abi.get "name") (@abi.owner "default")
       (@abi.ts "name: string")
-      (param $this externref (@abi.ref "default"))
+      (param $this externref (@abi.ref "default" (module "export-default")))
       (result externref (@abi.ref string))))
   (import "export-default" "default.named"
     (func $export-default:default.named (@abi.call "named" (on "default")) (@abi.owner "default")
       (@abi.ts "named(name: string): Processor")
       (param $name externref (@abi.ref string))
-      (result externref (@abi.ref "default"))))
+      (result externref (@abi.ref "default" (module "export-default")))))
 
   (import "export-default/create" "default"
     (func $export-default/create:default (@abi.call "default" (on))

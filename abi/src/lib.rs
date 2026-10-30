@@ -85,13 +85,31 @@ impl WasmType {
     }
 }
 
+/// An owner, by its identity: the `declare module` it is declared in, if
+/// any, and its dotted JS path. A global `DurableObject` interface and
+/// `"cloudflare:workers"`'s `DurableObject` class are two owners, so a
+/// reference to either names its module.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct OwnerRef {
+    pub module: Option<String>,
+    pub path: String,
+}
+
+impl OwnerRef {
+    pub fn global(path: impl Into<String>) -> Self {
+        OwnerRef {
+            module: None,
+            path: path.into(),
+        }
+    }
+}
+
 /// What a reference position names, ignoring empty arms, for a target
 /// to wrap.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Head {
-    /// An owner, as its dotted JS path (`WebAssembly.Module`), matching
-    /// the owner names.
-    Declared(String),
+    /// An owner (`WebAssembly.Module`, or `"cloudflare:sockets"`'s `Socket`).
+    Declared(OwnerRef),
     /// A TS `string`.
     String,
     /// A scalar that crosses as a reference because the position admits
@@ -281,7 +299,7 @@ pub struct AbiOwner {
     pub aliases: Vec<String>,
     /// Owners this one inherits members from, as written: inherited
     /// members are only on the base.
-    pub extends: Vec<String>,
+    pub extends: Vec<OwnerRef>,
     pub doc: Option<String>,
 }
 

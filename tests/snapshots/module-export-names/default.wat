@@ -29,14 +29,14 @@
   (import "pc" "_Bar.new"
     (func $pc:_Bar.new (@abi.object) (@abi.owner "_Bar")
       (@abi.ts "{} as _Bar")
-      (result externref (@abi.ref "_Bar"))))
+      (result externref (@abi.ref "_Bar" (module "pc")))))
   (import "pc" "Foo.new"
     (func $pc:Foo.new (@abi.alias "_Bar.new")
       (result externref)))
   (import "pc" "_Bar.b"
     (func $pc:_Bar.b (@abi.get "b") (@abi.owner "_Bar")
       (@abi.ts "b: number")
-      (param $this externref (@abi.ref "_Bar"))
+      (param $this externref (@abi.ref "_Bar" (module "pc")))
       (result f64)))
   (import "pc" "Foo.b"
     (func $pc:Foo.b (@abi.alias "_Bar.b")
@@ -45,7 +45,7 @@
   (import "pc" "_Bar.set_b"
     (func $pc:_Bar.set_b (@abi.set "b") (@abi.owner "_Bar")
       (@abi.ts "set b(value: number)")
-      (param $this externref (@abi.ref "_Bar"))
+      (param $this externref (@abi.ref "_Bar" (module "pc")))
       (param $value f64)))
   (import "pc" "Foo.set_b"
     (func $pc:Foo.set_b (@abi.alias "_Bar.set_b")
@@ -62,7 +62,7 @@
   (import "ns" "g"
     (func $ns:g (@abi.call "g" (on))
       (@abi.ts "g(t: _N.T): void")
-      (param $t externref (@abi.ref "N1.T"))))
+      (param $t externref (@abi.ref "N1.T" (module "ns")))))
 
   (import "plain" "make"
     (func $plain:make (@abi.call "make" (on))
@@ -94,60 +94,60 @@
   (import "col" "M.T.new"
     (func $col:M.T.new (@abi.object) (@abi.owner "M.T")
       (@abi.ts "{} as M.T")
-      (result externref (@abi.ref "M.T"))))
+      (result externref (@abi.ref "M.T" (module "col")))))
   (import "col" "M.T.n"
     (func $col:M.T.n (@abi.get "n") (@abi.owner "M.T")
       (@abi.ts "n: number")
-      (param $this externref (@abi.ref "M.T"))
+      (param $this externref (@abi.ref "M.T" (module "col")))
       (result f64)))
   (import "col" "M.T.set_n"
     (func $col:M.T.set_n (@abi.set "n") (@abi.owner "M.T")
       (@abi.ts "set n(value: number)")
-      (param $this externref (@abi.ref "M.T"))
+      (param $this externref (@abi.ref "M.T" (module "col")))
       (param $value f64)))
 
   (@abi.namespace "M" (module "col"))
   (import "col" "M.f"
     (func $col:M.f (@abi.call "f" (on "M")) (@abi.owner "M")
       (@abi.ts "f(t: T): void")
-      (param $t externref (@abi.ref "M.T"))))
+      (param $t externref (@abi.ref "M.T" (module "col")))))
 
   (import "col" "M.T.m"
     (func $col:M.T.m (@abi.get "m") (@abi.owner "M.T")
       (@abi.ts "m: string")
-      (param $this externref (@abi.ref "M.T"))
+      (param $this externref (@abi.ref "M.T" (module "col")))
       (result externref (@abi.ref string))))
   (import "col" "M.T.set_m"
     (func $col:M.T.set_m (@abi.set "m") (@abi.owner "M.T")
       (@abi.ts "set m(value: string)")
-      (param $this externref (@abi.ref "M.T"))
+      (param $this externref (@abi.ref "M.T" (module "col")))
       (param $value externref (@abi.ref string))))
 
   (import "col" "g"
     (func $col:g (@abi.call "g" (on))
       (@abi.ts "g(t: M.T): void")
-      (param $t externref (@abi.ref "M.T"))))
+      (param $t externref (@abi.ref "M.T" (module "col")))))
 
   (@abi.dictionary "M.T" (module "reached"))
   (import "reached" "M.T.new"
     (func $reached:M.T.new (@abi.object) (@abi.owner "M.T")
       (@abi.ts "{} as M.T")
-      (result externref (@abi.ref "M.T"))))
+      (result externref (@abi.ref "M.T" (module "reached")))))
   (import "reached" "M.T.t"
     (func $reached:M.T.t (@abi.get "t") (@abi.owner "M.T")
       (@abi.ts "t: number")
-      (param $this externref (@abi.ref "M.T"))
+      (param $this externref (@abi.ref "M.T" (module "reached")))
       (result f64)))
   (import "reached" "M.T.set_t"
     (func $reached:M.T.set_t (@abi.set "t") (@abi.owner "M.T")
       (@abi.ts "set t(value: number)")
-      (param $this externref (@abi.ref "M.T"))
+      (param $this externref (@abi.ref "M.T" (module "reached")))
       (param $value f64)))
 
   (import "user" "use"
     (func $user:use (@abi.call "use" (on))
       (@abi.ts "use(x: M.T): void")
-      (param $x externref (@abi.ref "M.T"))))
+      (param $x externref (@abi.ref "M.T" (module "reached")))))
 
   ;; Owners with no functions of their own.
   (@abi.interface "N1.T" (module "ns"))

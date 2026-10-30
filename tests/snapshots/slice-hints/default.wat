@@ -99,28 +99,28 @@
   (import "slice-hints" "Target.new"
     (func $slice-hints:Target.new (@abi.object) (@abi.owner "Target")
       (@abi.ts "{} as Target")
-      (result externref (@abi.ref "Target"))))
+      (result externref (@abi.ref "Target" (module "slice-hints")))))
   (import "slice-hints" "Target.buffer"
     (func $slice-hints:Target.buffer (@abi.get "buffer") (@abi.owner "Target")
       (@abi.ts "buffer?: Float64Array | number[]")
       (@abi.doc "The write destination.")
-      (param $this externref (@abi.ref "Target"))
+      (param $this externref (@abi.ref "Target" (module "slice-hints")))
       (result externref (@abi.ref undefined))))
   (import "slice-hints" "Target.set_buffer"
     (func $slice-hints:Target.set_buffer (@abi.set "buffer") (@abi.owner "Target")
       (@abi.ts "set buffer(value: number[])")
-      (param $this externref (@abi.ref "Target"))
+      (param $this externref (@abi.ref "Target" (module "slice-hints")))
       (param $value externref)))
   (import "slice-hints" "Target.set_buffer_with_float64_array"
     (func $slice-hints:Target.set_buffer_with_float64_array (@abi.set "buffer") (@abi.owner "Target")
       (@abi.ts "set buffer(value: Float64Array)")
-      (param $this externref (@abi.ref "Target"))
+      (param $this externref (@abi.ref "Target" (module "slice-hints")))
       (param $value externref (@abi.ref "Float64Array"))))
 
   (import "slice-hints" "describeTarget"
     (func $slice-hints:describeTarget (@abi.call "describeTarget" (on))
       (@abi.ts "describeTarget(target: Target): string")
-      (param $target externref (@abi.ref "Target"))
+      (param $target externref (@abi.ref "Target" (module "slice-hints")))
       (result externref (@abi.ref string))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

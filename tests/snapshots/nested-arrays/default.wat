@@ -29,27 +29,27 @@
   (import "nested-arrays" "Grid.rows"
     (func $nested-arrays:Grid.rows (@abi.call "rows") (@abi.owner "Grid")
       (@abi.ts "rows(): Promise<string[][]>")
-      (param $this externref (@abi.ref "Grid"))
+      (param $this externref (@abi.ref "Grid" (module "nested-arrays")))
       (result externref (@abi.ref "Promise"))))
   (import "nested-arrays" "Grid.put_rows"
     (func $nested-arrays:Grid.put_rows (@abi.call "putRows") (@abi.owner "Grid")
       (@abi.ts "putRows(rows: number[][]): void")
-      (param $this externref (@abi.ref "Grid"))
+      (param $this externref (@abi.ref "Grid" (module "nested-arrays")))
       (param $rows externref)))
   (import "nested-arrays" "Grid.names"
     (func $nested-arrays:Grid.names (@abi.call "names") (@abi.owner "Grid")
       (@abi.ts "names(): string[]")
-      (param $this externref (@abi.ref "Grid"))
+      (param $this externref (@abi.ref "Grid" (module "nested-arrays")))
       (result externref)))
   (import "nested-arrays" "Grid.tags"
     (func $nested-arrays:Grid.tags (@abi.get "tags") (@abi.owner "Grid")
       (@abi.ts "tags: boolean[][]")
-      (param $this externref (@abi.ref "Grid"))
+      (param $this externref (@abi.ref "Grid" (module "nested-arrays")))
       (result externref)))
   (import "nested-arrays" "Grid.set_tags"
     (func $nested-arrays:Grid.set_tags (@abi.set "tags") (@abi.owner "Grid")
       (@abi.ts "set tags(value: boolean[][])")
-      (param $this externref (@abi.ref "Grid"))
+      (param $this externref (@abi.ref "Grid" (module "nested-arrays")))
       (param $value externref)))
 
   (import "nested-arrays" "deep"

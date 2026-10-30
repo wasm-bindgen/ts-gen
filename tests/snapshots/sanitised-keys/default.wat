@@ -29,44 +29,44 @@
   (import "sanitised-keys" "Pair.new"
     (func $sanitised-keys:Pair.new (@abi.new "Pair") (@abi.owner "Pair")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Pair"))))
+      (result externref (@abi.ref "Pair" (module "sanitised-keys")))))
   (import "sanitised-keys" "Pair.0"
     (func $sanitised-keys:Pair.0 (@abi.get "0") (@abi.owner "Pair")
       (@abi.ts "0: Socket")
-      (param $this externref (@abi.ref "Pair"))
-      (result externref (@abi.ref "Socket"))))
+      (param $this externref (@abi.ref "Pair" (module "sanitised-keys")))
+      (result externref (@abi.ref "Socket" (module "sanitised-keys")))))
   (import "sanitised-keys" "Pair.set_0"
     (func $sanitised-keys:Pair.set_0 (@abi.set "0") (@abi.owner "Pair")
       (@abi.ts "set 0(value: Socket)")
-      (param $this externref (@abi.ref "Pair"))
-      (param $value externref (@abi.ref "Socket"))))
+      (param $this externref (@abi.ref "Pair" (module "sanitised-keys")))
+      (param $value externref (@abi.ref "Socket" (module "sanitised-keys")))))
   (import "sanitised-keys" "Pair.1"
     (func $sanitised-keys:Pair.1 (@abi.get "1") (@abi.owner "Pair")
       (@abi.ts "1: Socket")
-      (param $this externref (@abi.ref "Pair"))
-      (result externref (@abi.ref "Socket"))))
+      (param $this externref (@abi.ref "Pair" (module "sanitised-keys")))
+      (result externref (@abi.ref "Socket" (module "sanitised-keys")))))
   (import "sanitised-keys" "Pair.set_1"
     (func $sanitised-keys:Pair.set_1 (@abi.set "1") (@abi.owner "Pair")
       (@abi.ts "set 1(value: Socket)")
-      (param $this externref (@abi.ref "Pair"))
-      (param $value externref (@abi.ref "Socket"))))
+      (param $this externref (@abi.ref "Pair" (module "sanitised-keys")))
+      (param $value externref (@abi.ref "Socket" (module "sanitised-keys")))))
   (import "sanitised-keys" "Pair.2"
     (func $sanitised-keys:Pair.2 (@abi.get "2" (on "Pair")) (@abi.owner "Pair")
       (@abi.ts "static 2: Socket")
-      (result externref (@abi.ref "Socket"))))
+      (result externref (@abi.ref "Socket" (module "sanitised-keys")))))
   (import "sanitised-keys" "Pair.set_2"
     (func $sanitised-keys:Pair.set_2 (@abi.set "2" (on "Pair")) (@abi.owner "Pair")
       (@abi.ts "set 2(value: Socket)")
-      (param $value externref (@abi.ref "Socket"))))
+      (param $value externref (@abi.ref "Socket" (module "sanitised-keys")))))
   (import "sanitised-keys" "Pair.public"
     (func $sanitised-keys:Pair.public (@abi.get "$public") (@abi.owner "Pair")
       (@abi.ts "$public: string")
-      (param $this externref (@abi.ref "Pair"))
+      (param $this externref (@abi.ref "Pair" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "Pair.set_public"
     (func $sanitised-keys:Pair.set_public (@abi.set "$public") (@abi.owner "Pair")
       (@abi.ts "set $public(value: string)")
-      (param $this externref (@abi.ref "Pair"))
+      (param $this externref (@abi.ref "Pair" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "Pair.cfmodel"
     (func $sanitised-keys:Pair.cfmodel (@abi.get "@cf/model" (on "Pair")) (@abi.owner "Pair")
@@ -79,32 +79,32 @@
   (import "sanitised-keys" "Pair.emit"
     (func $sanitised-keys:Pair.emit (@abi.call "$emit") (@abi.owner "Pair")
       (@abi.ts "$emit(event: string): void")
-      (param $this externref (@abi.ref "Pair"))
+      (param $this externref (@abi.ref "Pair" (module "sanitised-keys")))
       (param $event externref (@abi.ref string))))
   (import "sanitised-keys" "Pair.cfrun"
     (func $sanitised-keys:Pair.cfrun (@abi.call "@cf/run") (@abi.owner "Pair")
       (@abi.ts "@cf/run(): void")
-      (param $this externref (@abi.ref "Pair"))))
+      (param $this externref (@abi.ref "Pair" (module "sanitised-keys")))))
   (import "sanitised-keys" "Pair.create"
     (func $sanitised-keys:Pair.create (@abi.call "$create" (on "Pair")) (@abi.owner "Pair")
       (@abi.ts "$create(): Pair")
-      (result externref (@abi.ref "Pair"))))
+      (result externref (@abi.ref "Pair" (module "sanitised-keys")))))
 
   (@abi.class "Socket" (module "sanitised-keys"))
   (import "sanitised-keys" "Socket.accept"
     (func $sanitised-keys:Socket.accept (@abi.call "accept") (@abi.owner "Socket")
       (@abi.ts "accept(): void")
-      (param $this externref (@abi.ref "Socket"))))
+      (param $this externref (@abi.ref "Socket" (module "sanitised-keys")))))
 
   (@abi.class "$Store" (module "sanitised-keys"))
   (import "sanitised-keys" "$Store.new"
     (func $sanitised-keys:$Store.new (@abi.new "$Store") (@abi.owner "$Store")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "$Store"))))
+      (result externref (@abi.ref "$Store" (module "sanitised-keys")))))
   (import "sanitised-keys" "$Store.create"
     (func $sanitised-keys:$Store.create (@abi.call "create" (on "$Store")) (@abi.owner "$Store")
       (@abi.ts "create(): $Store")
-      (result externref (@abi.ref "$Store"))))
+      (result externref (@abi.ref "$Store" (module "sanitised-keys")))))
   (import "sanitised-keys" "$Store.count"
     (func $sanitised-keys:$Store.count (@abi.get "count" (on "$Store")) (@abi.owner "$Store")
       (@abi.ts "static count: number")
@@ -118,7 +118,7 @@
     (func $sanitised-keys:$ (@abi.call "$" (on))
       (@abi.ts "$(selector: string): Pair")
       (param $selector externref (@abi.ref string))
-      (result externref (@abi.ref "Pair"))))
+      (result externref (@abi.ref "Pair" (module "sanitised-keys")))))
   (import "sanitised-keys" "$version"
     (func $sanitised-keys:$version (@abi.get "$version" (on))
       (@abi.ts "const $version: string")
@@ -146,196 +146,196 @@
   (import "sanitised-keys" "$_.new"
     (func $sanitised-keys:$_.new (@abi.new "$_") (@abi.owner "$_")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "$_"))))
+      (result externref (@abi.ref "$_" (module "sanitised-keys")))))
   (import "sanitised-keys" "$_.underscore"
     (func $sanitised-keys:$_.underscore (@abi.get "_") (@abi.owner "$_")
       (@abi.ts "_: string")
-      (param $this externref (@abi.ref "$_"))
+      (param $this externref (@abi.ref "$_" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "$_.set_underscore"
     (func $sanitised-keys:$_.set_underscore (@abi.set "_") (@abi.owner "$_")
       (@abi.ts "set _(value: string)")
-      (param $this externref (@abi.ref "$_"))
+      (param $this externref (@abi.ref "$_" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
 
   (@abi.class "Collide" (module "sanitised-keys"))
   (import "sanitised-keys" "Collide.new"
     (func $sanitised-keys:Collide.new (@abi.new "Collide") (@abi.owner "Collide")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Collide"))))
+      (result externref (@abi.ref "Collide" (module "sanitised-keys")))))
   (import "sanitised-keys" "Collide.data"
     (func $sanitised-keys:Collide.data (@abi.get "data") (@abi.owner "Collide")
       (@abi.ts "data: string")
-      (param $this externref (@abi.ref "Collide"))
+      (param $this externref (@abi.ref "Collide" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "Collide.set_data"
     (func $sanitised-keys:Collide.set_data (@abi.set "data") (@abi.owner "Collide")
       (@abi.ts "set data(value: string)")
-      (param $this externref (@abi.ref "Collide"))
+      (param $this externref (@abi.ref "Collide" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "Collide.data_2"
     (func $sanitised-keys:Collide.data_2 (@abi.get "$data") (@abi.owner "Collide")
       (@abi.ts "$data: string")
-      (param $this externref (@abi.ref "Collide"))
+      (param $this externref (@abi.ref "Collide" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "Collide.set_data_2"
     (func $sanitised-keys:Collide.set_data_2 (@abi.set "$data") (@abi.owner "Collide")
       (@abi.ts "set $data(value: string)")
-      (param $this externref (@abi.ref "Collide"))
+      (param $this externref (@abi.ref "Collide" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "CollideInit" (module "sanitised-keys"))
   (import "sanitised-keys" "CollideInit.new"
     (func $sanitised-keys:CollideInit.new (@abi.object) (@abi.owner "CollideInit")
       (@abi.ts "{} as CollideInit")
-      (result externref (@abi.ref "CollideInit"))))
+      (result externref (@abi.ref "CollideInit" (module "sanitised-keys")))))
   (import "sanitised-keys" "CollideInit.foo_bar"
     (func $sanitised-keys:CollideInit.foo_bar (@abi.get "fooBar") (@abi.owner "CollideInit")
       (@abi.ts "fooBar: number")
-      (param $this externref (@abi.ref "CollideInit"))
+      (param $this externref (@abi.ref "CollideInit" (module "sanitised-keys")))
       (result f64)))
   (import "sanitised-keys" "CollideInit.set_foo_bar"
     (func $sanitised-keys:CollideInit.set_foo_bar (@abi.set "fooBar") (@abi.owner "CollideInit")
       (@abi.ts "set fooBar(value: number)")
-      (param $this externref (@abi.ref "CollideInit"))
+      (param $this externref (@abi.ref "CollideInit" (module "sanitised-keys")))
       (param $value f64)))
   (import "sanitised-keys" "CollideInit.foo_bar_2"
     (func $sanitised-keys:CollideInit.foo_bar_2 (@abi.get "foo_bar") (@abi.owner "CollideInit")
       (@abi.ts "foo_bar: number")
-      (param $this externref (@abi.ref "CollideInit"))
+      (param $this externref (@abi.ref "CollideInit" (module "sanitised-keys")))
       (result f64)))
   (import "sanitised-keys" "CollideInit.set_foo_bar_2"
     (func $sanitised-keys:CollideInit.set_foo_bar_2 (@abi.set "foo_bar") (@abi.owner "CollideInit")
       (@abi.ts "set foo_bar(value: number)")
-      (param $this externref (@abi.ref "CollideInit"))
+      (param $this externref (@abi.ref "CollideInit" (module "sanitised-keys")))
       (param $value f64)))
   (import "sanitised-keys" "CollideInit.data"
     (func $sanitised-keys:CollideInit.data (@abi.get "data") (@abi.owner "CollideInit")
       (@abi.ts "data?: string")
-      (param $this externref (@abi.ref "CollideInit"))
+      (param $this externref (@abi.ref "CollideInit" (module "sanitised-keys")))
       (result externref (@abi.ref string undefined))))
   (import "sanitised-keys" "CollideInit.set_data"
     (func $sanitised-keys:CollideInit.set_data (@abi.set "data") (@abi.owner "CollideInit")
       (@abi.ts "set data(value: string)")
-      (param $this externref (@abi.ref "CollideInit"))
+      (param $this externref (@abi.ref "CollideInit" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "CollideInit.data_2"
     (func $sanitised-keys:CollideInit.data_2 (@abi.get "$data") (@abi.owner "CollideInit")
       (@abi.ts "$data?: string")
-      (param $this externref (@abi.ref "CollideInit"))
+      (param $this externref (@abi.ref "CollideInit" (module "sanitised-keys")))
       (result externref (@abi.ref string undefined))))
   (import "sanitised-keys" "CollideInit.set_data_2"
     (func $sanitised-keys:CollideInit.set_data_2 (@abi.set "$data") (@abi.owner "CollideInit")
       (@abi.ts "set $data(value: string)")
-      (param $this externref (@abi.ref "CollideInit"))
+      (param $this externref (@abi.ref "CollideInit" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
 
   (@abi.interface "MethodCollide" (module "sanitised-keys"))
   (import "sanitised-keys" "MethodCollide.data"
     (func $sanitised-keys:MethodCollide.data (@abi.call "data") (@abi.owner "MethodCollide")
       (@abi.ts "data(): void")
-      (param $this externref (@abi.ref "MethodCollide"))))
+      (param $this externref (@abi.ref "MethodCollide" (module "sanitised-keys")))))
   (import "sanitised-keys" "MethodCollide.data_2"
     (func $sanitised-keys:MethodCollide.data_2 (@abi.get "$data") (@abi.owner "MethodCollide")
       (@abi.ts "$data: string")
-      (param $this externref (@abi.ref "MethodCollide"))
+      (param $this externref (@abi.ref "MethodCollide" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "MethodCollide.set_data"
     (func $sanitised-keys:MethodCollide.set_data (@abi.set "$data") (@abi.owner "MethodCollide")
       (@abi.ts "set $data(value: string)")
-      (param $this externref (@abi.ref "MethodCollide"))
+      (param $this externref (@abi.ref "MethodCollide" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "MethodCollide.set_foo"
     (func $sanitised-keys:MethodCollide.set_foo (@abi.call "setFoo") (@abi.owner "MethodCollide")
       (@abi.ts "setFoo(): void")
-      (param $this externref (@abi.ref "MethodCollide"))))
+      (param $this externref (@abi.ref "MethodCollide" (module "sanitised-keys")))))
   (import "sanitised-keys" "MethodCollide.foo"
     (func $sanitised-keys:MethodCollide.foo (@abi.get "foo") (@abi.owner "MethodCollide")
       (@abi.ts "foo: string")
-      (param $this externref (@abi.ref "MethodCollide"))
+      (param $this externref (@abi.ref "MethodCollide" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "MethodCollide.set_foo_2"
     (func $sanitised-keys:MethodCollide.set_foo_2 (@abi.set "foo") (@abi.owner "MethodCollide")
       (@abi.ts "set foo(value: string)")
-      (param $this externref (@abi.ref "MethodCollide"))
+      (param $this externref (@abi.ref "MethodCollide" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "MethodCollide.call"
     (func $sanitised-keys:MethodCollide.call (@abi.call "call") (@abi.owner "MethodCollide")
       (@abi.ts "call(): void")
-      (param $this externref (@abi.ref "MethodCollide"))))
+      (param $this externref (@abi.ref "MethodCollide" (module "sanitised-keys")))))
   (import "sanitised-keys" "MethodCollide.call_with_a"
     (func $sanitised-keys:MethodCollide.call_with_a (@abi.call "call") (@abi.owner "MethodCollide")
       (@abi.ts "call(a: string): void")
-      (param $this externref (@abi.ref "MethodCollide"))
+      (param $this externref (@abi.ref "MethodCollide" (module "sanitised-keys")))
       (param $a externref (@abi.ref string))))
   (import "sanitised-keys" "MethodCollide.call_with_a_2"
     (func $sanitised-keys:MethodCollide.call_with_a_2 (@abi.call "call") (@abi.owner "MethodCollide")
       (@abi.ts "call(a: number): void")
-      (param $this externref (@abi.ref "MethodCollide"))
+      (param $this externref (@abi.ref "MethodCollide" (module "sanitised-keys")))
       (param $a f64)))
 
   (@abi.dictionary "SetterCollide" (module "sanitised-keys"))
   (import "sanitised-keys" "SetterCollide.new"
     (func $sanitised-keys:SetterCollide.new (@abi.object) (@abi.owner "SetterCollide")
       (@abi.ts "{} as SetterCollide")
-      (result externref (@abi.ref "SetterCollide"))))
+      (result externref (@abi.ref "SetterCollide" (module "sanitised-keys")))))
   (import "sanitised-keys" "SetterCollide.set_foo"
     (func $sanitised-keys:SetterCollide.set_foo (@abi.get "setFoo") (@abi.owner "SetterCollide")
       (@abi.ts "setFoo: string")
-      (param $this externref (@abi.ref "SetterCollide"))
+      (param $this externref (@abi.ref "SetterCollide" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "SetterCollide.set_set_foo"
     (func $sanitised-keys:SetterCollide.set_set_foo (@abi.set "setFoo") (@abi.owner "SetterCollide")
       (@abi.ts "set setFoo(value: string)")
-      (param $this externref (@abi.ref "SetterCollide"))
+      (param $this externref (@abi.ref "SetterCollide" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "SetterCollide.foo"
     (func $sanitised-keys:SetterCollide.foo (@abi.get "foo") (@abi.owner "SetterCollide")
       (@abi.ts "foo: string")
-      (param $this externref (@abi.ref "SetterCollide"))
+      (param $this externref (@abi.ref "SetterCollide" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "SetterCollide.set_foo_2"
     (func $sanitised-keys:SetterCollide.set_foo_2 (@abi.set "foo") (@abi.owner "SetterCollide")
       (@abi.ts "set foo(value: string)")
-      (param $this externref (@abi.ref "SetterCollide"))
+      (param $this externref (@abi.ref "SetterCollide" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
 
   (@abi.class "SetterNumbers" (module "sanitised-keys"))
   (import "sanitised-keys" "SetterNumbers.data"
     (func $sanitised-keys:SetterNumbers.data (@abi.get "data") (@abi.owner "SetterNumbers")
       (@abi.ts "data: string")
-      (param $this externref (@abi.ref "SetterNumbers"))
+      (param $this externref (@abi.ref "SetterNumbers" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "SetterNumbers.set_data"
     (func $sanitised-keys:SetterNumbers.set_data (@abi.set "data") (@abi.owner "SetterNumbers")
       (@abi.ts "set data(value: string)")
-      (param $this externref (@abi.ref "SetterNumbers"))
+      (param $this externref (@abi.ref "SetterNumbers" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "SetterNumbers.data_2"
     (func $sanitised-keys:SetterNumbers.data_2 (@abi.get "$data") (@abi.owner "SetterNumbers")
       (@abi.ts "$data: string")
-      (param $this externref (@abi.ref "SetterNumbers"))
+      (param $this externref (@abi.ref "SetterNumbers" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "SetterNumbers.set_data_2"
     (func $sanitised-keys:SetterNumbers.set_data_2 (@abi.set "$data") (@abi.owner "SetterNumbers")
       (@abi.ts "set $data(value: string)")
-      (param $this externref (@abi.ref "SetterNumbers"))
+      (param $this externref (@abi.ref "SetterNumbers" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "SetterNumbers.set_data_3"
     (func $sanitised-keys:SetterNumbers.set_data_3 (@abi.call "setData") (@abi.owner "SetterNumbers")
       (@abi.ts "setData(): void")
-      (param $this externref (@abi.ref "SetterNumbers"))))
+      (param $this externref (@abi.ref "SetterNumbers" (module "sanitised-keys")))))
 
   (@abi.class "ReadonlyCollide" (module "sanitised-keys"))
   (import "sanitised-keys" "ReadonlyCollide.value"
     (func $sanitised-keys:ReadonlyCollide.value (@abi.get "value") (@abi.owner "ReadonlyCollide")
       (@abi.ts "value: string")
-      (param $this externref (@abi.ref "ReadonlyCollide"))
+      (param $this externref (@abi.ref "ReadonlyCollide" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "ReadonlyCollide.set_value"
     (func $sanitised-keys:ReadonlyCollide.set_value (@abi.call "setValue") (@abi.owner "ReadonlyCollide")
       (@abi.ts "setValue(value: string): void")
-      (param $this externref (@abi.ref "ReadonlyCollide"))
+      (param $this externref (@abi.ref "ReadonlyCollide" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "ReadonlyCollide.level"
     (func $sanitised-keys:ReadonlyCollide.level (@abi.get "level" (on "ReadonlyCollide")) (@abi.owner "ReadonlyCollide")
@@ -369,7 +369,7 @@
   (import "sanitised-keys" "Receiver.method"
     (func $sanitised-keys:Receiver.method (@abi.call "method") (@abi.owner "Receiver")
       (@abi.ts "method(this2: string, value: number): void")
-      (param $this externref (@abi.ref "Receiver"))
+      (param $this externref (@abi.ref "Receiver" (module "sanitised-keys")))
       (param $this2 externref (@abi.ref string))
       (param $value f64)))
 
@@ -377,73 +377,73 @@
   (import "sanitised-keys" "ReservedInit.new"
     (func $sanitised-keys:ReservedInit.new (@abi.object) (@abi.owner "ReservedInit")
       (@abi.ts "{} as ReservedInit")
-      (result externref (@abi.ref "ReservedInit"))))
+      (result externref (@abi.ref "ReservedInit" (module "sanitised-keys")))))
   (import "sanitised-keys" "ReservedInit.new_2"
     (func $sanitised-keys:ReservedInit.new_2 (@abi.get "new") (@abi.owner "ReservedInit")
       (@abi.ts "new: string")
-      (param $this externref (@abi.ref "ReservedInit"))
+      (param $this externref (@abi.ref "ReservedInit" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "ReservedInit.set_new"
     (func $sanitised-keys:ReservedInit.set_new (@abi.set "new") (@abi.owner "ReservedInit")
       (@abi.ts "set new(value: string)")
-      (param $this externref (@abi.ref "ReservedInit"))
+      (param $this externref (@abi.ref "ReservedInit" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "ReservedInit.inner"
     (func $sanitised-keys:ReservedInit.inner (@abi.get "inner") (@abi.owner "ReservedInit")
       (@abi.ts "inner: string")
-      (param $this externref (@abi.ref "ReservedInit"))
+      (param $this externref (@abi.ref "ReservedInit" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "ReservedInit.set_inner"
     (func $sanitised-keys:ReservedInit.set_inner (@abi.set "inner") (@abi.owner "ReservedInit")
       (@abi.ts "set inner(value: string)")
-      (param $this externref (@abi.ref "ReservedInit"))
+      (param $this externref (@abi.ref "ReservedInit" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
   (import "sanitised-keys" "ReservedInit.builder"
     (func $sanitised-keys:ReservedInit.builder (@abi.get "builder") (@abi.owner "ReservedInit")
       (@abi.ts "builder?: number")
-      (param $this externref (@abi.ref "ReservedInit"))
+      (param $this externref (@abi.ref "ReservedInit" (module "sanitised-keys")))
       (result externref (@abi.ref number undefined))))
   (import "sanitised-keys" "ReservedInit.set_builder"
     (func $sanitised-keys:ReservedInit.set_builder (@abi.set "builder") (@abi.owner "ReservedInit")
       (@abi.ts "set builder(value: number)")
-      (param $this externref (@abi.ref "ReservedInit"))
+      (param $this externref (@abi.ref "ReservedInit" (module "sanitised-keys")))
       (param $value f64)))
   (import "sanitised-keys" "ReservedInit.build"
     (func $sanitised-keys:ReservedInit.build (@abi.get "build") (@abi.owner "ReservedInit")
       (@abi.ts "build?: boolean")
-      (param $this externref (@abi.ref "ReservedInit"))
+      (param $this externref (@abi.ref "ReservedInit" (module "sanitised-keys")))
       (result externref (@abi.ref boolean undefined))))
   (import "sanitised-keys" "ReservedInit.set_build"
     (func $sanitised-keys:ReservedInit.set_build (@abi.set "build") (@abi.owner "ReservedInit")
       (@abi.ts "set build(value: boolean)")
-      (param $this externref (@abi.ref "ReservedInit"))
+      (param $this externref (@abi.ref "ReservedInit" (module "sanitised-keys")))
       (param $value i32)))
 
   (@abi.class "ReservedClass" (module "sanitised-keys"))
   (import "sanitised-keys" "ReservedClass.new"
     (func $sanitised-keys:ReservedClass.new (@abi.new "ReservedClass") (@abi.owner "ReservedClass")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "ReservedClass"))))
+      (result externref (@abi.ref "ReservedClass" (module "sanitised-keys")))))
   (import "sanitised-keys" "ReservedClass.new_2"
     (func $sanitised-keys:ReservedClass.new_2 (@abi.get "new") (@abi.owner "ReservedClass")
       (@abi.ts "new: string")
-      (param $this externref (@abi.ref "ReservedClass"))
+      (param $this externref (@abi.ref "ReservedClass" (module "sanitised-keys")))
       (result externref (@abi.ref string))))
   (import "sanitised-keys" "ReservedClass.set_new"
     (func $sanitised-keys:ReservedClass.set_new (@abi.set "new") (@abi.owner "ReservedClass")
       (@abi.ts "set new(value: string)")
-      (param $this externref (@abi.ref "ReservedClass"))
+      (param $this externref (@abi.ref "ReservedClass" (module "sanitised-keys")))
       (param $value externref (@abi.ref string))))
 
   (@abi.class "ReservedMethod" (module "sanitised-keys"))
   (import "sanitised-keys" "ReservedMethod.new"
     (func $sanitised-keys:ReservedMethod.new (@abi.new "ReservedMethod") (@abi.owner "ReservedMethod")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "ReservedMethod"))))
+      (result externref (@abi.ref "ReservedMethod" (module "sanitised-keys")))))
   (import "sanitised-keys" "ReservedMethod.new_2"
     (func $sanitised-keys:ReservedMethod.new_2 (@abi.call "new") (@abi.owner "ReservedMethod")
       (@abi.ts "new(): void")
-      (param $this externref (@abi.ref "ReservedMethod"))))
+      (param $this externref (@abi.ref "ReservedMethod" (module "sanitised-keys")))))
 
   (import "sanitised-keys" "url"
     (func $sanitised-keys:url (@abi.get "url" (on))

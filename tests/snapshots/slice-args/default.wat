@@ -30,11 +30,11 @@
     (func $slice-args:Item.new (@abi.new "Item") (@abi.owner "Item")
       (@abi.ts "constructor(name: string)")
       (param $name externref (@abi.ref string))
-      (result externref (@abi.ref "Item"))))
+      (result externref (@abi.ref "Item" (module "slice-args")))))
   (import "slice-args" "Item.name"
     (func $slice-args:Item.name (@abi.get "name") (@abi.owner "Item")
       (@abi.ts "name: string")
-      (param $this externref (@abi.ref "Item"))
+      (param $this externref (@abi.ref "Item" (module "slice-args")))
       (result externref (@abi.ref string))))
 
   (import "slice-args" "numbers"
@@ -221,11 +221,11 @@
   (import "slice-args" "Bag.new"
     (func $slice-args:Bag.new (@abi.new "Bag") (@abi.owner "Bag")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Bag"))))
+      (result externref (@abi.ref "Bag" (module "slice-args")))))
   (import "slice-args" "Bag.take"
     (func $slice-args:Bag.take (@abi.call "take") (@abi.owner "Bag")
       (@abi.ts "take(values: T[]): string")
-      (param $this externref (@abi.ref "Bag"))
+      (param $this externref (@abi.ref "Bag" (module "slice-args")))
       (param $values externref)
       (result externref (@abi.ref string))))
 

@@ -30,11 +30,11 @@
     (func $export-default-module-file:default.new (@abi.new "default") (@abi.owner "default")
       (@abi.ts "constructor(name: string)")
       (param $name externref (@abi.ref string))
-      (result externref (@abi.ref "default"))))
+      (result externref (@abi.ref "default" (module "export-default-module-file")))))
   (import "export-default-module-file" "default.create"
     (func $export-default-module-file:default.create (@abi.call "create" (on "default")) (@abi.owner "default")
       (@abi.ts "create(): Widget")
-      (result externref (@abi.ref "default"))))
+      (result externref (@abi.ref "default" (module "export-default-module-file")))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

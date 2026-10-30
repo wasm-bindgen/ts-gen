@@ -61,18 +61,18 @@
     (func $mono-lists:bagOf (@abi.call "bagOf" (on))
       (@abi.ts "bagOf(...items: T[]): Bag<T>")
       (param $items (ref null $anyrefs))
-      (result externref (@abi.ref "Bag"))))
+      (result externref (@abi.ref "Bag" (module "mono-lists")))))
 
   (@abi.class "Bag" (module "mono-lists"))
   (import "mono-lists" "Bag.size"
     (func $mono-lists:Bag.size (@abi.get "size") (@abi.owner "Bag")
       (@abi.ts "size: number")
-      (param $this externref (@abi.ref "Bag"))
+      (param $this externref (@abi.ref "Bag" (module "mono-lists")))
       (result f64)))
   (import "mono-lists" "Bag.first"
     (func $mono-lists:Bag.first (@abi.call "first") (@abi.owner "Bag")
       (@abi.ts "first(): T")
-      (param $this externref (@abi.ref "Bag"))
+      (param $this externref (@abi.ref "Bag" (module "mono-lists")))
       (result externref (@abi.ref null undefined))))
 
   (import "mono-lists" "rows"
@@ -136,70 +136,70 @@
   (import "mono-lists" "Labels.new"
     (func $mono-lists:Labels.new (@abi.new "Labels") (@abi.owner "Labels")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Labels"))))
+      (result externref (@abi.ref "Labels" (module "mono-lists")))))
   (import "mono-lists" "Labels.add"
     (func $mono-lists:Labels.add (@abi.call "add") (@abi.owner "Labels")
       (@abi.ts "add(values: string[]): string")
-      (param $this externref (@abi.ref "Labels"))
+      (param $this externref (@abi.ref "Labels" (module "mono-lists")))
       (param $values externref)
       (result externref (@abi.ref string))))
   (import "mono-lists" "Labels.add_2"
     (func $mono-lists:Labels.add_2 (@abi.call "add") (@abi.owner "Labels")
       (@abi.ts "add(...values: string[]): string")
-      (param $this externref (@abi.ref "Labels"))
+      (param $this externref (@abi.ref "Labels" (module "mono-lists")))
       (param $values (ref null $anyrefs))
       (result externref (@abi.ref string))))
   (import "mono-lists" "Labels.values"
     (func $mono-lists:Labels.values (@abi.get "values") (@abi.owner "Labels")
       (@abi.ts "values: string[]")
-      (param $this externref (@abi.ref "Labels"))
+      (param $this externref (@abi.ref "Labels" (module "mono-lists")))
       (result externref)))
   (import "mono-lists" "Labels.set_values"
     (func $mono-lists:Labels.set_values (@abi.set "values") (@abi.owner "Labels")
       (@abi.ts "set values(value: string[])")
-      (param $this externref (@abi.ref "Labels"))
+      (param $this externref (@abi.ref "Labels" (module "mono-lists")))
       (param $value externref)))
   (import "mono-lists" "Labels.flags"
     (func $mono-lists:Labels.flags (@abi.get "flags") (@abi.owner "Labels")
       (@abi.ts "flags: boolean[]")
-      (param $this externref (@abi.ref "Labels"))
+      (param $this externref (@abi.ref "Labels" (module "mono-lists")))
       (result externref)))
   (import "mono-lists" "Labels.set_flags"
     (func $mono-lists:Labels.set_flags (@abi.set "flags") (@abi.owner "Labels")
       (@abi.ts "set flags(value: boolean[])")
-      (param $this externref (@abi.ref "Labels"))
+      (param $this externref (@abi.ref "Labels" (module "mono-lists")))
       (param $value externref)))
 
   (@abi.dictionary "LabelOptions" (module "mono-lists"))
   (import "mono-lists" "LabelOptions.new"
     (func $mono-lists:LabelOptions.new (@abi.object) (@abi.owner "LabelOptions")
       (@abi.ts "{} as LabelOptions")
-      (result externref (@abi.ref "LabelOptions"))))
+      (result externref (@abi.ref "LabelOptions" (module "mono-lists")))))
   (import "mono-lists" "LabelOptions.values"
     (func $mono-lists:LabelOptions.values (@abi.get "values") (@abi.owner "LabelOptions")
       (@abi.ts "values?: string[]")
-      (param $this externref (@abi.ref "LabelOptions"))
+      (param $this externref (@abi.ref "LabelOptions" (module "mono-lists")))
       (result externref (@abi.ref undefined))))
   (import "mono-lists" "LabelOptions.set_values"
     (func $mono-lists:LabelOptions.set_values (@abi.set "values") (@abi.owner "LabelOptions")
       (@abi.ts "set values(value: string[])")
-      (param $this externref (@abi.ref "LabelOptions"))
+      (param $this externref (@abi.ref "LabelOptions" (module "mono-lists")))
       (param $value externref)))
   (import "mono-lists" "LabelOptions.flags"
     (func $mono-lists:LabelOptions.flags (@abi.get "flags") (@abi.owner "LabelOptions")
       (@abi.ts "flags?: boolean[]")
-      (param $this externref (@abi.ref "LabelOptions"))
+      (param $this externref (@abi.ref "LabelOptions" (module "mono-lists")))
       (result externref (@abi.ref undefined))))
   (import "mono-lists" "LabelOptions.set_flags"
     (func $mono-lists:LabelOptions.set_flags (@abi.set "flags") (@abi.owner "LabelOptions")
       (@abi.ts "set flags(value: boolean[])")
-      (param $this externref (@abi.ref "LabelOptions"))
+      (param $this externref (@abi.ref "LabelOptions" (module "mono-lists")))
       (param $value externref)))
 
   (import "mono-lists" "describeOptions"
     (func $mono-lists:describeOptions (@abi.call "describeOptions" (on))
       (@abi.ts "describeOptions(options: LabelOptions): string")
-      (param $options externref (@abi.ref "LabelOptions"))
+      (param $options externref (@abi.ref "LabelOptions" (module "mono-lists")))
       (result externref (@abi.ref string))))
   (import "mono-lists" "getValue"
     (func $mono-lists:getValue (@abi.call "getValue" (on))
@@ -211,11 +211,11 @@
     (func $mono-lists:Total.new (@abi.new "Total") (@abi.owner "Total")
       (@abi.ts "constructor(...values: number[])")
       (param $values (ref null $anyrefs))
-      (result externref (@abi.ref "Total"))))
+      (result externref (@abi.ref "Total" (module "mono-lists")))))
   (import "mono-lists" "Total.value"
     (func $mono-lists:Total.value (@abi.get "value") (@abi.owner "Total")
       (@abi.ts "value: number")
-      (param $this externref (@abi.ref "Total"))
+      (param $this externref (@abi.ref "Total" (module "mono-lists")))
       (result f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

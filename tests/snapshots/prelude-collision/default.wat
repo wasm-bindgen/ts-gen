@@ -30,70 +30,70 @@
     (func $prelude-collision:Result.new (@abi.new "Result") (@abi.owner "Result")
       (@abi.ts "constructor(ok: boolean)")
       (param $ok i32)
-      (result externref (@abi.ref "Result"))))
+      (result externref (@abi.ref "Result" (module "prelude-collision")))))
   (import "prelude-collision" "Result.ok"
     (func $prelude-collision:Result.ok (@abi.get "ok") (@abi.owner "Result")
       (@abi.ts "ok: boolean")
-      (param $this externref (@abi.ref "Result"))
+      (param $this externref (@abi.ref "Result" (module "prelude-collision")))
       (result i32)))
 
   (@abi.dictionary "Option" (module "prelude-collision"))
   (import "prelude-collision" "Option.new"
     (func $prelude-collision:Option.new (@abi.object) (@abi.owner "Option")
       (@abi.ts "{} as Option")
-      (result externref (@abi.ref "Option"))))
+      (result externref (@abi.ref "Option" (module "prelude-collision")))))
   (import "prelude-collision" "Option.value"
     (func $prelude-collision:Option.value (@abi.get "value") (@abi.owner "Option")
       (@abi.ts "value: string")
-      (param $this externref (@abi.ref "Option"))
+      (param $this externref (@abi.ref "Option" (module "prelude-collision")))
       (result externref (@abi.ref string))))
   (import "prelude-collision" "Option.set_value"
     (func $prelude-collision:Option.set_value (@abi.set "value") (@abi.owner "Option")
       (@abi.ts "set value(value: string)")
-      (param $this externref (@abi.ref "Option"))
+      (param $this externref (@abi.ref "Option" (module "prelude-collision")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "Default" (module "prelude-collision"))
   (import "prelude-collision" "Default.new"
     (func $prelude-collision:Default.new (@abi.object) (@abi.owner "Default")
       (@abi.ts "{} as Default")
-      (result externref (@abi.ref "Default"))))
+      (result externref (@abi.ref "Default" (module "prelude-collision")))))
   (import "prelude-collision" "Default.limit"
     (func $prelude-collision:Default.limit (@abi.get "limit") (@abi.owner "Default")
       (@abi.ts "limit?: number")
-      (param $this externref (@abi.ref "Default"))
+      (param $this externref (@abi.ref "Default" (module "prelude-collision")))
       (result externref (@abi.ref number undefined))))
   (import "prelude-collision" "Default.set_limit"
     (func $prelude-collision:Default.set_limit (@abi.set "limit") (@abi.owner "Default")
       (@abi.ts "set limit(value: number)")
-      (param $this externref (@abi.ref "Default"))
+      (param $this externref (@abi.ref "Default" (module "prelude-collision")))
       (param $value f64)))
 
   (@abi.class "Vec" (module "prelude-collision"))
   (import "prelude-collision" "Vec.length"
     (func $prelude-collision:Vec.length (@abi.get "length") (@abi.owner "Vec")
       (@abi.ts "length: number")
-      (param $this externref (@abi.ref "Vec"))
+      (param $this externref (@abi.ref "Vec" (module "prelude-collision")))
       (result f64)))
   (import "prelude-collision" "Vec.set_length"
     (func $prelude-collision:Vec.set_length (@abi.set "length") (@abi.owner "Vec")
       (@abi.ts "set length(value: number)")
-      (param $this externref (@abi.ref "Vec"))
+      (param $this externref (@abi.ref "Vec" (module "prelude-collision")))
       (param $value f64)))
 
   (import "prelude-collision" "take"
     (func $prelude-collision:take (@abi.call "take" (on))
       (@abi.ts "take(r: Result, o: Option): Vec")
-      (param $r externref (@abi.ref "Result"))
-      (param $o externref (@abi.ref "Option"))
-      (result externref (@abi.ref "Vec"))))
+      (param $r externref (@abi.ref "Result" (module "prelude-collision")))
+      (param $o externref (@abi.ref "Option" (module "prelude-collision")))
+      (result externref (@abi.ref "Vec" (module "prelude-collision")))))
   (import "prelude-collision" "take_with_d"
     (func $prelude-collision:take_with_d (@abi.call "take" (on))
       (@abi.ts "take(r: Result, o: Option, d: Default): Vec")
-      (param $r externref (@abi.ref "Result"))
-      (param $o externref (@abi.ref "Option"))
-      (param $d externref (@abi.ref "Default"))
-      (result externref (@abi.ref "Vec"))))
+      (param $r externref (@abi.ref "Result" (module "prelude-collision")))
+      (param $o externref (@abi.ref "Option" (module "prelude-collision")))
+      (param $d externref (@abi.ref "Default" (module "prelude-collision")))
+      (result externref (@abi.ref "Vec" (module "prelude-collision")))))
   (import "prelude-collision" "label"
     (func $prelude-collision:label (@abi.call "label" (on))
       (@abi.ts "label(s: string): string")

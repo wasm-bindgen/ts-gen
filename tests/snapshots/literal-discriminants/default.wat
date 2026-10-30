@@ -29,42 +29,42 @@
   (import "literal-discriminants" "Options.new"
     (func $literal-discriminants:Options.new (@abi.object) (@abi.owner "Options")
       (@abi.ts "{} as Options")
-      (result externref (@abi.ref "Options"))))
+      (result externref (@abi.ref "Options" (module "literal-discriminants")))))
   (import "literal-discriminants" "Options.keep_alive"
     (func $literal-discriminants:Options.keep_alive (@abi.get "keepAlive") (@abi.owner "Options")
       (@abi.ts "keepAlive: KeepAlive")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "literal-discriminants")))
       (result externref (@abi.ref number))))
   (import "literal-discriminants" "Options.set_keep_alive"
     (func $literal-discriminants:Options.set_keep_alive (@abi.set "keepAlive") (@abi.owner "Options")
       (@abi.ts "set keepAlive(value: KeepAlive)")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "literal-discriminants")))
       (param $value externref (@abi.ref number))))
   (import "literal-discriminants" "Options.label"
     (func $literal-discriminants:Options.label (@abi.get "label") (@abi.owner "Options")
       (@abi.ts "label?: string")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "literal-discriminants")))
       (result externref (@abi.ref string undefined))))
   (import "literal-discriminants" "Options.set_label"
     (func $literal-discriminants:Options.set_label (@abi.set "label") (@abi.owner "Options")
       (@abi.ts "set label(value: string)")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "literal-discriminants")))
       (param $value externref (@abi.ref string))))
 
   (@abi.dictionary "Scaled" (module "literal-discriminants"))
   (import "literal-discriminants" "Scaled.new"
     (func $literal-discriminants:Scaled.new (@abi.object) (@abi.owner "Scaled")
       (@abi.ts "{} as Scaled")
-      (result externref (@abi.ref "Scaled"))))
+      (result externref (@abi.ref "Scaled" (module "literal-discriminants")))))
   (import "literal-discriminants" "Scaled.scale"
     (func $literal-discriminants:Scaled.scale (@abi.get "scale") (@abi.owner "Scaled")
       (@abi.ts "scale: -1 | 0.5")
-      (param $this externref (@abi.ref "Scaled"))
+      (param $this externref (@abi.ref "Scaled" (module "literal-discriminants")))
       (result externref (@abi.ref number))))
   (import "literal-discriminants" "Scaled.set_scale"
     (func $literal-discriminants:Scaled.set_scale (@abi.set "scale") (@abi.owner "Scaled")
       (@abi.ts "set scale(value: -1)")
-      (param $this externref (@abi.ref "Scaled"))
+      (param $this externref (@abi.ref "Scaled" (module "literal-discriminants")))
       (param $value f64)))
 
   (import "literal-discriminants" "level"
@@ -80,11 +80,11 @@
   (import "literal-discriminants" "Feedback.new"
     (func $literal-discriminants:Feedback.new (@abi.object) (@abi.owner "Feedback")
       (@abi.ts "{} as Feedback")
-      (result externref (@abi.ref "Feedback"))))
+      (result externref (@abi.ref "Feedback" (module "literal-discriminants")))))
   (import "literal-discriminants" "Feedback.value"
     (func $literal-discriminants:Feedback.value (@abi.get "value") (@abi.owner "Feedback")
       (@abi.ts "value: -1 | 1 | null")
-      (param $this externref (@abi.ref "Feedback"))
+      (param $this externref (@abi.ref "Feedback" (module "literal-discriminants")))
       (result externref (@abi.ref number null))))
 
   (import "literal-discriminants" "ratio"

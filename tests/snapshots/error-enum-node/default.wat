@@ -49,17 +49,17 @@
     (func $error-enum-node:Gate.new (@abi.new "Gate") (@abi.owner "Gate")
       (@abi.ts "constructor(open: boolean)")
       (param $open i32)
-      (result externref (@abi.ref "Gate"))))
+      (result externref (@abi.ref "Gate" (module "error-enum-node")))))
   (import "error-enum-node" "Gate.value"
     (func $error-enum-node:Gate.value (@abi.get "value") (@abi.owner "Gate")
       (@abi.ts "value: number")
       (@abi.doc "Throws when the gate is closed.\n\n## Errors\n\n* `SubFault`")
-      (param $this externref (@abi.ref "Gate"))
+      (param $this externref (@abi.ref "Gate" (module "error-enum-node")))
       (result f64)))
 
   ;; Owners with no functions of their own.
   (@abi.class "Fault" (module "error-enum-node") (extends "Error"))
-  (@abi.class "SubFault" (module "error-enum-node") (extends "Fault"))
+  (@abi.class "SubFault" (module "error-enum-node") (extends "Fault" (module "error-enum-node")))
   (@abi.class "Other" (module "error-enum-node") (extends "Error"))
   (@abi.class "CodesFault" (module "error-enum-node") (extends "Error"))
   (@abi.namespace "Codes" (module "error-enum-node"))

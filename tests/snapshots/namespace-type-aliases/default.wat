@@ -48,7 +48,7 @@
   (import "namespace-type-aliases" "Holder.on"
     (func $namespace-type-aliases:Holder.on (@abi.call "on") (@abi.owner "Holder")
       (@abi.ts "on(listener: Events.Listener<T>): void")
-      (param $this externref (@abi.ref "Holder"))
+      (param $this externref (@abi.ref "Holder" (module "namespace-type-aliases")))
       (param $listener externref)))
 
   (import "namespace-type-aliases" "tagged"

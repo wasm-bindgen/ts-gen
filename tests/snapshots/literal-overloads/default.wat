@@ -29,20 +29,20 @@
   (import "literal-overloads" "KVNamespace.get"
     (func $literal-overloads:KVNamespace.get (@abi.call "get") (@abi.owner "KVNamespace")
       (@abi.ts "get(key: string): Promise<string | null>")
-      (param $this externref (@abi.ref "KVNamespace"))
+      (param $this externref (@abi.ref "KVNamespace" (module "literal-overloads")))
       (param $key externref (@abi.ref string))
       (result externref (@abi.ref "Promise"))))
   (import "literal-overloads" "KVNamespace.get_2"
     (func $literal-overloads:KVNamespace.get_2 (@abi.call "get") (@abi.owner "KVNamespace")
       (@abi.ts "get(key: string, type: \"text\"): Promise<string | null>")
-      (param $this externref (@abi.ref "KVNamespace"))
+      (param $this externref (@abi.ref "KVNamespace" (module "literal-overloads")))
       (param $key externref (@abi.ref string))
       (param $type externref (@abi.ref string))
       (result externref (@abi.ref "Promise"))))
   (import "literal-overloads" "KVNamespace.get_with_slice"
     (func $literal-overloads:KVNamespace.get_with_slice (@abi.call "get") (@abi.owner "KVNamespace")
       (@abi.ts "get(key: string[], type: \"text\"): Promise<Map<string, string | null>>")
-      (param $this externref (@abi.ref "KVNamespace"))
+      (param $this externref (@abi.ref "KVNamespace" (module "literal-overloads")))
       (param $key externref)
       (param $type externref (@abi.ref string))
       (result externref (@abi.ref "Promise"))))
@@ -50,7 +50,7 @@
     (func $literal-overloads:KVNamespace.mode (@abi.call "mode") (@abi.owner "KVNamespace")
       (@abi.ts "mode(kind: \"fast\"): boolean")
       (@abi.doc "A literal union is one overload with several arms.")
-      (param $this externref (@abi.ref "KVNamespace"))
+      (param $this externref (@abi.ref "KVNamespace" (module "literal-overloads")))
       (param $kind externref (@abi.ref string))
       (result i32)))
 
@@ -58,7 +58,7 @@
   (import "literal-overloads" "Headers.get_all"
     (func $literal-overloads:Headers.get_all (@abi.call "getAll") (@abi.owner "Headers")
       (@abi.ts "getAll(name: \"Set-Cookie\"): string[]")
-      (param $this externref (@abi.ref "Headers"))
+      (param $this externref (@abi.ref "Headers" (module "literal-overloads")))
       (param $name externref (@abi.ref string))
       (result externref)))
 
@@ -66,7 +66,7 @@
   (import "literal-overloads" "SubtleCrypto.export_key"
     (func $literal-overloads:SubtleCrypto.export_key (@abi.call "exportKey") (@abi.owner "SubtleCrypto")
       (@abi.ts "exportKey(format: \"jwk\", key: string): Promise<object>")
-      (param $this externref (@abi.ref "SubtleCrypto"))
+      (param $this externref (@abi.ref "SubtleCrypto" (module "literal-overloads")))
       (param $format externref (@abi.ref string))
       (param $key externref (@abi.ref string))
       (result externref (@abi.ref "Promise"))))
@@ -80,7 +80,7 @@
   (import "literal-overloads" "KVStore.get"
     (func $literal-overloads:KVStore.get (@abi.call "get") (@abi.owner "KVStore")
       (@abi.ts "get(key: Key, type: \"text\"): Promise<string | null>")
-      (param $this externref (@abi.ref "KVStore"))
+      (param $this externref (@abi.ref "KVStore" (module "literal-overloads")))
       (param $key externref (@abi.ref null undefined))
       (param $type externref (@abi.ref string))
       (result externref (@abi.ref "Promise"))))
@@ -88,7 +88,7 @@
     (func $literal-overloads:KVStore.put (@abi.call "put") (@abi.owner "KVStore")
       (@abi.ts "put(key: Key, kind: \"a\", value: string | null): void")
       (@abi.doc "A `null` arm on a generic receiver keeps the receiver's `Key`.")
-      (param $this externref (@abi.ref "KVStore"))
+      (param $this externref (@abi.ref "KVStore" (module "literal-overloads")))
       (param $key externref (@abi.ref null undefined))
       (param $kind externref (@abi.ref string))
       (param $value externref (@abi.ref string null))))
@@ -97,7 +97,7 @@
   (import "literal-overloads" "Picker.pick"
     (func $literal-overloads:Picker.pick (@abi.call "pick") (@abi.owner "Picker")
       (@abi.ts "pick(kind: \"a\", x: ArrayBuffer | null): void")
-      (param $this externref (@abi.ref "Picker"))
+      (param $this externref (@abi.ref "Picker" (module "literal-overloads")))
       (param $kind externref (@abi.ref string))
       (param $x externref (@abi.ref "ArrayBuffer" null))))
   (import "literal-overloads" "Picker.make"
@@ -105,19 +105,19 @@
       (@abi.ts "make(kind: \"a\", x: string | null): Picker")
       (param $kind externref (@abi.ref string))
       (param $x externref (@abi.ref string null))
-      (result externref (@abi.ref "Picker"))))
+      (result externref (@abi.ref "Picker" (module "literal-overloads")))))
   (import "literal-overloads" "Picker.put"
     (func $literal-overloads:Picker.put (@abi.call "put") (@abi.owner "Picker")
       (@abi.ts "put(kind: \"a\", x: T | null): void")
       (@abi.doc "The `null` arm's wrappers and extern drop `T`, which only it named.")
-      (param $this externref (@abi.ref "Picker"))
+      (param $this externref (@abi.ref "Picker" (module "literal-overloads")))
       (param $kind externref (@abi.ref string))
       (param $x externref (@abi.ref null undefined))))
   (import "literal-overloads" "Picker.name"
     (func $literal-overloads:Picker.name (@abi.call "name") (@abi.owner "Picker")
       (@abi.ts "name(kind: \"a\", x: ArrayBuffer | null): string")
       (@abi.doc "Under mono, each `null` arm has a `_js_string` sibling.")
-      (param $this externref (@abi.ref "Picker"))
+      (param $this externref (@abi.ref "Picker" (module "literal-overloads")))
       (param $kind externref (@abi.ref string))
       (param $x externref (@abi.ref "ArrayBuffer" null))
       (result externref (@abi.ref string))))
@@ -125,7 +125,7 @@
     (func $literal-overloads:Picker.load (@abi.call "load") (@abi.owner "Picker")
       (@abi.ts "load(kind: \"a\", x: ArrayBuffer | null): Promise<string | null>")
       (@abi.doc "`_promise` forms follow per `null` arm.")
-      (param $this externref (@abi.ref "Picker"))
+      (param $this externref (@abi.ref "Picker" (module "literal-overloads")))
       (param $kind externref (@abi.ref string))
       (param $x externref (@abi.ref "ArrayBuffer" null))
       (result externref (@abi.ref "Promise"))))
@@ -134,17 +134,17 @@
   (import "literal-overloads" "Clash.mode"
     (func $literal-overloads:Clash.mode (@abi.call "mode") (@abi.owner "Clash")
       (@abi.ts "mode(kind: \"x\" | null): void")
-      (param $this externref (@abi.ref "Clash"))
+      (param $this externref (@abi.ref "Clash" (module "literal-overloads")))
       (param $kind externref (@abi.ref string null))))
   (import "literal-overloads" "Clash.f"
     (func $literal-overloads:Clash.f (@abi.call "f") (@abi.owner "Clash")
       (@abi.ts "f(x: ArrayBuffer | null): void")
-      (param $this externref (@abi.ref "Clash"))
+      (param $this externref (@abi.ref "Clash" (module "literal-overloads")))
       (param $x externref (@abi.ref "ArrayBuffer" null))))
   (import "literal-overloads" "Clash.f_2"
     (func $literal-overloads:Clash.f_2 (@abi.call "f") (@abi.owner "Clash")
       (@abi.ts "f(kind: \"a\", x: ArrayBuffer | null): void")
-      (param $this externref (@abi.ref "Clash"))
+      (param $this externref (@abi.ref "Clash" (module "literal-overloads")))
       (param $kind externref (@abi.ref string))
       (param $x externref (@abi.ref "ArrayBuffer" null))))
 
@@ -152,7 +152,7 @@
   (import "literal-overloads" "Repeats.tag"
     (func $literal-overloads:Repeats.tag (@abi.call "tag") (@abi.owner "Repeats")
       (@abi.ts "tag(m: \"a\"): string")
-      (param $this externref (@abi.ref "Repeats"))
+      (param $this externref (@abi.ref "Repeats" (module "literal-overloads")))
       (param $m externref (@abi.ref string))
       (result externref (@abi.ref string))))
 
@@ -161,7 +161,7 @@
     (func $literal-overloads:Boxed.new (@abi.new "Boxed") (@abi.owner "Boxed")
       (@abi.ts "constructor(kind: \"a\")")
       (param $kind externref (@abi.ref string))
-      (result externref (@abi.ref "Boxed"))))
+      (result externref (@abi.ref "Boxed" (module "literal-overloads")))))
   (import "literal-overloads" "Boxed.label"
     (func $literal-overloads:Boxed.label (@abi.call "label" (on "Boxed")) (@abi.owner "Boxed")
       (@abi.ts "label(kind: \"a\"): string")
@@ -172,14 +172,14 @@
       (@abi.ts "of(kind: \"a\", value: T): Boxed<T>")
       (param $kind externref (@abi.ref string))
       (param $value externref (@abi.ref null undefined))
-      (result externref (@abi.ref "Boxed"))))
+      (result externref (@abi.ref "Boxed" (module "literal-overloads")))))
   (import "literal-overloads" "Boxed.from"
     (func $literal-overloads:Boxed.from (@abi.call "from" (on "Boxed")) (@abi.owner "Boxed")
       (@abi.ts "from(kind: \"a\", value: T | null): Boxed<T>")
       (@abi.doc "A static's `null` arm lands where its return puts it.")
       (param $kind externref (@abi.ref string))
       (param $value externref (@abi.ref null undefined))
-      (result externref (@abi.ref "Boxed"))))
+      (result externref (@abi.ref "Boxed" (module "literal-overloads")))))
 
   (import "literal-overloads" "pickFree"
     (func $literal-overloads:pickFree (@abi.call "pickFree" (on))
@@ -193,7 +193,7 @@
       (@abi.ts "constructor(kind: \"a\", x: ArrayBuffer | null)")
       (param $kind externref (@abi.ref string))
       (param $x externref (@abi.ref "ArrayBuffer" null))
-      (result externref (@abi.ref "Opener"))))
+      (result externref (@abi.ref "Opener" (module "literal-overloads")))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

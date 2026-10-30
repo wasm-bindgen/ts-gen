@@ -29,39 +29,39 @@
   (import "module-file-locals" "Foo.new"
     (func $module-file-locals:Foo.new (@abi.new "Foo") (@abi.owner "Foo")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Foo"))))
+      (result externref (@abi.ref "Foo" (module "module-file-locals")))))
   (import "module-file-locals" "Foo.bar"
     (func $module-file-locals:Foo.bar (@abi.call "bar") (@abi.owner "Foo")
       (@abi.ts "bar(): void")
-      (param $this externref (@abi.ref "Foo"))))
+      (param $this externref (@abi.ref "Foo" (module "module-file-locals")))))
 
   (@abi.class "Server" (module "module-file-locals"))
   (import "module-file-locals" "Server.listen"
     (func $module-file-locals:Server.listen (@abi.call "listen") (@abi.owner "Server")
       (@abi.ts "listen(): void")
-      (param $this externref (@abi.ref "Server"))))
+      (param $this externref (@abi.ref "Server" (module "module-file-locals")))))
 
   (@abi.dictionary "Options" (module "module-file-locals"))
   (import "module-file-locals" "Options.new"
     (func $module-file-locals:Options.new (@abi.object) (@abi.owner "Options")
       (@abi.ts "{} as Options")
-      (result externref (@abi.ref "Options"))))
+      (result externref (@abi.ref "Options" (module "module-file-locals")))))
   (import "module-file-locals" "Options.depth"
     (func $module-file-locals:Options.depth (@abi.get "depth") (@abi.owner "Options")
       (@abi.ts "depth: number")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "module-file-locals")))
       (result f64)))
   (import "module-file-locals" "Options.set_depth"
     (func $module-file-locals:Options.set_depth (@abi.set "depth") (@abi.owner "Options")
       (@abi.ts "set depth(value: number)")
-      (param $this externref (@abi.ref "Options"))
+      (param $this externref (@abi.ref "Options" (module "module-file-locals")))
       (param $value f64)))
 
   (import "module-file-locals" "configure"
     (func $module-file-locals:configure (@abi.call "configure" (on))
       (@abi.ts "configure(o: Options): _Foo")
-      (param $o externref (@abi.ref "Options"))
-      (result externref (@abi.ref "Foo"))))
+      (param $o externref (@abi.ref "Options" (module "module-file-locals")))
+      (result externref (@abi.ref "Foo" (module "module-file-locals")))))
   (import "module-file-locals" "ren"
     (func $module-file-locals:ren (@abi.call "ren" (on))
       (@abi.ts "ren(): void")))
@@ -70,12 +70,12 @@
   (import "module-file-locals" "Hidden.m"
     (func $module-file-locals:Hidden.m (@abi.call "m") (@abi.owner "Hidden")
       (@abi.ts "m(): void")
-      (param $this externref (@abi.ref "Hidden"))))
+      (param $this externref (@abi.ref "Hidden" (module "module-file-locals")))))
 
   (import "module-file-locals" "reveal"
     (func $module-file-locals:reveal (@abi.call "reveal" (on))
       (@abi.ts "reveal(): Hidden")
-      (result externref (@abi.ref "Hidden"))))
+      (result externref (@abi.ref "Hidden" (module "module-file-locals")))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

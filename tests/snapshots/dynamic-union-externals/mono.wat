@@ -29,12 +29,12 @@
   (import "dynamic-union-externals" "Foo.worker"
     (func $dynamic-union-externals:Foo.worker (@abi.call "worker") (@abi.owner "Foo")
       (@abi.ts "worker(): Worker | string")
-      (param $this externref (@abi.ref "Foo"))
+      (param $this externref (@abi.ref "Foo" (module "dynamic-union-externals")))
       (result externref)))
   (import "dynamic-union-externals" "Foo.widget"
     (func $dynamic-union-externals:Foo.widget (@abi.call "widget") (@abi.owner "Foo")
       (@abi.ts "widget(): Widget | number")
-      (param $this externref (@abi.ref "Foo"))
+      (param $this externref (@abi.ref "Foo" (module "dynamic-union-externals")))
       (result externref (@abi.ref null undefined))))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

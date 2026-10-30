@@ -32,8 +32,8 @@ use crate::provides::ProvidedFn;
 use crate::util::naming::{LocalScope, Suffix};
 
 pub use ts_gen_abi::{
-    format, Abi, AbiFunction, AbiHandler, AbiOp, AbiOwner, AbiParam, Head, OwnerKind, WasmType,
-    BINDINGS_SPECIFIER, BUILTINS_SPECIFIER, STRING_CONSTANTS, UNDEFINED_GLOBAL,
+    format, Abi, AbiFunction, AbiHandler, AbiOp, AbiOwner, AbiParam, Head, OwnerKind, OwnerRef,
+    WasmType, BINDINGS_SPECIFIER, BUILTINS_SPECIFIER, STRING_CONSTANTS, UNDEFINED_GLOBAL,
 };
 
 /// Lowers TS types to ABI types with the scope needed to see through type
@@ -44,6 +44,12 @@ struct Lower<'a> {
     /// Dotted JS path of every declared type (`WebAssembly.Module`), for
     /// heads that match the owner names whatever a reference spells.
     paths: HashMap<crate::context::TypeId, String>,
+    /// The `declare module` each declared type is in, for references that
+    /// must tell a module's owner from a global one of the same path.
+    modules: HashMap<crate::context::TypeId, String>,
+    /// The module of the declaration being lowered, which its members'
+    /// references to their own owner are in.
+    current: std::cell::RefCell<Option<String>>,
     /// Aliases declared inside namespaces: the arena entry a namespace
     /// member resolves to is a placeholder, the body lives in the
     /// namespace's declaration list.
@@ -121,7 +127,7 @@ impl Lower<'_> {
             } => match self.resolve(segments, generic_args, scope)? {
                 Resolved::Alias(target, alias_scope) => self.head(&target, alias_scope),
                 Resolved::Bound(ty, from) => self.head(&ty, from),
-                Resolved::Declared(path) => Some(Head::Declared(path)),
+                Resolved::Declared(r) => Some(Head::Declared(r)),
                 Resolved::TypeParam => None,
             },
             _ => None,
@@ -184,12 +190,22 @@ impl Lower<'_> {
                     .collect();
                 Resolved::Alias(substitute(&alias.target, &subst), alias.body_scope)
             }
-            (None, _) => Resolved::Declared(
-                self.paths
+            (None, _) => Resolved::Declared(OwnerRef {
+                module: self.modules.get(&id).cloned(),
+                path: self
+                    .paths
                     .get(&id)
                     .cloned()
                     .unwrap_or_else(|| segments.join(".")),
-            ),
+            }),
+        }
+    }
+
+    /// The owner at `path` in the module being lowered: a member's own.
+    fn own(&self, path: &str) -> OwnerRef {
+        OwnerRef {
+            module: self.current.borrow().clone(),
+            path: path.to_string(),
         }
     }
 
@@ -275,49 +291,79 @@ fn substitute(ty: &TypeRef, subst: &HashMap<&str, &TypeRef>) -> TypeRef {
     }
 }
 
+/// Where each declared type is: its dotted JS path and, for one inside a
+/// `declare module`, the module.
+#[derive(Default)]
+struct Places {
+    paths: HashMap<crate::context::TypeId, String>,
+    modules: HashMap<crate::context::TypeId, String>,
+}
+
+impl Places {
+    fn insert(&mut self, id: crate::context::TypeId, path: String, module: Option<&str>) {
+        self.paths.insert(id, path);
+        if let Some(m) = module {
+            self.modules.insert(id, m.to_string());
+        }
+    }
+}
+
 type DeclaredIndex<'a> = (
-    HashMap<crate::context::TypeId, String>,
+    Places,
     HashMap<crate::context::TypeId, &'a crate::ir::TypeAliasDecl>,
 );
 
-/// Dotted JS paths of the input's declared types and the aliases nested in
-/// namespaces, walking namespaces.
+/// Dotted JS paths and modules of the input's declared types, and the
+/// aliases nested in namespaces, walking namespaces.
 fn declared_index<'a>(
     module: &Module,
     gctx: &'a GlobalContext,
     surface: &Surface,
 ) -> DeclaredIndex<'a> {
-    let mut paths = HashMap::new();
+    let mut places = Places::default();
     let mut aliases = HashMap::new();
     for &id in &module.types {
+        // The module the ABI binds the declaration in, which for a global
+        // interface collapsed into a module's class is the module's.
+        let context = surface
+            .get(id)
+            .first()
+            .map(|d| d.module_context.clone())
+            .unwrap_or_else(|| gctx.get_type(id).module_context.clone());
+        let spec = match &context {
+            ModuleContext::Module(spec) => Some(&**spec),
+            ModuleContext::Global => None,
+        };
         match &gctx.get_type(id).kind {
             TypeKind::Class(c) => {
-                paths.insert(id, surface.js_name(id, &c.js_name).to_string());
+                places.insert(id, surface.js_name(id, &c.js_name).to_string(), spec);
             }
             TypeKind::Interface(i) => {
-                paths.insert(id, i.js_name.clone());
+                places.insert(id, i.js_name.clone(), spec);
             }
             TypeKind::Namespace(ns) => namespace_index(
                 ns,
                 &[surface.js_name(id, &ns.name).to_string()],
+                spec,
                 gctx,
                 surface,
-                &mut paths,
+                &mut places,
                 &mut aliases,
             ),
             _ => {}
         }
     }
-    (paths, aliases)
+    (places, aliases)
 }
 
 /// Member types of a namespace are reached by name in its child scope.
 fn namespace_index<'a>(
     ns: &'a crate::ir::NamespaceDecl,
     prefix: &[String],
+    spec: Option<&str>,
     gctx: &'a GlobalContext,
     surface: &Surface,
-    paths: &mut HashMap<crate::context::TypeId, String>,
+    places: &mut Places,
     aliases: &mut HashMap<crate::context::TypeId, &'a crate::ir::TypeAliasDecl>,
 ) {
     for &inner in &ns.declarations {
@@ -338,7 +384,7 @@ fn namespace_index<'a>(
             TypeKind::Namespace(child) => {
                 let mut p = prefix.to_vec();
                 p.push(surface.js_name(inner, &child.name).to_string());
-                namespace_index(child, &p, gctx, surface, paths, aliases);
+                namespace_index(child, &p, spec, gctx, surface, places, aliases);
                 continue;
             }
             _ => continue,
@@ -346,7 +392,7 @@ fn namespace_index<'a>(
         if let Some(id) = gctx.scopes.resolve(ns.child_scope, name) {
             let mut p = prefix.to_vec();
             p.push(js_name.to_string());
-            paths.insert(id, p.join("."));
+            places.insert(id, p.join("."), spec);
         }
     }
 }
@@ -357,8 +403,8 @@ enum Resolved {
     Alias(TypeRef, ScopeId),
     /// A substituted type argument and the scope it was written in.
     Bound(TypeRef, ScopeId),
-    /// A class, interface or enum, as its dotted path.
-    Declared(String),
+    /// A class, interface or enum.
+    Declared(OwnerRef),
     TypeParam,
 }
 
@@ -425,10 +471,12 @@ pub fn build(
         ..Default::default()
     };
     let surface = Surface::build(module, gctx, options);
-    let (paths, aliases) = declared_index(module, gctx, &surface);
+    let (places, aliases) = declared_index(module, gctx, &surface);
     let lower = Lower {
         gctx,
-        paths,
+        paths: places.paths,
+        modules: places.modules,
+        current: Default::default(),
         aliases,
         surface,
         bound: Default::default(),
@@ -447,6 +495,10 @@ pub fn build(
         for decl in lower.surface.get(id) {
             let start = abi.functions.len();
             let owners_start = abi.owners.len();
+            *lower.current.borrow_mut() = match &decl.module_context {
+                ModuleContext::Module(spec) => Some(spec.to_string()),
+                ModuleContext::Global => None,
+            };
             build_declaration(id, decl, &[], &lower, &mut abi);
             // The specifier is a property of the declaration, so it is stamped
             // on everything the declaration produced rather than threaded
@@ -689,7 +741,7 @@ fn push_owner<'h>(
         aliases: Vec::new(),
         extends: extends
             .filter_map(|h| match lower.head(&h.type_ref, h.scope) {
-                Some(Head::Declared(p)) => Some(p),
+                Some(Head::Declared(r)) => Some(r),
                 _ => None,
             })
             .collect(),
@@ -795,7 +847,7 @@ fn build_members(
     let this = AbiParam {
         name: "this".into(),
         ty: WasmType::JS_NON_NULL,
-        head: Some(Head::Declared(type_name.to_string())),
+        head: Some(Head::Declared(lower.own(type_name))),
     };
 
     if dictionary {
@@ -807,7 +859,7 @@ fn build_members(
             op: AbiOp::NewObject,
             params: vec![],
             result: Some(WasmType::JS_NON_NULL),
-            result_head: Some(Head::Declared(type_name.to_string())),
+            result_head: Some(Head::Declared(lower.own(type_name))),
             ts: format!("{{}} as {type_name}"),
             variadic: false,
             module: None,
@@ -1128,7 +1180,7 @@ fn push_callable(
             result_head: match kind {
                 SignatureKind::Setter | SignatureKind::StaticSetter => None,
                 // A constructor's result is the owner itself.
-                SignatureKind::Constructor => owner.map(|o| Head::Declared(o.to_string())),
+                SignatureKind::Constructor => owner.map(|o| Head::Declared(lower.own(o))),
                 _ => lower.head(return_type, scope),
             },
             ts,
@@ -1218,7 +1270,7 @@ mod tests {
     use super::*;
 
     fn declared(path: &str) -> Option<Head> {
-        Some(Head::Declared(path.into()))
+        Some(Head::Declared(OwnerRef::global(path)))
     }
 
     /// Every declared module is selected, as `--export <specifier>` would.
@@ -1495,8 +1547,36 @@ mod tests {
         "#);
         let ctor = abi.function("Foo.new").unwrap();
         assert_eq!(ctor.result, Some(WasmType::JS_NON_NULL));
-        assert_eq!(ctor.result_head, declared("Foo"));
+        assert_eq!(
+            ctor.result_head,
+            Some(Head::Declared(OwnerRef {
+                module: Some("m:a".into()),
+                path: "Foo".into(),
+            }))
+        );
         assert!(abi.function("N.f").is_some());
+    }
+
+    #[test]
+    fn heads_name_the_module_of_their_owner() {
+        let abi = abi(r#"
+            declare class Thing { g(): void; }
+            declare function global(): Thing;
+            declare module "m:a" {
+                class Thing { m(): void; }
+                function local(): Thing;
+            }
+        "#);
+        let local = abi.import("m:a", "local").unwrap();
+        let global = abi.function("global").unwrap();
+        assert_eq!(
+            local.result_head,
+            Some(Head::Declared(OwnerRef {
+                module: Some("m:a".into()),
+                path: "Thing".into(),
+            }))
+        );
+        assert_eq!(global.result_head, declared("Thing"));
     }
 
     #[test]

@@ -29,7 +29,7 @@
   (import "module-export-aliases" "_Foo.bar"
     (func $module-export-aliases:_Foo.bar (@abi.call "bar") (@abi.owner "_Foo")
       (@abi.ts "bar(): void")
-      (param $this externref (@abi.ref "_Foo"))))
+      (param $this externref (@abi.ref "_Foo" (module "module-export-aliases")))))
   (import "module-export-aliases" "Foo.bar"
     (func $module-export-aliases:Foo.bar (@abi.alias "_Foo.bar")
       (param $this externref)))
@@ -48,14 +48,14 @@
   (import "module-export-aliases" "Conn.new"
     (func $module-export-aliases:Conn.new (@abi.new "Conn") (@abi.owner "Conn")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Conn"))))
+      (result externref (@abi.ref "Conn" (module "module-export-aliases")))))
   (import "module-export-aliases" "Connection.new"
     (func $module-export-aliases:Connection.new (@abi.alias "Conn.new")
       (result externref)))
   (import "module-export-aliases" "Conn.get"
     (func $module-export-aliases:Conn.get (@abi.call "get") (@abi.owner "Conn")
       (@abi.ts "get(): string")
-      (param $this externref (@abi.ref "Conn"))
+      (param $this externref (@abi.ref "Conn" (module "module-export-aliases")))
       (result externref (@abi.ref string))))
   (import "module-export-aliases" "Connection.get"
     (func $module-export-aliases:Connection.get (@abi.alias "Conn.get")
@@ -64,7 +64,7 @@
   (import "module-export-aliases" "Conn.open"
     (func $module-export-aliases:Conn.open (@abi.call "open" (on "Conn")) (@abi.owner "Conn")
       (@abi.ts "open(): _Conn")
-      (result externref (@abi.ref "Conn"))))
+      (result externref (@abi.ref "Conn" (module "module-export-aliases")))))
   (import "module-export-aliases" "Connection.open"
     (func $module-export-aliases:Connection.open (@abi.alias "Conn.open")
       (result externref)))

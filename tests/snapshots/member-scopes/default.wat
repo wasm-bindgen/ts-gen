@@ -109,97 +109,97 @@
   (import "ia" "T.new"
     (func $ia:T.new (@abi.object) (@abi.owner "T")
       (@abi.ts "{} as T")
-      (result externref (@abi.ref "T"))))
+      (result externref (@abi.ref "T" (module "ia")))))
   (import "ia" "T.a"
     (func $ia:T.a (@abi.get "a") (@abi.owner "T")
       (@abi.ts "a: number")
-      (param $this externref (@abi.ref "T"))
+      (param $this externref (@abi.ref "T" (module "ia")))
       (result f64)))
   (import "ia" "T.set_a"
     (func $ia:T.set_a (@abi.set "a") (@abi.owner "T")
       (@abi.ts "set a(value: number)")
-      (param $this externref (@abi.ref "T"))
+      (param $this externref (@abi.ref "T" (module "ia")))
       (param $value f64)))
 
   (@abi.dictionary "T" (module "ic"))
   (import "ic" "T.new"
     (func $ic:T.new (@abi.object) (@abi.owner "T")
       (@abi.ts "{} as T")
-      (result externref (@abi.ref "T"))))
+      (result externref (@abi.ref "T" (module "ic")))))
   (import "ic" "T.c"
     (func $ic:T.c (@abi.get "c") (@abi.owner "T")
       (@abi.ts "c: number")
-      (param $this externref (@abi.ref "T"))
+      (param $this externref (@abi.ref "T" (module "ic")))
       (result f64)))
   (import "ic" "T.set_c"
     (func $ic:T.set_c (@abi.set "c") (@abi.owner "T")
       (@abi.ts "set c(value: number)")
-      (param $this externref (@abi.ref "T"))
+      (param $this externref (@abi.ref "T" (module "ic")))
       (param $value f64)))
 
-  (@abi.interface "U" (module "ix") (extends "T"))
+  (@abi.interface "U" (module "ix") (extends "T" (module "ic")))
   (import "ix" "U.ua"
     (func $ix:U.ua (@abi.get "ua") (@abi.owner "U")
       (@abi.ts "ua: T")
-      (param $this externref (@abi.ref "U"))
-      (result externref (@abi.ref "T"))))
+      (param $this externref (@abi.ref "U" (module "ix")))
+      (result externref (@abi.ref "T" (module "ia")))))
   (import "ix" "U.set_ua"
     (func $ix:U.set_ua (@abi.set "ua") (@abi.owner "U")
       (@abi.ts "set ua(value: T)")
-      (param $this externref (@abi.ref "U"))
-      (param $value externref (@abi.ref "T"))))
+      (param $this externref (@abi.ref "U" (module "ix")))
+      (param $value externref (@abi.ref "T" (module "ia")))))
   (import "ix" "U.ma"
     (func $ix:U.ma (@abi.call "ma") (@abi.owner "U")
       (@abi.ts "ma(): T")
-      (param $this externref (@abi.ref "U"))
-      (result externref (@abi.ref "T"))))
+      (param $this externref (@abi.ref "U" (module "ix")))
+      (result externref (@abi.ref "T" (module "ia")))))
   (import "ix" "U.ub"
     (func $ix:U.ub (@abi.get "ub") (@abi.owner "U")
       (@abi.ts "ub: T")
-      (param $this externref (@abi.ref "U"))
-      (result externref (@abi.ref "T"))))
+      (param $this externref (@abi.ref "U" (module "ix")))
+      (result externref (@abi.ref "T" (module "ic")))))
   (import "ix" "U.set_ub"
     (func $ix:U.set_ub (@abi.set "ub") (@abi.owner "U")
       (@abi.ts "set ub(value: T)")
-      (param $this externref (@abi.ref "U"))
-      (param $value externref (@abi.ref "T"))))
+      (param $this externref (@abi.ref "U" (module "ix")))
+      (param $value externref (@abi.ref "T" (module "ic")))))
   (import "ix" "U.mb"
     (func $ix:U.mb (@abi.call "mb") (@abi.owner "U")
       (@abi.ts "mb(): T")
-      (param $this externref (@abi.ref "U"))
-      (result externref (@abi.ref "T"))))
+      (param $this externref (@abi.ref "U" (module "ix")))
+      (result externref (@abi.ref "T" (module "ic")))))
 
   (@abi.class "K" (module "ix"))
   (import "ix" "K.ka"
     (func $ix:K.ka (@abi.get "ka") (@abi.owner "K")
       (@abi.ts "ka: T")
-      (param $this externref (@abi.ref "K"))
-      (result externref (@abi.ref "T"))))
+      (param $this externref (@abi.ref "K" (module "ix")))
+      (result externref (@abi.ref "T" (module "ia")))))
   (import "ix" "K.set_ka"
     (func $ix:K.set_ka (@abi.set "ka") (@abi.owner "K")
       (@abi.ts "set ka(value: T)")
-      (param $this externref (@abi.ref "K"))
-      (param $value externref (@abi.ref "T"))))
+      (param $this externref (@abi.ref "K" (module "ix")))
+      (param $value externref (@abi.ref "T" (module "ia")))))
   (import "ix" "K.kb"
     (func $ix:K.kb (@abi.get "kb") (@abi.owner "K")
       (@abi.ts "kb: T")
-      (param $this externref (@abi.ref "K"))
-      (result externref (@abi.ref "T"))))
+      (param $this externref (@abi.ref "K" (module "ix")))
+      (result externref (@abi.ref "T" (module "ic")))))
   (import "ix" "K.set_kb"
     (func $ix:K.set_kb (@abi.set "kb") (@abi.owner "K")
       (@abi.ts "set kb(value: T)")
-      (param $this externref (@abi.ref "K"))
-      (param $value externref (@abi.ref "T"))))
+      (param $this externref (@abi.ref "K" (module "ix")))
+      (param $value externref (@abi.ref "T" (module "ic")))))
 
   (@abi.namespace "NS" (module "ib2"))
   (import "ib2" "NS.ga"
     (func $ib2:NS.ga (@abi.call "ga" (on "NS")) (@abi.owner "NS")
       (@abi.ts "ga(t: T): void")
-      (param $t externref (@abi.ref "T"))))
+      (param $t externref (@abi.ref "T" (module "ia")))))
   (import "ib2" "NS.gb"
     (func $ib2:NS.gb (@abi.call "gb" (on "NS")) (@abi.owner "NS")
       (@abi.ts "gb(t: T): void")
-      (param $t externref (@abi.ref "T"))))
+      (param $t externref (@abi.ref "T" (module "ic")))))
 
   (@abi.dictionary "Ev")
   (import "./bindings.wasm" "Ev.new"
@@ -237,17 +237,17 @@
     (func $Win.b (@abi.get "b") (@abi.owner "Win")
       (@abi.ts "b: Ev")
       (param $this externref (@abi.ref "Win"))
-      (result externref (@abi.ref "T"))))
+      (result externref (@abi.ref "T" (module "ia")))))
   (import "./bindings.wasm" "Win.set_b"
     (func $Win.set_b (@abi.set "b") (@abi.owner "Win")
       (@abi.ts "set b(value: Ev)")
       (param $this externref (@abi.ref "Win"))
-      (param $value externref (@abi.ref "T"))))
+      (param $value externref (@abi.ref "T" (module "ia")))))
   (import "./bindings.wasm" "Win.m"
     (func $Win.m (@abi.call "m") (@abi.owner "Win")
       (@abi.ts "m(): Ev")
       (param $this externref (@abi.ref "Win"))
-      (result externref (@abi.ref "T"))))
+      (result externref (@abi.ref "T" (module "ia")))))
 
   (@abi.namespace "GN")
   (import "./bindings.wasm" "GN.gl"
@@ -257,7 +257,7 @@
   (import "./bindings.wasm" "GN.gm"
     (func $GN.gm (@abi.call "gm" (on "GN")) (@abi.owner "GN")
       (@abi.ts "gm(e: Ev): void")
-      (param $e externref (@abi.ref "T"))))
+      (param $e externref (@abi.ref "T" (module "ia")))))
 
   (@abi.class "X")
   (import "./bindings.wasm" "X.new"
@@ -268,7 +268,7 @@
   (import "./bindings.wasm" "X.new_with_n"
     (func $X.new_with_n (@abi.new "X") (@abi.owner "X")
       (@abi.ts "constructor(e: Ev, n: number)")
-      (param $e externref (@abi.ref "T"))
+      (param $e externref (@abi.ref "T" (module "ia")))
       (param $n f64)
       (result externref (@abi.ref "X"))))
   (import "./bindings.wasm" "X.sl"
@@ -278,7 +278,7 @@
   (import "./bindings.wasm" "X.sm"
     (func $X.sm (@abi.call "sm" (on "X")) (@abi.owner "X")
       (@abi.ts "sm(e: Ev): void")
-      (param $e externref (@abi.ref "T"))))
+      (param $e externref (@abi.ref "T" (module "ia")))))
   (import "./bindings.wasm" "X.x"
     (func $X.x (@abi.call "x") (@abi.owner "X")
       (@abi.ts "x(): void")

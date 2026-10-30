@@ -83,18 +83,18 @@
   (import "never-returns" "Guard.new"
     (func $never-returns:Guard.new (@abi.new "Guard") (@abi.owner "Guard")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Guard"))))
+      (result externref (@abi.ref "Guard" (module "never-returns")))))
   (import "never-returns" "Guard.value_of"
     (func $never-returns:Guard.value_of (@abi.call "valueOf") (@abi.owner "Guard")
       (@abi.ts "valueOf(): never")
       (@abi.doc "A guard has no primitive value.")
-      (param $this externref (@abi.ref "Guard"))
+      (param $this externref (@abi.ref "Guard" (module "never-returns")))
       (result externref)))
   (import "never-returns" "Guard.fail_later"
     (func $never-returns:Guard.fail_later (@abi.call "failLater") (@abi.owner "Guard")
       (@abi.ts "failLater(): Promise<never>")
       (@abi.doc "Always rejects.")
-      (param $this externref (@abi.ref "Guard"))
+      (param $this externref (@abi.ref "Guard" (module "never-returns")))
       (result externref (@abi.ref "Promise"))))
   (import "never-returns" "Guard.unreachable"
     (func $never-returns:Guard.unreachable (@abi.call "unreachable" (on "Guard")) (@abi.owner "Guard")
@@ -105,20 +105,20 @@
     (func $never-returns:Guard.reject (@abi.call "reject") (@abi.owner "Guard")
       (@abi.ts "reject(kind: \"soft\"): never")
       (@abi.doc "Every literal arm throws.")
-      (param $this externref (@abi.ref "Guard"))
+      (param $this externref (@abi.ref "Guard" (module "never-returns")))
       (param $kind externref (@abi.ref string))
       (result externref)))
   (import "never-returns" "Guard.impossible"
     (func $never-returns:Guard.impossible (@abi.get "impossible") (@abi.owner "Guard")
       (@abi.ts "impossible: never")
-      (param $this externref (@abi.ref "Guard"))
+      (param $this externref (@abi.ref "Guard" (module "never-returns")))
       (result externref)))
 
   (@abi.class "Halt" (module "never-returns"))
   (import "never-returns" "Halt.new"
     (func $never-returns:Halt.new (@abi.new "Halt") (@abi.owner "Halt")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Halt"))))
+      (result externref (@abi.ref "Halt" (module "never-returns")))))
   (import "never-returns" "Halt.stop"
     (func $never-returns:Halt.stop (@abi.call "stop" (on "Halt")) (@abi.owner "Halt")
       (@abi.ts "stop(code: number): never")
@@ -127,7 +127,7 @@
   (import "never-returns" "Halt.ok"
     (func $never-returns:Halt.ok (@abi.call "ok") (@abi.owner "Halt")
       (@abi.ts "ok(): boolean")
-      (param $this externref (@abi.ref "Halt"))
+      (param $this externref (@abi.ref "Halt" (module "never-returns")))
       (result i32)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

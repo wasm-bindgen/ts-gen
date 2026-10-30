@@ -55,34 +55,34 @@
     (func $fallible:Counter.new (@abi.new "Counter") (@abi.owner "Counter")
       (@abi.ts "constructor(start: number)")
       (param $start f64)
-      (result externref (@abi.ref "Counter"))))
+      (result externref (@abi.ref "Counter" (module "fallible")))))
   (import "fallible" "Counter.increment"
     (func $fallible:Counter.increment (@abi.call "increment") (@abi.owner "Counter")
       (@abi.ts "increment(): number")
       (@abi.doc "Throws when the counter would overflow `max`.")
-      (param $this externref (@abi.ref "Counter"))
+      (param $this externref (@abi.ref "Counter" (module "fallible")))
       (result f64)))
   (import "fallible" "Counter.increment_with_by"
     (func $fallible:Counter.increment_with_by (@abi.call "increment") (@abi.owner "Counter")
       (@abi.ts "increment(by: number): number")
       (@abi.doc "Throws when the counter would overflow `max`.")
-      (param $this externref (@abi.ref "Counter"))
+      (param $this externref (@abi.ref "Counter" (module "fallible")))
       (param $by f64)
       (result f64)))
   (import "fallible" "Counter.value"
     (func $fallible:Counter.value (@abi.get "value") (@abi.owner "Counter")
       (@abi.ts "value: number")
-      (param $this externref (@abi.ref "Counter"))
+      (param $this externref (@abi.ref "Counter" (module "fallible")))
       (result f64)))
   (import "fallible" "Counter.max"
     (func $fallible:Counter.max (@abi.get "max") (@abi.owner "Counter")
       (@abi.ts "max: number")
-      (param $this externref (@abi.ref "Counter"))
+      (param $this externref (@abi.ref "Counter" (module "fallible")))
       (result f64)))
   (import "fallible" "Counter.set_max"
     (func $fallible:Counter.set_max (@abi.set "max") (@abi.owner "Counter")
       (@abi.ts "set max(value: number)")
-      (param $this externref (@abi.ref "Counter"))
+      (param $this externref (@abi.ref "Counter" (module "fallible")))
       (param $value f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

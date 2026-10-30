@@ -88,7 +88,7 @@
   (import "m" "W.new"
     (func $m:W.new (@abi.new "W") (@abi.owner "W")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "W"))))
+      (result externref (@abi.ref "W" (module "m")))))
   (import "m" "W.make"
     (func $m:W.make (@abi.call "make" (on "W")) (@abi.owner "W")
       (@abi.ts "make(): W")

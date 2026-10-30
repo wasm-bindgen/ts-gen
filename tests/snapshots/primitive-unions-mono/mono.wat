@@ -135,22 +135,22 @@
   (import "primitive-unions-mono" "Target.new"
     (func $primitive-unions-mono:Target.new (@abi.object) (@abi.owner "Target")
       (@abi.ts "{} as Target")
-      (result externref (@abi.ref "Target"))))
+      (result externref (@abi.ref "Target" (module "primitive-unions-mono")))))
   (import "primitive-unions-mono" "Target.name"
     (func $primitive-unions-mono:Target.name (@abi.get "name") (@abi.owner "Target")
       (@abi.ts "name: string")
-      (param $this externref (@abi.ref "Target"))
+      (param $this externref (@abi.ref "Target" (module "primitive-unions-mono")))
       (result externref (@abi.ref string))))
   (import "primitive-unions-mono" "Target.set_name"
     (func $primitive-unions-mono:Target.set_name (@abi.set "name") (@abi.owner "Target")
       (@abi.ts "set name(value: string)")
-      (param $this externref (@abi.ref "Target"))
+      (param $this externref (@abi.ref "Target" (module "primitive-unions-mono")))
       (param $value externref (@abi.ref string))))
 
   (import "primitive-unions-mono" "send"
     (func $primitive-unions-mono:send (@abi.call "send" (on))
       (@abi.ts "send(to: Target): void")
-      (param $to externref (@abi.ref "Target"))))
+      (param $to externref (@abi.ref "Target" (module "primitive-unions-mono")))))
   (import "primitive-unions-mono" "send_with_str"
     (func $primitive-unions-mono:send_with_str (@abi.call "send" (on))
       (@abi.ts "send(to: string): void")
@@ -173,109 +173,109 @@
     (func $primitive-unions-mono:Store.new (@abi.new "Store") (@abi.owner "Store")
       (@abi.ts "constructor(key: string)")
       (param $key externref (@abi.ref string))
-      (result externref (@abi.ref "Store"))))
+      (result externref (@abi.ref "Store" (module "primitive-unions-mono")))))
   (import "primitive-unions-mono" "Store.new_with_f64"
     (func $primitive-unions-mono:Store.new_with_f64 (@abi.new "Store") (@abi.owner "Store")
       (@abi.ts "constructor(key: number)")
       (param $key f64)
-      (result externref (@abi.ref "Store"))))
+      (result externref (@abi.ref "Store" (module "primitive-unions-mono")))))
   (import "primitive-unions-mono" "Store.new_with_symbol"
     (func $primitive-unions-mono:Store.new_with_symbol (@abi.new "Store") (@abi.owner "Store")
       (@abi.ts "constructor(key: symbol)")
       (param $key externref)
-      (result externref (@abi.ref "Store"))))
+      (result externref (@abi.ref "Store" (module "primitive-unions-mono")))))
   (import "primitive-unions-mono" "Store.get"
     (func $primitive-unions-mono:Store.get (@abi.call "get") (@abi.owner "Store")
       (@abi.ts "get(key: string): string")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "primitive-unions-mono")))
       (param $key externref (@abi.ref string))
       (result externref (@abi.ref string))))
   (import "primitive-unions-mono" "Store.get_with_f64"
     (func $primitive-unions-mono:Store.get_with_f64 (@abi.call "get") (@abi.owner "Store")
       (@abi.ts "get(key: number): string")
-      (param $this externref (@abi.ref "Store"))
+      (param $this externref (@abi.ref "Store" (module "primitive-unions-mono")))
       (param $key f64)
       (result externref (@abi.ref string))))
   (import "primitive-unions-mono" "Store.of"
     (func $primitive-unions-mono:Store.of (@abi.call "of" (on "Store")) (@abi.owner "Store")
       (@abi.ts "of(value: boolean): Store")
       (param $value i32)
-      (result externref (@abi.ref "Store"))))
+      (result externref (@abi.ref "Store" (module "primitive-unions-mono")))))
   (import "primitive-unions-mono" "Store.of_with_f64"
     (func $primitive-unions-mono:Store.of_with_f64 (@abi.call "of" (on "Store")) (@abi.owner "Store")
       (@abi.ts "of(value: number): Store")
       (param $value f64)
-      (result externref (@abi.ref "Store"))))
+      (result externref (@abi.ref "Store" (module "primitive-unions-mono")))))
 
   (@abi.dictionary "Settings" (module "primitive-unions-mono"))
   (import "primitive-unions-mono" "Settings.new"
     (func $primitive-unions-mono:Settings.new (@abi.object) (@abi.owner "Settings")
       (@abi.ts "{} as Settings")
-      (result externref (@abi.ref "Settings"))))
+      (result externref (@abi.ref "Settings" (module "primitive-unions-mono")))))
   (import "primitive-unions-mono" "Settings.level"
     (func $primitive-unions-mono:Settings.level (@abi.get "level") (@abi.owner "Settings")
       (@abi.ts "level: \"low\" | \"high\" | number")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (result externref)))
   (import "primitive-unions-mono" "Settings.set_level"
     (func $primitive-unions-mono:Settings.set_level (@abi.set "level") (@abi.owner "Settings")
       (@abi.ts "set level(value: \"low\")")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (param $value externref (@abi.ref string))))
   (import "primitive-unions-mono" "Settings.set_level_with_f64"
     (func $primitive-unions-mono:Settings.set_level_with_f64 (@abi.set "level") (@abi.owner "Settings")
       (@abi.ts "set level(value: number)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (param $value f64)))
   (import "primitive-unions-mono" "Settings.id"
     (func $primitive-unions-mono:Settings.id (@abi.get "id") (@abi.owner "Settings")
       (@abi.ts "id: string | number")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (result externref)))
   (import "primitive-unions-mono" "Settings.set_id"
     (func $primitive-unions-mono:Settings.set_id (@abi.set "id") (@abi.owner "Settings")
       (@abi.ts "set id(value: string)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (param $value externref (@abi.ref string))))
   (import "primitive-unions-mono" "Settings.set_id_with_f64"
     (func $primitive-unions-mono:Settings.set_id_with_f64 (@abi.set "id") (@abi.owner "Settings")
       (@abi.ts "set id(value: number)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (param $value f64)))
   (import "primitive-unions-mono" "Settings.label"
     (func $primitive-unions-mono:Settings.label (@abi.get "label") (@abi.owner "Settings")
       (@abi.ts "label?: string | boolean")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (result externref (@abi.ref undefined))))
   (import "primitive-unions-mono" "Settings.set_label"
     (func $primitive-unions-mono:Settings.set_label (@abi.set "label") (@abi.owner "Settings")
       (@abi.ts "set label(value: string)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (param $value externref (@abi.ref string))))
   (import "primitive-unions-mono" "Settings.set_label_with_bool"
     (func $primitive-unions-mono:Settings.set_label_with_bool (@abi.set "label") (@abi.owner "Settings")
       (@abi.ts "set label(value: boolean)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (param $value i32)))
   (import "primitive-unions-mono" "Settings.from"
     (func $primitive-unions-mono:Settings.from (@abi.get "from") (@abi.owner "Settings")
       (@abi.ts "from: Target | string | boolean")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (result externref)))
   (import "primitive-unions-mono" "Settings.set_from"
     (func $primitive-unions-mono:Settings.set_from (@abi.set "from") (@abi.owner "Settings")
       (@abi.ts "set from(value: Target)")
-      (param $this externref (@abi.ref "Settings"))
-      (param $value externref (@abi.ref "Target"))))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
+      (param $value externref (@abi.ref "Target" (module "primitive-unions-mono")))))
   (import "primitive-unions-mono" "Settings.set_from_with_str"
     (func $primitive-unions-mono:Settings.set_from_with_str (@abi.set "from") (@abi.owner "Settings")
       (@abi.ts "set from(value: string)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (param $value externref (@abi.ref string))))
   (import "primitive-unions-mono" "Settings.set_from_with_bool"
     (func $primitive-unions-mono:Settings.set_from_with_bool (@abi.set "from") (@abi.owner "Settings")
       (@abi.ts "set from(value: boolean)")
-      (param $this externref (@abi.ref "Settings"))
+      (param $this externref (@abi.ref "Settings" (module "primitive-unions-mono")))
       (param $value i32)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.

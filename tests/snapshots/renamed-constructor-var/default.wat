@@ -29,23 +29,23 @@
   (import "x" "Foo.new"
     (func $x:Foo.new (@abi.new "Foo") (@abi.owner "Foo")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Foo"))))
+      (result externref (@abi.ref "Foo" (module "x")))))
   (import "x" "Foo.from"
     (func $x:Foo.from (@abi.call "from" (on "Foo")) (@abi.owner "Foo")
       (@abi.ts "from(n: number): _Foo")
       (param $n f64)
-      (result externref (@abi.ref "Foo"))))
+      (result externref (@abi.ref "Foo" (module "x")))))
   (import "x" "Foo.bar"
     (func $x:Foo.bar (@abi.call "bar") (@abi.owner "Foo")
       (@abi.ts "bar(): void")
-      (param $this externref (@abi.ref "Foo"))))
+      (param $this externref (@abi.ref "Foo" (module "x")))))
 
   (@abi.class "Bar" (module "x"))
   (import "x" "Bar.new"
     (func $x:Bar.new (@abi.new "Bar") (@abi.owner "Bar")
       (@abi.ts "constructor(n: number)")
       (param $n f64)
-      (result externref (@abi.ref "Bar"))))
+      (result externref (@abi.ref "Bar" (module "x")))))
   (import "x" "Bar.version"
     (func $x:Bar.version (@abi.get "VERSION" (on "Bar")) (@abi.owner "Bar")
       (@abi.ts "static VERSION: string")
@@ -53,24 +53,24 @@
   (import "x" "Bar.baz"
     (func $x:Bar.baz (@abi.call "baz") (@abi.owner "Bar")
       (@abi.ts "baz(): string")
-      (param $this externref (@abi.ref "Bar"))
+      (param $this externref (@abi.ref "Bar" (module "x")))
       (result externref (@abi.ref string))))
 
   (@abi.class "Late" (module "x"))
   (import "x" "Late.new"
     (func $x:Late.new (@abi.new "Late") (@abi.owner "Late")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Late"))))
+      (result externref (@abi.ref "Late" (module "x")))))
   (import "x" "Late.go"
     (func $x:Late.go (@abi.call "go") (@abi.owner "Late")
       (@abi.ts "go(): void")
-      (param $this externref (@abi.ref "Late"))))
+      (param $this externref (@abi.ref "Late" (module "x")))))
 
   (@abi.class "Plain" (module "x") (alias "AlsoPlain"))
   (import "x" "Plain.new"
     (func $x:Plain.new (@abi.new "Plain") (@abi.owner "Plain")
       (@abi.ts "constructor()")
-      (result externref (@abi.ref "Plain"))))
+      (result externref (@abi.ref "Plain" (module "x")))))
   (import "x" "AlsoPlain.new"
     (func $x:AlsoPlain.new (@abi.alias "Plain.new")
       (result externref)))

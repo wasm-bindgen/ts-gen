@@ -12,7 +12,7 @@ use std::fmt::Write;
 use std::hash::Hash;
 
 use ts_gen_abi::{
-    Abi, AbiFunction, AbiHandler, AbiOp, AbiParam, Head, WasmType, BUILTINS_SPECIFIER,
+    Abi, AbiFunction, AbiHandler, AbiOp, AbiParam, Head, OwnerRef, WasmType, BUILTINS_SPECIFIER,
     UNDEFINED_GLOBAL,
 };
 
@@ -260,25 +260,24 @@ impl<'a> Ctx<'a> {
         }
     }
 
-    /// The wrapper for a position of a function imported from `module`:
-    /// its head names an owner of that module, else a global one, and an
-    /// alias owner wraps as the class it aliases.
-    fn wrap(&self, module: Option<&str>, head: Option<&Head>) -> Option<Wrap> {
+    /// The wrapper for a position: an alias owner wraps as the class it
+    /// aliases.
+    fn wrap(&self, head: Option<&'a Head>) -> Option<Wrap> {
         match head? {
             Head::String => Some(Wrap::Str),
-            Head::Declared(path) => {
-                let key = self.class_key(module, path)?;
+            Head::Declared(r) => {
+                let key = self.class_key(r)?;
                 Some(Wrap::Class(self.classes[&key].clone()))
             }
             Head::Number | Head::Boolean | Head::BigInt => None,
         }
     }
 
-    fn class_key(&self, module: Option<&'a str>, path: &'a str) -> Option<Key<'a>> {
-        let key = [(module, path), (None, path)]
-            .into_iter()
-            .find(|k| self.classes.contains_key(k))?;
-        Some(*self.aliases.get(&key).unwrap_or(&key))
+    fn class_key(&self, r: &'a OwnerRef) -> Option<Key<'a>> {
+        let (key, _) = self
+            .classes
+            .get_key_value(&(r.module.as_deref(), r.path.as_str()))?;
+        Some(*self.aliases.get(key).unwrap_or(key))
     }
 
     /// An owner's members with their Zena names. Declared members are
@@ -477,7 +476,7 @@ export function numberValue(x: externref): f64 {{ return {number_value}(x); }}
         let mut args = Vec::new();
         let names = param_names(&f.params);
         for (n, (p, name)) in f.params.iter().zip(names).enumerate().skip(skip) {
-            let wrap = self.wrap(f.module.as_deref(), p.head.as_ref());
+            let wrap = self.wrap(p.head.as_ref());
             let (ty, arg) = match (p.ty, wrap) {
                 _ if is_rest(f, n) => ("FixedArray<anyref>".to_string(), name.clone()),
                 (WasmType::ExternRef { null, undefined }, Some(w)) => {
@@ -509,7 +508,7 @@ export function numberValue(x: externref): f64 {{ return {number_value}(x); }}
         let Some(r) = f.result else {
             return ("void".to_string(), format!("{call};"));
         };
-        match (r, self.wrap(f.module.as_deref(), f.result_head.as_ref())) {
+        match (r, self.wrap(f.result_head.as_ref())) {
             (
                 WasmType::ExternRef {
                     null: false,
@@ -578,7 +577,7 @@ export function numberValue(x: externref): f64 {{ return {number_value}(x); }}
             let mut args = Vec::new();
             for (p, name) in h.params.iter().zip(param_names(&h.params)) {
                 params.push(format!("{name}: {}", flat_type(p.ty)));
-                args.push(match (p.ty, self.wrap(None, p.head.as_ref())) {
+                args.push(match (p.ty, self.wrap(p.head.as_ref())) {
                     (WasmType::ExternRef { null, undefined }, Some(w)) => {
                         if let Wrap::Class(c) = &w {
                             used.push(c.clone());
@@ -602,7 +601,7 @@ export function numberValue(x: externref): f64 {{ return {number_value}(x); }}
                 });
             }
             let call = format!("app.{}({})", h.name, args.join(", "));
-            let ret = match (h.result, self.wrap(None, h.result_head.as_ref())) {
+            let ret = match (h.result, self.wrap(h.result_head.as_ref())) {
                 (None, _) => format!("{{ {call}; }}"),
                 (
                     Some(WasmType::ExternRef {
@@ -685,7 +684,7 @@ export function numberValue(x: externref): f64 {{ return {number_value}(x); }}
     /// type admits one, the owner's zero-argument constructor, or a throw
     /// the author replaces.
     fn placeholder(&self, h: &AbiHandler, r: WasmType, used: &mut Vec<String>) -> String {
-        let wrap = self.wrap(None, h.result_head.as_ref());
+        let wrap = self.wrap(h.result_head.as_ref());
         let ctor = self.zero_arg_ctor(h.result_head.as_ref());
         const NON_NULL: WasmType = WasmType::JS_NON_NULL;
         let value = match (r, &wrap, ctor) {
@@ -706,11 +705,11 @@ export function numberValue(x: externref): f64 {{ return {number_value}(x); }}
     }
 
     /// The Zena name of a global owner's `new()`, when it has one.
-    fn zero_arg_ctor(&self, head: Option<&Head>) -> Option<String> {
-        let Some(Head::Declared(path)) = head else {
+    fn zero_arg_ctor(&self, head: Option<&'a Head>) -> Option<String> {
+        let Some(Head::Declared(r)) = head else {
             return None;
         };
-        let key = self.class_key(None, path)?;
+        let key = self.class_key(r)?;
         self.members(key)
             .into_iter()
             .find(|(i, _)| {
@@ -723,7 +722,7 @@ export function numberValue(x: externref): f64 {{ return {number_value}(x); }}
 
     /// The Zena type the app sees for a wire position.
     fn app_type(&self, ty: WasmType, head: Option<&Head>, used: &mut Vec<String>) -> String {
-        match (ty, self.wrap(None, head)) {
+        match (ty, self.wrap(head)) {
             (WasmType::ExternRef { null, undefined }, Some(w)) => {
                 if let Wrap::Class(c) = &w {
                     used.push(c.clone());

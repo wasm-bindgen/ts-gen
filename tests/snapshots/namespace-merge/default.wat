@@ -29,64 +29,64 @@
   (import "namespace-merge" "Foo.m"
     (func $namespace-merge:Foo.m (@abi.call "m") (@abi.owner "Foo")
       (@abi.ts "m(options: Foo.Options): void")
-      (param $this externref (@abi.ref "Foo"))
-      (param $options externref (@abi.ref "Foo.Options"))))
+      (param $this externref (@abi.ref "Foo" (module "namespace-merge")))
+      (param $options externref (@abi.ref "Foo.Options" (module "namespace-merge")))))
 
   (@abi.dictionary "Foo.Options" (module "namespace-merge"))
   (import "namespace-merge" "Foo.Options.new"
     (func $namespace-merge:Foo.Options.new (@abi.object) (@abi.owner "Foo.Options")
       (@abi.ts "{} as Foo.Options")
-      (result externref (@abi.ref "Foo.Options"))))
+      (result externref (@abi.ref "Foo.Options" (module "namespace-merge")))))
   (import "namespace-merge" "Foo.Options.a"
     (func $namespace-merge:Foo.Options.a (@abi.get "a") (@abi.owner "Foo.Options")
       (@abi.ts "a: string")
-      (param $this externref (@abi.ref "Foo.Options"))
+      (param $this externref (@abi.ref "Foo.Options" (module "namespace-merge")))
       (result externref (@abi.ref string))))
   (import "namespace-merge" "Foo.Options.set_a"
     (func $namespace-merge:Foo.Options.set_a (@abi.set "a") (@abi.owner "Foo.Options")
       (@abi.ts "set a(value: string)")
-      (param $this externref (@abi.ref "Foo.Options"))
+      (param $this externref (@abi.ref "Foo.Options" (module "namespace-merge")))
       (param $value externref (@abi.ref string))))
 
   (import "namespace-merge" "makeFoo"
     (func $namespace-merge:makeFoo (@abi.call "makeFoo" (on))
       (@abi.ts "makeFoo(): Foo")
-      (result externref (@abi.ref "Foo"))))
+      (result externref (@abi.ref "Foo" (module "namespace-merge")))))
 
   (@abi.namespace "Bar" (module "namespace-merge"))
   (import "namespace-merge" "Bar.power"
     (func $namespace-merge:Bar.power (@abi.call "power") (@abi.owner "Bar")
       (@abi.ts "power(power: Bar.Power): Bar")
-      (param $this externref (@abi.ref "Bar"))
+      (param $this externref (@abi.ref "Bar" (module "namespace-merge")))
       (param $power externref (@abi.ref "Bar.Power"))
-      (result externref (@abi.ref "Bar"))))
+      (result externref (@abi.ref "Bar" (module "namespace-merge")))))
 
   (import "namespace-merge" "make"
     (func $namespace-merge:make (@abi.call "make" (on))
       (@abi.ts "make(config: make.Config): void")
-      (param $config externref (@abi.ref "make.Config"))))
+      (param $config externref (@abi.ref "make.Config" (module "namespace-merge")))))
 
   (@abi.dictionary "make.Config" (module "namespace-merge"))
   (import "namespace-merge" "make.Config.new"
     (func $namespace-merge:make.Config.new (@abi.object) (@abi.owner "make.Config")
       (@abi.ts "{} as make.Config")
-      (result externref (@abi.ref "make.Config"))))
+      (result externref (@abi.ref "make.Config" (module "namespace-merge")))))
   (import "namespace-merge" "make.Config.c"
     (func $namespace-merge:make.Config.c (@abi.get "c") (@abi.owner "make.Config")
       (@abi.ts "c: string")
-      (param $this externref (@abi.ref "make.Config"))
+      (param $this externref (@abi.ref "make.Config" (module "namespace-merge")))
       (result externref (@abi.ref string))))
   (import "namespace-merge" "make.Config.set_c"
     (func $namespace-merge:make.Config.set_c (@abi.set "c") (@abi.owner "make.Config")
       (@abi.ts "set c(value: string)")
-      (param $this externref (@abi.ref "make.Config"))
+      (param $this externref (@abi.ref "make.Config" (module "namespace-merge")))
       (param $value externref (@abi.ref string))))
 
   (@abi.interface "Shape" (module "namespace-merge"))
   (import "namespace-merge" "Shape.axis"
     (func $namespace-merge:Shape.axis (@abi.call "axis") (@abi.owner "Shape")
       (@abi.ts "axis(axis: Shape.Axis): void")
-      (param $this externref (@abi.ref "Shape"))
+      (param $this externref (@abi.ref "Shape" (module "namespace-merge")))
       (param $axis externref (@abi.ref "Shape.Axis"))))
 
   ;; Owners with no functions of their own.

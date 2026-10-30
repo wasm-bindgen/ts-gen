@@ -79,26 +79,26 @@
   (import "symbol" "Tagged.new"
     (func $symbol:Tagged.new (@abi.object) (@abi.owner "Tagged")
       (@abi.ts "{} as Tagged")
-      (result externref (@abi.ref "Tagged"))))
+      (result externref (@abi.ref "Tagged" (module "symbol")))))
   (import "symbol" "Tagged.tag"
     (func $symbol:Tagged.tag (@abi.get "tag") (@abi.owner "Tagged")
       (@abi.ts "tag: symbol")
-      (param $this externref (@abi.ref "Tagged"))
+      (param $this externref (@abi.ref "Tagged" (module "symbol")))
       (result externref)))
   (import "symbol" "Tagged.set_tag"
     (func $symbol:Tagged.set_tag (@abi.set "tag") (@abi.owner "Tagged")
       (@abi.ts "set tag(value: symbol)")
-      (param $this externref (@abi.ref "Tagged"))
+      (param $this externref (@abi.ref "Tagged" (module "symbol")))
       (param $value externref)))
   (import "symbol" "Tagged.alias"
     (func $symbol:Tagged.alias (@abi.get "alias") (@abi.owner "Tagged")
       (@abi.ts "alias?: symbol")
-      (param $this externref (@abi.ref "Tagged"))
+      (param $this externref (@abi.ref "Tagged" (module "symbol")))
       (result externref (@abi.ref undefined))))
   (import "symbol" "Tagged.set_alias"
     (func $symbol:Tagged.set_alias (@abi.set "alias") (@abi.owner "Tagged")
       (@abi.ts "set alias(value: symbol)")
-      (param $this externref (@abi.ref "Tagged"))
+      (param $this externref (@abi.ref "Tagged" (module "symbol")))
       (param $value externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
