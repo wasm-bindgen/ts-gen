@@ -79,7 +79,8 @@ impl SignatureKind {
         !matches!(self, Self::Constructor | Self::Setter | Self::StaticSetter)
     }
 
-    /// Whether the binding always requires `catch` (constructors do).
+    /// Whether the binding catches by default, without `--fallible`
+    /// (constructors do; `@throws {never}` still opts out).
     pub fn always_catches(self) -> bool {
         matches!(self, Self::Constructor)
     }
@@ -392,6 +393,7 @@ pub fn collect_type_params(
         | TypeRef::PropertyKey
         | TypeRef::TypedSlice(..)
         | TypeRef::RustScalar(_)
+        | TypeRef::WideScalar(_)
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)
@@ -752,8 +754,8 @@ pub struct Overload<'a> {
     ///   error).
     /// * `Throws::Never` → caller declares the callable never throws.
     ///   Sync callables get *no* `try_` companion; async callables drop
-    ///   `catch` and return `T` directly. Constructors ignore this and
-    ///   still catch (per JS `new` semantics).
+    ///   `catch` and return `T` directly; a constructor returns the type
+    ///   bare.
     pub throws: &'a Throws,
     /// Declared `async`: see [`CallableSpec::call_never_throws`].
     pub async_modifier: bool,
@@ -805,12 +807,12 @@ impl CallableSpec<'_> {
 ///   a builtin or global one or declared `async`, whose calls never throw.
 /// * **`try_` companion**: for sync, non-setter, non-constructor callables,
 ///   each primary `name` gets a fallible `try_name` sibling.
-/// * **Constructor catches always**: per JS semantics; the primary signature
-///   is `catch: true` and there's no `try_` variant.
+/// * **Constructors catch by default**: `new` can throw in JS; the primary
+///   signature is `catch: true` and there's no `try_` variant.
 /// * **`Throws::Never`**: the caller declared the callable never throws
 ///   (`@throws {never}`). Sync callables get *no* `try_` companion; async
-///   callables drop `catch` and return `T` directly. Constructors ignore
-///   this — they always catch per JS `new` semantics.
+///   callables drop `catch` and return `T` directly; constructors drop
+///   `catch` and return the type bare.
 /// * **`never` returns**: a callable returning `never` (or `Promise<never>`)
 ///   never completes normally, so only its catching form is emitted, typed
 ///   `()`: the primary itself catches, under every policy, with no `try_`
@@ -921,10 +923,11 @@ pub fn build_signatures(
         } else {
             return_type
         };
-        // `Throws::Never` suppresses every fallible form — except for
-        // constructors, which always catch (`new` can always throw in JS),
-        // and for a `never` return, which contradicts it and wins.
-        let nothrow = overload.throws.is_never() && !spec.kind.always_catches() && !never_returns;
+        // `Throws::Never` suppresses every fallible form, constructors
+        // included: `new` can throw in JS, so the default is to catch, but a
+        // declaration saying it does not is honored like any other member.
+        // A `never` return contradicts it and wins.
+        let nothrow = overload.throws.is_never() && !never_returns;
         // A sync callable that can throw gets a catching form: as the
         // `try_` companion by default, or as the primary itself under
         // `--fallible` or when it returns `never`.
@@ -944,11 +947,10 @@ pub fn build_signatures(
         let primary_literal = literal.clone();
 
         // Primary variant catches when:
-        // * the kind always catches (constructors), OR
-        // * it's async — *unless* `Throws::Never` opts out, OR
+        // * the kind catches by default (constructors), OR
+        // * it's async — *unless* `Throws::Never` opts out of either, OR
         // * it's sync and can throw, under `--fallible` or returning `never`.
-        let primary_catches = spec.kind.always_catches()
-            || (is_async && !nothrow)
+        let primary_catches = (!nothrow && (spec.kind.always_catches() || is_async))
             || (sync_fallible && primary_is_catching);
         let primary = FunctionSignature {
             rust_name: primary_name.clone(),
@@ -3323,7 +3325,7 @@ mod tests {
             &None,
             &mut used,
         );
-        // Constructor: only 1 signature, always catch, no try_ variant
+        // Constructor: only 1 signature, catches by default, no try_ variant
         assert_eq!(sigs.len(), 1);
         assert_eq!(sigs[0].rust_name, "new");
         assert!(sigs[0].catch);
@@ -3821,10 +3823,7 @@ mod tests {
     }
 
     #[test]
-    fn test_throws_never_constructor_still_catches() {
-        // Constructors always catch per JS `new` semantics — `@throws
-        // {never}` is silently ignored on them. The resulting signature
-        // is the same as for any other constructor.
+    fn test_throws_never_constructor_is_plain() {
         let mut used = no_used();
         let sigs = expand_throws(
             "Foo",
@@ -3837,7 +3836,8 @@ mod tests {
         );
         assert_eq!(sigs.len(), 1);
         assert_eq!(sigs[0].rust_name, "new");
-        assert!(sigs[0].catch, "constructors always catch even with nothrow");
+        assert!(!sigs[0].catch);
+        assert!(sigs[0].error_type.is_none());
         assert!(!sigs[0].is_async);
     }
 

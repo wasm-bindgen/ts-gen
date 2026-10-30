@@ -50,6 +50,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<BoxLikeObject> for BoxLikeObjectBuilder {
+        fn from(inner: BoxLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -93,6 +98,11 @@ pub mod polish {
         }
         pub fn build(self) -> TimeLikeObject {
             self.inner
+        }
+    }
+    impl From<TimeLikeObject> for TimeLikeObjectBuilder {
+        fn from(inner: TimeLikeObject) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(private)]
@@ -172,6 +182,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<Options> for OptionsBuilder {
+        fn from(inner: Options) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -211,6 +226,11 @@ pub mod polish {
         }
         pub fn build(self) -> Holder<T> {
             self.inner
+        }
+    }
+    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<Holder<T>> for HolderBuilder<T> {
+        fn from(inner: Holder<T>) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -255,6 +275,11 @@ pub mod polish {
         }
         pub fn build(self) -> Transition {
             self.inner
+        }
+    }
+    impl From<Transition> for TransitionBuilder {
+        fn from(inner: Transition) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -302,6 +327,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<PartialBoxLikeObject> for PartialBoxLikeObjectBuilder {
+        fn from(inner: PartialBoxLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -345,6 +375,11 @@ pub mod polish {
         }
         pub fn build(self) -> PartialOmitLikeBoxLikeObject {
             self.inner
+        }
+    }
+    impl From<PartialOmitLikeBoxLikeObject> for PartialOmitLikeBoxLikeObjectBuilder {
+        fn from(inner: PartialOmitLikeBoxLikeObject) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(private)]

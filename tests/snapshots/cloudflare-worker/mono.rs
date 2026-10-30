@@ -268,6 +268,11 @@ impl RequestInitBuilder {
         self.inner
     }
 }
+impl From<RequestInit> for RequestInitBuilder {
+    fn from(inner: RequestInit) -> Self {
+        Self { inner }
+    }
+}
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `BodyInit`",
     label = "expected ReadableStream, string, ArrayBuffer, Blob, URLSearchParams or FormData"
@@ -526,6 +531,11 @@ impl ResponseInitBuilder {
     }
     pub fn build(self) -> ResponseInit {
         self.inner
+    }
+}
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

@@ -76,6 +76,11 @@ impl ConsoleOptionsBuilder {
         self.inner
     }
 }
+impl From<ConsoleOptions> for ConsoleOptionsBuilder {
+    fn from(inner: ConsoleOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "node:console", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

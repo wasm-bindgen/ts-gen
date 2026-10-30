@@ -438,7 +438,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::ArrayBufferView => buf.push_str("ArrayBufferView"),
         TypeRef::PropertyKey => buf.push_str("PropertyKey"),
         TypeRef::TypedSlice(e, _) => write!(buf, "slice:{}", e.typed_array()).unwrap(),
-        TypeRef::RustScalar(s) => buf.push_str(s.as_str()),
+        TypeRef::RustScalar(s) | TypeRef::WideScalar(s) => buf.push_str(s.as_str()),
         TypeRef::StringLiteral(s) => write!(buf, "lit:{s:?}").unwrap(),
         TypeRef::NumberLiteral(n) => write!(buf, "lit:{n}").unwrap(),
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
@@ -1373,6 +1373,7 @@ impl<'a> CodegenContext<'a> {
             | TypeRef::PropertyKey
             | TypeRef::TypedSlice(..)
             | TypeRef::RustScalar(_)
+            | TypeRef::WideScalar(_)
             | TypeRef::StringLiteral(_)
             | TypeRef::NumberLiteral(_)
             | TypeRef::BooleanLiteral(_)
@@ -2040,7 +2041,8 @@ pub fn to_syn_type(
             // inside a handle (`Promise<…>` that is not an async return,
             // `Array<…>`, `JsNullable<…>`) keeps the JS number it narrows.
             TypeRef::RustScalar(s) if s.is_bigint() => return quote! { BigInt },
-            TypeRef::RustScalar(_) => return quote! { Number },
+            // A wide scalar's leaf is a JS `number`.
+            TypeRef::RustScalar(_) | TypeRef::WideScalar(_) => return quote! { Number },
             TypeRef::String | TypeRef::StringLiteral(_) => return quote! { JsString },
             TypeRef::Void | TypeRef::Undefined => return quote! { Undefined },
             _ => {}
@@ -2098,6 +2100,9 @@ pub fn to_syn_type(
             let ident = syn::Ident::new(s.as_str(), proc_macro2::Span::call_site());
             quote! { #ident }
         }
+        // A marker the inline-wrapper pass rewrites: `f64` in the extern
+        // binding, the scalar in the wrapper it emits over it.
+        TypeRef::WideScalar(s) => super::inline_wrappers::marker_tokens(*s),
 
         // === TS-only synthetic ===
         // `ArrayBufferView` is a TS-only union alias (typed-array
@@ -3246,6 +3251,7 @@ fn is_mono_native_leaf(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -
             | TypeRef::Number
             | TypeRef::NumberLiteral(_)
             | TypeRef::RustScalar(_)
+            | TypeRef::WideScalar(_)
             | TypeRef::String
             | TypeRef::StringLiteral(_)
     ) || ctx.enum_kind(ty, scope).is_some()
@@ -4063,6 +4069,7 @@ fn is_native_array_element(
             | TypeRef::Number
             | TypeRef::NumberLiteral(_)
             | TypeRef::RustScalar(_)
+            | TypeRef::WideScalar(_)
             | TypeRef::Boolean
             | TypeRef::BooleanLiteral(_)
     )
@@ -4183,7 +4190,10 @@ fn is_numeric_array_element(
 ) -> bool {
     matches!(
         native_array_leaf(elem, ctx, scope).as_ref(),
-        TypeRef::Number | TypeRef::NumberLiteral(_) | TypeRef::RustScalar(_)
+        TypeRef::Number
+            | TypeRef::NumberLiteral(_)
+            | TypeRef::RustScalar(_)
+            | TypeRef::WideScalar(_)
     )
 }
 

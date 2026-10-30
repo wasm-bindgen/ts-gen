@@ -106,6 +106,11 @@ impl TaggedBuilder {
         self.inner
     }
 }
+impl From<Tagged> for TaggedBuilder {
+    fn from(inner: Tagged) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum LookupReturnKind {

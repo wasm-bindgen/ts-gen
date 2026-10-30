@@ -41,6 +41,11 @@ impl GetOptionsBuilder {
         self.inner
     }
 }
+impl From<GetOptions> for GetOptionsBuilder {
+    fn from(inner: GetOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -76,6 +81,11 @@ impl ConditionalBuilder {
     }
     pub fn build(self) -> Conditional {
         self.inner
+    }
+}
+impl From<Conditional> for ConditionalBuilder {
+    fn from(inner: Conditional) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]

@@ -38,6 +38,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
 * [`@rust` JSDoc → Rust scalar](#rust-jsdoc--rust-scalar)
+* [Inline wrappers](#inline-wrappers)
 * [`--annotate` side files](#--annotate-side-files)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
@@ -943,6 +944,32 @@ impl TransitionOptions {
 impl TransitionOptionsBuilder {
     pub fn direction(self, val: DirectionKind) -> Self { /* … */ }
     pub fn build(self) -> TransitionOptions { /* … */ }
+}
+```
+
+### Continuing from an existing dictionary
+
+`build()` consumes the builder and the builder has no getters, so a
+helper that needs to read what was set so far (append to a `headers`
+field, apply a preset) would otherwise have to rebuild the object field
+by field. Every builder therefore implements `From<Dict>`:
+
+```rust
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self { Self { inner } }
+}
+```
+
+The dictionary's generated getters and setters are the read/modify step,
+and `.into()` resumes chaining:
+
+```rust
+fn header(builder: ResponseInitBuilder, name: &str, value: &str) -> ResponseInitBuilder {
+    let init = builder.build();
+    let headers = /* normalize init.headers() */;
+    headers.set(name, value);
+    init.set_headers(&headers);
+    init.into()
 }
 ```
 
@@ -2155,7 +2182,7 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 
 The non-`try_` form panics on JS throw; the `try_` form returns `Result`.
 Setters and constructors don't get a `try_` companion (setters never
-catch; constructors always catch).
+catch; constructors catch unless annotated `@throws {never}`).
 
 ### `--fallible` — single `Result` form
 
@@ -2183,9 +2210,9 @@ single catching form; no `try_` name is declared. The error type is
 unchanged: `@throws {T}` → `T`, otherwise `JsValue`, or `js_sys::Error`
 under `--errors-as-error`, so the two flags compose. `@throws {never}`
 keeps a sync binding infallible (no `catch`, plain `T`) and is the only
-way to get one under the flag. Async callables, constructors (always
-catch), setters (never catch) and property getters are not affected
-(a getter annotated `@throws {X}` catches under either policy; see
+way to get one under the flag, constructors included. Async callables,
+other constructors (always catch), setters (never catch) and property
+getters are not affected (a getter annotated `@throws {X}` catches under either policy; see
 [`@throws {X}` on getters](#throws-x-on-getters)). An async callable's
 sync `<name>_promise` form (below) catches under the flag like any
 other sync primary, unless calling it
@@ -3256,8 +3283,11 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
   `pub async fn foo() -> T`; its `foo_promise` form is plain under
   every policy, as a builtin's, a global's or an `async` callable's is
   [without the annotation](#builtins-globals-and-async-never-throw-synchronously).
-* **Constructors** always catch per JS `new` semantics —
-  `@throws {never}` on a constructor is silently ignored.
+* **Constructors** catch by default (JS `new` can throw); annotated
+  `@throws {never}` the binding drops `catch` and returns the type
+  bare (`pub fn new(name: &str) -> Foo`). wasm-bindgen accepts a
+  non-`catch` constructor; a throw then aborts like any other
+  unguarded import.
 * **`never` returns** contradict the annotation and win: it is ignored
   and the callable keeps only its catching form (see
   [`never` returns](#never-returns-keep-only-the-catching-form)).
@@ -3292,6 +3322,9 @@ a `__`-prefixed name (`__<name>`). Three constructs qualify today:
   `--experimental-generic-mono` the extern takes the alias's trait,
   `impl PlainDateLike`, itself, and needs no wrapper.
 * **Overloads keyed by a string literal**, below.
+* **`@rust u64` / `i64` on a `number`**, whose extern binding keeps the
+  JS number's `f64` (see [`@rust u64` / `i64` on a
+  `number`](#rust-u64--i64-on-a-number)).
 
 **Overloads distinguished only by a string literal.** Rust has no
 literal types, so `get(key, type: "json")` and `get(key, type:
@@ -3455,18 +3488,18 @@ pub async fn count(this: &Response) -> Result<u32, JsValue>;
   (`Result<u32, _>`).
 * A generic handle's argument must be a JS type, so inside one the
   tagged leaf keeps the JS number it narrows: `Number`, or `BigInt` for
-  `u64`/`i64`. A `Promise<number>` getter or argument is
+  `u64`/`i64` on a `bigint` (on a `number` they too stay `Number`, with
+  no inline wrapper). A `Promise<number>` getter or argument is
   `Promise<Number>`, `number[][]` is `Vec<Array<Number>>` and
   `(number | null)[]` is `Vec<JsNullable<Number>>`; the tag still
   applies where the leaf reaches a Rust position.
 * Accepted scalars: `u8 u16 u32 u64 i8 i16 i32 i64 f32 f64 usize`.
-  wasm-bindgen crosses `u64`/`i64` as a JS `BigInt`, so they apply only
-  to a `bigint` leaf; every other scalar applies only to a `number`
-  leaf. A `@rust u64` on a `number` would make the JS glue reject the
-  value at runtime, so it is refused: sizes beyond `u32` stay `f64`
-  (exact to 2^53). An unknown scalar, an incompatible leaf, or a
-  parameter name that does not exist is an error diagnostic and the
-  tag is ignored.
+  wasm-bindgen crosses `u64`/`i64` as a JS `BigInt`, so on a `bigint`
+  leaf they are the extern type directly; on a `number` leaf the
+  extern binding stays `f64` and an [inline wrapper](#inline-wrappers)
+  converts. Every other scalar applies only to a `number` leaf. An
+  unknown scalar, an incompatible leaf, or a parameter name that does
+  not exist is an error diagnostic and the tag is ignored.
 
 Why a JSDoc tag rather than a branded alias (`type u16 = number`): the
 alias form needs the upstream declaration to *use* the alias, which an
@@ -3474,6 +3507,69 @@ upstream file never does, so annotations would still have to be
 layered on — and a tag reads as what it is, a Rust-side refinement,
 while a `u16` alias in `.d.ts` suggests a TS-level distinction that
 does not exist.
+
+### `@rust u64` / `i64` on a `number`
+
+wasm-bindgen passes 64-bit integers as `BigInt`, so a `u64` extern
+parameter or return would make the glue reject a JS number. The binding
+keeps `f64` under a private name and an [inline
+wrapper](#inline-wrappers) of the public name converts with `as`, which
+is exact to 2^53 (the range a JS number represents exactly) and
+saturates beyond it:
+
+```ts
+interface R2Object {
+  /** @rust u64 */
+  readonly size: number;
+  /** @rust limit: u64 */
+  list(limit: number): Promise<R2Object[]>;
+  /** @rust u64 */
+  count(): Promise<number>;
+}
+interface R2PutOptions {
+  /** @rust u64 */
+  size?: number;
+}
+```
+
+```rust
+extern "C" {
+    #[wasm_bindgen(method, getter, js_name = "size")]
+    fn __size(this: &R2Object) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    async fn __list(this: &R2Object, limit: f64) -> Result<Vec<R2Object>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "count")]
+    async fn __count(this: &R2Object) -> Result<f64, JsValue>;
+}
+impl R2Object {
+    pub fn size(&self) -> u64 { self.__size() as u64 }
+    pub async fn list(&self, limit: u64) -> Result<Vec<R2Object>, JsValue> {
+        self.__list(limit as f64).await
+    }
+    pub async fn count(&self) -> Result<u64, JsValue> {
+        self.__count().await.map(|v| v as u64)
+    }
+}
+```
+
+* Applies to getters, setters, parameters, sync and async returns,
+  static methods, constructors and free functions; the public
+  signature is exactly what the scalar would have been, through the
+  read carriers `Option<_>` / `Nullable<_>` (`?`, `| undefined`,
+  `| null`), `Vec<_>` / `&[_]` (`T[]`) and `Result<_, E>`. A slice
+  argument is converted into a `Vec<f64>` the call borrows; an
+  `Option<&[u64]>` one collects inside the `map` and borrows outside it
+  (`parts.map(|v| v.iter().map(|v| *v as f64).collect::<Vec<_>>())
+  .as_deref()`). A `@rust u64` on a `bigint` needs no wrapper.
+* A generic receiver (`Box<T>`) gives `impl<T: JsGeneric> Box<T>`; the
+  method's own type parameters stay on the wrapper fn.
+* The `_promise` companion is handed to JS (`waitUntil`, `Promise.race`),
+  so it keeps the JS number (`Promise<Number>`) and gets no wrapper. The
+  same holds for a scalar inside a callback type.
+* Dictionary factories and builder methods take the public scalar and
+  call the wrapper setter, so `R2PutOptions::builder().size(5)` reads as
+  declared.
+* Doc comments move to the wrapper; the extern binding is not `pub`.
 
 ## `--annotate` side files
 

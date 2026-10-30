@@ -420,6 +420,11 @@ pub mod web_assembly {
             self.inner
         }
     }
+    impl From<GlobalDescriptor> for GlobalDescriptorBuilder {
+        fn from(inner: GlobalDescriptor) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_name = "Global" , js_namespace = "WebAssembly")]
@@ -503,6 +508,11 @@ pub mod web_assembly {
         }
         pub fn build(self) -> MemoryDescriptor {
             self.inner
+        }
+    }
+    impl From<MemoryDescriptor> for MemoryDescriptorBuilder {
+        fn from(inner: MemoryDescriptor) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -647,6 +657,11 @@ pub mod web_assembly {
         }
         pub fn build(self) -> TableDescriptor {
             self.inner
+        }
+    }
+    impl From<TableDescriptor> for TableDescriptorBuilder {
+        fn from(inner: TableDescriptor) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -1974,6 +1989,18 @@ impl<
         self.inner
     }
 }
+impl<
+        Env: ::wasm_bindgen::convert::IntoWasmAbi,
+        QueueHandlerMessage: ::wasm_bindgen::convert::IntoWasmAbi,
+        CfHostMetadata: ::wasm_bindgen::convert::IntoWasmAbi,
+        Props: ::wasm_bindgen::convert::IntoWasmAbi,
+    > From<ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>>
+    for ExportedHandlerBuilder<Env, QueueHandlerMessage, CfHostMetadata, Props>
+{
+    fn from(inner: ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -2009,6 +2036,11 @@ impl StructuredSerializeOptionsBuilder {
     }
     pub fn build(self) -> StructuredSerializeOptions {
         self.inner
+    }
+}
+impl From<StructuredSerializeOptions> for StructuredSerializeOptionsBuilder {
+    fn from(inner: StructuredSerializeOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -2296,6 +2328,13 @@ impl DurableObjectNamespaceNewUniqueIdOptionsBuilder {
         self.inner
     }
 }
+impl From<DurableObjectNamespaceNewUniqueIdOptions>
+    for DurableObjectNamespaceNewUniqueIdOptionsBuilder
+{
+    fn from(inner: DurableObjectNamespaceNewUniqueIdOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DurableObjectLocationHint {
@@ -2367,6 +2406,13 @@ impl DurableObjectNamespaceGetDurableObjectOptionsBuilder {
     }
     pub fn build(self) -> DurableObjectNamespaceGetDurableObjectOptions {
         self.inner
+    }
+}
+impl From<DurableObjectNamespaceGetDurableObjectOptions>
+    for DurableObjectNamespaceGetDurableObjectOptionsBuilder
+{
+    fn from(inner: DurableObjectNamespaceGetDurableObjectOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -3159,6 +3205,11 @@ impl DurableObjectListOptionsBuilder {
         self.inner
     }
 }
+impl From<DurableObjectListOptions> for DurableObjectListOptionsBuilder {
+    fn from(inner: DurableObjectListOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -3204,6 +3255,11 @@ impl DurableObjectGetOptionsBuilder {
         self.inner
     }
 }
+impl From<DurableObjectGetOptions> for DurableObjectGetOptionsBuilder {
+    fn from(inner: DurableObjectGetOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -3239,6 +3295,11 @@ impl DurableObjectGetAlarmOptionsBuilder {
     }
     pub fn build(self) -> DurableObjectGetAlarmOptions {
         self.inner
+    }
+}
+impl From<DurableObjectGetAlarmOptions> for DurableObjectGetAlarmOptionsBuilder {
+    fn from(inner: DurableObjectGetAlarmOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -3294,6 +3355,11 @@ impl DurableObjectPutOptionsBuilder {
         self.inner
     }
 }
+impl From<DurableObjectPutOptions> for DurableObjectPutOptionsBuilder {
+    fn from(inner: DurableObjectPutOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -3337,6 +3403,11 @@ impl DurableObjectSetAlarmOptionsBuilder {
     }
     pub fn build(self) -> DurableObjectSetAlarmOptions {
         self.inner
+    }
+}
+impl From<DurableObjectSetAlarmOptions> for DurableObjectSetAlarmOptionsBuilder {
+    fn from(inner: DurableObjectSetAlarmOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -3425,6 +3496,11 @@ impl AnalyticsEngineDataPointBuilder {
     }
     pub fn build(self) -> AnalyticsEngineDataPoint {
         self.inner
+    }
+}
+impl From<AnalyticsEngineDataPoint> for AnalyticsEngineDataPointBuilder {
+    fn from(inner: AnalyticsEngineDataPoint) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -3598,6 +3674,11 @@ impl EventInitBuilder {
     }
     pub fn build(self) -> EventInit {
         self.inner
+    }
+}
+impl From<EventInit> for EventInitBuilder {
+    fn from(inner: EventInit) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -3792,6 +3873,11 @@ impl EventTargetEventListenerOptionsBuilder {
         self.inner
     }
 }
+impl From<EventTargetEventListenerOptions> for EventTargetEventListenerOptionsBuilder {
+    fn from(inner: EventTargetEventListenerOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -3851,6 +3937,11 @@ impl EventTargetAddEventListenerOptionsBuilder {
     }
     pub fn build(self) -> EventTargetAddEventListenerOptions {
         self.inner
+    }
+}
+impl From<EventTargetAddEventListenerOptions> for EventTargetAddEventListenerOptionsBuilder {
+    fn from(inner: EventTargetAddEventListenerOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -3997,6 +4088,11 @@ impl SchedulerWaitOptionsBuilder {
         self.inner
     }
 }
+impl From<SchedulerWaitOptions> for SchedulerWaitOptionsBuilder {
+    fn from(inner: SchedulerWaitOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Event , extends = Object)]
@@ -4087,6 +4183,11 @@ impl CustomEventCustomEventInitBuilder {
     }
     pub fn build(self) -> CustomEventCustomEventInit {
         self.inner
+    }
+}
+impl From<CustomEventCustomEventInit> for CustomEventCustomEventInitBuilder {
+    fn from(inner: CustomEventCustomEventInit) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -4227,6 +4328,11 @@ impl BlobOptionsBuilder {
         self.inner
     }
 }
+impl From<BlobOptions> for BlobOptionsBuilder {
+    fn from(inner: BlobOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Blob , extends = Object)]
@@ -4304,6 +4410,11 @@ impl FileOptionsBuilder {
     }
     pub fn build(self) -> FileOptions {
         self.inner
+    }
+}
+impl From<FileOptions> for FileOptionsBuilder {
+    fn from(inner: FileOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -4527,6 +4638,11 @@ impl CacheQueryOptionsBuilder {
     }
     pub fn build(self) -> CacheQueryOptions {
         self.inner
+    }
+}
+impl From<CacheQueryOptions> for CacheQueryOptionsBuilder {
+    fn from(inner: CacheQueryOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -6058,6 +6174,11 @@ impl JsonWebKeyBuilder {
         self.inner
     }
 }
+impl From<JsonWebKey> for JsonWebKeyBuilder {
+    fn from(inner: JsonWebKey) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -6115,6 +6236,11 @@ impl RsaOtherPrimesInfoBuilder {
     }
     pub fn build(self) -> RsaOtherPrimesInfo {
         self.inner
+    }
+}
+impl From<RsaOtherPrimesInfo> for RsaOtherPrimesInfoBuilder {
+    fn from(inner: RsaOtherPrimesInfo) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -6222,6 +6348,11 @@ impl SubtleCryptoDeriveKeyAlgorithmBuilder {
     }
     pub fn build(self) -> SubtleCryptoDeriveKeyAlgorithm {
         self.inner
+    }
+}
+impl From<SubtleCryptoDeriveKeyAlgorithm> for SubtleCryptoDeriveKeyAlgorithmBuilder {
+    fn from(inner: SubtleCryptoDeriveKeyAlgorithm) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -6354,6 +6485,11 @@ impl SubtleCryptoEncryptAlgorithmBuilder {
         self.inner
     }
 }
+impl From<SubtleCryptoEncryptAlgorithm> for SubtleCryptoEncryptAlgorithmBuilder {
+    fn from(inner: SubtleCryptoEncryptAlgorithm) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -6459,6 +6595,11 @@ impl SubtleCryptoGenerateKeyAlgorithmBuilder {
         self.inner
     }
 }
+impl From<SubtleCryptoGenerateKeyAlgorithm> for SubtleCryptoGenerateKeyAlgorithmBuilder {
+    fn from(inner: SubtleCryptoGenerateKeyAlgorithm) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -6556,6 +6697,11 @@ impl SubtleCryptoImportKeyAlgorithmBuilder {
         self.inner
     }
 }
+impl From<SubtleCryptoImportKeyAlgorithm> for SubtleCryptoImportKeyAlgorithmBuilder {
+    fn from(inner: SubtleCryptoImportKeyAlgorithm) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -6617,6 +6763,11 @@ impl SubtleCryptoSignAlgorithmBuilder {
     }
     pub fn build(self) -> SubtleCryptoSignAlgorithm {
         self.inner
+    }
+}
+impl From<SubtleCryptoSignAlgorithm> for SubtleCryptoSignAlgorithmBuilder {
+    fn from(inner: SubtleCryptoSignAlgorithm) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -6781,6 +6932,11 @@ impl CryptoKeyRsaKeyAlgorithmBuilder {
         self.inner
     }
 }
+impl From<CryptoKeyRsaKeyAlgorithm> for CryptoKeyRsaKeyAlgorithmBuilder {
+    fn from(inner: CryptoKeyRsaKeyAlgorithm) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -6872,6 +7028,11 @@ impl CryptoKeyArbitraryKeyAlgorithmBuilder {
     }
     pub fn build(self) -> CryptoKeyArbitraryKeyAlgorithm {
         self.inner
+    }
+}
+impl From<CryptoKeyArbitraryKeyAlgorithm> for CryptoKeyArbitraryKeyAlgorithmBuilder {
+    fn from(inner: CryptoKeyArbitraryKeyAlgorithm) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -7205,6 +7366,11 @@ impl ErrorEventErrorEventInitBuilder {
         self.inner
     }
 }
+impl From<ErrorEventErrorEventInit> for ErrorEventErrorEventInitBuilder {
+    fn from(inner: ErrorEventErrorEventInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Event , extends = Object)]
@@ -7435,6 +7601,11 @@ impl ContentOptionsBuilder {
     }
     pub fn build(self) -> ContentOptions {
         self.inner
+    }
+}
+impl From<ContentOptions> for ContentOptionsBuilder {
+    fn from(inner: ContentOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -8446,6 +8617,11 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type RequestInfo = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -8805,6 +8981,11 @@ impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> RequestInitBuilder<Cf> {
         self.inner
     }
 }
+impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> From<RequestInit<Cf>> for RequestInitBuilder<Cf> {
+    fn from(inner: RequestInit<Cf>) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type Service = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -8945,6 +9126,13 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListKeyBuilder<M
         self.inner
     }
 }
+impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> From<KVNamespaceListKey<Metadata>>
+    for KVNamespaceListKeyBuilder<Metadata>
+{
+    fn from(inner: KVNamespaceListKey<Metadata>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -9068,6 +9256,13 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListResultBuilde
     }
     pub fn build(self) -> KVNamespaceListResult<Metadata> {
         self.inner
+    }
+}
+impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> From<KVNamespaceListResult<Metadata>>
+    for KVNamespaceListResultBuilder<Metadata>
+{
+    fn from(inner: KVNamespaceListResult<Metadata>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -9771,6 +9966,11 @@ impl KVNamespaceListOptionsBuilder {
         self.inner
     }
 }
+impl From<KVNamespaceListOptions> for KVNamespaceListOptionsBuilder {
+    fn from(inner: KVNamespaceListOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -9809,6 +10009,13 @@ impl<Type: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceGetOptionsBuilder<Ty
     }
     pub fn build(self) -> KVNamespaceGetOptions<Type> {
         self.inner
+    }
+}
+impl<Type: ::wasm_bindgen::convert::IntoWasmAbi> From<KVNamespaceGetOptions<Type>>
+    for KVNamespaceGetOptionsBuilder<Type>
+{
+    fn from(inner: KVNamespaceGetOptions<Type>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -9862,6 +10069,11 @@ impl KVNamespacePutOptionsBuilder {
     }
     pub fn build(self) -> KVNamespacePutOptions {
         self.inner
+    }
+}
+impl From<KVNamespacePutOptions> for KVNamespacePutOptionsBuilder {
+    fn from(inner: KVNamespacePutOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -10122,6 +10334,11 @@ impl QueueSendOptionsBuilder {
         self.inner
     }
 }
+impl From<QueueSendOptions> for QueueSendOptionsBuilder {
+    fn from(inner: QueueSendOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -10157,6 +10374,11 @@ impl QueueSendBatchOptionsBuilder {
     }
     pub fn build(self) -> QueueSendBatchOptions {
         self.inner
+    }
+}
+impl From<QueueSendBatchOptions> for QueueSendBatchOptionsBuilder {
+    fn from(inner: QueueSendBatchOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -10207,6 +10429,13 @@ impl<Body: ::wasm_bindgen::convert::IntoWasmAbi> MessageSendRequestBuilder<Body>
         self.inner
     }
 }
+impl<Body: ::wasm_bindgen::convert::IntoWasmAbi> From<MessageSendRequest<Body>>
+    for MessageSendRequestBuilder<Body>
+{
+    fn from(inner: MessageSendRequest<Body>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -10242,6 +10471,11 @@ impl QueueRetryOptionsBuilder {
     }
     pub fn build(self) -> QueueRetryOptions {
         self.inner
+    }
+}
+impl From<QueueRetryOptions> for QueueRetryOptionsBuilder {
+    fn from(inner: QueueRetryOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -10433,6 +10667,11 @@ impl R2ListOptionsBuilder {
     }
     pub fn build(self) -> R2ListOptions {
         self.inner
+    }
+}
+impl From<R2ListOptions> for R2ListOptionsBuilder {
+    fn from(inner: R2ListOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -10894,6 +11133,11 @@ impl R2BucketOptionsBuilder {
         self.inner
     }
 }
+impl From<R2BucketOptions> for R2BucketOptionsBuilder {
+    fn from(inner: R2BucketOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = R2PutOptions , extends = Object , is_type_of = JsValue :: is_object)]
@@ -11029,6 +11273,11 @@ impl R2BucketOptions2Builder {
     }
     pub fn build(self) -> R2BucketOptions2 {
         self.inner
+    }
+}
+impl From<R2BucketOptions2> for R2BucketOptions2Builder {
+    fn from(inner: R2BucketOptions2) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -11344,6 +11593,11 @@ impl R2RangeBuilder {
         self.inner
     }
 }
+impl From<R2Range> for R2RangeBuilder {
+    fn from(inner: R2Range) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -11417,6 +11671,11 @@ impl R2ConditionalBuilder {
         self.inner
     }
 }
+impl From<R2Conditional> for R2ConditionalBuilder {
+    fn from(inner: R2Conditional) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -11486,6 +11745,11 @@ impl R2GetOptionsBuilder {
     }
     pub fn build(self) -> R2GetOptions {
         self.inner
+    }
+}
+impl From<R2GetOptions> for R2GetOptionsBuilder {
+    fn from(inner: R2GetOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -11702,6 +11966,11 @@ impl R2PutOptionsBuilder {
         self.inner
     }
 }
+impl From<R2PutOptions> for R2PutOptionsBuilder {
+    fn from(inner: R2PutOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -11775,6 +12044,11 @@ impl R2MultipartOptionsBuilder {
     }
     pub fn build(self) -> R2MultipartOptions {
         self.inner
+    }
+}
+impl From<R2MultipartOptions> for R2MultipartOptionsBuilder {
+    fn from(inner: R2MultipartOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -11874,6 +12148,11 @@ impl R2StringChecksumsBuilder {
         self.inner
     }
 }
+impl From<R2StringChecksums> for R2StringChecksumsBuilder {
+    fn from(inner: R2StringChecksums) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -11961,6 +12240,11 @@ impl R2HTTPMetadataBuilder {
         self.inner
     }
 }
+impl From<R2HTTPMetadata> for R2HTTPMetadataBuilder {
+    fn from(inner: R2HTTPMetadata) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -12037,6 +12321,11 @@ impl R2ObjectsBuilder {
         self.inner
     }
 }
+impl From<R2Objects> for R2ObjectsBuilder {
+    fn from(inner: R2Objects) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -12081,6 +12370,11 @@ impl R2UploadPartOptionsBuilder {
     }
     pub fn build(self) -> R2UploadPartOptions {
         self.inner
+    }
+}
+impl From<R2UploadPartOptions> for R2UploadPartOptionsBuilder {
+    fn from(inner: R2UploadPartOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12162,6 +12456,13 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> QueuingStrategyBuilder<T> {
     }
     pub fn build(self) -> QueuingStrategy<T> {
         self.inner
+    }
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<QueuingStrategy<T>>
+    for QueuingStrategyBuilder<T>
+{
+    fn from(inner: QueuingStrategy<T>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12264,6 +12565,11 @@ impl<W: ::wasm_bindgen::convert::IntoWasmAbi> UnderlyingSinkBuilder<W> {
         self.inner
     }
 }
+impl<W: ::wasm_bindgen::convert::IntoWasmAbi> From<UnderlyingSink<W>> for UnderlyingSinkBuilder<W> {
+    fn from(inner: UnderlyingSink<W>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -12347,6 +12653,11 @@ impl UnderlyingByteSourceBuilder {
     }
     pub fn build(self) -> UnderlyingByteSource {
         self.inner
+    }
+}
+impl From<UnderlyingByteSource> for UnderlyingByteSourceBuilder {
+    fn from(inner: UnderlyingByteSource) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12451,6 +12762,13 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> UnderlyingSourceBuilder<R> {
     }
     pub fn build(self) -> UnderlyingSource<R> {
         self.inner
+    }
+}
+impl<R: ::wasm_bindgen::convert::IntoWasmAbi> From<UnderlyingSource<R>>
+    for UnderlyingSourceBuilder<R>
+{
+    fn from(inner: UnderlyingSource<R>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12593,6 +12911,13 @@ impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWa
         self.inner
     }
 }
+impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWasmAbi>
+    From<Transformer<I, O>> for TransformerBuilder<I, O>
+{
+    fn from(inner: Transformer<I, O>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -12669,6 +12994,11 @@ impl StreamPipeOptionsBuilder {
         self.inner
     }
 }
+impl From<StreamPipeOptions> for StreamPipeOptionsBuilder {
+    fn from(inner: StreamPipeOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -12716,6 +13046,13 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadableStreamReadResultBuilder<R>
     }
     pub fn build(self) -> ReadableStreamReadResult<R> {
         self.inner
+    }
+}
+impl<R: ::wasm_bindgen::convert::IntoWasmAbi> From<ReadableStreamReadResult<R>>
+    for ReadableStreamReadResultBuilder<R>
+{
+    fn from(inner: ReadableStreamReadResult<R>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -13002,6 +13339,13 @@ impl ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptionsBuilder {
     }
     pub fn build(self) -> ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions {
         self.inner
+    }
+}
+impl From<ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions>
+    for ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptionsBuilder
+{
+    fn from(inner: ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -13520,6 +13864,13 @@ impl IdentityTransformStreamQueuingStrategyBuilder {
         self.inner
     }
 }
+impl From<IdentityTransformStreamQueuingStrategy>
+    for IdentityTransformStreamQueuingStrategyBuilder
+{
+    fn from(inner: IdentityTransformStreamQueuingStrategy) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -13555,6 +13906,11 @@ impl ReadableStreamValuesOptionsBuilder {
     }
     pub fn build(self) -> ReadableStreamValuesOptions {
         self.inner
+    }
+}
+impl From<ReadableStreamValuesOptions> for ReadableStreamValuesOptionsBuilder {
+    fn from(inner: ReadableStreamValuesOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -13677,6 +14033,13 @@ impl TextDecoderStreamTextDecoderStreamInitBuilder {
         self.inner
     }
 }
+impl From<TextDecoderStreamTextDecoderStreamInit>
+    for TextDecoderStreamTextDecoderStreamInitBuilder
+{
+    fn from(inner: TextDecoderStreamTextDecoderStreamInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -13787,6 +14150,11 @@ impl ScriptVersionBuilder {
     }
     pub fn build(self) -> ScriptVersion {
         self.inner
+    }
+}
+impl From<ScriptVersion> for ScriptVersionBuilder {
+    fn from(inner: ScriptVersion) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -14909,6 +15277,11 @@ impl URLPatternInitBuilder {
         self.inner
     }
 }
+impl From<URLPatternInit> for URLPatternInitBuilder {
+    fn from(inner: URLPatternInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -15040,6 +15413,11 @@ impl URLPatternOptionsBuilder {
         self.inner
     }
 }
+impl From<URLPatternOptions> for URLPatternOptionsBuilder {
+    fn from(inner: URLPatternOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Event , extends = Object)]
@@ -15126,6 +15504,11 @@ impl CloseEventInitBuilder {
     }
     pub fn build(self) -> CloseEventInit {
         self.inner
+    }
+}
+impl From<CloseEventInit> for CloseEventInitBuilder {
+    fn from(inner: CloseEventInit) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -15356,6 +15739,11 @@ impl WebSocketAcceptOptionsBuilder {
         self.inner
     }
 }
+impl From<WebSocketAcceptOptions> for WebSocketAcceptOptionsBuilder {
+    fn from(inner: WebSocketAcceptOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -15543,6 +15931,13 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> SqlStorageCursorNextReturnBuilder<
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<SqlStorageCursorNextReturn<T>>
+    for SqlStorageCursorNextReturnBuilder<T>
+{
+    fn from(inner: SqlStorageCursorNextReturn<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -15621,6 +16016,11 @@ impl SocketOptionsBuilder {
         self.inner
     }
 }
+impl From<SocketOptions> for SocketOptionsBuilder {
+    fn from(inner: SocketOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -15684,6 +16084,11 @@ impl TlsOptionsBuilder {
         self.inner
     }
 }
+impl From<TlsOptions> for TlsOptionsBuilder {
+    fn from(inner: TlsOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -15731,6 +16136,11 @@ impl SocketInfoBuilder {
     }
     pub fn build(self) -> SocketInfo {
         self.inner
+    }
+}
+impl From<SocketInfo> for SocketInfoBuilder {
+    fn from(inner: SocketInfo) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -15834,6 +16244,11 @@ impl EventSourceEventSourceInitBuilder {
     }
     pub fn build(self) -> EventSourceEventSourceInit {
         self.inner
+    }
+}
+impl From<EventSourceEventSourceInit> for EventSourceEventSourceInitBuilder {
+    fn from(inner: EventSourceEventSourceInit) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -15967,6 +16382,11 @@ impl ContainerStartupOptionsBuilder {
         self.inner
     }
 }
+impl From<ContainerStartupOptions> for ContainerStartupOptionsBuilder {
+    fn from(inner: ContainerStartupOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = EventTarget , extends = Object)]
@@ -16068,6 +16488,11 @@ impl MessagePortPostMessageOptionsBuilder {
     }
     pub fn build(self) -> MessagePortPostMessageOptions {
         self.inner
+    }
+}
+impl From<MessagePortPostMessageOptions> for MessagePortPostMessageOptionsBuilder {
+    fn from(inner: MessagePortPostMessageOptions) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -16213,6 +16638,11 @@ impl SyncKvListOptionsBuilder {
         self.inner
     }
 }
+impl From<SyncKvListOptions> for SyncKvListOptionsBuilder {
+    fn from(inner: SyncKvListOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -16267,6 +16697,11 @@ impl WorkerStubEntrypointOptionsBuilder {
     }
     pub fn build(self) -> WorkerStubEntrypointOptions {
         self.inner
+    }
+}
+impl From<WorkerStubEntrypointOptions> for WorkerStubEntrypointOptionsBuilder {
+    fn from(inner: WorkerStubEntrypointOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16383,6 +16818,11 @@ impl WorkerLoaderModuleBuilder {
     }
     pub fn build(self) -> WorkerLoaderModule {
         self.inner
+    }
+}
+impl From<WorkerLoaderModule> for WorkerLoaderModuleBuilder {
+    fn from(inner: WorkerLoaderModule) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16505,6 +16945,11 @@ impl WorkerLoaderWorkerCodeBuilder {
         self.inner
     }
 }
+impl From<WorkerLoaderWorkerCode> for WorkerLoaderWorkerCodeBuilder {
+    fn from(inner: WorkerLoaderWorkerCode) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -16574,6 +17019,11 @@ impl AiSearchSearchRequestBuilder {
         self.inner
     }
 }
+impl From<AiSearchSearchRequest> for AiSearchSearchRequestBuilder {
+    fn from(inner: AiSearchSearchRequest) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -16626,6 +17076,11 @@ impl AiSearchChatCompletionsRequestBuilder {
     }
     pub fn build(self) -> AiSearchChatCompletionsRequest {
         self.inner
+    }
+}
+impl From<AiSearchChatCompletionsRequest> for AiSearchChatCompletionsRequestBuilder {
+    fn from(inner: AiSearchChatCompletionsRequest) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16811,6 +17266,11 @@ impl AiSearchConfigBuilder {
         self.inner
     }
 }
+impl From<AiSearchConfig> for AiSearchConfigBuilder {
+    fn from(inner: AiSearchConfig) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -16865,6 +17325,11 @@ impl AiSearchInstanceBuilder {
     }
     pub fn build(self) -> AiSearchInstance {
         self.inner
+    }
+}
+impl From<AiSearchInstance> for AiSearchInstanceBuilder {
+    fn from(inner: AiSearchInstance) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -17119,6 +17584,11 @@ impl AiImageToTextInputBuilder {
         self.inner
     }
 }
+impl From<AiImageToTextInput> for AiImageToTextInputBuilder {
+    fn from(inner: AiImageToTextInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -17278,6 +17748,11 @@ impl AiImageTextToTextInputBuilder {
     }
     pub fn build(self) -> AiImageTextToTextInput {
         self.inner
+    }
+}
+impl From<AiImageTextToTextInput> for AiImageTextToTextInputBuilder {
+    fn from(inner: AiImageTextToTextInput) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -17552,6 +18027,11 @@ impl AiAutomaticSpeechRecognitionOutputBuilder {
         self.inner
     }
 }
+impl From<AiAutomaticSpeechRecognitionOutput> for AiAutomaticSpeechRecognitionOutputBuilder {
+    fn from(inner: AiAutomaticSpeechRecognitionOutput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -17610,6 +18090,11 @@ impl AiSummarizationInputBuilder {
     }
     pub fn build(self) -> AiSummarizationInput {
         self.inner
+    }
+}
+impl From<AiSummarizationInput> for AiSummarizationInputBuilder {
+    fn from(inner: AiSummarizationInput) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -17842,6 +18327,11 @@ impl RoleScopedChatInputBuilder {
         self.inner
     }
 }
+impl From<RoleScopedChatInput> for RoleScopedChatInputBuilder {
+    fn from(inner: RoleScopedChatInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -17896,6 +18386,11 @@ impl AiTextGenerationToolLegacyInputBuilder {
         self.inner
     }
 }
+impl From<AiTextGenerationToolLegacyInput> for AiTextGenerationToolLegacyInputBuilder {
+    fn from(inner: AiTextGenerationToolLegacyInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -17948,6 +18443,11 @@ impl AiTextGenerationToolInputBuilder {
     }
     pub fn build(self) -> AiTextGenerationToolInput {
         self.inner
+    }
+}
+impl From<AiTextGenerationToolInput> for AiTextGenerationToolInputBuilder {
+    fn from(inner: AiTextGenerationToolInput) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -18017,6 +18517,11 @@ impl AiTextGenerationResponseFormatBuilder {
     }
     pub fn build(self) -> AiTextGenerationResponseFormat {
         self.inner
+    }
+}
+impl From<AiTextGenerationResponseFormat> for AiTextGenerationResponseFormatBuilder {
+    fn from(inner: AiTextGenerationResponseFormat) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -18185,6 +18690,11 @@ impl AiTextGenerationInputBuilder {
         self.inner
     }
 }
+impl From<AiTextGenerationInput> for AiTextGenerationInputBuilder {
+    fn from(inner: AiTextGenerationInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -18332,6 +18842,11 @@ impl AiTextGenerationOutputBuilder {
         self.inner
     }
 }
+impl From<AiTextGenerationOutput> for AiTextGenerationOutputBuilder {
+    fn from(inner: AiTextGenerationOutput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -18384,6 +18899,11 @@ impl AiTextToSpeechInputBuilder {
     }
     pub fn build(self) -> AiTextToSpeechInput {
         self.inner
+    }
+}
+impl From<AiTextToSpeechInput> for AiTextToSpeechInputBuilder {
+    fn from(inner: AiTextToSpeechInput) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -18550,6 +19070,11 @@ impl AiTextToImageInputBuilder {
         self.inner
     }
 }
+impl From<AiTextToImageInput> for AiTextToImageInputBuilder {
+    fn from(inner: AiTextToImageInput) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type AiTextToImageOutput = ReadableStream<Uint8Array>;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -18619,6 +19144,11 @@ impl AiTranslationInputBuilder {
         self.inner
     }
 }
+impl From<AiTranslationInput> for AiTranslationInputBuilder {
+    fn from(inner: AiTranslationInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -18656,6 +19186,11 @@ impl AiTranslationOutputBuilder {
     }
     pub fn build(self) -> AiTranslationOutput {
         self.inner
+    }
+}
+impl From<AiTranslationOutput> for AiTranslationOutputBuilder {
+    fn from(inner: AiTranslationOutput) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -19027,6 +19562,11 @@ impl ResponsesInputBuilder {
         self.inner
     }
 }
+impl From<ResponsesInput> for ResponsesInputBuilder {
+    fn from(inner: ResponsesInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -19368,6 +19908,11 @@ impl ResponsesOutputBuilder {
         self.inner
     }
 }
+impl From<ResponsesOutput> for ResponsesOutputBuilder {
+    fn from(inner: ResponsesOutput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -19494,6 +20039,11 @@ impl EasyInputMessageBuilder {
     }
     pub fn build(self) -> EasyInputMessage {
         self.inner
+    }
+}
+impl From<EasyInputMessage> for EasyInputMessageBuilder {
+    fn from(inner: EasyInputMessage) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -19639,6 +20189,11 @@ impl ResponsesFunctionToolBuilder {
         self.inner
     }
 }
+impl From<ResponsesFunctionTool> for ResponsesFunctionToolBuilder {
+    fn from(inner: ResponsesFunctionTool) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -19674,6 +20229,11 @@ impl ResponseIncompleteDetailsBuilder {
     }
     pub fn build(self) -> ResponseIncompleteDetails {
         self.inner
+    }
+}
+impl From<ResponseIncompleteDetails> for ResponseIncompleteDetailsBuilder {
+    fn from(inner: ResponseIncompleteDetails) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -19742,6 +20302,11 @@ impl ResponsePromptBuilder {
     }
     pub fn build(self) -> ResponsePrompt {
         self.inner
+    }
+}
+impl From<ResponsePrompt> for ResponsePromptBuilder {
+    fn from(inner: ResponsePrompt) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -19824,6 +20389,11 @@ impl ReasoningBuilder {
     }
     pub fn build(self) -> Reasoning {
         self.inner
+    }
+}
+impl From<Reasoning> for ReasoningBuilder {
+    fn from(inner: Reasoning) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -20055,6 +20625,11 @@ impl ResponseCustomToolCallOutputBuilder {
     }
     pub fn build(self) -> ResponseCustomToolCallOutput {
         self.inner
+    }
+}
+impl From<ResponseCustomToolCallOutput> for ResponseCustomToolCallOutputBuilder {
+    fn from(inner: ResponseCustomToolCallOutput) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -20399,6 +20974,11 @@ impl ResponseFormatTextJSONSchemaConfigBuilder {
         self.inner
     }
 }
+impl From<ResponseFormatTextJSONSchemaConfig> for ResponseFormatTextJSONSchemaConfigBuilder {
+    fn from(inner: ResponseFormatTextJSONSchemaConfig) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -20645,6 +21225,11 @@ impl ResponseFunctionToolCallBuilder {
         self.inner
     }
 }
+impl From<ResponseFunctionToolCall> for ResponseFunctionToolCallBuilder {
+    fn from(inner: ResponseFunctionToolCall) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = ResponseFunctionToolCall , extends = Object , is_type_of = JsValue :: is_object)]
@@ -20693,6 +21278,11 @@ impl ResponseFunctionToolCallItemBuilder {
     }
     pub fn build(self) -> ResponseFunctionToolCallItem {
         self.inner
+    }
+}
+impl From<ResponseFunctionToolCallItem> for ResponseFunctionToolCallItemBuilder {
+    fn from(inner: ResponseFunctionToolCallItem) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -20797,6 +21387,11 @@ impl ResponseFunctionToolCallOutputItemBuilder {
     }
     pub fn build(self) -> ResponseFunctionToolCallOutputItem {
         self.inner
+    }
+}
+impl From<ResponseFunctionToolCallOutputItem> for ResponseFunctionToolCallOutputItemBuilder {
+    fn from(inner: ResponseFunctionToolCallOutputItem) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -20955,6 +21550,11 @@ impl ResponseInputImageBuilder {
         self.inner
     }
 }
+impl From<ResponseInputImage> for ResponseInputImageBuilder {
+    fn from(inner: ResponseInputImage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -21025,6 +21625,11 @@ impl ResponseInputImageContentBuilder {
     }
     pub fn build(self) -> ResponseInputImageContent {
         self.inner
+    }
+}
+impl From<ResponseInputImageContent> for ResponseInputImageContentBuilder {
+    fn from(inner: ResponseInputImageContent) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -21245,6 +21850,11 @@ impl ResponseInputItemFunctionCallOutputBuilder {
         self.inner
     }
 }
+impl From<ResponseInputItemFunctionCallOutput> for ResponseInputItemFunctionCallOutputBuilder {
+    fn from(inner: ResponseInputItemFunctionCallOutput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -21318,6 +21928,11 @@ impl ResponseInputItemMessageBuilder {
     }
     pub fn build(self) -> ResponseInputItemMessage {
         self.inner
+    }
+}
+impl From<ResponseInputItemMessage> for ResponseInputItemMessageBuilder {
+    fn from(inner: ResponseInputItemMessage) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -21422,6 +22037,11 @@ impl ResponseInputMessageItemBuilder {
     }
     pub fn build(self) -> ResponseInputMessageItem {
         self.inner
+    }
+}
+impl From<ResponseInputMessageItem> for ResponseInputMessageItemBuilder {
+    fn from(inner: ResponseInputMessageItem) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -21773,6 +22393,11 @@ impl ResponseOutputMessageBuilder {
         self.inner
     }
 }
+impl From<ResponseOutputMessage> for ResponseOutputMessageBuilder {
+    fn from(inner: ResponseOutputMessage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -21845,6 +22470,11 @@ impl ResponseOutputTextBuilder {
     }
     pub fn build(self) -> ResponseOutputText {
         self.inner
+    }
+}
+impl From<ResponseOutputText> for ResponseOutputTextBuilder {
+    fn from(inner: ResponseOutputText) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -21938,6 +22568,11 @@ impl ResponseReasoningItemBuilder {
     }
     pub fn build(self) -> ResponseReasoningItem {
         self.inner
+    }
+}
+impl From<ResponseReasoningItem> for ResponseReasoningItemBuilder {
+    fn from(inner: ResponseReasoningItem) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -22319,6 +22954,11 @@ impl ResponseTextConfigBuilder {
         self.inner
     }
 }
+impl From<ResponseTextConfig> for ResponseTextConfigBuilder {
+    fn from(inner: ResponseTextConfig) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22484,6 +23124,11 @@ impl LogprobBuilder {
         self.inner
     }
 }
+impl From<Logprob> for LogprobBuilder {
+    fn from(inner: Logprob) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22529,6 +23174,11 @@ impl TopLogprobBuilder {
     }
     pub fn build(self) -> TopLogprob {
         self.inner
+    }
+}
+impl From<TopLogprob> for TopLogprobBuilder {
+    fn from(inner: TopLogprob) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -22631,6 +23281,11 @@ impl StreamOptionsBuilder {
         self.inner
     }
 }
+impl From<StreamOptions> for StreamOptionsBuilder {
+    fn from(inner: StreamOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22696,6 +23351,11 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Base_En_V1_5_Input {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Base_En_V1_5_Input> for Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -22782,6 +23442,13 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse>
+    for Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -22920,6 +23587,11 @@ impl Ai_Cf_Openai_Whisper_OutputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Openai_Whisper_Output> for Ai_Cf_Openai_Whisper_OutputBuilder {
+    fn from(inner: Ai_Cf_Openai_Whisper_Output) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -23017,6 +23689,11 @@ impl Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_M2M100_1_2B_Input> for Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
+    fn from(inner: Ai_Cf_Meta_M2M100_1_2B_Input) -> Self {
+        Self { inner }
+    }
+}
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Meta_M2M100_1_2B_Output`",
     label = "expected Object or Ai_Cf_Meta_M2M100_1_2B_AsyncResponse"
@@ -23099,6 +23776,11 @@ impl Ai_Cf_Meta_M2M100_1_2B_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_M2M100_1_2B_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_M2M100_1_2B_AsyncResponse> for Ai_Cf_Meta_M2M100_1_2B_AsyncResponseBuilder {
+    fn from(inner: Ai_Cf_Meta_M2M100_1_2B_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -23185,6 +23867,11 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Small_En_V1_5_Input> for Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Self {
+        Self { inner }
+    }
+}
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Baai_Bge_Small_En_V1_5_Output`",
     label = "expected Object or Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse"
@@ -23269,6 +23956,13 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse>
+    for Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -23358,6 +24052,11 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Large_En_V1_5_Input> for Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Self {
+        Self { inner }
+    }
+}
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Baai_Bge_Large_En_V1_5_Output`",
     label = "expected Object or Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse"
@@ -23442,6 +24141,13 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse>
+    for Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -23561,6 +24267,13 @@ impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output>
+    for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -23712,6 +24425,11 @@ impl Ai_Cf_Openai_Whisper_Tiny_En_OutputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Openai_Whisper_Tiny_En_Output> for Ai_Cf_Openai_Whisper_Tiny_En_OutputBuilder {
+    fn from(inner: Ai_Cf_Openai_Whisper_Tiny_En_Output) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -23850,6 +24568,13 @@ impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input>
+    for Ai_Cf_Openai_Whisper_Large_V3_Turbo_InputBuilder
+{
+    fn from(inner: Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -23930,6 +24655,13 @@ impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output>
+    for Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -24065,6 +24797,13 @@ impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts>
+    for Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24126,6 +24865,11 @@ impl Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Input_Embedding> for Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Input_Embedding) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24180,6 +24924,13 @@ impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Builder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1>
+    for Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Builder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -24241,6 +24992,11 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_M3_Input_Embedding_1 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_M3_Input_Embedding_1> for Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Input_Embedding_1) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -24346,6 +25102,11 @@ impl Ai_Cf_Baai_Bge_M3_Ouput_QueryBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Ouput_Query> for Ai_Cf_Baai_Bge_M3_Ouput_QueryBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Ouput_Query) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24408,6 +25169,13 @@ impl Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts>
+    for Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24466,6 +25234,11 @@ impl Ai_Cf_Baai_Bge_M3_Ouput_EmbeddingBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Ouput_Embedding> for Ai_Cf_Baai_Bge_M3_Ouput_EmbeddingBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24508,6 +25281,11 @@ impl Ai_Cf_Baai_Bge_M3_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_M3_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_M3_AsyncResponse> for Ai_Cf_Baai_Bge_M3_AsyncResponseBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -24578,6 +25356,13 @@ impl Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input>
+    for Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_InputBuilder
+{
+    fn from(inner: Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24622,6 +25407,13 @@ impl Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output>
+    for Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -24882,6 +25674,13 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25048,6 +25847,13 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25103,6 +25909,13 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -25391,6 +26204,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25442,6 +26262,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -25622,6 +26449,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25675,6 +26509,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1Builder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25715,6 +26556,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -25768,6 +26616,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -25913,6 +26768,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponseBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -25994,6 +26856,11 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_Guard_3_8B_Input> for Ai_Cf_Meta_Llama_Guard_3_8B_InputBuilder {
+    fn from(inner: Ai_Cf_Meta_Llama_Guard_3_8B_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -26047,6 +26914,11 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_Guard_3_8B_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_Guard_3_8B_Output> for Ai_Cf_Meta_Llama_Guard_3_8B_OutputBuilder {
+    fn from(inner: Ai_Cf_Meta_Llama_Guard_3_8B_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -26112,6 +26984,11 @@ impl Ai_Cf_Baai_Bge_Reranker_Base_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Reranker_Base_Input> for Ai_Cf_Baai_Bge_Reranker_Base_InputBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_Reranker_Base_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -26147,6 +27024,11 @@ impl Ai_Cf_Baai_Bge_Reranker_Base_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Reranker_Base_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Reranker_Base_Output> for Ai_Cf_Baai_Bge_Reranker_Base_OutputBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_Reranker_Base_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -26387,6 +27269,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -26435,6 +27324,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_ModeBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_ModeBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -26590,6 +27486,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -26638,6 +27541,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1Builder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1Builder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -26698,6 +27608,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -26891,6 +27808,11 @@ impl Ai_Cf_Qwen_Qwq_32B_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwq_32B_Prompt> for Ai_Cf_Qwen_Qwq_32B_PromptBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -27038,6 +27960,11 @@ impl Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwq_32B_Messages> for Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -27090,6 +28017,11 @@ impl Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwq_32B_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwq_32B_Output> for Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -27339,6 +28271,13 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -27529,6 +28468,13 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -27594,6 +28540,13 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -27801,6 +28754,11 @@ impl Ai_Cf_Google_Gemma_3_12B_It_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Google_Gemma_3_12B_It_Prompt> for Ai_Cf_Google_Gemma_3_12B_It_PromptBuilder {
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -27949,6 +28907,11 @@ impl Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Google_Gemma_3_12B_It_Messages> for Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -28005,6 +28968,11 @@ impl Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Google_Gemma_3_12B_It_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Google_Gemma_3_12B_It_Output> for Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -28281,6 +29249,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -28332,6 +29307,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_ModeBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_ModeBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -28516,6 +29498,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -28719,6 +29708,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -28931,6 +29927,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -28991,6 +29994,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -29234,6 +30244,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -29282,6 +30297,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_ModeBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_ModeBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -29436,6 +30458,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -29484,6 +30511,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1Builder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1Builder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -29662,6 +30696,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1Builder {
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -29710,6 +30749,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2Builder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2Builder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -29864,6 +30910,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -29912,6 +30965,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -30158,6 +31218,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -30270,6 +31337,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -30314,6 +31388,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -30720,6 +31801,11 @@ impl Ai_Cf_Deepgram_Nova_3_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Deepgram_Nova_3_Input> for Ai_Cf_Deepgram_Nova_3_InputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -30755,6 +31841,11 @@ impl Ai_Cf_Deepgram_Nova_3_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Nova_3_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Nova_3_Output> for Ai_Cf_Deepgram_Nova_3_OutputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -30880,6 +31971,11 @@ impl Ai_Cf_Qwen_Qwen3_Embedding_0_6B_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input> for Ai_Cf_Qwen_Qwen3_Embedding_0_6B_InputBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -30926,6 +32022,13 @@ impl Ai_Cf_Qwen_Qwen3_Embedding_0_6B_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output>
+    for Ai_Cf_Qwen_Qwen3_Embedding_0_6B_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -31013,6 +32116,11 @@ impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input> for Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
+    fn from(inner: Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -31058,6 +32166,11 @@ impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output> for Ai_Cf_Pipecat_Ai_Smart_Turn_V2_OutputBuilder {
+    fn from(inner: Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -31211,6 +32324,11 @@ impl Ai_Cf_Leonardo_Phoenix_1_0_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Leonardo_Phoenix_1_0_Input> for Ai_Cf_Leonardo_Phoenix_1_0_InputBuilder {
+    fn from(inner: Ai_Cf_Leonardo_Phoenix_1_0_Input) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type Ai_Cf_Leonardo_Phoenix_1_0_Output = JsString;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -31329,6 +32447,11 @@ impl Ai_Cf_Leonardo_Lucid_Origin_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Leonardo_Lucid_Origin_Input> for Ai_Cf_Leonardo_Lucid_Origin_InputBuilder {
+    fn from(inner: Ai_Cf_Leonardo_Lucid_Origin_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -31371,6 +32494,11 @@ impl Ai_Cf_Leonardo_Lucid_Origin_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Leonardo_Lucid_Origin_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Leonardo_Lucid_Origin_Output> for Ai_Cf_Leonardo_Lucid_Origin_OutputBuilder {
+    fn from(inner: Ai_Cf_Leonardo_Lucid_Origin_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -31477,6 +32605,11 @@ impl Ai_Cf_Deepgram_Aura_1_InputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Aura_1_Input {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Aura_1_Input> for Ai_Cf_Deepgram_Aura_1_InputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Aura_1_Input) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -31873,6 +33006,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -31924,6 +33064,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_ModeBuilder {
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_ModeBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -32104,6 +33251,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -32155,6 +33309,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1Builder {
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1Builder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -32359,6 +33520,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1Builder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -32410,6 +33578,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2Builder {
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2Builder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -32595,6 +33770,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1Builder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -32646,6 +33828,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder {
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -32936,6 +34125,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseBuilder 
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -33064,6 +34260,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseBuilder 
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -33110,6 +34313,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -33376,6 +34586,11 @@ impl Ai_Cf_Deepgram_Flux_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Deepgram_Flux_Input> for Ai_Cf_Deepgram_Flux_InputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Flux_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -33498,6 +34713,11 @@ impl Ai_Cf_Deepgram_Flux_OutputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Deepgram_Flux_Output> for Ai_Cf_Deepgram_Flux_OutputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Flux_Output) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -33604,6 +34824,11 @@ impl Ai_Cf_Deepgram_Aura_2_En_InputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Aura_2_En_Input {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Aura_2_En_Input> for Ai_Cf_Deepgram_Aura_2_En_InputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Aura_2_En_Input) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -33716,6 +34941,11 @@ impl Ai_Cf_Deepgram_Aura_2_Es_InputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Aura_2_Es_Input {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Aura_2_Es_Input> for Ai_Cf_Deepgram_Aura_2_Es_InputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Aura_2_Es_Input) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -34484,6 +35714,11 @@ impl AiOptionsBuilder {
         self.inner
     }
 }
+impl From<AiOptions> for AiOptionsBuilder {
+    fn from(inner: AiOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -34573,6 +35808,11 @@ impl AiModelsSearchParamsBuilder {
     }
     pub fn build(self) -> AiModelsSearchParams {
         self.inner
+    }
+}
+impl From<AiModelsSearchParams> for AiModelsSearchParamsBuilder {
+    fn from(inner: AiModelsSearchParams) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -34885,6 +36125,11 @@ impl GatewayRetriesBuilder {
         self.inner
     }
 }
+impl From<GatewayRetries> for GatewayRetriesBuilder {
+    fn from(inner: GatewayRetries) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -34983,6 +36228,11 @@ impl GatewayOptionsBuilder {
         self.inner
     }
 }
+impl From<GatewayOptions> for GatewayOptionsBuilder {
+    fn from(inner: GatewayOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -35022,6 +36272,11 @@ impl UniversalGatewayOptionsBuilder {
     }
     pub fn build(self) -> UniversalGatewayOptions {
         self.inner
+    }
+}
+impl From<UniversalGatewayOptions> for UniversalGatewayOptionsBuilder {
+    fn from(inner: UniversalGatewayOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -35104,6 +36359,11 @@ impl AiGatewayPatchLogBuilder {
     }
     pub fn build(self) -> AiGatewayPatchLog {
         self.inner
+    }
+}
+impl From<AiGatewayPatchLog> for AiGatewayPatchLogBuilder {
+    fn from(inner: AiGatewayPatchLog) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -35351,6 +36611,11 @@ impl AiGatewayLogBuilder {
     }
     pub fn build(self) -> AiGatewayLog {
         self.inner
+    }
+}
+impl From<AiGatewayLog> for AiGatewayLogBuilder {
+    fn from(inner: AiGatewayLog) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -35737,6 +37002,11 @@ impl AiGatewayOptionsBuilder {
         self.inner
     }
 }
+impl From<AiGatewayOptions> for AiGatewayOptionsBuilder {
+    fn from(inner: AiGatewayOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
@@ -36111,6 +37381,11 @@ impl ComparisonFilterBuilder {
         self.inner
     }
 }
+impl From<ComparisonFilter> for ComparisonFilterBuilder {
+    fn from(inner: ComparisonFilter) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -36159,6 +37434,11 @@ impl CompoundFilterBuilder {
     }
     pub fn build(self) -> CompoundFilter {
         self.inner
+    }
+}
+impl From<CompoundFilter> for CompoundFilterBuilder {
+    fn from(inner: CompoundFilter) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -36237,6 +37517,11 @@ impl AutoRagSearchRequestBuilder {
         self.inner
     }
 }
+impl From<AutoRagSearchRequest> for AutoRagSearchRequestBuilder {
+    fn from(inner: AutoRagSearchRequest) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = AutoRagSearchRequest , extends = Object , is_type_of = JsValue :: is_object)]
@@ -36301,6 +37586,11 @@ impl AutoRagAiSearchRequestBuilder {
     }
     pub fn build(self) -> AutoRagAiSearchRequest {
         self.inner
+    }
+}
+impl From<AutoRagAiSearchRequest> for AutoRagAiSearchRequestBuilder {
+    fn from(inner: AutoRagAiSearchRequest) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -36405,6 +37695,11 @@ impl AutoRagAiSearchRequestStreamingBuilder {
     }
     pub fn build(self) -> AutoRagAiSearchRequestStreaming {
         self.inner
+    }
+}
+impl From<AutoRagAiSearchRequestStreaming> for AutoRagAiSearchRequestStreamingBuilder {
+    fn from(inner: AutoRagAiSearchRequestStreaming) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -36736,6 +38031,11 @@ impl BasicImageTransformationsBuilder {
         self.inner
     }
 }
+impl From<BasicImageTransformations> for BasicImageTransformationsBuilder {
+    fn from(inner: BasicImageTransformations) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -36792,6 +38092,13 @@ impl BasicImageTransformationsGravityCoordinatesBuilder {
     }
     pub fn build(self) -> BasicImageTransformationsGravityCoordinates {
         self.inner
+    }
+}
+impl From<BasicImageTransformationsGravityCoordinates>
+    for BasicImageTransformationsGravityCoordinatesBuilder
+{
+    fn from(inner: BasicImageTransformationsGravityCoordinates) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -36988,6 +38295,11 @@ impl RequestInitCfPropertiesBuilder {
         self.inner
     }
 }
+impl From<RequestInitCfProperties> for RequestInitCfPropertiesBuilder {
+    fn from(inner: RequestInitCfProperties) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = BasicImageTransformations , extends = Object , is_type_of = JsValue :: is_object)]
@@ -37137,6 +38449,11 @@ impl RequestInitCfPropertiesImageDrawBuilder {
     }
     pub fn build(self) -> RequestInitCfPropertiesImageDraw {
         self.inner
+    }
+}
+impl From<RequestInitCfPropertiesImageDraw> for RequestInitCfPropertiesImageDrawBuilder {
+    fn from(inner: RequestInitCfPropertiesImageDraw) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -37450,6 +38767,11 @@ impl RequestInitCfPropertiesImageBuilder {
         self.inner
     }
 }
+impl From<RequestInitCfPropertiesImage> for RequestInitCfPropertiesImageBuilder {
+    fn from(inner: RequestInitCfPropertiesImage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -37503,6 +38825,11 @@ impl RequestInitCfPropertiesImageMinifyBuilder {
         self.inner
     }
 }
+impl From<RequestInitCfPropertiesImageMinify> for RequestInitCfPropertiesImageMinifyBuilder {
+    fn from(inner: RequestInitCfPropertiesImageMinify) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -37539,6 +38866,11 @@ impl RequestInitCfPropertiesR2Builder {
     }
     pub fn build(self) -> RequestInitCfPropertiesR2 {
         self.inner
+    }
+}
+impl From<RequestInitCfPropertiesR2> for RequestInitCfPropertiesR2Builder {
+    fn from(inner: RequestInitCfPropertiesR2) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -39683,6 +41015,14 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
         self.inner
     }
 }
+impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
+    From<IncomingRequestCfProperties<HostMetadata>>
+    for IncomingRequestCfPropertiesBuilder<HostMetadata>
+{
+    fn from(inner: IncomingRequestCfProperties<HostMetadata>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -40492,6 +41832,11 @@ impl IncomingRequestCfPropertiesBaseBuilder {
         self.inner
     }
 }
+impl From<IncomingRequestCfPropertiesBase> for IncomingRequestCfPropertiesBaseBuilder {
+    fn from(inner: IncomingRequestCfPropertiesBase) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -40684,6 +42029,14 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
     }
     pub fn build(self) -> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata> {
         self.inner
+    }
+}
+impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
+    From<IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>>
+    for IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata>
+{
+    fn from(inner: IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -41135,6 +42488,13 @@ impl IncomingRequestCfPropertiesGeographicInformationBuilder {
     }
     pub fn build(self) -> IncomingRequestCfPropertiesGeographicInformation {
         self.inner
+    }
+}
+impl From<IncomingRequestCfPropertiesGeographicInformation>
+    for IncomingRequestCfPropertiesGeographicInformationBuilder
+{
+    fn from(inner: IncomingRequestCfPropertiesGeographicInformation) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -41762,6 +43122,13 @@ impl IncomingRequestCfPropertiesTLSClientAuthBuilder {
     }
     pub fn build(self) -> IncomingRequestCfPropertiesTLSClientAuth {
         self.inner
+    }
+}
+impl From<IncomingRequestCfPropertiesTLSClientAuth>
+    for IncomingRequestCfPropertiesTLSClientAuthBuilder
+{
+    fn from(inner: IncomingRequestCfPropertiesTLSClientAuth) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -42408,6 +43775,11 @@ impl D1MetaBuilder {
         self.inner
     }
 }
+impl From<D1Meta> for D1MetaBuilder {
+    fn from(inner: D1Meta) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -42451,6 +43823,11 @@ impl D1ResponseBuilder {
         self.inner
     }
 }
+impl From<D1Response> for D1ResponseBuilder {
+    fn from(inner: D1Response) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = D1Response , extends = Object , is_type_of = JsValue :: is_object)]
@@ -42489,6 +43866,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> D1ResultBuilder<T> {
     }
     pub fn build(self) -> D1Result<T> {
         self.inner
+    }
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<D1Result<T>> for D1ResultBuilder<T> {
+    fn from(inner: D1Result<T>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -42730,6 +44112,11 @@ impl D1PreparedStatementOptions2Builder {
     }
     pub fn build(self) -> D1PreparedStatementOptions2 {
         self.inner
+    }
+}
+impl From<D1PreparedStatementOptions2> for D1PreparedStatementOptions2Builder {
+    fn from(inner: D1PreparedStatementOptions2) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -43020,6 +44407,11 @@ impl EmailAttachmentBuilder {
         self.inner
     }
 }
+impl From<EmailAttachment> for EmailAttachmentBuilder {
+    fn from(inner: EmailAttachment) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -43259,6 +44651,11 @@ impl SendEmailBuilderBuilder {
         self.inner
     }
 }
+impl From<SendEmailBuilder> for SendEmailBuilderBuilder {
+    fn from(inner: SendEmailBuilder) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = ExtendableEvent , extends = Object)]
@@ -43371,6 +44768,11 @@ pub mod cloudflare {
             }
             pub fn build(self) -> NodeStyleServerAddressReturn {
                 self.inner
+            }
+        }
+        impl From<NodeStyleServerAddressReturn> for NodeStyleServerAddressReturnBuilder {
+            fn from(inner: NodeStyleServerAddressReturn) -> Self {
+                Self { inner }
             }
         }
         #[wasm_bindgen(module = "cloudflare:node", experimental_generic_mono)]
@@ -43946,6 +45348,11 @@ pub mod cloudflare {
                 self.inner
             }
         }
+        impl From<WorkflowStepConfig> for WorkflowStepConfigBuilder {
+            fn from(inner: WorkflowStepConfig) -> Self {
+                Self { inner }
+            }
+        }
         #[wasm_bindgen(module = "cloudflare:workers", experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -44150,6 +45557,11 @@ pub mod cloudflare {
             }
             pub fn build(self) -> WorkflowStepOptions {
                 self.inner
+            }
+        }
+        impl From<WorkflowStepOptions> for WorkflowStepOptionsBuilder {
+            fn from(inner: WorkflowStepOptions) -> Self {
+                Self { inner }
             }
         }
         #[wasm_bindgen(private)]
@@ -44422,6 +45834,11 @@ impl ImageInfoResponseBuilder {
         self.inner
     }
 }
+impl From<ImageInfoResponse> for ImageInfoResponseBuilder {
+    fn from(inner: ImageInfoResponse) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -44595,6 +46012,11 @@ impl ImageTransformBuilder {
         self.inner
     }
 }
+impl From<ImageTransform> for ImageTransformBuilder {
+    fn from(inner: ImageTransform) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -44678,6 +46100,11 @@ impl ImageDrawOptionsBuilder {
         self.inner
     }
 }
+impl From<ImageDrawOptions> for ImageDrawOptionsBuilder {
+    fn from(inner: ImageDrawOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -44715,6 +46142,11 @@ impl ImageInputOptionsBuilder {
     }
     pub fn build(self) -> ImageInputOptions {
         self.inner
+    }
+}
+impl From<ImageInputOptions> for ImageInputOptionsBuilder {
+    fn from(inner: ImageInputOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -44833,6 +46265,11 @@ impl ImageOutputOptionsBuilder {
         self.inner
     }
 }
+impl From<ImageOutputOptions> for ImageOutputOptionsBuilder {
+    fn from(inner: ImageOutputOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -44929,6 +46366,11 @@ impl ImageMetadataBuilder {
         self.inner
     }
 }
+impl From<ImageMetadata> for ImageMetadataBuilder {
+    fn from(inner: ImageMetadata) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45014,6 +46456,11 @@ impl ImageUploadOptionsBuilder {
         self.inner
     }
 }
+impl From<ImageUploadOptions> for ImageUploadOptionsBuilder {
+    fn from(inner: ImageUploadOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45067,6 +46514,11 @@ impl ImageUpdateOptionsBuilder {
     }
     pub fn build(self) -> ImageUpdateOptions {
         self.inner
+    }
+}
+impl From<ImageUpdateOptions> for ImageUpdateOptionsBuilder {
+    fn from(inner: ImageUpdateOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -45134,6 +46586,11 @@ impl ImageListOptionsBuilder {
         self.inner
     }
 }
+impl From<ImageListOptions> for ImageListOptionsBuilder {
+    fn from(inner: ImageListOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45175,6 +46632,11 @@ impl ImageListBuilder {
     }
     pub fn build(self) -> ImageList {
         self.inner
+    }
+}
+impl From<ImageList> for ImageListBuilder {
+    fn from(inner: ImageList) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -45646,6 +47108,11 @@ impl ImageTransformationOutputOptionsBuilder {
         self.inner
     }
 }
+impl From<ImageTransformationOutputOptions> for ImageTransformationOutputOptionsBuilder {
+    fn from(inner: ImageTransformationOutputOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45882,6 +47349,11 @@ impl MediaTransformationInputOptionsBuilder {
         self.inner
     }
 }
+impl From<MediaTransformationInputOptions> for MediaTransformationInputOptionsBuilder {
+    fn from(inner: MediaTransformationInputOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45985,6 +47457,11 @@ impl MediaTransformationOutputOptionsBuilder {
     }
     pub fn build(self) -> MediaTransformationOutputOptions {
         self.inner
+    }
+}
+impl From<MediaTransformationOutputOptions> for MediaTransformationOutputOptionsBuilder {
+    fn from(inner: MediaTransformationOutputOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -47272,6 +48749,11 @@ impl StreamVideoBuilder {
         self.inner
     }
 }
+impl From<StreamVideo> for StreamVideoBuilder {
+    fn from(inner: StreamVideo) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -47358,6 +48840,11 @@ impl StreamVideoStatusBuilder {
     }
     pub fn build(self) -> StreamVideoStatus {
         self.inner
+    }
+}
+impl From<StreamVideoStatus> for StreamVideoStatusBuilder {
+    fn from(inner: StreamVideoStatus) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -47917,6 +49404,11 @@ impl StreamDirectUploadCreateParamsBuilder {
         self.inner
     }
 }
+impl From<StreamDirectUploadCreateParams> for StreamDirectUploadCreateParamsBuilder {
+    fn from(inner: StreamDirectUploadCreateParams) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -48079,6 +49571,11 @@ impl StreamUrlUploadParamsBuilder {
     }
     pub fn build(self) -> StreamUrlUploadParams {
         self.inner
+    }
+}
+impl From<StreamUrlUploadParams> for StreamUrlUploadParamsBuilder {
+    fn from(inner: StreamUrlUploadParams) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -48772,6 +50269,11 @@ impl StreamUpdateVideoParamsBuilder {
         self.inner
     }
 }
+impl From<StreamUpdateVideoParams> for StreamUpdateVideoParamsBuilder {
+    fn from(inner: StreamUpdateVideoParams) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -48841,6 +50343,11 @@ impl StreamCaptionBuilder {
         self.inner
     }
 }
+impl From<StreamCaption> for StreamCaptionBuilder {
+    fn from(inner: StreamCaption) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamDownloadStatus {
@@ -48905,6 +50412,11 @@ impl StreamDownloadBuilder {
         self.inner
     }
 }
+impl From<StreamDownload> for StreamDownloadBuilder {
+    fn from(inner: StreamDownload) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -48950,6 +50462,11 @@ impl StreamDownloadGetResponseBuilder {
     }
     pub fn build(self) -> StreamDownloadGetResponse {
         self.inner
+    }
+}
+impl From<StreamDownloadGetResponse> for StreamDownloadGetResponseBuilder {
+    fn from(inner: StreamDownloadGetResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -49232,6 +50749,11 @@ impl StreamWatermarkCreateParamsBuilder {
         self.inner
     }
 }
+impl From<StreamWatermarkCreateParams> for StreamWatermarkCreateParamsBuilder {
+    fn from(inner: StreamWatermarkCreateParams) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -49316,6 +50838,11 @@ impl StreamVideosListParamsBuilder {
     }
     pub fn build(self) -> StreamVideosListParams {
         self.inner
+    }
+}
+impl From<StreamVideosListParams> for StreamVideosListParamsBuilder {
+    fn from(inner: StreamVideosListParams) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -49705,6 +51232,11 @@ impl ConversionResponseBuilder {
         self.inner
     }
 }
+impl From<ConversionResponse> for ConversionResponseBuilder {
+    fn from(inner: ConversionResponse) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -49740,6 +51272,11 @@ impl ImageConversionOptionsBuilder {
     }
     pub fn build(self) -> ImageConversionOptions {
         self.inner
+    }
+}
+impl From<ImageConversionOptions> for ImageConversionOptionsBuilder {
+    fn from(inner: ImageConversionOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -49789,6 +51326,11 @@ impl EmbeddedImageConversionOptionsBuilder {
     }
     pub fn build(self) -> EmbeddedImageConversionOptions {
         self.inner
+    }
+}
+impl From<EmbeddedImageConversionOptions> for EmbeddedImageConversionOptionsBuilder {
+    fn from(inner: EmbeddedImageConversionOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -49852,6 +51394,11 @@ impl ConversionOptionsBuilder {
         self.inner
     }
 }
+impl From<ConversionOptions> for ConversionOptionsBuilder {
+    fn from(inner: ConversionOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -49903,6 +51450,11 @@ impl ConversionRequestOptionsBuilder {
     }
     pub fn build(self) -> ConversionRequestOptions {
         self.inner
+    }
+}
+impl From<ConversionRequestOptions> for ConversionRequestOptionsBuilder {
+    fn from(inner: ConversionRequestOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -50869,6 +52421,11 @@ pub mod tail_stream {
             self.inner
         }
     }
+    impl From<TailEventHandlerObject> for TailEventHandlerObjectBuilder {
+        fn from(inner: TailEventHandlerObject) -> Self {
+            Self { inner }
+        }
+    }
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `VectorFloatArray`",
@@ -50942,6 +52499,11 @@ impl VectorizeErrorBuilder {
     }
     pub fn build(self) -> VectorizeError {
         self.inner
+    }
+}
+impl From<VectorizeError> for VectorizeErrorBuilder {
+    fn from(inner: VectorizeError) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -51064,6 +52626,11 @@ impl VectorizeQueryOptionsBuilder {
         self.inner
     }
 }
+impl From<VectorizeQueryOptions> for VectorizeQueryOptionsBuilder {
+    fn from(inner: VectorizeQueryOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -51117,6 +52684,11 @@ impl VectorizeIndexConfigBuilder {
     }
     pub fn build(self) -> VectorizeIndexConfig {
         self.inner
+    }
+}
+impl From<VectorizeIndexConfig> for VectorizeIndexConfigBuilder {
+    fn from(inner: VectorizeIndexConfig) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -51304,6 +52876,11 @@ impl VectorizeVectorBuilder {
         self.inner
     }
 }
+impl From<VectorizeVector> for VectorizeVectorBuilder {
+    fn from(inner: VectorizeVector) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -51383,6 +52960,11 @@ impl VectorizeMatchBuilder {
     }
     pub fn build(self) -> VectorizeMatch {
         self.inner
+    }
+}
+impl From<VectorizeMatch> for VectorizeMatchBuilder {
+    fn from(inner: VectorizeMatch) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -51968,6 +53550,11 @@ impl DynamicDispatchLimitsBuilder {
         self.inner
     }
 }
+impl From<DynamicDispatchLimits> for DynamicDispatchLimitsBuilder {
+    fn from(inner: DynamicDispatchLimits) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -52013,6 +53600,11 @@ impl DynamicDispatchOptionsBuilder {
     }
     pub fn build(self) -> DynamicDispatchOptions {
         self.inner
+    }
+}
+impl From<DynamicDispatchOptions> for DynamicDispatchOptionsBuilder {
+    fn from(inner: DynamicDispatchOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -52338,6 +53930,13 @@ impl<PARAMS: ::wasm_bindgen::convert::IntoWasmAbi> WorkflowInstanceCreateOptions
         self.inner
     }
 }
+impl<PARAMS: ::wasm_bindgen::convert::IntoWasmAbi> From<WorkflowInstanceCreateOptions<PARAMS>>
+    for WorkflowInstanceCreateOptionsBuilder<PARAMS>
+{
+    fn from(inner: WorkflowInstanceCreateOptions<PARAMS>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -52464,6 +54063,11 @@ impl InstanceStatusBuilder {
         self.inner
     }
 }
+impl From<InstanceStatus> for InstanceStatusBuilder {
+    fn from(inner: InstanceStatus) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -52500,6 +54104,11 @@ impl WorkflowErrorBuilder {
     }
     pub fn build(self) -> WorkflowError {
         self.inner
+    }
+}
+impl From<WorkflowError> for WorkflowErrorBuilder {
+    fn from(inner: WorkflowError) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -52626,6 +54235,11 @@ impl PartialKvNamespaceGetOptionsUndefinedBuilder {
     }
     pub fn build(self) -> PartialKvNamespaceGetOptionsUndefined {
         self.inner
+    }
+}
+impl From<PartialKvNamespaceGetOptionsUndefined> for PartialKvNamespaceGetOptionsUndefinedBuilder {
+    fn from(inner: PartialKvNamespaceGetOptionsUndefined) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -52853,6 +54467,11 @@ impl PartialAiGatewayHeadersBuilder {
     }
     pub fn build(self) -> PartialAiGatewayHeaders {
         self.inner
+    }
+}
+impl From<PartialAiGatewayHeaders> for PartialAiGatewayHeadersBuilder {
+    fn from(inner: PartialAiGatewayHeaders) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -53124,6 +54743,11 @@ impl VectorizeVectorMetadataFilter2Builder {
         self.inner
     }
 }
+impl From<VectorizeVectorMetadataFilter2> for VectorizeVectorMetadataFilter2Builder {
+    fn from(inner: VectorizeVectorMetadataFilter2) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -53167,6 +54791,11 @@ impl VectorizeVectorMetadataFilter3Builder {
     }
     pub fn build(self) -> VectorizeVectorMetadataFilter3 {
         self.inner
+    }
+}
+impl From<VectorizeVectorMetadataFilter3> for VectorizeVectorMetadataFilter3Builder {
+    fn from(inner: VectorizeVectorMetadataFilter3) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]

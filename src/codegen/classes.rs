@@ -1632,6 +1632,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     self.inner
                 }
             }
+
+            impl #type_decl From<#rust_type> for #builder_name {
+                fn from(inner: #rust_type) -> Self {
+                    Self { inner }
+                }
+            }
         }
     } else {
         // All-required dictionary: the builder would be empty, so we
@@ -2159,8 +2165,8 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         }
         TypeRef::generic(config.rust_name.clone(), args)
     };
-    // Constructors always return the constructed type, wrapped in Result
-    // when `catch` (which is always-true here per `SignatureKind::Constructor`).
+    // Constructors return the constructed type, wrapped in `Result` when
+    // `catch` (the default; `@throws {never}` opts out).
     // The class is named from its own body, wherever the params resolve.
     let ret = to_return_type(
         &return_type,
