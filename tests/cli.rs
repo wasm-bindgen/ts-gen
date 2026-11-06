@@ -27,3 +27,26 @@ fn provides_wrapper_flags_are_rust_only() {
     }
     assert!(!out.exists());
 }
+
+/// The naming options shape the IR, which the Rust output does not read.
+#[test]
+fn naming_options_are_ir_only() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    let out = std::env::temp_dir().join(format!("ts-gen-cli-naming-{}.rs", std::process::id()));
+    for flags in [&["--naming", "zena"][..], &["--member-case", "camel"]] {
+        let output = Command::new(env!("CARGO_BIN_EXE_ts-gen"))
+            .arg("--input")
+            .arg(root.join("tests/fixtures/cloudflare-worker.d.ts"))
+            .args(flags)
+            .arg("--output")
+            .arg(&out)
+            .output()
+            .expect("Failed to execute ts-gen");
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(
+            !output.status.success() && stderr.contains("apply to --target wat and ir only"),
+            "{flags:?}: {stderr}"
+        );
+    }
+    assert!(!out.exists());
+}

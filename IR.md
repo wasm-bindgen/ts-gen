@@ -5,11 +5,11 @@ types. ts-gen writes it; language generators read it to write a
 language's bindings, and the bridge builder reads it to build
 `bindings.wasm`, which implements every binding in JS terms. A generator
 needs nothing from TypeScript or ts-gen: overloads are already expanded
-into separately named members, and every position has its wire type.
-This document specifies the text form; `ts_gen_abi::text::{emit, parse}`
-(model in `abi/src/ir.rs`) are its reference writer and reader, and
-`parse(emit(ir)) == ir`. [Bridge](#bridge) specifies what `bindings.wasm`
-adds on the wire.
+into separately named members, naming options are applied, and every
+position has its wire type. This document specifies the text form;
+`ts_gen_abi::text::{emit, parse}` (model in `abi/src/ir.rs`) are its
+reference writer and reader, and `parse(emit(ir)) == ir`.
+[Bridge](#bridge) specifies what `bindings.wasm` adds on the wire.
 
 ```ts
 ir 1;

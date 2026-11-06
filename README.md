@@ -127,15 +127,16 @@ Flags:
 Generate the IR for languages that compile directly to Wasm:
 
 ```sh
-ts-gen --input types.d.ts --output types.ir --target ir
+ts-gen --input types.d.ts --output types.ir --target ir --naming zena
 ```
 
 The IR is the `.d.ts` expanded into uniquely named bindings with
 wasm-level types: one import per member, from `./bindings.wasm` for a
 global and from its specifier for a `declare module` declaration, and,
-with `--provides`, the functions the module exports. [IR.md](IR.md)
-specifies the format and the wire conventions; the `ts-gen-abi` crate is
-its reference reader and writer.
+with `--provides`, the functions the module exports. `--naming` (`rust`,
+`zena`, `kotlin`) and its overrides choose how bindings are named.
+[IR.md](IR.md) specifies the format and the wire conventions; the
+`ts-gen-abi` crate is its reference reader and writer.
 
 `--target wat` derives a WAT import template from the same IR: each
 import with its wasm signature, after a comment showing its IR
@@ -173,7 +174,7 @@ ts-gen embed --ir types.ir -m hello.wasm -o out/
 
 `--ir` reads the IR the module was written against. `embed` can instead
 build it again from the same `.d.ts` and flags, with `-i types.d.ts
---provides ExportedHandler.fetch`.
+--provides ExportedHandler.fetch`, under the default (`rust`) naming.
 
 This creates `out/hello.wasm` (merged), `out/builtins.js`, and optionally
 `out/bindings.wat` / `out/wrapper.wat` with `--text`. The merged module

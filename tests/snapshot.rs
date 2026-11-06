@@ -35,6 +35,14 @@ const CONFIGS: &[(&str, &[&str])] = &[
     ("mono", &["--experimental-generic-mono", "--fallible"]),
 ];
 
+/// The fixtures also rendered as `--target ir` under a naming preset, into
+/// `<preset>.ir`.
+const NAMING: &[(&str, &[&str])] = &[
+    ("cloudflare-worker", &["zena", "kotlin"]),
+    ("sanitised-keys", &["zena", "kotlin"]),
+    ("static-names", &["zena", "kotlin"]),
+];
+
 /// Root of the ts-gen crate (where Cargo.toml lives).
 fn crate_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).to_path_buf()
@@ -312,9 +320,16 @@ fn check_stale_snapshots(fixtures: &[String]) -> Vec<String> {
             stale.push(path.display().to_string());
             continue;
         }
+        let presets: Vec<String> = NAMING
+            .iter()
+            .filter(|(f, _)| *f == name)
+            .flat_map(|(_, p)| p.iter().map(|p| format!("{p}.ir")))
+            .collect();
         for file in std::fs::read_dir(&path).into_iter().flatten().flatten() {
             let file_name = file.file_name().to_string_lossy().to_string();
-            if !expected_prefixes.iter().any(|p| file_name.starts_with(p)) {
+            if !expected_prefixes.iter().any(|p| file_name.starts_with(p))
+                && !presets.contains(&file_name)
+            {
                 stale.push(file.path().display().to_string());
             }
         }
@@ -390,6 +405,43 @@ fn snapshots() {
         fixtures.len(),
         CONFIGS.len()
     );
+}
+
+/// The IR's member names under each language's naming preset.
+#[test]
+fn naming_presets() {
+    let root = crate_root();
+    let out_dir = TempDir::new("naming");
+    for (base, presets) in NAMING {
+        let fixture = root.join("tests/fixtures").join(format!("{base}.d.ts"));
+        let extra_args = collect_directive_args(&fixture);
+        for preset in *presets {
+            let out_file = out_dir.0.join(format!("{base}.{preset}.ir"));
+            let output = Command::new(ts_gen_bin())
+                .arg("--input")
+                .arg(&fixture)
+                .arg("--output")
+                .arg(&out_file)
+                .args(["--target", "ir", "--naming", preset])
+                .args(&extra_args)
+                .output()
+                .expect("Failed to execute ts-gen binary");
+            assert!(
+                output.status.success(),
+                "ts-gen --naming {preset} failed for {base}:\n{}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+            let code = std::fs::read_to_string(&out_file).unwrap();
+            validate_ir(&code, base);
+            assert_snapshot(
+                &root
+                    .join("tests/snapshots")
+                    .join(base)
+                    .join(format!("{preset}.ir")),
+                &code,
+            );
+        }
+    }
 }
 
 /// Diagnostics aren't part of a snapshot, so the absence of the dropped

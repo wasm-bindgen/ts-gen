@@ -124,6 +124,61 @@ struct Cli {
     /// `--target rust` only.
     #[arg(long)]
     provides_bindings: Option<String>,
+
+    /// How the IR names bindings, for the language that reads it: `rust`
+    /// (the default: the Rust bindings' names), `zena` (`create` for
+    /// constructors, Zena's keywords and `ref` reserved, ASCII
+    /// identifiers) or `kotlin` (camelCase members, Kotlin's keywords
+    /// reserved). Under `zena` and `kotlin` the keywords and identifier
+    /// characters apply to classes, kinds, arms and parameters too. The
+    /// options below override the preset's. `--target wat` and `ir` only.
+    #[arg(long, value_name = "PRESET")]
+    naming: Option<ts_gen::abi::Preset>,
+
+    /// Member case, `snake` or `camel`.
+    #[arg(long, value_name = "CASE")]
+    member_case: Option<ts_gen::abi::Case>,
+
+    /// Words no binding may be named, comma-separated, replacing the
+    /// preset's.
+    #[arg(long, value_name = "WORDS", value_delimiter = ',', num_args = 1..)]
+    reserved: Option<Vec<String>>,
+
+    /// Appended to a name that is a reserved word.
+    #[arg(long, value_name = "SUFFIX")]
+    reserved_escape: Option<String>,
+
+    /// What a constructor's `new` becomes (`create`, `create_with_init`);
+    /// `new` keeps it.
+    #[arg(long, value_name = "NAME")]
+    constructor_name: Option<String>,
+}
+
+impl Cli {
+    fn naming(&self) -> Option<ts_gen::abi::Naming> {
+        let set = self.naming.is_some()
+            || self.member_case.is_some()
+            || self.reserved.is_some()
+            || self.reserved_escape.is_some()
+            || self.constructor_name.is_some();
+        if !set {
+            return None;
+        }
+        let mut naming = ts_gen::abi::Naming::preset(self.naming.unwrap_or_default());
+        if let Some(case) = self.member_case {
+            naming.case = case;
+        }
+        if let Some(words) = &self.reserved {
+            naming.reserved = words.clone();
+        }
+        if let Some(escape) = &self.reserved_escape {
+            naming.escape = escape.clone();
+        }
+        if let Some(name) = &self.constructor_name {
+            naming.constructor = (name != "new").then(|| name.clone());
+        }
+        Some(naming)
+    }
 }
 
 /// What the output covers, shared by the main command and `embed`, which
@@ -268,6 +323,10 @@ fn main() -> Result<()> {
     {
         bail!("--provides-app and --provides-bindings apply to --target rust only");
     }
+    let naming = cli.naming();
+    if cli.target == Target::Rust && naming.is_some() {
+        bail!("--naming and the naming options apply to --target wat and ir only");
+    }
 
     // Resolve input files
     let input_files = resolve_input_files(&cli.input)?;
@@ -312,6 +371,9 @@ fn main() -> Result<()> {
     }
     if let Some(name) = &cli.error_enum {
         options = options.error_enum(name);
+    }
+    if let Some(naming) = naming {
+        options = options.naming(naming);
     }
     let source = match cli.target {
         Target::Rust => ts_gen::codegen::generate_with_options(&module, &gctx, &options)?,

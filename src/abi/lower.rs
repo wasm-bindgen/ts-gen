@@ -57,7 +57,9 @@ pub(crate) fn build(
     builder.records(records);
     builder.kinds();
     builder.provides(provided);
-    builder.finish()
+    let mut ir = builder.finish();
+    options.ir_naming().apply(&mut ir);
+    ir
 }
 
 /// Lowers TS types to IR types in the scope they read in, seeing through
