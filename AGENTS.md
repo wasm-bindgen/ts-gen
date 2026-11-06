@@ -62,9 +62,17 @@ tests/
 ├── embed.rs                   # embed end-to-end on the fixtures/embed modules
 └── embed.mjs                  # node run of each merged embed fixture
 
+examples/
+├── cloudflare-worker/         # Rust worker against generated bindings
+└── zena-worker/               # Zena worker through ts-gen-zena and embed
+
 abi/                           # ts-gen-abi: the IR model and its text format (IR.md)
 ├── src/ir.rs                  # the model, its imports and the sys functions
 └── src/text.rs                # reference writer and reader of the text
+
+generators/zena/               # ts-gen-zena: Zena bindings from the IR, outside ts-gen
+├── src/lib.rs                 # flat @external layer, sys layer, a class per owner
+└── tests/zena.rs              # every fixture's IR → snapshots, imports vs. the IR
 
 integration-tests/
 ├── tests/*.rs                 # hand-written integration tests
@@ -139,6 +147,16 @@ The embed tests (`cargo test --test embed`) also merge each fixture
 with binaryen's `wasm-merge` (`WASM_MERGE` or `PATH`) and run the
 result in node 24+ (`NODE` or `PATH`); a missing tool skips its step
 locally and fails under `CI`.
+
+The Zena tests (`cargo test -p ts-gen-zena`) build every fixture's IR
+under the `zena` naming, read it back from its text as any consumer of
+the format does, and check each `.zena` output's imports against it. With
+`ZENA` set to a `zena` CLI binary they also compile each output with
+`-t js`, embed it, and build and run `examples/zena-worker/` in node,
+with the same tool rules; without `ZENA` those steps are skipped, in CI
+too, since no Zena release compiles the bindings yet (they need `declare
+let` value imports and `ref.null` emission for `externref | null`). CI
+runs only the snapshots and the import check.
 
 A change to the IR or its wire conventions is a change to [IR.md](IR.md),
 the contract with generators outside this repository: an addition keeps

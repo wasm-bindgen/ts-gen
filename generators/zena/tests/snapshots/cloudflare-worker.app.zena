@@ -1,0 +1,3 @@
+import { Env, ExecutionContext, Request, Response } from './bindings.zena';
+
+export function fetch(request: Request, env: Env, ctx: ExecutionContext): Response { return Response.create(); }

@@ -164,6 +164,21 @@ ts-gen --input worker.d.ts --output src/bindings.rs --provides ExportedHandler.f
 | `--provides-app` | Module path the wrapper delegates to; its last segment names the scaffold (default `super::app`). `--target rust` only |
 | `--provides-bindings` | Module path of the bindings (default `super::<output stem>`, with `-` and `.` replaced by `_`). `--target rust` only |
 
+### Bindings generators
+
+Language bindings are written by separate programs that read the IR:
+
+* [`generators/zena`](generators/zena/README.md): Zena, a Rust crate that
+  depends only on [`ts-gen-abi`](abi/), the IR model and its reader.
+  `examples/zena-worker/` is a worker built with it.
+
+```sh
+ts-gen --input worker.d.ts --output worker.ir --target ir --naming zena --provides ExportedHandler.fetch
+ts-gen-zena worker.ir -o bindings.zena
+zena build main.zena -t js --imported-string-constants wasm:js/string-constants -o main.wasm
+ts-gen embed --ir worker.ir -m main.wasm -o out/
+```
+
 ### Embedding (`ts-gen embed`)
 
 Given a module written against the IR, produce the bridging modules:
