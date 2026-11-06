@@ -1,0 +1,27 @@
+ir 1;
+
+shape class U {
+  new {};
+  get u: String;
+  set u(value: String) as set_u;
+}
+
+shape class GenAbv<T> {
+  new {}: GenAbv;
+  get value?: T | Null | Undefined;
+  set value(value: T | Null | Undefined) as set_value;
+  get data?: ArrayBufferView | Undefined;
+  set data(value: ArrayBufferView) as set_data;
+}
+
+shape class ReqAbv<T> {
+  new {}: ReqAbv;
+  get value: T | Null | Undefined;
+  set value(value: T | Null | Undefined) as set_value;
+  get data: ArrayBufferView;
+  set data(value: ArrayBufferView) as set_data;
+  get other: ArrayBufferView;
+  set other(value: ArrayBufferView) as set_other;
+  get owner: U;
+  set owner(value: U) as set_owner;
+}

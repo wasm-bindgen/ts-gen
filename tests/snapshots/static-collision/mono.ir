@@ -1,0 +1,21 @@
+ir 1;
+
+class Response {
+  static json(data: Any | Null | Undefined): Response throws as json_static;
+  static json(data: Any | Null | Undefined, init: ResponseInit): Response throws as json_static_with_init;
+  static error(): Response throws;
+  json(): Promise<Any | Null | Undefined>;
+  get ok: bool;
+  static get ok: bool as ok_static;
+}
+
+shape class ResponseInit {
+  new {};
+  get status?: Number | Undefined;
+  set status(value: f64) as set_status;
+}
+
+class Counter {
+  count(): f64 throws;
+  try_count(): f64 throws;
+}

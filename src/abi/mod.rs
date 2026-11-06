@@ -1,1189 +1,50 @@
-//! The Wasm-level ABI derived from a `.d.ts`: one function per member, all
-//! JS values as `externref`, scalars as Wasm numeric types.
+//! The ts-gen IR of a `.d.ts` ([`build_ir`]): one binding per member, with
+//! wasm-level types.
 //!
-//! Two emitters consume this model:
+//! The model and its text format live in the `ts-gen-abi` crate; this
+//! module lowers a `.d.ts` to it. Two consumers are in ts-gen:
 //!
-//! * [`wat`] prints the ABI as an import template a language module is
-//!   written against (`--target wat`).
-//! * [`embed`] implements the ABI for a given language module: a
+//! * [`wat`] prints the IR's bindings as a WAT import template
+//!   (`--target wat`), for a language written in WAT by hand.
+//! * [`embed`] implements the bindings for a given language module: a
 //!   `bindings.wasm` built on a fixed set of JS primitives, a
-//!   `wrapper.wasm` that presents the module's handlers as a Worker, and
-//!   the `builtins.js` those two import.
+//!   `wrapper.wasm` that presents the module's provides at their JS
+//!   paths, and the `builtins.js` those two import.
 
 pub mod embed;
+mod lower;
 pub mod wat;
 
-use std::collections::{HashMap, HashSet};
-
-use crate::codegen::signatures::{
-    base_rust_name, expand_signatures, param_names, ConcreteParam, ExpandedSignature, Overload,
-    SignatureKind,
-};
-use crate::codegen::surface::Surface;
 use crate::codegen::GenerateOptions;
 use crate::context::GlobalContext;
-use crate::ir::{
-    ClassDecl, InterfaceClassification, InterfaceDecl, Member, Module, ModuleContext, Nullability,
-    Param, Throws, TypeDeclaration, TypeKind, TypeRef,
-};
-use crate::parse::scope::{Binding, ScopeId};
+use crate::ir::Module;
 use crate::provides::ProvidedFn;
-use crate::util::naming::{LocalScope, Suffix};
 
-/// Specifier a language module imports the bindings under.
-pub const BINDINGS_SPECIFIER: &str = "./bindings.wasm";
-/// Specifier for the fixed JS primitive module.
-pub const BUILTINS_SPECIFIER: &str = "./builtins.js";
-/// Import namespace for imported string constants (js-string builtins).
-pub const STRING_CONSTANTS: &str = "wasm:js/string-constants";
+pub use ts_gen_abi::ir::Ir;
+pub use ts_gen_abi::{
+    OwnerRef, WasmType, BINDINGS_SPECIFIER, BUILTINS_SPECIFIER, STRING_CONSTANTS, UNDEFINED_GLOBAL,
+};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum WasmType {
-    /// Only ever a TS `boolean`; `embed` relies on that to wrap writes in `Boolean()`.
-    I32,
-    I64,
-    F64,
-    /// A JS value. `null` / `undefined` record which empties the TS type
-    /// admits; the wire type is `externref` either way. Only `null` is a
-    /// wasm null, so `embed` lets a module take any position that does not
-    /// admit `null` as `(ref extern)`.
-    ExternRef {
-        null: bool,
-        undefined: bool,
-    },
-    /// Only used by the wrapper to hand a Wasm function to JS as a function object.
-    FuncRef,
-    /// A JS value a GC language holds as `anyref`: variadic array elements
-    /// in the ABI, and any reference position of a module written that
-    /// way. `null` as for [`WasmType::ExternRef`].
-    AnyRef {
-        null: bool,
-    },
-}
-
-impl WasmType {
-    pub fn wat(self) -> &'static str {
-        match self {
-            WasmType::I32 => "i32",
-            WasmType::I64 => "i64",
-            WasmType::F64 => "f64",
-            WasmType::ExternRef { .. } => "externref",
-            WasmType::FuncRef => "funcref",
-            WasmType::AnyRef { .. } => "anyref",
-        }
-    }
-
-    /// A JS value position with no nullability claim: intermediates in
-    /// the bindings, `any`, type parameters.
-    pub const JS: WasmType = WasmType::ExternRef {
-        null: true,
-        undefined: true,
-    };
-    /// A JS value position the TS type says is never `null`/`undefined`.
-    pub const JS_NON_NULL: WasmType = WasmType::ExternRef {
-        null: false,
-        undefined: false,
-    };
-
-    /// A reference position that may hold wasm `null`.
-    pub fn admits_null(self) -> bool {
-        matches!(
-            self,
-            WasmType::ExternRef { null: true, .. } | WasmType::AnyRef { null: true }
-        )
-    }
-}
-
-/// Lowers TS types to ABI types with the scope needed to see through type
-/// aliases: `type Foo = string | null` is nullable, and `embed` would
-/// otherwise let a module take it as `(ref extern)` and trap.
-struct Lower<'a> {
-    gctx: &'a GlobalContext,
-    /// Aliases declared inside namespaces: the arena entry a namespace
-    /// member resolves to is a placeholder, the body lives in the
-    /// namespace's declaration list.
-    aliases: HashMap<crate::context::TypeId, &'a crate::ir::TypeAliasDecl>,
-    /// The declarations the Rust bindings emit, in the forms they are
-    /// emitted in: the ABI binds exactly those.
-    surface: Surface<'a>,
-    /// Type arguments substituted into alias bodies, each with the scope
-    /// it came from, keyed by the placeholder name standing in for it.
-    bound: std::cell::RefCell<Vec<(TypeRef, ScopeId)>>,
-}
-
-/// Placeholder prefix for substituted type arguments; `#` cannot start a
-/// TS identifier, so it never clashes with a real name.
-const BOUND_PREFIX: &str = "#bound:";
-
-impl Lower<'_> {
-    fn of(&self, ty: &TypeRef, scope: ScopeId) -> WasmType {
-        let (ty, scope) = self.target(ty, scope);
-        match ty {
-            TypeRef::Boolean | TypeRef::BooleanLiteral(_) => WasmType::I32,
-            TypeRef::Number | TypeRef::NumberLiteral(_) => WasmType::F64,
-            TypeRef::BigInt => WasmType::I64,
-            _ => {
-                let n = self.admits_empty(&ty, scope);
-                WasmType::ExternRef {
-                    null: n.is_some_and(Nullability::admits_null),
-                    undefined: n.is_some_and(Nullability::admits_undefined),
-                }
-            }
-        }
-    }
-
-    /// What `ty` finally names through aliases and substituted type
-    /// arguments, with the scope it reads in. Type parameters stay as
-    /// they are. The Rust bindings lower a plain alias reference to its
-    /// target, so `type Millis = number` crosses as `f64`.
-    fn target(&self, ty: &TypeRef, scope: ScopeId) -> (TypeRef, ScopeId) {
-        let (mut ty, mut scope) = (ty.clone(), scope);
-        // Bounded: a cyclic alias is a TS error, not a reason to hang.
-        for _ in 0..64 {
-            let TypeRef::Reference {
-                segments,
-                generic_args,
-            } = &ty
-            else {
-                break;
-            };
-            match self.resolve(segments, generic_args, scope) {
-                Some(Resolved::Alias(t, s) | Resolved::Bound(t, s)) => (ty, scope) = (t, s),
-                _ => break,
-            }
-        }
-        (ty, scope)
-    }
-
-    /// Follow a (possibly qualified) reference to what it names. Type
-    /// arguments are substituted into an alias body; the body then
-    /// resolves in the alias's own scope, where the substituted arguments
-    /// are already concrete.
-    fn resolve(&self, segments: &[String], args: &[TypeRef], scope: ScopeId) -> Option<Resolved> {
-        let (head, rest) = segments.split_first()?;
-        if rest.is_empty() {
-            if let Some(i) = head.strip_prefix(BOUND_PREFIX) {
-                let (ty, from) = self.bound.borrow()[i.parse::<usize>().ok()?].clone();
-                return Some(Resolved::Bound(ty, from));
-            }
-            return match self.gctx.scopes.resolve_binding(scope, head)? {
-                Binding::TypeParam => Some(Resolved::TypeParam),
-                // A constrained type parameter reads as its primitive.
-                Binding::Erased(erasure) => Some(Resolved::Alias(erasure.type_ref(), scope)),
-                Binding::Declared(id) => Some(self.declared(id, args, scope)),
-            };
-        }
-        let id = self.gctx.resolve_path(scope, &segments.join("."))?;
-        Some(self.declared(id, args, scope))
-    }
-
-    /// What a declared name is. Arguments to an alias are recorded with
-    /// the scope they were written in and stand in the body as
-    /// placeholders, since they must not resolve in the alias's scope.
-    fn declared(&self, id: crate::context::TypeId, args: &[TypeRef], scope: ScopeId) -> Resolved {
-        let kind = &self.gctx.get_type(id).kind;
-        let alias = match (self.aliases.get(&id), kind) {
-            (Some(a), _) => Some(*a),
-            (None, TypeKind::TypeAlias(a)) => Some(a),
-            _ => None,
-        };
-        match (alias, kind) {
-            (Some(alias), _) => {
-                let placeholders: Vec<TypeRef> = args
-                    .iter()
-                    .map(|a| {
-                        let mut bound = self.bound.borrow_mut();
-                        bound.push((a.clone(), scope));
-                        TypeRef::ident(format!("{BOUND_PREFIX}{}", bound.len() - 1))
-                    })
-                    .collect();
-                let subst: HashMap<&str, &TypeRef> = alias
-                    .type_params
-                    .iter()
-                    .zip(&placeholders)
-                    .map(|(p, a)| (p.name.as_str(), a))
-                    .collect();
-                Resolved::Alias(substitute(&alias.target, &subst), alias.body_scope)
-            }
-            (None, _) => Resolved::Declared,
-        }
-    }
-
-    fn param(&self, name: &str, ty: &TypeRef, scope: ScopeId) -> AbiParam {
-        AbiParam {
-            name: name.into(),
-            ty: self.of(ty, scope),
-            ts: ty.format_ts(),
-        }
-    }
-
-    fn result(&self, ty: &TypeRef, scope: ScopeId) -> Option<WasmType> {
-        match self.target(ty, scope) {
-            (TypeRef::Void | TypeRef::Undefined, _) => None,
-            (other, scope) => Some(self.of(&other, scope)),
-        }
-    }
-
-    /// Which empties a TS type admits, through aliases, type arguments
-    /// and union arms; `None` for neither. A type parameter may be
-    /// instantiated with anything, so it admits both, as does an
-    /// unresolved name rather than promising non-null.
-    fn admits_empty(&self, ty: &TypeRef, scope: ScopeId) -> Option<Nullability> {
-        fn join(a: Option<Nullability>, b: Option<Nullability>) -> Option<Nullability> {
-            match (a, b) {
-                (Some(a), Some(b)) => Some(a.with(b)),
-                (a, None) => a,
-                (None, b) => b,
-            }
-        }
-        match ty {
-            TypeRef::Null => Some(Nullability::Null),
-            TypeRef::Undefined | TypeRef::Void => Some(Nullability::Undefined),
-            TypeRef::Any | TypeRef::Unknown => Some(Nullability::Both),
-            TypeRef::Union(union) => union
-                .members()
-                .iter()
-                .fold(None, |acc, m| join(acc, self.admits_empty(m, scope))),
-            TypeRef::Reference {
-                segments,
-                generic_args,
-            } => match self.resolve(segments, generic_args, scope) {
-                Some(Resolved::Alias(target, alias_scope)) => {
-                    self.admits_empty(&target, alias_scope)
-                }
-                Some(Resolved::Bound(ty, from)) => self.admits_empty(&ty, from),
-                Some(Resolved::Declared) => None,
-                Some(Resolved::TypeParam) | None => Some(Nullability::Both),
-            },
-            _ => None,
-        }
-    }
-}
-
-/// Replace bare references to the substitution's names, through the
-/// shapes an alias body can carry.
-fn substitute(ty: &TypeRef, subst: &HashMap<&str, &TypeRef>) -> TypeRef {
-    if subst.is_empty() {
-        return ty.clone();
-    }
-    let go = |t: &TypeRef| substitute(t, subst);
-    match ty {
-        TypeRef::Reference {
-            segments,
-            generic_args,
-        } if segments.len() == 1 && generic_args.is_empty() => subst
-            .get(segments[0].as_str())
-            .map(|t| (*t).clone())
-            .unwrap_or_else(|| ty.clone()),
-        TypeRef::Reference {
-            segments,
-            generic_args,
-        } => TypeRef::Reference {
-            segments: segments.clone(),
-            generic_args: generic_args.iter().map(go).collect(),
-        },
-        TypeRef::Array(inner) => TypeRef::Array(Box::new(go(inner))),
-        TypeRef::Union(ms) => TypeRef::union(ms.members().iter().map(go)),
-        TypeRef::Intersection(ms) => TypeRef::Intersection(ms.iter().map(go).collect()),
-        TypeRef::Tuple(ms) => TypeRef::Tuple(ms.iter().map(go).collect()),
-        other => other.clone(),
-    }
-}
-
-type DeclaredIndex<'a> = HashMap<crate::context::TypeId, &'a crate::ir::TypeAliasDecl>;
-
-/// The aliases nested in the input's namespaces, walking namespaces.
-fn declared_index<'a>(module: &Module, gctx: &'a GlobalContext) -> DeclaredIndex<'a> {
-    let mut aliases = HashMap::new();
-    for &id in &module.types {
-        if let TypeKind::Namespace(ns) = &gctx.get_type(id).kind {
-            namespace_index(ns, gctx, &mut aliases);
-        }
-    }
-    aliases
-}
-
-/// Member types of a namespace are reached by name in its child scope.
-fn namespace_index<'a>(
-    ns: &'a crate::ir::NamespaceDecl,
-    gctx: &'a GlobalContext,
-    aliases: &mut DeclaredIndex<'a>,
-) {
-    for &inner in &ns.declarations {
-        match &gctx.get_type(inner).kind {
-            TypeKind::TypeAlias(a) => {
-                // Only the alias's own placeholder: a re-export stub's name
-                // may resolve straight to the declaration it re-exports.
-                if let Some(id) = gctx.scopes.resolve(ns.child_scope, &a.name) {
-                    if matches!(&gctx.get_type(id).kind, TypeKind::TypeAlias(p) if p.name == a.name)
-                    {
-                        aliases.insert(id, a);
-                    }
-                }
-            }
-            TypeKind::Namespace(child) => namespace_index(child, gctx, aliases),
-            _ => {}
-        }
-    }
-}
-
-/// What a reference resolved to.
-enum Resolved {
-    /// An alias body and the scope it reads in, with type arguments applied.
-    Alias(TypeRef, ScopeId),
-    /// A substituted type argument and the scope it was written in.
-    Bound(TypeRef, ScopeId),
-    /// A class, interface or enum.
-    Declared,
-    TypeParam,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct AbiParam {
-    pub name: String,
-    pub ty: WasmType,
-    /// TS spelling, for the template's comments.
-    pub ts: String,
-}
-
-/// What the bridge has to do to implement a function.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum AbiOp {
-    /// `receiver[name]`
-    Get { name: String },
-    /// `receiver[name] = value`
-    Set { name: String },
-    /// `receiver[name](...args)`
-    Call { name: String },
-    /// `new path(...args)`
-    Construct { path: Vec<String> },
-    /// `path[name]`, where `path` is a global object such as a class or
-    /// namespace.
-    StaticGet { path: Vec<String>, name: String },
-    /// `path[name] = value`
-    StaticSet { path: Vec<String>, name: String },
-    /// `path[name](...args)` with `path` as the receiver.
-    StaticCall { path: Vec<String>, name: String },
-    /// `{}`
-    NewObject,
-    /// `x === undefined`; `null` needs nothing, `ref.is_null` in the language.
-    IsUndefined,
-    /// `Number(x)`: unboxes a `number` that crossed as a reference
-    /// (a nullable scalar, or a union arm) to `f64`.
-    NumberValue,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct AbiFunction {
-    /// Export name in `bindings.wasm` and import field in the language
-    /// module: `Type.member` with wasm-bindgen's variant suffixes.
-    pub name: String,
-    /// Further names `bindings.wasm` exports the same function under: a
-    /// type exported under several names has each member under each.
-    pub aliases: Vec<String>,
-    pub op: AbiOp,
-    /// Includes the receiver as the first parameter for instance ops.
-    pub params: Vec<AbiParam>,
-    pub result: Option<WasmType>,
-    /// TS declaration this came from, for the template's comments.
-    pub ts: String,
-    /// Trailing parameter is a JS array spread into the call.
-    pub variadic: bool,
-    /// For declarations inside `declare module "spec"`: the specifier whose
-    /// export roots the op's path (or is the callee itself when the path is
-    /// empty), and which the language module imports the function from.
-    /// `None` roots at `globalThis` and imports from `./bindings.wasm`.
-    pub module: Option<String>,
-}
-
-impl AbiFunction {
-    /// The module a language module imports this function from.
-    pub fn import_module(&self) -> &str {
-        self.module.as_deref().unwrap_or(BINDINGS_SPECIFIER)
-    }
-}
-
-/// A function the module provides, lowered from a [`ProvidedFn`]: the
-/// reverse of an [`AbiFunction`]. Parameters arrive by value (the language
-/// owns them), results are owned.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct AbiHandler {
-    /// Wasm export name the module provides: the JS path joined with `.`,
-    /// with a leading `default.` dropped unless a top-level provider has
-    /// the same path (`fetch`, `foo.bar.baz`, `default.add` beside `add`).
-    pub name: String,
-    /// JS path from the module namespace, which the wrapper synthesises
-    /// (`["default", "fetch"]`, `["foo", "bar", "baz"]`).
-    pub path: Vec<String>,
-    pub params: Vec<AbiParam>,
-    /// Wasm type of the result; for a `Promise<T>` result this is `T`'s,
-    /// a nullable reference when `T` is `void`.
-    pub result: Option<WasmType>,
-    /// The TS result was `Promise<T>`: under JSPI the module returns `T`
-    /// and the wrapper's `promising` supplies the promise; otherwise the
-    /// module returns the promise itself.
-    pub promise: bool,
-    pub ts: String,
-    pub doc: Option<String>,
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct Abi {
-    pub functions: Vec<AbiFunction>,
-    pub handlers: Vec<AbiHandler>,
-}
-
-impl Abi {
-    /// The first function named `name`, its own or an alias, from any
-    /// module.
-    pub fn function(&self, name: &str) -> Option<&AbiFunction> {
-        self.functions
-            .iter()
-            .find(|f| f.name == name || f.aliases.iter().any(|a| a == name))
-    }
-
-    /// The function a language module imports as `name` from `module`:
-    /// its own name or an alias.
-    pub fn import(&self, module: &str, name: &str) -> Option<&AbiFunction> {
-        self.functions.iter().find(|f| {
-            f.import_module() == module && (f.name == name || f.aliases.iter().any(|a| a == name))
-        })
-    }
-
-    /// Module specifiers the ABI imports from, sorted and deduplicated.
-    pub fn modules(&self) -> Vec<&str> {
-        let mut specs: Vec<&str> = self
-            .functions
-            .iter()
-            .filter_map(|f| f.module.as_deref())
-            .collect();
-        specs.sort_unstable();
-        specs.dedup();
-        specs
-    }
-}
-
-/// Name the language module imports `undefined` under from `builtins.js`,
-/// as an immutable `externref` global.
-pub const UNDEFINED_GLOBAL: &str = "undefined";
-
-/// ABI functions every language gets regardless of the `.d.ts`: the parts of
-/// wasm-bindgen's `sys` surface that need JS to answer.
-fn sys_functions() -> Vec<AbiFunction> {
-    let sys = |name: &str, op: AbiOp, param: WasmType, result: WasmType, ts: &str| AbiFunction {
-        name: name.into(),
-        aliases: Vec::new(),
-        op,
-        params: vec![AbiParam {
-            name: "x".into(),
-            ty: param,
-            ts: ts.into(),
-        }],
-        result: Some(result),
-        ts: ts.into(),
-        variadic: false,
-        module: None,
-    };
-    vec![
-        sys(
-            "JsValue.is_undefined",
-            AbiOp::IsUndefined,
-            WasmType::JS,
-            WasmType::I32,
-            "x === undefined",
-        ),
-        sys(
-            "Number.value",
-            AbiOp::NumberValue,
-            WasmType::JS_NON_NULL,
-            WasmType::F64,
-            "Number(x)",
-        ),
-    ]
-}
-
-pub fn build(
+/// The IR of the declarations the Rust bindings emit for `module` under
+/// `options`: one member per Rust binding, under its Rust name, with the
+/// bindings that only present another in Rust left out.
+pub fn build_ir(
     module: &Module,
     gctx: &GlobalContext,
     options: &GenerateOptions,
     provided: &[ProvidedFn],
-) -> Abi {
-    let mut abi = Abi {
-        functions: sys_functions(),
-        ..Default::default()
-    };
-    let surface = Surface::build(module, gctx, options);
-    let aliases = declared_index(module, gctx);
-    let lower = Lower {
-        gctx,
-        aliases,
-        surface,
-        bound: Default::default(),
-    };
-    // The wasm export name drops `default.` unless a top-level provider
-    // has the same path underneath, as the Rust name does.
-    let top_level: HashSet<String> = provided
-        .iter()
-        .filter(|e| e.path.first().is_some_and(|s| s != "default"))
-        .map(|e| e.js_path())
-        .collect();
-    for e in provided {
-        abi.handlers.push(build_handler(e, &lower, &top_level));
-    }
-    for &id in &module.types {
-        for decl in lower.surface.get(id) {
-            let start = abi.functions.len();
-            build_declaration(id, decl, &[], &lower, &mut abi);
-            // The specifier is a property of the declaration, so it is stamped
-            // on everything the declaration produced rather than threaded
-            // through every builder.
-            if let ModuleContext::Module(spec) = &decl.module_context {
-                for f in &mut abi.functions[start..] {
-                    f.module = Some(spec.to_string());
-                }
-            }
-        }
-    }
-    // A merged declaration repeats its members; the first occurrence wins.
-    // The same name in two modules is two imports, told apart by module.
-    let mut seen: HashSet<(Option<String>, String)> = HashSet::new();
-    let mut kept: Vec<AbiFunction> = Vec::with_capacity(abi.functions.len());
-    for f in std::mem::take(&mut abi.functions) {
-        let names: Vec<_> = std::iter::once(&f.name)
-            .chain(&f.aliases)
-            .map(|n| (f.module.clone(), n.clone()))
-            .collect();
-        if names.iter().any(|n| seen.contains(n)) {
-            continue;
-        }
-        seen.extend(names);
-        kept.push(f);
-    }
-    abi.functions = kept;
-    abi
-}
-
-fn build_declaration(
-    id: crate::context::TypeId,
-    decl: &TypeDeclaration,
-    path: &[String],
-    lower: &Lower,
-    abi: &mut Abi,
-) {
-    let start = abi.functions.len();
-    let owner = match &decl.kind {
-        TypeKind::Class(class) => {
-            build_class(class, path, lower, abi);
-            class.js_name.as_str()
-        }
-        TypeKind::Interface(iface) => {
-            build_interface(iface, path, lower, abi);
-            iface.js_name.as_str()
-        }
-        TypeKind::Function(func) => {
-            let overloads: Vec<Overload> = std::iter::once(Overload {
-                params: &func.params,
-                return_type: &func.return_type,
-                body_scope: func.body_scope,
-                throws: &func.throws,
-                async_modifier: func.async_modifier,
-                doc: &decl.doc,
-            })
-            .chain(func.overloads.iter().map(|o| Overload {
-                params: &o.params,
-                return_type: &o.return_type,
-                body_scope: o.body_scope,
-                throws: &o.throws,
-                async_modifier: o.async_modifier,
-                doc: &o.doc,
-            }))
-            .collect();
-            let mut used = LocalScope::default();
-            // A free function is `globalThis[name]`; a namespace function
-            // is `namespace[name]` with the namespace as receiver.
-            push_callable(
-                abi,
-                &join_name(path, &func.js_name),
-                SignatureKind::Function,
-                &overloads,
-                &[],
-                AbiOp::StaticCall {
-                    path: path.to_vec(),
-                    name: func.js_name.clone(),
-                },
-                &mut used,
-                lower,
-            );
-            return;
-        }
-        TypeKind::Namespace(ns) => {
-            let js_name = lower.surface.js_name(id, &ns.name);
-            let mut child = path.to_vec();
-            child.push(js_name.to_string());
-            for &inner in &ns.declarations {
-                for d in lower.surface.get(inner) {
-                    build_declaration(inner, d, &child, lower, abi);
-                }
-            }
-            js_name
-        }
-        TypeKind::Variable(var) => {
-            // A global variable is a getter: `globalThis[name]` or `namespace[name]`.
-            abi.functions.push(AbiFunction {
-                name: join_name(path, &var.js_name),
-                aliases: Vec::new(),
-                op: AbiOp::StaticGet {
-                    path: path.to_vec(),
-                    name: var.js_name.clone(),
-                },
-                params: vec![],
-                result: Some(lower.of(&var.type_ref, decl.scope_id)),
-                ts: format!(
-                    "{} {}: {}",
-                    if var.is_const { "const" } else { "var" },
-                    var.js_name,
-                    var.type_ref.format_ts()
-                ),
-                variadic: false,
-                module: None,
-            });
-            return;
-        }
-        TypeKind::TypeAlias(_)
-        | TypeKind::DiscriminatedUnion(_)
-        | TypeKind::StringEnum(_)
-        | TypeKind::NumericEnum(_)
-        | TypeKind::TsEnum(_) => return,
-    };
-    // Members are named `Owner.member`; each other public name of the
-    // owner binds the same function, under every name the member has
-    // within the owner.
-    let prefix = join_name(path, owner);
-    let others: Vec<String> = lower
-        .surface
-        .names(id)
-        .iter()
-        .filter(|&n| n != owner)
-        .map(|n| join_name(path, n))
-        .collect();
-    for f in &mut abi.functions[start..] {
-        let names: Vec<String> = std::iter::once(&f.name)
-            .chain(&f.aliases)
-            .cloned()
-            .collect();
-        for other in &others {
-            for name in &names {
-                f.aliases.push(format!("{other}{}", &name[prefix.len()..]));
-            }
-        }
-    }
-}
-
-/// The property's type as declared: the `?` already says `| undefined`.
-fn declared_ts(g: &crate::ir::GetterMember) -> String {
-    if g.optional {
-        g.type_ref.without_undefined().format_ts()
-    } else {
-        g.type_ref.format_ts()
-    }
-}
-
-fn join_name(path: &[String], name: &str) -> String {
-    if path.is_empty() {
-        name.to_string()
-    } else {
-        format!("{}.{}", path.join("."), name)
-    }
-}
-
-fn build_class(class: &ClassDecl, path: &[String], lower: &Lower, abi: &mut Abi) {
-    let mut js_path = path.to_vec();
-    js_path.push(class.js_name.clone());
-    build_members(&js_path, &class.name, &class.members, false, lower, abi);
-}
-
-fn build_interface(iface: &InterfaceDecl, path: &[String], lower: &Lower, abi: &mut Abi) {
-    let mut js_path = path.to_vec();
-    js_path.push(iface.js_name.clone());
-    let dictionary = iface.classification == InterfaceClassification::Dictionary;
-    build_members(
-        &js_path,
-        &iface.name,
-        &iface.members,
-        dictionary,
-        lower,
-        abi,
-    );
-}
-
-/// A parameter name with non-ASCII characters as `_`, since only ASCII
-/// is legal in a WAT identifier.
-fn ascii(name: &str) -> String {
-    name.chars()
-        .map(|c| if c.is_ascii() { c } else { '_' })
-        .collect()
-}
-
-fn build_handler(e: &ProvidedFn, lower: &Lower, top_level: &HashSet<String>) -> AbiHandler {
-    let (promise, result_ty) = match e.promise_inner() {
-        Some(inner) => (true, inner),
-        None => (false, &e.return_type),
-    };
-    let name = match e.path.as_slice() {
-        [first, rest @ ..]
-            if first == "default" && !rest.is_empty() && !top_level.contains(&rest.join(".")) =>
-        {
-            rest.join(".")
-        }
-        path => path.join("."),
-    };
-    let names = param_names(e.params.iter().map(|p| ascii(&p.name)), &[], None);
-    AbiHandler {
-        name,
-        path: e.path.clone(),
-        params: e
-            .params
-            .iter()
-            .zip(&names)
-            .map(|(p, name)| lower.param(name, &p.type_ref, e.scope))
-            .collect(),
-        // A promise handler always has a result slot: the promise itself
-        // without JSPI, the settled value (`undefined` for `Promise<void>`)
-        // under it. Only a plain `void` export has none.
-        result: match (promise, lower.result(result_ty, e.scope)) {
-            (true, None) => Some(WasmType::JS),
-            (_, r) => r,
-        },
-        promise,
-        ts: format_method_ts(e.leaf(), &e.params, &names, &e.return_type),
-        doc: e.doc.clone(),
-    }
-}
-
-/// Members are named by the owner's dotted JS path (`WebAssembly.Module`),
-/// so same-named types in different namespaces stay distinct. `local` is
-/// the name the owner is declared under, which a public name need not be.
-fn build_members(
-    js_path: &[String],
-    local: &str,
-    members: &[Member],
-    dictionary: bool,
-    lower: &Lower,
-    abi: &mut Abi,
-) {
-    let type_name = &js_path.join(".");
-    let mut used = LocalScope::default();
-    let this = AbiParam {
-        name: "this".into(),
-        ty: WasmType::JS_NON_NULL,
-        ts: type_name.to_string(),
-    };
-
-    if dictionary {
-        abi.functions.push(AbiFunction {
-            name: format!("{type_name}.new"),
-            aliases: Vec::new(),
-            op: AbiOp::NewObject,
-            params: vec![],
-            result: Some(WasmType::JS_NON_NULL),
-            ts: format!("{{}} as {type_name}"),
-            variadic: false,
-            module: None,
-        });
-        used.claim("new");
-    }
-
-    // Overloads of one JS callable expand together so their variants carry
-    // the Rust bindings' `_with_x` suffixes rather than numeric dedup.
-    let constructed = TypeRef::ident(local);
-    let mut method_overloads: HashMap<&str, Vec<Overload>> = HashMap::new();
-    let mut static_overloads: HashMap<&str, Vec<Overload>> = HashMap::new();
-    let mut ctor_overloads: Vec<Overload> = Vec::new();
-    for member in members {
-        match member {
-            Member::Method(m) => method_overloads
-                .entry(m.js_name.as_str())
-                .or_default()
-                .push(Overload {
-                    params: &m.params,
-                    return_type: &m.return_type,
-                    body_scope: m.body_scope,
-                    throws: &m.throws,
-                    async_modifier: m.async_modifier,
-                    doc: &m.doc,
-                }),
-            Member::StaticMethod(m) => static_overloads
-                .entry(m.js_name.as_str())
-                .or_default()
-                .push(Overload {
-                    params: &m.params,
-                    return_type: &m.return_type,
-                    body_scope: m.body_scope,
-                    throws: &m.throws,
-                    async_modifier: m.async_modifier,
-                    doc: &m.doc,
-                }),
-            Member::Constructor(c) => ctor_overloads.push(Overload {
-                params: &c.params,
-                return_type: &constructed,
-                body_scope: c.scope,
-                throws: &c.throws,
-                async_modifier: false,
-                doc: &c.doc,
-            }),
-            _ => {}
-        }
-    }
-    let void = TypeRef::Void;
-    let mut expanded: HashSet<(bool, &str)> = HashSet::new();
-    let mut ctor_expanded = false;
-
-    for member in members {
-        match member {
-            Member::Getter(g) => {
-                let name = used.declare(
-                    &base_rust_name(&g.js_name, SignatureKind::Method),
-                    Suffix::Snake,
-                );
-                // A read of an optional property admits `undefined`
-                // whatever the type says.
-                let read = if g.optional {
-                    g.type_ref.clone().with_empties(Nullability::Undefined)
-                } else {
-                    g.type_ref.clone()
-                };
-                abi.functions.push(AbiFunction {
-                    name: format!("{type_name}.{name}"),
-                    aliases: Vec::new(),
-                    op: AbiOp::Get {
-                        name: g.js_name.clone(),
-                    },
-                    params: vec![this.clone()],
-                    result: Some(lower.of(&read, g.scope)),
-                    ts: format!(
-                        "{}{}: {}",
-                        g.js_name,
-                        if g.optional { "?" } else { "" },
-                        declared_ts(g)
-                    ),
-                    variadic: false,
-                    module: None,
-                });
-            }
-            Member::Setter(s) => {
-                let params = [Param {
-                    name: "value".into(),
-                    type_ref: s.type_ref.clone(),
-                    optional: false,
-                    variadic: false,
-                    slice_mode: s.slice_mode,
-                }];
-                push_callable(
-                    abi,
-                    &format!(
-                        "{type_name}.{}",
-                        base_rust_name(&s.js_name, SignatureKind::Setter)
-                    ),
-                    SignatureKind::Setter,
-                    &[Overload {
-                        params: &params,
-                        return_type: &void,
-                        body_scope: s.scope,
-                        throws: &Throws::None,
-                        async_modifier: false,
-                        doc: &None,
-                    }],
-                    std::slice::from_ref(&this),
-                    AbiOp::Set {
-                        name: s.js_name.clone(),
-                    },
-                    &mut used,
-                    lower,
-                );
-            }
-            Member::Method(m) => {
-                if !expanded.insert((false, m.js_name.as_str())) {
-                    continue;
-                }
-                push_callable(
-                    abi,
-                    &format!(
-                        "{type_name}.{}",
-                        base_rust_name(&m.js_name, SignatureKind::Method)
-                    ),
-                    SignatureKind::Method,
-                    &method_overloads[m.js_name.as_str()],
-                    std::slice::from_ref(&this),
-                    AbiOp::Call {
-                        name: m.js_name.clone(),
-                    },
-                    &mut used,
-                    lower,
-                );
-            }
-            Member::Constructor(_) => {
-                if std::mem::replace(&mut ctor_expanded, true) {
-                    continue;
-                }
-                push_callable(
-                    abi,
-                    &format!("{type_name}.new"),
-                    SignatureKind::Constructor,
-                    &ctor_overloads,
-                    &[],
-                    AbiOp::Construct {
-                        path: js_path.to_vec(),
-                    },
-                    &mut used,
-                    lower,
-                );
-            }
-            Member::StaticGetter(g) => {
-                let name = used.declare(
-                    &base_rust_name(&g.js_name, SignatureKind::StaticMethod),
-                    Suffix::Snake,
-                );
-                abi.functions.push(AbiFunction {
-                    name: format!("{type_name}.{name}"),
-                    aliases: Vec::new(),
-                    op: AbiOp::StaticGet {
-                        path: js_path.to_vec(),
-                        name: g.js_name.clone(),
-                    },
-                    params: vec![],
-                    result: Some(lower.of(&g.type_ref, g.scope)),
-                    ts: format!("static {}: {}", g.js_name, g.type_ref.format_ts()),
-                    variadic: false,
-                    module: None,
-                });
-            }
-            Member::StaticSetter(s) => {
-                let params = [Param {
-                    name: "value".into(),
-                    type_ref: s.type_ref.clone(),
-                    optional: false,
-                    variadic: false,
-                    slice_mode: None,
-                }];
-                push_callable(
-                    abi,
-                    &format!(
-                        "{type_name}.{}",
-                        base_rust_name(&s.js_name, SignatureKind::StaticSetter)
-                    ),
-                    SignatureKind::StaticSetter,
-                    &[Overload {
-                        params: &params,
-                        return_type: &void,
-                        body_scope: s.scope,
-                        throws: &Throws::None,
-                        async_modifier: false,
-                        doc: &None,
-                    }],
-                    &[],
-                    AbiOp::StaticSet {
-                        path: js_path.to_vec(),
-                        name: s.js_name.clone(),
-                    },
-                    &mut used,
-                    lower,
-                );
-            }
-            Member::StaticMethod(m) => {
-                if !expanded.insert((true, m.js_name.as_str())) {
-                    continue;
-                }
-                push_callable(
-                    abi,
-                    &format!(
-                        "{type_name}.{}",
-                        base_rust_name(&m.js_name, SignatureKind::StaticMethod)
-                    ),
-                    SignatureKind::StaticMethod,
-                    &static_overloads[m.js_name.as_str()],
-                    &[],
-                    AbiOp::StaticCall {
-                        path: js_path.to_vec(),
-                        name: m.js_name.clone(),
-                    },
-                    &mut used,
-                    lower,
-                );
-            }
-            Member::IndexSignature(_) => {}
-        }
-    }
-}
-
-#[allow(clippy::too_many_arguments)]
-fn push_callable(
-    abi: &mut Abi,
-    base_name: &str,
-    kind: SignatureKind,
-    overloads: &[Overload],
-    leading: &[AbiParam],
-    op: AbiOp,
-    used: &mut LocalScope,
-    lower: &Lower,
-) {
-    let (owner, member) = match base_name.rsplit_once('.') {
-        Some((o, m)) => (Some(o), m),
-        None => (None, base_name),
-    };
-    let ts_name = match &op {
-        AbiOp::Construct { .. } => "constructor".to_string(),
-        AbiOp::Set { name } | AbiOp::StaticSet { name, .. } => format!("set {name}"),
-        AbiOp::Call { name } | AbiOp::StaticCall { name, .. } => name.clone(),
-        _ => member.to_string(),
-    };
-
-    // Without a codegen context, expansion keeps a type alias as one
-    // parameter and renders every reference outside `js_sys` as `JsValue`,
-    // so arms that differ only there are one function taking any of them.
-    for sig in fold_null_arms(expand_signatures(overloads, kind, None), overloads, lower) {
-        let Overload {
-            return_type,
-            body_scope: scope,
-            ..
-        } = overloads[sig.overload];
-        let variant = used.declare(&format!("{member}{}", sig.name_suffix), Suffix::Snake);
-        let name = match owner {
-            Some(o) => format!("{o}.{variant}"),
-            None => variant,
-        };
-        let variadic = sig.params.last().is_some_and(|p| p.variadic);
-        let reserved: Vec<&str> = leading.iter().map(|p| p.name.as_str()).collect();
-        let names = param_names(sig.params.iter().map(|p| ascii(&p.name)), &reserved, None);
-        let mut params = leading.to_vec();
-        params.extend(sig.params.iter().zip(&names).map(|(p, name)| {
-            if p.variadic {
-                AbiParam {
-                    name: name.clone(),
-                    ty: WasmType::JS,
-                    ts: format!("...{}", p.type_ref.format_ts()),
-                }
-            } else {
-                lower.param(name, &p.type_ref, scope)
-            }
-        }));
-        let ts_params = sig
-            .params
-            .iter()
-            .zip(&names)
-            .map(|(p, name)| {
-                format!(
-                    "{}{name}: {}",
-                    if p.variadic { "..." } else { "" },
-                    p.type_ref.format_ts()
-                )
-            })
-            .collect::<Vec<_>>()
-            .join(", ");
-        let ts = match kind {
-            SignatureKind::Constructor | SignatureKind::Setter | SignatureKind::StaticSetter => {
-                format!("{ts_name}({ts_params})")
-            }
-            _ => format!("{ts_name}({ts_params}): {}", return_type.format_ts()),
-        };
-        abi.functions.push(AbiFunction {
-            name,
-            aliases: Vec::new(),
-            op: op.clone(),
-            params,
-            result: match kind {
-                SignatureKind::Setter | SignatureKind::StaticSetter => None,
-                SignatureKind::Constructor => Some(WasmType::JS_NON_NULL),
-                _ => lower.result(return_type, scope),
-            },
-            ts,
-            variadic,
-            module: None,
-        });
-    }
-}
-
-/// Expansion gives a written `null` its own arm, a parameter typed `null`.
-/// The ABI keeps one nullable `externref` per position instead: a `null`
-/// arm folds into each arm that differs from it only at its `null`
-/// positions, with the same result, and those take `T | null` there (a
-/// scalar `number | null` crosses as `externref`). One with no such arm stays.
-fn fold_null_arms(
-    sigs: Vec<ExpandedSignature>,
-    overloads: &[Overload],
-    lower: &Lower,
-) -> Vec<ExpandedSignature> {
-    let is_null = |p: &ConcreteParam| matches!(p.type_ref, TypeRef::Null);
-    let result = |s: &ExpandedSignature| {
-        let o = &overloads[s.overload];
-        lower.result(o.return_type, o.body_scope)
-    };
-    let mut nulled: Vec<Vec<bool>> = sigs.iter().map(|s| vec![false; s.params.len()]).collect();
-    let mut folded = vec![false; sigs.len()];
-    for (i, arm) in sigs.iter().enumerate() {
-        if !arm.params.iter().any(is_null) {
-            continue;
-        }
-        for (j, base) in sigs.iter().enumerate() {
-            let sibling = !base.params.iter().any(is_null)
-                && base.params.len() == arm.params.len()
-                && base.params.iter().zip(&arm.params).all(|(b, a)| {
-                    is_null(a) || (b.type_ref == a.type_ref && b.variadic == a.variadic)
-                })
-                && result(base) == result(arm);
-            if sibling {
-                folded[i] = true;
-                for (k, a) in arm.params.iter().enumerate() {
-                    nulled[j][k] |= is_null(a);
-                }
-            }
-        }
-    }
-    sigs.into_iter()
-        .zip(nulled)
-        .zip(folded)
-        .filter(|(_, folded)| !folded)
-        .map(|((mut sig, nulled), _)| {
-            for (p, nulled) in sig.params.iter_mut().zip(nulled) {
-                if nulled {
-                    let (core, n) = p
-                        .type_ref
-                        .split_empties()
-                        .map_or((p.type_ref.clone(), Nullability::Null), |(core, n)| {
-                            (core, n.with(Nullability::Null))
-                        });
-                    p.type_ref = core.with_empties(n);
-                }
-            }
-            sig
-        })
-        .collect()
-}
-
-fn format_method_ts(name: &str, params: &[Param], names: &[String], ret: &TypeRef) -> String {
-    let ps = params
-        .iter()
-        .zip(names)
-        .map(|(p, param)| {
-            format!(
-                "{}{}{}: {}",
-                if p.variadic { "..." } else { "" },
-                param,
-                if p.optional { "?" } else { "" },
-                p.type_ref.format_ts()
-            )
-        })
-        .collect::<Vec<_>>()
-        .join(", ");
-    format!("{name}({ps}): {}", ret.format_ts())
+) -> Ir {
+    lower::build(module, gctx, options, provided)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ir::ModuleContext;
+    use ts_gen_abi::ir::{Head as H, Import, Literal, MemberKind, Type};
 
     /// Every declared module is selected, as `--export <specifier>` would.
-    fn abi(src: &str) -> Abi {
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+    fn exports(module: &Module, gctx: &GlobalContext) -> GenerateOptions {
         let exports = module
             .types
             .iter()
@@ -1193,54 +54,98 @@ mod tests {
             })
             .chain([crate::codegen::ExportSpec::File("<input>".into())])
             .collect();
-        let options = GenerateOptions::new().exports(exports);
-        build(&module, &gctx, &options, &[])
+        GenerateOptions::new().exports(exports)
     }
+
+    /// The first import named `name`, its own name or an alias, from any
+    /// module.
+    fn find<'a>(ir: &'a Ir, name: &str) -> Option<Import<'a>> {
+        ir.imports().find(|i| i.names.iter().any(|n| n == name))
+    }
+
+    fn imp<'a>(ir: &'a Ir, name: &str) -> Import<'a> {
+        find(ir, name).unwrap_or_else(|| panic!("no import {name}"))
+    }
+
+    /// The import a language module imports as `name` from `module`.
+    fn imp_in<'a>(ir: &'a Ir, module: &str, name: &str) -> Import<'a> {
+        ir.imports()
+            .find(|i| i.specifier() == module && i.names.iter().any(|n| n == name))
+            .unwrap_or_else(|| panic!("no import {module} {name}"))
+    }
+
+    fn result(ir: &Ir, name: &str) -> Option<WasmType> {
+        imp(ir, name).member.result.wasm()
+    }
+
+    /// The wire type of a parameter, receiver excluded.
+    fn param(ir: &Ir, name: &str, i: usize) -> WasmType {
+        imp(ir, name).member.params[i].ty.wasm().unwrap()
+    }
+
+    fn declared(module: Option<&str>, path: &str) -> OwnerRef {
+        OwnerRef {
+            module: module.map(String::from),
+            path: path.into(),
+        }
+    }
+
+    fn owner(ty: &Type) -> OwnerRef {
+        match head(ty) {
+            H::Named(n) => n.name.clone(),
+            other => panic!("not named: {other:?}"),
+        }
+    }
+
+    const NUL: WasmType = WasmType::ExternRef {
+        null: true,
+        undefined: false,
+    };
+    const UND: WasmType = WasmType::ExternRef {
+        null: false,
+        undefined: true,
+    };
 
     #[test]
     fn module_declarations_carry_their_specifier() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             declare function fetch(input: string): Promise<Response>;
             declare module "cloudflare:sockets" {
                 function connect(address: string): Socket;
                 class Socket { startTls(): Socket; }
             }
         "#);
-        assert_eq!(abi.function("fetch").unwrap().module, None);
+        assert_eq!(imp(&ir, "fetch").module, None);
+        assert_eq!(imp(&ir, "connect").module, Some("cloudflare:sockets"));
         assert_eq!(
-            abi.function("connect").unwrap().module.as_deref(),
+            imp(&ir, "Socket.start_tls").module,
             Some("cloudflare:sockets")
         );
-        assert_eq!(
-            abi.function("Socket.start_tls").unwrap().module.as_deref(),
-            Some("cloudflare:sockets")
-        );
-        assert_eq!(abi.modules(), ["cloudflare:sockets"]);
+        let mut modules: Vec<&str> = ir.imports().filter_map(|i| i.module).collect();
+        modules.dedup();
+        assert_eq!(modules, ["cloudflare:sockets"]);
     }
 
     #[test]
     fn global_interface_collapses_into_module_constructor() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             interface Email { readonly from: string; }
             declare module "cloudflare:email" {
                 let _Email: { new (from: string): Email };
                 export { _Email as Email };
             }
         "#);
-        let new = abi.import("cloudflare:email", "Email.new").unwrap();
-        assert!(matches!(new.op, AbiOp::Construct { .. }), "{:?}", new.op);
-        assert_eq!(new.module.as_deref(), Some("cloudflare:email"));
+        let new = imp_in(&ir, "cloudflare:email", "Email.new");
+        assert_eq!(new.member.kind, MemberKind::Constructor);
+        assert_eq!(new.module, Some("cloudflare:email"));
         // The global instance interface collapses into the module's
         // constructor class, so its members are the class's.
-        assert_eq!(
-            abi.function("Email.from").unwrap().module.as_deref(),
-            Some("cloudflare:email")
-        );
+        assert_eq!(imp(&ir, "Email.from").module, Some("cloudflare:email"));
     }
 
     #[test]
     fn nullability_sees_through_aliases() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             type MaybeStr = string | null;
             type Alias2 = MaybeStr;
             type Body = Blob | MaybeStr;
@@ -1257,22 +162,24 @@ mod tests {
             declare function unknownName(): NotDeclaredAnywhere;
             declare class Event<T = any> { readonly detail: T; }
         "#);
-        let result = |n: &str| abi.function(n).unwrap().result.unwrap();
+        let result = |n: &str| result(&ir, n).unwrap();
         assert!(result("a").admits_null());
         assert!(result("b").admits_null());
         assert!(result("c").admits_null());
         assert_eq!(result("d"), WasmType::JS_NON_NULL);
-        assert!(abi.function("e").unwrap().params[0].ty.admits_null());
+        // The `null` arm of a parameter is a binding of its own.
+        assert_eq!(param(&ir, "e", 0), WasmType::JS_NON_NULL);
+        assert!(param(&ir, "e_with_null", 0).admits_null());
         assert!(result("g").admits_null(), "generic alias instantiation");
         assert_eq!(result("clone"), WasmType::JS, "type parameter");
-        assert_eq!(abi.function("clone").unwrap().params[0].ty, WasmType::JS);
-        assert_eq!(result("unknownName"), WasmType::JS, "unresolved name");
+        assert_eq!(param(&ir, "clone", 0), WasmType::JS);
+        assert_eq!(result("unknown_name"), WasmType::JS, "unresolved name");
         assert_eq!(result("Event.detail"), WasmType::JS, "class type parameter");
     }
 
     #[test]
     fn scalars_through_aliases() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             type Millis = number;
             type Stamp = Millis;
             type Flag = boolean;
@@ -1287,29 +194,24 @@ mod tests {
             declare function wait(ms: Millis): void;
             declare function same<T>(value: T): T;
         "#);
-        let result = |n: &str| abi.function(n).unwrap().result;
+        let result = |n: &str| result(&ir, n);
         assert_eq!(result("now"), Some(WasmType::F64), "alias of an alias");
         assert_eq!(result("enabled"), Some(WasmType::I32));
         assert_eq!(result("big"), Some(WasmType::I64));
         assert_eq!(result("reset"), None, "alias of void");
         assert_eq!(result("wrapped"), Some(WasmType::F64), "type argument");
-        assert_eq!(abi.function("wait").unwrap().params[0].ty, WasmType::F64);
+        assert_eq!(param(&ir, "wait", 0), WasmType::F64);
         assert_eq!(result("same"), Some(WasmType::JS), "type parameter");
     }
 
     #[test]
     fn namespaced_types_keep_their_path() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             declare class Header { a(): void; }
             declare namespace TailStream { class Header { b(): void; } }
             declare namespace WebAssembly { class Module { constructor(bytes: ArrayBuffer); static exports(m: Module): string[]; } }
         "#);
-        let names: Vec<&str> = abi
-            .functions
-            .iter()
-            .map(|f| f.name.as_str())
-            .filter(|n| !n.starts_with("JsValue.") && !n.starts_with("Number."))
-            .collect();
+        let names: Vec<String> = ir.imports().map(|i| i.name().to_string()).collect();
         assert_eq!(
             names,
             [
@@ -1319,11 +221,18 @@ mod tests {
                 "WebAssembly.Module.exports"
             ]
         );
+        let ctor = imp(&ir, "WebAssembly.Module.new").member;
+        assert_eq!(owner(&ctor.result), OwnerRef::global("WebAssembly.Module"));
+        let exports = imp(&ir, "WebAssembly.Module.exports").member;
+        assert_eq!(
+            owner(&exports.params[0].ty),
+            OwnerRef::global("WebAssembly.Module")
+        );
     }
 
     #[test]
     fn overload_variants_use_the_rust_suffixes() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             declare class K {
                 constructor();
                 constructor(init: string);
@@ -1333,12 +242,7 @@ mod tests {
                 static s(x: string, y: number): void;
             }
         "#);
-        let names: Vec<&str> = abi
-            .functions
-            .iter()
-            .map(|f| f.name.as_str())
-            .filter(|n| n.starts_with("K."))
-            .collect();
+        let names: Vec<String> = ir.imports().map(|i| i.name().to_string()).collect();
         assert_eq!(
             names,
             [
@@ -1354,7 +258,7 @@ mod tests {
 
     #[test]
     fn nullability_through_type_params_qualified_paths_and_generic_aliases() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             declare class Headers { constructor(); }
             declare class Gen<T> {
                 optT(): T | undefined;
@@ -1372,37 +276,44 @@ mod tests {
                 partial: Gen2;
             }
         "#);
-        let f = |n: &str| abi.function(n).unwrap();
+        let result = |n: &str| result(&ir, n);
+        let read = |n: &str| owner(&imp(&ir, n).member.result);
         // The type parameter may be `X | null`, so the other empty is admitted too.
-        assert_eq!(f("Gen.opt_t").result, Some(WasmType::JS));
-        assert_eq!(f("Gen.nullable_t").result, Some(WasmType::JS));
-        assert_eq!(f("Gen.plain_t").result, Some(WasmType::JS));
+        assert_eq!(result("Gen.opt_t"), Some(WasmType::JS));
+        assert_eq!(result("Gen.nullable_t"), Some(WasmType::JS));
+        assert_eq!(result("Gen.plain_t"), Some(WasmType::JS));
         // Qualified alias resolves through the namespace scope.
-        assert!(f("Uses.qualified").result.unwrap().admits_null());
-        assert_eq!(
-            f("Uses.qualified_class").result,
-            Some(WasmType::JS_NON_NULL)
-        );
-        // Generic alias, once the argument is substituted.
-        assert!(f("Uses.via_gen").result.unwrap().admits_null());
-        assert_eq!(f("Uses.via_id").result, Some(WasmType::JS_NON_NULL));
-        // An un-instantiated alias parameter is a type parameter: BOTH.
-        assert_eq!(f("Uses.partial").result, Some(WasmType::JS));
+        assert!(result("Uses.qualified").unwrap().admits_null());
+        assert_eq!(read("Uses.qualified"), OwnerRef::global("Headers"));
+        assert_eq!(result("Uses.qualified_class"), Some(WasmType::JS_NON_NULL));
+        assert_eq!(read("Uses.qualified_class"), OwnerRef::global("NS.K"));
+        // Generic alias keeps the head once the argument is substituted.
+        assert!(result("Uses.via_gen").unwrap().admits_null());
+        assert_eq!(read("Uses.via_gen"), OwnerRef::global("Headers"));
+        assert_eq!(result("Uses.via_id"), Some(WasmType::JS_NON_NULL));
+        assert_eq!(read("Uses.via_id"), OwnerRef::global("Headers"));
+        // An alias parameter without an argument or default erases to `any`.
+        assert_eq!(result("Uses.partial"), Some(WasmType::JS));
+        assert_eq!(*head(&imp(&ir, "Uses.partial").member.result), H::Any);
     }
 
     #[test]
     fn members_bind_under_every_export_name() {
-        let class = abi(r#"
+        let class = ir(r#"
             declare module "m:a" {
                 class _Foo { constructor(); get(): string; }
                 export { _Foo as Foo, _Foo as Bar };
             }
         "#);
-        for (name, alias) in [("Foo.new", "Bar.new"), ("Foo.get", "Bar.get")] {
-            assert_eq!(class.function(name).unwrap().aliases, [alias]);
+        // The class binds under its Rust name, and under each public name.
+        for (name, aliases) in [
+            ("_Foo.new", ["Foo.new", "Bar.new"]),
+            ("_Foo.get", ["Foo.get", "Bar.get"]),
+        ] {
+            assert_eq!(imp(&class, name).names[1..], aliases);
         }
 
-        let ns = abi(r#"
+        let ns = ir(r#"
             declare module "m:a" {
                 namespace _N {
                     function nf(): void;
@@ -1412,13 +323,13 @@ mod tests {
             }
         "#);
         for (name, alias) in [("N1.nf", "N2.nf"), ("N1.C.new", "N2.C.new")] {
-            assert_eq!(ns.function(name).unwrap().aliases, [alias]);
+            assert_eq!(imp(&ns, name).names, [name, alias]);
         }
     }
 
     #[test]
     fn module_binds_only_its_export_map() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             declare module "m:a" {
                 function open(): Hidden;
                 function hidden(): void;
@@ -1427,31 +338,51 @@ mod tests {
                 export { open };
             }
         "#);
-        assert!(abi.function("open").is_some());
-        assert!(abi.function("hidden").is_none());
-        assert!(abi.function("secret").is_none());
+        assert!(find(&ir, "open").is_some());
+        assert!(find(&ir, "hidden").is_none());
+        assert!(find(&ir, "secret").is_none());
         // An unexported class keeps only what binds through a value.
-        assert!(abi.function("Hidden.m").is_some());
-        assert!(abi.function("Hidden.make").is_none());
+        assert!(find(&ir, "Hidden.m").is_some());
+        assert!(find(&ir, "Hidden.make").is_none());
     }
 
     #[test]
     fn renamed_exports_bind_by_their_public_name() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             declare module "m:a" {
                 class _Foo { constructor(); }
                 namespace _N { function f(): void; }
                 export { _Foo as Foo, _N as N };
             }
         "#);
-        let ctor = abi.function("Foo.new").unwrap();
-        assert_eq!(ctor.result, Some(WasmType::JS_NON_NULL));
-        assert!(abi.function("N.f").is_some());
+        let ctor = imp(&ir, "_Foo.new");
+        assert_eq!(ctor.names[1..], ["Foo.new"]);
+        assert_eq!(ctor.member.kind, MemberKind::Constructor);
+        assert_eq!(ctor.member.js, "Foo");
+        assert_eq!(ctor.member.result.wasm(), Some(WasmType::JS_NON_NULL));
+        assert_eq!(owner(&ctor.member.result), declared(Some("m:a"), "_Foo"));
+        assert!(find(&ir, "N.f").is_some());
+    }
+
+    #[test]
+    fn heads_name_the_module_of_their_owner() {
+        let ir = ir(r#"
+            declare class Thing { g(): void; }
+            declare function global(): Thing;
+            declare module "m:a" {
+                class Thing { m(): void; }
+                function local(): Thing;
+            }
+        "#);
+        let local = imp_in(&ir, "m:a", "local").member;
+        let global = imp(&ir, "global").member;
+        assert_eq!(owner(&local.result), declared(Some("m:a"), "Thing"));
+        assert_eq!(owner(&global.result), OwnerRef::global("Thing"));
     }
 
     #[test]
     fn module_scalar_exports_keep_their_type() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             declare module "m:a" { const n: number; let b: boolean; const l: bigint; }
         "#);
         for (name, ty) in [
@@ -1459,13 +390,14 @@ mod tests {
             ("b", WasmType::I32),
             ("l", WasmType::I64),
         ] {
-            assert_eq!(abi.import("m:a", name).unwrap().result, Some(ty), "{name}");
+            let m = imp_in(&ir, "m:a", name).member;
+            assert_eq!(m.result.wasm(), Some(ty), "{name}");
         }
     }
 
     #[test]
-    fn null_and_undefined_bits() {
-        let abi = abi(r#"
+    fn null_and_undefined_bits_and_heads() {
+        let ir = ir(r#"
             declare class Headers { constructor(); }
             type MaybeHeaders = Headers | null;
             interface Init {
@@ -1475,26 +407,58 @@ mod tests {
             }
             declare function f(h: MaybeHeaders): Headers;
         "#);
-        let f = |n: &str| abi.function(n).unwrap();
-        let und = WasmType::ExternRef {
-            null: false,
-            undefined: true,
-        };
-        let nul = WasmType::ExternRef {
-            null: true,
-            undefined: false,
-        };
-        let both = WasmType::JS;
-        assert_eq!(f("Init.headers").result, Some(und));
-        assert_eq!(f("Init.nullable").result, Some(nul));
-        assert_eq!(f("Init.both").result, Some(both));
-        assert_eq!(f("f").params[0].ty, nul);
-        assert_eq!(f("f").result, Some(WasmType::JS_NON_NULL));
+        let m = |n: &str| imp(&ir, n).member;
+        let headers = OwnerRef::global("Headers");
+        assert_eq!(result(&ir, "Init.headers"), Some(UND));
+        assert_eq!(result(&ir, "Init.nullable"), Some(NUL));
+        assert_eq!(result(&ir, "Init.both"), Some(WasmType::JS));
+        assert_eq!(param(&ir, "f", 0), WasmType::JS_NON_NULL);
+        assert_eq!(param(&ir, "f_with_null", 0), NUL);
+        assert_eq!(result(&ir, "f"), Some(WasmType::JS_NON_NULL));
+        assert_eq!(owner(&m("Init.nullable").result), headers);
+        assert_eq!(owner(&m("f").params[0].ty), headers);
+        assert_eq!(head(&m("f_with_null").params[0].ty), &H::Empty);
+        assert_eq!(owner(&m("f").result), headers);
+        assert_eq!(owner(&m("Headers.new").result), headers);
     }
 
     #[test]
-    fn null_arms_fold_into_one_nullable_position() {
-        let abi = abi(r#"
+    fn string_positions_have_the_string_head() {
+        let ir = ir(r#"
+            type S = string;
+            declare class Blob {}
+            declare function a(x: string | null): S;
+            declare function b(): "x" | "y";
+            declare function c(): string | number;
+            declare function d(): string | Blob;
+        "#);
+        let m = |n: &str| imp(&ir, n).member;
+        assert_eq!(head(&m("a").params[0].ty), &H::String);
+        assert_eq!(head(&m("a").result), &H::String);
+        // A union is a kind; one of string literals has only string arms.
+        let arms = |n: &str| {
+            let kind = owner(&m(n).result);
+            ir.kind(None, &kind.path)
+                .unwrap_or_else(|| panic!("{n} reads no kind"))
+                .arms
+                .iter()
+                .map(|a| a.ty.head.clone())
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(
+            arms("b"),
+            [
+                H::Literal(Literal::String("x".into())),
+                H::Literal(Literal::String("y".into()))
+            ]
+        );
+        assert_eq!(arms("c"), [H::String, H::Number]);
+        assert_eq!(arms("d")[0], H::String);
+    }
+
+    #[test]
+    fn null_arms_bind_as_rust_does() {
+        let ir = ir(r#"
             declare class Body { constructor(); }
             declare class Response {
                 constructor(body?: Body | null, init?: string);
@@ -1502,40 +466,26 @@ mod tests {
             interface Init { body?: Body | null; limit?: number | null; empties?: null; }
             declare function key(x: string | number | null): void;
         "#);
-        let names: Vec<&str> = abi.functions.iter().map(|f| f.name.as_str()).collect();
-        let f = |n: &str| abi.function(n).unwrap();
-        let ty = |n: &str, i: usize| f(n).params[i].ty;
-        let nul = WasmType::ExternRef {
-            null: true,
-            undefined: false,
-        };
-        for gone in [
-            "Response.new_with_null",
-            "Response.new_with_null_and_init",
-            "Init.set_body_with_null",
-            "Init.set_limit_with_null",
-            "key_with_null",
-        ] {
-            assert!(!names.contains(&gone), "{gone} folds into its sibling");
-        }
-        assert_eq!(ty("Response.new_with_body", 0), nul);
-        assert_eq!(ty("Response.new_with_body_and_init", 0), WasmType::JS);
-        assert_eq!(
-            f("Response.new_with_body").ts,
-            "constructor(body: Body | null)"
-        );
-        assert_eq!(ty("Init.set_body", 1), nul);
-        // A scalar admitting `null` crosses as a nullable reference.
-        assert_eq!(ty("Init.set_limit", 1), nul);
-        assert_eq!(ty("key", 0), nul);
-        assert_eq!(ty("key_with_f64", 0), nul);
-        // A `null` arm with no sibling keeps its name.
-        assert_eq!(ty("Init.set_empties_with_null", 1), nul);
+        let ty = |n: &str, i: usize| param(&ir, n, i);
+        assert_eq!(ty("Response.new_with_body", 0), WasmType::JS_NON_NULL);
+        assert_eq!(ty("Response.new_with_null", 0), NUL);
+        assert_eq!(ty("Response.new_with_null_and_init", 0), NUL);
+        let null_only = &imp(&ir, "Response.new_with_null").member.params;
+        assert_eq!(null_only.len(), 1);
+        assert_eq!(head(&null_only[0].ty), &H::Empty);
+        assert_eq!(ty("Init.set_body", 0), WasmType::JS_NON_NULL);
+        assert_eq!(ty("Init.set_body_with_null", 0), NUL);
+        assert_eq!(ty("Init.set_limit", 0), WasmType::F64);
+        assert_eq!(ty("Init.set_limit_with_null", 0), NUL);
+        assert_eq!(ty("key", 0), WasmType::JS_NON_NULL);
+        assert_eq!(ty("key_with_f64", 0), WasmType::F64);
+        assert_eq!(ty("key_with_null", 0), NUL);
+        assert_eq!(ty("Init.set_empties_with_null", 0), NUL);
     }
 
     #[test]
     fn same_name_in_two_roots_is_two_imports() {
-        let abi = abi(r#"
+        let ir = ir(r#"
             declare function connect(address: string): void;
             declare module "cloudflare:sockets" {
                 function connect(address: string): void;
@@ -1550,50 +500,43 @@ mod tests {
             }
         "#);
         for module in [BINDINGS_SPECIFIER, "cloudflare:sockets"] {
-            assert!(abi.import(module, "connect").is_some(), "{module}");
+            imp_in(&ir, module, "connect");
         }
         for module in ["node:net", "node:fs"] {
-            let f = abi.import(module, "constants.O_RDONLY").unwrap();
-            assert_eq!(
-                f.op,
-                AbiOp::StaticGet {
-                    path: vec!["constants".into()],
-                    name: "O_RDONLY".into()
-                }
-            );
+            let f = imp_in(&ir, module, "constants.o_rdonly");
+            assert_eq!(f.member.kind, MemberKind::StaticGet);
+            assert_eq!(f.class.unwrap().path, "constants");
+            assert_eq!(f.member.js, "O_RDONLY");
         }
     }
 
-    #[test]
-    fn param_names_are_numbered_where_they_collide_once_sanitised() {
-        let abi = abi(
-            "declare function collideArgs(a: string, $a: number, fooBar: string, foo_bar: number): void;",
-        );
-        let names: Vec<&str> = abi
-            .function("collideArgs")
-            .unwrap()
-            .params
-            .iter()
-            .map(|p| p.name.as_str())
-            .collect();
-        assert_eq!(names, ["a", "a2", "foo_bar", "foo_bar2"]);
-    }
-
-    fn param_names_of(params: &[AbiParam]) -> Vec<&str> {
+    fn param_names_of(params: &[ts_gen_abi::ir::Param]) -> Vec<&str> {
         params.iter().map(|p| p.name.as_str()).collect()
     }
 
     #[test]
+    fn param_names_are_numbered_where_they_collide_once_sanitised() {
+        let ir = ir(
+            "declare function collideArgs(a: string, $a: number, fooBar: string, foo_bar: number): void;",
+        );
+        assert_eq!(
+            param_names_of(&imp(&ir, "collide_args").member.params),
+            ["a", "a2", "foo_bar", "foo_bar2"]
+        );
+    }
+
+    #[test]
     fn receiver_name_is_reserved() {
-        let abi = abi("declare class Thing { method(_this: string, value: number): void; }");
-        let method = abi.function("Thing.method").unwrap();
-        assert_eq!(param_names_of(&method.params), ["this", "this2", "value"]);
+        // The receiver crosses as `this`.
+        let ir = ir("declare class Thing { method(_this: string, value: number): void; }");
+        let method = imp(&ir, "Thing.method").member;
+        assert_eq!(param_names_of(&method.params), ["this2", "value"]);
     }
 
     #[test]
     fn non_ascii_param_names_are_legal_wat_identifiers() {
-        let abi = abi("declare function uni(café: string, cafè: number): void;");
-        let uni = abi.function("uni").unwrap();
+        let ir = ir("declare function uni(café: string, cafè: number): void;");
+        let uni = imp(&ir, "uni").member;
         assert_eq!(param_names_of(&uni.params), ["caf_", "caf_2"]);
     }
 
@@ -1605,14 +548,310 @@ mod tests {
         )
         .unwrap();
         let provided = crate::provides::resolve("Handler.handle", &module, &mut gctx).unwrap();
-        let abi = build(&module, &gctx, &GenerateOptions::new(), &provided);
+        let ir = build_ir(&module, &gctx, &GenerateOptions::new(), &provided);
         assert_eq!(
-            param_names_of(&abi.handlers[0].params),
+            param_names_of(&ir.provides[0].params),
             ["foo_bar", "foo_bar2", "caf_"]
         );
         assert_eq!(
-            abi.handlers[0].ts,
-            "handle(foo_bar: string, foo_bar2: number, caf_: string): void"
+            ts_gen_abi::text::Printer::new(&ir).provide(&ir.provides[0]),
+            "provide default.handle(foo_bar: String, foo_bar2: f64, caf_: String);"
         );
+    }
+
+    fn ir(src: &str) -> Ir {
+        ir_with(src, false)
+    }
+
+    fn ir_with(src: &str, fallible: bool) -> Ir {
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let options = exports(&module, &gctx).fallible(fallible);
+        build_ir(&module, &gctx, &options, &[])
+    }
+
+    fn member<'a>(ir: &'a Ir, class: &str, name: &str) -> &'a ts_gen_abi::ir::Member {
+        ir.classes
+            .iter()
+            .filter(|c| c.name == class)
+            .flat_map(|c| &c.members)
+            .find(|m| m.name == name)
+            .unwrap_or_else(|| panic!("no {class}.{name}"))
+    }
+
+    fn function<'a>(ir: &'a Ir, name: &str) -> &'a ts_gen_abi::ir::Member {
+        ir.functions
+            .iter()
+            .map(|f| &f.member)
+            .find(|m| m.name == name)
+            .unwrap_or_else(|| panic!("no {name}"))
+    }
+
+    fn names(members: &[ts_gen_abi::ir::Member]) -> Vec<&str> {
+        members.iter().map(|m| m.name.as_str()).collect()
+    }
+
+    fn head(ty: &ts_gen_abi::ir::Type) -> &ts_gen_abi::ir::Head {
+        match ty {
+            ts_gen_abi::ir::Type::Js(js) => &js.head,
+            other => panic!("not a JS type: {other:?}"),
+        }
+    }
+
+    fn named(ty: &ts_gen_abi::ir::Type) -> (&str, Vec<&ts_gen_abi::ir::Head>) {
+        match head(ty) {
+            ts_gen_abi::ir::Head::Named(n) => (
+                n.name.path.as_str(),
+                n.args.iter().map(|a| &a.head).collect(),
+            ),
+            other => panic!("not named: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn setter_unions_expand_per_arm() {
+        use ts_gen_abi::ir::{Head as H, MemberKind, Type};
+        let ir = ir(r#"
+            declare class Headers { constructor(); }
+            interface Init {
+                headers?: Headers | Record<string, string>;
+                body?: string | ArrayBuffer | null;
+            }
+        "#);
+        let init = ir.class(None, "Init").unwrap();
+        assert_eq!(
+            names(&init.members),
+            [
+                "new",
+                "headers",
+                "set_headers",
+                "set_headers_with_record",
+                "body",
+                "set_body",
+                "set_body_with_array_buffer",
+                "set_body_with_null",
+            ]
+        );
+        let set = |n: &str| member(&ir, "Init", n);
+        assert_eq!(set("set_headers").kind, MemberKind::Set);
+        assert_eq!(set("set_headers").js, "headers");
+        assert_eq!(set("set_headers").params[0].name, "value");
+        assert_eq!(named(&set("set_headers").params[0].ty), ("Headers", vec![]));
+        assert_eq!(
+            named(&set("set_headers_with_record").params[0].ty),
+            ("Record", vec![&H::String])
+        );
+        assert_eq!(head(&set("set_body").params[0].ty), &H::String);
+        assert_eq!(head(&set("set_body_with_null").params[0].ty), &H::Empty);
+        assert_eq!(set("set_body").result, Type::Void);
+        // The read takes the whole union.
+        assert!(matches!(set("body").result, Type::Js(ref j) if j.undefined));
+    }
+
+    #[test]
+    fn kinds_carry_rust_names_arms_and_aliases() {
+        use ts_gen_abi::ir::{Head as H, Literal};
+        let ir = ir(r#"
+            declare class Headers { constructor(); }
+            type Mode = "fast" | "safe";
+            declare enum Level { Low = 1, High = 2, Max = 2 }
+            declare function setMode(m: Mode): void;
+            declare function level(): Level;
+            declare function pick(): string | Headers;
+            declare module "m" {
+                export class Day { constructor(); }
+                export interface DayFields { day: number; }
+                export type DayLike = Day | DayFields | string;
+                export function init(d: DayLike): DayLike;
+            }
+        "#);
+        let kind = |n: &str| {
+            ir.kinds
+                .iter()
+                .find(|k| k.name == n)
+                .unwrap_or_else(|| panic!("no kind {n}: {:?}", ir.kinds))
+        };
+        let mode = kind("Mode");
+        let arm_names = |k: &ts_gen_abi::ir::Kind| -> Vec<String> {
+            k.arms.iter().map(|a| a.name.clone()).collect()
+        };
+        assert_eq!(arm_names(mode), ["Fast", "Safe"]);
+        assert_eq!(
+            mode.arms[0].ty.head,
+            H::Literal(Literal::String("fast".into()))
+        );
+        assert!(!mode.fallback);
+        let level = kind("Level");
+        assert_eq!(arm_names(level), ["Low", "High"]);
+        assert_eq!(level.arms[1].aliases, ["Max"]);
+        assert_eq!(level.arms[1].ty.head, H::Literal(Literal::Int(2)));
+        let day = kind("DayLike");
+        assert_eq!(day.module.as_deref(), Some("m"));
+        assert_eq!(arm_names(day), ["Day", "String", "DayFields"]);
+        assert!(
+            day.fallback,
+            "the dictionary arm takes what the others don't"
+        );
+        // An argument takes the alias whole, as a kind, and a read is it.
+        let init = function(&ir, "init");
+        assert_eq!(named(&init.params[0].ty), ("DayLike", vec![]));
+        assert_eq!(named(&init.result), ("DayLike", vec![]));
+        assert_eq!(
+            named(&function(&ir, "set_mode").params[0].ty),
+            ("Mode", vec![])
+        );
+        // A union read is the enum Rust synthesises for it.
+        let (pick, _) = named(&function(&ir, "pick").result);
+        assert!(kind(pick).arms.len() == 2, "{pick}");
+    }
+
+    #[test]
+    fn throws_follows_rust_catch() {
+        let ir = ir(r#"
+            declare class TypeError { constructor(); }
+            declare class RangeError { constructor(); }
+            declare class Thing {
+                constructor();
+                plain(): number;
+                /** @throws {TypeError} */
+                typed(): number;
+                /** @throws {TypeError | RangeError} */
+                either(): number;
+                pick<T>(xs: T[]): T;
+                /** @throws {never} */
+                safe(): number;
+                later(): Promise<string>;
+            }
+        "#);
+        let m = |n: &str| member(&ir, "Thing", n);
+        assert!(m("new").throws, "constructors always catch");
+        assert!(!m("plain").throws && !m("plain").nothrow && m("plain").errors.is_empty());
+        let error = |path: &str| {
+            ts_gen_abi::ir::Head::Named(ts_gen_abi::ir::Named {
+                name: OwnerRef::global(path),
+                args: Vec::new(),
+            })
+        };
+        let heads = |n: &str| -> Vec<ts_gen_abi::ir::Head> {
+            m(n).errors.iter().map(|e| e.head.clone()).collect()
+        };
+        assert!(!m("typed").throws);
+        assert_eq!(heads("typed"), [error("TypeError")]);
+        assert_eq!(heads("either"), [error("TypeError"), error("RangeError")]);
+        assert_eq!(m("pick").type_params, ["T"]);
+        assert!(m("safe").nothrow);
+        // A promise binding catches what the call throws, not the rejection.
+        assert!(!m("later").throws);
+        let fallible = ir_with(
+            r#"declare module "m" {
+                export class Thing { plain(): number; later(): Promise<string>; }
+            }"#,
+            true,
+        );
+        assert!(member(&fallible, "Thing", "plain").throws);
+        assert!(member(&fallible, "Thing", "later").throws);
+    }
+
+    #[test]
+    fn promises_and_containers_keep_their_type_arguments() {
+        use ts_gen_abi::ir::Head as H;
+        let ir = ir(r#"
+            declare class Blob {}
+            declare function text(): Promise<string>;
+            declare function blobs(): Promise<Blob[]>;
+            declare function done(): Promise<void>;
+            declare function map(m: ReadonlyMap<string, number>): ArrayLike<Blob>;
+            declare function spread<A extends unknown[]>(...args: A): void;
+        "#);
+        assert_eq!(
+            named(&function(&ir, "text").result),
+            ("Promise", vec![&H::String])
+        );
+        let (promise, args) = named(&function(&ir, "blobs").result);
+        assert_eq!(promise, "Promise");
+        assert!(matches!(args[0], H::Named(n) if n.name.path == "Array"));
+        assert_eq!(
+            named(&function(&ir, "done").result),
+            ("Promise", vec![&H::Empty])
+        );
+        let map = function(&ir, "map");
+        assert_eq!(
+            named(&map.params[0].ty),
+            ("Map", vec![&H::String, &H::Number])
+        );
+        assert_eq!(map.params[0].ty.wasm(), Some(WasmType::JS_NON_NULL));
+        assert_eq!(named(&map.result).0, "Array");
+        let spread = function(&ir, "spread");
+        assert!(spread.variadic);
+        assert_eq!(named(&spread.params[0].ty).0, "Array");
+    }
+
+    #[test]
+    fn literal_arms_share_their_cohort_binding() {
+        use ts_gen_abi::ir::{Head as H, Literal};
+        let ir = ir(r#"
+            interface KV {
+                mode(kind: "fast" | "safe"): boolean;
+                get(name: "Set-Cookie"): string;
+            }
+        "#);
+        let kv = ir.class(None, "KV").unwrap();
+        assert_eq!(names(&kv.members), ["mode_fast", "mode_safe", "get"]);
+        for (name, lit) in [("mode_fast", "fast"), ("mode_safe", "safe")] {
+            let m = member(&ir, "KV", name);
+            assert_eq!(m.js, "mode");
+            assert_eq!(m.cohort.as_deref(), Some("__mode"));
+            assert_eq!(
+                head(&m.params[0].ty),
+                &H::Literal(Literal::String(lit.into()))
+            );
+        }
+        // A lone literal is no cohort.
+        assert_eq!(member(&ir, "KV", "get").cohort, None);
+    }
+
+    #[test]
+    fn classes_bind_under_their_rust_names() {
+        let ir = ir(r#"
+            declare module "m:a" {
+                class _Foo { constructor(); }
+                export { _Foo as Foo };
+            }
+            declare module "lh" {
+                interface H { x: number; }
+                export function u(h: H): void;
+                export {};
+            }
+            declare module "lh" {
+                export interface H { y?: number; }
+            }
+        "#);
+        let foo = ir.class(Some("m:a"), "_Foo").unwrap();
+        assert_eq!(foo.path, "Foo");
+        assert_eq!(foo.aliases, ["Foo"]);
+        assert_eq!(member(&ir, "_Foo", "new").js, "Foo");
+        // A block's local `H` beside the module's exported one.
+        let local = ir.class(Some("lh"), "H2").unwrap();
+        assert_eq!(
+            (local.path.as_str(), names(&local.members)),
+            ("H", vec!["new", "x", "set_x"])
+        );
+        let exported = ir.class(Some("lh"), "H").unwrap();
+        assert_eq!(names(&exported.members), ["new", "y", "set_y"]);
+        assert!(!member(&ir, "H2", "x").optional);
+        assert!(member(&ir, "H", "y").optional);
+        let u = ir.functions.iter().find(|f| f.member.name == "u").unwrap();
+        assert_eq!(named(&u.member.params[0].ty).0, "H2");
+    }
+
+    #[test]
+    fn member_names_escape_as_rust_does() {
+        let ir = ir(r#"
+            declare class Pair { readonly 0: string; static readonly 1: string; }
+            declare var self: Pair;
+        "#);
+        let pair = ir.class(None, "Pair").unwrap();
+        assert_eq!(names(&pair.members), ["_0", "_1"]);
+        assert_eq!(pair.members[0].js, "0");
+        assert_eq!(function(&ir, "self_").js, "self");
     }
 }

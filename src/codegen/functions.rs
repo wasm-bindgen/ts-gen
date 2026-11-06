@@ -3,6 +3,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use crate::codegen::record::{record, Binding, Record};
 use crate::codegen::signatures::{
     build_signatures, generate_callable_params, is_void_return, public_rust_name,
     render_generic_bounds, CallableSpec, FunctionSignature, Overload, SignatureKind,
@@ -104,6 +105,10 @@ fn emit_function(
         &mut value_names.idents,
         cgctx,
     );
+    record(cgctx, || Record::Callable {
+        kind: Binding::Function,
+        sigs: sigs.clone(),
+    });
 
     let items: Vec<TokenStream> = sigs
         .iter()
@@ -344,6 +349,12 @@ pub fn generate_variable(
     }
     let base = value_names.take(&binding, ident_chars(&decl.name));
     let rust_name = value_names.idents.declare(&base, Suffix::Snake);
+    record(cgctx, || Record::Static {
+        rust_name: rust_name.clone(),
+        js_name: decl.js_name.clone(),
+        type_ref: decl.type_ref.clone(),
+        scope,
+    });
     let rust_ident = super::typemap::make_ident(&rust_name);
     let ty = to_syn_type(&decl.type_ref, TypePosition::RETURN, cgctx, scope, ctx);
     let doc = super::doc_tokens(doc);
@@ -477,6 +488,11 @@ fn generate_constructs(
             names.entry(*target).or_default(),
             Some(cgctx),
         );
+        cgctx.record(|| Record::Construct {
+            target: *target,
+            js_class: js_class.clone(),
+            sigs: sigs.clone(),
+        });
         for sig in &sigs {
             let scope = sig.body_scope;
             let rust_ident = super::typemap::make_ident(&sig.rust_name);

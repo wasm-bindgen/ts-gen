@@ -1,0 +1,33 @@
+ir 1;
+
+module "module-export-assignment" {
+  static class nested {
+    static run(): String throws;
+  }
+}
+
+module "module-export-assignment/counter" {
+  class default as Counter {
+    new(start: f64) throws;
+    get value: f64;
+    increment() throws;
+  }
+  alias default = Counter;
+}
+
+module "module-export-assignment/global" {
+  class Greeter {
+    new(prefix: String) throws;
+    greet(name: String): String throws;
+  }
+}
+
+module "module-export-assignment" {
+  function default(value: Any | Null | Undefined) throws as check;
+  function strictEqual(actual: Any | Null | Undefined, expected: Any | Null | Undefined): bool throws as strict_equal;
+  get VERSION: String as version;
+}
+
+module "module-export-assignment/global" {
+  function greet(name: String): String throws;
+}

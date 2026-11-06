@@ -1,0 +1,199 @@
+ir 1;
+
+module "node:console" {
+  /// Options for the Console constructor.
+  shape class ConsoleOptions {
+    new {};
+    get stdout: Object;
+    set stdout(value: Object) as set_stdout;
+    get stderr?: Object | Undefined;
+    set stderr(value: Object) as set_stderr;
+    /// Ignore errors when writing to the underlying streams.
+    /// @default true
+    get ignoreErrors?: Boolean | Undefined as ignore_errors;
+    set ignoreErrors(value: bool) as set_ignore_errors;
+    /// Set color support for this `Console` instance.
+    /// @default 'auto'
+    get colorMode?: ColorModeKind | Undefined as color_mode;
+    set colorMode(value: bool) as set_color_mode;
+    set colorMode(value: String) as set_color_mode_with_str;
+    /// Set group indentation.
+    /// @default 2
+    get groupIndentation?: Number | Undefined as group_indentation;
+    set groupIndentation(value: f64) as set_group_indentation;
+  }
+
+  /// The `Console` class can be used to create a simple logger with configurable
+  /// output streams and can be accessed using either `require('node:console').Console`
+  /// or `console.Console` (or their destructured counterparts).
+  class Console {
+    /// Creates a new `Console` with one or two writable stream instances.
+    /// `stdout` is a writable stream to print log or info output.
+    /// `stderr` is used for warning or error output.
+    ///
+    /// * `stdout` - A writable stream for log output
+    /// * `stderr` - A writable stream for error output
+    /// * `ignoreErrors` - Whether to ignore errors when writing
+    new(stdout: Object) throws;
+    /// Creates a new `Console` with one or two writable stream instances.
+    /// `stdout` is a writable stream to print log or info output.
+    /// `stderr` is used for warning or error output.
+    ///
+    /// * `stdout` - A writable stream for log output
+    /// * `stderr` - A writable stream for error output
+    /// * `ignoreErrors` - Whether to ignore errors when writing
+    new(stdout: Object, stderr: Object) throws as new_with_stderr;
+    /// Creates a new `Console` with one or two writable stream instances.
+    /// `stdout` is a writable stream to print log or info output.
+    /// `stderr` is used for warning or error output.
+    ///
+    /// * `stdout` - A writable stream for log output
+    /// * `stderr` - A writable stream for error output
+    /// * `ignoreErrors` - Whether to ignore errors when writing
+    new(stdout: Object, stderr: Object | Undefined, ignore_errors: bool) throws as new_with_stderr_and_ignore_errors;
+    /// A simple assertion test. If `condition` is falsy, an `AssertionError` is
+    /// written with an optional message.
+    ///
+    /// * `condition` - The condition to test
+    /// * `data` - Optional message or data
+    assert(...data: Array<Any | Null | Undefined>);
+    /// A simple assertion test. If `condition` is falsy, an `AssertionError` is
+    /// written with an optional message.
+    ///
+    /// * `condition` - The condition to test
+    /// * `data` - Optional message or data
+    assert(condition: bool, ...data: Array<Any | Null | Undefined>) as assert_with_condition;
+    /// Clears the console when possible.
+    clear();
+    /// Maintains an internal counter and outputs to `stdout` the number of
+    /// times `count()` has been called with the given `label`.
+    ///
+    /// * `label` - The counter label
+    count();
+    /// Maintains an internal counter and outputs to `stdout` the number of
+    /// times `count()` has been called with the given `label`.
+    ///
+    /// * `label` - The counter label
+    count(label: String) as count_with_label;
+    /// Resets the internal counter for the given `label`.
+    ///
+    /// * `label` - The counter label to reset
+    countReset() as count_reset;
+    /// Resets the internal counter for the given `label`.
+    ///
+    /// * `label` - The counter label to reset
+    countReset(label: String) as count_reset_with_label;
+    /// Prints to `stderr` with newline. Multiple arguments can be passed.
+    ///
+    /// * `data` - Values to output
+    debug(...data: Array<Any | Null | Undefined>);
+    /// Prints to `stderr` with newline. Multiple arguments can be passed.
+    ///
+    /// * `data` - Values to output
+    error(...data: Array<Any | Null | Undefined>);
+    /// Increases indentation of subsequent lines by spaces for `groupIndentation` length.
+    ///
+    /// * `data` - Optional label for the group
+    group(...data: Array<Any | Null | Undefined>);
+    /// An alias for `group()`.
+    ///
+    /// * `data` - Optional label for the group
+    groupCollapsed(...data: Array<Any | Null | Undefined>) as group_collapsed;
+    /// Decreases indentation of subsequent lines.
+    groupEnd() as group_end;
+    /// Prints to `stdout` with newline. Multiple arguments can be passed.
+    ///
+    /// * `data` - Values to output
+    info(...data: Array<Any | Null | Undefined>);
+    /// Prints to `stdout` with newline. Multiple arguments can be passed.
+    /// First argument is used as the primary message and additional arguments
+    /// are used as substitution values similar to `printf(3)`.
+    ///
+    /// * `data` - Values to output
+    log(...data: Array<Any | Null | Undefined>);
+    /// Try to construct a table with the columns of the properties of
+    /// `tabularData` (or use `properties`) and rows of `tabularData`.
+    ///
+    /// * `tabularData` - Data to display as a table
+    /// * `properties` - Column headers to display
+    table();
+    /// Try to construct a table with the columns of the properties of
+    /// `tabularData` (or use `properties`) and rows of `tabularData`.
+    ///
+    /// * `tabularData` - Data to display as a table
+    /// * `properties` - Column headers to display
+    table(tabular_data: Any | Null | Undefined) as table_with_tabular_data;
+    /// Try to construct a table with the columns of the properties of
+    /// `tabularData` (or use `properties`) and rows of `tabularData`.
+    ///
+    /// * `tabularData` - Data to display as a table
+    /// * `properties` - Column headers to display
+    table(tabular_data: Any | Null | Undefined, properties: Array<String>) as table_with_tabular_data_and_properties;
+    /// Starts a timer identified by the given `label`.
+    ///
+    /// * `label` - The timer label
+    time();
+    /// Starts a timer identified by the given `label`.
+    ///
+    /// * `label` - The timer label
+    time(label: String) as time_with_label;
+    /// Stops a timer previously started with `time()` and prints the result.
+    ///
+    /// * `label` - The timer label
+    timeEnd() as time_end;
+    /// Stops a timer previously started with `time()` and prints the result.
+    ///
+    /// * `label` - The timer label
+    timeEnd(label: String) as time_end_with_label;
+    /// For a timer previously started with `time()`, prints the elapsed time
+    /// and other `data` arguments.
+    ///
+    /// * `label` - The timer label
+    /// * `data` - Additional values to output
+    timeLog(...data: Array<Any | Null | Undefined>) as time_log;
+    /// For a timer previously started with `time()`, prints the elapsed time
+    /// and other `data` arguments.
+    ///
+    /// * `label` - The timer label
+    /// * `data` - Additional values to output
+    timeLog(label: String, ...data: Array<Any | Null | Undefined>) as time_log_with_label;
+    /// Prints to `stderr` the string `'Trace: '`, followed by `util.format()`
+    /// output of the message and current stack trace.
+    ///
+    /// * `data` - Values to output alongside the trace
+    trace(...data: Array<Any | Null | Undefined>);
+    /// Prints to `stderr` with newline. Multiple arguments can be passed.
+    ///
+    /// * `data` - Values to output
+    warn(...data: Array<Any | Null | Undefined>);
+    /// Starts a JavaScript CPU profile with an optional label.
+    ///
+    /// * `label` - The profile label
+    profile();
+    /// Starts a JavaScript CPU profile with an optional label.
+    ///
+    /// * `label` - The profile label
+    profile(label: String) as profile_with_label;
+    /// Stops the current JavaScript CPU profiling session.
+    ///
+    /// * `label` - The profile label to stop
+    profileEnd() as profile_end;
+    /// Stops the current JavaScript CPU profiling session.
+    ///
+    /// * `label` - The profile label to stop
+    profileEnd(label: String) as profile_end_with_label;
+    /// Adds an event with the label to the Timeline panel of the inspector.
+    ///
+    /// * `label` - The timestamp label
+    timeStamp() as time_stamp;
+    /// Adds an event with the label to the Timeline panel of the inspector.
+    ///
+    /// * `label` - The timestamp label
+    timeStamp(label: String) as time_stamp_with_label;
+  }
+}
+
+kind ColorModeKind {
+  Bool = Boolean;
+  String = String;
+}

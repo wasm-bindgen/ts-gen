@@ -1,0 +1,21 @@
+ir 1;
+
+class Holder<Value> {
+  new(): Holder throws;
+  new(initial: Value | Null | Undefined): Holder throws as new_with_initial;
+  get value?: Value | Null | Undefined;
+  reset(): Holder<Value | Null | Undefined> throws;
+}
+
+class Pair<A, B> {
+  new(first: A | Null | Undefined, second: B | Null | Undefined): Pair throws;
+  static swap(pair: Pair<A | Null | Undefined, B | Null | Undefined>): Pair<B | Null | Undefined, A | Null | Undefined> throws;
+  get first: A | Null | Undefined;
+  get second: B | Null | Undefined;
+}
+
+class Slot<T> {
+  new(value: T | Null | Undefined): Slot throws;
+  get value: T | Null | Undefined;
+  set value(value: T | Null | Undefined) as set_value;
+}

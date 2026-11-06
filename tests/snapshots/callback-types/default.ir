@@ -1,0 +1,9 @@
+ir 1;
+
+class Timer {
+  setTimeout(callback: (Array<Any | Null | Undefined>) => void): f64 as set_timeout;
+  setTimeout(callback: (Array<Any | Null | Undefined>) => void, ms_delay: f64): f64 as set_timeout_with_ms_delay;
+  onTick(callback: (f64, String) => bool) as on_tick;
+  onAny(callback: (Any | Null | Undefined) => Any | Null | Undefined) as on_any;
+  onRest(callback: (String, Array<Number>) => void) as on_rest;
+}

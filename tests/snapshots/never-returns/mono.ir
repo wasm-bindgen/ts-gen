@@ -1,0 +1,54 @@
+ir 1;
+
+module "never-returns" {
+  class Guard {
+    new() throws;
+    /// A guard has no primitive value.
+    valueOf() throws as value_of;
+    /// Always rejects.
+    failLater(): Promise<Undefined> throws as fail_later;
+    static unreachable(reason: String) throws;
+    /// Every literal arm throws.
+    reject(kind: "soft") throws cohort __reject as reject_soft;
+    /// Every literal arm throws.
+    reject(kind: "hard") throws cohort __reject as reject_hard;
+    get impossible: Any;
+  }
+
+  class Halt {
+    new() throws;
+    static stop(code: f64) throws;
+    ok(): bool throws;
+  }
+
+  /// Always throws an `Error` carrying `message`.
+  function fail(message: String) throws;
+
+  /// ## Errors
+  ///
+  /// * `RangeError` — always
+  function failRange(n: f64) throws RangeError as fail_range;
+
+  /// Contradicts its return type: the `never` return wins.
+  function failAnyway() throws as fail_anyway;
+
+  /// Always rejects.
+  function rejectLater(message: String): Promise<Undefined> throws as reject_later;
+
+  /// The string overload returns; the number overload throws.
+  function check(value: String): String throws;
+  function check(value: f64) throws as check_with_f64;
+
+  /// Every literal arm throws.
+  function raise(kind: "type", message: String) throws cohort __raise as raise_type;
+
+  /// Every literal arm throws.
+  function raise(kind: "range", message: String) throws cohort __raise as raise_range;
+
+  /// The `"text"` arm returns; the `"fail"` arm throws.
+  function read(kind: "text"): String throws cohort __read_text as read_text;
+  function read(kind: "fail") throws cohort __read_fail as read_fail;
+
+  /// A variable typed as a function binds as one.
+  function abort(code: f64) throws;
+}

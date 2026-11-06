@@ -1,0 +1,125 @@
+ir 1;
+
+module "literal-overloads" {
+  shape class KVNamespace {
+    get(key: String): Promise<String | Null>;
+    get(key: String, type: "text"): Promise<String | Null> cohort __get_text as get_text;
+    get(key: String, type: "json"): Promise<Any | Null | Undefined> cohort __get_json as get_json;
+    get(key: String, type: "arrayBuffer"): Promise<ArrayBuffer | Null> cohort __get_array_buffer as get_array_buffer;
+    get(key: String, type: "stream"): Promise<Uint8Array | Null> cohort __get_stream as get_stream;
+    get(key: Array<String>, type: "text"): Promise<Map<String, String | Null>> cohort __get_text_with_slice as get_text_with_slice;
+    get(key: Array<String>, type: "json"): Promise<Map<String, Any | Null | Undefined>> cohort __get_json_with_slice as get_json_with_slice;
+    /// A literal union is one overload with several arms.
+    mode(kind: "fast"): bool cohort __mode as mode_fast;
+    /// A literal union is one overload with several arms.
+    mode(kind: "safe"): bool cohort __mode as mode_safe;
+  }
+
+  shape class Headers {
+    getAll(name: "Set-Cookie"): Array<String> as get_all;
+  }
+
+  class SubtleCrypto {
+    exportKey(format: "jwk", key: String): Promise<Object> cohort __export_key_jwk as export_key_jwk;
+    exportKey(format: "raw", key: String): Promise<ArrayBuffer> cohort __export_key_raw as export_key_raw;
+    exportKey(format: "pkcs8", key: String): Promise<ArrayBuffer> cohort __export_key_raw as export_key_pkcs8;
+    exportKey(format: "spki", key: String): Promise<ArrayBuffer> cohort __export_key_raw as export_key_spki;
+    static describe(format: "jwk"): String cohort __describe as describe_jwk;
+    static describe(format: "raw"): String cohort __describe as describe_raw;
+  }
+
+  shape class KVStore<Key> {
+    get(key: Key | Null | Undefined, type: "text"): Promise<String | Null> cohort __get_text as get_text;
+    get<ExpectedValue>(key: Key | Null | Undefined, type: "json"): Promise<ExpectedValue | Null | Undefined> cohort __get_json as get_json;
+    /// A `null` arm on a generic receiver keeps the receiver's `Key`.
+    put(key: Key | Null | Undefined, kind: "a", value: String) cohort __put as put_a;
+    /// A `null` arm on a generic receiver keeps the receiver's `Key`.
+    put(key: Key | Null | Undefined, kind: "b", value: String) cohort __put as put_b;
+    /// A `null` arm on a generic receiver keeps the receiver's `Key`.
+    put(key: Key | Null | Undefined, kind: "a", value: Null) cohort __put_with_null as put_a_with_null;
+    /// A `null` arm on a generic receiver keeps the receiver's `Key`.
+    put(key: Key | Null | Undefined, kind: "b", value: Null) cohort __put_with_null as put_b_with_null;
+  }
+
+  class Picker {
+    pick(kind: "a", x: ArrayBuffer) cohort __pick as pick_a;
+    pick(kind: "b", x: ArrayBuffer) cohort __pick as pick_b;
+    pick(kind: "a", x: Null) cohort __pick_with_null as pick_a_with_null;
+    pick(kind: "b", x: Null) cohort __pick_with_null as pick_b_with_null;
+    static make(kind: "a", x: String): Picker cohort __make as make_a;
+    static make(kind: "b", x: String): Picker cohort __make as make_b;
+    static make(kind: "a", x: Null): Picker cohort __make_with_null as make_a_with_null;
+    static make(kind: "b", x: Null): Picker cohort __make_with_null as make_b_with_null;
+    /// The `null` arm's wrappers and extern drop `T`, which only it named.
+    put<T>(kind: "a", x: T | Null | Undefined) cohort __put as put_a;
+    /// The `null` arm's wrappers and extern drop `T`, which only it named.
+    put<T>(kind: "b", x: T | Null | Undefined) cohort __put as put_b;
+    /// The `null` arm's wrappers and extern drop `T`, which only it named.
+    put(kind: "a", x: Null) cohort __put_with_null as put_a_with_null;
+    /// The `null` arm's wrappers and extern drop `T`, which only it named.
+    put(kind: "b", x: Null) cohort __put_with_null as put_b_with_null;
+    /// Under mono, each `null` arm has a `_js_string` sibling.
+    name(kind: "a", x: ArrayBuffer): String cohort __name as name_a;
+    /// Under mono, each `null` arm has a `_js_string` sibling.
+    name(kind: "b", x: ArrayBuffer): String cohort __name as name_b;
+    /// Under mono, each `null` arm has a `_js_string` sibling.
+    name(kind: "a", x: Null): String cohort __name_with_null as name_a_with_null;
+    /// Under mono, each `null` arm has a `_js_string` sibling.
+    name(kind: "b", x: Null): String cohort __name_with_null as name_b_with_null;
+    /// `_promise` forms follow per `null` arm.
+    load(kind: "a", x: ArrayBuffer): Promise<String | Null> cohort __load as load_a;
+    /// `_promise` forms follow per `null` arm.
+    load(kind: "b", x: ArrayBuffer): Promise<String | Null> cohort __load as load_b;
+    /// `_promise` forms follow per `null` arm.
+    load(kind: "a", x: Null): Promise<String | Null> cohort __load_with_null as load_a_with_null;
+    /// `_promise` forms follow per `null` arm.
+    load(kind: "b", x: Null): Promise<String | Null> cohort __load_with_null as load_b_with_null;
+  }
+
+  shape class Clash {
+    mode(kind: "x") cohort __mode as mode_x;
+    mode(kind: "y") cohort __mode as mode_y;
+    mode(kind: Null) as mode_with_null;
+    f(x: ArrayBuffer);
+    f(x: Null) as f_with_null;
+    f(kind: "a", x: ArrayBuffer) cohort __f as f_a;
+    f(kind: "b", x: ArrayBuffer) cohort __f as f_b;
+    f(kind: "a", x: Null) cohort __f_with_null_2 as f_a_with_null;
+    f(kind: "b", x: Null) cohort __f_with_null_2 as f_b_with_null;
+  }
+
+  shape class Repeats {
+    tag(m: "a"): String cohort __tag as tag_a;
+    tag(m: "b"): String cohort __tag as tag_b;
+    tag(m: "c"): String cohort __tag as tag_c;
+  }
+
+  class Boxed<T> {
+    new(kind: "a"): Boxed throws cohort __new as new_a;
+    new(kind: "b"): Boxed throws cohort __new as new_b;
+    static label(kind: "a"): String cohort __label as label_a;
+    static label(kind: "b"): String cohort __label as label_b;
+    static of(kind: "a", value: T | Null | Undefined): Boxed<T | Null | Undefined> cohort __of as of_a;
+    static of(kind: "b", value: T | Null | Undefined): Boxed<T | Null | Undefined> cohort __of as of_b;
+    /// A static's `null` arm lands where its return puts it.
+    static from(kind: "a", value: T | Null | Undefined): Boxed<T | Null | Undefined> cohort __from as from_a;
+    /// A static's `null` arm lands where its return puts it.
+    static from(kind: "b", value: T | Null | Undefined): Boxed<T | Null | Undefined> cohort __from as from_b;
+    /// A static's `null` arm lands where its return puts it.
+    static from(kind: "a", value: Null): Boxed<T | Null | Undefined> cohort __from_with_null as from_a_with_null;
+    /// A static's `null` arm lands where its return puts it.
+    static from(kind: "b", value: Null): Boxed<T | Null | Undefined> cohort __from_with_null as from_b_with_null;
+  }
+
+  class Opener {
+    new(kind: "a", x: ArrayBuffer) throws cohort __new as new_a;
+    new(kind: "b", x: ArrayBuffer) throws cohort __new as new_b;
+    new(kind: "a", x: Null) throws cohort __new_with_null as new_a_with_null;
+    new(kind: "b", x: Null) throws cohort __new_with_null as new_b_with_null;
+  }
+
+  function pickFree<T>(kind: "a", x: T | Null | Undefined) cohort __pick_free as pick_free_a;
+  function pickFree<T>(kind: "b", x: T | Null | Undefined) cohort __pick_free as pick_free_b;
+  function pickFree(kind: "a", x: Null) cohort __pick_free_with_null as pick_free_a_with_null;
+  function pickFree(kind: "b", x: Null) cohort __pick_free_with_null as pick_free_b_with_null;
+}

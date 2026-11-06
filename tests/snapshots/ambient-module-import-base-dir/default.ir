@@ -1,0 +1,8 @@
+ir 1;
+
+module "lib" {
+  function fromPackage(p: String) as from_package;
+  function fromRelative(r: Rel | Null | Undefined) as from_relative;
+  function augmented(r: f64);
+  function augmentedPkg(p: Pkg | Null | Undefined) as augmented_pkg;
+}

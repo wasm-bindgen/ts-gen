@@ -1,0 +1,70 @@
+ir 1;
+
+shape class Win {
+  get b: "ia".T;
+  set b(value: "ia".T) as set_b;
+  m(): "ia".T;
+  get a: Ev;
+  set a(value: Ev) as set_a;
+  l(): Ev;
+}
+
+static class GN {
+  static gm(e: "ia".T);
+  static gl(e: Ev);
+}
+
+module "ix" {
+  shape class U extends "ic".T {
+    get ub: "ic".T;
+    set ub(value: "ic".T) as set_ub;
+    mb(): "ic".T;
+    get ua: "ia".T;
+    set ua(value: "ia".T) as set_ua;
+    ma(): "ia".T;
+  }
+
+  class K {
+    get ka: "ia".T;
+    set ka(value: "ia".T) as set_ka;
+    get kb: "ic".T;
+    set kb(value: "ic".T) as set_kb;
+  }
+}
+
+module "ib2" {
+  static class NS {
+    static gb(t: "ic".T);
+    static ga(t: "ia".T);
+  }
+}
+
+module "ia" {
+  shape class T {
+    new {};
+    get a: f64;
+    set a(value: f64) as set_a;
+  }
+}
+
+module "ic" {
+  shape class T {
+    new {};
+    get c: f64;
+    set c(value: f64) as set_c;
+  }
+}
+
+shape class Ev {
+  new {};
+  get e: f64;
+  set e(value: f64) as set_e;
+}
+
+class X {
+  new(e: Ev) throws;
+  new(e: "ia".T, n: f64) throws as new_with_n;
+  static sm(e: "ia".T);
+  static sl(e: Ev);
+  x();
+}

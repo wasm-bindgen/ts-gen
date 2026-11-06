@@ -1,0 +1,48 @@
+ir 1;
+
+shape class Emitter {
+  emit(event: String): bool throws;
+}
+
+static class Events {
+  static listen(name: String, options: Events.Options): Events.Emitter throws;
+}
+
+shape class Events.Emitter {
+  on(event: String) throws;
+}
+
+shape class Events.Options {
+  new {};
+  get emitter: Events.Emitter;
+  set emitter(value: Events.Emitter) as set_emitter;
+}
+
+static class Events.Inner {}
+
+shape class Events.Inner.Handle {
+  new {};
+  get emitter: Events.Emitter;
+  set emitter(value: Events.Emitter) as set_emitter;
+  get options: Events.Options;
+  set options(value: Events.Options) as set_options;
+}
+
+shape class Stream extends Events.Emitter {
+  pipe() throws;
+}
+
+static class Wasm {
+  static current(): Wasm.Global throws;
+}
+
+class Wasm.Global {
+  new() throws;
+  get value: f64;
+}
+
+module "namespace-members" {
+  function make(): Events.Emitter throws;
+}
+
+function globalEmitter(): Emitter throws as global_emitter;

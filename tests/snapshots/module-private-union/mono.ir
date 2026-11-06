@@ -1,0 +1,24 @@
+ir 1;
+
+module "x:shapes" {
+  class Base {
+    base() throws;
+  }
+
+  class A extends Base {
+    a() throws;
+  }
+
+  class B extends Base {
+    b() throws;
+  }
+}
+
+kind ListReturnKind {
+  VecOfId = Array<String>;
+  Promise = Promise<"x:shapes".Base>;
+}
+
+module "x:shapes" {
+  function list(): ListReturnKind throws;
+}

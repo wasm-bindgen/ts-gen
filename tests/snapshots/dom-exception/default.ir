@@ -1,0 +1,8 @@
+ir 1;
+
+class Codec {
+  /// ## Errors
+  ///
+  /// * `DOMException` — when the codec is closed
+  encode(input: String): Uint8Array raises DOMException;
+}

@@ -1,11 +1,11 @@
 //! The ts-gen IR: a `.d.ts` expanded into uniquely named bindings with
-//! wasm-level types. Language generators consume it; the text form is
-//! specified in IR.md.
+//! wasm-level types. Language generators and the bridge builder consume
+//! it; the text form is specified in IR.md.
 //!
 //! Every member is one import, named `<class name>.<member name>` (or
 //! `<name>` for a top-level function) in the module `./bindings.wasm`, or
 //! the specifier of the `module` it is declared in. Names are final: the
-//! front end has already expanded overloads.
+//! front end has already expanded overloads and applied naming options.
 
 use crate::{OwnerRef, WasmType, BINDINGS_SPECIFIER};
 
@@ -319,5 +319,63 @@ impl Ir {
             member: &f.member,
         });
         members.chain(functions)
+    }
+}
+
+/// The functions every `bindings.wasm` has besides the IR's members,
+/// fixed by the spec rather than listed in an [`Ir`] (IR.md, Bridge).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Sys {
+    /// `x === undefined`.
+    IsUndefined,
+    /// `undefined`.
+    Undefined,
+    /// `Number(x)`.
+    NumberValue,
+}
+
+impl Sys {
+    pub const ALL: [Sys; 3] = [Sys::IsUndefined, Sys::Undefined, Sys::NumberValue];
+
+    /// The import name, in `./bindings.wasm`.
+    pub fn name(self) -> &'static str {
+        match self {
+            Sys::IsUndefined => "JsValue.is_undefined",
+            Sys::Undefined => "JsValue.undefined",
+            Sys::NumberValue => "Number.value",
+        }
+    }
+
+    /// The JS it performs on its parameter `x`.
+    pub fn js(self) -> &'static str {
+        match self {
+            Sys::IsUndefined => "x === undefined",
+            Sys::Undefined => "undefined",
+            Sys::NumberValue => "Number(x)",
+        }
+    }
+
+    /// Its parameter `x`, if any.
+    pub fn param(self) -> Option<WasmType> {
+        match self {
+            Sys::IsUndefined => Some(WasmType::JS),
+            Sys::Undefined => None,
+            Sys::NumberValue => Some(WasmType::JS_NON_NULL),
+        }
+    }
+
+    pub fn result(self) -> WasmType {
+        match self {
+            Sys::IsUndefined => WasmType::I32,
+            Sys::Undefined => WasmType::ExternRef {
+                null: false,
+                undefined: true,
+            },
+            Sys::NumberValue => WasmType::F64,
+        }
+    }
+
+    pub fn from_name(name: &str) -> Option<Sys> {
+        Sys::ALL.into_iter().find(|s| s.name() == name)
     }
 }

@@ -1,0 +1,34 @@
+ir 1;
+
+class Cursor<T> {
+  next(): CursorNextReturn<T | Null | Undefined>;
+  address(): CursorAddressReturn;
+  cost(): CostReturnKind;
+}
+
+shape class CursorNextReturn<T> {
+  new {}: CursorNextReturn;
+  get done?: Boolean | Undefined;
+  set done(value: bool) as set_done;
+  get value?: T | Null | Undefined;
+  set value(value: T | Null | Undefined) as set_value;
+}
+
+shape class CursorAddressReturn {
+  new {};
+  get port: f64;
+  set port(value: f64) as set_port;
+  get family: String;
+  set family(value: String) as set_family;
+}
+
+shape class ImageOptions {
+  new {};
+  get border?: Object | Undefined;
+  set border(value: Object) as set_border;
+}
+
+kind CostReturnKind fallback {
+  String = String;
+  Object = Object;
+}

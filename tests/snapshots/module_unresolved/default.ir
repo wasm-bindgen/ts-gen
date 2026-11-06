@@ -1,0 +1,5 @@
+ir 1;
+
+shape class UsesBar {
+  method(b: Bar | Null | Undefined);
+}

@@ -1,0 +1,133 @@
+ir 1;
+
+module "union-alias-reads" {
+  class Zoned {
+    new(zone: String) throws;
+    get zone: String;
+  }
+
+  class Day {
+    new(day: f64) throws;
+    get day: f64;
+    static from(item: DayLike): Day throws;
+    static from(item: DayLike, options: FromOptions): Day throws as from_with_options;
+    static compare(one: DayLike, two: DayLike): f64 throws;
+    equals(other: DayLike): bool throws;
+    until(other: DayLike): f64 throws;
+    until(other: DayLike, options: FromOptions): f64 throws as until_with_options;
+    shift(offset: Offset): Day throws;
+    step(direction: "next", other: DayLike): String throws cohort __step as step_next;
+    step(direction: "previous", other: DayLike): String throws cohort __step as step_previous;
+    pick(): String throws;
+    pick(other: MaybeDay | Null | Undefined): String throws as pick_with_other;
+    pick(other: Null): String throws as pick_with_null;
+    between(start: DayLike | Undefined, end: DayLike): String throws;
+    later(other: DayLike): Promise<String> throws;
+  }
+
+  shape class ZonedFields {
+    new {};
+    get zone: String;
+    set zone(value: String) as set_zone;
+  }
+
+  shape class DayFields {
+    new {};
+    get day: f64;
+    set day(value: f64) as set_day;
+  }
+
+  shape class FromOptions {
+    new {};
+    get overflow?: OverflowKind | Undefined;
+    set overflow(value: OverflowKind) as set_overflow;
+  }
+
+  shape class RelativeOptions {
+    new {};
+    /// Two aliases sharing `Zoned` and `string`, with a dictionary each.
+    get relativeTo?: RelativeToKind | Undefined as relative_to;
+    set relativeTo(value: ZonedLike) as set_relative_to;
+    set relativeTo(value: DayLike) as set_relative_to_with_day_like;
+    /// A union alias read whole.
+    get zone: Zone;
+    set zone(value: Zone) as set_zone;
+    /// Its dictionary arm is the read's fallback.
+    get zoned?: ZonedLike | Undefined;
+    set zoned(value: ZonedLike) as set_zoned;
+    /// Only dictionaries.
+    get fields: Any;
+    set fields(value: Fields) as set_fields;
+  }
+
+  shape class Span {
+    new {};
+    get start: DayLike;
+    set start(value: DayLike) as set_start;
+    get relativeTo?: DayLike | Undefined as relative_to;
+    set relativeTo(value: DayLike) as set_relative_to;
+  }
+
+  kind ZonedLike fallback {
+    Zoned = Zoned;
+    String = String;
+    ZonedFields = ZonedFields;
+  }
+
+  kind DayLike fallback {
+    Day = Day;
+    Zoned = Zoned;
+    String = String;
+    DayFields = DayFields;
+  }
+
+  kind Zone {
+    Zoned = Zoned;
+    String = String;
+  }
+
+  kind Fields {
+    ZonedFields = ZonedFields;
+    DayFields = DayFields;
+  }
+
+  kind Offset {
+    F64 = Number;
+    String = String;
+    Bool = Boolean;
+  }
+
+  kind MaybeDay fallback {
+    Day = Day;
+    Zoned = Zoned;
+    String = String;
+    DayFields = DayFields;
+  }
+}
+
+kind OverflowKind {
+  Constrain = "constrain";
+  Reject = "reject";
+}
+
+kind RelativeToKind fallback {
+  Zoned = "union-alias-reads".Zoned;
+  String = String;
+  Day = "union-alias-reads".Day;
+  Object = Object;
+}
+
+module "union-alias-reads" {
+  /// Options whose `relativeTo` holds the kind of value named.
+  function options(kind: String): RelativeOptions throws;
+
+  /// The kind of value named, as a function return.
+  function relativeTo(kind: String): RelativeToKind throws as relative_to;
+
+  /// The arm the item reached JS as, and its day.
+  function describe(item: DayLike): String throws;
+  function describeSpan(span: Span): String throws as describe_span;
+  function describeFields(fields: Fields): String throws as describe_fields;
+  function either(item: Day): String throws;
+  function either(item: String): String throws as either_with_str;
+}

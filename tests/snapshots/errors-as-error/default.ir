@@ -1,0 +1,23 @@
+ir 1;
+
+shape class Foo {
+  /// Plain method — fallible variant uses the new default error type.
+  bar(x: f64): String;
+  /// Async method — `Result<T, Error>` instead of `Result<T, JsValue>`.
+  baz(): Promise<Number>;
+  /// Method with explicit `@throws` — the typed error wins regardless
+  /// of the flag.
+  ///
+  /// ## Errors
+  ///
+  /// * `TypeError` — when input is invalid
+  parse(input: String): f64 raises TypeError;
+}
+
+class Resource {
+  /// Constructor — wasm-bindgen always catches; default error follows the flag.
+  new(path: String) throws;
+}
+
+/// Free function — same default-error rule.
+function fetchData(url: String): Promise<String> as fetch_data;

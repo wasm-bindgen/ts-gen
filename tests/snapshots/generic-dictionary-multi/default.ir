@@ -1,0 +1,9 @@
+ir 1;
+
+shape class ResultBox<T, E> {
+  new {}: ResultBox;
+  get value: T | Null | Undefined;
+  set value(value: T | Null | Undefined) as set_value;
+  get error: E | Null | Undefined;
+  set error(value: E | Null | Undefined) as set_error;
+}

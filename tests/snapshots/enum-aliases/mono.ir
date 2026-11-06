@@ -1,0 +1,48 @@
+ir 1;
+
+module "enum-aliases" {
+  shape class Api {
+    new {};
+    get version: Version;
+    set version(value: Version) as set_version;
+    get flags: Flags;
+    set flags(value: Flags) as set_flags;
+    get kind: Kind;
+    set kind(value: Kind) as set_kind;
+  }
+
+  kind Version {
+    V1 = 1 alias Qualified;
+    V2 = 2 alias Latest, Current, Next;
+  }
+
+  kind Flags {
+    None = 0;
+    Read = 1;
+    Write = 2;
+    ReadWrite = 3;
+    All = 7;
+    Mask = -1 alias Negated;
+  }
+
+  kind Kind {
+    Text = "text" alias Default, Fallback;
+    Bytes = "bytes";
+  }
+
+  kind Bits {
+    Low = 1;
+    High = 2;
+    Both = 3;
+  }
+
+  kind Other {
+    X = 7;
+  }
+
+  kind Unresolved {
+    A = 1;
+    C = 2;
+    D = 7;
+  }
+}

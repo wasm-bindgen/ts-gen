@@ -1,0 +1,60 @@
+ir 1;
+
+module "mono-lists" {
+  class Bag<T> {
+    get size: f64;
+    first(): T | Null | Undefined;
+  }
+
+  class Labels {
+    new() throws;
+    add(values: Array<String>): String;
+    add(...values: Array<String>): String as add_2;
+    get values: Array<String>;
+    set values(value: Array<String>) as set_values;
+    get flags: Array<Boolean>;
+    set flags(value: Array<Boolean>) as set_flags;
+  }
+
+  shape class LabelOptions {
+    new {};
+    get values?: Array<String> | Undefined;
+    set values(value: Array<String>) as set_values;
+    get flags?: Array<Boolean> | Undefined;
+    set flags(value: Array<Boolean>) as set_flags;
+  }
+
+  class Total {
+    new(...values: Array<Number>) throws;
+    get value: f64;
+  }
+}
+
+kind GetValueReturnKind {
+  String = String;
+  VecOfBool = Array<Boolean>;
+}
+
+module "mono-lists" {
+  function tags(values: Array<String>): String;
+  function tagged(values: Array<String>): String;
+  function tagsLike(values: Array<String>): String as tags_like;
+  function flags(values: Array<Boolean>): String;
+  function join(separator: String, ...parts: Array<String>): String;
+  function sum(...values: Array<Number>): f64;
+  function bagOf(...items: Array<Any | Null | Undefined>): Bag<Any | Null | Undefined> as bag_of;
+  function rows(values: Array<Array<String>>): String;
+  function unique(values: Set<String>): String;
+  function lookup(values: Map<String, Number>, key: String): f64;
+  function joinTags(...tags: Array<String>): String as join_tags;
+  function awaitTag(tag: Promise<String>): String as await_tag;
+  function firstTag(tags: Iterator<String>): String as first_tag;
+  function nextTag(tags: AsyncIterator<String>): String as next_tag;
+  function getTags(): Array<String> as get_tags;
+  function getMaybeTags(): Array<String> | Undefined as get_maybe_tags;
+  function getFlags(): Array<Boolean> as get_flags;
+  function fetchTags(): Promise<Array<String>> as fetch_tags;
+  function fetchMaybeTags(): Promise<Array<String> | Null> as fetch_maybe_tags;
+  function describeOptions(options: LabelOptions): String as describe_options;
+  function getValue(): GetValueReturnKind as get_value;
+}

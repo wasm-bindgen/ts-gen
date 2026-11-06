@@ -27,6 +27,7 @@ use quote::quote;
 
 use std::collections::HashMap;
 
+use crate::codegen::record::{record, Binding, ClassRecord, GetterRecord, Record};
 use crate::codegen::signatures::{
     build_signatures, generate_callable_params, generate_dictionary_params, is_void_return,
     public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam, DictionaryParams,
@@ -49,6 +50,10 @@ pub(crate) struct ClassConfig<'a> {
     js_name: String,
     /// The `extends` parents (wasm_bindgen supports chained `extends = ...`).
     extends: Vec<TokenStream>,
+    /// The `extends` clauses they are lowered from.
+    heritage: Vec<crate::ir::Heritage>,
+    /// A dictionary: plain objects, built by the factory.
+    dictionary: bool,
     /// Module specifier for `#[wasm_bindgen(module = "...")]`.
     module: Option<std::rc::Rc<str>>,
     /// JS namespace path (e.g., `["WebAssembly"]`) for types inside a
@@ -342,6 +347,8 @@ impl<'a> ClassConfig<'a> {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
             extends,
+            heritage: decl.extends.iter().cloned().collect(),
+            dictionary: false,
             module,
             js_namespace: Vec::new(),
             is_abstract: decl.is_abstract,
@@ -378,6 +385,8 @@ impl<'a> ClassConfig<'a> {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
             extends,
+            heritage: decl.extends.clone(),
+            dictionary,
             module,
             js_namespace: Vec::new(),
             is_abstract: false,
@@ -401,6 +410,8 @@ impl<'a> ClassConfig<'a> {
             rust_name: self.rust_name.clone(),
             js_name: self.js_name.clone(),
             extends: self.extends.clone(),
+            heritage: self.heritage.clone(),
+            dictionary: self.dictionary,
             module: self.module.clone(),
             js_namespace: self.js_namespace.clone(),
             is_abstract: self.is_abstract,
@@ -435,6 +446,8 @@ impl<'a> ClassConfig<'a> {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
             extends: vec![quote! { Object }],
+            heritage: Vec::new(),
+            dictionary: true,
             module,
             js_namespace: Vec::new(),
             is_abstract: false,
@@ -1713,6 +1726,20 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
 
     // 1. Type declaration with attributes
     items.push(generate_type_decl(config));
+    record(config.cgctx, || {
+        Record::Class(ClassRecord {
+            js_name: config.js_name.clone(),
+            module: config.from_module(),
+            type_params: config
+                .type_params
+                .iter()
+                .map(|tp| tp.name.clone())
+                .collect(),
+            heritage: config.heritage.clone(),
+            runtime_class: config.runtime_class,
+            dictionary: config.dictionary,
+        })
+    });
 
     // 2. Process all members in declaration order through the single naming pass.
     //    When we encounter the first member of a method group, expand all overloads
@@ -1767,6 +1794,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     &mut names,
                     config.cgctx,
                 );
+                record(config.cgctx, || Record::Callable {
+                    kind: Binding::Constructor,
+                    sigs: sigs.clone(),
+                });
                 for sig in &sigs {
                     items.push(generate_expanded_constructor(config, sig));
                 }
@@ -1802,6 +1833,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     &mut names,
                     config.cgctx,
                 );
+                record(config.cgctx, || Record::Callable {
+                    kind: Binding::Method,
+                    sigs: sigs.clone(),
+                });
                 if let Some(display) = display_to_string(config, &mut sigs, &mut names) {
                     items.extend(display.binding);
                     impls.push(display.impl_);
@@ -1841,6 +1876,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     &mut names,
                     config.cgctx,
                 );
+                record(config.cgctx, || Record::Callable {
+                    kind: Binding::StaticMethod,
+                    sigs: sigs.clone(),
+                });
                 for sig in &sigs {
                     items.push(generate_expanded_static_method(config, sig));
                 }
@@ -2384,6 +2423,18 @@ fn generate_getter(
     let rust_ident = super::typemap::make_ident(&rust_name);
 
     let lowered_ty = read_type(&getter.type_ref, getter.optional);
+    record(config.cgctx, || {
+        Record::Getter(GetterRecord {
+            is_static: false,
+            rust_name: rust_name.clone(),
+            js_name: getter.js_name.clone(),
+            type_ref: lowered_ty.clone(),
+            optional: getter.optional,
+            throws: getter.throws.clone(),
+            doc: getter.doc.clone(),
+            scope: getter.scope,
+        })
+    });
     // Top-level erasing-union return synthesises a dynamic-union
     // enum (see [`ReturnAnchor`]). For getters the anchor is the
     // property name itself — no `Return` infix.
@@ -2518,6 +2569,10 @@ fn generate_setter(
         names,
         config.cgctx,
     );
+    record(config.cgctx, || Record::Callable {
+        kind: Binding::Setter,
+        sigs: sigs.clone(),
+    });
 
     let this_generics = config.type_generics_args();
     sigs.iter()
@@ -2576,6 +2631,18 @@ fn generate_static_getter(
     let rust_ident = super::typemap::make_ident(&rust_name);
 
     let lowered_ty = read_type(&getter.type_ref, getter.optional);
+    record(config.cgctx, || {
+        Record::Getter(GetterRecord {
+            is_static: true,
+            rust_name: rust_name.clone(),
+            js_name: getter.js_name.clone(),
+            type_ref: lowered_ty.clone(),
+            optional: getter.optional,
+            throws: getter.throws.clone(),
+            doc: getter.doc.clone(),
+            scope: getter.scope,
+        })
+    });
     let getter_type = super::typemap::to_getter_return_type(
         &lowered_ty,
         config.cgctx,
@@ -2667,6 +2734,10 @@ fn generate_static_setter(
         names,
         config.cgctx,
     );
+    record(config.cgctx, || Record::Callable {
+        kind: Binding::StaticSetter,
+        sigs: sigs.clone(),
+    });
 
     sigs.iter()
         .map(|sig| {

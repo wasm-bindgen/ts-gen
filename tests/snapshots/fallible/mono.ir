@@ -1,0 +1,26 @@
+ir 1;
+
+module "fallible" {
+  class Counter {
+    new(start: f64) throws;
+    /// Throws when the counter would overflow `max`.
+    increment(): f64 throws;
+    /// Throws when the counter would overflow `max`.
+    increment(by: f64): f64 throws as increment_with_by;
+    get value: f64;
+    get max: f64;
+    set max(value: f64) as set_max;
+  }
+
+  /// Throws when `n` is negative.
+  function checkedSqrt(n: f64): f64 throws as checked_sqrt;
+
+  /// Pure arithmetic — stays a plain `f64` return under `--fallible`.
+  function double(n: f64): f64 nothrow;
+
+  /// ## Errors
+  ///
+  /// * `RangeError` — when `n` is out of range
+  function clampIndex(n: f64, len: f64): f64 throws RangeError as clamp_index;
+  function parseLater(s: String): Promise<Number> throws as parse_later;
+}

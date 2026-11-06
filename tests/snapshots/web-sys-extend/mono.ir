@@ -1,0 +1,39 @@
+ir 1;
+
+/// Options for fetch, extending the standard RequestInit.
+shape class FetchOptions extends RequestInit {
+  new {};
+  /// Number of times to retry on failure.
+  get retries?: Number | Undefined;
+  set retries(value: f64) as set_retries;
+  /// Timeout in milliseconds.
+  get timeout?: Number | Undefined;
+  set timeout(value: f64) as set_timeout;
+  /// Custom priority hint.
+  get priority?: String | Undefined;
+  set priority(value: String) as set_priority;
+}
+
+/// Extended response with additional convenience methods.
+shape class ResponseExt extends Response {
+  /// Parse the body as JSON and return a typed result.
+  jsonExt<T>(): Promise<T | Null | Undefined> as json_ext;
+  /// Get the response body as a Uint8Array.
+  bytes(): Promise<ArrayBuffer>;
+  /// Whether the response was served from cache.
+  get cached: bool;
+  /// Timing info in milliseconds.
+  get timing: f64;
+}
+
+/// Perform a fetch with extended options, returning an extended response.
+function fetch(input: Request): Promise<ResponseExt>;
+
+/// Perform a fetch with extended options, returning an extended response.
+function fetch(input: String): Promise<ResponseExt> as fetch_with_str;
+
+/// Perform a fetch with extended options, returning an extended response.
+function fetch(input: Request, init: FetchOptions): Promise<ResponseExt> as fetch_with_init;
+
+/// Perform a fetch with extended options, returning an extended response.
+function fetch(input: String, init: FetchOptions): Promise<ResponseExt> as fetch_with_str_and_init;

@@ -1,0 +1,37 @@
+ir 1;
+
+module "dep" {
+  class Foo as _Foo {
+    new() throws;
+    bar() throws;
+  }
+
+  static class Foo {
+    static helper() throws;
+  }
+
+  shape class Holder {
+    new {};
+    get foo: _Foo;
+    set foo(value: _Foo) as set_foo;
+    get alias: _Foo;
+    set alias(value: _Foo) as set_alias;
+  }
+}
+
+module "main" {
+  class Sub extends "dep"._Foo {}
+}
+
+module "dep" {
+  kind Foo.Mode {
+    A = "a";
+    B = "b";
+  }
+
+  function makeFoo(): _Foo throws as make_foo;
+}
+
+module "main" {
+  function take(f: "dep"._Foo, a: "dep"._Foo, h: "dep".Holder, d: "dep"._Foo, da: "dep"._Foo, m: "dep".Foo.Mode): "dep"._Foo throws;
+}

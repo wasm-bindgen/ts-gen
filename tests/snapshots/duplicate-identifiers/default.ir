@@ -1,0 +1,88 @@
+ir 1;
+
+shape class Dup {
+  new {};
+  get a: f64;
+  set a(value: f64) as set_a;
+}
+
+shape class IfaceFirst {
+  new {};
+  get b: String;
+  set b(value: String) as set_b;
+  get c: bool;
+  set c(value: bool) as set_c;
+}
+
+class TwoClasses {
+  a();
+}
+
+class Widget {
+  w();
+}
+
+shape class Later {
+  new {};
+  get x: f64;
+  set x(value: f64) as set_x;
+}
+
+static class N {}
+
+shape class N.T {
+  new {};
+  get a: f64;
+  set a(value: f64) as set_a;
+}
+
+shape class Merged {
+  new {};
+  get a: f64;
+  set a(value: f64) as set_a;
+  get b: String;
+  set b(value: String) as set_b;
+}
+
+class Both {
+  c();
+  i();
+}
+
+class Late {
+  c();
+  i();
+}
+
+class VarClass {
+  new() throws;
+  v();
+}
+
+shape class Opts {
+  new {};
+  get a: f64;
+  set a(value: f64) as set_a;
+  static make(): Opts;
+}
+
+static class Level {
+  static parse(s: String): Level;
+}
+
+kind Mode {
+  On = "on";
+  Off = "off";
+}
+
+kind Color {
+  Red = 0;
+}
+
+kind Level {
+  Low = 0;
+  High = 1;
+}
+
+function use(dup: Dup, first: IfaceFirst, prim: String, mode: Mode, two: TwoClasses, widget: Widget, color: Color, later: Later, t: N.T) as use_;
+function useOther(dup: Dup, first: IfaceFirst, two: TwoClasses, merged: Merged, t: N.T) as use_other;

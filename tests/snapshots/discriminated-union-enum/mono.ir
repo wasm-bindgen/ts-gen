@@ -1,0 +1,56 @@
+ir 1;
+
+module "discriminated-union-enum" {
+  shape class Attachment {
+    new {};
+    get disposition: DispositionKind;
+    set disposition(value: DispositionKind) as set_disposition;
+    get contentId?: String | Undefined as content_id;
+    set contentId(value: String) as set_content_id;
+    get filename?: String | Undefined;
+    set filename(value: String) as set_filename;
+  }
+
+  shape class Reply {
+    new {};
+    get code: CodeKind;
+    set code(value: CodeKind) as set_code;
+    get body?: String | Undefined;
+    set body(value: String) as set_body;
+    get reason?: String | Undefined;
+    set reason(value: String) as set_reason;
+  }
+
+  shape class Payload {
+    new {};
+    get kind: KindKind;
+    set kind(value: KindKind) as set_kind;
+    get data: DataKind;
+    set data(value: String) as set_data;
+    set data(value: ArrayBuffer) as set_data_with_array_buffer;
+  }
+}
+
+kind DispositionKind {
+  Inline = "inline";
+  Attachment = "attachment";
+}
+
+kind CodeKind {
+  N200 = 200;
+  N404 = 404;
+}
+
+kind KindKind {
+  Text = "text";
+  Binary = "binary";
+}
+
+kind DataKind {
+  String = String;
+  ArrayBuffer = ArrayBuffer;
+}
+
+module "discriminated-union-enum" {
+  function send(attachment: Attachment, reply: Reply, payload: Payload) throws;
+}

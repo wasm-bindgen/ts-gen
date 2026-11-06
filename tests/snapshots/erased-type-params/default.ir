@@ -1,0 +1,74 @@
+ir 1;
+
+shape class ListKey<Metadata> {
+  new {}: ListKey;
+  get name: String;
+  set name(value: String) as set_name;
+  get metadata?: Metadata | Null | Undefined;
+  set metadata(value: Metadata | Null | Undefined) as set_metadata;
+}
+
+shape class ListResult<Metadata> {
+  new {}: ListResult;
+  get keys: Array<ListKey<Metadata | Null | Undefined>>;
+  set keys(value: Array<ListKey<Metadata | Null | Undefined>>) as set_keys;
+  get cursor: String;
+  set cursor(value: String) as set_cursor;
+}
+
+shape class Store {
+  get(key: String): Promise<String | Null>;
+  list(): Promise<ListResult<Any | Null | Undefined>>;
+  tag(level: String, count: f64);
+  bump(by: f64): f64;
+}
+
+class Target<EventMap> {
+  addEventListener(type: String, handler: (Any) => void) as add_event_listener;
+}
+
+shape class Env {
+  new {};
+  get KV: Store as kv;
+  set KV(value: Store) as set_kv;
+  get TYPED: Store as typed;
+  set TYPED(value: Store) as set_typed;
+}
+
+shape class Point {
+  new {};
+  get x: f64;
+  set x(value: f64) as set_x;
+  get y: f64;
+  set y(value: f64) as set_y;
+}
+
+shape class Slot<V> {
+  new {}: Slot;
+  get value: V | Null | Undefined;
+  set value(value: V | Null | Undefined) as set_value;
+}
+
+shape class Nested {
+  new {};
+  get indexed: f64;
+  set indexed(value: f64) as set_indexed;
+  get keys: V;
+  set keys(value: V) as set_keys;
+  get mapped: NestedMapped;
+  set mapped(value: NestedMapped) as set_mapped;
+  get literal: Array<String>;
+  set literal(value: Array<String>) as set_literal;
+}
+
+shape class NestedMapped {
+  new {};
+  get x: bool;
+  set x(value: bool) as set_x;
+  get y: bool;
+  set y(value: bool) as set_y;
+}
+
+kind V {
+  X = "x";
+}

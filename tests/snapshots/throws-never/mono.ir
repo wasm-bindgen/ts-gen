@@ -1,0 +1,32 @@
+ir 1;
+
+class NeverThrows {
+  /// Always succeeds — no `try_safe_op` companion.
+  safeOp(x: f64): String nothrow as safe_op;
+  /// Async, declared infallible — emits `async fn -> Loaded` (no Result).
+  loaded(): Promise<Loaded> nothrow;
+  /// Sync method without `@throws {never}` — keeps the `try_normal_op`
+  /// companion as usual.
+  normalOp(x: f64): String throws as normal_op;
+  /// Sync with a typed throws — keeps `try_typed_op` returning the
+  /// typed error. `Throws::Type` is the existing behavior.
+  ///
+  /// ## Errors
+  ///
+  /// * `RangeError`
+  typedOp(x: f64): String throws RangeError as typed_op;
+  /// Constructor with `@throws {never}` is a no-op — JS `new` can
+  /// always throw, so the constructor still catches.
+  new(name: String) throws;
+}
+
+shape class Loaded {
+  new {};
+  get ready: bool;
+}
+
+/// Free function with `@throws {never}` — no `try_pure_compute`.
+function pureCompute(x: f64): f64 nothrow as pure_compute;
+
+/// Async free function with `@throws {never}` — no Result wrapper.
+function infallibleFetch(url: String): Promise<String> nothrow as infallible_fetch;

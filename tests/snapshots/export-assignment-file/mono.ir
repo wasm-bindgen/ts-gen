@@ -1,0 +1,6 @@
+ir 1;
+
+module "export-assignment-file" {
+  function default(value: Any | Null | Undefined) throws as check;
+  function strictEqual(actual: Any | Null | Undefined, expected: Any | Null | Undefined): bool throws as strict_equal;
+}

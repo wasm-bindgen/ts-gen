@@ -1,0 +1,32 @@
+ir 1;
+
+module "generic-mono-review" {
+  class S {
+    get x: f64;
+  }
+
+  class S2 {
+    get x: f64;
+  }
+
+  class Holder<T> {
+    new(value: T | Null | Undefined): Holder throws;
+    get(): T | Null | Undefined;
+  }
+}
+
+kind LiteralUnionReturnKind {
+  A = "a";
+  B = "b";
+}
+
+module "generic-mono-review" {
+  function byAlias(id: String): String as by_alias;
+  function asyncByAlias(id: String): Promise<String> as async_by_alias;
+  function withS(s: S, s2: S2, name: String) as with_s;
+  function takesHolder(h: Holder<String>, g: Holder<String>) as takes_holder;
+  function holderOfId(): Holder<String> as holder_of_id;
+  function literalHolder(): Holder<String> as literal_holder;
+  function literalUnion(): LiteralUnionReturnKind as literal_union;
+  function shadowsAlias<Id>(h: Holder<Id | Null | Undefined>): Holder<Id | Null | Undefined> as shadows_alias;
+}

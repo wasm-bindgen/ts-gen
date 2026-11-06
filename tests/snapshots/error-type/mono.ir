@@ -1,0 +1,22 @@
+ir 1;
+
+shape class Foo {
+  /// Plain method — the `try_` companion uses the configured error type.
+  bar(x: f64): String throws;
+  /// Async method — `Result<T, crate::Error>`.
+  baz(): Promise<Number>;
+  /// Explicit `@throws` still wins over the configured default.
+  ///
+  /// ## Errors
+  ///
+  /// * `TypeError` — when input is invalid
+  parse(input: String): f64 throws TypeError;
+}
+
+class Resource {
+  /// Constructors always catch; the error type follows the flag.
+  new(path: String) throws;
+}
+
+/// Free function — same default-error rule.
+function fetchData(url: String): Promise<String> as fetch_data;

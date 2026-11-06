@@ -1160,6 +1160,7 @@ dependencies = [
  "similar",
  "syn 2.0.117",
  "tempfile",
+ "ts-gen-abi",
  "walkdir",
  "wasm-encoder",
  "wasmparser",

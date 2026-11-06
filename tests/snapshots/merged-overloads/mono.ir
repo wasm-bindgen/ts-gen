@@ -1,0 +1,35 @@
+ir 1;
+
+shape class Stream {
+  write(data: bool) throws;
+  write(data: String) throws as write_with_str;
+  write(data: f64) throws as write_with_f64;
+  get size: f64;
+}
+
+class Widget {
+  draw(x: f64) throws;
+  draw(x: String) throws as draw_with_str;
+}
+
+class Gadget {
+  run(x: String) throws;
+  run(x: f64) throws as run_with_f64;
+}
+
+shape class Clock {
+  now(x: String): Date throws;
+}
+
+class Codec {
+  new(id: f64) throws;
+  new(name: String) throws as new_with_name;
+  static from(input: ArrayBuffer): Codec throws;
+  static from(input: String): Codec throws as from_with_str;
+  encode(input: String): String throws;
+}
+
+shape class Box {
+  put(x: f64) throws;
+  put(x: String) throws as put_with_str;
+}

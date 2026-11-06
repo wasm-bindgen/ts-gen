@@ -1,0 +1,14 @@
+ir 1;
+
+module "x:foo" {
+  class Bar {
+    new(name: String) throws;
+    name(): String throws;
+  }
+}
+
+module "x:uses" {
+  shape class UsesBar {
+    method(b: "x:foo".Bar) throws;
+  }
+}

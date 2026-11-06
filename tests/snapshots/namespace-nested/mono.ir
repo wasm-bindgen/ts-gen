@@ -1,0 +1,30 @@
+ir 1;
+
+static class Outer {}
+
+static class Outer.Inner {
+  static run() throws;
+  static get LIMIT: f64 as limit;
+}
+
+class Outer.Inner.Thing {
+  static make(): Outer.Inner.Thing throws;
+}
+
+static class Other {}
+
+static class Other.Inner {}
+
+kind Outer.Inner.Kind {
+  A = "a";
+  B = "b";
+}
+
+kind Outer.Inner.Level {
+  One = 1;
+}
+
+kind Other.Inner.Kind {
+  X = "x";
+  Y = "y";
+}

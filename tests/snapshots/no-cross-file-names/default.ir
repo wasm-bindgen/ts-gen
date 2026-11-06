@@ -1,0 +1,12 @@
+ir 1;
+
+module "no-cross-file-names" {
+  function useSecret(s: Secret | Null | Undefined) as use_secret;
+  function useShared(s: Shared | Null | Undefined) as use_shared;
+  function a();
+  function b();
+}
+
+module "no-cross-file-names-dep" {
+  function useHidden(h: Hidden | Null | Undefined) as use_hidden;
+}

@@ -1,0 +1,12 @@
+ir 1;
+
+module "alias-reexport-cycle" {
+  class Position {
+    get lineNumber: f64 as line_number;
+    set lineNumber(value: f64) as set_line_number;
+  }
+
+  static class m {
+    static at(p: Position): Position throws;
+  }
+}

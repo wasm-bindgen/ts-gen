@@ -8,9 +8,9 @@
   ;; Sole-rest variadic instance method: Console.log(this, ...args)
   (import "./bindings.wasm" "Console.log" (func $Console.log (param externref (ref null $anyrefs))))
   ;; Fixed+rest variadic free function: joinAll(sep, ...parts)
-  (import "./bindings.wasm" "joinAll" (func $joinAll (param externref (ref null $anyrefs)) (result externref)))
-  (import "./bindings.wasm" "restLog" (func $restLog (param (ref null $anyrefs))))
-  (import "./bindings.wasm" "arrLog" (func $arrLog (param externref (ref null $anyrefs))))
+  (import "./bindings.wasm" "join_all" (func $joinAll (param externref (ref null $anyrefs)) (result externref)))
+  (import "./bindings.wasm" "rest_log" (func $restLog (param (ref null $anyrefs))))
+  (import "./bindings.wasm" "arr_log" (func $arrLog (param externref (ref null $anyrefs))))
 
   (import "wasm:js/string-constants" "Hello" (global $hello externref))
   (import "wasm:js/string-constants" "World" (global $world externref))

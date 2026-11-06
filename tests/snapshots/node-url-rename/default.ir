@@ -1,0 +1,12 @@
+ir 1;
+
+module "node:url" {
+  class URL as _URL {
+    new(input: String) throws;
+    get href: String;
+    static canParse(input: String): bool as can_parse;
+  }
+  alias URL = _URL;
+
+  function fileURLToPath(url: String): String as file_url_to_path;
+}

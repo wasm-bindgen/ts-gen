@@ -1,0 +1,88 @@
+ir 1;
+
+static class Shapes {
+  static pick(kind: f64): PickReturnKind;
+  static pickAny(kind: f64): PickAnyReturnKind as pick_any;
+  static pickOrText(kind: f64): PickOrTextReturnKind as pick_or_text;
+}
+
+shape class Shapes.RoundingOptions {
+  new {};
+  get smallestUnit?: Shapes.Unit | Undefined as smallest_unit;
+  set smallestUnit(value: Shapes.Unit) as set_smallest_unit;
+  get roundingIncrement?: Number | Undefined as rounding_increment;
+  set roundingIncrement(value: f64) as set_rounding_increment;
+}
+
+shape class Shapes.Handle {
+  close();
+}
+
+class Shapes.Span {
+  new(hours: f64) throws;
+  new(hours: f64, unit: Shapes.Unit) throws as new_with_unit;
+  get hours: f64;
+  get unit: Shapes.Unit;
+  round(options: Shapes.RoundingOptions): Shapes.Span;
+  handle(): Shapes.Handle;
+}
+
+class Shapes.Ticket {
+  new(id: f64) throws;
+  get id: f64;
+}
+
+shape class Shapes.Init {
+  new {};
+  get body?: String | Undefined;
+  set body(value: String) as set_body;
+}
+
+shape class GlobalInit {
+  new {};
+  get status?: Number | Undefined;
+  set status(value: f64) as set_status;
+}
+
+module "shape-checks" {
+  shape class ModuleOptions {
+    new {};
+    get verbose?: Boolean | Undefined;
+    set verbose(value: bool) as set_verbose;
+  }
+
+  shape class Choice {
+    new {};
+    get kind: KindKind;
+    set kind(value: KindKind) as set_kind;
+    get a?: Number | Undefined;
+    set a(value: f64) as set_a;
+    get b?: String | Undefined;
+    set b(value: String) as set_b;
+  }
+}
+
+kind Shapes.Unit {
+  Hour = "hour";
+  Minute = "minute";
+}
+
+kind PickReturnKind fallback {
+  Ticket = Shapes.Ticket;
+  RoundingOptions = Shapes.RoundingOptions;
+}
+
+kind PickAnyReturnKind fallback {
+  Ticket = Shapes.Ticket;
+  Object = Object;
+}
+
+kind PickOrTextReturnKind fallback {
+  String = String;
+  RoundingOptions = Shapes.RoundingOptions;
+}
+
+kind KindKind {
+  A = "a";
+  B = "b";
+}

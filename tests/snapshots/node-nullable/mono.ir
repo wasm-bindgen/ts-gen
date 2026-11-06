@@ -1,0 +1,72 @@
+ir 1;
+
+module "node-nullable" {
+  shape class Options {
+    new {};
+    /// `undefined` takes the default; `null` means "no label".
+    get label?: String | Null | Undefined;
+    set label(value: String) as set_label;
+    set label(value: Null) as set_label_with_null;
+  }
+
+  /// `null` disables the fallback; `undefined` takes the default `"anon"`.
+  function describe(name: String): String throws;
+
+  /// `null` disables the fallback; `undefined` takes the default `"anon"`.
+  function describe(name: Null): String throws as describe_with_null;
+
+  /// `undefined` takes the default `1`.
+  function repeat(): String throws;
+
+  /// `undefined` takes the default `1`.
+  function repeat(count: f64): String throws as repeat_with_count;
+
+  /// Omitted, explicit `null`, or a value: three distinct inputs.
+  function greet(): String throws;
+
+  /// Omitted, explicit `null`, or a value: three distinct inputs.
+  function greet(name: String): String throws as greet_with_name;
+
+  /// Omitted, explicit `null`, or a value: three distinct inputs.
+  function greet(name: Null): String throws as greet_with_null;
+
+  /// Returns `null` for an unknown key and `undefined` for a known empty one.
+  function lookup(key: String): String | Null | Undefined throws;
+
+  /// `lookup`, resolved asynchronously.
+  function lookupAsync(key: String): Promise<String | Null | Undefined> throws as lookup_async;
+
+  /// Resolves to `null` for an unknown key.
+  function find(key: String): Promise<Options | Null> throws;
+
+  /// Tells `undefined`, `null` and a value apart.
+  function classify(): String throws;
+
+  /// Tells `undefined`, `null` and a value apart.
+  function classify(value: String): String throws as classify_with_value;
+
+  /// Tells `undefined`, `null` and a value apart.
+  function classify(value: Null): String throws as classify_with_null;
+
+  /// An `Options` whose `label` is missing, `undefined`, `null` or `"x"`.
+  function options(label: String): Options throws;
+  function configure(options: Options): String throws;
+
+  /// How many arguments arrived, and what the last one was.
+  function arity(): String throws;
+
+  /// How many arguments arrived, and what the last one was.
+  function arity(a: String): String throws as arity_with_a;
+
+  /// How many arguments arrived, and what the last one was.
+  function arity(a: String | Undefined, b: f64): String throws as arity_with_a_and_b;
+
+  /// How many arguments arrived, and what the last one was.
+  function arity(a: String | Undefined, b: Null): String throws as arity_with_a_and_null;
+
+  /// A non-trailing `undefined` is passed, not omitted.
+  function pick(a: String | Undefined, b: f64): String throws;
+
+  /// Reports how many arguments arrived and the first.
+  function onlyNull(value: Null): String throws as only_null_with_null;
+}

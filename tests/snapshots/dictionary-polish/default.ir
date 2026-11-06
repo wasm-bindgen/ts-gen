@@ -1,0 +1,87 @@
+ir 1;
+
+static class Polish {}
+
+shape class Polish.BoxLikeObject {
+  new {};
+  get id: String;
+  set id(value: String) as set_id;
+  get width?: Number | Undefined;
+  set width(value: f64) as set_width;
+  get height: f64;
+  set height(value: f64) as set_height;
+}
+
+shape class Polish.TimeLikeObject {
+  new {};
+  get hour?: Number | Undefined;
+  set hour(value: f64) as set_hour;
+  get minute?: Number | Undefined;
+  set minute(value: f64) as set_minute;
+}
+
+shape class Polish.Options {
+  new {};
+  get box?: Polish.PartialBoxLikeObject | Undefined as box_;
+  set box(value: Polish.PartialBoxLikeObject) as set_box;
+  get time?: Polish.TimeLikeObject | Undefined;
+  set time(value: Polish.TimeLikeObject) as set_time;
+  get omitted?: Polish.PartialOmitLikeBoxLikeObject | Undefined;
+  set omitted(value: Polish.PartialOmitLikeBoxLikeObject) as set_omitted;
+  get unit?: Polish.PluralizeTimeUnit | Undefined;
+  set unit(value: Polish.PluralizeTimeUnit) as set_unit;
+}
+
+shape class Polish.Holder<T> {
+  new {}: Polish.Holder;
+  get value?: T | Null | Undefined;
+  set value(value: T | Null | Undefined) as set_value;
+}
+
+shape class Polish.Transition {
+  new {};
+  get direction: DirectionKind;
+  set direction(value: DirectionKind) as set_direction;
+}
+
+shape class Polish.PartialBoxLikeObject {
+  new {};
+  get width?: Number | Undefined;
+  set width(value: f64) as set_width;
+  get height?: Number | Undefined;
+  set height(value: f64) as set_height;
+}
+
+shape class Polish.PartialOmitLikeBoxLikeObject {
+  new {};
+  get width?: Number | Undefined;
+  set width(value: f64) as set_width;
+  get height?: Number | Undefined;
+  set height(value: f64) as set_height;
+}
+
+kind Polish.TimeUnit {
+  Hour = "hour";
+  Minute = "minute";
+}
+
+kind Polish.PluralizeUnit {
+  Day = "day";
+  Hour = "hour";
+  Minute = "minute";
+  Days = "days";
+  Hours = "hours";
+  Minutes = "minutes";
+}
+
+kind Polish.PluralizeTimeUnit {
+  Hour = "hour";
+  Minute = "minute";
+  Hours = "hours";
+  Minutes = "minutes";
+}
+
+kind DirectionKind {
+  Next = "next";
+  Previous = "previous";
+}

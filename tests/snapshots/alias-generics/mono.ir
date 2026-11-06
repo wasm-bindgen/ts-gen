@@ -1,0 +1,38 @@
+ir 1;
+
+shape class Request<Meta> {
+  new {}: Request;
+  get meta: Meta | Null | Undefined;
+}
+
+class Client {
+  send(input: Request<Request>) throws;
+  send(input: String) throws as send_with_str;
+  sendDefault(input: Request<Any | Null | Undefined>) throws as send_default;
+  sendDefault(input: String) throws as send_default_with_str;
+  pairs(): Promise<[Number, String]>;
+  same(): Promise<[Number, Number]>;
+  boxed(items: Array<String>) throws;
+}
+
+module "shapes" {
+  shape class _Shape {
+    new {};
+    get sides: f64;
+  }
+  alias Shape = _Shape;
+  alias Polygon = _Shape;
+}
+
+module "hidden" {
+  shape class Hidden {
+    new {};
+    get h: f64;
+  }
+}
+
+module "uses" {
+  function tag(t: [String, "shapes"._Shape]) throws;
+  function triple(t: [Number, String, "hidden".Hidden]) throws;
+  function either(e: Any) throws;
+}

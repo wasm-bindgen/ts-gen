@@ -1,0 +1,9 @@
+ir 1;
+
+module "export-default-module-file" {
+  class default as Widget {
+    new(name: String) throws;
+    static create(): Widget;
+  }
+  alias default = Widget;
+}

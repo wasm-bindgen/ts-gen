@@ -1,0 +1,21 @@
+ir 1;
+
+module "ambient-enum-members" {
+  kind Mixed {
+    A = 1;
+    C = 4;
+  }
+
+  kind Numbered {
+    A = 0;
+    B = 1;
+    C = 10;
+    D = 11;
+  }
+
+  kind AfterString {
+    A = "a";
+  }
+
+  function useAll(computed: f64, mixed: Mixed, numbered: Numbered, after_string: AfterString) throws as use_all;
+}

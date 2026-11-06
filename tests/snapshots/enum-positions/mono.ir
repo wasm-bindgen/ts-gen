@@ -1,0 +1,86 @@
+ir 1;
+
+module "enum-positions" {
+  static class Codes {}
+
+  class Holder<T> {
+    new(value: T | Null | Undefined): Holder throws;
+    get(): T | Null | Undefined throws;
+    set(value: T | Null | Undefined) throws;
+  }
+
+  shape class Details<T> {
+    new {}: Details;
+    get value: T | Null | Undefined;
+    set value(value: T | Null | Undefined) as set_value;
+    get fallback?: T | Null | Undefined;
+    set fallback(value: T | Null | Undefined) as set_fallback;
+  }
+
+  class Probe {
+    get level: Level;
+    set level(value: Level) as set_level;
+    region(r: Codes.Region) throws;
+    regionOf(): Codes.Region throws as region_of;
+    alias(m: Mode) throws;
+    levels(ls: Array<Level>): Array<Level> throws;
+    modes(ms: Array<Mode>): Array<Mode> throws;
+    modeArray(ms: Array<Mode>): Array<Mode> throws as mode_array;
+    rest(...ms: Array<Mode>) throws;
+    onMode(cb: (Mode) => Level) throws as on_mode;
+    nextMode(): Promise<Mode> throws as next_mode;
+    maybeMode(): Promise<Mode | Null> throws as maybe_mode;
+    modeMap(): Map<String, Mode> throws as mode_map;
+    modeRecord(): Record<Mode> throws as mode_record;
+    pair(): [Mode, Level] throws;
+    modeOrNumber(): ModeOrNumberReturnKind throws as mode_or_number;
+    modeOrString(): ModeOrStringReturnKind throws as mode_or_string;
+    modeOrRegion(): ModeOrRegionReturnKind throws as mode_or_region;
+    levelOrString(): LevelOrStringReturnKind throws as level_or_string;
+    holder(h: Holder<Mode>): Holder<Level> throws;
+    details(d: Details<Mode>): Details<Level> throws;
+    maybeHolder(): Holder<Mode | Null> throws as maybe_holder;
+    nextLevel(): Promise<Level | Undefined> throws as next_level;
+    nextDetails(): Promise<Details<Mode>> throws as next_details;
+    modeOrNumberArg(x: Mode): ModeOrNumberReturnKind throws as mode_or_number_arg;
+    modeOrNumberArg(x: f64): ModeOrNumberReturnKind throws as mode_or_number_arg_with_f64;
+    modeOrNumberOrString(x: Mode) throws as mode_or_number_or_string;
+    modeOrNumberOrString(x: f64) throws as mode_or_number_or_string_with_f64;
+    modeOrNumberOrString(x: String) throws as mode_or_number_or_string_with_str;
+  }
+
+  kind Mode {
+    Fast = "fast";
+    Slow = "slow";
+  }
+
+  kind Level {
+    Low = 1;
+    High = 2;
+  }
+
+  kind Codes.Region {
+    Eu = "eu";
+    Us = "us";
+  }
+}
+
+kind ModeOrNumberReturnKind {
+  Mode = "enum-positions".Mode;
+  F64 = Number;
+}
+
+kind ModeOrStringReturnKind {
+  Mode = "enum-positions".Mode;
+  String = String;
+}
+
+kind ModeOrRegionReturnKind {
+  Mode = "enum-positions".Mode;
+  Region = "enum-positions".Codes.Region;
+}
+
+kind LevelOrStringReturnKind {
+  Level = "enum-positions".Level;
+  String = String;
+}

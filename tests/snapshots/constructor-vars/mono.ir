@@ -1,0 +1,56 @@
+ir 1;
+
+static class N {}
+
+class N.Foo {
+  new() throws;
+  static create(): N.Foo throws;
+  go() throws;
+}
+
+class N.Before {
+  new(x: f64) throws;
+  b() throws;
+}
+
+static class R {}
+
+class R.Q {
+  new() throws;
+  q() throws;
+}
+
+class R.P {
+  new() throws;
+  p() throws;
+}
+
+class W {
+  new() throws;
+  static make(): W throws;
+  w() throws;
+}
+
+module "m" {
+  class W {
+    new() throws;
+    static make(): globalThis.W throws;
+  }
+}
+
+class Multi {
+  new() throws;
+  new(n: f64) throws as new_with_n;
+  new(s: String, n: f64) throws as new_with_s_and_n;
+  m() throws;
+}
+
+static class Ctors {}
+
+static class Q {}
+
+class Q.Qual {
+  new() throws;
+  static make(): Q.Qual throws;
+  q() throws;
+}

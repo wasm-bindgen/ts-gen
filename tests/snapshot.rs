@@ -8,7 +8,8 @@
 //! `diff` between siblings.
 //!
 //! The harness also runs `--target wat` for each fixture and configuration,
-//! producing a `tests/snapshots/<name>/<config>.wat` alongside the `.rs`. The
+//! producing a `tests/snapshots/<name>/<config>.wat` alongside the `.rs`, and
+//! `--target ir` into `<config>.ir`, which must read back as it was written. The
 //! WAT output is validated with `wat::parse_str` and `wasmparser` to ensure it
 //! assembles and passes validation.
 //!
@@ -229,44 +230,47 @@ fn snapshot_test(fixture_name: &str) {
             }
         }
 
-        // Run --target wat
-        let out_file_wat = config_dir.join("bindings.wat");
-        let snap_path_wat = snap_dir.join(format!("{config_name}.wat"));
-        let output_wat = Command::new(ts_gen_bin())
-            .arg("--input")
-            .arg(&fixture)
-            .arg("--output")
-            .arg(&out_file_wat)
-            .arg("--target")
-            .arg("wat")
-            .args(&extra_args)
-            .args(*config_args)
-            .output()
-            .expect("Failed to execute ts-gen binary for WAT");
-
-        if !output_wat.status.success() {
-            let stderr = String::from_utf8_lossy(&output_wat.stderr);
-            let stdout = String::from_utf8_lossy(&output_wat.stdout);
-            panic!(
-                "ts-gen --target wat failed for {fixture_name} ({config_name}):\n\
-                 exit code: {:?}\n\
-                 stderr:\n{stderr}\n\
-                 stdout:\n{stdout}",
-                output_wat.status.code()
-            );
+        for (target, validate) in [("wat", validate_wat as fn(&str, &str)), ("ir", validate_ir)] {
+            let out_file = config_dir.join(format!("bindings.{target}"));
+            let output = Command::new(ts_gen_bin())
+                .arg("--input")
+                .arg(&fixture)
+                .arg("--output")
+                .arg(&out_file)
+                .arg("--target")
+                .arg(target)
+                .args(&extra_args)
+                .args(*config_args)
+                .output()
+                .expect("Failed to execute ts-gen binary");
+            if !output.status.success() {
+                panic!(
+                    "ts-gen --target {target} failed for {fixture_name} ({config_name}):\n\
+                     exit code: {:?}\n\
+                     stderr:\n{}",
+                    output.status.code(),
+                    String::from_utf8_lossy(&output.stderr),
+                );
+            }
+            let code = std::fs::read_to_string(&out_file)
+                .unwrap_or_else(|e| panic!("Failed to read {}: {e}", out_file.display()));
+            validate(&code, fixture_name);
+            assert_snapshot(&snap_dir.join(format!("{config_name}.{target}")), &code);
         }
+    }
+}
 
-        let wat_code = std::fs::read_to_string(&out_file_wat).unwrap_or_else(|e| {
-            panic!(
-                "Failed to read generated WAT output {}: {e}",
-                out_file_wat.display()
-            )
-        });
-
-        // Validate the WAT assembles and passes Wasm validation
-        validate_wat(&wat_code, fixture_name);
-
-        assert_snapshot(&snap_path_wat, &wat_code);
+/// The IR text reads back to a model that writes the same text.
+fn validate_ir(text: &str, fixture_name: &str) {
+    let ir = ts_gen_abi::text::parse(text)
+        .unwrap_or_else(|e| panic!("IR does not read back for {fixture_name}: {e}"));
+    let rewritten = ts_gen_abi::text::emit(&ir);
+    if rewritten != text {
+        let diff = similar::TextDiff::from_lines(text, &rewritten);
+        panic!(
+            "IR for {fixture_name} does not round-trip:\n{}",
+            diff.unified_diff().header("written", "read back")
+        );
     }
 }
 

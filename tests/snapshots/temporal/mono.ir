@@ -1,0 +1,1692 @@
+ir 1;
+
+static class Temporal {}
+
+shape class Temporal.DateLikeObject {
+  new {};
+  get year?: Number | Undefined;
+  set year(value: f64) as set_year;
+  get era?: String | Undefined;
+  set era(value: String) as set_era;
+  get eraYear?: Number | Undefined as era_year;
+  set eraYear(value: f64) as set_era_year;
+  get month?: Number | Undefined;
+  set month(value: f64) as set_month;
+  get monthCode?: String | Undefined as month_code;
+  set monthCode(value: String) as set_month_code;
+  get day: f64;
+  set day(value: f64) as set_day;
+  get calendar?: Temporal.CalendarLike | Undefined;
+  set calendar(value: Temporal.CalendarLike) as set_calendar;
+}
+
+shape class Temporal.DateTimeLikeObject extends Temporal.DateLikeObject, Temporal.TimeLikeObject {
+  new {};
+  get hour?: Number | Undefined;
+  set hour(value: f64) as set_hour;
+  get minute?: Number | Undefined;
+  set minute(value: f64) as set_minute;
+  get second?: Number | Undefined;
+  set second(value: f64) as set_second;
+  get millisecond?: Number | Undefined;
+  set millisecond(value: f64) as set_millisecond;
+  get microsecond?: Number | Undefined;
+  set microsecond(value: f64) as set_microsecond;
+  get nanosecond?: Number | Undefined;
+  set nanosecond(value: f64) as set_nanosecond;
+}
+
+shape class Temporal.DurationLikeObject {
+  new {};
+  get years?: Number | Undefined;
+  set years(value: f64) as set_years;
+  get months?: Number | Undefined;
+  set months(value: f64) as set_months;
+  get weeks?: Number | Undefined;
+  set weeks(value: f64) as set_weeks;
+  get days?: Number | Undefined;
+  set days(value: f64) as set_days;
+  get hours?: Number | Undefined;
+  set hours(value: f64) as set_hours;
+  get minutes?: Number | Undefined;
+  set minutes(value: f64) as set_minutes;
+  get seconds?: Number | Undefined;
+  set seconds(value: f64) as set_seconds;
+  get milliseconds?: Number | Undefined;
+  set milliseconds(value: f64) as set_milliseconds;
+  get microseconds?: Number | Undefined;
+  set microseconds(value: f64) as set_microseconds;
+  get nanoseconds?: Number | Undefined;
+  set nanoseconds(value: f64) as set_nanoseconds;
+}
+
+shape class Temporal.TimeLikeObject {
+  new {};
+  get hour?: Number | Undefined;
+  set hour(value: f64) as set_hour;
+  get minute?: Number | Undefined;
+  set minute(value: f64) as set_minute;
+  get second?: Number | Undefined;
+  set second(value: f64) as set_second;
+  get millisecond?: Number | Undefined;
+  set millisecond(value: f64) as set_millisecond;
+  get microsecond?: Number | Undefined;
+  set microsecond(value: f64) as set_microsecond;
+  get nanosecond?: Number | Undefined;
+  set nanosecond(value: f64) as set_nanosecond;
+}
+
+shape class Temporal.YearMonthLikeObject {
+  new {};
+  get year?: Number | Undefined;
+  set year(value: f64) as set_year;
+  get era?: String | Undefined;
+  set era(value: String) as set_era;
+  get eraYear?: Number | Undefined as era_year;
+  set eraYear(value: f64) as set_era_year;
+  get month?: Number | Undefined;
+  set month(value: f64) as set_month;
+  get monthCode?: String | Undefined as month_code;
+  set monthCode(value: String) as set_month_code;
+  get calendar?: Temporal.CalendarLike | Undefined;
+  set calendar(value: Temporal.CalendarLike) as set_calendar;
+}
+
+shape class Temporal.ZonedDateTimeLikeObject extends Temporal.DateTimeLikeObject {
+  new {};
+  get timeZone: Temporal.TimeZoneLike as time_zone;
+  set timeZone(value: Temporal.TimeZoneLike) as set_time_zone;
+  get offset?: String | Undefined;
+  set offset(value: String) as set_offset;
+}
+
+shape class Temporal.DisambiguationOptions {
+  new {};
+  get disambiguation?: DisambiguationKind | Undefined;
+  set disambiguation(value: DisambiguationKind) as set_disambiguation;
+}
+
+shape class Temporal.OverflowOptions {
+  new {};
+  get overflow?: OverflowKind | Undefined;
+  set overflow(value: OverflowKind) as set_overflow;
+}
+
+shape class Temporal.TransitionOptions {
+  new {};
+  get direction: DirectionKind;
+  set direction(value: DirectionKind) as set_direction;
+}
+
+shape class Temporal.RoundingOptions<Units> {
+  new {}: Temporal.RoundingOptions;
+  get smallestUnit?: Temporal.PluralizeUnit | Undefined as smallest_unit;
+  set smallestUnit(value: Temporal.PluralizeUnit) as set_smallest_unit;
+  get roundingIncrement?: Number | Undefined as rounding_increment;
+  set roundingIncrement(value: f64) as set_rounding_increment;
+  get roundingMode?: RoundingModeKind | Undefined as rounding_mode;
+  set roundingMode(value: RoundingModeKind) as set_rounding_mode;
+}
+
+shape class Temporal.RoundToOptions<Units> extends Temporal.RoundingOptions<Units | Null | Undefined> {
+  new {}: Temporal.RoundToOptions;
+  get smallestUnit: Temporal.PluralizeUnit as smallest_unit;
+  set smallestUnit(value: Temporal.PluralizeUnit) as set_smallest_unit;
+}
+
+shape class Temporal.RoundingOptionsWithLargestUnit<Units> extends Temporal.RoundingOptions<Units | Null | Undefined> {
+  new {}: Temporal.RoundingOptionsWithLargestUnit;
+  get largestUnit?: LargestUnitKind | Undefined as largest_unit;
+  set largestUnit(value: LargestUnitKind) as set_largest_unit;
+}
+
+shape class Temporal.ToStringRoundingOptions<Units> {
+  new {}: Temporal.ToStringRoundingOptions;
+  get smallestUnit?: Temporal.PluralizeUnit | Undefined as smallest_unit;
+  set smallestUnit(value: Temporal.PluralizeUnit) as set_smallest_unit;
+  get roundingMode?: RoundingModeKind | Undefined as rounding_mode;
+  set roundingMode(value: RoundingModeKind) as set_rounding_mode;
+}
+
+shape class Temporal.ToStringRoundingOptionsWithFractionalSeconds<Units> extends Temporal.ToStringRoundingOptions<Units | Null | Undefined> {
+  new {}: Temporal.ToStringRoundingOptionsWithFractionalSeconds;
+  get fractionalSecondDigits?: FractionalSecondDigitsKind | Undefined as fractional_second_digits;
+  set fractionalSecondDigits(value: FractionalSecondDigitsKind) as set_fractional_second_digits;
+  set fractionalSecondDigits(value: f64) as set_fractional_second_digits_with_f64;
+}
+
+static class Temporal.Now {
+  static timeZoneId(): String throws as time_zone_id;
+  static instant(): Temporal.Instant throws;
+  static plainDateTimeISO(): Temporal.PlainDateTime throws as plain_date_time_iso;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the time zone is unknown
+  static plainDateTimeISO(time_zone: Temporal.TimeZoneLike): Temporal.PlainDateTime throws RangeError as plain_date_time_iso_with_time_zone;
+  static zonedDateTimeISO(): Temporal.ZonedDateTime throws as zoned_date_time_iso;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the time zone is unknown
+  static zonedDateTimeISO(time_zone: Temporal.TimeZoneLike): Temporal.ZonedDateTime throws RangeError as zoned_date_time_iso_with_time_zone;
+  static plainDateISO(): Temporal.PlainDate throws as plain_date_iso;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the time zone is unknown
+  static plainDateISO(time_zone: Temporal.TimeZoneLike): Temporal.PlainDate throws RangeError as plain_date_iso_with_time_zone;
+  static plainTimeISO(): Temporal.PlainTime throws as plain_time_iso;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the time zone is unknown
+  static plainTimeISO(time_zone: Temporal.TimeZoneLike): Temporal.PlainTime throws RangeError as plain_time_iso_with_time_zone;
+}
+
+shape class Temporal.PlainDateToStringOptions {
+  new {};
+  get calendarName?: CalendarNameKind | Undefined as calendar_name;
+  set calendarName(value: CalendarNameKind) as set_calendar_name;
+}
+
+shape class Temporal.PlainDateToZonedDateTimeOptions {
+  new {};
+  get plainTime?: Temporal.PlainTimeLike | Undefined as plain_time;
+  set plainTime(value: Temporal.PlainTimeLike) as set_plain_time;
+  get timeZone: Temporal.TimeZoneLike as time_zone;
+  set timeZone(value: Temporal.TimeZoneLike) as set_time_zone;
+}
+
+class Temporal.PlainDate {
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, iso_day: f64) throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, iso_day: f64, calendar: String) throws RangeError as new_with_calendar;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.PlainDateLike): Temporal.PlainDate throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.PlainDateLike, options: Temporal.OverflowOptions): Temporal.PlainDate throws RangeError | TypeError as from_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown
+  /// * `TypeError` — if an object is missing the fields it needs
+  static compare(one: Temporal.PlainDateLike, two: Temporal.PlainDateLike): f64 throws RangeError | TypeError;
+  get calendarId: String as calendar_id;
+  get era: String | Undefined;
+  get eraYear: Number | Undefined as era_year;
+  get year: f64;
+  get month: f64;
+  get monthCode: String as month_code;
+  get day: f64;
+  get dayOfWeek: f64 as day_of_week;
+  get dayOfYear: f64 as day_of_year;
+  get weekOfYear: Number | Undefined as week_of_year;
+  get yearOfWeek: Number | Undefined as year_of_week;
+  get daysInWeek: f64 as days_in_week;
+  get daysInMonth: f64 as days_in_month;
+  get daysInYear: f64 as days_in_year;
+  get monthsInYear: f64 as months_in_year;
+  get inLeapYear: bool as in_leap_year;
+  toPlainYearMonth(): Temporal.PlainYearMonth throws as to_plain_year_month;
+  toPlainMonthDay(): Temporal.PlainMonthDay throws as to_plain_month_day;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(duration: Temporal.DurationLike): Temporal.PlainDate throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(duration: Temporal.DurationLike, options: Temporal.OverflowOptions): Temporal.PlainDate throws RangeError | TypeError as add_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(duration: Temporal.DurationLike): Temporal.PlainDate throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(duration: Temporal.DurationLike, options: Temporal.OverflowOptions): Temporal.PlainDate throws RangeError | TypeError as subtract_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(date_like: Temporal.PartialDateLikeObject): Temporal.PlainDate throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(date_like: Temporal.PartialDateLikeObject, options: Temporal.OverflowOptions): Temporal.PlainDate throws RangeError | TypeError as with_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendar is unknown
+  withCalendar(calendar_like: Temporal.CalendarLike): Temporal.PlainDate throws RangeError as with_calendar;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  until(other: Temporal.PlainDateLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  until(other: Temporal.PlainDateLike, options: Temporal.RoundingOptionsWithLargestUnit<Temporal.DateUnit>): Temporal.Duration throws RangeError | TypeError as until_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  since(other: Temporal.PlainDateLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  since(other: Temporal.PlainDateLike, options: Temporal.RoundingOptionsWithLargestUnit<Temporal.DateUnit>): Temporal.Duration throws RangeError | TypeError as since_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown
+  /// * `TypeError` — if an object is missing the fields it needs
+  equals(other: Temporal.PlainDateLike): bool throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the result is out of range
+  toPlainDateTime(): Temporal.PlainDateTime throws RangeError as to_plain_date_time;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  toPlainDateTime(time: Temporal.PlainTimeLike): Temporal.PlainDateTime throws RangeError | TypeError as to_plain_date_time_with_time;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the time zone is unknown, or the result is out of range
+  toZonedDateTime(time_zone: Temporal.TimeZoneLike): Temporal.ZonedDateTime throws RangeError as to_zoned_date_time;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the time zone is unknown, a string does not parse, a field is out of range, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  toZonedDateTime(item: Temporal.PlainDateToZonedDateTimeOptions): Temporal.ZonedDateTime throws RangeError | TypeError as to_zoned_date_time_with_item;
+  toString(): String throws as to_string;
+  toString(options: Temporal.PlainDateToStringOptions): String throws as to_string_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(): String throws RangeError | TypeError as to_locale_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String): String throws RangeError | TypeError as to_locale_string_with_str;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>): String throws RangeError | TypeError as to_locale_string_with_slice;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String | Undefined, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_str_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_slice_and_options;
+  toJSON(): String throws as to_json;
+  valueOf() throws as value_of;
+}
+
+shape class Temporal.PlainTimeToStringOptions extends Temporal.ToStringRoundingOptionsWithFractionalSeconds<Exclude<Temporal.TimeUnit, "hour"> | Null | Undefined> {
+  new {};
+}
+
+class Temporal.PlainTime {
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new() throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(hour: f64) throws RangeError as new_with_hour;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(hour: Number | Undefined, minute: f64) throws RangeError as new_with_hour_and_minute;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(hour: Number | Undefined, minute: Number | Undefined, second: f64) throws RangeError as new_with_hour_and_minute_and_second;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(hour: Number | Undefined, minute: Number | Undefined, second: Number | Undefined, millisecond: f64) throws RangeError as new_with_hour_and_minute_and_second_and_millisecond;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(hour: Number | Undefined, minute: Number | Undefined, second: Number | Undefined, millisecond: Number | Undefined, microsecond: f64) throws RangeError as new_with_hour_and_minute_and_second_and_millisecond_and_microsecond;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(hour: Number | Undefined, minute: Number | Undefined, second: Number | Undefined, millisecond: Number | Undefined, microsecond: Number | Undefined, nanosecond: f64) throws RangeError as new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.PlainTimeLike): Temporal.PlainTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.PlainTimeLike, options: Temporal.OverflowOptions): Temporal.PlainTime throws RangeError | TypeError as from_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static compare(one: Temporal.PlainTimeLike, two: Temporal.PlainTimeLike): f64 throws RangeError | TypeError;
+  get hour: f64;
+  get minute: f64;
+  get second: f64;
+  get millisecond: f64;
+  get microsecond: f64;
+  get nanosecond: f64;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(duration: Temporal.DurationLike): Temporal.PlainTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(duration: Temporal.DurationLike): Temporal.PlainTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(time_like: Temporal.TimeLikeObject): Temporal.PlainTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(time_like: Temporal.TimeLikeObject, options: Temporal.OverflowOptions): Temporal.PlainTime throws RangeError | TypeError as with_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  until(other: Temporal.PlainTimeLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  until(other: Temporal.PlainTimeLike, options: Temporal.RoundingOptionsWithLargestUnit<Temporal.TimeUnit>): Temporal.Duration throws RangeError | TypeError as until_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  since(other: Temporal.PlainTimeLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  since(other: Temporal.PlainTimeLike, options: Temporal.RoundingOptionsWithLargestUnit<Temporal.TimeUnit>): Temporal.Duration throws RangeError | TypeError as since_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  equals(other: Temporal.PlainTimeLike): bool throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the rounding options are invalid
+  round(round_to: Temporal.PluralizeTimeUnit): Temporal.PlainTime throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the rounding options are invalid
+  round(round_to: Temporal.RoundToOptions<Temporal.TimeUnit>): Temporal.PlainTime throws RangeError as round_with_round_to_options;
+  toString(): String throws as to_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid
+  toString(options: Temporal.PlainTimeToStringOptions): String throws RangeError as to_string_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  /// * `TypeError` — if the options conflict
+  toLocaleString(): String throws RangeError | TypeError as to_locale_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String): String throws RangeError | TypeError as to_locale_string_with_str;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>): String throws RangeError | TypeError as to_locale_string_with_slice;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String | Undefined, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_str_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_slice_and_options;
+  toJSON(): String throws as to_json;
+  valueOf() throws as value_of;
+}
+
+shape class Temporal.PlainDateTimeToStringOptions extends Temporal.PlainDateToStringOptions, Temporal.PlainTimeToStringOptions {
+  new {};
+  get smallestUnit?: Temporal.PluralizeUnit | Undefined as smallest_unit;
+  set smallestUnit(value: Temporal.PluralizeUnit) as set_smallest_unit;
+  get roundingMode?: RoundingModeKind | Undefined as rounding_mode;
+  set roundingMode(value: RoundingModeKind) as set_rounding_mode;
+  get fractionalSecondDigits?: FractionalSecondDigitsKind | Undefined as fractional_second_digits;
+  set fractionalSecondDigits(value: FractionalSecondDigitsKind) as set_fractional_second_digits;
+  set fractionalSecondDigits(value: f64) as set_fractional_second_digits_with_f64;
+}
+
+class Temporal.PlainDateTime {
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, iso_day: f64) throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, iso_day: f64, hour: f64) throws RangeError as new_with_hour;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, iso_day: f64, hour: Number | Undefined, minute: f64) throws RangeError as new_with_hour_and_minute;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, iso_day: f64, hour: Number | Undefined, minute: Number | Undefined, second: f64) throws RangeError as new_with_hour_and_minute_and_second;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, iso_day: f64, hour: Number | Undefined, minute: Number | Undefined, second: Number | Undefined, millisecond: f64) throws RangeError as new_with_hour_and_minute_and_second_and_millisecond;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, iso_day: f64, hour: Number | Undefined, minute: Number | Undefined, second: Number | Undefined, millisecond: Number | Undefined, microsecond: f64) throws RangeError as new_with_hour_and_minute_and_second_and_millisecond_and_microsecond;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, iso_day: f64, hour: Number | Undefined, minute: Number | Undefined, second: Number | Undefined, millisecond: Number | Undefined, microsecond: Number | Undefined, nanosecond: f64) throws RangeError as new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, iso_day: f64, hour: Number | Undefined, minute: Number | Undefined, second: Number | Undefined, millisecond: Number | Undefined, microsecond: Number | Undefined, nanosecond: Number | Undefined, calendar: String) throws RangeError as new_with_hour_and_minute_and_second_and_millisecond_and_microsecond_and_nanosecond_and_calendar;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.PlainDateTimeLike): Temporal.PlainDateTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.PlainDateTimeLike, options: Temporal.OverflowOptions): Temporal.PlainDateTime throws RangeError | TypeError as from_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown
+  /// * `TypeError` — if an object is missing the fields it needs
+  static compare(one: Temporal.PlainDateTimeLike, two: Temporal.PlainDateTimeLike): f64 throws RangeError | TypeError;
+  get calendarId: String as calendar_id;
+  get era: String | Undefined;
+  get eraYear: Number | Undefined as era_year;
+  get year: f64;
+  get month: f64;
+  get monthCode: String as month_code;
+  get day: f64;
+  get hour: f64;
+  get minute: f64;
+  get second: f64;
+  get millisecond: f64;
+  get microsecond: f64;
+  get nanosecond: f64;
+  get dayOfWeek: f64 as day_of_week;
+  get dayOfYear: f64 as day_of_year;
+  get weekOfYear: Number | Undefined as week_of_year;
+  get yearOfWeek: Number | Undefined as year_of_week;
+  get daysInWeek: f64 as days_in_week;
+  get daysInMonth: f64 as days_in_month;
+  get daysInYear: f64 as days_in_year;
+  get monthsInYear: f64 as months_in_year;
+  get inLeapYear: bool as in_leap_year;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(date_time_like: Temporal.PartialDateTimeLikeObject): Temporal.PlainDateTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(date_time_like: Temporal.PartialDateTimeLikeObject, options: Temporal.OverflowOptions): Temporal.PlainDateTime throws RangeError | TypeError as with_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the result is out of range
+  withPlainTime(): Temporal.PlainDateTime throws RangeError as with_plain_time;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  withPlainTime(plain_time: Temporal.PlainTimeLike): Temporal.PlainDateTime throws RangeError | TypeError as with_plain_time_with_plain_time;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendar is unknown
+  withCalendar(calendar: Temporal.CalendarLike): Temporal.PlainDateTime throws RangeError as with_calendar;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(duration: Temporal.DurationLike): Temporal.PlainDateTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(duration: Temporal.DurationLike, options: Temporal.OverflowOptions): Temporal.PlainDateTime throws RangeError | TypeError as add_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(duration: Temporal.DurationLike): Temporal.PlainDateTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(duration: Temporal.DurationLike, options: Temporal.OverflowOptions): Temporal.PlainDateTime throws RangeError | TypeError as subtract_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  until(other: Temporal.PlainDateTimeLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  until(other: Temporal.PlainDateTimeLike, options: Temporal.RoundingOptionsWithLargestUnit<Any>): Temporal.Duration throws RangeError | TypeError as until_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  since(other: Temporal.PlainDateTimeLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  since(other: Temporal.PlainDateTimeLike, options: Temporal.RoundingOptionsWithLargestUnit<Any>): Temporal.Duration throws RangeError | TypeError as since_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the rounding options are invalid
+  round(round_to: Temporal.PluralizeDayOrTimeUnit): Temporal.PlainDateTime throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the rounding options are invalid
+  round(round_to: Temporal.RoundToOptions<Any>): Temporal.PlainDateTime throws RangeError as round_with_round_to_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown
+  /// * `TypeError` — if an object is missing the fields it needs
+  equals(other: Temporal.PlainDateTimeLike): bool throws RangeError | TypeError;
+  toString(): String throws as to_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid, or the rounded result is out of range
+  toString(options: Temporal.PlainDateTimeToStringOptions): String throws RangeError as to_string_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(): String throws RangeError | TypeError as to_locale_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String): String throws RangeError | TypeError as to_locale_string_with_str;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>): String throws RangeError | TypeError as to_locale_string_with_slice;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String | Undefined, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_str_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_slice_and_options;
+  toJSON(): String throws as to_json;
+  valueOf() throws as value_of;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the time zone is unknown, the wall-clock time is ambiguous or skipped under `disambiguation: 'reject'`, or the result is out of range
+  toZonedDateTime(time_zone: Temporal.TimeZoneLike): Temporal.ZonedDateTime throws RangeError as to_zoned_date_time;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the time zone is unknown, the wall-clock time is ambiguous or skipped under `disambiguation: 'reject'`, or the result is out of range
+  toZonedDateTime(time_zone: Temporal.TimeZoneLike, options: Temporal.DisambiguationOptions): Temporal.ZonedDateTime throws RangeError as to_zoned_date_time_with_options;
+  toPlainDate(): Temporal.PlainDate throws as to_plain_date;
+  toPlainTime(): Temporal.PlainTime throws as to_plain_time;
+}
+
+shape class Temporal.ZonedDateTimeToStringOptions extends Temporal.PlainDateTimeToStringOptions {
+  new {};
+  get offset?: OffsetKind | Undefined;
+  set offset(value: OffsetKind) as set_offset;
+  get timeZoneName?: TimeZoneNameKind | Undefined as time_zone_name;
+  set timeZoneName(value: TimeZoneNameKind) as set_time_zone_name;
+}
+
+shape class Temporal.ZonedDateTimeFromOptions extends Temporal.OverflowOptions, Temporal.DisambiguationOptions {
+  new {};
+  get disambiguation?: DisambiguationKind | Undefined;
+  set disambiguation(value: DisambiguationKind) as set_disambiguation;
+  get offset?: ZonedDateTimeFromOptionsOffsetKind | Undefined;
+  set offset(value: ZonedDateTimeFromOptionsOffsetKind) as set_offset;
+}
+
+class Temporal.ZonedDateTime {
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the instant is out of range, or the time zone or calendar is unknown
+  new(epoch_nanoseconds: i64, time_zone: String) throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the instant is out of range, or the time zone or calendar is unknown
+  new(epoch_nanoseconds: i64, time_zone: String, calendar: String) throws RangeError as new_with_calendar;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.ZonedDateTimeLike): Temporal.ZonedDateTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.ZonedDateTimeLike, options: Temporal.ZonedDateTimeFromOptions): Temporal.ZonedDateTime throws RangeError | TypeError as from_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the offset does not match the time zone, or the time zone or calendar is unknown
+  /// * `TypeError` — if an object is missing the fields it needs
+  static compare(one: Temporal.ZonedDateTimeLike, two: Temporal.ZonedDateTimeLike): f64 throws RangeError | TypeError;
+  get calendarId: String as calendar_id;
+  get timeZoneId: String as time_zone_id;
+  get era: String | Undefined;
+  get eraYear: Number | Undefined as era_year;
+  get year: f64;
+  get month: f64;
+  get monthCode: String as month_code;
+  get day: f64;
+  get hour: f64;
+  get minute: f64;
+  get second: f64;
+  get millisecond: f64;
+  get microsecond: f64;
+  get nanosecond: f64;
+  get epochMilliseconds: f64 as epoch_milliseconds;
+  get epochNanoseconds: i64 as epoch_nanoseconds;
+  get dayOfWeek: f64 as day_of_week;
+  get dayOfYear: f64 as day_of_year;
+  get weekOfYear: Number | Undefined as week_of_year;
+  get yearOfWeek: Number | Undefined as year_of_week;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the day starts or ends outside the representable range
+  get hoursInDay: f64 throws RangeError as hours_in_day;
+  get daysInWeek: f64 as days_in_week;
+  get daysInMonth: f64 as days_in_month;
+  get daysInYear: f64 as days_in_year;
+  get monthsInYear: f64 as months_in_year;
+  get inLeapYear: bool as in_leap_year;
+  get offsetNanoseconds: f64 as offset_nanoseconds;
+  get offset: String;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(zoned_date_time_like: Temporal.PartialZonedDateTimeLikeObject): Temporal.ZonedDateTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(zoned_date_time_like: Temporal.PartialZonedDateTimeLikeObject, options: Temporal.ZonedDateTimeFromOptions): Temporal.ZonedDateTime throws RangeError | TypeError as with_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the result is out of range
+  withPlainTime(): Temporal.ZonedDateTime throws RangeError as with_plain_time;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  withPlainTime(plain_time: Temporal.PlainTimeLike): Temporal.ZonedDateTime throws RangeError | TypeError as with_plain_time_with_plain_time;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the time zone is unknown
+  withTimeZone(time_zone: Temporal.TimeZoneLike): Temporal.ZonedDateTime throws RangeError as with_time_zone;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendar is unknown
+  withCalendar(calendar: Temporal.CalendarLike): Temporal.ZonedDateTime throws RangeError as with_calendar;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(duration: Temporal.DurationLike): Temporal.ZonedDateTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(duration: Temporal.DurationLike, options: Temporal.OverflowOptions): Temporal.ZonedDateTime throws RangeError | TypeError as add_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(duration: Temporal.DurationLike): Temporal.ZonedDateTime throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(duration: Temporal.DurationLike, options: Temporal.OverflowOptions): Temporal.ZonedDateTime throws RangeError | TypeError as subtract_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  until(other: Temporal.ZonedDateTimeLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  until(other: Temporal.ZonedDateTimeLike, options: Temporal.RoundingOptionsWithLargestUnit<Any>): Temporal.Duration throws RangeError | TypeError as until_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  since(other: Temporal.ZonedDateTimeLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, the time zones differ for a date `largestUnit`, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  since(other: Temporal.ZonedDateTimeLike, options: Temporal.RoundingOptionsWithLargestUnit<Any>): Temporal.Duration throws RangeError | TypeError as since_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the rounding options are invalid
+  round(round_to: Temporal.PluralizeDayOrTimeUnit): Temporal.ZonedDateTime throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the rounding options are invalid
+  round(round_to: Temporal.RoundToOptions<Any>): Temporal.ZonedDateTime throws RangeError as round_with_round_to_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the offset does not match the time zone, or the time zone or calendar is unknown
+  /// * `TypeError` — if an object is missing the fields it needs
+  equals(other: Temporal.ZonedDateTimeLike): bool throws RangeError | TypeError;
+  toString(): String throws as to_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid
+  toString(options: Temporal.ZonedDateTimeToStringOptions): String throws RangeError as to_string_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict, or include `timeZone`
+  toLocaleString(): String throws RangeError | TypeError as to_locale_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict, or include `timeZone`
+  toLocaleString(locales: String): String throws RangeError | TypeError as to_locale_string_with_str;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict, or include `timeZone`
+  toLocaleString(locales: Array<String>): String throws RangeError | TypeError as to_locale_string_with_slice;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict, or include `timeZone`
+  toLocaleString(locales: String | Undefined, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_str_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict, or include `timeZone`
+  toLocaleString(locales: Array<String>, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_slice_and_options;
+  toJSON(): String throws as to_json;
+  valueOf() throws as value_of;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the day starts outside the representable range
+  startOfDay(): Temporal.ZonedDateTime throws RangeError as start_of_day;
+  getTimeZoneTransition(direction: "next"): Temporal.ZonedDateTime | Null throws cohort __get_time_zone_transition as get_time_zone_transition_next;
+  getTimeZoneTransition(direction: "previous"): Temporal.ZonedDateTime | Null throws cohort __get_time_zone_transition as get_time_zone_transition_previous;
+  getTimeZoneTransition(direction: Temporal.TransitionOptions): Temporal.ZonedDateTime | Null throws as get_time_zone_transition;
+  toInstant(): Temporal.Instant throws as to_instant;
+  toPlainDate(): Temporal.PlainDate throws as to_plain_date;
+  toPlainTime(): Temporal.PlainTime throws as to_plain_time;
+  toPlainDateTime(): Temporal.PlainDateTime throws as to_plain_date_time;
+}
+
+shape class Temporal.DurationRelativeToOptions {
+  new {};
+  get relativeTo?: RelativeToKind | Undefined as relative_to;
+  set relativeTo(value: Temporal.ZonedDateTimeLike) as set_relative_to;
+  set relativeTo(value: Temporal.PlainDateLike) as set_relative_to_with_plain_date_like;
+}
+
+shape class Temporal.DurationRoundingOptions extends Temporal.DurationRelativeToOptions, Temporal.RoundingOptionsWithLargestUnit<Any> {
+  new {};
+  get smallestUnit?: Temporal.PluralizeUnit | Undefined as smallest_unit;
+  set smallestUnit(value: Temporal.PluralizeUnit) as set_smallest_unit;
+  get roundingIncrement?: Number | Undefined as rounding_increment;
+  set roundingIncrement(value: f64) as set_rounding_increment;
+  get roundingMode?: RoundingModeKind | Undefined as rounding_mode;
+  set roundingMode(value: RoundingModeKind) as set_rounding_mode;
+  get largestUnit?: LargestUnitKind | Undefined as largest_unit;
+  set largestUnit(value: LargestUnitKind) as set_largest_unit;
+}
+
+shape class Temporal.DurationToStringOptions extends Temporal.ToStringRoundingOptionsWithFractionalSeconds<Exclude<Temporal.TimeUnit, String> | Null | Undefined> {
+  new {};
+}
+
+shape class Temporal.DurationTotalOptions extends Temporal.DurationRelativeToOptions {
+  new {};
+  get unit: Temporal.PluralizeUnit;
+  set unit(value: Temporal.PluralizeUnit) as set_unit;
+}
+
+class Temporal.Duration {
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new() throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(years: f64) throws RangeError as new_with_years;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(years: Number | Undefined, months: f64) throws RangeError as new_with_years_and_months;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(years: Number | Undefined, months: Number | Undefined, weeks: f64) throws RangeError as new_with_years_and_months_and_weeks;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(years: Number | Undefined, months: Number | Undefined, weeks: Number | Undefined, days: f64) throws RangeError as new_with_years_and_months_and_weeks_and_days;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(years: Number | Undefined, months: Number | Undefined, weeks: Number | Undefined, days: Number | Undefined, hours: f64) throws RangeError as new_with_years_and_months_and_weeks_and_days_and_hours;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(years: Number | Undefined, months: Number | Undefined, weeks: Number | Undefined, days: Number | Undefined, hours: Number | Undefined, minutes: f64) throws RangeError as new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(years: Number | Undefined, months: Number | Undefined, weeks: Number | Undefined, days: Number | Undefined, hours: Number | Undefined, minutes: Number | Undefined, seconds: f64) throws RangeError as new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(years: Number | Undefined, months: Number | Undefined, weeks: Number | Undefined, days: Number | Undefined, hours: Number | Undefined, minutes: Number | Undefined, seconds: Number | Undefined, milliseconds: f64) throws RangeError as new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(years: Number | Undefined, months: Number | Undefined, weeks: Number | Undefined, days: Number | Undefined, hours: Number | Undefined, minutes: Number | Undefined, seconds: Number | Undefined, milliseconds: Number | Undefined, microseconds: f64) throws RangeError as new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(years: Number | Undefined, months: Number | Undefined, weeks: Number | Undefined, days: Number | Undefined, hours: Number | Undefined, minutes: Number | Undefined, seconds: Number | Undefined, milliseconds: Number | Undefined, microseconds: Number | Undefined, nanoseconds: f64) throws RangeError as new_with_years_and_months_and_weeks_and_days_and_hours_and_minutes_and_seconds_and_milliseconds_and_microseconds_and_nanoseconds;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.DurationLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or either duration has calendar units and `relativeTo` is not given
+  /// * `TypeError` — if an object is missing the fields it needs
+  static compare(one: Temporal.DurationLike, two: Temporal.DurationLike): f64 throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or either duration has calendar units and `relativeTo` is not given
+  /// * `TypeError` — if an object is missing the fields it needs
+  static compare(one: Temporal.DurationLike, two: Temporal.DurationLike, options: Temporal.DurationRelativeToOptions): f64 throws RangeError | TypeError as compare_with_options;
+  get years: f64;
+  get months: f64;
+  get weeks: f64;
+  get days: f64;
+  get hours: f64;
+  get minutes: f64;
+  get seconds: f64;
+  get milliseconds: f64;
+  get microseconds: f64;
+  get nanoseconds: f64;
+  get sign: f64;
+  get blank: bool;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(duration_like: Temporal.DurationLikeObject): Temporal.Duration throws RangeError | TypeError;
+  negated(): Temporal.Duration throws;
+  abs(): Temporal.Duration throws;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if either duration has calendar units, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(other: Temporal.DurationLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if either duration has calendar units, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(other: Temporal.DurationLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the rounding options are invalid, or calendar units need `relativeTo`
+  round(round_to: Temporal.PluralizeDayOrTimeUnit): Temporal.Duration throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the rounding options are invalid, or calendar units need `relativeTo`
+  /// * `TypeError` — if `relativeTo` is an object missing the fields it needs
+  round(round_to: Temporal.DurationRoundingOptions): Temporal.Duration throws RangeError | TypeError as round_with_duration_rounding_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the duration has calendar units, which need `relativeTo`
+  total(total_of: Temporal.PluralizeDayOrTimeUnit): f64 throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the duration has calendar units and `relativeTo` is not given
+  /// * `TypeError` — if `relativeTo` is an object missing the fields it needs
+  total(total_of: Temporal.DurationTotalOptions): f64 throws RangeError | TypeError as total_with_duration_total_options;
+  toString(): String throws as to_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid, or the rounded result is out of range
+  toString(options: Temporal.DurationToStringOptions): String throws RangeError as to_string_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  toLocaleString(): String throws RangeError as to_locale_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  toLocaleString(locales: String): String throws RangeError as to_locale_string_with_str;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  toLocaleString(locales: Array<String>): String throws RangeError as to_locale_string_with_slice;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  toLocaleString(locales: String | Undefined, options: Intl.DurationFormatOptions): String throws RangeError as to_locale_string_with_str_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  toLocaleString(locales: Array<String>, options: Intl.DurationFormatOptions): String throws RangeError as to_locale_string_with_slice_and_options;
+  toJSON(): String throws as to_json;
+  valueOf() throws as value_of;
+}
+
+shape class Temporal.InstantToStringOptions extends Temporal.PlainTimeToStringOptions {
+  new {};
+  get timeZone?: Temporal.TimeZoneLike | Undefined as time_zone;
+  set timeZone(value: Temporal.TimeZoneLike) as set_time_zone;
+}
+
+class Temporal.Instant {
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  new(epoch_nanoseconds: i64) throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the string does not parse, or the instant is out of range
+  static from(item: Temporal.InstantLike): Temporal.Instant throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the instant is outside the representable range
+  static fromEpochMilliseconds(epoch_milliseconds: f64): Temporal.Instant throws RangeError as from_epoch_milliseconds;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the instant is outside the representable range
+  static fromEpochNanoseconds(epoch_nanoseconds: i64): Temporal.Instant throws RangeError as from_epoch_nanoseconds;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or an instant is out of range
+  static compare(one: Temporal.InstantLike, two: Temporal.InstantLike): f64 throws RangeError;
+  get epochMilliseconds: f64 as epoch_milliseconds;
+  get epochNanoseconds: i64 as epoch_nanoseconds;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the duration has date units, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(duration: Temporal.DurationLike): Temporal.Instant throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the duration has date units, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(duration: Temporal.DurationLike): Temporal.Instant throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid
+  until(other: Temporal.InstantLike): Temporal.Duration throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid
+  until(other: Temporal.InstantLike, options: Temporal.RoundingOptionsWithLargestUnit<Temporal.TimeUnit>): Temporal.Duration throws RangeError as until_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid
+  since(other: Temporal.InstantLike): Temporal.Duration throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid
+  since(other: Temporal.InstantLike, options: Temporal.RoundingOptionsWithLargestUnit<Temporal.TimeUnit>): Temporal.Duration throws RangeError as since_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the rounding options are invalid
+  round(round_to: Temporal.PluralizeTimeUnit): Temporal.Instant throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the rounding options are invalid
+  round(round_to: Temporal.RoundToOptions<Temporal.TimeUnit>): Temporal.Instant throws RangeError as round_with_round_to_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the string does not parse, or the instant is out of range
+  equals(other: Temporal.InstantLike): bool throws RangeError;
+  toString(): String throws as to_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the options are invalid, or the time zone is unknown
+  toString(options: Temporal.InstantToStringOptions): String throws RangeError as to_string_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  /// * `TypeError` — if the options conflict
+  toLocaleString(): String throws RangeError | TypeError as to_locale_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String): String throws RangeError | TypeError as to_locale_string_with_str;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>): String throws RangeError | TypeError as to_locale_string_with_slice;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String | Undefined, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_str_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale or options are invalid
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_slice_and_options;
+  toJSON(): String throws as to_json;
+  valueOf() throws as value_of;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the time zone is unknown
+  toZonedDateTimeISO(time_zone: Temporal.TimeZoneLike): Temporal.ZonedDateTime throws RangeError as to_zoned_date_time_iso;
+}
+
+shape class Temporal.PlainYearMonthToPlainDateOptions {
+  new {};
+  get day: f64;
+  set day(value: f64) as set_day;
+}
+
+class Temporal.PlainYearMonth {
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64) throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, calendar: String) throws RangeError as new_with_calendar;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_year: f64, iso_month: f64, calendar: String | Undefined, reference_iso_day: f64) throws RangeError as new_with_calendar_and_reference_iso_day;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.PlainYearMonthLike): Temporal.PlainYearMonth throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.PlainYearMonthLike, options: Temporal.OverflowOptions): Temporal.PlainYearMonth throws RangeError | TypeError as from_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown
+  /// * `TypeError` — if an object is missing the fields it needs
+  static compare(one: Temporal.PlainYearMonthLike, two: Temporal.PlainYearMonthLike): f64 throws RangeError | TypeError;
+  get calendarId: String as calendar_id;
+  get era: String | Undefined;
+  get eraYear: Number | Undefined as era_year;
+  get year: f64;
+  get month: f64;
+  get monthCode: String as month_code;
+  get daysInYear: f64 as days_in_year;
+  get daysInMonth: f64 as days_in_month;
+  get monthsInYear: f64 as months_in_year;
+  get inLeapYear: bool as in_leap_year;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(year_month_like: Temporal.PartialYearMonthLikeObject): Temporal.PlainYearMonth throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(year_month_like: Temporal.PartialYearMonthLikeObject, options: Temporal.OverflowOptions): Temporal.PlainYearMonth throws RangeError | TypeError as with_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(duration: Temporal.DurationLike): Temporal.PlainYearMonth throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  add(duration: Temporal.DurationLike, options: Temporal.OverflowOptions): Temporal.PlainYearMonth throws RangeError | TypeError as add_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(duration: Temporal.DurationLike): Temporal.PlainYearMonth throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, the duration has units smaller than months, the result does not exist under `overflow: 'reject'`, or the result is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  subtract(duration: Temporal.DurationLike, options: Temporal.OverflowOptions): Temporal.PlainYearMonth throws RangeError | TypeError as subtract_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  until(other: Temporal.PlainYearMonthLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  until(other: Temporal.PlainYearMonthLike, options: Temporal.RoundingOptionsWithLargestUnit<String>): Temporal.Duration throws RangeError | TypeError as until_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  since(other: Temporal.PlainYearMonthLike): Temporal.Duration throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the calendars differ, or the options are invalid
+  /// * `TypeError` — if an object is missing the fields it needs
+  since(other: Temporal.PlainYearMonthLike, options: Temporal.RoundingOptionsWithLargestUnit<String>): Temporal.Duration throws RangeError | TypeError as since_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown
+  /// * `TypeError` — if an object is missing the fields it needs
+  equals(other: Temporal.PlainYearMonthLike): bool throws RangeError | TypeError;
+  toString(): String throws as to_string;
+  toString(options: Temporal.PlainDateToStringOptions): String throws as to_string_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(): String throws RangeError | TypeError as to_locale_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String): String throws RangeError | TypeError as to_locale_string_with_str;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>): String throws RangeError | TypeError as to_locale_string_with_slice;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String | Undefined, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_str_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_slice_and_options;
+  toJSON(): String throws as to_json;
+  valueOf() throws as value_of;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the day is not finite, or the date is out of range
+  toPlainDate(item: Temporal.PlainYearMonthToPlainDateOptions): Temporal.PlainDate throws RangeError as to_plain_date;
+}
+
+shape class Temporal.PlainMonthDayToPlainDateOptions {
+  new {};
+  get era?: String | Undefined;
+  set era(value: String) as set_era;
+  get eraYear?: Number | Undefined as era_year;
+  set eraYear(value: f64) as set_era_year;
+  get year?: Number | Undefined;
+  set year(value: f64) as set_year;
+}
+
+class Temporal.PlainMonthDay {
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_month: f64, iso_day: f64) throws RangeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_month: f64, iso_day: f64, calendar: String) throws RangeError as new_with_calendar;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the calendar is unknown
+  new(iso_month: f64, iso_day: f64, calendar: String | Undefined, reference_iso_year: f64) throws RangeError as new_with_calendar_and_reference_iso_year;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.PlainMonthDayLike): Temporal.PlainMonthDay throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, or a field is out of range
+  /// * `TypeError` — if an object is missing the fields it needs
+  static from(item: Temporal.PlainMonthDayLike, options: Temporal.OverflowOptions): Temporal.PlainMonthDay throws RangeError | TypeError as from_with_options;
+  get calendarId: String as calendar_id;
+  get monthCode: String as month_code;
+  get day: f64;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(month_day_like: Temporal.PartialDateLikeObject): Temporal.PlainMonthDay throws RangeError | TypeError;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range
+  /// * `TypeError` — if the object has no recognised fields
+  with(month_day_like: Temporal.PartialDateLikeObject, options: Temporal.OverflowOptions): Temporal.PlainMonthDay throws RangeError | TypeError as with_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a string does not parse, a field is out of range, or the calendar is unknown
+  /// * `TypeError` — if an object is missing the fields it needs
+  equals(other: Temporal.PlainMonthDayLike): bool throws RangeError | TypeError;
+  toString(): String throws as to_string;
+  toString(options: Temporal.PlainDateToStringOptions): String throws as to_string_with_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(): String throws RangeError | TypeError as to_locale_string;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String): String throws RangeError | TypeError as to_locale_string_with_str;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>): String throws RangeError | TypeError as to_locale_string_with_slice;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: String | Undefined, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_str_and_options;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if the locale is invalid, or the calendar differs from the formatter's
+  /// * `TypeError` — if the options conflict
+  toLocaleString(locales: Array<String>, options: Intl.DateTimeFormatOptions): String throws RangeError | TypeError as to_locale_string_with_slice_and_options;
+  toJSON(): String throws as to_json;
+  valueOf() throws as value_of;
+  /// ## Errors
+  ///
+  /// * `RangeError` — if a field is out of range, or the date is out of range
+  /// * `TypeError` — if the object has no year for the calendar
+  toPlainDate(item: Temporal.PlainMonthDayToPlainDateOptions): Temporal.PlainDate throws RangeError | TypeError as to_plain_date;
+}
+
+shape class Temporal.PartialDateLikeObject {
+  new {};
+  get year?: Number | Undefined;
+  set year(value: f64) as set_year;
+  get era?: String | Undefined;
+  set era(value: String) as set_era;
+  get eraYear?: Number | Undefined as era_year;
+  set eraYear(value: f64) as set_era_year;
+  get month?: Number | Undefined;
+  set month(value: f64) as set_month;
+  get monthCode?: String | Undefined as month_code;
+  set monthCode(value: String) as set_month_code;
+  get day?: Number | Undefined;
+  set day(value: f64) as set_day;
+}
+
+shape class Temporal.PartialDateTimeLikeObject {
+  new {};
+  get year?: Number | Undefined;
+  set year(value: f64) as set_year;
+  get era?: String | Undefined;
+  set era(value: String) as set_era;
+  get eraYear?: Number | Undefined as era_year;
+  set eraYear(value: f64) as set_era_year;
+  get month?: Number | Undefined;
+  set month(value: f64) as set_month;
+  get monthCode?: String | Undefined as month_code;
+  set monthCode(value: String) as set_month_code;
+  get day?: Number | Undefined;
+  set day(value: f64) as set_day;
+  get hour?: Number | Undefined;
+  set hour(value: f64) as set_hour;
+  get minute?: Number | Undefined;
+  set minute(value: f64) as set_minute;
+  get second?: Number | Undefined;
+  set second(value: f64) as set_second;
+  get millisecond?: Number | Undefined;
+  set millisecond(value: f64) as set_millisecond;
+  get microsecond?: Number | Undefined;
+  set microsecond(value: f64) as set_microsecond;
+  get nanosecond?: Number | Undefined;
+  set nanosecond(value: f64) as set_nanosecond;
+}
+
+shape class Temporal.PartialZonedDateTimeLikeObject {
+  new {};
+  get offset?: String | Undefined;
+  set offset(value: String) as set_offset;
+  get year?: Number | Undefined;
+  set year(value: f64) as set_year;
+  get era?: String | Undefined;
+  set era(value: String) as set_era;
+  get eraYear?: Number | Undefined as era_year;
+  set eraYear(value: f64) as set_era_year;
+  get month?: Number | Undefined;
+  set month(value: f64) as set_month;
+  get monthCode?: String | Undefined as month_code;
+  set monthCode(value: String) as set_month_code;
+  get day?: Number | Undefined;
+  set day(value: f64) as set_day;
+  get hour?: Number | Undefined;
+  set hour(value: f64) as set_hour;
+  get minute?: Number | Undefined;
+  set minute(value: f64) as set_minute;
+  get second?: Number | Undefined;
+  set second(value: f64) as set_second;
+  get millisecond?: Number | Undefined;
+  set millisecond(value: f64) as set_millisecond;
+  get microsecond?: Number | Undefined;
+  set microsecond(value: f64) as set_microsecond;
+  get nanosecond?: Number | Undefined;
+  set nanosecond(value: f64) as set_nanosecond;
+}
+
+shape class Temporal.PartialYearMonthLikeObject {
+  new {};
+  get year?: Number | Undefined;
+  set year(value: f64) as set_year;
+  get era?: String | Undefined;
+  set era(value: String) as set_era;
+  get eraYear?: Number | Undefined as era_year;
+  set eraYear(value: f64) as set_era_year;
+  get month?: Number | Undefined;
+  set month(value: f64) as set_month;
+  get monthCode?: String | Undefined as month_code;
+  set monthCode(value: String) as set_month_code;
+}
+
+kind Temporal.CalendarLike {
+  PlainDate = Temporal.PlainDate;
+  PlainDateTime = Temporal.PlainDateTime;
+  PlainMonthDay = Temporal.PlainMonthDay;
+  PlainYearMonth = Temporal.PlainYearMonth;
+  ZonedDateTime = Temporal.ZonedDateTime;
+  String = String;
+}
+
+kind Temporal.DurationLike fallback {
+  Duration = Temporal.Duration;
+  String = String;
+  DurationLikeObject = Temporal.DurationLikeObject;
+}
+
+kind Temporal.InstantLike {
+  Instant = Temporal.Instant;
+  ZonedDateTime = Temporal.ZonedDateTime;
+  String = String;
+}
+
+kind Temporal.PlainDateLike fallback {
+  PlainDate = Temporal.PlainDate;
+  ZonedDateTime = Temporal.ZonedDateTime;
+  PlainDateTime = Temporal.PlainDateTime;
+  String = String;
+  DateLikeObject = Temporal.DateLikeObject;
+}
+
+kind Temporal.PlainDateTimeLike fallback {
+  PlainDateTime = Temporal.PlainDateTime;
+  ZonedDateTime = Temporal.ZonedDateTime;
+  PlainDate = Temporal.PlainDate;
+  String = String;
+  DateTimeLikeObject = Temporal.DateTimeLikeObject;
+}
+
+kind Temporal.PlainMonthDayLike fallback {
+  PlainMonthDay = Temporal.PlainMonthDay;
+  String = String;
+  DateLikeObject = Temporal.DateLikeObject;
+}
+
+kind Temporal.PlainTimeLike fallback {
+  PlainTime = Temporal.PlainTime;
+  PlainDateTime = Temporal.PlainDateTime;
+  ZonedDateTime = Temporal.ZonedDateTime;
+  String = String;
+  TimeLikeObject = Temporal.TimeLikeObject;
+}
+
+kind Temporal.PlainYearMonthLike fallback {
+  PlainYearMonth = Temporal.PlainYearMonth;
+  String = String;
+  YearMonthLikeObject = Temporal.YearMonthLikeObject;
+}
+
+kind Temporal.TimeZoneLike {
+  ZonedDateTime = Temporal.ZonedDateTime;
+  String = String;
+}
+
+kind Temporal.ZonedDateTimeLike fallback {
+  ZonedDateTime = Temporal.ZonedDateTime;
+  String = String;
+  ZonedDateTimeLikeObject = Temporal.ZonedDateTimeLikeObject;
+}
+
+kind Temporal.DateUnit {
+  Year = "year";
+  Month = "month";
+  Week = "week";
+  Day = "day";
+}
+
+kind Temporal.TimeUnit {
+  Hour = "hour";
+  Minute = "minute";
+  Second = "second";
+  Millisecond = "millisecond";
+  Microsecond = "microsecond";
+  Nanosecond = "nanosecond";
+}
+
+kind Temporal.PluralizeUnit {
+  Year = "year";
+  Month = "month";
+  Week = "week";
+  Day = "day";
+  Hour = "hour";
+  Minute = "minute";
+  Second = "second";
+  Millisecond = "millisecond";
+  Microsecond = "microsecond";
+  Nanosecond = "nanosecond";
+  Years = "years";
+  Months = "months";
+  Weeks = "weeks";
+  Days = "days";
+  Hours = "hours";
+  Minutes = "minutes";
+  Seconds = "seconds";
+  Milliseconds = "milliseconds";
+  Microseconds = "microseconds";
+  Nanoseconds = "nanoseconds";
+}
+
+kind Temporal.PluralizeTimeUnit {
+  Hour = "hour";
+  Minute = "minute";
+  Second = "second";
+  Millisecond = "millisecond";
+  Microsecond = "microsecond";
+  Nanosecond = "nanosecond";
+  Hours = "hours";
+  Minutes = "minutes";
+  Seconds = "seconds";
+  Milliseconds = "milliseconds";
+  Microseconds = "microseconds";
+  Nanoseconds = "nanoseconds";
+}
+
+kind Temporal.PluralizeDayOrTimeUnit {
+  Day = "day";
+  Hour = "hour";
+  Minute = "minute";
+  Second = "second";
+  Millisecond = "millisecond";
+  Microsecond = "microsecond";
+  Nanosecond = "nanosecond";
+  Days = "days";
+  Hours = "hours";
+  Minutes = "minutes";
+  Seconds = "seconds";
+  Milliseconds = "milliseconds";
+  Microseconds = "microseconds";
+  Nanoseconds = "nanoseconds";
+}
+
+kind DisambiguationKind {
+  Compatible = "compatible";
+  Earlier = "earlier";
+  Later = "later";
+  Reject = "reject";
+}
+
+kind OverflowKind {
+  Constrain = "constrain";
+  Reject = "reject";
+}
+
+kind DirectionKind {
+  Next = "next";
+  Previous = "previous";
+}
+
+kind RoundingModeKind {
+  Ceil = "ceil";
+  Floor = "floor";
+  Expand = "expand";
+  Trunc = "trunc";
+  HalfCeil = "halfCeil";
+  HalfFloor = "halfFloor";
+  HalfExpand = "halfExpand";
+  HalfTrunc = "halfTrunc";
+  HalfEven = "halfEven";
+}
+
+kind LargestUnitKind {
+  Auto = "auto";
+  Year = "year";
+  Month = "month";
+  Week = "week";
+  Day = "day";
+  Hour = "hour";
+  Minute = "minute";
+  Second = "second";
+  Millisecond = "millisecond";
+  Microsecond = "microsecond";
+  Nanosecond = "nanosecond";
+  Years = "years";
+  Months = "months";
+  Weeks = "weeks";
+  Days = "days";
+  Hours = "hours";
+  Minutes = "minutes";
+  Seconds = "seconds";
+  Milliseconds = "milliseconds";
+  Microseconds = "microseconds";
+  Nanoseconds = "nanoseconds";
+}
+
+kind FractionalSecondDigitsKind {
+  Auto = "auto";
+  F64 = Number;
+}
+
+kind CalendarNameKind {
+  Auto = "auto";
+  Always = "always";
+  Never = "never";
+  Critical = "critical";
+}
+
+kind OffsetKind {
+  Auto = "auto";
+  Never = "never";
+}
+
+kind TimeZoneNameKind {
+  Auto = "auto";
+  Never = "never";
+  Critical = "critical";
+}
+
+kind ZonedDateTimeFromOptionsOffsetKind {
+  Use = "use";
+  Ignore = "ignore";
+  Prefer = "prefer";
+  Reject = "reject";
+}
+
+kind RelativeToKind fallback {
+  ZonedDateTime = Temporal.ZonedDateTime;
+  String = String;
+  PlainDate = Temporal.PlainDate;
+  PlainDateTime = Temporal.PlainDateTime;
+  Object = Object;
+}

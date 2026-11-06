@@ -1,0 +1,22 @@
+ir 1;
+
+module "enum-args" {
+  shape class SendOptions {
+    new {};
+    get kind?: Kind | Undefined;
+    set kind(value: Kind) as set_kind;
+    get payload?: ArrayBufferView | Undefined;
+    set payload(value: ArrayBufferView) as set_payload;
+  }
+
+  class Sender {
+    send(kind: Kind) throws;
+    send(kind: Kind, options: SendOptions) throws as send_with_options;
+    get kind: Kind;
+  }
+
+  kind Kind {
+    Text = "text";
+    Bytes = "bytes";
+  }
+}

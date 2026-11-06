@@ -1,9 +1,9 @@
-//! `embed`: implement the ABI for one language module.
+//! `embed`: implement an IR's bindings for one language module.
 //!
-//! Reads the module's imports, keeps the ABI functions it uses, and emits
+//! Reads the module's imports, keeps the bindings it uses, and emits
 //! three artifacts that need no hand-written JavaScript:
 //!
-//! * `bindings.wasm`: one export per used ABI function, built from the
+//! * `bindings.wasm`: one export per used binding, built from the
 //!   primitives in `builtins.js` and imported string constants.
 //! * `wrapper.wasm`: imports the module's provided functions and
 //!   publishes them at their JS paths, one externref global per first
@@ -18,17 +18,15 @@
 //!   `Reflect.construct`, `WebAssembly.promising`) is reached through
 //!   `reflect_get` + `call`.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::fmt::Write;
 
 use anyhow::{anyhow, bail, Context, Result};
 use indexmap::IndexSet;
+use ts_gen_abi::ir::{Import, Ir, MemberKind, Sys};
 
 use super::wat::{ident, result as wat_result};
-use super::{
-    Abi, AbiFunction, AbiOp, AbiParam, WasmType, BINDINGS_SPECIFIER, BUILTINS_SPECIFIER,
-    STRING_CONSTANTS, UNDEFINED_GLOBAL,
-};
+use super::{WasmType, BINDINGS_SPECIFIER, BUILTINS_SPECIFIER, STRING_CONSTANTS, UNDEFINED_GLOBAL};
 
 pub const MAX_ARITY: usize = 8;
 
@@ -38,10 +36,18 @@ pub struct Options {
     pub module_specifier: String,
 }
 
+impl Options {
+    pub fn new(module_specifier: impl Into<String>) -> Self {
+        Options {
+            module_specifier: module_specifier.into(),
+        }
+    }
+}
+
 #[derive(Debug, Default, Clone)]
 pub struct Output {
-    /// The language module with its imports of module-scoped ABI
-    /// functions linked to the bindings: what `merge` takes.
+    /// The language module with its imports of the bindings linked to
+    /// their exports: what `merge` takes.
     pub module: Vec<u8>,
     pub bindings_wat: String,
     pub wrapper_wat: String,
@@ -54,15 +60,167 @@ pub struct Output {
     pub handlers: Vec<String>,
 }
 
-/// An ABI function the module uses with one signature, and the bindings
-/// exports it is imported through: one bindings function exported under
-/// each.
+/// A binding the module uses with one signature, and the bindings exports
+/// it is imported through: one bindings function exported under each.
 struct UsedFunction {
-    module: Option<String>,
-    function: String,
+    binding: usize,
     names: Vec<String>,
     param_types: Vec<WasmType>,
     result_type: Option<WasmType>,
+}
+
+/// The JS a binding performs.
+enum Op {
+    /// `this[name]`
+    Get(String),
+    /// `this[name] = value`
+    Set(String),
+    /// `this[name](...args)`
+    Call(String),
+    /// `new path(...args)`
+    Construct(Vec<String>),
+    /// `{}`
+    Object,
+    /// `path[name]`, where an empty path is the root.
+    StaticGet(Vec<String>, String),
+    StaticSet(Vec<String>, String),
+    /// `path[name](...args)` with `path` as `this`.
+    StaticCall(Vec<String>, String),
+    Sys(Sys),
+}
+
+struct Param {
+    name: String,
+    ty: WasmType,
+}
+
+/// A binding on the wire.
+struct Binding {
+    /// The module its path is rooted at and it is imported from.
+    module: Option<String>,
+    name: String,
+    op: Op,
+    /// The receiver first for an instance op.
+    params: Vec<Param>,
+    result: Option<WasmType>,
+    /// The last param is spread from `(ref null $anyrefs)`.
+    variadic: bool,
+}
+
+impl Binding {
+    fn of(import: &Import) -> Binding {
+        let m = import.member;
+        let path = || -> Vec<String> {
+            import
+                .class
+                .map(|c| c.path.split('.').map(String::from).collect())
+                .unwrap_or_default()
+        };
+        let js = m.js.clone();
+        let op = match m.kind {
+            MemberKind::Constructor => Op::Construct(m.js.split('.').map(String::from).collect()),
+            MemberKind::Object => Op::Object,
+            MemberKind::Get => Op::Get(js),
+            MemberKind::Set => Op::Set(js),
+            MemberKind::Method => Op::Call(js),
+            MemberKind::StaticGet => Op::StaticGet(path(), js),
+            MemberKind::StaticSet => Op::StaticSet(path(), js),
+            MemberKind::StaticMethod => Op::StaticCall(path(), js),
+        };
+        let receiver = m.kind.has_receiver().then(|| Param {
+            name: "this".into(),
+            ty: WasmType::JS_NON_NULL,
+        });
+        let mut params: Vec<Param> = receiver
+            .into_iter()
+            .chain(m.params.iter().map(|p| Param {
+                name: p.name.clone(),
+                ty: p.ty.wasm().unwrap_or(R),
+            }))
+            .collect();
+        if m.variadic {
+            if let Some(rest) = params.last_mut() {
+                rest.ty = R;
+            }
+        }
+        Binding {
+            module: import.module.map(String::from),
+            name: import.name().to_string(),
+            op,
+            params,
+            result: m.result.wasm(),
+            variadic: m.variadic,
+        }
+    }
+
+    fn sys(sys: Sys) -> Binding {
+        Binding {
+            module: None,
+            name: sys.name().into(),
+            op: Op::Sys(sys),
+            params: sys
+                .param()
+                .map(|ty| Param {
+                    name: "x".into(),
+                    ty,
+                })
+                .into_iter()
+                .collect(),
+            result: Some(sys.result()),
+            variadic: false,
+        }
+    }
+
+    fn has_receiver(&self) -> bool {
+        matches!(
+            self.op,
+            Op::Get(_) | Op::Set(_) | Op::Call(_) | Op::Sys(Sys::IsUndefined | Sys::NumberValue)
+        )
+    }
+}
+
+/// An IR's bindings by the module and name the language imports them under.
+struct Bindings {
+    list: Vec<Binding>,
+    index: HashMap<(String, String), usize>,
+    /// The module specifiers bindings are imported from.
+    modules: Vec<String>,
+}
+
+impl Bindings {
+    fn of(ir: &Ir) -> Bindings {
+        let mut list = Vec::new();
+        let mut index = HashMap::new();
+        for sys in Sys::ALL {
+            index.insert(
+                (BINDINGS_SPECIFIER.to_string(), sys.name().to_string()),
+                list.len(),
+            );
+            list.push(Binding::sys(sys));
+        }
+        for import in ir.imports() {
+            for name in &import.names {
+                index
+                    .entry((import.specifier().to_string(), name.clone()))
+                    .or_insert(list.len());
+            }
+            list.push(Binding::of(&import));
+        }
+        let mut modules: Vec<String> = list.iter().filter_map(|b| b.module.clone()).collect();
+        modules.sort_unstable();
+        modules.dedup();
+        Bindings {
+            list,
+            index,
+            modules,
+        }
+    }
+
+    fn import(&self, specifier: &str, name: &str) -> Option<usize> {
+        self.index
+            .get(&(specifier.to_string(), name.to_string()))
+            .copied()
+    }
 }
 
 /// An export the module provides, with the types it declared for it.
@@ -76,7 +234,7 @@ struct HandlerInfo {
 /// What `embed` learned from the language module.
 struct ModuleInfo {
     used: Vec<UsedFunction>,
-    /// The module's imports of module-scoped ABI functions, `(specifier,
+    /// The module's imports of module-scoped bindings, `(specifier,
     /// name)`, each with the bindings export it is linked to.
     links: BTreeMap<(String, String), String>,
     jspi: bool,
@@ -85,11 +243,28 @@ struct ModuleInfo {
     handlers: Vec<HandlerInfo>,
 }
 
-pub fn embed(abi: &Abi, module: &[u8], options: &Options) -> Result<Output> {
-    let info = inspect(abi, module)?;
+pub fn embed(ir: &Ir, module: &[u8], options: &Options) -> Result<Output> {
+    let bindings = Bindings::of(ir);
+    let handlers: Vec<HandlerInfo> = ir
+        .provides
+        .iter()
+        .map(|p| HandlerInfo {
+            name: p.name.clone(),
+            path: p.js.clone(),
+            param_types: p.params.iter().map(|p| p.ty.wasm().unwrap_or(R)).collect(),
+            // A promise handler always has a result: the promise itself
+            // without JSPI, the settled value (`undefined` for `Promise<void>`)
+            // under it.
+            result_type: match (p.is_async, p.result.wasm()) {
+                (true, None) => Some(R),
+                (_, r) => r,
+            },
+        })
+        .collect();
+    let info = inspect(&bindings, &handlers, module)?;
     let mut builtins = Builtins::default();
 
-    let bindings_wat = generate_bindings(abi, &info.used, &mut builtins)?;
+    let bindings_wat = generate_bindings(&bindings, &info.used, &mut builtins)?;
     let wrapper_wat = generate_wrapper(
         &info.handlers,
         info.jspi,
@@ -172,11 +347,11 @@ pub fn merge(
     std::fs::read(&out).context("reading wasm-merge output")
 }
 
-/// Point the module's ABI imports at the bindings exports implementing
-/// them, under the bindings' private prefix: those from `./bindings.wasm`
-/// and those of module-scoped ABI functions. `wasm-merge` links by module
-/// name, and the bindings import the real specifier themselves, so the
-/// latter cannot keep it.
+/// Point the module's imports of bindings at the bindings exports
+/// implementing them, under the bindings' private prefix: those from
+/// `./bindings.wasm` and those of module-scoped bindings. `wasm-merge`
+/// links by module name, and the bindings import the real specifier
+/// themselves, so the latter cannot keep it.
 fn link_imports(wasm: &[u8], links: &BTreeMap<(String, String), String>) -> Result<Vec<u8>> {
     use wasm_encoder::reencode::{Reencode, RoundtripReencoder};
     use wasm_encoder::RawSection;
@@ -221,7 +396,7 @@ fn link_imports(wasm: &[u8], links: &BTreeMap<(String, String), String>) -> Resu
     Ok(out.finish())
 }
 
-/// Assemble WAT and validate it with the features the ABI relies on.
+/// Assemble WAT and validate it with the features the bindings rely on.
 pub fn assemble(wat_text: &str) -> Result<Vec<u8>> {
     let bytes = wat::parse_str(wat_text).context("assembling generated WAT")?;
     let mut validator = wasmparser::Validator::new_with_features(
@@ -329,7 +504,7 @@ pub fn postprocess(
     Ok(bytes)
 }
 
-fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
+fn inspect(bindings: &Bindings, provides: &[HandlerInfo], module: &[u8]) -> Result<ModuleInfo> {
     use wasmparser::{Payload, TypeRef};
 
     let mut types: Vec<wasmparser::SubType> = Vec::new();
@@ -398,33 +573,39 @@ fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
     let mut links = BTreeMap::new();
     let mut jspi = false;
     let mut undefined = false;
-    let modules = abi.modules();
     for (module_name, field, ty) in &imports {
-        // A module-scoped ABI function is imported from its specifier, which
-        // the module may also import other things from directly.
-        let abi_import = module_name == BINDINGS_SPECIFIER
-            || (modules.contains(&module_name.as_str()) && matches!(ty, TypeRef::Func(_)));
-        if abi_import {
-            let f = abi.import(module_name, field).ok_or_else(|| {
-                anyhow!("module imports {module_name:?} {field:?}, which is not in the ABI")
+        // A module-scoped binding is imported from its specifier, which the
+        // module may also import other things from directly.
+        let found = if module_name == BINDINGS_SPECIFIER
+            || (bindings.modules.contains(module_name) && matches!(ty, TypeRef::Func(_)))
+        {
+            let i = bindings.import(module_name, field).ok_or_else(|| {
+                anyhow!("module imports {module_name:?} {field:?}, which is not in the IR")
             })?;
+            Some((i, field.as_str()))
+        } else {
+            None
+        };
+        if let Some((index, name)) = found {
+            let b = &bindings.list[index];
             let TypeRef::Func(idx) = ty else {
                 bail!("import {field:?} must be a function");
             };
             let actual = func_type(*idx, &format!("import {field:?}"))?;
+            let params: Vec<WasmType> = b.params.iter().map(|p| p.ty).collect();
             let expected = Expected {
                 what: &format!("import {field:?}"),
-                params: &f.params,
-                result: f.result,
-                variadic: f.variadic,
+                params: &params,
+                result: b.result,
+                variadic: b.variadic,
                 import: true,
             };
             let sig = check_signature(&expected, actual, &types)?;
-            let export = match &f.module {
-                Some(spec) => format!("{spec}:{field}"),
-                None => field.clone(),
+            let export = match &b.module {
+                Some(spec) => format!("{spec}:{name}"),
+                None => name.to_string(),
             };
-            if f.module.is_some() {
+            if b.module.is_some() {
                 links.insert((module_name.clone(), field.clone()), export.clone());
             }
             if used
@@ -434,16 +615,14 @@ fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
                 continue;
             }
             let same = used.iter_mut().find(|u| {
-                u.module == f.module
-                    && u.function == f.name
+                u.binding == index
                     && u.param_types == sig.param_types
                     && u.result_type == sig.result_type
             });
             match same {
                 Some(u) => u.names.push(export),
                 None => used.push(UsedFunction {
-                    module: f.module.clone(),
-                    function: f.name.clone(),
+                    binding: index,
                     names: vec![export],
                     param_types: sig.param_types,
                     result_type: sig.result_type,
@@ -467,15 +646,15 @@ fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
     }
 
     let mut handlers = Vec::new();
-    for e in &abi.handlers {
+    for e in provides {
         if let Some(&func_idx) = export_func_indices.get(&e.name) {
             let actual = func_types
                 .get(func_idx as usize)
                 .ok_or_else(|| anyhow!("bad function index for export {:?}", e.name))?;
             let expected = Expected {
                 what: &format!("export {:?}", e.name),
-                params: &e.params,
-                result: e.result,
+                params: &e.param_types,
+                result: e.result_type,
                 variadic: false,
                 import: false,
             };
@@ -488,10 +667,10 @@ fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
             });
         }
     }
-    if handlers.is_empty() && !abi.handlers.is_empty() {
+    if handlers.is_empty() && !provides.is_empty() {
         bail!(
             "module provides none of the exports ({})",
-            abi.handlers
+            provides
                 .iter()
                 .map(|h| h.name.as_str())
                 .collect::<Vec<_>>()
@@ -532,10 +711,10 @@ struct SignatureInfo {
     result_type: Option<WasmType>,
 }
 
-/// The ABI side of a signature check: a bindings import or a handler export.
+/// The IR side of a signature check: a bindings import or a handler export.
 struct Expected<'a> {
     what: &'a str,
-    params: &'a [AbiParam],
+    params: &'a [WasmType],
     result: Option<WasmType>,
     variadic: bool,
     /// A bindings import (the module calls out) rather than a handler
@@ -543,7 +722,7 @@ struct Expected<'a> {
     import: bool,
 }
 
-/// Check that the actual type matches the ABI signature: arity exact,
+/// Check that the actual type matches the IR signature: arity exact,
 /// scalars exact, and each reference position independently externref or
 /// anyref. Returns the actual types.
 fn check_signature(
@@ -554,7 +733,7 @@ fn check_signature(
     let actual_params = actual.params();
     if actual_params.len() != f.params.len() {
         bail!(
-            "{} has {} params but the ABI declares {}",
+            "{} has {} params but the IR declares {}",
             f.what,
             actual_params.len(),
             f.params.len()
@@ -562,7 +741,7 @@ fn check_signature(
     }
 
     let mut param_types = Vec::with_capacity(f.params.len());
-    for (i, p) in f.params.iter().enumerate() {
+    for (i, &p) in f.params.iter().enumerate() {
         let actual_p = &actual_params[i];
 
         if f.variadic && i == f.params.len() - 1 {
@@ -573,16 +752,16 @@ fn check_signature(
                     describe_type(actual_p, types)
                 );
             }
-            param_types.push(p.ty);
+            param_types.push(p);
             continue;
         }
 
-        if matches!(p.ty, WasmType::ExternRef { .. } | WasmType::AnyRef { .. }) {
+        if matches!(p, WasmType::ExternRef { .. } | WasmType::AnyRef { .. }) {
             match ref_type_of(actual_p) {
                 Some(ty) => param_types.push(if f.import {
                     ty
                 } else {
-                    accept_ref(f.what, &format!("param {i}"), p.ty, ty)?
+                    accept_ref(f.what, &format!("param {i}"), p, ty)?
                 }),
                 None => bail!(
                     "{} param {} has type {} but expected externref or anyref",
@@ -592,7 +771,7 @@ fn check_signature(
                 ),
             }
         } else {
-            let expected = val_type(p.ty);
+            let expected = val_type(p);
             if *actual_p != expected {
                 bail!(
                     "{} param {} has type {} but expected {}",
@@ -602,7 +781,7 @@ fn check_signature(
                     expected
                 );
             }
-            param_types.push(p.ty);
+            param_types.push(p);
         }
     }
 
@@ -980,7 +1159,7 @@ fn string_ident(s: &str) -> String {
     }
     id
 }
-fn wat_params_typed(params: &[AbiParam], types: &[WasmType], variadic: bool) -> String {
+fn wat_params_typed(params: &[Param], types: &[WasmType], variadic: bool) -> String {
     params
         .iter()
         .enumerate()
@@ -1199,16 +1378,16 @@ struct FuncBody {
     value: String,
 }
 
-fn generate_bindings(abi: &Abi, used: &[UsedFunction], builtins: &mut Builtins) -> Result<String> {
+fn generate_bindings(
+    bindings: &Bindings,
+    used: &[UsedFunction],
+    builtins: &mut Builtins,
+) -> Result<String> {
     let mut imports = Imports::default();
     let mut funcs = String::new();
 
     for uf in used {
-        let f = abi
-            .functions
-            .iter()
-            .find(|f| f.module == uf.module && f.name == uf.function)
-            .expect("checked in inspect");
+        let f = &bindings.list[uf.binding];
         let mut body = Body {
             imports: &mut imports,
             builtins,
@@ -1244,10 +1423,10 @@ fn generate_bindings(abi: &Abi, used: &[UsedFunction], builtins: &mut Builtins) 
     ))
 }
 
-fn function_body(f: &AbiFunction, uf: &UsedFunction, body: &mut Body) -> Result<FuncBody> {
-    // An i32 argument is a TS boolean (`Lower::of`), which JS would
-    // otherwise receive as the Number 1/0; route it through `Boolean()`.
-    let skip_receiver = if has_receiver(&f.op) { 1 } else { 0 };
+fn function_body(f: &Binding, uf: &UsedFunction, body: &mut Body) -> Result<FuncBody> {
+    // An i32 argument is a JS boolean, which JS would otherwise receive as
+    // the Number 1/0; route it through `Boolean()`.
+    let skip_receiver = if f.has_receiver() { 1 } else { 0 };
     let args: Vec<(String, WasmType)> = f
         .params
         .iter()
@@ -1265,7 +1444,7 @@ fn function_body(f: &AbiFunction, uf: &UsedFunction, body: &mut Body) -> Result<
 }
 
 fn function_body_inner(
-    f: &AbiFunction,
+    f: &Binding,
     uf: &UsedFunction,
     body: &mut Body,
     args: &[(String, WasmType)],
@@ -1288,13 +1467,13 @@ fn function_body_inner(
     let result = uf.result_type.unwrap_or(R);
     let module = f.module.as_deref();
     let expr = match &f.op {
-        AbiOp::Get { name } => body.get(this, name, result),
-        AbiOp::Set { name } => body.set(this, name, value()?),
-        AbiOp::Call { name } => {
+        Op::Get(name) => body.get(this, name, result),
+        Op::Set(name) => body.set(this, name, value()?),
+        Op::Call(name) => {
             let func = body.get(this, name, R);
             return invoke(body, &func, this, args, f, uf.result_type);
         }
-        AbiOp::Construct { path } => {
+        Op::Construct(path) => {
             let class = body.path(module, path);
             if f.variadic || args.len() > MAX_ARITY {
                 let (locals, stmts) = collect_args(body, args, f);
@@ -1307,21 +1486,21 @@ fn function_body_inner(
             }
             body.construct(&class, args, result)
         }
-        AbiOp::StaticGet { path, name } if module.is_some() && path.is_empty() => {
+        Op::StaticGet(path, name) if module.is_some() && path.is_empty() => {
             body.export_value(module.unwrap_or_default(), name, result)
         }
-        AbiOp::StaticGet { path, name } => {
+        Op::StaticGet(path, name) => {
             let recv = body.path(module, path);
             body.get((&recv, R), name, result)
         }
-        AbiOp::StaticSet { path, name } => {
+        Op::StaticSet(path, name) => {
             if module.is_some() && path.is_empty() {
                 bail!("{}: module exports cannot be assigned", f.name);
             }
             let recv = body.path(module, path);
             body.set((&recv, R), name, value()?)
         }
-        AbiOp::StaticCall { path, name } => {
+        Op::StaticCall(path, name) => {
             // A module's own export is called with `this` undefined, as
             // `import { f } from "m"; f()` calls it.
             let recv = match (module, path.is_empty()) {
@@ -1331,18 +1510,19 @@ fn function_body_inner(
             let func = body.static_ref(module, path, name);
             return invoke(body, &func, (&recv, R), args, f, uf.result_type);
         }
-        AbiOp::NewObject => {
+        Op::Object => {
             let object = body.path(None, &["Object".to_string()]);
             body.construct(&object, &[], result)
         }
-        AbiOp::IsUndefined => {
+        Op::Sys(Sys::IsUndefined) => {
             body.builtins.is_undefined = true;
             let f = body
                 .imports
                 .func("is_undefined", vec![this.1], Some(WasmType::I32));
             format!("(call ${f} {})", this.0)
         }
-        AbiOp::NumberValue => {
+        Op::Sys(Sys::Undefined) => body.undefined(),
+        Op::Sys(Sys::NumberValue) => {
             let number = body.path(None, &["Number".to_string()]);
             let g = body.global();
             body.call(
@@ -1365,7 +1545,7 @@ fn invoke(
     func: &str,
     this: (&str, WasmType),
     args: &[(String, WasmType)],
-    f: &AbiFunction,
+    f: &Binding,
     result: Option<WasmType>,
 ) -> Result<FuncBody> {
     if f.variadic || args.len() > MAX_ARITY {
@@ -1388,9 +1568,9 @@ fn invoke(
 /// Gather `args` into a JS array in `$.arr` for `Reflect.apply` /
 /// `Reflect.construct`: the fixed arguments one `push` each, then the
 /// elements of the GC rest array when the function is variadic. Returns
-/// the locals and setup statements. The locals are dotted, which no ABI
+/// the locals and setup statements. The locals are dotted, which no IR
 /// parameter name is.
-fn collect_args(body: &mut Body, args: &[(String, WasmType)], f: &AbiFunction) -> (String, String) {
+fn collect_args(body: &mut Body, args: &[(String, WasmType)], f: &Binding) -> (String, String) {
     let (fixed, rest) = if f.variadic {
         let rest = f.params.last().expect("variadic function has a rest param");
         (&args[..args.len() - 1], Some(rest.name.as_str()))
@@ -1431,17 +1611,6 @@ fn collect_args(body: &mut Body, args: &[(String, WasmType)], f: &AbiFunction) -
     }
     stmts.push_str("    ");
     (locals, stmts)
-}
-
-fn has_receiver(op: &AbiOp) -> bool {
-    matches!(
-        op,
-        AbiOp::Get { .. }
-            | AbiOp::Set { .. }
-            | AbiOp::Call { .. }
-            | AbiOp::IsUndefined
-            | AbiOp::NumberValue
-    )
 }
 
 /// The module namespace the wrapper publishes: each distinct first path

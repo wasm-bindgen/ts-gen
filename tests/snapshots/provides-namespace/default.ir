@@ -1,0 +1,36 @@
+ir 1;
+
+class Ticket {
+  new(id: f64) throws;
+  get id: f64;
+}
+
+/// A top-level function.
+provide version(): f64;
+
+/// Same leaf as a default member: both are kept apart in Rust.
+provide add(a: f64, b: f64): f64;
+
+/// Types from js_sys in a provider signature.
+provide sum(values: Record<Number>): f64;
+provide describeSymbol(s: Symbol): String;
+provide double(x: i64): i64;
+provide keys(o: Object): Array<String>;
+provide notify(cb: (Error | Null, f64) => void);
+provide retOpt(x: String | Null): String;
+
+/// A nullable result is a write: `Nullable<String>`, so JS receives `null`.
+provide find(id: f64): String | Null;
+
+/// Nested two deep.
+provide api.math.add(a: f64, b: f64): f64 as "api.math.add";
+
+/// Same leaf name on another path.
+provide api.str.add(a: String, b: String): String as "api.str.add";
+
+/// Receives a value, returns one.
+provide default.issue(id: f64): Ticket;
+provide default.describe(ticket: Ticket | Null): String;
+
+/// Collides with the top-level `add` by leaf.
+provide default.add(a: f64): f64 as "default.add";

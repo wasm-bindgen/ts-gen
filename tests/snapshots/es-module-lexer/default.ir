@@ -1,0 +1,218 @@
+ir 1;
+
+module "es-module-lexer" {
+  shape class ImportSpecifier {
+    new {};
+    /// Module name
+    ///
+    /// To handle escape sequences in specifier strings, the .n field of imported specifiers will be provided where possible.
+    ///
+    /// For dynamic import expressions, this field will be empty if not a valid JS string.
+    /// For static import expressions, this field will always be populated.
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const [imports1, exports1] = parse(String.raw`import './\u0061\u0062.js'`);
+    /// imports1[0].n;
+    /// // Returns "./ab.js"
+    ///
+    /// const [imports2, exports2] = parse(`import("./ab.js")`);
+    /// imports2[0].n;
+    /// // Returns "./ab.js"
+    ///
+    /// const [imports3, exports3] = parse(`import("./" + "ab.js")`);
+    /// imports3[0].n;
+    /// // Returns undefined
+    /// ```
+    get n: String | Undefined;
+    /// Type of import statement
+    get t: ImportType;
+    /// Start of module specifier
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const source = `import { a } from 'asdf'`;
+    /// const [imports, exports] = parse(source);
+    /// source.substring(imports[0].s, imports[0].e);
+    /// // Returns "asdf"
+    /// ```
+    get s: f64;
+    /// End of module specifier
+    get e: f64;
+    /// Start of import statement
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const source = `import { a } from 'asdf'`;
+    /// const [imports, exports] = parse(source);
+    /// source.substring(imports[0].ss, imports[0].se);
+    /// // Returns "import { a } from 'asdf';"
+    /// ```
+    get ss: f64;
+    /// End of import statement
+    get se: f64;
+    /// If this import keyword is a dynamic import, this is the start value.
+    /// If this import keyword is a static import, this is -1.
+    /// If this import keyword is an import.meta expresion, this is -2.
+    get d: f64;
+    /// If this import has an import attribute, this is the start value.
+    /// Otherwise this is `-1`.
+    get a: f64;
+    /// Parsed import attributes as an array of [key, value] tuples.
+    /// If this import has no attributes, this is `null`.
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const source = `import foo from 'bar' with { type: "json" }`;
+    /// const [imports] = parse(source);
+    /// imports[0].at;
+    /// // Returns [['type', 'json']]
+    /// ```
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const source = `import foo from 'bar' with { type: "json", integrity: "sha384-..." }`;
+    /// const [imports] = parse(source);
+    /// imports[0].at;
+    /// // Returns [['type', 'json'], ['integrity', 'sha384-...']]
+    /// ```
+    get at: Array<[String, String]> | Null;
+  }
+
+  shape class ExportSpecifier {
+    new {};
+    /// Exported name
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const source = `export default []`;
+    /// const [imports, exports] = parse(source);
+    /// exports[0].n;
+    /// // Returns "default"
+    /// ```
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const source = `export const asdf = 42`;
+    /// const [imports, exports] = parse(source);
+    /// exports[0].n;
+    /// // Returns "asdf"
+    /// ```
+    get n: String;
+    /// Local name, or undefined.
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const source = `export default []`;
+    /// const [imports, exports] = parse(source);
+    /// exports[0].ln;
+    /// // Returns undefined
+    /// ```
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const asdf = 42;
+    /// const source = `export { asdf as a }`;
+    /// const [imports, exports] = parse(source);
+    /// exports[0].ln;
+    /// // Returns "asdf"
+    /// ```
+    get ln: String | Undefined;
+    /// Start of exported name
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const source = `export default []`;
+    /// const [imports, exports] = parse(source);
+    /// source.substring(exports[0].s, exports[0].e);
+    /// // Returns "default"
+    /// ```
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const source = `export { 42 as asdf }`;
+    /// const [imports, exports] = parse(source);
+    /// source.substring(exports[0].s, exports[0].e);
+    /// // Returns "asdf"
+    /// ```
+    get s: f64;
+    /// End of exported name
+    get e: f64;
+    /// Start of local name, or -1.
+    ///
+    /// ## Example
+    ///
+    /// ```js
+    /// const asdf = 42;
+    /// const source = `export { asdf as a }`;
+    /// const [imports, exports] = parse(source);
+    /// source.substring(exports[0].ls, exports[0].le);
+    /// // Returns "asdf"
+    /// ```
+    get ls: f64;
+    /// End of local name, or -1.
+    get le: f64;
+  }
+
+  shape class ParseError extends Error {
+    new {};
+    get idx: f64;
+    set idx(value: f64) as set_idx;
+  }
+
+  kind ImportType {
+    /// A normal static using any syntax variations
+    ///   import .. from 'module'
+    Static = 1;
+    /// A dynamic import expression `import(specifier)`
+    /// or `import(specifier, opts)`
+    Dynamic = 2;
+    /// An import.meta expression
+    ImportMeta = 3;
+    /// A source phase import
+    ///   import source x from 'module'
+    StaticSourcePhase = 4;
+    /// A dynamic source phase import
+    ///   import.source('module')
+    DynamicSourcePhase = 5;
+    /// A defer phase import
+    ///   import defer * as x from 'module'
+    StaticDeferPhase = 6;
+    /// A dynamic defer phase import
+    ///   import.defer('module')
+    DynamicDeferPhase = 7;
+  }
+
+  /// Outputs the list of exports and locations of import specifiers,
+  /// including dynamic import and import meta handling.
+  ///
+  /// * `source` - Source code to parser
+  /// * `name` - Optional sourcename
+  ///
+  /// Returns: Tuple contaning imports list and exports list.
+  function parse(source: String): [Array<ImportSpecifier>, Array<ExportSpecifier>, Boolean, Boolean];
+
+  /// Outputs the list of exports and locations of import specifiers,
+  /// including dynamic import and import meta handling.
+  ///
+  /// * `source` - Source code to parser
+  /// * `name` - Optional sourcename
+  ///
+  /// Returns: Tuple contaning imports list and exports list.
+  function parse(source: String, name: String): [Array<ImportSpecifier>, Array<ExportSpecifier>, Boolean, Boolean] as parse_with_name;
+
+  /// Wait for init to resolve before calling `parse`.
+  get init: Promise<Undefined>;
+  function initSync() as init_sync;
+}

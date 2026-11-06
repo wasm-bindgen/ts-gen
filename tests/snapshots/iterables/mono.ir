@@ -1,0 +1,31 @@
+ir 1;
+
+shape class KeyValueStore {
+  list(): KeyValueStoreList<Any | Null | Undefined> throws;
+  listAsync(): KeyValueStoreListAsync<Any | Null | Undefined> throws as list_async;
+  entries(): Iterator<[String, Any | Null | Undefined]> throws;
+  keys(): Iterator<String> throws;
+  pages(): AsyncIterator<Any | Null | Undefined> throws;
+  asyncEntries(): AsyncIterator<[String, Any | Null | Undefined]> throws as async_entries;
+  put<T>(key: String, value: T | Null | Undefined) throws;
+  get<T>(key: String): T | Null | Undefined throws;
+}
+
+shape class KeyValueStoreList<T> {
+  /// Conformance to the JS iteration protocol — returns the underlying iterator.
+  "[Symbol.iterator]"(): Iterator<[String, T | Null | Undefined]> throws as iterator;
+}
+
+shape class KeyValueStoreListAsync<T> {
+  /// Conformance to the JS async iteration protocol — returns the underlying iterator.
+  "[Symbol.asyncIterator]"(): AsyncIterator<[String, T | Null | Undefined]> throws as async_iterator;
+}
+
+class Cursor {
+  walk(): CursorWalk<Any | Null | Undefined> throws;
+}
+
+shape class CursorWalk<T> {
+  /// Conformance to the JS iteration protocol — returns the underlying iterator.
+  "[Symbol.iterator]"(): Iterator<T | Null | Undefined> throws as iterator;
+}

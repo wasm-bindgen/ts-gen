@@ -1,0 +1,64 @@
+ir 1;
+
+shape class Win {
+  a();
+  b();
+}
+
+shape class OnlyA {
+  new {};
+  get x: f64;
+  set x(value: f64) as set_x;
+}
+
+class XV {
+  new() throws;
+  static stat();
+  inst();
+}
+
+class VX {
+  new() throws;
+  static stat();
+  inst();
+}
+
+class XC {
+  new() throws;
+  static stat();
+  inst();
+}
+
+shape class XF {
+  new {};
+  get a: f64;
+  set a(value: f64) as set_a;
+}
+
+shape class Proc {
+  new {};
+  get pid: f64;
+  set pid(value: f64) as set_pid;
+}
+
+class CX {
+  new() throws;
+  static stat();
+  inst();
+}
+
+shape class FX {
+  new {};
+  get a: f64;
+  set a(value: f64) as set_a;
+}
+
+class SX {
+  new() throws;
+  static added(): SX;
+  inst();
+}
+
+function FX(): FX as fx;
+function f(w: Win, o: OnlyA);
+function XF(): XF as xf;

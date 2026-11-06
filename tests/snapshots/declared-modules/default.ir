@@ -1,0 +1,47 @@
+ir 1;
+
+module "declared-modules" {
+  shape class Options {
+    new {};
+    get depth: f64;
+    set depth(value: f64) as set_depth;
+  }
+}
+
+module "declared-modules/fs" {
+  static class constants {
+    static get O_RDONLY: f64 as o_rdonly;
+  }
+}
+
+module "declared-modules/os" {
+  static class constants {
+    static get O_RDONLY: f64 as o_rdonly;
+  }
+
+  static class constants.signals {
+    static get SIGINT: f64 as sigint;
+  }
+}
+
+shape class Handle {
+  new {};
+  get fd: f64;
+  set fd(value: f64) as set_fd;
+}
+
+static class DeclaredModules {
+  static get VERSION: String as version;
+}
+
+module "declared-modules" {
+  function options(): Options;
+}
+
+module "declared-modules/fs" {
+  function open(path: String): Handle;
+}
+
+module "declared-modules/os" {
+  function hostname(): String;
+}

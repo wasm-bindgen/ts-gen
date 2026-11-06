@@ -1,0 +1,30 @@
+ir 1;
+
+module "generic-hoisting" {
+  class Envelope<Meta, Body> {
+    new(label: String): Envelope throws;
+    get label: String;
+    forward(other: Envelope): String throws;
+    copy(): Envelope throws;
+  }
+
+  class Courier {
+    new(first: Envelope) throws;
+    send(envelope: Envelope): String throws;
+    sendLabelled(envelope: Envelope<String>): String throws as send_labelled;
+    sendAsync(envelope: Envelope): Promise<String> throws as send_async;
+    sendEither(envelope: Envelope): String throws as send_either;
+    sendEither(envelope: String): String throws as send_either_with_str;
+    sendMaybe(envelope: Envelope | Undefined, tag: String): String throws as send_maybe;
+    static check(envelope: Envelope): String throws;
+  }
+
+  kind Loose {
+    F64 = Number;
+    String = String;
+  }
+
+  function post(envelope: Envelope): String throws;
+  function postAsync(envelope: Envelope): Promise<String> throws as post_async;
+  function relay<Meta>(envelope: Envelope, meta: Meta | Null | Undefined): String throws;
+}

@@ -1,0 +1,41 @@
+ir 1;
+
+class Request {
+  new(url: String) throws;
+  get url: String;
+}
+
+class Response {
+  new(body: String) throws;
+  get body: String;
+}
+
+class ExecutionContext {
+  new() throws;
+  waitUntil(promise: Promise<Any | Null | Undefined>) as wait_until;
+}
+
+shape class Env {}
+
+shape class ExportedHandler {
+  /// Handles a request.
+  get fetch?: ((Request, Env, ExecutionContext) => Any) | Undefined;
+  set fetch(value: (Request, Env, ExecutionContext) => Any) as set_fetch;
+  /// Receives trace events.
+  get tail?: ((Array<String>, Env, ExecutionContext) => Promise<Undefined> | Undefined) | Undefined;
+  set tail(value: (Array<String>, Env, ExecutionContext) => Promise<Undefined> | Undefined) as set_tail;
+  scheduled(cron: String, env: Env): Promise<Undefined>;
+  /// Always provided: a plain method with an optional parameter.
+  health(): String;
+  /// Always provided: a plain method with an optional parameter.
+  health(verbose: bool): String as health_with_verbose;
+}
+
+/// Handles a request.
+provide default.fetch(request: Request, env: Env, ctx: ExecutionContext): async Response;
+
+/// Receives trace events.
+provide default.tail(events: Array<String>, env: Env, ctx: ExecutionContext): async void;
+
+/// Always provided: a plain method with an optional parameter.
+provide default.health(verbose: bool): String;

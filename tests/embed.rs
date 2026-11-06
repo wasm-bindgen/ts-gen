@@ -122,13 +122,13 @@ fn find_node() -> Option<PathBuf> {
     Some(node)
 }
 
-/// The ABI with every declared module selected, as `--export <specifier>`
+/// The IR with every declared module selected, as `--export <specifier>`
 /// for each would.
-fn build_abi(
+fn build_ir(
     ir: &ts_gen::ir::Module,
     gctx: &ts_gen::context::GlobalContext,
     provided: &[ts_gen::provides::ProvidedFn],
-) -> ts_gen::abi::Abi {
+) -> ts_gen::abi::Ir {
     let exports = ir
         .types
         .iter()
@@ -141,29 +141,29 @@ fn build_abi(
         .chain([ts_gen::codegen::ExportSpec::File("<input>".into())])
         .collect();
     let options = ts_gen::codegen::GenerateOptions::new().exports(exports);
-    ts_gen::abi::build(ir, gctx, &options, provided)
+    ts_gen::abi::build_ir(ir, gctx, &options, provided)
 }
 
-/// The worker fixture ABI with `--provides ExportedHandler.fetch`.
-fn worker_abi() -> Result<ts_gen::abi::Abi> {
-    worker_abi_with("ExportedHandler.fetch")
+/// The worker fixture IR with `--provides ExportedHandler.fetch`.
+fn worker_ir() -> Result<ts_gen::abi::Ir> {
+    worker_ir_with("ExportedHandler.fetch")
 }
 
-fn worker_abi_with_no_exports() -> Result<ts_gen::abi::Abi> {
+fn worker_ir_with_no_exports() -> Result<ts_gen::abi::Ir> {
     let dts_file = crate_root().join("tests/fixtures/cloudflare-worker.d.ts");
     let dts_content = std::fs::read_to_string(&dts_file).context("reading .d.ts")?;
-    let (ir, gctx) =
+    let (dts, gctx) =
         ts_gen::parse_source(&dts_content, Some("cloudflare-worker")).context("parsing .d.ts")?;
-    Ok(build_abi(&ir, &gctx, &[]))
+    Ok(build_ir(&dts, &gctx, &[]))
 }
 
-fn worker_abi_with(exports: &str) -> Result<ts_gen::abi::Abi> {
+fn worker_ir_with(exports: &str) -> Result<ts_gen::abi::Ir> {
     let dts_file = crate_root().join("tests/fixtures/cloudflare-worker.d.ts");
     let dts_content = std::fs::read_to_string(&dts_file).context("reading .d.ts")?;
-    let (ir, mut gctx) =
+    let (dts, mut gctx) =
         ts_gen::parse_source(&dts_content, Some("cloudflare-worker")).context("parsing .d.ts")?;
-    let exports = ts_gen::provides::resolve(exports, &ir, &mut gctx)?;
-    Ok(build_abi(&ir, &gctx, &exports))
+    let exports = ts_gen::provides::resolve(exports, &dts, &mut gctx)?;
+    Ok(build_ir(&dts, &gctx, &exports))
 }
 
 fn run_embed_test(fixture_name: &str) -> Result<()> {
@@ -177,23 +177,21 @@ fn run_embed_test(fixture_name: &str) -> Result<()> {
     let exports_file = root
         .join("tests/fixtures/embed")
         .join(format!("{fixture_name}.provides.d.ts"));
-    let abi = if exports_file.is_file() {
-        worker_abi_with(exports_file.to_str().unwrap())
+    let ir = if exports_file.is_file() {
+        worker_ir_with(exports_file.to_str().unwrap())
     } else {
-        worker_abi()
+        worker_ir()
     }
-    .context("building ABI")?;
+    .context("building IR")?;
 
     // Read and assemble the fixture
     let wat_source = std::fs::read_to_string(&fixture).context("reading fixture")?;
     let module_bytes = ts_gen::abi::embed::assemble(&wat_source).context("assembling fixture")?;
 
     // Embed
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./hello.wasm".into(),
-    };
+    let options = ts_gen::abi::embed::Options::new("./hello.wasm");
     let output =
-        ts_gen::abi::embed::embed(&abi, &module_bytes, &options).context("running embed")?;
+        ts_gen::abi::embed::embed(&ir, &module_bytes, &options).context("running embed")?;
 
     // Compare snapshots
     assert_snapshot(&snap_dir.join("bindings.wat"), &output.bindings_wat);
@@ -365,17 +363,15 @@ fn embed_error_nonnull_on_nullable_position() {
 fn embed_nonnull_on_module_produced_positions() {
     // The module's own import arguments and handler result may be narrowed
     // even where the ABI admits null; only JS-produced positions are guarded.
-    let abi = worker_abi().unwrap();
+    let ir = worker_ir().unwrap();
     let module = r#"(module
         (import "./bindings.wasm" "Response.new_with_body" (func $new (param (ref extern)) (result externref)))
         (func (export "fetch") (param externref externref externref) (result (ref extern))
             unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
-    let out = ts_gen::abi::embed::embed(&abi, &bytes, &options)
-        .expect("narrowing own positions is sound");
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let out =
+        ts_gen::abi::embed::embed(&ir, &bytes, &options).expect("narrowing own positions is sound");
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     ts_gen::abi::embed::assemble(&out.wrapper_wat).unwrap();
     assert!(
@@ -406,12 +402,10 @@ fn embed_anyref_ctor() {
 
 /// Embed `wat` against the worker fixture and return the error message.
 fn embed_error(wat: &str) -> String {
-    let abi = worker_abi().unwrap();
+    let ir = worker_ir().unwrap();
     let bytes = ts_gen::abi::embed::assemble(wat).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./bad.wasm".into(),
-    };
-    ts_gen::abi::embed::embed(&abi, &bytes, &options)
+    let options = ts_gen::abi::embed::Options::new("./bad.wasm");
+    ts_gen::abi::embed::embed(&ir, &bytes, &options)
         .err()
         .expect("embed should fail")
         .to_string()
@@ -450,12 +444,12 @@ fn embed_error_rest_param_not_anyref_array() {
     let err = embed_error(
         r#"(module
         (type $arr (array (mut externref)))
-        (import "./bindings.wasm" "joinAll" (func (param externref (ref null $arr)) (result externref)))
+        (import "./bindings.wasm" "join_all" (func (param externref (ref null $arr)) (result externref)))
         (func (export "fetch") (param externref externref externref) (result externref)
             unreachable))"#,
     );
     assert!(
-        err.contains("joinAll")
+        err.contains("join_all")
             && err.contains("(array (mut externref))")
             && err.contains("(array (mut anyref))"),
         "error should show actual and expected array types: {err}"
@@ -488,16 +482,14 @@ fn embed_error_handler_signature() {
 fn embed_non_null_anyref_follows_the_extern_rule() {
     // `(ref any)` is accepted where `(ref extern)` is: the module's own
     // argument, and a result whose TS type has no null.
-    let abi = worker_abi().unwrap();
+    let ir = worker_ir().unwrap();
     let module = r#"(module
         (import "./bindings.wasm" "Request.url" (func (param (ref any)) (result (ref any))))
         (func (export "fetch") (param externref externref externref) (result externref)
             unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
-    let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &options).unwrap();
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     assert!(
         out.bindings_wat
@@ -520,16 +512,14 @@ fn embed_non_null_anyref_follows_the_extern_rule() {
 
 #[test]
 fn embed_error_jspi_without_provides() {
-    let abi = worker_abi_with_no_exports().unwrap();
+    let ir = worker_ir_with_no_exports().unwrap();
     let module = r#"(module
         (import "./builtins.js" "await" (func (param externref) (result externref)))
         (func (export "fetch") (param externref externref externref) (result externref)
             unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
-    let err = ts_gen::abi::embed::embed(&abi, &bytes, &options)
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let err = ts_gen::abi::embed::embed(&ir, &bytes, &options)
         .err()
         .expect("nothing would be wrapped with promising")
         .to_string();
@@ -539,7 +529,7 @@ fn embed_error_jspi_without_provides() {
 #[test]
 fn embed_error_export_collides_with_published_namespace() {
     let exports = crate_root().join("tests/fixtures/embed/exports_nested.provides.d.ts");
-    let abi = worker_abi_with(exports.to_str().unwrap()).unwrap();
+    let ir = worker_ir_with(exports.to_str().unwrap()).unwrap();
     // A raw `api` export beside the `api.math.add` the wrapper publishes
     // under `api`; `postprocess` strips only handler functions, so this
     // would survive the merge as a duplicate export.
@@ -547,10 +537,8 @@ fn embed_error_export_collides_with_published_namespace() {
         (func (export "api.math.add") (param f64 f64) (result f64) unreachable)
         (func (export "api") (result f64) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
-    let err = ts_gen::abi::embed::embed(&abi, &bytes, &options)
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let err = ts_gen::abi::embed::embed(&ir, &bytes, &options)
         .err()
         .expect("collision")
         .to_string();
@@ -562,20 +550,18 @@ fn embed_error_export_collides_with_published_namespace() {
 
 #[test]
 fn embed_error_handler_param_message_names_the_export_side() {
-    let (ir, mut gctx) = ts_gen::parse_source(
+    let (dts, mut gctx) = ts_gen::parse_source(
         "interface ExportedHandler { fetch?(request: string, env: object | null): string; }",
         None,
     )
     .unwrap();
-    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &ir, &mut gctx).unwrap();
-    let abi = build_abi(&ir, &gctx, &provided);
+    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &dts, &mut gctx).unwrap();
+    let ir = build_ir(&dts, &gctx, &provided);
     let module = r#"(module
         (func (export "fetch") (param externref (ref extern)) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
-    let err = ts_gen::abi::embed::embed(&abi, &bytes, &options)
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let err = ts_gen::abi::embed::embed(&ir, &bytes, &options)
         .err()
         .expect("nullable handler param")
         .to_string();
@@ -587,7 +573,7 @@ fn embed_error_handler_param_message_names_the_export_side() {
 
 #[test]
 fn embed_module_export_globals_take_the_declared_reference_type() {
-    let (ir, mut gctx) = ts_gen::parse_source(
+    let (dts, mut gctx) = ts_gen::parse_source(
         r#"
         declare module "m:lib" { const cfg: Sock; const maybe: Sock | null; class Sock {} }
         interface ExportedHandler { fetch?(request: string): string; }
@@ -595,17 +581,15 @@ fn embed_module_export_globals_take_the_declared_reference_type() {
         None,
     )
     .unwrap();
-    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &ir, &mut gctx).unwrap();
-    let abi = build_abi(&ir, &gctx, &provided);
+    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &dts, &mut gctx).unwrap();
+    let ir = build_ir(&dts, &gctx, &provided);
     let module = r#"(module
         (import "m:lib" "cfg" (func (result (ref extern))))
         (import "m:lib" "maybe" (func (result anyref)))
         (func (export "fetch") (param externref) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
-    let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &options).unwrap();
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     assert!(
         out.bindings_wat
@@ -623,7 +607,7 @@ fn embed_module_export_globals_take_the_declared_reference_type() {
 
 #[test]
 fn embed_beyond_the_call_family_applies_an_array() {
-    let (ir, mut gctx) = ts_gen::parse_source(
+    let (dts, mut gctx) = ts_gen::parse_source(
         r#"
         declare function nine(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): number;
         declare class Big { constructor(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number); }
@@ -633,8 +617,8 @@ fn embed_beyond_the_call_family_applies_an_array() {
         None,
     )
     .unwrap();
-    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &ir, &mut gctx).unwrap();
-    let abi = build_abi(&ir, &gctx, &provided);
+    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &dts, &mut gctx).unwrap();
+    let ir = build_ir(&dts, &gctx, &provided);
     let module = r#"(module
         (type $anyrefs (array (mut anyref)))
         (import "./bindings.wasm" "nine" (func (param f64 f64 f64 f64 f64 f64 f64 f64 f64) (result f64)))
@@ -642,10 +626,8 @@ fn embed_beyond_the_call_family_applies_an_array() {
         (import "./bindings.wasm" "Spread.new" (func (param (ref null $anyrefs)) (result externref)))
         (func (export "fetch") (param externref) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
-    let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &options).unwrap();
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     assert!(
         out.builtins_js.contains("reflect_apply"),
@@ -674,14 +656,12 @@ fn embed_error_no_handler() {
 
 #[test]
 fn embed_without_exports_passes_the_module_through() {
-    let abi = worker_abi_with_no_exports().unwrap();
+    let ir = worker_ir_with_no_exports().unwrap();
     let module = r#"(module
         (func (export "whatever") (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
-    let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &options).unwrap();
     assert!(out.handlers.is_empty());
     assert!(
         out.wrapper_wat.contains("No --provides"),
@@ -693,7 +673,7 @@ fn embed_without_exports_passes_the_module_through() {
 
 #[test]
 fn embed_binds_one_function_under_every_alias() {
-    let (ir, mut gctx) = ts_gen::parse_source(
+    let (dts, mut gctx) = ts_gen::parse_source(
         r#"
         declare module "m:lib" {
             class _Conn { constructor(); get(): string; }
@@ -704,8 +684,8 @@ fn embed_binds_one_function_under_every_alias() {
         None,
     )
     .unwrap();
-    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &ir, &mut gctx).unwrap();
-    let abi = build_abi(&ir, &gctx, &provided);
+    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &dts, &mut gctx).unwrap();
+    let ir = build_ir(&dts, &gctx, &provided);
     // The two `new` imports differ in result type, so they need two functions.
     let module = r#"(module
         (import "m:lib" "Conn.get" (func (param externref) (result externref)))
@@ -714,10 +694,8 @@ fn embed_binds_one_function_under_every_alias() {
         (import "m:lib" "Connection.new" (func (result (ref extern))))
         (func (export "fetch") (param externref) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
-    let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &options).unwrap();
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     let b = &out.bindings_wat;
     assert!(
@@ -747,7 +725,7 @@ fn embed_binds_one_function_under_every_alias() {
 
 #[test]
 fn embed_links_the_same_name_from_two_modules_separately() {
-    let (ir, mut gctx) = ts_gen::parse_source(
+    let (dts, mut gctx) = ts_gen::parse_source(
         r#"
         declare module "m:a" { namespace constants { const MODE: Sock; } class Sock {} }
         declare module "m:b" { namespace constants { const MODE: Sock; } class Sock {} }
@@ -756,17 +734,15 @@ fn embed_links_the_same_name_from_two_modules_separately() {
         None,
     )
     .unwrap();
-    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &ir, &mut gctx).unwrap();
-    let abi = build_abi(&ir, &gctx, &provided);
+    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &dts, &mut gctx).unwrap();
+    let ir = build_ir(&dts, &gctx, &provided);
     let module = r#"(module
-        (import "m:a" "constants.MODE" (func (result externref)))
-        (import "m:b" "constants.MODE" (func (result externref)))
+        (import "m:a" "constants.mode" (func (result externref)))
+        (import "m:b" "constants.mode" (func (result externref)))
         (func (export "fetch") (param externref) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
-    let options = ts_gen::abi::embed::Options {
-        module_specifier: "./m.wasm".into(),
-    };
-    let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
+    let options = ts_gen::abi::embed::Options::new("./m.wasm");
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &options).unwrap();
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     let b = &out.bindings_wat;
     for spec in ["m:a", "m:b"] {
@@ -778,7 +754,7 @@ fn embed_links_the_same_name_from_two_modules_separately() {
         );
         assert!(
             b.contains(&format!(
-                r#"(func (export "ts-gen:bindings.{spec}:constants.MODE")"#
+                r#"(func (export "ts-gen:bindings.{spec}:constants.mode")"#
             )),
             "{b}"
         );
@@ -797,12 +773,63 @@ fn embed_links_the_same_name_from_two_modules_separately() {
         [
             (
                 "./bindings.wasm".to_string(),
-                "ts-gen:bindings.m:a:constants.MODE".to_string()
+                "ts-gen:bindings.m:a:constants.mode".to_string()
             ),
             (
                 "./bindings.wasm".to_string(),
-                "ts-gen:bindings.m:b:constants.MODE".to_string()
+                "ts-gen:bindings.m:b:constants.mode".to_string()
             ),
         ]
     );
+}
+
+#[test]
+fn embed_member_from_another_module() {
+    // A constructor another module's variable exports (`new RpcStub(...)
+    // from "cloudflare:workers"`) is imported from, and constructs the
+    // export of, that module rather than its class's.
+    let (dts, mut gctx) = ts_gen::parse_source(
+        r#"
+        declare namespace Rpc { interface Stub { dup(): Stub; } }
+        declare namespace WorkersModule {
+            export type RpcStub = Rpc.Stub;
+            export const RpcStub: { new (value: string): Rpc.Stub };
+        }
+        declare module "m:workers" { export = WorkersModule; }
+        interface ExportedHandler { fetch?(request: string): string; }
+        "#,
+        None,
+    )
+    .unwrap();
+    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &dts, &mut gctx).unwrap();
+    let ir = build_ir(&dts, &gctx, &provided);
+    let stub = ir.class(None, "Rpc.Stub").unwrap();
+    assert_eq!(
+        (
+            stub.members[0].js.as_str(),
+            stub.members[0].module.as_deref()
+        ),
+        ("RpcStub", Some("m:workers"))
+    );
+    let module = r#"(module
+        (import "m:workers" "Rpc.Stub.new" (func (param externref) (result externref)))
+        (func (export "fetch") (param externref) (result externref) unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &ts_gen::abi::embed::Options::new("./m.wasm"))
+        .unwrap();
+    ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
+    assert_eq!(out.used, ["m:workers:Rpc.Stub.new"]);
+    let b = &out.bindings_wat;
+    assert!(
+        b.contains(r#"(import "m:workers" "RpcStub" (global $m:m:workers:RpcStub externref))"#),
+        "{b}"
+    );
+    assert!(
+        b.contains(
+            r#"(func (export "ts-gen:bindings.m:workers:Rpc.Stub.new") (param $value externref) (result externref)
+    (call $call_new1 (global.get $m:m:workers:RpcStub) (local.get $value)))"#
+        ),
+        "{b}"
+    );
+    assert_eq!(b.matches("(import ").count(), 2, "{b}");
 }

@@ -1,0 +1,43 @@
+ir 1;
+
+module "namespace-type-aliases" {
+  class Holder<T> {
+    on(listener: (T | Null | Undefined) => void);
+  }
+}
+
+shape class Shadowed {
+  new {};
+  get globalSide: String as global_side;
+  set globalSide(value: String) as set_global_side;
+}
+
+static class Events {
+  static listen(name: String, options: Events.Options): String;
+  static pair(p: [String, Number]): [Number, String];
+}
+
+shape class Events.Shadowed {
+  new {};
+  get eventsSide: f64 as events_side;
+  set eventsSide(value: f64) as set_events_side;
+}
+
+shape class Events.Options {
+  new {};
+  get name: String;
+  set name(value: String) as set_name;
+}
+
+static class Events.Inner {
+  static find(id: String): Events.Options;
+}
+
+module "namespace-type-aliases" {
+  function emit(name: String, options: Events.Options): String;
+  function onEvent(listener: (String) => void) as on_event;
+  function outerPair(r: [Number, String]) as outer_pair;
+  function loose(x: String);
+  function loose(x: f64) as loose_with_f64;
+  function tagged(t: [Number, Events.Shadowed]);
+}

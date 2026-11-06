@@ -1,0 +1,64 @@
+ir 1;
+
+module "generic-mono" {
+  class Holder<T> {
+    new(value: T | Null | Undefined): Holder throws;
+    get(): T | Null | Undefined throws;
+    set(value: T | Null | Undefined) throws;
+  }
+
+  class Store<T> {
+    load(): Promise<T | Null | Undefined> throws;
+    loadHolder(): Promise<Holder<T | Null | Undefined>> throws as load_holder;
+    find(key: String): T | Null | Undefined throws;
+  }
+
+  shape class EvaluationDetails<T> {
+    new {}: EvaluationDetails;
+    get flagKey: String as flag_key;
+    set flagKey(value: String) as set_flag_key;
+    get value: T | Null | Undefined;
+    set value(value: T | Null | Undefined) as set_value;
+    get variant?: String | Undefined;
+    set variant(value: String) as set_variant;
+  }
+
+  shape class Pair<A, B> {
+    new {}: Pair;
+    get first: A | Null | Undefined;
+    set first(value: A | Null | Undefined) as set_first;
+    get second: B | Null | Undefined;
+    set second(value: B | Null | Undefined) as set_second;
+  }
+
+  shape class TypedArrayOptions {
+    new {};
+    get value: ArrayBufferView;
+    set value(value: ArrayBufferView) as set_value;
+    get extra?: ArrayBufferView | Undefined;
+    set extra(value: ArrayBufferView) as set_extra;
+  }
+
+  class Flags {
+    getStringValue(default_value: String): Promise<String> throws as get_string_value;
+    getStringDetails(default_value: String): Promise<EvaluationDetails<String>> throws as get_string_details;
+    getBooleanDetails(default_value: bool): Promise<EvaluationDetails<Boolean>> throws as get_boolean_details;
+    getNumberDetails(default_value: f64): Promise<EvaluationDetails<Number>> throws as get_number_details;
+    getNullableString(default_value: String): Promise<String | Undefined> throws as get_nullable_string;
+    getStringPair(default_value: String): Promise<Pair<String, String>> throws as get_string_pair;
+    getStringArray(): Promise<Array<String>> throws as get_string_array;
+    getStringMap(): Promise<Map<String, String>> throws as get_string_map;
+    getStringTuple(): Promise<[String, String]> throws as get_string_tuple;
+    getStringCallback(): Promise<(String) => String> throws as get_string_callback;
+    compareStrings(left: String, right: String): bool throws as compare_strings;
+  }
+
+  function identity<T>(value: T | Null | Undefined): T | Null | Undefined throws;
+
+  /// ## Errors
+  ///
+  /// * `TypeError`
+  function parseString(value: String): String throws TypeError as parse_string;
+  function roundtripBoolean(value: bool): bool throws as roundtrip_boolean;
+  function roundtripNumber(value: f64): f64 throws as roundtrip_number;
+}

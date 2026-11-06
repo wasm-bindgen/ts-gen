@@ -1,0 +1,259 @@
+ir 1;
+
+module "type-eval" {
+  shape class Options {
+    new {};
+    /// The name.
+    get name: String;
+    set name(value: String) as set_name;
+    get size?: Number | Undefined;
+    set size(value: f64) as set_size;
+    get fixed: bool;
+  }
+
+  shape class Sized {
+    new {};
+    get size?: Number | Undefined;
+    set size(value: f64) as set_size;
+  }
+
+  shape class Named {
+    new {};
+    get label?: String | Undefined;
+    set label(value: String) as set_label;
+    /// The name.
+    get name: String;
+    set name(value: String) as set_name;
+    get fixed: bool;
+  }
+
+  shape class Mixed {
+    new {};
+    /// The name.
+    get name: String;
+    set name(value: String) as set_name;
+    get size?: Number | Undefined;
+    set size(value: f64) as set_size;
+  }
+
+  shape class Rounding<U> {
+    new {}: Rounding;
+    get smallestUnit?: Plural | Undefined as smallest_unit;
+    set smallestUnit(value: Plural) as set_smallest_unit;
+    get largestUnit?: LargestUnitKind | Undefined as largest_unit;
+    set largestUnit(value: LargestUnitKind) as set_largest_unit;
+  }
+
+  shape class Box<T> {
+    new {}: Box;
+    get value: T | Null | Undefined;
+    set value(value: T | Null | Undefined) as set_value;
+    get label: String;
+    set label(value: String) as set_label;
+  }
+
+  shape class Holder<T> {
+    new {}: Holder;
+    get partial: PartialBox<T | Null | Undefined>;
+    set partial(value: PartialBox<T | Null | Undefined>) as set_partial;
+  }
+
+  shape class Extended extends Options {
+    new {};
+    get extra: f64;
+    set extra(value: f64) as set_extra;
+  }
+
+  static class Scoped {
+    static apply(settings: Scoped.PartialSettings, mode: Scoped.NotFast);
+  }
+
+  shape class Scoped.Settings {
+    new {};
+    get mode?: Scoped.Mode | Undefined;
+    set mode(value: Scoped.Mode) as set_mode;
+    get depth: f64;
+    set depth(value: f64) as set_depth;
+  }
+
+  shape class Scoped.PartialSettings {
+    new {};
+    get mode?: Scoped.Mode | Undefined;
+    set mode(value: Scoped.Mode) as set_mode;
+    get depth?: Number | Undefined;
+    set depth(value: f64) as set_depth;
+  }
+
+  class Widget {
+    get size: f64;
+    set size(value: f64) as set_size;
+    render();
+  }
+
+  shape class PartialOptions {
+    new {};
+    /// The name.
+    get name?: String | Undefined;
+    set name(value: String) as set_name;
+    get size?: Number | Undefined;
+    set size(value: f64) as set_size;
+    get fixed?: Boolean | Undefined;
+  }
+
+  shape class RequiredOptions {
+    new {};
+    /// The name.
+    get name: String;
+    set name(value: String) as set_name;
+    get size: f64;
+    set size(value: f64) as set_size;
+    get fixed: bool;
+  }
+
+  shape class ReadonlyOptions {
+    new {};
+    /// The name.
+    get name: String;
+    get size?: Number | Undefined;
+    get fixed: bool;
+  }
+
+  shape class PickOptionsNameOrSize {
+    new {};
+    /// The name.
+    get name: String;
+    set name(value: String) as set_name;
+    get size?: Number | Undefined;
+    set size(value: f64) as set_size;
+  }
+
+  shape class LooseOptions {
+    new {};
+    /// The name.
+    get name?: String | Undefined;
+    set name(value: String) as set_name;
+    get size?: Number | Undefined;
+    set size(value: f64) as set_size;
+    get fixed?: Boolean | Undefined;
+  }
+
+  shape class FlagsAOrB {
+    new {};
+    get a: bool;
+    set a(value: bool) as set_a;
+    get b: bool;
+    set b(value: bool) as set_b;
+  }
+
+  shape class PartialBox<T> {
+    new {}: PartialBox;
+    get value?: T | Null | Undefined;
+    set value(value: T | Null | Undefined) as set_value;
+    get label?: String | Undefined;
+    set label(value: String) as set_label;
+  }
+
+  shape class PartialExtended {
+    new {};
+    get extra?: Number | Undefined;
+    set extra(value: f64) as set_extra;
+    /// The name.
+    get name?: String | Undefined;
+    set name(value: String) as set_name;
+    get size?: Number | Undefined;
+    set size(value: f64) as set_size;
+    get fixed?: Boolean | Undefined;
+  }
+
+  kind Unit {
+    Hour = "hour";
+    Minute = "minute";
+    Second = "second";
+  }
+
+  kind Minute {
+    Minute = "minute";
+  }
+
+  kind OptionKey {
+    Name = "name";
+    Size = "size";
+    Fixed = "fixed";
+  }
+
+  kind NotMinute {
+    Hour = "hour";
+    Second = "second";
+  }
+
+  kind Plural {
+    Hour = "hour";
+    Minute = "minute";
+    Second = "second";
+    Hours = "hours";
+    Minutes = "minutes";
+    Seconds = "seconds";
+  }
+
+  kind Scoped.Mode {
+    Fast = "fast";
+    Slow = "slow";
+  }
+
+  kind Scoped.NotFast {
+    Slow = "slow";
+  }
+
+  kind ExcludeUnitHour {
+    Minute = "minute";
+    Second = "second";
+  }
+
+  kind ExtractUnitOrDayUnit {
+    Hour = "hour";
+    Minute = "minute";
+    Second = "second";
+  }
+
+  kind PluralHourOrMinute {
+    Hour = "hour";
+    Minute = "minute";
+    Hours = "hours";
+    Minutes = "minutes";
+  }
+
+  kind KeyOfExtended {
+    Extra = "extra";
+    Name = "name";
+    Size = "size";
+    Fixed = "fixed";
+  }
+}
+
+kind LargestUnitKind {
+  Auto = "auto";
+  Hour = "hour";
+  Minute = "minute";
+  Second = "second";
+  Hours = "hours";
+  Minutes = "minutes";
+  Seconds = "seconds";
+}
+
+module "type-eval" {
+  function roundTo(unit: ExcludeUnitHour) as round_to;
+  function pickUnit(unit: ExtractUnitOrDayUnit) as pick_unit;
+  function present(value: String);
+  function configure(partial: PartialOptions, required: RequiredOptions, frozen: ReadonlyOptions, picked: PickOptionsNameOrSize, omitted: PickOptionsNameOrSize, unchanged: Sized);
+  function keyed(picked: PickOptionsNameOrSize);
+  function mapped(loose: LooseOptions, strict: RequiredOptions, flags: FlagsAOrB, patch: PartialOptions);
+  function patch(open: Any);
+  function size(opts: Options): Number | Undefined;
+  function plural(all: Plural, some: PluralHourOrMinute);
+  function round(opts: Rounding<"hour">);
+  function extended(keys: KeyOfExtended, partial: PartialExtended);
+  function fail() throws;
+  function fallback(value: Any);
+  function widget(partial: Widget);
+  function unbound<T>(keys: Any, partial: T | Null | Undefined);
+}

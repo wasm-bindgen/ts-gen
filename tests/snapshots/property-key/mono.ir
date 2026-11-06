@@ -1,0 +1,17 @@
+ir 1;
+
+kind FirstKeyReturnKind {
+  String = String;
+  F64 = Number;
+  Symbol = Symbol;
+}
+
+module "property-key" {
+  function hasKey(key: String): bool throws as has_key;
+  function hasKey(key: f64): bool throws as has_key_with_f64;
+  function hasKey(key: Symbol): bool throws as has_key_with_symbol;
+  function firstKey(): FirstKeyReturnKind throws as first_key;
+  function keys(): Array<PropertyKey> throws;
+  function setValue(value: String) throws as set_value;
+  function setValue(value: f64) throws as set_value_with_f64;
+}

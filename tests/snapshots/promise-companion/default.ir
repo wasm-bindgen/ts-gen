@@ -1,0 +1,36 @@
+ir 1;
+
+class State {
+  /// `block_concurrency_while` + `block_concurrency_while_promise`.
+  blockConcurrencyWhile(callback: () => Promise<Undefined>): Promise<Undefined> as block_concurrency_while;
+  /// Overloads: each expansion gets its own `_promise`.
+  fetch(url: String): Promise<Response>;
+  fetch(url: String, init: RequestInit): Promise<Response> as fetch_with_init;
+  /// Awaited: `Nullable<String>`; the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`.
+  get(key: String): Promise<String | Null>;
+  /// A `null` argument arm gets its own `_promise` form too.
+  put(key: String, value: String): Promise<Undefined>;
+  /// A `null` argument arm gets its own `_promise` form too.
+  put(key: String, value: Null): Promise<Undefined> as put_with_null;
+  /// ## Errors
+  ///
+  /// * `TypeError` — on an invalid key
+  delete(key: String): Promise<Boolean> raises TypeError;
+  /// `@throws {never}` drops `catch` from the async form; the promise
+  /// form is plain under every policy.
+  ready(): Promise<Boolean> nothrow;
+  /// Sync methods are untouched.
+  id(): String;
+  /// A `Promise`-typed property is already sync; no companion.
+  get done: Promise<Undefined>;
+}
+
+class Response {}
+
+shape class RequestInit {
+  new {};
+  get method?: String | Undefined;
+  set method(value: String) as set_method;
+}
+
+function sleep(ms: f64): Promise<Undefined>;

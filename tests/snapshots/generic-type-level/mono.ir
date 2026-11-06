@@ -1,0 +1,56 @@
+ir 1;
+
+shape class Event {
+  new {};
+  get type: String as type_;
+}
+
+class EventTarget<EventMap> {
+  new(): EventTarget throws;
+  dispatchEvent(event: Event): bool throws as dispatch_event;
+}
+
+class AbortSignal extends EventTarget {
+  get aborted: bool;
+}
+
+class PingTarget extends EventTarget {}
+
+shape class Bag extends Record<Any | Null | Undefined> {
+  new {};
+  get size: f64;
+}
+
+shape class Transformer<I, O> {
+  new {}: Transformer;
+  get readableType?: I | Null | Undefined as readable_type;
+  set readableType(value: I | Null | Undefined) as set_readable_type;
+  get writableType?: O | Null | Undefined as writable_type;
+  set writableType(value: O | Null | Undefined) as set_writable_type;
+}
+
+class TransformStream<I, O> {
+  new(): TransformStream throws;
+  new(transformer: Transformer<I | Null | Undefined, O | Null | Undefined>): TransformStream throws as new_with_transformer;
+  get locked: bool;
+}
+
+class Labelled<T> {
+  new(value: T | Null | Undefined): Labelled throws;
+  static empty(): Labelled throws;
+  static of(value: T | Null | Undefined): Labelled<T | Null | Undefined> throws;
+  static load(): Promise<T | Null | Undefined>;
+  get value: T | Null | Undefined;
+}
+
+class Chained<A, B, C> {
+  new(c: C | Null | Undefined): Chained throws;
+}
+
+shape class Storage<Props> {
+  get<T>(key: String): Promise<T | Null | Undefined>;
+  run<T>(callback: () => Promise<T | Null | Undefined>): Promise<T | Null | Undefined>;
+  props(): Props | Null | Undefined throws;
+}
+
+function loadValue<T>(): Promise<T | Null | Undefined> as load_value;

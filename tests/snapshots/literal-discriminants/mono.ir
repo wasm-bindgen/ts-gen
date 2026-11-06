@@ -1,0 +1,66 @@
+ir 1;
+
+module "literal-discriminants" {
+  shape class Options {
+    new {};
+    get keepAlive: KeepAliveKind as keep_alive;
+    set keepAlive(value: KeepAliveKind) as set_keep_alive;
+    get label?: String | Undefined;
+    set label(value: String) as set_label;
+  }
+
+  shape class Scaled {
+    new {};
+    get scale: Number;
+    set scale(value: f64) as set_scale;
+  }
+
+  shape class Feedback {
+    new {};
+    get value: ValueKind | Null;
+  }
+}
+
+kind KeepAliveKind {
+  N0 = 0;
+  N1 = 1;
+  N2 = 2;
+}
+
+kind DirectionReturnKind {
+  Neg1 = -1;
+  N0 = 0;
+  N1 = 1;
+}
+
+kind ValueKind {
+  Neg1 = -1;
+  N1 = 1;
+}
+
+kind SizeReturnKind {
+  Auto = "auto";
+  F64 = Number;
+}
+
+kind RepeatReturnKind {
+  Bool = Boolean;
+  X = "x";
+  Y = "y";
+}
+
+kind FlagReturnKind {
+  Bool = Boolean;
+  ArrayBuffer = ArrayBuffer;
+}
+
+module "literal-discriminants" {
+  function level(): KeepAliveKind throws;
+  function direction(): DirectionReturnKind throws;
+  function ratio(): Number throws;
+  function count(): Number throws;
+  function wide(): Number throws;
+  function size(): SizeReturnKind throws;
+  function repeat(): RepeatReturnKind throws;
+  function flag(): FlagReturnKind throws;
+}
