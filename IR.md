@@ -1,8 +1,8 @@
 # The ts-gen IR
 
 The IR is a `.d.ts` expanded into uniquely named bindings with wasm-level
-types. ts-gen writes it; language generators read it to write a
-language's bindings, and the bridge builder reads it to build
+types. ts-gen writes it; language generators (Rust, Zena) read it to
+write a language's bindings, and the bridge builder reads it to build
 `bindings.wasm`, which implements every binding in JS terms. A generator
 needs nothing from TypeScript or ts-gen: overloads are already expanded
 into separately named members, naming options are applied, and every

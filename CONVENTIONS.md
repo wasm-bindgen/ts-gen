@@ -5029,7 +5029,7 @@ Besides the default `--target rust` output (wasm-bindgen extern
 blocks), ts-gen can emit **the ts-gen IR** ([IR.md](IR.md)), uniquely
 named bindings with wasm-level types, for languages that compile
 directly to WebAssembly without wasm-bindgen. `--target ir` writes it;
-bindings generators read it to write a
+[bindings generators](#bindings-generators) read it to write a
 language's bindings, and `ts-gen embed` implements the bindings for a
 module written against it. `--target wat` derives a plain WAT import
 template from it: every binding as an import from `./bindings.wasm`
@@ -5433,6 +5433,13 @@ runtime in workerd) presents their values as the module's exports,
 so `export default` is the handler object. Instantiated by hand, read
 `exports.default.value`.
 
+### Bindings generators
+
+A language's bindings are written by a program that reads the IR,
+outside ts-gen: [`generators/zena`](generators/zena/README.md) for Zena.
+[IR.md](IR.md) specifies the IR, the only interface between them and
+ts-gen.
+
 ### Limitations
 
 **Variadics** (`...rest: T[]`) become a Wasm GC array parameter
@@ -5440,7 +5447,9 @@ so `export default` is the handler object. Instantiated by hand, read
 anyref)))`. The `anyref` element type lets GC languages build the
 array natively. Fixed parameters before the rest are allowed; the
 bindings copy the GC array into a JS array and call `Reflect.apply`.
-This requires Wasm GC, not just reference-types.
+This requires Wasm GC, not just reference-types. Zena cannot convert
+an `externref` to `anyref` (`x as anyref` does not compile), so from
+Zena the array holds only Zena values.
 
 **Duplicate names.** Within one module, or among the globals, a
 declaration merged from several `.d.ts` statements contributes each

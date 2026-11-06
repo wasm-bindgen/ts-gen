@@ -1,0 +1,30 @@
+ir 1;
+
+class Error {
+  new(message: String) throws;
+  get message: String;
+}
+
+class String {
+  get length: f64;
+}
+
+class FixedArray {}
+
+class Message {
+  new() throws;
+  static create(n: f64): Message;
+}
+
+function isEmpty(x: String): bool as is_empty;
+function isUndefined(x: String): bool as is_undefined;
+function numberValue(): f64 as number_value;
+get Undefined: f64 as undefined;
+function await_(p: Promise<Undefined>);
+function describe(e: Error, s: String): String;
+function send(m: String);
+
+module "mail" {
+  function send(m: String);
+  function send(m: String, opt: f64) as send_with_opt;
+}

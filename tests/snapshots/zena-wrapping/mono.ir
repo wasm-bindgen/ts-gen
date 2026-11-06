@@ -1,0 +1,22 @@
+ir 1;
+
+class Item {
+  new() throws;
+  get name: String;
+  get label?: String | Undefined;
+  set label(value: String) as set_label;
+  get parent: Item | Null;
+  set parent(value: Item) as set_parent;
+  set parent(value: Null) as set_parent_with_null;
+}
+
+function find(name: String): Item | Null throws;
+function find(name: Null): Item | Null throws as find_with_null;
+function find(name: String, fallback: Item): Item | Null throws as find_with_fallback;
+function find(name: Null, fallback: Item): Item | Null throws as find_with_null_and_fallback;
+function first(): Item | Undefined throws;
+function title(): String | Undefined throws;
+function join(sep: String, ...parts: Array<String>): String throws;
+
+provide handle(item: Item | Null, name: String | Undefined, label: String): Item | Undefined;
+provide pick(item: Item, flag: bool): String | Null;

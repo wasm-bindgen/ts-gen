@@ -21,11 +21,11 @@ clippy:
 
 # Run ts-gen unit + snapshot tests
 test *ARGS="":
-    RUST_BACKTRACE=1 cargo +stable test -p ts-gen -p ts-gen-abi {{ARGS}}
+    RUST_BACKTRACE=1 cargo +stable test -p ts-gen -p ts-gen-abi -p ts-gen-zena {{ARGS}}
 
 # Re-bless all snapshots
 test-overwrite:
-    RUST_BACKTRACE=1 BLESS=1 cargo +stable test -p ts-gen
+    RUST_BACKTRACE=1 BLESS=1 cargo +stable test -p ts-gen -p ts-gen-zena
 
 # Run wasm-bindgen integration tests (requires wasm32-unknown-unknown target + Node)
 # package.json must live alongside the crate's Cargo.toml: wasm-bindgen-test-runner

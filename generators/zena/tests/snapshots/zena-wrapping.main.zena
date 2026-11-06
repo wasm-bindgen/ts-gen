@@ -1,0 +1,5 @@
+import * as app from './app.zena';
+import { Item, Undefined, isUndefined } from './bindings.zena';
+
+export function handle(item: externref | null, name: externref, label: externref): externref { let __r = app.handle(if (isUndefined(item) || item == null) null else new Item(item), if (isUndefined(name)) null else String.fromHandle(name), String.fromHandle(label)); return if (__r == null) Undefined else __r.ref(); }
+export function pick(item: externref, flag: boolean): externref | null { let __r = app.pick(new Item(item), flag); return if (__r == null) null else __r.handle; }

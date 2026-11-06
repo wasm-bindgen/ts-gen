@@ -1,0 +1,6 @@
+import * as app from './app.zena';
+import { Env, ExecutionContext, Request, Undefined } from './bindings.zena';
+
+export function fetch(request: externref, env: externref, ctx: externref): externref { return app.fetch(new Request(request), new Env(env), new ExecutionContext(ctx)).ref(); }
+export function tail(events: externref, env: externref, ctx: externref): externref { app.tail(events, new Env(env), new ExecutionContext(ctx)); return Undefined; }
+export function health(verbose: boolean): externref { return app.health(verbose).handle; }

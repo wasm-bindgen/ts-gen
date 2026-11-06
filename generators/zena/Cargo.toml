@@ -1,0 +1,22 @@
+[package]
+description = "Zena bindings for the ts-gen IR"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+name = "ts-gen-zena"
+repository = "https://github.com/wasm-bindgen/ts-gen"
+version = "0.1.0"
+
+[[bin]]
+name = "ts-gen-zena"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+ts-gen-abi = { path = "../../abi" }
+
+# The tests build each fixture's IR with ts-gen; the generator itself
+# reads only the IR.
+[dev-dependencies]
+ts-gen = { path = "../..", default-features = false }
+similar = "2"
+wasmparser = "0.262"
