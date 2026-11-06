@@ -1,0 +1,158 @@
+ir 1;
+
+module "sanitised-keys" {
+  class Pair {
+    new() throws;
+    get "0": Socket as _0;
+    set "0"(value: Socket) as set0;
+    get "1": Socket as _1;
+    set "1"(value: Socket) as set1;
+    static get "2": Socket as _2;
+    static set "2"(value: Socket) as set2;
+    get $public: String as public;
+    set $public(value: String) as setPublic;
+    static get "@cf/model": String as cfmodel;
+    static set "@cf/model"(value: String) as setCfmodel;
+    $emit(event: String) as emit;
+    "@cf/run"() as cfrun;
+    static $create(): Pair as create;
+  }
+
+  class Socket {
+    accept();
+  }
+
+  class $Store as Store {
+    new() throws;
+    static create(): Store;
+    static get count: f64;
+    static set count(value: f64) as setCount;
+  }
+
+  class $_ as DollarUnderscore {
+    new() throws;
+    get _: String as underscore;
+    set _(value: String) as setUnderscore;
+  }
+
+  class Collide {
+    new() throws;
+    get data: String;
+    set data(value: String) as setData;
+    get $data: String as data2;
+    set $data(value: String) as setData2;
+  }
+
+  shape class CollideInit {
+    new {};
+    get fooBar: f64 as fooBar2;
+    set fooBar(value: f64) as setFooBar2;
+    get foo_bar: f64 as fooBar;
+    set foo_bar(value: f64) as setFooBar;
+    get data?: String | Undefined;
+    set data(value: String) as setData;
+    get $data?: String | Undefined as data2;
+    set $data(value: String) as setData2;
+  }
+
+  shape class MethodCollide {
+    data();
+    get $data: String as data2;
+    set $data(value: String) as setData2;
+    setFoo();
+    get foo: String;
+    set foo(value: String) as setFoo2;
+    call();
+    call(a: String) as callWithA;
+    call(a: f64) as callWithA2;
+  }
+
+  shape class SetterCollide {
+    new {};
+    get setFoo: String;
+    set setFoo(value: String) as setSetFoo;
+    get foo: String;
+    set foo(value: String) as setFoo2;
+  }
+
+  class SetterNumbers {
+    get data: String;
+    set data(value: String) as setData3;
+    get $data: String as data2;
+    set $data(value: String) as setData2;
+    setData();
+  }
+
+  class ReadonlyCollide {
+    get value: String;
+    setValue(value: String);
+    static get level: f64;
+    static setLevel(level: f64);
+  }
+
+  class Receiver {
+    method(this2: String, value: f64);
+  }
+
+  shape class ReservedInit {
+    new {};
+    get "new": String as new_;
+    set "new"(value: String) as setNew;
+    get inner: String;
+    set inner(value: String) as setInner;
+    get builder?: Number | Undefined as builder_;
+    set builder(value: f64) as setBuilder;
+    get build?: Boolean | Undefined as build_;
+    set build(value: bool) as setBuild;
+  }
+
+  class ReservedClass {
+    new() throws;
+    get "new": String as new_;
+    set "new"(value: String) as setNew;
+  }
+
+  class ReservedMethod {
+    new() throws;
+    "new"() as new2;
+  }
+
+  static class Scoped {
+    static fetchUrl(url: String);
+  }
+
+  static class Ns {
+    static get x: f64;
+  }
+
+  static class ns {
+    static get x: String as x2;
+  }
+
+  kind Op {
+    Plus = "+";
+    Minus = "-";
+    Empty = "";
+    LtEq = "<=";
+  }
+
+  kind Sigil {
+    Dollar = 1;
+    Underscore = 2;
+  }
+
+  function $(selector: String): Pair as dollar2;
+  get $version: String as version;
+  function $$(selector: String): Array<Pair> as dollarDollar;
+  get __: f64 as underscoreUnderscore;
+  function each(underscore: f64, dollar: String);
+  function compare(op: Op);
+  function ajax(url: String);
+  function $ajax(url: String) as ajax2;
+  function dollar();
+  function collideArgs(a: String, a2: f64, foo_bar: String, foo_bar2: f64);
+  get url: String;
+  get val: String as val_;
+  get inner: f64 as inner_;
+  function fetchUrl(url: String);
+}

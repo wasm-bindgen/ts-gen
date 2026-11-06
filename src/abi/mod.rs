@@ -13,6 +13,7 @@
 
 pub mod embed;
 mod lower;
+pub mod naming;
 pub mod wat;
 
 use crate::codegen::GenerateOptions;
@@ -20,14 +21,16 @@ use crate::context::GlobalContext;
 use crate::ir::Module;
 use crate::provides::ProvidedFn;
 
+pub use naming::{Case, Naming, Preset};
 pub use ts_gen_abi::ir::Ir;
 pub use ts_gen_abi::{
     OwnerRef, WasmType, BINDINGS_SPECIFIER, BUILTINS_SPECIFIER, STRING_CONSTANTS, UNDEFINED_GLOBAL,
 };
 
 /// The IR of the declarations the Rust bindings emit for `module` under
-/// `options`: one member per Rust binding, under its Rust name, with the
-/// bindings that only present another in Rust left out.
+/// `options`: one member per Rust binding, under its Rust name or as
+/// `options`' naming respells it, with the bindings that only present
+/// another in Rust left out.
 pub fn build_ir(
     module: &Module,
     gctx: &GlobalContext,

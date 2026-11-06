@@ -46,6 +46,7 @@ src/
 ├── abi/                       # the ts-gen IR (--target ir / wat, embed)
 │   ├── mod.rs                 # `build_ir()`: .d.ts → the ts-gen-abi IR
 │   ├── lower.rs               # the lowering, from the Rust emitters' records
+│   ├── naming.rs              # --naming presets, applied to the IR
 │   ├── wat.rs                 # --target wat: a WAT import template derived from the IR
 │   └── embed.rs               # bindings.wasm / wrapper.wasm emitter
 └── util/                      # naming, diagnostics, dedup helpers

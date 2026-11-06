@@ -111,6 +111,10 @@ pub struct GenerateOptions {
     /// A module that is fully covered by `--external` is always
     /// suppressed from emission regardless of its presence here.
     exports: HashSet<ExportSpec>,
+
+    /// How the IR names members for the language reading it (`--target ir`
+    /// and `wat`); the Rust output ignores it.
+    naming: crate::abi::Naming,
 }
 
 impl GenerateOptions {
@@ -165,6 +169,16 @@ impl GenerateOptions {
     pub fn exports(mut self, exports: HashSet<ExportSpec>) -> Self {
         self.exports = exports;
         self
+    }
+
+    /// Name the IR's members by `naming`.
+    pub fn naming(mut self, naming: crate::abi::Naming) -> Self {
+        self.naming = naming;
+        self
+    }
+
+    pub(crate) fn ir_naming(&self) -> &crate::abi::Naming {
+        &self.naming
     }
 }
 
