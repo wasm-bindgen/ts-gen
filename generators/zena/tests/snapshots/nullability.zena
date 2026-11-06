@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -809,6 +810,30 @@ declare function __nullability_upload(upload: externref): void;
 @external("nullability", "cover")
 declare function __nullability_cover(cover: externref): void;
 
+// kind Mode: the index of the arm holding x, -1 for none
+@external("nullability", "kind:Mode")
+declare function __nullability_kind_Mode(x: externref | null): i32;
+
+// kind Source: the index of the arm holding x, -1 for none
+@external("nullability", "kind:Source")
+declare function __nullability_kind_Source(x: externref | null): i32;
+
+// kind KeyKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:KeyKind")
+declare function __kind_KeyKind(x: externref | null): i32;
+
+// kind DispositionKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DispositionKind")
+declare function __kind_DispositionKind(x: externref | null): i32;
+
+// kind KindKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:KindKind")
+declare function __kind_KindKind(x: externref | null): i32;
+
+// kind CoverKindKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CoverKindKind")
+declare function __kind_CoverKindKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -835,6 +860,92 @@ export type KindKind = String;
 
 // kind CoverKindKind: Image = "image", Blank = "blank"
 export type CoverKindKind = String;
+
+// The arm a `Mode` holds, from `Mode_arm`.
+export sealed class Mode_Arm {
+  case Mode_Fast
+  case Mode_Slow
+}
+export function Mode_arm(x: Mode): Mode_Arm {
+  let __r = x.handle;
+  return match (__nullability_kind_Mode(__r)) {
+    case 0: new Mode_Fast()
+    case 1: new Mode_Slow()
+    case _: throw new Error("no arm of Mode")
+  };
+}
+
+// The arm a `Source` holds, from `Source_arm`.
+export sealed class Source_Arm {
+  case Source_String(value: String)
+  case Source_Registry(value: Registry)
+}
+export function Source_arm(x: Source): Source_Arm {
+  let __r = x;
+  return match (__nullability_kind_Source(__r)) {
+    case 0: new Source_String(String.fromHandle(__r))
+    case 1: new Source_Registry(new Registry(__r))
+    case _: throw new Error("no arm of Source")
+  };
+}
+
+// The arm a `KeyKind` holds, from `KeyKind_arm`.
+export sealed class KeyKind_Arm {
+  case KeyKind_String(value: String)
+  case KeyKind_F64(value: f64)
+}
+export function KeyKind_arm(x: KeyKind): KeyKind_Arm {
+  let __r = x;
+  return match (__kind_KeyKind(__r)) {
+    case 0: new KeyKind_String(String.fromHandle(__r))
+    case 1: new KeyKind_F64(numberValue(__r))
+    case _: throw new Error("no arm of KeyKind")
+  };
+}
+
+// The arm a `DispositionKind` holds, from `DispositionKind_arm`.
+export sealed class DispositionKind_Arm {
+  case DispositionKind_Inline
+  case DispositionKind_Attachment
+}
+export function DispositionKind_arm(x: DispositionKind): DispositionKind_Arm {
+  let __r = x.handle;
+  return match (__kind_DispositionKind(__r)) {
+    case 0: new DispositionKind_Inline()
+    case 1: new DispositionKind_Attachment()
+    case _: throw new Error("no arm of DispositionKind")
+  };
+}
+
+// The arm a `KindKind` holds, from `KindKind_arm`.
+export sealed class KindKind_Arm {
+  case KindKind_File
+  case KindKind_None
+  case KindKind_Skip
+}
+export function KindKind_arm(x: KindKind): KindKind_Arm {
+  let __r = x.handle;
+  return match (__kind_KindKind(__r)) {
+    case 0: new KindKind_File()
+    case 1: new KindKind_None()
+    case 2: new KindKind_Skip()
+    case _: throw new Error("no arm of KindKind")
+  };
+}
+
+// The arm a `CoverKindKind` holds, from `CoverKindKind_arm`.
+export sealed class CoverKindKind_Arm {
+  case CoverKindKind_Image
+  case CoverKindKind_Blank
+}
+export function CoverKindKind_arm(x: CoverKindKind): CoverKindKind_Arm {
+  let __r = x.handle;
+  return match (__kind_CoverKindKind(__r)) {
+    case 0: new CoverKindKind_Image()
+    case 1: new CoverKindKind_Blank()
+    case _: throw new Error("no arm of CoverKindKind")
+  };
+}
 
 export class Settings {
   #ref: externref;

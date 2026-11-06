@@ -15,6 +15,11 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:Outer.Inner.Kind" (func $kind:Outer.Inner.Kind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:Outer.Inner.Level" (func $kind:Outer.Inner.Level (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:Other.Inner.Kind" (func $kind:Other.Inner.Kind (param $x externref) (result i32)))
+
   ;; static run();
   (import "./bindings.wasm" "Outer.Inner.run" (func $Outer.Inner.run))
   ;; static get LIMIT: f64 as limit;

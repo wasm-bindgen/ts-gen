@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -2441,6 +2442,110 @@ declare function __Temporal_PartialYearMonthLikeObject_month_code(this_: externr
 @external("./bindings.wasm", "Temporal.PartialYearMonthLikeObject.set_month_code")
 declare function __Temporal_PartialYearMonthLikeObject_set_month_code(this_: externref, value: externref): void;
 
+// kind Temporal.CalendarLike: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.CalendarLike")
+declare function __kind_Temporal_CalendarLike(x: externref | null): i32;
+
+// kind Temporal.DurationLike: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.DurationLike")
+declare function __kind_Temporal_DurationLike(x: externref | null): i32;
+
+// kind Temporal.InstantLike: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.InstantLike")
+declare function __kind_Temporal_InstantLike(x: externref | null): i32;
+
+// kind Temporal.PlainDateLike: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.PlainDateLike")
+declare function __kind_Temporal_PlainDateLike(x: externref | null): i32;
+
+// kind Temporal.PlainDateTimeLike: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.PlainDateTimeLike")
+declare function __kind_Temporal_PlainDateTimeLike(x: externref | null): i32;
+
+// kind Temporal.PlainMonthDayLike: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.PlainMonthDayLike")
+declare function __kind_Temporal_PlainMonthDayLike(x: externref | null): i32;
+
+// kind Temporal.PlainTimeLike: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.PlainTimeLike")
+declare function __kind_Temporal_PlainTimeLike(x: externref | null): i32;
+
+// kind Temporal.PlainYearMonthLike: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.PlainYearMonthLike")
+declare function __kind_Temporal_PlainYearMonthLike(x: externref | null): i32;
+
+// kind Temporal.TimeZoneLike: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.TimeZoneLike")
+declare function __kind_Temporal_TimeZoneLike(x: externref | null): i32;
+
+// kind Temporal.ZonedDateTimeLike: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.ZonedDateTimeLike")
+declare function __kind_Temporal_ZonedDateTimeLike(x: externref | null): i32;
+
+// kind Temporal.DateUnit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.DateUnit")
+declare function __kind_Temporal_DateUnit(x: externref | null): i32;
+
+// kind Temporal.TimeUnit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.TimeUnit")
+declare function __kind_Temporal_TimeUnit(x: externref | null): i32;
+
+// kind Temporal.PluralizeUnit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.PluralizeUnit")
+declare function __kind_Temporal_PluralizeUnit(x: externref | null): i32;
+
+// kind Temporal.PluralizeTimeUnit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.PluralizeTimeUnit")
+declare function __kind_Temporal_PluralizeTimeUnit(x: externref | null): i32;
+
+// kind Temporal.PluralizeDayOrTimeUnit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Temporal.PluralizeDayOrTimeUnit")
+declare function __kind_Temporal_PluralizeDayOrTimeUnit(x: externref | null): i32;
+
+// kind DisambiguationKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DisambiguationKind")
+declare function __kind_DisambiguationKind(x: externref | null): i32;
+
+// kind OverflowKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:OverflowKind")
+declare function __kind_OverflowKind(x: externref | null): i32;
+
+// kind DirectionKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DirectionKind")
+declare function __kind_DirectionKind(x: externref | null): i32;
+
+// kind RoundingModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RoundingModeKind")
+declare function __kind_RoundingModeKind(x: externref | null): i32;
+
+// kind LargestUnitKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:LargestUnitKind")
+declare function __kind_LargestUnitKind(x: externref | null): i32;
+
+// kind FractionalSecondDigitsKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FractionalSecondDigitsKind")
+declare function __kind_FractionalSecondDigitsKind(x: externref | null): i32;
+
+// kind CalendarNameKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CalendarNameKind")
+declare function __kind_CalendarNameKind(x: externref | null): i32;
+
+// kind OffsetKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:OffsetKind")
+declare function __kind_OffsetKind(x: externref | null): i32;
+
+// kind TimeZoneNameKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:TimeZoneNameKind")
+declare function __kind_TimeZoneNameKind(x: externref | null): i32;
+
+// kind ZonedDateTimeFromOptionsOffsetKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ZonedDateTimeFromOptionsOffsetKind")
+declare function __kind_ZonedDateTimeFromOptionsOffsetKind(x: externref | null): i32;
+
+// kind RelativeToKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RelativeToKind")
+declare function __kind_RelativeToKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -2527,6 +2632,562 @@ export type ZonedDateTimeFromOptionsOffsetKind = String;
 
 // kind RelativeToKind fallback: ZonedDateTime = Temporal.ZonedDateTime, String = String, PlainDate = Temporal.PlainDate, PlainDateTime = Temporal.PlainDateTime, Object = Object
 export type RelativeToKind = externref;
+
+// The arm a `Temporal_CalendarLike` holds, from `Temporal_CalendarLike_arm`.
+export sealed class Temporal_CalendarLike_Arm {
+  case Temporal_CalendarLike_PlainDate(value: Temporal_PlainDate)
+  case Temporal_CalendarLike_PlainDateTime(value: Temporal_PlainDateTime)
+  case Temporal_CalendarLike_PlainMonthDay(value: Temporal_PlainMonthDay)
+  case Temporal_CalendarLike_PlainYearMonth(value: Temporal_PlainYearMonth)
+  case Temporal_CalendarLike_ZonedDateTime(value: Temporal_ZonedDateTime)
+  case Temporal_CalendarLike_String(value: String)
+}
+export function Temporal_CalendarLike_arm(x: Temporal_CalendarLike): Temporal_CalendarLike_Arm {
+  let __r = x;
+  return match (__kind_Temporal_CalendarLike(__r)) {
+    case 0: new Temporal_CalendarLike_PlainDate(new Temporal_PlainDate(__r))
+    case 1: new Temporal_CalendarLike_PlainDateTime(new Temporal_PlainDateTime(__r))
+    case 2: new Temporal_CalendarLike_PlainMonthDay(new Temporal_PlainMonthDay(__r))
+    case 3: new Temporal_CalendarLike_PlainYearMonth(new Temporal_PlainYearMonth(__r))
+    case 4: new Temporal_CalendarLike_ZonedDateTime(new Temporal_ZonedDateTime(__r))
+    case 5: new Temporal_CalendarLike_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of Temporal.CalendarLike")
+  };
+}
+
+// The arm a `Temporal_DurationLike` holds, from `Temporal_DurationLike_arm`.
+export sealed class Temporal_DurationLike_Arm {
+  case Temporal_DurationLike_Duration(value: Temporal_Duration)
+  case Temporal_DurationLike_String(value: String)
+  case Temporal_DurationLike_DurationLikeObject(value: Temporal_DurationLikeObject)
+}
+export function Temporal_DurationLike_arm(x: Temporal_DurationLike): Temporal_DurationLike_Arm {
+  let __r = x;
+  return match (__kind_Temporal_DurationLike(__r)) {
+    case 0: new Temporal_DurationLike_Duration(new Temporal_Duration(__r))
+    case 1: new Temporal_DurationLike_String(String.fromHandle(__r))
+    case _: new Temporal_DurationLike_DurationLikeObject(new Temporal_DurationLikeObject(__r))
+  };
+}
+
+// The arm a `Temporal_InstantLike` holds, from `Temporal_InstantLike_arm`.
+export sealed class Temporal_InstantLike_Arm {
+  case Temporal_InstantLike_Instant(value: Temporal_Instant)
+  case Temporal_InstantLike_ZonedDateTime(value: Temporal_ZonedDateTime)
+  case Temporal_InstantLike_String(value: String)
+}
+export function Temporal_InstantLike_arm(x: Temporal_InstantLike): Temporal_InstantLike_Arm {
+  let __r = x;
+  return match (__kind_Temporal_InstantLike(__r)) {
+    case 0: new Temporal_InstantLike_Instant(new Temporal_Instant(__r))
+    case 1: new Temporal_InstantLike_ZonedDateTime(new Temporal_ZonedDateTime(__r))
+    case 2: new Temporal_InstantLike_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of Temporal.InstantLike")
+  };
+}
+
+// The arm a `Temporal_PlainDateLike` holds, from `Temporal_PlainDateLike_arm`.
+export sealed class Temporal_PlainDateLike_Arm {
+  case Temporal_PlainDateLike_PlainDate(value: Temporal_PlainDate)
+  case Temporal_PlainDateLike_ZonedDateTime(value: Temporal_ZonedDateTime)
+  case Temporal_PlainDateLike_PlainDateTime(value: Temporal_PlainDateTime)
+  case Temporal_PlainDateLike_String(value: String)
+  case Temporal_PlainDateLike_DateLikeObject(value: Temporal_DateLikeObject)
+}
+export function Temporal_PlainDateLike_arm(x: Temporal_PlainDateLike): Temporal_PlainDateLike_Arm {
+  let __r = x;
+  return match (__kind_Temporal_PlainDateLike(__r)) {
+    case 0: new Temporal_PlainDateLike_PlainDate(new Temporal_PlainDate(__r))
+    case 1: new Temporal_PlainDateLike_ZonedDateTime(new Temporal_ZonedDateTime(__r))
+    case 2: new Temporal_PlainDateLike_PlainDateTime(new Temporal_PlainDateTime(__r))
+    case 3: new Temporal_PlainDateLike_String(String.fromHandle(__r))
+    case _: new Temporal_PlainDateLike_DateLikeObject(new Temporal_DateLikeObject(__r))
+  };
+}
+
+// The arm a `Temporal_PlainDateTimeLike` holds, from `Temporal_PlainDateTimeLike_arm`.
+export sealed class Temporal_PlainDateTimeLike_Arm {
+  case Temporal_PlainDateTimeLike_PlainDateTime(value: Temporal_PlainDateTime)
+  case Temporal_PlainDateTimeLike_ZonedDateTime(value: Temporal_ZonedDateTime)
+  case Temporal_PlainDateTimeLike_PlainDate(value: Temporal_PlainDate)
+  case Temporal_PlainDateTimeLike_String(value: String)
+  case Temporal_PlainDateTimeLike_DateTimeLikeObject(value: Temporal_DateTimeLikeObject)
+}
+export function Temporal_PlainDateTimeLike_arm(x: Temporal_PlainDateTimeLike): Temporal_PlainDateTimeLike_Arm {
+  let __r = x;
+  return match (__kind_Temporal_PlainDateTimeLike(__r)) {
+    case 0: new Temporal_PlainDateTimeLike_PlainDateTime(new Temporal_PlainDateTime(__r))
+    case 1: new Temporal_PlainDateTimeLike_ZonedDateTime(new Temporal_ZonedDateTime(__r))
+    case 2: new Temporal_PlainDateTimeLike_PlainDate(new Temporal_PlainDate(__r))
+    case 3: new Temporal_PlainDateTimeLike_String(String.fromHandle(__r))
+    case _: new Temporal_PlainDateTimeLike_DateTimeLikeObject(new Temporal_DateTimeLikeObject(__r))
+  };
+}
+
+// The arm a `Temporal_PlainMonthDayLike` holds, from `Temporal_PlainMonthDayLike_arm`.
+export sealed class Temporal_PlainMonthDayLike_Arm {
+  case Temporal_PlainMonthDayLike_PlainMonthDay(value: Temporal_PlainMonthDay)
+  case Temporal_PlainMonthDayLike_String(value: String)
+  case Temporal_PlainMonthDayLike_DateLikeObject(value: Temporal_DateLikeObject)
+}
+export function Temporal_PlainMonthDayLike_arm(x: Temporal_PlainMonthDayLike): Temporal_PlainMonthDayLike_Arm {
+  let __r = x;
+  return match (__kind_Temporal_PlainMonthDayLike(__r)) {
+    case 0: new Temporal_PlainMonthDayLike_PlainMonthDay(new Temporal_PlainMonthDay(__r))
+    case 1: new Temporal_PlainMonthDayLike_String(String.fromHandle(__r))
+    case _: new Temporal_PlainMonthDayLike_DateLikeObject(new Temporal_DateLikeObject(__r))
+  };
+}
+
+// The arm a `Temporal_PlainTimeLike` holds, from `Temporal_PlainTimeLike_arm`.
+export sealed class Temporal_PlainTimeLike_Arm {
+  case Temporal_PlainTimeLike_PlainTime(value: Temporal_PlainTime)
+  case Temporal_PlainTimeLike_PlainDateTime(value: Temporal_PlainDateTime)
+  case Temporal_PlainTimeLike_ZonedDateTime(value: Temporal_ZonedDateTime)
+  case Temporal_PlainTimeLike_String(value: String)
+  case Temporal_PlainTimeLike_TimeLikeObject(value: Temporal_TimeLikeObject)
+}
+export function Temporal_PlainTimeLike_arm(x: Temporal_PlainTimeLike): Temporal_PlainTimeLike_Arm {
+  let __r = x;
+  return match (__kind_Temporal_PlainTimeLike(__r)) {
+    case 0: new Temporal_PlainTimeLike_PlainTime(new Temporal_PlainTime(__r))
+    case 1: new Temporal_PlainTimeLike_PlainDateTime(new Temporal_PlainDateTime(__r))
+    case 2: new Temporal_PlainTimeLike_ZonedDateTime(new Temporal_ZonedDateTime(__r))
+    case 3: new Temporal_PlainTimeLike_String(String.fromHandle(__r))
+    case _: new Temporal_PlainTimeLike_TimeLikeObject(new Temporal_TimeLikeObject(__r))
+  };
+}
+
+// The arm a `Temporal_PlainYearMonthLike` holds, from `Temporal_PlainYearMonthLike_arm`.
+export sealed class Temporal_PlainYearMonthLike_Arm {
+  case Temporal_PlainYearMonthLike_PlainYearMonth(value: Temporal_PlainYearMonth)
+  case Temporal_PlainYearMonthLike_String(value: String)
+  case Temporal_PlainYearMonthLike_YearMonthLikeObject(value: Temporal_YearMonthLikeObject)
+}
+export function Temporal_PlainYearMonthLike_arm(x: Temporal_PlainYearMonthLike): Temporal_PlainYearMonthLike_Arm {
+  let __r = x;
+  return match (__kind_Temporal_PlainYearMonthLike(__r)) {
+    case 0: new Temporal_PlainYearMonthLike_PlainYearMonth(new Temporal_PlainYearMonth(__r))
+    case 1: new Temporal_PlainYearMonthLike_String(String.fromHandle(__r))
+    case _: new Temporal_PlainYearMonthLike_YearMonthLikeObject(new Temporal_YearMonthLikeObject(__r))
+  };
+}
+
+// The arm a `Temporal_TimeZoneLike` holds, from `Temporal_TimeZoneLike_arm`.
+export sealed class Temporal_TimeZoneLike_Arm {
+  case Temporal_TimeZoneLike_ZonedDateTime(value: Temporal_ZonedDateTime)
+  case Temporal_TimeZoneLike_String(value: String)
+}
+export function Temporal_TimeZoneLike_arm(x: Temporal_TimeZoneLike): Temporal_TimeZoneLike_Arm {
+  let __r = x;
+  return match (__kind_Temporal_TimeZoneLike(__r)) {
+    case 0: new Temporal_TimeZoneLike_ZonedDateTime(new Temporal_ZonedDateTime(__r))
+    case 1: new Temporal_TimeZoneLike_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of Temporal.TimeZoneLike")
+  };
+}
+
+// The arm a `Temporal_ZonedDateTimeLike` holds, from `Temporal_ZonedDateTimeLike_arm`.
+export sealed class Temporal_ZonedDateTimeLike_Arm {
+  case Temporal_ZonedDateTimeLike_ZonedDateTime(value: Temporal_ZonedDateTime)
+  case Temporal_ZonedDateTimeLike_String(value: String)
+  case Temporal_ZonedDateTimeLike_ZonedDateTimeLikeObject(value: Temporal_ZonedDateTimeLikeObject)
+}
+export function Temporal_ZonedDateTimeLike_arm(x: Temporal_ZonedDateTimeLike): Temporal_ZonedDateTimeLike_Arm {
+  let __r = x;
+  return match (__kind_Temporal_ZonedDateTimeLike(__r)) {
+    case 0: new Temporal_ZonedDateTimeLike_ZonedDateTime(new Temporal_ZonedDateTime(__r))
+    case 1: new Temporal_ZonedDateTimeLike_String(String.fromHandle(__r))
+    case _: new Temporal_ZonedDateTimeLike_ZonedDateTimeLikeObject(new Temporal_ZonedDateTimeLikeObject(__r))
+  };
+}
+
+// The arm a `Temporal_DateUnit` holds, from `Temporal_DateUnit_arm`.
+export sealed class Temporal_DateUnit_Arm {
+  case Temporal_DateUnit_Year
+  case Temporal_DateUnit_Month
+  case Temporal_DateUnit_Week
+  case Temporal_DateUnit_Day
+}
+export function Temporal_DateUnit_arm(x: Temporal_DateUnit): Temporal_DateUnit_Arm {
+  let __r = x.handle;
+  return match (__kind_Temporal_DateUnit(__r)) {
+    case 0: new Temporal_DateUnit_Year()
+    case 1: new Temporal_DateUnit_Month()
+    case 2: new Temporal_DateUnit_Week()
+    case 3: new Temporal_DateUnit_Day()
+    case _: throw new Error("no arm of Temporal.DateUnit")
+  };
+}
+
+// The arm a `Temporal_TimeUnit` holds, from `Temporal_TimeUnit_arm`.
+export sealed class Temporal_TimeUnit_Arm {
+  case Temporal_TimeUnit_Hour
+  case Temporal_TimeUnit_Minute
+  case Temporal_TimeUnit_Second
+  case Temporal_TimeUnit_Millisecond
+  case Temporal_TimeUnit_Microsecond
+  case Temporal_TimeUnit_Nanosecond
+}
+export function Temporal_TimeUnit_arm(x: Temporal_TimeUnit): Temporal_TimeUnit_Arm {
+  let __r = x.handle;
+  return match (__kind_Temporal_TimeUnit(__r)) {
+    case 0: new Temporal_TimeUnit_Hour()
+    case 1: new Temporal_TimeUnit_Minute()
+    case 2: new Temporal_TimeUnit_Second()
+    case 3: new Temporal_TimeUnit_Millisecond()
+    case 4: new Temporal_TimeUnit_Microsecond()
+    case 5: new Temporal_TimeUnit_Nanosecond()
+    case _: throw new Error("no arm of Temporal.TimeUnit")
+  };
+}
+
+// The arm a `Temporal_PluralizeUnit` holds, from `Temporal_PluralizeUnit_arm`.
+export sealed class Temporal_PluralizeUnit_Arm {
+  case Temporal_PluralizeUnit_Year
+  case Temporal_PluralizeUnit_Month
+  case Temporal_PluralizeUnit_Week
+  case Temporal_PluralizeUnit_Day
+  case Temporal_PluralizeUnit_Hour
+  case Temporal_PluralizeUnit_Minute
+  case Temporal_PluralizeUnit_Second
+  case Temporal_PluralizeUnit_Millisecond
+  case Temporal_PluralizeUnit_Microsecond
+  case Temporal_PluralizeUnit_Nanosecond
+  case Temporal_PluralizeUnit_Years
+  case Temporal_PluralizeUnit_Months
+  case Temporal_PluralizeUnit_Weeks
+  case Temporal_PluralizeUnit_Days
+  case Temporal_PluralizeUnit_Hours
+  case Temporal_PluralizeUnit_Minutes
+  case Temporal_PluralizeUnit_Seconds
+  case Temporal_PluralizeUnit_Milliseconds
+  case Temporal_PluralizeUnit_Microseconds
+  case Temporal_PluralizeUnit_Nanoseconds
+}
+export function Temporal_PluralizeUnit_arm(x: Temporal_PluralizeUnit): Temporal_PluralizeUnit_Arm {
+  let __r = x.handle;
+  return match (__kind_Temporal_PluralizeUnit(__r)) {
+    case 0: new Temporal_PluralizeUnit_Year()
+    case 1: new Temporal_PluralizeUnit_Month()
+    case 2: new Temporal_PluralizeUnit_Week()
+    case 3: new Temporal_PluralizeUnit_Day()
+    case 4: new Temporal_PluralizeUnit_Hour()
+    case 5: new Temporal_PluralizeUnit_Minute()
+    case 6: new Temporal_PluralizeUnit_Second()
+    case 7: new Temporal_PluralizeUnit_Millisecond()
+    case 8: new Temporal_PluralizeUnit_Microsecond()
+    case 9: new Temporal_PluralizeUnit_Nanosecond()
+    case 10: new Temporal_PluralizeUnit_Years()
+    case 11: new Temporal_PluralizeUnit_Months()
+    case 12: new Temporal_PluralizeUnit_Weeks()
+    case 13: new Temporal_PluralizeUnit_Days()
+    case 14: new Temporal_PluralizeUnit_Hours()
+    case 15: new Temporal_PluralizeUnit_Minutes()
+    case 16: new Temporal_PluralizeUnit_Seconds()
+    case 17: new Temporal_PluralizeUnit_Milliseconds()
+    case 18: new Temporal_PluralizeUnit_Microseconds()
+    case 19: new Temporal_PluralizeUnit_Nanoseconds()
+    case _: throw new Error("no arm of Temporal.PluralizeUnit")
+  };
+}
+
+// The arm a `Temporal_PluralizeTimeUnit` holds, from `Temporal_PluralizeTimeUnit_arm`.
+export sealed class Temporal_PluralizeTimeUnit_Arm {
+  case Temporal_PluralizeTimeUnit_Hour
+  case Temporal_PluralizeTimeUnit_Minute
+  case Temporal_PluralizeTimeUnit_Second
+  case Temporal_PluralizeTimeUnit_Millisecond
+  case Temporal_PluralizeTimeUnit_Microsecond
+  case Temporal_PluralizeTimeUnit_Nanosecond
+  case Temporal_PluralizeTimeUnit_Hours
+  case Temporal_PluralizeTimeUnit_Minutes
+  case Temporal_PluralizeTimeUnit_Seconds
+  case Temporal_PluralizeTimeUnit_Milliseconds
+  case Temporal_PluralizeTimeUnit_Microseconds
+  case Temporal_PluralizeTimeUnit_Nanoseconds
+}
+export function Temporal_PluralizeTimeUnit_arm(x: Temporal_PluralizeTimeUnit): Temporal_PluralizeTimeUnit_Arm {
+  let __r = x.handle;
+  return match (__kind_Temporal_PluralizeTimeUnit(__r)) {
+    case 0: new Temporal_PluralizeTimeUnit_Hour()
+    case 1: new Temporal_PluralizeTimeUnit_Minute()
+    case 2: new Temporal_PluralizeTimeUnit_Second()
+    case 3: new Temporal_PluralizeTimeUnit_Millisecond()
+    case 4: new Temporal_PluralizeTimeUnit_Microsecond()
+    case 5: new Temporal_PluralizeTimeUnit_Nanosecond()
+    case 6: new Temporal_PluralizeTimeUnit_Hours()
+    case 7: new Temporal_PluralizeTimeUnit_Minutes()
+    case 8: new Temporal_PluralizeTimeUnit_Seconds()
+    case 9: new Temporal_PluralizeTimeUnit_Milliseconds()
+    case 10: new Temporal_PluralizeTimeUnit_Microseconds()
+    case 11: new Temporal_PluralizeTimeUnit_Nanoseconds()
+    case _: throw new Error("no arm of Temporal.PluralizeTimeUnit")
+  };
+}
+
+// The arm a `Temporal_PluralizeDayOrTimeUnit` holds, from `Temporal_PluralizeDayOrTimeUnit_arm`.
+export sealed class Temporal_PluralizeDayOrTimeUnit_Arm {
+  case Temporal_PluralizeDayOrTimeUnit_Day
+  case Temporal_PluralizeDayOrTimeUnit_Hour
+  case Temporal_PluralizeDayOrTimeUnit_Minute
+  case Temporal_PluralizeDayOrTimeUnit_Second
+  case Temporal_PluralizeDayOrTimeUnit_Millisecond
+  case Temporal_PluralizeDayOrTimeUnit_Microsecond
+  case Temporal_PluralizeDayOrTimeUnit_Nanosecond
+  case Temporal_PluralizeDayOrTimeUnit_Days
+  case Temporal_PluralizeDayOrTimeUnit_Hours
+  case Temporal_PluralizeDayOrTimeUnit_Minutes
+  case Temporal_PluralizeDayOrTimeUnit_Seconds
+  case Temporal_PluralizeDayOrTimeUnit_Milliseconds
+  case Temporal_PluralizeDayOrTimeUnit_Microseconds
+  case Temporal_PluralizeDayOrTimeUnit_Nanoseconds
+}
+export function Temporal_PluralizeDayOrTimeUnit_arm(x: Temporal_PluralizeDayOrTimeUnit): Temporal_PluralizeDayOrTimeUnit_Arm {
+  let __r = x.handle;
+  return match (__kind_Temporal_PluralizeDayOrTimeUnit(__r)) {
+    case 0: new Temporal_PluralizeDayOrTimeUnit_Day()
+    case 1: new Temporal_PluralizeDayOrTimeUnit_Hour()
+    case 2: new Temporal_PluralizeDayOrTimeUnit_Minute()
+    case 3: new Temporal_PluralizeDayOrTimeUnit_Second()
+    case 4: new Temporal_PluralizeDayOrTimeUnit_Millisecond()
+    case 5: new Temporal_PluralizeDayOrTimeUnit_Microsecond()
+    case 6: new Temporal_PluralizeDayOrTimeUnit_Nanosecond()
+    case 7: new Temporal_PluralizeDayOrTimeUnit_Days()
+    case 8: new Temporal_PluralizeDayOrTimeUnit_Hours()
+    case 9: new Temporal_PluralizeDayOrTimeUnit_Minutes()
+    case 10: new Temporal_PluralizeDayOrTimeUnit_Seconds()
+    case 11: new Temporal_PluralizeDayOrTimeUnit_Milliseconds()
+    case 12: new Temporal_PluralizeDayOrTimeUnit_Microseconds()
+    case 13: new Temporal_PluralizeDayOrTimeUnit_Nanoseconds()
+    case _: throw new Error("no arm of Temporal.PluralizeDayOrTimeUnit")
+  };
+}
+
+// The arm a `DisambiguationKind` holds, from `DisambiguationKind_arm`.
+export sealed class DisambiguationKind_Arm {
+  case DisambiguationKind_Compatible
+  case DisambiguationKind_Earlier
+  case DisambiguationKind_Later
+  case DisambiguationKind_Reject
+}
+export function DisambiguationKind_arm(x: DisambiguationKind): DisambiguationKind_Arm {
+  let __r = x.handle;
+  return match (__kind_DisambiguationKind(__r)) {
+    case 0: new DisambiguationKind_Compatible()
+    case 1: new DisambiguationKind_Earlier()
+    case 2: new DisambiguationKind_Later()
+    case 3: new DisambiguationKind_Reject()
+    case _: throw new Error("no arm of DisambiguationKind")
+  };
+}
+
+// The arm a `OverflowKind` holds, from `OverflowKind_arm`.
+export sealed class OverflowKind_Arm {
+  case OverflowKind_Constrain
+  case OverflowKind_Reject
+}
+export function OverflowKind_arm(x: OverflowKind): OverflowKind_Arm {
+  let __r = x.handle;
+  return match (__kind_OverflowKind(__r)) {
+    case 0: new OverflowKind_Constrain()
+    case 1: new OverflowKind_Reject()
+    case _: throw new Error("no arm of OverflowKind")
+  };
+}
+
+// The arm a `DirectionKind` holds, from `DirectionKind_arm`.
+export sealed class DirectionKind_Arm {
+  case DirectionKind_Next
+  case DirectionKind_Previous
+}
+export function DirectionKind_arm(x: DirectionKind): DirectionKind_Arm {
+  let __r = x.handle;
+  return match (__kind_DirectionKind(__r)) {
+    case 0: new DirectionKind_Next()
+    case 1: new DirectionKind_Previous()
+    case _: throw new Error("no arm of DirectionKind")
+  };
+}
+
+// The arm a `RoundingModeKind` holds, from `RoundingModeKind_arm`.
+export sealed class RoundingModeKind_Arm {
+  case RoundingModeKind_Ceil
+  case RoundingModeKind_Floor
+  case RoundingModeKind_Expand
+  case RoundingModeKind_Trunc
+  case RoundingModeKind_HalfCeil
+  case RoundingModeKind_HalfFloor
+  case RoundingModeKind_HalfExpand
+  case RoundingModeKind_HalfTrunc
+  case RoundingModeKind_HalfEven
+}
+export function RoundingModeKind_arm(x: RoundingModeKind): RoundingModeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_RoundingModeKind(__r)) {
+    case 0: new RoundingModeKind_Ceil()
+    case 1: new RoundingModeKind_Floor()
+    case 2: new RoundingModeKind_Expand()
+    case 3: new RoundingModeKind_Trunc()
+    case 4: new RoundingModeKind_HalfCeil()
+    case 5: new RoundingModeKind_HalfFloor()
+    case 6: new RoundingModeKind_HalfExpand()
+    case 7: new RoundingModeKind_HalfTrunc()
+    case 8: new RoundingModeKind_HalfEven()
+    case _: throw new Error("no arm of RoundingModeKind")
+  };
+}
+
+// The arm a `LargestUnitKind` holds, from `LargestUnitKind_arm`.
+export sealed class LargestUnitKind_Arm {
+  case LargestUnitKind_Auto
+  case LargestUnitKind_Year
+  case LargestUnitKind_Month
+  case LargestUnitKind_Week
+  case LargestUnitKind_Day
+  case LargestUnitKind_Hour
+  case LargestUnitKind_Minute
+  case LargestUnitKind_Second
+  case LargestUnitKind_Millisecond
+  case LargestUnitKind_Microsecond
+  case LargestUnitKind_Nanosecond
+  case LargestUnitKind_Years
+  case LargestUnitKind_Months
+  case LargestUnitKind_Weeks
+  case LargestUnitKind_Days
+  case LargestUnitKind_Hours
+  case LargestUnitKind_Minutes
+  case LargestUnitKind_Seconds
+  case LargestUnitKind_Milliseconds
+  case LargestUnitKind_Microseconds
+  case LargestUnitKind_Nanoseconds
+}
+export function LargestUnitKind_arm(x: LargestUnitKind): LargestUnitKind_Arm {
+  let __r = x.handle;
+  return match (__kind_LargestUnitKind(__r)) {
+    case 0: new LargestUnitKind_Auto()
+    case 1: new LargestUnitKind_Year()
+    case 2: new LargestUnitKind_Month()
+    case 3: new LargestUnitKind_Week()
+    case 4: new LargestUnitKind_Day()
+    case 5: new LargestUnitKind_Hour()
+    case 6: new LargestUnitKind_Minute()
+    case 7: new LargestUnitKind_Second()
+    case 8: new LargestUnitKind_Millisecond()
+    case 9: new LargestUnitKind_Microsecond()
+    case 10: new LargestUnitKind_Nanosecond()
+    case 11: new LargestUnitKind_Years()
+    case 12: new LargestUnitKind_Months()
+    case 13: new LargestUnitKind_Weeks()
+    case 14: new LargestUnitKind_Days()
+    case 15: new LargestUnitKind_Hours()
+    case 16: new LargestUnitKind_Minutes()
+    case 17: new LargestUnitKind_Seconds()
+    case 18: new LargestUnitKind_Milliseconds()
+    case 19: new LargestUnitKind_Microseconds()
+    case 20: new LargestUnitKind_Nanoseconds()
+    case _: throw new Error("no arm of LargestUnitKind")
+  };
+}
+
+// The arm a `FractionalSecondDigitsKind` holds, from `FractionalSecondDigitsKind_arm`.
+export sealed class FractionalSecondDigitsKind_Arm {
+  case FractionalSecondDigitsKind_Auto
+  case FractionalSecondDigitsKind_F64(value: f64)
+}
+export function FractionalSecondDigitsKind_arm(x: FractionalSecondDigitsKind): FractionalSecondDigitsKind_Arm {
+  let __r = x;
+  return match (__kind_FractionalSecondDigitsKind(__r)) {
+    case 0: new FractionalSecondDigitsKind_Auto()
+    case 1: new FractionalSecondDigitsKind_F64(numberValue(__r))
+    case _: throw new Error("no arm of FractionalSecondDigitsKind")
+  };
+}
+
+// The arm a `CalendarNameKind` holds, from `CalendarNameKind_arm`.
+export sealed class CalendarNameKind_Arm {
+  case CalendarNameKind_Auto
+  case CalendarNameKind_Always
+  case CalendarNameKind_Never
+  case CalendarNameKind_Critical
+}
+export function CalendarNameKind_arm(x: CalendarNameKind): CalendarNameKind_Arm {
+  let __r = x.handle;
+  return match (__kind_CalendarNameKind(__r)) {
+    case 0: new CalendarNameKind_Auto()
+    case 1: new CalendarNameKind_Always()
+    case 2: new CalendarNameKind_Never()
+    case 3: new CalendarNameKind_Critical()
+    case _: throw new Error("no arm of CalendarNameKind")
+  };
+}
+
+// The arm a `OffsetKind` holds, from `OffsetKind_arm`.
+export sealed class OffsetKind_Arm {
+  case OffsetKind_Auto
+  case OffsetKind_Never
+}
+export function OffsetKind_arm(x: OffsetKind): OffsetKind_Arm {
+  let __r = x.handle;
+  return match (__kind_OffsetKind(__r)) {
+    case 0: new OffsetKind_Auto()
+    case 1: new OffsetKind_Never()
+    case _: throw new Error("no arm of OffsetKind")
+  };
+}
+
+// The arm a `TimeZoneNameKind` holds, from `TimeZoneNameKind_arm`.
+export sealed class TimeZoneNameKind_Arm {
+  case TimeZoneNameKind_Auto
+  case TimeZoneNameKind_Never
+  case TimeZoneNameKind_Critical
+}
+export function TimeZoneNameKind_arm(x: TimeZoneNameKind): TimeZoneNameKind_Arm {
+  let __r = x.handle;
+  return match (__kind_TimeZoneNameKind(__r)) {
+    case 0: new TimeZoneNameKind_Auto()
+    case 1: new TimeZoneNameKind_Never()
+    case 2: new TimeZoneNameKind_Critical()
+    case _: throw new Error("no arm of TimeZoneNameKind")
+  };
+}
+
+// The arm a `ZonedDateTimeFromOptionsOffsetKind` holds, from `ZonedDateTimeFromOptionsOffsetKind_arm`.
+export sealed class ZonedDateTimeFromOptionsOffsetKind_Arm {
+  case ZonedDateTimeFromOptionsOffsetKind_Use
+  case ZonedDateTimeFromOptionsOffsetKind_Ignore
+  case ZonedDateTimeFromOptionsOffsetKind_Prefer
+  case ZonedDateTimeFromOptionsOffsetKind_Reject
+}
+export function ZonedDateTimeFromOptionsOffsetKind_arm(x: ZonedDateTimeFromOptionsOffsetKind): ZonedDateTimeFromOptionsOffsetKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ZonedDateTimeFromOptionsOffsetKind(__r)) {
+    case 0: new ZonedDateTimeFromOptionsOffsetKind_Use()
+    case 1: new ZonedDateTimeFromOptionsOffsetKind_Ignore()
+    case 2: new ZonedDateTimeFromOptionsOffsetKind_Prefer()
+    case 3: new ZonedDateTimeFromOptionsOffsetKind_Reject()
+    case _: throw new Error("no arm of ZonedDateTimeFromOptionsOffsetKind")
+  };
+}
+
+// The arm a `RelativeToKind` holds, from `RelativeToKind_arm`.
+export sealed class RelativeToKind_Arm {
+  case RelativeToKind_ZonedDateTime(value: Temporal_ZonedDateTime)
+  case RelativeToKind_String(value: String)
+  case RelativeToKind_PlainDate(value: Temporal_PlainDate)
+  case RelativeToKind_PlainDateTime(value: Temporal_PlainDateTime)
+  case RelativeToKind_Object(value: externref)
+}
+export function RelativeToKind_arm(x: RelativeToKind): RelativeToKind_Arm {
+  let __r = x;
+  return match (__kind_RelativeToKind(__r)) {
+    case 0: new RelativeToKind_ZonedDateTime(new Temporal_ZonedDateTime(__r))
+    case 1: new RelativeToKind_String(String.fromHandle(__r))
+    case 2: new RelativeToKind_PlainDate(new Temporal_PlainDate(__r))
+    case 3: new RelativeToKind_PlainDateTime(new Temporal_PlainDateTime(__r))
+    case _: new RelativeToKind_Object(__r)
+  };
+}
 
 export class Temporal_DateLikeObject {
   #ref: externref;

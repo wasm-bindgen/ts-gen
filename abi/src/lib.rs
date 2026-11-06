@@ -22,7 +22,8 @@ pub const UNDEFINED_GLOBAL: &str = "undefined";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum WasmType {
-    /// Only ever a `bool`; `embed` relies on that to wrap writes in `Boolean()`.
+    /// A `bool`, or a kind discriminator's arm index; `embed` relies on an
+    /// `i32` argument being a `bool` to wrap it in `Boolean()`.
     I32,
     I64,
     F64,

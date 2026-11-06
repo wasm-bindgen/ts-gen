@@ -16,6 +16,15 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "enum-positions" "kind:Mode" (func $enum-positions:kind:Mode (param $x externref) (result i32)))
+  (import "enum-positions" "kind:Level" (func $enum-positions:kind:Level (param $x externref) (result i32)))
+  (import "enum-positions" "kind:Codes.Region" (func $enum-positions:kind:Codes.Region (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:ModeOrNumberReturnKind" (func $kind:ModeOrNumberReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:ModeOrStringReturnKind" (func $kind:ModeOrStringReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:ModeOrRegionReturnKind" (func $kind:ModeOrRegionReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:LevelOrStringReturnKind" (func $kind:LevelOrStringReturnKind (param $x externref) (result i32)))
+
   ;; new(value: T | Null | Undefined): Holder throws;
   (import "enum-positions" "Holder.new" (func $enum-positions:Holder.new (param $value externref) (result externref)))
   ;; get(): T | Null | Undefined;

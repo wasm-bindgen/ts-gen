@@ -16,6 +16,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "generic-defaults" "kind:Loose" (func $generic-defaults:kind:Loose (param $x externref) (result i32)))
+
   ;; get value: T | Null | Undefined;
   (import "generic-defaults" "Box.value" (func $generic-defaults:Box.value (param $this externref) (result externref)))
   ;; set(value: T | Null | Undefined);

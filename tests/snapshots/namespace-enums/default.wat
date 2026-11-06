@@ -15,6 +15,13 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "namespace-enums" "kind:DurationUnit" (func $namespace-enums:kind:DurationUnit (param $x externref) (result i32)))
+  (import "namespace-enums" "kind:TimingDurationUnit" (func $namespace-enums:kind:TimingDurationUnit (param $x externref) (result i32)))
+  (import "namespace-enums" "kind:Precision" (func $namespace-enums:kind:Precision (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:Timing.DurationUnit" (func $kind:Timing.DurationUnit (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:Timing.Precision" (func $kind:Timing.Precision (param $x externref) (result i32)))
+
   ;; `undefined`, for passing where a type admits Undefined.
   (import "./builtins.js" "undefined" (global $undefined externref))
   ;; JSPI: suspends on a Promise and returns its value. Importing this

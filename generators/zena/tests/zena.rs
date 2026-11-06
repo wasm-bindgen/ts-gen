@@ -273,7 +273,7 @@ fn zena_imports(code: &str) -> BTreeSet<ImportSig> {
     let ty = |t: &str| match t.trim() {
         "f64" => "f64",
         "i64" => "i64",
-        "boolean" => "i32",
+        "boolean" | "i32" => "i32",
         "externref" | "externref | null" => "externref",
         "FixedArray<anyref> | null" => "(ref null $anyrefs)",
         other => panic!("unexpected Zena type in an @external declaration: {other}"),
@@ -327,7 +327,8 @@ fn quoted(s: &str) -> (String, &str) {
 
 /// Every import a language module may take from the bindings of `ir`, by
 /// IR.md: one per member, the three `bindings.wasm` functions every IR
-/// has, and the `builtins.js` `undefined` global and `await`.
+/// has, a discriminator per kind, and the `builtins.js` `undefined` global
+/// and `await`.
 fn ir_imports(ir: &ts_gen_abi::ir::Ir) -> BTreeSet<ImportSig> {
     use ts_gen_abi::ir::{Member, Type};
     let val = |t: &Type| match t {
@@ -375,6 +376,13 @@ fn ir_imports(ir: &ts_gen_abi::ir::Ir) -> BTreeSet<ImportSig> {
     for f in &ir.functions {
         let m = &f.member;
         imports.insert((module(&f.module, m), m.name.clone(), func(m)));
+    }
+    for k in &ir.kinds {
+        imports.insert((
+            k.specifier().to_string(),
+            k.discriminator(),
+            "(func (param externref) (result i32))".to_string(),
+        ));
     }
     let bindings = ts_gen_abi::BINDINGS_SPECIFIER;
     let builtins = ts_gen_abi::BUILTINS_SPECIFIER;

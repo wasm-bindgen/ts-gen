@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -26,6 +27,18 @@ declare function __Number_value(x: externref): f64;
 @external("ambient-enum-members", "use_all")
 declare function __ambient_enum_members_use_all(computed: f64, mixed: externref, numbered: externref, after_string: externref): void;
 
+// kind Mixed: the index of the arm holding x, -1 for none
+@external("ambient-enum-members", "kind:Mixed")
+declare function __ambient_enum_members_kind_Mixed(x: externref | null): i32;
+
+// kind Numbered: the index of the arm holding x, -1 for none
+@external("ambient-enum-members", "kind:Numbered")
+declare function __ambient_enum_members_kind_Numbered(x: externref | null): i32;
+
+// kind AfterString: the index of the arm holding x, -1 for none
+@external("ambient-enum-members", "kind:AfterString")
+declare function __ambient_enum_members_kind_AfterString(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -43,6 +56,50 @@ export type Numbered = externref;
 
 // kind AfterString: A = "a"
 export type AfterString = String;
+
+// The arm a `Mixed` holds, from `Mixed_arm`.
+export sealed class Mixed_Arm {
+  case Mixed_A
+  case Mixed_C
+}
+export function Mixed_arm(x: Mixed): Mixed_Arm {
+  let __r = x;
+  return match (__ambient_enum_members_kind_Mixed(__r)) {
+    case 0: new Mixed_A()
+    case 1: new Mixed_C()
+    case _: throw new Error("no arm of Mixed")
+  };
+}
+
+// The arm a `Numbered` holds, from `Numbered_arm`.
+export sealed class Numbered_Arm {
+  case Numbered_A
+  case Numbered_B
+  case Numbered_C
+  case Numbered_D
+}
+export function Numbered_arm(x: Numbered): Numbered_Arm {
+  let __r = x;
+  return match (__ambient_enum_members_kind_Numbered(__r)) {
+    case 0: new Numbered_A()
+    case 1: new Numbered_B()
+    case 2: new Numbered_C()
+    case 3: new Numbered_D()
+    case _: throw new Error("no arm of Numbered")
+  };
+}
+
+// The arm a `AfterString` holds, from `AfterString_arm`.
+export sealed class AfterString_Arm {
+  case AfterString_A
+}
+export function AfterString_arm(x: AfterString): AfterString_Arm {
+  let __r = x.handle;
+  return match (__ambient_enum_members_kind_AfterString(__r)) {
+    case 0: new AfterString_A()
+    case _: throw new Error("no arm of AfterString")
+  };
+}
 
 export function use_all(computed: f64, mixed: Mixed, numbered: Numbered, after_string: AfterString): void { __ambient_enum_members_use_all(computed, mixed, numbered, after_string.handle); }
 

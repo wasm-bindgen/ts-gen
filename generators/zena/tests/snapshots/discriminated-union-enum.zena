@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -109,6 +110,22 @@ declare function __discriminated_union_enum_Payload_set_data_with_array_buffer(t
 @external("discriminated-union-enum", "send")
 declare function __discriminated_union_enum_send(attachment: externref, reply: externref, payload: externref): void;
 
+// kind DispositionKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DispositionKind")
+declare function __kind_DispositionKind(x: externref | null): i32;
+
+// kind CodeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CodeKind")
+declare function __kind_CodeKind(x: externref | null): i32;
+
+// kind KindKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:KindKind")
+declare function __kind_KindKind(x: externref | null): i32;
+
+// kind DataKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DataKind")
+declare function __kind_DataKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -129,6 +146,62 @@ export type KindKind = String;
 
 // kind DataKind: String = String, ArrayBuffer = ArrayBuffer
 export type DataKind = externref;
+
+// The arm a `DispositionKind` holds, from `DispositionKind_arm`.
+export sealed class DispositionKind_Arm {
+  case DispositionKind_Inline
+  case DispositionKind_Attachment
+}
+export function DispositionKind_arm(x: DispositionKind): DispositionKind_Arm {
+  let __r = x.handle;
+  return match (__kind_DispositionKind(__r)) {
+    case 0: new DispositionKind_Inline()
+    case 1: new DispositionKind_Attachment()
+    case _: throw new Error("no arm of DispositionKind")
+  };
+}
+
+// The arm a `CodeKind` holds, from `CodeKind_arm`.
+export sealed class CodeKind_Arm {
+  case CodeKind_N200
+  case CodeKind_N404
+}
+export function CodeKind_arm(x: CodeKind): CodeKind_Arm {
+  let __r = x;
+  return match (__kind_CodeKind(__r)) {
+    case 0: new CodeKind_N200()
+    case 1: new CodeKind_N404()
+    case _: throw new Error("no arm of CodeKind")
+  };
+}
+
+// The arm a `KindKind` holds, from `KindKind_arm`.
+export sealed class KindKind_Arm {
+  case KindKind_Text
+  case KindKind_Binary
+}
+export function KindKind_arm(x: KindKind): KindKind_Arm {
+  let __r = x.handle;
+  return match (__kind_KindKind(__r)) {
+    case 0: new KindKind_Text()
+    case 1: new KindKind_Binary()
+    case _: throw new Error("no arm of KindKind")
+  };
+}
+
+// The arm a `DataKind` holds, from `DataKind_arm`.
+export sealed class DataKind_Arm {
+  case DataKind_String(value: String)
+  case DataKind_ArrayBuffer(value: externref)
+}
+export function DataKind_arm(x: DataKind): DataKind_Arm {
+  let __r = x;
+  return match (__kind_DataKind(__r)) {
+    case 0: new DataKind_String(String.fromHandle(__r))
+    case 1: new DataKind_ArrayBuffer(__r)
+    case _: throw new Error("no arm of DataKind")
+  };
+}
 
 export class Attachment {
   #ref: externref;

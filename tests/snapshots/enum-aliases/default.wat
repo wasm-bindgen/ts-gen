@@ -15,6 +15,14 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "enum-aliases" "kind:Version" (func $enum-aliases:kind:Version (param $x externref) (result i32)))
+  (import "enum-aliases" "kind:Flags" (func $enum-aliases:kind:Flags (param $x externref) (result i32)))
+  (import "enum-aliases" "kind:Kind" (func $enum-aliases:kind:Kind (param $x externref) (result i32)))
+  (import "enum-aliases" "kind:Bits" (func $enum-aliases:kind:Bits (param $x externref) (result i32)))
+  (import "enum-aliases" "kind:Other" (func $enum-aliases:kind:Other (param $x externref) (result i32)))
+  (import "enum-aliases" "kind:Unresolved" (func $enum-aliases:kind:Unresolved (param $x externref) (result i32)))
+
   ;; new {};
   (import "enum-aliases" "Api.new" (func $enum-aliases:Api.new (result externref)))
   ;; get version: Version;

@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -324,6 +325,18 @@ declare function __navigator(): externref | null;
 @external("./bindings.wasm", "self")
 declare function __self(): externref | null;
 
+// kind QueueContentType: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:QueueContentType")
+declare function __kind_QueueContentType(x: externref | null): i32;
+
+// kind BodyInit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:BodyInit")
+declare function __kind_BodyInit(x: externref | null): i32;
+
+// kind HeadersKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:HeadersKind")
+declare function __kind_HeadersKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -341,6 +354,61 @@ export type BodyInit = externref;
 
 // kind HeadersKind fallback: Headers = Headers, VecOfVecOfString = Array<Array<String>>, Record = Record<String>
 export type HeadersKind = externref;
+
+// The arm a `QueueContentType` holds, from `QueueContentType_arm`.
+export sealed class QueueContentType_Arm {
+  case QueueContentType_Text
+  case QueueContentType_Bytes
+  case QueueContentType_Json
+  case QueueContentType_V8
+}
+export function QueueContentType_arm(x: QueueContentType): QueueContentType_Arm {
+  let __r = x.handle;
+  return match (__kind_QueueContentType(__r)) {
+    case 0: new QueueContentType_Text()
+    case 1: new QueueContentType_Bytes()
+    case 2: new QueueContentType_Json()
+    case 3: new QueueContentType_V8()
+    case _: throw new Error("no arm of QueueContentType")
+  };
+}
+
+// The arm a `BodyInit` holds, from `BodyInit_arm`.
+export sealed class BodyInit_Arm {
+  case BodyInit_ReadableStream(value: externref)
+  case BodyInit_String(value: String)
+  case BodyInit_ArrayBuffer(value: externref)
+  case BodyInit_Blob(value: externref)
+  case BodyInit_UrlSearchParams(value: externref)
+  case BodyInit_FormData(value: externref)
+}
+export function BodyInit_arm(x: BodyInit): BodyInit_Arm {
+  let __r = x;
+  return match (__kind_BodyInit(__r)) {
+    case 0: new BodyInit_ReadableStream(__r)
+    case 1: new BodyInit_String(String.fromHandle(__r))
+    case 2: new BodyInit_ArrayBuffer(__r)
+    case 3: new BodyInit_Blob(__r)
+    case 4: new BodyInit_UrlSearchParams(__r)
+    case 5: new BodyInit_FormData(__r)
+    case _: throw new Error("no arm of BodyInit")
+  };
+}
+
+// The arm a `HeadersKind` holds, from `HeadersKind_arm`.
+export sealed class HeadersKind_Arm {
+  case HeadersKind_Headers(value: externref)
+  case HeadersKind_VecOfVecOfString(value: externref)
+  case HeadersKind_Record(value: externref)
+}
+export function HeadersKind_arm(x: HeadersKind): HeadersKind_Arm {
+  let __r = x;
+  return match (__kind_HeadersKind(__r)) {
+    case 0: new HeadersKind_Headers(__r)
+    case 1: new HeadersKind_VecOfVecOfString(__r)
+    case _: new HeadersKind_Record(__r)
+  };
+}
 
 export class DOMException {
   #ref: externref;

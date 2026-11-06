@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -208,6 +209,10 @@ declare function __node_console_Console_time_stamp(this_: externref): void;
 @external("node:console", "Console.time_stamp_with_label")
 declare function __node_console_Console_time_stamp_with_label(this_: externref, label: externref): void;
 
+// kind ColorModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ColorModeKind")
+declare function __kind_ColorModeKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -219,6 +224,20 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind ColorModeKind: Bool = Boolean, String = String
 export type ColorModeKind = externref;
+
+// The arm a `ColorModeKind` holds, from `ColorModeKind_arm`.
+export sealed class ColorModeKind_Arm {
+  case ColorModeKind_Bool(value: externref)
+  case ColorModeKind_String(value: String)
+}
+export function ColorModeKind_arm(x: ColorModeKind): ColorModeKind_Arm {
+  let __r = x;
+  return match (__kind_ColorModeKind(__r)) {
+    case 0: new ColorModeKind_Bool(__r)
+    case 1: new ColorModeKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of ColorModeKind")
+  };
+}
 
 export class ConsoleOptions {
   #ref: externref;

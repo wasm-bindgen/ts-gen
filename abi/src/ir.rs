@@ -61,11 +61,27 @@ pub struct Kind {
     pub path: String,
     pub module: Option<String>,
     pub arms: Vec<Arm>,
-    /// Open: a value no other arm matches is the last arm's, a shape that
-    /// is not tested for.
+    /// Open: a value no other arm matches is the last non-literal arm's,
+    /// a shape that is not tested for (IR.md, Recognition).
     pub fallback: bool,
     pub doc: Option<String>,
 }
+
+impl Kind {
+    /// The import name of the kind's discriminator (IR.md, Bridge), in
+    /// [`Kind::specifier`].
+    pub fn discriminator(&self) -> String {
+        format!("kind:{}", self.name)
+    }
+
+    /// The module the language imports the discriminator from.
+    pub fn specifier(&self) -> &str {
+        self.module.as_deref().unwrap_or(BINDINGS_SPECIFIER)
+    }
+}
+
+/// What a kind's discriminator returns for a value no arm holds.
+pub const NO_ARM: i32 = -1;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Arm {

@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -34,6 +35,22 @@ declare function __send(body: externref): void;
 @external("./bindings.wasm", "fetch")
 declare function __fetch(input: externref): externref;
 
+// kind Priority: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Priority")
+declare function __kind_Priority(x: externref | null): i32;
+
+// kind StringOrNumber: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:StringOrNumber")
+declare function __kind_StringOrNumber(x: externref | null): i32;
+
+// kind BodyInit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:BodyInit")
+declare function __kind_BodyInit(x: externref | null): i32;
+
+// kind RequestInfo: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RequestInfo")
+declare function __kind_RequestInfo(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -54,6 +71,68 @@ export type BodyInit = externref;
 
 // kind RequestInfo: String = String, Request = Request
 export type RequestInfo = externref;
+
+// The arm a `Priority` holds, from `Priority_arm`.
+export sealed class Priority_Arm {
+  case Priority_Low
+  case Priority_Normal
+  case Priority_High
+}
+export function Priority_arm(x: Priority): Priority_Arm {
+  let __r = x;
+  return match (__kind_Priority(__r)) {
+    case 0: new Priority_Low()
+    case 1: new Priority_Normal()
+    case 2: new Priority_High()
+    case _: throw new Error("no arm of Priority")
+  };
+}
+
+// The arm a `StringOrNumber` holds, from `StringOrNumber_arm`.
+export sealed class StringOrNumber_Arm {
+  case StringOrNumber_String(value: String)
+  case StringOrNumber_F64(value: f64)
+}
+export function StringOrNumber_arm(x: StringOrNumber): StringOrNumber_Arm {
+  let __r = x;
+  return match (__kind_StringOrNumber(__r)) {
+    case 0: new StringOrNumber_String(String.fromHandle(__r))
+    case 1: new StringOrNumber_F64(numberValue(__r))
+    case _: throw new Error("no arm of StringOrNumber")
+  };
+}
+
+// The arm a `BodyInit` holds, from `BodyInit_arm`.
+export sealed class BodyInit_Arm {
+  case BodyInit_ReadableStream(value: externref)
+  case BodyInit_String(value: String)
+  case BodyInit_ArrayBuffer(value: externref)
+  case BodyInit_Blob(value: externref)
+}
+export function BodyInit_arm(x: BodyInit): BodyInit_Arm {
+  let __r = x;
+  return match (__kind_BodyInit(__r)) {
+    case 0: new BodyInit_ReadableStream(__r)
+    case 1: new BodyInit_String(String.fromHandle(__r))
+    case 2: new BodyInit_ArrayBuffer(__r)
+    case 3: new BodyInit_Blob(__r)
+    case _: throw new Error("no arm of BodyInit")
+  };
+}
+
+// The arm a `RequestInfo` holds, from `RequestInfo_arm`.
+export sealed class RequestInfo_Arm {
+  case RequestInfo_String(value: String)
+  case RequestInfo_Request(value: externref)
+}
+export function RequestInfo_arm(x: RequestInfo): RequestInfo_Arm {
+  let __r = x;
+  return match (__kind_RequestInfo(__r)) {
+    case 0: new RequestInfo_String(String.fromHandle(__r))
+    case 1: new RequestInfo_Request(__r)
+    case _: throw new Error("no arm of RequestInfo")
+  };
+}
 
 export class Writable {
   #ref: externref;

@@ -5101,6 +5101,13 @@ Three bindings, one global and one JSPI function exist for every
 | `"./builtins.js" "undefined"`             | immutable `externref` global     |
 | `"./builtins.js" "await"`                 | JSPI suspend: promise → settled value |
 
+Each kind also has a discriminator, `"./bindings.wasm" "kind:<name>"`
+(a module's kind from its specifier), `(param externref) (result i32)`:
+the index of the arm holding the value, tested in the order Rust's
+binding reads it (literals first, then the other arms in order, a
+`fallback` kind's last one untested), or `-1` for none. IR.md
+(Recognition, Kind discriminators) gives each arm's test.
+
 `is_null` needs nothing: `ref.is_null` in the language. `Number.value`
 is JS coercion, not a type test: `Number(null)` is `0`,
 `Number(undefined)`, non-numeric strings and plain objects are `NaN`,

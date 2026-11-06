@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -26604,6 +26605,698 @@ declare function __cloudflare_sockets_connect_with_options(address: externref, o
 @external("cloudflare:sockets", "connect_with_socket_address_and_options")
 declare function __cloudflare_sockets_connect_with_socket_address_and_options(address: externref, options: externref): externref;
 
+// kind WebAssembly.ValueType: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:WebAssembly.ValueType")
+declare function __kind_WebAssembly_ValueType(x: externref | null): i32;
+
+// kind WebAssembly.ImportExportKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:WebAssembly.ImportExportKind")
+declare function __kind_WebAssembly_ImportExportKind(x: externref | null): i32;
+
+// kind WebAssembly.TableKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:WebAssembly.TableKind")
+declare function __kind_WebAssembly_TableKind(x: externref | null): i32;
+
+// kind DurableObjectJurisdiction: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DurableObjectJurisdiction")
+declare function __kind_DurableObjectJurisdiction(x: externref | null): i32;
+
+// kind DurableObjectLocationHint: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DurableObjectLocationHint")
+declare function __kind_DurableObjectLocationHint(x: externref | null): i32;
+
+// kind DurableObjectRoutingMode: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DurableObjectRoutingMode")
+declare function __kind_DurableObjectRoutingMode(x: externref | null): i32;
+
+// kind QueueContentType: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:QueueContentType")
+declare function __kind_QueueContentType(x: externref | null): i32;
+
+// kind SqlStorageValue: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:SqlStorageValue")
+declare function __kind_SqlStorageValue(x: externref | null): i32;
+
+// kind AiTextToSpeechOutput: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:AiTextToSpeechOutput")
+declare function __kind_AiTextToSpeechOutput(x: externref | null): i32;
+
+// kind ResponseContent: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseContent")
+declare function __kind_ResponseContent(x: externref | null): i32;
+
+// kind ResponseFormatTextConfig: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseFormatTextConfig")
+declare function __kind_ResponseFormatTextConfig(x: externref | null): i32;
+
+// kind ResponseFunctionCallOutputItem: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseFunctionCallOutputItem")
+declare function __kind_ResponseFunctionCallOutputItem(x: externref | null): i32;
+
+// kind ResponseIncludable: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseIncludable")
+declare function __kind_ResponseIncludable(x: externref | null): i32;
+
+// kind ResponseInputContent: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseInputContent")
+declare function __kind_ResponseInputContent(x: externref | null): i32;
+
+// kind ResponseInputItem: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseInputItem")
+declare function __kind_ResponseInputItem(x: externref | null): i32;
+
+// kind ResponseItem: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseItem")
+declare function __kind_ResponseItem(x: externref | null): i32;
+
+// kind ResponseOutputItem: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseOutputItem")
+declare function __kind_ResponseOutputItem(x: externref | null): i32;
+
+// kind ResponseStatus: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseStatus")
+declare function __kind_ResponseStatus(x: externref | null): i32;
+
+// kind ToolChoiceOptions: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ToolChoiceOptions")
+declare function __kind_ToolChoiceOptions(x: externref | null): i32;
+
+// kind Ai_Cf_Baai_Bge_Base_En_V1_5_Output: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Baai_Bge_Base_En_V1_5_Output")
+declare function __kind_Ai_Cf_Baai_Bge_Base_En_V1_5_Output(x: externref | null): i32;
+
+// kind Ai_Cf_Openai_Whisper_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Openai_Whisper_Input")
+declare function __kind_Ai_Cf_Openai_Whisper_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Meta_M2M100_1_2B_Output: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Meta_M2M100_1_2B_Output")
+declare function __kind_Ai_Cf_Meta_M2M100_1_2B_Output(x: externref | null): i32;
+
+// kind Ai_Cf_Baai_Bge_Small_En_V1_5_Output: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Baai_Bge_Small_En_V1_5_Output")
+declare function __kind_Ai_Cf_Baai_Bge_Small_En_V1_5_Output(x: externref | null): i32;
+
+// kind Ai_Cf_Baai_Bge_Large_En_V1_5_Output: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Baai_Bge_Large_En_V1_5_Output")
+declare function __kind_Ai_Cf_Baai_Bge_Large_En_V1_5_Output(x: externref | null): i32;
+
+// kind Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input")
+declare function __kind_Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Openai_Whisper_Tiny_En_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Openai_Whisper_Tiny_En_Input")
+declare function __kind_Ai_Cf_Openai_Whisper_Tiny_En_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Baai_Bge_M3_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Baai_Bge_M3_Input")
+declare function __kind_Ai_Cf_Baai_Bge_M3_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Baai_Bge_M3_Output: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Baai_Bge_M3_Output")
+declare function __kind_Ai_Cf_Baai_Bge_M3_Output(x: externref | null): i32;
+
+// kind Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input")
+declare function __kind_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input")
+declare function __kind_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output")
+declare function __kind_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output(x: externref | null): i32;
+
+// kind Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input")
+declare function __kind_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Qwen_Qwq_32B_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Qwen_Qwq_32B_Input")
+declare function __kind_Ai_Cf_Qwen_Qwq_32B_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input")
+declare function __kind_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Google_Gemma_3_12B_It_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Google_Gemma_3_12B_It_Input")
+declare function __kind_Ai_Cf_Google_Gemma_3_12B_It_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input")
+declare function __kind_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input")
+declare function __kind_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output")
+declare function __kind_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output(x: externref | null): i32;
+
+// kind Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input")
+declare function __kind_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input(x: externref | null): i32;
+
+// kind Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output")
+declare function __kind_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output(x: externref | null): i32;
+
+// kind AIGatewayProviders: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:AIGatewayProviders")
+declare function __kind_AIGatewayProviders(x: externref | null): i32;
+
+// kind CertVerificationStatus: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CertVerificationStatus")
+declare function __kind_CertVerificationStatus(x: externref | null): i32;
+
+// kind Iso3166Alpha2Code: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Iso3166Alpha2Code")
+declare function __kind_Iso3166Alpha2Code(x: externref | null): i32;
+
+// kind ContinentCode: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ContinentCode")
+declare function __kind_ContinentCode(x: externref | null): i32;
+
+// kind D1SessionConstraint: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:D1SessionConstraint")
+declare function __kind_D1SessionConstraint(x: externref | null): i32;
+
+// kind Rpc.EntrypointBranded: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Rpc.EntrypointBranded")
+declare function __kind_Rpc_EntrypointBranded(x: externref | null): i32;
+
+// kind WorkflowDurationLabel: the index of the arm holding x, -1 for none
+@external("cloudflare:workers", "kind:WorkflowDurationLabel")
+declare function __cloudflare_workers_kind_WorkflowDurationLabel(x: externref | null): i32;
+
+// kind WorkflowSleepDuration: the index of the arm holding x, -1 for none
+@external("cloudflare:workers", "kind:WorkflowSleepDuration")
+declare function __cloudflare_workers_kind_WorkflowSleepDuration(x: externref | null): i32;
+
+// kind WorkflowDelayDuration: the index of the arm holding x, -1 for none
+@external("cloudflare:workers", "kind:WorkflowDelayDuration")
+declare function __cloudflare_workers_kind_WorkflowDelayDuration(x: externref | null): i32;
+
+// kind WorkflowTimeoutDuration: the index of the arm holding x, -1 for none
+@external("cloudflare:workers", "kind:WorkflowTimeoutDuration")
+declare function __cloudflare_workers_kind_WorkflowTimeoutDuration(x: externref | null): i32;
+
+// kind WorkflowRetentionDuration: the index of the arm holding x, -1 for none
+@external("cloudflare:workers", "kind:WorkflowRetentionDuration")
+declare function __cloudflare_workers_kind_WorkflowRetentionDuration(x: externref | null): i32;
+
+// kind WorkflowBackoff: the index of the arm holding x, -1 for none
+@external("cloudflare:workers", "kind:WorkflowBackoff")
+declare function __cloudflare_workers_kind_WorkflowBackoff(x: externref | null): i32;
+
+// kind WorkflowInstanceStatus: the index of the arm holding x, -1 for none
+@external("cloudflare:workers", "kind:WorkflowInstanceStatus")
+declare function __cloudflare_workers_kind_WorkflowInstanceStatus(x: externref | null): i32;
+
+// kind StreamDownloadStatus: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:StreamDownloadStatus")
+declare function __kind_StreamDownloadStatus(x: externref | null): i32;
+
+// kind StreamDownloadType: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:StreamDownloadType")
+declare function __kind_StreamDownloadType(x: externref | null): i32;
+
+// kind StreamWatermarkPosition: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:StreamWatermarkPosition")
+declare function __kind_StreamWatermarkPosition(x: externref | null): i32;
+
+// kind StreamPaginationComparison: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:StreamPaginationComparison")
+declare function __kind_StreamPaginationComparison(x: externref | null): i32;
+
+// kind TailStream.EventOutcome: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:TailStream.EventOutcome")
+declare function __kind_TailStream_EventOutcome(x: externref | null): i32;
+
+// kind VectorFloatArray: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:VectorFloatArray")
+declare function __kind_VectorFloatArray(x: externref | null): i32;
+
+// kind VectorizeVectorMetadataFilterOp: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:VectorizeVectorMetadataFilterOp")
+declare function __kind_VectorizeVectorMetadataFilterOp(x: externref | null): i32;
+
+// kind VectorizeVectorMetadataFilterCollectionOp: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:VectorizeVectorMetadataFilterCollectionOp")
+declare function __kind_VectorizeVectorMetadataFilterCollectionOp(x: externref | null): i32;
+
+// kind VectorizeDistanceMetric: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:VectorizeDistanceMetric")
+declare function __kind_VectorizeDistanceMetric(x: externref | null): i32;
+
+// kind VectorizeMetadataRetrievalLevel: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:VectorizeMetadataRetrievalLevel")
+declare function __kind_VectorizeMetadataRetrievalLevel(x: externref | null): i32;
+
+// kind WorkflowDurationLabel: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:WorkflowDurationLabel")
+declare function __kind_WorkflowDurationLabel(x: externref | null): i32;
+
+// kind WorkflowSleepDuration: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:WorkflowSleepDuration")
+declare function __kind_WorkflowSleepDuration(x: externref | null): i32;
+
+// kind WorkflowRetentionDuration: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:WorkflowRetentionDuration")
+declare function __kind_WorkflowRetentionDuration(x: externref | null): i32;
+
+// kind ExcludeCertVerificationStatusNone: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ExcludeCertVerificationStatusNone")
+declare function __kind_ExcludeCertVerificationStatusNone(x: externref | null): i32;
+
+// kind FetchReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FetchReturnKind")
+declare function __kind_FetchReturnKind(x: externref | null): i32;
+
+// kind GenerateKeyReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:GenerateKeyReturnKind")
+declare function __kind_GenerateKeyReturnKind(x: externref | null): i32;
+
+// kind ExportKeyReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ExportKeyReturnKind")
+declare function __kind_ExportKeyReturnKind(x: externref | null): i32;
+
+// kind SaltKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:SaltKind")
+declare function __kind_SaltKind(x: externref | null): i32;
+
+// kind HashKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:HashKind")
+declare function __kind_HashKind(x: externref | null): i32;
+
+// kind BytesWrittenKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:BytesWrittenKind")
+declare function __kind_BytesWrittenKind(x: externref | null): i32;
+
+// kind DataKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DataKind")
+declare function __kind_DataKind(x: externref | null): i32;
+
+// kind TypeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:TypeKind")
+declare function __kind_TypeKind(x: externref | null): i32;
+
+// kind HeadersKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:HeadersKind")
+declare function __kind_HeadersKind(x: externref | null): i32;
+
+// kind EncodeBodyKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:EncodeBodyKind")
+declare function __kind_EncodeBodyKind(x: externref | null): i32;
+
+// kind CacheKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CacheKind")
+declare function __kind_CacheKind(x: externref | null): i32;
+
+// kind BodyKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:BodyKind")
+declare function __kind_BodyKind(x: externref | null): i32;
+
+// kind OnlyIfKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:OnlyIfKind")
+declare function __kind_OnlyIfKind(x: externref | null): i32;
+
+// kind RangeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RangeKind")
+declare function __kind_RangeKind(x: externref | null): i32;
+
+// kind HttpMetadataKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:HttpMetadataKind")
+declare function __kind_HttpMetadataKind(x: externref | null): i32;
+
+// kind Md5Kind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Md5Kind")
+declare function __kind_Md5Kind(x: externref | null): i32;
+
+// kind BinaryTypeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:BinaryTypeKind")
+declare function __kind_BinaryTypeKind(x: externref | null): i32;
+
+// kind SecureTransportKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:SecureTransportKind")
+declare function __kind_SecureTransportKind(x: externref | null): i32;
+
+// kind AiSearchConfigTypeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:AiSearchConfigTypeKind")
+declare function __kind_AiSearchConfigTypeKind(x: externref | null): i32;
+
+// kind ChatCompletionsReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ChatCompletionsReturnKind")
+declare function __kind_ChatCompletionsReturnKind(x: externref | null): i32;
+
+// kind TextKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:TextKind")
+declare function __kind_TextKind(x: externref | null): i32;
+
+// kind RoleKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RoleKind")
+declare function __kind_RoleKind(x: externref | null): i32;
+
+// kind AiTextGenerationToolInputTypeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:AiTextGenerationToolInputTypeKind")
+declare function __kind_AiTextGenerationToolInputTypeKind(x: externref | null): i32;
+
+// kind ToolsKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ToolsKind")
+declare function __kind_ToolsKind(x: externref | null): i32;
+
+// kind ConversationKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ConversationKind")
+declare function __kind_ConversationKind(x: externref | null): i32;
+
+// kind InputKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:InputKind")
+declare function __kind_InputKind(x: externref | null): i32;
+
+// kind ServiceTierKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ServiceTierKind")
+declare function __kind_ServiceTierKind(x: externref | null): i32;
+
+// kind ToolChoiceKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ToolChoiceKind")
+declare function __kind_ToolChoiceKind(x: externref | null): i32;
+
+// kind TruncationKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:TruncationKind")
+declare function __kind_TruncationKind(x: externref | null): i32;
+
+// kind InstructionsKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:InstructionsKind")
+declare function __kind_InstructionsKind(x: externref | null): i32;
+
+// kind ContentKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ContentKind")
+declare function __kind_ContentKind(x: externref | null): i32;
+
+// kind EasyInputMessageRoleKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:EasyInputMessageRoleKind")
+declare function __kind_EasyInputMessageRoleKind(x: externref | null): i32;
+
+// kind ReasonKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ReasonKind")
+declare function __kind_ReasonKind(x: externref | null): i32;
+
+// kind EffortKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:EffortKind")
+declare function __kind_EffortKind(x: externref | null): i32;
+
+// kind GenerateSummaryKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:GenerateSummaryKind")
+declare function __kind_GenerateSummaryKind(x: externref | null): i32;
+
+// kind OutputKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:OutputKind")
+declare function __kind_OutputKind(x: externref | null): i32;
+
+// kind CodeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CodeKind")
+declare function __kind_CodeKind(x: externref | null): i32;
+
+// kind StatusKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:StatusKind")
+declare function __kind_StatusKind(x: externref | null): i32;
+
+// kind DetailKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DetailKind")
+declare function __kind_DetailKind(x: externref | null): i32;
+
+// kind ResponseInputItemFunctionCallOutputOutputKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseInputItemFunctionCallOutputOutputKind")
+declare function __kind_ResponseInputItemFunctionCallOutputOutputKind(x: externref | null): i32;
+
+// kind ResponseInputItemMessageRoleKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ResponseInputItemMessageRoleKind")
+declare function __kind_ResponseInputItemMessageRoleKind(x: externref | null): i32;
+
+// kind VerbosityKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:VerbosityKind")
+declare function __kind_VerbosityKind(x: externref | null): i32;
+
+// kind PoolingKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:PoolingKind")
+declare function __kind_PoolingKind(x: externref | null): i32;
+
+// kind ImageKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ImageKind")
+declare function __kind_ImageKind(x: externref | null): i32;
+
+// kind Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind")
+declare function __kind_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind(x: externref | null): i32;
+
+// kind PostProcessedOutputsKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:PostProcessedOutputsKind")
+declare function __kind_PostProcessedOutputsKind(x: externref | null): i32;
+
+// kind CustomTopicModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CustomTopicModeKind")
+declare function __kind_CustomTopicModeKind(x: externref | null): i32;
+
+// kind EncodingKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:EncodingKind")
+declare function __kind_EncodingKind(x: externref | null): i32;
+
+// kind ModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ModeKind")
+declare function __kind_ModeKind(x: externref | null): i32;
+
+// kind DtypeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DtypeKind")
+declare function __kind_DtypeKind(x: externref | null): i32;
+
+// kind SpeakerKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:SpeakerKind")
+declare function __kind_SpeakerKind(x: externref | null): i32;
+
+// kind Ai_Cf_Deepgram_Aura_1_InputEncodingKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Deepgram_Aura_1_InputEncodingKind")
+declare function __kind_Ai_Cf_Deepgram_Aura_1_InputEncodingKind(x: externref | null): i32;
+
+// kind ContainerKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ContainerKind")
+declare function __kind_ContainerKind(x: externref | null): i32;
+
+// kind TargetLanguageKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:TargetLanguageKind")
+declare function __kind_TargetLanguageKind(x: externref | null): i32;
+
+// kind MipOptOutKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:MipOptOutKind")
+declare function __kind_MipOptOutKind(x: externref | null): i32;
+
+// kind EventKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:EventKind")
+declare function __kind_EventKind(x: externref | null): i32;
+
+// kind Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind")
+declare function __kind_Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind(x: externref | null): i32;
+
+// kind Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind")
+declare function __kind_Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind(x: externref | null): i32;
+
+// kind MaxAttemptsKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:MaxAttemptsKind")
+declare function __kind_MaxAttemptsKind(x: externref | null): i32;
+
+// kind BackoffKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:BackoffKind")
+declare function __kind_BackoffKind(x: externref | null): i32;
+
+// kind FeedbackKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FeedbackKind")
+declare function __kind_FeedbackKind(x: externref | null): i32;
+
+// kind CfAigMetadataKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CfAigMetadataKind")
+declare function __kind_CfAigMetadataKind(x: externref | null): i32;
+
+// kind CfAigCacheTtlKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CfAigCacheTtlKind")
+declare function __kind_CfAigCacheTtlKind(x: externref | null): i32;
+
+// kind CfAigSkipCacheKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CfAigSkipCacheKind")
+declare function __kind_CfAigSkipCacheKind(x: externref | null): i32;
+
+// kind ProviderKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ProviderKind")
+declare function __kind_ProviderKind(x: externref | null): i32;
+
+// kind ComparisonFilterTypeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ComparisonFilterTypeKind")
+declare function __kind_ComparisonFilterTypeKind(x: externref | null): i32;
+
+// kind ValueKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ValueKind")
+declare function __kind_ValueKind(x: externref | null): i32;
+
+// kind CompoundFilterTypeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CompoundFilterTypeKind")
+declare function __kind_CompoundFilterTypeKind(x: externref | null): i32;
+
+// kind FitKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FitKind")
+declare function __kind_FitKind(x: externref | null): i32;
+
+// kind GravityKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:GravityKind")
+declare function __kind_GravityKind(x: externref | null): i32;
+
+// kind RotateKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RotateKind")
+declare function __kind_RotateKind(x: externref | null): i32;
+
+// kind BasicImageTransformationsGravityCoordinatesModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:BasicImageTransformationsGravityCoordinatesModeKind")
+declare function __kind_BasicImageTransformationsGravityCoordinatesModeKind(x: externref | null): i32;
+
+// kind PolishKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:PolishKind")
+declare function __kind_PolishKind(x: externref | null): i32;
+
+// kind RepeatKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RepeatKind")
+declare function __kind_RepeatKind(x: externref | null): i32;
+
+// kind TrimKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:TrimKind")
+declare function __kind_TrimKind(x: externref | null): i32;
+
+// kind QualityKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:QualityKind")
+declare function __kind_QualityKind(x: externref | null): i32;
+
+// kind FormatKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FormatKind")
+declare function __kind_FormatKind(x: externref | null): i32;
+
+// kind MetadataKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:MetadataKind")
+declare function __kind_MetadataKind(x: externref | null): i32;
+
+// kind FlipKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FlipKind")
+declare function __kind_FlipKind(x: externref | null): i32;
+
+// kind CountryKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CountryKind")
+declare function __kind_CountryKind(x: externref | null): i32;
+
+// kind EdgeRequestKeepAliveStatusKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:EdgeRequestKeepAliveStatusKind")
+declare function __kind_EdgeRequestKeepAliveStatusKind(x: externref | null): i32;
+
+// kind CertRevokedKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CertRevokedKind")
+declare function __kind_CertRevokedKind(x: externref | null): i32;
+
+// kind DispositionKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DispositionKind")
+declare function __kind_DispositionKind(x: externref | null): i32;
+
+// kind EmailAttachmentContentKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:EmailAttachmentContentKind")
+declare function __kind_EmailAttachmentContentKind(x: externref | null): i32;
+
+// kind FromKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FromKind")
+declare function __kind_FromKind(x: externref | null): i32;
+
+// kind TailStreamReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:TailStreamReturnKind")
+declare function __kind_TailStreamReturnKind(x: externref | null): i32;
+
+// kind TimeoutKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:TimeoutKind")
+declare function __kind_TimeoutKind(x: externref | null): i32;
+
+// kind ImageInfoResponseFormatKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ImageInfoResponseFormatKind")
+declare function __kind_ImageInfoResponseFormatKind(x: externref | null): i32;
+
+// kind ImageTransformFitKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ImageTransformFitKind")
+declare function __kind_ImageTransformFitKind(x: externref | null): i32;
+
+// kind ImageTransformGravityKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ImageTransformGravityKind")
+declare function __kind_ImageTransformGravityKind(x: externref | null): i32;
+
+// kind ImageTransformRotateKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ImageTransformRotateKind")
+declare function __kind_ImageTransformRotateKind(x: externref | null): i32;
+
+// kind ImageOutputOptionsFormatKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ImageOutputOptionsFormatKind")
+declare function __kind_ImageOutputOptionsFormatKind(x: externref | null): i32;
+
+// kind SortOrderKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:SortOrderKind")
+declare function __kind_SortOrderKind(x: externref | null): i32;
+
+// kind MediaTransformationInputOptionsFitKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:MediaTransformationInputOptionsFitKind")
+declare function __kind_MediaTransformationInputOptionsFitKind(x: externref | null): i32;
+
+// kind MediaTransformationOutputOptionsModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:MediaTransformationOutputOptionsModeKind")
+declare function __kind_MediaTransformationOutputOptionsModeKind(x: externref | null): i32;
+
+// kind MediaTransformationOutputOptionsFormatKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:MediaTransformationOutputOptionsFormatKind")
+declare function __kind_MediaTransformationOutputOptionsFormatKind(x: externref | null): i32;
+
+// kind PayloadKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:PayloadKind")
+declare function __kind_PayloadKind(x: externref | null): i32;
+
+// kind StreamCaptionStatusKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:StreamCaptionStatusKind")
+declare function __kind_StreamCaptionStatusKind(x: externref | null): i32;
+
+// kind ConversionResponseFormatKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ConversionResponseFormatKind")
+declare function __kind_ConversionResponseFormatKind(x: externref | null): i32;
+
+// kind DescriptionLanguageKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DescriptionLanguageKind")
+declare function __kind_DescriptionLanguageKind(x: externref | null): i32;
+
+// kind LevelKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:LevelKind")
+declare function __kind_LevelKind(x: externref | null): i32;
+
+// kind AttributeValueKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:AttributeValueKind")
+declare function __kind_AttributeValueKind(x: externref | null): i32;
+
+// kind ReturnMetadataKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ReturnMetadataKind")
+declare function __kind_ReturnMetadataKind(x: externref | null): i32;
+
+// kind ValuesKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ValuesKind")
+declare function __kind_ValuesKind(x: externref | null): i32;
+
+// kind InstanceStatusStatusKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:InstanceStatusStatusKind")
+declare function __kind_InstanceStatusStatusKind(x: externref | null): i32;
+
+// kind EqKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:EqKind")
+declare function __kind_EqKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -27131,6 +27824,3600 @@ export type InstanceStatusStatusKind = String;
 
 // kind EqKind: String = String, F64 = Number, Bool = Boolean, VecOfString = Array<String>
 export type EqKind = externref;
+
+// The arm a `WebAssembly_ValueType` holds, from `WebAssembly_ValueType_arm`.
+export sealed class WebAssembly_ValueType_Arm {
+  case WebAssembly_ValueType_Anyfunc
+  case WebAssembly_ValueType_Externref
+  case WebAssembly_ValueType_F32
+  case WebAssembly_ValueType_F64
+  case WebAssembly_ValueType_I32
+  case WebAssembly_ValueType_I64
+  case WebAssembly_ValueType_V128
+}
+export function WebAssembly_ValueType_arm(x: WebAssembly_ValueType): WebAssembly_ValueType_Arm {
+  let __r = x.handle;
+  return match (__kind_WebAssembly_ValueType(__r)) {
+    case 0: new WebAssembly_ValueType_Anyfunc()
+    case 1: new WebAssembly_ValueType_Externref()
+    case 2: new WebAssembly_ValueType_F32()
+    case 3: new WebAssembly_ValueType_F64()
+    case 4: new WebAssembly_ValueType_I32()
+    case 5: new WebAssembly_ValueType_I64()
+    case 6: new WebAssembly_ValueType_V128()
+    case _: throw new Error("no arm of WebAssembly.ValueType")
+  };
+}
+
+// The arm a `WebAssembly_ImportExportKind` holds, from `WebAssembly_ImportExportKind_arm`.
+export sealed class WebAssembly_ImportExportKind_Arm {
+  case WebAssembly_ImportExportKind_Function
+  case WebAssembly_ImportExportKind_Global
+  case WebAssembly_ImportExportKind_Memory
+  case WebAssembly_ImportExportKind_Table
+}
+export function WebAssembly_ImportExportKind_arm(x: WebAssembly_ImportExportKind): WebAssembly_ImportExportKind_Arm {
+  let __r = x.handle;
+  return match (__kind_WebAssembly_ImportExportKind(__r)) {
+    case 0: new WebAssembly_ImportExportKind_Function()
+    case 1: new WebAssembly_ImportExportKind_Global()
+    case 2: new WebAssembly_ImportExportKind_Memory()
+    case 3: new WebAssembly_ImportExportKind_Table()
+    case _: throw new Error("no arm of WebAssembly.ImportExportKind")
+  };
+}
+
+// The arm a `WebAssembly_TableKind` holds, from `WebAssembly_TableKind_arm`.
+export sealed class WebAssembly_TableKind_Arm {
+  case WebAssembly_TableKind_Anyfunc
+  case WebAssembly_TableKind_Externref
+}
+export function WebAssembly_TableKind_arm(x: WebAssembly_TableKind): WebAssembly_TableKind_Arm {
+  let __r = x.handle;
+  return match (__kind_WebAssembly_TableKind(__r)) {
+    case 0: new WebAssembly_TableKind_Anyfunc()
+    case 1: new WebAssembly_TableKind_Externref()
+    case _: throw new Error("no arm of WebAssembly.TableKind")
+  };
+}
+
+// The arm a `DurableObjectJurisdiction` holds, from `DurableObjectJurisdiction_arm`.
+export sealed class DurableObjectJurisdiction_Arm {
+  case DurableObjectJurisdiction_Eu
+  case DurableObjectJurisdiction_Fedramp
+  case DurableObjectJurisdiction_FedrampHigh
+}
+export function DurableObjectJurisdiction_arm(x: DurableObjectJurisdiction): DurableObjectJurisdiction_Arm {
+  let __r = x.handle;
+  return match (__kind_DurableObjectJurisdiction(__r)) {
+    case 0: new DurableObjectJurisdiction_Eu()
+    case 1: new DurableObjectJurisdiction_Fedramp()
+    case 2: new DurableObjectJurisdiction_FedrampHigh()
+    case _: throw new Error("no arm of DurableObjectJurisdiction")
+  };
+}
+
+// The arm a `DurableObjectLocationHint` holds, from `DurableObjectLocationHint_arm`.
+export sealed class DurableObjectLocationHint_Arm {
+  case DurableObjectLocationHint_Wnam
+  case DurableObjectLocationHint_Enam
+  case DurableObjectLocationHint_Sam
+  case DurableObjectLocationHint_Weur
+  case DurableObjectLocationHint_Eeur
+  case DurableObjectLocationHint_Apac
+  case DurableObjectLocationHint_Oc
+  case DurableObjectLocationHint_Afr
+  case DurableObjectLocationHint_Me
+}
+export function DurableObjectLocationHint_arm(x: DurableObjectLocationHint): DurableObjectLocationHint_Arm {
+  let __r = x.handle;
+  return match (__kind_DurableObjectLocationHint(__r)) {
+    case 0: new DurableObjectLocationHint_Wnam()
+    case 1: new DurableObjectLocationHint_Enam()
+    case 2: new DurableObjectLocationHint_Sam()
+    case 3: new DurableObjectLocationHint_Weur()
+    case 4: new DurableObjectLocationHint_Eeur()
+    case 5: new DurableObjectLocationHint_Apac()
+    case 6: new DurableObjectLocationHint_Oc()
+    case 7: new DurableObjectLocationHint_Afr()
+    case 8: new DurableObjectLocationHint_Me()
+    case _: throw new Error("no arm of DurableObjectLocationHint")
+  };
+}
+
+// The arm a `DurableObjectRoutingMode` holds, from `DurableObjectRoutingMode_arm`.
+export sealed class DurableObjectRoutingMode_Arm {
+  case DurableObjectRoutingMode_PrimaryOnly
+}
+export function DurableObjectRoutingMode_arm(x: DurableObjectRoutingMode): DurableObjectRoutingMode_Arm {
+  let __r = x.handle;
+  return match (__kind_DurableObjectRoutingMode(__r)) {
+    case 0: new DurableObjectRoutingMode_PrimaryOnly()
+    case _: throw new Error("no arm of DurableObjectRoutingMode")
+  };
+}
+
+// The arm a `QueueContentType` holds, from `QueueContentType_arm`.
+export sealed class QueueContentType_Arm {
+  case QueueContentType_Text
+  case QueueContentType_Bytes
+  case QueueContentType_Json
+  case QueueContentType_V8
+}
+export function QueueContentType_arm(x: QueueContentType): QueueContentType_Arm {
+  let __r = x.handle;
+  return match (__kind_QueueContentType(__r)) {
+    case 0: new QueueContentType_Text()
+    case 1: new QueueContentType_Bytes()
+    case 2: new QueueContentType_Json()
+    case 3: new QueueContentType_V8()
+    case _: throw new Error("no arm of QueueContentType")
+  };
+}
+
+// The arm a `SqlStorageValue` holds, from `SqlStorageValue_arm`.
+export sealed class SqlStorageValue_Arm {
+  case SqlStorageValue_ArrayBuffer(value: externref)
+  case SqlStorageValue_String(value: String)
+  case SqlStorageValue_F64(value: f64)
+}
+export function SqlStorageValue_arm(x: SqlStorageValue): SqlStorageValue_Arm {
+  let __r = x;
+  return match (__kind_SqlStorageValue(__r)) {
+    case 0: new SqlStorageValue_ArrayBuffer(__r)
+    case 1: new SqlStorageValue_String(String.fromHandle(__r))
+    case 2: new SqlStorageValue_F64(numberValue(__r))
+    case _: throw new Error("no arm of SqlStorageValue")
+  };
+}
+
+// The arm a `AiTextToSpeechOutput` holds, from `AiTextToSpeechOutput_arm`.
+export sealed class AiTextToSpeechOutput_Arm {
+  case AiTextToSpeechOutput_Uint8Array(value: externref)
+  case AiTextToSpeechOutput_Object(value: externref)
+}
+export function AiTextToSpeechOutput_arm(x: AiTextToSpeechOutput): AiTextToSpeechOutput_Arm {
+  let __r = x;
+  return match (__kind_AiTextToSpeechOutput(__r)) {
+    case 0: new AiTextToSpeechOutput_Uint8Array(__r)
+    case _: new AiTextToSpeechOutput_Object(__r)
+  };
+}
+
+// The arm a `ResponseContent` holds, from `ResponseContent_arm`.
+export sealed class ResponseContent_Arm {
+  case ResponseContent_ResponseInputText(value: ResponseInputText)
+  case ResponseContent_ResponseInputImage(value: ResponseInputImage)
+  case ResponseContent_ResponseOutputText(value: ResponseOutputText)
+  case ResponseContent_ResponseOutputRefusal(value: ResponseOutputRefusal)
+  case ResponseContent_ResponseContentReasoningText(value: ResponseContentReasoningText)
+}
+export function ResponseContent_arm(x: ResponseContent): ResponseContent_Arm {
+  let __r = x;
+  return match (__kind_ResponseContent(__r)) {
+    case 0: new ResponseContent_ResponseInputText(new ResponseInputText(__r))
+    case 1: new ResponseContent_ResponseInputImage(new ResponseInputImage(__r))
+    case 2: new ResponseContent_ResponseOutputText(new ResponseOutputText(__r))
+    case 3: new ResponseContent_ResponseOutputRefusal(new ResponseOutputRefusal(__r))
+    case 4: new ResponseContent_ResponseContentReasoningText(new ResponseContentReasoningText(__r))
+    case _: throw new Error("no arm of ResponseContent")
+  };
+}
+
+// The arm a `ResponseFormatTextConfig` holds, from `ResponseFormatTextConfig_arm`.
+export sealed class ResponseFormatTextConfig_Arm {
+  case ResponseFormatTextConfig_ResponseFormatText(value: ResponseFormatText)
+  case ResponseFormatTextConfig_ResponseFormatTextJsonSchemaConfig(value: ResponseFormatTextJSONSchemaConfig)
+  case ResponseFormatTextConfig_ResponseFormatJsonObject(value: ResponseFormatJSONObject)
+}
+export function ResponseFormatTextConfig_arm(x: ResponseFormatTextConfig): ResponseFormatTextConfig_Arm {
+  let __r = x;
+  return match (__kind_ResponseFormatTextConfig(__r)) {
+    case 0: new ResponseFormatTextConfig_ResponseFormatText(new ResponseFormatText(__r))
+    case 1: new ResponseFormatTextConfig_ResponseFormatTextJsonSchemaConfig(new ResponseFormatTextJSONSchemaConfig(__r))
+    case 2: new ResponseFormatTextConfig_ResponseFormatJsonObject(new ResponseFormatJSONObject(__r))
+    case _: throw new Error("no arm of ResponseFormatTextConfig")
+  };
+}
+
+// The arm a `ResponseFunctionCallOutputItem` holds, from `ResponseFunctionCallOutputItem_arm`.
+export sealed class ResponseFunctionCallOutputItem_Arm {
+  case ResponseFunctionCallOutputItem_ResponseInputTextContent(value: ResponseInputTextContent)
+  case ResponseFunctionCallOutputItem_ResponseInputImageContent(value: ResponseInputImageContent)
+}
+export function ResponseFunctionCallOutputItem_arm(x: ResponseFunctionCallOutputItem): ResponseFunctionCallOutputItem_Arm {
+  let __r = x;
+  return match (__kind_ResponseFunctionCallOutputItem(__r)) {
+    case 0: new ResponseFunctionCallOutputItem_ResponseInputTextContent(new ResponseInputTextContent(__r))
+    case 1: new ResponseFunctionCallOutputItem_ResponseInputImageContent(new ResponseInputImageContent(__r))
+    case _: throw new Error("no arm of ResponseFunctionCallOutputItem")
+  };
+}
+
+// The arm a `ResponseIncludable` holds, from `ResponseIncludable_arm`.
+export sealed class ResponseIncludable_Arm {
+  case ResponseIncludable_MessageinputImageimageUrl
+  case ResponseIncludable_MessageoutputTextlogprobs
+}
+export function ResponseIncludable_arm(x: ResponseIncludable): ResponseIncludable_Arm {
+  let __r = x.handle;
+  return match (__kind_ResponseIncludable(__r)) {
+    case 0: new ResponseIncludable_MessageinputImageimageUrl()
+    case 1: new ResponseIncludable_MessageoutputTextlogprobs()
+    case _: throw new Error("no arm of ResponseIncludable")
+  };
+}
+
+// The arm a `ResponseInputContent` holds, from `ResponseInputContent_arm`.
+export sealed class ResponseInputContent_Arm {
+  case ResponseInputContent_ResponseInputText(value: ResponseInputText)
+  case ResponseInputContent_ResponseInputImage(value: ResponseInputImage)
+}
+export function ResponseInputContent_arm(x: ResponseInputContent): ResponseInputContent_Arm {
+  let __r = x;
+  return match (__kind_ResponseInputContent(__r)) {
+    case 0: new ResponseInputContent_ResponseInputText(new ResponseInputText(__r))
+    case 1: new ResponseInputContent_ResponseInputImage(new ResponseInputImage(__r))
+    case _: throw new Error("no arm of ResponseInputContent")
+  };
+}
+
+// The arm a `ResponseInputItem` holds, from `ResponseInputItem_arm`.
+export sealed class ResponseInputItem_Arm {
+  case ResponseInputItem_EasyInputMessage(value: EasyInputMessage)
+  case ResponseInputItem_ResponseInputItemMessage(value: ResponseInputItemMessage)
+  case ResponseInputItem_ResponseOutputMessage(value: ResponseOutputMessage)
+  case ResponseInputItem_ResponseFunctionToolCall(value: ResponseFunctionToolCall)
+  case ResponseInputItem_ResponseInputItemFunctionCallOutput(value: ResponseInputItemFunctionCallOutput)
+  case ResponseInputItem_ResponseReasoningItem(value: ResponseReasoningItem)
+}
+export function ResponseInputItem_arm(x: ResponseInputItem): ResponseInputItem_Arm {
+  let __r = x;
+  return match (__kind_ResponseInputItem(__r)) {
+    case 0: new ResponseInputItem_EasyInputMessage(new EasyInputMessage(__r))
+    case 1: new ResponseInputItem_ResponseInputItemMessage(new ResponseInputItemMessage(__r))
+    case 2: new ResponseInputItem_ResponseOutputMessage(new ResponseOutputMessage(__r))
+    case 3: new ResponseInputItem_ResponseFunctionToolCall(new ResponseFunctionToolCall(__r))
+    case 4: new ResponseInputItem_ResponseInputItemFunctionCallOutput(new ResponseInputItemFunctionCallOutput(__r))
+    case 5: new ResponseInputItem_ResponseReasoningItem(new ResponseReasoningItem(__r))
+    case _: throw new Error("no arm of ResponseInputItem")
+  };
+}
+
+// The arm a `ResponseItem` holds, from `ResponseItem_arm`.
+export sealed class ResponseItem_Arm {
+  case ResponseItem_ResponseInputMessageItem(value: ResponseInputMessageItem)
+  case ResponseItem_ResponseOutputMessage(value: ResponseOutputMessage)
+  case ResponseItem_ResponseFunctionToolCallItem(value: ResponseFunctionToolCallItem)
+  case ResponseItem_ResponseFunctionToolCallOutputItem(value: ResponseFunctionToolCallOutputItem)
+}
+export function ResponseItem_arm(x: ResponseItem): ResponseItem_Arm {
+  let __r = x;
+  return match (__kind_ResponseItem(__r)) {
+    case 0: new ResponseItem_ResponseInputMessageItem(new ResponseInputMessageItem(__r))
+    case 1: new ResponseItem_ResponseOutputMessage(new ResponseOutputMessage(__r))
+    case 2: new ResponseItem_ResponseFunctionToolCallItem(new ResponseFunctionToolCallItem(__r))
+    case 3: new ResponseItem_ResponseFunctionToolCallOutputItem(new ResponseFunctionToolCallOutputItem(__r))
+    case _: throw new Error("no arm of ResponseItem")
+  };
+}
+
+// The arm a `ResponseOutputItem` holds, from `ResponseOutputItem_arm`.
+export sealed class ResponseOutputItem_Arm {
+  case ResponseOutputItem_ResponseOutputMessage(value: ResponseOutputMessage)
+  case ResponseOutputItem_ResponseFunctionToolCall(value: ResponseFunctionToolCall)
+  case ResponseOutputItem_ResponseReasoningItem(value: ResponseReasoningItem)
+}
+export function ResponseOutputItem_arm(x: ResponseOutputItem): ResponseOutputItem_Arm {
+  let __r = x;
+  return match (__kind_ResponseOutputItem(__r)) {
+    case 0: new ResponseOutputItem_ResponseOutputMessage(new ResponseOutputMessage(__r))
+    case 1: new ResponseOutputItem_ResponseFunctionToolCall(new ResponseFunctionToolCall(__r))
+    case 2: new ResponseOutputItem_ResponseReasoningItem(new ResponseReasoningItem(__r))
+    case _: throw new Error("no arm of ResponseOutputItem")
+  };
+}
+
+// The arm a `ResponseStatus` holds, from `ResponseStatus_arm`.
+export sealed class ResponseStatus_Arm {
+  case ResponseStatus_Completed
+  case ResponseStatus_Failed
+  case ResponseStatus_InProgress
+  case ResponseStatus_Cancelled
+  case ResponseStatus_Queued
+  case ResponseStatus_Incomplete
+}
+export function ResponseStatus_arm(x: ResponseStatus): ResponseStatus_Arm {
+  let __r = x.handle;
+  return match (__kind_ResponseStatus(__r)) {
+    case 0: new ResponseStatus_Completed()
+    case 1: new ResponseStatus_Failed()
+    case 2: new ResponseStatus_InProgress()
+    case 3: new ResponseStatus_Cancelled()
+    case 4: new ResponseStatus_Queued()
+    case 5: new ResponseStatus_Incomplete()
+    case _: throw new Error("no arm of ResponseStatus")
+  };
+}
+
+// The arm a `ToolChoiceOptions` holds, from `ToolChoiceOptions_arm`.
+export sealed class ToolChoiceOptions_Arm {
+  case ToolChoiceOptions_None
+}
+export function ToolChoiceOptions_arm(x: ToolChoiceOptions): ToolChoiceOptions_Arm {
+  let __r = x.handle;
+  return match (__kind_ToolChoiceOptions(__r)) {
+    case 0: new ToolChoiceOptions_None()
+    case _: throw new Error("no arm of ToolChoiceOptions")
+  };
+}
+
+// The arm a `Ai_Cf_Baai_Bge_Base_En_V1_5_Output` holds, from `Ai_Cf_Baai_Bge_Base_En_V1_5_Output_arm`.
+export sealed class Ai_Cf_Baai_Bge_Base_En_V1_5_Output_Arm {
+  case Ai_Cf_Baai_Bge_Base_En_V1_5_Output_Object(value: externref)
+  case Ai_Cf_Baai_Bge_Base_En_V1_5_Output_AiCfBaaiBgeBaseEnV15AsyncResponse(value: Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse)
+}
+export function Ai_Cf_Baai_Bge_Base_En_V1_5_Output_arm(x: Ai_Cf_Baai_Bge_Base_En_V1_5_Output): Ai_Cf_Baai_Bge_Base_En_V1_5_Output_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Baai_Bge_Base_En_V1_5_Output(__r)) {
+    case 0: new Ai_Cf_Baai_Bge_Base_En_V1_5_Output_Object(__r)
+    case 1: new Ai_Cf_Baai_Bge_Base_En_V1_5_Output_AiCfBaaiBgeBaseEnV15AsyncResponse(new Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse(__r))
+    case _: throw new Error("no arm of Ai_Cf_Baai_Bge_Base_En_V1_5_Output")
+  };
+}
+
+// The arm a `Ai_Cf_Openai_Whisper_Input` holds, from `Ai_Cf_Openai_Whisper_Input_arm`.
+export sealed class Ai_Cf_Openai_Whisper_Input_Arm {
+  case Ai_Cf_Openai_Whisper_Input_String(value: String)
+  case Ai_Cf_Openai_Whisper_Input_Object(value: externref)
+}
+export function Ai_Cf_Openai_Whisper_Input_arm(x: Ai_Cf_Openai_Whisper_Input): Ai_Cf_Openai_Whisper_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Openai_Whisper_Input(__r)) {
+    case 0: new Ai_Cf_Openai_Whisper_Input_String(String.fromHandle(__r))
+    case _: new Ai_Cf_Openai_Whisper_Input_Object(__r)
+  };
+}
+
+// The arm a `Ai_Cf_Meta_M2M100_1_2B_Output` holds, from `Ai_Cf_Meta_M2M100_1_2B_Output_arm`.
+export sealed class Ai_Cf_Meta_M2M100_1_2B_Output_Arm {
+  case Ai_Cf_Meta_M2M100_1_2B_Output_Object(value: externref)
+  case Ai_Cf_Meta_M2M100_1_2B_Output_AiCfMetaM2M10012BAsyncResponse(value: Ai_Cf_Meta_M2M100_1_2B_AsyncResponse)
+}
+export function Ai_Cf_Meta_M2M100_1_2B_Output_arm(x: Ai_Cf_Meta_M2M100_1_2B_Output): Ai_Cf_Meta_M2M100_1_2B_Output_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Meta_M2M100_1_2B_Output(__r)) {
+    case 0: new Ai_Cf_Meta_M2M100_1_2B_Output_Object(__r)
+    case 1: new Ai_Cf_Meta_M2M100_1_2B_Output_AiCfMetaM2M10012BAsyncResponse(new Ai_Cf_Meta_M2M100_1_2B_AsyncResponse(__r))
+    case _: throw new Error("no arm of Ai_Cf_Meta_M2M100_1_2B_Output")
+  };
+}
+
+// The arm a `Ai_Cf_Baai_Bge_Small_En_V1_5_Output` holds, from `Ai_Cf_Baai_Bge_Small_En_V1_5_Output_arm`.
+export sealed class Ai_Cf_Baai_Bge_Small_En_V1_5_Output_Arm {
+  case Ai_Cf_Baai_Bge_Small_En_V1_5_Output_Object(value: externref)
+  case Ai_Cf_Baai_Bge_Small_En_V1_5_Output_AiCfBaaiBgeSmallEnV15AsyncResponse(value: Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse)
+}
+export function Ai_Cf_Baai_Bge_Small_En_V1_5_Output_arm(x: Ai_Cf_Baai_Bge_Small_En_V1_5_Output): Ai_Cf_Baai_Bge_Small_En_V1_5_Output_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Baai_Bge_Small_En_V1_5_Output(__r)) {
+    case 0: new Ai_Cf_Baai_Bge_Small_En_V1_5_Output_Object(__r)
+    case 1: new Ai_Cf_Baai_Bge_Small_En_V1_5_Output_AiCfBaaiBgeSmallEnV15AsyncResponse(new Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse(__r))
+    case _: throw new Error("no arm of Ai_Cf_Baai_Bge_Small_En_V1_5_Output")
+  };
+}
+
+// The arm a `Ai_Cf_Baai_Bge_Large_En_V1_5_Output` holds, from `Ai_Cf_Baai_Bge_Large_En_V1_5_Output_arm`.
+export sealed class Ai_Cf_Baai_Bge_Large_En_V1_5_Output_Arm {
+  case Ai_Cf_Baai_Bge_Large_En_V1_5_Output_Object(value: externref)
+  case Ai_Cf_Baai_Bge_Large_En_V1_5_Output_AiCfBaaiBgeLargeEnV15AsyncResponse(value: Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse)
+}
+export function Ai_Cf_Baai_Bge_Large_En_V1_5_Output_arm(x: Ai_Cf_Baai_Bge_Large_En_V1_5_Output): Ai_Cf_Baai_Bge_Large_En_V1_5_Output_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Baai_Bge_Large_En_V1_5_Output(__r)) {
+    case 0: new Ai_Cf_Baai_Bge_Large_En_V1_5_Output_Object(__r)
+    case 1: new Ai_Cf_Baai_Bge_Large_En_V1_5_Output_AiCfBaaiBgeLargeEnV15AsyncResponse(new Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse(__r))
+    case _: throw new Error("no arm of Ai_Cf_Baai_Bge_Large_En_V1_5_Output")
+  };
+}
+
+// The arm a `Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input` holds, from `Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input_arm`.
+export sealed class Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input_Arm {
+  case Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input_String(value: String)
+  case Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input_Object(value: externref)
+}
+export function Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input_arm(x: Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input): Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input(__r)) {
+    case 0: new Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input_String(String.fromHandle(__r))
+    case _: new Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input_Object(__r)
+  };
+}
+
+// The arm a `Ai_Cf_Openai_Whisper_Tiny_En_Input` holds, from `Ai_Cf_Openai_Whisper_Tiny_En_Input_arm`.
+export sealed class Ai_Cf_Openai_Whisper_Tiny_En_Input_Arm {
+  case Ai_Cf_Openai_Whisper_Tiny_En_Input_String(value: String)
+  case Ai_Cf_Openai_Whisper_Tiny_En_Input_Object(value: externref)
+}
+export function Ai_Cf_Openai_Whisper_Tiny_En_Input_arm(x: Ai_Cf_Openai_Whisper_Tiny_En_Input): Ai_Cf_Openai_Whisper_Tiny_En_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Openai_Whisper_Tiny_En_Input(__r)) {
+    case 0: new Ai_Cf_Openai_Whisper_Tiny_En_Input_String(String.fromHandle(__r))
+    case _: new Ai_Cf_Openai_Whisper_Tiny_En_Input_Object(__r)
+  };
+}
+
+// The arm a `Ai_Cf_Baai_Bge_M3_Input` holds, from `Ai_Cf_Baai_Bge_M3_Input_arm`.
+export sealed class Ai_Cf_Baai_Bge_M3_Input_Arm {
+  case Ai_Cf_Baai_Bge_M3_Input_AiCfBaaiBgeM3InputQueryAndContexts(value: Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts)
+  case Ai_Cf_Baai_Bge_M3_Input_AiCfBaaiBgeM3InputEmbedding(value: Ai_Cf_Baai_Bge_M3_Input_Embedding)
+  case Ai_Cf_Baai_Bge_M3_Input_Object(value: externref)
+}
+export function Ai_Cf_Baai_Bge_M3_Input_arm(x: Ai_Cf_Baai_Bge_M3_Input): Ai_Cf_Baai_Bge_M3_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Baai_Bge_M3_Input(__r)) {
+    case 0: new Ai_Cf_Baai_Bge_M3_Input_AiCfBaaiBgeM3InputQueryAndContexts(new Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts(__r))
+    case 1: new Ai_Cf_Baai_Bge_M3_Input_AiCfBaaiBgeM3InputEmbedding(new Ai_Cf_Baai_Bge_M3_Input_Embedding(__r))
+    case 2: new Ai_Cf_Baai_Bge_M3_Input_Object(__r)
+    case _: throw new Error("no arm of Ai_Cf_Baai_Bge_M3_Input")
+  };
+}
+
+// The arm a `Ai_Cf_Baai_Bge_M3_Output` holds, from `Ai_Cf_Baai_Bge_M3_Output_arm`.
+export sealed class Ai_Cf_Baai_Bge_M3_Output_Arm {
+  case Ai_Cf_Baai_Bge_M3_Output_AiCfBaaiBgeM3OuputQuery(value: Ai_Cf_Baai_Bge_M3_Ouput_Query)
+  case Ai_Cf_Baai_Bge_M3_Output_AiCfBaaiBgeM3OutputEmbeddingForContexts(value: Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts)
+  case Ai_Cf_Baai_Bge_M3_Output_AiCfBaaiBgeM3OuputEmbedding(value: Ai_Cf_Baai_Bge_M3_Ouput_Embedding)
+  case Ai_Cf_Baai_Bge_M3_Output_AiCfBaaiBgeM3AsyncResponse(value: Ai_Cf_Baai_Bge_M3_AsyncResponse)
+}
+export function Ai_Cf_Baai_Bge_M3_Output_arm(x: Ai_Cf_Baai_Bge_M3_Output): Ai_Cf_Baai_Bge_M3_Output_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Baai_Bge_M3_Output(__r)) {
+    case 0: new Ai_Cf_Baai_Bge_M3_Output_AiCfBaaiBgeM3OuputQuery(new Ai_Cf_Baai_Bge_M3_Ouput_Query(__r))
+    case 1: new Ai_Cf_Baai_Bge_M3_Output_AiCfBaaiBgeM3OutputEmbeddingForContexts(new Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts(__r))
+    case 2: new Ai_Cf_Baai_Bge_M3_Output_AiCfBaaiBgeM3OuputEmbedding(new Ai_Cf_Baai_Bge_M3_Ouput_Embedding(__r))
+    case 3: new Ai_Cf_Baai_Bge_M3_Output_AiCfBaaiBgeM3AsyncResponse(new Ai_Cf_Baai_Bge_M3_AsyncResponse(__r))
+    case _: throw new Error("no arm of Ai_Cf_Baai_Bge_M3_Output")
+  };
+}
+
+// The arm a `Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input` holds, from `Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input_arm`.
+export sealed class Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input_Arm {
+  case Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input_AiCfMetaLlama3211BVisionInstructPrompt(value: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt)
+  case Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input_AiCfMetaLlama3211BVisionInstructMessages(value: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages)
+}
+export function Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input_arm(x: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input): Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input(__r)) {
+    case 0: new Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input_AiCfMetaLlama3211BVisionInstructPrompt(new Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt(__r))
+    case 1: new Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input_AiCfMetaLlama3211BVisionInstructMessages(new Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages(__r))
+    case _: throw new Error("no arm of Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input")
+  };
+}
+
+// The arm a `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input` holds, from `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input_arm`.
+export sealed class Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input_Arm {
+  case Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input_AiCfMetaLlama3370BInstructFp8FastPrompt(value: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt)
+  case Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input_AiCfMetaLlama3370BInstructFp8FastMessages(value: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages)
+  case Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input_AiCfMetaLlama3370BInstructFp8FastAsyncBatch(value: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch)
+}
+export function Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input_arm(x: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input): Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input(__r)) {
+    case 0: new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input_AiCfMetaLlama3370BInstructFp8FastPrompt(new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt(__r))
+    case 1: new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input_AiCfMetaLlama3370BInstructFp8FastMessages(new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages(__r))
+    case 2: new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input_AiCfMetaLlama3370BInstructFp8FastAsyncBatch(new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch(__r))
+    case _: throw new Error("no arm of Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Input")
+  };
+}
+
+// The arm a `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output` holds, from `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output_arm`.
+export sealed class Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output_Arm {
+  case Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output_Object(value: externref)
+  case Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output_String(value: String)
+  case Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output_AiCfMetaLlama3370BInstructFp8FastAsyncResponse(value: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse)
+}
+export function Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output_arm(x: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output): Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output(__r)) {
+    case 0: new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output_Object(__r)
+    case 1: new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output_String(String.fromHandle(__r))
+    case 2: new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output_AiCfMetaLlama3370BInstructFp8FastAsyncResponse(new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse(__r))
+    case _: throw new Error("no arm of Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Output")
+  };
+}
+
+// The arm a `Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input` holds, from `Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input_arm`.
+export sealed class Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input_Arm {
+  case Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input_AiCfQwenQwen25Coder32BInstructPrompt(value: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt)
+  case Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input_AiCfQwenQwen25Coder32BInstructMessages(value: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages)
+}
+export function Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input_arm(x: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input): Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input(__r)) {
+    case 0: new Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input_AiCfQwenQwen25Coder32BInstructPrompt(new Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt(__r))
+    case 1: new Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input_AiCfQwenQwen25Coder32BInstructMessages(new Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages(__r))
+    case _: throw new Error("no arm of Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Input")
+  };
+}
+
+// The arm a `Ai_Cf_Qwen_Qwq_32B_Input` holds, from `Ai_Cf_Qwen_Qwq_32B_Input_arm`.
+export sealed class Ai_Cf_Qwen_Qwq_32B_Input_Arm {
+  case Ai_Cf_Qwen_Qwq_32B_Input_AiCfQwenQwq32BPrompt(value: Ai_Cf_Qwen_Qwq_32B_Prompt)
+  case Ai_Cf_Qwen_Qwq_32B_Input_AiCfQwenQwq32BMessages(value: Ai_Cf_Qwen_Qwq_32B_Messages)
+}
+export function Ai_Cf_Qwen_Qwq_32B_Input_arm(x: Ai_Cf_Qwen_Qwq_32B_Input): Ai_Cf_Qwen_Qwq_32B_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Qwen_Qwq_32B_Input(__r)) {
+    case 0: new Ai_Cf_Qwen_Qwq_32B_Input_AiCfQwenQwq32BPrompt(new Ai_Cf_Qwen_Qwq_32B_Prompt(__r))
+    case 1: new Ai_Cf_Qwen_Qwq_32B_Input_AiCfQwenQwq32BMessages(new Ai_Cf_Qwen_Qwq_32B_Messages(__r))
+    case _: throw new Error("no arm of Ai_Cf_Qwen_Qwq_32B_Input")
+  };
+}
+
+// The arm a `Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input` holds, from `Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input_arm`.
+export sealed class Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input_Arm {
+  case Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input_AiCfMistralaiMistralSmall3124BInstructPrompt(value: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt)
+  case Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input_AiCfMistralaiMistralSmall3124BInstructMessages(value: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages)
+}
+export function Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input_arm(x: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input): Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input(__r)) {
+    case 0: new Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input_AiCfMistralaiMistralSmall3124BInstructPrompt(new Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt(__r))
+    case 1: new Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input_AiCfMistralaiMistralSmall3124BInstructMessages(new Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages(__r))
+    case _: throw new Error("no arm of Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input")
+  };
+}
+
+// The arm a `Ai_Cf_Google_Gemma_3_12B_It_Input` holds, from `Ai_Cf_Google_Gemma_3_12B_It_Input_arm`.
+export sealed class Ai_Cf_Google_Gemma_3_12B_It_Input_Arm {
+  case Ai_Cf_Google_Gemma_3_12B_It_Input_AiCfGoogleGemma312BItPrompt(value: Ai_Cf_Google_Gemma_3_12B_It_Prompt)
+  case Ai_Cf_Google_Gemma_3_12B_It_Input_AiCfGoogleGemma312BItMessages(value: Ai_Cf_Google_Gemma_3_12B_It_Messages)
+}
+export function Ai_Cf_Google_Gemma_3_12B_It_Input_arm(x: Ai_Cf_Google_Gemma_3_12B_It_Input): Ai_Cf_Google_Gemma_3_12B_It_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Google_Gemma_3_12B_It_Input(__r)) {
+    case 0: new Ai_Cf_Google_Gemma_3_12B_It_Input_AiCfGoogleGemma312BItPrompt(new Ai_Cf_Google_Gemma_3_12B_It_Prompt(__r))
+    case 1: new Ai_Cf_Google_Gemma_3_12B_It_Input_AiCfGoogleGemma312BItMessages(new Ai_Cf_Google_Gemma_3_12B_It_Messages(__r))
+    case _: throw new Error("no arm of Ai_Cf_Google_Gemma_3_12B_It_Input")
+  };
+}
+
+// The arm a `Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input` holds, from `Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input_arm`.
+export sealed class Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input_Arm {
+  case Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input_AiCfMetaLlama4Scout17B16EInstructPrompt(value: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt)
+  case Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input_AiCfMetaLlama4Scout17B16EInstructMessages(value: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages)
+  case Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input_AiCfMetaLlama4Scout17B16EInstructAsyncBatch(value: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch)
+}
+export function Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input_arm(x: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input): Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input(__r)) {
+    case 0: new Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input_AiCfMetaLlama4Scout17B16EInstructPrompt(new Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt(__r))
+    case 1: new Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input_AiCfMetaLlama4Scout17B16EInstructMessages(new Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages(__r))
+    case 2: new Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input_AiCfMetaLlama4Scout17B16EInstructAsyncBatch(new Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch(__r))
+    case _: throw new Error("no arm of Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input")
+  };
+}
+
+// The arm a `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input` holds, from `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input_arm`.
+export sealed class Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input_Arm {
+  case Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input_AiCfQwenQwen330BA3BFp8Prompt(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt)
+  case Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input_AiCfQwenQwen330BA3BFp8Messages(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages)
+  case Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input_AiCfQwenQwen330BA3BFp8AsyncBatch(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch)
+}
+export function Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input_arm(x: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input): Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input(__r)) {
+    case 0: new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input_AiCfQwenQwen330BA3BFp8Prompt(new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt(__r))
+    case 1: new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input_AiCfQwenQwen330BA3BFp8Messages(new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages(__r))
+    case 2: new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input_AiCfQwenQwen330BA3BFp8AsyncBatch(new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch(__r))
+    case _: throw new Error("no arm of Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Input")
+  };
+}
+
+// The arm a `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output` holds, from `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_arm`.
+export sealed class Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_Arm {
+  case Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_AiCfQwenQwen330BA3BFp8ChatCompletionResponse(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response)
+  case Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_AiCfQwenQwen330BA3BFp8TextCompletionResponse(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response)
+  case Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_String(value: String)
+  case Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_AiCfQwenQwen330BA3BFp8AsyncResponse(value: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse)
+}
+export function Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_arm(x: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output): Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output(__r)) {
+    case 0: new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_AiCfQwenQwen330BA3BFp8ChatCompletionResponse(new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response(__r))
+    case 1: new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_AiCfQwenQwen330BA3BFp8TextCompletionResponse(new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response(__r))
+    case 2: new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_String(String.fromHandle(__r))
+    case 3: new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output_AiCfQwenQwen330BA3BFp8AsyncResponse(new Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse(__r))
+    case _: throw new Error("no arm of Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Output")
+  };
+}
+
+// The arm a `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input` holds, from `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input_arm`.
+export sealed class Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input_Arm {
+  case Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input_AiCfAisingaporeGemmaSeaLionV427BItPrompt(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt)
+  case Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input_AiCfAisingaporeGemmaSeaLionV427BItMessages(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages)
+  case Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input_AiCfAisingaporeGemmaSeaLionV427BItAsyncBatch(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch)
+}
+export function Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input_arm(x: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input): Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input(__r)) {
+    case 0: new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input_AiCfAisingaporeGemmaSeaLionV427BItPrompt(new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt(__r))
+    case 1: new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input_AiCfAisingaporeGemmaSeaLionV427BItMessages(new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages(__r))
+    case 2: new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input_AiCfAisingaporeGemmaSeaLionV427BItAsyncBatch(new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch(__r))
+    case _: throw new Error("no arm of Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input")
+  };
+}
+
+// The arm a `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output` holds, from `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_arm`.
+export sealed class Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_Arm {
+  case Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_AiCfAisingaporeGemmaSeaLionV427BItChatCompletionResponse(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response)
+  case Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_AiCfAisingaporeGemmaSeaLionV427BItTextCompletionResponse(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response)
+  case Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_String(value: String)
+  case Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_AiCfAisingaporeGemmaSeaLionV427BItAsyncResponse(value: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse)
+}
+export function Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_arm(x: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output): Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_Arm {
+  let __r = x;
+  return match (__kind_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output(__r)) {
+    case 0: new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_AiCfAisingaporeGemmaSeaLionV427BItChatCompletionResponse(new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response(__r))
+    case 1: new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_AiCfAisingaporeGemmaSeaLionV427BItTextCompletionResponse(new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response(__r))
+    case 2: new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_String(String.fromHandle(__r))
+    case 3: new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output_AiCfAisingaporeGemmaSeaLionV427BItAsyncResponse(new Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse(__r))
+    case _: throw new Error("no arm of Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output")
+  };
+}
+
+// The arm a `AIGatewayProviders` holds, from `AIGatewayProviders_arm`.
+export sealed class AIGatewayProviders_Arm {
+  case AIGatewayProviders_WorkersAi
+  case AIGatewayProviders_Anthropic
+  case AIGatewayProviders_AwsBedrock
+  case AIGatewayProviders_AzureOpenai
+  case AIGatewayProviders_GoogleVertexAi
+  case AIGatewayProviders_Huggingface
+  case AIGatewayProviders_Openai
+  case AIGatewayProviders_PerplexityAi
+  case AIGatewayProviders_Replicate
+  case AIGatewayProviders_Groq
+  case AIGatewayProviders_Cohere
+  case AIGatewayProviders_GoogleAiStudio
+  case AIGatewayProviders_Mistral
+  case AIGatewayProviders_Grok
+  case AIGatewayProviders_Openrouter
+  case AIGatewayProviders_Deepseek
+  case AIGatewayProviders_Cerebras
+  case AIGatewayProviders_Cartesia
+  case AIGatewayProviders_Elevenlabs
+  case AIGatewayProviders_AdobeFirefly
+}
+export function AIGatewayProviders_arm(x: AIGatewayProviders): AIGatewayProviders_Arm {
+  let __r = x.handle;
+  return match (__kind_AIGatewayProviders(__r)) {
+    case 0: new AIGatewayProviders_WorkersAi()
+    case 1: new AIGatewayProviders_Anthropic()
+    case 2: new AIGatewayProviders_AwsBedrock()
+    case 3: new AIGatewayProviders_AzureOpenai()
+    case 4: new AIGatewayProviders_GoogleVertexAi()
+    case 5: new AIGatewayProviders_Huggingface()
+    case 6: new AIGatewayProviders_Openai()
+    case 7: new AIGatewayProviders_PerplexityAi()
+    case 8: new AIGatewayProviders_Replicate()
+    case 9: new AIGatewayProviders_Groq()
+    case 10: new AIGatewayProviders_Cohere()
+    case 11: new AIGatewayProviders_GoogleAiStudio()
+    case 12: new AIGatewayProviders_Mistral()
+    case 13: new AIGatewayProviders_Grok()
+    case 14: new AIGatewayProviders_Openrouter()
+    case 15: new AIGatewayProviders_Deepseek()
+    case 16: new AIGatewayProviders_Cerebras()
+    case 17: new AIGatewayProviders_Cartesia()
+    case 18: new AIGatewayProviders_Elevenlabs()
+    case 19: new AIGatewayProviders_AdobeFirefly()
+    case _: throw new Error("no arm of AIGatewayProviders")
+  };
+}
+
+// The arm a `CertVerificationStatus` holds, from `CertVerificationStatus_arm`.
+export sealed class CertVerificationStatus_Arm {
+  case CertVerificationStatus_Success
+  case CertVerificationStatus_None
+  case CertVerificationStatus_FailedselfSignedCertificate
+  case CertVerificationStatus_FailedunableToVerifyTheFirstCertificate
+  case CertVerificationStatus_FailedcertificateIsNotYetValid
+  case CertVerificationStatus_FailedcertificateHasExpired
+  case CertVerificationStatus_Failed
+}
+export function CertVerificationStatus_arm(x: CertVerificationStatus): CertVerificationStatus_Arm {
+  let __r = x.handle;
+  return match (__kind_CertVerificationStatus(__r)) {
+    case 0: new CertVerificationStatus_Success()
+    case 1: new CertVerificationStatus_None()
+    case 2: new CertVerificationStatus_FailedselfSignedCertificate()
+    case 3: new CertVerificationStatus_FailedunableToVerifyTheFirstCertificate()
+    case 4: new CertVerificationStatus_FailedcertificateIsNotYetValid()
+    case 5: new CertVerificationStatus_FailedcertificateHasExpired()
+    case 6: new CertVerificationStatus_Failed()
+    case _: throw new Error("no arm of CertVerificationStatus")
+  };
+}
+
+// The arm a `Iso3166Alpha2Code` holds, from `Iso3166Alpha2Code_arm`.
+export sealed class Iso3166Alpha2Code_Arm {
+  case Iso3166Alpha2Code_Ad
+  case Iso3166Alpha2Code_Ae
+  case Iso3166Alpha2Code_Af
+  case Iso3166Alpha2Code_Ag
+  case Iso3166Alpha2Code_Ai
+  case Iso3166Alpha2Code_Al
+  case Iso3166Alpha2Code_Am
+  case Iso3166Alpha2Code_Ao
+  case Iso3166Alpha2Code_Aq
+  case Iso3166Alpha2Code_Ar
+  case Iso3166Alpha2Code_As
+  case Iso3166Alpha2Code_At
+  case Iso3166Alpha2Code_Au
+  case Iso3166Alpha2Code_Aw
+  case Iso3166Alpha2Code_Ax
+  case Iso3166Alpha2Code_Az
+  case Iso3166Alpha2Code_Ba
+  case Iso3166Alpha2Code_Bb
+  case Iso3166Alpha2Code_Bd
+  case Iso3166Alpha2Code_Be
+  case Iso3166Alpha2Code_Bf
+  case Iso3166Alpha2Code_Bg
+  case Iso3166Alpha2Code_Bh
+  case Iso3166Alpha2Code_Bi
+  case Iso3166Alpha2Code_Bj
+  case Iso3166Alpha2Code_Bl
+  case Iso3166Alpha2Code_Bm
+  case Iso3166Alpha2Code_Bn
+  case Iso3166Alpha2Code_Bo
+  case Iso3166Alpha2Code_Bq
+  case Iso3166Alpha2Code_Br
+  case Iso3166Alpha2Code_Bs
+  case Iso3166Alpha2Code_Bt
+  case Iso3166Alpha2Code_Bv
+  case Iso3166Alpha2Code_Bw
+  case Iso3166Alpha2Code_By
+  case Iso3166Alpha2Code_Bz
+  case Iso3166Alpha2Code_Ca
+  case Iso3166Alpha2Code_Cc
+  case Iso3166Alpha2Code_Cd
+  case Iso3166Alpha2Code_Cf
+  case Iso3166Alpha2Code_Cg
+  case Iso3166Alpha2Code_Ch
+  case Iso3166Alpha2Code_Ci
+  case Iso3166Alpha2Code_Ck
+  case Iso3166Alpha2Code_Cl
+  case Iso3166Alpha2Code_Cm
+  case Iso3166Alpha2Code_Cn
+  case Iso3166Alpha2Code_Co
+  case Iso3166Alpha2Code_Cr
+  case Iso3166Alpha2Code_Cu
+  case Iso3166Alpha2Code_Cv
+  case Iso3166Alpha2Code_Cw
+  case Iso3166Alpha2Code_Cx
+  case Iso3166Alpha2Code_Cy
+  case Iso3166Alpha2Code_Cz
+  case Iso3166Alpha2Code_De
+  case Iso3166Alpha2Code_Dj
+  case Iso3166Alpha2Code_Dk
+  case Iso3166Alpha2Code_Dm
+  case Iso3166Alpha2Code_Do
+  case Iso3166Alpha2Code_Dz
+  case Iso3166Alpha2Code_Ec
+  case Iso3166Alpha2Code_Ee
+  case Iso3166Alpha2Code_Eg
+  case Iso3166Alpha2Code_Eh
+  case Iso3166Alpha2Code_Er
+  case Iso3166Alpha2Code_Es
+  case Iso3166Alpha2Code_Et
+  case Iso3166Alpha2Code_Fi
+  case Iso3166Alpha2Code_Fj
+  case Iso3166Alpha2Code_Fk
+  case Iso3166Alpha2Code_Fm
+  case Iso3166Alpha2Code_Fo
+  case Iso3166Alpha2Code_Fr
+  case Iso3166Alpha2Code_Ga
+  case Iso3166Alpha2Code_Gb
+  case Iso3166Alpha2Code_Gd
+  case Iso3166Alpha2Code_Ge
+  case Iso3166Alpha2Code_Gf
+  case Iso3166Alpha2Code_Gg
+  case Iso3166Alpha2Code_Gh
+  case Iso3166Alpha2Code_Gi
+  case Iso3166Alpha2Code_Gl
+  case Iso3166Alpha2Code_Gm
+  case Iso3166Alpha2Code_Gn
+  case Iso3166Alpha2Code_Gp
+  case Iso3166Alpha2Code_Gq
+  case Iso3166Alpha2Code_Gr
+  case Iso3166Alpha2Code_Gs
+  case Iso3166Alpha2Code_Gt
+  case Iso3166Alpha2Code_Gu
+  case Iso3166Alpha2Code_Gw
+  case Iso3166Alpha2Code_Gy
+  case Iso3166Alpha2Code_Hk
+  case Iso3166Alpha2Code_Hm
+  case Iso3166Alpha2Code_Hn
+  case Iso3166Alpha2Code_Hr
+  case Iso3166Alpha2Code_Ht
+  case Iso3166Alpha2Code_Hu
+  case Iso3166Alpha2Code_Id
+  case Iso3166Alpha2Code_Ie
+  case Iso3166Alpha2Code_Il
+  case Iso3166Alpha2Code_Im
+  case Iso3166Alpha2Code_In
+  case Iso3166Alpha2Code_Io
+  case Iso3166Alpha2Code_Iq
+  case Iso3166Alpha2Code_Ir
+  case Iso3166Alpha2Code_Is
+  case Iso3166Alpha2Code_It
+  case Iso3166Alpha2Code_Je
+  case Iso3166Alpha2Code_Jm
+  case Iso3166Alpha2Code_Jo
+  case Iso3166Alpha2Code_Jp
+  case Iso3166Alpha2Code_Ke
+  case Iso3166Alpha2Code_Kg
+  case Iso3166Alpha2Code_Kh
+  case Iso3166Alpha2Code_Ki
+  case Iso3166Alpha2Code_Km
+  case Iso3166Alpha2Code_Kn
+  case Iso3166Alpha2Code_Kp
+  case Iso3166Alpha2Code_Kr
+  case Iso3166Alpha2Code_Kw
+  case Iso3166Alpha2Code_Ky
+  case Iso3166Alpha2Code_Kz
+  case Iso3166Alpha2Code_La
+  case Iso3166Alpha2Code_Lb
+  case Iso3166Alpha2Code_Lc
+  case Iso3166Alpha2Code_Li
+  case Iso3166Alpha2Code_Lk
+  case Iso3166Alpha2Code_Lr
+  case Iso3166Alpha2Code_Ls
+  case Iso3166Alpha2Code_Lt
+  case Iso3166Alpha2Code_Lu
+  case Iso3166Alpha2Code_Lv
+  case Iso3166Alpha2Code_Ly
+  case Iso3166Alpha2Code_Ma
+  case Iso3166Alpha2Code_Mc
+  case Iso3166Alpha2Code_Md
+  case Iso3166Alpha2Code_Me
+  case Iso3166Alpha2Code_Mf
+  case Iso3166Alpha2Code_Mg
+  case Iso3166Alpha2Code_Mh
+  case Iso3166Alpha2Code_Mk
+  case Iso3166Alpha2Code_Ml
+  case Iso3166Alpha2Code_Mm
+  case Iso3166Alpha2Code_Mn
+  case Iso3166Alpha2Code_Mo
+  case Iso3166Alpha2Code_Mp
+  case Iso3166Alpha2Code_Mq
+  case Iso3166Alpha2Code_Mr
+  case Iso3166Alpha2Code_Ms
+  case Iso3166Alpha2Code_Mt
+  case Iso3166Alpha2Code_Mu
+  case Iso3166Alpha2Code_Mv
+  case Iso3166Alpha2Code_Mw
+  case Iso3166Alpha2Code_Mx
+  case Iso3166Alpha2Code_My
+  case Iso3166Alpha2Code_Mz
+  case Iso3166Alpha2Code_Na
+  case Iso3166Alpha2Code_Nc
+  case Iso3166Alpha2Code_Ne
+  case Iso3166Alpha2Code_Nf
+  case Iso3166Alpha2Code_Ng
+  case Iso3166Alpha2Code_Ni
+  case Iso3166Alpha2Code_Nl
+  case Iso3166Alpha2Code_No
+  case Iso3166Alpha2Code_Np
+  case Iso3166Alpha2Code_Nr
+  case Iso3166Alpha2Code_Nu
+  case Iso3166Alpha2Code_Nz
+  case Iso3166Alpha2Code_Om
+  case Iso3166Alpha2Code_Pa
+  case Iso3166Alpha2Code_Pe
+  case Iso3166Alpha2Code_Pf
+  case Iso3166Alpha2Code_Pg
+  case Iso3166Alpha2Code_Ph
+  case Iso3166Alpha2Code_Pk
+  case Iso3166Alpha2Code_Pl
+  case Iso3166Alpha2Code_Pm
+  case Iso3166Alpha2Code_Pn
+  case Iso3166Alpha2Code_Pr
+  case Iso3166Alpha2Code_Ps
+  case Iso3166Alpha2Code_Pt
+  case Iso3166Alpha2Code_Pw
+  case Iso3166Alpha2Code_Py
+  case Iso3166Alpha2Code_Qa
+  case Iso3166Alpha2Code_Re
+  case Iso3166Alpha2Code_Ro
+  case Iso3166Alpha2Code_Rs
+  case Iso3166Alpha2Code_Ru
+  case Iso3166Alpha2Code_Rw
+  case Iso3166Alpha2Code_Sa
+  case Iso3166Alpha2Code_Sb
+  case Iso3166Alpha2Code_Sc
+  case Iso3166Alpha2Code_Sd
+  case Iso3166Alpha2Code_Se
+  case Iso3166Alpha2Code_Sg
+  case Iso3166Alpha2Code_Sh
+  case Iso3166Alpha2Code_Si
+  case Iso3166Alpha2Code_Sj
+  case Iso3166Alpha2Code_Sk
+  case Iso3166Alpha2Code_Sl
+  case Iso3166Alpha2Code_Sm
+  case Iso3166Alpha2Code_Sn
+  case Iso3166Alpha2Code_So
+  case Iso3166Alpha2Code_Sr
+  case Iso3166Alpha2Code_Ss
+  case Iso3166Alpha2Code_St
+  case Iso3166Alpha2Code_Sv
+  case Iso3166Alpha2Code_Sx
+  case Iso3166Alpha2Code_Sy
+  case Iso3166Alpha2Code_Sz
+  case Iso3166Alpha2Code_Tc
+  case Iso3166Alpha2Code_Td
+  case Iso3166Alpha2Code_Tf
+  case Iso3166Alpha2Code_Tg
+  case Iso3166Alpha2Code_Th
+  case Iso3166Alpha2Code_Tj
+  case Iso3166Alpha2Code_Tk
+  case Iso3166Alpha2Code_Tl
+  case Iso3166Alpha2Code_Tm
+  case Iso3166Alpha2Code_Tn
+  case Iso3166Alpha2Code_To
+  case Iso3166Alpha2Code_Tr
+  case Iso3166Alpha2Code_Tt
+  case Iso3166Alpha2Code_Tv
+  case Iso3166Alpha2Code_Tw
+  case Iso3166Alpha2Code_Tz
+  case Iso3166Alpha2Code_Ua
+  case Iso3166Alpha2Code_Ug
+  case Iso3166Alpha2Code_Um
+  case Iso3166Alpha2Code_Us
+  case Iso3166Alpha2Code_Uy
+  case Iso3166Alpha2Code_Uz
+  case Iso3166Alpha2Code_Va
+  case Iso3166Alpha2Code_Vc
+  case Iso3166Alpha2Code_Ve
+  case Iso3166Alpha2Code_Vg
+  case Iso3166Alpha2Code_Vi
+  case Iso3166Alpha2Code_Vn
+  case Iso3166Alpha2Code_Vu
+  case Iso3166Alpha2Code_Wf
+  case Iso3166Alpha2Code_Ws
+  case Iso3166Alpha2Code_Ye
+  case Iso3166Alpha2Code_Yt
+  case Iso3166Alpha2Code_Za
+  case Iso3166Alpha2Code_Zm
+  case Iso3166Alpha2Code_Zw
+}
+export function Iso3166Alpha2Code_arm(x: Iso3166Alpha2Code): Iso3166Alpha2Code_Arm {
+  let __r = x.handle;
+  return match (__kind_Iso3166Alpha2Code(__r)) {
+    case 0: new Iso3166Alpha2Code_Ad()
+    case 1: new Iso3166Alpha2Code_Ae()
+    case 2: new Iso3166Alpha2Code_Af()
+    case 3: new Iso3166Alpha2Code_Ag()
+    case 4: new Iso3166Alpha2Code_Ai()
+    case 5: new Iso3166Alpha2Code_Al()
+    case 6: new Iso3166Alpha2Code_Am()
+    case 7: new Iso3166Alpha2Code_Ao()
+    case 8: new Iso3166Alpha2Code_Aq()
+    case 9: new Iso3166Alpha2Code_Ar()
+    case 10: new Iso3166Alpha2Code_As()
+    case 11: new Iso3166Alpha2Code_At()
+    case 12: new Iso3166Alpha2Code_Au()
+    case 13: new Iso3166Alpha2Code_Aw()
+    case 14: new Iso3166Alpha2Code_Ax()
+    case 15: new Iso3166Alpha2Code_Az()
+    case 16: new Iso3166Alpha2Code_Ba()
+    case 17: new Iso3166Alpha2Code_Bb()
+    case 18: new Iso3166Alpha2Code_Bd()
+    case 19: new Iso3166Alpha2Code_Be()
+    case 20: new Iso3166Alpha2Code_Bf()
+    case 21: new Iso3166Alpha2Code_Bg()
+    case 22: new Iso3166Alpha2Code_Bh()
+    case 23: new Iso3166Alpha2Code_Bi()
+    case 24: new Iso3166Alpha2Code_Bj()
+    case 25: new Iso3166Alpha2Code_Bl()
+    case 26: new Iso3166Alpha2Code_Bm()
+    case 27: new Iso3166Alpha2Code_Bn()
+    case 28: new Iso3166Alpha2Code_Bo()
+    case 29: new Iso3166Alpha2Code_Bq()
+    case 30: new Iso3166Alpha2Code_Br()
+    case 31: new Iso3166Alpha2Code_Bs()
+    case 32: new Iso3166Alpha2Code_Bt()
+    case 33: new Iso3166Alpha2Code_Bv()
+    case 34: new Iso3166Alpha2Code_Bw()
+    case 35: new Iso3166Alpha2Code_By()
+    case 36: new Iso3166Alpha2Code_Bz()
+    case 37: new Iso3166Alpha2Code_Ca()
+    case 38: new Iso3166Alpha2Code_Cc()
+    case 39: new Iso3166Alpha2Code_Cd()
+    case 40: new Iso3166Alpha2Code_Cf()
+    case 41: new Iso3166Alpha2Code_Cg()
+    case 42: new Iso3166Alpha2Code_Ch()
+    case 43: new Iso3166Alpha2Code_Ci()
+    case 44: new Iso3166Alpha2Code_Ck()
+    case 45: new Iso3166Alpha2Code_Cl()
+    case 46: new Iso3166Alpha2Code_Cm()
+    case 47: new Iso3166Alpha2Code_Cn()
+    case 48: new Iso3166Alpha2Code_Co()
+    case 49: new Iso3166Alpha2Code_Cr()
+    case 50: new Iso3166Alpha2Code_Cu()
+    case 51: new Iso3166Alpha2Code_Cv()
+    case 52: new Iso3166Alpha2Code_Cw()
+    case 53: new Iso3166Alpha2Code_Cx()
+    case 54: new Iso3166Alpha2Code_Cy()
+    case 55: new Iso3166Alpha2Code_Cz()
+    case 56: new Iso3166Alpha2Code_De()
+    case 57: new Iso3166Alpha2Code_Dj()
+    case 58: new Iso3166Alpha2Code_Dk()
+    case 59: new Iso3166Alpha2Code_Dm()
+    case 60: new Iso3166Alpha2Code_Do()
+    case 61: new Iso3166Alpha2Code_Dz()
+    case 62: new Iso3166Alpha2Code_Ec()
+    case 63: new Iso3166Alpha2Code_Ee()
+    case 64: new Iso3166Alpha2Code_Eg()
+    case 65: new Iso3166Alpha2Code_Eh()
+    case 66: new Iso3166Alpha2Code_Er()
+    case 67: new Iso3166Alpha2Code_Es()
+    case 68: new Iso3166Alpha2Code_Et()
+    case 69: new Iso3166Alpha2Code_Fi()
+    case 70: new Iso3166Alpha2Code_Fj()
+    case 71: new Iso3166Alpha2Code_Fk()
+    case 72: new Iso3166Alpha2Code_Fm()
+    case 73: new Iso3166Alpha2Code_Fo()
+    case 74: new Iso3166Alpha2Code_Fr()
+    case 75: new Iso3166Alpha2Code_Ga()
+    case 76: new Iso3166Alpha2Code_Gb()
+    case 77: new Iso3166Alpha2Code_Gd()
+    case 78: new Iso3166Alpha2Code_Ge()
+    case 79: new Iso3166Alpha2Code_Gf()
+    case 80: new Iso3166Alpha2Code_Gg()
+    case 81: new Iso3166Alpha2Code_Gh()
+    case 82: new Iso3166Alpha2Code_Gi()
+    case 83: new Iso3166Alpha2Code_Gl()
+    case 84: new Iso3166Alpha2Code_Gm()
+    case 85: new Iso3166Alpha2Code_Gn()
+    case 86: new Iso3166Alpha2Code_Gp()
+    case 87: new Iso3166Alpha2Code_Gq()
+    case 88: new Iso3166Alpha2Code_Gr()
+    case 89: new Iso3166Alpha2Code_Gs()
+    case 90: new Iso3166Alpha2Code_Gt()
+    case 91: new Iso3166Alpha2Code_Gu()
+    case 92: new Iso3166Alpha2Code_Gw()
+    case 93: new Iso3166Alpha2Code_Gy()
+    case 94: new Iso3166Alpha2Code_Hk()
+    case 95: new Iso3166Alpha2Code_Hm()
+    case 96: new Iso3166Alpha2Code_Hn()
+    case 97: new Iso3166Alpha2Code_Hr()
+    case 98: new Iso3166Alpha2Code_Ht()
+    case 99: new Iso3166Alpha2Code_Hu()
+    case 100: new Iso3166Alpha2Code_Id()
+    case 101: new Iso3166Alpha2Code_Ie()
+    case 102: new Iso3166Alpha2Code_Il()
+    case 103: new Iso3166Alpha2Code_Im()
+    case 104: new Iso3166Alpha2Code_In()
+    case 105: new Iso3166Alpha2Code_Io()
+    case 106: new Iso3166Alpha2Code_Iq()
+    case 107: new Iso3166Alpha2Code_Ir()
+    case 108: new Iso3166Alpha2Code_Is()
+    case 109: new Iso3166Alpha2Code_It()
+    case 110: new Iso3166Alpha2Code_Je()
+    case 111: new Iso3166Alpha2Code_Jm()
+    case 112: new Iso3166Alpha2Code_Jo()
+    case 113: new Iso3166Alpha2Code_Jp()
+    case 114: new Iso3166Alpha2Code_Ke()
+    case 115: new Iso3166Alpha2Code_Kg()
+    case 116: new Iso3166Alpha2Code_Kh()
+    case 117: new Iso3166Alpha2Code_Ki()
+    case 118: new Iso3166Alpha2Code_Km()
+    case 119: new Iso3166Alpha2Code_Kn()
+    case 120: new Iso3166Alpha2Code_Kp()
+    case 121: new Iso3166Alpha2Code_Kr()
+    case 122: new Iso3166Alpha2Code_Kw()
+    case 123: new Iso3166Alpha2Code_Ky()
+    case 124: new Iso3166Alpha2Code_Kz()
+    case 125: new Iso3166Alpha2Code_La()
+    case 126: new Iso3166Alpha2Code_Lb()
+    case 127: new Iso3166Alpha2Code_Lc()
+    case 128: new Iso3166Alpha2Code_Li()
+    case 129: new Iso3166Alpha2Code_Lk()
+    case 130: new Iso3166Alpha2Code_Lr()
+    case 131: new Iso3166Alpha2Code_Ls()
+    case 132: new Iso3166Alpha2Code_Lt()
+    case 133: new Iso3166Alpha2Code_Lu()
+    case 134: new Iso3166Alpha2Code_Lv()
+    case 135: new Iso3166Alpha2Code_Ly()
+    case 136: new Iso3166Alpha2Code_Ma()
+    case 137: new Iso3166Alpha2Code_Mc()
+    case 138: new Iso3166Alpha2Code_Md()
+    case 139: new Iso3166Alpha2Code_Me()
+    case 140: new Iso3166Alpha2Code_Mf()
+    case 141: new Iso3166Alpha2Code_Mg()
+    case 142: new Iso3166Alpha2Code_Mh()
+    case 143: new Iso3166Alpha2Code_Mk()
+    case 144: new Iso3166Alpha2Code_Ml()
+    case 145: new Iso3166Alpha2Code_Mm()
+    case 146: new Iso3166Alpha2Code_Mn()
+    case 147: new Iso3166Alpha2Code_Mo()
+    case 148: new Iso3166Alpha2Code_Mp()
+    case 149: new Iso3166Alpha2Code_Mq()
+    case 150: new Iso3166Alpha2Code_Mr()
+    case 151: new Iso3166Alpha2Code_Ms()
+    case 152: new Iso3166Alpha2Code_Mt()
+    case 153: new Iso3166Alpha2Code_Mu()
+    case 154: new Iso3166Alpha2Code_Mv()
+    case 155: new Iso3166Alpha2Code_Mw()
+    case 156: new Iso3166Alpha2Code_Mx()
+    case 157: new Iso3166Alpha2Code_My()
+    case 158: new Iso3166Alpha2Code_Mz()
+    case 159: new Iso3166Alpha2Code_Na()
+    case 160: new Iso3166Alpha2Code_Nc()
+    case 161: new Iso3166Alpha2Code_Ne()
+    case 162: new Iso3166Alpha2Code_Nf()
+    case 163: new Iso3166Alpha2Code_Ng()
+    case 164: new Iso3166Alpha2Code_Ni()
+    case 165: new Iso3166Alpha2Code_Nl()
+    case 166: new Iso3166Alpha2Code_No()
+    case 167: new Iso3166Alpha2Code_Np()
+    case 168: new Iso3166Alpha2Code_Nr()
+    case 169: new Iso3166Alpha2Code_Nu()
+    case 170: new Iso3166Alpha2Code_Nz()
+    case 171: new Iso3166Alpha2Code_Om()
+    case 172: new Iso3166Alpha2Code_Pa()
+    case 173: new Iso3166Alpha2Code_Pe()
+    case 174: new Iso3166Alpha2Code_Pf()
+    case 175: new Iso3166Alpha2Code_Pg()
+    case 176: new Iso3166Alpha2Code_Ph()
+    case 177: new Iso3166Alpha2Code_Pk()
+    case 178: new Iso3166Alpha2Code_Pl()
+    case 179: new Iso3166Alpha2Code_Pm()
+    case 180: new Iso3166Alpha2Code_Pn()
+    case 181: new Iso3166Alpha2Code_Pr()
+    case 182: new Iso3166Alpha2Code_Ps()
+    case 183: new Iso3166Alpha2Code_Pt()
+    case 184: new Iso3166Alpha2Code_Pw()
+    case 185: new Iso3166Alpha2Code_Py()
+    case 186: new Iso3166Alpha2Code_Qa()
+    case 187: new Iso3166Alpha2Code_Re()
+    case 188: new Iso3166Alpha2Code_Ro()
+    case 189: new Iso3166Alpha2Code_Rs()
+    case 190: new Iso3166Alpha2Code_Ru()
+    case 191: new Iso3166Alpha2Code_Rw()
+    case 192: new Iso3166Alpha2Code_Sa()
+    case 193: new Iso3166Alpha2Code_Sb()
+    case 194: new Iso3166Alpha2Code_Sc()
+    case 195: new Iso3166Alpha2Code_Sd()
+    case 196: new Iso3166Alpha2Code_Se()
+    case 197: new Iso3166Alpha2Code_Sg()
+    case 198: new Iso3166Alpha2Code_Sh()
+    case 199: new Iso3166Alpha2Code_Si()
+    case 200: new Iso3166Alpha2Code_Sj()
+    case 201: new Iso3166Alpha2Code_Sk()
+    case 202: new Iso3166Alpha2Code_Sl()
+    case 203: new Iso3166Alpha2Code_Sm()
+    case 204: new Iso3166Alpha2Code_Sn()
+    case 205: new Iso3166Alpha2Code_So()
+    case 206: new Iso3166Alpha2Code_Sr()
+    case 207: new Iso3166Alpha2Code_Ss()
+    case 208: new Iso3166Alpha2Code_St()
+    case 209: new Iso3166Alpha2Code_Sv()
+    case 210: new Iso3166Alpha2Code_Sx()
+    case 211: new Iso3166Alpha2Code_Sy()
+    case 212: new Iso3166Alpha2Code_Sz()
+    case 213: new Iso3166Alpha2Code_Tc()
+    case 214: new Iso3166Alpha2Code_Td()
+    case 215: new Iso3166Alpha2Code_Tf()
+    case 216: new Iso3166Alpha2Code_Tg()
+    case 217: new Iso3166Alpha2Code_Th()
+    case 218: new Iso3166Alpha2Code_Tj()
+    case 219: new Iso3166Alpha2Code_Tk()
+    case 220: new Iso3166Alpha2Code_Tl()
+    case 221: new Iso3166Alpha2Code_Tm()
+    case 222: new Iso3166Alpha2Code_Tn()
+    case 223: new Iso3166Alpha2Code_To()
+    case 224: new Iso3166Alpha2Code_Tr()
+    case 225: new Iso3166Alpha2Code_Tt()
+    case 226: new Iso3166Alpha2Code_Tv()
+    case 227: new Iso3166Alpha2Code_Tw()
+    case 228: new Iso3166Alpha2Code_Tz()
+    case 229: new Iso3166Alpha2Code_Ua()
+    case 230: new Iso3166Alpha2Code_Ug()
+    case 231: new Iso3166Alpha2Code_Um()
+    case 232: new Iso3166Alpha2Code_Us()
+    case 233: new Iso3166Alpha2Code_Uy()
+    case 234: new Iso3166Alpha2Code_Uz()
+    case 235: new Iso3166Alpha2Code_Va()
+    case 236: new Iso3166Alpha2Code_Vc()
+    case 237: new Iso3166Alpha2Code_Ve()
+    case 238: new Iso3166Alpha2Code_Vg()
+    case 239: new Iso3166Alpha2Code_Vi()
+    case 240: new Iso3166Alpha2Code_Vn()
+    case 241: new Iso3166Alpha2Code_Vu()
+    case 242: new Iso3166Alpha2Code_Wf()
+    case 243: new Iso3166Alpha2Code_Ws()
+    case 244: new Iso3166Alpha2Code_Ye()
+    case 245: new Iso3166Alpha2Code_Yt()
+    case 246: new Iso3166Alpha2Code_Za()
+    case 247: new Iso3166Alpha2Code_Zm()
+    case 248: new Iso3166Alpha2Code_Zw()
+    case _: throw new Error("no arm of Iso3166Alpha2Code")
+  };
+}
+
+// The arm a `ContinentCode` holds, from `ContinentCode_arm`.
+export sealed class ContinentCode_Arm {
+  case ContinentCode_Af
+  case ContinentCode_An
+  case ContinentCode_As
+  case ContinentCode_Eu
+  case ContinentCode_Na
+  case ContinentCode_Oc
+  case ContinentCode_Sa
+}
+export function ContinentCode_arm(x: ContinentCode): ContinentCode_Arm {
+  let __r = x.handle;
+  return match (__kind_ContinentCode(__r)) {
+    case 0: new ContinentCode_Af()
+    case 1: new ContinentCode_An()
+    case 2: new ContinentCode_As()
+    case 3: new ContinentCode_Eu()
+    case 4: new ContinentCode_Na()
+    case 5: new ContinentCode_Oc()
+    case 6: new ContinentCode_Sa()
+    case _: throw new Error("no arm of ContinentCode")
+  };
+}
+
+// The arm a `D1SessionConstraint` holds, from `D1SessionConstraint_arm`.
+export sealed class D1SessionConstraint_Arm {
+  case D1SessionConstraint_FirstPrimary
+  case D1SessionConstraint_FirstUnconstrained
+}
+export function D1SessionConstraint_arm(x: D1SessionConstraint): D1SessionConstraint_Arm {
+  let __r = x.handle;
+  return match (__kind_D1SessionConstraint(__r)) {
+    case 0: new D1SessionConstraint_FirstPrimary()
+    case 1: new D1SessionConstraint_FirstUnconstrained()
+    case _: throw new Error("no arm of D1SessionConstraint")
+  };
+}
+
+// The arm a `Rpc_EntrypointBranded` holds, from `Rpc_EntrypointBranded_arm`.
+export sealed class Rpc_EntrypointBranded_Arm {
+  case Rpc_EntrypointBranded_WorkerEntrypointBranded(value: Rpc_WorkerEntrypointBranded)
+  case Rpc_EntrypointBranded_DurableObjectBranded(value: Rpc_DurableObjectBranded)
+  case Rpc_EntrypointBranded_WorkflowEntrypointBranded(value: Rpc_WorkflowEntrypointBranded)
+}
+export function Rpc_EntrypointBranded_arm(x: Rpc_EntrypointBranded): Rpc_EntrypointBranded_Arm {
+  let __r = x;
+  return match (__kind_Rpc_EntrypointBranded(__r)) {
+    case 0: new Rpc_EntrypointBranded_WorkerEntrypointBranded(new Rpc_WorkerEntrypointBranded(__r))
+    case 1: new Rpc_EntrypointBranded_DurableObjectBranded(new Rpc_DurableObjectBranded(__r))
+    case 2: new Rpc_EntrypointBranded_WorkflowEntrypointBranded(new Rpc_WorkflowEntrypointBranded(__r))
+    case _: throw new Error("no arm of Rpc.EntrypointBranded")
+  };
+}
+
+// The arm a `cloudflare_workers_WorkflowDurationLabel` holds, from `cloudflare_workers_WorkflowDurationLabel_arm`.
+export sealed class cloudflare_workers_WorkflowDurationLabel_Arm {
+  case cloudflare_workers_WorkflowDurationLabel_Second
+  case cloudflare_workers_WorkflowDurationLabel_Minute
+  case cloudflare_workers_WorkflowDurationLabel_Hour
+  case cloudflare_workers_WorkflowDurationLabel_Day
+  case cloudflare_workers_WorkflowDurationLabel_Week
+  case cloudflare_workers_WorkflowDurationLabel_Month
+  case cloudflare_workers_WorkflowDurationLabel_Year
+}
+export function cloudflare_workers_WorkflowDurationLabel_arm(x: cloudflare_workers_WorkflowDurationLabel): cloudflare_workers_WorkflowDurationLabel_Arm {
+  let __r = x.handle;
+  return match (__cloudflare_workers_kind_WorkflowDurationLabel(__r)) {
+    case 0: new cloudflare_workers_WorkflowDurationLabel_Second()
+    case 1: new cloudflare_workers_WorkflowDurationLabel_Minute()
+    case 2: new cloudflare_workers_WorkflowDurationLabel_Hour()
+    case 3: new cloudflare_workers_WorkflowDurationLabel_Day()
+    case 4: new cloudflare_workers_WorkflowDurationLabel_Week()
+    case 5: new cloudflare_workers_WorkflowDurationLabel_Month()
+    case 6: new cloudflare_workers_WorkflowDurationLabel_Year()
+    case _: throw new Error("no arm of WorkflowDurationLabel")
+  };
+}
+
+// The arm a `cloudflare_workers_WorkflowSleepDuration` holds, from `cloudflare_workers_WorkflowSleepDuration_arm`.
+export sealed class cloudflare_workers_WorkflowSleepDuration_Arm {
+  case cloudflare_workers_WorkflowSleepDuration_String(value: String)
+  case cloudflare_workers_WorkflowSleepDuration_F64(value: f64)
+}
+export function cloudflare_workers_WorkflowSleepDuration_arm(x: cloudflare_workers_WorkflowSleepDuration): cloudflare_workers_WorkflowSleepDuration_Arm {
+  let __r = x;
+  return match (__cloudflare_workers_kind_WorkflowSleepDuration(__r)) {
+    case 0: new cloudflare_workers_WorkflowSleepDuration_String(String.fromHandle(__r))
+    case 1: new cloudflare_workers_WorkflowSleepDuration_F64(numberValue(__r))
+    case _: throw new Error("no arm of WorkflowSleepDuration")
+  };
+}
+
+// The arm a `WorkflowDelayDuration` holds, from `WorkflowDelayDuration_arm`.
+export sealed class WorkflowDelayDuration_Arm {
+  case WorkflowDelayDuration_String(value: String)
+  case WorkflowDelayDuration_F64(value: f64)
+}
+export function WorkflowDelayDuration_arm(x: WorkflowDelayDuration): WorkflowDelayDuration_Arm {
+  let __r = x;
+  return match (__cloudflare_workers_kind_WorkflowDelayDuration(__r)) {
+    case 0: new WorkflowDelayDuration_String(String.fromHandle(__r))
+    case 1: new WorkflowDelayDuration_F64(numberValue(__r))
+    case _: throw new Error("no arm of WorkflowDelayDuration")
+  };
+}
+
+// The arm a `WorkflowTimeoutDuration` holds, from `WorkflowTimeoutDuration_arm`.
+export sealed class WorkflowTimeoutDuration_Arm {
+  case WorkflowTimeoutDuration_String(value: String)
+  case WorkflowTimeoutDuration_F64(value: f64)
+}
+export function WorkflowTimeoutDuration_arm(x: WorkflowTimeoutDuration): WorkflowTimeoutDuration_Arm {
+  let __r = x;
+  return match (__cloudflare_workers_kind_WorkflowTimeoutDuration(__r)) {
+    case 0: new WorkflowTimeoutDuration_String(String.fromHandle(__r))
+    case 1: new WorkflowTimeoutDuration_F64(numberValue(__r))
+    case _: throw new Error("no arm of WorkflowTimeoutDuration")
+  };
+}
+
+// The arm a `cloudflare_workers_WorkflowRetentionDuration` holds, from `cloudflare_workers_WorkflowRetentionDuration_arm`.
+export sealed class cloudflare_workers_WorkflowRetentionDuration_Arm {
+  case cloudflare_workers_WorkflowRetentionDuration_String(value: String)
+  case cloudflare_workers_WorkflowRetentionDuration_F64(value: f64)
+}
+export function cloudflare_workers_WorkflowRetentionDuration_arm(x: cloudflare_workers_WorkflowRetentionDuration): cloudflare_workers_WorkflowRetentionDuration_Arm {
+  let __r = x;
+  return match (__cloudflare_workers_kind_WorkflowRetentionDuration(__r)) {
+    case 0: new cloudflare_workers_WorkflowRetentionDuration_String(String.fromHandle(__r))
+    case 1: new cloudflare_workers_WorkflowRetentionDuration_F64(numberValue(__r))
+    case _: throw new Error("no arm of WorkflowRetentionDuration")
+  };
+}
+
+// The arm a `WorkflowBackoff` holds, from `WorkflowBackoff_arm`.
+export sealed class WorkflowBackoff_Arm {
+  case WorkflowBackoff_Constant
+  case WorkflowBackoff_Linear
+  case WorkflowBackoff_Exponential
+}
+export function WorkflowBackoff_arm(x: WorkflowBackoff): WorkflowBackoff_Arm {
+  let __r = x.handle;
+  return match (__cloudflare_workers_kind_WorkflowBackoff(__r)) {
+    case 0: new WorkflowBackoff_Constant()
+    case 1: new WorkflowBackoff_Linear()
+    case 2: new WorkflowBackoff_Exponential()
+    case _: throw new Error("no arm of WorkflowBackoff")
+  };
+}
+
+// The arm a `WorkflowInstanceStatus` holds, from `WorkflowInstanceStatus_arm`.
+export sealed class WorkflowInstanceStatus_Arm {
+  case WorkflowInstanceStatus_Queued
+  case WorkflowInstanceStatus_Running
+  case WorkflowInstanceStatus_Paused
+  case WorkflowInstanceStatus_Errored
+  case WorkflowInstanceStatus_Terminated
+  case WorkflowInstanceStatus_Complete
+  case WorkflowInstanceStatus_Waiting
+  case WorkflowInstanceStatus_WaitingForPause
+  case WorkflowInstanceStatus_Unknown
+}
+export function WorkflowInstanceStatus_arm(x: WorkflowInstanceStatus): WorkflowInstanceStatus_Arm {
+  let __r = x.handle;
+  return match (__cloudflare_workers_kind_WorkflowInstanceStatus(__r)) {
+    case 0: new WorkflowInstanceStatus_Queued()
+    case 1: new WorkflowInstanceStatus_Running()
+    case 2: new WorkflowInstanceStatus_Paused()
+    case 3: new WorkflowInstanceStatus_Errored()
+    case 4: new WorkflowInstanceStatus_Terminated()
+    case 5: new WorkflowInstanceStatus_Complete()
+    case 6: new WorkflowInstanceStatus_Waiting()
+    case 7: new WorkflowInstanceStatus_WaitingForPause()
+    case 8: new WorkflowInstanceStatus_Unknown()
+    case _: throw new Error("no arm of WorkflowInstanceStatus")
+  };
+}
+
+// The arm a `StreamDownloadStatus` holds, from `StreamDownloadStatus_arm`.
+export sealed class StreamDownloadStatus_Arm {
+  case StreamDownloadStatus_Ready
+  case StreamDownloadStatus_Inprogress
+  case StreamDownloadStatus_Error
+}
+export function StreamDownloadStatus_arm(x: StreamDownloadStatus): StreamDownloadStatus_Arm {
+  let __r = x.handle;
+  return match (__kind_StreamDownloadStatus(__r)) {
+    case 0: new StreamDownloadStatus_Ready()
+    case 1: new StreamDownloadStatus_Inprogress()
+    case 2: new StreamDownloadStatus_Error()
+    case _: throw new Error("no arm of StreamDownloadStatus")
+  };
+}
+
+// The arm a `StreamDownloadType` holds, from `StreamDownloadType_arm`.
+export sealed class StreamDownloadType_Arm {
+  case StreamDownloadType_Default
+  case StreamDownloadType_Audio
+}
+export function StreamDownloadType_arm(x: StreamDownloadType): StreamDownloadType_Arm {
+  let __r = x.handle;
+  return match (__kind_StreamDownloadType(__r)) {
+    case 0: new StreamDownloadType_Default()
+    case 1: new StreamDownloadType_Audio()
+    case _: throw new Error("no arm of StreamDownloadType")
+  };
+}
+
+// The arm a `StreamWatermarkPosition` holds, from `StreamWatermarkPosition_arm`.
+export sealed class StreamWatermarkPosition_Arm {
+  case StreamWatermarkPosition_UpperRight
+  case StreamWatermarkPosition_UpperLeft
+  case StreamWatermarkPosition_LowerLeft
+  case StreamWatermarkPosition_LowerRight
+  case StreamWatermarkPosition_Center
+}
+export function StreamWatermarkPosition_arm(x: StreamWatermarkPosition): StreamWatermarkPosition_Arm {
+  let __r = x.handle;
+  return match (__kind_StreamWatermarkPosition(__r)) {
+    case 0: new StreamWatermarkPosition_UpperRight()
+    case 1: new StreamWatermarkPosition_UpperLeft()
+    case 2: new StreamWatermarkPosition_LowerLeft()
+    case 3: new StreamWatermarkPosition_LowerRight()
+    case 4: new StreamWatermarkPosition_Center()
+    case _: throw new Error("no arm of StreamWatermarkPosition")
+  };
+}
+
+// The arm a `StreamPaginationComparison` holds, from `StreamPaginationComparison_arm`.
+export sealed class StreamPaginationComparison_Arm {
+  case StreamPaginationComparison_Eq
+  case StreamPaginationComparison_Gt
+  case StreamPaginationComparison_Gte
+  case StreamPaginationComparison_Lt
+  case StreamPaginationComparison_Lte
+}
+export function StreamPaginationComparison_arm(x: StreamPaginationComparison): StreamPaginationComparison_Arm {
+  let __r = x.handle;
+  return match (__kind_StreamPaginationComparison(__r)) {
+    case 0: new StreamPaginationComparison_Eq()
+    case 1: new StreamPaginationComparison_Gt()
+    case 2: new StreamPaginationComparison_Gte()
+    case 3: new StreamPaginationComparison_Lt()
+    case 4: new StreamPaginationComparison_Lte()
+    case _: throw new Error("no arm of StreamPaginationComparison")
+  };
+}
+
+// The arm a `TailStream_EventOutcome` holds, from `TailStream_EventOutcome_arm`.
+export sealed class TailStream_EventOutcome_Arm {
+  case TailStream_EventOutcome_Ok
+  case TailStream_EventOutcome_Canceled
+  case TailStream_EventOutcome_Exception
+  case TailStream_EventOutcome_Unknown
+  case TailStream_EventOutcome_KillSwitch
+  case TailStream_EventOutcome_DaemonDown
+  case TailStream_EventOutcome_ExceededCpu
+  case TailStream_EventOutcome_ExceededMemory
+  case TailStream_EventOutcome_LoadShed
+  case TailStream_EventOutcome_ResponseStreamDisconnected
+  case TailStream_EventOutcome_ScriptNotFound
+}
+export function TailStream_EventOutcome_arm(x: TailStream_EventOutcome): TailStream_EventOutcome_Arm {
+  let __r = x.handle;
+  return match (__kind_TailStream_EventOutcome(__r)) {
+    case 0: new TailStream_EventOutcome_Ok()
+    case 1: new TailStream_EventOutcome_Canceled()
+    case 2: new TailStream_EventOutcome_Exception()
+    case 3: new TailStream_EventOutcome_Unknown()
+    case 4: new TailStream_EventOutcome_KillSwitch()
+    case 5: new TailStream_EventOutcome_DaemonDown()
+    case 6: new TailStream_EventOutcome_ExceededCpu()
+    case 7: new TailStream_EventOutcome_ExceededMemory()
+    case 8: new TailStream_EventOutcome_LoadShed()
+    case 9: new TailStream_EventOutcome_ResponseStreamDisconnected()
+    case 10: new TailStream_EventOutcome_ScriptNotFound()
+    case _: throw new Error("no arm of TailStream.EventOutcome")
+  };
+}
+
+// The arm a `VectorFloatArray` holds, from `VectorFloatArray_arm`.
+export sealed class VectorFloatArray_Arm {
+  case VectorFloatArray_Float32Array(value: externref)
+  case VectorFloatArray_Float64Array(value: externref)
+}
+export function VectorFloatArray_arm(x: VectorFloatArray): VectorFloatArray_Arm {
+  let __r = x;
+  return match (__kind_VectorFloatArray(__r)) {
+    case 0: new VectorFloatArray_Float32Array(__r)
+    case 1: new VectorFloatArray_Float64Array(__r)
+    case _: throw new Error("no arm of VectorFloatArray")
+  };
+}
+
+// The arm a `VectorizeVectorMetadataFilterOp` holds, from `VectorizeVectorMetadataFilterOp_arm`.
+export sealed class VectorizeVectorMetadataFilterOp_Arm {
+  case VectorizeVectorMetadataFilterOp_eq
+  case VectorizeVectorMetadataFilterOp_ne
+  case VectorizeVectorMetadataFilterOp_lt
+  case VectorizeVectorMetadataFilterOp_lte
+  case VectorizeVectorMetadataFilterOp_gt
+  case VectorizeVectorMetadataFilterOp_gte
+}
+export function VectorizeVectorMetadataFilterOp_arm(x: VectorizeVectorMetadataFilterOp): VectorizeVectorMetadataFilterOp_Arm {
+  let __r = x.handle;
+  return match (__kind_VectorizeVectorMetadataFilterOp(__r)) {
+    case 0: new VectorizeVectorMetadataFilterOp_eq()
+    case 1: new VectorizeVectorMetadataFilterOp_ne()
+    case 2: new VectorizeVectorMetadataFilterOp_lt()
+    case 3: new VectorizeVectorMetadataFilterOp_lte()
+    case 4: new VectorizeVectorMetadataFilterOp_gt()
+    case 5: new VectorizeVectorMetadataFilterOp_gte()
+    case _: throw new Error("no arm of VectorizeVectorMetadataFilterOp")
+  };
+}
+
+// The arm a `VectorizeVectorMetadataFilterCollectionOp` holds, from `VectorizeVectorMetadataFilterCollectionOp_arm`.
+export sealed class VectorizeVectorMetadataFilterCollectionOp_Arm {
+  case VectorizeVectorMetadataFilterCollectionOp_in_
+  case VectorizeVectorMetadataFilterCollectionOp_nin
+}
+export function VectorizeVectorMetadataFilterCollectionOp_arm(x: VectorizeVectorMetadataFilterCollectionOp): VectorizeVectorMetadataFilterCollectionOp_Arm {
+  let __r = x.handle;
+  return match (__kind_VectorizeVectorMetadataFilterCollectionOp(__r)) {
+    case 0: new VectorizeVectorMetadataFilterCollectionOp_in_()
+    case 1: new VectorizeVectorMetadataFilterCollectionOp_nin()
+    case _: throw new Error("no arm of VectorizeVectorMetadataFilterCollectionOp")
+  };
+}
+
+// The arm a `VectorizeDistanceMetric` holds, from `VectorizeDistanceMetric_arm`.
+export sealed class VectorizeDistanceMetric_Arm {
+  case VectorizeDistanceMetric_Euclidean
+  case VectorizeDistanceMetric_Cosine
+  case VectorizeDistanceMetric_DotProduct
+}
+export function VectorizeDistanceMetric_arm(x: VectorizeDistanceMetric): VectorizeDistanceMetric_Arm {
+  let __r = x.handle;
+  return match (__kind_VectorizeDistanceMetric(__r)) {
+    case 0: new VectorizeDistanceMetric_Euclidean()
+    case 1: new VectorizeDistanceMetric_Cosine()
+    case 2: new VectorizeDistanceMetric_DotProduct()
+    case _: throw new Error("no arm of VectorizeDistanceMetric")
+  };
+}
+
+// The arm a `VectorizeMetadataRetrievalLevel` holds, from `VectorizeMetadataRetrievalLevel_arm`.
+export sealed class VectorizeMetadataRetrievalLevel_Arm {
+  case VectorizeMetadataRetrievalLevel_All
+  case VectorizeMetadataRetrievalLevel_Indexed
+  case VectorizeMetadataRetrievalLevel_None
+}
+export function VectorizeMetadataRetrievalLevel_arm(x: VectorizeMetadataRetrievalLevel): VectorizeMetadataRetrievalLevel_Arm {
+  let __r = x.handle;
+  return match (__kind_VectorizeMetadataRetrievalLevel(__r)) {
+    case 0: new VectorizeMetadataRetrievalLevel_All()
+    case 1: new VectorizeMetadataRetrievalLevel_Indexed()
+    case 2: new VectorizeMetadataRetrievalLevel_None()
+    case _: throw new Error("no arm of VectorizeMetadataRetrievalLevel")
+  };
+}
+
+// The arm a `WorkflowDurationLabel` holds, from `WorkflowDurationLabel_arm`.
+export sealed class WorkflowDurationLabel_Arm {
+  case WorkflowDurationLabel_Second
+  case WorkflowDurationLabel_Minute
+  case WorkflowDurationLabel_Hour
+  case WorkflowDurationLabel_Day
+  case WorkflowDurationLabel_Week
+  case WorkflowDurationLabel_Month
+  case WorkflowDurationLabel_Year
+}
+export function WorkflowDurationLabel_arm(x: WorkflowDurationLabel): WorkflowDurationLabel_Arm {
+  let __r = x.handle;
+  return match (__kind_WorkflowDurationLabel(__r)) {
+    case 0: new WorkflowDurationLabel_Second()
+    case 1: new WorkflowDurationLabel_Minute()
+    case 2: new WorkflowDurationLabel_Hour()
+    case 3: new WorkflowDurationLabel_Day()
+    case 4: new WorkflowDurationLabel_Week()
+    case 5: new WorkflowDurationLabel_Month()
+    case 6: new WorkflowDurationLabel_Year()
+    case _: throw new Error("no arm of WorkflowDurationLabel")
+  };
+}
+
+// The arm a `WorkflowSleepDuration` holds, from `WorkflowSleepDuration_arm`.
+export sealed class WorkflowSleepDuration_Arm {
+  case WorkflowSleepDuration_String(value: String)
+  case WorkflowSleepDuration_F64(value: f64)
+}
+export function WorkflowSleepDuration_arm(x: WorkflowSleepDuration): WorkflowSleepDuration_Arm {
+  let __r = x;
+  return match (__kind_WorkflowSleepDuration(__r)) {
+    case 0: new WorkflowSleepDuration_String(String.fromHandle(__r))
+    case 1: new WorkflowSleepDuration_F64(numberValue(__r))
+    case _: throw new Error("no arm of WorkflowSleepDuration")
+  };
+}
+
+// The arm a `WorkflowRetentionDuration` holds, from `WorkflowRetentionDuration_arm`.
+export sealed class WorkflowRetentionDuration_Arm {
+  case WorkflowRetentionDuration_String(value: String)
+  case WorkflowRetentionDuration_F64(value: f64)
+}
+export function WorkflowRetentionDuration_arm(x: WorkflowRetentionDuration): WorkflowRetentionDuration_Arm {
+  let __r = x;
+  return match (__kind_WorkflowRetentionDuration(__r)) {
+    case 0: new WorkflowRetentionDuration_String(String.fromHandle(__r))
+    case 1: new WorkflowRetentionDuration_F64(numberValue(__r))
+    case _: throw new Error("no arm of WorkflowRetentionDuration")
+  };
+}
+
+// The arm a `ExcludeCertVerificationStatusNone` holds, from `ExcludeCertVerificationStatusNone_arm`.
+export sealed class ExcludeCertVerificationStatusNone_Arm {
+  case ExcludeCertVerificationStatusNone_Success
+  case ExcludeCertVerificationStatusNone_FailedselfSignedCertificate
+  case ExcludeCertVerificationStatusNone_FailedunableToVerifyTheFirstCertificate
+  case ExcludeCertVerificationStatusNone_FailedcertificateIsNotYetValid
+  case ExcludeCertVerificationStatusNone_FailedcertificateHasExpired
+  case ExcludeCertVerificationStatusNone_Failed
+}
+export function ExcludeCertVerificationStatusNone_arm(x: ExcludeCertVerificationStatusNone): ExcludeCertVerificationStatusNone_Arm {
+  let __r = x.handle;
+  return match (__kind_ExcludeCertVerificationStatusNone(__r)) {
+    case 0: new ExcludeCertVerificationStatusNone_Success()
+    case 1: new ExcludeCertVerificationStatusNone_FailedselfSignedCertificate()
+    case 2: new ExcludeCertVerificationStatusNone_FailedunableToVerifyTheFirstCertificate()
+    case 3: new ExcludeCertVerificationStatusNone_FailedcertificateIsNotYetValid()
+    case 4: new ExcludeCertVerificationStatusNone_FailedcertificateHasExpired()
+    case 5: new ExcludeCertVerificationStatusNone_Failed()
+    case _: throw new Error("no arm of ExcludeCertVerificationStatusNone")
+  };
+}
+
+// The arm a `FetchReturnKind` holds, from `FetchReturnKind_arm`.
+export sealed class FetchReturnKind_Arm {
+  case FetchReturnKind_Response(value: Response)
+  case FetchReturnKind_Promise(value: externref)
+}
+export function FetchReturnKind_arm(x: FetchReturnKind): FetchReturnKind_Arm {
+  let __r = x;
+  return match (__kind_FetchReturnKind(__r)) {
+    case 0: new FetchReturnKind_Response(new Response(__r))
+    case 1: new FetchReturnKind_Promise(__r)
+    case _: throw new Error("no arm of FetchReturnKind")
+  };
+}
+
+// The arm a `GenerateKeyReturnKind` holds, from `GenerateKeyReturnKind_arm`.
+export sealed class GenerateKeyReturnKind_Arm {
+  case GenerateKeyReturnKind_CryptoKey(value: CryptoKey)
+  case GenerateKeyReturnKind_CryptoKeyPair(value: CryptoKeyPair)
+}
+export function GenerateKeyReturnKind_arm(x: GenerateKeyReturnKind): GenerateKeyReturnKind_Arm {
+  let __r = x;
+  return match (__kind_GenerateKeyReturnKind(__r)) {
+    case 0: new GenerateKeyReturnKind_CryptoKey(new CryptoKey(__r))
+    case _: new GenerateKeyReturnKind_CryptoKeyPair(new CryptoKeyPair(__r))
+  };
+}
+
+// The arm a `ExportKeyReturnKind` holds, from `ExportKeyReturnKind_arm`.
+export sealed class ExportKeyReturnKind_Arm {
+  case ExportKeyReturnKind_ArrayBuffer(value: externref)
+  case ExportKeyReturnKind_JsonWebKey(value: JsonWebKey)
+}
+export function ExportKeyReturnKind_arm(x: ExportKeyReturnKind): ExportKeyReturnKind_Arm {
+  let __r = x;
+  return match (__kind_ExportKeyReturnKind(__r)) {
+    case 0: new ExportKeyReturnKind_ArrayBuffer(__r)
+    case _: new ExportKeyReturnKind_JsonWebKey(new JsonWebKey(__r))
+  };
+}
+
+// The arm a `SaltKind` holds, from `SaltKind_arm`.
+export sealed class SaltKind_Arm {
+  case SaltKind_ArrayBuffer(value: externref)
+  case SaltKind_Uint8Array(value: externref)
+}
+export function SaltKind_arm(x: SaltKind): SaltKind_Arm {
+  let __r = x;
+  return match (__kind_SaltKind(__r)) {
+    case 0: new SaltKind_ArrayBuffer(__r)
+    case 1: new SaltKind_Uint8Array(__r)
+    case _: throw new Error("no arm of SaltKind")
+  };
+}
+
+// The arm a `HashKind` holds, from `HashKind_arm`.
+export sealed class HashKind_Arm {
+  case HashKind_String(value: String)
+  case HashKind_SubtleCryptoHashAlgorithm(value: SubtleCryptoHashAlgorithm)
+}
+export function HashKind_arm(x: HashKind): HashKind_Arm {
+  let __r = x;
+  return match (__kind_HashKind(__r)) {
+    case 0: new HashKind_String(String.fromHandle(__r))
+    case _: new HashKind_SubtleCryptoHashAlgorithm(new SubtleCryptoHashAlgorithm(__r))
+  };
+}
+
+// The arm a `BytesWrittenKind` holds, from `BytesWrittenKind_arm`.
+export sealed class BytesWrittenKind_Arm {
+  case BytesWrittenKind_F64(value: f64)
+  case BytesWrittenKind_BigInt(value: externref)
+}
+export function BytesWrittenKind_arm(x: BytesWrittenKind): BytesWrittenKind_Arm {
+  let __r = x;
+  return match (__kind_BytesWrittenKind(__r)) {
+    case 0: new BytesWrittenKind_F64(numberValue(__r))
+    case 1: new BytesWrittenKind_BigInt(__r)
+    case _: throw new Error("no arm of BytesWrittenKind")
+  };
+}
+
+// The arm a `DataKind` holds, from `DataKind_arm`.
+export sealed class DataKind_Arm {
+  case DataKind_ArrayBuffer(value: externref)
+  case DataKind_String(value: String)
+}
+export function DataKind_arm(x: DataKind): DataKind_Arm {
+  let __r = x;
+  return match (__kind_DataKind(__r)) {
+    case 0: new DataKind_ArrayBuffer(__r)
+    case 1: new DataKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of DataKind")
+  };
+}
+
+// The arm a `TypeKind` holds, from `TypeKind_arm`.
+export sealed class TypeKind_Arm {
+  case TypeKind_Default
+  case TypeKind_Error
+}
+export function TypeKind_arm(x: TypeKind): TypeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_TypeKind(__r)) {
+    case 0: new TypeKind_Default()
+    case 1: new TypeKind_Error()
+    case _: throw new Error("no arm of TypeKind")
+  };
+}
+
+// The arm a `HeadersKind` holds, from `HeadersKind_arm`.
+export sealed class HeadersKind_Arm {
+  case HeadersKind_Headers(value: Headers)
+  case HeadersKind_Record(value: externref)
+  case HeadersKind_JsValue(value: externref)
+}
+export function HeadersKind_arm(x: HeadersKind): HeadersKind_Arm {
+  let __r = x;
+  return match (__kind_HeadersKind(__r)) {
+    case 0: new HeadersKind_Headers(new Headers(__r))
+    case 1: new HeadersKind_Record(__r)
+    case 2: new HeadersKind_JsValue(__r)
+    case _: throw new Error("no arm of HeadersKind")
+  };
+}
+
+// The arm a `EncodeBodyKind` holds, from `EncodeBodyKind_arm`.
+export sealed class EncodeBodyKind_Arm {
+  case EncodeBodyKind_Automatic
+  case EncodeBodyKind_Manual
+}
+export function EncodeBodyKind_arm(x: EncodeBodyKind): EncodeBodyKind_Arm {
+  let __r = x.handle;
+  return match (__kind_EncodeBodyKind(__r)) {
+    case 0: new EncodeBodyKind_Automatic()
+    case 1: new EncodeBodyKind_Manual()
+    case _: throw new Error("no arm of EncodeBodyKind")
+  };
+}
+
+// The arm a `CacheKind` holds, from `CacheKind_arm`.
+export sealed class CacheKind_Arm {
+  case CacheKind_NoStore
+  case CacheKind_NoCache
+}
+export function CacheKind_arm(x: CacheKind): CacheKind_Arm {
+  let __r = x.handle;
+  return match (__kind_CacheKind(__r)) {
+    case 0: new CacheKind_NoStore()
+    case 1: new CacheKind_NoCache()
+    case _: throw new Error("no arm of CacheKind")
+  };
+}
+
+// The arm a `BodyKind` holds, from `BodyKind_arm`.
+export sealed class BodyKind_Arm {
+  case BodyKind_ReadableStream(value: ReadableStream)
+  case BodyKind_String(value: String)
+  case BodyKind_ArrayBuffer(value: externref)
+  case BodyKind_Uint8Array(value: externref)
+  case BodyKind_Blob(value: Blob)
+  case BodyKind_UrlSearchParams(value: URLSearchParams)
+  case BodyKind_FormData(value: FormData)
+  case BodyKind_JsValue(value: externref)
+}
+export function BodyKind_arm(x: BodyKind): BodyKind_Arm {
+  let __r = x;
+  return match (__kind_BodyKind(__r)) {
+    case 0: new BodyKind_ReadableStream(new ReadableStream(__r))
+    case 1: new BodyKind_String(String.fromHandle(__r))
+    case 2: new BodyKind_ArrayBuffer(__r)
+    case 3: new BodyKind_Uint8Array(__r)
+    case 4: new BodyKind_Blob(new Blob(__r))
+    case 5: new BodyKind_UrlSearchParams(new URLSearchParams(__r))
+    case 6: new BodyKind_FormData(new FormData(__r))
+    case 7: new BodyKind_JsValue(__r)
+    case _: throw new Error("no arm of BodyKind")
+  };
+}
+
+// The arm a `OnlyIfKind` holds, from `OnlyIfKind_arm`.
+export sealed class OnlyIfKind_Arm {
+  case OnlyIfKind_Headers(value: Headers)
+  case OnlyIfKind_R2Conditional(value: R2Conditional)
+}
+export function OnlyIfKind_arm(x: OnlyIfKind): OnlyIfKind_Arm {
+  let __r = x;
+  return match (__kind_OnlyIfKind(__r)) {
+    case 0: new OnlyIfKind_Headers(new Headers(__r))
+    case _: new OnlyIfKind_R2Conditional(new R2Conditional(__r))
+  };
+}
+
+// The arm a `RangeKind` holds, from `RangeKind_arm`.
+export sealed class RangeKind_Arm {
+  case RangeKind_Headers(value: Headers)
+  case RangeKind_R2Range(value: R2Range)
+}
+export function RangeKind_arm(x: RangeKind): RangeKind_Arm {
+  let __r = x;
+  return match (__kind_RangeKind(__r)) {
+    case 0: new RangeKind_Headers(new Headers(__r))
+    case _: new RangeKind_R2Range(new R2Range(__r))
+  };
+}
+
+// The arm a `HttpMetadataKind` holds, from `HttpMetadataKind_arm`.
+export sealed class HttpMetadataKind_Arm {
+  case HttpMetadataKind_Headers(value: Headers)
+  case HttpMetadataKind_R2HttpMetadata(value: R2HTTPMetadata)
+}
+export function HttpMetadataKind_arm(x: HttpMetadataKind): HttpMetadataKind_Arm {
+  let __r = x;
+  return match (__kind_HttpMetadataKind(__r)) {
+    case 0: new HttpMetadataKind_Headers(new Headers(__r))
+    case _: new HttpMetadataKind_R2HttpMetadata(new R2HTTPMetadata(__r))
+  };
+}
+
+// The arm a `Md5Kind` holds, from `Md5Kind_arm`.
+export sealed class Md5Kind_Arm {
+  case Md5Kind_ArrayBuffer(value: externref)
+  case Md5Kind_Uint8Array(value: externref)
+  case Md5Kind_String(value: String)
+}
+export function Md5Kind_arm(x: Md5Kind): Md5Kind_Arm {
+  let __r = x;
+  return match (__kind_Md5Kind(__r)) {
+    case 0: new Md5Kind_ArrayBuffer(__r)
+    case 1: new Md5Kind_Uint8Array(__r)
+    case 2: new Md5Kind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of Md5Kind")
+  };
+}
+
+// The arm a `BinaryTypeKind` holds, from `BinaryTypeKind_arm`.
+export sealed class BinaryTypeKind_Arm {
+  case BinaryTypeKind_Blob
+  case BinaryTypeKind_Arraybuffer
+}
+export function BinaryTypeKind_arm(x: BinaryTypeKind): BinaryTypeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_BinaryTypeKind(__r)) {
+    case 0: new BinaryTypeKind_Blob()
+    case 1: new BinaryTypeKind_Arraybuffer()
+    case _: throw new Error("no arm of BinaryTypeKind")
+  };
+}
+
+// The arm a `SecureTransportKind` holds, from `SecureTransportKind_arm`.
+export sealed class SecureTransportKind_Arm {
+  case SecureTransportKind_On
+  case SecureTransportKind_Off
+  case SecureTransportKind_Starttls
+}
+export function SecureTransportKind_arm(x: SecureTransportKind): SecureTransportKind_Arm {
+  let __r = x.handle;
+  return match (__kind_SecureTransportKind(__r)) {
+    case 0: new SecureTransportKind_On()
+    case 1: new SecureTransportKind_Off()
+    case 2: new SecureTransportKind_Starttls()
+    case _: throw new Error("no arm of SecureTransportKind")
+  };
+}
+
+// The arm a `AiSearchConfigTypeKind` holds, from `AiSearchConfigTypeKind_arm`.
+export sealed class AiSearchConfigTypeKind_Arm {
+  case AiSearchConfigTypeKind_R2
+  case AiSearchConfigTypeKind_WebCrawler
+}
+export function AiSearchConfigTypeKind_arm(x: AiSearchConfigTypeKind): AiSearchConfigTypeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_AiSearchConfigTypeKind(__r)) {
+    case 0: new AiSearchConfigTypeKind_R2()
+    case 1: new AiSearchConfigTypeKind_WebCrawler()
+    case _: throw new Error("no arm of AiSearchConfigTypeKind")
+  };
+}
+
+// The arm a `ChatCompletionsReturnKind` holds, from `ChatCompletionsReturnKind_arm`.
+export sealed class ChatCompletionsReturnKind_Arm {
+  case ChatCompletionsReturnKind_Response(value: Response)
+  case ChatCompletionsReturnKind_Object(value: externref)
+}
+export function ChatCompletionsReturnKind_arm(x: ChatCompletionsReturnKind): ChatCompletionsReturnKind_Arm {
+  let __r = x;
+  return match (__kind_ChatCompletionsReturnKind(__r)) {
+    case 0: new ChatCompletionsReturnKind_Response(new Response(__r))
+    case _: new ChatCompletionsReturnKind_Object(__r)
+  };
+}
+
+// The arm a `TextKind` holds, from `TextKind_arm`.
+export sealed class TextKind_Arm {
+  case TextKind_String(value: String)
+  case TextKind_VecOfString(value: externref)
+}
+export function TextKind_arm(x: TextKind): TextKind_Arm {
+  let __r = x;
+  return match (__kind_TextKind(__r)) {
+    case 0: new TextKind_String(String.fromHandle(__r))
+    case 1: new TextKind_VecOfString(__r)
+    case _: throw new Error("no arm of TextKind")
+  };
+}
+
+// The arm a `RoleKind` holds, from `RoleKind_arm`.
+export sealed class RoleKind_Arm {
+  case RoleKind_User
+  case RoleKind_Assistant
+  case RoleKind_System
+  case RoleKind_Tool
+  case RoleKind_String(value: String)
+}
+export function RoleKind_arm(x: RoleKind): RoleKind_Arm {
+  let __r = x.handle;
+  return match (__kind_RoleKind(__r)) {
+    case 0: new RoleKind_User()
+    case 1: new RoleKind_Assistant()
+    case 2: new RoleKind_System()
+    case 3: new RoleKind_Tool()
+    case 4: new RoleKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of RoleKind")
+  };
+}
+
+// The arm a `AiTextGenerationToolInputTypeKind` holds, from `AiTextGenerationToolInputTypeKind_arm`.
+export sealed class AiTextGenerationToolInputTypeKind_Arm {
+  case AiTextGenerationToolInputTypeKind_Function
+  case AiTextGenerationToolInputTypeKind_String(value: String)
+}
+export function AiTextGenerationToolInputTypeKind_arm(x: AiTextGenerationToolInputTypeKind): AiTextGenerationToolInputTypeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_AiTextGenerationToolInputTypeKind(__r)) {
+    case 0: new AiTextGenerationToolInputTypeKind_Function()
+    case 1: new AiTextGenerationToolInputTypeKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of AiTextGenerationToolInputTypeKind")
+  };
+}
+
+// The arm a `ToolsKind` holds, from `ToolsKind_arm`.
+export sealed class ToolsKind_Arm {
+  case ToolsKind_VecOfAiTextGenerationToolInput(value: externref)
+  case ToolsKind_VecOfAiTextGenerationToolLegacyInput(value: externref)
+  case ToolsKind_Object(value: externref)
+}
+export function ToolsKind_arm(x: ToolsKind): ToolsKind_Arm {
+  let __r = x;
+  return match (__kind_ToolsKind(__r)) {
+    case 0: new ToolsKind_VecOfAiTextGenerationToolInput(__r)
+    case 1: new ToolsKind_VecOfAiTextGenerationToolLegacyInput(__r)
+    case _: new ToolsKind_Object(__r)
+  };
+}
+
+// The arm a `ConversationKind` holds, from `ConversationKind_arm`.
+export sealed class ConversationKind_Arm {
+  case ConversationKind_String(value: String)
+  case ConversationKind_ResponseConversationParam(value: ResponseConversationParam)
+}
+export function ConversationKind_arm(x: ConversationKind): ConversationKind_Arm {
+  let __r = x;
+  return match (__kind_ConversationKind(__r)) {
+    case 0: new ConversationKind_String(String.fromHandle(__r))
+    case _: new ConversationKind_ResponseConversationParam(new ResponseConversationParam(__r))
+  };
+}
+
+// The arm a `InputKind` holds, from `InputKind_arm`.
+export sealed class InputKind_Arm {
+  case InputKind_String(value: String)
+  case InputKind_ResponseInput(value: externref)
+}
+export function InputKind_arm(x: InputKind): InputKind_Arm {
+  let __r = x;
+  return match (__kind_InputKind(__r)) {
+    case 0: new InputKind_String(String.fromHandle(__r))
+    case 1: new InputKind_ResponseInput(__r)
+    case _: throw new Error("no arm of InputKind")
+  };
+}
+
+// The arm a `ServiceTierKind` holds, from `ServiceTierKind_arm`.
+export sealed class ServiceTierKind_Arm {
+  case ServiceTierKind_Auto
+  case ServiceTierKind_Default
+  case ServiceTierKind_Flex
+  case ServiceTierKind_Scale
+  case ServiceTierKind_Priority
+}
+export function ServiceTierKind_arm(x: ServiceTierKind): ServiceTierKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ServiceTierKind(__r)) {
+    case 0: new ServiceTierKind_Auto()
+    case 1: new ServiceTierKind_Default()
+    case 2: new ServiceTierKind_Flex()
+    case 3: new ServiceTierKind_Scale()
+    case 4: new ServiceTierKind_Priority()
+    case _: throw new Error("no arm of ServiceTierKind")
+  };
+}
+
+// The arm a `ToolChoiceKind` holds, from `ToolChoiceKind_arm`.
+export sealed class ToolChoiceKind_Arm {
+  case ToolChoiceKind_ToolChoiceOptions(value: ToolChoiceOptions)
+  case ToolChoiceKind_ToolChoiceFunction(value: ToolChoiceFunction)
+}
+export function ToolChoiceKind_arm(x: ToolChoiceKind): ToolChoiceKind_Arm {
+  let __r = x;
+  return match (__kind_ToolChoiceKind(__r)) {
+    case 0: new ToolChoiceKind_ToolChoiceOptions(String.fromHandle(__r))
+    case _: new ToolChoiceKind_ToolChoiceFunction(new ToolChoiceFunction(__r))
+  };
+}
+
+// The arm a `TruncationKind` holds, from `TruncationKind_arm`.
+export sealed class TruncationKind_Arm {
+  case TruncationKind_Auto
+  case TruncationKind_Disabled
+}
+export function TruncationKind_arm(x: TruncationKind): TruncationKind_Arm {
+  let __r = x.handle;
+  return match (__kind_TruncationKind(__r)) {
+    case 0: new TruncationKind_Auto()
+    case 1: new TruncationKind_Disabled()
+    case _: throw new Error("no arm of TruncationKind")
+  };
+}
+
+// The arm a `InstructionsKind` holds, from `InstructionsKind_arm`.
+export sealed class InstructionsKind_Arm {
+  case InstructionsKind_String(value: String)
+  case InstructionsKind_VecOfResponseInputItem(value: externref)
+}
+export function InstructionsKind_arm(x: InstructionsKind): InstructionsKind_Arm {
+  let __r = x;
+  return match (__kind_InstructionsKind(__r)) {
+    case 0: new InstructionsKind_String(String.fromHandle(__r))
+    case 1: new InstructionsKind_VecOfResponseInputItem(__r)
+    case _: throw new Error("no arm of InstructionsKind")
+  };
+}
+
+// The arm a `ContentKind` holds, from `ContentKind_arm`.
+export sealed class ContentKind_Arm {
+  case ContentKind_String(value: String)
+  case ContentKind_ResponseInputMessageContentList(value: externref)
+}
+export function ContentKind_arm(x: ContentKind): ContentKind_Arm {
+  let __r = x;
+  return match (__kind_ContentKind(__r)) {
+    case 0: new ContentKind_String(String.fromHandle(__r))
+    case 1: new ContentKind_ResponseInputMessageContentList(__r)
+    case _: throw new Error("no arm of ContentKind")
+  };
+}
+
+// The arm a `EasyInputMessageRoleKind` holds, from `EasyInputMessageRoleKind_arm`.
+export sealed class EasyInputMessageRoleKind_Arm {
+  case EasyInputMessageRoleKind_User
+  case EasyInputMessageRoleKind_Assistant
+  case EasyInputMessageRoleKind_System
+  case EasyInputMessageRoleKind_Developer
+}
+export function EasyInputMessageRoleKind_arm(x: EasyInputMessageRoleKind): EasyInputMessageRoleKind_Arm {
+  let __r = x.handle;
+  return match (__kind_EasyInputMessageRoleKind(__r)) {
+    case 0: new EasyInputMessageRoleKind_User()
+    case 1: new EasyInputMessageRoleKind_Assistant()
+    case 2: new EasyInputMessageRoleKind_System()
+    case 3: new EasyInputMessageRoleKind_Developer()
+    case _: throw new Error("no arm of EasyInputMessageRoleKind")
+  };
+}
+
+// The arm a `ReasonKind` holds, from `ReasonKind_arm`.
+export sealed class ReasonKind_Arm {
+  case ReasonKind_MaxOutputTokens
+  case ReasonKind_ContentFilter
+}
+export function ReasonKind_arm(x: ReasonKind): ReasonKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ReasonKind(__r)) {
+    case 0: new ReasonKind_MaxOutputTokens()
+    case 1: new ReasonKind_ContentFilter()
+    case _: throw new Error("no arm of ReasonKind")
+  };
+}
+
+// The arm a `EffortKind` holds, from `EffortKind_arm`.
+export sealed class EffortKind_Arm {
+  case EffortKind_Minimal
+  case EffortKind_Low
+  case EffortKind_Medium
+  case EffortKind_High
+}
+export function EffortKind_arm(x: EffortKind): EffortKind_Arm {
+  let __r = x.handle;
+  return match (__kind_EffortKind(__r)) {
+    case 0: new EffortKind_Minimal()
+    case 1: new EffortKind_Low()
+    case 2: new EffortKind_Medium()
+    case 3: new EffortKind_High()
+    case _: throw new Error("no arm of EffortKind")
+  };
+}
+
+// The arm a `GenerateSummaryKind` holds, from `GenerateSummaryKind_arm`.
+export sealed class GenerateSummaryKind_Arm {
+  case GenerateSummaryKind_Auto
+  case GenerateSummaryKind_Concise
+  case GenerateSummaryKind_Detailed
+}
+export function GenerateSummaryKind_arm(x: GenerateSummaryKind): GenerateSummaryKind_Arm {
+  let __r = x.handle;
+  return match (__kind_GenerateSummaryKind(__r)) {
+    case 0: new GenerateSummaryKind_Auto()
+    case 1: new GenerateSummaryKind_Concise()
+    case 2: new GenerateSummaryKind_Detailed()
+    case _: throw new Error("no arm of GenerateSummaryKind")
+  };
+}
+
+// The arm a `OutputKind` holds, from `OutputKind_arm`.
+export sealed class OutputKind_Arm {
+  case OutputKind_String(value: String)
+  case OutputKind_VecOfJsValue(value: externref)
+}
+export function OutputKind_arm(x: OutputKind): OutputKind_Arm {
+  let __r = x;
+  return match (__kind_OutputKind(__r)) {
+    case 0: new OutputKind_String(String.fromHandle(__r))
+    case 1: new OutputKind_VecOfJsValue(__r)
+    case _: throw new Error("no arm of OutputKind")
+  };
+}
+
+// The arm a `CodeKind` holds, from `CodeKind_arm`.
+export sealed class CodeKind_Arm {
+  case CodeKind_ServerError
+  case CodeKind_RateLimitExceeded
+  case CodeKind_InvalidPrompt
+  case CodeKind_VectorStoreTimeout
+  case CodeKind_InvalidImage
+  case CodeKind_InvalidImageFormat
+  case CodeKind_InvalidBase64Image
+  case CodeKind_InvalidImageUrl
+  case CodeKind_ImageTooLarge
+  case CodeKind_ImageTooSmall
+  case CodeKind_ImageParseError
+  case CodeKind_ImageContentPolicyViolation
+  case CodeKind_InvalidImageMode
+  case CodeKind_ImageFileTooLarge
+  case CodeKind_UnsupportedImageMediaType
+  case CodeKind_EmptyImageFile
+  case CodeKind_FailedToDownloadImage
+  case CodeKind_ImageFileNotFound
+}
+export function CodeKind_arm(x: CodeKind): CodeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_CodeKind(__r)) {
+    case 0: new CodeKind_ServerError()
+    case 1: new CodeKind_RateLimitExceeded()
+    case 2: new CodeKind_InvalidPrompt()
+    case 3: new CodeKind_VectorStoreTimeout()
+    case 4: new CodeKind_InvalidImage()
+    case 5: new CodeKind_InvalidImageFormat()
+    case 6: new CodeKind_InvalidBase64Image()
+    case 7: new CodeKind_InvalidImageUrl()
+    case 8: new CodeKind_ImageTooLarge()
+    case 9: new CodeKind_ImageTooSmall()
+    case 10: new CodeKind_ImageParseError()
+    case 11: new CodeKind_ImageContentPolicyViolation()
+    case 12: new CodeKind_InvalidImageMode()
+    case 13: new CodeKind_ImageFileTooLarge()
+    case 14: new CodeKind_UnsupportedImageMediaType()
+    case 15: new CodeKind_EmptyImageFile()
+    case 16: new CodeKind_FailedToDownloadImage()
+    case 17: new CodeKind_ImageFileNotFound()
+    case _: throw new Error("no arm of CodeKind")
+  };
+}
+
+// The arm a `StatusKind` holds, from `StatusKind_arm`.
+export sealed class StatusKind_Arm {
+  case StatusKind_InProgress
+  case StatusKind_Completed
+  case StatusKind_Incomplete
+}
+export function StatusKind_arm(x: StatusKind): StatusKind_Arm {
+  let __r = x.handle;
+  return match (__kind_StatusKind(__r)) {
+    case 0: new StatusKind_InProgress()
+    case 1: new StatusKind_Completed()
+    case 2: new StatusKind_Incomplete()
+    case _: throw new Error("no arm of StatusKind")
+  };
+}
+
+// The arm a `DetailKind` holds, from `DetailKind_arm`.
+export sealed class DetailKind_Arm {
+  case DetailKind_Low
+  case DetailKind_High
+  case DetailKind_Auto
+}
+export function DetailKind_arm(x: DetailKind): DetailKind_Arm {
+  let __r = x.handle;
+  return match (__kind_DetailKind(__r)) {
+    case 0: new DetailKind_Low()
+    case 1: new DetailKind_High()
+    case 2: new DetailKind_Auto()
+    case _: throw new Error("no arm of DetailKind")
+  };
+}
+
+// The arm a `ResponseInputItemFunctionCallOutputOutputKind` holds, from `ResponseInputItemFunctionCallOutputOutputKind_arm`.
+export sealed class ResponseInputItemFunctionCallOutputOutputKind_Arm {
+  case ResponseInputItemFunctionCallOutputOutputKind_String(value: String)
+  case ResponseInputItemFunctionCallOutputOutputKind_ResponseFunctionCallOutputItemList(value: externref)
+}
+export function ResponseInputItemFunctionCallOutputOutputKind_arm(x: ResponseInputItemFunctionCallOutputOutputKind): ResponseInputItemFunctionCallOutputOutputKind_Arm {
+  let __r = x;
+  return match (__kind_ResponseInputItemFunctionCallOutputOutputKind(__r)) {
+    case 0: new ResponseInputItemFunctionCallOutputOutputKind_String(String.fromHandle(__r))
+    case 1: new ResponseInputItemFunctionCallOutputOutputKind_ResponseFunctionCallOutputItemList(__r)
+    case _: throw new Error("no arm of ResponseInputItemFunctionCallOutputOutputKind")
+  };
+}
+
+// The arm a `ResponseInputItemMessageRoleKind` holds, from `ResponseInputItemMessageRoleKind_arm`.
+export sealed class ResponseInputItemMessageRoleKind_Arm {
+  case ResponseInputItemMessageRoleKind_User
+  case ResponseInputItemMessageRoleKind_System
+  case ResponseInputItemMessageRoleKind_Developer
+}
+export function ResponseInputItemMessageRoleKind_arm(x: ResponseInputItemMessageRoleKind): ResponseInputItemMessageRoleKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ResponseInputItemMessageRoleKind(__r)) {
+    case 0: new ResponseInputItemMessageRoleKind_User()
+    case 1: new ResponseInputItemMessageRoleKind_System()
+    case 2: new ResponseInputItemMessageRoleKind_Developer()
+    case _: throw new Error("no arm of ResponseInputItemMessageRoleKind")
+  };
+}
+
+// The arm a `VerbosityKind` holds, from `VerbosityKind_arm`.
+export sealed class VerbosityKind_Arm {
+  case VerbosityKind_Low
+  case VerbosityKind_Medium
+  case VerbosityKind_High
+}
+export function VerbosityKind_arm(x: VerbosityKind): VerbosityKind_Arm {
+  let __r = x.handle;
+  return match (__kind_VerbosityKind(__r)) {
+    case 0: new VerbosityKind_Low()
+    case 1: new VerbosityKind_Medium()
+    case 2: new VerbosityKind_High()
+    case _: throw new Error("no arm of VerbosityKind")
+  };
+}
+
+// The arm a `PoolingKind` holds, from `PoolingKind_arm`.
+export sealed class PoolingKind_Arm {
+  case PoolingKind_Mean
+  case PoolingKind_Cls
+}
+export function PoolingKind_arm(x: PoolingKind): PoolingKind_Arm {
+  let __r = x.handle;
+  return match (__kind_PoolingKind(__r)) {
+    case 0: new PoolingKind_Mean()
+    case 1: new PoolingKind_Cls()
+    case _: throw new Error("no arm of PoolingKind")
+  };
+}
+
+// The arm a `ImageKind` holds, from `ImageKind_arm`.
+export sealed class ImageKind_Arm {
+  case ImageKind_VecOfF64(value: externref)
+  case ImageKind_String(value: String)
+}
+export function ImageKind_arm(x: ImageKind): ImageKind_Arm {
+  let __r = x;
+  return match (__kind_ImageKind(__r)) {
+    case 0: new ImageKind_VecOfF64(__r)
+    case 1: new ImageKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of ImageKind")
+  };
+}
+
+// The arm a `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind` holds, from `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind_arm`.
+export sealed class Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind_Arm {
+  case Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind_JsonObject
+  case Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind_JsonSchema
+}
+export function Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind_arm(x: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind): Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind(__r)) {
+    case 0: new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind_JsonObject()
+    case 1: new Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind_JsonSchema()
+    case _: throw new Error("no arm of Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind")
+  };
+}
+
+// The arm a `PostProcessedOutputsKind` holds, from `PostProcessedOutputsKind_arm`.
+export sealed class PostProcessedOutputsKind_Arm {
+  case PostProcessedOutputsKind_String(value: String)
+  case PostProcessedOutputsKind_Object(value: externref)
+}
+export function PostProcessedOutputsKind_arm(x: PostProcessedOutputsKind): PostProcessedOutputsKind_Arm {
+  let __r = x;
+  return match (__kind_PostProcessedOutputsKind(__r)) {
+    case 0: new PostProcessedOutputsKind_String(String.fromHandle(__r))
+    case _: new PostProcessedOutputsKind_Object(__r)
+  };
+}
+
+// The arm a `CustomTopicModeKind` holds, from `CustomTopicModeKind_arm`.
+export sealed class CustomTopicModeKind_Arm {
+  case CustomTopicModeKind_Extended
+  case CustomTopicModeKind_Strict
+}
+export function CustomTopicModeKind_arm(x: CustomTopicModeKind): CustomTopicModeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_CustomTopicModeKind(__r)) {
+    case 0: new CustomTopicModeKind_Extended()
+    case 1: new CustomTopicModeKind_Strict()
+    case _: throw new Error("no arm of CustomTopicModeKind")
+  };
+}
+
+// The arm a `EncodingKind` holds, from `EncodingKind_arm`.
+export sealed class EncodingKind_Arm {
+  case EncodingKind_Linear16
+  case EncodingKind_Flac
+  case EncodingKind_Mulaw
+  case EncodingKind_AmrNb
+  case EncodingKind_AmrWb
+  case EncodingKind_Opus
+  case EncodingKind_Speex
+  case EncodingKind_G729
+}
+export function EncodingKind_arm(x: EncodingKind): EncodingKind_Arm {
+  let __r = x.handle;
+  return match (__kind_EncodingKind(__r)) {
+    case 0: new EncodingKind_Linear16()
+    case 1: new EncodingKind_Flac()
+    case 2: new EncodingKind_Mulaw()
+    case 3: new EncodingKind_AmrNb()
+    case 4: new EncodingKind_AmrWb()
+    case 5: new EncodingKind_Opus()
+    case 6: new EncodingKind_Speex()
+    case 7: new EncodingKind_G729()
+    case _: throw new Error("no arm of EncodingKind")
+  };
+}
+
+// The arm a `ModeKind` holds, from `ModeKind_arm`.
+export sealed class ModeKind_Arm {
+  case ModeKind_General
+  case ModeKind_Medical
+  case ModeKind_Finance
+}
+export function ModeKind_arm(x: ModeKind): ModeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ModeKind(__r)) {
+    case 0: new ModeKind_General()
+    case 1: new ModeKind_Medical()
+    case 2: new ModeKind_Finance()
+    case _: throw new Error("no arm of ModeKind")
+  };
+}
+
+// The arm a `DtypeKind` holds, from `DtypeKind_arm`.
+export sealed class DtypeKind_Arm {
+  case DtypeKind_Uint8
+  case DtypeKind_Float32
+  case DtypeKind_Float64
+}
+export function DtypeKind_arm(x: DtypeKind): DtypeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_DtypeKind(__r)) {
+    case 0: new DtypeKind_Uint8()
+    case 1: new DtypeKind_Float32()
+    case 2: new DtypeKind_Float64()
+    case _: throw new Error("no arm of DtypeKind")
+  };
+}
+
+// The arm a `SpeakerKind` holds, from `SpeakerKind_arm`.
+export sealed class SpeakerKind_Arm {
+  case SpeakerKind_Angus
+  case SpeakerKind_Asteria
+  case SpeakerKind_Arcas
+  case SpeakerKind_Orion
+  case SpeakerKind_Orpheus
+  case SpeakerKind_Athena
+  case SpeakerKind_Luna
+  case SpeakerKind_Zeus
+  case SpeakerKind_Perseus
+  case SpeakerKind_Helios
+  case SpeakerKind_Hera
+  case SpeakerKind_Stella
+}
+export function SpeakerKind_arm(x: SpeakerKind): SpeakerKind_Arm {
+  let __r = x.handle;
+  return match (__kind_SpeakerKind(__r)) {
+    case 0: new SpeakerKind_Angus()
+    case 1: new SpeakerKind_Asteria()
+    case 2: new SpeakerKind_Arcas()
+    case 3: new SpeakerKind_Orion()
+    case 4: new SpeakerKind_Orpheus()
+    case 5: new SpeakerKind_Athena()
+    case 6: new SpeakerKind_Luna()
+    case 7: new SpeakerKind_Zeus()
+    case 8: new SpeakerKind_Perseus()
+    case 9: new SpeakerKind_Helios()
+    case 10: new SpeakerKind_Hera()
+    case 11: new SpeakerKind_Stella()
+    case _: throw new Error("no arm of SpeakerKind")
+  };
+}
+
+// The arm a `Ai_Cf_Deepgram_Aura_1_InputEncodingKind` holds, from `Ai_Cf_Deepgram_Aura_1_InputEncodingKind_arm`.
+export sealed class Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Arm {
+  case Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Linear16
+  case Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Flac
+  case Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Mulaw
+  case Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Alaw
+  case Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Mp3
+  case Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Opus
+  case Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Aac
+}
+export function Ai_Cf_Deepgram_Aura_1_InputEncodingKind_arm(x: Ai_Cf_Deepgram_Aura_1_InputEncodingKind): Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Arm {
+  let __r = x.handle;
+  return match (__kind_Ai_Cf_Deepgram_Aura_1_InputEncodingKind(__r)) {
+    case 0: new Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Linear16()
+    case 1: new Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Flac()
+    case 2: new Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Mulaw()
+    case 3: new Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Alaw()
+    case 4: new Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Mp3()
+    case 5: new Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Opus()
+    case 6: new Ai_Cf_Deepgram_Aura_1_InputEncodingKind_Aac()
+    case _: throw new Error("no arm of Ai_Cf_Deepgram_Aura_1_InputEncodingKind")
+  };
+}
+
+// The arm a `ContainerKind` holds, from `ContainerKind_arm`.
+export sealed class ContainerKind_Arm {
+  case ContainerKind_None
+  case ContainerKind_Wav
+  case ContainerKind_Ogg
+}
+export function ContainerKind_arm(x: ContainerKind): ContainerKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ContainerKind(__r)) {
+    case 0: new ContainerKind_None()
+    case 1: new ContainerKind_Wav()
+    case 2: new ContainerKind_Ogg()
+    case _: throw new Error("no arm of ContainerKind")
+  };
+}
+
+// The arm a `TargetLanguageKind` holds, from `TargetLanguageKind_arm`.
+export sealed class TargetLanguageKind_Arm {
+  case TargetLanguageKind_AsmBeng
+  case TargetLanguageKind_AwaDeva
+  case TargetLanguageKind_BenBeng
+  case TargetLanguageKind_BhoDeva
+  case TargetLanguageKind_BrxDeva
+  case TargetLanguageKind_DoiDeva
+  case TargetLanguageKind_EngLatn
+  case TargetLanguageKind_GomDeva
+  case TargetLanguageKind_GonDeva
+  case TargetLanguageKind_GujGujr
+  case TargetLanguageKind_HinDeva
+  case TargetLanguageKind_HneDeva
+  case TargetLanguageKind_KanKnda
+  case TargetLanguageKind_KasArab
+  case TargetLanguageKind_KasDeva
+  case TargetLanguageKind_KhaLatn
+  case TargetLanguageKind_LusLatn
+  case TargetLanguageKind_MagDeva
+  case TargetLanguageKind_MaiDeva
+  case TargetLanguageKind_MalMlym
+  case TargetLanguageKind_MarDeva
+  case TargetLanguageKind_MniBeng
+  case TargetLanguageKind_MniMtei
+  case TargetLanguageKind_NpiDeva
+  case TargetLanguageKind_OryOrya
+  case TargetLanguageKind_PanGuru
+  case TargetLanguageKind_SanDeva
+  case TargetLanguageKind_SatOlck
+  case TargetLanguageKind_SndArab
+  case TargetLanguageKind_SndDeva
+  case TargetLanguageKind_TamTaml
+  case TargetLanguageKind_TelTelu
+  case TargetLanguageKind_UrdArab
+  case TargetLanguageKind_UnrDeva
+}
+export function TargetLanguageKind_arm(x: TargetLanguageKind): TargetLanguageKind_Arm {
+  let __r = x.handle;
+  return match (__kind_TargetLanguageKind(__r)) {
+    case 0: new TargetLanguageKind_AsmBeng()
+    case 1: new TargetLanguageKind_AwaDeva()
+    case 2: new TargetLanguageKind_BenBeng()
+    case 3: new TargetLanguageKind_BhoDeva()
+    case 4: new TargetLanguageKind_BrxDeva()
+    case 5: new TargetLanguageKind_DoiDeva()
+    case 6: new TargetLanguageKind_EngLatn()
+    case 7: new TargetLanguageKind_GomDeva()
+    case 8: new TargetLanguageKind_GonDeva()
+    case 9: new TargetLanguageKind_GujGujr()
+    case 10: new TargetLanguageKind_HinDeva()
+    case 11: new TargetLanguageKind_HneDeva()
+    case 12: new TargetLanguageKind_KanKnda()
+    case 13: new TargetLanguageKind_KasArab()
+    case 14: new TargetLanguageKind_KasDeva()
+    case 15: new TargetLanguageKind_KhaLatn()
+    case 16: new TargetLanguageKind_LusLatn()
+    case 17: new TargetLanguageKind_MagDeva()
+    case 18: new TargetLanguageKind_MaiDeva()
+    case 19: new TargetLanguageKind_MalMlym()
+    case 20: new TargetLanguageKind_MarDeva()
+    case 21: new TargetLanguageKind_MniBeng()
+    case 22: new TargetLanguageKind_MniMtei()
+    case 23: new TargetLanguageKind_NpiDeva()
+    case 24: new TargetLanguageKind_OryOrya()
+    case 25: new TargetLanguageKind_PanGuru()
+    case 26: new TargetLanguageKind_SanDeva()
+    case 27: new TargetLanguageKind_SatOlck()
+    case 28: new TargetLanguageKind_SndArab()
+    case 29: new TargetLanguageKind_SndDeva()
+    case 30: new TargetLanguageKind_TamTaml()
+    case 31: new TargetLanguageKind_TelTelu()
+    case 32: new TargetLanguageKind_UrdArab()
+    case 33: new TargetLanguageKind_UnrDeva()
+    case _: throw new Error("no arm of TargetLanguageKind")
+  };
+}
+
+// The arm a `MipOptOutKind` holds, from `MipOptOutKind_arm`.
+export sealed class MipOptOutKind_Arm {
+  case MipOptOutKind_True
+  case MipOptOutKind_False
+}
+export function MipOptOutKind_arm(x: MipOptOutKind): MipOptOutKind_Arm {
+  let __r = x.handle;
+  return match (__kind_MipOptOutKind(__r)) {
+    case 0: new MipOptOutKind_True()
+    case 1: new MipOptOutKind_False()
+    case _: throw new Error("no arm of MipOptOutKind")
+  };
+}
+
+// The arm a `EventKind` holds, from `EventKind_arm`.
+export sealed class EventKind_Arm {
+  case EventKind_Update
+  case EventKind_StartOfTurn
+  case EventKind_EagerEndOfTurn
+  case EventKind_TurnResumed
+  case EventKind_EndOfTurn
+}
+export function EventKind_arm(x: EventKind): EventKind_Arm {
+  let __r = x.handle;
+  return match (__kind_EventKind(__r)) {
+    case 0: new EventKind_Update()
+    case 1: new EventKind_StartOfTurn()
+    case 2: new EventKind_EagerEndOfTurn()
+    case 3: new EventKind_TurnResumed()
+    case 4: new EventKind_EndOfTurn()
+    case _: throw new Error("no arm of EventKind")
+  };
+}
+
+// The arm a `Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind` holds, from `Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_arm`.
+export sealed class Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Arm {
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Amalthea
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Andromeda
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Apollo
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Arcas
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Aries
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Asteria
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Athena
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Atlas
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Aurora
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Callista
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Cora
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Cordelia
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Delia
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Draco
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Electra
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Harmonia
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Helena
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Hera
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Hermes
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Hyperion
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Iris
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Janus
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Juno
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Jupiter
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Luna
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Mars
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Minerva
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Neptune
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Odysseus
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Ophelia
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Orion
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Orpheus
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Pandora
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Phoebe
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Pluto
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Saturn
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Thalia
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Theia
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Vesta
+  case Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Zeus
+}
+export function Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_arm(x: Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind): Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Arm {
+  let __r = x.handle;
+  return match (__kind_Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind(__r)) {
+    case 0: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Amalthea()
+    case 1: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Andromeda()
+    case 2: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Apollo()
+    case 3: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Arcas()
+    case 4: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Aries()
+    case 5: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Asteria()
+    case 6: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Athena()
+    case 7: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Atlas()
+    case 8: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Aurora()
+    case 9: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Callista()
+    case 10: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Cora()
+    case 11: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Cordelia()
+    case 12: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Delia()
+    case 13: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Draco()
+    case 14: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Electra()
+    case 15: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Harmonia()
+    case 16: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Helena()
+    case 17: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Hera()
+    case 18: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Hermes()
+    case 19: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Hyperion()
+    case 20: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Iris()
+    case 21: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Janus()
+    case 22: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Juno()
+    case 23: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Jupiter()
+    case 24: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Luna()
+    case 25: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Mars()
+    case 26: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Minerva()
+    case 27: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Neptune()
+    case 28: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Odysseus()
+    case 29: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Ophelia()
+    case 30: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Orion()
+    case 31: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Orpheus()
+    case 32: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Pandora()
+    case 33: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Phoebe()
+    case 34: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Pluto()
+    case 35: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Saturn()
+    case 36: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Thalia()
+    case 37: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Theia()
+    case 38: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Vesta()
+    case 39: new Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind_Zeus()
+    case _: throw new Error("no arm of Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind")
+  };
+}
+
+// The arm a `Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind` holds, from `Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_arm`.
+export sealed class Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Arm {
+  case Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Sirio
+  case Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Nestor
+  case Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Carina
+  case Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Celeste
+  case Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Alvaro
+  case Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Diana
+  case Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Aquila
+  case Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Selena
+  case Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Estrella
+  case Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Javier
+}
+export function Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_arm(x: Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind): Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Arm {
+  let __r = x.handle;
+  return match (__kind_Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind(__r)) {
+    case 0: new Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Sirio()
+    case 1: new Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Nestor()
+    case 2: new Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Carina()
+    case 3: new Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Celeste()
+    case 4: new Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Alvaro()
+    case 5: new Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Diana()
+    case 6: new Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Aquila()
+    case 7: new Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Selena()
+    case 8: new Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Estrella()
+    case 9: new Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind_Javier()
+    case _: throw new Error("no arm of Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind")
+  };
+}
+
+// The arm a `MaxAttemptsKind` holds, from `MaxAttemptsKind_arm`.
+export sealed class MaxAttemptsKind_Arm {
+  case MaxAttemptsKind_N1
+  case MaxAttemptsKind_N2
+  case MaxAttemptsKind_N3
+  case MaxAttemptsKind_N4
+  case MaxAttemptsKind_N5
+}
+export function MaxAttemptsKind_arm(x: MaxAttemptsKind): MaxAttemptsKind_Arm {
+  let __r = x;
+  return match (__kind_MaxAttemptsKind(__r)) {
+    case 0: new MaxAttemptsKind_N1()
+    case 1: new MaxAttemptsKind_N2()
+    case 2: new MaxAttemptsKind_N3()
+    case 3: new MaxAttemptsKind_N4()
+    case 4: new MaxAttemptsKind_N5()
+    case _: throw new Error("no arm of MaxAttemptsKind")
+  };
+}
+
+// The arm a `BackoffKind` holds, from `BackoffKind_arm`.
+export sealed class BackoffKind_Arm {
+  case BackoffKind_Constant
+  case BackoffKind_Linear
+  case BackoffKind_Exponential
+}
+export function BackoffKind_arm(x: BackoffKind): BackoffKind_Arm {
+  let __r = x.handle;
+  return match (__kind_BackoffKind(__r)) {
+    case 0: new BackoffKind_Constant()
+    case 1: new BackoffKind_Linear()
+    case 2: new BackoffKind_Exponential()
+    case _: throw new Error("no arm of BackoffKind")
+  };
+}
+
+// The arm a `FeedbackKind` holds, from `FeedbackKind_arm`.
+export sealed class FeedbackKind_Arm {
+  case FeedbackKind_Neg1
+  case FeedbackKind_N1
+}
+export function FeedbackKind_arm(x: FeedbackKind): FeedbackKind_Arm {
+  let __r = x;
+  return match (__kind_FeedbackKind(__r)) {
+    case 0: new FeedbackKind_Neg1()
+    case 1: new FeedbackKind_N1()
+    case _: throw new Error("no arm of FeedbackKind")
+  };
+}
+
+// The arm a `CfAigMetadataKind` holds, from `CfAigMetadataKind_arm`.
+export sealed class CfAigMetadataKind_Arm {
+  case CfAigMetadataKind_String(value: String)
+  case CfAigMetadataKind_Record(value: externref)
+}
+export function CfAigMetadataKind_arm(x: CfAigMetadataKind): CfAigMetadataKind_Arm {
+  let __r = x;
+  return match (__kind_CfAigMetadataKind(__r)) {
+    case 0: new CfAigMetadataKind_String(String.fromHandle(__r))
+    case _: new CfAigMetadataKind_Record(__r)
+  };
+}
+
+// The arm a `CfAigCacheTtlKind` holds, from `CfAigCacheTtlKind_arm`.
+export sealed class CfAigCacheTtlKind_Arm {
+  case CfAigCacheTtlKind_F64(value: f64)
+  case CfAigCacheTtlKind_String(value: String)
+}
+export function CfAigCacheTtlKind_arm(x: CfAigCacheTtlKind): CfAigCacheTtlKind_Arm {
+  let __r = x;
+  return match (__kind_CfAigCacheTtlKind(__r)) {
+    case 0: new CfAigCacheTtlKind_F64(numberValue(__r))
+    case 1: new CfAigCacheTtlKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of CfAigCacheTtlKind")
+  };
+}
+
+// The arm a `CfAigSkipCacheKind` holds, from `CfAigSkipCacheKind_arm`.
+export sealed class CfAigSkipCacheKind_Arm {
+  case CfAigSkipCacheKind_Bool(value: externref)
+  case CfAigSkipCacheKind_String(value: String)
+}
+export function CfAigSkipCacheKind_arm(x: CfAigSkipCacheKind): CfAigSkipCacheKind_Arm {
+  let __r = x;
+  return match (__kind_CfAigSkipCacheKind(__r)) {
+    case 0: new CfAigSkipCacheKind_Bool(__r)
+    case 1: new CfAigSkipCacheKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of CfAigSkipCacheKind")
+  };
+}
+
+// The arm a `ProviderKind` holds, from `ProviderKind_arm`.
+export sealed class ProviderKind_Arm {
+  case ProviderKind_AiGatewayProviders(value: AIGatewayProviders)
+  case ProviderKind_String(value: String)
+}
+export function ProviderKind_arm(x: ProviderKind): ProviderKind_Arm {
+  let __r = x;
+  return match (__kind_ProviderKind(__r)) {
+    case 0: new ProviderKind_AiGatewayProviders(String.fromHandle(__r))
+    case 1: new ProviderKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of ProviderKind")
+  };
+}
+
+// The arm a `ComparisonFilterTypeKind` holds, from `ComparisonFilterTypeKind_arm`.
+export sealed class ComparisonFilterTypeKind_Arm {
+  case ComparisonFilterTypeKind_Eq
+  case ComparisonFilterTypeKind_Ne
+  case ComparisonFilterTypeKind_Gt
+  case ComparisonFilterTypeKind_Gte
+  case ComparisonFilterTypeKind_Lt
+  case ComparisonFilterTypeKind_Lte
+}
+export function ComparisonFilterTypeKind_arm(x: ComparisonFilterTypeKind): ComparisonFilterTypeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ComparisonFilterTypeKind(__r)) {
+    case 0: new ComparisonFilterTypeKind_Eq()
+    case 1: new ComparisonFilterTypeKind_Ne()
+    case 2: new ComparisonFilterTypeKind_Gt()
+    case 3: new ComparisonFilterTypeKind_Gte()
+    case 4: new ComparisonFilterTypeKind_Lt()
+    case 5: new ComparisonFilterTypeKind_Lte()
+    case _: throw new Error("no arm of ComparisonFilterTypeKind")
+  };
+}
+
+// The arm a `ValueKind` holds, from `ValueKind_arm`.
+export sealed class ValueKind_Arm {
+  case ValueKind_String(value: String)
+  case ValueKind_F64(value: f64)
+  case ValueKind_Bool(value: externref)
+}
+export function ValueKind_arm(x: ValueKind): ValueKind_Arm {
+  let __r = x;
+  return match (__kind_ValueKind(__r)) {
+    case 0: new ValueKind_String(String.fromHandle(__r))
+    case 1: new ValueKind_F64(numberValue(__r))
+    case 2: new ValueKind_Bool(__r)
+    case _: throw new Error("no arm of ValueKind")
+  };
+}
+
+// The arm a `CompoundFilterTypeKind` holds, from `CompoundFilterTypeKind_arm`.
+export sealed class CompoundFilterTypeKind_Arm {
+  case CompoundFilterTypeKind_And
+  case CompoundFilterTypeKind_Or
+}
+export function CompoundFilterTypeKind_arm(x: CompoundFilterTypeKind): CompoundFilterTypeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_CompoundFilterTypeKind(__r)) {
+    case 0: new CompoundFilterTypeKind_And()
+    case 1: new CompoundFilterTypeKind_Or()
+    case _: throw new Error("no arm of CompoundFilterTypeKind")
+  };
+}
+
+// The arm a `FitKind` holds, from `FitKind_arm`.
+export sealed class FitKind_Arm {
+  case FitKind_ScaleDown
+  case FitKind_Contain
+  case FitKind_Cover
+  case FitKind_Crop
+  case FitKind_Pad
+  case FitKind_Squeeze
+}
+export function FitKind_arm(x: FitKind): FitKind_Arm {
+  let __r = x.handle;
+  return match (__kind_FitKind(__r)) {
+    case 0: new FitKind_ScaleDown()
+    case 1: new FitKind_Contain()
+    case 2: new FitKind_Cover()
+    case 3: new FitKind_Crop()
+    case 4: new FitKind_Pad()
+    case 5: new FitKind_Squeeze()
+    case _: throw new Error("no arm of FitKind")
+  };
+}
+
+// The arm a `GravityKind` holds, from `GravityKind_arm`.
+export sealed class GravityKind_Arm {
+  case GravityKind_Face
+  case GravityKind_Left
+  case GravityKind_Right
+  case GravityKind_Top
+  case GravityKind_Bottom
+  case GravityKind_Center
+  case GravityKind_Auto
+  case GravityKind_Entropy
+  case GravityKind_BasicImageTransformationsGravityCoordinates(value: BasicImageTransformationsGravityCoordinates)
+}
+export function GravityKind_arm(x: GravityKind): GravityKind_Arm {
+  let __r = x;
+  return match (__kind_GravityKind(__r)) {
+    case 0: new GravityKind_Face()
+    case 1: new GravityKind_Left()
+    case 2: new GravityKind_Right()
+    case 3: new GravityKind_Top()
+    case 4: new GravityKind_Bottom()
+    case 5: new GravityKind_Center()
+    case 6: new GravityKind_Auto()
+    case 7: new GravityKind_Entropy()
+    case _: new GravityKind_BasicImageTransformationsGravityCoordinates(new BasicImageTransformationsGravityCoordinates(__r))
+  };
+}
+
+// The arm a `RotateKind` holds, from `RotateKind_arm`.
+export sealed class RotateKind_Arm {
+  case RotateKind_N0
+  case RotateKind_N90
+  case RotateKind_N180
+  case RotateKind_N270
+  case RotateKind_N360
+}
+export function RotateKind_arm(x: RotateKind): RotateKind_Arm {
+  let __r = x;
+  return match (__kind_RotateKind(__r)) {
+    case 0: new RotateKind_N0()
+    case 1: new RotateKind_N90()
+    case 2: new RotateKind_N180()
+    case 3: new RotateKind_N270()
+    case 4: new RotateKind_N360()
+    case _: throw new Error("no arm of RotateKind")
+  };
+}
+
+// The arm a `BasicImageTransformationsGravityCoordinatesModeKind` holds, from `BasicImageTransformationsGravityCoordinatesModeKind_arm`.
+export sealed class BasicImageTransformationsGravityCoordinatesModeKind_Arm {
+  case BasicImageTransformationsGravityCoordinatesModeKind_Remainder
+  case BasicImageTransformationsGravityCoordinatesModeKind_BoxCenter
+}
+export function BasicImageTransformationsGravityCoordinatesModeKind_arm(x: BasicImageTransformationsGravityCoordinatesModeKind): BasicImageTransformationsGravityCoordinatesModeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_BasicImageTransformationsGravityCoordinatesModeKind(__r)) {
+    case 0: new BasicImageTransformationsGravityCoordinatesModeKind_Remainder()
+    case 1: new BasicImageTransformationsGravityCoordinatesModeKind_BoxCenter()
+    case _: throw new Error("no arm of BasicImageTransformationsGravityCoordinatesModeKind")
+  };
+}
+
+// The arm a `PolishKind` holds, from `PolishKind_arm`.
+export sealed class PolishKind_Arm {
+  case PolishKind_Lossy
+  case PolishKind_Lossless
+  case PolishKind_Off
+}
+export function PolishKind_arm(x: PolishKind): PolishKind_Arm {
+  let __r = x.handle;
+  return match (__kind_PolishKind(__r)) {
+    case 0: new PolishKind_Lossy()
+    case 1: new PolishKind_Lossless()
+    case 2: new PolishKind_Off()
+    case _: throw new Error("no arm of PolishKind")
+  };
+}
+
+// The arm a `RepeatKind` holds, from `RepeatKind_arm`.
+export sealed class RepeatKind_Arm {
+  case RepeatKind_Bool(value: externref)
+  case RepeatKind_X
+  case RepeatKind_Y
+}
+export function RepeatKind_arm(x: RepeatKind): RepeatKind_Arm {
+  let __r = x;
+  return match (__kind_RepeatKind(__r)) {
+    case 0: new RepeatKind_Bool(__r)
+    case 1: new RepeatKind_X()
+    case 2: new RepeatKind_Y()
+    case _: throw new Error("no arm of RepeatKind")
+  };
+}
+
+// The arm a `TrimKind` holds, from `TrimKind_arm`.
+export sealed class TrimKind_Arm {
+  case TrimKind_Border
+  case TrimKind_Object(value: externref)
+}
+export function TrimKind_arm(x: TrimKind): TrimKind_Arm {
+  let __r = x;
+  return match (__kind_TrimKind(__r)) {
+    case 0: new TrimKind_Border()
+    case _: new TrimKind_Object(__r)
+  };
+}
+
+// The arm a `QualityKind` holds, from `QualityKind_arm`.
+export sealed class QualityKind_Arm {
+  case QualityKind_F64(value: f64)
+  case QualityKind_Low
+  case QualityKind_MediumLow
+  case QualityKind_MediumHigh
+  case QualityKind_High
+}
+export function QualityKind_arm(x: QualityKind): QualityKind_Arm {
+  let __r = x;
+  return match (__kind_QualityKind(__r)) {
+    case 0: new QualityKind_F64(numberValue(__r))
+    case 1: new QualityKind_Low()
+    case 2: new QualityKind_MediumLow()
+    case 3: new QualityKind_MediumHigh()
+    case 4: new QualityKind_High()
+    case _: throw new Error("no arm of QualityKind")
+  };
+}
+
+// The arm a `FormatKind` holds, from `FormatKind_arm`.
+export sealed class FormatKind_Arm {
+  case FormatKind_Avif
+  case FormatKind_Webp
+  case FormatKind_Json
+  case FormatKind_Jpeg
+  case FormatKind_Png
+  case FormatKind_BaselineJpeg
+  case FormatKind_PngForce
+  case FormatKind_Svg
+}
+export function FormatKind_arm(x: FormatKind): FormatKind_Arm {
+  let __r = x.handle;
+  return match (__kind_FormatKind(__r)) {
+    case 0: new FormatKind_Avif()
+    case 1: new FormatKind_Webp()
+    case 2: new FormatKind_Json()
+    case 3: new FormatKind_Jpeg()
+    case 4: new FormatKind_Png()
+    case 5: new FormatKind_BaselineJpeg()
+    case 6: new FormatKind_PngForce()
+    case 7: new FormatKind_Svg()
+    case _: throw new Error("no arm of FormatKind")
+  };
+}
+
+// The arm a `MetadataKind` holds, from `MetadataKind_arm`.
+export sealed class MetadataKind_Arm {
+  case MetadataKind_Keep
+  case MetadataKind_Copyright
+  case MetadataKind_None
+}
+export function MetadataKind_arm(x: MetadataKind): MetadataKind_Arm {
+  let __r = x.handle;
+  return match (__kind_MetadataKind(__r)) {
+    case 0: new MetadataKind_Keep()
+    case 1: new MetadataKind_Copyright()
+    case 2: new MetadataKind_None()
+    case _: throw new Error("no arm of MetadataKind")
+  };
+}
+
+// The arm a `FlipKind` holds, from `FlipKind_arm`.
+export sealed class FlipKind_Arm {
+  case FlipKind_H
+  case FlipKind_V
+  case FlipKind_Hv
+}
+export function FlipKind_arm(x: FlipKind): FlipKind_Arm {
+  let __r = x.handle;
+  return match (__kind_FlipKind(__r)) {
+    case 0: new FlipKind_H()
+    case 1: new FlipKind_V()
+    case 2: new FlipKind_Hv()
+    case _: throw new Error("no arm of FlipKind")
+  };
+}
+
+// The arm a `CountryKind` holds, from `CountryKind_arm`.
+export sealed class CountryKind_Arm {
+  case CountryKind_Iso3166Alpha2Code(value: Iso3166Alpha2Code)
+  case CountryKind_T1
+}
+export function CountryKind_arm(x: CountryKind): CountryKind_Arm {
+  let __r = x;
+  return match (__kind_CountryKind(__r)) {
+    case 0: new CountryKind_Iso3166Alpha2Code(String.fromHandle(__r))
+    case 1: new CountryKind_T1()
+    case _: throw new Error("no arm of CountryKind")
+  };
+}
+
+// The arm a `EdgeRequestKeepAliveStatusKind` holds, from `EdgeRequestKeepAliveStatusKind_arm`.
+export sealed class EdgeRequestKeepAliveStatusKind_Arm {
+  case EdgeRequestKeepAliveStatusKind_N0
+  case EdgeRequestKeepAliveStatusKind_N1
+  case EdgeRequestKeepAliveStatusKind_N2
+  case EdgeRequestKeepAliveStatusKind_N3
+  case EdgeRequestKeepAliveStatusKind_N4
+  case EdgeRequestKeepAliveStatusKind_N5
+}
+export function EdgeRequestKeepAliveStatusKind_arm(x: EdgeRequestKeepAliveStatusKind): EdgeRequestKeepAliveStatusKind_Arm {
+  let __r = x;
+  return match (__kind_EdgeRequestKeepAliveStatusKind(__r)) {
+    case 0: new EdgeRequestKeepAliveStatusKind_N0()
+    case 1: new EdgeRequestKeepAliveStatusKind_N1()
+    case 2: new EdgeRequestKeepAliveStatusKind_N2()
+    case 3: new EdgeRequestKeepAliveStatusKind_N3()
+    case 4: new EdgeRequestKeepAliveStatusKind_N4()
+    case 5: new EdgeRequestKeepAliveStatusKind_N5()
+    case _: throw new Error("no arm of EdgeRequestKeepAliveStatusKind")
+  };
+}
+
+// The arm a `CertRevokedKind` holds, from `CertRevokedKind_arm`.
+export sealed class CertRevokedKind_Arm {
+  case CertRevokedKind__1
+  case CertRevokedKind__0
+}
+export function CertRevokedKind_arm(x: CertRevokedKind): CertRevokedKind_Arm {
+  let __r = x.handle;
+  return match (__kind_CertRevokedKind(__r)) {
+    case 0: new CertRevokedKind__1()
+    case 1: new CertRevokedKind__0()
+    case _: throw new Error("no arm of CertRevokedKind")
+  };
+}
+
+// The arm a `DispositionKind` holds, from `DispositionKind_arm`.
+export sealed class DispositionKind_Arm {
+  case DispositionKind_Inline
+  case DispositionKind_Attachment
+}
+export function DispositionKind_arm(x: DispositionKind): DispositionKind_Arm {
+  let __r = x.handle;
+  return match (__kind_DispositionKind(__r)) {
+    case 0: new DispositionKind_Inline()
+    case 1: new DispositionKind_Attachment()
+    case _: throw new Error("no arm of DispositionKind")
+  };
+}
+
+// The arm a `EmailAttachmentContentKind` holds, from `EmailAttachmentContentKind_arm`.
+export sealed class EmailAttachmentContentKind_Arm {
+  case EmailAttachmentContentKind_String(value: String)
+  case EmailAttachmentContentKind_ArrayBuffer(value: externref)
+  case EmailAttachmentContentKind_Uint8Array(value: externref)
+}
+export function EmailAttachmentContentKind_arm(x: EmailAttachmentContentKind): EmailAttachmentContentKind_Arm {
+  let __r = x;
+  return match (__kind_EmailAttachmentContentKind(__r)) {
+    case 0: new EmailAttachmentContentKind_String(String.fromHandle(__r))
+    case 1: new EmailAttachmentContentKind_ArrayBuffer(__r)
+    case 2: new EmailAttachmentContentKind_Uint8Array(__r)
+    case _: throw new Error("no arm of EmailAttachmentContentKind")
+  };
+}
+
+// The arm a `FromKind` holds, from `FromKind_arm`.
+export sealed class FromKind_Arm {
+  case FromKind_String(value: String)
+  case FromKind_EmailAddress(value: EmailAddress)
+}
+export function FromKind_arm(x: FromKind): FromKind_Arm {
+  let __r = x;
+  return match (__kind_FromKind(__r)) {
+    case 0: new FromKind_String(String.fromHandle(__r))
+    case _: new FromKind_EmailAddress(new EmailAddress(__r))
+  };
+}
+
+// The arm a `TailStreamReturnKind` holds, from `TailStreamReturnKind_arm`.
+export sealed class TailStreamReturnKind_Arm {
+  case TailStreamReturnKind_Promise(value: externref)
+  case TailStreamReturnKind_JsValue(value: externref)
+}
+export function TailStreamReturnKind_arm(x: TailStreamReturnKind): TailStreamReturnKind_Arm {
+  let __r = x;
+  return match (__kind_TailStreamReturnKind(__r)) {
+    case 0: new TailStreamReturnKind_Promise(__r)
+    case 1: new TailStreamReturnKind_JsValue(__r)
+    case _: throw new Error("no arm of TailStreamReturnKind")
+  };
+}
+
+// The arm a `TimeoutKind` holds, from `TimeoutKind_arm`.
+export sealed class TimeoutKind_Arm {
+  case TimeoutKind_String(value: String)
+  case TimeoutKind_F64(value: f64)
+}
+export function TimeoutKind_arm(x: TimeoutKind): TimeoutKind_Arm {
+  let __r = x;
+  return match (__kind_TimeoutKind(__r)) {
+    case 0: new TimeoutKind_String(String.fromHandle(__r))
+    case 1: new TimeoutKind_F64(numberValue(__r))
+    case _: throw new Error("no arm of TimeoutKind")
+  };
+}
+
+// The arm a `ImageInfoResponseFormatKind` holds, from `ImageInfoResponseFormatKind_arm`.
+export sealed class ImageInfoResponseFormatKind_Arm {
+  case ImageInfoResponseFormatKind_Imagesvgxml
+  case ImageInfoResponseFormatKind_String(value: String)
+}
+export function ImageInfoResponseFormatKind_arm(x: ImageInfoResponseFormatKind): ImageInfoResponseFormatKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ImageInfoResponseFormatKind(__r)) {
+    case 0: new ImageInfoResponseFormatKind_Imagesvgxml()
+    case 1: new ImageInfoResponseFormatKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of ImageInfoResponseFormatKind")
+  };
+}
+
+// The arm a `ImageTransformFitKind` holds, from `ImageTransformFitKind_arm`.
+export sealed class ImageTransformFitKind_Arm {
+  case ImageTransformFitKind_ScaleDown
+  case ImageTransformFitKind_Contain
+  case ImageTransformFitKind_Pad
+  case ImageTransformFitKind_Squeeze
+  case ImageTransformFitKind_Cover
+  case ImageTransformFitKind_Crop
+}
+export function ImageTransformFitKind_arm(x: ImageTransformFitKind): ImageTransformFitKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ImageTransformFitKind(__r)) {
+    case 0: new ImageTransformFitKind_ScaleDown()
+    case 1: new ImageTransformFitKind_Contain()
+    case 2: new ImageTransformFitKind_Pad()
+    case 3: new ImageTransformFitKind_Squeeze()
+    case 4: new ImageTransformFitKind_Cover()
+    case 5: new ImageTransformFitKind_Crop()
+    case _: throw new Error("no arm of ImageTransformFitKind")
+  };
+}
+
+// The arm a `ImageTransformGravityKind` holds, from `ImageTransformGravityKind_arm`.
+export sealed class ImageTransformGravityKind_Arm {
+  case ImageTransformGravityKind_Face
+  case ImageTransformGravityKind_Left
+  case ImageTransformGravityKind_Right
+  case ImageTransformGravityKind_Top
+  case ImageTransformGravityKind_Bottom
+  case ImageTransformGravityKind_Center
+  case ImageTransformGravityKind_Auto
+  case ImageTransformGravityKind_Entropy
+  case ImageTransformGravityKind_Object(value: externref)
+}
+export function ImageTransformGravityKind_arm(x: ImageTransformGravityKind): ImageTransformGravityKind_Arm {
+  let __r = x;
+  return match (__kind_ImageTransformGravityKind(__r)) {
+    case 0: new ImageTransformGravityKind_Face()
+    case 1: new ImageTransformGravityKind_Left()
+    case 2: new ImageTransformGravityKind_Right()
+    case 3: new ImageTransformGravityKind_Top()
+    case 4: new ImageTransformGravityKind_Bottom()
+    case 5: new ImageTransformGravityKind_Center()
+    case 6: new ImageTransformGravityKind_Auto()
+    case 7: new ImageTransformGravityKind_Entropy()
+    case _: new ImageTransformGravityKind_Object(__r)
+  };
+}
+
+// The arm a `ImageTransformRotateKind` holds, from `ImageTransformRotateKind_arm`.
+export sealed class ImageTransformRotateKind_Arm {
+  case ImageTransformRotateKind_N0
+  case ImageTransformRotateKind_N90
+  case ImageTransformRotateKind_N180
+  case ImageTransformRotateKind_N270
+}
+export function ImageTransformRotateKind_arm(x: ImageTransformRotateKind): ImageTransformRotateKind_Arm {
+  let __r = x;
+  return match (__kind_ImageTransformRotateKind(__r)) {
+    case 0: new ImageTransformRotateKind_N0()
+    case 1: new ImageTransformRotateKind_N90()
+    case 2: new ImageTransformRotateKind_N180()
+    case 3: new ImageTransformRotateKind_N270()
+    case _: throw new Error("no arm of ImageTransformRotateKind")
+  };
+}
+
+// The arm a `ImageOutputOptionsFormatKind` holds, from `ImageOutputOptionsFormatKind_arm`.
+export sealed class ImageOutputOptionsFormatKind_Arm {
+  case ImageOutputOptionsFormatKind_Imagejpeg
+  case ImageOutputOptionsFormatKind_Imagepng
+  case ImageOutputOptionsFormatKind_Imagegif
+  case ImageOutputOptionsFormatKind_Imagewebp
+  case ImageOutputOptionsFormatKind_Imageavif
+  case ImageOutputOptionsFormatKind_Rgb
+  case ImageOutputOptionsFormatKind_Rgba
+}
+export function ImageOutputOptionsFormatKind_arm(x: ImageOutputOptionsFormatKind): ImageOutputOptionsFormatKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ImageOutputOptionsFormatKind(__r)) {
+    case 0: new ImageOutputOptionsFormatKind_Imagejpeg()
+    case 1: new ImageOutputOptionsFormatKind_Imagepng()
+    case 2: new ImageOutputOptionsFormatKind_Imagegif()
+    case 3: new ImageOutputOptionsFormatKind_Imagewebp()
+    case 4: new ImageOutputOptionsFormatKind_Imageavif()
+    case 5: new ImageOutputOptionsFormatKind_Rgb()
+    case 6: new ImageOutputOptionsFormatKind_Rgba()
+    case _: throw new Error("no arm of ImageOutputOptionsFormatKind")
+  };
+}
+
+// The arm a `SortOrderKind` holds, from `SortOrderKind_arm`.
+export sealed class SortOrderKind_Arm {
+  case SortOrderKind_Asc
+  case SortOrderKind_Desc
+}
+export function SortOrderKind_arm(x: SortOrderKind): SortOrderKind_Arm {
+  let __r = x.handle;
+  return match (__kind_SortOrderKind(__r)) {
+    case 0: new SortOrderKind_Asc()
+    case 1: new SortOrderKind_Desc()
+    case _: throw new Error("no arm of SortOrderKind")
+  };
+}
+
+// The arm a `MediaTransformationInputOptionsFitKind` holds, from `MediaTransformationInputOptionsFitKind_arm`.
+export sealed class MediaTransformationInputOptionsFitKind_Arm {
+  case MediaTransformationInputOptionsFitKind_Contain
+  case MediaTransformationInputOptionsFitKind_Cover
+  case MediaTransformationInputOptionsFitKind_ScaleDown
+}
+export function MediaTransformationInputOptionsFitKind_arm(x: MediaTransformationInputOptionsFitKind): MediaTransformationInputOptionsFitKind_Arm {
+  let __r = x.handle;
+  return match (__kind_MediaTransformationInputOptionsFitKind(__r)) {
+    case 0: new MediaTransformationInputOptionsFitKind_Contain()
+    case 1: new MediaTransformationInputOptionsFitKind_Cover()
+    case 2: new MediaTransformationInputOptionsFitKind_ScaleDown()
+    case _: throw new Error("no arm of MediaTransformationInputOptionsFitKind")
+  };
+}
+
+// The arm a `MediaTransformationOutputOptionsModeKind` holds, from `MediaTransformationOutputOptionsModeKind_arm`.
+export sealed class MediaTransformationOutputOptionsModeKind_Arm {
+  case MediaTransformationOutputOptionsModeKind_Video
+  case MediaTransformationOutputOptionsModeKind_Spritesheet
+  case MediaTransformationOutputOptionsModeKind_Frame
+  case MediaTransformationOutputOptionsModeKind_Audio
+}
+export function MediaTransformationOutputOptionsModeKind_arm(x: MediaTransformationOutputOptionsModeKind): MediaTransformationOutputOptionsModeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_MediaTransformationOutputOptionsModeKind(__r)) {
+    case 0: new MediaTransformationOutputOptionsModeKind_Video()
+    case 1: new MediaTransformationOutputOptionsModeKind_Spritesheet()
+    case 2: new MediaTransformationOutputOptionsModeKind_Frame()
+    case 3: new MediaTransformationOutputOptionsModeKind_Audio()
+    case _: throw new Error("no arm of MediaTransformationOutputOptionsModeKind")
+  };
+}
+
+// The arm a `MediaTransformationOutputOptionsFormatKind` holds, from `MediaTransformationOutputOptionsFormatKind_arm`.
+export sealed class MediaTransformationOutputOptionsFormatKind_Arm {
+  case MediaTransformationOutputOptionsFormatKind_Jpg
+  case MediaTransformationOutputOptionsFormatKind_Png
+  case MediaTransformationOutputOptionsFormatKind_M4A
+}
+export function MediaTransformationOutputOptionsFormatKind_arm(x: MediaTransformationOutputOptionsFormatKind): MediaTransformationOutputOptionsFormatKind_Arm {
+  let __r = x.handle;
+  return match (__kind_MediaTransformationOutputOptionsFormatKind(__r)) {
+    case 0: new MediaTransformationOutputOptionsFormatKind_Jpg()
+    case 1: new MediaTransformationOutputOptionsFormatKind_Png()
+    case 2: new MediaTransformationOutputOptionsFormatKind_M4A()
+    case _: throw new Error("no arm of MediaTransformationOutputOptionsFormatKind")
+  };
+}
+
+// The arm a `PayloadKind` holds, from `PayloadKind_arm`.
+export sealed class PayloadKind_Arm {
+  case PayloadKind_String(value: String)
+  case PayloadKind_Uint8Array(value: externref)
+}
+export function PayloadKind_arm(x: PayloadKind): PayloadKind_Arm {
+  let __r = x;
+  return match (__kind_PayloadKind(__r)) {
+    case 0: new PayloadKind_String(String.fromHandle(__r))
+    case 1: new PayloadKind_Uint8Array(__r)
+    case _: throw new Error("no arm of PayloadKind")
+  };
+}
+
+// The arm a `StreamCaptionStatusKind` holds, from `StreamCaptionStatusKind_arm`.
+export sealed class StreamCaptionStatusKind_Arm {
+  case StreamCaptionStatusKind_Ready
+  case StreamCaptionStatusKind_Inprogress
+  case StreamCaptionStatusKind_Error
+}
+export function StreamCaptionStatusKind_arm(x: StreamCaptionStatusKind): StreamCaptionStatusKind_Arm {
+  let __r = x.handle;
+  return match (__kind_StreamCaptionStatusKind(__r)) {
+    case 0: new StreamCaptionStatusKind_Ready()
+    case 1: new StreamCaptionStatusKind_Inprogress()
+    case 2: new StreamCaptionStatusKind_Error()
+    case _: throw new Error("no arm of StreamCaptionStatusKind")
+  };
+}
+
+// The arm a `ConversionResponseFormatKind` holds, from `ConversionResponseFormatKind_arm`.
+export sealed class ConversionResponseFormatKind_Arm {
+  case ConversionResponseFormatKind_Markdown
+  case ConversionResponseFormatKind_Error
+}
+export function ConversionResponseFormatKind_arm(x: ConversionResponseFormatKind): ConversionResponseFormatKind_Arm {
+  let __r = x.handle;
+  return match (__kind_ConversionResponseFormatKind(__r)) {
+    case 0: new ConversionResponseFormatKind_Markdown()
+    case 1: new ConversionResponseFormatKind_Error()
+    case _: throw new Error("no arm of ConversionResponseFormatKind")
+  };
+}
+
+// The arm a `DescriptionLanguageKind` holds, from `DescriptionLanguageKind_arm`.
+export sealed class DescriptionLanguageKind_Arm {
+  case DescriptionLanguageKind_En
+  case DescriptionLanguageKind_Es
+  case DescriptionLanguageKind_Fr
+  case DescriptionLanguageKind_It
+  case DescriptionLanguageKind_Pt
+  case DescriptionLanguageKind_De
+}
+export function DescriptionLanguageKind_arm(x: DescriptionLanguageKind): DescriptionLanguageKind_Arm {
+  let __r = x.handle;
+  return match (__kind_DescriptionLanguageKind(__r)) {
+    case 0: new DescriptionLanguageKind_En()
+    case 1: new DescriptionLanguageKind_Es()
+    case 2: new DescriptionLanguageKind_Fr()
+    case 3: new DescriptionLanguageKind_It()
+    case 4: new DescriptionLanguageKind_Pt()
+    case 5: new DescriptionLanguageKind_De()
+    case _: throw new Error("no arm of DescriptionLanguageKind")
+  };
+}
+
+// The arm a `LevelKind` holds, from `LevelKind_arm`.
+export sealed class LevelKind_Arm {
+  case LevelKind_Debug
+  case LevelKind_Error
+  case LevelKind_Info
+  case LevelKind_Log
+  case LevelKind_Warn
+}
+export function LevelKind_arm(x: LevelKind): LevelKind_Arm {
+  let __r = x.handle;
+  return match (__kind_LevelKind(__r)) {
+    case 0: new LevelKind_Debug()
+    case 1: new LevelKind_Error()
+    case 2: new LevelKind_Info()
+    case 3: new LevelKind_Log()
+    case 4: new LevelKind_Warn()
+    case _: throw new Error("no arm of LevelKind")
+  };
+}
+
+// The arm a `AttributeValueKind` holds, from `AttributeValueKind_arm`.
+export sealed class AttributeValueKind_Arm {
+  case AttributeValueKind_String(value: String)
+  case AttributeValueKind_VecOfString(value: externref)
+  case AttributeValueKind_Bool(value: externref)
+  case AttributeValueKind_VecOfBool(value: externref)
+  case AttributeValueKind_F64(value: f64)
+  case AttributeValueKind_VecOfF64(value: externref)
+  case AttributeValueKind_BigInt(value: externref)
+  case AttributeValueKind_VecOfBigInt(value: externref)
+}
+export function AttributeValueKind_arm(x: AttributeValueKind): AttributeValueKind_Arm {
+  let __r = x;
+  return match (__kind_AttributeValueKind(__r)) {
+    case 0: new AttributeValueKind_String(String.fromHandle(__r))
+    case 1: new AttributeValueKind_VecOfString(__r)
+    case 2: new AttributeValueKind_Bool(__r)
+    case 3: new AttributeValueKind_VecOfBool(__r)
+    case 4: new AttributeValueKind_F64(numberValue(__r))
+    case 5: new AttributeValueKind_VecOfF64(__r)
+    case 6: new AttributeValueKind_BigInt(__r)
+    case 7: new AttributeValueKind_VecOfBigInt(__r)
+    case _: throw new Error("no arm of AttributeValueKind")
+  };
+}
+
+// The arm a `ReturnMetadataKind` holds, from `ReturnMetadataKind_arm`.
+export sealed class ReturnMetadataKind_Arm {
+  case ReturnMetadataKind_Bool(value: externref)
+  case ReturnMetadataKind_VectorizeMetadataRetrievalLevel(value: VectorizeMetadataRetrievalLevel)
+}
+export function ReturnMetadataKind_arm(x: ReturnMetadataKind): ReturnMetadataKind_Arm {
+  let __r = x;
+  return match (__kind_ReturnMetadataKind(__r)) {
+    case 0: new ReturnMetadataKind_Bool(__r)
+    case 1: new ReturnMetadataKind_VectorizeMetadataRetrievalLevel(String.fromHandle(__r))
+    case _: throw new Error("no arm of ReturnMetadataKind")
+  };
+}
+
+// The arm a `ValuesKind` holds, from `ValuesKind_arm`.
+export sealed class ValuesKind_Arm {
+  case ValuesKind_Float32Array(value: externref)
+  case ValuesKind_Float64Array(value: externref)
+  case ValuesKind_VecOfF64(value: externref)
+}
+export function ValuesKind_arm(x: ValuesKind): ValuesKind_Arm {
+  let __r = x;
+  return match (__kind_ValuesKind(__r)) {
+    case 0: new ValuesKind_Float32Array(__r)
+    case 1: new ValuesKind_Float64Array(__r)
+    case 2: new ValuesKind_VecOfF64(__r)
+    case _: throw new Error("no arm of ValuesKind")
+  };
+}
+
+// The arm a `InstanceStatusStatusKind` holds, from `InstanceStatusStatusKind_arm`.
+export sealed class InstanceStatusStatusKind_Arm {
+  case InstanceStatusStatusKind_Queued
+  case InstanceStatusStatusKind_Running
+  case InstanceStatusStatusKind_Paused
+  case InstanceStatusStatusKind_Errored
+  case InstanceStatusStatusKind_Terminated
+  case InstanceStatusStatusKind_Complete
+  case InstanceStatusStatusKind_Waiting
+  case InstanceStatusStatusKind_WaitingForPause
+  case InstanceStatusStatusKind_Unknown
+}
+export function InstanceStatusStatusKind_arm(x: InstanceStatusStatusKind): InstanceStatusStatusKind_Arm {
+  let __r = x.handle;
+  return match (__kind_InstanceStatusStatusKind(__r)) {
+    case 0: new InstanceStatusStatusKind_Queued()
+    case 1: new InstanceStatusStatusKind_Running()
+    case 2: new InstanceStatusStatusKind_Paused()
+    case 3: new InstanceStatusStatusKind_Errored()
+    case 4: new InstanceStatusStatusKind_Terminated()
+    case 5: new InstanceStatusStatusKind_Complete()
+    case 6: new InstanceStatusStatusKind_Waiting()
+    case 7: new InstanceStatusStatusKind_WaitingForPause()
+    case 8: new InstanceStatusStatusKind_Unknown()
+    case _: throw new Error("no arm of InstanceStatusStatusKind")
+  };
+}
+
+// The arm a `EqKind` holds, from `EqKind_arm`.
+export sealed class EqKind_Arm {
+  case EqKind_String(value: String)
+  case EqKind_F64(value: f64)
+  case EqKind_Bool(value: externref)
+  case EqKind_VecOfString(value: externref)
+}
+export function EqKind_arm(x: EqKind): EqKind_Arm {
+  let __r = x;
+  return match (__kind_EqKind(__r)) {
+    case 0: new EqKind_String(String.fromHandle(__r))
+    case 1: new EqKind_F64(numberValue(__r))
+    case 2: new EqKind_Bool(__r)
+    case 3: new EqKind_VecOfString(__r)
+    case _: throw new Error("no arm of EqKind")
+  };
+}
 
 export class DOMException {
   #ref: externref;

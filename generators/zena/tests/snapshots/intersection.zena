@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -268,6 +269,10 @@ declare function __intersection_ViaBaseAlias_w(this_: externref): externref;
 @external("intersection", "ViaBaseAlias.set_w")
 declare function __intersection_ViaBaseAlias_set_w(this_: externref, value: externref): void;
 
+// kind RoleKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RoleKind")
+declare function __kind_RoleKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -279,6 +284,22 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind RoleKind: User = "user", Assistant = "assistant", String = String
 export type RoleKind = String;
+
+// The arm a `RoleKind` holds, from `RoleKind_arm`.
+export sealed class RoleKind_Arm {
+  case RoleKind_User
+  case RoleKind_Assistant
+  case RoleKind_String(value: String)
+}
+export function RoleKind_arm(x: RoleKind): RoleKind_Arm {
+  let __r = x.handle;
+  return match (__kind_RoleKind(__r)) {
+    case 0: new RoleKind_User()
+    case 1: new RoleKind_Assistant()
+    case 2: new RoleKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of RoleKind")
+  };
+}
 
 export class Conditional {
   #ref: externref;

@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:FirstKeyReturnKind" (func $kind:FirstKeyReturnKind (param $x externref) (result i32)))
+
   ;; function hasKey(key: String): bool throws as has_key;
   (import "property-key" "has_key" (func $property-key:has_key (param $key externref) (result i32)))
   ;; function hasKey(key: f64): bool throws as has_key_with_f64;

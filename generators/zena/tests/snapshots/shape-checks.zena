@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -163,6 +164,26 @@ declare function __shape_checks_Choice_b(this_: externref): externref;
 @external("shape-checks", "Choice.set_b")
 declare function __shape_checks_Choice_set_b(this_: externref, value: externref): void;
 
+// kind Shapes.Unit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Shapes.Unit")
+declare function __kind_Shapes_Unit(x: externref | null): i32;
+
+// kind PickReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:PickReturnKind")
+declare function __kind_PickReturnKind(x: externref | null): i32;
+
+// kind PickAnyReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:PickAnyReturnKind")
+declare function __kind_PickAnyReturnKind(x: externref | null): i32;
+
+// kind PickOrTextReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:PickOrTextReturnKind")
+declare function __kind_PickOrTextReturnKind(x: externref | null): i32;
+
+// kind KindKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:KindKind")
+declare function __kind_KindKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -186,6 +207,73 @@ export type PickOrTextReturnKind = externref;
 
 // kind KindKind: A = "a", B = "b"
 export type KindKind = String;
+
+// The arm a `Shapes_Unit` holds, from `Shapes_Unit_arm`.
+export sealed class Shapes_Unit_Arm {
+  case Shapes_Unit_Hour
+  case Shapes_Unit_Minute
+}
+export function Shapes_Unit_arm(x: Shapes_Unit): Shapes_Unit_Arm {
+  let __r = x.handle;
+  return match (__kind_Shapes_Unit(__r)) {
+    case 0: new Shapes_Unit_Hour()
+    case 1: new Shapes_Unit_Minute()
+    case _: throw new Error("no arm of Shapes.Unit")
+  };
+}
+
+// The arm a `PickReturnKind` holds, from `PickReturnKind_arm`.
+export sealed class PickReturnKind_Arm {
+  case PickReturnKind_Ticket(value: Shapes_Ticket)
+  case PickReturnKind_RoundingOptions(value: Shapes_RoundingOptions)
+}
+export function PickReturnKind_arm(x: PickReturnKind): PickReturnKind_Arm {
+  let __r = x;
+  return match (__kind_PickReturnKind(__r)) {
+    case 0: new PickReturnKind_Ticket(new Shapes_Ticket(__r))
+    case _: new PickReturnKind_RoundingOptions(new Shapes_RoundingOptions(__r))
+  };
+}
+
+// The arm a `PickAnyReturnKind` holds, from `PickAnyReturnKind_arm`.
+export sealed class PickAnyReturnKind_Arm {
+  case PickAnyReturnKind_Ticket(value: Shapes_Ticket)
+  case PickAnyReturnKind_Object(value: externref)
+}
+export function PickAnyReturnKind_arm(x: PickAnyReturnKind): PickAnyReturnKind_Arm {
+  let __r = x;
+  return match (__kind_PickAnyReturnKind(__r)) {
+    case 0: new PickAnyReturnKind_Ticket(new Shapes_Ticket(__r))
+    case _: new PickAnyReturnKind_Object(__r)
+  };
+}
+
+// The arm a `PickOrTextReturnKind` holds, from `PickOrTextReturnKind_arm`.
+export sealed class PickOrTextReturnKind_Arm {
+  case PickOrTextReturnKind_String(value: String)
+  case PickOrTextReturnKind_RoundingOptions(value: Shapes_RoundingOptions)
+}
+export function PickOrTextReturnKind_arm(x: PickOrTextReturnKind): PickOrTextReturnKind_Arm {
+  let __r = x;
+  return match (__kind_PickOrTextReturnKind(__r)) {
+    case 0: new PickOrTextReturnKind_String(String.fromHandle(__r))
+    case _: new PickOrTextReturnKind_RoundingOptions(new Shapes_RoundingOptions(__r))
+  };
+}
+
+// The arm a `KindKind` holds, from `KindKind_arm`.
+export sealed class KindKind_Arm {
+  case KindKind_A
+  case KindKind_B
+}
+export function KindKind_arm(x: KindKind): KindKind_Arm {
+  let __r = x.handle;
+  return match (__kind_KindKind(__r)) {
+    case 0: new KindKind_A()
+    case 1: new KindKind_B()
+    case _: throw new Error("no arm of KindKind")
+  };
+}
 
 export class Shapes {
   #ref: externref;

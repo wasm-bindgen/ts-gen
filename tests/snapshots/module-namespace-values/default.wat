@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "module-namespace-values" "kind:inspect.Style" (func $module-namespace-values:kind:inspect.Style (param $x externref) (result i32)))
+
   ;; new {};
   (import "module-namespace-values" "InspectOptions.new" (func $module-namespace-values:InspectOptions.new (result externref)))
   ;; get depth: f64;

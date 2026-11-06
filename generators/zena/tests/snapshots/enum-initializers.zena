@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -25,6 +26,42 @@ declare function __Number_value(x: externref): f64;
 // function useAll(mode: Mode, label: Label, merged: Merged, restart: Restart, cycle: Cycle, loop: Loop)
 @external("enum-initializers", "use_all")
 declare function __enum_initializers_use_all(mode: externref, label: externref, merged: externref, restart: externref, cycle: externref, loop: externref): void;
+
+// kind Base: the index of the arm holding x, -1 for none
+@external("enum-initializers", "kind:Base")
+declare function __enum_initializers_kind_Base(x: externref | null): i32;
+
+// kind Later: the index of the arm holding x, -1 for none
+@external("enum-initializers", "kind:Later")
+declare function __enum_initializers_kind_Later(x: externref | null): i32;
+
+// kind Mode: the index of the arm holding x, -1 for none
+@external("enum-initializers", "kind:Mode")
+declare function __enum_initializers_kind_Mode(x: externref | null): i32;
+
+// kind Ns.Inner: the index of the arm holding x, -1 for none
+@external("enum-initializers", "kind:Ns.Inner")
+declare function __enum_initializers_kind_Ns_Inner(x: externref | null): i32;
+
+// kind Label: the index of the arm holding x, -1 for none
+@external("enum-initializers", "kind:Label")
+declare function __enum_initializers_kind_Label(x: externref | null): i32;
+
+// kind Merged: the index of the arm holding x, -1 for none
+@external("enum-initializers", "kind:Merged")
+declare function __enum_initializers_kind_Merged(x: externref | null): i32;
+
+// kind Restart: the index of the arm holding x, -1 for none
+@external("enum-initializers", "kind:Restart")
+declare function __enum_initializers_kind_Restart(x: externref | null): i32;
+
+// kind Cycle: the index of the arm holding x, -1 for none
+@external("enum-initializers", "kind:Cycle")
+declare function __enum_initializers_kind_Cycle(x: externref | null): i32;
+
+// kind Loop: the index of the arm holding x, -1 for none
+@external("enum-initializers", "kind:Loop")
+declare function __enum_initializers_kind_Loop(x: externref | null): i32;
 
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
@@ -61,6 +98,134 @@ export type Cycle = externref;
 
 // kind Loop: C = 1
 export type Loop = externref;
+
+// The arm a `Base` holds, from `Base_arm`.
+export sealed class Base_Arm {
+  case Base_Default
+  case Base_Other
+}
+export function Base_arm(x: Base): Base_Arm {
+  let __r = x;
+  return match (__enum_initializers_kind_Base(__r)) {
+    case 0: new Base_Default()
+    case 1: new Base_Other()
+    case _: throw new Error("no arm of Base")
+  };
+}
+
+// The arm a `Later` holds, from `Later_arm`.
+export sealed class Later_Arm {
+  case Later_X
+}
+export function Later_arm(x: Later): Later_Arm {
+  let __r = x;
+  return match (__enum_initializers_kind_Later(__r)) {
+    case 0: new Later_X()
+    case _: throw new Error("no arm of Later")
+  };
+}
+
+// The arm a `Mode` holds, from `Mode_arm`.
+export sealed class Mode_Arm {
+  case Mode_A
+  case Mode_B
+  case Mode_C
+  case Mode_D
+  case Mode_E
+}
+export function Mode_arm(x: Mode): Mode_Arm {
+  let __r = x;
+  return match (__enum_initializers_kind_Mode(__r)) {
+    case 0: new Mode_A()
+    case 1: new Mode_B()
+    case 2: new Mode_C()
+    case 3: new Mode_D()
+    case 4: new Mode_E()
+    case _: throw new Error("no arm of Mode")
+  };
+}
+
+// The arm a `Ns_Inner` holds, from `Ns_Inner_arm`.
+export sealed class Ns_Inner_Arm {
+  case Ns_Inner_Value
+}
+export function Ns_Inner_arm(x: Ns_Inner): Ns_Inner_Arm {
+  let __r = x.handle;
+  return match (__enum_initializers_kind_Ns_Inner(__r)) {
+    case 0: new Ns_Inner_Value()
+    case _: throw new Error("no arm of Ns.Inner")
+  };
+}
+
+// The arm a `Label` holds, from `Label_arm`.
+export sealed class Label_Arm {
+  case Label_Inner
+  case Label_Joined
+}
+export function Label_arm(x: Label): Label_Arm {
+  let __r = x.handle;
+  return match (__enum_initializers_kind_Label(__r)) {
+    case 0: new Label_Inner()
+    case 1: new Label_Joined()
+    case _: throw new Error("no arm of Label")
+  };
+}
+
+// The arm a `Merged` holds, from `Merged_arm`.
+export sealed class Merged_Arm {
+  case Merged_A
+  case Merged_B
+  case Merged_C
+}
+export function Merged_arm(x: Merged): Merged_Arm {
+  let __r = x;
+  return match (__enum_initializers_kind_Merged(__r)) {
+    case 0: new Merged_A()
+    case 1: new Merged_B()
+    case 2: new Merged_C()
+    case _: throw new Error("no arm of Merged")
+  };
+}
+
+// The arm a `Restart` holds, from `Restart_arm`.
+export sealed class Restart_Arm {
+  case Restart_A
+  case Restart_B
+  case Restart_C
+}
+export function Restart_arm(x: Restart): Restart_Arm {
+  let __r = x;
+  return match (__enum_initializers_kind_Restart(__r)) {
+    case 0: new Restart_A()
+    case 1: new Restart_B()
+    case 2: new Restart_C()
+    case _: throw new Error("no arm of Restart")
+  };
+}
+
+// The arm a `Cycle` holds, from `Cycle_arm`.
+export sealed class Cycle_Arm {
+  case Cycle_Fixed
+}
+export function Cycle_arm(x: Cycle): Cycle_Arm {
+  let __r = x;
+  return match (__enum_initializers_kind_Cycle(__r)) {
+    case 0: new Cycle_Fixed()
+    case _: throw new Error("no arm of Cycle")
+  };
+}
+
+// The arm a `Loop` holds, from `Loop_arm`.
+export sealed class Loop_Arm {
+  case Loop_C
+}
+export function Loop_arm(x: Loop): Loop_Arm {
+  let __r = x;
+  return match (__enum_initializers_kind_Loop(__r)) {
+    case 0: new Loop_C()
+    case _: throw new Error("no arm of Loop")
+  };
+}
 
 export function use_all(mode: Mode, label: Label, merged: Merged, restart: Restart, cycle: Cycle, loop: Loop): void { __enum_initializers_use_all(mode, label.handle, merged, restart, cycle, loop); }
 

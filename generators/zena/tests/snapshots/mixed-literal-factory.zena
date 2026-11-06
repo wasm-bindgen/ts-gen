@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -116,6 +117,30 @@ declare function __mixed_literal_factory_Optional_mode(this_: externref): extern
 @external("mixed-literal-factory", "Optional.set_mode")
 declare function __mixed_literal_factory_Optional_set_mode(this_: externref, value: externref): void;
 
+// kind ModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ModeKind")
+declare function __kind_ModeKind(x: externref | null): i32;
+
+// kind NumberOrStringsModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:NumberOrStringsModeKind")
+declare function __kind_NumberOrStringsModeKind(x: externref | null): i32;
+
+// kind MixedModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:MixedModeKind")
+declare function __kind_MixedModeKind(x: externref | null): i32;
+
+// kind LevelKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:LevelKind")
+declare function __kind_LevelKind(x: externref | null): i32;
+
+// kind OpenModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:OpenModeKind")
+declare function __kind_OpenModeKind(x: externref | null): i32;
+
+// kind OptionalModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:OptionalModeKind")
+declare function __kind_OptionalModeKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -142,6 +167,100 @@ export type OpenModeKind = String;
 
 // kind OptionalModeKind: X = "x", Y = "y"
 export type OptionalModeKind = String;
+
+// The arm a `ModeKind` holds, from `ModeKind_arm`.
+export sealed class ModeKind_Arm {
+  case ModeKind_Bool(value: externref)
+  case ModeKind_X
+  case ModeKind_Y
+}
+export function ModeKind_arm(x: ModeKind): ModeKind_Arm {
+  let __r = x;
+  return match (__kind_ModeKind(__r)) {
+    case 0: new ModeKind_Bool(__r)
+    case 1: new ModeKind_X()
+    case 2: new ModeKind_Y()
+    case _: throw new Error("no arm of ModeKind")
+  };
+}
+
+// The arm a `NumberOrStringsModeKind` holds, from `NumberOrStringsModeKind_arm`.
+export sealed class NumberOrStringsModeKind_Arm {
+  case NumberOrStringsModeKind_F64(value: f64)
+  case NumberOrStringsModeKind_X
+  case NumberOrStringsModeKind_Y
+}
+export function NumberOrStringsModeKind_arm(x: NumberOrStringsModeKind): NumberOrStringsModeKind_Arm {
+  let __r = x;
+  return match (__kind_NumberOrStringsModeKind(__r)) {
+    case 0: new NumberOrStringsModeKind_F64(numberValue(__r))
+    case 1: new NumberOrStringsModeKind_X()
+    case 2: new NumberOrStringsModeKind_Y()
+    case _: throw new Error("no arm of NumberOrStringsModeKind")
+  };
+}
+
+// The arm a `MixedModeKind` holds, from `MixedModeKind_arm`.
+export sealed class MixedModeKind_Arm {
+  case MixedModeKind_X
+  case MixedModeKind_Y
+  case MixedModeKind_F64(value: f64)
+  case MixedModeKind_Bool(value: externref)
+}
+export function MixedModeKind_arm(x: MixedModeKind): MixedModeKind_Arm {
+  let __r = x;
+  return match (__kind_MixedModeKind(__r)) {
+    case 0: new MixedModeKind_X()
+    case 1: new MixedModeKind_Y()
+    case 2: new MixedModeKind_F64(numberValue(__r))
+    case 3: new MixedModeKind_Bool(__r)
+    case _: throw new Error("no arm of MixedModeKind")
+  };
+}
+
+// The arm a `LevelKind` holds, from `LevelKind_arm`.
+export sealed class LevelKind_Arm {
+  case LevelKind_N0
+  case LevelKind_N1
+  case LevelKind_N2
+}
+export function LevelKind_arm(x: LevelKind): LevelKind_Arm {
+  let __r = x;
+  return match (__kind_LevelKind(__r)) {
+    case 0: new LevelKind_N0()
+    case 1: new LevelKind_N1()
+    case 2: new LevelKind_N2()
+    case _: throw new Error("no arm of LevelKind")
+  };
+}
+
+// The arm a `OpenModeKind` holds, from `OpenModeKind_arm`.
+export sealed class OpenModeKind_Arm {
+  case OpenModeKind_X
+  case OpenModeKind_String(value: String)
+}
+export function OpenModeKind_arm(x: OpenModeKind): OpenModeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_OpenModeKind(__r)) {
+    case 0: new OpenModeKind_X()
+    case 1: new OpenModeKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of OpenModeKind")
+  };
+}
+
+// The arm a `OptionalModeKind` holds, from `OptionalModeKind_arm`.
+export sealed class OptionalModeKind_Arm {
+  case OptionalModeKind_X
+  case OptionalModeKind_Y
+}
+export function OptionalModeKind_arm(x: OptionalModeKind): OptionalModeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_OptionalModeKind(__r)) {
+    case 0: new OptionalModeKind_X()
+    case 1: new OptionalModeKind_Y()
+    case _: throw new Error("no arm of OptionalModeKind")
+  };
+}
 
 export class BoolOrStrings {
   #ref: externref;

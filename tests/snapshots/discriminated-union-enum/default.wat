@@ -15,6 +15,12 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:DispositionKind" (func $kind:DispositionKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:CodeKind" (func $kind:CodeKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:KindKind" (func $kind:KindKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:DataKind" (func $kind:DataKind (param $x externref) (result i32)))
+
   ;; new {};
   (import "discriminated-union-enum" "Attachment.new" (func $discriminated-union-enum:Attachment.new (result externref)))
   ;; get disposition: DispositionKind;

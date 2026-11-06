@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -174,6 +175,10 @@ declare function __mono_lists_describe_options(options: externref): externref;
 @external("mono-lists", "get_value")
 declare function __mono_lists_get_value(): externref;
 
+// kind GetValueReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:GetValueReturnKind")
+declare function __kind_GetValueReturnKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -185,6 +190,20 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind GetValueReturnKind: String = String, VecOfBool = Array<Boolean>
 export type GetValueReturnKind = externref;
+
+// The arm a `GetValueReturnKind` holds, from `GetValueReturnKind_arm`.
+export sealed class GetValueReturnKind_Arm {
+  case GetValueReturnKind_String(value: String)
+  case GetValueReturnKind_VecOfBool(value: externref)
+}
+export function GetValueReturnKind_arm(x: GetValueReturnKind): GetValueReturnKind_Arm {
+  let __r = x;
+  return match (__kind_GetValueReturnKind(__r)) {
+    case 0: new GetValueReturnKind_String(String.fromHandle(__r))
+    case 1: new GetValueReturnKind_VecOfBool(__r)
+    case _: throw new Error("no arm of GetValueReturnKind")
+  };
+}
 
 export class Bag {
   #ref: externref;

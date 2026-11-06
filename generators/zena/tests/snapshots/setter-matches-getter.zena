@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -80,6 +81,18 @@ declare function __Toggle_set_mode(this_: externref, value: externref): void;
 @external("./bindings.wasm", "Toggle.set_mode_with_bool")
 declare function __Toggle_set_mode_with_bool(this_: externref, value: boolean): void;
 
+// kind FractionalSecondDigitsKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FractionalSecondDigitsKind")
+declare function __kind_FractionalSecondDigitsKind(x: externref | null): i32;
+
+// kind RoundingModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RoundingModeKind")
+declare function __kind_RoundingModeKind(x: externref | null): i32;
+
+// kind ModeKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ModeKind")
+declare function __kind_ModeKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -97,6 +110,50 @@ export type RoundingModeKind = String;
 
 // kind ModeKind: Bool = Boolean, X = "x", Y = "y"
 export type ModeKind = externref;
+
+// The arm a `FractionalSecondDigitsKind` holds, from `FractionalSecondDigitsKind_arm`.
+export sealed class FractionalSecondDigitsKind_Arm {
+  case FractionalSecondDigitsKind_Auto
+  case FractionalSecondDigitsKind_F64(value: f64)
+}
+export function FractionalSecondDigitsKind_arm(x: FractionalSecondDigitsKind): FractionalSecondDigitsKind_Arm {
+  let __r = x;
+  return match (__kind_FractionalSecondDigitsKind(__r)) {
+    case 0: new FractionalSecondDigitsKind_Auto()
+    case 1: new FractionalSecondDigitsKind_F64(numberValue(__r))
+    case _: throw new Error("no arm of FractionalSecondDigitsKind")
+  };
+}
+
+// The arm a `RoundingModeKind` holds, from `RoundingModeKind_arm`.
+export sealed class RoundingModeKind_Arm {
+  case RoundingModeKind_Ceil
+  case RoundingModeKind_Floor
+}
+export function RoundingModeKind_arm(x: RoundingModeKind): RoundingModeKind_Arm {
+  let __r = x.handle;
+  return match (__kind_RoundingModeKind(__r)) {
+    case 0: new RoundingModeKind_Ceil()
+    case 1: new RoundingModeKind_Floor()
+    case _: throw new Error("no arm of RoundingModeKind")
+  };
+}
+
+// The arm a `ModeKind` holds, from `ModeKind_arm`.
+export sealed class ModeKind_Arm {
+  case ModeKind_Bool(value: externref)
+  case ModeKind_X
+  case ModeKind_Y
+}
+export function ModeKind_arm(x: ModeKind): ModeKind_Arm {
+  let __r = x;
+  return match (__kind_ModeKind(__r)) {
+    case 0: new ModeKind_Bool(__r)
+    case 1: new ModeKind_X()
+    case 2: new ModeKind_Y()
+    case _: throw new Error("no arm of ModeKind")
+  };
+}
 
 export class DigitsOptions {
   #ref: externref;

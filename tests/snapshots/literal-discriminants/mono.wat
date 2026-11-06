@@ -15,6 +15,14 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:KeepAliveKind" (func $kind:KeepAliveKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:DirectionReturnKind" (func $kind:DirectionReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:ValueKind" (func $kind:ValueKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:SizeReturnKind" (func $kind:SizeReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:RepeatReturnKind" (func $kind:RepeatReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:FlagReturnKind" (func $kind:FlagReturnKind (param $x externref) (result i32)))
+
   ;; new {};
   (import "literal-discriminants" "Options.new" (func $literal-discriminants:Options.new (result externref)))
   ;; get keepAlive: KeepAliveKind as keep_alive;

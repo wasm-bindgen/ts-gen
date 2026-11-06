@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -225,6 +226,38 @@ declare function __union_alias_reads_either(item: externref): externref;
 @external("union-alias-reads", "either_with_str")
 declare function __union_alias_reads_either_with_str(item: externref): externref;
 
+// kind ZonedLike: the index of the arm holding x, -1 for none
+@external("union-alias-reads", "kind:ZonedLike")
+declare function __union_alias_reads_kind_ZonedLike(x: externref | null): i32;
+
+// kind DayLike: the index of the arm holding x, -1 for none
+@external("union-alias-reads", "kind:DayLike")
+declare function __union_alias_reads_kind_DayLike(x: externref | null): i32;
+
+// kind Zone: the index of the arm holding x, -1 for none
+@external("union-alias-reads", "kind:Zone")
+declare function __union_alias_reads_kind_Zone(x: externref | null): i32;
+
+// kind Fields: the index of the arm holding x, -1 for none
+@external("union-alias-reads", "kind:Fields")
+declare function __union_alias_reads_kind_Fields(x: externref | null): i32;
+
+// kind Offset: the index of the arm holding x, -1 for none
+@external("union-alias-reads", "kind:Offset")
+declare function __union_alias_reads_kind_Offset(x: externref | null): i32;
+
+// kind MaybeDay: the index of the arm holding x, -1 for none
+@external("union-alias-reads", "kind:MaybeDay")
+declare function __union_alias_reads_kind_MaybeDay(x: externref | null): i32;
+
+// kind OverflowKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:OverflowKind")
+declare function __kind_OverflowKind(x: externref | null): i32;
+
+// kind RelativeToKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RelativeToKind")
+declare function __kind_RelativeToKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -257,6 +290,130 @@ export type OverflowKind = String;
 
 // kind RelativeToKind fallback: Zoned = Zoned, String = String, Day = Day, Object = Object
 export type RelativeToKind = externref;
+
+// The arm a `ZonedLike` holds, from `ZonedLike_arm`.
+export sealed class ZonedLike_Arm {
+  case ZonedLike_Zoned(value: Zoned)
+  case ZonedLike_String(value: String)
+  case ZonedLike_ZonedFields(value: ZonedFields)
+}
+export function ZonedLike_arm(x: ZonedLike): ZonedLike_Arm {
+  let __r = x;
+  return match (__union_alias_reads_kind_ZonedLike(__r)) {
+    case 0: new ZonedLike_Zoned(new Zoned(__r))
+    case 1: new ZonedLike_String(String.fromHandle(__r))
+    case _: new ZonedLike_ZonedFields(new ZonedFields(__r))
+  };
+}
+
+// The arm a `DayLike` holds, from `DayLike_arm`.
+export sealed class DayLike_Arm {
+  case DayLike_Day(value: Day)
+  case DayLike_Zoned(value: Zoned)
+  case DayLike_String(value: String)
+  case DayLike_DayFields(value: DayFields)
+}
+export function DayLike_arm(x: DayLike): DayLike_Arm {
+  let __r = x;
+  return match (__union_alias_reads_kind_DayLike(__r)) {
+    case 0: new DayLike_Day(new Day(__r))
+    case 1: new DayLike_Zoned(new Zoned(__r))
+    case 2: new DayLike_String(String.fromHandle(__r))
+    case _: new DayLike_DayFields(new DayFields(__r))
+  };
+}
+
+// The arm a `Zone` holds, from `Zone_arm`.
+export sealed class Zone_Arm {
+  case Zone_Zoned(value: Zoned)
+  case Zone_String(value: String)
+}
+export function Zone_arm(x: Zone): Zone_Arm {
+  let __r = x;
+  return match (__union_alias_reads_kind_Zone(__r)) {
+    case 0: new Zone_Zoned(new Zoned(__r))
+    case 1: new Zone_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of Zone")
+  };
+}
+
+// The arm a `Fields` holds, from `Fields_arm`.
+export sealed class Fields_Arm {
+  case Fields_ZonedFields(value: ZonedFields)
+  case Fields_DayFields(value: DayFields)
+}
+export function Fields_arm(x: Fields): Fields_Arm {
+  let __r = x;
+  return match (__union_alias_reads_kind_Fields(__r)) {
+    case 0: new Fields_ZonedFields(new ZonedFields(__r))
+    case 1: new Fields_DayFields(new DayFields(__r))
+    case _: throw new Error("no arm of Fields")
+  };
+}
+
+// The arm a `Offset` holds, from `Offset_arm`.
+export sealed class Offset_Arm {
+  case Offset_F64(value: f64)
+  case Offset_String(value: String)
+  case Offset_Bool(value: externref)
+}
+export function Offset_arm(x: Offset): Offset_Arm {
+  let __r = x;
+  return match (__union_alias_reads_kind_Offset(__r)) {
+    case 0: new Offset_F64(numberValue(__r))
+    case 1: new Offset_String(String.fromHandle(__r))
+    case 2: new Offset_Bool(__r)
+    case _: throw new Error("no arm of Offset")
+  };
+}
+
+// The arm a `MaybeDay` holds, from `MaybeDay_arm`.
+export sealed class MaybeDay_Arm {
+  case MaybeDay_Day(value: Day)
+  case MaybeDay_Zoned(value: Zoned)
+  case MaybeDay_String(value: String)
+  case MaybeDay_DayFields(value: DayFields)
+}
+export function MaybeDay_arm(x: MaybeDay): MaybeDay_Arm {
+  let __r = x;
+  return match (__union_alias_reads_kind_MaybeDay(__r)) {
+    case 0: new MaybeDay_Day(new Day(__r))
+    case 1: new MaybeDay_Zoned(new Zoned(__r))
+    case 2: new MaybeDay_String(String.fromHandle(__r))
+    case _: new MaybeDay_DayFields(new DayFields(__r))
+  };
+}
+
+// The arm a `OverflowKind` holds, from `OverflowKind_arm`.
+export sealed class OverflowKind_Arm {
+  case OverflowKind_Constrain
+  case OverflowKind_Reject
+}
+export function OverflowKind_arm(x: OverflowKind): OverflowKind_Arm {
+  let __r = x.handle;
+  return match (__kind_OverflowKind(__r)) {
+    case 0: new OverflowKind_Constrain()
+    case 1: new OverflowKind_Reject()
+    case _: throw new Error("no arm of OverflowKind")
+  };
+}
+
+// The arm a `RelativeToKind` holds, from `RelativeToKind_arm`.
+export sealed class RelativeToKind_Arm {
+  case RelativeToKind_Zoned(value: Zoned)
+  case RelativeToKind_String(value: String)
+  case RelativeToKind_Day(value: Day)
+  case RelativeToKind_Object(value: externref)
+}
+export function RelativeToKind_arm(x: RelativeToKind): RelativeToKind_Arm {
+  let __r = x;
+  return match (__kind_RelativeToKind(__r)) {
+    case 0: new RelativeToKind_Zoned(new Zoned(__r))
+    case 1: new RelativeToKind_String(String.fromHandle(__r))
+    case 2: new RelativeToKind_Day(new Day(__r))
+    case _: new RelativeToKind_Object(__r)
+  };
+}
 
 export class Zoned {
   #ref: externref;

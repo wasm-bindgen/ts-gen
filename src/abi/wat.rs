@@ -44,6 +44,22 @@ pub fn generate(ir: &Ir) -> String {
         );
     }
 
+    if !ir.kinds.is_empty() {
+        out.push_str("\n  ;; Kind discriminators: the index of the arm holding $x, -1 for none.\n");
+    }
+    for k in &ir.kinds {
+        let id = match &k.module {
+            Some(spec) => ident(&format!("{spec}:{}", k.discriminator())),
+            None => ident(&k.discriminator()),
+        };
+        let _ = writeln!(
+            out,
+            "  (import {} {} (func ${id} (param $x externref) (result i32)))",
+            string(k.specifier()),
+            string(&k.discriminator()),
+        );
+    }
+
     let mut group = None;
     for import in &imports {
         let this_group = (import.module, import.class.map(|c| &c.name));

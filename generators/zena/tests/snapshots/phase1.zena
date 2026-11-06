@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -111,6 +112,18 @@ declare function __Intl_CollatorOptions_sensitivity(this_: externref): externref
 @external("./bindings.wasm", "Intl.CollatorOptions.set_sensitivity")
 declare function __Intl_CollatorOptions_set_sensitivity(this_: externref, value: externref): void;
 
+// kind SignedEnum: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:SignedEnum")
+declare function __kind_SignedEnum(x: externref | null): i32;
+
+// kind UnsignedEnum: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:UnsignedEnum")
+declare function __kind_UnsignedEnum(x: externref | null): i32;
+
+// kind AutoIncrement: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:AutoIncrement")
+declare function __kind_AutoIncrement(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -128,6 +141,54 @@ export type UnsignedEnum = externref;
 
 // kind AutoIncrement: Start = -2, Next = -1, Last = 0
 export type AutoIncrement = externref;
+
+// The arm a `SignedEnum` holds, from `SignedEnum_arm`.
+export sealed class SignedEnum_Arm {
+  case SignedEnum_Negative
+  case SignedEnum_Zero
+  case SignedEnum_Positive
+}
+export function SignedEnum_arm(x: SignedEnum): SignedEnum_Arm {
+  let __r = x;
+  return match (__kind_SignedEnum(__r)) {
+    case 0: new SignedEnum_Negative()
+    case 1: new SignedEnum_Zero()
+    case 2: new SignedEnum_Positive()
+    case _: throw new Error("no arm of SignedEnum")
+  };
+}
+
+// The arm a `UnsignedEnum` holds, from `UnsignedEnum_arm`.
+export sealed class UnsignedEnum_Arm {
+  case UnsignedEnum_A
+  case UnsignedEnum_B
+  case UnsignedEnum_C
+}
+export function UnsignedEnum_arm(x: UnsignedEnum): UnsignedEnum_Arm {
+  let __r = x;
+  return match (__kind_UnsignedEnum(__r)) {
+    case 0: new UnsignedEnum_A()
+    case 1: new UnsignedEnum_B()
+    case 2: new UnsignedEnum_C()
+    case _: throw new Error("no arm of UnsignedEnum")
+  };
+}
+
+// The arm a `AutoIncrement` holds, from `AutoIncrement_arm`.
+export sealed class AutoIncrement_Arm {
+  case AutoIncrement_Start
+  case AutoIncrement_Next
+  case AutoIncrement_Last
+}
+export function AutoIncrement_arm(x: AutoIncrement): AutoIncrement_Arm {
+  let __r = x;
+  return match (__kind_AutoIncrement(__r)) {
+    case 0: new AutoIncrement_Start()
+    case 1: new AutoIncrement_Next()
+    case 2: new AutoIncrement_Last()
+    case _: throw new Error("no arm of AutoIncrement")
+  };
+}
 
 export class EventTarget {
   #ref: externref;

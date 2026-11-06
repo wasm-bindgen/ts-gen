@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "generic-hoisting" "kind:Loose" (func $generic-hoisting:kind:Loose (param $x externref) (result i32)))
+
   ;; new(label: String): Envelope throws;
   (import "generic-hoisting" "Envelope.new" (func $generic-hoisting:Envelope.new (param $label externref) (result externref)))
   ;; get label: String;

@@ -15,6 +15,13 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:Shapes.Unit" (func $kind:Shapes.Unit (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:PickReturnKind" (func $kind:PickReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:PickAnyReturnKind" (func $kind:PickAnyReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:PickOrTextReturnKind" (func $kind:PickOrTextReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:KindKind" (func $kind:KindKind (param $x externref) (result i32)))
+
   ;; static pick(kind: f64): PickReturnKind;
   (import "./bindings.wasm" "Shapes.pick" (func $Shapes.pick (param $kind f64) (result externref)))
   ;; static pickAny(kind: f64): PickAnyReturnKind as pick_any;

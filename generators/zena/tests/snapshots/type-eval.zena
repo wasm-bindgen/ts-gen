@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -482,6 +483,54 @@ declare function __type_eval_widget(partial: externref): void;
 @external("type-eval", "unbound")
 declare function __type_eval_unbound(keys: externref, partial: externref | null): void;
 
+// kind Unit: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:Unit")
+declare function __type_eval_kind_Unit(x: externref | null): i32;
+
+// kind Minute: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:Minute")
+declare function __type_eval_kind_Minute(x: externref | null): i32;
+
+// kind OptionKey: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:OptionKey")
+declare function __type_eval_kind_OptionKey(x: externref | null): i32;
+
+// kind NotMinute: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:NotMinute")
+declare function __type_eval_kind_NotMinute(x: externref | null): i32;
+
+// kind Plural: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:Plural")
+declare function __type_eval_kind_Plural(x: externref | null): i32;
+
+// kind Scoped.Mode: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:Scoped.Mode")
+declare function __type_eval_kind_Scoped_Mode(x: externref | null): i32;
+
+// kind Scoped.NotFast: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:Scoped.NotFast")
+declare function __type_eval_kind_Scoped_NotFast(x: externref | null): i32;
+
+// kind ExcludeUnitHour: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:ExcludeUnitHour")
+declare function __type_eval_kind_ExcludeUnitHour(x: externref | null): i32;
+
+// kind ExtractUnitOrDayUnit: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:ExtractUnitOrDayUnit")
+declare function __type_eval_kind_ExtractUnitOrDayUnit(x: externref | null): i32;
+
+// kind PluralHourOrMinute: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:PluralHourOrMinute")
+declare function __type_eval_kind_PluralHourOrMinute(x: externref | null): i32;
+
+// kind KeyOfExtended: the index of the arm holding x, -1 for none
+@external("type-eval", "kind:KeyOfExtended")
+declare function __type_eval_kind_KeyOfExtended(x: externref | null): i32;
+
+// kind LargestUnitKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:LargestUnitKind")
+declare function __kind_LargestUnitKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -526,6 +575,202 @@ export type KeyOfExtended = String;
 
 // kind LargestUnitKind: Auto = "auto", Hour = "hour", Minute = "minute", Second = "second", Hours = "hours", Minutes = "minutes", Seconds = "seconds"
 export type LargestUnitKind = String;
+
+// The arm a `Unit` holds, from `Unit_arm`.
+export sealed class Unit_Arm {
+  case Unit_Hour
+  case Unit_Minute
+  case Unit_Second
+}
+export function Unit_arm(x: Unit): Unit_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_Unit(__r)) {
+    case 0: new Unit_Hour()
+    case 1: new Unit_Minute()
+    case 2: new Unit_Second()
+    case _: throw new Error("no arm of Unit")
+  };
+}
+
+// The arm a `Minute` holds, from `Minute_arm`.
+export sealed class Minute_Arm {
+  case Minute_Minute
+}
+export function Minute_arm(x: Minute): Minute_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_Minute(__r)) {
+    case 0: new Minute_Minute()
+    case _: throw new Error("no arm of Minute")
+  };
+}
+
+// The arm a `OptionKey` holds, from `OptionKey_arm`.
+export sealed class OptionKey_Arm {
+  case OptionKey_Name
+  case OptionKey_Size
+  case OptionKey_Fixed
+}
+export function OptionKey_arm(x: OptionKey): OptionKey_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_OptionKey(__r)) {
+    case 0: new OptionKey_Name()
+    case 1: new OptionKey_Size()
+    case 2: new OptionKey_Fixed()
+    case _: throw new Error("no arm of OptionKey")
+  };
+}
+
+// The arm a `NotMinute` holds, from `NotMinute_arm`.
+export sealed class NotMinute_Arm {
+  case NotMinute_Hour
+  case NotMinute_Second
+}
+export function NotMinute_arm(x: NotMinute): NotMinute_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_NotMinute(__r)) {
+    case 0: new NotMinute_Hour()
+    case 1: new NotMinute_Second()
+    case _: throw new Error("no arm of NotMinute")
+  };
+}
+
+// The arm a `Plural` holds, from `Plural_arm`.
+export sealed class Plural_Arm {
+  case Plural_Hour
+  case Plural_Minute
+  case Plural_Second
+  case Plural_Hours
+  case Plural_Minutes
+  case Plural_Seconds
+}
+export function Plural_arm(x: Plural): Plural_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_Plural(__r)) {
+    case 0: new Plural_Hour()
+    case 1: new Plural_Minute()
+    case 2: new Plural_Second()
+    case 3: new Plural_Hours()
+    case 4: new Plural_Minutes()
+    case 5: new Plural_Seconds()
+    case _: throw new Error("no arm of Plural")
+  };
+}
+
+// The arm a `Scoped_Mode` holds, from `Scoped_Mode_arm`.
+export sealed class Scoped_Mode_Arm {
+  case Scoped_Mode_Fast
+  case Scoped_Mode_Slow
+}
+export function Scoped_Mode_arm(x: Scoped_Mode): Scoped_Mode_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_Scoped_Mode(__r)) {
+    case 0: new Scoped_Mode_Fast()
+    case 1: new Scoped_Mode_Slow()
+    case _: throw new Error("no arm of Scoped.Mode")
+  };
+}
+
+// The arm a `Scoped_NotFast` holds, from `Scoped_NotFast_arm`.
+export sealed class Scoped_NotFast_Arm {
+  case Scoped_NotFast_Slow
+}
+export function Scoped_NotFast_arm(x: Scoped_NotFast): Scoped_NotFast_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_Scoped_NotFast(__r)) {
+    case 0: new Scoped_NotFast_Slow()
+    case _: throw new Error("no arm of Scoped.NotFast")
+  };
+}
+
+// The arm a `ExcludeUnitHour` holds, from `ExcludeUnitHour_arm`.
+export sealed class ExcludeUnitHour_Arm {
+  case ExcludeUnitHour_Minute
+  case ExcludeUnitHour_Second
+}
+export function ExcludeUnitHour_arm(x: ExcludeUnitHour): ExcludeUnitHour_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_ExcludeUnitHour(__r)) {
+    case 0: new ExcludeUnitHour_Minute()
+    case 1: new ExcludeUnitHour_Second()
+    case _: throw new Error("no arm of ExcludeUnitHour")
+  };
+}
+
+// The arm a `ExtractUnitOrDayUnit` holds, from `ExtractUnitOrDayUnit_arm`.
+export sealed class ExtractUnitOrDayUnit_Arm {
+  case ExtractUnitOrDayUnit_Hour
+  case ExtractUnitOrDayUnit_Minute
+  case ExtractUnitOrDayUnit_Second
+}
+export function ExtractUnitOrDayUnit_arm(x: ExtractUnitOrDayUnit): ExtractUnitOrDayUnit_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_ExtractUnitOrDayUnit(__r)) {
+    case 0: new ExtractUnitOrDayUnit_Hour()
+    case 1: new ExtractUnitOrDayUnit_Minute()
+    case 2: new ExtractUnitOrDayUnit_Second()
+    case _: throw new Error("no arm of ExtractUnitOrDayUnit")
+  };
+}
+
+// The arm a `PluralHourOrMinute` holds, from `PluralHourOrMinute_arm`.
+export sealed class PluralHourOrMinute_Arm {
+  case PluralHourOrMinute_Hour
+  case PluralHourOrMinute_Minute
+  case PluralHourOrMinute_Hours
+  case PluralHourOrMinute_Minutes
+}
+export function PluralHourOrMinute_arm(x: PluralHourOrMinute): PluralHourOrMinute_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_PluralHourOrMinute(__r)) {
+    case 0: new PluralHourOrMinute_Hour()
+    case 1: new PluralHourOrMinute_Minute()
+    case 2: new PluralHourOrMinute_Hours()
+    case 3: new PluralHourOrMinute_Minutes()
+    case _: throw new Error("no arm of PluralHourOrMinute")
+  };
+}
+
+// The arm a `KeyOfExtended` holds, from `KeyOfExtended_arm`.
+export sealed class KeyOfExtended_Arm {
+  case KeyOfExtended_Extra
+  case KeyOfExtended_Name
+  case KeyOfExtended_Size
+  case KeyOfExtended_Fixed
+}
+export function KeyOfExtended_arm(x: KeyOfExtended): KeyOfExtended_Arm {
+  let __r = x.handle;
+  return match (__type_eval_kind_KeyOfExtended(__r)) {
+    case 0: new KeyOfExtended_Extra()
+    case 1: new KeyOfExtended_Name()
+    case 2: new KeyOfExtended_Size()
+    case 3: new KeyOfExtended_Fixed()
+    case _: throw new Error("no arm of KeyOfExtended")
+  };
+}
+
+// The arm a `LargestUnitKind` holds, from `LargestUnitKind_arm`.
+export sealed class LargestUnitKind_Arm {
+  case LargestUnitKind_Auto
+  case LargestUnitKind_Hour
+  case LargestUnitKind_Minute
+  case LargestUnitKind_Second
+  case LargestUnitKind_Hours
+  case LargestUnitKind_Minutes
+  case LargestUnitKind_Seconds
+}
+export function LargestUnitKind_arm(x: LargestUnitKind): LargestUnitKind_Arm {
+  let __r = x.handle;
+  return match (__kind_LargestUnitKind(__r)) {
+    case 0: new LargestUnitKind_Auto()
+    case 1: new LargestUnitKind_Hour()
+    case 2: new LargestUnitKind_Minute()
+    case 3: new LargestUnitKind_Second()
+    case 4: new LargestUnitKind_Hours()
+    case 5: new LargestUnitKind_Minutes()
+    case 6: new LargestUnitKind_Seconds()
+    case _: throw new Error("no arm of LargestUnitKind")
+  };
+}
 
 export class Options {
   #ref: externref;

@@ -21,8 +21,8 @@ fun sanitize(s: String): String {
     return if (u.all { it == '_' }) "${u}1" else u
 }
 
-/** Backticks a name Kotlin would read as a keyword or that holds `$`. */
-fun q(s: String) = if (s in kotlinKeywords || '$' in s) "`$s`" else s
+/** Backticks a name Kotlin would read as a keyword or that holds `$` or `:`. */
+fun q(s: String) = if (s in kotlinKeywords || '$' in s || ':' in s) "`$s`" else s
 
 fun camel(snake: String): String {
     val parts = snake.split('_').filter { it.isNotEmpty() }

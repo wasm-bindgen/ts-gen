@@ -14,7 +14,7 @@ use std::hash::Hash;
 
 use ts_gen_abi::ir::{
     Class, ClassKind, Head, Ir, JsType, Kind, Literal, Member, MemberKind, Named, Param, Provide,
-    Type,
+    Type, NO_ARM,
 };
 use ts_gen_abi::{OwnerRef, BINDINGS_SPECIFIER, BUILTINS_SPECIFIER, UNDEFINED_GLOBAL};
 
@@ -103,6 +103,17 @@ struct Ctx<'a> {
     member_flats: Vec<Vec<String>>,
     function_flats: Vec<String>,
     sys_flats: Vec<String>,
+    /// Each kind's discriminator declaration and the names matching on it.
+    kind_flats: Vec<String>,
+    kind_arms: Vec<ArmNames>,
+}
+
+/// The sealed class a kind's value is matched as, a case per arm, and the
+/// function returning it.
+struct ArmNames {
+    class: String,
+    cases: Vec<String>,
+    func: String,
 }
 
 /// How a reference position is presented: a class around `#ref`, or a
@@ -227,6 +238,16 @@ impl<'a> Ctx<'a> {
                 unique(&mut used, flat_name(module, &f.member.name))
             })
             .collect();
+        let kind_flats = ir
+            .kinds
+            .iter()
+            .map(|k| {
+                unique(
+                    &mut used,
+                    flat_name(k.module.as_deref(), &k.discriminator()),
+                )
+            })
+            .collect();
 
         let mut used: HashSet<String> =
             RESERVED.iter().map(|s| s.to_string()).chain(used).collect();
@@ -294,6 +315,21 @@ impl<'a> Ctx<'a> {
                 function_names.by_ref().take(n).collect()
             })
             .collect();
+        // Derived from the kinds' names, after every name the IR gives.
+        let kind_arms = ir
+            .kinds
+            .iter()
+            .zip(&kind_names)
+            .map(|(k, name)| ArmNames {
+                class: unique(&mut used, format!("{name}_Arm")),
+                cases: k
+                    .arms
+                    .iter()
+                    .map(|a| unique(&mut used, format!("{name}_{}", a.name)))
+                    .collect(),
+                func: unique(&mut used, format!("{name}_arm")),
+            })
+            .collect();
 
         Ctx {
             ir,
@@ -307,6 +343,8 @@ impl<'a> Ctx<'a> {
             member_flats,
             function_flats,
             sys_flats,
+            kind_flats,
+            kind_arms,
         }
     }
 
@@ -485,7 +523,8 @@ impl<'a> Ctx<'a> {
         out.push_str("// `undefined` included; positions that admit null are `externref |\n");
         out.push_str("// null`. TS strings are `String`s over the JS string. A class or string\n");
         out.push_str("// result that admits an empty is `T | null`, null for null and\n");
-        out.push_str("// undefined. A kind is a type alias of its arms' common wrapper.\n");
+        out.push_str("// undefined. A kind is a type alias of its arms' common wrapper, and\n");
+        out.push_str("// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.\n");
         if self.has_modules() {
             out.push_str("// Declarations of a `module \"spec\"` are imported from \"spec\".\n");
         }
@@ -529,6 +568,21 @@ impl<'a> Ctx<'a> {
             out.push('\n');
             let module = import_module(f.module.as_deref(), &f.member);
             self.emit_external(out, None, &f.member, module, &f.member.name, flat);
+        }
+        for (k, flat) in self.ir.kinds.iter().zip(&self.kind_flats) {
+            out.push('\n');
+            let _ = writeln!(
+                out,
+                "// kind {}: the index of the arm holding x, {NO_ARM} for none",
+                k.path
+            );
+            let _ = writeln!(
+                out,
+                "@external({:?}, {:?})",
+                k.specifier(),
+                k.discriminator()
+            );
+            let _ = writeln!(out, "declare function {flat}(x: externref | null): i32;");
         }
     }
 
@@ -606,6 +660,83 @@ export function numberValue(x: externref): f64 {{ return {number_value}(x); }}
             let _ = writeln!(out, "\n// kind {}{fallback}: {}", k.path, arms.join(", "));
             let _ = writeln!(out, "export type {name} = {ty};");
         }
+        for ki in 0..self.ir.kinds.len() {
+            self.emit_arm(out, ki);
+        }
+    }
+
+    /// The sealed class a kind's value is matched as, and the function
+    /// telling its arm with the discriminator: a literal arm is a unit
+    /// case, another holds the value as its position would. In a fallback
+    /// kind the last other arm takes what no arm before it does; otherwise
+    /// a value of no arm throws, as Rust's binding does.
+    fn emit_arm(&self, out: &mut String, ki: usize) {
+        let k = &self.ir.kinds[ki];
+        let names = &self.kind_arms[ki];
+        let kind = &self.kind_names[ki];
+        let class = &names.class;
+        let _ = writeln!(out, "\n// The arm a `{kind}` holds, from `{}`.", names.func);
+        let _ = writeln!(out, "export sealed class {class} {{");
+        let mut values = Vec::new();
+        for (a, case) in k.arms.iter().zip(&names.cases) {
+            let value = match &a.ty.head {
+                Head::Literal(_) => None,
+                Head::Number => Some(("f64".to_string(), format!("numberValue({RESULT})"))),
+                _ => {
+                    let pres = self.pres(&a.ty);
+                    let wrapped = match &pres.wrap {
+                        Some(w) => w.wrap(RESULT),
+                        None => RESULT.to_string(),
+                    };
+                    Some((pres.ty, wrapped))
+                }
+            };
+            match &value {
+                Some((ty, _)) => {
+                    let _ = writeln!(out, "  case {case}(value: {ty})");
+                }
+                None => {
+                    let _ = writeln!(out, "  case {case}");
+                }
+            }
+            values.push(match value {
+                Some((_, v)) => format!("new {case}({v})"),
+                None => format!("new {case}()"),
+            });
+        }
+        out.push_str("}\n");
+        let x = match self.kind_wrap(k) {
+            Some(w) => w.unwrap("x"),
+            None => "x".to_string(),
+        };
+        let fallback = k
+            .fallback
+            .then(|| {
+                k.arms
+                    .iter()
+                    .rposition(|a| !matches!(a.ty.head, Head::Literal(_)))
+            })
+            .flatten();
+        let mut cases: Vec<String> = values
+            .iter()
+            .enumerate()
+            .filter(|&(i, _)| Some(i) != fallback)
+            .map(|(i, v)| format!("    case {i}: {v}"))
+            .collect();
+        cases.push(match fallback {
+            Some(i) => format!("    case _: {}", values[i]),
+            None => format!(
+                "    case _: throw new Error({:?})",
+                format!("no arm of {}", k.path)
+            ),
+        });
+        let _ = writeln!(
+            out,
+            "export function {}(x: {kind}): {class} {{\n  let {RESULT} = {x};\n  return match ({}({RESULT})) {{\n{}\n  }};\n}}",
+            names.func,
+            self.kind_flats[ki],
+            cases.join("\n")
+        );
     }
 
     fn emit_class(&self, out: &mut String, ci: usize) {

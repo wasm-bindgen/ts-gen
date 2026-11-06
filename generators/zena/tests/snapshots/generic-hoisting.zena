@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -84,6 +85,10 @@ declare function __generic_hoisting_post_async(envelope: externref): externref;
 @external("generic-hoisting", "relay")
 declare function __generic_hoisting_relay(envelope: externref, meta: externref | null): externref;
 
+// kind Loose: the index of the arm holding x, -1 for none
+@external("generic-hoisting", "kind:Loose")
+declare function __generic_hoisting_kind_Loose(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -95,6 +100,20 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind Loose: F64 = Number, String = String
 export type Loose = externref;
+
+// The arm a `Loose` holds, from `Loose_arm`.
+export sealed class Loose_Arm {
+  case Loose_F64(value: f64)
+  case Loose_String(value: String)
+}
+export function Loose_arm(x: Loose): Loose_Arm {
+  let __r = x;
+  return match (__generic_hoisting_kind_Loose(__r)) {
+    case 0: new Loose_F64(numberValue(__r))
+    case 1: new Loose_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of Loose")
+  };
+}
 
 export class Envelope {
   #ref: externref;

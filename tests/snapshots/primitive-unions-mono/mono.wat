@@ -15,6 +15,13 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "primitive-unions-mono" "kind:Id" (func $primitive-unions-mono:kind:Id (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:CurrentReturnKind" (func $kind:CurrentReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:LevelKind" (func $kind:LevelKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:LabelKind" (func $kind:LabelKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:FromKind" (func $kind:FromKind (param $x externref) (result i32)))
+
   ;; new {};
   (import "primitive-unions-mono" "Target.new" (func $primitive-unions-mono:Target.new (result externref)))
   ;; get name: String;

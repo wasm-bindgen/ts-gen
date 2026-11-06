@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -35,6 +36,18 @@ declare function __Outer_Inner_limit(): f64;
 @external("./bindings.wasm", "Outer.Inner.Thing.make")
 declare function __Outer_Inner_Thing_make(): externref;
 
+// kind Outer.Inner.Kind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Outer.Inner.Kind")
+declare function __kind_Outer_Inner_Kind(x: externref | null): i32;
+
+// kind Outer.Inner.Level: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Outer.Inner.Level")
+declare function __kind_Outer_Inner_Level(x: externref | null): i32;
+
+// kind Other.Inner.Kind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Other.Inner.Kind")
+declare function __kind_Other_Inner_Kind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -52,6 +65,46 @@ export type Outer_Inner_Level = externref;
 
 // kind Other.Inner.Kind: X = "x", Y = "y"
 export type Other_Inner_Kind = String;
+
+// The arm a `Outer_Inner_Kind` holds, from `Outer_Inner_Kind_arm`.
+export sealed class Outer_Inner_Kind_Arm {
+  case Outer_Inner_Kind_A
+  case Outer_Inner_Kind_B
+}
+export function Outer_Inner_Kind_arm(x: Outer_Inner_Kind): Outer_Inner_Kind_Arm {
+  let __r = x.handle;
+  return match (__kind_Outer_Inner_Kind(__r)) {
+    case 0: new Outer_Inner_Kind_A()
+    case 1: new Outer_Inner_Kind_B()
+    case _: throw new Error("no arm of Outer.Inner.Kind")
+  };
+}
+
+// The arm a `Outer_Inner_Level` holds, from `Outer_Inner_Level_arm`.
+export sealed class Outer_Inner_Level_Arm {
+  case Outer_Inner_Level_One
+}
+export function Outer_Inner_Level_arm(x: Outer_Inner_Level): Outer_Inner_Level_Arm {
+  let __r = x;
+  return match (__kind_Outer_Inner_Level(__r)) {
+    case 0: new Outer_Inner_Level_One()
+    case _: throw new Error("no arm of Outer.Inner.Level")
+  };
+}
+
+// The arm a `Other_Inner_Kind` holds, from `Other_Inner_Kind_arm`.
+export sealed class Other_Inner_Kind_Arm {
+  case Other_Inner_Kind_X
+  case Other_Inner_Kind_Y
+}
+export function Other_Inner_Kind_arm(x: Other_Inner_Kind): Other_Inner_Kind_Arm {
+  let __r = x.handle;
+  return match (__kind_Other_Inner_Kind(__r)) {
+    case 0: new Other_Inner_Kind_X()
+    case 1: new Other_Inner_Kind_Y()
+    case _: throw new Error("no arm of Other.Inner.Kind")
+  };
+}
 
 export class Outer_Inner {
   #ref: externref;

@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -77,6 +78,10 @@ declare function __Context_connect_with_cloudflare_socket(this_: externref, targ
 @external("./bindings.wasm", "Context.connect_with_storage_stub")
 declare function __Context_connect_with_storage_stub(this_: externref, target: externref): void;
 
+// kind Cloudflare.Kind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Cloudflare.Kind")
+declare function __kind_Cloudflare_Kind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -88,6 +93,20 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind Cloudflare.Kind: Http = "http", Tcp = "tcp"
 export type Cloudflare_Kind = String;
+
+// The arm a `Cloudflare_Kind` holds, from `Cloudflare_Kind_arm`.
+export sealed class Cloudflare_Kind_Arm {
+  case Cloudflare_Kind_Http
+  case Cloudflare_Kind_Tcp
+}
+export function Cloudflare_Kind_arm(x: Cloudflare_Kind): Cloudflare_Kind_Arm {
+  let __r = x.handle;
+  return match (__kind_Cloudflare_Kind(__r)) {
+    case 0: new Cloudflare_Kind_Http()
+    case 1: new Cloudflare_Kind_Tcp()
+    case _: throw new Error("no arm of Cloudflare.Kind")
+  };
+}
 
 export class Cloudflare_Stub {
   #ref: externref;

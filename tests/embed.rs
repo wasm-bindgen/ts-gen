@@ -158,8 +158,13 @@ fn worker_ir_with_no_exports() -> Result<ts_gen::abi::Ir> {
 }
 
 fn worker_ir_with(exports: &str) -> Result<ts_gen::abi::Ir> {
+    worker_ir_with_more(exports, "")
+}
+
+/// The worker fixture IR with `more` declared beside it.
+fn worker_ir_with_more(exports: &str, more: &str) -> Result<ts_gen::abi::Ir> {
     let dts_file = crate_root().join("tests/fixtures/cloudflare-worker.d.ts");
-    let dts_content = std::fs::read_to_string(&dts_file).context("reading .d.ts")?;
+    let dts_content = std::fs::read_to_string(&dts_file).context("reading .d.ts")? + more;
     let (dts, mut gctx) =
         ts_gen::parse_source(&dts_content, Some("cloudflare-worker")).context("parsing .d.ts")?;
     let exports = ts_gen::provides::resolve(exports, &dts, &mut gctx)?;
@@ -177,10 +182,19 @@ fn run_embed_test(fixture_name: &str) -> Result<()> {
     let exports_file = root
         .join("tests/fixtures/embed")
         .join(format!("{fixture_name}.provides.d.ts"));
-    let ir = if exports_file.is_file() {
-        worker_ir_with(exports_file.to_str().unwrap())
+    // A sibling `<name>.d.ts` is declared beside the worker's.
+    let more_file = root
+        .join("tests/fixtures/embed")
+        .join(format!("{fixture_name}.d.ts"));
+    let more = if more_file.is_file() {
+        std::fs::read_to_string(&more_file).context("reading the fixture's .d.ts")?
     } else {
-        worker_ir()
+        String::new()
+    };
+    let ir = if exports_file.is_file() {
+        worker_ir_with_more(exports_file.to_str().unwrap(), &more)
+    } else {
+        worker_ir_with_more("ExportedHandler.fetch", &more)
     }
     .context("building IR")?;
 
@@ -390,6 +404,13 @@ fn embed_nonnull_on_module_produced_positions() {
 fn embed_exports_nested() {
     if let Err(e) = run_embed_test("exports_nested") {
         panic!("exports_nested failed: {e:#}");
+    }
+}
+
+#[test]
+fn embed_kinds() {
+    if let Err(e) = run_embed_test("kinds") {
+        panic!("kinds failed: {e:#}");
     }
 }
 
@@ -912,6 +933,103 @@ fn embed_bindings_module_links_module_bindings_by_specifier() {
             ("js_code".into(), "cloudflare:sockets:nope".into()),
         ]
     );
+}
+
+/// The worker fixture IR with the `kinds` embed fixture's declarations.
+fn kinds_ir() -> ts_gen::abi::Ir {
+    let more =
+        std::fs::read_to_string(crate_root().join("tests/fixtures/embed/kinds.d.ts")).unwrap();
+    worker_ir_with_more("ExportedHandler.fetch", &more).unwrap()
+}
+
+/// The module's imports after `embed` linked them.
+fn linked_imports(module: &[u8]) -> Vec<(String, String)> {
+    wasmparser::Parser::new(0)
+        .parse_all(module)
+        .filter_map(|p| match p.unwrap() {
+            wasmparser::Payload::ImportSection(r) => Some(
+                r.into_imports()
+                    .map(|i| {
+                        let i = i.unwrap();
+                        (i.module.to_string(), i.name.to_string())
+                    })
+                    .collect::<Vec<_>>(),
+            ),
+            _ => None,
+        })
+        .flatten()
+        .collect()
+}
+
+#[test]
+fn embed_discriminators_are_pruned_and_apart_from_members() {
+    // `kind:Level` beside the namespace `Level`'s `Level.name`; only the
+    // imported discriminator and the tests it needs are emitted.
+    let ir = kinds_ir();
+    let module = r#"(module
+        (import "./bindings.wasm" "kind:Level" (func (param externref) (result i32)))
+        (import "./bindings.wasm" "Level.name" (func (param externref) (result externref)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &ts_gen::abi::embed::Options::new("./m.wasm"))
+        .unwrap();
+    ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
+    assert_eq!(out.used, ["kind:Level", "Level.name"]);
+    let funcs: Vec<&str> = out
+        .bindings_wat
+        .lines()
+        .filter_map(|l| l.trim().strip_prefix("(func $"))
+        .map(|l| l.split(' ').next().unwrap())
+        .collect();
+    assert_eq!(funcs, ["kind.Level"], "{}", out.bindings_wat);
+}
+
+#[test]
+fn embed_bindings_module_links_discriminators() {
+    // Under `--bindings-module`, a module's kind is `<spec>:kind:<name>`.
+    let ir = kinds_ir();
+    let module = r#"(module
+        (import "js_code" "kind:HeadersKind" (func (param externref) (result i32)))
+        (import "js_code" "embed:kinds:kind:Shade" (func (param externref) (result i32)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let options = ts_gen::abi::embed::Options {
+        bindings_module: "js_code".into(),
+        ..ts_gen::abi::embed::Options::new("./m.wasm")
+    };
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &options).unwrap();
+    ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
+    assert_eq!(out.used, ["kind:HeadersKind", "embed:kinds:kind:Shade"]);
+    assert_eq!(
+        linked_imports(&out.module),
+        [
+            (
+                "./bindings.wasm".into(),
+                "ts-gen:bindings.kind:HeadersKind".into()
+            ),
+            (
+                "./bindings.wasm".into(),
+                "ts-gen:bindings.embed:kinds:kind:Shade".into()
+            ),
+        ]
+    );
+}
+
+#[test]
+fn embed_error_discriminator_signature() {
+    let ir = kinds_ir();
+    let module = r#"(module
+        (import "./bindings.wasm" "kind:Method" (func (param externref) (result externref)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let err = ts_gen::abi::embed::embed(&ir, &bytes, &ts_gen::abi::embed::Options::new("./m.wasm"))
+        .err()
+        .expect("a discriminator returns i32")
+        .to_string();
+    assert!(err.contains("kind:Method") && err.contains("i32"), "{err}");
 }
 
 #[test]

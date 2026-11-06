@@ -3,7 +3,8 @@
 // suspend: `await` on the `Promise<JsString>` that `text()` returns. Classes
 // are external interfaces with extension members; `Headers()`,
 // `ResponseInit()` and `Response(...)` are their constructors, `BodyInit(...)`
-// makes the union `Response` takes from a string.
+// makes the union `Response` takes from a string, and a union read back is
+// matched on its `arm`.
 @file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
 package app
 
@@ -13,6 +14,8 @@ import workers.ExecutionContext
 import workers.greeting
 import workers.await
 import workers.Headers
+import workers.HeadersKindArm
+import workers.arm
 import workers.Request
 import workers.Response
 import workers.ResponseInit
@@ -37,5 +40,11 @@ suspend fun fetch(request: Request, env: Env, ctx: ExecutionContext): Response {
     val init = ResponseInit()
     init.setStatus(200.0)
     init.setHeaders(headers)
-    return Response(BodyInit(reply), init)
+    val set = when (val arm = init.headers?.arm) {
+        is HeadersKindArm.Headers -> "Headers(content-type: ${arm.value.get("content-type")})"
+        is HeadersKindArm.VecOfTuple -> "pairs"
+        is HeadersKindArm.Record -> "record"
+        null -> "(none)"
+    }
+    return Response(BodyInit(reply + "init.headers: $set\n"), init)
 }

@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -65,6 +66,10 @@ declare function __dep_make_foo(): externref;
 @external("main", "take")
 declare function __main_take(f: externref, a: externref, h: externref, d: externref, da: externref, m: externref): externref;
 
+// kind Foo.Mode: the index of the arm holding x, -1 for none
+@external("dep", "kind:Foo.Mode")
+declare function __dep_kind_Foo_Mode(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -76,6 +81,20 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind Foo.Mode: A = "a", B = "b"
 export type Foo_Mode = String;
+
+// The arm a `Foo_Mode` holds, from `Foo_Mode_arm`.
+export sealed class Foo_Mode_Arm {
+  case Foo_Mode_A
+  case Foo_Mode_B
+}
+export function Foo_Mode_arm(x: Foo_Mode): Foo_Mode_Arm {
+  let __r = x.handle;
+  return match (__dep_kind_Foo_Mode(__r)) {
+    case 0: new Foo_Mode_A()
+    case 1: new Foo_Mode_B()
+    case _: throw new Error("no arm of Foo.Mode")
+  };
+}
 
 export class _Foo {
   #ref: externref;

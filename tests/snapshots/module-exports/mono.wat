@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "dep" "kind:Foo.Mode" (func $dep:kind:Foo.Mode (param $x externref) (result i32)))
+
   ;; new() throws;
   (import "dep" "_Foo.new" (func $dep:_Foo.new (result externref)))
   ;; bar() throws;

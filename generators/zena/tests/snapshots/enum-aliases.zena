@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -51,6 +52,30 @@ declare function __enum_aliases_Api_kind(this_: externref): externref;
 @external("enum-aliases", "Api.set_kind")
 declare function __enum_aliases_Api_set_kind(this_: externref, value: externref): void;
 
+// kind Version: the index of the arm holding x, -1 for none
+@external("enum-aliases", "kind:Version")
+declare function __enum_aliases_kind_Version(x: externref | null): i32;
+
+// kind Flags: the index of the arm holding x, -1 for none
+@external("enum-aliases", "kind:Flags")
+declare function __enum_aliases_kind_Flags(x: externref | null): i32;
+
+// kind Kind: the index of the arm holding x, -1 for none
+@external("enum-aliases", "kind:Kind")
+declare function __enum_aliases_kind_Kind(x: externref | null): i32;
+
+// kind Bits: the index of the arm holding x, -1 for none
+@external("enum-aliases", "kind:Bits")
+declare function __enum_aliases_kind_Bits(x: externref | null): i32;
+
+// kind Other: the index of the arm holding x, -1 for none
+@external("enum-aliases", "kind:Other")
+declare function __enum_aliases_kind_Other(x: externref | null): i32;
+
+// kind Unresolved: the index of the arm holding x, -1 for none
+@external("enum-aliases", "kind:Unresolved")
+declare function __enum_aliases_kind_Unresolved(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -77,6 +102,100 @@ export type Other = externref;
 
 // kind Unresolved: A = 1, C = 2, D = 7
 export type Unresolved = externref;
+
+// The arm a `Version` holds, from `Version_arm`.
+export sealed class Version_Arm {
+  case Version_V1
+  case Version_V2
+}
+export function Version_arm(x: Version): Version_Arm {
+  let __r = x;
+  return match (__enum_aliases_kind_Version(__r)) {
+    case 0: new Version_V1()
+    case 1: new Version_V2()
+    case _: throw new Error("no arm of Version")
+  };
+}
+
+// The arm a `Flags` holds, from `Flags_arm`.
+export sealed class Flags_Arm {
+  case Flags_None
+  case Flags_Read
+  case Flags_Write
+  case Flags_ReadWrite
+  case Flags_All
+  case Flags_Mask
+}
+export function Flags_arm(x: Flags): Flags_Arm {
+  let __r = x;
+  return match (__enum_aliases_kind_Flags(__r)) {
+    case 0: new Flags_None()
+    case 1: new Flags_Read()
+    case 2: new Flags_Write()
+    case 3: new Flags_ReadWrite()
+    case 4: new Flags_All()
+    case 5: new Flags_Mask()
+    case _: throw new Error("no arm of Flags")
+  };
+}
+
+// The arm a `Kind` holds, from `Kind_arm`.
+export sealed class Kind_Arm {
+  case Kind_Text
+  case Kind_Bytes
+}
+export function Kind_arm(x: Kind): Kind_Arm {
+  let __r = x.handle;
+  return match (__enum_aliases_kind_Kind(__r)) {
+    case 0: new Kind_Text()
+    case 1: new Kind_Bytes()
+    case _: throw new Error("no arm of Kind")
+  };
+}
+
+// The arm a `Bits` holds, from `Bits_arm`.
+export sealed class Bits_Arm {
+  case Bits_Low
+  case Bits_High
+  case Bits_Both
+}
+export function Bits_arm(x: Bits): Bits_Arm {
+  let __r = x;
+  return match (__enum_aliases_kind_Bits(__r)) {
+    case 0: new Bits_Low()
+    case 1: new Bits_High()
+    case 2: new Bits_Both()
+    case _: throw new Error("no arm of Bits")
+  };
+}
+
+// The arm a `Other` holds, from `Other_arm`.
+export sealed class Other_Arm {
+  case Other_X
+}
+export function Other_arm(x: Other): Other_Arm {
+  let __r = x;
+  return match (__enum_aliases_kind_Other(__r)) {
+    case 0: new Other_X()
+    case _: throw new Error("no arm of Other")
+  };
+}
+
+// The arm a `Unresolved` holds, from `Unresolved_arm`.
+export sealed class Unresolved_Arm {
+  case Unresolved_A
+  case Unresolved_C
+  case Unresolved_D
+}
+export function Unresolved_arm(x: Unresolved): Unresolved_Arm {
+  let __r = x;
+  return match (__enum_aliases_kind_Unresolved(__r)) {
+    case 0: new Unresolved_A()
+    case 1: new Unresolved_C()
+    case 2: new Unresolved_D()
+    case _: throw new Error("no arm of Unresolved")
+  };
+}
 
 export class Api {
   #ref: externref;

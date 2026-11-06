@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:V" (func $kind:V (param $x externref) (result i32)))
+
   ;; new {}: ListKey;
   (import "./bindings.wasm" "ListKey.new" (func $ListKey.new (result externref)))
   ;; get name: String;

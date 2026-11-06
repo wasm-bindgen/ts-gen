@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -21,6 +22,26 @@ declare function __JsValue_undefined(): externref;
 // Number(x)
 @external("./bindings.wasm", "Number.value")
 declare function __Number_value(x: externref): f64;
+
+// kind DurationUnit: the index of the arm holding x, -1 for none
+@external("namespace-enums", "kind:DurationUnit")
+declare function __namespace_enums_kind_DurationUnit(x: externref | null): i32;
+
+// kind TimingDurationUnit: the index of the arm holding x, -1 for none
+@external("namespace-enums", "kind:TimingDurationUnit")
+declare function __namespace_enums_kind_TimingDurationUnit(x: externref | null): i32;
+
+// kind Precision: the index of the arm holding x, -1 for none
+@external("namespace-enums", "kind:Precision")
+declare function __namespace_enums_kind_Precision(x: externref | null): i32;
+
+// kind Timing.DurationUnit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Timing.DurationUnit")
+declare function __kind_Timing_DurationUnit(x: externref | null): i32;
+
+// kind Timing.Precision: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Timing.Precision")
+declare function __kind_Timing_Precision(x: externref | null): i32;
 
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
@@ -45,6 +66,78 @@ export type Timing_DurationUnit = String;
 
 // kind Timing.Precision: Coarse = 1, Fine = 2
 export type Timing_Precision = externref;
+
+// The arm a `DurationUnit` holds, from `DurationUnit_arm`.
+export sealed class DurationUnit_Arm {
+  case DurationUnit_Second
+  case DurationUnit_Minute
+}
+export function DurationUnit_arm(x: DurationUnit): DurationUnit_Arm {
+  let __r = x.handle;
+  return match (__namespace_enums_kind_DurationUnit(__r)) {
+    case 0: new DurationUnit_Second()
+    case 1: new DurationUnit_Minute()
+    case _: throw new Error("no arm of DurationUnit")
+  };
+}
+
+// The arm a `TimingDurationUnit` holds, from `TimingDurationUnit_arm`.
+export sealed class TimingDurationUnit_Arm {
+  case TimingDurationUnit_Day
+  case TimingDurationUnit_Week
+}
+export function TimingDurationUnit_arm(x: TimingDurationUnit): TimingDurationUnit_Arm {
+  let __r = x.handle;
+  return match (__namespace_enums_kind_TimingDurationUnit(__r)) {
+    case 0: new TimingDurationUnit_Day()
+    case 1: new TimingDurationUnit_Week()
+    case _: throw new Error("no arm of TimingDurationUnit")
+  };
+}
+
+// The arm a `Precision` holds, from `Precision_arm`.
+export sealed class Precision_Arm {
+  case Precision_Low
+  case Precision_High
+}
+export function Precision_arm(x: Precision): Precision_Arm {
+  let __r = x;
+  return match (__namespace_enums_kind_Precision(__r)) {
+    case 0: new Precision_Low()
+    case 1: new Precision_High()
+    case _: throw new Error("no arm of Precision")
+  };
+}
+
+// The arm a `Timing_DurationUnit` holds, from `Timing_DurationUnit_arm`.
+export sealed class Timing_DurationUnit_Arm {
+  case Timing_DurationUnit_Second
+  case Timing_DurationUnit_Minute
+  case Timing_DurationUnit_Hour
+}
+export function Timing_DurationUnit_arm(x: Timing_DurationUnit): Timing_DurationUnit_Arm {
+  let __r = x.handle;
+  return match (__kind_Timing_DurationUnit(__r)) {
+    case 0: new Timing_DurationUnit_Second()
+    case 1: new Timing_DurationUnit_Minute()
+    case 2: new Timing_DurationUnit_Hour()
+    case _: throw new Error("no arm of Timing.DurationUnit")
+  };
+}
+
+// The arm a `Timing_Precision` holds, from `Timing_Precision_arm`.
+export sealed class Timing_Precision_Arm {
+  case Timing_Precision_Coarse
+  case Timing_Precision_Fine
+}
+export function Timing_Precision_arm(x: Timing_Precision): Timing_Precision_Arm {
+  let __r = x;
+  return match (__kind_Timing_Precision(__r)) {
+    case 0: new Timing_Precision_Coarse()
+    case 1: new Timing_Precision_Fine()
+    case _: throw new Error("no arm of Timing.Precision")
+  };
+}
 
 // JSPI: suspends on a Promise and returns its value. Importing this
 // selects JSPI mode in `embed`, which wraps the provides with promising.

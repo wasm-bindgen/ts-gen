@@ -15,6 +15,11 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:SignedEnum" (func $kind:SignedEnum (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:UnsignedEnum" (func $kind:UnsignedEnum (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:AutoIncrement" (func $kind:AutoIncrement (param $x externref) (result i32)))
+
   ;; addEventListener(type: String, listener: () => Any | Null | Undefined) as add_event_listener;
   (import "./bindings.wasm" "EventTarget.add_event_listener" (func $EventTarget.add_event_listener (param $this externref) (param $type externref) (param $listener externref)))
 

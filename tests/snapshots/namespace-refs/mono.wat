@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:Cloudflare.Kind" (func $kind:Cloudflare.Kind (param $x externref) (result i32)))
+
   ;; new {};
   (import "./bindings.wasm" "Cloudflare.Stub.new" (func $Cloudflare.Stub.new (result externref)))
   ;; get id: String;

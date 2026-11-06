@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -31,6 +32,14 @@ declare function __dynamic_union_externals_Foo_worker(this_: externref): externr
 @external("dynamic-union-externals", "Foo.widget")
 declare function __dynamic_union_externals_Foo_widget(this_: externref): externref;
 
+// kind WorkerReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:WorkerReturnKind")
+declare function __kind_WorkerReturnKind(x: externref | null): i32;
+
+// kind WidgetReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:WidgetReturnKind")
+declare function __kind_WidgetReturnKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -45,6 +54,34 @@ export type WorkerReturnKind = externref;
 
 // kind WidgetReturnKind: Widget = Widget, F64 = Number
 export type WidgetReturnKind = externref;
+
+// The arm a `WorkerReturnKind` holds, from `WorkerReturnKind_arm`.
+export sealed class WorkerReturnKind_Arm {
+  case WorkerReturnKind_Worker(value: externref)
+  case WorkerReturnKind_String(value: String)
+}
+export function WorkerReturnKind_arm(x: WorkerReturnKind): WorkerReturnKind_Arm {
+  let __r = x;
+  return match (__kind_WorkerReturnKind(__r)) {
+    case 0: new WorkerReturnKind_Worker(__r)
+    case 1: new WorkerReturnKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of WorkerReturnKind")
+  };
+}
+
+// The arm a `WidgetReturnKind` holds, from `WidgetReturnKind_arm`.
+export sealed class WidgetReturnKind_Arm {
+  case WidgetReturnKind_Widget(value: externref)
+  case WidgetReturnKind_F64(value: f64)
+}
+export function WidgetReturnKind_arm(x: WidgetReturnKind): WidgetReturnKind_Arm {
+  let __r = x;
+  return match (__kind_WidgetReturnKind(__r)) {
+    case 0: new WidgetReturnKind_Widget(__r)
+    case 1: new WidgetReturnKind_F64(numberValue(__r))
+    case _: throw new Error("no arm of WidgetReturnKind")
+  };
+}
 
 export class Foo {
   #ref: externref;

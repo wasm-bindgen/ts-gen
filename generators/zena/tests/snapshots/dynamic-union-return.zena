@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -51,6 +52,18 @@ declare function __NoErasure_name(this_: externref): externref;
 @external("./bindings.wasm", "fetch_value")
 declare function __fetch_value(): externref;
 
+// kind ContentKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ContentKind")
+declare function __kind_ContentKind(x: externref | null): i32;
+
+// kind VariantKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:VariantKind")
+declare function __kind_VariantKind(x: externref | null): i32;
+
+// kind FetchValueReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FetchValueReturnKind")
+declare function __kind_FetchValueReturnKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -68,6 +81,50 @@ export type VariantKind = String;
 
 // kind FetchValueReturnKind: F64 = Number, Foo = "foo"
 export type FetchValueReturnKind = externref;
+
+// The arm a `ContentKind` holds, from `ContentKind_arm`.
+export sealed class ContentKind_Arm {
+  case ContentKind_String(value: String)
+  case ContentKind_ArrayBuffer(value: externref)
+  case ContentKind_Uint8Array(value: externref)
+}
+export function ContentKind_arm(x: ContentKind): ContentKind_Arm {
+  let __r = x;
+  return match (__kind_ContentKind(__r)) {
+    case 0: new ContentKind_String(String.fromHandle(__r))
+    case 1: new ContentKind_ArrayBuffer(__r)
+    case 2: new ContentKind_Uint8Array(__r)
+    case _: throw new Error("no arm of ContentKind")
+  };
+}
+
+// The arm a `VariantKind` holds, from `VariantKind_arm`.
+export sealed class VariantKind_Arm {
+  case VariantKind_A
+  case VariantKind_B
+}
+export function VariantKind_arm(x: VariantKind): VariantKind_Arm {
+  let __r = x.handle;
+  return match (__kind_VariantKind(__r)) {
+    case 0: new VariantKind_A()
+    case 1: new VariantKind_B()
+    case _: throw new Error("no arm of VariantKind")
+  };
+}
+
+// The arm a `FetchValueReturnKind` holds, from `FetchValueReturnKind_arm`.
+export sealed class FetchValueReturnKind_Arm {
+  case FetchValueReturnKind_F64(value: f64)
+  case FetchValueReturnKind_Foo
+}
+export function FetchValueReturnKind_arm(x: FetchValueReturnKind): FetchValueReturnKind_Arm {
+  let __r = x;
+  return match (__kind_FetchValueReturnKind(__r)) {
+    case 0: new FetchValueReturnKind_F64(numberValue(__r))
+    case 1: new FetchValueReturnKind_Foo()
+    case _: throw new Error("no arm of FetchValueReturnKind")
+  };
+}
 
 export class Erased {
   #ref: externref;

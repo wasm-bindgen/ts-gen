@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -173,6 +174,34 @@ declare function __enum_positions_Probe_mode_or_number_or_string_with_f64(this_:
 @external("enum-positions", "Probe.mode_or_number_or_string_with_str")
 declare function __enum_positions_Probe_mode_or_number_or_string_with_str(this_: externref, x: externref): void;
 
+// kind Mode: the index of the arm holding x, -1 for none
+@external("enum-positions", "kind:Mode")
+declare function __enum_positions_kind_Mode(x: externref | null): i32;
+
+// kind Level: the index of the arm holding x, -1 for none
+@external("enum-positions", "kind:Level")
+declare function __enum_positions_kind_Level(x: externref | null): i32;
+
+// kind Codes.Region: the index of the arm holding x, -1 for none
+@external("enum-positions", "kind:Codes.Region")
+declare function __enum_positions_kind_Codes_Region(x: externref | null): i32;
+
+// kind ModeOrNumberReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ModeOrNumberReturnKind")
+declare function __kind_ModeOrNumberReturnKind(x: externref | null): i32;
+
+// kind ModeOrStringReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ModeOrStringReturnKind")
+declare function __kind_ModeOrStringReturnKind(x: externref | null): i32;
+
+// kind ModeOrRegionReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ModeOrRegionReturnKind")
+declare function __kind_ModeOrRegionReturnKind(x: externref | null): i32;
+
+// kind LevelOrStringReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:LevelOrStringReturnKind")
+declare function __kind_LevelOrStringReturnKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -202,6 +231,104 @@ export type ModeOrRegionReturnKind = externref;
 
 // kind LevelOrStringReturnKind: Level = Level, String = String
 export type LevelOrStringReturnKind = externref;
+
+// The arm a `Mode` holds, from `Mode_arm`.
+export sealed class Mode_Arm {
+  case Mode_Fast
+  case Mode_Slow
+}
+export function Mode_arm(x: Mode): Mode_Arm {
+  let __r = x.handle;
+  return match (__enum_positions_kind_Mode(__r)) {
+    case 0: new Mode_Fast()
+    case 1: new Mode_Slow()
+    case _: throw new Error("no arm of Mode")
+  };
+}
+
+// The arm a `Level` holds, from `Level_arm`.
+export sealed class Level_Arm {
+  case Level_Low
+  case Level_High
+}
+export function Level_arm(x: Level): Level_Arm {
+  let __r = x;
+  return match (__enum_positions_kind_Level(__r)) {
+    case 0: new Level_Low()
+    case 1: new Level_High()
+    case _: throw new Error("no arm of Level")
+  };
+}
+
+// The arm a `Codes_Region` holds, from `Codes_Region_arm`.
+export sealed class Codes_Region_Arm {
+  case Codes_Region_Eu
+  case Codes_Region_Us
+}
+export function Codes_Region_arm(x: Codes_Region): Codes_Region_Arm {
+  let __r = x.handle;
+  return match (__enum_positions_kind_Codes_Region(__r)) {
+    case 0: new Codes_Region_Eu()
+    case 1: new Codes_Region_Us()
+    case _: throw new Error("no arm of Codes.Region")
+  };
+}
+
+// The arm a `ModeOrNumberReturnKind` holds, from `ModeOrNumberReturnKind_arm`.
+export sealed class ModeOrNumberReturnKind_Arm {
+  case ModeOrNumberReturnKind_Mode(value: Mode)
+  case ModeOrNumberReturnKind_F64(value: f64)
+}
+export function ModeOrNumberReturnKind_arm(x: ModeOrNumberReturnKind): ModeOrNumberReturnKind_Arm {
+  let __r = x;
+  return match (__kind_ModeOrNumberReturnKind(__r)) {
+    case 0: new ModeOrNumberReturnKind_Mode(String.fromHandle(__r))
+    case 1: new ModeOrNumberReturnKind_F64(numberValue(__r))
+    case _: throw new Error("no arm of ModeOrNumberReturnKind")
+  };
+}
+
+// The arm a `ModeOrStringReturnKind` holds, from `ModeOrStringReturnKind_arm`.
+export sealed class ModeOrStringReturnKind_Arm {
+  case ModeOrStringReturnKind_Mode(value: Mode)
+  case ModeOrStringReturnKind_String(value: String)
+}
+export function ModeOrStringReturnKind_arm(x: ModeOrStringReturnKind): ModeOrStringReturnKind_Arm {
+  let __r = x;
+  return match (__kind_ModeOrStringReturnKind(__r)) {
+    case 0: new ModeOrStringReturnKind_Mode(String.fromHandle(__r))
+    case 1: new ModeOrStringReturnKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of ModeOrStringReturnKind")
+  };
+}
+
+// The arm a `ModeOrRegionReturnKind` holds, from `ModeOrRegionReturnKind_arm`.
+export sealed class ModeOrRegionReturnKind_Arm {
+  case ModeOrRegionReturnKind_Mode(value: Mode)
+  case ModeOrRegionReturnKind_Region(value: Codes_Region)
+}
+export function ModeOrRegionReturnKind_arm(x: ModeOrRegionReturnKind): ModeOrRegionReturnKind_Arm {
+  let __r = x;
+  return match (__kind_ModeOrRegionReturnKind(__r)) {
+    case 0: new ModeOrRegionReturnKind_Mode(String.fromHandle(__r))
+    case 1: new ModeOrRegionReturnKind_Region(String.fromHandle(__r))
+    case _: throw new Error("no arm of ModeOrRegionReturnKind")
+  };
+}
+
+// The arm a `LevelOrStringReturnKind` holds, from `LevelOrStringReturnKind_arm`.
+export sealed class LevelOrStringReturnKind_Arm {
+  case LevelOrStringReturnKind_Level(value: Level)
+  case LevelOrStringReturnKind_String(value: String)
+}
+export function LevelOrStringReturnKind_arm(x: LevelOrStringReturnKind): LevelOrStringReturnKind_Arm {
+  let __r = x;
+  return match (__kind_LevelOrStringReturnKind(__r)) {
+    case 0: new LevelOrStringReturnKind_Level(__r)
+    case 1: new LevelOrStringReturnKind_String(String.fromHandle(__r))
+    case _: throw new Error("no arm of LevelOrStringReturnKind")
+  };
+}
 
 export class Holder {
   #ref: externref;

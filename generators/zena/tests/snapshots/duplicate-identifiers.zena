@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -169,6 +170,18 @@ declare function __use(dup: externref, first: externref, prim: externref, mode: 
 @external("./bindings.wasm", "use_other")
 declare function __use_other(dup: externref, first: externref, two: externref, merged: externref, t: externref): void;
 
+// kind Mode: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Mode")
+declare function __kind_Mode(x: externref | null): i32;
+
+// kind Color: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Color")
+declare function __kind_Color(x: externref | null): i32;
+
+// kind Level: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Level")
+declare function __kind_Level(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -186,6 +199,46 @@ export type Color = externref;
 
 // kind Level: Low = 0, High = 1
 export type Level_2 = externref;
+
+// The arm a `Mode` holds, from `Mode_arm`.
+export sealed class Mode_Arm {
+  case Mode_On
+  case Mode_Off
+}
+export function Mode_arm(x: Mode): Mode_Arm {
+  let __r = x.handle;
+  return match (__kind_Mode(__r)) {
+    case 0: new Mode_On()
+    case 1: new Mode_Off()
+    case _: throw new Error("no arm of Mode")
+  };
+}
+
+// The arm a `Color` holds, from `Color_arm`.
+export sealed class Color_Arm {
+  case Color_Red
+}
+export function Color_arm(x: Color): Color_Arm {
+  let __r = x;
+  return match (__kind_Color(__r)) {
+    case 0: new Color_Red()
+    case _: throw new Error("no arm of Color")
+  };
+}
+
+// The arm a `Level_2` holds, from `Level_2_arm`.
+export sealed class Level_2_Arm {
+  case Level_2_Low
+  case Level_2_High
+}
+export function Level_2_arm(x: Level_2): Level_2_Arm {
+  let __r = x;
+  return match (__kind_Level(__r)) {
+    case 0: new Level_2_Low()
+    case 1: new Level_2_High()
+    case _: throw new Error("no arm of Level")
+  };
+}
 
 export class Dup {
   #ref: externref;

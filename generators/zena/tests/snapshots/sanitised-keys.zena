@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -403,6 +404,14 @@ declare function __sanitised_keys_inner_(): f64;
 @external("sanitised-keys", "fetch_url")
 declare function __sanitised_keys_fetch_url(url: externref): void;
 
+// kind Op: the index of the arm holding x, -1 for none
+@external("sanitised-keys", "kind:Op")
+declare function __sanitised_keys_kind_Op(x: externref | null): i32;
+
+// kind Sigil: the index of the arm holding x, -1 for none
+@external("sanitised-keys", "kind:Sigil")
+declare function __sanitised_keys_kind_Sigil(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -417,6 +426,38 @@ export type Op = String;
 
 // kind Sigil: Dollar = 1, Underscore = 2
 export type Sigil = externref;
+
+// The arm a `Op` holds, from `Op_arm`.
+export sealed class Op_Arm {
+  case Op_Plus
+  case Op_Minus
+  case Op_Empty
+  case Op_LtEq
+}
+export function Op_arm(x: Op): Op_Arm {
+  let __r = x.handle;
+  return match (__sanitised_keys_kind_Op(__r)) {
+    case 0: new Op_Plus()
+    case 1: new Op_Minus()
+    case 2: new Op_Empty()
+    case 3: new Op_LtEq()
+    case _: throw new Error("no arm of Op")
+  };
+}
+
+// The arm a `Sigil` holds, from `Sigil_arm`.
+export sealed class Sigil_Arm {
+  case Sigil_Dollar
+  case Sigil_Underscore
+}
+export function Sigil_arm(x: Sigil): Sigil_Arm {
+  let __r = x;
+  return match (__sanitised_keys_kind_Sigil(__r)) {
+    case 0: new Sigil_Dollar()
+    case 1: new Sigil_Underscore()
+    case _: throw new Error("no arm of Sigil")
+  };
+}
 
 export class Pair {
   #ref: externref;

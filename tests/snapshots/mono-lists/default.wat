@@ -16,6 +16,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:GetValueReturnKind" (func $kind:GetValueReturnKind (param $x externref) (result i32)))
+
   ;; get size: f64;
   (import "mono-lists" "Bag.size" (func $mono-lists:Bag.size (param $this externref) (result f64)))
   ;; first(): T | Null | Undefined;

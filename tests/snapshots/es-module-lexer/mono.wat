@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "es-module-lexer" "kind:ImportType" (func $es-module-lexer:kind:ImportType (param $x externref) (result i32)))
+
   ;; new {};
   (import "es-module-lexer" "ImportSpecifier.new" (func $es-module-lexer:ImportSpecifier.new (result externref)))
   ;; get n: String | Undefined;

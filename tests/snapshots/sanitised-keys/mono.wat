@@ -15,6 +15,10 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "sanitised-keys" "kind:Op" (func $sanitised-keys:kind:Op (param $x externref) (result i32)))
+  (import "sanitised-keys" "kind:Sigil" (func $sanitised-keys:kind:Sigil (param $x externref) (result i32)))
+
   ;; new() throws;
   (import "sanitised-keys" "Pair.new" (func $sanitised-keys:Pair.new (result externref)))
   ;; get "0": Socket as _0;

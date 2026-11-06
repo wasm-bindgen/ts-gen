@@ -68,7 +68,27 @@ with. Three layers:
   members, getters included, are exported functions, one per name and
   alias. A kind is `export type Kind = W;`, `W` the wrapper all its
   arms share (`String` for a string enum, a class), else
-  `externref`.
+  `externref`. Each kind also gets its discriminator, `@external(<module>,
+  "kind:<kind>") declare function __kind_<kind>(x: externref | null):
+  i32`, and a match surface over it (below).
+
+A kind's value, from a result or a provide parameter, is matched with
+`<Kind>_arm(x)`, which asks the discriminator for the arm (IR.md,
+Recognition) and returns a case of `export sealed class <Kind>_Arm`: a
+literal arm is a unit case, `<Kind>_<Arm>`, and another arm a case
+holding the value as its position would be typed (`Number` as `f64`):
+
+```zena
+match (HeadersKind_arm(init)) {
+  case let HeadersKind_Headers { value as h }: ...
+  case let HeadersKind_VecOfTuple { value as pairs }: ...
+  case let HeadersKind_Record { value as record }: ...
+}
+```
+
+A value of no arm throws, as Rust's binding does; in a `fallback` kind
+the last non-literal arm is the match's default. A position's empties are
+tested before, as its type says.
 
 The binding names are unique per module; Zena has one namespace per
 file. Classes, kinds and class aliases are named first, then top-level
@@ -78,7 +98,8 @@ specifier as a prefix (`mail_send` beside a global `send`), the
 overloads of one function together. A name the bindings define or use
 (`Undefined`, `isUndefined`, `isEmpty`, `numberValue`, `await_`,
 `String`, `Error`, `FixedArray`, `__r`, or a flat declaration) takes a
-`_2` suffix, as does a parameter named `this_` or `__r`.
+`_2` suffix, as does a parameter named `this_` or `__r`. The match
+surface's names are taken last, with the same suffix on a clash.
 
 Positions whose type is a class, a string or a string literal, or a kind
 whose arms share one of those, are typed:

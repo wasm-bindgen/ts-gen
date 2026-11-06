@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -447,6 +448,30 @@ declare function __stringify_with_replacer(value: externref | null, replacer: ex
 @external("./bindings.wasm", "stringify_with_replacer_and_space")
 declare function __stringify_with_replacer_and_space(value: externref | null, replacer: externref, space: f64): externref;
 
+// kind Direction: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Direction")
+declare function __kind_Direction(x: externref | null): i32;
+
+// kind HttpStatus: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:HttpStatus")
+declare function __kind_HttpStatus(x: externref | null): i32;
+
+// kind SignedValues: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:SignedValues")
+declare function __kind_SignedValues(x: externref | null): i32;
+
+// kind HeadersKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:HeadersKind")
+declare function __kind_HeadersKind(x: externref | null): i32;
+
+// kind BodyKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:BodyKind")
+declare function __kind_BodyKind(x: externref | null): i32;
+
+// kind LabelKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:LabelKind")
+declare function __kind_LabelKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -473,6 +498,99 @@ export type BodyKind = externref;
 
 // kind LabelKind: String = String, F64 = Number
 export type LabelKind = externref;
+
+// The arm a `Direction` holds, from `Direction_arm`.
+export sealed class Direction_Arm {
+  case Direction_Up
+  case Direction_Down
+  case Direction_Left
+  case Direction_Right
+}
+export function Direction_arm(x: Direction): Direction_Arm {
+  let __r = x;
+  return match (__kind_Direction(__r)) {
+    case 0: new Direction_Up()
+    case 1: new Direction_Down()
+    case 2: new Direction_Left()
+    case 3: new Direction_Right()
+    case _: throw new Error("no arm of Direction")
+  };
+}
+
+// The arm a `HttpStatus` holds, from `HttpStatus_arm`.
+export sealed class HttpStatus_Arm {
+  case HttpStatus_Ok
+  case HttpStatus_NotFound
+  case HttpStatus_InternalServerError
+}
+export function HttpStatus_arm(x: HttpStatus): HttpStatus_Arm {
+  let __r = x;
+  return match (__kind_HttpStatus(__r)) {
+    case 0: new HttpStatus_Ok()
+    case 1: new HttpStatus_NotFound()
+    case 2: new HttpStatus_InternalServerError()
+    case _: throw new Error("no arm of HttpStatus")
+  };
+}
+
+// The arm a `SignedValues` holds, from `SignedValues_arm`.
+export sealed class SignedValues_Arm {
+  case SignedValues_NegativeOne
+  case SignedValues_Zero
+  case SignedValues_One
+  case SignedValues_Max
+}
+export function SignedValues_arm(x: SignedValues): SignedValues_Arm {
+  let __r = x;
+  return match (__kind_SignedValues(__r)) {
+    case 0: new SignedValues_NegativeOne()
+    case 1: new SignedValues_Zero()
+    case 2: new SignedValues_One()
+    case 3: new SignedValues_Max()
+    case _: throw new Error("no arm of SignedValues")
+  };
+}
+
+// The arm a `HeadersKind` holds, from `HeadersKind_arm`.
+export sealed class HeadersKind_Arm {
+  case HeadersKind_Headers(value: externref)
+  case HeadersKind_Record(value: externref)
+}
+export function HeadersKind_arm(x: HeadersKind): HeadersKind_Arm {
+  let __r = x;
+  return match (__kind_HeadersKind(__r)) {
+    case 0: new HeadersKind_Headers(__r)
+    case _: new HeadersKind_Record(__r)
+  };
+}
+
+// The arm a `BodyKind` holds, from `BodyKind_arm`.
+export sealed class BodyKind_Arm {
+  case BodyKind_String(value: String)
+  case BodyKind_ArrayBuffer(value: externref)
+}
+export function BodyKind_arm(x: BodyKind): BodyKind_Arm {
+  let __r = x;
+  return match (__kind_BodyKind(__r)) {
+    case 0: new BodyKind_String(String.fromHandle(__r))
+    case 1: new BodyKind_ArrayBuffer(__r)
+    case _: throw new Error("no arm of BodyKind")
+  };
+}
+
+// The arm a `LabelKind` holds, from `LabelKind_arm`.
+export sealed class LabelKind_Arm {
+  case LabelKind_String(value: String)
+  case LabelKind_F64(value: f64)
+}
+export function LabelKind_arm(x: LabelKind): LabelKind_Arm {
+  let __r = x;
+  return match (__kind_LabelKind(__r)) {
+    case 0: new LabelKind_String(String.fromHandle(__r))
+    case 1: new LabelKind_F64(numberValue(__r))
+    case _: throw new Error("no arm of LabelKind")
+  };
+}
 
 export class StringMap {
   #ref: externref;

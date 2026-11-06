@@ -15,6 +15,17 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "enum-initializers" "kind:Base" (func $enum-initializers:kind:Base (param $x externref) (result i32)))
+  (import "enum-initializers" "kind:Later" (func $enum-initializers:kind:Later (param $x externref) (result i32)))
+  (import "enum-initializers" "kind:Mode" (func $enum-initializers:kind:Mode (param $x externref) (result i32)))
+  (import "enum-initializers" "kind:Ns.Inner" (func $enum-initializers:kind:Ns.Inner (param $x externref) (result i32)))
+  (import "enum-initializers" "kind:Label" (func $enum-initializers:kind:Label (param $x externref) (result i32)))
+  (import "enum-initializers" "kind:Merged" (func $enum-initializers:kind:Merged (param $x externref) (result i32)))
+  (import "enum-initializers" "kind:Restart" (func $enum-initializers:kind:Restart (param $x externref) (result i32)))
+  (import "enum-initializers" "kind:Cycle" (func $enum-initializers:kind:Cycle (param $x externref) (result i32)))
+  (import "enum-initializers" "kind:Loop" (func $enum-initializers:kind:Loop (param $x externref) (result i32)))
+
   ;; function useAll(mode: Mode, label: Label, merged: Merged, restart: Restart, cycle: Cycle, loop: Loop) as use_all;
   (import "enum-initializers" "use_all" (func $enum-initializers:use_all (param $mode externref) (param $label externref) (param $merged externref) (param $restart externref) (param $cycle externref) (param $loop externref)))
 
