@@ -1167,6 +1167,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "ts-gen-abi"
+version = "0.1.0"
+
+[[package]]
 name = "ts-gen-integration-tests"
 version = "0.0.0"
 dependencies = [

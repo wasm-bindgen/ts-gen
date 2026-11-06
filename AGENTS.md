@@ -59,6 +59,10 @@ tests/
 ├── embed.rs                   # embed end-to-end on the fixtures/embed modules
 └── embed.mjs                  # node run of each merged embed fixture
 
+abi/                           # ts-gen-abi: the IR model and its text format (IR.md)
+├── src/ir.rs                  # the model and its imports
+└── src/text.rs                # reference writer and reader of the text
+
 integration-tests/
 ├── tests/*.rs                 # hand-written integration tests
 ├── js/<lib-name>/             # backing JS packages for tests that run (file: deps)
@@ -132,6 +136,11 @@ The embed tests (`cargo test --test embed`) also merge each fixture
 with binaryen's `wasm-merge` (`WASM_MERGE` or `PATH`) and run the
 result in node 24+ (`NODE` or `PATH`); a missing tool skips its step
 locally and fails under `CI`.
+
+A change to the IR or its wire conventions is a change to [IR.md](IR.md),
+the contract with generators outside this repository: an addition keeps
+the `ir 1;` version, a change a reader of the previous version would
+misread bumps it.
 
 ## Pipeline
 
