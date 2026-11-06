@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -146,6 +147,14 @@ declare function __cloudflare_sockets_connect(address: externref): externref;
 @external("cloudflare:sockets", "connect_with_options")
 declare function __cloudflare_sockets_connect_with_options(address: externref, options: externref): externref;
 
+// kind BucketKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:BucketKind")
+declare function __kind_BucketKind(x: externref | null): i32;
+
+// kind SecureTransportKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:SecureTransportKind")
+declare function __kind_SecureTransportKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -160,6 +169,34 @@ export type BucketKind = String;
 
 // kind SecureTransportKind: Off = "off", On = "on"
 export type SecureTransportKind = String;
+
+// The arm a `BucketKind` holds, from `BucketKind_arm`.
+export sealed class BucketKind_Arm {
+  case BucketKind_Standard
+  case BucketKind_Infrequent
+}
+export function BucketKind_arm(x: BucketKind): BucketKind_Arm {
+  let __r = x.handle;
+  return match (__kind_BucketKind(__r)) {
+    case 0: new BucketKind_Standard()
+    case 1: new BucketKind_Infrequent()
+    case _: throw new Error("no arm of BucketKind")
+  };
+}
+
+// The arm a `SecureTransportKind` holds, from `SecureTransportKind_arm`.
+export sealed class SecureTransportKind_Arm {
+  case SecureTransportKind_Off
+  case SecureTransportKind_On
+}
+export function SecureTransportKind_arm(x: SecureTransportKind): SecureTransportKind_Arm {
+  let __r = x.handle;
+  return match (__kind_SecureTransportKind(__r)) {
+    case 0: new SecureTransportKind_Off()
+    case 1: new SecureTransportKind_On()
+    case _: throw new Error("no arm of SecureTransportKind")
+  };
+}
 
 export class Checksums {
   #ref: externref;

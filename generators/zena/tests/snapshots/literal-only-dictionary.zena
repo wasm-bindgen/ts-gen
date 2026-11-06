@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -201,6 +202,14 @@ declare function __CappedAttachment_set_f(this_: externref, value: externref): v
 @external("./bindings.wasm", "CappedAttachment.set_f_with_f64")
 declare function __CappedAttachment_set_f_with_f64(this_: externref, value: f64): void;
 
+// kind DispositionKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DispositionKind")
+declare function __kind_DispositionKind(x: externref | null): i32;
+
+// kind AKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:AKind")
+declare function __kind_AKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -215,6 +224,34 @@ export type DispositionKind = String;
 
 // kind AKind: String = String, F64 = Number
 export type AKind = externref;
+
+// The arm a `DispositionKind` holds, from `DispositionKind_arm`.
+export sealed class DispositionKind_Arm {
+  case DispositionKind_Inline
+  case DispositionKind_Attachment
+}
+export function DispositionKind_arm(x: DispositionKind): DispositionKind_Arm {
+  let __r = x.handle;
+  return match (__kind_DispositionKind(__r)) {
+    case 0: new DispositionKind_Inline()
+    case 1: new DispositionKind_Attachment()
+    case _: throw new Error("no arm of DispositionKind")
+  };
+}
+
+// The arm a `AKind` holds, from `AKind_arm`.
+export sealed class AKind_Arm {
+  case AKind_String(value: String)
+  case AKind_F64(value: f64)
+}
+export function AKind_arm(x: AKind): AKind_Arm {
+  let __r = x;
+  return match (__kind_AKind(__r)) {
+    case 0: new AKind_String(String.fromHandle(__r))
+    case 1: new AKind_F64(numberValue(__r))
+    case _: throw new Error("no arm of AKind")
+  };
+}
 
 export class Placeholder {
   #ref: externref;

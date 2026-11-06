@@ -15,6 +15,11 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:QueueContentType" (func $kind:QueueContentType (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:BodyInit" (func $kind:BodyInit (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:HeadersKind" (func $kind:HeadersKind (param $x externref) (result i32)))
+
   ;; new() throws;
   (import "./bindings.wasm" "DOMException.new" (func $DOMException.new (result externref)))
   ;; new(message: String) throws as new_with_message;

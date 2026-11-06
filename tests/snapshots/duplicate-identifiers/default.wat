@@ -15,6 +15,11 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:Mode" (func $kind:Mode (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:Color" (func $kind:Color (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:Level" (func $kind:Level (param $x externref) (result i32)))
+
   ;; new {};
   (import "./bindings.wasm" "Dup.new" (func $Dup.new (result externref)))
   ;; get a: f64;

@@ -16,6 +16,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:ColorModeKind" (func $kind:ColorModeKind (param $x externref) (result i32)))
+
   ;; new {};
   (import "node:console" "ConsoleOptions.new" (func $node:console:ConsoleOptions.new (result externref)))
   ;; get stdout: Object;

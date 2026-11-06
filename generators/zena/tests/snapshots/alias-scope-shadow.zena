@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -119,6 +120,22 @@ declare function __Holder_create(value: externref | null): externref;
 @external("./bindings.wasm", "Holder.get")
 declare function __Holder_get(this_: externref): externref | null;
 
+// kind InnerOrName: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:InnerOrName")
+declare function __kind_InnerOrName(x: externref | null): i32;
+
+// kind Chained: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Chained")
+declare function __kind_Chained(x: externref | null): i32;
+
+// kind Names: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Names")
+declare function __kind_Names(x: externref | null): i32;
+
+// kind Mode: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Mode")
+declare function __kind_Mode(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -139,6 +156,60 @@ export type Names = externref;
 
 // kind Mode: Fast = "fast", Slow = "slow"
 export type Mode = String;
+
+// The arm a `InnerOrName` holds, from `InnerOrName_arm`.
+export sealed class InnerOrName_Arm {
+  case InnerOrName_String(value: String)
+  case InnerOrName_Inner(value: Inner)
+}
+export function InnerOrName_arm(x: InnerOrName): InnerOrName_Arm {
+  let __r = x;
+  return match (__kind_InnerOrName(__r)) {
+    case 0: new InnerOrName_String(String.fromHandle(__r))
+    case _: new InnerOrName_Inner(new Inner(__r))
+  };
+}
+
+// The arm a `Chained` holds, from `Chained_arm`.
+export sealed class Chained_Arm {
+  case Chained_String(value: String)
+  case Chained_Inner(value: Inner)
+}
+export function Chained_arm(x: Chained): Chained_Arm {
+  let __r = x;
+  return match (__kind_Chained(__r)) {
+    case 0: new Chained_String(String.fromHandle(__r))
+    case _: new Chained_Inner(new Inner(__r))
+  };
+}
+
+// The arm a `Names` holds, from `Names_arm`.
+export sealed class Names_Arm {
+  case Names_String(value: String)
+  case Names_F64(value: f64)
+}
+export function Names_arm(x: Names): Names_Arm {
+  let __r = x;
+  return match (__kind_Names(__r)) {
+    case 0: new Names_String(String.fromHandle(__r))
+    case 1: new Names_F64(numberValue(__r))
+    case _: throw new Error("no arm of Names")
+  };
+}
+
+// The arm a `Mode` holds, from `Mode_arm`.
+export sealed class Mode_Arm {
+  case Mode_Fast
+  case Mode_Slow
+}
+export function Mode_arm(x: Mode): Mode_Arm {
+  let __r = x.handle;
+  return match (__kind_Mode(__r)) {
+    case 0: new Mode_Fast()
+    case 1: new Mode_Slow()
+    case _: throw new Error("no arm of Mode")
+  };
+}
 
 export class Pair {
   #ref: externref;

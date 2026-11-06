@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -198,6 +199,10 @@ declare function __NestedMapped_y(this_: externref): boolean;
 @external("./bindings.wasm", "NestedMapped.set_y")
 declare function __NestedMapped_set_y(this_: externref, value: boolean): void;
 
+// kind V: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:V")
+declare function __kind_V(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -209,6 +214,18 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind V: X = "x"
 export type V = String;
+
+// The arm a `V` holds, from `V_arm`.
+export sealed class V_Arm {
+  case V_X
+}
+export function V_arm(x: V): V_Arm {
+  let __r = x.handle;
+  return match (__kind_V(__r)) {
+    case 0: new V_X()
+    case _: throw new Error("no arm of V")
+  };
+}
 
 export class ListKey {
   #ref: externref;

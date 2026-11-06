@@ -15,6 +15,11 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:FractionalSecondDigitsKind" (func $kind:FractionalSecondDigitsKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:RoundingModeKind" (func $kind:RoundingModeKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:ModeKind" (func $kind:ModeKind (param $x externref) (result i32)))
+
   ;; new {};
   (import "./bindings.wasm" "DigitsOptions.new" (func $DigitsOptions.new (result externref)))
   ;; get fractionalSecondDigits?: FractionalSecondDigitsKind | Undefined as fractional_second_digits;

@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -73,6 +74,10 @@ declare function __generic_mono_review_literal_union(): externref;
 @external("generic-mono-review", "shadows_alias")
 declare function __generic_mono_review_shadows_alias(h: externref): externref;
 
+// kind LiteralUnionReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:LiteralUnionReturnKind")
+declare function __kind_LiteralUnionReturnKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -84,6 +89,20 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind LiteralUnionReturnKind: A = "a", B = "b"
 export type LiteralUnionReturnKind = String;
+
+// The arm a `LiteralUnionReturnKind` holds, from `LiteralUnionReturnKind_arm`.
+export sealed class LiteralUnionReturnKind_Arm {
+  case LiteralUnionReturnKind_A
+  case LiteralUnionReturnKind_B
+}
+export function LiteralUnionReturnKind_arm(x: LiteralUnionReturnKind): LiteralUnionReturnKind_Arm {
+  let __r = x.handle;
+  return match (__kind_LiteralUnionReturnKind(__r)) {
+    case 0: new LiteralUnionReturnKind_A()
+    case 1: new LiteralUnionReturnKind_B()
+    case _: throw new Error("no arm of LiteralUnionReturnKind")
+  };
+}
 
 export class S {
   #ref: externref;

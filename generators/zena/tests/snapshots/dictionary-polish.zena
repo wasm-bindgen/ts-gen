@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -176,6 +177,22 @@ declare function __Polish_PartialOmitLikeBoxLikeObject_height(this_: externref):
 @external("./bindings.wasm", "Polish.PartialOmitLikeBoxLikeObject.set_height")
 declare function __Polish_PartialOmitLikeBoxLikeObject_set_height(this_: externref, value: f64): void;
 
+// kind Polish.TimeUnit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Polish.TimeUnit")
+declare function __kind_Polish_TimeUnit(x: externref | null): i32;
+
+// kind Polish.PluralizeUnit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Polish.PluralizeUnit")
+declare function __kind_Polish_PluralizeUnit(x: externref | null): i32;
+
+// kind Polish.PluralizeTimeUnit: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Polish.PluralizeTimeUnit")
+declare function __kind_Polish_PluralizeTimeUnit(x: externref | null): i32;
+
+// kind DirectionKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DirectionKind")
+declare function __kind_DirectionKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -196,6 +213,74 @@ export type Polish_PluralizeTimeUnit = String;
 
 // kind DirectionKind: Next = "next", Previous = "previous"
 export type DirectionKind = String;
+
+// The arm a `Polish_TimeUnit` holds, from `Polish_TimeUnit_arm`.
+export sealed class Polish_TimeUnit_Arm {
+  case Polish_TimeUnit_Hour
+  case Polish_TimeUnit_Minute
+}
+export function Polish_TimeUnit_arm(x: Polish_TimeUnit): Polish_TimeUnit_Arm {
+  let __r = x.handle;
+  return match (__kind_Polish_TimeUnit(__r)) {
+    case 0: new Polish_TimeUnit_Hour()
+    case 1: new Polish_TimeUnit_Minute()
+    case _: throw new Error("no arm of Polish.TimeUnit")
+  };
+}
+
+// The arm a `Polish_PluralizeUnit` holds, from `Polish_PluralizeUnit_arm`.
+export sealed class Polish_PluralizeUnit_Arm {
+  case Polish_PluralizeUnit_Day
+  case Polish_PluralizeUnit_Hour
+  case Polish_PluralizeUnit_Minute
+  case Polish_PluralizeUnit_Days
+  case Polish_PluralizeUnit_Hours
+  case Polish_PluralizeUnit_Minutes
+}
+export function Polish_PluralizeUnit_arm(x: Polish_PluralizeUnit): Polish_PluralizeUnit_Arm {
+  let __r = x.handle;
+  return match (__kind_Polish_PluralizeUnit(__r)) {
+    case 0: new Polish_PluralizeUnit_Day()
+    case 1: new Polish_PluralizeUnit_Hour()
+    case 2: new Polish_PluralizeUnit_Minute()
+    case 3: new Polish_PluralizeUnit_Days()
+    case 4: new Polish_PluralizeUnit_Hours()
+    case 5: new Polish_PluralizeUnit_Minutes()
+    case _: throw new Error("no arm of Polish.PluralizeUnit")
+  };
+}
+
+// The arm a `Polish_PluralizeTimeUnit` holds, from `Polish_PluralizeTimeUnit_arm`.
+export sealed class Polish_PluralizeTimeUnit_Arm {
+  case Polish_PluralizeTimeUnit_Hour
+  case Polish_PluralizeTimeUnit_Minute
+  case Polish_PluralizeTimeUnit_Hours
+  case Polish_PluralizeTimeUnit_Minutes
+}
+export function Polish_PluralizeTimeUnit_arm(x: Polish_PluralizeTimeUnit): Polish_PluralizeTimeUnit_Arm {
+  let __r = x.handle;
+  return match (__kind_Polish_PluralizeTimeUnit(__r)) {
+    case 0: new Polish_PluralizeTimeUnit_Hour()
+    case 1: new Polish_PluralizeTimeUnit_Minute()
+    case 2: new Polish_PluralizeTimeUnit_Hours()
+    case 3: new Polish_PluralizeTimeUnit_Minutes()
+    case _: throw new Error("no arm of Polish.PluralizeTimeUnit")
+  };
+}
+
+// The arm a `DirectionKind` holds, from `DirectionKind_arm`.
+export sealed class DirectionKind_Arm {
+  case DirectionKind_Next
+  case DirectionKind_Previous
+}
+export function DirectionKind_arm(x: DirectionKind): DirectionKind_Arm {
+  let __r = x.handle;
+  return match (__kind_DirectionKind(__r)) {
+    case 0: new DirectionKind_Next()
+    case 1: new DirectionKind_Previous()
+    case _: throw new Error("no arm of DirectionKind")
+  };
+}
 
 export class Polish_BoxLikeObject {
   #ref: externref;

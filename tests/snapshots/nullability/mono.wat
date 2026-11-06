@@ -15,6 +15,14 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "nullability" "kind:Mode" (func $nullability:kind:Mode (param $x externref) (result i32)))
+  (import "nullability" "kind:Source" (func $nullability:kind:Source (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:KeyKind" (func $kind:KeyKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:DispositionKind" (func $kind:DispositionKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:KindKind" (func $kind:KindKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:CoverKindKind" (func $kind:CoverKindKind (param $x externref) (result i32)))
+
   ;; new {};
   (import "nullability" "Settings.new" (func $nullability:Settings.new (result externref)))
   ;; get plain?: String | Undefined;

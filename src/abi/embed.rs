@@ -16,14 +16,17 @@
 //!   `reflect_apply`, `is_undefined` and `boolean` are shortcuts for
 //!   what every module needs, and everything else (`Array`,
 //!   `Reflect.construct`, `WebAssembly.promising`) is reached through
-//!   `reflect_get` + `call`.
+//!   `reflect_get` + `call`. The kind discriminators also need what JS
+//!   alone can do: `typeof`, `===` and a guarded `instanceof`.
 
 use std::collections::{BTreeMap, HashMap};
 use std::fmt::Write;
 
 use anyhow::{anyhow, bail, Context, Result};
-use indexmap::IndexSet;
-use ts_gen_abi::ir::{Import, Ir, MemberKind, Sys};
+use indexmap::{IndexMap, IndexSet};
+use ts_gen_abi::ir::{
+    ClassKind, Head, Import, Ir, JsType, Kind, Literal, MemberKind, Named, Sys, NO_ARM,
+};
 
 use super::wat::{ident, result as wat_result};
 use super::{WasmType, BINDINGS_SPECIFIER, BUILTINS_SPECIFIER, STRING_CONSTANTS, UNDEFINED_GLOBAL};
@@ -99,6 +102,8 @@ enum Op {
     /// `path[name](...args)` with `path` as `this`.
     StaticCall(Vec<String>, String),
     Sys(Sys),
+    /// The index of the arm of kind `ir.kinds[_]` holding the value.
+    Discriminate(usize),
 }
 
 struct Param {
@@ -183,10 +188,29 @@ impl Binding {
         }
     }
 
+    /// A kind's discriminator (IR.md, Bridge), which takes the value.
+    fn discriminator(k: usize, kind: &Kind) -> Binding {
+        Binding {
+            module: kind.module.clone(),
+            name: kind.discriminator(),
+            op: Op::Discriminate(k),
+            params: vec![Param {
+                name: "x".into(),
+                ty: R,
+            }],
+            result: Some(WasmType::I32),
+            variadic: false,
+        }
+    }
+
     fn has_receiver(&self) -> bool {
         matches!(
             self.op,
-            Op::Get(_) | Op::Set(_) | Op::Call(_) | Op::Sys(Sys::IsUndefined | Sys::NumberValue)
+            Op::Get(_)
+                | Op::Set(_)
+                | Op::Call(_)
+                | Op::Sys(Sys::IsUndefined | Sys::NumberValue)
+                | Op::Discriminate(_)
         )
     }
 }
@@ -209,6 +233,14 @@ impl Bindings {
                 list.len(),
             );
             list.push(Binding::sys(sys));
+        }
+        // Like the sys functions, a discriminator wins over a member of its
+        // import name.
+        for (k, kind) in ir.kinds.iter().enumerate() {
+            index
+                .entry((kind.specifier().to_string(), kind.discriminator()))
+                .or_insert(list.len());
+            list.push(Binding::discriminator(k, kind));
         }
         for import in ir.imports() {
             for name in &import.names {
@@ -296,7 +328,7 @@ pub fn embed(ir: &Ir, module: &[u8], options: &Options) -> Result<Output> {
         ..Default::default()
     };
 
-    let bindings_wat = generate_bindings(&bindings, &info.used, imports(), &mut builtins)?;
+    let bindings_wat = generate_bindings(ir, &bindings, &info.used, imports(), &mut builtins)?;
     let wrapper_wat = generate_wrapper(
         &info.handlers,
         info.jspi,
@@ -1006,6 +1038,12 @@ struct Builtins {
     /// called with: `i32` to a JS boolean for writes, a JS value to `i32`
     /// for a boolean module export.
     boolean: bool,
+    /// The kind discriminators' tests: `typeof x === t`, `a === b`,
+    /// `Array.isArray` and `x instanceof o[k0][k1]...`, false if that throws.
+    is_type: bool,
+    strict_equals: bool,
+    is_array: bool,
+    instance_of: bool,
 }
 
 impl Builtins {
@@ -1048,6 +1086,18 @@ impl Builtins {
         if self.boolean {
             js.push_str("export const boolean = Boolean;\n");
         }
+        if self.is_type {
+            js.push_str("export const is_type = (x, t) => typeof x === t;\n");
+        }
+        if self.strict_equals {
+            js.push_str("export const strict_equals = (a, b) => a === b;\n");
+        }
+        if self.is_array {
+            js.push_str("export const is_array = Array.isArray;\n");
+        }
+        if self.instance_of {
+            js.push_str("export const instance_of = (x, o, ...keys) => {\n  try {\n    for (const k of keys) o = o[k];\n    return x instanceof o;\n  } catch {\n    return false;\n  }\n};\n");
+        }
         if self.undefined {
             js.push_str("const undefined_ = undefined;\nexport { undefined_ as undefined };\n");
         }
@@ -1076,6 +1126,10 @@ struct Imports {
     module_exports: IndexSet<(String, String, WasmType)>,
     /// Namespace of the string constant imports.
     string_constants: String,
+    /// Functions the bindings call, by identifier: the kind discriminators
+    /// and their tests. `None` while one is being generated, so a kind may
+    /// name itself.
+    helpers: IndexMap<String, Option<String>>,
 }
 
 impl Imports {
@@ -1417,6 +1471,310 @@ impl Body<'_> {
     }
 }
 
+/// What an arm or element is tested with.
+enum Test {
+    TypeOf(&'static str),
+    Func(String),
+}
+
+/// The kind discriminators (IR.md, Kinds and Bridge): a function per kind
+/// returning the index of the arm holding `$x`, and one per test its arms
+/// need, each `(param $x externref) (result i32)`.
+impl Body<'_> {
+    /// The function returning kind `k`'s arm index for a value.
+    fn kind(&mut self, ir: &Ir, k: usize) -> Result<String> {
+        let kind = &ir.kinds[k];
+        let id = format!(
+            "kind.{}",
+            ident(&match &kind.module {
+                Some(spec) => format!("{spec}:{}", kind.name),
+                None => kind.name.clone(),
+            })
+        );
+        if self.imports.helpers.contains_key(&id) {
+            return Ok(id);
+        }
+        self.imports.helpers.insert(id.clone(), None);
+        let x = "(local.get $x)";
+        let mut tests = String::new();
+        let arm =
+            |i: usize, cond: String| format!("    (if {cond} (then (return (i32.const {i}))))\n");
+        // Literals first, then the other arms in order, as wasm-bindgen's
+        // dynamic unions read them; a fallback's last other arm untested.
+        for (i, a) in kind.arms.iter().enumerate() {
+            let cond = match &a.ty.head {
+                Head::Literal(Literal::String(s)) => {
+                    let s = self.imports.string(s);
+                    self.strict_equals(x, &format!("(global.get ${s})"), R)
+                }
+                Head::Literal(Literal::Int(n)) => {
+                    self.strict_equals(x, &format!("(f64.const {n})"), WasmType::F64)
+                }
+                _ => continue,
+            };
+            tests.push_str(&arm(i, cond));
+        }
+        let others: Vec<usize> = (0..kind.arms.len())
+            .filter(|&i| !matches!(kind.arms[i].ty.head, Head::Literal(_)))
+            .collect();
+        let (tested, last) = match others.split_last() {
+            Some((&last, rest)) if kind.fallback => (rest, i64::try_from(last)?),
+            _ => (&others[..], i64::from(NO_ARM)),
+        };
+        for &i in tested {
+            let what = || format!("kind {} arm {}", kind.name, kind.arms[i].name);
+            match self.test(ir, &kind.arms[i].ty, false).with_context(what)? {
+                Some(test) => tests.push_str(&arm(i, format!("(call ${test} {x})"))),
+                None => {
+                    tests.push_str(&format!("    (return (i32.const {i}))\n"));
+                    break;
+                }
+            }
+        }
+        let func = format!(
+            "  (func ${id} (param $x externref) (result i32)\n{tests}    (i32.const {last}))\n"
+        );
+        self.imports.helpers.insert(id.clone(), Some(func));
+        Ok(id)
+    }
+
+    /// `a === b`, `b` a string constant (`R`) or a number.
+    fn strict_equals(&mut self, a: &str, b: &str, b_ty: WasmType) -> String {
+        self.builtins.strict_equals = true;
+        let f = self
+            .imports
+            .func("strict_equals", vec![R, b_ty], Some(WasmType::I32));
+        format!("(call ${f} {a} {b})")
+    }
+
+    /// A test function, `None` when every value passes. An `element` is
+    /// one of an `Array<T>` arm, which Rust reads as a `Vec`'s element:
+    /// a nested array or tuple only by `Array.isArray`, a literal kind or
+    /// literal by `typeof`, and an empty the type admits passes.
+    fn test(&mut self, ir: &Ir, j: &JsType, element: bool) -> Result<Option<String>> {
+        if element && (j.null || j.undefined) {
+            let inner = JsType {
+                null: false,
+                undefined: false,
+                ..j.clone()
+            };
+            let Some(inner) = self.test(ir, &inner, true)? else {
+                return Ok(None);
+            };
+            let id = format!(
+                "is.opt.{}{}.{}",
+                if j.null { "n" } else { "" },
+                if j.undefined { "u" } else { "" },
+                inner.trim_start_matches("is.")
+            );
+            return self
+                .helper(id, |body| {
+                    let mut out = String::new();
+                    if j.null {
+                        out.push_str(
+                            "(if (ref.is_null (local.get $x)) (then (return (i32.const 1))))\n    ",
+                        );
+                    }
+                    if j.undefined {
+                        body.builtins.is_undefined = true;
+                        let f = body
+                            .imports
+                            .func("is_undefined", vec![R], Some(WasmType::I32));
+                        let _ = write!(
+                            out,
+                            "(if (call ${f} (local.get $x)) (then (return (i32.const 1))))\n    "
+                        );
+                    }
+                    let _ = write!(out, "(call ${inner} (local.get $x))");
+                    Ok(out)
+                })
+                .map(Some);
+        }
+        let test = match &j.head {
+            Head::Any | Head::Var(_) => return Ok(None),
+            Head::Empty => {
+                Test::Func(self.helper("is.never".into(), |_| Ok("(i32.const 0)".into()))?)
+            }
+            Head::String | Head::Literal(Literal::String(_)) => Test::TypeOf("string"),
+            Head::Number | Head::Literal(Literal::Int(_)) => Test::TypeOf("number"),
+            Head::Boolean => Test::TypeOf("boolean"),
+            Head::BigInt => Test::TypeOf("bigint"),
+            Head::Callback { .. } => Test::TypeOf("function"),
+            Head::Tuple(_) => Test::Func(self.is_array()?),
+            Head::Named(n) => self.named(ir, n, element)?,
+        };
+        match test {
+            Test::TypeOf(t) => self.type_of(t).map(Some),
+            Test::Func(id) => Ok(Some(id)),
+        }
+    }
+
+    /// The test of a named type: a kind's, a class's, or a global's.
+    fn named(&mut self, ir: &Ir, n: &Named, element: bool) -> Result<Test> {
+        let module = n.name.module.as_deref();
+        let name = n.name.path.as_str();
+        if let Some(k) = ir
+            .kinds
+            .iter()
+            .position(|k| k.module.as_deref() == module && k.name == name)
+        {
+            let literals = |f: fn(&Literal) -> bool| {
+                ir.kinds[k]
+                    .arms
+                    .iter()
+                    .all(|a| matches!(&a.ty.head, Head::Literal(l) if f(l)))
+            };
+            // Rust reads a `Vec` of a string or numeric enum as a
+            // `Vec<String>` or `Vec<f64>`.
+            if element && literals(|l| matches!(l, Literal::String(_))) {
+                return Ok(Test::TypeOf("string"));
+            }
+            if element && literals(|l| matches!(l, Literal::Int(_))) {
+                return Ok(Test::TypeOf("number"));
+            }
+            let f = self.kind(ir, k)?;
+            return self
+                .helper(format!("is.{f}"), |_| {
+                    Ok(format!(
+                        "(i32.ge_s (call ${f} (local.get $x)) (i32.const 0))"
+                    ))
+                })
+                .map(Test::Func);
+        }
+        let path = |p: &str| -> Vec<String> { p.split('.').map(String::from).collect() };
+        if let Some(c) = ir.class(module, name) {
+            return match c.kind {
+                ClassKind::Class => self
+                    .instance_of(c.module.as_deref(), &path(&c.path))
+                    .map(Test::Func),
+                ClassKind::Interface => self.is_object().map(Test::Func),
+                ClassKind::Namespace => {
+                    bail!("`{name}` is a static class, which is not a type")
+                }
+            };
+        }
+        let id = match (module, name) {
+            (None, "Array") if element => self.is_array()?,
+            (None, "Array") => {
+                let any = JsType {
+                    head: Head::Any,
+                    null: false,
+                    undefined: false,
+                };
+                self.every(ir, n.args.first().unwrap_or(&any))?
+            }
+            (None, "Symbol") => return Ok(Test::TypeOf("symbol")),
+            (None, "Function") => return Ok(Test::TypeOf("function")),
+            // Rust reads an `ArrayBufferView` as a `Uint8Array`.
+            (None, "ArrayBufferView") => self.instance_of(None, &path("Uint8Array"))?,
+            (None, "Record") => self.instance_of(None, &path("Object"))?,
+            _ => self.instance_of(module, &path(name))?,
+        };
+        Ok(Test::Func(id))
+    }
+
+    /// The test function `id` with body `body`, generated once.
+    fn helper(
+        &mut self,
+        id: String,
+        body: impl FnOnce(&mut Self) -> Result<String>,
+    ) -> Result<String> {
+        if !self.imports.helpers.contains_key(&id) {
+            self.imports.helpers.insert(id.clone(), None);
+            let value = body(self)?;
+            let func = format!("  (func ${id} (param $x externref) (result i32)\n    {value})\n");
+            self.imports.helpers.insert(id.clone(), Some(func));
+        }
+        Ok(id)
+    }
+
+    fn type_of(&mut self, t: &str) -> Result<String> {
+        let id = format!("is.typeof.{t}");
+        self.helper(id, |body| {
+            body.builtins.is_type = true;
+            let f = body
+                .imports
+                .func("is_type", vec![R, R], Some(WasmType::I32));
+            let s = body.imports.string(t);
+            Ok(format!("(call ${f} (local.get $x) (global.get ${s}))"))
+        })
+    }
+
+    /// `typeof x === "object" && x !== null`, the `is_object` Rust checks
+    /// a shape with.
+    fn is_object(&mut self) -> Result<String> {
+        self.helper("is.object".into(), |body| {
+            let t = body.type_of("object")?;
+            Ok(format!(
+                "(i32.and (call ${t} (local.get $x)) (i32.eqz (ref.is_null (local.get $x))))"
+            ))
+        })
+    }
+
+    fn is_array(&mut self) -> Result<String> {
+        self.helper("is.array".into(), |body| {
+            body.builtins.is_array = true;
+            let f = body.imports.func("is_array", vec![R], Some(WasmType::I32));
+            Ok(format!("(call ${f} (local.get $x))"))
+        })
+    }
+
+    /// `x instanceof C`, `C` at `path` from the module's namespace or
+    /// `globalThis`, false if looking it up or testing throws.
+    fn instance_of(&mut self, module: Option<&str>, path: &[String]) -> Result<String> {
+        let full = path.join(".");
+        let id = format!(
+            "is.instance.{}",
+            ident(&match module {
+                Some(spec) => format!("{spec}:{full}"),
+                None => full,
+            })
+        );
+        self.helper(id, |body| {
+            let (root, keys) = match (module, path) {
+                (Some(spec), [first, rest @ ..]) => {
+                    let g = body.imports.module_export(spec, first, R);
+                    (format!("(global.get ${g})"), rest)
+                }
+                _ => (body.global(), path),
+            };
+            body.builtins.instance_of = true;
+            let mut params = vec![R, R];
+            params.extend(keys.iter().map(|_| R));
+            let f = body
+                .imports
+                .func("instance_of", params, Some(WasmType::I32));
+            let keys: String = keys
+                .iter()
+                .map(|k| format!(" (global.get ${})", body.imports.string(k)))
+                .collect();
+            Ok(format!("(call ${f} (local.get $x) {root}{keys})"))
+        })
+    }
+
+    /// `Array.isArray(x)` and every element passes `elem`'s test.
+    fn every(&mut self, ir: &Ir, elem: &JsType) -> Result<String> {
+        let Some(test) = self.test(ir, elem, true)? else {
+            return self.is_array();
+        };
+        let array = self.is_array()?;
+        let id = format!("is.every.{}", test.trim_start_matches("is."));
+        if self.imports.helpers.contains_key(&id) {
+            return Ok(id);
+        }
+        let length = self.get(("(local.get $x)", R), "length", WasmType::F64);
+        self.builtins.reflect_get = true;
+        let at = self
+            .imports
+            .func("reflect_get", vec![R, WasmType::F64], Some(R));
+        let func = format!(
+            "  (func ${id} (param $x externref) (result i32) (local $n f64) (local $i f64)\n    (if (i32.eqz (call ${array} (local.get $x))) (then (return (i32.const 0))))\n    (local.set $n {length})\n    (block $done (loop $next\n      (br_if $done (i32.eqz (f64.lt (local.get $i) (local.get $n))))\n      (if (i32.eqz (call ${test} (call ${at} (local.get $x) (local.get $i)))) (then (return (i32.const 0))))\n      (local.set $i (f64.add (local.get $i) (f64.const 1)))\n      (br $next)))\n    (i32.const 1))\n"
+        );
+        self.imports.helpers.insert(id.clone(), Some(func));
+        Ok(id)
+    }
+}
+
 struct FuncBody {
     locals: String,
     /// Statements run before the value expression (variadic setup).
@@ -1426,6 +1784,7 @@ struct FuncBody {
 }
 
 fn generate_bindings(
+    ir: &Ir,
     bindings: &Bindings,
     used: &[UsedFunction],
     mut imports: Imports,
@@ -1439,7 +1798,7 @@ fn generate_bindings(
             imports: &mut imports,
             builtins,
         };
-        let fb = function_body(f, uf, &mut body)?;
+        let fb = function_body(ir, f, uf, &mut body)?;
         let params_str = wat_params_typed(&f.params, &uf.param_types, f.variadic);
         let result_str = uf
             .result_type
@@ -1464,13 +1823,30 @@ fn generate_bindings(
         );
     }
 
+    for helper in imports.helpers.values().flatten() {
+        funcs.push_str(helper);
+    }
+
     Ok(format!(
         ";; Generated by ts-gen. Wasm implementation of the ABI over the JS primitives in builtins.js.\n(module\n{}\n{funcs})\n",
         imports.render()
     ))
 }
 
-fn function_body(f: &Binding, uf: &UsedFunction, body: &mut Body) -> Result<FuncBody> {
+fn function_body(ir: &Ir, f: &Binding, uf: &UsedFunction, body: &mut Body) -> Result<FuncBody> {
+    if let Op::Discriminate(k) = f.op {
+        let x = format!("(local.get ${})", f.params[0].name);
+        let x = match uf.param_types[0] {
+            WasmType::AnyRef { .. } => format!("(extern.convert_any {x})"),
+            _ => x,
+        };
+        let kind = body.kind(ir, k)?;
+        return Ok(FuncBody {
+            locals: String::new(),
+            stmts: String::new(),
+            value: format!("(call ${kind} {x})"),
+        });
+    }
     // An i32 argument is a JS boolean, which JS would otherwise receive as
     // the Number 1/0; route it through `Boolean()`.
     let skip_receiver = if f.has_receiver() { 1 } else { 0 };
@@ -1569,6 +1945,7 @@ fn function_body_inner(
             format!("(call ${f} {})", this.0)
         }
         Op::Sys(Sys::Undefined) => body.undefined(),
+        Op::Discriminate(_) => unreachable!("function_body generates discriminators"),
         Op::Sys(Sys::NumberValue) => {
             let number = body.path(None, &["Number".to_string()]);
             let g = body.global();

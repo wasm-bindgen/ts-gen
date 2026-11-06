@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:BufferKind" (func $kind:BufferKind (param $x externref) (result i32)))
+
   ;; new {};
   (import "slice-hints" "Target.new" (func $slice-hints:Target.new (result externref)))
   ;; get buffer?: BufferKind | Undefined;

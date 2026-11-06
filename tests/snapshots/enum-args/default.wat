@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "enum-args" "kind:Kind" (func $enum-args:kind:Kind (param $x externref) (result i32)))
+
   ;; new {};
   (import "enum-args" "SendOptions.new" (func $enum-args:SendOptions.new (result externref)))
   ;; get kind?: Kind | Undefined;

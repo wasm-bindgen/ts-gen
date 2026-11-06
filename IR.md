@@ -169,12 +169,13 @@ kind Method as MethodKind fallback {
 }
 ```
 
-A named union. A generator matches on the arms in a result, and takes
-any arm in an argument. Like a class, a kind has a JS path (where a
-numeric enum's object is; the name itself for a union no declaration
-names) and a binding name after `as`, which shares the class namespace.
+A named union. A generator matches on the arms in a result (see
+[Recognition](#recognition)), and takes any arm in an argument. Like a
+class, a kind has a JS path (where a numeric enum's object is; the name
+itself for a union no declaration names) and a binding name after `as`,
+which shares the class namespace.
 `fallback` makes it open: a value no other arm matches is the last
-arm's, a shape that is not tested for.
+non-literal arm's, a shape that is not tested for.
 
 Each arm is `<name> = <type> [alias <name>, ...];` with an optional
 doc: a variant name unique in the kind, aliases included (later enum
@@ -188,6 +189,47 @@ MaybeDay = Day | string | null | undefined`, is the kind of its other
 arms, and a position naming it admits its empties. An arm that holds
 any value (`JsValue = Any`, an unresolved name) still admits none: a
 non-null position of its kind is non-null.
+
+#### Recognition
+
+Where JS produces a kind's value (an import's result, a provide's
+parameter), the value's arm is the one Rust's binding reads it as
+(wasm-bindgen's dynamic union, string and numeric enums):
+
+1. The literal arms are tested first, in any order (their values are
+   distinct).
+2. Then the other arms, in order. In a `fallback` kind the last of them
+   is not tested: it holds whatever no earlier arm does.
+3. The first arm that holds the value is its arm. A value no arm holds
+   has none, which Rust reports as an error, except for a kind of only
+   string literals, which it reads as a hidden invalid variant.
+
+A position's empties are its own: a position admitting `null` or
+`undefined` tests for them before its kind's arms. An arm holds `x`
+when:
+
+| Arm | Test |
+| --- | --- |
+| `"s"`, `n` | `x === "s"`, `x === n` |
+| `String`, `Number`, `Boolean`, `BigInt` | `typeof x` is `"string"`, `"number"`, `"boolean"`, `"bigint"` |
+| `Any` | always |
+| a `class` `C` | `x instanceof C`, at `C`'s path from its root (the module's namespace or `globalThis`); false if looking it up or testing throws |
+| a `shape class` | `typeof x === "object" && x !== null` |
+| a kind `K` | `x` has an arm of `K` |
+| `Array<T>` | `Array.isArray(x)` and every element holds as an element of `T` (below) |
+| a tuple | `Array.isArray(x)`; the elements are not tested |
+| `Record<T>` | `x instanceof Object` |
+| a callback, `Function` | `typeof x === "function"` |
+| `Symbol` | `typeof x === "symbol"` |
+| `ArrayBufferView` | `x instanceof Uint8Array`, the type Rust reads it as |
+| another undeclared `G` (`Promise<T>`, `ArrayBuffer`) | as a `class` `G` |
+
+An element of `T` holds as an arm of `T` would, except that an element
+whose type admits an empty holds when it is that empty, an `Array<U>`
+element by `Array.isArray` alone, and a literal, or a kind of only string
+(integer) literals, by `typeof` `"string"` (`"number"`) alone: Rust reads
+`Array<T>` as a `Vec` of `T`'s element type (`Vec<Array<JsString>>`,
+`Vec<String>`).
 
 ### Members
 
@@ -346,7 +388,10 @@ every alias: `<class alias>.<name>` for each class alias,
 `<class name>.<member alias>` (and `<class alias>.<member alias>`) for
 each member alias, `<alias>` for a top-level alias. A generator that
 binds a class once, with its aliases as type aliases, may ignore them.
-`Ir::imports` (`abi/src/ir.rs`) lists every member with its names.
+`Ir::imports` (`abi/src/ir.rs`) lists every member with its names. The
+bridge adds a few functions of its own, the [sys
+functions](#sys-functions) and a [discriminator](#kind-discriminators)
+per kind.
 
 ## Bridge
 
@@ -369,6 +414,26 @@ fixed by this spec (`ts_gen_abi::ir::Sys`):
 
 They win over a member of the same import name. `Number.value` is JS
 coercion, not a test: `Number(null)` is `0`, `Number(undefined)` `NaN`.
+
+### Kind discriminators
+
+`bindings.wasm` also has a discriminator per kind (`Kind::discriminator`):
+
+| Import | Signature | Result |
+| --- | --- | --- |
+| `"./bindings.wasm" "kind:<name>"` | `(param externref) (result i32)` | the index in the kind's arms of the arm holding the value, by [Recognition](#recognition); `-1` (`NO_ARM`) for none |
+
+`<name>` is the kind's binding name. A kind of a `module` block is
+imported from its specifier, like its module's members, and under
+`--bindings-module` as `<spec>:kind:<name>`. A class member's import
+name is `<class>.<member>`, so a kind's discriminator and a `static
+class` of its name (`kind:Level`, `Level.name`) never meet; like the sys
+functions, a discriminator wins over a top-level member of its import
+name. The parameter is the value as JS produced it, `externref` or
+`anyref`, nullable or not; the discriminator tests `null` and
+`undefined` like any value (an `Any` or `fallback` arm holds them), so a
+generator tests the position's empties first. Like every binding, a
+discriminator is in `bindings.wasm` only when the module imports it.
 
 ### Builtins
 

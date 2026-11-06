@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -121,6 +122,10 @@ declare function __es_module_lexer_init(): externref;
 @external("es-module-lexer", "init_sync")
 declare function __es_module_lexer_init_sync(): void;
 
+// kind ImportType: the index of the arm holding x, -1 for none
+@external("es-module-lexer", "kind:ImportType")
+declare function __es_module_lexer_kind_ImportType(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -132,6 +137,30 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind ImportType: Static = 1, Dynamic = 2, ImportMeta = 3, StaticSourcePhase = 4, DynamicSourcePhase = 5, StaticDeferPhase = 6, DynamicDeferPhase = 7
 export type ImportType = externref;
+
+// The arm a `ImportType` holds, from `ImportType_arm`.
+export sealed class ImportType_Arm {
+  case ImportType_Static
+  case ImportType_Dynamic
+  case ImportType_ImportMeta
+  case ImportType_StaticSourcePhase
+  case ImportType_DynamicSourcePhase
+  case ImportType_StaticDeferPhase
+  case ImportType_DynamicDeferPhase
+}
+export function ImportType_arm(x: ImportType): ImportType_Arm {
+  let __r = x;
+  return match (__es_module_lexer_kind_ImportType(__r)) {
+    case 0: new ImportType_Static()
+    case 1: new ImportType_Dynamic()
+    case 2: new ImportType_ImportMeta()
+    case 3: new ImportType_StaticSourcePhase()
+    case 4: new ImportType_DynamicSourcePhase()
+    case 5: new ImportType_StaticDeferPhase()
+    case 6: new ImportType_DynamicDeferPhase()
+    case _: throw new Error("no arm of ImportType")
+  };
+}
 
 export class ImportSpecifier {
   #ref: externref;

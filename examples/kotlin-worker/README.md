@@ -4,12 +4,14 @@ A Cloudflare Worker in Kotlin/Wasm, built against bindings that a
 generator written in Kotlin (`generator/`) derives from the ts-gen IR
 alone (`ts-gen --target ir`, format in `IR.md`), and linked with `ts-gen
 embed`. It replies with the request's method, URL, `x-kotlin` header and
-body, and the `GREETING` binding from `config.capnp`.
+body, the `GREETING` binding from `config.capnp`, and the arm of the
+headers its response init reads back.
 
 Files:
 
 - `src/wasmJsMain/kotlin/app/App.kt`: the worker, `suspend fun fetch(request,
-  env, ctx): Response` against the typed bindings.
+  env, ctx): Response` against the typed bindings, which reads the
+  `ResponseInit`'s headers back and matches their arm.
 - `generator/`: the bindings generator (Kotlin/JVM, its own IR reader in
   `Ir.kt`, no dependency on ts-gen). `generator/testdata/sample.ir` is a copy
   of `abi/testdata/sample.ir`, which covers the whole grammar.
@@ -47,7 +49,13 @@ Files:
   `CounterStatic.ofA()`).
 - Kinds: a class arm is a subtype; another arm has a factory overload named
   like the kind (`BodyInit("text")`), and literal arms are constants in
-  `object <Kind>Static` (`MethodKindStatic.Get` in the sample). Results are not matched on arms.
+  `object <Kind>Static` (`MethodKindStatic.Get` in the sample). A kind's
+  value is matched on `kind.arm`, a `sealed interface <Kind>Arm` with a
+  case per arm (an object for a literal, else a class holding the value as
+  its type reads: `HeadersKindArm.Headers(value: Headers)`), which the
+  kind's discriminator (``external fun `kind:<Kind>`(x): Int``, imported as
+  `"js_code" "kind:<Kind>"`, IR.md, Bridge) tells. A value of no arm
+  throws; a `fallback` kind's last non-literal arm takes it instead.
 - Names: by default the JS name, falling back to the IR binding name,
   camel-cased, when Kotlin signatures clash (`redirectWithStatus`).
   `--verbatim-names` takes the binding names as they are, for IR written with
@@ -70,6 +78,7 @@ examples/kotlin-worker/run.sh serve
 # x-kotlin: hi
 # GREETING: Hello from workerd
 # body: Hello!
+# init.headers: Headers(content-type: text/plain; charset=utf-8)
 ```
 
 Step by step (from this directory):

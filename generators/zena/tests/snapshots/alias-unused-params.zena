@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -139,6 +140,10 @@ declare function __misc(handler: externref, color: externref, qualified: externr
 @external("./bindings.wasm", "qualified_return")
 declare function __qualified_return(): externref;
 
+// kind Color: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:Color")
+declare function __kind_Color(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -150,6 +155,20 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind Color: Red = "red", Green = "green"
 export type Color = String;
+
+// The arm a `Color` holds, from `Color_arm`.
+export sealed class Color_Arm {
+  case Color_Red
+  case Color_Green
+}
+export function Color_arm(x: Color): Color_Arm {
+  let __r = x.handle;
+  return match (__kind_Color(__r)) {
+    case 0: new Color_Red()
+    case 1: new Color_Green()
+    case _: throw new Error("no arm of Color")
+  };
+}
 
 export class Local {
   #ref: externref;

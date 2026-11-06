@@ -15,6 +15,20 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "type-eval" "kind:Unit" (func $type-eval:kind:Unit (param $x externref) (result i32)))
+  (import "type-eval" "kind:Minute" (func $type-eval:kind:Minute (param $x externref) (result i32)))
+  (import "type-eval" "kind:OptionKey" (func $type-eval:kind:OptionKey (param $x externref) (result i32)))
+  (import "type-eval" "kind:NotMinute" (func $type-eval:kind:NotMinute (param $x externref) (result i32)))
+  (import "type-eval" "kind:Plural" (func $type-eval:kind:Plural (param $x externref) (result i32)))
+  (import "type-eval" "kind:Scoped.Mode" (func $type-eval:kind:Scoped.Mode (param $x externref) (result i32)))
+  (import "type-eval" "kind:Scoped.NotFast" (func $type-eval:kind:Scoped.NotFast (param $x externref) (result i32)))
+  (import "type-eval" "kind:ExcludeUnitHour" (func $type-eval:kind:ExcludeUnitHour (param $x externref) (result i32)))
+  (import "type-eval" "kind:ExtractUnitOrDayUnit" (func $type-eval:kind:ExtractUnitOrDayUnit (param $x externref) (result i32)))
+  (import "type-eval" "kind:PluralHourOrMinute" (func $type-eval:kind:PluralHourOrMinute (param $x externref) (result i32)))
+  (import "type-eval" "kind:KeyOfExtended" (func $type-eval:kind:KeyOfExtended (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:LargestUnitKind" (func $kind:LargestUnitKind (param $x externref) (result i32)))
+
   ;; new {};
   (import "type-eval" "Options.new" (func $type-eval:Options.new (result externref)))
   ;; get name: String;

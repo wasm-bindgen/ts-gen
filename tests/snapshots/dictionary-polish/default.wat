@@ -15,6 +15,12 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:Polish.TimeUnit" (func $kind:Polish.TimeUnit (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:Polish.PluralizeUnit" (func $kind:Polish.PluralizeUnit (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:Polish.PluralizeTimeUnit" (func $kind:Polish.PluralizeTimeUnit (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:DirectionKind" (func $kind:DirectionKind (param $x externref) (result i32)))
+
   ;; new {};
   (import "./bindings.wasm" "Polish.BoxLikeObject.new" (func $Polish.BoxLikeObject.new (result externref)))
   ;; get id: String;

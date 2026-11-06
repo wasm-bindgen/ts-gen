@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -62,6 +63,10 @@ declare function __module_namespace_values_outer_inner_run(style: externref): ex
 @external("module-namespace-values", "inspect")
 declare function __module_namespace_values_inspect(value: externref | null): externref;
 
+// kind inspect.Style: the index of the arm holding x, -1 for none
+@external("module-namespace-values", "kind:inspect.Style")
+declare function __module_namespace_values_kind_inspect_Style(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -73,6 +78,20 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind inspect.Style: Plain = "plain", Ansi = "ansi"
 export type inspect_Style = String;
+
+// The arm a `inspect_Style` holds, from `inspect_Style_arm`.
+export sealed class inspect_Style_Arm {
+  case inspect_Style_Plain
+  case inspect_Style_Ansi
+}
+export function inspect_Style_arm(x: inspect_Style): inspect_Style_Arm {
+  let __r = x.handle;
+  return match (__module_namespace_values_kind_inspect_Style(__r)) {
+    case 0: new inspect_Style_Plain()
+    case 1: new inspect_Style_Ansi()
+    case _: throw new Error("no arm of inspect.Style")
+  };
+}
 
 export class InspectOptions {
   #ref: externref;

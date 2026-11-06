@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -97,6 +98,30 @@ declare function __literal_discriminants_repeat(): externref;
 @external("literal-discriminants", "flag")
 declare function __literal_discriminants_flag(): externref;
 
+// kind KeepAliveKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:KeepAliveKind")
+declare function __kind_KeepAliveKind(x: externref | null): i32;
+
+// kind DirectionReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:DirectionReturnKind")
+declare function __kind_DirectionReturnKind(x: externref | null): i32;
+
+// kind ValueKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:ValueKind")
+declare function __kind_ValueKind(x: externref | null): i32;
+
+// kind SizeReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:SizeReturnKind")
+declare function __kind_SizeReturnKind(x: externref | null): i32;
+
+// kind RepeatReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:RepeatReturnKind")
+declare function __kind_RepeatReturnKind(x: externref | null): i32;
+
+// kind FlagReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FlagReturnKind")
+declare function __kind_FlagReturnKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -123,6 +148,96 @@ export type RepeatReturnKind = externref;
 
 // kind FlagReturnKind: Bool = Boolean, ArrayBuffer = ArrayBuffer
 export type FlagReturnKind = externref;
+
+// The arm a `KeepAliveKind` holds, from `KeepAliveKind_arm`.
+export sealed class KeepAliveKind_Arm {
+  case KeepAliveKind_N0
+  case KeepAliveKind_N1
+  case KeepAliveKind_N2
+}
+export function KeepAliveKind_arm(x: KeepAliveKind): KeepAliveKind_Arm {
+  let __r = x;
+  return match (__kind_KeepAliveKind(__r)) {
+    case 0: new KeepAliveKind_N0()
+    case 1: new KeepAliveKind_N1()
+    case 2: new KeepAliveKind_N2()
+    case _: throw new Error("no arm of KeepAliveKind")
+  };
+}
+
+// The arm a `DirectionReturnKind` holds, from `DirectionReturnKind_arm`.
+export sealed class DirectionReturnKind_Arm {
+  case DirectionReturnKind_Neg1
+  case DirectionReturnKind_N0
+  case DirectionReturnKind_N1
+}
+export function DirectionReturnKind_arm(x: DirectionReturnKind): DirectionReturnKind_Arm {
+  let __r = x;
+  return match (__kind_DirectionReturnKind(__r)) {
+    case 0: new DirectionReturnKind_Neg1()
+    case 1: new DirectionReturnKind_N0()
+    case 2: new DirectionReturnKind_N1()
+    case _: throw new Error("no arm of DirectionReturnKind")
+  };
+}
+
+// The arm a `ValueKind` holds, from `ValueKind_arm`.
+export sealed class ValueKind_Arm {
+  case ValueKind_Neg1
+  case ValueKind_N1
+}
+export function ValueKind_arm(x: ValueKind): ValueKind_Arm {
+  let __r = x;
+  return match (__kind_ValueKind(__r)) {
+    case 0: new ValueKind_Neg1()
+    case 1: new ValueKind_N1()
+    case _: throw new Error("no arm of ValueKind")
+  };
+}
+
+// The arm a `SizeReturnKind` holds, from `SizeReturnKind_arm`.
+export sealed class SizeReturnKind_Arm {
+  case SizeReturnKind_Auto
+  case SizeReturnKind_F64(value: f64)
+}
+export function SizeReturnKind_arm(x: SizeReturnKind): SizeReturnKind_Arm {
+  let __r = x;
+  return match (__kind_SizeReturnKind(__r)) {
+    case 0: new SizeReturnKind_Auto()
+    case 1: new SizeReturnKind_F64(numberValue(__r))
+    case _: throw new Error("no arm of SizeReturnKind")
+  };
+}
+
+// The arm a `RepeatReturnKind` holds, from `RepeatReturnKind_arm`.
+export sealed class RepeatReturnKind_Arm {
+  case RepeatReturnKind_Bool(value: externref)
+  case RepeatReturnKind_X
+  case RepeatReturnKind_Y
+}
+export function RepeatReturnKind_arm(x: RepeatReturnKind): RepeatReturnKind_Arm {
+  let __r = x;
+  return match (__kind_RepeatReturnKind(__r)) {
+    case 0: new RepeatReturnKind_Bool(__r)
+    case 1: new RepeatReturnKind_X()
+    case 2: new RepeatReturnKind_Y()
+    case _: throw new Error("no arm of RepeatReturnKind")
+  };
+}
+
+// The arm a `FlagReturnKind` holds, from `FlagReturnKind_arm`.
+export sealed class FlagReturnKind_Arm {
+  case FlagReturnKind_Bool(value: externref)
+  case FlagReturnKind_ArrayBuffer(value: externref)
+}
+export function FlagReturnKind_arm(x: FlagReturnKind): FlagReturnKind_Arm {
+  let __r = x;
+  return match (__kind_FlagReturnKind(__r)) {
+    case 0: new FlagReturnKind_Bool(__r)
+    case 1: new FlagReturnKind_ArrayBuffer(__r)
+    case _: throw new Error("no arm of FlagReturnKind")
+  };
+}
 
 export class Options {
   #ref: externref;

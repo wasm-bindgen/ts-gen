@@ -15,6 +15,10 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:WorkerReturnKind" (func $kind:WorkerReturnKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:WidgetReturnKind" (func $kind:WidgetReturnKind (param $x externref) (result i32)))
+
   ;; worker(): WorkerReturnKind throws;
   (import "dynamic-union-externals" "Foo.worker" (func $dynamic-union-externals:Foo.worker (param $this externref) (result externref)))
   ;; widget(): WidgetReturnKind throws;

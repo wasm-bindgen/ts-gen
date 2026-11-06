@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "slice-args" "kind:Level" (func $slice-args:kind:Level (param $x externref) (result i32)))
+
   ;; new(name: String) throws;
   (import "slice-args" "Item.new" (func $slice-args:Item.new (param $name externref) (result externref)))
   ;; get name: String;

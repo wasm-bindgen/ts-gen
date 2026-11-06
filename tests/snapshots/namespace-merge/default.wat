@@ -15,6 +15,10 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "namespace-merge" "kind:Bar.Power" (func $namespace-merge:kind:Bar.Power (param $x externref) (result i32)))
+  (import "namespace-merge" "kind:Shape.Axis" (func $namespace-merge:kind:Shape.Axis (param $x externref) (result i32)))
+
   ;; m(options: Foo.Options);
   (import "namespace-merge" "Foo.m" (func $namespace-merge:Foo.m (param $this externref) (param $options externref)))
 

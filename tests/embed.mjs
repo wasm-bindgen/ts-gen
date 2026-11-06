@@ -26,11 +26,13 @@ class Socket {
   startTls() { return this; }
   get closed() { return Promise.resolve(); }
 }
+class Thing {}
 const modules = {
   'cloudflare:sockets': {
     connect: (address) => { connected.push(address); return new Socket(); },
     Socket,
   },
+  'embed:kinds': { Thing },
   'embed:values': {
     count: 42,
     enabled: true,
@@ -141,6 +143,49 @@ switch (fixture) {
     const res = fetch(get);
     assert.equal(res.headers.get('content-type'), 'text/plain');
     assert.equal(await res.text(), 'ok');
+    break;
+  }
+  case 'kinds': {
+    const arms = (kind, cases) => {
+      for (const [value, arm] of cases) {
+        assert.equal(published[kind](value), arm, `${kind}(${String(value)})`);
+      }
+    };
+    // `fallback`: Headers, then Array<[String, String]>, and the last arm,
+    // `Record<String>`, takes the rest untested.
+    arms('headers', [
+      [new Headers(), 0],
+      [[['a', 'b']], 1],
+      [[], 1],
+      [[['a', 'b'], 'c'], 2],
+      [{ a: 'b' }, 2],
+      [5, 2],
+      [null, 2],
+    ]);
+    // String literals by `===`; nothing else is an arm.
+    arms('method', [['GET', 0], ['POST', 1], ['get', -1], [new String('GET'), -1], [undefined, -1]]);
+    arms('level', [[1, 0], [2, 1], [3, -1], ['1', -1]]);
+    // The literal first, then Number, Request, and the shape untested.
+    arms('mixed', [['auto', 0], [5, 1], [get, 2], [{ x: 1 }, 3], ['other', 3], [undefined, 3]]);
+    // In order: an empty array is the first array arm, a mixed one only
+    // the tuple's, which `Array.isArray` alone tests.
+    arms('lists', [
+      [['a'], 0],
+      [[], 0],
+      [[1, 2], 1],
+      [['a', 1], 2],
+      [[{}], 2],
+      [() => {}, 3],
+      [true, 4],
+      [1n, 5],
+      ['x', -1],
+      [null, -1],
+    ]);
+    // A nested kind holds what has one of its arms.
+    arms('nested', [['POST', 0], [get, 1], ['PUT', -1]]);
+    // A module's class, by `instanceof` its export, and a module's kind.
+    arms('things', [[new Thing(), 0], [['a'], 1], [{}, -1]]);
+    arms('shade', [['light', 0], ['dark', 1], ['dim', -1]]);
     break;
   }
   default:

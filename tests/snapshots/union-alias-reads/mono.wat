@@ -15,6 +15,16 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "union-alias-reads" "kind:ZonedLike" (func $union-alias-reads:kind:ZonedLike (param $x externref) (result i32)))
+  (import "union-alias-reads" "kind:DayLike" (func $union-alias-reads:kind:DayLike (param $x externref) (result i32)))
+  (import "union-alias-reads" "kind:Zone" (func $union-alias-reads:kind:Zone (param $x externref) (result i32)))
+  (import "union-alias-reads" "kind:Fields" (func $union-alias-reads:kind:Fields (param $x externref) (result i32)))
+  (import "union-alias-reads" "kind:Offset" (func $union-alias-reads:kind:Offset (param $x externref) (result i32)))
+  (import "union-alias-reads" "kind:MaybeDay" (func $union-alias-reads:kind:MaybeDay (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:OverflowKind" (func $kind:OverflowKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:RelativeToKind" (func $kind:RelativeToKind (param $x externref) (result i32)))
+
   ;; new(zone: String) throws;
   (import "union-alias-reads" "Zoned.new" (func $union-alias-reads:Zoned.new (param $zone externref) (result externref)))
   ;; get zone: String;

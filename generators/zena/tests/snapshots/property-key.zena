@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -50,6 +51,10 @@ declare function __property_key_set_value(value: externref): void;
 @external("property-key", "set_value_with_f64")
 declare function __property_key_set_value_with_f64(value: f64): void;
 
+// kind FirstKeyReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:FirstKeyReturnKind")
+declare function __kind_FirstKeyReturnKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -61,6 +66,22 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind FirstKeyReturnKind: String = String, F64 = Number, Symbol = Symbol
 export type FirstKeyReturnKind = externref;
+
+// The arm a `FirstKeyReturnKind` holds, from `FirstKeyReturnKind_arm`.
+export sealed class FirstKeyReturnKind_Arm {
+  case FirstKeyReturnKind_String(value: String)
+  case FirstKeyReturnKind_F64(value: f64)
+  case FirstKeyReturnKind_Symbol(value: externref)
+}
+export function FirstKeyReturnKind_arm(x: FirstKeyReturnKind): FirstKeyReturnKind_Arm {
+  let __r = x;
+  return match (__kind_FirstKeyReturnKind(__r)) {
+    case 0: new FirstKeyReturnKind_String(String.fromHandle(__r))
+    case 1: new FirstKeyReturnKind_F64(numberValue(__r))
+    case 2: new FirstKeyReturnKind_Symbol(__r)
+    case _: throw new Error("no arm of FirstKeyReturnKind")
+  };
+}
 
 export function has_key(key: String): boolean { return __property_key_has_key(key.handle); }
 export function has_key_with_f64(key: f64): boolean { return __property_key_has_key_with_f64(key); }

@@ -15,6 +15,12 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:Priority" (func $kind:Priority (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:StringOrNumber" (func $kind:StringOrNumber (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:BodyInit" (func $kind:BodyInit (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:RequestInfo" (func $kind:RequestInfo (param $x externref) (result i32)))
+
   ;; write(data: String): bool;
   (import "./bindings.wasm" "Writable.write" (func $Writable.write (param $this externref) (param $data externref) (result i32)))
 

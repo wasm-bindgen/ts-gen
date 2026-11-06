@@ -15,6 +15,11 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "ambient-enum-members" "kind:Mixed" (func $ambient-enum-members:kind:Mixed (param $x externref) (result i32)))
+  (import "ambient-enum-members" "kind:Numbered" (func $ambient-enum-members:kind:Numbered (param $x externref) (result i32)))
+  (import "ambient-enum-members" "kind:AfterString" (func $ambient-enum-members:kind:AfterString (param $x externref) (result i32)))
+
   ;; function useAll(computed: f64, mixed: Mixed, numbered: Numbered, after_string: AfterString) as use_all;
   (import "ambient-enum-members" "use_all" (func $ambient-enum-members:use_all (param $computed f64) (param $mixed externref) (param $numbered externref) (param $after_string externref)))
 

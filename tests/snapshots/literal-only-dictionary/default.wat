@@ -15,6 +15,10 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:DispositionKind" (func $kind:DispositionKind (param $x externref) (result i32)))
+  (import "./bindings.wasm" "kind:AKind" (func $kind:AKind (param $x externref) (result i32)))
+
   ;; new {};
   (import "./bindings.wasm" "Placeholder.new" (func $Placeholder.new (result externref)))
   ;; get certPresented: "0" as cert_presented;

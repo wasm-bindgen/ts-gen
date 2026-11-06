@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 // Declarations of a `module "spec"` are imported from "spec".
 
 // JsValue
@@ -196,6 +197,10 @@ declare function __slice_args_mixed_generic(values: externref, weights: externre
 @external("slice-args", "mixed_generic_with_float64_array")
 declare function __slice_args_mixed_generic_with_float64_array(values: externref, weights: externref, data: externref): externref;
 
+// kind Level: the index of the arm holding x, -1 for none
+@external("slice-args", "kind:Level")
+declare function __slice_args_kind_Level(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -207,6 +212,20 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind Level: Low = 1, High = 2
 export type Level = externref;
+
+// The arm a `Level` holds, from `Level_arm`.
+export sealed class Level_Arm {
+  case Level_Low
+  case Level_High
+}
+export function Level_arm(x: Level): Level_Arm {
+  let __r = x;
+  return match (__slice_args_kind_Level(__r)) {
+    case 0: new Level_Low()
+    case 1: new Level_High()
+    case _: throw new Error("no arm of Level")
+  };
+}
 
 export class Item {
   #ref: externref;

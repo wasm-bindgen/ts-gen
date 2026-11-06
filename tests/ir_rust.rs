@@ -174,13 +174,22 @@ impl Binding {
     }
 }
 
+/// A kind's or enum's arms, each with its aliases and whether it is a
+/// literal (a unit variant), and its `fallback`: the order and the open
+/// last arm recognition relies on.
+#[derive(Clone, Debug, PartialEq)]
+struct KindArms {
+    arms: Vec<(String, Vec<String>, bool)>,
+    fallback: bool,
+}
+
 #[derive(Default)]
 struct Model {
     bindings: Vec<Binding>,
     /// `(module, path)` of every kind.
     kinds: HashSet<(Option<String>, String)>,
-    /// Every kind's binding name and its arms' names with their aliases.
-    kind_arms: Vec<(Option<String>, String, Vec<(String, Vec<String>)>)>,
+    /// Every kind's binding name, its arms and whether it is `fallback`.
+    kind_arms: Vec<(Option<String>, String, KindArms)>,
     /// What is at each owner's path; dictionaries are interfaces.
     owners: HashMap<(Option<String>, String), OwnerKind>,
 }
@@ -296,8 +305,15 @@ fn from_ir(ir: &ts_gen_abi::ir::Ir) -> Model {
                 let arms = k
                     .arms
                     .iter()
-                    .map(|a| (a.name.clone(), a.aliases.clone()))
+                    .map(|a| {
+                        let literal = matches!(a.ty.head, IrHead::Literal(_));
+                        (a.name.clone(), a.aliases.clone(), literal)
+                    })
                     .collect();
+                let arms = KindArms {
+                    arms,
+                    fallback: k.fallback,
+                };
                 (k.module.clone(), k.name.clone(), arms)
             })
             .collect(),
@@ -550,8 +566,9 @@ struct RustFile {
     /// Extern types by (Rust mod, ident), for owner resolution.
     types_in_mod: HashMap<(String, String), (Option<String>, String)>,
     enums: HashMap<String, EnumShape>,
-    /// `(Rust mod, ident, variants)` of every enum but an error enum.
-    enum_variants: Vec<(String, String, Vec<String>)>,
+    /// `(Rust mod, ident, variants, fallback)` of every enum but an error
+    /// enum, each variant with whether it is a unit variant.
+    enum_variants: Vec<(String, String, Vec<(String, bool)>, bool)>,
     /// `(Rust mod, enum, alias, variant)`: `impl E { const A: E = E::V; }`.
     enum_aliases: Vec<(String, String, String, String)>,
     /// `(Rust mod, module, JS path, has is_type_of)` of every extern type.
@@ -836,11 +853,16 @@ fn collect_types(items: &[Item], rust_mod: &str, rf: &mut RustFile) {
                     EnumShape::Union
                 };
                 rf.enums.insert(e.ident.to_string(), shape);
+                let fallback = has(&wb_args(&e.attrs), "fallback");
                 if shape != EnumShape::Error {
                     rf.enum_variants.push((
                         rust_mod.to_string(),
                         e.ident.to_string(),
-                        e.variants.iter().map(|v| unraw(&v.ident)).collect(),
+                        e.variants
+                            .iter()
+                            .map(|v| (unraw(&v.ident), v.fields.is_empty()))
+                            .collect(),
+                        fallback,
                     ));
                 }
                 let x = &mut rf.extras;
@@ -850,7 +872,7 @@ fn collect_types(items: &[Item], rust_mod: &str, rf: &mut RustFile) {
                     EnumShape::Union => x.union_enums += 1,
                     EnumShape::Error => x.error_enums += 1,
                 }
-                if has(&wb_args(&e.attrs), "fallback") {
+                if fallback {
                     x.fallback_enums += 1;
                 }
             }
@@ -1922,36 +1944,50 @@ fn classify(ty: &Type, rf: &RustFile, generics: &[String], depth: usize) -> RT {
 }
 
 /// Each kind is a Rust enum of its last segment's name, with its arms'
-/// names as the variants in order and its aliases as the enum's alias
-/// consts; each Rust enum is a kind. A kind may match any enum of that
-/// name, as namespaced kinds are enums in nested Rust mods.
+/// names as the variants in order, its literal arms as the unit variants,
+/// its aliases as the enum's alias consts and its `fallback` as the enum's
+/// `#[wasm_bindgen(fallback)]`; each Rust enum is a kind. A kind may match
+/// any enum of that name, as namespaced kinds are enums in nested Rust mods.
 fn kinds_match_enums(model: &Model, rf: &RustFile, report: &mut FixtureReport) {
-    type Arms = Vec<(String, Vec<String>)>;
-    let rust_arms = |rust_mod: &str, ident: &str, variants: &[String]| -> Arms {
-        variants
+    let rust_arms =
+        |rust_mod: &str, ident: &str, variants: &[(String, bool)], fallback: bool| KindArms {
+            arms: variants
+                .iter()
+                .map(|(v, unit)| {
+                    let aliases = rf
+                        .enum_aliases
+                        .iter()
+                        .filter(|(m, e, _, t)| m == rust_mod && e == ident && t == v)
+                        .map(|(_, _, a, _)| a.clone())
+                        .collect();
+                    (v.clone(), aliases, *unit)
+                })
+                .collect(),
+            fallback,
+        };
+    let show = |k: &KindArms| {
+        let arms = k
+            .arms
             .iter()
-            .map(|v| {
-                let aliases = rf
-                    .enum_aliases
-                    .iter()
-                    .filter(|(m, e, _, t)| m == rust_mod && e == ident && t == v)
-                    .map(|(_, _, a, _)| a.clone())
-                    .collect();
-                (v.clone(), aliases)
-            })
-            .collect()
-    };
-    let show = |arms: &Arms| {
-        arms.iter()
-            .map(|(n, a)| {
-                if a.is_empty() {
+            .map(|(n, a, literal)| {
+                let n = if *literal {
                     n.clone()
+                } else {
+                    format!("{n}(..)")
+                };
+                if a.is_empty() {
+                    n
                 } else {
                     format!("{n} alias {}", a.join(", "))
                 }
             })
             .collect::<Vec<_>>()
-            .join(", ")
+            .join(", ");
+        if k.fallback {
+            format!("fallback {{ {arms} }}")
+        } else {
+            format!("{{ {arms} }}")
+        }
     };
     let mut matched = HashSet::new();
     for (module, name, arms) in &model.kind_arms {
@@ -1960,12 +1996,12 @@ fn kinds_match_enums(model: &Model, rf: &RustFile, report: &mut FixtureReport) {
             Some(m) => format!("\"{m}\" kind {name}"),
             None => format!("kind {name}"),
         };
-        let candidates: Vec<(usize, Arms)> = rf
+        let candidates: Vec<(usize, KindArms)> = rf
             .enum_variants
             .iter()
             .enumerate()
-            .filter(|(_, (_, e, _))| e == ident)
-            .map(|(i, (m, e, v))| (i, rust_arms(m, e, v)))
+            .filter(|(_, (_, e, _, _))| e == ident)
+            .map(|(i, (m, e, v, f))| (i, rust_arms(m, e, v, *f)))
             .collect();
         if let Some((i, _)) = candidates.iter().find(|(_, r)| r == arms) {
             matched.insert(*i);
@@ -1981,21 +2017,26 @@ fn kinds_match_enums(model: &Model, rf: &RustFile, report: &mut FixtureReport) {
             continue;
         };
         matched.insert(*i);
-        let category = if rust.len() != arms.len() {
+        let (r, a) = (&rust.arms, &arms.arms);
+        let category = if r.len() != a.len() {
             "kind arm count differs from the Rust enum's"
-        } else if rust.iter().zip(arms).any(|(r, a)| r.0 != a.0) {
+        } else if r.iter().zip(a).any(|(r, a)| r.0 != a.0) {
             "kind arm names differ from the Rust enum's variants"
+        } else if r.iter().zip(a).any(|(r, a)| r.2 != a.2) {
+            "kind literal arms differ from the Rust enum's unit variants"
+        } else if rust.fallback != arms.fallback {
+            "kind fallback differs from the Rust enum's `#[wasm_bindgen(fallback)]`"
         } else {
             "kind arm aliases differ from the Rust enum's"
         };
         report.mismatches.push(Entry {
             category: category.into(),
-            rust: format!("enum {ident} {{ {} }}", show(rust)),
+            rust: format!("enum {ident} {}", show(rust)),
             ir,
             detail: show(arms),
         });
     }
-    for (i, (m, e, _)) in rf.enum_variants.iter().enumerate() {
+    for (i, (m, e, _, _)) in rf.enum_variants.iter().enumerate() {
         if !matched.contains(&i)
             && !model
                 .kind_arms

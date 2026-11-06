@@ -5,7 +5,8 @@
 // `undefined` included; positions that admit null are `externref |
 // null`. TS strings are `String`s over the JS string. A class or string
 // result that admits an empty is `T | null`, null for null and
-// undefined. A kind is a type alias of its arms' common wrapper.
+// undefined. A kind is a type alias of its arms' common wrapper, and
+// `<Kind>_arm(x)` tells its arm as a case of the sealed `<Kind>_Arm`.
 
 // JsValue
 // x === undefined
@@ -89,6 +90,10 @@ declare function __ImageOptions_border(this_: externref): externref;
 @external("./bindings.wasm", "ImageOptions.set_border")
 declare function __ImageOptions_set_border(this_: externref, value: externref): void;
 
+// kind CostReturnKind: the index of the arm holding x, -1 for none
+@external("./bindings.wasm", "kind:CostReturnKind")
+declare function __kind_CostReturnKind(x: externref | null): i32;
+
 // sys: wasm-bindgen's JsValue surface. `externref` is JsValue; `null`
 // is wasm null, `undefined` the JS value below.
 @external("./builtins.js", "undefined")
@@ -100,6 +105,19 @@ export function numberValue(x: externref): f64 { return __Number_value(x); }
 
 // kind CostReturnKind fallback: String = String, Object = Object
 export type CostReturnKind = externref;
+
+// The arm a `CostReturnKind` holds, from `CostReturnKind_arm`.
+export sealed class CostReturnKind_Arm {
+  case CostReturnKind_String(value: String)
+  case CostReturnKind_Object(value: externref)
+}
+export function CostReturnKind_arm(x: CostReturnKind): CostReturnKind_Arm {
+  let __r = x;
+  return match (__kind_CostReturnKind(__r)) {
+    case 0: new CostReturnKind_String(String.fromHandle(__r))
+    case _: new CostReturnKind_Object(__r)
+  };
+}
 
 export class Cursor {
   #ref: externref;

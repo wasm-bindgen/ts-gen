@@ -15,6 +15,9 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
+  ;; Kind discriminators: the index of the arm holding $x, -1 for none.
+  (import "./bindings.wasm" "kind:LookupReturnKind" (func $kind:LookupReturnKind (param $x externref) (result i32)))
+
   ;; static get kind: Symbol;
   (import "symbol" "Kinded.kind" (func $symbol:Kinded.kind (result externref)))
 
