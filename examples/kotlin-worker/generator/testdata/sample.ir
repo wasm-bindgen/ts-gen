@@ -1,0 +1,190 @@
+ir 1;
+
+/// An HTTP request.
+///
+///   Indented, and "quoted" \ text.
+class Request extends Body {
+  new(input: String);
+  new(input: Request, init: RequestInit | Undefined) as new_with_request;
+  get url: String nothrow;
+  get cf: Any | Undefined;
+  get bodyUsed: bool;
+  /// Reads the body as text.
+  text(): Promise<String>;
+  clone(): Request throws TypeError | RangeError;
+  json(): Promise<Any> raises SyntaxError | Null;
+  formData(): Promise<Any> throws nothrow as form_data;
+  waitUntil(promise: Promise<Any>) as wait_until;
+  static redirect(url: String, status: f64): Response throws;
+  static get version: String;
+  static set version(value: String) as set_version;
+}
+
+shape class Body {
+  get body: ReadableStream<Number> | Null;
+  arrayBuffer(): Promise<ArrayBuffer>;
+}
+
+class Response extends Body {}
+
+shape class RequestInit {
+  new {};
+  get method?: String | Null | Undefined;
+}
+
+shape class ResponseInit {
+  new {};
+  get status: Number | Undefined;
+  set status(value: Number | Undefined) as set_status;
+  set headers(value: Headers) as set_headers;
+  set headers(value: Record<String>) as set_headers_with_record;
+  set headers(value: Array<Array<String>>) as set_headers_with_slice;
+  get headers: HeadersKind | Undefined;
+}
+
+class Headers {
+  new(init: HeadersKind | Undefined);
+  get(name: String): String | Null;
+  forEach(callback: (String, String, Headers) => void);
+  set onchange(value: ((Any) => void) | Null) as set_onchange;
+  get "content-type": String | Null as content_type;
+  get "0": f64;
+  "[Symbol.iterator]"(): Any as iterator;
+  get flags: globalThis.util.Flags;
+  get pair: [String, Number | Undefined];
+  get nothing: Null;
+  get maybe: Null | Undefined;
+  entries(): Array<[]>;
+}
+
+static class WebAssembly {
+  static validate(bytes: Any): bool;
+}
+
+class WebAssembly.Module {
+  new(bytes: Any);
+  static exports(module: WebAssembly.Module): Array<Any>;
+}
+
+class Console {
+  log(...data: Array<Any>);
+  table(data: Any, columns: Array<String> | Undefined);
+}
+
+class ReadableStream<R> {
+  new(source: Any);
+  getReader(): ReadableStreamDefaultReader<R>;
+  tee(): Array<ReadableStream<R>>;
+  pipeThrough<T>(transform: Any): ReadableStream<T>;
+  pipeTo(destination: WritableStream<R>, map: ((R) => (Any) => BigInt | Undefined) | Undefined): Promise<Any>;
+}
+
+class ReadableStreamDefaultReader<R> {
+  read(): Promise<R | Undefined>;
+}
+
+class Uint8Stream extends ReadableStream<Number>, EventTarget {}
+
+class Counter {
+  new(): Counter | Undefined;
+  new Counters.Counter(start: f64) as new_from;
+  "new"(): Counter as new_instance;
+  get value: i64;
+  add(n: i64): BigInt | Null;
+  done(): Boolean | Undefined;
+  static make(): f64 as "make-it";
+  static of(kind: "a"): Counter cohort __of as of_a;
+  static of(kind: "b"): Counter cohort __of as of_b;
+  reset(): Promise<Undefined>;
+}
+
+class Conn {
+  open();
+  close() throws;
+}
+alias Connection = Conn;
+alias Db.Connection = Conn;
+alias Conn.open2 = Conn.open;
+alias Conn.reopen = Conn.open;
+
+class Local as Local2 {
+  new();
+  get other: Local;
+}
+
+class Local {
+  get other: Local2;
+  get t: M_2.T;
+}
+
+class M.T as M_2.T {}
+
+module "cloudflare:workers" {
+  /// A Durable Object.
+  class DurableObject<Env> {
+    new(ctx: Any, env: Env);
+    fetch(request: globalThis.Request): Promise<Response>;
+    get socket: "cloudflare:sockets".Socket | Undefined;
+  }
+
+  class Request {}
+}
+
+module "cloudflare:sockets" {
+  class Socket {
+    new(addr: String) from "cloudflare:workers";
+    get readable: ReadableStream<Any>;
+    close(): Promise<Any>;
+  }
+}
+
+kind HeadersKind {
+  Headers = Headers;
+  Record = Record<String>;
+  Pairs = Array<Array<String>>;
+}
+
+/// A union with a callback arm.
+kind Thing {
+  Text = String;
+  Callback = (f64) => bool;
+  Number = Number;
+}
+
+kind Method as MethodKind fallback {
+  /// Fetches.
+  Get = "GET";
+  Post = "POST" alias Create, Submit;
+  Zero = 0;
+  MinusOne = -1;
+  Other = String;
+}
+
+kind Empty {}
+
+module "cloudflare:workers" {
+  kind Body {
+    Request = Request;
+    Text = String;
+  }
+
+  function connect(addr: String): "cloudflare:sockets".Socket;
+  alias open = connect;
+}
+
+function fetch(input: Request, init: RequestInit | Undefined): Promise<Response>;
+function durable(): "cloudflare:workers".DurableObject<Any>;
+function queueMicrotask(callback: () => void);
+alias enqueue = queueMicrotask;
+function structuredClone<T>(value: T): T throws;
+
+/// Decodes a URI component.
+function decodeURIComponent(input: String): String throws as decode_uri_component;
+get location: String;
+set location(value: String) as set_location;
+
+/// Handles a request.
+provide default.fetch(request: Request, env: Any, ctx: Any): async Response;
+provide default.scheduled(controller: Any): async void as "default.scheduled";
+provide add(a: f64, b: f64): f64;
+provide log(message: String);
