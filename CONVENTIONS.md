@@ -5436,9 +5436,9 @@ so `export default` is the handler object. Instantiated by hand, read
 ### Bindings generators
 
 A language's bindings are written by a program that reads the IR,
-outside ts-gen: [`generators/zena`](generators/zena/README.md) for Zena.
-[IR.md](IR.md) specifies the IR, the only interface between them and
-ts-gen.
+outside ts-gen: [`generators/zena`](generators/zena/README.md) for Zena,
+and the Kotlin generator in `examples/kotlin-worker/`. [IR.md](IR.md)
+specifies the IR, the only interface between them and ts-gen.
 
 ### Limitations
 

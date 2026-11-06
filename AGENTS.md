@@ -64,7 +64,8 @@ tests/
 
 examples/
 ├── cloudflare-worker/         # Rust worker against generated bindings
-└── zena-worker/               # Zena worker through ts-gen-zena and embed
+├── zena-worker/               # Zena worker through ts-gen-zena and embed
+└── kotlin-worker/             # Kotlin/Wasm worker, with a generator written in Kotlin
 
 abi/                           # ts-gen-abi: the IR model and its text format (IR.md)
 ├── src/ir.rs                  # the model, its imports and the sys functions

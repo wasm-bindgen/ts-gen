@@ -171,6 +171,8 @@ Language bindings are written by separate programs that read the IR:
 * [`generators/zena`](generators/zena/README.md): Zena, a Rust crate that
   depends only on [`ts-gen-abi`](abi/), the IR model and its reader.
   `examples/zena-worker/` is a worker built with it.
+* [`examples/kotlin-worker`](examples/kotlin-worker/README.md): Kotlin/Wasm,
+  with a generator written in Kotlin and its own reader.
 
 ```sh
 ts-gen --input worker.d.ts --output worker.ir --target ir --naming zena --provides ExportedHandler.fetch
