@@ -206,8 +206,24 @@ enum Command {
 #[derive(clap::Args, Debug)]
 struct EmbedArgs {
     /// The .d.ts files the module was written against.
-    #[arg(short, long, required = true, num_args = 1..)]
+    #[arg(short, long, required_unless_present = "ir", num_args = 1..)]
     input: Vec<PathBuf>,
+
+    /// The IR the module was written against (`--target ir` output), read
+    /// in place of the `.d.ts`.
+    #[arg(long, conflicts_with_all = ["input", "provides", "lib_name"])]
+    ir: Option<PathBuf>,
+
+    /// Module the language imports the bindings from, when it cannot
+    /// import them from `./bindings.wasm` (Kotlin: `js_code`), a module's
+    /// as `<spec>:<name>`. Its other imports are left to the host.
+    #[arg(long, default_value = ts_gen::abi::BINDINGS_SPECIFIER)]
+    bindings_module: String,
+
+    /// Namespace the bindings import string constants from: the
+    /// `importedStringConstants` the merged module is compiled with.
+    #[arg(long, default_value = ts_gen::abi::STRING_CONSTANTS)]
+    imported_string_constants: String,
 
     /// The language's compiled Wasm module.
     #[arg(short, long)]
@@ -417,6 +433,12 @@ fn resolve_exports(
 }
 
 fn embed_ir(args: &EmbedArgs) -> Result<ts_gen::abi::Ir> {
+    if let Some(path) = &args.ir {
+        let text = std::fs::read_to_string(path)
+            .with_context(|| format!("Failed to read {}", path.display()))?;
+        return ts_gen_abi::text::parse(&text)
+            .map_err(|e| anyhow::anyhow!("{}: {e}", path.display()));
+    }
     let input_files = resolve_input_files(&args.input)?;
     if input_files.is_empty() {
         bail!("No .d.ts files found in the specified input paths");
@@ -449,7 +471,11 @@ fn embed(args: EmbedArgs) -> Result<()> {
                 .unwrap_or_default()
         )
     });
-    let options = ts_gen::abi::embed::Options::new(module_specifier);
+    let options = ts_gen::abi::embed::Options {
+        module_specifier,
+        bindings_module: args.bindings_module.clone(),
+        string_constants: args.imported_string_constants.clone(),
+    };
     let out = ts_gen::abi::embed::embed(&ir, &wasm, &options)?;
 
     eprintln!(

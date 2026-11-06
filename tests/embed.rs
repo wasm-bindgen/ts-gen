@@ -784,6 +784,156 @@ fn embed_links_the_same_name_from_two_modules_separately() {
 }
 
 #[test]
+fn embed_reads_the_ir_it_was_written_against() {
+    // `embed --ir` reads the IR text instead of the `.d.ts`: the text gives
+    // back the IR `embed -i` builds, and so the same bindings.
+    let ir = worker_ir().unwrap();
+    let read = ts_gen_abi::text::parse(&ts_gen_abi::text::emit(&ir)).unwrap();
+    assert_eq!(read, ir);
+    let module = r#"(module
+        (import "./bindings.wasm" "Request.url" (func (param externref) (result externref)))
+        (import "./bindings.wasm" "Headers.get" (func (param externref externref) (result externref)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let out =
+        ts_gen::abi::embed::embed(&read, &bytes, &ts_gen::abi::embed::Options::new("./m.wasm"))
+            .unwrap();
+    assert_eq!(out.used, ["Request.url", "Headers.get"]);
+}
+
+#[test]
+fn embed_bindings_module_links_only_abi_names() {
+    // Kotlin's `@JsFun` imports from `js_code` under the function's
+    // qualified name. Under `--bindings-module js_code` the ABI's names
+    // link to the bindings, and the language's own snippets stay imports.
+    let ir = worker_ir().unwrap();
+    let module = r#"(module
+        (import "js_code" "Request.url" (func (param externref) (result externref)))
+        (import "js_code" "kotlin.js.stdlibSnippet" (func (param externref)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let options = ts_gen::abi::embed::Options {
+        bindings_module: "js_code".into(),
+        string_constants: "'".into(),
+        ..ts_gen::abi::embed::Options::new("./m.wasm")
+    };
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &options).unwrap();
+    assert_eq!(out.used, ["Request.url"]);
+    let imports: Vec<(String, String)> = wasmparser::Parser::new(0)
+        .parse_all(&out.module)
+        .filter_map(|p| match p.unwrap() {
+            wasmparser::Payload::ImportSection(r) => Some(
+                r.into_imports()
+                    .map(|i| {
+                        let i = i.unwrap();
+                        (i.module.to_string(), i.name.to_string())
+                    })
+                    .collect::<Vec<_>>(),
+            ),
+            _ => None,
+        })
+        .flatten()
+        .collect();
+    assert_eq!(
+        imports,
+        [
+            (
+                "./bindings.wasm".into(),
+                "ts-gen:bindings.Request.url".into()
+            ),
+            ("js_code".into(), "kotlin.js.stdlibSnippet".into()),
+        ]
+    );
+    assert!(
+        out.bindings_wat.contains(r#"(import "'" "url""#),
+        "{}",
+        out.bindings_wat
+    );
+}
+
+#[test]
+fn embed_bindings_module_links_module_bindings_by_specifier() {
+    // Under `--bindings-module`, a module's binding is `<spec>:<name>`.
+    let ir = worker_ir().unwrap();
+    let module = r#"(module
+        (import "js_code" "cloudflare:sockets:connect" (func (param externref) (result externref)))
+        (import "js_code" "cloudflare:sockets:Socket.closed" (func (param externref) (result externref)))
+        (import "js_code" "cloudflare:sockets:nope" (func (param externref)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let options = ts_gen::abi::embed::Options {
+        bindings_module: "js_code".into(),
+        ..ts_gen::abi::embed::Options::new("./m.wasm")
+    };
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &options).unwrap();
+    ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
+    assert_eq!(
+        out.used,
+        [
+            "cloudflare:sockets:connect",
+            "cloudflare:sockets:Socket.closed"
+        ]
+    );
+    assert!(
+        out.bindings_wat
+            .contains(r#"(import "cloudflare:sockets" "connect" (global $m:cloudflare:sockets:connect externref))"#),
+        "{}",
+        out.bindings_wat
+    );
+    let imports: Vec<(String, String)> = wasmparser::Parser::new(0)
+        .parse_all(&out.module)
+        .filter_map(|p| match p.unwrap() {
+            wasmparser::Payload::ImportSection(r) => Some(
+                r.into_imports()
+                    .map(|i| {
+                        let i = i.unwrap();
+                        (i.module.to_string(), i.name.to_string())
+                    })
+                    .collect::<Vec<_>>(),
+            ),
+            _ => None,
+        })
+        .flatten()
+        .collect();
+    assert_eq!(
+        imports,
+        [
+            (
+                "./bindings.wasm".into(),
+                "ts-gen:bindings.cloudflare:sockets:connect".into()
+            ),
+            (
+                "./bindings.wasm".into(),
+                "ts-gen:bindings.cloudflare:sockets:Socket.closed".into()
+            ),
+            ("js_code".into(), "cloudflare:sockets:nope".into()),
+        ]
+    );
+}
+
+#[test]
+fn embed_accepts_legacy_exceptions() {
+    // Kotlin/Wasm emits the legacy `try`/`catch` by default.
+    let ir = worker_ir().unwrap();
+    let module = r#"(module
+        (tag $e (param externref))
+        (import "./bindings.wasm" "Request.url" (func $url (param externref) (result externref)))
+        (func (export "fetch") (param externref externref externref) (result externref)
+            try (result externref)
+                local.get 0
+                call $url
+            catch $e
+            end))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let out = ts_gen::abi::embed::embed(&ir, &bytes, &ts_gen::abi::embed::Options::new("./m.wasm"))
+        .unwrap();
+    assert_eq!(out.used, ["Request.url"]);
+}
+
+#[test]
 fn embed_member_from_another_module() {
     // A constructor another module's variable exports (`new RpcStub(...)
     // from "cloudflare:workers"`) is imported from, and constructs the

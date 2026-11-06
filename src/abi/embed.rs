@@ -34,12 +34,24 @@ pub const MAX_ARITY: usize = 8;
 pub struct Options {
     /// Specifier `wrapper.wasm` imports the language module under.
     pub module_specifier: String,
+    /// Module the language imports the bindings from. A language that
+    /// cannot name its imports (Kotlin's `@JsFun` always imports from
+    /// `js_code`) matches the bindings' names under its own module, a
+    /// module's as `<spec>:<name>`; its other imports from it are left to
+    /// the host.
+    pub bindings_module: String,
+    /// Namespace the bindings import their string constants from, so a
+    /// merged module compiles with the one `importedStringConstants` the
+    /// language module uses.
+    pub string_constants: String,
 }
 
 impl Options {
     pub fn new(module_specifier: impl Into<String>) -> Self {
         Options {
             module_specifier: module_specifier.into(),
+            bindings_module: BINDINGS_SPECIFIER.into(),
+            string_constants: STRING_CONSTANTS.into(),
         }
     }
 }
@@ -221,6 +233,22 @@ impl Bindings {
             .get(&(specifier.to_string(), name.to_string()))
             .copied()
     }
+
+    /// An import from `--bindings-module`: a global binding by its name, a
+    /// module's as `<spec>:<name>`. Returns the binding and the name it is
+    /// imported under from its own module.
+    fn in_bindings_module<'a>(&self, field: &'a str) -> Option<(usize, &'a str)> {
+        if let Some(i) = self.import(BINDINGS_SPECIFIER, field) {
+            return Some((i, field));
+        }
+        self.modules
+            .iter()
+            .filter_map(|spec| {
+                let name = field.strip_prefix(spec.as_str())?.strip_prefix(':')?;
+                Some((self.import(spec, name)?, name))
+            })
+            .next()
+    }
 }
 
 /// An export the module provides, with the types it declared for it.
@@ -261,14 +289,19 @@ pub fn embed(ir: &Ir, module: &[u8], options: &Options) -> Result<Output> {
             },
         })
         .collect();
-    let info = inspect(&bindings, &handlers, module)?;
+    let info = inspect(&bindings, &handlers, module, &options.bindings_module)?;
     let mut builtins = Builtins::default();
+    let imports = || Imports {
+        string_constants: options.string_constants.clone(),
+        ..Default::default()
+    };
 
-    let bindings_wat = generate_bindings(&bindings, &info.used, &mut builtins)?;
+    let bindings_wat = generate_bindings(&bindings, &info.used, imports(), &mut builtins)?;
     let wrapper_wat = generate_wrapper(
         &info.handlers,
         info.jspi,
         &options.module_specifier,
+        imports(),
         &mut builtins,
     )?;
     if info.jspi {
@@ -397,11 +430,15 @@ fn link_imports(wasm: &[u8], links: &BTreeMap<(String, String), String>) -> Resu
 }
 
 /// Assemble WAT and validate it with the features the bindings rely on.
+/// Kotlin/Wasm emits the legacy `try`/`catch` by default.
+fn features() -> wasmparser::WasmFeatures {
+    use wasmparser::WasmFeatures;
+    WasmFeatures::default() | WasmFeatures::GC | WasmFeatures::LEGACY_EXCEPTIONS
+}
+
 pub fn assemble(wat_text: &str) -> Result<Vec<u8>> {
     let bytes = wat::parse_str(wat_text).context("assembling generated WAT")?;
-    let mut validator = wasmparser::Validator::new_with_features(
-        wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
-    );
+    let mut validator = wasmparser::Validator::new_with_features(features());
     validator
         .validate_all(&bytes)
         .context("validating generated Wasm")?;
@@ -495,16 +532,19 @@ pub fn postprocess(
     }
 
     let bytes = out.finish();
-    let mut validator = wasmparser::Validator::new_with_features(
-        wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
-    );
+    let mut validator = wasmparser::Validator::new_with_features(features());
     validator
         .validate_all(&bytes)
         .context("validating postprocessed Wasm")?;
     Ok(bytes)
 }
 
-fn inspect(bindings: &Bindings, provides: &[HandlerInfo], module: &[u8]) -> Result<ModuleInfo> {
+fn inspect(
+    bindings: &Bindings,
+    provides: &[HandlerInfo],
+    module: &[u8],
+    bindings_module: &str,
+) -> Result<ModuleInfo> {
     use wasmparser::{Payload, TypeRef};
 
     let mut types: Vec<wasmparser::SubType> = Vec::new();
@@ -575,8 +615,12 @@ fn inspect(bindings: &Bindings, provides: &[HandlerInfo], module: &[u8]) -> Resu
     let mut undefined = false;
     for (module_name, field, ty) in &imports {
         // A module-scoped binding is imported from its specifier, which the
-        // module may also import other things from directly.
-        let found = if module_name == BINDINGS_SPECIFIER
+        // module may also import other things from directly. Under another
+        // bindings module, only the names the bindings have are theirs.
+        let aliased = module_name == bindings_module && bindings_module != BINDINGS_SPECIFIER;
+        let found = if aliased {
+            bindings.in_bindings_module(field)
+        } else if module_name == bindings_module
             || (bindings.modules.contains(module_name) && matches!(ty, TypeRef::Func(_)))
         {
             let i = bindings.import(module_name, field).ok_or_else(|| {
@@ -605,7 +649,7 @@ fn inspect(bindings: &Bindings, provides: &[HandlerInfo], module: &[u8]) -> Resu
                 Some(spec) => format!("{spec}:{name}"),
                 None => name.to_string(),
             };
-            if b.module.is_some() {
+            if b.module.is_some() || aliased {
                 links.insert((module_name.clone(), field.clone()), export.clone());
             }
             if used
@@ -1030,6 +1074,8 @@ struct Imports {
     anyrefs_type: bool,
     /// (specifier, export, type) imported as globals of that type.
     module_exports: IndexSet<(String, String, WasmType)>,
+    /// Namespace of the string constant imports.
+    string_constants: String,
 }
 
 impl Imports {
@@ -1088,7 +1134,8 @@ impl Imports {
         for s in &self.strings {
             let _ = writeln!(
                 out,
-                "  (import {STRING_CONSTANTS:?} {s:?} (global ${} externref))",
+                "  (import {:?} {s:?} (global ${} externref))",
+                self.string_constants,
                 string_ident(s)
             );
         }
@@ -1381,9 +1428,9 @@ struct FuncBody {
 fn generate_bindings(
     bindings: &Bindings,
     used: &[UsedFunction],
+    mut imports: Imports,
     builtins: &mut Builtins,
 ) -> Result<String> {
-    let mut imports = Imports::default();
     let mut funcs = String::new();
 
     for uf in used {
@@ -1650,13 +1697,13 @@ fn generate_wrapper(
     handlers: &[HandlerInfo],
     jspi: bool,
     module_specifier: &str,
+    mut imports: Imports,
     builtins: &mut Builtins,
 ) -> Result<String> {
     if handlers.is_empty() {
         return Ok(";; Generated by ts-gen. No --provides: the module's own exports pass through.\n(module)\n".into());
     }
     let ns = namespace(handlers)?;
-    let mut imports = Imports::default();
     let mut init = String::new();
     let mut locals = 0usize;
     // A boolean result is an `i32` the module returns, which JS would

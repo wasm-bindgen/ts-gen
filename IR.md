@@ -393,7 +393,9 @@ reaches JS as a boolean, and so does a provide's `bool` result.
 ### String constants
 
 The bindings take property keys as imported string constants, from
-`wasm:js/string-constants`.
+`wasm:js/string-constants` or the namespace `embed
+--imported-string-constants` names: the `importedStringConstants` the
+merged module is compiled with (Kotlin's is `'`).
 
 ### Exceptions
 
@@ -402,7 +404,8 @@ propagates through the bindings into the language module as a Wasm
 exception; `throws`, `raises` and `nothrow` tell a generator where to
 catch it and what it may be. How a catching binding reports a caught
 exception to its caller is the generator's choice, not yet fixed on the
-wire.
+wire. `embed` accepts modules that use the legacy exception-handling
+instructions (`try`/`catch`), as Kotlin/Wasm emits.
 
 ### Provides and JSPI
 
@@ -415,6 +418,16 @@ opts the module into JSPI: the wrapper wraps each provide in
 `WebAssembly.promising`, so the export returns `T` and JS receives a
 promise of it. Without the import, an `async` provide returns the
 promise itself. Importing `await` with no provides is an error.
+
+### Bindings module
+
+A language that cannot choose its import modules, as Kotlin's `@JsFun`
+imports only from `js_code`, imports every binding from one module,
+`embed --bindings-module <name>`: a global binding under its import
+name, a module's under `<spec>:<name>` (`cloudflare:sockets:connect`,
+`node:fs:constants.o_rdonly`). The bridge resolves such a name against
+the IR's specifiers, a global name first. The module's other imports
+from it are left to the host.
 
 ## Name resolution
 
