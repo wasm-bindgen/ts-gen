@@ -168,8 +168,12 @@ ts-gen --input worker.d.ts --output src/bindings.rs --provides ExportedHandler.f
 Given a module written against the IR, produce the bridging modules:
 
 ```sh
-ts-gen embed -i types.d.ts --provides ExportedHandler.fetch -m hello.wasm -o out/
+ts-gen embed --ir types.ir -m hello.wasm -o out/
 ```
+
+`--ir` reads the IR the module was written against. `embed` can instead
+build it again from the same `.d.ts` and flags, with `-i types.d.ts
+--provides ExportedHandler.fetch`.
 
 This creates `out/hello.wasm` (merged), `out/builtins.js`, and optionally
 `out/bindings.wat` / `out/wrapper.wat` with `--text`. The merged module
@@ -180,8 +184,11 @@ Flags:
 
 | Flag | Description |
 |------|-------------|
+| `--ir` | The IR the module was written against, in place of `-i` |
 | `-i`, `--input` | The `.d.ts` files the module was written against |
 | `-m`, `--module` | The compiled language module |
+| `--bindings-module` | Module the language imports the bindings from (default `./bindings.wasm`), a module's as `<spec>:<name>`. Its other imports are left to the host |
+| `--imported-string-constants` | Namespace the bindings import string constants from (default `wasm:js/string-constants`): the one the merged module is compiled with |
 | `-o`, `--out-dir` | Output directory |
 | `--text` | Also write `.wat` text for debugging |
 | `--wasm-merge` | Path to binaryen's `wasm-merge` (required; defaults to `$WASM_MERGE`, then `PATH`) |
