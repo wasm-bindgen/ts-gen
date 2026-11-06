@@ -1,0 +1,42 @@
+ir 1;
+
+module "namespace-merge" {
+  class Foo {
+    m(options: Foo.Options);
+  }
+
+  shape class Foo.Options {
+    new {};
+    get a: String;
+    set a(value: String) as set_a;
+  }
+
+  class Bar {
+    power(power: Bar.Power): Bar;
+  }
+
+  static class make {}
+
+  shape class make.Config {
+    new {};
+    get c: String;
+    set c(value: String) as set_c;
+  }
+
+  shape class Shape {
+    axis(axis: Shape.Axis);
+  }
+
+  kind Bar.Power {
+    On = "on";
+    Off = "off";
+  }
+
+  kind Shape.Axis {
+    X = "x";
+    Y = "y";
+  }
+
+  function makeFoo(): Foo as make_foo;
+  function make(config: make.Config);
+}

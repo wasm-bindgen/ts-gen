@@ -1,0 +1,35 @@
+ir 1;
+
+static class Cloudflare {}
+
+shape class Cloudflare.Stub {
+  new {};
+  get id: String;
+}
+
+shape class Cloudflare.Socket {
+  new {};
+  get port: f64;
+}
+
+static class Storage {}
+
+shape class Storage.Stub {
+  new {};
+  get region: String;
+}
+
+class Context {
+  get exports: Any;
+  get stub: Cloudflare.Stub;
+  open(kind: Cloudflare.Kind) throws;
+  connect(target: String) throws;
+  connect(target: Cloudflare.Stub) throws as connect_with_cloudflare_stub;
+  connect(target: Cloudflare.Socket) throws as connect_with_cloudflare_socket;
+  connect(target: Storage.Stub) throws as connect_with_storage_stub;
+}
+
+kind Cloudflare.Kind {
+  Http = "http";
+  Tcp = "tcp";
+}

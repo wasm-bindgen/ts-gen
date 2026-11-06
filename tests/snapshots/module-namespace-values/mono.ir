@@ -1,0 +1,32 @@
+ir 1;
+
+module "module-namespace-values" {
+  shape class InspectOptions {
+    new {};
+    get depth: f64;
+    set depth(value: f64) as set_depth;
+  }
+
+  static class inspect {
+    static get defaultOptions: InspectOptions as default_options;
+    static withDepth(depth: f64): inspect.Formatter<String> throws as with_depth;
+  }
+
+  class inspect.Formatter<T> {
+    format(value: T | Null | Undefined): String throws;
+  }
+
+  static class outer {}
+
+  static class outer.inner {
+    static get LIMIT: f64 as limit;
+    static run(style: inspect.Style): String throws;
+  }
+
+  kind inspect.Style {
+    Plain = "plain";
+    Ansi = "ansi";
+  }
+
+  function inspect(value: Any | Null | Undefined): String throws;
+}

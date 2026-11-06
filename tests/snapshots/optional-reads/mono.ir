@@ -1,0 +1,50 @@
+ir 1;
+
+module "optional-reads" {
+  class Moment {
+    new() throws;
+  }
+
+  class Tagged {
+    new() throws;
+  }
+
+  shape class Settings {
+    new {};
+    /// Anything, `null`, or absent: all in-band.
+    get data?: Any | Null | Undefined;
+    set data(value: Any | Null | Undefined) as set_data;
+    /// Anything, `null`, or absent: all in-band.
+    get detail?: Any | Null | Undefined;
+    set detail(value: Any | Null | Undefined) as set_detail;
+    /// No member subtypes the other, so it erases.
+    get stamp?: Any | Undefined;
+    set stamp(value: Any) as set_stamp;
+    /// Erased, `null`, or absent.
+    get cleared?: Any | Null | Undefined;
+    set cleared(value: Any) as set_cleared;
+    set cleared(value: Null) as set_cleared_with_null;
+    /// Required, but admitting `undefined`.
+    get maybe: Any | Undefined;
+    set maybe(value: Any) as set_maybe;
+    /// Always present, so bare.
+    get value: Any;
+    set value(value: Any) as set_value;
+  }
+
+  class Registry {
+    /// Absent.
+    static get missing?: Any | Undefined;
+    static set missing(value: Any) as set_missing;
+    /// Present, holding `null`.
+    static get cleared?: Any | Null | Undefined;
+    static set cleared(value: Any) as set_cleared;
+    static set cleared(value: Null) as set_cleared_with_null;
+    /// The top type, holding `null`.
+    static get anything?: Any | Null | Undefined;
+    static set anything(value: Any | Null | Undefined) as set_anything;
+  }
+
+  /// Settings with every field set (`"full"`), none (`"empty"`) or `null`s.
+  function settings(kind: String): Settings throws;
+}

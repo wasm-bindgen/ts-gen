@@ -1,0 +1,32 @@
+ir 1;
+
+shape class Writable {
+  write(data: String): bool;
+}
+alias WritableStream = Writable;
+
+kind Priority {
+  Low = -1;
+  Normal = 0;
+  High = 1;
+}
+
+kind StringOrNumber {
+  String = String;
+  F64 = Number;
+}
+
+kind BodyInit {
+  ReadableStream = ReadableStream;
+  String = String;
+  ArrayBuffer = ArrayBuffer;
+  Blob = Blob;
+}
+
+kind RequestInfo {
+  String = String;
+  Request = Request;
+}
+
+function send(body: BodyInit);
+function fetch(input: RequestInfo): Promise<Response>;

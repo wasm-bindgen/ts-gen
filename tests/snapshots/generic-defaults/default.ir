@@ -1,0 +1,62 @@
+ir 1;
+
+module "generic-defaults" {
+  shape class Box<T> {
+    get value: T | Null | Undefined;
+    set(value: T | Null | Undefined);
+  }
+
+  class Holder<T, U> {
+    new(): Holder throws;
+    get(): T | Null | Undefined;
+    boxed(): U | Null | Undefined;
+    static make(): Holder<String, Any | Null | Undefined>;
+  }
+
+  shape class Options<T> {
+    new {}: Options;
+    get initial?: T | Null | Undefined;
+    set initial(value: T | Null | Undefined) as set_initial;
+  }
+
+  shape class Row<T> {
+    new {}: Row;
+    get results: Array<T | Null | Undefined>;
+    set results(value: Array<T | Null | Undefined>) as set_results;
+  }
+
+  shape class Cursor<T> {
+    next(): T | Null | Undefined;
+  }
+
+  shape class Store {
+    put<T>(key: String, value: T | Null | Undefined): Promise<Undefined>;
+    append(...items: Array<Record<Any | Null | Undefined>>): Row<Record<Any | Null | Undefined>>;
+    get<T>(key: String): Promise<T | Null | Undefined>;
+    first<T>(): Promise<T | Null | Undefined>;
+    json<T>(): Promise<T | Null | Undefined>;
+    transaction<T>(closure: (Store) => Promise<T | Null | Undefined>): Promise<T | Null | Undefined>;
+    collect(make: () => Promise<Any | Null | Undefined>): Promise<Map<String, Any | Null | Undefined>>;
+    each<T>(fn: (T | Null | Undefined) => void): Promise<Map<String, T | Null | Undefined>>;
+    eachRest(fn: (Any | Null | Undefined, Array<Any | Null | Undefined>) => void): Promise<Map<String, Any | Null | Undefined>> as each_rest;
+    run(): Promise<Row<Record<Any | Null | Undefined>>>;
+    list(): Promise<Map<String, Any | Null | Undefined>>;
+    scan(): Cursor<String>;
+    schedule(callback: (Any | Null | Undefined) => void, ...args: Array<Any | Null | Undefined>): f64;
+  }
+
+  kind Loose {
+    F64 = Number;
+    String = String;
+  }
+
+  function looseBox(): Box<Any | Null | Undefined> as loose_box;
+  function looseHolder(): Holder<Any, Box<Any>> as loose_holder;
+  function stringHolder(): Holder<String, Box<String>> as string_holder;
+  function mixedHolder(): Holder<String, Box<Any | Null | Undefined>> as mixed_holder;
+  function makeHolder(): Holder<String, Any | Null | Undefined> as make_holder;
+  function of(...items: Array<Record<Any | Null | Undefined>>): Row<Record<Any | Null | Undefined>>;
+  function enterSpan<T>(name: String, fn: (Any | Null | Undefined) => T | Null | Undefined, ...args: Array<Any | Null | Undefined>): T | Null | Undefined as enter_span;
+  function lookup(): Map<String, Number>;
+  function lookup(key: String) as lookup_with_key;
+}

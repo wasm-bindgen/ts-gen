@@ -1,0 +1,96 @@
+ir 1;
+
+module "promise-builtins" {
+  class Store {
+    /// User module: `Result<Promise<JsString>, JsValue>`.
+    get(key: String): Promise<String>;
+    /// Declared `async`: plain.
+    put(key: String, value: String): Promise<Undefined>;
+    /// Declared `async`: plain.
+    static open(name: String): Promise<Store>;
+  }
+}
+
+class Cache {
+  /// A global class's method: plain.
+  match(url: String): Promise<String | Undefined> as match_;
+  /// `@throws` types the rejection: the `async fn` form is
+  /// `Result<(), TypeError>`, the `_promise` form stays plain.
+  ///
+  /// ## Errors
+  ///
+  /// * `TypeError` — on a non-GET request
+  put(url: String, body: String): Promise<Undefined> raises TypeError;
+  /// A global class's static: plain.
+  static open(name: String): Promise<Cache>;
+}
+
+static class scheduler {
+  /// A function of a global namespace: plain.
+  static wait(ms: f64): Promise<Undefined>;
+}
+
+module "cloudflare:sockets" {
+  shape class Socket {
+    /// `cloudflare:` builtin method: plain.
+    close(): Promise<Undefined>;
+  }
+}
+
+module "promise-builtins" {
+  /// The `--lib-name` module is the user's: `Result<Promise<JsString>, JsValue>`.
+  function load(url: String): Promise<String>;
+
+  /// Typed: `Result<Promise<Number>, TypeError>`.
+  ///
+  /// ## Errors
+  ///
+  /// * `TypeError` — on a malformed key
+  function count(key: String): Promise<Number> raises TypeError;
+
+  /// Declared `async`: plain `Promise<Number>`.
+  function size(key: String): Promise<Number>;
+}
+
+/// A global function: plain `Promise<Undefined>`.
+function sleep(ms: f64): Promise<Undefined>;
+
+module "node:fs" {
+  /// `node:` builtin: plain.
+  function readFile(path: String): Promise<String> as read_file;
+}
+
+module "fs" {
+  /// Bare Node builtin: plain.
+  function readFile(path: String): Promise<String> as read_file;
+}
+
+module "cloudflare:sockets" {
+  /// `cloudflare:` builtin: plain.
+  function connect(address: String): Promise<Socket>;
+}
+
+module "bun:sqlite" {
+  /// Any other specifier with a `scheme:` is a builtin: plain.
+  function open(path: String): Promise<Number>;
+}
+
+module "user-lib" {
+  /// A user module: `Result<Promise<JsString>, JsValue>`.
+  function fetchText(url: String): Promise<String> as fetch_text;
+}
+
+module "npm:lodash" {
+  /// A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`.
+  function fetchText(url: String): Promise<String> as fetch_text;
+}
+
+module "jsr:@std/path" {
+  /// A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`.
+  function fetchText(url: String): Promise<String> as fetch_text;
+}
+
+module "https://esm.sh/foo" {
+  /// A URL is no builtin: `Result<Promise<JsString>, JsValue>`.
+  function fetchText(url: String): Promise<String> as fetch_text;
+}

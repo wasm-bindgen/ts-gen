@@ -1,0 +1,141 @@
+ir 1;
+
+/// Represents an error from a DOM operation.
+class DOMException {
+  new() throws;
+  new(message: String) throws as new_with_message;
+  new(message: String | Undefined, name: String) throws as new_with_message_and_name;
+  /// The error message.
+  get message: String;
+  get name: String;
+  get code: f64;
+}
+
+/// The Response interface of the Fetch API represents the response to a request.
+class Response extends Body {
+  new() throws;
+  new(body: BodyInit) throws as new_with_body;
+  new(body: Null) throws as new_with_null;
+  new(body: BodyInit | Undefined, init: ResponseInit) throws as new_with_body_and_init;
+  new(body: Null, init: ResponseInit) throws as new_with_null_and_init;
+  /// Returns a new Response with a network error.
+  static error(): Response throws;
+  static redirect(url: String): Response throws;
+  static redirect(url: String, status: f64): Response throws as redirect_with_status;
+  static json(any: Any | Null | Undefined): Response throws;
+  static json(any: Any | Null | Undefined, maybe_init: ResponseInit): Response throws as json_with_response_init;
+  static json(any: Any | Null | Undefined, maybe_init: Response): Response throws as json_with_response;
+  /// Creates a clone of this response.
+  clone(): Response throws;
+  /// The HTTP status code.
+  get status: f64;
+  get statusText: String as status_text;
+  get headers: Headers;
+  get ok: bool;
+  get url: String;
+  get body: ReadableStream | Null;
+}
+
+/// Provides methods to read the body of a request or response.
+shape class Body {
+  get body: ReadableStream | Null;
+  get bodyUsed: bool as body_used;
+  /// Returns the body as an ArrayBuffer.
+  arrayBuffer(): Promise<ArrayBuffer> as array_buffer;
+  text(): Promise<String>;
+  json<T>(): Promise<T | Null | Undefined>;
+  blob(): Promise<Blob>;
+  formData(): Promise<FormData> as form_data;
+}
+
+/// Options for constructing a Response.
+shape class ResponseInit {
+  new {};
+  get status?: Number | Undefined;
+  set status(value: f64) as set_status;
+  get statusText?: String | Undefined as status_text;
+  set statusText(value: String) as set_status_text;
+  get headers?: HeadersKind | Undefined;
+  set headers(value: Headers) as set_headers;
+  set headers(value: Array<Array<String>>) as set_headers_with_slice;
+  set headers(value: Record<String>) as set_headers_with_record;
+}
+
+module "cloudflare:sockets" {
+  shape class Socket {
+    close(): Promise<Undefined>;
+    get closed: Promise<Undefined>;
+    get opened: Promise<Undefined>;
+    get readable: ReadableStream;
+    get writable: WritableStream;
+    startTls(): Socket throws as start_tls;
+  }
+
+  shape class SocketOptions {
+    new {};
+    get secureTransport?: String | Undefined as secure_transport;
+    set secureTransport(value: String) as set_secure_transport;
+    get allowHalfOpen?: Boolean | Undefined as allow_half_open;
+    set allowHalfOpen(value: bool) as set_allow_half_open;
+  }
+}
+
+class DurableObject {
+  get ctx: DurableObjectState | Null | Undefined;
+  set ctx(value: DurableObjectState | Null | Undefined) as set_ctx;
+  get env: Record<Any | Null | Undefined>;
+  set env(value: Record<Any | Null | Undefined>) as set_env;
+  alarm(): Promise<Undefined>;
+  webSocketMessage(ws: WebSocket, message: String): Promise<Undefined> as web_socket_message;
+  webSocketMessage(ws: WebSocket, message: ArrayBuffer): Promise<Undefined> as web_socket_message_with_array_buffer;
+}
+
+static class WebAssembly {
+  static compile(bytes: ArrayBuffer): Promise<WebAssembly.Module>;
+  static instantiate(module: WebAssembly.Module): Promise<WebAssembly.Instance>;
+  static instantiate(module: WebAssembly.Module, imports: Object): Promise<WebAssembly.Instance> as instantiate_with_imports;
+}
+
+class WebAssembly.Module {
+  new(bytes: ArrayBuffer) throws;
+}
+
+class WebAssembly.Instance {
+  new(module: WebAssembly.Module) throws;
+  new(module: WebAssembly.Module, imports: Object) throws as new_with_imports;
+  get exports: Record<Any | Null | Undefined>;
+}
+
+kind QueueContentType {
+  Text = "text";
+  Bytes = "bytes";
+  Json = "json";
+  V8 = "v8";
+}
+
+kind BodyInit {
+  ReadableStream = ReadableStream;
+  String = String;
+  ArrayBuffer = ArrayBuffer;
+  Blob = Blob;
+  UrlSearchParams = URLSearchParams;
+  FormData = FormData;
+}
+
+kind HeadersKind fallback {
+  Headers = Headers;
+  VecOfVecOfString = Array<Array<String>>;
+  Record = Record<String>;
+}
+
+module "cloudflare:sockets" {
+  function connect(address: String): Socket throws;
+  function connect(address: String, options: SocketOptions): Socket throws as connect_with_options;
+}
+
+function fetch(input: RequestInfo | Null | Undefined): Promise<Response>;
+function fetch(input: RequestInfo | Null | Undefined, init: RequestInit | Null | Undefined): Promise<Response> as fetch_with_init;
+function atob(data: String): String throws;
+function btoa(data: String): String throws;
+get navigator: Navigator | Null | Undefined;
+get self: ServiceWorkerGlobalScope | Null | Undefined as self_;

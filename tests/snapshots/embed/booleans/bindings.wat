@@ -16,7 +16,7 @@
     (call $call_new0 (call $reflect_get (global.get $global) (global.get $s:Object))))
   (func (export "ts-gen:bindings.Flags.set_verbose") (param $this externref) (param $value i32)
     (call $reflect_set_rrr_v (local.get $this) (global.get $s:verbose) (call $boolean_i_r (local.get $value))))
-  (func (export "ts-gen:bindings.describeFlags") (param $flags externref) (param $strict i32) (result externref)
+  (func (export "ts-gen:bindings.describe_flags") (param $flags externref) (param $strict i32) (result externref)
     (call $call2 (call $reflect_get (global.get $global) (global.get $s:describeFlags)) (global.get $global) (local.get $flags) (call $boolean_i_r (local.get $strict))))
   (func (export "ts-gen:bindings.Response.new_with_body") (param $body externref) (result externref)
     (call $call_new1 (call $reflect_get (global.get $global) (global.get $s:Response)) (local.get $body)))

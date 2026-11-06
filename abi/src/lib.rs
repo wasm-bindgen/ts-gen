@@ -2,15 +2,23 @@
 //! wasm-level types, specified in `IR.md`.
 //!
 //! This crate holds the model ([`ir`]), its text format ([`text`]) and
-//! nothing that depends on TypeScript. An [`ir::Ir`] is written with
-//! [`text::emit`]; a bindings generator reads it back with
-//! [`text::parse`].
+//! nothing that depends on TypeScript. ts-gen lowers a `.d.ts` to an
+//! [`ir::Ir`] and writes it with [`text::emit`]; a bindings generator
+//! reads it back with [`text::parse`].
 
 pub mod ir;
 pub mod text;
+pub mod wat;
 
 /// Specifier a language module imports the bindings under.
 pub const BINDINGS_SPECIFIER: &str = "./bindings.wasm";
+/// Specifier for the fixed JS primitive module.
+pub const BUILTINS_SPECIFIER: &str = "./builtins.js";
+/// Import namespace for imported string constants (js-string builtins).
+pub const STRING_CONSTANTS: &str = "wasm:js/string-constants";
+/// Name the language module imports `undefined` under from `builtins.js`,
+/// as an immutable `externref` global.
+pub const UNDEFINED_GLOBAL: &str = "undefined";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum WasmType {

@@ -27,7 +27,7 @@ use crate::util::naming::{LocalScope, Suffix};
 
 /// Heads [`lower_reference`] maps to `js_sys` containers rather than to
 /// a declaration of the same name.
-const DEDICATED_HEADS: &[&str] = &[
+pub(crate) const DEDICATED_HEADS: &[&str] = &[
     "Promise",
     "PromiseLike",
     "Set",
@@ -274,6 +274,9 @@ pub struct CodegenContext<'a> {
     /// members share a single enum. Callers reach into this through
     /// [`CodegenContext::synthesise_dynamic_union`].
     pub dynamic_unions: RefCell<DynamicUnionRegistry>,
+    /// Where emitters report what they bind, when the IR is being built
+    /// from this pass (see [`crate::codegen::record`]).
+    pub(crate) recorder: RefCell<Option<Vec<crate::codegen::record::Record>>>,
     /// Default error type for fallible bindings without `@throws`;
     /// `None` is `JsValue`. See
     /// [`crate::codegen::GenerateOptions::error_type`].
@@ -379,6 +382,16 @@ pub struct DynamicUnionRegistry {
 /// behaviour.)
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DynamicUnionKey(pub Vec<String>);
+
+impl DynamicUnionKey {
+    fn of(arms: &ReadArms) -> Self {
+        let mut key: Vec<String> = arms.members.iter().map(format_type_ref_key).collect();
+        if arms.fallback {
+            key.push("fallback".to_string());
+        }
+        DynamicUnionKey(key)
+    }
+}
 
 /// Bookkeeping for a single synthesised dynamic-union enum.
 #[derive(Debug, Clone)]
@@ -1132,6 +1145,7 @@ impl<'a> CodegenContext<'a> {
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
+            recorder: RefCell::new(None),
             error_type,
             fallible: options.fallible,
             error_enum: options.error_enum.clone(),
@@ -1193,6 +1207,7 @@ impl<'a> CodegenContext<'a> {
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
+            recorder: RefCell::new(None),
             error_type: None,
             fallible: false,
             error_enum: None,
@@ -1243,11 +1258,7 @@ impl<'a> CodegenContext<'a> {
         from_module: &ModuleContext,
     ) -> String {
         let members = &arms.members;
-        let mut key: Vec<String> = members.iter().map(format_type_ref_key).collect();
-        if arms.fallback {
-            key.push("fallback".to_string());
-        }
-        let key = DynamicUnionKey(key);
+        let key = DynamicUnionKey::of(arms);
         let mut reg = self.dynamic_unions.borrow_mut();
         if let Some(info) = reg.by_key.get_mut(&key) {
             for shape in &arms.merged_shapes {
@@ -3511,6 +3522,87 @@ pub fn to_getter_return_type(
         }
     }
     to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)
+}
+
+/// The enum a read names, as [`to_return_type`] (or, for a `getter`,
+/// [`to_getter_return_type`]) lowered it. Only looked up: a union the emit
+/// pass did not synthesise an enum for has none.
+#[derive(Clone, Debug)]
+pub(crate) enum ReadEnum {
+    /// A named union alias's own enum; `alias` is the reference to it.
+    UnionAlias {
+        alias: TypeRef,
+        nullability: Option<ir::Nullability>,
+    },
+    /// A synthesised `<Anchor>Kind`.
+    Dynamic {
+        name: String,
+        nullability: Option<ir::Nullability>,
+    },
+}
+
+pub(crate) fn read_enum(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+    getter: bool,
+    is_async: bool,
+) -> Option<ReadEnum> {
+    if is_async && is_generic_rust_list(ty, ctx, scope) {
+        return None;
+    }
+    let (core, n) = match ty.split_empties() {
+        Some((core, n)) => (core, Some(n)),
+        None => (ty.clone(), None),
+    };
+    if let Some(alias) = ctx.union_alias(&core, scope).filter(|a| a.readable) {
+        if matches!(core, TypeRef::Reference { .. }) {
+            return Some(ReadEnum::UnionAlias {
+                alias: core,
+                nullability: n
+                    .into_iter()
+                    .chain(alias.nullability)
+                    .reduce(|a, b| a.with(b)),
+            });
+        }
+    }
+    let read = resolve_union_aliases(ty, Some(ctx), scope);
+    let lookup = |ty: &TypeRef| {
+        let property_key_members;
+        let members = match ty {
+            TypeRef::Union(u) if u.nullability().is_none() => u.members(),
+            TypeRef::PropertyKey => {
+                property_key_members = TypeRef::property_key_members();
+                &property_key_members
+            }
+            _ => return None,
+        };
+        let arms = dynamic_union_members(members, Some(ctx), scope, from_module)?;
+        let key = DynamicUnionKey::of(&arms);
+        ctx.dynamic_unions
+            .borrow()
+            .by_key
+            .get(&key)
+            .map(|info| info.rust_name.clone())
+    };
+    if let Some(name) = lookup(&read) {
+        return Some(ReadEnum::Dynamic {
+            name,
+            nullability: None,
+        });
+    }
+    if getter {
+        if let Some((core, n)) = read.split_empties() {
+            if let Some(name) = lookup(&core) {
+                return Some(ReadEnum::Dynamic {
+                    name,
+                    nullability: Some(n),
+                });
+            }
+        }
+    }
+    None
 }
 
 /// Whether `ty` is `any` or `unknown`, through aliases.

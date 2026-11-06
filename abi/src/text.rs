@@ -5,8 +5,8 @@ use std::collections::HashSet;
 use std::fmt::Write;
 
 use crate::ir::{
-    Arm, Class, ClassKind, Function, Head, Ir, JsType, Kind, Literal, Member, MemberKind, Named,
-    Param, Provide, Type,
+    Arm, Class, ClassKind, Function, Head, Import, Ir, JsType, Kind, Literal, Member, MemberKind,
+    Named, Param, Provide, Type,
 };
 use crate::OwnerRef;
 
@@ -254,6 +254,47 @@ pub fn emit(ir: &Ir) -> String {
         w.provide(&mut out, p);
     }
     out
+}
+
+/// Single declarations as [`emit`] writes them, without their docs.
+pub struct Printer(Writer);
+
+impl Printer {
+    pub fn new(ir: &Ir) -> Printer {
+        Printer(Writer {
+            names: Names::of(ir),
+        })
+    }
+
+    /// The declaration line of an imported member, `;` included.
+    pub fn member(&self, import: &Import) -> String {
+        let module = match import.class {
+            Some(c) => c.module.as_deref(),
+            None => import.module,
+        };
+        let scope = Scope {
+            module,
+            params: import.class.map_or(&[][..], |c| &c.params),
+        };
+        let mut out = String::new();
+        self.0.member(&mut out, import.member, import.class, scope);
+        out.truncate(out.trim_end().len());
+        out
+    }
+
+    /// The declaration line of a provide, `;` included.
+    pub fn provide(&self, p: &Provide) -> String {
+        let mut out = String::new();
+        self.0.provide(
+            &mut out,
+            &Provide {
+                doc: None,
+                ..p.clone()
+            },
+        );
+        out.truncate(out.trim_end().len());
+        out
+    }
 }
 
 impl Writer {

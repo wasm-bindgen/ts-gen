@@ -1,0 +1,96 @@
+ir 1;
+
+shape class Base {
+  new {};
+  get a: String;
+  set a(value: String) as set_a;
+}
+
+shape class Geo {
+  new {};
+  get country?: String | Undefined;
+  set country(value: String) as set_country;
+}
+
+shape class Child extends Base, Geo {
+  new {};
+  get country?: String | Undefined;
+  set country(value: String) as set_country;
+  get c: f64;
+  set c(value: f64) as set_c;
+}
+
+shape class Destinations {
+  new {};
+  get to?: String | Undefined;
+  set to(value: String) as set_to;
+  get cc?: String | Undefined;
+  set cc(value: String) as set_cc;
+}
+
+shape class Message extends Base, Destinations {
+  new {};
+  get to?: String | Undefined;
+  set to(value: String) as set_to;
+  get cc?: String | Undefined;
+  set cc(value: String) as set_cc;
+}
+
+shape class Box<T> {
+  get value: T | Null | Undefined;
+  set value(value: T | Null | Undefined) as set_value;
+  unwrap(): T | Null | Undefined;
+}
+
+shape class Tagged {
+  new {};
+  get tag: String;
+  set tag(value: String) as set_tag;
+}
+
+shape class Named extends Tagged, Box<String> {
+  get value: String;
+  set value(value: String) as set_value;
+  unwrap(): String;
+}
+
+shape class Left {
+  get shared: String;
+  set shared(value: String) as set_shared;
+  onlyLeft() as only_left;
+}
+
+shape class Right {
+  get shared: f64;
+  set shared(value: f64) as set_shared;
+  onlyRight() as only_right;
+  get own: String;
+  set own(value: String) as set_own;
+}
+
+shape class Siblings extends Base, Left, Right {
+  get shared: String;
+  set shared(value: String) as set_shared;
+  onlyLeft() as only_left;
+  onlyRight() as only_right;
+  get own: f64;
+  set own(value: f64) as set_own;
+}
+
+class Resource {
+  new(id: String) throws;
+  static open(id: String): Resource;
+  static get kind: String;
+  get id: String;
+  close();
+}
+
+shape class Handle extends Base, Resource {
+  get id: String;
+  close();
+}
+
+shape class Opened extends Base, Resource {
+  get id: String;
+  close();
+}

@@ -1,0 +1,28 @@
+ir 1;
+
+module "x" {
+  class Foo as _Foo {
+    new() throws;
+    static from(n: f64): _Foo throws;
+    bar() throws;
+  }
+  alias Foo = _Foo;
+
+  class Bar as _Bar {
+    new(n: f64) throws;
+    static get VERSION: String as version;
+    baz(): String throws;
+  }
+  alias Bar = _Bar;
+
+  class Late as _Late {
+    new() throws;
+    go() throws;
+  }
+  alias Late = _Late;
+
+  class Plain {
+    new() throws;
+  }
+  alias AlsoPlain = Plain;
+}

@@ -1,0 +1,60 @@
+ir 1;
+
+module "alias-constructors" {
+  shape class Stub<T> {
+    new Wrap(value: T | Null | Undefined): Stub<T | Null | Undefined> throws;
+    get(): T | Null | Undefined;
+  }
+
+  shape class Labelled {
+    new Label(text: String) throws;
+    new Label(n: f64, unit: String) throws as new_with_n_and_unit;
+    text(): String;
+  }
+
+  shape class Point {
+    new {};
+    get x?: Number | Undefined;
+    set x(value: f64) as set_x;
+  }
+
+  shape class Proto {
+    p();
+  }
+
+  shape class Wrapped<T> {
+    get(): T | Null | Undefined;
+  }
+
+  class StaticNew {
+    static "new"(): StaticNew;
+    y();
+  }
+
+  shape class CapNew {
+    New() as new;
+  }
+
+  shape class Counter {
+    new Count(start: f64) throws;
+    count(): f64;
+  }
+
+  shape class MultiA {
+    new Multi() throws;
+    a(): String;
+  }
+
+  shape class MultiB {
+    new Multi(n: f64) throws;
+    b(): f64;
+  }
+
+  function unwrapText(stub: Stub<String>): String as unwrap_text;
+  get Pt: Object as pt;
+  get Wrap2: Object as wrap2;
+  get ProtoOnly: Object as proto_only;
+  get WithStatics: Object as with_statics;
+  get SN: Object as sn;
+  get CN: Object as cn;
+}

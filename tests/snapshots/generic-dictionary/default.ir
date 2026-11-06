@@ -1,0 +1,13 @@
+ir 1;
+
+shape class EvaluationDetails<T> {
+  new {}: EvaluationDetails;
+  get flagKey: String as flag_key;
+  set flagKey(value: String) as set_flag_key;
+  get value: T | Null | Undefined;
+  set value(value: T | Null | Undefined) as set_value;
+  get variant?: String | Undefined;
+  set variant(value: String) as set_variant;
+  get reason?: String | Undefined;
+  set reason(value: String) as set_reason;
+}

@@ -1,0 +1,41 @@
+ir 1;
+
+shape class ForwardableEmailMessage extends "cloudflare:email".EmailMessage {
+  reply(message: "cloudflare:email".EmailMessage): Promise<Undefined>;
+}
+
+module "cloudflare:email" {
+  class EmailMessage {
+    new(from: String, to: String, raw: String) throws;
+    get from: String;
+    get to: String;
+  }
+}
+
+module "msg:a" {
+  class Msg {
+    new(from: String) throws;
+    get from: String;
+  }
+}
+
+module "msg:b" {
+  shape class Msg {
+    new {};
+    get other: f64;
+    set other(value: f64) as set_other;
+  }
+}
+
+module "late" {
+  class Late {
+    new() throws;
+    get at: f64;
+  }
+}
+
+module "msg:b" {
+  function use(m: Msg) throws as use_;
+}
+
+function arrival(): "late".Late throws;

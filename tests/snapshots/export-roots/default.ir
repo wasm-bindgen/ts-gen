@@ -1,0 +1,68 @@
+ir 1;
+
+shape class Checksums {
+  new {};
+  get md5?: String | Undefined;
+  set md5(value: String) as set_md5;
+}
+
+shape class Conditional {
+  new {};
+  get etagMatches?: String | Undefined as etag_matches;
+  set etagMatches(value: String) as set_etag_matches;
+}
+
+shape class GetOptions {
+  new {};
+  get onlyIf?: Conditional | Undefined as only_if;
+  set onlyIf(value: Conditional) as set_only_if;
+}
+
+shape class BucketObject {
+  new {};
+  get key: String;
+  get checksums: Checksums;
+}
+
+class Bucket {
+  get(key: String): Promise<BucketObject | Null>;
+  get(key: String, options: GetOptions): Promise<BucketObject | Null> as get_with_options;
+  kind(): BucketKind;
+  setKind(kind: BucketKind) as set_kind;
+}
+
+shape class ListDefaults {
+  new {};
+  get limit?: Number | Undefined;
+  set limit(value: f64) as set_limit;
+}
+
+shape class Socket {
+  new {};
+  get closed: Promise<Undefined>;
+}
+
+shape class SocketOptions {
+  new {};
+  get secureTransport?: SecureTransportKind | Undefined as secure_transport;
+  set secureTransport(value: SecureTransportKind) as set_secure_transport;
+}
+
+kind BucketKind {
+  Standard = "standard";
+  Infrequent = "infrequent";
+}
+
+kind SecureTransportKind {
+  Off = "off";
+  On = "on";
+}
+
+function openBucket(name: String): Bucket as open_bucket;
+function listBuckets(): Map<String, ListDefaults> as list_buckets;
+function listBuckets(prefix: String): Array<String> as list_buckets_with_prefix;
+
+module "cloudflare:sockets" {
+  function connect(address: String): Socket;
+  function connect(address: String, options: SocketOptions): Socket as connect_with_options;
+}

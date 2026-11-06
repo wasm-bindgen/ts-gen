@@ -1,0 +1,28 @@
+ir 1;
+
+/// A named codec.
+class Codec {
+  new(name: String) throws;
+  /// Wire format version.
+  static get version: f64;
+  static isCodec(value: Any | Null | Undefined): bool as is_codec;
+  get name: String;
+  encode(input: String): Uint8Array;
+}
+
+class Registry {
+  new() throws;
+  lookup(name: String): Codec | Undefined;
+}
+
+shape class Factory {
+  new {};
+  get label: String;
+  set label(value: String) as set_label;
+}
+
+shape class Widget {
+  new {};
+  get id: f64;
+  set id(value: f64) as set_id;
+}

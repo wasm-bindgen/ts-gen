@@ -1,0 +1,7 @@
+ir 1;
+
+module "x:uses" {
+  shape class UsesBar {
+    method(b: "x:foo".Bar) throws;
+  }
+}

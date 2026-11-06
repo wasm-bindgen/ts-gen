@@ -1,0 +1,20 @@
+ir 1;
+
+module "import-require-module" {
+  class Walker {
+    new(o: "dep".Options) throws;
+    walk();
+  }
+}
+
+module "dep" {
+  shape class Options {
+    new {};
+    get depth: f64;
+    set depth(value: f64) as set_depth;
+  }
+}
+
+module "import-require-module" {
+  function walk(o: "dep".Options): Walker;
+}

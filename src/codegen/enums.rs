@@ -52,7 +52,7 @@ use crate::ir::{NumericEnumDecl, StringEnumDecl};
 
 /// Split members into the variants (first member per value) and the aliases
 /// (later members, paired with the variant they repeat).
-fn split_aliases<V, K: Eq + Hash>(
+pub(crate) fn split_aliases<V, K: Eq + Hash>(
     members: &[V],
     key: impl Fn(&V) -> K,
 ) -> (Vec<&V>, Vec<(&V, &V)>) {

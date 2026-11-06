@@ -1,0 +1,253 @@
+ir 1;
+
+module "nullability" {
+  shape class Settings {
+    new {};
+    get plain?: String | Undefined;
+    set plain(value: String) as set_plain;
+    get explicit?: String | Undefined;
+    set explicit(value: String) as set_explicit;
+    get required: String | Undefined;
+    set required(value: String) as set_required;
+    get nullable: String | Null;
+    set nullable(value: String) as set_nullable;
+    set nullable(value: Null) as set_nullable_with_null;
+    get both?: String | Null | Undefined;
+    set both(value: String) as set_both;
+    set both(value: Null) as set_both_with_null;
+    get aliased?: String | Null | Undefined;
+    set aliased(value: String) as set_aliased;
+    set aliased(value: Null) as set_aliased_with_null;
+    get mode?: Mode | Null | Undefined;
+    set mode(value: Mode) as set_mode;
+    set mode(value: Null) as set_mode_with_null;
+    get empties: Null | Undefined;
+    set empties(value: Null) as set_empties_with_null;
+    get limit?: Number | Null | Undefined;
+    set limit(value: f64) as set_limit;
+    set limit(value: Null) as set_limit_with_null;
+    get owner?: Registry | Null | Undefined;
+    set owner(value: Registry) as set_owner;
+    set owner(value: Null) as set_owner_with_null;
+    get values?: Array<Number> | Null | Undefined;
+    set values(value: Array<Number>) as set_values;
+    set values(value: Null) as set_values_with_null;
+    get key?: KeyKind | Null | Undefined;
+    set key(value: String) as set_key;
+    set key(value: f64) as set_key_with_f64;
+    set key(value: Null) as set_key_with_null;
+  }
+
+  class Registry {
+    static get current?: Registry | Undefined;
+    static set current(value: Registry) as set_current;
+    static get fallback: Registry | Null;
+    static set fallback(value: Registry) as set_fallback;
+    static set fallback(value: Null) as set_fallback_with_null;
+    static get last?: Registry | Null | Undefined;
+    static set last(value: Registry) as set_last;
+    static set last(value: Null) as set_last_with_null;
+    get pending: Promise<String | Null>;
+    get settled: Promise<Number | Undefined>;
+  }
+
+  class Holder<T> {
+    get(): T | Null | Undefined throws;
+    get value: T | Null | Undefined;
+  }
+
+  class Body {
+    new(body: String) throws;
+    new(body: Null) throws as new_with_body_null;
+    new(body: String, length: f64) throws as new_with_length;
+    new(body: Null, length: f64) throws as new_with_body_null_and_length;
+    new(body: String, length: Null) throws as new_with_length_null;
+    new(body: Null, length: Null) throws as new_with_body_null_and_length_null;
+    put(value: String) throws;
+    put(value: Null) throws as put_with_null;
+    static from(owner: Registry): Body throws;
+    static from(owner: Null): Body throws as from_with_null;
+  }
+
+  shape class Attachment {
+    new {};
+    get disposition: DispositionKind;
+    set disposition(value: DispositionKind) as set_disposition;
+    get contentId?: String | Undefined as content_id;
+    set contentId(value: String) as set_content_id;
+    get filename: String;
+    set filename(value: String) as set_filename;
+  }
+
+  shape class Upload {
+    new {};
+    get kind: KindKind;
+    set kind(value: KindKind) as set_kind;
+    get path?: String | Null | Undefined;
+    set path(value: String) as set_path;
+    set path(value: Null) as set_path_with_null;
+  }
+
+  shape class Cover {
+    new {};
+    get kind: CoverKindKind;
+    set kind(value: CoverKindKind) as set_kind;
+    get src: String | Null;
+    set src(value: String) as set_src;
+    set src(value: Null) as set_src_with_null;
+  }
+
+  kind Mode {
+    Fast = "fast";
+    Slow = "slow";
+  }
+
+  kind Source {
+    String = String;
+    Registry = Registry;
+  }
+}
+
+kind KeyKind {
+  String = String;
+  F64 = Number;
+}
+
+kind DispositionKind {
+  Inline = "inline";
+  Attachment = "attachment";
+}
+
+kind KindKind {
+  File = "file";
+  None = "none";
+  Skip = "skip";
+}
+
+kind CoverKindKind {
+  Image = "image";
+  Blank = "blank";
+}
+
+module "nullability" {
+  function optional() throws;
+  function optional(x: String) throws as optional_with_x;
+  function nullable(x: String) throws;
+  function nullable(x: Null) throws as nullable_with_null;
+  function both(): String | Null | Undefined throws;
+  function both(x: String): String | Null | Undefined throws as both_with_x;
+  function both(x: Null): String | Null | Undefined throws as both_with_null;
+  function optionalBoth() throws as optional_both;
+  function optionalBoth(x: String) throws as optional_both_with_x;
+  function optionalBoth(x: Null) throws as optional_both_with_null;
+  function aliased(): String | Null | Undefined throws;
+  function aliased(x: String): String | Null | Undefined throws as aliased_with_x;
+  function aliased(x: Null): String | Null | Undefined throws as aliased_with_null;
+  function aliasedNull(x: String): String | Null throws as aliased_null;
+  function aliasedNull(x: Null): String | Null throws as aliased_null_with_null;
+  function optAliasedNull(): String | Null | Undefined throws as opt_aliased_null;
+  function optAliasedNull(x: String): String | Null | Undefined throws as opt_aliased_null_with_x;
+  function optAliasedNull(x: Null): String | Null | Undefined throws as opt_aliased_null_with_null;
+  function count(): Number | Null | Undefined throws;
+  function count(x: f64): Number | Null | Undefined throws as count_with_x;
+  function count(x: Null): Number | Null | Undefined throws as count_with_null;
+  function countNull(x: f64) throws as count_null;
+  function countNull(x: Null) throws as count_null_with_null;
+  function countOptional() throws as count_optional;
+  function countOptional(x: f64) throws as count_optional_with_x;
+  function countOptional(x: Null) throws as count_optional_with_null;
+  function flag(x: bool): Boolean | Null throws;
+  function flag(x: Null): Boolean | Null throws as flag_with_null;
+  function registry(): Registry | Null | Undefined throws;
+  function registry(r: Registry): Registry | Null | Undefined throws as registry_with_r;
+  function registry(r: Null): Registry | Null | Undefined throws as registry_with_null;
+  function registryNull(r: Registry) throws as registry_null;
+  function registryNull(r: Null) throws as registry_null_with_null;
+  function registryOptional() throws as registry_optional;
+  function registryOptional(r: Registry) throws as registry_optional_with_r;
+  function registryOptional(r: Null) throws as registry_optional_with_null;
+  function scalar() throws;
+  function scalar(x: String) throws as scalar_with_str;
+  function scalar(x: f64) throws as scalar_with_f64;
+  function scalar(x: Null) throws as scalar_with_null;
+  function scalarNull(x: String) throws as scalar_null;
+  function scalarNull(x: f64) throws as scalar_null_with_f64;
+  function scalarNull(x: Null) throws as scalar_null_with_null;
+  function scalarOptional() throws as scalar_optional;
+  function scalarOptional(x: String) throws as scalar_optional_with_str;
+  function scalarOptional(x: f64) throws as scalar_optional_with_f64;
+  function scalarOptional(x: Null) throws as scalar_optional_with_null;
+  function pair(x: String) throws;
+  function pair(x: f64) throws as pair_with_f64;
+  function leading(a: String | Undefined, b: f64) throws;
+  function leadingNull(a: String | Undefined, b: f64) throws as leading_null;
+  function leadingNull(a: Null, b: f64) throws as leading_null_with_null;
+  function trailing(a: f64) throws;
+  function trailing(a: f64, b: String) throws as trailing_with_b;
+  function chain() throws;
+  function chain(a: String) throws as chain_with_a;
+  function chain(a: String | Undefined, b: f64) throws as chain_with_a_and_b;
+  function chain(a: String | Undefined, b: Null) throws as chain_with_a_and_null;
+  function chainOptional() throws as chain_optional;
+  function chainOptional(a: String) throws as chain_optional_with_a;
+  function chainOptional(a: String | Undefined, b: f64) throws as chain_optional_with_a_and_b;
+  function chainOptional(a: String | Undefined, b: Null) throws as chain_optional_with_a_and_null;
+  function chainThree() throws as chain_three;
+  function chainThree(a: String) throws as chain_three_with_a;
+  function chainThree(a: String | Undefined, b: f64) throws as chain_three_with_a_and_b;
+  function chainThree(a: String | Undefined, b: Null) throws as chain_three_with_a_and_null;
+  function chainThree(a: String | Undefined, b: Number | Undefined, c: bool) throws as chain_three_with_a_and_b_and_c;
+  function chainThree(a: String | Undefined, b: Null, c: bool) throws as chain_three_with_a_and_null_and_c;
+  function chainUnion() throws as chain_union;
+  function chainUnion(a: String) throws as chain_union_with_str;
+  function chainUnion(a: Array<String>) throws as chain_union_with_slice;
+  function chainUnion(a: String | Undefined, b: f64) throws as chain_union_with_str_and_b;
+  function chainUnion(a: Array<String>, b: f64) throws as chain_union_with_slice_and_b;
+  function chainAlias() throws as chain_alias;
+  function chainAlias(a: Source) throws as chain_alias_with_a;
+  function chainAlias(a: Source | Undefined, b: f64) throws as chain_alias_with_a_and_b;
+  function modeArg(m: Mode): Mode | Null throws as mode_arg;
+  function modeArg(m: Null): Mode | Null throws as mode_arg_with_null;
+  function modeBoth(): Mode | Null | Undefined throws as mode_both;
+  function modeBoth(m: Mode): Mode | Null | Undefined throws as mode_both_with_m;
+  function modeBoth(m: Null): Mode | Null | Undefined throws as mode_both_with_null;
+  function modeOptional() throws as mode_optional;
+  function modeOptional(m: Mode) throws as mode_optional_with_m;
+  function modeOptional(m: Null) throws as mode_optional_with_null;
+  function emptiesOnly(): Null | Undefined throws as empties_only;
+  function emptiesOnly(x: Null): Null | Undefined throws as empties_only_with_null;
+  function generic<T>(x: T | Null | Undefined): T | Null | Undefined throws;
+  function generic<T>(x: Null): T | Null | Undefined throws as generic_with_null;
+  function genericBoth<T>(): T | Null | Undefined throws as generic_both;
+  function genericBoth<T>(x: T | Null | Undefined): T | Null | Undefined throws as generic_both_with_x;
+  function genericBoth<T>(x: Null): T | Null | Undefined throws as generic_both_with_null;
+  function inner(xs: Promise<String | Null>, ys: Array<Number | Undefined>) throws;
+  function innerBoth(xs: Promise<String | Null | Undefined>) throws as inner_both;
+  function callback(cb: (String | Null) => void) throws;
+  function record(r: Record<String | Null>): Record<Number | Undefined> throws;
+  function holder(h: Holder<String | Null>): Holder<Number | Undefined> throws;
+  function fetchNull(): Promise<Registry | Null> throws as fetch_null;
+  function fetchOptional(): Promise<Number | Undefined> throws as fetch_optional;
+  function fetchBoth(): Promise<String | Null | Undefined> throws as fetch_both;
+  function fetchGeneric<T>(): Promise<T | Null | Undefined> throws as fetch_generic;
+  function numbers(xs: Array<Number>): Array<Number> | Null throws;
+  function numbers(xs: Null): Array<Number> | Null throws as numbers_with_null;
+  function numbersBoth(): Array<Number> | Null | Undefined throws as numbers_both;
+  function numbersBoth(xs: Array<Number>): Array<Number> | Null | Undefined throws as numbers_both_with_xs;
+  function numbersBoth(xs: Null): Array<Number> | Null | Undefined throws as numbers_both_with_null;
+  function numbersOptional() throws as numbers_optional;
+  function numbersOptional(xs: Array<Number>) throws as numbers_optional_with_xs;
+  function numbersOptional(xs: Null) throws as numbers_optional_with_null;
+  function bytes(xs: Uint8Array) throws;
+  function bytes(xs: Uint8Array) throws as bytes_with_uint8_array;
+  function bytes(xs: Null) throws as bytes_with_null;
+  function bytesBoth() throws as bytes_both;
+  function bytesBoth(xs: Uint8Array) throws as bytes_both_with_slice;
+  function bytesBoth(xs: Uint8Array) throws as bytes_both_with_uint8_array;
+  function bytesBoth(xs: Null) throws as bytes_both_with_null;
+  function jsdoc(x: String) throws;
+  function jsdoc(x: Null) throws as jsdoc_with_null;
+  function send(attachment: Attachment) throws;
+  function upload(upload: Upload) throws;
+  function cover(cover: Cover) throws;
+}

@@ -1,0 +1,212 @@
+ir 1;
+
+shape class StringMap {}
+
+shape class NumberIndexed {
+  new {};
+  get length: f64;
+  set length(value: f64) as set_length;
+}
+
+shape class MixedWithIndex {
+  new {};
+  get name: String;
+  set name(value: String) as set_name;
+}
+
+shape class HasName {
+  new {};
+  get name: String;
+  set name(value: String) as set_name;
+}
+
+shape class HasAge {
+  new {};
+  get age: f64;
+  set age(value: f64) as set_age;
+}
+
+shape class Person extends HasName, HasAge {
+  new {};
+  get age: f64;
+  set age(value: f64) as set_age;
+}
+
+shape class Serializable {
+  serialize(): String;
+}
+
+shape class SerializablePerson extends Person, Serializable {
+  serialize(): String;
+}
+
+module "my-module" {
+  shape class WorkResult {
+    new {};
+    get success: bool;
+    set success(value: bool) as set_success;
+    get data?: String | Undefined;
+    set data(value: String) as set_data;
+  }
+}
+
+shape class GlobalMixin {
+  customMethod() as custom_method;
+}
+
+class DefaultProcessor {
+  new(config: Object) throws;
+  process(input: String): Promise<String>;
+  get name: String;
+}
+
+shape class TreeNode {
+  new {};
+  get value: String;
+  set value(value: String) as set_value;
+  get children: Array<TreeNode>;
+  set children(value: Array<TreeNode>) as set_children;
+  get parent?: TreeNode | Undefined;
+  set parent(value: TreeNode) as set_parent;
+}
+
+shape class LinkedList {
+  new {};
+  get data: Any | Null | Undefined;
+  set data(value: Any | Null | Undefined) as set_data;
+  get next: LinkedList | Null;
+  set next(value: LinkedList) as set_next;
+  set next(value: Null) as set_next_with_null;
+}
+
+shape class Iterable {}
+
+shape class AsyncIterable {}
+
+shape class MultiExtend extends Serializable, GlobalMixin {
+  customMethod() as custom_method;
+  get id: String;
+  set id(value: String) as set_id;
+}
+
+shape class EventTarget {
+  addEventListener(type: String, listener: () => Any | Null | Undefined) as add_event_listener;
+  removeEventListener(type: String, listener: () => Any | Null | Undefined) as remove_event_listener;
+  dispatchEvent(event: Object): bool as dispatch_event;
+}
+
+class EventEmitter {
+  new() throws;
+  static listenerCount(emitter: EventEmitter, event: String): f64 as listener_count;
+  on(event: String, listener: () => Any | Null | Undefined): Any;
+  emit(event: String, ...args: Array<Any | Null | Undefined>): bool;
+  removeAllListeners(): Any as remove_all_listeners;
+  removeAllListeners(event: String): Any as remove_all_listeners_with_event;
+}
+
+shape class Storage {
+  getItem(key: String): String | Null as get_item;
+  setItem(key: String, value: String) as set_item;
+  removeItem(key: String) as remove_item;
+  clear();
+  get length: f64;
+}
+
+shape class Cache {
+  get(key: String): Promise<Map<String, Array<String>> | Null>;
+  set(key: String, value: Map<String, Array<String>>): Promise<Undefined>;
+}
+
+shape class FetchOptions {
+  new {};
+  get method?: String | Undefined;
+  set method(value: String) as set_method;
+  get headers?: HeadersKind | Undefined;
+  set headers(value: Headers) as set_headers;
+  set headers(value: Record<String>) as set_headers_with_record;
+  get body?: BodyKind | Null | Undefined;
+  set body(value: String) as set_body;
+  set body(value: ArrayBuffer) as set_body_with_array_buffer;
+  set body(value: Null) as set_body_with_null;
+  get redirect?: String | Undefined;
+  set redirect(value: String) as set_redirect;
+  get signal?: AbortSignal | Undefined;
+  set signal(value: AbortSignal) as set_signal;
+}
+
+shape class SimpleConfig {
+  new {};
+  get verbose?: Boolean | Undefined;
+  set verbose(value: bool) as set_verbose;
+}
+
+shape class NotificationOptions {
+  new {};
+  get body?: String | Undefined;
+  set body(value: String) as set_body;
+  get icon?: String | Undefined;
+  set icon(value: String) as set_icon;
+  get tag?: String | Undefined;
+  set tag(value: String) as set_tag;
+  get data?: Any | Null | Undefined;
+  set data(value: Any | Null | Undefined) as set_data;
+}
+
+shape class MutableWidget {
+  new {};
+  get label: LabelKind;
+  set label(value: String) as set_label;
+  set label(value: f64) as set_label_with_f64;
+  get id: String;
+  get callback: () => Any | Null | Undefined;
+  set callback(value: () => Any | Null | Undefined) as set_callback;
+}
+
+kind Direction {
+  Up = 0;
+  Down = 1;
+  Left = 2;
+  Right = 3;
+}
+
+kind HttpStatus {
+  Ok = 200;
+  NotFound = 404;
+  InternalServerError = 500;
+}
+
+kind SignedValues {
+  NegativeOne = -1;
+  Zero = 0;
+  One = 1;
+  Max = 2147483647;
+}
+
+kind HeadersKind fallback {
+  Headers = Headers;
+  Record = Record<String>;
+}
+
+kind BodyKind {
+  String = String;
+  ArrayBuffer = ArrayBuffer;
+}
+
+kind LabelKind {
+  String = String;
+  F64 = Number;
+}
+
+module "my-module" {
+  function doWork(input: String): Promise<String> as do_work;
+}
+
+function globalHelper(x: f64): String as global_helper;
+get GLOBAL_VERSION: String as global_version;
+function createProcessor(name: String): DefaultProcessor as create_processor;
+function parse(input: String): Object;
+function parse(input: ArrayBuffer): Object as parse_with_array_buffer;
+function parse(input: String, reviver: () => Any | Null | Undefined): Object as parse_with_reviver;
+function stringify(value: Any | Null | Undefined): String;
+function stringify(value: Any | Null | Undefined, replacer: () => Any | Null | Undefined): String as stringify_with_replacer;
+function stringify(value: Any | Null | Undefined, replacer: () => Any | Null | Undefined, space: f64): String as stringify_with_replacer_and_space;

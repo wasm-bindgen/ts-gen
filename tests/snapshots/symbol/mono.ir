@@ -1,0 +1,33 @@
+ir 1;
+
+module "symbol" {
+  class Kinded {
+    static get kind: Symbol;
+  }
+
+  shape class Tagged {
+    new {};
+    get tag: Symbol;
+    set tag(value: Symbol) as set_tag;
+    get alias?: Symbol | Undefined;
+    set alias(value: Symbol) as set_alias;
+  }
+}
+
+kind LookupReturnKind {
+  String = String;
+  Symbol = Symbol;
+}
+
+module "symbol" {
+  function describe(value: Symbol): String throws;
+  function create(): Symbol throws;
+  function create(description: String): Symbol throws as create_with_description;
+  function find(name: String): Symbol | Null throws;
+  function all(): Array<Symbol> throws;
+  function forEach(callback: (Symbol) => void) throws as for_each;
+  function setKey(key: String) throws as set_key;
+  function setKey(key: Symbol) throws as set_key_with_symbol;
+  function lookup(): LookupReturnKind throws;
+  get marker: Symbol;
+}

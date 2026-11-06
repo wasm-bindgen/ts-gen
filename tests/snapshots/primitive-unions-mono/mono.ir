@@ -1,0 +1,97 @@
+ir 1;
+
+module "primitive-unions-mono" {
+  shape class Target {
+    new {};
+    get name: String;
+    set name(value: String) as set_name;
+  }
+
+  class Store {
+    new(key: String) throws;
+    new(key: f64) throws as new_with_f64;
+    new(key: Symbol) throws as new_with_symbol;
+    get(key: String): String throws;
+    get(key: f64): String throws as get_with_f64;
+    static of(value: bool): Store throws;
+    static of(value: f64): Store throws as of_with_f64;
+  }
+
+  shape class Settings {
+    new {};
+    get level: LevelKind;
+    set level(value: LevelKind) as set_level;
+    set level(value: f64) as set_level_with_f64;
+    get id: CurrentReturnKind;
+    set id(value: String) as set_id;
+    set id(value: f64) as set_id_with_f64;
+    get label?: LabelKind | Undefined;
+    set label(value: String) as set_label;
+    set label(value: bool) as set_label_with_bool;
+    get from: FromKind;
+    set from(value: Target) as set_from;
+    set from(value: String) as set_from_with_str;
+    set from(value: bool) as set_from_with_bool;
+  }
+
+  kind Id {
+    String = String;
+    F64 = Number;
+  }
+}
+
+kind CurrentReturnKind {
+  String = String;
+  F64 = Number;
+}
+
+kind LevelKind {
+  Low = "low";
+  High = "high";
+  F64 = Number;
+}
+
+kind LabelKind {
+  String = String;
+  Bool = Boolean;
+}
+
+kind FromKind fallback {
+  String = String;
+  Bool = Boolean;
+  Target = "primitive-unions-mono".Target;
+}
+
+module "primitive-unions-mono" {
+  function setValue(value: String) throws as set_value;
+  function setValue(value: f64) throws as set_value_with_f64;
+  function setFlag(value: bool) throws as set_flag;
+  function setFlag(value: i64) throws as set_flag_with_big_int;
+  function setAny(value: i64) throws as set_any;
+  function setAny(value: bool) throws as set_any_with_bool;
+  function setAny(value: f64) throws as set_any_with_f64;
+  function setAny(value: String) throws as set_any_with_str;
+  function setAny(value: Symbol) throws as set_any_with_symbol;
+  function setKeyed(value: String) throws as set_keyed;
+  function setKeyed(value: Symbol) throws as set_keyed_with_symbol;
+  function setLevel(level: f64) throws as set_level;
+  function setLevel(level: "auto") throws as set_level_with_str;
+  function setNullable(value: String) throws as set_nullable;
+  function setNullable(value: f64) throws as set_nullable_with_f64;
+  function setNullable(value: Null) throws as set_nullable_with_null;
+  function setMaybe() throws as set_maybe;
+  function setMaybe(value: String) throws as set_maybe_with_str;
+  function setMaybe(value: f64) throws as set_maybe_with_f64;
+  function lookup(id: Id) throws;
+  function hasKey(key: String): bool throws as has_key;
+  function hasKey(key: f64): bool throws as has_key_with_f64;
+  function hasKey(key: Symbol): bool throws as has_key_with_symbol;
+  function hasKeyExplicit(key: String): bool throws as has_key_explicit;
+  function hasKeyExplicit(key: f64): bool throws as has_key_explicit_with_f64;
+  function hasKeyExplicit(key: Symbol): bool throws as has_key_explicit_with_symbol;
+  function send(to: Target) throws;
+  function send(to: String) throws as send_with_str;
+  function send(to: f64) throws as send_with_f64;
+  function setMode(mode: "a") throws as set_mode;
+  function current(): CurrentReturnKind throws;
+}

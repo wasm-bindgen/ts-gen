@@ -115,17 +115,19 @@ struct Cli {
 
     /// Module path the `--provides` wrapper delegates to, relative to the
     /// wrapper's parent; its last segment names the scaffold file.
-    #[arg(long, default_value = "super::app")]
-    provides_app: String,
+    /// Defaults to `super::app`. `--target rust` only.
+    #[arg(long)]
+    provides_app: Option<String>,
 
     /// Module path of the generated bindings, for the `--provides` wrapper.
     /// Defaults to `super::<output file stem>`, with `-` and `.` replaced by `_`.
+    /// `--target rust` only.
     #[arg(long)]
     provides_bindings: Option<String>,
 }
 
 /// What the output covers, shared by the main command and `embed`, which
-/// binds the surface the template lists.
+/// binds the surface the IR lists.
 #[derive(clap::Args, Debug)]
 struct Selection {
     /// Output surface: files and/or JS module specifiers to emit. The
@@ -186,14 +188,18 @@ impl Selection {
 enum Target {
     /// wasm-bindgen extern declarations.
     Rust,
-    /// Import template for the externref Wasm ABI; see `embed`.
+    /// The IR's bindings as a WAT import template, for a language written
+    /// in WAT by hand.
     Wat,
+    /// The IR (IR.md): the bindings with wasm-level types, which bindings
+    /// generators and `embed` read.
+    Ir,
 }
 
 #[derive(clap::Subcommand, Debug)]
 enum Command {
-    /// Implement the Wasm ABI for a module written against the `--target wat`
-    /// template: emits `bindings.wasm`, `wrapper.wasm` and `builtins.js`.
+    /// Implement the bindings of an IR for a module written against it:
+    /// emits `bindings.wasm`, `wrapper.wasm` and `builtins.js`.
     Embed(EmbedArgs),
 }
 
@@ -242,6 +248,10 @@ fn main() -> Result<()> {
         return embed(args);
     }
     let output = cli.output.clone().expect("required without a subcommand");
+    if cli.target != Target::Rust && (cli.provides_app.is_some() || cli.provides_bindings.is_some())
+    {
+        bail!("--provides-app and --provides-bindings apply to --target rust only");
+    }
 
     // Resolve input files
     let input_files = resolve_input_files(&cli.input)?;
@@ -290,7 +300,10 @@ fn main() -> Result<()> {
     let source = match cli.target {
         Target::Rust => ts_gen::codegen::generate_with_options(&module, &gctx, &options)?,
         Target::Wat => {
-            ts_gen::abi::wat::generate(&ts_gen::abi::build(&module, &gctx, &options, &provided))
+            ts_gen::abi::wat::generate(&ts_gen::abi::build_ir(&module, &gctx, &options, &provided))
+        }
+        Target::Ir => {
+            ts_gen_abi::text::emit(&ts_gen::abi::build_ir(&module, &gctx, &options, &provided))
         }
     };
 
@@ -301,8 +314,9 @@ fn main() -> Result<()> {
             .provides_bindings
             .clone()
             .unwrap_or_else(|| default_bindings_path(&output));
-        let app: syn::Path = syn::parse_str(&cli.provides_app)
-            .with_context(|| format!("--provides-app {:?} is not a path", cli.provides_app))?;
+        let app_path = cli.provides_app.as_deref().unwrap_or("super::app");
+        let app: syn::Path = syn::parse_str(app_path)
+            .with_context(|| format!("--provides-app {app_path:?} is not a path"))?;
         let app_file_stem = app
             .segments
             .last()
@@ -358,7 +372,7 @@ fn default_bindings_path(output: &Path) -> String {
 }
 
 /// The `ExportSpec`s `--export` selects, for both the main command and
-/// `embed`, which binds the same surface the template lists.
+/// `embed`, which binds the same surface the IR lists.
 fn resolve_exports(
     export: &[String],
     input_files: &[PathBuf],
@@ -402,7 +416,7 @@ fn resolve_exports(
     Ok(exports)
 }
 
-fn embed(args: EmbedArgs) -> Result<()> {
+fn embed_ir(args: &EmbedArgs) -> Result<ts_gen::abi::Ir> {
     let input_files = resolve_input_files(&args.input)?;
     if input_files.is_empty() {
         bail!("No .d.ts files found in the specified input paths");
@@ -418,7 +432,11 @@ fn embed(args: EmbedArgs) -> Result<()> {
     };
     gctx.diagnostics.emit();
     let options = ts_gen::codegen::GenerateOptions::new().exports(exports);
-    let abi = ts_gen::abi::build(&module, &gctx, &options, &provided);
+    Ok(ts_gen::abi::build_ir(&module, &gctx, &options, &provided))
+}
+
+fn embed(args: EmbedArgs) -> Result<()> {
+    let ir = embed_ir(&args)?;
 
     let wasm = std::fs::read(&args.module)
         .with_context(|| format!("Failed to read {}", args.module.display()))?;
@@ -431,11 +449,11 @@ fn embed(args: EmbedArgs) -> Result<()> {
                 .unwrap_or_default()
         )
     });
-    let options = ts_gen::abi::embed::Options { module_specifier };
-    let out = ts_gen::abi::embed::embed(&abi, &wasm, &options)?;
+    let options = ts_gen::abi::embed::Options::new(module_specifier);
+    let out = ts_gen::abi::embed::embed(&ir, &wasm, &options)?;
 
     eprintln!(
-        "[ts-gen] {} ABI function(s) used, handlers: {}{}",
+        "[ts-gen] {} binding(s) used, handlers: {}{}",
         out.used.len(),
         out.handlers.join(", "),
         if out.jspi { " (JSPI mode)" } else { "" }

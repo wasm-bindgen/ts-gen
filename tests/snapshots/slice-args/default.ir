@@ -1,0 +1,58 @@
+ir 1;
+
+module "slice-args" {
+  class Item {
+    new(name: String) throws;
+    get name: String;
+  }
+
+  class Bag<T> {
+    new(): Bag throws;
+    take(values: Array<T | Null | Undefined>): String;
+  }
+
+  kind Level {
+    Low = 1;
+    High = 2;
+  }
+
+  function numbers(values: Array<Number>): String;
+  function counts(values: Array<Number>): String;
+  function literals(values: Array<Number>): String;
+  function levels(values: Array<Level>): String;
+  function strings(values: Array<String>): String;
+  function flags(values: Array<Boolean>): String;
+  function bigints(values: Array<BigInt>): String;
+  function items(values: Array<Item>): String;
+  function generic<T>(values: Array<T | Null | Undefined>): String;
+  function bytes(values: Uint8Array): String;
+  function bytes(values: Uint8Array): String as bytes_with_uint8_array;
+  function words(values: BigInt64Array): String;
+  function words(values: BigInt64Array): String as words_with_big_int64_array;
+  function unsigned(values: BigUint64Array): String;
+  function unsigned(values: BigUint64Array): String as unsigned_with_big_uint64_array;
+  function buffered(values: Uint8Array): String;
+  function buffered(values: Uint8Array<ArrayBuffer>): String as buffered_with_uint8_array;
+  function clamped(values: Uint8ClampedArray): String;
+  function clamped(values: Uint8ClampedArray): String as clamped_with_uint8_clamped_array;
+  function pixels(values: Uint8Array): String;
+  function pixels(values: Uint8Array): String as pixels_with_uint8_array;
+  function pixels(values: Uint8ClampedArray): String as pixels_with_uint8_clamped_array;
+  function floats(): String;
+  function floats(values: Float64Array): String as floats_with_slice;
+  function floats(values: Float64Array): String as floats_with_float64_array;
+  function floats(values: Null): String as floats_with_null;
+  function maybeBytes(): String as maybe_bytes;
+  function maybeBytes(values: Uint8Array): String as maybe_bytes_with_slice;
+  function maybeBytes(values: Uint8Array): String as maybe_bytes_with_uint8_array;
+  function maybeClamped(): String as maybe_clamped;
+  function maybeClamped(values: Uint8ClampedArray): String as maybe_clamped_with_slice;
+  function maybeClamped(values: Uint8ClampedArray): String as maybe_clamped_with_uint8_clamped_array;
+  function mixed(nums: Array<Number>, bytes: Uint8Array): String;
+  function mixed(nums: Array<Number>, bytes: Uint8Array): String as mixed_with_uint8_array;
+  function spelled(values: Array<String>): String;
+  function spelled_readonly(values: Array<Number>): String;
+  function array_like(values: Array<String>): String;
+  function mixedGeneric<T>(values: Array<T | Null | Undefined>, weights: Array<Number>, data: Float64Array): String as mixed_generic;
+  function mixedGeneric<T>(values: Array<T | Null | Undefined>, weights: Array<Number>, data: Float64Array): String as mixed_generic_with_float64_array;
+}

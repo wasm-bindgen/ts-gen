@@ -1,0 +1,9 @@
+ir 1;
+
+static class Tree {}
+
+function step(next: (((((((((((((((((Any) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void, ping: (((((((((((((((((Any) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void);
+function grow(next: (((((((((((((((((Any) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void);
+function wrapped(w: (Array<(Array<(Array<(Array<(Array<(Array<(Array<(Array<(Any) => void>) => void>) => void>) => void>) => void>) => void>) => void>) => void>) => void, nested: Array<Array<String>>);
+function chain(s: (((((((((((((((((Any) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void);
+function tree(node: Any, leaf: (((((((((((((((((Any) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void) => void);

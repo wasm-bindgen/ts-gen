@@ -1,0 +1,33 @@
+ir 1;
+
+shape class GetOptions {
+  new {};
+  get range?: String | Undefined;
+  set range(value: String) as set_range;
+}
+
+shape class Conditional {
+  new {};
+  get etag?: String | Undefined;
+  set etag(value: String) as set_etag;
+}
+
+shape class Store {
+  get(key: String): Promise<String>;
+  get(key: String, options: Conditional): Promise<String | Null> as get_with_conditional;
+  get(key: String, options: GetOptions): Promise<String> as get_with_get_options;
+  first(): Promise<String | Null>;
+  first(column: String): Promise<String | Null> as first_with_column;
+  put(key: String, value: String): Promise<Undefined>;
+  put(key: String, value: String, options: GetOptions): Promise<Undefined> as put_with_options;
+  put(entries: Record<String>): Promise<Undefined> as put_with_entries;
+  put(entries: Record<String>, options: GetOptions): Promise<Undefined> as put_with_entries_and_options;
+  find(key: String, options: GetOptions): Promise<String>;
+  find(key: f64): Promise<String> as find_with_f64;
+  until(other: Store): f64;
+  until(other: String): f64 as until_with_str;
+  until(other: Store, options: GetOptions): f64 as until_with_options;
+  until(other: String, options: GetOptions): f64 as until_with_str_and_options;
+  with(fields: Conditional): Store;
+  with(fields: Conditional, options: GetOptions): Store as with_and_options;
+}

@@ -1,0 +1,146 @@
+ir 1;
+
+class Headers {
+  new() throws;
+  new(init: Headers) throws as new_with_headers;
+  new(init: Record<String>) throws as new_with_record;
+  new(init: Array<[String, String]>) throws as new_with_slice;
+  append(name: String, value: String) throws;
+  delete(name: String) throws;
+  get(name: String): String | Null throws;
+  has(name: String): bool throws;
+  set(name: String, value: String) throws;
+  entries(): Iterator<[String, String]> throws;
+  keys(): Iterator<String> throws;
+  values(): Iterator<String> throws;
+}
+
+class Request {
+  new(input: RequestInfo) throws;
+  new(input: RequestInfo, init: RequestInit) throws as new_with_init;
+  get method: String;
+  get url: String;
+  get headers: Headers;
+  get body: ReadableStream | Null;
+  get bodyUsed: bool as body_used;
+  get redirect: String;
+  get signal: AbortSignal;
+  clone(): Request throws;
+  arrayBuffer(): Promise<ArrayBuffer> as array_buffer;
+  text(): Promise<String>;
+  json<T>(): Promise<T | Null | Undefined>;
+  blob(): Promise<Blob>;
+  formData(): Promise<FormData> as form_data;
+}
+
+shape class RequestInit {
+  new {};
+  get method?: String | Undefined;
+  set method(value: String) as set_method;
+  get headers?: HeadersKind | Undefined;
+  set headers(value: Headers) as set_headers;
+  set headers(value: Record<String>) as set_headers_with_record;
+  set headers(value: Array<[String, String]>) as set_headers_with_slice;
+  get body?: BodyInit | Null | Undefined;
+  set body(value: BodyInit) as set_body;
+  set body(value: Null) as set_body_with_null;
+  get redirect?: String | Undefined;
+  set redirect(value: String) as set_redirect;
+  get signal?: AbortSignal | Undefined;
+  set signal(value: AbortSignal) as set_signal;
+}
+
+class Response {
+  new() throws;
+  new(body: BodyInit) throws as new_with_body;
+  new(body: Null) throws as new_with_null;
+  new(body: BodyInit | Undefined, init: ResponseInit) throws as new_with_body_and_init;
+  new(body: Null, init: ResponseInit) throws as new_with_null_and_init;
+  static redirect(url: String): Response throws;
+  static redirect(url: String, status: f64): Response throws as redirect_with_status;
+  static json(data: Any | Null | Undefined): Response throws as json_static;
+  static json(data: Any | Null | Undefined, init: ResponseInit): Response throws as json_static_with_init;
+  get status: f64;
+  get statusText: String as status_text;
+  get ok: bool;
+  get headers: Headers;
+  get body: ReadableStream | Null;
+  get bodyUsed: bool as body_used;
+  get url: String;
+  clone(): Response throws;
+  arrayBuffer(): Promise<ArrayBuffer> as array_buffer;
+  text(): Promise<String>;
+  json<T>(): Promise<T | Null | Undefined>;
+  blob(): Promise<Blob>;
+  formData(): Promise<FormData> as form_data;
+}
+
+shape class ResponseInit {
+  new {};
+  get status?: Number | Undefined;
+  set status(value: f64) as set_status;
+  get statusText?: String | Undefined as status_text;
+  set statusText(value: String) as set_status_text;
+  get headers?: HeadersKind | Undefined;
+  set headers(value: Headers) as set_headers;
+  set headers(value: Record<String>) as set_headers_with_record;
+  set headers(value: Array<[String, String]>) as set_headers_with_slice;
+}
+
+class ExecutionContext {
+  waitUntil(promise: Promise<Any | Null | Undefined>) throws as wait_until;
+  passThroughOnException() throws as pass_through_on_exception;
+}
+
+shape class Env {}
+
+shape class ExportedHandler<E> {
+  fetch(request: Request, env: E | Null | Undefined, ctx: ExecutionContext): Promise<Response>;
+  scheduled(controller: ScheduledController, env: E | Null | Undefined, ctx: ExecutionContext): Promise<Undefined>;
+}
+
+shape class ScheduledController {
+  get scheduledTime: f64 as scheduled_time;
+  get cron: String;
+  noRetry() throws as no_retry;
+}
+
+shape class Console {
+  log(...args: Array<Any | Null | Undefined>) throws;
+}
+
+shape class Flags {
+  new {};
+  get verbose?: Boolean | Undefined;
+  set verbose(value: bool) as set_verbose;
+}
+
+kind RequestInfo {
+  Request = Request;
+  String = String;
+}
+
+kind BodyInit {
+  ReadableStream = ReadableStream;
+  String = String;
+  ArrayBuffer = ArrayBuffer;
+  Blob = Blob;
+  UrlSearchParams = URLSearchParams;
+  FormData = FormData;
+}
+
+kind HeadersKind fallback {
+  Headers = Headers;
+  VecOfTuple = Array<[String, String]>;
+  Record = Record<String>;
+}
+
+function fetch(input: RequestInfo): Promise<Response>;
+function fetch(input: RequestInfo, init: RequestInit): Promise<Response> as fetch_with_init;
+get console: Console;
+function joinAll(sep: String, ...parts: Array<String>): String throws as join_all;
+function restLog(...rest: Array<String>) throws as rest_log;
+function arrLog(arr: String, ...args: Array<String>) throws as arr_log;
+function describeFlags(flags: Flags, strict: bool): String throws as describe_flags;
+
+provide default.fetch(request: Request, env: Env, ctx: ExecutionContext): async Response;

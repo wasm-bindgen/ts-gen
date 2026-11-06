@@ -1,0 +1,104 @@
+ir 1;
+
+static class QN {}
+
+shape class QN.Loc {
+  new {};
+  get l: f64;
+  set l(value: f64) as set_l;
+}
+
+class QFoo {
+  new(l: QN.Loc) throws;
+  static mk(l: QN.Loc): QFoo throws;
+  go() throws;
+}
+
+shape class Loc {
+  new {};
+  get g: String;
+  set g(value: String) as set_g;
+}
+
+static class NN {}
+
+shape class NN.Loc {
+  new {};
+  get l: f64;
+  set l(value: f64) as set_l;
+}
+
+class NN.NFoo {
+  new(l: Loc) throws;
+  static mk(l: Loc): NN.NFoo throws;
+  go() throws;
+}
+
+module "ia" {
+  shape class T {
+    new {};
+    get a: f64;
+    set a(value: f64) as set_a;
+  }
+}
+
+module "ic" {
+  shape class T {
+    new {};
+    get c: f64;
+    set c(value: f64) as set_c;
+  }
+}
+
+module "ix" {
+  shape class U extends "ic".T {
+    get ua: "ia".T;
+    set ua(value: "ia".T) as set_ua;
+    ma(): "ia".T throws;
+    get ub: "ic".T;
+    set ub(value: "ic".T) as set_ub;
+    mb(): "ic".T throws;
+  }
+
+  class K {
+    get ka: "ia".T;
+    set ka(value: "ia".T) as set_ka;
+    get kb: "ic".T;
+    set kb(value: "ic".T) as set_kb;
+  }
+}
+
+module "ib2" {
+  static class NS {
+    static ga(t: "ia".T) throws;
+    static gb(t: "ic".T) throws;
+  }
+}
+
+shape class Ev {
+  new {};
+  get e: f64;
+  set e(value: f64) as set_e;
+}
+
+shape class Win {
+  get a: Ev;
+  set a(value: Ev) as set_a;
+  l(): Ev throws;
+  get b: "ia".T;
+  set b(value: "ia".T) as set_b;
+  m(): "ia".T throws;
+}
+
+static class GN {
+  static gl(e: Ev) throws;
+  static gm(e: "ia".T) throws;
+}
+
+class X {
+  new(e: Ev) throws;
+  new(e: "ia".T, n: f64) throws as new_with_n;
+  static sl(e: Ev) throws;
+  static sm(e: "ia".T) throws;
+  x() throws;
+}

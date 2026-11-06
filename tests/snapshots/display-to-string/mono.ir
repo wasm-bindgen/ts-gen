@@ -1,0 +1,56 @@
+ir 1;
+
+shape class StampOptions {
+  new {};
+  get upper?: Boolean | Undefined;
+  set upper(value: bool) as set_upper;
+}
+
+class Stamp {
+  new(label: String) throws;
+  toString(): String throws as to_string;
+  toString(options: StampOptions): String throws as to_string_with_options;
+}
+
+class SubStamp extends Stamp {}
+
+class Moment {
+  new(label: String) throws;
+  toString(): String throws as to_string;
+  toString(options: StampOptions): String throws as to_string_with_options;
+}
+
+class Pure {
+  new(label: String) throws;
+  ///
+  toString(): String nothrow as to_string;
+}
+
+class Strict {
+  new(label: String) throws;
+  /// ## Errors
+  ///
+  /// * `RangeError` — when the label is empty
+  toString(): String throws RangeError as to_string;
+}
+
+class Boxed<T> {
+  new(value: T | Null | Undefined): Boxed throws;
+  toString(): String throws as to_string;
+}
+
+shape class Labelled {
+  toString(): String throws as to_string;
+}
+
+class Radix {
+  new() throws;
+  toString(radix: f64): String throws as to_string;
+}
+
+class Opaque {
+  new() throws;
+  toString(): f64 throws as to_string;
+}
+
+function labelled(label: String): Labelled throws;

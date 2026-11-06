@@ -1,0 +1,27 @@
+ir 1;
+
+shape class WebSocket {
+  send(data: String);
+}
+
+class WebSocketPair {
+  new() throws;
+  get "0": WebSocket as _0;
+  set "0"(value: WebSocket) as set_0;
+  get "1": WebSocket as _1;
+  set "1"(value: WebSocket) as set_1;
+}
+
+shape class Socket {
+  new {};
+  get readable: bool;
+}
+
+class TcpSocket extends Socket {
+  new(address: String) throws;
+  static get defaultPort: f64 as default_port;
+}
+
+class Registry {
+  static get size: f64;
+}

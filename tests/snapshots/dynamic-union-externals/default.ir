@@ -1,0 +1,18 @@
+ir 1;
+
+module "dynamic-union-externals" {
+  shape class Foo {
+    worker(): WorkerReturnKind;
+    widget(): WidgetReturnKind;
+  }
+}
+
+kind WorkerReturnKind {
+  Worker = Worker;
+  String = String;
+}
+
+kind WidgetReturnKind {
+  Widget = Widget;
+  F64 = Number;
+}

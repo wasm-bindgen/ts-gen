@@ -1,0 +1,28 @@
+ir 1;
+
+module "module-file-locals" {
+  class Foo as _Foo {
+    new() throws;
+    bar();
+  }
+  alias Foo = _Foo;
+
+  class Server as _Server {
+    listen();
+  }
+  alias Server = _Server;
+
+  shape class Options {
+    new {};
+    get depth: f64;
+    set depth(value: f64) as set_depth;
+  }
+
+  class Hidden {
+    m();
+  }
+
+  function configure(o: Options): _Foo;
+  function ren();
+  function reveal(): Hidden;
+}

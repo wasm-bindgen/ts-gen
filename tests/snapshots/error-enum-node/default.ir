@@ -1,0 +1,42 @@
+ir 1;
+
+module "error-enum-node" {
+  class Fault extends Error {}
+
+  class SubFault extends Fault {}
+
+  class Other extends Error {}
+
+  class CodesFault extends Error {}
+
+  static class Codes {}
+
+  class Codes.Fault extends Error {}
+
+  class Gate {
+    new(open: bool) throws;
+    /// Throws when the gate is closed.
+    ///
+    /// ## Errors
+    ///
+    /// * `SubFault`
+    get value: f64 throws SubFault;
+  }
+
+  /// Throws per `kind`: `sub`, `fault`, `type`, `string`, `number` or `opaque`.
+  ///
+  /// ## Errors
+  ///
+  /// * `Fault | SubFault | TypeError`
+  function raise(kind: String): String raises Fault | SubFault | TypeError;
+
+  /// Throws per `kind`: `other`, `codes-fault` or `codes.fault`.
+  ///
+  /// ## Errors
+  ///
+  /// * `Other | CodesFault | Codes.Fault`
+  function raiseNamed(kind: String): String raises Other | CodesFault | Codes.Fault as raise_named;
+
+  /// `raise` without a `@throws`: the `crate::CaughtError` default.
+  function raiseUntyped(kind: String): String as raise_untyped;
+}

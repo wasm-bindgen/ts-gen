@@ -1,0 +1,43 @@
+ir 1;
+
+class Headers {
+  new() throws;
+  new(init: Record<String>) throws as new_with_init;
+  /// Sync method — `Result<Nullable<String>, crate::Error>`, no `try_get`.
+  get(name: String): String | Null;
+  /// Sync void method with a typed throws — `Result<(), TypeError>`.
+  ///
+  /// ## Errors
+  ///
+  /// * `TypeError` — on an invalid header name
+  set(name: String, value: String) raises TypeError;
+  /// Declared infallible — plain `bool`.
+  has(name: String): bool nothrow;
+  /// Async — unchanged: already a single `Result` form.
+  text(): Promise<String>;
+  /// Getter — infallible by default.
+  get size: f64;
+  /// Getter with a typed throws — `Result<String, RangeError>` with `catch`.
+  ///
+  /// ## Errors
+  ///
+  /// * `RangeError` — when the body was already consumed
+  get consumedText: String throws RangeError as consumed_text;
+  /// Writable property — the setter never catches.
+  get label: String;
+  set label(value: String) as set_label;
+  /// Static method — same rule as instance methods.
+  static parse(raw: String): Headers;
+  /// Static getter with a typed throws.
+  ///
+  /// ## Errors
+  ///
+  /// * `TypeError`
+  static get defaults: Headers throws TypeError;
+}
+
+/// Free function — `Result<f64, crate::Error>`.
+function compute(x: f64): f64;
+
+/// Free function declared infallible — plain `f64`.
+function pureCompute(x: f64): f64 nothrow as pure_compute;

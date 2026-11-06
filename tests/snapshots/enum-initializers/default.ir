@@ -1,0 +1,53 @@
+ir 1;
+
+module "enum-initializers" {
+  static class Ns {}
+
+  kind Base {
+    Default = 2;
+    Other = 4;
+  }
+
+  kind Later {
+    X = 16;
+  }
+
+  kind Mode {
+    A = 2;
+    B = 3;
+    C = 10;
+    D = 19;
+    E = 4;
+  }
+
+  kind Ns.Inner {
+    Value = "inner";
+  }
+
+  kind Label {
+    Inner = "inner";
+    Joined = "inner-label";
+  }
+
+  kind Merged {
+    A = 1;
+    B = 2;
+    C = 3;
+  }
+
+  kind Restart {
+    A = 5;
+    B = 0;
+    C = 1;
+  }
+
+  kind Cycle {
+    Fixed = 1;
+  }
+
+  kind Loop {
+    C = 1;
+  }
+
+  function useAll(mode: Mode, label: Label, merged: Merged, restart: Restart, cycle: Cycle, loop: Loop) as use_all;
+}

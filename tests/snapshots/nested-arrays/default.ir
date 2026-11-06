@@ -1,0 +1,28 @@
+ir 1;
+
+module "nested-arrays" {
+  class Grid {
+    rows(): Promise<Array<Array<String>>>;
+    putRows(rows: Array<Array<Number>>) as put_rows;
+    names(): Array<String>;
+    get tags: Array<Array<Boolean>>;
+    set tags(value: Array<Array<Boolean>>) as set_tags;
+  }
+
+  function deep(): Array<Array<Array<String>>>;
+  function putDeep(rows: Array<Array<Array<String>>>) as put_deep;
+  function readonlyRows(rows: Array<Array<String>>): Array<Array<String>> as readonly_rows;
+  function genericRows(rows: Array<Array<String>>): Array<Array<String>> as generic_rows;
+  function aliasRows(rows: Array<Array<String>>): Array<Array<String>> as alias_rows;
+  function maybeRows(rows: Array<Array<String>>): Array<Array<String>> | Null as maybe_rows;
+  function maybeRows(rows: Null): Array<Array<String>> | Null as maybe_rows_with_null;
+  function forEachRow(callback: (Array<Array<String>>) => void) as for_each_row;
+  function nullableStrings(values: Array<String | Null>): Array<String | Null> as nullable_strings;
+  function nullableRows(rows: Array<Array<String> | Null>): Array<Array<String> | Null> as nullable_rows;
+  function flags(values: Array<Boolean>): Array<Boolean>;
+  function ids(values: Array<String>): Array<String>;
+  function modes(values: Array<String>): Array<String>;
+  function counts(values: Array<Number>): Array<Number>;
+  function bigints(values: Array<BigInt>): Array<BigInt>;
+  function grids(values: Array<Grid>): Array<Grid>;
+}

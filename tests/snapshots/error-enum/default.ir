@@ -1,0 +1,59 @@
+ir 1;
+
+class DOMException extends Error {
+  get code: f64;
+}
+
+class QuotaError extends DOMException {
+  get quota: f64;
+}
+
+static class Lock {}
+
+class Lock.HeldError extends Error {
+  get holder: String;
+}
+
+class Store {
+  /// A union keeps both classes instead of collapsing to `Error`.
+  ///
+  /// ## Errors
+  ///
+  /// * `TypeError | RangeError` — on bad input
+  put(key: String, value: String) raises TypeError | RangeError;
+  /// A single type routes through the enum too.
+  ///
+  /// ## Errors
+  ///
+  /// * `DOMException` — when the store is closed
+  get(key: String): String | Null raises DOMException;
+  /// Multiple `@throws` lines aggregate; a user subclass sorts before its
+  /// parents.
+  ///
+  /// ## Errors
+  ///
+  /// * `QuotaError` — when over quota
+  /// * `Error` — otherwise
+  grow(bytes: f64): Promise<Undefined> raises QuotaError | Error;
+  /// A qualified name resolves through its namespace; the variant is named
+  /// by its Rust path.
+  ///
+  /// ## Errors
+  ///
+  /// * `Lock.HeldError` — when another writer holds the lock
+  lock() raises Lock.HeldError;
+  /// Untyped — `crate::Error`, not the enum.
+  size(): f64;
+  /// Typed getter.
+  ///
+  /// ## Errors
+  ///
+  /// * `TypeError`
+  get name: String throws TypeError;
+  /// An external class: ancestry unknown to ts-gen, so it is tested first.
+  ///
+  /// ## Errors
+  ///
+  /// * `AbortError` — when the signal fires
+  abortable() raises AbortError;
+}

@@ -1,0 +1,119 @@
+ir 1;
+
+module "ovi" {
+  shape class I {
+    new {};
+    get a: f64;
+    set a(value: f64) as set_a;
+    get b: f64;
+    set b(value: f64) as set_b;
+    get c: f64;
+    set c(value: f64) as set_c;
+  }
+
+  static class NS {
+    static h(x: String) throws;
+    static h(x: f64) throws as h_with_f64;
+  }
+}
+
+module "loc" {
+  static class M {
+    static f() throws;
+  }
+
+  shape class E {
+    new {};
+    get a: f64;
+    set a(value: f64) as set_a;
+    get b: f64;
+    set b(value: f64) as set_b;
+  }
+}
+
+module "ia" {
+  shape class T {
+    new {};
+    get a: f64;
+    set a(value: f64) as set_a;
+  }
+}
+
+module "ic" {
+  shape class T {
+    new {};
+    get c: f64;
+    set c(value: f64) as set_c;
+  }
+}
+
+module "dflt" {
+  static class default {
+    static f() throws;
+  }
+}
+
+shape class W {
+  glob() throws;
+}
+
+module "mm2" {
+  class W {
+    new() throws;
+    static make(): globalThis.W throws;
+    w() throws;
+  }
+}
+
+module "lh" {
+  shape class H as H2 {
+    new {};
+    get x: f64;
+    set x(value: f64) as set_x;
+  }
+
+  shape class H {
+    new {};
+    get y: f64;
+    set y(value: f64) as set_y;
+  }
+}
+
+module "loc" {
+  static class N {
+    static g() throws;
+  }
+}
+
+module "dflt" {
+  static class N {
+    static g() throws;
+  }
+}
+
+module "mm" {
+  class W {
+    new() throws;
+    static make(): globalThis.W throws;
+    w() throws;
+  }
+}
+
+module "ovi" {
+  function k(x: String) throws;
+  function k(x: f64) throws as k_with_f64;
+  function k(x: bool) throws as k_with_bool;
+}
+
+module "ib" {
+  function fa(t: "ia".T) throws;
+}
+
+module "lh" {
+  function u(h: H2) throws;
+  function v(h: H) throws;
+}
+
+module "ib" {
+  function fb(t: "ic".T) throws;
+}

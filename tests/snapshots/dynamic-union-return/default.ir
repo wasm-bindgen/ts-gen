@@ -1,0 +1,36 @@
+ir 1;
+
+shape class Erased {
+  new {};
+  /// Mixed primitives + objects — no LUB, becomes a dynamic union.
+  get content: ContentKind;
+  /// Inner-erased generic — outer Array stays as `Vec<JsValue>`.
+  get tags: Array<Any>;
+}
+
+shape class NoErasure {
+  new {};
+  /// Literal widening — lowers to `string`, no enum synthesised.
+  get variant: VariantKind;
+  /// Plain type — no enum synthesised.
+  get name: String;
+}
+
+kind ContentKind {
+  String = String;
+  ArrayBuffer = ArrayBuffer;
+  Uint8Array = ArrayBufferView;
+}
+
+kind VariantKind {
+  A = "a";
+  B = "b";
+}
+
+kind FetchValueReturnKind {
+  F64 = Number;
+  Foo = "foo";
+}
+
+/// The awaited value is a top-level return: the enum is synthesised.
+function fetchValue(): Promise<FetchValueReturnKind> as fetch_value;

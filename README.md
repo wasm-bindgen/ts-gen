@@ -95,25 +95,55 @@ primary plus a `try_<name>` companion:
 ts-gen --input types.d.ts --output src/bindings.rs --fallible
 ```
 
+Flags:
+
+| Flag | Description |
+|------|-------------|
+| `-i`, `--input` | `.d.ts` files or directories to read |
+| `-o`, `--output` | The output file |
+| `--target` | What to generate (see below) |
+| `-E`, `--export` | Files, module specifiers and declaration names the output covers (default: every input file) |
+| `-e`, `--external` | External type mappings, `Foo=::path::Foo` or `node:*=node_sys::*` |
+| `--lib-name` | JS module specifier, required when the `.d.ts` has top-level exports |
+| `--no-web-sys` | Don't map web platform types to `web_sys` by default |
+| `--error-type` | Rust error type for bindings without `@throws`, replacing `JsValue` |
+| `--error-enum` | One enum (default `JsException`) over every `@throws` type |
+| `--errors-as-error` | Shorthand for `--error-type ::js_sys::Error` |
+| `--fallible` | One `Result` form per sync callable instead of a `try_<name>` companion |
+| `--experimental-generic-mono` | Per-monomorphization codegen for generic imports |
+| `--provides`, `--provides-app`, `--provides-bindings` | See below |
+| `-v`, `--verbose` | Print the parsed IR |
+
 ### Targets (`--target`)
 
 | Value  | Output |
 |--------|--------|
 | `rust` | wasm-bindgen extern blocks (the default) |
-| `wat`  | The Wasm ABI as a WAT import template |
+| `ir`   | The ts-gen IR ([IR.md](IR.md)), which bindings generators and `embed` read |
+| `wat`  | The IR's bindings as a plain WAT import template, for writing WAT by hand |
 
-### Wasm ABI template (`--target wat`)
+### The IR (`--target ir`)
 
-Generate a WAT import template for languages that compile directly to Wasm:
+Generate the IR for languages that compile directly to Wasm:
 
 ```sh
-ts-gen --input types.d.ts --output template.wat --target wat
+ts-gen --input types.d.ts --output types.ir --target ir
 ```
 
-The template lists every ABI function as an import, from `./bindings.wasm`
-for a global and from its specifier for a `declare module` declaration,
-and, with `--provides`, a stub export per provided function. Write your
-module against it, then use `embed` to generate the runtime artifacts.
+The IR is the `.d.ts` expanded into uniquely named bindings with
+wasm-level types: one import per member, from `./bindings.wasm` for a
+global and from its specifier for a `declare module` declaration, and,
+with `--provides`, the functions the module exports. [IR.md](IR.md)
+specifies the format and the wire conventions; the `ts-gen-abi` crate is
+its reference reader and writer.
+
+`--target wat` derives a WAT import template from the same IR: each
+import with its wasm signature, after a comment showing its IR
+declaration, and a stub export per provide. It is output only.
+
+Write a module against either by hand, or have a bindings generator read
+the IR, then use `embed` to generate the runtime artifacts. A generator
+needs nothing from ts-gen but the file.
 
 ### Provided functions (`--provides`)
 
@@ -130,12 +160,12 @@ ts-gen --input worker.d.ts --output src/bindings.rs --provides ExportedHandler.f
 | Flag | Description |
 |------|-------------|
 | `--provides` | A `.d.ts` export surface, or `Name[.member,...]` |
-| `--provides-app` | Module path the wrapper delegates to; its last segment names the scaffold (default `super::app`) |
-| `--provides-bindings` | Module path of the bindings (default `super::<output stem>`, with `-` and `.` replaced by `_`) |
+| `--provides-app` | Module path the wrapper delegates to; its last segment names the scaffold (default `super::app`). `--target rust` only |
+| `--provides-bindings` | Module path of the bindings (default `super::<output stem>`, with `-` and `.` replaced by `_`). `--target rust` only |
 
 ### Embedding (`ts-gen embed`)
 
-Given a module written against the template, produce the bridging modules:
+Given a module written against the IR, produce the bridging modules:
 
 ```sh
 ts-gen embed -i types.d.ts --provides ExportedHandler.fetch -m hello.wasm -o out/
@@ -158,14 +188,14 @@ Flags:
 | `--module-specifier` | Specifier `wrapper.wasm` imports the module under (default `./<module file name>`) |
 | `--provides` | What the module provides, as for the main command |
 | `--lib-name` | JS module specifier, required when the `.d.ts` has top-level exports |
-| `-E`, `--export` | What the template covers, as for the main command; pass the same values |
+| `-E`, `--export` | What the IR covers, as for the main command; pass the same values |
 | `-e`, `--external` | External mappings, as for the main command; pass the same values |
 
 Hello-world flow:
 
 ```sh
-# 1. Generate the template
-ts-gen --input worker.d.ts --output template.wat --target wat --provides ExportedHandler.fetch
+# 1. Generate the import template
+ts-gen --input worker.d.ts --output worker.wat --target wat --provides ExportedHandler.fetch
 
 # 2. Write your module against it (e.g. hello.wat)
 # 3. Assemble it

@@ -1,0 +1,85 @@
+ir 1;
+
+module "pc" {
+  shape class _Bar {
+    new {};
+    get b: f64;
+    set b(value: f64) as set_b;
+  }
+  alias Foo = _Bar;
+}
+
+module "ns" {
+  static class N1 {
+    static f();
+  }
+  alias N2 = N1;
+
+  shape class N1.T {}
+  alias N2.T = N1.T;
+}
+
+module "pure" {
+  static class M {
+    static f();
+  }
+}
+
+module "own" {
+  static class make {
+    static helper();
+  }
+  alias create = make;
+}
+
+module "col" {
+  static class M {
+    static f(t: M.T);
+  }
+
+  shape class M.T {
+    new {};
+    get n: f64;
+    set n(value: f64) as set_n;
+  }
+
+  static class M as M_2 {}
+
+  shape class M.T as M_2.T {
+    new {};
+    get m: String;
+    set m(value: String) as set_m;
+  }
+}
+
+module "reached" {
+  static class M {}
+
+  shape class M.T {
+    new {};
+    get t: f64;
+    set t(value: f64) as set_t;
+  }
+}
+
+module "ns" {
+  function g(t: N1.T);
+}
+
+module "plain" {
+  function make();
+  function create();
+}
+
+module "own" {
+  function make();
+  function create();
+}
+
+module "col" {
+  function g(t: M_2.T);
+}
+
+module "user" {
+  function use(x: "reached".M.T) as use_;
+}

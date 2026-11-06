@@ -1,0 +1,5 @@
+ir 1;
+
+module "module-default-export" {
+  function default() throws as f;
+}

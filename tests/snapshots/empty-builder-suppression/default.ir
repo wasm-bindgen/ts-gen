@@ -1,0 +1,42 @@
+ir 1;
+
+/// All fields required → no builder, only `new`.
+shape class AllRequired {
+  new {};
+  /// The thing's name.
+  get name: String;
+  set name(value: String) as set_name;
+  /// The thing's count.
+  get count: f64;
+  set count(value: f64) as set_count;
+}
+
+/// Has at least one optional field → builder still emitted.
+shape class HasOptional {
+  new {};
+  /// Required.
+  get name: String;
+  set name(value: String) as set_name;
+  /// Optional.
+  get count?: Number | Undefined;
+  set count(value: f64) as set_count;
+}
+
+/// All optional → zero-arg `new()` and `builder()` with chainable setters.
+shape class AllOptional {
+  new {};
+  /// Optional.
+  get name?: String | Undefined;
+  set name(value: String) as set_name;
+  /// Optional.
+  get count?: Number | Undefined;
+  set count(value: f64) as set_count;
+}
+
+/// Single required field, no optionals → no builder, just `new`.
+shape class SingleRequired {
+  new {};
+  /// The id.
+  get id: String;
+  set id(value: String) as set_id;
+}

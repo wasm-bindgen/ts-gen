@@ -1,0 +1,60 @@
+ir 1;
+
+module "mono-lists" {
+  class Bag<T> {
+    get size: f64;
+    first(): T | Null | Undefined throws;
+  }
+
+  class Labels {
+    new() throws;
+    add(values: Array<String>): String throws;
+    add(...values: Array<String>): String throws as add_2;
+    get values: Array<String>;
+    set values(value: Array<String>) as set_values;
+    get flags: Array<Boolean>;
+    set flags(value: Array<Boolean>) as set_flags;
+  }
+
+  shape class LabelOptions {
+    new {};
+    get values?: Array<String> | Undefined;
+    set values(value: Array<String>) as set_values;
+    get flags?: Array<Boolean> | Undefined;
+    set flags(value: Array<Boolean>) as set_flags;
+  }
+
+  class Total {
+    new(...values: Array<Number>) throws;
+    get value: f64;
+  }
+}
+
+kind GetValueReturnKind {
+  String = String;
+  VecOfBool = Array<Boolean>;
+}
+
+module "mono-lists" {
+  function tags(values: Array<String>): String throws;
+  function tagged(values: Array<String>): String throws;
+  function tagsLike(values: Array<String>): String throws as tags_like;
+  function flags(values: Array<Boolean>): String throws;
+  function join(separator: String, ...parts: Array<String>): String throws;
+  function sum(...values: Array<Number>): f64 throws;
+  function bagOf<T>(...items: Array<T | Null | Undefined>): Bag<T | Null | Undefined> throws as bag_of;
+  function rows(values: Array<Array<String>>): String throws;
+  function unique(values: Set<String>): String throws;
+  function lookup(values: Map<String, Number>, key: String): f64 throws;
+  function joinTags(...tags: Array<String>): String throws as join_tags;
+  function awaitTag(tag: Promise<String>): String throws as await_tag;
+  function firstTag(tags: Iterator<String>): String throws as first_tag;
+  function nextTag(tags: AsyncIterator<String>): String throws as next_tag;
+  function getTags(): Array<String> throws as get_tags;
+  function getMaybeTags(): Array<String> | Undefined throws as get_maybe_tags;
+  function getFlags(): Array<Boolean> throws as get_flags;
+  function fetchTags(): Promise<Array<String>> throws as fetch_tags;
+  function fetchMaybeTags(): Promise<Array<String> | Null> throws as fetch_maybe_tags;
+  function describeOptions(options: LabelOptions): String throws as describe_options;
+  function getValue(): GetValueReturnKind throws as get_value;
+}

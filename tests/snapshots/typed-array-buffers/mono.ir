@@ -1,0 +1,17 @@
+ir 1;
+
+shape class Frame {
+  new {};
+  get payload: ArrayBufferView;
+  set payload(value: ArrayBufferView) as set_payload;
+  get bytes?: BigUint64Array<SharedArrayBuffer> | Undefined;
+  set bytes(value: BigUint64Array<SharedArrayBuffer>) as set_bytes;
+}
+
+function digest(data: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> throws;
+function samples(): Float64Array<ArrayBufferLike | Null | Undefined> throws;
+function clamped(data: Uint8ClampedArray<ArrayBuffer>) throws;
+function view(data: DataView<ArrayBuffer>): DataView<ArrayBuffer> throws;
+function pair(data: Uint8Array) throws;
+function pair(data: Uint8Array<ArrayBuffer>) throws as pair_with_uint8_array;
+function chunks(): Array<Uint8Array<ArrayBuffer>> throws;

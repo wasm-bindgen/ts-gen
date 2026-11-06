@@ -1,0 +1,49 @@
+ir 1;
+
+module "builtin-errors" {
+  class Codec {
+    /// ## Errors
+    ///
+    /// * `URIError` — on a malformed escape sequence
+    decode(input: String): String throws URIError;
+    /// ## Errors
+    ///
+    /// * `AggregateError` — when several escape sequences are malformed
+    decodeAll(input: String): String throws AggregateError as decode_all;
+    /// ## Errors
+    ///
+    /// * `URIError | TypeError`
+    parse(input: String): Promise<String> throws URIError | TypeError;
+  }
+
+  class Formatter {
+    new() throws;
+    new(locales: String) throws as new_with_str;
+    new(locales: Array<String>) throws as new_with_slice;
+    new(locales: String | Undefined, options: Intl.DateTimeFormatOptions) throws as new_with_str_and_options;
+    new(locales: Array<String>, options: Intl.DateTimeFormatOptions) throws as new_with_slice_and_options;
+    get received: String;
+    format(): String throws;
+    format(locales: String): String throws as format_with_str;
+    format(locales: Array<String>): String throws as format_with_slice;
+    format(locales: String | Undefined, options: Intl.NumberFormatOptions): String throws as format_with_str_and_options;
+    format(locales: Array<String>, options: Intl.NumberFormatOptions): String throws as format_with_slice_and_options;
+    locale(tag: String): Intl.Locale throws;
+  }
+
+  shape class FormatSettings {
+    new {};
+    get locales?: Any | Undefined;
+    set locales(value: String) as set_locales;
+    set locales(value: Array<String>) as set_locales_with_slice;
+    get dateTime?: Intl.DateTimeFormatOptions | Undefined as date_time;
+    set dateTime(value: Intl.DateTimeFormatOptions) as set_date_time;
+  }
+
+  function describe(): String throws;
+  function describe(locales: String): String throws as describe_with_str;
+  function describe(locales: Array<String>): String throws as describe_with_slice;
+  function describe(locales: String | Undefined, options: Intl.DateTimeFormatOptions): String throws as describe_with_str_and_options;
+  function describe(locales: Array<String>, options: Intl.DateTimeFormatOptions): String throws as describe_with_slice_and_options;
+  function settings(value: FormatSettings): String throws;
+}

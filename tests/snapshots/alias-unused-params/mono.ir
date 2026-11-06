@@ -1,0 +1,57 @@
+ir 1;
+
+shape class Local {
+  new {};
+  get l: String;
+  set l(value: String) as set_l;
+}
+
+shape class Pair<A, B> {
+  new {}: Pair;
+  get a: A | Null | Undefined;
+  set a(value: A | Null | Undefined) as set_a;
+  get b: B | Null | Undefined;
+  set b(value: B | Null | Undefined) as set_b;
+}
+
+shape class Inner {
+  new {};
+  get top: String;
+  set top(value: String) as set_top;
+}
+
+static class Ns {}
+
+shape class Ns.Inner {
+  new {};
+  get ns: f64;
+  set ns(value: f64) as set_ns;
+}
+
+static class Cf {}
+
+shape class Cf.Env {
+  new {};
+  get e: String;
+  set e(value: String) as set_e;
+}
+
+shape class Holder<T> {
+  get(): Any throws;
+  take(value: Pair<T | Null | Undefined, String>) throws;
+  entry(): Any throws;
+}
+
+kind Color {
+  Red = "red";
+  Green = "green";
+}
+
+function brand(value: Local) throws;
+function erase(value: Any): Local throws;
+function skip(value: Pair<String, Boolean>) throws;
+function defaults(a: Pair<Number, String>, b: Pair<Number, Number>, c: Pair<Undefined, Undefined>, d: Pair<String, String>, e: Pair<String, Ns.Inner>, f: Pair<Undefined, Undefined>) throws;
+function defaultReturn(): Pair<Number, String> throws as default_return;
+function skipReturn(): Pair<Number, Boolean> throws as skip_return;
+function misc(handler: (Cf.Env) => void, color: Color, qualified: Color, chosen: Color, given: Pair<Number, String>) throws;
+function qualifiedReturn(): Pair<String, Ns.Inner> throws as qualified_return;

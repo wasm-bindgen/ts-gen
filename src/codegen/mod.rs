@@ -11,6 +11,7 @@ pub mod functions;
 pub(crate) mod inline_wrappers;
 pub(crate) mod null_arms;
 pub mod provides;
+pub(crate) mod record;
 pub mod signatures;
 pub mod subtyping;
 pub mod surface;
@@ -146,6 +147,15 @@ impl GenerateOptions {
     }
 
     /// Configure wasm-bindgen's experimental per-monomorphization codegen.
+    /// These options without `--error-type`, which only spells the Rust
+    /// error type.
+    pub(crate) fn without_error_type(&self) -> Self {
+        Self {
+            error_type: None,
+            ..self.clone()
+        }
+    }
+
     pub fn experimental_generic_mono(mut self, enabled: bool) -> Self {
         self.experimental_generic_mono = enabled;
         self
@@ -391,19 +401,7 @@ fn generate_tokens(
         }
     }
 
-    let mut root = ModTree::default();
-    for &type_id in &module.types {
-        for decl in surface.get(type_id) {
-            root.at(&cgctx.module_path(&decl.module_context)).insert(
-                type_id,
-                decl,
-                Vec::new(),
-                &surface,
-            );
-        }
-    }
-    let global_items = root.generate(&mut Vec::new(), &cgctx);
-    cgctx.emit_path.replace(Vec::new());
+    let global_items = emit_items(module, &surface, &cgctx);
 
     let error_enum = options.error_enum.as_deref().map(|name| {
         let names = error_enum::collect_throws_names(&module.types, &surface);
@@ -435,6 +433,40 @@ fn generate_tokens(
     })
 }
 
+/// The items of the top-level module, each declared module and namespace
+/// a `pub mod` among them.
+fn emit_items(
+    module: &Module,
+    surface: &surface::Surface<'_>,
+    cgctx: &CodegenContext,
+) -> Vec<TokenStream> {
+    let mut root = ModTree::default();
+    for &type_id in &module.types {
+        for decl in surface.get(type_id) {
+            root.at(&cgctx.module_path(&decl.module_context)).insert(
+                type_id,
+                decl,
+                Vec::new(),
+                surface,
+            );
+        }
+    }
+    let items = root.generate(&mut Vec::new(), cgctx);
+    cgctx.emit_path.replace(Vec::new());
+    items
+}
+
+/// What the emitters bind for the surface, in emission order.
+pub(crate) fn record_bindings(
+    module: &Module,
+    surface: &surface::Surface<'_>,
+    cgctx: &CodegenContext,
+) -> Vec<record::Record> {
+    cgctx.recorder.replace(Some(Vec::new()));
+    emit_items(module, surface, cgctx);
+    cgctx.recorder.take().unwrap_or_default()
+}
+
 /// Emit the synthesised dynamic-union enums collected on `cgctx`
 /// during the per-declaration pass. Each enum lowers each member
 /// type via the regular return-position path, resolved from the
@@ -462,9 +494,8 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
             let members = &info.members;
             let variants: Vec<TokenStream> = members
                 .iter()
-                .zip(dynamic_union_variant_names(members))
-                .map(|(m, variant_name)| {
-                    let variant_ident = typemap::make_ident(&variant_name);
+                .zip(dynamic_union_variant_idents(members))
+                .map(|(m, variant_ident)| {
                     match m {
                         // Literal members become discriminant variants.
                         // `typemap::dynamic_union_members` only keeps
@@ -506,6 +537,15 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
         })
         .collect();
     quote! { #(#enums)* }
+}
+
+/// The variant idents of a union enum's members, in member order: the
+/// names of [`dynamic_union_variant_names`] as Rust identifiers.
+pub(crate) fn dynamic_union_variant_idents(members: &[crate::ir::TypeRef]) -> Vec<syn::Ident> {
+    dynamic_union_variant_names(members)
+        .iter()
+        .map(|n| typemap::make_ident(n))
+        .collect()
 }
 
 /// Variant names for the members of a synthesised dynamic union, in member
@@ -826,6 +866,32 @@ fn generate_type_alias(
 /// each arm's argument types implement, so an argument taking `impl Alias`
 /// crosses the ABI as the arm's own type; the enum is `<Alias>Kind` and
 /// implements the trait too, so a read can be passed straight back.
+/// A union alias enum's arms with their payloads: two arms lowering alike
+/// are one variant.
+pub(crate) fn union_alias_arms<'u>(
+    union: &'u typemap::UnionAlias,
+    cgctx: &CodegenContext,
+    from_module: &crate::ir::ModuleContext,
+) -> Vec<(&'u crate::ir::TypeRef, TokenStream)> {
+    let mut arms: Vec<(&crate::ir::TypeRef, TokenStream)> = Vec::new();
+    for arm in &union.arms {
+        let payload = typemap::to_syn_type(
+            arm,
+            typemap::TypePosition::RETURN,
+            Some(cgctx),
+            union.scope,
+            from_module,
+        );
+        if !arms
+            .iter()
+            .any(|(_, p)| p.to_string() == payload.to_string())
+        {
+            arms.push((arm, payload));
+        }
+    }
+    arms
+}
+
 fn generate_union_alias_enum(
     name: &syn::Ident,
     union: &typemap::UnionAlias,
@@ -848,21 +914,7 @@ fn generate_union_alias_enum(
     let mut payloads: Vec<TokenStream> = Vec::new();
     let mut sources: Vec<Vec<(TokenStream, TokenStream)>> = Vec::new();
     let mut arguments: Vec<TokenStream> = Vec::new();
-    for arm in &union.arms {
-        let payload = typemap::to_syn_type(
-            arm,
-            typemap::TypePosition::RETURN,
-            Some(cgctx),
-            union.scope,
-            from_module,
-        );
-        // Two arms lowering alike are one variant.
-        if payloads
-            .iter()
-            .any(|p| p.to_string() == payload.to_string())
-        {
-            continue;
-        }
+    for (arm, payload) in union_alias_arms(union, cgctx, from_module) {
         // Each source type with the expression turning `value` into the
         // payload, and the argument types the trait takes for the arm.
         let (from, args) = match arm {
@@ -911,7 +963,7 @@ fn generate_union_alias_enum(
     let mut variants = Vec::new();
     let mut conversions = Vec::new();
     let mut expected = Vec::new();
-    for (((variant_name, payload), from), arm) in dynamic_union_variant_names(&arms)
+    for (((variant, payload), from), arm) in dynamic_union_variant_idents(&arms)
         .into_iter()
         .zip(&payloads)
         .zip(sources)
@@ -928,7 +980,6 @@ fn generate_union_alias_enum(
                 path.rsplit("::").next().unwrap_or(&path).to_string()
             }
         });
-        let variant = typemap::make_ident(&variant_name);
         variants.push(quote! { #variant(#payload) });
         for (source, expr) in from {
             conversions.push(quote! {
@@ -994,7 +1045,7 @@ struct ModTree<'d> {
 
 enum ModEntry<'d> {
     /// A declaration and the JS path of the namespaces enclosing it.
-    Item(&'d TypeDeclaration, Vec<String>),
+    Item(crate::context::TypeId, &'d TypeDeclaration, Vec<String>),
     /// A child `pub mod`, at the position of its first declaration.
     Mod(String),
 }
@@ -1039,7 +1090,7 @@ impl<'d> ModTree<'d> {
                     }
                 }
             }
-            _ => self.entries.push(ModEntry::Item(decl, js_namespace)),
+            _ => self.entries.push(ModEntry::Item(id, decl, js_namespace)),
         }
     }
 
@@ -1047,7 +1098,7 @@ impl<'d> ModTree<'d> {
     fn generate(&self, path: &mut Vec<String>, cgctx: &CodegenContext) -> Vec<TokenStream> {
         let mut value_names =
             functions::ValueNames::new(self.entries.iter().filter_map(|entry| match entry {
-                ModEntry::Item(decl, js_namespace) => Some((*decl, js_namespace.as_slice())),
+                ModEntry::Item(_, decl, js_namespace) => Some((*decl, js_namespace.as_slice())),
                 ModEntry::Mod(_) => None,
             }));
         // A child module's `use super::*` brings its parent's statics into
@@ -1060,8 +1111,13 @@ impl<'d> ModTree<'d> {
         let mut items = Vec::new();
         for entry in &self.entries {
             match entry {
-                ModEntry::Item(decl, js_namespace) => {
+                ModEntry::Item(id, decl, js_namespace) => {
                     cgctx.emit_path.replace(path.clone());
+                    cgctx.record(|| record::Record::Decl {
+                        id: *id,
+                        decl: *decl as *const TypeDeclaration as usize,
+                        js_namespace: js_namespace.clone(),
+                    });
                     items.extend(if js_namespace.is_empty() {
                         generate_declaration(decl, cgctx, &mut value_names)
                     } else {

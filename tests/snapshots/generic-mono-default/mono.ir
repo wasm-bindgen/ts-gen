@@ -1,0 +1,14 @@
+ir 1;
+
+shape class DefaultDetails<T> {
+  new {}: DefaultDetails;
+  get value: T | Null | Undefined;
+  set value(value: T | Null | Undefined) as set_value;
+}
+
+class DefaultFlags {
+  getStringDetails(default_value: String): Promise<DefaultDetails<String>> as get_string_details;
+  getBooleanDetails(default_value: bool): Promise<DefaultDetails<Boolean>> as get_boolean_details;
+  getNumberDetails(default_value: f64): Promise<DefaultDetails<Number>> as get_number_details;
+  getStringArray(): Promise<Array<String>> as get_string_array;
+}

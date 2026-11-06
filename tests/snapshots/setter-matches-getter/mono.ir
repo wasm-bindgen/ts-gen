@@ -1,0 +1,40 @@
+ir 1;
+
+shape class DigitsOptions {
+  new {};
+  get fractionalSecondDigits?: FractionalSecondDigitsKind | Undefined as fractional_second_digits;
+  set fractionalSecondDigits(value: FractionalSecondDigitsKind) as set_fractional_second_digits;
+  set fractionalSecondDigits(value: f64) as set_fractional_second_digits_with_f64;
+  get roundingMode?: RoundingModeKind | Undefined as rounding_mode;
+  set roundingMode(value: RoundingModeKind) as set_rounding_mode;
+}
+
+shape class RequiredDigits {
+  new {};
+  get digits: FractionalSecondDigitsKind;
+  set digits(value: FractionalSecondDigitsKind) as set_digits;
+  set digits(value: f64) as set_digits_with_f64;
+}
+
+shape class Toggle {
+  new {};
+  get mode: ModeKind;
+  set mode(value: ModeKind) as set_mode;
+  set mode(value: bool) as set_mode_with_bool;
+}
+
+kind FractionalSecondDigitsKind {
+  Auto = "auto";
+  F64 = Number;
+}
+
+kind RoundingModeKind {
+  Ceil = "ceil";
+  Floor = "floor";
+}
+
+kind ModeKind {
+  Bool = Boolean;
+  X = "x";
+  Y = "y";
+}

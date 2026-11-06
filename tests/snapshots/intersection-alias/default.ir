@@ -1,0 +1,85 @@
+ir 1;
+
+shape class Base {
+  new {};
+  get colo: String;
+}
+
+shape class Geo {
+  new {};
+  get country?: String | Undefined;
+}
+
+shape class Response {
+  new {};
+  get success: bool;
+}
+
+shape class Properties<HostMetadata> extends Base, Geo {
+  new {}: Properties;
+  get country?: String | Undefined;
+  get hostMetadata: HostMetadata | Null | Undefined as host_metadata;
+  set hostMetadata(value: HostMetadata | Null | Undefined) as set_host_metadata;
+}
+
+shape class QueryResult<T> extends Response {
+  new {}: QueryResult;
+  get results: Array<T | Null | Undefined>;
+  set results(value: Array<T | Null | Undefined>) as set_results;
+}
+
+shape class Stub<T> extends Response {
+  new {}: Stub;
+}
+
+shape class Endpoint<T> {
+  fetch(input: String): Promise<String>;
+}
+
+shape class Plain extends Base {
+  new {};
+  get extra: String;
+  set extra(value: String) as set_extra;
+}
+
+shape class Range<R> {
+  new {}: Range;
+  get offset?: Number | Undefined;
+  set offset(value: f64) as set_offset;
+  get value: R | Null | Undefined;
+  set value(value: R | Null | Undefined) as set_value;
+}
+
+shape class ReadResult<R> {
+  new {}: ReadResult;
+  get done: Boolean;
+  set done(value: bool) as set_done;
+  get value?: R | Null | Undefined;
+  set value(value: R | Null | Undefined) as set_value;
+}
+
+shape class Listing {
+  new {};
+  get truncated: bool;
+  set truncated(value: bool) as set_truncated;
+  get cursor?: String | Undefined;
+  set cursor(value: String) as set_cursor;
+  get objects: Array<String>;
+  set objects(value: Array<String>) as set_objects;
+}
+
+shape class Vector {
+  new {};
+  get id: String;
+  set id(value: String) as set_id;
+  get values: Array<Number>;
+  set values(value: Array<Number>) as set_values;
+}
+
+shape class Match {
+  new {};
+  get score: f64;
+  set score(value: f64) as set_score;
+  get id: String;
+  set id(value: String) as set_id;
+}

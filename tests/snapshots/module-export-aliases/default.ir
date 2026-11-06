@@ -1,0 +1,20 @@
+ir 1;
+
+module "module-export-aliases" {
+  shape class _Foo {
+    bar();
+  }
+  alias Foo = _Foo;
+  alias Bar = _Foo;
+
+  class Conn as _Conn {
+    new() throws;
+    get(): String;
+    static open(): _Conn;
+  }
+  alias Conn = _Conn;
+  alias Connection = _Conn;
+
+  function a();
+  function b();
+}

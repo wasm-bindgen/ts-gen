@@ -1,0 +1,17 @@
+ir 1;
+
+get $: Any | Null | Undefined as dollar;
+get $foo: String as foo;
+get fooBar: f64 as foo_bar_2;
+get FOO_BAR: f64 as foo_bar_3;
+function foo_bar();
+get déjà: String;
+get console: String;
+
+module "mod-a" {
+  get value: String as value_;
+}
+
+module "mod-b" {
+  get value: String as value_;
+}

@@ -1,0 +1,120 @@
+ir 1;
+
+module "intersection" {
+  shape class Conditional {
+    new {};
+    get etag?: String | Undefined;
+    set etag(value: String) as set_etag;
+  }
+
+  shape class GetOptions {
+    new {};
+    get onlyIf?: Conditional | Undefined as only_if;
+    set onlyIf(value: Conditional) as set_only_if;
+    get range?: String | Undefined;
+    set range(value: String) as set_range;
+  }
+
+  shape class Base {
+    new {};
+    get id: String;
+    set id(value: String) as set_id;
+  }
+
+  shape class Derived extends Base {
+    new {};
+    get extra: String;
+    set extra(value: String) as set_extra;
+  }
+
+  shape class Unrelated {
+    new {};
+    get other: String;
+    set other(value: String) as set_other;
+  }
+
+  shape class Store {
+    get(key: String): Promise<String> throws;
+    get(key: String, options: StoreOptions): Promise<String | Null> throws as get_with_store_options;
+    get(key: String, options: GetOptions): Promise<String> throws as get_with_get_options;
+    refine(value: Derived) throws;
+    same(value: Derived) throws;
+    unrelated(value: Any) throws;
+    shape(value: StoreValue) throws;
+    generic<T>(value: T | Null | Undefined) throws;
+    primitive(value: String) throws;
+    anything(value: Any | Null | Undefined) throws;
+  }
+
+  shape class StoreOptions extends GetOptions {
+    new {};
+    get onlyIf: Conditional as only_if;
+    set onlyIf(value: Conditional) as set_only_if;
+  }
+
+  shape class StoreValue {
+    new {};
+    get a: String;
+    set a(value: String) as set_a;
+    get b: f64;
+    set b(value: f64) as set_b;
+  }
+
+  shape class Both extends Derived, Unrelated {
+    new {};
+    get other: String;
+    set other(value: String) as set_other;
+  }
+
+  shape class Refined extends GetOptions {
+    new {};
+    get onlyIf: Conditional as only_if;
+    set onlyIf(value: Conditional) as set_only_if;
+  }
+
+  shape class Fetcher {
+    fetch(input: String): Promise<String> throws;
+  }
+
+  shape class Stub extends Fetcher {
+    get id: String;
+  }
+
+  shape class Provider<T> {
+    call(): T | Null | Undefined throws;
+  }
+
+  shape class GenericStub<T> extends Provider<T | Null | Undefined>, Fetcher {
+    fetch(input: String): Promise<String> throws;
+    get id: String;
+  }
+
+  shape class Unknown extends Missing, Fetcher {
+    fetch(input: String): Promise<String> throws;
+    get id: String;
+  }
+
+  shape class Ext extends Foreign {
+    new {};
+    get extra: String;
+    set extra(value: String) as set_extra;
+  }
+
+  shape class Message {
+    new {};
+    get role: RoleKind;
+    set role(value: "user") as set_role;
+  }
+
+  shape class ViaBaseAlias extends Base {
+    new {};
+    get w: String;
+    set w(value: String) as set_w;
+  }
+}
+
+kind RoleKind {
+  User = "user";
+  Assistant = "assistant";
+  String = String;
+}

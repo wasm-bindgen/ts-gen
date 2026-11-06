@@ -1,0 +1,44 @@
+ir 1;
+
+module "export-default" {
+  class default as Processor {
+    new(name: String) throws;
+    get name: String;
+    static named(name: String): Processor;
+  }
+  alias default = Processor;
+}
+
+module "export-default/merged" {
+  static class default {
+    static helper(): String;
+  }
+}
+
+module "export-default/renamed" {
+  static class create {
+    static helper(): String;
+  }
+}
+
+module "export-default/namespace" {
+  static class default {
+    static f(): String;
+  }
+}
+
+module "export-default/create" {
+  function default(name: String): String as create;
+}
+
+module "export-default/version" {
+  get default: String as version;
+}
+
+module "export-default/merged" {
+  function default(): String as make;
+}
+
+module "export-default/renamed" {
+  function create(): String;
+}

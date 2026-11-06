@@ -43,9 +43,10 @@ src/
 │   ├── surface.rs             # output surface: export roots, `--export <Name>`, closure
 │   ├── type_params.rs         # erase method type params no argument infers
 │   └── typemap.rs             # TypeRef → syn tokens, `to_return_type`, externals
-├── abi/                       # Wasm ABI layer (--target wat, embed)
-│   ├── mod.rs                 # ABI model, `build()`
-│   ├── wat.rs                 # import template generator
+├── abi/                       # the ts-gen IR (--target ir / wat, embed)
+│   ├── mod.rs                 # `build_ir()`: .d.ts → the ts-gen-abi IR
+│   ├── lower.rs               # the lowering, from the Rust emitters' records
+│   ├── wat.rs                 # --target wat: a WAT import template derived from the IR
 │   └── embed.rs               # bindings.wasm / wrapper.wasm emitter
 └── util/                      # naming, diagnostics, dedup helpers
 
@@ -53,14 +54,15 @@ tests/
 ├── fixtures/*.d.ts            # input declarations
 ├── fixtures/embed/*.wat       # language modules for the embed tests
 ├── snapshots/<name>/*.rs      # expected output per CLI configuration (default, mono)
+├── snapshots/<name>/*.ir      # --target ir output per configuration
 ├── snapshots/<name>/*.wat     # --target wat output per configuration
 ├── snapshots/embed/           # embed artifacts per fixture
-├── snapshot.rs                # the Rust and WAT snapshot harness
+├── snapshot.rs                # the Rust, IR and WAT snapshot harness
 ├── embed.rs                   # embed end-to-end on the fixtures/embed modules
 └── embed.mjs                  # node run of each merged embed fixture
 
 abi/                           # ts-gen-abi: the IR model and its text format (IR.md)
-├── src/ir.rs                  # the model and its imports
+├── src/ir.rs                  # the model, its imports and the sys functions
 └── src/text.rs                # reference writer and reader of the text
 
 integration-tests/

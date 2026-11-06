@@ -317,6 +317,25 @@ pub struct FunctionSignature {
     /// arm's wrapper name, and the extern itself is emitted privately as
     /// [`LiteralSpec::binding`].
     pub literal: Option<LiteralSpec>,
+    /// Which of a binding's forms this is.
+    pub form: SigForm,
+    /// `@throws {never}` applies: no catching form is emitted for it.
+    pub nothrow: bool,
+    /// The `@throws` type, whether or not this form catches.
+    pub throws_type: Option<TypeRef>,
+}
+
+/// The forms [`build_signatures`] emits for one binding.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SigForm {
+    /// The binding itself; an `async fn` for a promise.
+    Primary,
+    /// The `try_` companion.
+    Try,
+    /// The un-awaited `_promise` form of an `async fn`.
+    Promise,
+    /// The `_js_string` variant of another form.
+    JsString,
 }
 
 /// Recursively collect every in-scope type-parameter name reachable
@@ -965,6 +984,9 @@ pub fn build_signatures(
             doc: overload.doc.clone(),
             body_scope: scope,
             literal: primary_literal,
+            form: SigForm::Primary,
+            nothrow,
+            throws_type: error_type.cloned(),
         };
         push_with_js_string_return(&mut out, primary, names, cgctx, scope);
 
@@ -1005,6 +1027,9 @@ pub fn build_signatures(
                 doc: overload.doc.clone(),
                 body_scope: scope,
                 literal: promise_literal,
+                form: SigForm::Promise,
+                nothrow,
+                throws_type: error_type.cloned(),
             });
         }
 
@@ -1026,6 +1051,9 @@ pub fn build_signatures(
                 doc: overload.doc.clone(),
                 body_scope: scope,
                 literal: try_literal,
+                form: SigForm::Try,
+                nothrow,
+                throws_type: error_type.cloned(),
             };
             push_with_js_string_return(&mut out, try_sig, names, cgctx, scope);
         }
@@ -1115,6 +1143,7 @@ fn push_with_js_string_return(
             }
         }
         js_sig.js_string_return = true;
+        js_sig.form = SigForm::JsString;
         out.push(js_sig);
     }
 }

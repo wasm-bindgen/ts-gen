@@ -1,0 +1,62 @@
+ir 1;
+
+module "slice-hints" {
+  shape class Target {
+    new {};
+    /// The write destination.
+    get buffer?: BufferKind | Undefined;
+    set buffer(value: Float64Array) as set_buffer;
+    set buffer(value: Float64Array) as set_buffer_with_float64_array;
+  }
+}
+
+kind BufferKind {
+  Float64Array = Float64Array;
+  VecOfF64 = Array<Number>;
+}
+
+module "slice-hints" {
+  /// Retains the received array for `first()` to read.
+  ///
+  /// * `data` - consumed synchronously by the host
+  function keepView(data: Float64Array) throws as keep_view;
+
+  /// Retains the received array for `first()` to read.
+  ///
+  /// * `data` - consumed synchronously by the host
+  function keepView(data: Float64Array) throws as keep_view_with_float64_array;
+
+  /// * `data`
+  function keepCopy(data: Float64Array) throws as keep_copy;
+
+  /// * `data`
+  function keepCopy(data: Float64Array) throws as keep_copy_with_float64_array;
+
+  /// Reads element 0 of the last retained array.
+  function first(): f64 throws;
+
+  /// * `values` - a plain `Array` instead of the typed copy
+  function entries(values: BigInt64Array): String throws;
+
+  /// * `values` - a plain `Array` instead of the typed copy
+  function entries(values: BigInt64Array): String throws as entries_with_big_int64_array;
+
+  /// * `bytes`
+  function digest(bytes: Uint8Array): String throws;
+
+  /// * `bytes`
+  function digest(bytes: Uint8Array): String throws as digest_with_uint8_array;
+
+  /// * `data`
+  function keepUnsharedView(data: Uint8Array) throws as keep_unshared_view;
+
+  /// * `data`
+  function keepUnsharedView(data: Uint8Array<ArrayBuffer>) throws as keep_unshared_view_with_uint8_array;
+
+  /// * `data`
+  function keepSharedView(data: Uint8Array) throws as keep_shared_view;
+
+  /// * `data`
+  function keepSharedView(data: Uint8Array<ArrayBufferLike | Null | Undefined>) throws as keep_shared_view_with_uint8_array;
+  function describeTarget(target: Target): String throws as describe_target;
+}

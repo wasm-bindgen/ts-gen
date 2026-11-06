@@ -1,0 +1,158 @@
+ir 1;
+
+module "sanitised-keys" {
+  class Pair {
+    new() throws;
+    get "0": Socket as _0;
+    set "0"(value: Socket) as set_0;
+    get "1": Socket as _1;
+    set "1"(value: Socket) as set_1;
+    static get "2": Socket as _2;
+    static set "2"(value: Socket) as set_2;
+    get $public: String as public;
+    set $public(value: String) as set_public;
+    static get "@cf/model": String as cfmodel;
+    static set "@cf/model"(value: String) as set_cfmodel;
+    $emit(event: String) throws as emit;
+    "@cf/run"() throws as cfrun;
+    static $create(): Pair throws as create;
+  }
+
+  class Socket {
+    accept() throws;
+  }
+
+  class $Store as Store {
+    new() throws;
+    static create(): Store throws;
+    static get count: f64;
+    static set count(value: f64) as set_count;
+  }
+
+  class $_ as DollarUnderscore {
+    new() throws;
+    get _: String as underscore;
+    set _(value: String) as set_underscore;
+  }
+
+  class Collide {
+    new() throws;
+    get data: String;
+    set data(value: String) as set_data;
+    get $data: String as data_2;
+    set $data(value: String) as set_data_2;
+  }
+
+  shape class CollideInit {
+    new {};
+    get fooBar: f64 as foo_bar_2;
+    set fooBar(value: f64) as set_foo_bar_2;
+    get foo_bar: f64;
+    set foo_bar(value: f64) as set_foo_bar;
+    get data?: String | Undefined;
+    set data(value: String) as set_data;
+    get $data?: String | Undefined as data_2;
+    set $data(value: String) as set_data_2;
+  }
+
+  shape class MethodCollide {
+    data() throws;
+    get $data: String as data_2;
+    set $data(value: String) as set_data_2;
+    setFoo() throws as set_foo;
+    get foo: String;
+    set foo(value: String) as set_foo_2;
+    call() throws;
+    call(a: String) throws as call_with_a;
+    call(a: f64) throws as call_with_a_2;
+  }
+
+  shape class SetterCollide {
+    new {};
+    get setFoo: String as set_foo;
+    set setFoo(value: String) as set_set_foo;
+    get foo: String;
+    set foo(value: String) as set_foo_2;
+  }
+
+  class SetterNumbers {
+    get data: String;
+    set data(value: String) as set_data_3;
+    get $data: String as data_2;
+    set $data(value: String) as set_data_2;
+    setData() throws as set_data;
+  }
+
+  class ReadonlyCollide {
+    get value: String;
+    setValue(value: String) throws as set_value;
+    static get level: f64;
+    static setLevel(level: f64) throws as set_level;
+  }
+
+  class Receiver {
+    method(this2: String, value: f64) throws;
+  }
+
+  shape class ReservedInit {
+    new {};
+    get "new": String as new_;
+    set "new"(value: String) as set_new;
+    get inner: String;
+    set inner(value: String) as set_inner;
+    get builder?: Number | Undefined as builder_;
+    set builder(value: f64) as set_builder;
+    get build?: Boolean | Undefined as build_;
+    set build(value: bool) as set_build;
+  }
+
+  class ReservedClass {
+    new() throws;
+    get "new": String as new_;
+    set "new"(value: String) as set_new;
+  }
+
+  class ReservedMethod {
+    new() throws;
+    "new"() throws as new_2;
+  }
+
+  static class Scoped {
+    static fetchUrl(url: String) throws as fetch_url;
+  }
+
+  static class Ns {
+    static get x: f64;
+  }
+
+  static class ns {
+    static get x: String as x_2;
+  }
+
+  kind Op {
+    Plus = "+";
+    Minus = "-";
+    Empty = "";
+    LtEq = "<=";
+  }
+
+  kind Sigil {
+    Dollar = 1;
+    Underscore = 2;
+  }
+
+  function $(selector: String): Pair throws as dollar_2;
+  get $version: String as version;
+  function $$(selector: String): Array<Pair> throws as dollar_dollar;
+  get __: f64 as underscore_underscore;
+  function each(underscore: f64, dollar: String) throws;
+  function compare(op: Op) throws;
+  function ajax(url: String) throws;
+  function $ajax(url: String) throws as ajax_2;
+  function dollar() throws;
+  function collideArgs(a: String, a2: f64, foo_bar: String, foo_bar2: f64) throws as collide_args;
+  get url: String;
+  get val: String as val_;
+  get inner: f64 as inner_;
+  function fetchUrl(url: String) throws as fetch_url;
+}

@@ -1,12 +1,15 @@
 # The ts-gen IR
 
 The IR is a `.d.ts` expanded into uniquely named bindings with wasm-level
-types. Language generators read it to write a language's bindings. A
-generator needs nothing from TypeScript or ts-gen: overloads are already
-expanded into separately named members, and every position has its wire
-type. This document specifies the text form;
-`ts_gen_abi::text::{emit, parse}` (model in `abi/src/ir.rs`) are its
-reference writer and reader, and `parse(emit(ir)) == ir`.
+types. ts-gen writes it; language generators read it to write a
+language's bindings, and the bridge builder reads it to build
+`bindings.wasm`, which implements every binding in JS terms. A generator
+needs nothing from TypeScript or ts-gen: overloads are already expanded
+into separately named members, and every position has its wire type.
+This document specifies the text form; `ts_gen_abi::text::{emit, parse}`
+(model in `abi/src/ir.rs`) are its reference writer and reader, and
+`parse(emit(ir)) == ir`. [Bridge](#bridge) specifies what `bindings.wasm`
+adds on the wire.
 
 ```ts
 ir 1;
@@ -104,7 +107,10 @@ Every JS type is `externref` at the boundary, exactly as JS produced it.
 * A JS type admitting neither empty may be taken as `(ref extern)`.
 * `null` admits a wasm null: JS `null` arrives as `ref.null extern`, and
   a language passes `null` as one. Test it with `ref.is_null`.
-* `undefined` is a non-null reference.
+* `undefined` is a non-null reference. Test it with
+  `JsValue.is_undefined`; produce it from the `undefined` global or
+  `JsValue.undefined` (see [Bridge](#bridge)).
+* A `Number` reference unboxes to `f64` with `Number.value`.
 * A GC language may take any JS position as `anyref` instead, and as
   `(ref any)` where `(ref extern)` is allowed.
 
@@ -256,7 +262,7 @@ distinct.
 followed by an optional `nothrow`: declared never to throw (`@throws
 {never}`), so no catching form derives from the binding. How a caught
 exception crosses to the language is the bridge's convention, not this
-format's.
+format's (see [Exceptions](#exceptions)).
 
 Then an optional `cohort <name>` (`Member.cohort`): the member is an arm
 of a literal-keyed cohort, members that differ only in the literals they
@@ -282,7 +288,8 @@ another module's variable exports is: `new(addr: String) from
 
 `log(...data: Array<Any>)`: the last parameter may be a rest parameter,
 whose type is `Array<T>`. On the wire it is `(ref null $anyrefs)`, where
-the language module declares `(type $anyrefs (array (mut anyref)))`.
+the language module declares `(type $anyrefs (array (mut anyref)))`, and
+the bridge spreads the array's elements into the call.
 
 ### Modules
 
@@ -340,6 +347,74 @@ every alias: `<class alias>.<name>` for each class alias,
 each member alias, `<alias>` for a top-level alias. A generator that
 binds a class once, with its aliases as type aliases, may ignore them.
 `Ir::imports` (`abi/src/ir.rs`) lists every member with its names.
+
+## Bridge
+
+`ts-gen embed` reads a language module and the IR it was written
+against, and builds `bindings.wasm`, which implements each member the
+module imports in JS terms, and `wrapper.wasm`, which publishes the
+module's provides. Merged with the module, they leave it importing only
+`./builtins.js`, the string constants and the IR's module specifiers.
+
+### Sys functions
+
+Every `bindings.wasm` also has three functions the IR does not list,
+fixed by this spec (`ts_gen_abi::ir::Sys`):
+
+| Import | Signature | JS |
+| --- | --- | --- |
+| `"./bindings.wasm" "JsValue.is_undefined"` | `(param externref) (result i32)` | `x === undefined` |
+| `"./bindings.wasm" "JsValue.undefined"` | `(result externref)` | `undefined` |
+| `"./bindings.wasm" "Number.value"` | `(param externref) (result f64)` | `Number(x)` |
+
+They win over a member of the same import name. `Number.value` is JS
+coercion, not a test: `Number(null)` is `0`, `Number(undefined)` `NaN`.
+
+### Builtins
+
+A module may import two names from `./builtins.js`, and nothing else:
+the global `"undefined"`, an immutable `externref` or `anyref` global,
+and `"await"`, `(func (param externref) (result externref))` with each
+position `externref` or `anyref`, which suspends on a promise and returns
+its value (`WebAssembly.Suspending`). A language that cannot import a
+global uses `JsValue.undefined`.
+
+### Signatures
+
+An import's signature is the member's: the receiver, the parameters'
+wire types and the result's, `void` none. Arity and scalars are exact. A
+reference position may be `externref` or `anyref`, and `(ref extern)` or
+`(ref any)` unless JS produces the value there (an import result, a
+provide parameter, the `await` result) and its type admits `Null`; a
+non-null result JS returns as `null` traps. A rest parameter is `(ref
+null $anyrefs)`, exactly `(array (mut anyref))`. A `bool` argument
+reaches JS as a boolean, and so does a provide's `bool` result.
+
+### String constants
+
+The bindings take property keys as imported string constants, from
+`wasm:js/string-constants`.
+
+### Exceptions
+
+The bridge does not catch. A JS exception a binding's JS throws
+propagates through the bindings into the language module as a Wasm
+exception; `throws`, `raises` and `nothrow` tell a generator where to
+catch it and what it may be. How a catching binding reports a caught
+exception to its caller is the generator's choice, not yet fixed on the
+wire.
+
+### Provides and JSPI
+
+A provide is an export of the language module under its export name,
+with its parameters' wire types and its result's; an `async` provide
+always has a result, `externref` for `async void`. The wrapper
+publishes it at its path: each first segment is an export of the merged
+module holding the function or an object of them. Importing `await`
+opts the module into JSPI: the wrapper wraps each provide in
+`WebAssembly.promising`, so the export returns `T` and JS receives a
+promise of it. Without the import, an `async` provide returns the
+promise itself. Importing `await` with no provides is an error.
 
 ## Name resolution
 

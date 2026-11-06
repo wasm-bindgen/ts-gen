@@ -1,0 +1,71 @@
+ir 1;
+
+shape class EventTarget {
+  addEventListener(type: String, listener: () => Any | Null | Undefined) as add_event_listener;
+}
+
+shape class Serializable {
+  toJSON(): Any | Null | Undefined as to_json;
+}
+
+shape class EventEmitter extends EventTarget, Serializable {
+  toJSON(): Any | Null | Undefined as to_json;
+  emit(event: String): bool;
+}
+
+static class NodeJS {}
+
+shape class NodeJS.EventEmitter {
+  on(event: String, listener: () => Any | Null | Undefined): Any;
+}
+
+class Stream extends NodeJS.EventEmitter {
+  pipe(destination: Stream): Stream;
+}
+
+class Counter {
+  count(): f64;
+  try_count(): f64;
+  reset();
+}
+
+shape class Duplex {
+  read(): Any | Null | Undefined;
+  write(data: ArrayBuffer): bool;
+  write(data: String): bool as write_with_str;
+  end();
+}
+
+static class Intl {
+  static get defaultLocale: String as default_locale;
+}
+
+shape class Intl.Collator {
+  compare(a: String, b: String): f64;
+}
+
+shape class Intl.CollatorOptions {
+  new {};
+  get usage?: String | Undefined;
+  set usage(value: String) as set_usage;
+  get sensitivity?: String | Undefined;
+  set sensitivity(value: String) as set_sensitivity;
+}
+
+kind SignedEnum {
+  Negative = -1;
+  Zero = 0;
+  Positive = 1;
+}
+
+kind UnsignedEnum {
+  A = 0;
+  B = 1;
+  C = 2;
+}
+
+kind AutoIncrement {
+  Start = -2;
+  Next = -1;
+  Last = 0;
+}

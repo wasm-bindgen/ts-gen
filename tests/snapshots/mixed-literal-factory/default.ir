@@ -1,0 +1,78 @@
+ir 1;
+
+module "mixed-literal-factory" {
+  shape class BoolOrStrings {
+    new {};
+    get mode: ModeKind;
+    set mode(value: ModeKind) as set_mode;
+    set mode(value: bool) as set_mode_with_bool;
+  }
+
+  shape class NumberOrStrings {
+    new {};
+    get mode: NumberOrStringsModeKind;
+    set mode(value: NumberOrStringsModeKind) as set_mode;
+    set mode(value: f64) as set_mode_with_f64;
+  }
+
+  shape class Mixed {
+    new {};
+    get mode: MixedModeKind;
+    set mode(value: MixedModeKind) as set_mode;
+    set mode(value: f64) as set_mode_with_f64;
+    set mode(value: bool) as set_mode_with_bool;
+  }
+
+  shape class Level {
+    new {};
+    get level: LevelKind;
+    set level(value: LevelKind) as set_level;
+  }
+
+  shape class Open {
+    new {};
+    get mode: OpenModeKind;
+    set mode(value: "x") as set_mode;
+  }
+
+  shape class Optional {
+    new {};
+    get mode?: OptionalModeKind | Undefined;
+    set mode(value: OptionalModeKind) as set_mode;
+  }
+}
+
+kind ModeKind {
+  Bool = Boolean;
+  X = "x";
+  Y = "y";
+}
+
+kind NumberOrStringsModeKind {
+  F64 = Number;
+  X = "x";
+  Y = "y";
+}
+
+kind MixedModeKind {
+  X = "x";
+  Y = "y";
+  F64 = Number;
+  Bool = Boolean;
+}
+
+kind LevelKind {
+  N0 = 0;
+  N1 = 1;
+  N2 = 2;
+}
+
+kind OpenModeKind {
+  X = "x";
+  String = String;
+}
+
+kind OptionalModeKind {
+  X = "x";
+  Y = "y";
+}

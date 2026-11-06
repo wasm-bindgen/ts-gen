@@ -1,0 +1,29 @@
+ir 1;
+
+module "prelude-collision" {
+  class Result {
+    new(ok: bool) throws;
+    get ok: bool;
+  }
+
+  shape class Option {
+    new {};
+    get value: String;
+    set value(value: String) as set_value;
+  }
+
+  shape class Default {
+    new {};
+    get limit?: Number | Undefined;
+    set limit(value: f64) as set_limit;
+  }
+
+  class Vec {
+    get length: f64;
+    set length(value: f64) as set_length;
+  }
+
+  function take(r: Result, o: Option): Vec throws;
+  function take(r: Result, o: Option, d: Default): Vec throws as take_with_d;
+  function label(s: String): String throws;
+}

@@ -1,0 +1,27 @@
+ir 1;
+
+module "node:thing" {
+  class Server as _Server {
+    new(port: f64) throws;
+    stop() throws;
+  }
+  alias Server = _Server;
+}
+
+shape class Socket {
+  close(): Promise<Undefined>;
+}
+
+module "node:thing" {
+  function connect(address: String): Socket throws;
+  function serve(port: f64) throws;
+  function listenOn(port: f64) throws as listen_on;
+  function shutdown() throws;
+  get version: String;
+}
+
+function _listen(host: String) throws as listen;
+
+module "node:other" {
+  function _close(): bool throws as close;
+}

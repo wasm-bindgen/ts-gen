@@ -1,0 +1,67 @@
+ir 1;
+
+shape class Placeholder {
+  new {};
+  get certPresented: "0" as cert_presented;
+  set certPresented(value: "0") as set_cert_presented;
+  get certVerified: "NONE" as cert_verified;
+  set certVerified(value: "NONE") as set_cert_verified;
+  get certIssuerDN: "" as cert_issuer_dn;
+  set certIssuerDN(value: "") as set_cert_issuer_dn;
+  get verified?: Boolean | Undefined;
+  set verified(value: bool) as set_verified;
+}
+
+shape class Attachment {
+  new {};
+  get kind: "attachment";
+  set kind(value: "attachment") as set_kind;
+  get disposition: DispositionKind;
+  set disposition(value: DispositionKind) as set_disposition;
+  get filename: String;
+  set filename(value: String) as set_filename;
+}
+
+shape class Part {
+  new {};
+  get disposition: DispositionKind;
+  set disposition(value: DispositionKind) as set_disposition;
+  get contentId?: String | Undefined as content_id;
+  set contentId(value: String) as set_content_id;
+  get filename: String;
+  set filename(value: String) as set_filename;
+}
+
+shape class CappedAttachment {
+  new {};
+  get disposition: DispositionKind;
+  set disposition(value: DispositionKind) as set_disposition;
+  get a: AKind;
+  set a(value: String) as set_a;
+  set a(value: f64) as set_a_with_f64;
+  get b: AKind;
+  set b(value: String) as set_b;
+  set b(value: f64) as set_b_with_f64;
+  get c: AKind;
+  set c(value: String) as set_c;
+  set c(value: f64) as set_c_with_f64;
+  get d: AKind;
+  set d(value: String) as set_d;
+  set d(value: f64) as set_d_with_f64;
+  get e: AKind;
+  set e(value: String) as set_e;
+  set e(value: f64) as set_e_with_f64;
+  get f: AKind;
+  set f(value: String) as set_f;
+  set f(value: f64) as set_f_with_f64;
+}
+
+kind DispositionKind {
+  Inline = "inline";
+  Attachment = "attachment";
+}
+
+kind AKind {
+  String = String;
+  F64 = Number;
+}
