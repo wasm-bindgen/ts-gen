@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Function, JsString, Map, Nullable, Number, Object};
+use js_sys::{Function, JsString, Map, Number, Object};
 use wasm_bindgen::{JsCast, JsValue};
 
 use ts_gen_integration_tests::generic_defaults::{
@@ -49,7 +49,7 @@ async fn uninferrable_type_params_compile(
 ) -> Result<(), JsValue> {
     store.put("k", &JsString::from("v")).await?;
     let _: Option<JsString> = store.get::<JsString>("k").await?;
-    let _: Nullable<Number> = store.first::<Number>().await?;
+    let _: Option<Number> = store.first::<Number>().await?;
     let _: Object = store.json::<Object>().await?;
     let _: JsString = store
         .transaction::<JsString>(callback.unchecked_ref())

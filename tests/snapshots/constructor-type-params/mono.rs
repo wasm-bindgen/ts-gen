@@ -18,7 +18,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value<Value>(this: &Holder<Value>) -> Option<Value>
     where
-        Value: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<Value>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub fn reset<Value>(this: &Holder<Value>) -> Result<Holder<Value>, JsValue>;
 }

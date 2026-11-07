@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, JsString, Nullable};
+use js_sys::{Array, JsString};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::erased_type_params_mono::{
@@ -16,8 +16,8 @@ use ts_gen_integration_tests::erased_type_params_mono::{
 // No argument infers `list`'s own `Metadata`, so it erases to `unknown`.
 #[allow(dead_code)]
 async fn erased_type_params_mono_compile(store: &Store) -> Result<(), JsValue> {
-    let _: Nullable<String> = store.get("k").await?;
-    let _: Nullable<JsString> = store.get_js_string("k").await?;
+    let _: Option<String> = store.get("k").await?;
+    let _: Option<JsString> = store.get_js_string("k").await?;
     let result: ListResult = store.list().await?;
     let keys: Vec<ListKey> = result.keys();
     for key in &keys {

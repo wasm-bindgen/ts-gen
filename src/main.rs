@@ -130,6 +130,17 @@ struct Cli {
     /// generic imports instead of erasing their type parameters to JsValue.
     #[arg(long = "experimental-generic-mono")]
     experimental_generic_mono: bool,
+
+    /// Keep the exact carrier for each empty on reads.
+    ///
+    /// By default a return, awaited value or getter admitting `null`,
+    /// `undefined` or both reads as `Option<T>`: a read has no
+    /// representation to choose, and `Option<T>` reads either empty as
+    /// `None`. With this flag a read of `T | null` is `Nullable<T>` and
+    /// one of `T | null | undefined` is `Option<Nullable<T>>`, telling the
+    /// two empties apart. Writes are exact under either setting.
+    #[arg(long = "strict-nullable")]
+    strict_nullable: bool,
 }
 
 fn main() -> Result<()> {
@@ -203,6 +214,7 @@ fn main() -> Result<()> {
         .errors_as_error(cli.errors_as_error)
         .fallible(cli.fallible)
         .experimental_generic_mono(cli.experimental_generic_mono)
+        .strict_nullable(cli.strict_nullable)
         .exports(exports);
     if let Some(path) = &cli.error_type {
         options = options.error_type(path);

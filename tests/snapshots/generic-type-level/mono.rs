@@ -75,7 +75,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "readableType")]
     pub fn readable_type<I, O>(this: &Transformer<I, O>) -> Option<I>
     where
-        I: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<I>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "readableType")]
     pub fn set_readable_type<I, O>(this: &Transformer<I, O>, val: I)
     where
@@ -83,7 +83,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "writableType")]
     pub fn writable_type<I, O>(this: &Transformer<I, O>) -> Option<O>
     where
-        O: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<O>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "writableType")]
     pub fn set_writable_type<I, O>(this: &Transformer<I, O>, val: O)
     where
@@ -187,7 +187,8 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi + 'static;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise<Props, T>(
         this: &Storage<Props>,

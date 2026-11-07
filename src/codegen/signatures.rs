@@ -2427,16 +2427,15 @@ fn state_awaited_carrier_bound(f: &mut syn::ForeignItemFn) {
     let Some((param, carrier)) = carrier_param(ret, &params) else {
         return;
     };
-    let abi = match carrier {
-        "Option" => quote! { ::wasm_bindgen::convert::OptionFromWasmAbi },
-        _ => quote! { ::wasm_bindgen::convert::NullableFromWasmAbi },
+    let predicate: syn::WherePredicate = match carrier {
+        "Option" => syn::parse_quote! { #ret: ::wasm_bindgen::convert::FromWasmAbi },
+        _ => syn::parse_quote! { #param: ::wasm_bindgen::convert::NullableFromWasmAbi },
     };
-    let param = param.clone();
     f.sig
         .generics
         .make_where_clause()
         .predicates
-        .push(syn::parse_quote! { #param: #abi });
+        .push(predicate);
 }
 
 fn has_wasm_bindgen_flag(attrs: &[syn::Attribute], flag: &str) -> bool {
@@ -2531,18 +2530,16 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn) {
     };
     let into = quote! { ::wasm_bindgen::convert::IntoWasmAbi };
     let from = quote! { ::wasm_bindgen::convert::FromWasmAbi };
-    // `Option<T>` has its ABI exactly when `T: Option{Into,From}WasmAbi`,
-    // and `Nullable<T>` (alone or under `Option`) when
+    // `Nullable<T>` (alone or under `Option`) has its ABI exactly when
     // `T: Nullable{Into,From}WasmAbi`, which is the form a generic caller
-    // writes.
+    // writes. `Option<T>` is bounded whole: the natives whose `Option` has
+    // an ABI of its own (`f64`, `i64`) are not `Option{Into,From}WasmAbi`.
     let bounded = |ty: &syn::Type, abi: &TokenStream| -> (TokenStream, TokenStream) {
-        if let Some((inner, carrier)) = carrier_param(ty, &params) {
-            let into = abi.to_string().contains("Into");
-            let abi = match (carrier, into) {
-                ("Option", true) => quote! { ::wasm_bindgen::convert::OptionIntoWasmAbi },
-                ("Option", false) => quote! { ::wasm_bindgen::convert::OptionFromWasmAbi },
-                (_, true) => quote! { ::wasm_bindgen::convert::NullableIntoWasmAbi },
-                (_, false) => quote! { ::wasm_bindgen::convert::NullableFromWasmAbi },
+        if let Some((inner, "Nullable")) = carrier_param(ty, &params) {
+            let abi = if abi.to_string().contains("Into") {
+                quote! { ::wasm_bindgen::convert::NullableIntoWasmAbi }
+            } else {
+                quote! { ::wasm_bindgen::convert::NullableFromWasmAbi }
             };
             return (inner.to_token_stream(), abi);
         }
@@ -2600,9 +2597,13 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn) {
             match abi_shape(ret, &params) {
                 AbiShape::Dependent => {
                     let (ty, abi) = bounded(ret, &from);
-                    bound(ty.clone(), abi);
+                    bound(ty, abi);
                     if is_async {
-                        bound(ty, quote! { 'static });
+                        let owner = match carrier_param(ret, &params) {
+                            Some((inner, _)) => inner.to_token_stream(),
+                            None => ret.to_token_stream(),
+                        };
+                        bound(owner, quote! { 'static });
                     }
                 }
                 AbiShape::Imported if is_async => {
@@ -2760,9 +2761,9 @@ mod tests {
             wheres,
             [
                 "where U : :: wasm_bindgen :: convert :: IntoWasmAbi , T : 'static",
-                "where T : :: wasm_bindgen :: convert :: RefIntoWasmAbi + \
-                 :: wasm_bindgen :: convert :: OptionFromWasmAbi , \
-                 Vec < T > : :: wasm_bindgen :: convert :: IntoWasmAbi",
+                "where T : :: wasm_bindgen :: convert :: RefIntoWasmAbi , \
+                 Vec < T > : :: wasm_bindgen :: convert :: IntoWasmAbi , \
+                 Option < T > : :: wasm_bindgen :: convert :: FromWasmAbi",
                 "",
                 "where T : :: wasm_bindgen :: convert :: NullableIntoWasmAbi + \
                  :: wasm_bindgen :: convert :: NullableFromWasmAbi , \

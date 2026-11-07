@@ -15,7 +15,7 @@ declare class State {
   /** Overloads: each expansion gets its own `_promise`. */
   fetch(url: string): Promise<Response>;
   fetch(url: string, init: RequestInit): Promise<Response>;
-  /** Awaited: `Nullable<String>`; the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`. */
+  /** Awaited: `Option<String>` (`Nullable<String>` under `--strict-nullable`); the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`. */
   get(key: string): Promise<string | null>;
   /** A `null` argument arm gets its own `_promise` form too. */
   put(key: string, value: string | null): Promise<void>;

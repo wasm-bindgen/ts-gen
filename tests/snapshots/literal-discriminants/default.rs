@@ -132,7 +132,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Feedback;
     #[wasm_bindgen(method, getter)]
-    pub fn value(this: &Feedback) -> Nullable<ValueKind>;
+    pub fn value(this: &Feedback) -> Option<ValueKind>;
 }
 impl Feedback {
     #[allow(clippy::new_without_default)]

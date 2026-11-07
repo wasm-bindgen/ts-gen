@@ -1,10 +1,9 @@
 #![cfg(target_arch = "wasm32")]
 
 // A property that can be absent reads as `Option` when its type erases to
-// `JsValue`: an absent field is `None`, and a written `null` is the
-// `Nullable` under it. `any` and `unknown` hold both empties in-band and
-// stay a bare `JsValue`, so a stored `null` is not lost.
-use js_sys::Nullable;
+// `JsValue`: an absent field is `None`, and so is a written `null`, as for
+// any other read. `any` and `unknown` hold both empties in-band and stay a
+// bare `JsValue`, so a stored `null` is not lost.
 use wasm_bindgen::JsValue;
 use wasm_bindgen_test::*;
 
@@ -30,9 +29,9 @@ fn top_type_keeps_both_empties_in_band() {
 }
 
 #[wasm_bindgen_test]
-fn written_null_reads_as_nullable() {
+fn written_null_reads_as_none() {
     let settings = settings("null");
-    assert_eq!(settings.cleared(), Some(Nullable::Null));
+    assert_eq!(settings.cleared(), None);
     assert_eq!(settings.value(), JsValue::NULL);
 }
 
@@ -42,7 +41,7 @@ fn set_fields_read_as_some() {
     assert_eq!(settings.data(), JsValue::from(1));
     assert_eq!(settings.detail(), JsValue::from("detail"));
     assert_eq!(settings.stamp(), Some(JsValue::from(2)));
-    assert_eq!(settings.cleared(), Some(Nullable::Value(JsValue::from(3))));
+    assert_eq!(settings.cleared(), Some(JsValue::from(3)));
     assert_eq!(settings.maybe(), Some(JsValue::TRUE));
 }
 
@@ -59,6 +58,6 @@ fn built_fields_read_back() {
 #[wasm_bindgen_test]
 fn static_getters_read_as_option() {
     assert_eq!(Registry::missing(), None);
-    assert_eq!(Registry::cleared(), Some(Nullable::Null));
+    assert_eq!(Registry::cleared(), None);
     assert_eq!(Registry::anything(), JsValue::NULL);
 }

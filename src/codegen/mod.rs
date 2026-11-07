@@ -92,6 +92,11 @@ pub struct GenerateOptions {
     /// `JsGeneric` bounds and cross the ABI at their concrete Rust types.
     experimental_generic_mono: bool,
 
+    /// Keep the exact carrier for each empty on reads (`Nullable<T>` for a
+    /// `T | null` return, `Option<Nullable<T>>` for `T | null | undefined`)
+    /// instead of folding every empty-admitting read into `Option<T>`.
+    strict_nullable: bool,
+
     /// The output surface — the authoritative list of inputs (files /
     /// modules) whose declarations are emitted. The `--input` set
     /// still defines the *type universe* for resolution; `exports`
@@ -147,6 +152,13 @@ impl GenerateOptions {
     /// Configure wasm-bindgen's experimental per-monomorphization codegen.
     pub fn experimental_generic_mono(mut self, enabled: bool) -> Self {
         self.experimental_generic_mono = enabled;
+        self
+    }
+
+    /// Configure whether reads keep the exact carrier for each empty
+    /// (`Nullable<T>` for `T | null`) rather than reading as `Option<T>`.
+    pub fn strict_nullable(mut self, enabled: bool) -> Self {
+        self.strict_nullable = enabled;
         self
     }
 

@@ -59,14 +59,14 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `DOMException` — when the store is closed"]
     #[wasm_bindgen(method)]
-    pub fn get(this: &Store, key: &str) -> Nullable<String>;
+    pub fn get(this: &Store, key: &str) -> Option<String>;
     #[doc = " A single type routes through the enum too."]
     #[doc = ""]
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `DOMException` — when the store is closed"]
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(this: &Store, key: &str) -> Result<Nullable<String>, JsException>;
+    pub fn try_get(this: &Store, key: &str) -> Result<Option<String>, JsException>;
     #[doc = " Multiple `@throws` lines aggregate; a user subclass sorts before its"]
     #[doc = " parents."]
     #[doc = ""]

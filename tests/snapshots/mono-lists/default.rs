@@ -197,7 +197,7 @@ extern "C" {
 #[wasm_bindgen(module = "mono-lists")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchMaybeTags")]
-    pub async fn fetch_maybe_tags() -> Result<Nullable<Vec<String>>, JsValue>;
+    pub async fn fetch_maybe_tags() -> Result<Option<Vec<String>>, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists")]
 extern "C" {

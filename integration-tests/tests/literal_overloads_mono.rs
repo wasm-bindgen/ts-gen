@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Nullable, Object, Promise, Uint8Array};
+use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Object, Promise, Uint8Array};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads_mono::{
@@ -20,13 +20,13 @@ async fn mono_arms_compile(
     headers: &Headers,
     crypto: &SubtleCrypto,
 ) -> Result<(), JsValue> {
-    let _: Nullable<String> = kv.get("k").await?;
-    let _: Nullable<JsString> = kv.get_js_string("k").await?;
-    let _: Nullable<String> = kv.get_text("k").await?;
-    let _: Nullable<JsString> = kv.get_text_js_string("k").await?;
+    let _: Option<String> = kv.get("k").await?;
+    let _: Option<JsString> = kv.get_js_string("k").await?;
+    let _: Option<String> = kv.get_text("k").await?;
+    let _: Option<JsString> = kv.get_text_js_string("k").await?;
     let _: JsValue = kv.get_json("k").await?;
-    let _: Nullable<ArrayBuffer> = kv.get_array_buffer("k").await?;
-    let _: Nullable<Uint8Array> = kv.get_stream("k").await?;
+    let _: Option<ArrayBuffer> = kv.get_array_buffer("k").await?;
+    let _: Option<Uint8Array> = kv.get_stream("k").await?;
     let _: Map<JsString, JsNullable<JsString>> = kv.get_text_with_slice(&["a"]).await?;
     let _: Map<JsString, JsValue> = kv.get_json_with_slice(&["a"]).await?;
     let _: bool = kv.mode_fast();
@@ -43,9 +43,9 @@ async fn mono_arms_compile(
 
 #[allow(dead_code)]
 async fn generic_arms_compile(store: &KVStore<JsString>) -> Result<(), JsValue> {
-    let _: Nullable<String> = store.get_text(JsString::from("k")).await?;
-    let _: Nullable<JsString> = store.get_text_js_string(JsString::from("k")).await?;
-    let _: Nullable<Object> = store.get_json::<Object>(JsString::from("k")).await?;
+    let _: Option<String> = store.get_text(JsString::from("k")).await?;
+    let _: Option<JsString> = store.get_text_js_string(JsString::from("k")).await?;
+    let _: Option<Object> = store.get_json::<Object>(JsString::from("k")).await?;
     Ok(())
 }
 
@@ -98,9 +98,9 @@ async fn null_arm_forms_compile(
 ) -> Result<(), JsValue> {
     let _: String = picker.name_a_with_null();
     let _: JsString = picker.name_b_with_null_js_string();
-    let _: Nullable<String> = picker.load_b_with_null().await?;
-    let _: Nullable<JsString> = picker.load_a_with_null_js_string().await?;
-    let _: Promise<Nullable<JsString>> = picker.load_a_with_null_promise();
+    let _: Option<String> = picker.load_b_with_null().await?;
+    let _: Option<JsString> = picker.load_a_with_null_js_string().await?;
+    let _: Promise<Option<JsString>> = picker.load_a_with_null_promise();
     store.put_a(JsString::from("k"), "v");
     store.put_b_with_null(JsString::from("k"));
     let _: Boxed<Object> = Boxed::from_a(obj.clone());

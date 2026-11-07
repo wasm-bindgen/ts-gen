@@ -155,24 +155,24 @@ extern "C" {
     pub async fn get(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<BucketObject>, JsValue>;
+    ) -> Result<Option<BucketObject>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Nullable<BucketObject>>;
+    ) -> Promise<Option<BucketObject>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_options(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
-    ) -> Result<Nullable<BucketObject>, JsValue>;
+    ) -> Result<Option<BucketObject>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_options_promise(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
-    ) -> Promise<Nullable<BucketObject>>;
+    ) -> Promise<Option<BucketObject>>;
     #[wasm_bindgen(method, catch)]
     pub fn kind(this: &Bucket) -> Result<BucketKind, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setKind")]

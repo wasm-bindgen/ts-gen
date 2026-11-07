@@ -43,24 +43,24 @@ extern "C" {
         url: impl ::wasm_bindgen::JsStringLike,
         init: &RequestInit,
     ) -> Promise<Response>;
-    #[doc = " Awaited: `Nullable<String>`; the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
+    #[doc = " Awaited: `Option<String>` (`Nullable<String>` under `--strict-nullable`); the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
     #[wasm_bindgen(method, catch)]
     pub async fn get(
         this: &State,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<String>, JsValue>;
-    #[doc = " Awaited: `Nullable<String>`; the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
+    ) -> Result<Option<String>, JsValue>;
+    #[doc = " Awaited: `Option<String>` (`Nullable<String>` under `--strict-nullable`); the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_js_string(
         this: &State,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<JsString>, JsValue>;
-    #[doc = " Awaited: `Nullable<String>`; the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
+    ) -> Result<Option<JsString>, JsValue>;
+    #[doc = " Awaited: `Option<String>` (`Nullable<String>` under `--strict-nullable`); the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(
         this: &State,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Nullable<JsString>>;
+    ) -> Promise<Option<JsString>>;
     #[doc = " A `null` argument arm gets its own `_promise` form too."]
     #[wasm_bindgen(method, catch)]
     pub async fn put(

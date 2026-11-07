@@ -253,7 +253,7 @@ pub mod shadow {
         pub fn wrapped(
             a: &[super::Pair<super::Inner, super::Inner>],
             b: &Promise<super::Pair<super::Inner, super::Inner>>,
-        ) -> Result<Nullable<super::Pair<super::Inner, super::Inner>>, JsValue>;
+        ) -> Result<Option<super::Pair<super::Inner, super::Inner>>, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {

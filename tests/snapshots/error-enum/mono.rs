@@ -61,7 +61,7 @@ extern "C" {
     pub fn get(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<String>, JsException>;
+    ) -> Result<Option<String>, JsException>;
     #[doc = " A single type routes through the enum too."]
     #[doc = ""]
     #[doc = " ## Errors"]
@@ -71,7 +71,7 @@ extern "C" {
     pub fn get_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<JsString>, JsException>;
+    ) -> Result<Option<JsString>, JsException>;
     #[doc = " Multiple `@throws` lines aggregate; a user subclass sorts before its"]
     #[doc = " parents."]
     #[doc = ""]

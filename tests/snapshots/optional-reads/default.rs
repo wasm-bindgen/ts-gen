@@ -42,7 +42,7 @@ extern "C" {
     pub fn set_stamp(this: &Settings, val: &JsValue);
     #[doc = " Erased, `null`, or absent."]
     #[wasm_bindgen(method, getter)]
-    pub fn cleared(this: &Settings) -> Option<Nullable<JsValue>>;
+    pub fn cleared(this: &Settings) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cleared(this: &Settings, val: &JsValue);
     #[wasm_bindgen(method, setter, js_name = "cleared")]
@@ -120,7 +120,7 @@ extern "C" {
     pub fn set_missing(val: &JsValue);
     #[doc = " Present, holding `null`."]
     # [wasm_bindgen (static_method_of = Registry , getter)]
-    pub fn cleared() -> Option<Nullable<JsValue>>;
+    pub fn cleared() -> Option<JsValue>;
     # [wasm_bindgen (static_method_of = Registry , setter)]
     pub fn set_cleared(val: &JsValue);
     # [wasm_bindgen (static_method_of = Registry , setter , js_name = "cleared")]

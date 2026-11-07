@@ -18,7 +18,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn metadata<Metadata>(this: &ListKey<Metadata>) -> Option<Metadata>
     where
-        Metadata: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        Option<Metadata>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata<Metadata>(this: &ListKey<Metadata>, val: Metadata)
     where
@@ -89,17 +89,17 @@ extern "C" {
     pub async fn get(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<String>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<JsString>, JsValue>;
+    ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Nullable<JsString>>;
+    ) -> Promise<Option<JsString>>;
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &Store) -> Result<ListResult, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]

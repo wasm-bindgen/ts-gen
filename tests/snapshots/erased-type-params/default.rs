@@ -78,7 +78,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &Store, key: &str) -> Result<Nullable<String>, JsValue>;
+    pub async fn get(this: &Store, key: &str) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &Store, key: &str) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch)]

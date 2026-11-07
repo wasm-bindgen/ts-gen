@@ -39,10 +39,10 @@ extern "C" {
         url: &str,
         init: &RequestInit,
     ) -> Promise<Response>;
-    #[doc = " Awaited: `Nullable<String>`; the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
+    #[doc = " Awaited: `Option<String>` (`Nullable<String>` under `--strict-nullable`); the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &State, key: &str) -> Result<Nullable<String>, JsValue>;
-    #[doc = " Awaited: `Nullable<String>`; the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
+    pub async fn get(this: &State, key: &str) -> Result<Option<String>, JsValue>;
+    #[doc = " Awaited: `Option<String>` (`Nullable<String>` under `--strict-nullable`); the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &State, key: &str) -> Promise<JsNullable<JsString>>;
     #[doc = " A `null` argument arm gets its own `_promise` form too."]

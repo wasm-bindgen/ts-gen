@@ -316,7 +316,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &LinkedList, val: &JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn next(this: &LinkedList) -> Nullable<LinkedList>;
+    pub fn next(this: &LinkedList) -> Option<LinkedList>;
     #[wasm_bindgen(method, setter)]
     pub fn set_next(this: &LinkedList, val: &LinkedList);
     #[wasm_bindgen(method, setter, js_name = "next")]
@@ -497,12 +497,12 @@ extern "C" {
     pub fn get_item(
         this: &Storage,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<String>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getItem")]
     pub fn get_item_js_string(
         this: &Storage,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<JsString>, JsValue>;
+    ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setItem")]
     pub fn set_item(
         this: &Storage,
@@ -528,12 +528,12 @@ extern "C" {
     pub async fn get(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<Map<JsString, Array<JsString>>>, JsValue>;
+    ) -> Result<Option<Map<JsString, Array<JsString>>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Nullable<Map<JsString, Array<JsString>>>>;
+    ) -> Promise<Option<Map<JsString, Array<JsString>>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn set(
         this: &Cache,
@@ -565,7 +565,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &FetchOptions, val: &Object<JsString>);
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &FetchOptions) -> Option<Nullable<BodyKind>>;
+    pub fn body(this: &FetchOptions) -> Option<BodyKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body(this: &FetchOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "body")]

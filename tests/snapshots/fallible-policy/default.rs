@@ -15,10 +15,10 @@ extern "C" {
     pub fn new_with_init(init: &Object<JsString>) -> Result<Headers, crate::Error>;
     #[doc = " Sync method — `Result<Nullable<String>, crate::Error>`, no `try_get`."]
     #[wasm_bindgen(method)]
-    pub fn get(this: &Headers, name: &str) -> Nullable<String>;
+    pub fn get(this: &Headers, name: &str) -> Option<String>;
     #[doc = " Sync method — `Result<Nullable<String>, crate::Error>`, no `try_get`."]
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(this: &Headers, name: &str) -> Result<Nullable<String>, crate::Error>;
+    pub fn try_get(this: &Headers, name: &str) -> Result<Option<String>, crate::Error>;
     #[doc = " Sync void method with a typed throws — `Result<(), TypeError>`."]
     #[doc = ""]
     #[doc = " ## Errors"]

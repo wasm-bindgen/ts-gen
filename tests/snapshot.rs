@@ -1,8 +1,9 @@
 //! Snapshot tests for ts-gen code generation.
 //!
 //! Every `.d.ts` file in `tests/fixtures/` is automatically discovered and run
-//! through the `ts-gen` CLI binary once per entry in [`CONFIGS`], then each
-//! generated Rust output is compared against a blessed snapshot in
+//! through the `ts-gen` CLI binary once per entry in [`CONFIGS`], plus once
+//! per entry in [`FEATURE_CONFIGS`] naming the fixture, then each generated
+//! Rust output is compared against a blessed snapshot in
 //! `tests/snapshots/<name>/<config>.rs`. Keeping the configurations side by
 //! side in one directory makes the effect of a flag on a fixture a plain
 //! `diff` between siblings.
@@ -28,6 +29,35 @@ const CONFIGS: &[(&str, &[&str])] = &[
     ("default", &[]),
     ("mono", &["--experimental-generic-mono", "--fallible"]),
 ];
+
+/// Configurations rendered only for the fixtures named with them, as
+/// `(snapshot file stem, extra CLI args, fixture stems)`. A flag whose
+/// effect is confined to one feature is snapshotted on that feature's
+/// fixtures rather than on every fixture.
+const FEATURE_CONFIGS: &[(&str, &[&str], &[&str])] = &[(
+    "strict",
+    &["--strict-nullable"],
+    &[
+        "node-nullable",
+        "nullability",
+        "optional-reads",
+        "promise-companion",
+    ],
+)];
+
+/// The configurations `fixture_stem` is rendered under.
+fn configs_for(fixture_stem: &str) -> Vec<(&'static str, &'static [&'static str])> {
+    CONFIGS
+        .iter()
+        .copied()
+        .chain(
+            FEATURE_CONFIGS
+                .iter()
+                .filter(|(_, _, fixtures)| fixtures.contains(&fixture_stem))
+                .map(|(name, args, _)| (*name, *args)),
+        )
+        .collect()
+}
 
 /// Root of the ts-gen crate (where Cargo.toml lives).
 fn crate_root() -> PathBuf {
@@ -161,7 +191,8 @@ fn snapshot_test(fixture_name: &str) {
 
     // Collect any extra CLI flags from directive comments
     let extra_args = collect_directive_args(&fixture);
-    for (_, config_args) in CONFIGS {
+    let configs = configs_for(&base_name);
+    for (_, config_args) in &configs {
         for flag in *config_args {
             assert!(
                 !extra_args.iter().any(|a| a == flag),
@@ -173,7 +204,7 @@ fn snapshot_test(fixture_name: &str) {
 
     let out_dir = TempDir::new(&format!("snapshot-{base_name}"));
 
-    for (config_name, config_args) in CONFIGS {
+    for (config_name, config_args) in &configs {
         let out_file = out_dir.0.join(format!("{config_name}.rs"));
 
         // Invoke the CLI binary: ts-gen --input <fixture> --output <out_file> [extra_args...]
@@ -211,14 +242,11 @@ fn snapshot_test(fixture_name: &str) {
 }
 
 /// Every entry under `tests/snapshots/` must be the directory of a current
-/// fixture holding exactly one file per configuration, so a renamed fixture or
-/// a dropped configuration can't leave stale snapshots behind.
+/// fixture holding exactly one file per configuration it is rendered under,
+/// so a renamed fixture or a dropped configuration can't leave stale
+/// snapshots behind.
 fn check_stale_snapshots(fixtures: &[String]) -> Vec<String> {
     let snapshots_dir = crate_root().join("tests/snapshots");
-    let expected_files: Vec<String> = CONFIGS
-        .iter()
-        .map(|(name, _)| format!("{name}.rs"))
-        .collect();
     let mut stale = Vec::new();
     for entry in std::fs::read_dir(&snapshots_dir)
         .into_iter()
@@ -231,6 +259,10 @@ fn check_stale_snapshots(fixtures: &[String]) -> Vec<String> {
             stale.push(path.display().to_string());
             continue;
         }
+        let expected_files: Vec<String> = configs_for(&name)
+            .iter()
+            .map(|(config, _)| format!("{config}.rs"))
+            .collect();
         for file in std::fs::read_dir(&path).into_iter().flatten().flatten() {
             if !expected_files.contains(&file.file_name().to_string_lossy().to_string()) {
                 stale.push(file.path().display().to_string());
@@ -268,6 +300,14 @@ fn snapshots() {
         "No .d.ts fixtures found in {}",
         fixtures_dir.display()
     );
+    for (config, _, stems) in FEATURE_CONFIGS {
+        for stem in *stems {
+            assert!(
+                fixtures.contains(&format!("{stem}.d.ts")),
+                "`{config}` configuration names a missing fixture `{stem}`"
+            );
+        }
+    }
 
     let mut failures = Vec::new();
 

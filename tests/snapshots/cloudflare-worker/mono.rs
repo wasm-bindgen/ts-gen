@@ -39,12 +39,12 @@ extern "C" {
     pub fn get(
         this: &Headers,
         name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<String>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_js_string(
         this: &Headers,
         name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<JsString>, JsValue>;
+    ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn has(this: &Headers, name: impl ::wasm_bindgen::JsStringLike) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -80,7 +80,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn headers(this: &Request) -> Headers;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &Request) -> Nullable<ReadableStream>;
+    pub fn body(this: &Request) -> Option<ReadableStream>;
     #[wasm_bindgen(method, getter, js_name = "bodyUsed")]
     pub fn body_used(this: &Request) -> bool;
     #[wasm_bindgen(method, getter)]
@@ -192,7 +192,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_slice(this: &RequestInit, val: &[ArrayTuple<(JsString, JsString)>]);
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &RequestInit) -> Option<Nullable<BodyInitKind>>;
+    pub fn body(this: &RequestInit) -> Option<BodyInitKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body(this: &RequestInit, val: impl BodyInit);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -419,7 +419,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn headers(this: &Response) -> Headers;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &Response) -> Nullable<ReadableStream>;
+    pub fn body(this: &Response) -> Option<ReadableStream>;
     #[wasm_bindgen(method, getter, js_name = "bodyUsed")]
     pub fn body_used(this: &Response) -> bool;
     #[wasm_bindgen(method, getter)]

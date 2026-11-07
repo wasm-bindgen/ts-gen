@@ -116,7 +116,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "url")]
     pub fn url_js_string(this: &Response) -> JsString;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &Response) -> Nullable<ReadableStream>;
+    pub fn body(this: &Response) -> Option<ReadableStream>;
 }
 impl Response {
     pub fn new_with_null() -> Result<Response, JsValue> {
@@ -132,7 +132,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Body;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &Body) -> Nullable<ReadableStream>;
+    pub fn body(this: &Body) -> Option<ReadableStream>;
     #[wasm_bindgen(method, getter, js_name = "bodyUsed")]
     pub fn body_used(this: &Body) -> bool;
     #[doc = " Returns the body as an ArrayBuffer."]
