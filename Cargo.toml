@@ -2,6 +2,7 @@
 members = [
     "abi",
     "bridge",
+    "generators/zena",
     "integration-tests",
 ]
 exclude = [
@@ -73,3 +74,4 @@ walkdir = { version = "2", optional = true }
 
 [dev-dependencies]
 similar = "2"
+wasmparser = "0.263"

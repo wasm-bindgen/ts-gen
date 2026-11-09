@@ -44,7 +44,7 @@ ts-gen --input worker.d.ts --ir worker.ir
 ts-gen-bridge generate worker.ir worker.wasm --profile all-gc -o out
 ```
 
-A Kotlin module links first:
+A Kotlin module links first ([examples/kotlin-worker](../examples/kotlin-worker)):
 
 ```sh
 ts-gen-bridge link worker.wasm bindings/links.tsv -o out/worker.wasm

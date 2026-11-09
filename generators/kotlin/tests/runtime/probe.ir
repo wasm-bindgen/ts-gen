@@ -1,0 +1,38 @@
+ir 1;
+
+enum ProbeError extends err {
+  @js(RangeError) Busy(Str);
+}
+
+enum Mode {
+  @js("off") Off;
+  Count(u32);
+}
+
+namespace ext {
+  none(): Str?;
+  apply(f: fn(u32) -> u32, x: u32): u32;
+  seen(v: Str?);
+  seenNull(v: @js(null) Str?);
+}
+
+export class Counter {
+  new();
+  get n(): u32;
+}
+
+export namespace probe {
+  split(n: u32): (u32, bool);
+  check(n: u32): u32 throws ProbeError;
+  settle(ok: bool): future<str, ProbeError>;
+  absent(v: Str?): bool;
+  imported(): bool;
+  counter(): Any;
+  count(v: Any): u32;
+  mode(n: u32): Any;
+  modeOf(v: Any): u32;
+  adder(): Any;
+  callBoxed(f: Any, x: u32): u32;
+  none(): Str?;
+  writeNones();
+}
