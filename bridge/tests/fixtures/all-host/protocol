@@ -1,0 +1,7 @@
+tw:arr len
+tw:arr get<u32>
+tw:destroy fn(u32)->str
+tw:call fn(u32)->u32
+tw:box Counter
+tw:unbox Counter
+export tw:call:fn(u32)->str

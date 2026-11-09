@@ -1,0 +1,6 @@
+tw:call fn(...arr<f64>)
+tw:call fn(str,...arr<f64>)
+export tw:call:fn(...arr<f64>)
+export tw:call:fn(str,...arr<f64>)
+export tw:drop:fn(...arr<f64>)
+export tw:drop:fn(str,...arr<f64>)

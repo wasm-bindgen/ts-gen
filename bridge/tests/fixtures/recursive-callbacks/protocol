@@ -1,0 +1,3 @@
+tw:call fn(Next<f64>,f64)->f64
+export tw:call:fn(Next<f64>,f64)->f64
+export tw:drop:fn(Next<f64>,f64)->f64

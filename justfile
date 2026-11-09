@@ -19,9 +19,15 @@ fmt-check:
 clippy:
     cargo +stable clippy --no-deps --workspace --all-features --exclude ts-gen-integration-tests -- -D warnings
 
-# Run the unit and snapshot tests
+# Run the unit, snapshot and bridge runtime tests (Node 26)
 test *ARGS="":
-    RUST_BACKTRACE=1 cargo +stable test -p ts-gen -p ts-gen-abi {{ARGS}}
+    RUST_BACKTRACE=1 cargo +stable test -p ts-gen -p ts-gen-abi -p ts-gen-bridge {{ARGS}}
+
+# Run the bridge microbenchmarks (Node 26; BENCH=<dir> filters) and print a ns/op table
+bench:
+    rm -f target/tmp/bench/results.jsonl
+    cargo +stable test -q -p ts-gen-bridge --test bridge -- --ignored bench --nocapture
+    python3 bridge/benches/table.py target/tmp/bench/results.jsonl
 
 # List, per fixture and configuration, the types the IR zip reads from the parse, into target/zip-diffs
 zip-diffs:

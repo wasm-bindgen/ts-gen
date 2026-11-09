@@ -1,0 +1,13 @@
+tw:tag Oops
+tw:box str
+tw:unbox str
+tw:box u8
+tw:unbox u8
+tw:box f64
+tw:unbox f64
+tw:call fn(i32)->i32
+export tw:call:fn(i32)->i32
+tw:future poll
+tw:future take<u32>
+tw:future drop
+export tw:future/wake

@@ -1,0 +1,3 @@
+tw:instanceof Absent
+tw:instanceof Present
+tw:instanceof ns.Deep

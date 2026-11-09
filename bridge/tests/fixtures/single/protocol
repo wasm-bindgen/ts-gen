@@ -1,0 +1,5 @@
+tw:err KvError
+tw:err set:KvError
+tw:call fn(u32)->(u32,str)
+tw:future new
+export tw:call:fn(u32)->(u32,str)
