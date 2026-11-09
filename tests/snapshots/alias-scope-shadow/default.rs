@@ -226,11 +226,11 @@ pub mod shadow {
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(js_namespace = "Shadow", js_name = "either")]
-        fn __either(a: super::InnerOrName, b: super::Chained) -> super::InnerOrName;
+        fn __either(a: super::InnerOrName, b: super::InnerOrName) -> super::InnerOrName;
     }
     pub fn either(
         a: impl ::core::convert::Into<super::InnerOrName>,
-        b: impl ::core::convert::Into<super::Chained>,
+        b: impl ::core::convert::Into<super::InnerOrName>,
     ) -> super::InnerOrName {
         __either(a.into(), b.into())
     }
@@ -239,12 +239,12 @@ pub mod shadow {
         #[wasm_bindgen(catch, js_name = "either", js_namespace = "Shadow")]
         fn __try_either(
             a: super::InnerOrName,
-            b: super::Chained,
+            b: super::InnerOrName,
         ) -> Result<super::InnerOrName, JsValue>;
     }
     pub fn try_either(
         a: impl ::core::convert::Into<super::InnerOrName>,
-        b: impl ::core::convert::Into<super::Chained>,
+        b: impl ::core::convert::Into<super::InnerOrName>,
     ) -> Result<super::InnerOrName, JsValue> {
         __try_either(a.into(), b.into())
     }
@@ -304,12 +304,7 @@ pub mod shadow {
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "Shadow")]
-        pub async fn next() -> Result<super::Mode, JsValue>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(js_name = "next", js_namespace = "Shadow")]
-        pub fn next_promise() -> Promise<JsString>;
+        pub fn next() -> Promise<super::Mode>;
     }
 }
 #[wasm_bindgen(private)]

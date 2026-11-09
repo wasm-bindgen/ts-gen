@@ -6,9 +6,8 @@
 // aliases reads as one flat enum: `ZonedLike | DayLike` has `Zoned` and
 // `string` once, and its two dictionaries share the `Object` arm, which
 // takes what the class and string arms don't. `Fields`, two dictionaries,
-// is an argument enum, and reads as `JsValue`.
+// is an argument enum, and reads as the `Object` both are.
 use js_sys::{JsString, Object};
-use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::union_alias_reads::*;
@@ -17,12 +16,12 @@ fn keys(object: &Object) -> String {
     Object::keys(object).join(",").into()
 }
 
-fn show(value: RelativeToKind) -> String {
+fn show(value: ZonedLikeOrDayLike) -> String {
     match value {
-        RelativeToKind::Zoned(zoned) => format!("zoned:{}", zoned.zone()),
-        RelativeToKind::String(s) => format!("string:{s}"),
-        RelativeToKind::Day(day) => format!("day:{}", day.day()),
-        RelativeToKind::Object(object) => format!("object:{}", keys(&object)),
+        ZonedLikeOrDayLike::Zoned(zoned) => format!("zoned:{}", zoned.zone()),
+        ZonedLikeOrDayLike::String(s) => format!("string:{s}"),
+        ZonedLikeOrDayLike::Day(day) => format!("day:{}", day.day()),
+        ZonedLikeOrDayLike::Object(object) => format!("object:{}", keys(&object)),
     }
 }
 
@@ -82,9 +81,9 @@ fn read_passes_straight_back() {
 }
 
 #[wasm_bindgen_test]
-fn dictionaries_alone_read_as_js_value_and_write_as_their_enum() {
-    let fields: JsValue = options("missing").fields();
-    assert_eq!(keys(fields.unchecked_ref()), "day");
+fn dictionaries_alone_read_as_object_and_write_as_their_enum() {
+    let fields: Object = options("missing").fields();
+    assert_eq!(keys(&fields), "day");
     assert_eq!(describe_fields(ZonedFields::new("UTC")), "zone:UTC");
     assert_eq!(describe_fields(&DayFields::new(4.0)), "day:4");
 }
@@ -123,7 +122,7 @@ fn from_and_equals_take_every_arm() {
 
     // The optional trailing options still omit or pass.
     let options = FromOptions::builder()
-        .overflow(OverflowKind::Reject)
+        .overflow(FromOptionsOverflowKind::Reject)
         .build();
     let _ = Day::from_with_options("1", &options);
     assert_eq!(day.until(&fields), 0.0);
@@ -141,11 +140,10 @@ fn primitive_arms_convert_from_their_rust_values() {
 #[wasm_bindgen_test]
 fn wrappers_compose_with_literals_nulls_options_and_async() {
     let day = Day::new(10.0).unwrap();
-    assert_eq!(day.step_next("1"), "next:string");
-    assert_eq!(day.step_previous(&day), "previous:day");
+    assert_eq!(day.step(DayDirectionKind::Next, "1"), "next:string");
+    assert_eq!(day.step(DayDirectionKind::Previous, &day), "previous:day");
     assert_eq!(day.pick(), "none");
     assert_eq!(day.pick_with_other(&day), "day");
-    assert_eq!(day.pick_with_null(), "null");
     let _: MaybeDay = MaybeDay::from("1");
     assert_eq!(day.between(None, "1"), "undefined..string");
     assert_eq!(

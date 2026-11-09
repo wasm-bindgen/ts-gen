@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Promise, RangeError, Undefined};
+use js_sys::{Promise, RangeError};
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_test::*;
 
@@ -68,10 +68,10 @@ fn methods_and_statics_bind_only_the_catching_form() {
 async fn promise_never_awaits_unit() {
     let rejected: Result<(), JsValue> = reject_later("nope").await;
     assert_eq!(message(&rejected.unwrap_err()), "nope");
-    let promise: Promise<Undefined> = reject_later_promise("later");
+    let promise: Promise<()> = reject_later("later");
     assert_eq!(message(&promise.await.unwrap_err()), "later");
     let guard = Guard::new().unwrap();
     let rejected: Result<(), JsValue> = guard.fail_later().await;
     assert_eq!(message(&rejected.unwrap_err()), "later");
-    let _: Promise<Undefined> = guard.fail_later_promise();
+    let _: Promise<()> = guard.fail_later();
 }

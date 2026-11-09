@@ -260,7 +260,7 @@ pub mod shadow {
         #[wasm_bindgen(catch, js_namespace = "Shadow")]
         pub fn either(
             a: impl super::InnerOrName,
-            b: impl super::Chained,
+            b: impl super::InnerOrName,
         ) -> Result<super::InnerOrNameKind, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -298,12 +298,7 @@ pub mod shadow {
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "Shadow")]
-        pub async fn next() -> Result<super::Mode, JsValue>;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(js_name = "next", js_namespace = "Shadow")]
-        pub fn next_promise() -> Promise<JsString>;
+        pub fn next() -> Promise<super::Mode>;
     }
 }
 #[wasm_bindgen(private)]

@@ -241,19 +241,25 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Rounding<U = JsValue>;
+    pub type Rounding<U = Unit>;
     #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
-    pub fn smallest_unit<U>(this: &Rounding<U>) -> Option<Plural>;
+    pub fn smallest_unit<U: RoundingU>(this: &Rounding<U>) -> Option<U::PluralU>
+    where
+        Option<U::PluralU>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
-    pub fn set_smallest_unit<U>(this: &Rounding<U>, val: Plural);
+    pub fn set_smallest_unit<U: RoundingU>(this: &Rounding<U>, val: U::PluralU)
+    where
+        U::PluralU: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-    pub fn largest_unit<U>(this: &Rounding<U>) -> Option<LargestUnitKind>;
+    pub fn largest_unit<U: RoundingU>(this: &Rounding<U>) -> Option<U::LargestUnit>
+    where
+        Option<U::LargestUnit>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-    pub fn set_largest_unit<U>(this: &Rounding<U>, val: LargestUnitKind);
-    #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-    pub fn set_largest_unit_with_plural<U>(this: &Rounding<U>, val: Plural);
+    pub fn set_largest_unit<U: RoundingU>(this: &Rounding<U>, val: U::LargestUnit)
+    where
+        U::LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi;
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Rounding<U> {
+impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> Rounding<U> {
     pub fn new() -> Rounding<U> {
         Self::builder().build()
     }
@@ -263,7 +269,7 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Rounding<U> {
         }
     }
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Default for Rounding<U> {
+impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> Default for Rounding<U> {
     fn default() -> Self {
         Self::new()
     }
@@ -271,27 +277,41 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Default for Rounding<U> {
 pub struct RoundingBuilder<U> {
     inner: Rounding<U>,
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> RoundingBuilder<U> {
-    pub fn smallest_unit(self, val: Plural) -> Self {
+impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> RoundingBuilder<U> {
+    pub fn smallest_unit(self, val: U::PluralU) -> Self {
         self.inner.set_smallest_unit(val);
         self
     }
-    pub fn largest_unit(self, val: LargestUnitKind) -> Self {
+    pub fn largest_unit(self, val: U::LargestUnit) -> Self {
         self.inner.set_largest_unit(val);
-        self
-    }
-    pub fn largest_unit_with_plural(self, val: Plural) -> Self {
-        self.inner.set_largest_unit_with_plural(val);
         self
     }
     pub fn build(self) -> Rounding<U> {
         self.inner
     }
 }
+pub trait RoundingU {
+    type PluralU: ::wasm_bindgen::convert::IntoWasmAbi
+        + ::wasm_bindgen::convert::FromWasmAbi
+        + ::wasm_bindgen::convert::OptionIntoWasmAbi
+        + ::wasm_bindgen::convert::OptionFromWasmAbi;
+    type LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi
+        + ::wasm_bindgen::convert::FromWasmAbi
+        + ::wasm_bindgen::convert::OptionIntoWasmAbi
+        + ::wasm_bindgen::convert::OptionFromWasmAbi;
+}
+impl RoundingU for Unit {
+    type PluralU = Plural;
+    type LargestUnit = LargestUnitUnit;
+}
+impl RoundingU for Hour {
+    type PluralU = PluralHour;
+    type LargestUnit = LargestUnitHour;
+}
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn round(opts: &Rounding<String>) -> Result<(), JsValue>;
+    pub fn round(opts: &Rounding<Hour>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
@@ -366,11 +386,6 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch)]
     pub fn fail() -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch)]
-    pub fn fallback(value: &JsValue) -> Result<(), JsValue>;
 }
 pub mod scoped {
     #[allow(unused_imports)]
@@ -949,8 +964,31 @@ impl Default for PartialExtended {
     }
 }
 #[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
-pub enum LargestUnitKind {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LargestUnitUnit {
     Auto = "auto",
-    Plural(Plural),
+    Hour = "hour",
+    Minute = "minute",
+    Second = "second",
+    Hours = "hours",
+    Minutes = "minutes",
+    Seconds = "seconds",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Hour {
+    Hour = "hour",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PluralHour {
+    Hour = "hour",
+    Hours = "hours",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LargestUnitHour {
+    Auto = "auto",
+    Hour = "hour",
+    Hours = "hours",
 }

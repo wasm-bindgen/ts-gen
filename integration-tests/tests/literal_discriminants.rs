@@ -1,8 +1,8 @@
 #![cfg(target_arch = "wasm32")]
 
 use ts_gen_integration_tests::literal_discriminants::{
-    count, direction, flag, level, ratio, repeat, size, wide, DirectionReturnKind, Feedback,
-    FlagReturnKind, KeepAliveKind, Options, RepeatReturnKind, Scaled, SizeReturnKind, ValueKind,
+    count, direction, flag, level, ratio, repeat, size, wide, DirectionKind, Feedback,
+    FeedbackValueKind, FlagKind, KeepAliveKind, Options, RepeatKind, Scaled, SizeKind,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -18,22 +18,22 @@ fn literal_discriminants_compile(feedback: &Feedback) {
         KeepAliveKind::N0 | KeepAliveKind::N1 | KeepAliveKind::N2 => {}
     }
     match direction() {
-        DirectionReturnKind::Neg1 | DirectionReturnKind::N0 | DirectionReturnKind::N1 => {}
+        DirectionKind::Neg1 | DirectionKind::N0 | DirectionKind::N1 => {}
     }
     match feedback.value() {
-        Some(ValueKind::Neg1 | ValueKind::N1) | None => {}
+        Some(FeedbackValueKind::Neg1 | FeedbackValueKind::N1) | None => {}
     }
 
     let _: f64 = ratio();
     let _: f64 = count();
     let _: f64 = wide();
     match size() {
-        SizeReturnKind::Auto | SizeReturnKind::F64(_) => {}
+        SizeKind::Auto | SizeKind::F64(_) => {}
     }
     match repeat() {
-        RepeatReturnKind::Bool(_) | RepeatReturnKind::X | RepeatReturnKind::Y => {}
+        RepeatKind::Bool(_) | RepeatKind::X | RepeatKind::Y => {}
     }
     match flag() {
-        FlagReturnKind::Bool(_) | FlagReturnKind::ArrayBuffer(_) => {}
+        FlagKind::Bool(_) | FlagKind::ArrayBuffer(_) => {}
     }
 }

@@ -26,47 +26,12 @@ use crate::context::GlobalContext;
 use crate::ir::Module;
 use crate::parse::scope::ScopeId;
 
-/// How the front end parses. The default is the Rust codegen's, and the
-/// IR producer's is [`Options::IR`].
-#[derive(Clone, Copy, Debug)]
-pub struct Options {
-    /// For the Rust codegen that reads the parse directly, and goes with
-    /// it: erase inline object types to `object`, rather than naming them
-    /// as dictionaries (a lone index signature as a `Record`).
-    pub legacy_rust: bool,
-}
-
-impl Default for Options {
-    fn default() -> Self {
-        Options { legacy_rust: true }
-    }
-}
-
-impl Options {
-    /// The IR producer's parse.
-    pub const IR: Options = Options { legacy_rust: false };
-
-    fn context(self) -> GlobalContext {
-        let mut gctx = GlobalContext::new();
-        gctx.scopes.legacy_rust = self.legacy_rust;
-        gctx
-    }
-}
-
 /// Parse one or more `.d.ts` files and produce a `Module` + `GlobalContext`.
 pub fn parse_dts_files(
     paths: &[impl AsRef<Path>],
     lib_name: Option<&str>,
 ) -> Result<(Module, GlobalContext)> {
-    parse_dts_files_with(paths, lib_name, Options::default())
-}
-
-pub fn parse_dts_files_with(
-    paths: &[impl AsRef<Path>],
-    lib_name: Option<&str>,
-    opts: Options,
-) -> Result<(Module, GlobalContext)> {
-    let mut gctx = opts.context();
+    let mut gctx = GlobalContext::new();
     let mut module = Module::new(&mut gctx, lib_name);
     let global = module.global_scope;
 
@@ -117,15 +82,7 @@ pub fn parse_single_source(
     source: &str,
     lib_name: Option<&str>,
 ) -> Result<(Module, GlobalContext)> {
-    parse_single_source_with(source, lib_name, Options::default())
-}
-
-pub fn parse_single_source_with(
-    source: &str,
-    lib_name: Option<&str>,
-    opts: Options,
-) -> Result<(Module, GlobalContext)> {
-    let mut gctx = opts.context();
+    let mut gctx = GlobalContext::new();
     let mut module = Module::new(&mut gctx, lib_name);
     let file_scope = gctx.create_child_scope(module.global_scope);
     let path = Path::new("<input>");

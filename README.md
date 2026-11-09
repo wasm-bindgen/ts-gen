@@ -127,6 +127,15 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts --output src/bi
   --export Request --export Response --export KVNamespace --export cloudflare:workers
 ```
 
+Layer `@tw-abi` / `@throws` tags onto a large declaration file from a side
+file (see `CONVENTIONS.md`, "`--annotate` side files"):
+
+```sh
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
+  --output src/bindings.rs \
+  --annotate types/annotations.d.ts
+```
+
 Opt generic imports into wasm-bindgen's experimental per-monomorphization
 codegen:
 
@@ -141,10 +150,12 @@ primary plus a `try_<name>` companion:
 ts-gen --input types.d.ts --output src/bindings.rs --fallible
 ```
 
-Keep the exact carrier for each empty on reads. By default a return, awaited
-value or getter admitting `null`, `undefined` or both reads as `Option<T>`;
-with the flag `T | null` reads as `Nullable<T>` and `T | null | undefined` as
-`Option<Nullable<T>>`. Writes are exact either way:
+Keep `T | null | undefined` three-state. By default a return, awaited value or
+getter admitting `null`, `undefined` or both reads as `Option<T>`, and a
+`T | null | undefined` write passes `undefined`. With the flag the producer
+keeps it as the IR's `T??`, so it reads as `Option<Nullable<T>>` and its
+writes gain a `_with_null` variant. `T | null` and `T | undefined` are the
+same either way:
 
 ```sh
 ts-gen --input types.d.ts --output src/bindings.rs --strict-nullable

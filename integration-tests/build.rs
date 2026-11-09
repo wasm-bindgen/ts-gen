@@ -26,8 +26,10 @@ use std::path::{Path, PathBuf};
 /// so a configuration flag belongs to the test file rather than the fixture:
 /// a `//! @ts-gen --experimental-generic-mono` header on the test `.rs`
 /// compiles it against the per-monomorphization bindings, and
-/// `//! @ts-gen --fallible` against the single `Result` forms. A
-/// `<name>_mono.rs` test may share `<name>.d.ts` with `<name>.rs`.
+/// `//! @ts-gen --fallible` against the single `Result` forms, and
+/// `//! @ts-gen --strict-nullable` against the IR's three-state
+/// `T | null | undefined`. A `<name>_mono.rs` or `<name>_strict.rs` test
+/// may share `<name>.d.ts` with `<name>.rs`.
 fn main() {
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let crate_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -44,11 +46,12 @@ fn main() {
     // Each fixture's bindings go inside their own `pub mod <name> { ... }`
     // wrapper. ts-gen emits at global scope (one extern block per type)
     // and we can't have multiple fixtures' top-level declarations
-    // colliding at the crate root, so we namespace them here.
+    // colliding at the crate root, so we namespace them here. Bindings
+    // keep the TS names (`Ai_Cf_Openai_Whisper_Input`).
     for entry in &entries {
         generate_bindings(entry, &out_dir);
         lib_code.push_str(&format!(
-            "pub mod {0} {{ include!(concat!(env!(\"OUT_DIR\"), \"/{0}.rs\")); }}\n\n",
+            "#[allow(non_camel_case_types)]\npub mod {0} {{ include!(concat!(env!(\"OUT_DIR\"), \"/{0}.rs\")); }}\n\n",
             entry.mod_name
         ));
     }
@@ -79,6 +82,8 @@ struct Entry {
     experimental_generic_mono: bool,
     /// Whether the test file opts into single `Result` forms for sync callables.
     fallible: bool,
+    /// Whether the test file opts into the strict nullable IR.
+    strict_nullable: bool,
     /// Whether the fixture declares its own `--lib-name` (module mode).
     /// Script-mode fixtures parse without one and export by `--export`.
     module_mode: bool,
@@ -114,12 +119,16 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
 
         // Conventionally test stems are snake_case; the matching fixture is
         // the kebab-case form. (Stems without underscores are unchanged.)
-        // A `<name>_mono` test without a fixture of its own compiles the
-        // `<name>` fixture under the flags its directive sets.
+        // A `<name>_mono` or `<name>_strict` test without a fixture of its
+        // own compiles the `<name>` fixture under the flags its directive
+        // sets.
         let mut kebab = stem.replace('_', "-");
         let mut dts_path = fixtures_dir.join(format!("{kebab}.d.ts"));
         if !dts_path.is_file() {
-            if let Some(base) = kebab.strip_suffix("-mono") {
+            if let Some(base) = kebab
+                .strip_suffix("-mono")
+                .or_else(|| kebab.strip_suffix("-strict"))
+            {
                 let base_path = fixtures_dir.join(format!("{base}.d.ts"));
                 if base_path.is_file() {
                     kebab = base.to_string();
@@ -149,6 +158,7 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
             externals: directive.externals,
             experimental_generic_mono: test_directive.experimental_generic_mono,
             fallible: test_directive.fallible,
+            strict_nullable: test_directive.strict_nullable,
             export_specs: directive.export_specs,
             inputs: directive
                 .inputs
@@ -173,6 +183,8 @@ struct Directive {
     experimental_generic_mono: bool,
     /// Whether `--fallible` is present.
     fallible: bool,
+    /// Whether `--strict-nullable` is present.
+    strict_nullable: bool,
     /// All `--export <spec>` (or `-E <spec>`) values.
     export_specs: Vec<String>,
     /// All `--input <path>` (or `-i <path>`) values.
@@ -191,6 +203,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let mut externals = Vec::new();
     let mut experimental_generic_mono = false;
     let mut fallible = false;
+    let mut strict_nullable = false;
     let mut export_specs = Vec::new();
     let mut inputs = Vec::new();
     let mut error_enum = None;
@@ -217,6 +230,10 @@ fn parse_directive(dts_path: &Path) -> Directive {
                     }
                     "--fallible" => {
                         fallible = true;
+                        i += 1;
+                    }
+                    "--strict-nullable" => {
+                        strict_nullable = true;
                         i += 1;
                     }
                     "--export" | "-E" if i + 1 < args.len() => {
@@ -255,6 +272,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
         externals,
         experimental_generic_mono,
         fallible,
+        strict_nullable,
         export_specs,
         inputs,
         error_enum,
@@ -291,8 +309,7 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
         .collect();
 
     let lib_name = entry.module_mode.then_some(entry.lib_name.as_str());
-    let legacy = ts_gen::parse::Options { legacy_rust: true };
-    let (module, mut gctx) = ts_gen::parse_with(&path_refs, lib_name, legacy)
+    let (module, mut gctx) = ts_gen::parse(&path_refs, lib_name)
         .unwrap_or_else(|e| panic!("Failed to parse {}: {e}", entry.dts_path.display()));
 
     for mapping in &entry.externals {
@@ -348,6 +365,7 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
     let mut options = ts_gen::codegen::GenerateOptions::new()
         .experimental_generic_mono(entry.experimental_generic_mono)
         .fallible(entry.fallible)
+        .strict_nullable(entry.strict_nullable)
         .exports(exports);
     if let Some(name) = &entry.error_enum {
         options = options.error_enum(name);

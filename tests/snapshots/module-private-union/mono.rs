@@ -39,13 +39,13 @@ pub mod x {
         #[wasm_bindgen(module = "x:shapes", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch)]
-            pub fn list() -> Result<ListReturnKind, JsValue>;
+            pub fn list() -> Result<ListKind, JsValue>;
         }
     }
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ListReturnKind {
+pub enum ListKind {
     VecOfId(Vec<String>),
     Promise(Promise<x::shapes::Base>),
 }

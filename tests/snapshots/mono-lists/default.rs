@@ -187,22 +187,12 @@ extern "C" {
 #[wasm_bindgen(module = "mono-lists")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchTags")]
-    pub async fn fetch_tags() -> Result<Vec<String>, JsValue>;
-}
-#[wasm_bindgen(module = "mono-lists")]
-extern "C" {
-    #[wasm_bindgen(js_name = "fetchTags")]
-    pub fn fetch_tags_promise() -> Promise<Array<JsString>>;
+    pub fn fetch_tags() -> Promise<Vec<String>>;
 }
 #[wasm_bindgen(module = "mono-lists")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchMaybeTags")]
-    pub async fn fetch_maybe_tags() -> Result<Option<Vec<String>>, JsValue>;
-}
-#[wasm_bindgen(module = "mono-lists")]
-extern "C" {
-    #[wasm_bindgen(js_name = "fetchMaybeTags")]
-    pub fn fetch_maybe_tags_promise() -> Promise<JsNullable<Array<JsString>>>;
+    pub fn fetch_maybe_tags() -> Promise<Option<Vec<String>>>;
 }
 #[wasm_bindgen(module = "mono-lists")]
 extern "C" {
@@ -286,12 +276,12 @@ extern "C" {
 #[wasm_bindgen(module = "mono-lists")]
 extern "C" {
     #[wasm_bindgen(js_name = "getValue")]
-    pub fn get_value() -> GetValueReturnKind;
+    pub fn get_value() -> GetValueKind;
 }
 #[wasm_bindgen(module = "mono-lists")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "getValue")]
-    pub fn try_get_value() -> Result<GetValueReturnKind, JsValue>;
+    pub fn try_get_value() -> Result<GetValueKind, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists")]
 extern "C" {
@@ -305,7 +295,7 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum GetValueReturnKind {
+pub enum GetValueKind {
     String(String),
     VecOfBool(Vec<bool>),
 }

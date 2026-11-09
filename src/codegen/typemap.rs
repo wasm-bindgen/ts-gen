@@ -12,7 +12,7 @@
 //! - `Nullable` becomes `JsOption<T>` instead of `Option<T>`
 //! - Argument-position types are NOT borrowed (owned `T`, not `&T`)
 
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet};
 
 use proc_macro2::TokenStream;
@@ -239,6 +239,12 @@ pub struct CodegenContext<'a> {
     /// they resolve from: a synthesised union resolves from its use site
     /// but is emitted at the top level.
     pub emit_path: RefCell<Vec<String>>,
+    /// The lowered IR, for the declaration kinds emitted from it.
+    pub ir: Option<crate::codegen::from_ir::IrDecls>,
+    /// The readings the IR zip takes from the parse, when they're asked for.
+    pub zip: Option<crate::codegen::ir_callables::Zip>,
+    /// The type declaration being emitted.
+    pub current_decl: std::cell::Cell<Option<crate::context::TypeId>>,
     /// The statics the module being emitted sees, which a parameter or
     /// local can't shadow (E0530).
     pub statics_in_scope: RefCell<HashSet<String>>,
@@ -256,6 +262,14 @@ pub struct CodegenContext<'a> {
     /// members share a single enum. Callers reach into this through
     /// [`CodegenContext::synthesise_dynamic_union`].
     pub dynamic_unions: RefCell<DynamicUnionRegistry>,
+    /// The IR's names for the unions it synthesises an enum for, by their
+    /// members, which a synthesised enum takes over its anchor's.
+    ir_enum_names: RefCell<HashMap<Vec<String>, String>>,
+    /// Each union alias's `<Alias>Kind` and the Rust modules declaring it,
+    /// which can share it, as they don't clash.
+    alias_kinds: RefCell<HashMap<String, Vec<ModuleContext>>>,
+    /// The module of the union alias being named.
+    naming_module: RefCell<ModuleContext>,
     /// Default error type for fallible bindings without `@throws`;
     /// `None` is `JsValue`. See
     /// [`crate::codegen::GenerateOptions::error_type`].
@@ -271,10 +285,6 @@ pub struct CodegenContext<'a> {
     /// Whether generic imports use wasm-bindgen's experimental
     /// per-monomorphization codegen rather than type erasure.
     pub experimental_generic_mono: bool,
-    /// Whether a read keeps the exact carrier for each empty
-    /// (`Nullable<T>` for `T | null`) rather than folding every empty
-    /// into `Option<T>`. See [`read_carrier`].
-    pub strict_nullable: bool,
     /// JS module specifiers whose declarations are emitted, each in the
     /// `pub mod` of `module_path`.
     pub exported_modules: HashSet<String>,
@@ -298,12 +308,17 @@ pub struct CodegenContext<'a> {
     recursive_aliases: RefCell<HashMap<TypeId, bool>>,
     /// The types [`Self::trim_default_args`] is reading the defaults of.
     trimming: RefCell<HashSet<TypeId>>,
+    /// How deep lowering is inside a user generic's type argument or a
+    /// type parameter default, which has no direction.
+    type_args: Cell<usize>,
     /// Arguments standing in for type parameters while a default is read
     /// against them: the scope declaring the parameters, and each one's
     /// argument tokens. Innermost last.
     param_args: RefCell<Vec<(ScopeId, HashMap<String, TokenStream>)>>,
     /// [`Self::union_alias_of`], by the address of the alias declaration.
     union_aliases: RefCell<HashMap<usize, Option<std::rc::Rc<UnionAlias>>>>,
+    /// The generic alias instances taken whole, by alias and arguments.
+    pub(crate) alias_instances: RefCell<Vec<AliasInstance>>,
 }
 
 /// A named union alias that an argument takes whole, as one enum of its
@@ -326,6 +341,10 @@ pub(crate) struct UnionAlias {
     /// Under per-monomorphization, the enum's name, `<Alias>Kind`: the
     /// alias's own name is the trait its arguments take.
     pub kind: Option<String>,
+    /// The name of an instance of a generic alias, which the IR takes
+    /// whole (`LooseStr` for `Loose<string>`), emitted at the top level as
+    /// an argument enum only.
+    pub instance: Option<String>,
 }
 
 impl UnionAlias {
@@ -337,6 +356,10 @@ impl UnionAlias {
         }
     }
 }
+
+/// A generic alias's declaration and arguments, and the enum of the
+/// instance; see [`CodegenContext::take_alias_instance`].
+pub(crate) type AliasInstance = (TypeId, Vec<String>, std::rc::Rc<UnionAlias>);
 
 /// How a local generic alias's type parameters carry over to the Rust
 /// alias; see [`CodegenContext::alias_params`].
@@ -442,8 +465,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::ArrayBufferView => buf.push_str("ArrayBufferView"),
         TypeRef::PropertyKey => buf.push_str("PropertyKey"),
         TypeRef::TypedSlice(e, _) => write!(buf, "slice:{}", e.typed_array()).unwrap(),
-        TypeRef::AbiScalar(s) if s.is_bigint() => buf.push_str("bigint"),
-        TypeRef::AbiScalar(_) => buf.push_str("num"),
+        TypeRef::AbiScalar(s) => buf.push_str(s.as_str()),
         TypeRef::StringLiteral(s) => write!(buf, "lit:{s:?}").unwrap(),
         TypeRef::NumberLiteral(n) => write!(buf, "lit:{n}").unwrap(),
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
@@ -589,7 +611,10 @@ fn qualify_references(
 
 /// `alias`'s target with `generic_args` substituted for its parameters;
 /// a missing argument takes the parameter's default, else `any`.
-fn alias_instance(alias: &ir::TypeAliasDecl, generic_args: &[ir::TypeRef]) -> ir::TypeRef {
+pub(crate) fn alias_instance(
+    alias: &ir::TypeAliasDecl,
+    generic_args: &[ir::TypeRef],
+) -> ir::TypeRef {
     // A default may name an earlier parameter (`<A, B = A>`), so each
     // one is substituted with the map built so far.
     let mut map: HashMap<&str, ir::TypeRef> = HashMap::new();
@@ -619,13 +644,19 @@ pub(crate) fn type_param_default_tokens(
     let Some(default) = default else {
         return quote! { JsValue };
     };
-    let tokens = to_syn_type(
-        default,
-        TypePosition::ARGUMENT.to_inner(),
-        ctx,
-        scope,
-        from_module,
-    );
+    let lower = || {
+        to_syn_type(
+            default,
+            TypePosition::ARGUMENT.to_inner(),
+            ctx,
+            scope,
+            from_module,
+        )
+    };
+    let tokens = match ctx {
+        Some(c) => c.in_type_arg(lower),
+        None => lower(),
+    };
     if let (TypeRef::Reference { segments, .. }, Some(ctx)) = (default, ctx) {
         let uses = ctx.external_uses.borrow();
         if uses.get(&segments[0]).is_some_and(|v| v == "JsValue") {
@@ -668,12 +699,6 @@ impl<'a> CodegenContext<'a> {
     /// most emitters carry an optional context; no context means default mode.
     pub(crate) fn generic_mono(ctx: Option<&CodegenContext<'_>>) -> bool {
         ctx.is_some_and(|ctx| ctx.experimental_generic_mono)
-    }
-
-    /// Whether reads keep the exact carrier for each empty
-    /// (`--strict-nullable`). No context means the default, folded reads.
-    pub(crate) fn strict_nullable(ctx: Option<&CodegenContext<'_>>) -> bool {
-        ctx.is_some_and(|ctx| ctx.strict_nullable)
     }
 
     /// One type-parameter declaration: bare `T` under per-monomorphization
@@ -901,6 +926,14 @@ impl<'a> CodegenContext<'a> {
         r
     }
 
+    /// Run `f` lowering a type argument (see [`Self::type_args`]).
+    fn in_type_arg<R>(&self, f: impl FnOnce() -> R) -> R {
+        self.type_args.set(self.type_args.get() + 1);
+        let r = f();
+        self.type_args.set(self.type_args.get() - 1);
+        r
+    }
+
     /// The declared Rust default of parameter `i` of the generic type
     /// `id` (see [`type_param_default_tokens`]), read against the
     /// arguments `earlier` chosen for the parameters before it. `None`
@@ -1121,16 +1154,21 @@ impl<'a> CodegenContext<'a> {
             namespace_paths: HashMap::new(),
             lib_name: module.lib_name.clone(),
             emit_path: RefCell::new(Vec::new()),
+            ir: None,
+            zip: options.zip_diffs.then(Default::default),
+            current_decl: std::cell::Cell::new(None),
             statics_in_scope: RefCell::new(HashSet::new()),
             root_scope: module.global_scope,
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
+            ir_enum_names: RefCell::default(),
+            alias_kinds: RefCell::default(),
+            naming_module: RefCell::new(ModuleContext::Global),
             error_type,
             fallible: options.fallible,
             error_enum: options.error_enum.clone(),
             experimental_generic_mono: options.experimental_generic_mono,
-            strict_nullable: options.strict_nullable,
             exported_modules,
             externalised_modules,
             unresolved_module_refs: RefCell::new(HashSet::new()),
@@ -1138,8 +1176,10 @@ impl<'a> CodegenContext<'a> {
             alias_param_mentions: RefCell::new(Vec::new()),
             recursive_aliases: RefCell::new(HashMap::new()),
             trimming: RefCell::new(HashSet::new()),
+            type_args: Cell::new(0),
             param_args: RefCell::new(Vec::new()),
             union_aliases: RefCell::new(HashMap::new()),
+            alias_instances: RefCell::default(),
         };
         for (spec, scopes) in &gctx.ambient_module_scopes {
             let path = ctx.specifier_path(spec);
@@ -1158,7 +1198,9 @@ impl<'a> CodegenContext<'a> {
         if ctx.experimental_generic_mono {
             let mut pending: Vec<TypeId> = module.types.iter().rev().copied().collect();
             while let Some(type_id) = pending.pop() {
-                match &gctx.get_type(type_id).kind {
+                let decl = gctx.get_type(type_id);
+                *ctx.naming_module.borrow_mut() = decl.module_context.clone();
+                match &decl.kind {
                     TypeKind::TypeAlias(alias) => {
                         ctx.union_alias_of(alias);
                     }
@@ -1183,16 +1225,21 @@ impl<'a> CodegenContext<'a> {
             namespace_paths: HashMap::new(),
             lib_name: None,
             emit_path: RefCell::new(Vec::new()),
+            ir: None,
+            zip: None,
+            current_decl: std::cell::Cell::new(None),
             statics_in_scope: RefCell::new(HashSet::new()),
             root_scope,
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
+            ir_enum_names: RefCell::default(),
+            alias_kinds: RefCell::default(),
+            naming_module: RefCell::new(ModuleContext::Global),
             error_type: None,
             fallible: false,
             error_enum: None,
             experimental_generic_mono: false,
-            strict_nullable: false,
             exported_modules: HashSet::new(),
             externalised_modules: HashSet::new(),
             unresolved_module_refs: RefCell::new(HashSet::new()),
@@ -1200,8 +1247,10 @@ impl<'a> CodegenContext<'a> {
             alias_param_mentions: RefCell::new(Vec::new()),
             recursive_aliases: RefCell::new(HashMap::new()),
             trimming: RefCell::new(HashSet::new()),
+            type_args: Cell::new(0),
             param_args: RefCell::new(Vec::new()),
             union_aliases: RefCell::new(HashMap::new()),
+            alias_instances: RefCell::default(),
         }
     }
 
@@ -1232,6 +1281,7 @@ impl<'a> CodegenContext<'a> {
     /// numeric-suffixed if that also collides).
     pub(crate) fn synthesise_dynamic_union(
         &self,
+        source: &[TypeRef],
         arms: &ReadArms,
         anchor: &str,
         parent: Option<&str>,
@@ -1253,7 +1303,18 @@ impl<'a> CodegenContext<'a> {
             }
             return info.rust_name.clone();
         }
-        let chosen = allocate_dynamic_union_name(&mut self.names.borrow_mut(), anchor, parent);
+        let source: Vec<String> = source.iter().map(format_type_ref_key).collect();
+        let named = self.ir_enum_names.borrow().get(&source).cloned();
+        // The IR's enum for these members in another order.
+        if let Some(name) = &named {
+            if reg.by_key.values().any(|info| &info.rust_name == name) {
+                return name.clone();
+            }
+        }
+        let chosen = match named {
+            Some(name) => self.names.borrow_mut().declare(&name, Suffix::Pascal),
+            None => allocate_dynamic_union_name(&mut self.names.borrow_mut(), anchor, parent),
+        };
         reg.by_key.insert(
             key,
             DynamicUnionInfo {
@@ -1266,6 +1327,52 @@ impl<'a> CodegenContext<'a> {
             },
         );
         chosen
+    }
+
+    /// Name the enum synthesised for `union`, as read from `scope`, `name`,
+    /// unless it already has one.
+    pub(crate) fn name_synthesised_union(&self, union: &TypeRef, scope: ScopeId, name: &str) {
+        let read = resolve_union_aliases(union, Some(self), scope);
+        let core = read.split_empties().map_or(read, |(core, _)| core);
+        let members = match &core {
+            TypeRef::Union(u) => u.members().to_vec(),
+            TypeRef::PropertyKey => TypeRef::property_key_members(),
+            _ => return,
+        };
+        let key = members.iter().map(format_type_ref_key).collect();
+        self.ir_enum_names
+            .borrow_mut()
+            .entry(key)
+            .or_insert_with(|| name.to_string());
+    }
+
+    /// The enum of `literals` the IR synthesised as `name`, emitted with
+    /// the synthesised enums.
+    pub(crate) fn synthesise_literal_enum(
+        &self,
+        name: &str,
+        members: &[TypeRef],
+        scope: ScopeId,
+        from_module: &ModuleContext,
+    ) -> Option<String> {
+        let members = members.to_vec();
+        self.name_synthesised_union(&TypeRef::union(members.clone()), scope, name);
+        // A family's argument can be one literal (`Rounding<"hour">`).
+        let arms = match members.as_slice() {
+            [one] => {
+                self.ir_enum_names
+                    .borrow_mut()
+                    .entry(vec![format_type_ref_key(one)])
+                    .or_insert_with(|| name.to_string());
+                ReadArms {
+                    members: members.clone(),
+                    fallback: false,
+                    merged_shapes: Vec::new(),
+                }
+            }
+            _ => dynamic_union_members(&members, Some(self), scope, from_module)?,
+        };
+        Some(self.synthesise_dynamic_union(&members, &arms, name, None, scope, from_module))
     }
 
     /// Whether `name` is a synthesised dynamic-union enum.
@@ -1417,7 +1524,14 @@ impl<'a> CodegenContext<'a> {
             return None;
         };
         if !generic_args.is_empty() {
-            return None;
+            let id = self.gctx.resolve_path(scope, &segments.join("."))?;
+            let args: Vec<String> = generic_args.iter().map(format_type_ref_key).collect();
+            return self
+                .alias_instances
+                .borrow()
+                .iter()
+                .find(|(i, a, _)| *i == id && *a == args)
+                .map(|(.., u)| u.clone());
         }
         if let [name] = segments.as_slice() {
             if matches!(
@@ -1457,13 +1571,60 @@ impl<'a> CodegenContext<'a> {
         computed
     }
 
+    /// Takes the instance `ty` of a local generic alias whole, as the
+    /// enum `name`, if it qualifies as a non-generic alias would.
+    pub(crate) fn take_alias_instance(&self, ty: &ir::TypeRef, scope: ScopeId, name: &str) -> bool {
+        if self.union_alias(ty, scope).is_some() {
+            return true;
+        }
+        let ir::TypeRef::Reference {
+            segments,
+            generic_args,
+        } = ty
+        else {
+            return false;
+        };
+        let Some(id) = self.gctx.resolve_path(scope, &segments.join(".")) else {
+            return false;
+        };
+        let generic = matches!(&self.gctx.get_type(id).kind,
+            TypeKind::TypeAlias(a) if !a.type_params.is_empty() && a.from_module.is_none());
+        if generic_args.is_empty()
+            || !generic
+            || !self.local_type_ids.contains(&id)
+            || self.is_recursive_alias(id)
+        {
+            return false;
+        }
+        let Some(target) = self.resolve_alias_instance(ty, scope) else {
+            return false;
+        };
+        let Some(union) = self.compute_union(&target, scope, name) else {
+            return false;
+        };
+        let union = UnionAlias {
+            readable: false,
+            fallback: false,
+            instance: Some(name.to_string()),
+            ..union
+        };
+        let args = generic_args.iter().map(format_type_ref_key).collect();
+        self.alias_instances
+            .borrow_mut()
+            .push((id, args, std::rc::Rc::new(union)));
+        true
+    }
+
     fn compute_union_alias(&self, alias: &ir::TypeAliasDecl) -> Option<UnionAlias> {
         if !alias.type_params.is_empty() || alias.from_module.is_some() {
             return None;
         }
-        let scope = alias.body_scope;
+        self.compute_union(&alias.target, alias.body_scope, &alias.name)
+    }
+
+    fn compute_union(&self, target: &TypeRef, scope: ScopeId, name: &str) -> Option<UnionAlias> {
         let alternatives =
-            crate::codegen::signatures::union_alias_alternatives(&alias.target, self, scope)?;
+            crate::codegen::signatures::union_alias_alternatives(target, self, scope)?;
         let mut arms: Vec<TypeRef> = Vec::new();
         let mut nullability: Option<ir::Nullability> = None;
         let mut admit = |n: ir::Nullability| {
@@ -1490,19 +1651,31 @@ impl<'a> CodegenContext<'a> {
         // A read tells the arms apart as it would the union written out,
         // with at most one shape arm, last; several shapes, or a named
         // upper bound the read keeps instead, leave the enum write-only.
+        // An `ArrayBufferView` arm reads as a `Uint8Array` but is written
+        // as any `Object`, so the enum is write-only.
         let read = dynamic_union_members(&arms, Some(self), scope, &ModuleContext::Global)
-            .filter(|read| read.merged_shapes.is_empty() && !read.members.contains(&TypeRef::Any));
+            .filter(|read| read.merged_shapes.is_empty() && !read.members.contains(&TypeRef::Any))
+            .filter(|_| !arms.contains(&TypeRef::ArrayBufferView));
         let (arms, readable, fallback) = match read {
             Some(read) => (read.members, true, read.fallback),
             None => (arms, false, false),
         };
+        // Numbered only on a clash within the alias's own Rust module.
         let kind = self.experimental_generic_mono.then(|| {
-            let bare = format!("{}Kind", alias.name);
+            let bare = format!("{name}Kind");
+            let module = self.naming_module.borrow().clone();
+            let mut kinds = self.alias_kinds.borrow_mut();
             let mut names = self.names.borrow_mut();
             if names.claim(bare.clone()) {
-                bare
-            } else {
-                names.declare(&bare, Suffix::Pascal)
+                kinds.insert(bare.clone(), vec![module]);
+                return bare;
+            }
+            match kinds.get_mut(&bare) {
+                Some(modules) if !modules.contains(&module) => {
+                    modules.push(module);
+                    bare
+                }
+                _ => names.declare(&bare, Suffix::Pascal),
             }
         });
         Some(UnionAlias {
@@ -1512,6 +1685,7 @@ impl<'a> CodegenContext<'a> {
             readable,
             fallback,
             kind,
+            instance: None,
         })
     }
 
@@ -1525,7 +1699,8 @@ impl<'a> CodegenContext<'a> {
             | TypeRef::Boolean
             | TypeRef::BigInt
             | TypeRef::Symbol
-            | TypeRef::Object => true,
+            | TypeRef::Object
+            | TypeRef::ArrayBufferView => true,
             TypeRef::Reference {
                 segments,
                 generic_args,
@@ -1729,6 +1904,11 @@ impl<'a> CodegenContext<'a> {
         };
         if segments.len() != 1 {
             return self.resolve_qualified_alias_instance(segments, generic_args, scope);
+        }
+        // A utility the parse keeps for the IR producer to name reads as
+        // the union it keeps.
+        if let Some(kept) = self.gctx.utilities.get(&ty.format_ts()) {
+            return Some(kept.clone());
         }
         let type_id = self.gctx.scopes.resolve(scope, &segments[0])?;
         let TypeKind::TypeAlias(alias) = &self.gctx.get_type(type_id).kind else {
@@ -2034,16 +2214,6 @@ pub fn to_syn_type(
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
-    // The Rust bindings don't read `@tw-abi` yet: a scalar keeps the JS
-    // number or bigint it narrows.
-    if let TypeRef::AbiScalar(s) = ty {
-        let leaf = if s.is_bigint() {
-            TypeRef::BigInt
-        } else {
-            TypeRef::Number
-        };
-        return to_syn_type(&leaf, pos, ctx, scope, from_module);
-    }
     // `PropertyKey` lowers as the union it abbreviates.
     if matches!(ty, TypeRef::PropertyKey) {
         return to_syn_type(
@@ -2060,6 +2230,11 @@ pub fn to_syn_type(
         match ty {
             TypeRef::Boolean | TypeRef::BooleanLiteral(_) => return quote! { Boolean },
             TypeRef::Number | TypeRef::NumberLiteral(_) => return quote! { Number },
+            // A generic argument must be a JS type, so a `@tw-abi` scalar
+            // inside a handle (`Promise<…>` that is not an async return,
+            // `Array<…>`, `JsNullable<…>`) keeps the JS number it narrows.
+            TypeRef::AbiScalar(s) if s.is_bigint() => return quote! { BigInt },
+            TypeRef::AbiScalar(_) => return quote! { Number },
             TypeRef::String | TypeRef::StringLiteral(_) => return quote! { JsString },
             TypeRef::Void | TypeRef::Undefined => return quote! { Undefined },
             _ => {}
@@ -2094,14 +2269,11 @@ pub fn to_syn_type(
         // TypeScript itself erases a `| null` or `| undefined` on them. Any
         // other read that erases to `JsValue` (an unrelated intersection, a
         // union with no useful bound) takes the read carrier, so an empty
-        // reads as `None` as it does for every other type. Under
-        // `--strict-nullable` every `JsValue` read stays bare, as before.
-        if is_jsvalue_arg(&inner_ty)
-            && (CodegenContext::strict_nullable(ctx) || is_top_type(&core, ctx, scope))
-        {
+        // reads as `None` as it does for every other type.
+        if is_jsvalue_arg(&inner_ty) && is_top_type(&core, ctx, scope) {
             return inner_ty;
         }
-        return read_carrier(inner_ty, n, ctx);
+        return read_carrier(inner_ty, n);
     }
 
     // Helper: should this type get `&` in argument position?
@@ -2128,7 +2300,15 @@ pub fn to_syn_type(
         TypeRef::Unknown => maybe_ref(quote! { JsValue }, borrow),
         TypeRef::Object => maybe_ref(quote! { Object }, borrow),
         TypeRef::Symbol => maybe_ref(quote! { Symbol }, borrow),
-        TypeRef::AbiScalar(_) => unreachable!("read as its leaf above"),
+        // Always by value; wasm-bindgen converts the JS number.
+        TypeRef::AbiScalar(s) => {
+            let ident = syn::Ident::new(s.rust_ident(), proc_macro2::Span::call_site());
+            if s.is_safe_integer() {
+                quote! { ::wasm_bindgen::SafeInteger<#ident> }
+            } else {
+                quote! { #ident }
+            }
+        }
 
         // === TS-only synthetic ===
         // `ArrayBufferView` is a TS-only union alias (typed-array
@@ -2221,6 +2401,21 @@ pub fn to_syn_type(
             if let Some(lub) = crate::codegen::subtyping::lub_union(u.members(), ctx, scope) {
                 return to_syn_type(&lub, pos, ctx, scope, from_module);
             }
+            // Shapes have no runtime class to tell them apart, so the
+            // object every one of them is stands for the union. A type
+            // argument keeps the top type, which any instantiation passes.
+            if let Some(c) = ctx.filter(|c| {
+                c.type_args.get() == 0
+                    && u.members()
+                        .iter()
+                        .all(|m| matches!(m, TypeRef::Object) || is_shape_ref(m, scope, c))
+            }) {
+                c.warn(format!(
+                    "union `{}` of shapes can't be told apart, read as Object",
+                    ty.format_ts(),
+                ));
+                return to_syn_type(&TypeRef::Object, pos, ctx, scope, from_module);
+            }
             if let Some(c) = ctx {
                 c.warn(format!(
                     "union `{}` has no common supertype, erased to JsValue",
@@ -2262,25 +2457,7 @@ pub fn to_syn_type(
                 .take(8)
                 .map(|p| to_syn_type(&p.type_ref, inner_pos, ctx, scope, from_module))
                 .collect();
-            // `Function<fn() -> Promise<T>>` with a type parameter `T`
-            // does not satisfy wasm-bindgen's `JsFunction` (the nested
-            // `ErasableGeneric::Repr` projection fails to normalise), so
-            // the promised value erases inside callback signatures.
-            let promised_param = sig.return_type.as_promise_inner().is_some_and(|inner| {
-                inner.as_ident().is_some_and(|name| {
-                    ctx.is_some_and(|c| {
-                        matches!(
-                            c.gctx.scopes.resolve_binding(scope, name),
-                            Some(crate::parse::scope::Binding::TypeParam)
-                        )
-                    })
-                })
-            });
-            let ret = if promised_param {
-                quote! { Promise }
-            } else {
-                to_syn_type(&sig.return_type, inner_pos, ctx, scope, from_module)
-            };
+            let ret = to_syn_type(&sig.return_type, inner_pos, ctx, scope, from_module);
             // A `fn` pointer type has fixed arity, so a rest parameter
             // cannot be spelled; the untyped `Function` accepts any
             // closure, which is what `(...args: any[]) => void` means.
@@ -2357,6 +2534,37 @@ pub fn to_syn_type(
                         return maybe_ref(base, borrow);
                     }
                     _ => {}
+                }
+            }
+            // An enum the producer synthesised for a family's use site,
+            // declared by its literals.
+            if let (Some((name, literals)), Some(c)) = (super::ir_types::synthesised(ty), ctx) {
+                let literals = literals
+                    .iter()
+                    .all(|l| matches!(l, TypeRef::StringLiteral(_)))
+                    || is_integer_literal_union(literals);
+                if let Some(name) = literals
+                    .then(|| c.synthesise_literal_enum(name, generic_args, scope, from_module))
+                    .flatten()
+                {
+                    let ident = make_ident(&name);
+                    return quote! { #ident };
+                }
+                return quote! { JsValue };
+            }
+            // An associated type of a literal-only parameter, read through
+            // its family's trait (`Units::PluralizeUnits`).
+            if let ([param, assoc], [], Some(c)) =
+                (segments.as_slice(), generic_args.as_slice(), ctx)
+            {
+                if c.experimental_generic_mono
+                    && matches!(
+                        c.gctx.scopes.resolve_binding(scope, param),
+                        Some(crate::parse::scope::Binding::TypeParam),
+                    )
+                {
+                    let (param, assoc) = (make_ident(param), make_ident(assoc));
+                    return quote! { #param::#assoc };
                 }
             }
             if segments.len() == 1 && generic_args.is_empty() {
@@ -2526,7 +2734,13 @@ pub(crate) fn union_alias_argument(
     let TypeRef::Reference { segments, .. } = &core else {
         return None;
     };
-    let path = emit_type_name(&segments.join("."), scope, ctx);
+    let path = match &alias.instance {
+        Some(name) => {
+            let name = make_ident(name);
+            quote! { #name }
+        }
+        None => emit_type_name(&segments.join("."), scope, ctx),
+    };
     Some(match n {
         None if alias.kind.is_some() => quote! { impl #path },
         None => quote! { impl ::core::convert::Into<#path> },
@@ -2558,7 +2772,7 @@ fn union_alias_read(
             .chain(alias.nullability)
             .reduce(|a, b| a.with(b))
         {
-            Some(n) => read_carrier(path, n, Some(ctx)),
+            Some(n) => read_carrier(path, n),
             None => path,
         },
     )
@@ -2596,22 +2810,16 @@ pub(crate) fn nullable_carrier(inner: TokenStream, n: ir::Nullability) -> TokenS
     }
 }
 
-/// The read carrier of a return, an awaited value or a getter: `Option<T>`
-/// whichever empties the type admits. `FromWasmAbi` chooses nothing, and
-/// `Option<T>` reads `null` and `undefined` alike as `None`
-/// (wasm-bindgen#5428), so a read loses nothing by folding them; the Rust
-/// side receiving a value has no use for the distinction, where a write
-/// must pick one (see [`nullable_carrier`]). `--strict-nullable` keeps the
-/// exact carrier on reads too.
-pub(crate) fn read_carrier(
-    inner: TokenStream,
-    n: ir::Nullability,
-    ctx: Option<&CodegenContext<'_>>,
-) -> TokenStream {
-    if CodegenContext::strict_nullable(ctx) {
-        return nullable_carrier(inner, n);
+/// The read carrier of a return, an awaited value or a getter. `@js(null)`
+/// changes nothing JS to Wasm, so `T?` and `@js(null) T?` read as
+/// `Option<T>`, which takes `null` and `undefined` alike as `None`
+/// (wasm-bindgen#5428), where `Nullable<T>` would reject `undefined`. Only
+/// the strict IR's `T??` tells them apart, as `Option<Nullable<T>>`.
+pub(crate) fn read_carrier(inner: TokenStream, n: ir::Nullability) -> TokenStream {
+    match n {
+        ir::Nullability::Both => nullable_carrier(inner, n),
+        _ => quote! { Option<#inner> },
     }
-    quote! { Option<#inner> }
 }
 
 /// Inner-position nullability follows wasm-bindgen's `sys` split:
@@ -2983,7 +3191,7 @@ fn mono_promise_carrier(
     }
     let (core, n, scope) = split_empties_in(inner, ctx, scope)?;
     let inner_ty = to_syn_type(&core, pos.to_inner(), ctx, scope, from_module);
-    (!is_jsvalue_arg(&inner_ty)).then(|| read_carrier(inner_ty, n, ctx))
+    (!is_jsvalue_arg(&inner_ty)).then(|| read_carrier(inner_ty, n))
 }
 
 /// Append `generic_args` to `base` when `name` is a locally emitted generic
@@ -3019,11 +3227,16 @@ fn with_generic_args(
     if generic_args.is_empty() {
         return base;
     }
+    let decl = ctx.and_then(|c| Some((c, c.gctx.resolve_path(scope, name)?)));
     let arg_tokens: Vec<TokenStream> = generic_args
         .iter()
-        .map(|a| generic_arg_tokens(a, pos, ctx, scope, from_module))
+        .enumerate()
+        .map(|(i, a)| {
+            decl.and_then(|(c, id)| family_literal_arg(c, id, i, a, scope, from_module))
+                .unwrap_or_else(|| generic_arg_tokens(a, pos, ctx, scope, from_module))
+        })
         .collect();
-    let arg_tokens = match ctx.and_then(|c| Some((c, c.gctx.resolve_path(scope, name)?))) {
+    let arg_tokens = match decl {
         Some((c, id)) => c.trim_default_args(id, arg_tokens),
         None => arg_tokens,
     };
@@ -3031,6 +3244,46 @@ fn with_generic_args(
         return base;
     }
     quote! { #base<#(#arg_tokens),*> }
+}
+
+/// Under mono, literals instantiating a family's literal-only parameter
+/// (`Stepped<"hour">`), as their enum, named for them as the IR names it.
+fn family_literal_arg(
+    c: &CodegenContext<'_>,
+    id: crate::context::TypeId,
+    index: usize,
+    arg: &TypeRef,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> Option<TokenStream> {
+    let ir = c.ir.as_ref().filter(|_| c.experimental_generic_mono)?;
+    let params = match &c.gctx.get_type(id).kind {
+        TypeKind::Class(d) => &d.type_params,
+        TypeKind::Interface(d) => &d.type_params,
+        _ => return None,
+    };
+    if !ir.family_param(id, &params.get(index)?.name) {
+        return None;
+    }
+    let members = match arg {
+        TypeRef::Union(u) => u.members(),
+        arg => std::slice::from_ref(arg),
+    };
+    let literals: Vec<String> = members
+        .iter()
+        .map(|m| match m {
+            TypeRef::StringLiteral(s) => Some(s.clone()),
+            _ => None,
+        })
+        .collect::<Option<_>>()?;
+    let name: String = literals
+        .iter()
+        .map(|l| crate::util::naming::to_pascal_case(l))
+        .collect::<Vec<_>>()
+        .join("Or");
+    let name = c.synthesise_literal_enum(&name, members, scope, from_module)?;
+    let ident = make_ident(&name);
+    Some(quote! { #ident })
 }
 
 /// One generic argument of a locally declared generic type.
@@ -3041,10 +3294,16 @@ fn generic_arg_tokens(
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
-    if CodegenContext::generic_mono(ctx) {
-        to_mono_user_generic_arg(arg, ctx, scope, from_module)
-    } else {
-        to_syn_type(arg, pos.to_inner(), ctx, scope, from_module)
+    let lower = || {
+        if CodegenContext::generic_mono(ctx) {
+            to_mono_user_generic_arg(arg, ctx, scope, from_module)
+        } else {
+            to_syn_type(arg, pos.to_inner(), ctx, scope, from_module)
+        }
+    };
+    match ctx {
+        Some(c) => c.in_type_arg(lower),
+        None => lower(),
     }
 }
 
@@ -3111,13 +3370,12 @@ pub(crate) fn needs_js_name(ident: &syn::Ident, js_name: &str) -> bool {
 /// Map an IR `TypeRef` to the type used in a wasm_bindgen return position,
 /// wrapping in `Result<T, ErrTy>` when `catch` is true.
 ///
-/// The awaited value of an `async fn` import crosses the boundary through
-/// `JsFuture<T>`'s resolve closure, whose argument only needs
-/// `FromWasmAbi`, so async returns lower exactly like sync ones: bare
-/// primitives, the read carriers (`Option<T>`, `Nullable<T>`,
-/// `Option<Nullable<T>>`), `Vec<T>` and synthesized return unions. A list
-/// over a type parameter is the exception (see [`is_generic_rust_list`]).
-/// Only the un-awaited `Promise<T>` form keeps the inside-generic lowering.
+/// A `Promise<T>` is bound as `Promise<T, ErrTy>` instead, and awaiting it
+/// converts the settled value through `FromWasmAbi`, so its `T` lowers
+/// like a sync return: bare primitives, the read carriers (`Option<T>`,
+/// `Nullable<T>`, `Option<Nullable<T>>`), `Vec<T>` and synthesized return
+/// unions. A list over a type parameter is the exception (see
+/// [`is_generic_rust_list`]).
 ///
 /// `error_ty`, when supplied, replaces the default `JsValue` error type —
 /// callers pass the simplified throws union here. Resolution goes through
@@ -3127,7 +3385,6 @@ pub(crate) fn needs_js_name(ident: &syn::Ident, js_name: &str) -> bool {
 pub fn to_return_type(
     ty: &TypeRef,
     catch: bool,
-    is_async: bool,
     js_string_return: bool,
     error_ty: Option<&TypeRef>,
     ctx: Option<&CodegenContext<'_>>,
@@ -3135,16 +3392,48 @@ pub fn to_return_type(
     from_module: &ModuleContext,
     anchor: ReturnAnchor<'_>,
 ) -> TokenStream {
+    let err = catch.then(|| error_type_tokens(error_ty, ctx, scope, from_module));
+    let Some(awaited) = ty.as_promise_inner() else {
+        let inner = return_value(ty, false, js_string_return, ctx, scope, from_module, anchor);
+        return match err {
+            Some(err) => quote! { Result<#inner, #err> },
+            None => inner,
+        };
+    };
+    let inner = return_value(
+        awaited,
+        true,
+        js_string_return,
+        ctx,
+        scope,
+        from_module,
+        anchor,
+    );
+    match err {
+        Some(err) if !is_jsvalue_arg(&err) => quote! { Promise<#inner, #err> },
+        _ => quote! { Promise<#inner> },
+    }
+}
+
+/// A returned value, or what a returned promise resolves to.
+fn return_value(
+    ty: &TypeRef,
+    awaited: bool,
+    js_string_return: bool,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+    anchor: ReturnAnchor<'_>,
+) -> TokenStream {
     // `js_string_return` is only set by `build_signatures` in per-mono mode,
     // which implies a context; without one, fall through to the plain lowering.
-    let js_string_ctx = ctx.filter(|_| js_string_return);
-    let generic_list = is_async && ctx.is_some_and(|c| is_generic_rust_list(ty, c, scope));
-    let inner = if let Some(ctx) = js_string_ctx {
-        to_mono_js_string_return_type(ty, ctx, scope, from_module)
-    } else if generic_list {
+    if let Some(ctx) = ctx.filter(|_| js_string_return) {
+        return to_mono_js_string_return_type(ty, ctx, scope, from_module);
+    }
+    if awaited && ctx.is_some_and(|c| is_generic_rust_list(ty, c, scope)) {
         // The list keeps its `Array<T>` handle; the awaited value's own
         // empties still take the read carriers around it.
-        match split_empties_in(ty, ctx, scope) {
+        return match split_empties_in(ty, ctx, scope) {
             Some((core, n, scope)) => read_carrier(
                 to_syn_type(
                     &core,
@@ -3154,26 +3443,27 @@ pub fn to_return_type(
                     from_module,
                 ),
                 n,
-                ctx,
             ),
             None => to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module),
-        }
-    } else if let Some(tokens) = union_alias_read(ty, ctx, scope) {
-        tokens
-    } else {
-        let read = resolve_union_aliases(ty, ctx, scope);
-        match maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor) {
-            Some(tokens) => tokens,
-            None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
-        }
-    };
-
-    if catch {
-        let err = error_type_tokens(error_ty, ctx, scope, from_module);
-        quote! { Result<#inner, #err> }
-    } else {
-        inner
+        };
     }
+    // Under erasure a promise's argument is a JS type, but for one that
+    // never resolves.
+    if awaited && *ty == TypeRef::Never {
+        return quote! { () };
+    }
+    if awaited && matches!(ty, TypeRef::Void | TypeRef::Undefined) {
+        return match ctx.is_some_and(|c| c.experimental_generic_mono) {
+            true => quote! { () },
+            false => quote! { Undefined },
+        };
+    }
+    if let Some(tokens) = union_alias_read(ty, ctx, scope) {
+        return tokens;
+    }
+    let read = resolve_union_aliases(ty, ctx, scope);
+    maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor)
+        .unwrap_or_else(|| to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module))
 }
 
 /// The `E` of a fallible binding's `Result<T, E>`: the `@throws` type
@@ -3297,10 +3587,10 @@ fn is_mono_native_leaf(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -
             | TypeRef::BooleanLiteral(_)
             | TypeRef::Number
             | TypeRef::NumberLiteral(_)
+            | TypeRef::AbiScalar(_)
             | TypeRef::String
             | TypeRef::StringLiteral(_)
-    ) || matches!(ty, TypeRef::AbiScalar(s) if !s.is_bigint())
-        || ctx.enum_kind(ty, scope).is_some()
+    ) || ctx.enum_kind(ty, scope).is_some()
 }
 
 /// The generic arguments of `ty` if it instantiates a locally declared
@@ -3350,6 +3640,7 @@ fn to_mono_user_generic_arg_impl(
 ) -> TokenStream {
     let (peeled, peeled_scope) = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
+        TypeRef::Void | TypeRef::Undefined => quote! { () },
         t if is_mono_native_leaf(t, ctx, peeled_scope) => to_syn_type(
             t,
             TypePosition::RETURN,
@@ -3459,7 +3750,7 @@ fn to_mono_js_string_return_type_impl(
             let inner =
                 to_mono_js_string_return_type_impl(&inner, ctx, s, from_module, read, visited);
             if read {
-                read_carrier(inner, n, Some(ctx))
+                read_carrier(inner, n)
             } else {
                 nullable_carrier(inner, n)
             }
@@ -3549,24 +3840,7 @@ pub fn to_getter_return_type(
         if let Some(inner_tokens) =
             maybe_synthesise_return_union(&core, ctx, scope, from_module, anchor)
         {
-            return read_carrier(inner_tokens, n, ctx);
-        }
-    }
-    // Under `--strict-nullable` a `JsValue` read stays bare, except a
-    // property that can be absent: it keeps its `Option` around a type that
-    // erases to `JsValue`, so absence reads as `None`, and a written `null`
-    // nests a `Nullable` under that `Option`, which would read `null` as
-    // `None`. The top type already holds both empties in-band, so it stays
-    // bare. (Without the flag `to_syn_type` gives every such read
-    // `Option<JsValue>`.)
-    if let Some((core, n, core_scope)) =
-        split_empties_in(ty, ctx, scope).filter(|_| CodegenContext::strict_nullable(ctx))
-    {
-        if n.admits_undefined() && !is_top_type(&core, ctx, core_scope) {
-            let inner = to_syn_type(&core, TypePosition::RETURN, ctx, core_scope, from_module);
-            if is_jsvalue_arg(&inner) {
-                return nullable_carrier(inner, n);
-            }
+            return read_carrier(inner_tokens, n);
         }
     }
     to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)
@@ -3734,6 +4008,7 @@ fn maybe_synthesise_return_union(
 
     let arms = dynamic_union_members(members, ctx, scope, from_module)?;
     let name = cgctx.synthesise_dynamic_union(
+        members,
         &arms,
         &anchor.enum_anchor(),
         anchor.parent,
@@ -3834,6 +4109,7 @@ pub(crate) fn setter_enum(
         return None;
     }
     let name = cgctx.synthesise_dynamic_union(
+        u.members(),
         &arms,
         &anchor.enum_anchor(),
         anchor.parent,
@@ -4011,7 +4287,7 @@ fn is_shape_ref(ty: &TypeRef, scope: ScopeId, cgctx: &CodegenContext<'_>) -> boo
 
 /// Whether every member is a distinct-valued integer literal that fits the
 /// `u32` (or, with any negative, `i32`) repr of a wasm-bindgen C-style enum.
-fn is_integer_literal_union(members: &[TypeRef]) -> bool {
+pub(crate) fn is_integer_literal_union(members: &[TypeRef]) -> bool {
     let signed = members
         .iter()
         .any(|m| matches!(m, TypeRef::NumberLiteral(n) if *n < 0.0));
@@ -4126,8 +4402,8 @@ fn is_mono_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: Sco
 }
 
 /// Whether a top-level `T[]` element keeps its Rust-native form
-/// (`String` / `f64`) inside the slice / `Vec`, rather than its handle
-/// form. Enums count as the primitive they carry.
+/// (`String` / `f64` / a `@tw-abi` scalar) inside the slice / `Vec`, rather
+/// than its handle form. Enums count as the primitive they carry.
 fn is_native_array_element(
     elem: &TypeRef,
     ctx: Option<&CodegenContext<'_>>,
@@ -4139,11 +4415,9 @@ fn is_native_array_element(
             | TypeRef::StringLiteral(_)
             | TypeRef::Number
             | TypeRef::NumberLiteral(_)
+            | TypeRef::AbiScalar(_)
             | TypeRef::Boolean
             | TypeRef::BooleanLiteral(_)
-    ) || matches!(
-        native_array_leaf(elem, ctx, scope).as_ref(),
-        TypeRef::AbiScalar(s) if !s.is_bigint()
     )
 }
 
@@ -4253,7 +4527,8 @@ pub(crate) fn is_mono_string_list_return(
     )
 }
 
-/// Whether a top-level `T[]` element lowers to `f64`.
+/// Whether a top-level `T[]` element is a JS number: `f64`, or the scalar
+/// a `@tw-abi` tag forces.
 fn is_numeric_array_element(
     elem: &TypeRef,
     ctx: Option<&CodegenContext<'_>>,
@@ -4261,8 +4536,8 @@ fn is_numeric_array_element(
 ) -> bool {
     matches!(
         native_array_leaf(elem, ctx, scope).as_ref(),
-        TypeRef::Number | TypeRef::NumberLiteral(_)
-    ) || matches!(native_array_leaf(elem, ctx, scope).as_ref(), TypeRef::AbiScalar(s) if !s.is_bigint())
+        TypeRef::Number | TypeRef::NumberLiteral(_) | TypeRef::AbiScalar(_)
+    )
 }
 
 fn native_array_leaf<'t>(
@@ -4534,56 +4809,12 @@ mod tests {
             ret_type(&nullable(Nullability::Undefined)),
             "Option < String >"
         );
-        // A read folds every empty into `Option`.
+        // A read is `Option` but for the strict IR's `T??`.
         assert_eq!(ret_type(&nullable(Nullability::Null)), "Option < String >");
-        assert_eq!(ret_type(&nullable(Nullability::Both)), "Option < String >");
-    }
-
-    #[test]
-    fn strict_nullable_reads_keep_the_exact_carriers() {
-        let src = "declare class Foo {} declare class Bar {}";
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let options = GenerateOptions::new().strict_nullable(true);
-        let ctx = CodegenContext::from_module_full(&module, &gctx, &options, None).unwrap();
-        let scope = *module.file_scopes.first().expect("file scope");
-        assert!(CodegenContext::strict_nullable(Some(&ctx)));
-        assert!(!CodegenContext::strict_nullable(None));
-        let read = |ty: &TypeRef| {
-            to_syn_type(
-                ty,
-                TypePosition::RETURN,
-                Some(&ctx),
-                scope,
-                &ModuleContext::Global,
-            )
-            .to_string()
-        };
-        let nullable = |n| TypeRef::String.with_empties(n);
-        assert_eq!(read(&nullable(Nullability::Undefined)), "Option < String >");
-        assert_eq!(read(&nullable(Nullability::Null)), "Nullable < String >");
         assert_eq!(
-            read(&nullable(Nullability::Both)),
+            ret_type(&nullable(Nullability::Both)),
             "Option < Nullable < String >>"
         );
-        // Every `JsValue` read stays bare, as before the fold.
-        let erased = TypeRef::Intersection(vec![TypeRef::ident("Foo"), TypeRef::ident("Bar")]);
-        assert_eq!(read(&erased.with_empties(Nullability::Null)), "JsValue");
-        assert_eq!(
-            read(&TypeRef::Any.with_empties(Nullability::Null)),
-            "JsValue"
-        );
-        // Writes are the same under either setting.
-        let write = |ty: &TypeRef| {
-            to_syn_type(
-                ty,
-                TypePosition::ARGUMENT,
-                Some(&ctx),
-                scope,
-                &ModuleContext::Global,
-            )
-            .to_string()
-        };
-        assert_eq!(write(&nullable(Nullability::Null)), "Nullable < & str >");
     }
 
     #[test]
@@ -4884,24 +5115,29 @@ mod tests {
 
     #[test]
     fn test_return_with_catch() {
-        let ty = TypeRef::generic("Promise", vec![TypeRef::Void]);
-        let result = to_return_type(
-            &ty,
-            true,
-            false,
-            false,
-            None,
-            None,
-            ScopeId(0),
-            &ModuleContext::Global,
-            ReturnAnchor {
-                base: "test",
-                kind: ReturnAnchorKind::Callable,
-                parent: None,
-            },
-        )
-        .to_string();
-        assert_eq!(result, "Result < Promise < Undefined > , JsValue >");
+        let catching = |ty: &TypeRef| {
+            to_return_type(
+                ty,
+                true,
+                false,
+                None,
+                None,
+                ScopeId(0),
+                &ModuleContext::Global,
+                ReturnAnchor {
+                    base: "test",
+                    kind: ReturnAnchorKind::Callable,
+                    parent: None,
+                },
+            )
+            .to_string()
+        };
+        assert_eq!(catching(&TypeRef::String), "Result < String , JsValue >");
+        // A promise rejects with the error rather than returning a `Result`.
+        let promise = TypeRef::generic("Promise", vec![TypeRef::Void]);
+        assert_eq!(catching(&promise), "Promise < Undefined >");
+        let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
+        assert_eq!(catching(&promise), "Promise < String >");
     }
 
     #[test]
@@ -5839,19 +6075,22 @@ mod tests {
             parent: None,
         };
         let erased = || TypeRef::Intersection(vec![TypeRef::ident("Foo"), TypeRef::ident("Bar")]);
-        let reads = |strict: bool| {
-            let options = GenerateOptions::new().strict_nullable(strict);
-            let ctx = CodegenContext::from_module_full(&module, &gctx, &options, None).unwrap();
-            let read = |members: Vec<TypeRef>| {
-                to_getter_return_type(
-                    &TypeRef::union(members),
-                    Some(&ctx),
-                    scope,
-                    &ModuleContext::Global,
-                    anchor,
-                )
-                .to_string()
-            };
+        let ctx = CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
+            .unwrap();
+        let read = |members: Vec<TypeRef>| {
+            to_getter_return_type(
+                &TypeRef::union(members),
+                Some(&ctx),
+                scope,
+                &ModuleContext::Global,
+                anchor,
+            )
+            .to_string()
+        };
+        // A read erasing to `JsValue` takes the read carrier whichever
+        // empties it admits; the top type holds both empties in-band and
+        // stays bare.
+        assert_eq!(
             [
                 read(vec![erased(), TypeRef::Undefined]),
                 read(vec![erased(), TypeRef::Null, TypeRef::Undefined]),
@@ -5860,32 +6099,11 @@ mod tests {
                 read(vec![TypeRef::Unknown, TypeRef::Null, TypeRef::Undefined]),
                 read(vec![TypeRef::ident("Anything"), TypeRef::Undefined]),
                 read(vec![TypeRef::ident("Foo"), TypeRef::Undefined]),
-            ]
-        };
-        // A read erasing to `JsValue` takes the read carrier whichever
-        // empties it admits; the top type holds both empties in-band and
-        // stays bare.
-        assert_eq!(
-            reads(false),
-            [
-                "Option < JsValue >",
-                "Option < JsValue >",
-                "Option < JsValue >",
-                "JsValue",
-                "JsValue",
-                "JsValue",
-                "Option < Foo >",
-            ]
-        );
-        // Under `--strict-nullable` only a property that can be absent
-        // keeps its `Option`, with a written `null` as the `Nullable`
-        // under it; without `undefined` any `JsValue` stays bare.
-        assert_eq!(
-            reads(true),
+            ],
             [
                 "Option < JsValue >",
                 "Option < Nullable < JsValue >>",
-                "JsValue",
+                "Option < JsValue >",
                 "JsValue",
                 "JsValue",
                 "JsValue",
@@ -5957,10 +6175,11 @@ mod tests {
             );
 
             // Two dictionaries, or a named upper bound, leave the enum to
-            // the arguments, and the read resolves the alias as before.
+            // the arguments. The read resolves the alias as before, so two
+            // dictionaries read as the `Object` both are.
             let fields = ctx.union_alias(&id("Fields"), scope).unwrap();
             assert!(!fields.readable && !fields.fallback);
-            assert_eq!(read(id("Fields")), "JsValue");
+            assert_eq!(read(id("Fields")), "Object");
             assert!(!ctx.union_alias(&id("Errors"), scope).unwrap().readable);
             assert_eq!(read(id("Errors")), "Error");
         }

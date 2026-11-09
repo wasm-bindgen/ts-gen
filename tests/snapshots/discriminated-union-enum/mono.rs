@@ -10,9 +10,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Attachment;
     #[wasm_bindgen(method, getter)]
-    pub fn disposition(this: &Attachment) -> DispositionKind;
+    pub fn disposition(this: &Attachment) -> AttachmentDispositionKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_disposition(this: &Attachment, val: DispositionKind);
+    pub fn set_disposition(this: &Attachment, val: AttachmentDispositionKind);
     #[wasm_bindgen(method, getter, js_name = "contentId")]
     pub fn content_id(this: &Attachment) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "contentId")]
@@ -38,14 +38,14 @@ impl Attachment {
     #[doc = " Start a builder with `disposition: \"inline\"`."]
     pub fn builder_inline(content_id: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(DispositionKind::Inline);
+        inner.set_disposition(AttachmentDispositionKind::Inline);
         inner.set_content_id(content_id);
         AttachmentBuilder { inner }
     }
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(DispositionKind::Attachment);
+        inner.set_disposition(AttachmentDispositionKind::Attachment);
         inner.set_filename(filename);
         AttachmentBuilder { inner }
     }
@@ -72,9 +72,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Reply;
     #[wasm_bindgen(method, getter)]
-    pub fn code(this: &Reply) -> CodeKind;
+    pub fn code(this: &Reply) -> ReplyCodeKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_code(this: &Reply, val: CodeKind);
+    pub fn set_code(this: &Reply, val: ReplyCodeKind);
     #[wasm_bindgen(method, getter)]
     pub fn body(this: &Reply) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "body")]
@@ -100,14 +100,14 @@ impl Reply {
     #[doc = " Start a builder with `code: 200`."]
     pub fn builder_200(body: impl ::wasm_bindgen::JsStringLike) -> ReplyBuilder {
         let inner: Reply = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code(CodeKind::N200);
+        inner.set_code(ReplyCodeKind::N200);
         inner.set_body(body);
         ReplyBuilder { inner }
     }
     #[doc = " Start a builder with `code: 404`."]
     pub fn builder_404(reason: impl ::wasm_bindgen::JsStringLike) -> ReplyBuilder {
         let inner: Reply = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code(CodeKind::N404);
+        inner.set_code(ReplyCodeKind::N404);
         inner.set_reason(reason);
         ReplyBuilder { inner }
     }
@@ -134,11 +134,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Payload;
     #[wasm_bindgen(method, getter)]
-    pub fn kind(this: &Payload) -> KindKind;
+    pub fn kind(this: &Payload) -> PayloadKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_kind(this: &Payload, val: KindKind);
+    pub fn set_kind(this: &Payload, val: PayloadKind);
     #[wasm_bindgen(method, getter)]
-    pub fn data(this: &Payload) -> DataKind;
+    pub fn data(this: &Payload) -> PayloadDataKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &Payload, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "data")]
@@ -156,14 +156,14 @@ impl Payload {
     #[doc = " Start a builder with `kind: \"text\"`."]
     pub fn builder_text(data: impl ::wasm_bindgen::JsStringLike) -> PayloadBuilder {
         let inner: Payload = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(KindKind::Text);
+        inner.set_kind(PayloadKind::Text);
         inner.set_data(data);
         PayloadBuilder { inner }
     }
     #[doc = " Start a builder with `kind: \"binary\"`."]
     pub fn builder_binary(data: &ArrayBuffer) -> PayloadBuilder {
         let inner: Payload = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(KindKind::Binary);
+        inner.set_kind(PayloadKind::Binary);
         inner.set_data_with_array_buffer(data);
         PayloadBuilder { inner }
     }
@@ -172,7 +172,7 @@ pub struct PayloadBuilder {
     inner: Payload,
 }
 impl PayloadBuilder {
-    pub fn kind(self, val: KindKind) -> Self {
+    pub fn kind(self, val: PayloadKind) -> Self {
         self.inner.set_kind(val);
         self
     }
@@ -187,25 +187,25 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DispositionKind {
+pub enum AttachmentDispositionKind {
     Inline = "inline",
     Attachment = "attachment",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CodeKind {
+pub enum ReplyCodeKind {
     N200 = 200,
     N404 = 404,
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KindKind {
+pub enum PayloadKind {
     Text = "text",
     Binary = "binary",
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum DataKind {
+pub enum PayloadDataKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
 }

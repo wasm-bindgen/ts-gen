@@ -1,10 +1,10 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, ArrayTuple, Function, JsNullable, JsString, Map, Number, Object};
+use js_sys::{Array, ArrayTuple, Function, JsString, Map, Number, Object};
 
 use ts_gen_integration_tests::enum_positions::{
-    codes::Region, Level, LevelOrStringReturnKind, Mode, ModeAlias, ModeOrNumberReturnKind,
-    ModeOrRegionReturnKind, ModeOrStringReturnKind, Probe,
+    codes::Region, Level, LevelOrStringKind, Mode, ModeAlias, ModeOrF64, ModeOrRegion,
+    ModeOrStringKind, Probe,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -31,28 +31,25 @@ async fn enum_positions_compile(
 
     let _: Mode = probe.next_mode().await?;
     let _: Option<Mode> = probe.maybe_mode().await?;
-    let mode: JsString = probe.next_mode_promise().await?;
-    let _: Option<Mode> = Mode::from_js_value(&mode);
-    let _: JsNullable<JsString> = probe.maybe_mode_promise().await?;
     let _: Map<JsString, JsString> = probe.mode_map();
     let _: Object<JsString> = probe.mode_record();
     let _: ArrayTuple<(JsString, Number)> = probe.pair();
 
     match probe.mode_or_number() {
-        ModeOrNumberReturnKind::Mode(mode) => probe.alias(mode),
-        ModeOrNumberReturnKind::F64(_) => {}
+        ModeOrF64::Mode(mode) => probe.alias(mode),
+        ModeOrF64::F64(_) => {}
     }
     match probe.mode_or_string() {
-        ModeOrStringReturnKind::Mode(mode) => probe.alias(mode),
-        ModeOrStringReturnKind::String(_) => {}
+        ModeOrStringKind::Mode(mode) => probe.alias(mode),
+        ModeOrStringKind::String(_) => {}
     }
     match probe.mode_or_region() {
-        ModeOrRegionReturnKind::Mode(mode) => probe.alias(mode),
-        ModeOrRegionReturnKind::Region(region) => probe.region(region),
+        ModeOrRegion::Mode(mode) => probe.alias(mode),
+        ModeOrRegion::Region(region) => probe.region(region),
     }
     match probe.level_or_string() {
-        LevelOrStringReturnKind::Level(level) => probe.set_level(level),
-        LevelOrStringReturnKind::String(_) => {}
+        LevelOrStringKind::Level(level) => probe.set_level(level),
+        LevelOrStringKind::String(_) => {}
     }
     Ok(())
 }

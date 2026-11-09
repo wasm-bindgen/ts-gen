@@ -3,7 +3,7 @@
 use js_sys::{Function, Symbol, Undefined};
 
 use ts_gen_integration_tests::symbol::{
-    all, create, describe, find, for_each, lookup, set_key, set_key_with_symbol, LookupReturnKind,
+    all, create, describe, find, for_each, lookup, set_key, set_key_with_symbol, StrOrSymbol,
     Tagged,
 };
 
@@ -20,8 +20,8 @@ fn symbol_signatures_compile(symbol: &Symbol, callback: &Function<fn(Symbol) -> 
     set_key("key");
     set_key_with_symbol(symbol);
     match lookup() {
-        LookupReturnKind::String(_) => {}
-        LookupReturnKind::Symbol(_) => {}
+        StrOrSymbol::String(_) => {}
+        StrOrSymbol::Symbol(_) => {}
     }
 
     let tagged = Tagged::builder(symbol).alias(symbol).build();

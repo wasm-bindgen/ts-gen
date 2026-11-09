@@ -13,6 +13,9 @@
 //! flags the CLI supports (e.g. `--lib-name`, `--external`) just work. Flags
 //! owned by a configuration can't appear there.
 //!
+//! The bindings a fixture skips are listed in `tests/snapshot.skipped`,
+//! which blessing doesn't update.
+//!
 //! To add a new snapshot test, just drop a `.d.ts` file into `tests/fixtures/`.
 //! To update snapshots after intentional changes:
 //!
@@ -37,12 +40,7 @@ const CONFIGS: &[(&str, &[&str])] = &[
 const FEATURE_CONFIGS: &[(&str, &[&str], &[&str])] = &[(
     "strict",
     &["--strict-nullable"],
-    &[
-        "node-nullable",
-        "nullability",
-        "optional-reads",
-        "promise-companion",
-    ],
+    &["node-nullable", "nullability", "optional-reads"],
 )];
 
 /// The configurations `fixture_stem` is rendered under.
@@ -182,8 +180,9 @@ fn assert_snapshot(snap_path: &Path, actual: &str) {
 }
 
 /// Run the `ts-gen` CLI on a `.d.ts` fixture under every configuration and
-/// compare each generated Rust output against its blessed snapshot.
-fn snapshot_test(fixture_name: &str) {
+/// compare each generated Rust output against its blessed snapshot. Returns
+/// the bindings each configuration skips, as [`SKIPPED`] lists them.
+fn snapshot_test(fixture_name: &str) -> Vec<String> {
     let root = crate_root();
     let fixture = root.join("tests/fixtures").join(fixture_name);
     let base_name = fixture_name.replace(".d.ts", "");
@@ -203,6 +202,7 @@ fn snapshot_test(fixture_name: &str) {
     }
 
     let out_dir = TempDir::new(&format!("snapshot-{base_name}"));
+    let mut skipped = Vec::new();
 
     for (config_name, config_args) in &configs {
         let out_file = out_dir.0.join(format!("{config_name}.rs"));
@@ -238,7 +238,49 @@ fn snapshot_test(fixture_name: &str) {
         });
 
         assert_snapshot(&snap_dir.join(format!("{config_name}.rs")), &rust_code);
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        skipped.extend(
+            stderr
+                .lines()
+                .filter_map(|l| l.strip_prefix("[ts-gen warning]: "))
+                .filter(|l| l.contains("skipped"))
+                .map(|l| format!("{base_name} ({config_name}): {l}")),
+        );
     }
+    skipped
+}
+
+/// The checked-in list of the bindings the fixtures skip, which blessing
+/// leaves alone: a binding the IR can't restate is dropped with only a
+/// warning, so a new skip fails until it is fixed or listed by hand, and a
+/// listed one that no longer occurs until it is removed.
+const SKIPPED: &str = "tests/snapshot.skipped";
+
+fn check_skipped(mut skipped: Vec<String>) {
+    skipped.sort();
+    skipped.dedup();
+    let listed = std::fs::read_to_string(crate_root().join(SKIPPED)).unwrap_or_default();
+    let listed: Vec<&str> = listed
+        .lines()
+        .filter(|l| !l.is_empty() && !l.starts_with("//"))
+        .collect();
+    let new: Vec<&str> = skipped
+        .iter()
+        .map(String::as_str)
+        .filter(|s| !listed.contains(s))
+        .collect();
+    let gone: Vec<&str> = listed
+        .iter()
+        .copied()
+        .filter(|l| !skipped.iter().any(|s| s == l))
+        .collect();
+    assert!(
+        new.is_empty() && gone.is_empty(),
+        "{SKIPPED} is stale.\nSkipped, and not listed:\n  {}\nListed, and no longer skipped:\n  {}",
+        new.join("\n  "),
+        gone.join("\n  ")
+    );
 }
 
 /// Every entry under `tests/snapshots/` must be the directory of a current
@@ -310,11 +352,13 @@ fn snapshots() {
     }
 
     let mut failures = Vec::new();
+    let mut skipped = Vec::new();
 
     for fixture in &fixtures {
-        let result = std::panic::catch_unwind(|| {
-            snapshot_test(fixture);
-        });
+        let result = std::panic::catch_unwind(|| snapshot_test(fixture));
+        if let Ok(s) = &result {
+            skipped.extend(s.iter().cloned());
+        }
         if let Err(e) = result {
             let msg = if let Some(s) = e.downcast_ref::<String>() {
                 s.clone()
@@ -335,6 +379,8 @@ fn snapshots() {
         panic!("{report}");
     }
 
+    check_skipped(skipped);
+
     let stale = check_stale_snapshots(&fixtures);
     assert!(
         stale.is_empty(),
@@ -347,6 +393,47 @@ fn snapshots() {
         fixtures.len(),
         CONFIGS.len()
     );
+}
+
+/// A dictionary whose required field has no setter skips its factories,
+/// warning once with the field.
+#[test]
+fn a_required_field_without_a_setter_skips_the_factories() {
+    let fixture = crate_root().join("tests/fixtures/unwritable-fields.d.ts");
+    let out_dir = TempDir::new("unwritable-fields");
+    let output = Command::new(ts_gen_bin())
+        .arg("--input")
+        .arg(&fixture)
+        .arg("--output")
+        .arg(out_dir.0.join("bindings.rs"))
+        .output()
+        .expect("Failed to execute ts-gen binary");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(output.status.success(), "{stderr}");
+    let warning = "`Sealed.seal`: a required field without a setter; `new` and `builder` skipped";
+    assert_eq!(stderr.matches(warning).count(), 1, "{stderr}");
+    assert!(!stderr.contains("`Unsealed.seal`: a required"), "{stderr}");
+}
+
+/// An accessor the IR skips is warned once, at its class and form.
+#[test]
+fn a_skipped_accessor_is_located_once() {
+    let fixture = crate_root().join("tests/fixtures/unwritable-fields.d.ts");
+    let out_dir = TempDir::new("skipped-accessor");
+    let output = Command::new(ts_gen_bin())
+        .arg("--input")
+        .arg(&fixture)
+        .arg("--output")
+        .arg(out_dir.0.join("bindings.rs"))
+        .output()
+        .expect("Failed to execute ts-gen binary");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(output.status.success(), "{stderr}");
+    for form in ["Get", "Set"] {
+        let warning =
+            format!("`Sealed.seal` ({form}): the IR doesn't state the parse's reading; skipped");
+        assert_eq!(stderr.matches(&warning).count(), 1, "{stderr}");
+    }
 }
 
 /// Diagnostics aren't part of a snapshot, so the absence of the dropped

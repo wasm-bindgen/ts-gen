@@ -82,12 +82,12 @@ extern "C" {
 }
 #[wasm_bindgen(module = "symbol")]
 extern "C" {
-    pub fn lookup() -> LookupReturnKind;
+    pub fn lookup() -> StrOrSymbol;
 }
 #[wasm_bindgen(module = "symbol")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "lookup")]
-    pub fn try_lookup() -> Result<LookupReturnKind, JsValue>;
+    pub fn try_lookup() -> Result<StrOrSymbol, JsValue>;
 }
 #[wasm_bindgen(module = "symbol")]
 extern "C" {
@@ -141,7 +141,7 @@ impl TaggedBuilder {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum LookupReturnKind {
+pub enum StrOrSymbol {
     String(String),
     Symbol(Symbol),
 }

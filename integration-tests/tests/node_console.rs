@@ -74,9 +74,9 @@ fn test_console_time() {
 fn test_console_time_log() {
     let console = make_console();
 
-    // timeLog has optional label + variadic data (always present)
-    console.time_log(&[]);
-    console.time_log_with_label("my-timer", &[JsValue::from("extra data")]);
+    // The data follows the label, so only the call with a label takes it.
+    console.time_log();
+    console.time_log_with_label_and_data(Some("my-timer"), &[JsValue::from("extra data")]);
 }
 
 #[wasm_bindgen_test]
@@ -96,10 +96,10 @@ fn test_console_group() {
 fn test_console_assert() {
     let console = make_console();
 
-    // assert: optional condition + variadic data
-    console.assert(&[]);
-    console.assert_with_condition(true, &[]);
-    console.assert_with_condition(false, &[JsValue::from("assertion failed")]);
+    // The data follows the condition, so only the call with one takes it.
+    console.assert();
+    console.assert_with_condition_and_data(Some(true), &[]);
+    console.assert_with_condition_and_data(Some(false), &[JsValue::from("assertion failed")]);
 }
 
 #[wasm_bindgen_test]

@@ -10,9 +10,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BoolOrStrings;
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &BoolOrStrings) -> ModeKind;
+    pub fn mode(this: &BoolOrStrings) -> BoolOrStringsModeKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(this: &BoolOrStrings, val: ModeKind);
+    pub fn set_mode(this: &BoolOrStrings, val: BoolOrStringsModeKind);
     #[wasm_bindgen(method, setter, js_name = "mode")]
     pub fn set_mode_with_bool(this: &BoolOrStrings, val: bool);
 }
@@ -38,13 +38,13 @@ impl BoolOrStrings {
     #[doc = " Start a builder with `mode: \"x\"`."]
     pub fn builder_x() -> BoolOrStringsBuilder {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(ModeKind::X);
+        inner.set_mode(BoolOrStringsModeKind::X);
         BoolOrStringsBuilder { inner }
     }
     #[doc = " Start a builder with `mode: \"y\"`."]
     pub fn builder_y() -> BoolOrStringsBuilder {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(ModeKind::Y);
+        inner.set_mode(BoolOrStringsModeKind::Y);
         BoolOrStringsBuilder { inner }
     }
 }
@@ -52,7 +52,7 @@ pub struct BoolOrStringsBuilder {
     inner: BoolOrStrings,
 }
 impl BoolOrStringsBuilder {
-    pub fn mode(self, val: ModeKind) -> Self {
+    pub fn mode(self, val: BoolOrStringsModeKind) -> Self {
         self.inner.set_mode(val);
         self
     }
@@ -312,9 +312,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Optional;
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &Optional) -> Option<OptionalModeKind>;
+    pub fn mode(this: &Optional) -> Option<XOrY>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(this: &Optional, val: OptionalModeKind);
+    pub fn set_mode(this: &Optional, val: XOrY);
 }
 impl Optional {
     pub fn new() -> Optional {
@@ -335,7 +335,7 @@ pub struct OptionalBuilder {
     inner: Optional,
 }
 impl OptionalBuilder {
-    pub fn mode(self, val: OptionalModeKind) -> Self {
+    pub fn mode(self, val: XOrY) -> Self {
         self.inner.set_mode(val);
         self
     }
@@ -345,7 +345,7 @@ impl OptionalBuilder {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ModeKind {
+pub enum BoolOrStringsModeKind {
     Bool(bool),
     X = "x",
     Y = "y",
@@ -380,7 +380,7 @@ pub enum OpenModeKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OptionalModeKind {
+pub enum XOrY {
     X = "x",
     Y = "y",
 }

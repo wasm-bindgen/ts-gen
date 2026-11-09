@@ -37,31 +37,24 @@ extern "C" {
     pub fn set_detail(this: &Settings, val: &JsValue);
     #[doc = " No member subtypes the other, so it erases."]
     #[wasm_bindgen(method, getter)]
-    pub fn stamp(this: &Settings) -> Option<JsValue>;
+    pub fn stamp(this: &Settings) -> Option<Moment>;
     #[wasm_bindgen(method, setter)]
     pub fn set_stamp(this: &Settings, val: &JsValue);
     #[doc = " Erased, `null`, or absent."]
     #[wasm_bindgen(method, getter)]
-    pub fn cleared(this: &Settings) -> Option<JsValue>;
+    pub fn cleared(this: &Settings) -> Option<Moment>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cleared(this: &Settings, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "cleared")]
-    fn __set_cleared_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[doc = " Required, but admitting `undefined`."]
     #[wasm_bindgen(method, getter)]
-    pub fn maybe(this: &Settings) -> Option<JsValue>;
+    pub fn maybe(this: &Settings) -> Option<Moment>;
     #[wasm_bindgen(method, setter)]
     pub fn set_maybe(this: &Settings, val: &JsValue);
     #[doc = " Always present, so bare."]
     #[wasm_bindgen(method, getter)]
-    pub fn value(this: &Settings) -> JsValue;
+    pub fn value(this: &Settings) -> Moment;
     #[wasm_bindgen(method, setter)]
     pub fn set_value(this: &Settings, val: &JsValue);
-}
-impl Settings {
-    pub fn set_cleared_with_null(&self) {
-        self.__set_cleared_with_null(&::wasm_bindgen::JsValue::NULL)
-    }
 }
 impl Settings {
     #[doc = " * `maybe` - Required, but admitting `undefined`."]
@@ -100,10 +93,6 @@ impl SettingsBuilder {
         self.inner.set_cleared(val);
         self
     }
-    pub fn cleared_with_null(self) -> Self {
-        self.inner.set_cleared_with_null();
-        self
-    }
     pub fn build(self) -> Settings {
         self.inner
     }
@@ -115,14 +104,14 @@ extern "C" {
     pub type Registry;
     #[doc = " Absent."]
     # [wasm_bindgen (static_method_of = Registry , getter)]
-    pub fn missing() -> Option<JsValue>;
+    pub fn missing() -> Option<Moment>;
     # [wasm_bindgen (static_method_of = Registry , setter)]
-    pub fn set_missing(val: &JsValue);
+    pub fn set_missing(val: &Moment);
     #[doc = " Present, holding `null`."]
     # [wasm_bindgen (static_method_of = Registry , getter)]
-    pub fn cleared() -> Option<JsValue>;
+    pub fn cleared() -> Option<Moment>;
     # [wasm_bindgen (static_method_of = Registry , setter)]
-    pub fn set_cleared(val: &JsValue);
+    pub fn set_cleared(val: &Moment);
     # [wasm_bindgen (static_method_of = Registry , setter , js_name = "cleared")]
     fn __set_cleared_with_null(val: &::wasm_bindgen::JsValue);
     #[doc = " The top type, holding `null`."]

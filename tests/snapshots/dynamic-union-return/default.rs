@@ -11,7 +11,7 @@ extern "C" {
     pub type Erased;
     #[doc = " Mixed primitives + objects — no LUB, becomes a dynamic union."]
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &Erased) -> ContentKind;
+    pub fn content(this: &Erased) -> ErasedContentKind;
     #[doc = " Inner-erased generic — outer Array stays as `Vec<JsValue>`."]
     #[wasm_bindgen(method, getter)]
     pub fn tags(this: &Erased) -> Vec<JsValue>;
@@ -32,7 +32,7 @@ extern "C" {
     pub type NoErasure;
     #[doc = " Literal widening — lowers to `string`, no enum synthesised."]
     #[wasm_bindgen(method, getter)]
-    pub fn variant(this: &NoErasure) -> VariantKind;
+    pub fn variant(this: &NoErasure) -> NoErasureVariantKind;
     #[doc = " Plain type — no enum synthesised."]
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &NoErasure) -> String;
@@ -50,30 +50,24 @@ impl NoErasure {
 extern "C" {
     #[doc = " The awaited value is a top-level return: the enum is synthesised."]
     #[wasm_bindgen(catch, js_name = "fetchValue")]
-    pub async fn fetch_value() -> Result<FetchValueReturnKind, JsValue>;
-}
-#[wasm_bindgen]
-extern "C" {
-    #[doc = " The awaited value is a top-level return: the enum is synthesised."]
-    #[wasm_bindgen(js_name = "fetchValue")]
-    pub fn fetch_value_promise() -> Promise;
+    pub fn fetch_value() -> Promise<FooOrF64>;
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ContentKind {
+pub enum ErasedContentKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VariantKind {
+pub enum NoErasureVariantKind {
     A = "a",
     B = "b",
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum FetchValueReturnKind {
+pub enum FooOrF64 {
     F64(f64),
     Foo = "foo",
 }

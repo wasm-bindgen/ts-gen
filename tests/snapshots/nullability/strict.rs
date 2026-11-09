@@ -73,7 +73,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_required(this: &Settings, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn nullable(this: &Settings) -> Nullable<String>;
+    pub fn nullable(this: &Settings) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_nullable(this: &Settings, val: &str);
     #[wasm_bindgen(method, setter, js_name = "nullable")]
@@ -97,7 +97,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "mode")]
     fn __set_mode_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn empties(this: &Settings) -> Option<Null>;
+    pub fn empties(this: &Settings) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "empties")]
     fn __set_empties_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
@@ -119,7 +119,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "values")]
     fn __set_values_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn key(this: &Settings) -> Option<Nullable<KeyKind>>;
+    pub fn key(this: &Settings) -> Option<Nullable<StrOrF64>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_key(this: &Settings, val: &str);
     #[wasm_bindgen(method, setter, js_name = "key")]
@@ -276,7 +276,7 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Registry , setter)]
     pub fn set_current(val: &Registry);
     # [wasm_bindgen (static_method_of = Registry , getter)]
-    pub fn fallback() -> Nullable<Registry>;
+    pub fn fallback() -> Option<Registry>;
     # [wasm_bindgen (static_method_of = Registry , setter)]
     pub fn set_fallback(val: &Registry);
     # [wasm_bindgen (static_method_of = Registry , setter , js_name = "fallback")]
@@ -310,7 +310,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> Result<T, JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> Nullable<T>;
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> Option<T>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
@@ -541,29 +541,28 @@ pub fn try_aliased_with_null() -> Result<Option<Nullable<String>>, JsValue> {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "aliasedNull")]
-    pub fn aliased_null(x: &str) -> Nullable<String>;
+    pub fn aliased_null(x: &str) -> Option<String>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "aliasedNull")]
-    pub fn try_aliased_null(x: &str) -> Result<Nullable<String>, JsValue>;
+    pub fn try_aliased_null(x: &str) -> Result<Option<String>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "aliasedNull")]
-    fn __aliased_null_with_null(x: &::wasm_bindgen::JsValue) -> Nullable<String>;
+    fn __aliased_null_with_null(x: &::wasm_bindgen::JsValue) -> Option<String>;
 }
-pub fn aliased_null_with_null() -> Nullable<String> {
+pub fn aliased_null_with_null() -> Option<String> {
     __aliased_null_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "aliasedNull")]
-    fn __try_aliased_null_with_null(
-        x: &::wasm_bindgen::JsValue,
-    ) -> Result<Nullable<String>, JsValue>;
+    fn __try_aliased_null_with_null(x: &::wasm_bindgen::JsValue)
+        -> Result<Option<String>, JsValue>;
 }
-pub fn try_aliased_null_with_null() -> Result<Nullable<String>, JsValue> {
+pub fn try_aliased_null_with_null() -> Result<Option<String>, JsValue> {
     __try_aliased_null_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
@@ -704,27 +703,27 @@ pub fn try_count_optional_with_null() -> Result<(), JsValue> {
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
-    pub fn flag(x: bool) -> Nullable<bool>;
+    pub fn flag(x: bool) -> Option<bool>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "flag")]
-    pub fn try_flag(x: bool) -> Result<Nullable<bool>, JsValue>;
+    pub fn try_flag(x: bool) -> Result<Option<bool>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "flag")]
-    fn __flag_with_null(x: &::wasm_bindgen::JsValue) -> Nullable<bool>;
+    fn __flag_with_null(x: &::wasm_bindgen::JsValue) -> Option<bool>;
 }
-pub fn flag_with_null() -> Nullable<bool> {
+pub fn flag_with_null() -> Option<bool> {
     __flag_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "flag")]
-    fn __try_flag_with_null(x: &::wasm_bindgen::JsValue) -> Result<Nullable<bool>, JsValue>;
+    fn __try_flag_with_null(x: &::wasm_bindgen::JsValue) -> Result<Option<bool>, JsValue>;
 }
-pub fn try_flag_with_null() -> Result<Nullable<bool>, JsValue> {
+pub fn try_flag_with_null() -> Result<Option<bool>, JsValue> {
     __try_flag_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
@@ -1295,27 +1294,27 @@ extern "C" {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "modeArg")]
-    pub fn mode_arg(m: Mode) -> Nullable<Mode>;
+    pub fn mode_arg(m: Mode) -> Option<Mode>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "modeArg")]
-    pub fn try_mode_arg(m: Mode) -> Result<Nullable<Mode>, JsValue>;
+    pub fn try_mode_arg(m: Mode) -> Result<Option<Mode>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "modeArg")]
-    fn __mode_arg_with_null(m: &::wasm_bindgen::JsValue) -> Nullable<Mode>;
+    fn __mode_arg_with_null(m: &::wasm_bindgen::JsValue) -> Option<Mode>;
 }
-pub fn mode_arg_with_null() -> Nullable<Mode> {
+pub fn mode_arg_with_null() -> Option<Mode> {
     __mode_arg_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "modeArg")]
-    fn __try_mode_arg_with_null(m: &::wasm_bindgen::JsValue) -> Result<Nullable<Mode>, JsValue>;
+    fn __try_mode_arg_with_null(m: &::wasm_bindgen::JsValue) -> Result<Option<Mode>, JsValue>;
 }
-pub fn try_mode_arg_with_null() -> Result<Nullable<Mode>, JsValue> {
+pub fn try_mode_arg_with_null() -> Result<Option<Mode>, JsValue> {
     __try_mode_arg_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
@@ -1395,46 +1394,44 @@ pub fn try_mode_optional_with_null() -> Result<(), JsValue> {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "emptiesOnly")]
-    pub fn empties_only() -> Option<Null>;
+    pub fn empties_only() -> JsValue;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "emptiesOnly")]
-    pub fn try_empties_only() -> Result<Option<Null>, JsValue>;
+    pub fn try_empties_only() -> Result<JsValue, JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "emptiesOnly")]
-    fn __empties_only_with_null(x: &::wasm_bindgen::JsValue) -> Option<Null>;
+    fn __empties_only_with_null(x: &::wasm_bindgen::JsValue) -> JsValue;
 }
-pub fn empties_only_with_null() -> Option<Null> {
+pub fn empties_only_with_null() -> JsValue {
     __empties_only_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "emptiesOnly")]
-    fn __try_empties_only_with_null(x: &::wasm_bindgen::JsValue) -> Result<Option<Null>, JsValue>;
+    fn __try_empties_only_with_null(x: &::wasm_bindgen::JsValue) -> Result<JsValue, JsValue>;
 }
-pub fn try_empties_only_with_null() -> Result<Option<Null>, JsValue> {
+pub fn try_empties_only_with_null() -> Result<JsValue, JsValue> {
     __try_empties_only_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
-    pub fn generic<T: ::wasm_bindgen::JsGeneric>(x: &T) -> Nullable<T>;
+    pub fn generic<T: ::wasm_bindgen::JsGeneric>(x: &T) -> Option<T>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "generic")]
-    pub fn try_generic<T: ::wasm_bindgen::JsGeneric>(x: &T) -> Result<Nullable<T>, JsValue>;
+    pub fn try_generic<T: ::wasm_bindgen::JsGeneric>(x: &T) -> Result<Option<T>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "generic")]
-    fn __generic_with_null<T: ::wasm_bindgen::JsGeneric>(
-        x: &::wasm_bindgen::JsValue,
-    ) -> Nullable<T>;
+    fn __generic_with_null<T: ::wasm_bindgen::JsGeneric>(x: &::wasm_bindgen::JsValue) -> Option<T>;
 }
-pub fn generic_with_null<T: ::wasm_bindgen::JsGeneric>() -> Nullable<T> {
+pub fn generic_with_null<T: ::wasm_bindgen::JsGeneric>() -> Option<T> {
     __generic_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
@@ -1442,9 +1439,9 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "generic")]
     fn __try_generic_with_null<T: ::wasm_bindgen::JsGeneric>(
         x: &::wasm_bindgen::JsValue,
-    ) -> Result<Nullable<T>, JsValue>;
+    ) -> Result<Option<T>, JsValue>;
 }
-pub fn try_generic_with_null<T: ::wasm_bindgen::JsGeneric>() -> Result<Nullable<T>, JsValue> {
+pub fn try_generic_with_null<T: ::wasm_bindgen::JsGeneric>() -> Result<Option<T>, JsValue> {
     __try_generic_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
@@ -1548,71 +1545,50 @@ extern "C" {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchNull")]
-    pub async fn fetch_null() -> Result<Nullable<Registry>, JsValue>;
-}
-#[wasm_bindgen(module = "nullability")]
-extern "C" {
-    #[wasm_bindgen(js_name = "fetchNull")]
-    pub fn fetch_null_promise() -> Promise<JsNullable<Registry>>;
+    pub fn fetch_null() -> Promise<Option<Registry>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchOptional")]
-    pub async fn fetch_optional() -> Result<Option<f64>, JsValue>;
-}
-#[wasm_bindgen(module = "nullability")]
-extern "C" {
-    #[wasm_bindgen(js_name = "fetchOptional")]
-    pub fn fetch_optional_promise() -> Promise<JsOption<Number>>;
+    pub fn fetch_optional() -> Promise<Option<f64>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchBoth")]
-    pub async fn fetch_both() -> Result<Option<Nullable<String>>, JsValue>;
-}
-#[wasm_bindgen(module = "nullability")]
-extern "C" {
-    #[wasm_bindgen(js_name = "fetchBoth")]
-    pub fn fetch_both_promise() -> Promise<JsNullable<JsString>>;
+    pub fn fetch_both() -> Promise<Option<Nullable<String>>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchGeneric")]
-    pub async fn fetch_generic<T: ::wasm_bindgen::JsGeneric>() -> Result<Nullable<T>, JsValue>
+    pub fn fetch_generic<T: ::wasm_bindgen::JsGeneric>() -> Promise<Option<T>>
     where
-        T: ::wasm_bindgen::convert::NullableFromWasmAbi;
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetchGeneric")]
-    pub fn fetch_generic_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<JsNullable<T>>;
-}
-#[wasm_bindgen(module = "nullability")]
-extern "C" {
-    pub fn numbers(#[wasm_bindgen(slice = "array")] xs: &[f64]) -> Nullable<Vec<f64>>;
+    pub fn numbers(#[wasm_bindgen(slice = "array")] xs: &[f64]) -> Option<Vec<f64>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "numbers")]
     pub fn try_numbers(
         #[wasm_bindgen(slice = "array")] xs: &[f64],
-    ) -> Result<Nullable<Vec<f64>>, JsValue>;
+    ) -> Result<Option<Vec<f64>>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "numbers")]
-    fn __numbers_with_null(xs: &::wasm_bindgen::JsValue) -> Nullable<Vec<f64>>;
+    fn __numbers_with_null(xs: &::wasm_bindgen::JsValue) -> Option<Vec<f64>>;
 }
-pub fn numbers_with_null() -> Nullable<Vec<f64>> {
+pub fn numbers_with_null() -> Option<Vec<f64>> {
     __numbers_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "numbers")]
-    fn __try_numbers_with_null(xs: &::wasm_bindgen::JsValue)
-        -> Result<Nullable<Vec<f64>>, JsValue>;
+    fn __try_numbers_with_null(xs: &::wasm_bindgen::JsValue) -> Result<Option<Vec<f64>>, JsValue>;
 }
-pub fn try_numbers_with_null() -> Result<Nullable<Vec<f64>>, JsValue> {
+pub fn try_numbers_with_null() -> Result<Option<Vec<f64>>, JsValue> {
     __try_numbers_with_null(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "nullability")]
@@ -1809,9 +1785,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Attachment;
     #[wasm_bindgen(method, getter)]
-    pub fn disposition(this: &Attachment) -> DispositionKind;
+    pub fn disposition(this: &Attachment) -> AttachmentDispositionKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_disposition(this: &Attachment, val: DispositionKind);
+    pub fn set_disposition(this: &Attachment, val: AttachmentDispositionKind);
     #[wasm_bindgen(method, getter, js_name = "contentId")]
     pub fn content_id(this: &Attachment) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "contentId")]
@@ -1825,7 +1801,7 @@ impl Attachment {
     #[doc = " Construct with `disposition: \"inline\"`."]
     pub fn new_inline(content_id: &str, filename: &str) -> Attachment {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(DispositionKind::Inline);
+        inner.set_disposition(AttachmentDispositionKind::Inline);
         inner.set_content_id(content_id);
         inner.set_filename(filename);
         inner
@@ -1837,7 +1813,7 @@ impl Attachment {
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(filename: &str) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(DispositionKind::Attachment);
+        inner.set_disposition(AttachmentDispositionKind::Attachment);
         inner.set_filename(filename);
         AttachmentBuilder { inner }
     }
@@ -1869,9 +1845,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Upload;
     #[wasm_bindgen(method, getter)]
-    pub fn kind(this: &Upload) -> KindKind;
+    pub fn kind(this: &Upload) -> UploadKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_kind(this: &Upload, val: KindKind);
+    pub fn set_kind(this: &Upload, val: UploadKind);
     #[wasm_bindgen(method, getter)]
     pub fn path(this: &Upload) -> Option<Nullable<String>>;
     #[wasm_bindgen(method, setter)]
@@ -1888,7 +1864,7 @@ impl Upload {
     #[doc = " Construct with `kind: \"file\"`."]
     pub fn new_file(path: &str) -> Upload {
         let inner: Upload = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(KindKind::File);
+        inner.set_kind(UploadKind::File);
         inner.set_path(path);
         inner
     }
@@ -1903,13 +1879,13 @@ impl Upload {
     #[doc = " Start a builder with `kind: \"none\"`."]
     pub fn builder_none() -> UploadBuilder {
         let inner: Upload = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(KindKind::None);
+        inner.set_kind(UploadKind::None);
         UploadBuilder { inner }
     }
     #[doc = " Start a builder with `kind: \"skip\"`."]
     pub fn builder_skip() -> UploadBuilder {
         let inner: Upload = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(KindKind::Skip);
+        inner.set_kind(UploadKind::Skip);
         UploadBuilder { inner }
     }
 }
@@ -1944,11 +1920,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cover;
     #[wasm_bindgen(method, getter)]
-    pub fn kind(this: &Cover) -> CoverKindKind;
+    pub fn kind(this: &Cover) -> CoverKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_kind(this: &Cover, val: CoverKindKind);
+    pub fn set_kind(this: &Cover, val: CoverKind);
     #[wasm_bindgen(method, getter)]
-    pub fn src(this: &Cover) -> Nullable<String>;
+    pub fn src(this: &Cover) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_src(this: &Cover, val: &str);
     #[wasm_bindgen(method, setter, js_name = "src")]
@@ -1971,14 +1947,14 @@ impl Cover {
     #[doc = " Start a builder with `kind: \"image\"`."]
     pub fn builder_image(src: &str) -> CoverBuilder {
         let inner: Cover = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(CoverKindKind::Image);
+        inner.set_kind(CoverKind::Image);
         inner.set_src(src);
         CoverBuilder { inner }
     }
     #[doc = " Start a builder with `kind: \"blank\"`."]
     pub fn builder_blank() -> CoverBuilder {
         let inner: Cover = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(CoverKindKind::Blank);
+        inner.set_kind(CoverKind::Blank);
         inner.set_src_with_null();
         CoverBuilder { inner }
     }
@@ -1987,7 +1963,7 @@ pub struct CoverBuilder {
     inner: Cover,
 }
 impl CoverBuilder {
-    pub fn kind(self, val: CoverKindKind) -> Self {
+    pub fn kind(self, val: CoverKind) -> Self {
         self.inner.set_kind(val);
         self
     }
@@ -2006,26 +1982,26 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum KeyKind {
+pub enum StrOrF64 {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DispositionKind {
+pub enum AttachmentDispositionKind {
     Inline = "inline",
     Attachment = "attachment",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KindKind {
+pub enum UploadKind {
     File = "file",
     None = "none",
     Skip = "skip",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CoverKindKind {
+pub enum CoverKind {
     Image = "image",
     Blank = "blank",
 }

@@ -23,7 +23,8 @@ declare namespace Lock {
 
 declare class Store {
   /**
-   * A union keeps both classes instead of collapsing to `Error`.
+   * Classes the built-in `err` matches: `TypeError` keeps its variant, and
+   * a `RangeError` lands in `Error`.
    * @throws {TypeError | RangeError} on bad input
    */
   put(key: string, value: string): void;

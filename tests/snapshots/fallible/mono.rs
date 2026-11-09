@@ -26,14 +26,7 @@ extern "C" {
 #[wasm_bindgen(module = "fallible", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "parseLater")]
-    pub async fn parse_later(s: impl ::wasm_bindgen::JsStringLike) -> Result<f64, JsValue>;
-}
-#[wasm_bindgen(module = "fallible", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "parseLater")]
-    pub fn parse_later_promise(
-        s: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<Number>, JsValue>;
+    pub fn parse_later(s: impl ::wasm_bindgen::JsStringLike) -> Promise<f64>;
 }
 #[wasm_bindgen(module = "fallible", experimental_generic_mono)]
 extern "C" {

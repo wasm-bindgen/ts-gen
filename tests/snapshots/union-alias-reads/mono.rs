@@ -43,16 +43,16 @@ extern "C" {
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn shift(this: &Day, offset: impl Offset) -> Result<Day, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "step")]
-    fn __step(
+    #[wasm_bindgen(method, catch)]
+    pub fn step(
         this: &Day,
-        direction: impl ::wasm_bindgen::JsStringLike,
+        direction: DayDirectionKind,
         other: impl DayLike,
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "step")]
-    fn __step_js_string(
+    pub fn step_js_string(
         this: &Day,
-        direction: impl ::wasm_bindgen::JsStringLike,
+        direction: DayDirectionKind,
         other: impl DayLike,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -60,17 +60,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "pick")]
     pub fn pick_js_string(this: &Day) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "pick")]
-    pub fn pick_with_other(this: &Day, other: impl MaybeDay) -> Result<String, JsValue>;
+    pub fn pick_with_other(this: &Day, other: impl DayLike) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "pick")]
-    pub fn pick_with_other_js_string(this: &Day, other: impl MaybeDay)
-        -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "pick")]
-    fn __pick_with_null(this: &Day, other: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "pick")]
-    fn __pick_with_null_js_string(
-        this: &Day,
-        other: &::wasm_bindgen::JsValue,
-    ) -> Result<JsString, JsValue>;
+    pub fn pick_with_other_js_string(this: &Day, other: impl DayLike) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn between(
         this: &Day,
@@ -84,33 +76,9 @@ extern "C" {
         end: impl DayLike,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn later(this: &Day, other: impl DayLike) -> Result<String, JsValue>;
+    pub fn later(this: &Day, other: impl DayLike) -> Promise<String>;
     #[wasm_bindgen(method, catch, js_name = "later")]
-    pub async fn later_js_string(this: &Day, other: impl DayLike) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "later")]
-    pub fn later_promise(this: &Day, other: impl DayLike) -> Result<Promise<JsString>, JsValue>;
-}
-impl Day {
-    pub fn pick_with_null(&self) -> Result<String, JsValue> {
-        self.__pick_with_null(&::wasm_bindgen::JsValue::NULL)
-    }
-    pub fn pick_with_null_js_string(&self) -> Result<JsString, JsValue> {
-        self.__pick_with_null_js_string(&::wasm_bindgen::JsValue::NULL)
-    }
-}
-impl Day {
-    pub fn step_next(&self, other: impl DayLike) -> Result<String, JsValue> {
-        self.__step("next", other)
-    }
-    pub fn step_previous(&self, other: impl DayLike) -> Result<String, JsValue> {
-        self.__step("previous", other)
-    }
-    pub fn step_next_js_string(&self, other: impl DayLike) -> Result<JsString, JsValue> {
-        self.__step_js_string("next", other)
-    }
-    pub fn step_previous_js_string(&self, other: impl DayLike) -> Result<JsString, JsValue> {
-        self.__step_js_string("previous", other)
-    }
+    pub fn later_js_string(this: &Day, other: impl DayLike) -> Promise<JsString>;
 }
 #[wasm_bindgen(module = "union-alias-reads", experimental_generic_mono)]
 extern "C" {
@@ -154,9 +122,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FromOptions;
     #[wasm_bindgen(method, getter)]
-    pub fn overflow(this: &FromOptions) -> Option<OverflowKind>;
+    pub fn overflow(this: &FromOptions) -> Option<FromOptionsOverflowKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_overflow(this: &FromOptions, val: OverflowKind);
+    pub fn set_overflow(this: &FromOptions, val: FromOptionsOverflowKind);
 }
 impl FromOptions {
     pub fn new() -> FromOptions {
@@ -177,7 +145,7 @@ pub struct FromOptionsBuilder {
     inner: FromOptions,
 }
 impl FromOptionsBuilder {
-    pub fn overflow(self, val: OverflowKind) -> Self {
+    pub fn overflow(self, val: FromOptionsOverflowKind) -> Self {
         self.inner.set_overflow(val);
         self
     }
@@ -574,7 +542,7 @@ extern "C" {
     pub type RelativeOptions;
     #[doc = " Two aliases sharing `Zoned` and `string`, with a dictionary each."]
     #[wasm_bindgen(method, getter, js_name = "relativeTo")]
-    pub fn relative_to(this: &RelativeOptions) -> Option<RelativeToKind>;
+    pub fn relative_to(this: &RelativeOptions) -> Option<ZonedLikeOrDayLike>;
     #[wasm_bindgen(method, setter, js_name = "relativeTo")]
     pub fn set_relative_to(this: &RelativeOptions, val: impl ZonedLike);
     #[wasm_bindgen(method, setter, js_name = "relativeTo")]
@@ -591,7 +559,7 @@ extern "C" {
     pub fn set_zoned(this: &RelativeOptions, val: impl ZonedLike);
     #[doc = " Only dictionaries."]
     #[wasm_bindgen(method, getter)]
-    pub fn fields(this: &RelativeOptions) -> JsValue;
+    pub fn fields(this: &RelativeOptions) -> Object;
     #[wasm_bindgen(method, setter)]
     pub fn set_fields(this: &RelativeOptions, val: impl Fields);
 }
@@ -676,7 +644,9 @@ extern "C" {
 extern "C" {
     #[doc = " The kind of value named, as a function return."]
     #[wasm_bindgen(catch, js_name = "relativeTo")]
-    pub fn relative_to(kind: impl ::wasm_bindgen::JsStringLike) -> Result<RelativeToKind, JsValue>;
+    pub fn relative_to(
+        kind: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<ZonedLikeOrDayLike, JsValue>;
 }
 #[wasm_bindgen(module = "union-alias-reads", experimental_generic_mono)]
 extern "C" {
@@ -734,13 +704,19 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OverflowKind {
+pub enum DayDirectionKind {
+    Next = "next",
+    Previous = "previous",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FromOptionsOverflowKind {
     Constrain = "constrain",
     Reject = "reject",
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum RelativeToKind {
+pub enum ZonedLikeOrDayLike {
     Zoned(Zoned),
     String(String),
     Day(Day),
