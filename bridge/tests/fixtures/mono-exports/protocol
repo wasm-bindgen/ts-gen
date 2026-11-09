@@ -1,0 +1,4 @@
+export mono util.id<u32>(T)
+export mono util.id<str>(T)
+export mono util.pick<bool>(T,T)
+export mono util.pick<f64>(T,T)

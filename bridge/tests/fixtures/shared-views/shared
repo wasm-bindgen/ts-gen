@@ -1,0 +1,1 @@
+A shared language memory: `@js(unshared)` views become copies.

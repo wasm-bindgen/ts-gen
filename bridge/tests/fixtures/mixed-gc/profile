@@ -1,0 +1,3 @@
+all-linear
+str = gc+utf8
+handles = gc

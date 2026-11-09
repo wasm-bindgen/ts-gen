@@ -1,0 +1,6 @@
+tw:future poll
+tw:future take<str>
+tw:future drop
+tw:future new
+tw:future resolve<str>
+export tw:future/wake

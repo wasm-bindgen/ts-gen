@@ -1,0 +1,2 @@
+mono tw:js/global Pair#get:first<unit,Str>()
+mono tw:js/global Pair#get:second<unit,Str>()

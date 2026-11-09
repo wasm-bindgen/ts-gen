@@ -1,0 +1,9 @@
+termination = on
+rename.memory = mem
+rename.tw:realloc = __realloc
+rename.tw:free = __free
+rename.tw:table = __table
+rename.tw:table/alloc = __talloc
+rename.tw:table/free = __tfree
+rename.tw:terminated = __terminated
+rename.tw:table/const_base = __const_base
