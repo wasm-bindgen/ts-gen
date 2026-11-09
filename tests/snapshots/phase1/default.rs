@@ -75,13 +75,13 @@ pub mod node_js {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type EventEmitter;
         #[wasm_bindgen(method)]
-        pub fn on(this: &EventEmitter, event: &str, listener: &Function) -> JsValue;
+        pub fn on(this: &EventEmitter, event: &str, listener: &Function) -> EventEmitter;
         #[wasm_bindgen(method, catch, js_name = "on")]
         pub fn try_on(
             this: &EventEmitter,
             event: &str,
             listener: &Function,
-        ) -> Result<JsValue, JsValue>;
+        ) -> Result<EventEmitter, JsValue>;
     }
 }
 #[wasm_bindgen]

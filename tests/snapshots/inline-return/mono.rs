@@ -14,7 +14,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub fn address<T>(this: &Cursor<T>) -> Result<CursorAddressReturn, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn cost<T>(this: &Cursor<T>) -> Result<CostReturnKind, JsValue>;
+    pub fn cost<T>(this: &Cursor<T>) -> Result<CursorCostKind, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -97,7 +97,12 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn border(this: &ImageOptions) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_border(this: &ImageOptions, val: &Object);
+    pub fn set_border(this: &ImageOptions, val: &ImageOptionsBorderWidth);
+    #[wasm_bindgen(method, setter, js_name = "border")]
+    pub fn set_border_with_image_options_border_top(
+        this: &ImageOptions,
+        val: &ImageOptionsBorderTop,
+    );
 }
 impl ImageOptions {
     pub fn new() -> ImageOptions {
@@ -118,17 +123,103 @@ pub struct ImageOptionsBuilder {
     inner: ImageOptions,
 }
 impl ImageOptionsBuilder {
-    pub fn border(self, val: &Object) -> Self {
+    pub fn border(self, val: &ImageOptionsBorderWidth) -> Self {
         self.inner.set_border(val);
+        self
+    }
+    pub fn border_with_image_options_border_top(self, val: &ImageOptionsBorderTop) -> Self {
+        self.inner.set_border_with_image_options_border_top(val);
         self
     }
     pub fn build(self) -> ImageOptions {
         self.inner
     }
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type CursorCostReturnTotal;
+    #[wasm_bindgen(method, getter)]
+    pub fn total(this: &CursorCostReturnTotal) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_total(this: &CursorCostReturnTotal, val: f64);
+}
+impl CursorCostReturnTotal {
+    pub fn new(total: f64) -> CursorCostReturnTotal {
+        let inner: CursorCostReturnTotal = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_total(total);
+        inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type CursorCostReturnPerItem;
+    #[wasm_bindgen(method, getter, js_name = "perItem")]
+    pub fn per_item(this: &CursorCostReturnPerItem) -> f64;
+    #[wasm_bindgen(method, setter, js_name = "perItem")]
+    pub fn set_per_item(this: &CursorCostReturnPerItem, val: f64);
+}
+impl CursorCostReturnPerItem {
+    pub fn new(per_item: f64) -> CursorCostReturnPerItem {
+        let inner: CursorCostReturnPerItem = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_per_item(per_item);
+        inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ImageOptionsBorderWidth;
+    #[wasm_bindgen(method, getter)]
+    pub fn color(this: &ImageOptionsBorderWidth) -> String;
+    #[wasm_bindgen(method, getter, js_name = "color")]
+    pub fn color_js_string(this: &ImageOptionsBorderWidth) -> JsString;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_color(this: &ImageOptionsBorderWidth, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, getter)]
+    pub fn width(this: &ImageOptionsBorderWidth) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_width(this: &ImageOptionsBorderWidth, val: f64);
+}
+impl ImageOptionsBorderWidth {
+    pub fn new(color: impl ::wasm_bindgen::JsStringLike, width: f64) -> ImageOptionsBorderWidth {
+        let inner: ImageOptionsBorderWidth = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_color(color);
+        inner.set_width(width);
+        inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ImageOptionsBorderTop;
+    #[wasm_bindgen(method, getter)]
+    pub fn color(this: &ImageOptionsBorderTop) -> String;
+    #[wasm_bindgen(method, getter, js_name = "color")]
+    pub fn color_js_string(this: &ImageOptionsBorderTop) -> JsString;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_color(this: &ImageOptionsBorderTop, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, getter)]
+    pub fn top(this: &ImageOptionsBorderTop) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top(this: &ImageOptionsBorderTop, val: f64);
+}
+impl ImageOptionsBorderTop {
+    pub fn new(color: impl ::wasm_bindgen::JsStringLike, top: f64) -> ImageOptionsBorderTop {
+        let inner: ImageOptionsBorderTop = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_color(color);
+        inner.set_top(top);
+        inner
+    }
+}
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum CostReturnKind {
+pub enum CursorCostKind {
     String(String),
     Object(Object),
 }

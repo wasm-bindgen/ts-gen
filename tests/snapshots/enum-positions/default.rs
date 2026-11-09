@@ -129,13 +129,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "onMode")]
     pub fn try_on_mode(this: &Probe, cb: &Function<fn(JsString) -> Number>) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextMode")]
-    pub async fn next_mode(this: &Probe) -> Result<Mode, JsValue>;
-    #[wasm_bindgen(method, js_name = "nextMode")]
-    pub fn next_mode_promise(this: &Probe) -> Promise<JsString>;
+    pub fn next_mode(this: &Probe) -> Promise<Mode>;
     #[wasm_bindgen(method, catch, js_name = "maybeMode")]
-    pub async fn maybe_mode(this: &Probe) -> Result<Option<Mode>, JsValue>;
-    #[wasm_bindgen(method, js_name = "maybeMode")]
-    pub fn maybe_mode_promise(this: &Probe) -> Promise<JsNullable<JsString>>;
+    pub fn maybe_mode(this: &Probe) -> Promise<Option<Mode>>;
     #[wasm_bindgen(method, js_name = "modeMap")]
     pub fn mode_map(this: &Probe) -> Map<JsString, JsString>;
     #[wasm_bindgen(method, catch, js_name = "modeMap")]
@@ -149,21 +145,21 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "pair")]
     pub fn try_pair(this: &Probe) -> Result<ArrayTuple<(JsString, Number)>, JsValue>;
     #[wasm_bindgen(method, js_name = "modeOrNumber")]
-    pub fn mode_or_number(this: &Probe) -> ModeOrNumberReturnKind;
+    pub fn mode_or_number(this: &Probe) -> ModeOrF64;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumber")]
-    pub fn try_mode_or_number(this: &Probe) -> Result<ModeOrNumberReturnKind, JsValue>;
+    pub fn try_mode_or_number(this: &Probe) -> Result<ModeOrF64, JsValue>;
     #[wasm_bindgen(method, js_name = "modeOrString")]
-    pub fn mode_or_string(this: &Probe) -> ModeOrStringReturnKind;
+    pub fn mode_or_string(this: &Probe) -> ModeOrStringKind;
     #[wasm_bindgen(method, catch, js_name = "modeOrString")]
-    pub fn try_mode_or_string(this: &Probe) -> Result<ModeOrStringReturnKind, JsValue>;
+    pub fn try_mode_or_string(this: &Probe) -> Result<ModeOrStringKind, JsValue>;
     #[wasm_bindgen(method, js_name = "modeOrRegion")]
-    pub fn mode_or_region(this: &Probe) -> ModeOrRegionReturnKind;
+    pub fn mode_or_region(this: &Probe) -> ModeOrRegion;
     #[wasm_bindgen(method, catch, js_name = "modeOrRegion")]
-    pub fn try_mode_or_region(this: &Probe) -> Result<ModeOrRegionReturnKind, JsValue>;
+    pub fn try_mode_or_region(this: &Probe) -> Result<ModeOrRegion, JsValue>;
     #[wasm_bindgen(method, js_name = "levelOrString")]
-    pub fn level_or_string(this: &Probe) -> LevelOrStringReturnKind;
+    pub fn level_or_string(this: &Probe) -> LevelOrStringKind;
     #[wasm_bindgen(method, catch, js_name = "levelOrString")]
-    pub fn try_level_or_string(this: &Probe) -> Result<LevelOrStringReturnKind, JsValue>;
+    pub fn try_level_or_string(this: &Probe) -> Result<LevelOrStringKind, JsValue>;
     #[wasm_bindgen(method)]
     pub fn holder(this: &Probe, h: &Holder<JsString>) -> Holder<Number>;
     #[wasm_bindgen(method, catch, js_name = "holder")]
@@ -177,25 +173,17 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "maybeHolder")]
     pub fn try_maybe_holder(this: &Probe) -> Result<Holder<JsNullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextLevel")]
-    pub async fn next_level(this: &Probe) -> Result<Option<Level>, JsValue>;
-    #[wasm_bindgen(method, js_name = "nextLevel")]
-    pub fn next_level_promise(this: &Probe) -> Promise<JsOption<Number>>;
+    pub fn next_level(this: &Probe) -> Promise<Option<Level>>;
     #[wasm_bindgen(method, catch, js_name = "nextDetails")]
-    pub async fn next_details(this: &Probe) -> Result<Details<JsString>, JsValue>;
-    #[wasm_bindgen(method, js_name = "nextDetails")]
-    pub fn next_details_promise(this: &Probe) -> Promise<Details<JsString>>;
+    pub fn next_details(this: &Probe) -> Promise<Details<JsString>>;
     #[wasm_bindgen(method, js_name = "modeOrNumberArg")]
-    pub fn mode_or_number_arg(this: &Probe, x: Mode) -> ModeOrNumberReturnKind;
+    pub fn mode_or_number_arg(this: &Probe, x: Mode) -> ModeOrF64;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberArg")]
-    pub fn try_mode_or_number_arg(this: &Probe, x: Mode)
-        -> Result<ModeOrNumberReturnKind, JsValue>;
+    pub fn try_mode_or_number_arg(this: &Probe, x: Mode) -> Result<ModeOrF64, JsValue>;
     #[wasm_bindgen(method, js_name = "modeOrNumberArg")]
-    pub fn mode_or_number_arg_with_f64(this: &Probe, x: f64) -> ModeOrNumberReturnKind;
+    pub fn mode_or_number_arg_with_f64(this: &Probe, x: f64) -> ModeOrF64;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberArg")]
-    pub fn try_mode_or_number_arg_with_f64(
-        this: &Probe,
-        x: f64,
-    ) -> Result<ModeOrNumberReturnKind, JsValue>;
+    pub fn try_mode_or_number_arg_with_f64(this: &Probe, x: f64) -> Result<ModeOrF64, JsValue>;
     #[wasm_bindgen(method, js_name = "modeOrNumberOrString")]
     pub fn mode_or_number_or_string(this: &Probe, x: Mode);
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberOrString")]
@@ -211,25 +199,25 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ModeOrNumberReturnKind {
+pub enum ModeOrF64 {
     Mode(Mode),
     F64(f64),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ModeOrStringReturnKind {
+pub enum ModeOrStringKind {
     Mode(Mode),
     String(String),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ModeOrRegionReturnKind {
+pub enum ModeOrRegion {
     Mode(Mode),
     Region(codes::Region),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum LevelOrStringReturnKind {
+pub enum LevelOrStringKind {
     Level(Level),
     String(String),
 }

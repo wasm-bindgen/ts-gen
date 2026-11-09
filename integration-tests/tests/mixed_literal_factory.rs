@@ -1,8 +1,8 @@
 #![cfg(target_arch = "wasm32")]
 
 use ts_gen_integration_tests::mixed_literal_factory::{
-    BoolOrStrings, Level, LevelKind, Mixed, MixedModeKind, ModeKind, NumberOrStrings,
-    NumberOrStringsModeKind, Open, Optional, OptionalModeKind,
+    BoolOrStrings, BoolOrStringsModeKind, Level, LevelKind, Mixed, MixedModeKind, NumberOrStrings,
+    NumberOrStringsModeKind, Open, Optional, XOrY,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -12,7 +12,7 @@ use ts_gen_integration_tests::mixed_literal_factory::{
 fn mixed_literal_factory_compile() {
     let bool_or_strings = BoolOrStrings::new_y();
     bool_or_strings.set_mode_with_bool(true);
-    bool_or_strings.set_mode(ModeKind::X);
+    bool_or_strings.set_mode(BoolOrStringsModeKind::X);
     bool_or_strings.set_mode(bool_or_strings.mode());
 
     let number_or_strings = NumberOrStrings::new_x();
@@ -31,7 +31,7 @@ fn mixed_literal_factory_compile() {
     let _: Open = Open::new_x();
     let _: Open = Open::new("z");
 
-    let optional = Optional::builder().mode(OptionalModeKind::X).build();
+    let optional = Optional::builder().mode(XOrY::X).build();
     if let Some(mode) = optional.mode() {
         optional.set_mode(mode);
     }

@@ -922,8 +922,7 @@ mod tests {
     "#;
 
     fn with_spec(spec: &str) -> Result<(Vec<ProvidedFn>, GlobalContext)> {
-        let (module, mut gctx) =
-            crate::parse_source_with(WORKER, None, crate::parse::Options::IR).unwrap();
+        let (module, mut gctx) = crate::parse_source(WORKER, None).unwrap();
         let fns = resolve(spec, &module, &mut gctx)?;
         Ok((fns.fns, gctx))
     }

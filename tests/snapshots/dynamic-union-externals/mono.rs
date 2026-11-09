@@ -14,19 +14,19 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Foo;
     #[wasm_bindgen(method, catch)]
-    pub fn worker(this: &Foo) -> Result<WorkerReturnKind, JsValue>;
+    pub fn worker(this: &Foo) -> Result<FooWorkerKind, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn widget(this: &Foo) -> Result<WidgetReturnKind, JsValue>;
+    pub fn widget(this: &Foo) -> Result<FooWidgetKind, JsValue>;
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum WorkerReturnKind {
+pub enum FooWorkerKind {
     Worker(Worker),
     String(String),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum WidgetReturnKind {
+pub enum FooWidgetKind {
     Widget(Widget),
     F64(f64),
 }

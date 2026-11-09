@@ -153,7 +153,7 @@ pub(crate) fn convert_ts_type_with_arena(
         TSType::TSLiteralType(lit) => convert_literal_type(lit, diag),
 
         // === Type literal (object type) ===
-        TSType::TSTypeLiteral(lit) if !scopes.legacy_rust => {
+        TSType::TSTypeLiteral(lit) => {
             inline_object(lit, scope, scopes, diag).unwrap_or_else(|| {
                 if !lit.members.is_empty() {
                     diag.warn(
@@ -163,7 +163,6 @@ pub(crate) fn convert_ts_type_with_arena(
                 TypeRef::Object
             })
         }
-        TSType::TSTypeLiteral(_) => TypeRef::Object,
 
         // === Constructor type ===
         TSType::TSConstructorType(_) => {
@@ -201,7 +200,7 @@ pub(crate) fn convert_ts_type_with_arena(
             }))
         }
         // Only evaluation reads a template, applying it to literals.
-        TSType::TSTemplateLiteralType(t) if !scopes.legacy_rust && !t.types.is_empty() => {
+        TSType::TSTemplateLiteralType(t) if !t.types.is_empty() => {
             TypeRef::Template {
                 quasis: t
                     .quasis

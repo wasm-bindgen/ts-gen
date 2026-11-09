@@ -370,12 +370,12 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono")]
 extern "C" {
-    pub fn current() -> CurrentReturnKind;
+    pub fn current() -> StrOrF64;
 }
 #[wasm_bindgen(module = "primitive-unions-mono")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "current")]
-    pub fn try_current() -> Result<CurrentReturnKind, JsValue>;
+    pub fn try_current() -> Result<StrOrF64, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono")]
 extern "C" {
@@ -411,25 +411,25 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Settings;
     #[wasm_bindgen(method, getter)]
-    pub fn level(this: &Settings) -> LevelKind;
+    pub fn level(this: &Settings) -> SettingsLevelKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_level(this: &Settings, val: LevelKind);
+    pub fn set_level(this: &Settings, val: SettingsLevelKind);
     #[wasm_bindgen(method, setter, js_name = "level")]
     pub fn set_level_with_f64(this: &Settings, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn id(this: &Settings) -> CurrentReturnKind;
+    pub fn id(this: &Settings) -> StrOrF64;
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &Settings, val: &str);
     #[wasm_bindgen(method, setter, js_name = "id")]
     pub fn set_id_with_f64(this: &Settings, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn label(this: &Settings) -> Option<LabelKind>;
+    pub fn label(this: &Settings) -> Option<SettingsLabelKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_label(this: &Settings, val: &str);
     #[wasm_bindgen(method, setter, js_name = "label")]
     pub fn set_label_with_bool(this: &Settings, val: bool);
     #[wasm_bindgen(method, getter)]
-    pub fn from(this: &Settings) -> FromKind;
+    pub fn from(this: &Settings) -> SettingsFromKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_from(this: &Settings, val: &Target);
     #[wasm_bindgen(method, setter, js_name = "from")]
@@ -507,7 +507,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low(id: &str, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::Low);
+        inner.set_level(SettingsLevelKind::Low);
         inner.set_id(id);
         inner.set_from(from);
         SettingsBuilder { inner }
@@ -515,7 +515,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low_with_str(id: &str, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::Low);
+        inner.set_level(SettingsLevelKind::Low);
         inner.set_id(id);
         inner.set_from_with_str(from);
         SettingsBuilder { inner }
@@ -523,7 +523,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low_with_bool(id: &str, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::Low);
+        inner.set_level(SettingsLevelKind::Low);
         inner.set_id(id);
         inner.set_from_with_bool(from);
         SettingsBuilder { inner }
@@ -531,7 +531,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low_with_f64(id: f64, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::Low);
+        inner.set_level(SettingsLevelKind::Low);
         inner.set_id_with_f64(id);
         inner.set_from(from);
         SettingsBuilder { inner }
@@ -539,7 +539,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low_with_f64_and_str(id: f64, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::Low);
+        inner.set_level(SettingsLevelKind::Low);
         inner.set_id_with_f64(id);
         inner.set_from_with_str(from);
         SettingsBuilder { inner }
@@ -547,7 +547,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"low\"`."]
     pub fn builder_low_with_f64_and_bool(id: f64, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::Low);
+        inner.set_level(SettingsLevelKind::Low);
         inner.set_id_with_f64(id);
         inner.set_from_with_bool(from);
         SettingsBuilder { inner }
@@ -555,7 +555,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high(id: &str, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::High);
+        inner.set_level(SettingsLevelKind::High);
         inner.set_id(id);
         inner.set_from(from);
         SettingsBuilder { inner }
@@ -563,7 +563,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high_with_str(id: &str, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::High);
+        inner.set_level(SettingsLevelKind::High);
         inner.set_id(id);
         inner.set_from_with_str(from);
         SettingsBuilder { inner }
@@ -571,7 +571,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high_with_bool(id: &str, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::High);
+        inner.set_level(SettingsLevelKind::High);
         inner.set_id(id);
         inner.set_from_with_bool(from);
         SettingsBuilder { inner }
@@ -579,7 +579,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high_with_f64(id: f64, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::High);
+        inner.set_level(SettingsLevelKind::High);
         inner.set_id_with_f64(id);
         inner.set_from(from);
         SettingsBuilder { inner }
@@ -587,7 +587,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high_with_f64_and_str(id: f64, from: &str) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::High);
+        inner.set_level(SettingsLevelKind::High);
         inner.set_id_with_f64(id);
         inner.set_from_with_str(from);
         SettingsBuilder { inner }
@@ -595,7 +595,7 @@ impl Settings {
     #[doc = " Start a builder with `level: \"high\"`."]
     pub fn builder_high_with_f64_and_bool(id: f64, from: bool) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::High);
+        inner.set_level(SettingsLevelKind::High);
         inner.set_id_with_f64(id);
         inner.set_from_with_bool(from);
         SettingsBuilder { inner }
@@ -661,26 +661,26 @@ impl SettingsBuilder {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum CurrentReturnKind {
+pub enum StrOrF64 {
     String(String),
     F64(f64),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum LevelKind {
+pub enum SettingsLevelKind {
     Low = "low",
     High = "high",
     F64(f64),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum LabelKind {
+pub enum SettingsLabelKind {
     String(String),
     Bool(bool),
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum FromKind {
+pub enum SettingsFromKind {
     String(String),
     Bool(bool),
     Target(Target),

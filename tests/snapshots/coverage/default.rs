@@ -143,12 +143,7 @@ pub mod my_module {
     #[wasm_bindgen(module = "my-module")]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "doWork")]
-        pub async fn do_work(input: &str) -> Result<String, JsValue>;
-    }
-    #[wasm_bindgen(module = "my-module")]
-    extern "C" {
-        #[wasm_bindgen(js_name = "doWork")]
-        pub fn do_work_promise(input: &str) -> Promise<JsString>;
+        pub fn do_work(input: &str) -> Promise<String>;
     }
     #[wasm_bindgen(module = "my-module")]
     extern "C" {
@@ -221,9 +216,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(config: &Object) -> Result<DefaultProcessor, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn process(this: &DefaultProcessor, input: &str) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, js_name = "process")]
-    pub fn process_promise(this: &DefaultProcessor, input: &str) -> Promise<JsString>;
+    pub fn process(this: &DefaultProcessor, input: &str) -> Promise<String>;
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &DefaultProcessor) -> String;
 }
@@ -455,28 +448,28 @@ extern "C" {
     # [wasm_bindgen (static_method_of = EventEmitter , catch , js_name = "listenerCount")]
     pub fn try_listener_count(emitter: &EventEmitter, event: &str) -> Result<f64, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn on(this: &EventEmitter, event: &str, listener: &Function) -> JsValue;
+    pub fn on(this: &EventEmitter, event: &str, listener: &Function) -> EventEmitter;
     #[wasm_bindgen(method, catch, js_name = "on")]
     pub fn try_on(
         this: &EventEmitter,
         event: &str,
         listener: &Function,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<EventEmitter, JsValue>;
     #[wasm_bindgen(method, variadic)]
     pub fn emit(this: &EventEmitter, event: &str, args: &[JsValue]) -> bool;
     #[wasm_bindgen(method, variadic, catch, js_name = "emit")]
     pub fn try_emit(this: &EventEmitter, event: &str, args: &[JsValue]) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "removeAllListeners")]
-    pub fn remove_all_listeners(this: &EventEmitter) -> JsValue;
+    pub fn remove_all_listeners(this: &EventEmitter) -> EventEmitter;
     #[wasm_bindgen(method, catch, js_name = "removeAllListeners")]
-    pub fn try_remove_all_listeners(this: &EventEmitter) -> Result<JsValue, JsValue>;
+    pub fn try_remove_all_listeners(this: &EventEmitter) -> Result<EventEmitter, JsValue>;
     #[wasm_bindgen(method, js_name = "removeAllListeners")]
-    pub fn remove_all_listeners_with_event(this: &EventEmitter, event: &str) -> JsValue;
+    pub fn remove_all_listeners_with_event(this: &EventEmitter, event: &str) -> EventEmitter;
     #[wasm_bindgen(method, catch, js_name = "removeAllListeners")]
     pub fn try_remove_all_listeners_with_event(
         this: &EventEmitter,
         event: &str,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<EventEmitter, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -508,23 +501,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(
-        this: &Cache,
-        key: &str,
-    ) -> Result<Option<Map<JsString, Array<JsString>>>, JsValue>;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise(
-        this: &Cache,
-        key: &str,
-    ) -> Promise<JsNullable<Map<JsString, Array<JsString>>>>;
+    pub fn get(this: &Cache, key: &str) -> Promise<Option<Map<JsString, Array<JsString>>>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn set(
-        this: &Cache,
-        key: &str,
-        value: &Map<JsString, Array<JsString>>,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "set")]
-    pub fn set_promise(
+    pub fn set(
         this: &Cache,
         key: &str,
         value: &Map<JsString, Array<JsString>>,
@@ -540,13 +519,13 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_method(this: &FetchOptions, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &FetchOptions) -> Option<HeadersKind>;
+    pub fn headers(this: &FetchOptions) -> Option<FetchOptionsHeadersKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &FetchOptions, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &FetchOptions, val: &Object<JsString>);
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &FetchOptions) -> Option<BodyKind>;
+    pub fn body(this: &FetchOptions) -> Option<FetchOptionsBodyKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body(this: &FetchOptions, val: &str);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -726,7 +705,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MutableWidget;
     #[wasm_bindgen(method, getter)]
-    pub fn label(this: &MutableWidget) -> LabelKind;
+    pub fn label(this: &MutableWidget) -> MutableWidgetLabelKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_label(this: &MutableWidget, val: &str);
     #[wasm_bindgen(method, setter, js_name = "label")]
@@ -749,19 +728,19 @@ impl MutableWidget {
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum HeadersKind {
+pub enum FetchOptionsHeadersKind {
     Headers(Headers),
     Record(Object<JsString>),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum BodyKind {
+pub enum FetchOptionsBodyKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum LabelKind {
+pub enum MutableWidgetLabelKind {
     String(String),
     F64(f64),
 }

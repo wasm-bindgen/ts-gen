@@ -56,30 +56,27 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "shift")]
     fn __try_shift(this: &Day, offset: Offset) -> Result<Day, JsValue>;
     #[wasm_bindgen(method, js_name = "step")]
-    fn __step(this: &Day, direction: &str, other: DayLike) -> String;
+    fn __step(this: &Day, direction: DayDirectionKind, other: DayLike) -> String;
     #[wasm_bindgen(method, catch, js_name = "step")]
-    fn __try_step(this: &Day, direction: &str, other: DayLike) -> Result<String, JsValue>;
+    fn __try_step(
+        this: &Day,
+        direction: DayDirectionKind,
+        other: DayLike,
+    ) -> Result<String, JsValue>;
     #[wasm_bindgen(method)]
     pub fn pick(this: &Day) -> String;
     #[wasm_bindgen(method, catch, js_name = "pick")]
     pub fn try_pick(this: &Day) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "pick")]
-    fn __pick_with_other(this: &Day, other: MaybeDay) -> String;
+    fn __pick_with_other(this: &Day, other: DayLike) -> String;
     #[wasm_bindgen(method, catch, js_name = "pick")]
-    fn __try_pick_with_other(this: &Day, other: MaybeDay) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, js_name = "pick")]
-    fn __pick_with_null(this: &Day, other: &::wasm_bindgen::JsValue) -> String;
-    #[wasm_bindgen(method, catch, js_name = "pick")]
-    fn __try_pick_with_null(this: &Day, other: &::wasm_bindgen::JsValue)
-        -> Result<String, JsValue>;
+    fn __try_pick_with_other(this: &Day, other: DayLike) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "between")]
     fn __between(this: &Day, start: Option<DayLike>, end: DayLike) -> String;
     #[wasm_bindgen(method, catch, js_name = "between")]
     fn __try_between(this: &Day, start: Option<DayLike>, end: DayLike) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "later")]
-    async fn __later(this: &Day, other: DayLike) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, js_name = "later")]
-    fn __later_promise(this: &Day, other: DayLike) -> Promise<JsString>;
+    fn __later(this: &Day, other: DayLike) -> Promise<String>;
 }
 impl Day {
     pub fn from(item: impl ::core::convert::Into<DayLike>) -> Day {
@@ -144,20 +141,28 @@ impl Day {
     pub fn try_shift(&self, offset: impl ::core::convert::Into<Offset>) -> Result<Day, JsValue> {
         self.__try_shift(offset.into())
     }
-    pub fn pick_with_other(&self, other: impl ::core::convert::Into<MaybeDay>) -> String {
+    pub fn step(
+        &self,
+        direction: DayDirectionKind,
+        other: impl ::core::convert::Into<DayLike>,
+    ) -> String {
+        self.__step(direction, other.into())
+    }
+    pub fn try_step(
+        &self,
+        direction: DayDirectionKind,
+        other: impl ::core::convert::Into<DayLike>,
+    ) -> Result<String, JsValue> {
+        self.__try_step(direction, other.into())
+    }
+    pub fn pick_with_other(&self, other: impl ::core::convert::Into<DayLike>) -> String {
         self.__pick_with_other(other.into())
     }
     pub fn try_pick_with_other(
         &self,
-        other: impl ::core::convert::Into<MaybeDay>,
+        other: impl ::core::convert::Into<DayLike>,
     ) -> Result<String, JsValue> {
         self.__try_pick_with_other(other.into())
-    }
-    pub fn pick_with_null(&self) -> String {
-        self.__pick_with_null(&::wasm_bindgen::JsValue::NULL)
-    }
-    pub fn try_pick_with_null(&self) -> Result<String, JsValue> {
-        self.__try_pick_with_null(&::wasm_bindgen::JsValue::NULL)
     }
     pub fn between(
         &self,
@@ -173,34 +178,8 @@ impl Day {
     ) -> Result<String, JsValue> {
         self.__try_between(start, end.into())
     }
-    pub async fn later(
-        &self,
-        other: impl ::core::convert::Into<DayLike>,
-    ) -> Result<String, JsValue> {
-        self.__later(other.into()).await
-    }
-    pub fn later_promise(&self, other: impl ::core::convert::Into<DayLike>) -> Promise<JsString> {
-        self.__later_promise(other.into())
-    }
-}
-impl Day {
-    pub fn step_next(&self, other: impl ::core::convert::Into<DayLike>) -> String {
-        self.__step("next", other.into())
-    }
-    pub fn step_previous(&self, other: impl ::core::convert::Into<DayLike>) -> String {
-        self.__step("previous", other.into())
-    }
-    pub fn try_step_next(
-        &self,
-        other: impl ::core::convert::Into<DayLike>,
-    ) -> Result<String, JsValue> {
-        self.__try_step("next", other.into())
-    }
-    pub fn try_step_previous(
-        &self,
-        other: impl ::core::convert::Into<DayLike>,
-    ) -> Result<String, JsValue> {
-        self.__try_step("previous", other.into())
+    pub fn later(&self, other: impl ::core::convert::Into<DayLike>) -> Promise<String> {
+        self.__later(other.into())
     }
 }
 #[wasm_bindgen(module = "union-alias-reads")]
@@ -243,9 +222,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FromOptions;
     #[wasm_bindgen(method, getter)]
-    pub fn overflow(this: &FromOptions) -> Option<OverflowKind>;
+    pub fn overflow(this: &FromOptions) -> Option<FromOptionsOverflowKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_overflow(this: &FromOptions, val: OverflowKind);
+    pub fn set_overflow(this: &FromOptions, val: FromOptionsOverflowKind);
 }
 impl FromOptions {
     pub fn new() -> FromOptions {
@@ -266,7 +245,7 @@ pub struct FromOptionsBuilder {
     inner: FromOptions,
 }
 impl FromOptionsBuilder {
-    pub fn overflow(self, val: OverflowKind) -> Self {
+    pub fn overflow(self, val: FromOptionsOverflowKind) -> Self {
         self.inner.set_overflow(val);
         self
     }
@@ -568,7 +547,7 @@ extern "C" {
     pub type RelativeOptions;
     #[doc = " Two aliases sharing `Zoned` and `string`, with a dictionary each."]
     #[wasm_bindgen(method, getter, js_name = "relativeTo")]
-    pub fn relative_to(this: &RelativeOptions) -> Option<RelativeToKind>;
+    pub fn relative_to(this: &RelativeOptions) -> Option<ZonedLikeOrDayLike>;
     #[wasm_bindgen(method, setter, js_name = "relativeTo")]
     fn __set_relative_to(this: &RelativeOptions, val: ZonedLike);
     #[wasm_bindgen(method, setter, js_name = "relativeTo")]
@@ -585,7 +564,7 @@ extern "C" {
     fn __set_zoned(this: &RelativeOptions, val: ZonedLike);
     #[doc = " Only dictionaries."]
     #[wasm_bindgen(method, getter)]
-    pub fn fields(this: &RelativeOptions) -> JsValue;
+    pub fn fields(this: &RelativeOptions) -> Object;
     #[wasm_bindgen(method, setter, js_name = "fields")]
     fn __set_fields(this: &RelativeOptions, val: Fields);
 }
@@ -706,13 +685,13 @@ extern "C" {
 extern "C" {
     #[doc = " The kind of value named, as a function return."]
     #[wasm_bindgen(js_name = "relativeTo")]
-    pub fn relative_to(kind: &str) -> RelativeToKind;
+    pub fn relative_to(kind: &str) -> ZonedLikeOrDayLike;
 }
 #[wasm_bindgen(module = "union-alias-reads")]
 extern "C" {
     #[doc = " The kind of value named, as a function return."]
     #[wasm_bindgen(catch, js_name = "relativeTo")]
-    pub fn try_relative_to(kind: &str) -> Result<RelativeToKind, JsValue>;
+    pub fn try_relative_to(kind: &str) -> Result<ZonedLikeOrDayLike, JsValue>;
 }
 #[wasm_bindgen(module = "union-alias-reads")]
 extern "C" {
@@ -779,13 +758,19 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OverflowKind {
+pub enum DayDirectionKind {
+    Next = "next",
+    Previous = "previous",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FromOptionsOverflowKind {
     Constrain = "constrain",
     Reject = "reject",
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum RelativeToKind {
+pub enum ZonedLikeOrDayLike {
     Zoned(Zoned),
     String(String),
     Day(Day),

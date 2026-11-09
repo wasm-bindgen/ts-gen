@@ -22,7 +22,7 @@ extern "C" {
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "firstKey")]
-    pub fn first_key() -> Result<FirstKeyReturnKind, JsValue>;
+    pub fn first_key() -> Result<StrOrF64OrSymbol, JsValue>;
 }
 #[wasm_bindgen(module = "property-key", experimental_generic_mono)]
 extern "C" {
@@ -41,7 +41,7 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum FirstKeyReturnKind {
+pub enum StrOrF64OrSymbol {
     String(String),
     F64(f64),
     Symbol(Symbol),

@@ -19,16 +19,16 @@ wasm-bindgen = "0.2.128"
 wasm-bindgen-futures = "0.4.78"
 wasm-bindgen-test = "0.3.78"
 
-# Temporarily track the wasm-bindgen/wasm-bindgen#5433 branch (generic
+# Temporarily pin a tag of the wasm-bindgen/wasm-bindgen#5433 branch (generic
 # sequences over the element ABI, stacked on #5390's real-generic js-sys
 # element types and on main with #5428 and #5437) until these ship in a
-# release. Cargo.lock pins the commit; `cargo update -p wasm-bindgen` moves
-# it. All four crates must come from the same source.
+# release. The tag survives rebases of the branch. All four crates must come
+# from the same source.
 [patch.crates-io]
-js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "gbedford/mono-vec" }
-wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "gbedford/mono-vec" }
-wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "gbedford/mono-vec" }
-wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "gbedford/mono-vec" }
+js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-vec-228d2027" }
+wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-vec-228d2027" }
+wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-vec-228d2027" }
+wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-vec-228d2027" }
 
 [package]
 categories = ["wasm", "development-tools::ffi"]

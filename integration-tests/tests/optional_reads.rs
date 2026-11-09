@@ -4,10 +4,14 @@
 // `JsValue`: an absent field is `None`, and so is a written `null`, as for
 // any other read. `any` and `unknown` hold both empties in-band and stay a
 // bare `JsValue`, so a stored `null` is not lost.
-use wasm_bindgen::JsValue;
+use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::optional_reads::*;
+
+fn moment(v: impl Into<JsValue>) -> Moment {
+    v.into().unchecked_into()
+}
 
 #[wasm_bindgen_test]
 fn absent_fields_read_as_none() {
@@ -15,7 +19,7 @@ fn absent_fields_read_as_none() {
     assert_eq!(settings.stamp(), None);
     assert_eq!(settings.cleared(), None);
     assert_eq!(settings.maybe(), None);
-    assert_eq!(settings.value(), JsValue::from(1));
+    assert_eq!(settings.value(), moment(1));
 }
 
 #[wasm_bindgen_test]
@@ -32,7 +36,7 @@ fn top_type_keeps_both_empties_in_band() {
 fn written_null_reads_as_none() {
     let settings = settings("null");
     assert_eq!(settings.cleared(), None);
-    assert_eq!(settings.value(), JsValue::NULL);
+    assert_eq!(settings.value(), moment(JsValue::NULL));
 }
 
 #[wasm_bindgen_test]
@@ -40,17 +44,17 @@ fn set_fields_read_as_some() {
     let settings = settings("full");
     assert_eq!(settings.data(), JsValue::from(1));
     assert_eq!(settings.detail(), JsValue::from("detail"));
-    assert_eq!(settings.stamp(), Some(JsValue::from(2)));
-    assert_eq!(settings.cleared(), Some(JsValue::from(3)));
-    assert_eq!(settings.maybe(), Some(JsValue::TRUE));
+    assert_eq!(settings.stamp(), Some(moment(2)));
+    assert_eq!(settings.cleared(), Some(moment(3)));
+    assert_eq!(settings.maybe(), Some(moment(true)));
 }
 
 #[wasm_bindgen_test]
 fn built_fields_read_back() {
-    let built = Settings::builder(None, &JsValue::from(2))
-        .stamp(&JsValue::from("stamp"))
+    let built = Settings::builder(None, &moment(2))
+        .stamp(&moment("stamp"))
         .build();
-    assert_eq!(built.stamp(), Some(JsValue::from("stamp")));
+    assert_eq!(built.stamp(), Some(moment("stamp")));
     assert_eq!(built.cleared(), None);
     assert_eq!(built.maybe(), None);
 }

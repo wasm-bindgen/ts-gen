@@ -161,25 +161,39 @@ extern "C" {
 extern "C" {
     #[doc = " `lookup`, resolved asynchronously."]
     #[wasm_bindgen(catch, js_name = "lookupAsync")]
-    pub async fn lookup_async(key: &str) -> Result<Option<Nullable<String>>, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable")]
-extern "C" {
-    #[doc = " `lookup`, resolved asynchronously."]
-    #[wasm_bindgen(js_name = "lookupAsync")]
-    pub fn lookup_async_promise(key: &str) -> Promise<JsNullable<JsString>>;
+    pub fn lookup_async(key: &str) -> Promise<Option<Nullable<String>>>;
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {
     #[doc = " Resolves to `null` for an unknown key."]
     #[wasm_bindgen(catch)]
-    pub async fn find(key: &str) -> Result<Nullable<Options>, JsValue>;
+    pub fn find(key: &str) -> Promise<Option<Options>>;
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {
-    #[doc = " Resolves to `null` for an unknown key."]
-    #[wasm_bindgen(js_name = "find")]
-    pub fn find_promise(key: &str) -> Promise<JsNullable<Options>>;
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Pending;
+    #[wasm_bindgen(method, getter)]
+    pub fn value(this: &Pending) -> Promise<JsOption<JsString>>;
+}
+impl Pending {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Pending {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[wasm_bindgen(module = "node-nullable")]
+extern "C" {
+    pub fn pending(key: &str) -> Pending;
+}
+#[wasm_bindgen(module = "node-nullable")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "pending")]
+    pub fn try_pending(key: &str) -> Result<Pending, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {

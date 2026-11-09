@@ -10,9 +10,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DigitsOptions;
     #[wasm_bindgen(method, getter, js_name = "fractionalSecondDigits")]
-    pub fn fractional_second_digits(this: &DigitsOptions) -> Option<FractionalSecondDigitsKind>;
+    pub fn fractional_second_digits(this: &DigitsOptions) -> Option<AutoOrF64>;
     #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
-    pub fn set_fractional_second_digits(this: &DigitsOptions, val: FractionalSecondDigitsKind);
+    pub fn set_fractional_second_digits(this: &DigitsOptions, val: AutoOrF64);
     #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
     pub fn set_fractional_second_digits_with_f64(this: &DigitsOptions, val: f64);
     #[wasm_bindgen(method, getter, js_name = "roundingMode")]
@@ -39,7 +39,7 @@ pub struct DigitsOptionsBuilder {
     inner: DigitsOptions,
 }
 impl DigitsOptionsBuilder {
-    pub fn fractional_second_digits(self, val: FractionalSecondDigitsKind) -> Self {
+    pub fn fractional_second_digits(self, val: AutoOrF64) -> Self {
         self.inner.set_fractional_second_digits(val);
         self
     }
@@ -61,9 +61,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequiredDigits;
     #[wasm_bindgen(method, getter)]
-    pub fn digits(this: &RequiredDigits) -> FractionalSecondDigitsKind;
+    pub fn digits(this: &RequiredDigits) -> AutoOrF64;
     #[wasm_bindgen(method, setter)]
-    pub fn set_digits(this: &RequiredDigits, val: FractionalSecondDigitsKind);
+    pub fn set_digits(this: &RequiredDigits, val: AutoOrF64);
     #[wasm_bindgen(method, setter, js_name = "digits")]
     pub fn set_digits_with_f64(this: &RequiredDigits, val: f64);
 }
@@ -87,7 +87,7 @@ impl RequiredDigits {
     #[doc = " Start a builder with `digits: \"auto\"`."]
     pub fn builder_auto() -> RequiredDigitsBuilder {
         let inner: RequiredDigits = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_digits(FractionalSecondDigitsKind::Auto);
+        inner.set_digits(AutoOrF64::Auto);
         RequiredDigitsBuilder { inner }
     }
     #[doc = " Start a builder with `digits: 0`."]
@@ -113,7 +113,7 @@ pub struct RequiredDigitsBuilder {
     inner: RequiredDigits,
 }
 impl RequiredDigitsBuilder {
-    pub fn digits(self, val: FractionalSecondDigitsKind) -> Self {
+    pub fn digits(self, val: AutoOrF64) -> Self {
         self.inner.set_digits(val);
         self
     }
@@ -131,9 +131,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Toggle;
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &Toggle) -> ModeKind;
+    pub fn mode(this: &Toggle) -> ToggleModeKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(this: &Toggle, val: ModeKind);
+    pub fn set_mode(this: &Toggle, val: ToggleModeKind);
     #[wasm_bindgen(method, setter, js_name = "mode")]
     pub fn set_mode_with_bool(this: &Toggle, val: bool);
 }
@@ -159,13 +159,13 @@ impl Toggle {
     #[doc = " Start a builder with `mode: \"x\"`."]
     pub fn builder_x() -> ToggleBuilder {
         let inner: Toggle = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(ModeKind::X);
+        inner.set_mode(ToggleModeKind::X);
         ToggleBuilder { inner }
     }
     #[doc = " Start a builder with `mode: \"y\"`."]
     pub fn builder_y() -> ToggleBuilder {
         let inner: Toggle = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode(ModeKind::Y);
+        inner.set_mode(ToggleModeKind::Y);
         ToggleBuilder { inner }
     }
 }
@@ -173,7 +173,7 @@ pub struct ToggleBuilder {
     inner: Toggle,
 }
 impl ToggleBuilder {
-    pub fn mode(self, val: ModeKind) -> Self {
+    pub fn mode(self, val: ToggleModeKind) -> Self {
         self.inner.set_mode(val);
         self
     }
@@ -187,7 +187,7 @@ impl ToggleBuilder {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum FractionalSecondDigitsKind {
+pub enum AutoOrF64 {
     Auto = "auto",
     F64(f64),
 }
@@ -199,7 +199,7 @@ pub enum RoundingModeKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum ModeKind {
+pub enum ToggleModeKind {
     Bool(bool),
     X = "x",
     Y = "y",

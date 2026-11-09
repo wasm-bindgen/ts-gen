@@ -23,6 +23,25 @@ clippy:
 test *ARGS="":
     RUST_BACKTRACE=1 cargo +stable test -p ts-gen -p ts-gen-abi {{ARGS}}
 
+# List, per fixture and configuration, the types the IR zip reads from the parse, into target/zip-diffs
+zip-diffs:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cargo +stable build -q -p ts-gen
+    out={{justfile_directory()}}/target/zip-diffs
+    rm -rf "$out"
+    for f in {{justfile_directory()}}/tests/fixtures/*.d.ts; do
+        name=$(basename "$f" .d.ts)
+        args=$(sed -n 's|^//! @ts-gen ||p' "$f" | tr '\n' ' ')
+        for config in "default:" "mono:--experimental-generic-mono --fallible"; do
+            mkdir -p "$out/$name"
+            {{justfile_directory()}}/target/debug/ts-gen --input "$f" --output /dev/null $args ${config#*:} --zip-diffs 2>&1 \
+                | sed -n 's|^\[ts-gen info\]: zip: ||p' > "$out/$name/${config%%:*}.zip" || true
+        done
+    done
+    find "$out" -empty -delete
+    cat "$out"/*/*.zip 2>/dev/null | wc -l
+
 # Re-bless all snapshots
 test-overwrite:
     RUST_BACKTRACE=1 BLESS=1 cargo +stable test -p ts-gen

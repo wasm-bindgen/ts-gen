@@ -3,11 +3,11 @@
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::setter_matches_getter::{
-    DigitsOptions, FractionalSecondDigitsKind, ModeKind, RequiredDigits, RoundingModeKind, Toggle,
+    AutoOrF64, DigitsOptions, RequiredDigits, RoundingModeKind, Toggle, ToggleModeKind,
 };
 
-fn is_f64(kind: Option<FractionalSecondDigitsKind>, expected: f64) -> bool {
-    matches!(kind, Some(FractionalSecondDigitsKind::F64(n)) if n == expected)
+fn is_f64(kind: Option<AutoOrF64>, expected: f64) -> bool {
+    matches!(kind, Some(AutoOrF64::F64(n)) if n == expected)
 }
 
 // Dictionaries need no backing module, so this writes the mixed
@@ -15,14 +15,14 @@ fn is_f64(kind: Option<FractionalSecondDigitsKind>, expected: f64) -> bool {
 #[wasm_bindgen_test]
 fn mixed_literal_enum_round_trips() {
     let options = DigitsOptions::builder()
-        .fractional_second_digits(FractionalSecondDigitsKind::F64(3.0))
+        .fractional_second_digits(AutoOrF64::F64(3.0))
         .build();
     assert!(is_f64(options.fractional_second_digits(), 3.0));
 
-    options.set_fractional_second_digits(FractionalSecondDigitsKind::Auto);
+    options.set_fractional_second_digits(AutoOrF64::Auto);
     assert!(matches!(
         options.fractional_second_digits(),
-        Some(FractionalSecondDigitsKind::Auto)
+        Some(AutoOrF64::Auto)
     ));
 
     options.set_fractional_second_digits_with_f64(9.0);
@@ -33,15 +33,15 @@ fn mixed_literal_enum_round_trips() {
 
     assert!(matches!(
         RequiredDigits::new_auto().digits(),
-        FractionalSecondDigitsKind::Auto
+        AutoOrF64::Auto
     ));
     assert!(is_f64(Some(RequiredDigits::new_2().digits()), 2.0));
 
     let toggle = Toggle::new_true();
-    assert!(matches!(toggle.mode(), ModeKind::Bool(true)));
-    toggle.set_mode(ModeKind::Y);
+    assert!(matches!(toggle.mode(), ToggleModeKind::Bool(true)));
+    toggle.set_mode(ToggleModeKind::Y);
     toggle.set_mode(toggle.mode());
-    assert!(matches!(toggle.mode(), ModeKind::Y));
+    assert!(matches!(toggle.mode(), ToggleModeKind::Y));
 }
 
 // A synthesised enum is a value like any declared one: a literal-only read
@@ -63,5 +63,5 @@ fn synthesised_enum_derives() {
     let mode = toggle.mode();
     toggle.set_mode(mode.clone());
     assert_eq!(format!("{mode:?}"), "X");
-    assert!(matches!(toggle.mode(), ModeKind::X));
+    assert!(matches!(toggle.mode(), ToggleModeKind::X));
 }

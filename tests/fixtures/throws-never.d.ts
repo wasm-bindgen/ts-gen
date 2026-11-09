@@ -1,8 +1,8 @@
 // Fixture: `@throws {never}` JSDoc → opt out of fallible variants.
 //
 // Sync callables annotated with `@throws {never}` get *no* `try_*`
-// companion. Async (Promise-returning) callables drop the `Result`
-// wrapper and `catch` attribute, becoming `async fn -> T`.
+// companion. Promise-returning callables drop the `catch` attribute and
+// return a plain `Promise<T>`.
 // Constructors ignore the annotation — JS `new` always catches.
 
 declare class NeverThrows {
@@ -13,7 +13,7 @@ declare class NeverThrows {
   safeOp(x: number): string;
 
   /**
-   * Async, declared infallible — emits `async fn -> Loaded` (no Result).
+   * Promise, declared infallible — a plain `Promise<Loaded>`.
    * @throws {never}
    */
   loaded(): Promise<Loaded>;
@@ -50,7 +50,7 @@ interface Loaded {
 declare function pureCompute(x: number): number;
 
 /**
- * Async free function with `@throws {never}` — no Result wrapper.
+ * Promise-returning free function with `@throws {never}` — no `catch`.
  * @throws {never}
  */
 declare function infallibleFetch(url: string): Promise<string>;

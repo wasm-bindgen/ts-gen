@@ -1,0 +1,30 @@
+// Checked by tests/snapshot.rs, and edited by hand: every binding a fixture
+// skips, by configuration, with its warning. A binding the IR can't restate
+// is dropped, so a skip not listed here fails the snapshot test, as does a
+// listed one that no longer occurs.
+never-returns (default): `never-returns:Guard.impossible` (Get): the IR doesn't state the parse's reading; skipped
+never-returns (mono): `never-returns:Guard.impossible` (Get): the IR doesn't state the parse's reading; skipped
+type-eval (default): `type-eval:fallback`: the IR doesn't state the parse's reading; skipped
+type-eval (mono): `type-eval:fallback`: the IR doesn't state the parse's reading; skipped
+unwritable-fields (default): `Sealed.seal` (Get): the IR doesn't state the parse's reading; skipped
+unwritable-fields (default): `Sealed.seal` (Set): the IR doesn't state the parse's reading; skipped
+unwritable-fields (default): `Sealed.seal`: a required field without a setter; `new` and `builder` skipped
+unwritable-fields (default): `Unsealed.seal` (Get): the IR doesn't state the parse's reading; skipped
+unwritable-fields (default): `Unsealed.seal` (Set): the IR doesn't state the parse's reading; skipped
+unwritable-fields (mono): `Sealed.seal` (Get): the IR doesn't state the parse's reading; skipped
+unwritable-fields (mono): `Sealed.seal` (Set): the IR doesn't state the parse's reading; skipped
+unwritable-fields (mono): `Sealed.seal`: a required field without a setter; `new` and `builder` skipped
+unwritable-fields (mono): `Unsealed.seal` (Get): the IR doesn't state the parse's reading; skipped
+unwritable-fields (mono): `Unsealed.seal` (Set): the IR doesn't state the parse's reading; skipped
+workers-types (default): `D1Response.error` (Get): the IR doesn't state the parse's reading; skipped
+workers-types (default): `D1Response.error` (Set): the IR doesn't state the parse's reading; skipped
+workers-types (default): `D1Result.error` (Set): the IR doesn't state the parse's reading; skipped
+workers-types (default): `PartialKvNamespaceGetOptionsUndefined.type` (Get): the IR doesn't state the parse's reading; skipped
+workers-types (default): `PartialKvNamespaceGetOptionsUndefined.type` (Set): the IR doesn't state the parse's reading; skipped
+workers-types (default): `onmessage` (Variable): the IR doesn't state the parse's reading; skipped
+workers-types (mono): `D1Response.error` (Get): the IR doesn't state the parse's reading; skipped
+workers-types (mono): `D1Response.error` (Set): the IR doesn't state the parse's reading; skipped
+workers-types (mono): `D1Result.error` (Set): the IR doesn't state the parse's reading; skipped
+workers-types (mono): `PartialKvNamespaceGetOptionsUndefined.type` (Get): the IR doesn't state the parse's reading; skipped
+workers-types (mono): `PartialKvNamespaceGetOptionsUndefined.type` (Set): the IR doesn't state the parse's reading; skipped
+workers-types (mono): `onmessage` (Variable): the IR doesn't state the parse's reading; skipped
