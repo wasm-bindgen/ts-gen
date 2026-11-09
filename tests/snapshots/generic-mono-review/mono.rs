@@ -35,21 +35,12 @@ extern "C" {
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "asyncByAlias")]
-    pub async fn async_by_alias(id: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    pub fn async_by_alias(id: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "asyncByAlias")]
-    pub async fn async_by_alias_js_string(
-        id: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "asyncByAlias")]
-    pub fn async_by_alias_promise(
-        id: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<JsString>, JsValue>;
+    pub fn async_by_alias_js_string(id: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
@@ -88,17 +79,12 @@ extern "C" {
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "literalHolder")]
-    pub fn literal_holder() -> Result<Holder<String>, JsValue>;
-}
-#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "literalHolder")]
-    pub fn literal_holder_js_string() -> Result<Holder<JsString>, JsValue>;
+    pub fn literal_holder() -> Result<Holder<AOrB>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "literalUnion")]
-    pub fn literal_union() -> Result<LiteralUnionReturnKind, JsValue>;
+    pub fn literal_union() -> Result<AOrB, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
@@ -107,7 +93,7 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LiteralUnionReturnKind {
+pub enum AOrB {
     A = "a",
     B = "b",
 }

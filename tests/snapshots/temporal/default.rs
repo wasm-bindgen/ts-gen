@@ -1204,9 +1204,14 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DisambiguationOptions;
         #[wasm_bindgen(method, getter)]
-        pub fn disambiguation(this: &DisambiguationOptions) -> Option<DisambiguationKind>;
+        pub fn disambiguation(
+            this: &DisambiguationOptions,
+        ) -> Option<DisambiguationOptionsDisambiguationKind>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_disambiguation(this: &DisambiguationOptions, val: DisambiguationKind);
+        pub fn set_disambiguation(
+            this: &DisambiguationOptions,
+            val: DisambiguationOptionsDisambiguationKind,
+        );
     }
     impl DisambiguationOptions {
         pub fn new() -> DisambiguationOptions {
@@ -1227,7 +1232,7 @@ pub mod temporal {
         inner: DisambiguationOptions,
     }
     impl DisambiguationOptionsBuilder {
-        pub fn disambiguation(self, val: DisambiguationKind) -> Self {
+        pub fn disambiguation(self, val: DisambiguationOptionsDisambiguationKind) -> Self {
             self.inner.set_disambiguation(val);
             self
         }
@@ -1241,9 +1246,9 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type OverflowOptions;
         #[wasm_bindgen(method, getter)]
-        pub fn overflow(this: &OverflowOptions) -> Option<OverflowKind>;
+        pub fn overflow(this: &OverflowOptions) -> Option<OverflowOptionsOverflowKind>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_overflow(this: &OverflowOptions, val: OverflowKind);
+        pub fn set_overflow(this: &OverflowOptions, val: OverflowOptionsOverflowKind);
     }
     impl OverflowOptions {
         pub fn new() -> OverflowOptions {
@@ -1264,7 +1269,7 @@ pub mod temporal {
         inner: OverflowOptions,
     }
     impl OverflowOptionsBuilder {
-        pub fn overflow(self, val: OverflowKind) -> Self {
+        pub fn overflow(self, val: OverflowOptionsOverflowKind) -> Self {
             self.inner.set_overflow(val);
             self
         }
@@ -1278,9 +1283,9 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type TransitionOptions;
         #[wasm_bindgen(method, getter)]
-        pub fn direction(this: &TransitionOptions) -> DirectionKind;
+        pub fn direction(this: &TransitionOptions) -> NextOrPrevious;
         #[wasm_bindgen(method, setter)]
-        pub fn set_direction(this: &TransitionOptions, val: DirectionKind);
+        pub fn set_direction(this: &TransitionOptions, val: NextOrPrevious);
     }
     impl TransitionOptions {
         #[doc = " Construct with `direction: \"next\"`."]
@@ -1294,13 +1299,13 @@ pub mod temporal {
         #[doc = " Start a builder with `direction: \"next\"`."]
         pub fn builder_next() -> TransitionOptionsBuilder {
             let inner: TransitionOptions = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_direction(DirectionKind::Next);
+            inner.set_direction(NextOrPrevious::Next);
             TransitionOptionsBuilder { inner }
         }
         #[doc = " Start a builder with `direction: \"previous\"`."]
         pub fn builder_previous() -> TransitionOptionsBuilder {
             let inner: TransitionOptions = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_direction(DirectionKind::Previous);
+            inner.set_direction(NextOrPrevious::Previous);
             TransitionOptionsBuilder { inner }
         }
     }
@@ -1308,7 +1313,7 @@ pub mod temporal {
         inner: TransitionOptions,
     }
     impl TransitionOptionsBuilder {
-        pub fn direction(self, val: DirectionKind) -> Self {
+        pub fn direction(self, val: NextOrPrevious) -> Self {
             self.inner.set_direction(val);
             self
         }
@@ -1433,16 +1438,11 @@ pub mod temporal {
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
         pub fn largest_unit<Units: ::wasm_bindgen::JsGeneric>(
             this: &RoundingOptionsWithLargestUnit<Units>,
-        ) -> Option<LargestUnitKind>;
+        ) -> Option<LargestUnitDateUnitOrTimeUnit>;
         #[wasm_bindgen(method, setter, js_name = "largestUnit")]
         pub fn set_largest_unit<Units: ::wasm_bindgen::JsGeneric>(
             this: &RoundingOptionsWithLargestUnit<Units>,
-            val: LargestUnitKind,
-        );
-        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit_with_pluralize_unit<Units: ::wasm_bindgen::JsGeneric>(
-            this: &RoundingOptionsWithLargestUnit<Units>,
-            val: PluralizeUnit,
+            val: LargestUnitDateUnitOrTimeUnit,
         );
     }
     impl<Units: ::wasm_bindgen::JsGeneric> RoundingOptionsWithLargestUnit<Units> {
@@ -1476,12 +1476,8 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn largest_unit(self, val: LargestUnitKind) -> Self {
+        pub fn largest_unit(self, val: LargestUnitDateUnitOrTimeUnit) -> Self {
             self.inner.set_largest_unit(val);
-            self
-        }
-        pub fn largest_unit_with_pluralize_unit(self, val: PluralizeUnit) -> Self {
-            self.inner.set_largest_unit_with_pluralize_unit(val);
             self
         }
         pub fn build(self) -> RoundingOptionsWithLargestUnit<Units> {
@@ -3886,9 +3882,14 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ZonedDateTimeToStringOptions;
         #[wasm_bindgen(method, getter)]
-        pub fn offset(this: &ZonedDateTimeToStringOptions) -> Option<OffsetKind>;
+        pub fn offset(
+            this: &ZonedDateTimeToStringOptions,
+        ) -> Option<ZonedDateTimeToStringOptionsOffsetKind>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_offset(this: &ZonedDateTimeToStringOptions, val: OffsetKind);
+        pub fn set_offset(
+            this: &ZonedDateTimeToStringOptions,
+            val: ZonedDateTimeToStringOptionsOffsetKind,
+        );
         #[wasm_bindgen(method, getter, js_name = "timeZoneName")]
         pub fn time_zone_name(this: &ZonedDateTimeToStringOptions) -> Option<TimeZoneNameKind>;
         #[wasm_bindgen(method, setter, js_name = "timeZoneName")]
@@ -3933,7 +3934,7 @@ pub mod temporal {
             self.inner.set_fractional_second_digits_with_f64(val);
             self
         }
-        pub fn offset(self, val: OffsetKind) -> Self {
+        pub fn offset(self, val: ZonedDateTimeToStringOptionsOffsetKind) -> Self {
             self.inner.set_offset(val);
             self
         }
@@ -3951,9 +3952,14 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ZonedDateTimeFromOptions;
         #[wasm_bindgen(method, getter)]
-        pub fn disambiguation(this: &ZonedDateTimeFromOptions) -> Option<DisambiguationKind>;
+        pub fn disambiguation(
+            this: &ZonedDateTimeFromOptions,
+        ) -> Option<DisambiguationOptionsDisambiguationKind>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_disambiguation(this: &ZonedDateTimeFromOptions, val: DisambiguationKind);
+        pub fn set_disambiguation(
+            this: &ZonedDateTimeFromOptions,
+            val: DisambiguationOptionsDisambiguationKind,
+        );
         #[wasm_bindgen(method, getter)]
         pub fn offset(
             this: &ZonedDateTimeFromOptions,
@@ -3980,11 +3986,11 @@ pub mod temporal {
         inner: ZonedDateTimeFromOptions,
     }
     impl ZonedDateTimeFromOptionsBuilder {
-        pub fn overflow(self, val: OverflowKind) -> Self {
+        pub fn overflow(self, val: OverflowOptionsOverflowKind) -> Self {
             self.inner.set_overflow(val);
             self
         }
-        pub fn disambiguation(self, val: DisambiguationKind) -> Self {
+        pub fn disambiguation(self, val: DisambiguationOptionsDisambiguationKind) -> Self {
             self.inner.set_disambiguation(val);
             self
         }
@@ -4384,22 +4390,22 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "startOfDay")]
         pub fn try_start_of_day(this: &ZonedDateTime) -> Result<ZonedDateTime, RangeError>;
         #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
-        fn __get_time_zone_transition(
+        pub fn get_time_zone_transition(
             this: &ZonedDateTime,
-            direction: &str,
+            direction: NextOrPrevious,
         ) -> Option<ZonedDateTime>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
-        fn __try_get_time_zone_transition(
+        pub fn try_get_time_zone_transition(
             this: &ZonedDateTime,
-            direction: &str,
+            direction: NextOrPrevious,
         ) -> Result<Option<ZonedDateTime>, JsValue>;
         #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
-        pub fn get_time_zone_transition(
+        pub fn get_time_zone_transition_with_transition_options(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
         ) -> Option<ZonedDateTime>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
-        pub fn try_get_time_zone_transition(
+        pub fn try_get_time_zone_transition_with_transition_options(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
         ) -> Result<Option<ZonedDateTime>, JsValue>;
@@ -4710,22 +4716,6 @@ pub mod temporal {
             self.__try_equals(other.into())
         }
     }
-    impl ZonedDateTime {
-        pub fn get_time_zone_transition_next(&self) -> Option<ZonedDateTime> {
-            self.__get_time_zone_transition("next")
-        }
-        pub fn get_time_zone_transition_previous(&self) -> Option<ZonedDateTime> {
-            self.__get_time_zone_transition("previous")
-        }
-        pub fn try_get_time_zone_transition_next(&self) -> Result<Option<ZonedDateTime>, JsValue> {
-            self.__try_get_time_zone_transition("next")
-        }
-        pub fn try_get_time_zone_transition_previous(
-            &self,
-        ) -> Result<Option<ZonedDateTime>, JsValue> {
-            self.__try_get_time_zone_transition("previous")
-        }
-    }
     impl core::fmt::Display for ZonedDateTime {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
             f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
@@ -4737,7 +4727,9 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurationRelativeToOptions;
         #[wasm_bindgen(method, getter, js_name = "relativeTo")]
-        pub fn relative_to(this: &DurationRelativeToOptions) -> Option<RelativeToKind>;
+        pub fn relative_to(
+            this: &DurationRelativeToOptions,
+        ) -> Option<ZonedDateTimeLikeOrPlainDateLike>;
         #[wasm_bindgen(method, setter, js_name = "relativeTo")]
         fn __set_relative_to(this: &DurationRelativeToOptions, val: ZonedDateTimeLike);
         #[wasm_bindgen(method, setter, js_name = "relativeTo")]
@@ -4811,17 +4803,9 @@ pub mod temporal {
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
         pub fn largest_unit(
             this: &DurationRoundingOptions,
-        ) -> Option<DurationRoundingOptionsLargestUnitKind>;
+        ) -> Option<LargestUnitDateUnitOrTimeUnit>;
         #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(
-            this: &DurationRoundingOptions,
-            val: DurationRoundingOptionsLargestUnitKind,
-        );
-        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit_with_pluralize_unit(
-            this: &DurationRoundingOptions,
-            val: PluralizeUnit,
-        );
+        pub fn set_largest_unit(this: &DurationRoundingOptions, val: LargestUnitDateUnitOrTimeUnit);
     }
     impl DurationRoundingOptions {
         pub fn new() -> DurationRoundingOptions {
@@ -4865,12 +4849,8 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn largest_unit(self, val: DurationRoundingOptionsLargestUnitKind) -> Self {
+        pub fn largest_unit(self, val: LargestUnitDateUnitOrTimeUnit) -> Self {
             self.inner.set_largest_unit(val);
-            self
-        }
-        pub fn largest_unit_with_pluralize_unit(self, val: PluralizeUnit) -> Self {
-            self.inner.set_largest_unit_with_pluralize_unit(val);
             self
         }
         pub fn build(self) -> DurationRoundingOptions {
@@ -7269,7 +7249,7 @@ pub mod temporal {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DisambiguationKind {
+pub enum DisambiguationOptionsDisambiguationKind {
     Compatible = "compatible",
     Earlier = "earlier",
     Later = "later",
@@ -7277,13 +7257,13 @@ pub enum DisambiguationKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OverflowKind {
+pub enum OverflowOptionsOverflowKind {
     Constrain = "constrain",
     Reject = "reject",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DirectionKind {
+pub enum NextOrPrevious {
     Next = "next",
     Previous = "previous",
 }
@@ -7301,10 +7281,29 @@ pub enum RoundingModeKind {
     HalfEven = "halfEven",
 }
 #[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
-pub enum LargestUnitKind {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LargestUnitDateUnitOrTimeUnit {
     Auto = "auto",
-    PluralizeUnit(temporal::PluralizeUnit),
+    Year = "year",
+    Month = "month",
+    Week = "week",
+    Day = "day",
+    Hour = "hour",
+    Minute = "minute",
+    Second = "second",
+    Millisecond = "millisecond",
+    Microsecond = "microsecond",
+    Nanosecond = "nanosecond",
+    Years = "years",
+    Months = "months",
+    Weeks = "weeks",
+    Days = "days",
+    Hours = "hours",
+    Minutes = "minutes",
+    Seconds = "seconds",
+    Milliseconds = "milliseconds",
+    Microseconds = "microseconds",
+    Nanoseconds = "nanoseconds",
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
@@ -7322,7 +7321,7 @@ pub enum CalendarNameKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OffsetKind {
+pub enum ZonedDateTimeToStringOptionsOffsetKind {
     Auto = "auto",
     Never = "never",
 }
@@ -7343,16 +7342,10 @@ pub enum ZonedDateTimeFromOptionsOffsetKind {
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum RelativeToKind {
+pub enum ZonedDateTimeLikeOrPlainDateLike {
     ZonedDateTime(temporal::ZonedDateTime),
     String(String),
     PlainDate(temporal::PlainDate),
     PlainDateTime(temporal::PlainDateTime),
     Object(Object),
-}
-#[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
-pub enum DurationRoundingOptionsLargestUnitKind {
-    Auto = "auto",
-    PluralizeUnit(temporal::PluralizeUnit),
 }

@@ -105,7 +105,9 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> QueryResult<T> {
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::VectorRefIntoWasmAbi>
+    QueryResult<T>
+{
     #[allow(clippy::new_without_default)]
     pub fn new() -> QueryResult<T> {
         #[allow(unused_unsafe)]
@@ -135,17 +137,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Endpoint<T = JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn fetch<T>(
+    pub fn fetch<T>(
         this: &Endpoint<T>,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
+    ) -> Promise<String>;
     #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub async fn fetch_js_string<T>(
-        this: &Endpoint<T>,
-        input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, js_name = "fetch")]
-    pub fn fetch_promise<T>(
+    pub fn fetch_js_string<T>(
         this: &Endpoint<T>,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<JsString>;

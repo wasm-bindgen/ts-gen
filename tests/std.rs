@@ -9,8 +9,6 @@
 
 use std::path::{Path, PathBuf};
 
-use ts_gen::parse::Options;
-
 const TYPESCRIPT: &str = "7.0.2";
 
 const LIBS: &[&str] = &[
@@ -89,9 +87,9 @@ fn std_ir_is_current() {
         .iter()
         .map(|l| dir.join(format!("lib.{l}.d.ts")))
         .collect();
-    let (module, mut gctx) = ts_gen::parse_with(&files, None, Options::IR).unwrap();
+    let (module, mut gctx) = ts_gen::parse(&files, None).unwrap();
     let side = [root().join("std/annotate.d.ts")];
-    let (annotations, agctx) = ts_gen::parse_with(&side, None, Options::IR).unwrap();
+    let (annotations, agctx) = ts_gen::parse(&side, None).unwrap();
     let errors = ts_gen::parse::annotate::apply(&mut gctx, &module, &annotations, &agctx);
     assert!(errors.is_empty(), "{}", errors.join("\n"));
     let opts = ts_gen::lower::Options {
@@ -139,7 +137,7 @@ fn std_ir_is_current() {
 fn workers_types_resolve_against_std() {
     let std = std_ir();
     let files = [root().join("tests/fixtures/workers-types.d.ts")];
-    let (module, gctx) = ts_gen::parse_with(&files, None, Options::IR).unwrap();
+    let (module, gctx) = ts_gen::parse(&files, None).unwrap();
     let opts = ts_gen::lower::Options {
         with: vec![std.clone()],
         ..Default::default()

@@ -14,6 +14,14 @@ extern "C" {
 }
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(catch, js_name = "emit")]
+    pub fn emit_js_string(
+        name: impl ::wasm_bindgen::JsStringLike,
+        options: &events::Options,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
+extern "C" {
     #[wasm_bindgen(catch, js_name = "onEvent")]
     pub fn on_event(listener: &Function<fn(JsString) -> Undefined>) -> Result<(), JsValue>;
 }
@@ -25,12 +33,7 @@ extern "C" {
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn loose(x: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "loose")]
-    pub fn loose_with_f64(x: f64) -> Result<(), JsValue>;
+    pub fn loose(x: impl LooseStr) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
@@ -152,5 +155,55 @@ pub mod events {
             # [wasm_bindgen (catch , js_namespace = ["Events" , "Inner"])]
             pub fn find(id: impl ::wasm_bindgen::JsStringLike) -> Result<super::Options, JsValue>;
         }
+    }
+}
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `LooseStr`",
+    label = "expected string or number"
+)]
+pub trait LooseStr: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl LooseStr for &str {}
+impl LooseStr for ::std::string::String {}
+impl LooseStr for &::std::string::String {}
+impl LooseStr for &::std::boxed::Box<str> {}
+impl LooseStr for &::std::borrow::Cow<'_, str> {}
+impl LooseStr for ::js_sys::JsString {}
+impl LooseStr for &::js_sys::JsString {}
+impl LooseStr for f64 {}
+impl LooseStr for LooseStrKind {}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum LooseStrKind {
+    String(String),
+    F64(f64),
+}
+impl ::core::convert::From<&str> for LooseStrKind {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for LooseStrKind {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for LooseStrKind {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for LooseStrKind {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for LooseStrKind {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<f64> for LooseStrKind {
+    fn from(value: f64) -> Self {
+        Self::F64(value)
     }
 }

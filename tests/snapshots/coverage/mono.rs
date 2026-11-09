@@ -147,21 +147,12 @@ pub mod my_module {
     #[wasm_bindgen(module = "my-module", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "doWork")]
-        pub async fn do_work(input: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+        pub fn do_work(input: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
     }
     #[wasm_bindgen(module = "my-module", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "doWork")]
-        pub async fn do_work_js_string(
-            input: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, JsValue>;
-    }
-    #[wasm_bindgen(module = "my-module", experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "doWork")]
-        pub fn do_work_promise(
-            input: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Promise<JsString>, JsValue>;
+        pub fn do_work_js_string(input: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
     }
     #[wasm_bindgen(module = "my-module", experimental_generic_mono)]
     extern "C" {
@@ -234,17 +225,12 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(config: &Object) -> Result<DefaultProcessor, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn process(
+    pub fn process(
         this: &DefaultProcessor,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
+    ) -> Promise<String>;
     #[wasm_bindgen(method, catch, js_name = "process")]
-    pub async fn process_js_string(
-        this: &DefaultProcessor,
-        input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, js_name = "process")]
-    pub fn process_promise(
+    pub fn process_js_string(
         this: &DefaultProcessor,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<JsString>;
@@ -473,7 +459,7 @@ extern "C" {
         this: &EventEmitter,
         event: impl ::wasm_bindgen::JsStringLike,
         listener: &Function,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<EventEmitter, JsValue>;
     #[wasm_bindgen(method, variadic, catch)]
     pub fn emit(
         this: &EventEmitter,
@@ -481,12 +467,12 @@ extern "C" {
         args: &[JsValue],
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeAllListeners")]
-    pub fn remove_all_listeners(this: &EventEmitter) -> Result<JsValue, JsValue>;
+    pub fn remove_all_listeners(this: &EventEmitter) -> Result<EventEmitter, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeAllListeners")]
     pub fn remove_all_listeners_with_event(
         this: &EventEmitter,
         event: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<EventEmitter, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -525,27 +511,16 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(
-        this: &Cache,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<Map<JsString, Array<JsString>>>, JsValue>;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise(
+    pub fn get(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<Map<JsString, Array<JsString>>>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn set(
+    pub fn set(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &Map<impl ::wasm_bindgen::JsStringLike, Array<impl ::wasm_bindgen::JsStringLike>>,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "set")]
-    pub fn set_promise(
-        this: &Cache,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Map<impl ::wasm_bindgen::JsStringLike, Array<impl ::wasm_bindgen::JsStringLike>>,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -559,13 +534,13 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_method(this: &FetchOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &FetchOptions) -> Option<HeadersKind>;
+    pub fn headers(this: &FetchOptions) -> Option<FetchOptionsHeadersKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &FetchOptions, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &FetchOptions, val: &Object<JsString>);
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &FetchOptions) -> Option<BodyKind>;
+    pub fn body(this: &FetchOptions) -> Option<FetchOptionsBodyKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body(this: &FetchOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -753,7 +728,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MutableWidget;
     #[wasm_bindgen(method, getter)]
-    pub fn label(this: &MutableWidget) -> LabelKind;
+    pub fn label(this: &MutableWidget) -> MutableWidgetLabelKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_label(this: &MutableWidget, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "label")]
@@ -778,19 +753,19 @@ impl MutableWidget {
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum HeadersKind {
+pub enum FetchOptionsHeadersKind {
     Headers(Headers),
     Record(Object<JsString>),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum BodyKind {
+pub enum FetchOptionsBodyKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum LabelKind {
+pub enum MutableWidgetLabelKind {
     String(String),
     F64(f64),
 }

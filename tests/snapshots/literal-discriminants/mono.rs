@@ -118,7 +118,7 @@ extern "C" {
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn direction() -> Result<DirectionReturnKind, JsValue>;
+    pub fn direction() -> Result<DirectionKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
@@ -126,7 +126,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Feedback;
     #[wasm_bindgen(method, getter)]
-    pub fn value(this: &Feedback) -> Option<ValueKind>;
+    pub fn value(this: &Feedback) -> Option<FeedbackValueKind>;
 }
 impl Feedback {
     #[allow(clippy::new_without_default)]
@@ -155,17 +155,17 @@ extern "C" {
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn size() -> Result<SizeReturnKind, JsValue>;
+    pub fn size() -> Result<SizeKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn repeat() -> Result<RepeatReturnKind, JsValue>;
+    pub fn repeat() -> Result<RepeatKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn flag() -> Result<FlagReturnKind, JsValue>;
+    pub fn flag() -> Result<FlagKind, JsValue>;
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -176,33 +176,33 @@ pub enum KeepAliveKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DirectionReturnKind {
+pub enum DirectionKind {
     Neg1 = -1,
     N0 = 0,
     N1 = 1,
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ValueKind {
+pub enum FeedbackValueKind {
     Neg1 = -1,
     N1 = 1,
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum SizeReturnKind {
+pub enum SizeKind {
     Auto = "auto",
     F64(f64),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum RepeatReturnKind {
+pub enum RepeatKind {
     Bool(bool),
     X = "x",
     Y = "y",
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum FlagReturnKind {
+pub enum FlagKind {
     Bool(bool),
     ArrayBuffer(ArrayBuffer),
 }

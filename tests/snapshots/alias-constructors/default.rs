@@ -94,17 +94,15 @@ impl PointBuilder {
 pub type Pt = Point;
 #[wasm_bindgen(module = "alias-constructors")]
 extern "C" {
-    #[allow(non_upper_case_globals)]
-    #[wasm_bindgen(thread_local_v2, js_name = "Pt")]
-    pub static pt: Object;
+    #[wasm_bindgen(constructor, js_class = "Pt", catch, js_name = "Pt")]
+    pub fn pt() -> Result<Point, JsValue>;
 }
 #[allow(dead_code)]
 pub type Wrap2<T> = Stub<T>;
 #[wasm_bindgen(module = "alias-constructors")]
 extern "C" {
-    #[allow(non_upper_case_globals)]
-    #[wasm_bindgen(thread_local_v2, js_name = "Wrap2")]
-    pub static wrap2: Object;
+    #[wasm_bindgen(constructor, js_class = "Wrap2", catch, js_name = "Wrap2")]
+    pub fn wrap2<T: ::wasm_bindgen::JsGeneric>(value: &T) -> Result<Stub<T>, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors")]
 extern "C" {
@@ -122,7 +120,7 @@ pub type ProtoOnly = Proto;
 extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "ProtoOnly")]
-    pub static proto_only: Object;
+    pub static proto_only: ProtoOnly2;
 }
 #[allow(dead_code)]
 pub type WithStatics<T> = Wrapped<T>;
@@ -160,9 +158,8 @@ extern "C" {
 pub type SN = StaticNew;
 #[wasm_bindgen(module = "alias-constructors")]
 extern "C" {
-    #[allow(non_upper_case_globals)]
-    #[wasm_bindgen(thread_local_v2, js_name = "SN")]
-    pub static sn: Object;
+    #[wasm_bindgen(constructor, js_class = "SN", catch, js_name = "SN")]
+    pub fn sn() -> Result<StaticNew, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors")]
 extern "C" {
@@ -178,9 +175,8 @@ extern "C" {
 pub type CN = CapNew;
 #[wasm_bindgen(module = "alias-constructors")]
 extern "C" {
-    #[allow(non_upper_case_globals)]
-    #[wasm_bindgen(thread_local_v2, js_name = "CN")]
-    pub static cn: Object;
+    #[wasm_bindgen(constructor, js_class = "CN", catch, js_name = "CN")]
+    pub fn cn() -> Result<CapNew, JsValue>;
 }
 #[allow(dead_code)]
 pub type Count = Counter;
@@ -230,4 +226,21 @@ extern "C" {
     pub fn b(this: &MultiB) -> f64;
     #[wasm_bindgen(method, catch, js_name = "b")]
     pub fn try_b(this: &MultiB) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen(module = "alias-constructors")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ProtoOnly2;
+    #[wasm_bindgen(method, getter)]
+    pub fn prototype(this: &ProtoOnly2) -> Proto;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_prototype(this: &ProtoOnly2, val: &Proto);
+}
+impl ProtoOnly2 {
+    pub fn new(prototype: &Proto) -> ProtoOnly2 {
+        let inner: ProtoOnly2 = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_prototype(prototype);
+        inner
+    }
 }

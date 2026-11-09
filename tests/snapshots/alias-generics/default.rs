@@ -51,13 +51,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "sendDefault")]
     pub fn try_send_default_with_str(this: &Client, input: &str) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn pairs(this: &Client) -> Result<ArrayTuple<(Number, JsString)>, JsValue>;
-    #[wasm_bindgen(method, js_name = "pairs")]
-    pub fn pairs_promise(this: &Client) -> Promise<ArrayTuple<(Number, JsString)>>;
+    pub fn pairs(this: &Client) -> Promise<ArrayTuple<(Number, JsString)>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn same(this: &Client) -> Result<ArrayTuple<(Number, Number)>, JsValue>;
-    #[wasm_bindgen(method, js_name = "same")]
-    pub fn same_promise(this: &Client) -> Promise<ArrayTuple<(Number, Number)>>;
+    pub fn same(this: &Client) -> Promise<ArrayTuple<(Number, Number)>>;
     #[wasm_bindgen(method)]
     pub fn boxed(this: &Client, items: &[String]);
     #[wasm_bindgen(method, catch, js_name = "boxed")]
@@ -129,12 +125,14 @@ pub mod uses {
     }
     #[wasm_bindgen(module = "uses")]
     extern "C" {
-        pub fn triple(t: &super::hidden::Triple<Number>);
+        pub fn triple(t: &ArrayTuple<(Number, JsString, super::hidden::Hidden)>);
     }
     #[wasm_bindgen(module = "uses")]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "triple")]
-        pub fn try_triple(t: &super::hidden::Triple<Number>) -> Result<(), JsValue>;
+        pub fn try_triple(
+            t: &ArrayTuple<(Number, JsString, super::hidden::Hidden)>,
+        ) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "uses")]
     extern "C" {

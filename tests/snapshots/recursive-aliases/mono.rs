@@ -39,7 +39,10 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn wrapped(w: &Wrapped, nested: &[Array<JsString>]) -> Result<(), JsValue>;
+    pub fn wrapped(
+        w: &Wrapped,
+        nested: &[Array<impl ::wasm_bindgen::JsStringLike>],
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -49,5 +52,13 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn tree(node: &tree::Node, leaf: &tree::Leaf) -> Result<(), JsValue>;
+    pub fn tree(node: &Object, leaf: &tree::Leaf) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "tree")]
+    pub fn tree_with_function(
+        node: &Function<fn(JsValue) -> Undefined>,
+        leaf: &tree::Leaf,
+    ) -> Result<(), JsValue>;
 }

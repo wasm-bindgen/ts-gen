@@ -1,7 +1,7 @@
 use super::lower;
 
 fn ir(src: &str) -> String {
-    let (module, gctx) = crate::parse_source_with(src, None, crate::parse::Options::IR).unwrap();
+    let (module, gctx) = crate::parse_source(src, None).unwrap();
     let lowered = lower(&module, &gctx);
     let text = ts_gen_abi::text::print(&lowered.ir);
     let back = ts_gen_abi::text::parse(&text).unwrap_or_else(|e| panic!("{e}\n{text}"));

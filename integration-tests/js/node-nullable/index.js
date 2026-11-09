@@ -14,6 +14,9 @@ export function lookup(key) {
 export async function lookupAsync(key) {
   return lookup(key);
 }
+export function pending(key) {
+  return { value: lookupAsync(key) };
+}
 export async function find(key) {
   return key === "known" ? { label: "found" } : null;
 }

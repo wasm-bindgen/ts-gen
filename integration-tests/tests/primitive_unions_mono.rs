@@ -9,8 +9,8 @@ use ts_gen_integration_tests::primitive_unions_mono::{
     send_with_str, set_any, set_any_with_bool, set_any_with_f64, set_any_with_str,
     set_any_with_symbol, set_flag, set_flag_with_big_int, set_keyed, set_keyed_with_symbol,
     set_level, set_level_with_str, set_maybe, set_maybe_with_f64, set_maybe_with_str, set_nullable,
-    set_nullable_with_f64, set_nullable_with_null, set_value, set_value_with_f64, LevelKind,
-    Settings, Store, Target,
+    set_nullable_with_f64, set_nullable_with_null, set_value, set_value_with_f64, Settings,
+    SettingsLevelKind, Store, Target,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -68,7 +68,7 @@ fn primitive_union_signatures_compile(js_string: &JsString, symbol: &Symbol, big
         .label_with_bool(true)
         .build();
     let settings = Settings::new(2.0, "id", &target);
-    settings.set_level(LevelKind::Low);
+    settings.set_level(SettingsLevelKind::Low);
     settings.set_level_with_f64(3.0);
     settings.set_id_with_f64(4.0);
 }

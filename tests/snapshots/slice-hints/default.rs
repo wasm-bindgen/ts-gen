@@ -187,9 +187,9 @@ extern "C" {
     pub type Target;
     #[doc = " The write destination."]
     #[wasm_bindgen(method, getter)]
-    pub fn buffer(this: &Target) -> Option<BufferKind>;
+    pub fn buffer(this: &Target) -> Option<TargetBufferKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_buffer(this: &Target, #[wasm_bindgen(slice = "view")] val: &[f64]);
+    pub fn set_buffer(this: &Target, #[wasm_bindgen(slice = "copy")] val: &[f64]);
     #[wasm_bindgen(method, setter, js_name = "buffer")]
     pub fn set_buffer_with_float64_array(this: &Target, val: &Float64Array);
 }
@@ -236,7 +236,7 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum BufferKind {
+pub enum TargetBufferKind {
     Float64Array(Float64Array),
     VecOfF64(Vec<f64>),
 }

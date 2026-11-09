@@ -1004,7 +1004,7 @@ impl<'g> Eval<'g> {
                 return self.synth_dict(props, hint, dest, place);
             }
             // The IR producer names an inline object type as a dictionary.
-            TypeRef::ObjectLiteral(props) if !self.gctx.scopes.legacy_rust => {
+            TypeRef::ObjectLiteral(props) => {
                 let props = props
                     .iter()
                     .map(|p| {
@@ -1021,7 +1021,6 @@ impl<'g> Eval<'g> {
                     .collect::<Option<Vec<_>>>()?;
                 return self.synth_dict(props, hint, dest, place);
             }
-            TypeRef::ObjectLiteral(_) => TypeRef::Object,
             other => other.clone(),
         })
     }
@@ -1283,10 +1282,7 @@ impl<'g> Eval<'g> {
         }
         let test = expanded_test;
         let has_literals = test.iter().any(|t| matches!(t, TypeRef::StringLiteral(_)));
-        let members = match self.gctx.scopes.legacy_rust {
-            true => union_members(&subject),
-            false => self.alias_members(&subject, dest, place, 0),
-        };
+        let members = self.alias_members(&subject, dest, place, 0);
         let mut kept = Vec::new();
         let mut tested = 0;
         for member in members {
@@ -2361,7 +2357,7 @@ mod tests {
     use crate::ir::InterfaceClassification;
 
     fn parse(src: &str) -> (Module, GlobalContext) {
-        super::super::parse_single_source_with(src, None, super::super::Options::IR).unwrap()
+        super::super::parse_single_source(src, None).unwrap()
     }
 
     fn kind<'g>(gctx: &'g GlobalContext, module: &Module, name: &str) -> &'g TypeKind {

@@ -170,33 +170,26 @@ struct Cli {
     /// and returns `Result<T, E>`; `E` follows the usual rules
     /// (`@throws {T}`, else `JsValue`, or `js_sys::Error` under
     /// `--errors-as-error`). `@throws {never}` keeps a binding
-    /// infallible. Async callables, constructors and setters are
-    /// unchanged. An async callable's sync `_promise` form catches too,
-    /// unless it is a builtin or global one (a specifier with a scheme
-    /// such as `node:`, other than a URL or `npm:`, `jsr:`, `data:` or
-    /// `blob:`; a bare Node builtin; or no module) or declared `async`,
-    /// which reject rather than throw.
+    /// infallible. Promise-returning callables (which always catch, as a
+    /// rejection), constructors, setters and getters are unchanged.
     #[arg(long = "fallible")]
     fallible: bool,
+
+    /// Report each type the IR zip reads from the parse in place of the
+    /// IR's.
+    #[arg(long = "zip-diffs", hide = true)]
+    zip_diffs: bool,
 
     /// Use wasm-bindgen's experimental per-monomorphization codegen for
     /// generic imports instead of erasing their type parameters to JsValue.
     #[arg(long = "experimental-generic-mono")]
     experimental_generic_mono: bool,
 
-    /// Keep the exact carrier for each empty on reads.
+    /// Keep `T | null | undefined` three-state in the IR, as `T??`.
     ///
-    /// By default a return, awaited value or getter admitting `null`,
-    /// `undefined` or both reads as `Option<T>`: a read has no
-    /// representation to choose, and `Option<T>` reads either empty as
-    /// `None`. With this flag a read of `T | null` is `Nullable<T>` and
-    /// one of `T | null | undefined` is `Option<Nullable<T>>`, telling the
-    /// two empties apart. Writes are exact under either setting.
-    ///
-    /// With `--ir`, it also keeps `T | null | undefined` three-state in the
-    /// IR, as `T??`. By default it's `T?`, which writes `undefined`, a value
-    /// TS accepts there. `T | null` is `@js(null) T?` either way, since TS
-    /// rejects `undefined` for it.
+    /// By default it's `T?`, which writes `undefined`, a value TS accepts
+    /// there. `T | null` is `@js(null) T?` either way, since TS rejects
+    /// `undefined` for it. Every target reads the IR this produces.
     #[arg(long = "strict-nullable")]
     strict_nullable: bool,
 }
@@ -212,18 +205,17 @@ fn main() -> Result<()> {
 
     eprintln!("[ts-gen] Processing {} file(s)...", input_files.len());
 
-    // `--ir` and `--output` parse the inputs differently, so each loads them;
-    // a diagnostic both report prints once.
+    // `--ir` and `--output` each load the inputs; a diagnostic both report
+    // prints once.
     let mut seen = Default::default();
     if let Some(ir_path) = &cli.ir {
-        let (module, mut gctx) = load(&cli, &input_files, ts_gen::parse::Options::IR, &mut seen)?;
+        let (module, mut gctx) = load(&cli, &input_files, &mut seen)?;
         produce_ir(&cli, ir_path, &module, &mut gctx)?;
     }
     let Some(output) = cli.output.clone() else {
         return Ok(());
     };
-    let legacy = ts_gen::parse::Options { legacy_rust: true };
-    let (module, gctx) = load(&cli, &input_files, legacy, &mut seen)?;
+    let (module, gctx) = load(&cli, &input_files, &mut seen)?;
 
     if cli.verbose {
         eprintln!("[ts-gen] Parsed {} declarations", module.types.len());
@@ -271,6 +263,7 @@ fn main() -> Result<()> {
         .errors_as_error(cli.errors_as_error)
         .fallible(cli.fallible)
         .experimental_generic_mono(cli.experimental_generic_mono)
+        .zip_diffs(cli.zip_diffs)
         .strict_nullable(cli.strict_nullable)
         .exports(exports);
     if let Some(path) = &cli.error_type {
@@ -489,11 +482,10 @@ fn print_member(member: &ts_gen::ir::Member, indent: usize) {
 fn load(
     cli: &Cli,
     input_files: &[PathBuf],
-    opts: ts_gen::parse::Options,
     seen: &mut std::collections::HashSet<String>,
 ) -> Result<(ts_gen::ir::Module, ts_gen::context::GlobalContext)> {
     let lib_name = cli.lib_name.as_deref();
-    let (module, mut gctx) = ts_gen::parse_with(input_files, lib_name, opts)?;
+    let (module, mut gctx) = ts_gen::parse(input_files, lib_name)?;
 
     if cli.no_web_sys {
         gctx.external_map.clear_defaults();
@@ -506,7 +498,7 @@ fn load(
 
     if !cli.annotate.is_empty() {
         let files = resolve_input_files(&cli.annotate)?;
-        let (annotations, agctx) = ts_gen::parse_with(&files, lib_name, opts)?;
+        let (annotations, agctx) = ts_gen::parse(&files, lib_name)?;
         agctx.diagnostics.emit_unseen(seen);
         if agctx.diagnostics.has_errors() {
             let files: Vec<String> = cli

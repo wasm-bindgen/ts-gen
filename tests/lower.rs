@@ -16,8 +16,6 @@
 
 use std::path::{Path, PathBuf};
 
-use ts_gen::parse::Options;
-
 fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).to_path_buf()
 }
@@ -76,11 +74,11 @@ fn produce(fixture: &Path) -> Result<String, String> {
     let mut d = directives(fixture);
     let mut files = vec![fixture.to_path_buf()];
     files.extend(d.inputs);
-    let (module, mut gctx) = ts_gen::parse_with(&files, d.lib_name.as_deref(), Options::IR)
-        .map_err(|e| e.to_string())?;
+    let (module, mut gctx) =
+        ts_gen::parse(&files, d.lib_name.as_deref()).map_err(|e| e.to_string())?;
     if !d.annotate.is_empty() {
-        let (side, sgctx) = ts_gen::parse_with(&d.annotate, d.lib_name.as_deref(), Options::IR)
-            .map_err(|e| e.to_string())?;
+        let (side, sgctx) =
+            ts_gen::parse(&d.annotate, d.lib_name.as_deref()).map_err(|e| e.to_string())?;
         let errors = ts_gen::parse::annotate::apply(&mut gctx, &module, &side, &sgctx);
         if !errors.is_empty() {
             return Err(errors.join("\n"));

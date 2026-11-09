@@ -7,8 +7,12 @@ pub mod classes;
 pub mod discriminated_unions;
 pub mod enums;
 pub mod error_enum;
+mod families;
+pub mod from_ir;
 pub mod functions;
 pub(crate) mod inline_wrappers;
+mod ir_callables;
+mod ir_types;
 pub(crate) mod null_arms;
 pub mod signatures;
 pub mod subtyping;
@@ -92,9 +96,8 @@ pub struct GenerateOptions {
     /// `JsGeneric` bounds and cross the ABI at their concrete Rust types.
     experimental_generic_mono: bool,
 
-    /// Keep the exact carrier for each empty on reads (`Nullable<T>` for a
-    /// `T | null` return, `Option<Nullable<T>>` for `T | null | undefined`)
-    /// instead of folding every empty-admitting read into `Option<T>`.
+    /// Keep `T | null | undefined` three-state in the IR, as `T??` (see
+    /// the `strict_nullable` method).
     strict_nullable: bool,
 
     /// The output surface — the authoritative list of inputs (files /
@@ -114,6 +117,12 @@ pub struct GenerateOptions {
     /// A module that is fully covered by `--external` is always
     /// suppressed from emission regardless of its presence here.
     exports: HashSet<ExportSpec>,
+
+    /// Emit every declaration from the parse, none from the IR.
+    legacy_codegen: bool,
+
+    /// Report, as info, each reading the IR zip takes from the parse.
+    zip_diffs: bool,
 }
 
 impl GenerateOptions {
@@ -155,8 +164,24 @@ impl GenerateOptions {
         self
     }
 
-    /// Configure whether reads keep the exact carrier for each empty
-    /// (`Nullable<T>` for `T | null`) rather than reading as `Option<T>`.
+    /// Emit every declaration from the parse, none from the IR.
+    pub fn legacy_codegen(mut self, enabled: bool) -> Self {
+        self.legacy_codegen = enabled;
+        self
+    }
+
+    /// Report each type the IR zip reads from the parse in place of the
+    /// IR's, which emitting from the IR would change.
+    pub fn zip_diffs(mut self, enabled: bool) -> Self {
+        self.zip_diffs = enabled;
+        self
+    }
+
+    /// Keep `T | null | undefined` and `x?: T | null` three-state, as the
+    /// IR's `T??`: a read is `Option<Nullable<T>>` and a write gains a
+    /// `_with_null` form. By default they're `T?`, which reads as
+    /// `Option<T>` and writes `undefined`. `T | null` reads as `Option<T>`
+    /// either way.
     pub fn strict_nullable(mut self, enabled: bool) -> Self {
         self.strict_nullable = enabled;
         self
@@ -320,6 +345,14 @@ fn rustfmt(code: &str) -> anyhow::Result<String> {
     }
 }
 
+/// `std/std.ir`, the JS standard library as a lib IR.
+fn std_ir() -> &'static ts_gen_abi::ir::Ir {
+    static STD: std::sync::OnceLock<ts_gen_abi::ir::Ir> = std::sync::OnceLock::new();
+    STD.get_or_init(|| {
+        ts_gen_abi::text::parse(include_str!("../../std/std.ir")).expect("std/std.ir parses")
+    })
+}
+
 /// Generate the token stream for a full module.
 ///
 /// `Promise<T>` awaitability used to require an emitted `PromiseExt` trait
@@ -332,7 +365,21 @@ fn generate_tokens(
     options: &GenerateOptions,
 ) -> anyhow::Result<TokenStream> {
     let surface = surface::Surface::build(module, gctx, options);
-    let cgctx = CodegenContext::from_module_full(module, gctx, options, Some(&surface))?;
+    let mut cgctx = CodegenContext::from_module_full(module, gctx, options, Some(&surface))?;
+    if !options.legacy_codegen {
+        // The input's lib types resolve against std (`with std`).
+        let opts = crate::lower::Options {
+            with: vec![std_ir().clone()],
+            strict_nullable: options.strict_nullable,
+            ..Default::default()
+        };
+        let mut ir = from_ir::IrDecls::new(crate::lower::lower_with(module, gctx, &opts));
+        if options.experimental_generic_mono {
+            ir.monomorphize();
+        }
+        cgctx.ir = Some(ir);
+    }
+    let cgctx = cgctx;
 
     let preamble = quote! {
         #[allow(unused_imports)]
@@ -391,7 +438,10 @@ fn generate_tokens(
     cgctx.emit_path.replace(Vec::new());
 
     let error_enum = options.error_enum.as_deref().map(|name| {
-        let names = error_enum::collect_throws_names(&module.types, &surface);
+        let mut names = error_enum::collect_throws_names(&module.types, &surface);
+        if let Some(ir) = &cgctx.ir {
+            names = error_enum::ir_throws_names(names, &ir.error_classes(), &cgctx);
+        }
         error_enum::generate_error_enum(name, &names, &cgctx)
     });
 
@@ -406,9 +456,26 @@ fn generate_tokens(
     // `Worker` reachable only through a `<Name>Kind` arm), so they
     // are built before the `use` statements are collected.
     let dynamic_unions = generate_dynamic_unions(&cgctx);
+    let instances: Vec<TokenStream> = cgctx
+        .alias_instances
+        .borrow()
+        .iter()
+        .map(|(.., union)| {
+            let name = typemap::make_ident(union.instance.as_deref().unwrap_or_default());
+            generate_union_alias_enum(&name, union, &cgctx, &crate::ir::ModuleContext::Global)
+        })
+        .collect();
 
     let external_uses = cgctx.external_use_tokens();
 
+    if let Some(zip) = &cgctx.zip {
+        let mut diffs = zip.diffs.take();
+        diffs.sort();
+        diffs.dedup();
+        for d in diffs {
+            cgctx.diagnostics.borrow_mut().info(format!("zip: {d}"));
+        }
+    }
     cgctx.take_diagnostics().emit();
 
     Ok(quote! {
@@ -416,6 +483,7 @@ fn generate_tokens(
         #external_uses
         #(#global_items)*
         #dynamic_unions
+        #(#instances)*
         #error_enum
     })
 }
@@ -553,8 +621,8 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
     match ty {
         T::Boolean | T::BooleanLiteral(_) => "Bool".to_string(),
         T::Number | T::NumberLiteral(_) => "F64".to_string(),
-        T::AbiScalar(s) if s.is_bigint() => "BigInt".to_string(),
-        T::AbiScalar(_) => "F64".to_string(),
+        T::AbiScalar(s) if s.is_safe_integer() => format!("Safe{}", s.rust_ident().to_uppercase()),
+        T::AbiScalar(s) => s.rust_ident().to_uppercase(),
         T::String | T::StringLiteral(_) | T::Template { .. } => "String".to_string(),
         T::BigInt => "BigInt".to_string(),
         T::Void | T::Undefined => "Undefined".to_string(),
@@ -586,8 +654,19 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
     }
 }
 
+/// The unit enum `id` from the IR, when there is one.
+fn ir_unit_enum(
+    cgctx: &CodegenContext,
+    id: crate::context::TypeId,
+    name: &str,
+    js_namespace: &[String],
+) -> Option<TokenStream> {
+    cgctx.ir.as_ref()?.unit_enum(id, name, js_namespace)
+}
+
 /// Generate tokens for a single declaration.
 fn generate_declaration(
+    id: crate::context::TypeId,
     decl: &TypeDeclaration,
     cgctx: &CodegenContext,
     value_names: &mut functions::ValueNames,
@@ -625,8 +704,13 @@ fn generate_declaration(
                 decl.scope_id,
             ))
         }
-        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e)),
-        TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, &[])),
+        TypeKind::StringEnum(e) => Some(
+            ir_unit_enum(cgctx, id, &e.name, &[]).unwrap_or_else(|| enums::generate_string_enum(e)),
+        ),
+        TypeKind::NumericEnum(e) => Some(
+            ir_unit_enum(cgctx, id, &e.name, &[])
+                .unwrap_or_else(|| enums::generate_numeric_enum(e, &[])),
+        ),
         // Evaluated into one of the above once parsing ends.
         TypeKind::TsEnum(_) => None,
         TypeKind::Function(f) => Some(functions::generate_function(
@@ -835,7 +919,23 @@ fn generate_union_alias_enum(
     let mut payloads: Vec<TokenStream> = Vec::new();
     let mut sources: Vec<Vec<(TokenStream, TokenStream)>> = Vec::new();
     let mut arguments: Vec<TokenStream> = Vec::new();
+    let mut viewed: Vec<bool> = Vec::new();
     for arm in &union.arms {
+        // A view is written as the `Object` an argument takes, from any
+        // typed array or `DataView`.
+        let views = (arm == &TypeRef::ArrayBufferView).then(|| {
+            crate::ir::TypedArrayElement::typed_arrays()
+                .chain(["DataView"])
+                .map(|n| {
+                    let n = typemap::make_ident(n);
+                    quote! { ::js_sys::#n }
+                })
+                .collect::<Vec<_>>()
+        });
+        let arm = match arm {
+            TypeRef::ArrayBufferView => &TypeRef::Object,
+            arm => arm,
+        };
         let payload = typemap::to_syn_type(
             arm,
             typemap::TypePosition::RETURN,
@@ -885,6 +985,13 @@ fn generate_union_alias_enum(
                 vec![payload.clone(), quote! { &#payload }],
             ),
         };
+        let (mut from, mut args) = (from, args);
+        for view in views.iter().flatten() {
+            from.push((view.clone(), quote! { #payload::from(value) }));
+            from.push((quote! { &#view }, quote! { #payload::from(value.clone()) }));
+            args.extend([view.clone(), quote! { &#view }]);
+        }
+        viewed.push(views.is_some());
         arms.push(arm);
         payloads.push(payload);
         sources.push(from);
@@ -898,13 +1005,15 @@ fn generate_union_alias_enum(
     let mut variants = Vec::new();
     let mut conversions = Vec::new();
     let mut expected = Vec::new();
-    for (((variant_name, payload), from), arm) in dynamic_union_variant_names(&arms)
+    for ((((variant_name, payload), from), arm), viewed) in dynamic_union_variant_names(&arms)
         .into_iter()
         .zip(&payloads)
         .zip(sources)
         .zip(&arms)
+        .zip(viewed)
     {
         expected.push(match arm {
+            _ if viewed => "ArrayBufferView".to_string(),
             TypeRef::String => "string".to_string(),
             TypeRef::Number => "number".to_string(),
             TypeRef::Boolean => "boolean".to_string(),
@@ -981,7 +1090,7 @@ struct ModTree<'d> {
 
 enum ModEntry<'d> {
     /// A declaration and the JS path of the namespaces enclosing it.
-    Item(&'d TypeDeclaration, Vec<String>),
+    Item(crate::context::TypeId, &'d TypeDeclaration, Vec<String>),
     /// A child `pub mod`, at the position of its first declaration.
     Mod(String),
 }
@@ -1026,7 +1135,7 @@ impl<'d> ModTree<'d> {
                     }
                 }
             }
-            _ => self.entries.push(ModEntry::Item(decl, js_namespace)),
+            _ => self.entries.push(ModEntry::Item(id, decl, js_namespace)),
         }
     }
 
@@ -1034,7 +1143,7 @@ impl<'d> ModTree<'d> {
     fn generate(&self, path: &mut Vec<String>, cgctx: &CodegenContext) -> Vec<TokenStream> {
         let mut value_names =
             functions::ValueNames::new(self.entries.iter().filter_map(|entry| match entry {
-                ModEntry::Item(decl, js_namespace) => Some((*decl, js_namespace.as_slice())),
+                ModEntry::Item(_, decl, js_namespace) => Some((*decl, js_namespace.as_slice())),
                 ModEntry::Mod(_) => None,
             }));
         // A child module's `use super::*` brings its parent's statics into
@@ -1047,12 +1156,13 @@ impl<'d> ModTree<'d> {
         let mut items = Vec::new();
         for entry in &self.entries {
             match entry {
-                ModEntry::Item(decl, js_namespace) => {
+                ModEntry::Item(id, decl, js_namespace) => {
                     cgctx.emit_path.replace(path.clone());
+                    cgctx.current_decl.set(Some(*id));
                     items.extend(if js_namespace.is_empty() {
-                        generate_declaration(decl, cgctx, &mut value_names)
+                        generate_declaration(*id, decl, cgctx, &mut value_names)
                     } else {
-                        generate_ns_declaration(decl, js_namespace, cgctx, &mut value_names)
+                        generate_ns_declaration(*id, decl, js_namespace, cgctx, &mut value_names)
                     });
                 }
                 ModEntry::Mod(name) => {
@@ -1092,6 +1202,7 @@ impl<'d> ModTree<'d> {
 /// Adds `js_namespace` attribute to extern blocks so wasm_bindgen emits
 /// the correct JS access (e.g., `WebAssembly.Module`).
 fn generate_ns_declaration(
+    id: crate::context::TypeId,
     decl: &TypeDeclaration,
     js_namespace: &[String],
     cgctx: &CodegenContext,
@@ -1144,8 +1255,13 @@ fn generate_ns_declaration(
             decl.scope_id,
             value_names,
         )),
-        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e)),
-        TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, js_namespace)),
+        TypeKind::StringEnum(e) => Some(
+            ir_unit_enum(cgctx, id, &e.name, &[]).unwrap_or_else(|| enums::generate_string_enum(e)),
+        ),
+        TypeKind::NumericEnum(e) => Some(
+            ir_unit_enum(cgctx, id, &e.name, js_namespace)
+                .unwrap_or_else(|| enums::generate_numeric_enum(e, js_namespace)),
+        ),
         TypeKind::TsEnum(_) => None,
         TypeKind::Variable(v) => Some(functions::generate_variable(
             v,

@@ -1,18 +1,19 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Object, Promise};
+use js_sys::{ArrayBuffer, JsString, Map, Object};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads::{
-    pick_free_a, pick_free_b_with_null, Boxed, Clash, Headers, KVNamespace, KVStore, Opener,
-    Picker, Repeats, SubtleCrypto,
+    pick_free, pick_free_with_null, AOrB, Boxed, Clash, ClashKind, Headers, KVNamespace,
+    KVNamespaceKind, KVStore, Opener, Picker, Repeats, SubtleCrypto,
 };
 
-// No backing JavaScript module; compile-only coverage that each literal arm
-// is a wrapper with the arm's own return type and without the literal
-// parameter, that a lone literal keeps the plain `&str` binding, and that
-// static and `_promise` / `try_` forms follow, and that a generic arm
-// carries its extern's ABI bounds.
+// No backing JavaScript module; compile-only coverage that a literal union
+// takes the IR's enum, that each literal arm of separate overloads is a
+// wrapper with the arm's own return type and without the literal
+// parameter, that a lone literal keeps the plain `&str` binding, that
+// static and `try_` forms follow, and that a generic arm carries its
+// extern's ABI bounds.
 #[allow(dead_code)]
 async fn arms_compile(
     kv: &KVNamespace,
@@ -23,10 +24,9 @@ async fn arms_compile(
     let _: Option<String> = kv.get_text("k").await?;
     let _: JsValue = kv.get_json("k").await?;
     let _: Option<ArrayBuffer> = kv.get_array_buffer("k").await?;
-    let _: Promise<JsNullable<JsString>> = kv.get_text_promise("k");
     let _: Map<JsString, JsValue> = kv.get_json_with_slice(&["a".to_string()]).await?;
-    let _: bool = kv.mode_fast();
-    let _: Result<bool, JsValue> = kv.try_mode_safe();
+    let _: bool = kv.mode(KVNamespaceKind::Fast);
+    let _: Result<bool, JsValue> = kv.try_mode(KVNamespaceKind::Safe);
     let _: Vec<String> = headers.get_all("Set-Cookie");
     let _: Object = crypto.export_key_jwk("k").await?;
     let _: ArrayBuffer = crypto.export_key_spki("k").await?;
@@ -41,18 +41,18 @@ async fn generic_arms_compile(store: &KVStore<JsString>, key: &JsString) -> Resu
     Ok(())
 }
 
-// A literal cohort with a `null` arm: its wrappers drop the `null`
-// parameter and pass `null` themselves, under `_with_null` names.
+// An enum beside a `null` arm: its wrappers drop the `null` parameter and
+// pass `null` themselves, under `_with_null` names.
 #[allow(dead_code)]
 fn null_arms_compile(picker: &Picker, buf: &ArrayBuffer, obj: &Object) -> Result<(), JsValue> {
-    picker.pick_a(buf);
-    picker.pick_b_with_null();
-    picker.try_pick_a_with_null()?;
-    let _: Picker = Picker::make_a("x");
-    let _: Picker = Picker::make_b_with_null();
-    let _: Result<Picker, JsValue> = Picker::try_make_a_with_null();
-    picker.put_a(obj);
-    picker.put_b_with_null();
+    picker.pick(AOrB::A, buf);
+    picker.pick_with_null(AOrB::B);
+    picker.try_pick_with_null(AOrB::A)?;
+    let _: Picker = Picker::make(AOrB::A, "x");
+    let _: Picker = Picker::make_with_null(AOrB::B);
+    let _: Result<Picker, JsValue> = Picker::try_make_with_null(AOrB::A);
+    picker.put(AOrB::A, obj);
+    picker.put_with_null(AOrB::B);
     Ok(())
 }
 
@@ -64,19 +64,18 @@ fn repeated_literal_compiles(repeats: &Repeats) {
     let _: String = repeats.tag_c();
 }
 
-// A generic class: a bare static binds the type's defaults, a static
-// returning the class hoists its type arguments.
+// A generic class's statics taking an enum.
 #[allow(dead_code)]
 fn generic_class_arms_compile(obj: &Object) -> Result<(), JsValue> {
-    let _: String = Boxed::label_a();
-    let _: Boxed<Object> = Boxed::of_b(obj);
-    let _: Boxed<Object> = Boxed::of_a(obj);
-    let _: Boxed = Boxed::new_a()?;
+    let _: String = Boxed::label(AOrB::A);
+    let _: Boxed<Object> = Boxed::of(AOrB::B, obj);
+    let _: Boxed<Object> = Boxed::of(AOrB::A, obj);
+    let _: Boxed = Boxed::new(AOrB::A)?;
     Ok(())
 }
 
-// A `null` arm's `_promise` / `try_` forms, on a generic receiver and on a
-// static returning its class; and a plain `null` arm beside a cohort,
+// A `null` arm's promise and `try_` forms, on a generic receiver and on a
+// static returning its class; and a plain `null` arm beside an enum,
 // whose private bindings don't collide.
 #[allow(dead_code)]
 async fn null_arm_forms_compile(
@@ -87,28 +86,27 @@ async fn null_arm_forms_compile(
     buf: &ArrayBuffer,
     obj: &Object,
 ) -> Result<(), JsValue> {
-    let _: String = picker.name_a_with_null();
-    let _: Result<String, JsValue> = picker.try_name_b_with_null();
-    let _: Option<String> = picker.load_b_with_null().await?;
-    let _: Promise<JsNullable<JsString>> = picker.load_a_with_null_promise();
-    store.put_a(key, "v");
-    store.put_b_with_null(key);
-    let _: Boxed<Object> = Boxed::from_a(obj);
-    let _: Boxed<Object> = Boxed::from_b_with_null();
+    let _: String = picker.name_with_null(AOrB::A);
+    let _: Result<String, JsValue> = picker.try_name_with_null(AOrB::B);
+    let _: Option<String> = picker.load_with_null(AOrB::B).await?;
+    store.put(key, AOrB::A, "v");
+    store.put_with_null(key, AOrB::B);
+    let _: Boxed<Object> = Boxed::from(AOrB::A, obj);
+    let _: Boxed<Object> = Boxed::from_with_null(AOrB::B);
     clash.mode_with_null();
-    clash.mode_x();
+    clash.mode(ClashKind::X);
     clash.f(buf);
-    clash.f_with_null();
-    clash.f_a(buf);
-    clash.f_b_with_null();
+    clash.f_with_x_null();
+    clash.f_with_kind_and_x(AOrB::A, buf);
+    clash.f_with_kind_and_x_null(AOrB::B);
     Ok(())
 }
 
 #[allow(dead_code)]
 fn free_and_constructor_null_arms_compile(buf: &ArrayBuffer, obj: &Object) -> Result<(), JsValue> {
-    pick_free_a(obj);
-    pick_free_b_with_null();
-    let _: Opener = Opener::new_a(buf)?;
-    let _: Opener = Opener::new_b_with_null()?;
+    pick_free(AOrB::A, obj);
+    pick_free_with_null(AOrB::B);
+    let _: Opener = Opener::new(AOrB::A, buf)?;
+    let _: Opener = Opener::new_with_null(AOrB::B)?;
     Ok(())
 }

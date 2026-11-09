@@ -139,24 +139,6 @@ extern "C" {
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "greet")]
-    fn __greet_with_null(name: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
-}
-#[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-pub fn greet_with_null() -> Result<String, JsValue> {
-    __greet_with_null(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "greet")]
-    fn __greet_with_null_js_string(name: &::wasm_bindgen::JsValue) -> Result<JsString, JsValue>;
-}
-#[doc = " Omitted, explicit `null`, or a value: three distinct inputs."]
-pub fn greet_with_null_js_string() -> Result<JsString, JsValue> {
-    __greet_with_null_js_string(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
     #[doc = " Returns `null` for an unknown key and `undefined` for a known empty one."]
     #[wasm_bindgen(catch)]
     pub fn lookup(key: impl ::wasm_bindgen::JsStringLike) -> Result<Option<String>, JsValue>;
@@ -173,39 +155,43 @@ extern "C" {
 extern "C" {
     #[doc = " `lookup`, resolved asynchronously."]
     #[wasm_bindgen(catch, js_name = "lookupAsync")]
-    pub async fn lookup_async(
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<String>, JsValue>;
+    pub fn lookup_async(key: impl ::wasm_bindgen::JsStringLike) -> Promise<Option<String>>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " `lookup`, resolved asynchronously."]
     #[wasm_bindgen(catch, js_name = "lookupAsync")]
-    pub async fn lookup_async_js_string(
+    pub fn lookup_async_js_string(
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<JsString>, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[doc = " `lookup`, resolved asynchronously."]
-    #[wasm_bindgen(catch, js_name = "lookupAsync")]
-    pub fn lookup_async_promise(
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<Option<JsString>>, JsValue>;
+    ) -> Promise<Option<JsString>>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " Resolves to `null` for an unknown key."]
     #[wasm_bindgen(catch)]
-    pub async fn find(key: impl ::wasm_bindgen::JsStringLike) -> Result<Option<Options>, JsValue>;
+    pub fn find(key: impl ::wasm_bindgen::JsStringLike) -> Promise<Option<Options>>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
-    #[doc = " Resolves to `null` for an unknown key."]
-    #[wasm_bindgen(catch, js_name = "find")]
-    pub fn find_promise(
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<Option<Options>>, JsValue>;
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Pending;
+    #[wasm_bindgen(method, getter)]
+    pub fn value(this: &Pending) -> Promise<Option<JsString>>;
+}
+impl Pending {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Pending {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn pending(key: impl ::wasm_bindgen::JsStringLike) -> Result<Pending, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
@@ -233,25 +219,6 @@ extern "C" {
     pub fn classify_with_value_js_string(
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "classify")]
-    fn __classify_with_null(value: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
-}
-#[doc = " Tells `undefined`, `null` and a value apart."]
-pub fn classify_with_null() -> Result<String, JsValue> {
-    __classify_with_null(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "classify")]
-    fn __classify_with_null_js_string(value: &::wasm_bindgen::JsValue)
-        -> Result<JsString, JsValue>;
-}
-#[doc = " Tells `undefined`, `null` and a value apart."]
-pub fn classify_with_null_js_string() -> Result<JsString, JsValue> {
-    __classify_with_null_js_string(&::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
@@ -306,30 +273,6 @@ extern "C" {
     #[doc = " How many arguments arrived, and what the last one was."]
     #[wasm_bindgen(catch, js_name = "arity")]
     pub fn arity_with_a_and_b_js_string(a: Option<&str>, b: f64) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "arity")]
-    fn __arity_with_a_and_null(
-        a: Option<&str>,
-        b: &::wasm_bindgen::JsValue,
-    ) -> Result<String, JsValue>;
-}
-#[doc = " How many arguments arrived, and what the last one was."]
-pub fn arity_with_a_and_null(a: Option<&str>) -> Result<String, JsValue> {
-    __arity_with_a_and_null(a, &::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "arity")]
-    fn __arity_with_a_and_null_js_string(
-        a: Option<&str>,
-        b: &::wasm_bindgen::JsValue,
-    ) -> Result<JsString, JsValue>;
-}
-#[doc = " How many arguments arrived, and what the last one was."]
-pub fn arity_with_a_and_null_js_string(a: Option<&str>) -> Result<JsString, JsValue> {
-    __arity_with_a_and_null_js_string(a, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
