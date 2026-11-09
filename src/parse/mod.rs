@@ -1,11 +1,12 @@
 //! Parser orchestration: parse `.d.ts` files into IR.
 
+pub mod annotate;
 pub mod classify;
 pub mod ctx;
 pub mod docs;
 mod enums;
 mod erased_args;
-mod eval;
+pub(crate) mod eval;
 pub mod first_pass;
 pub mod literal_union;
 pub mod members;
@@ -25,12 +26,47 @@ use crate::context::GlobalContext;
 use crate::ir::Module;
 use crate::parse::scope::ScopeId;
 
+/// How the front end parses. The default is the Rust codegen's, and the
+/// IR producer's is [`Options::IR`].
+#[derive(Clone, Copy, Debug)]
+pub struct Options {
+    /// For the Rust codegen that reads the parse directly, and goes with
+    /// it: erase inline object types to `object`, rather than naming them
+    /// as dictionaries (a lone index signature as a `Record`).
+    pub legacy_rust: bool,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Options { legacy_rust: true }
+    }
+}
+
+impl Options {
+    /// The IR producer's parse.
+    pub const IR: Options = Options { legacy_rust: false };
+
+    fn context(self) -> GlobalContext {
+        let mut gctx = GlobalContext::new();
+        gctx.scopes.legacy_rust = self.legacy_rust;
+        gctx
+    }
+}
+
 /// Parse one or more `.d.ts` files and produce a `Module` + `GlobalContext`.
 pub fn parse_dts_files(
     paths: &[impl AsRef<Path>],
     lib_name: Option<&str>,
 ) -> Result<(Module, GlobalContext)> {
-    let mut gctx = GlobalContext::new();
+    parse_dts_files_with(paths, lib_name, Options::default())
+}
+
+pub fn parse_dts_files_with(
+    paths: &[impl AsRef<Path>],
+    lib_name: Option<&str>,
+    opts: Options,
+) -> Result<(Module, GlobalContext)> {
+    let mut gctx = opts.context();
     let mut module = Module::new(&mut gctx, lib_name);
     let global = module.global_scope;
 
@@ -81,7 +117,15 @@ pub fn parse_single_source(
     source: &str,
     lib_name: Option<&str>,
 ) -> Result<(Module, GlobalContext)> {
-    let mut gctx = GlobalContext::new();
+    parse_single_source_with(source, lib_name, Options::default())
+}
+
+pub fn parse_single_source_with(
+    source: &str,
+    lib_name: Option<&str>,
+    opts: Options,
+) -> Result<(Module, GlobalContext)> {
+    let mut gctx = opts.context();
     let mut module = Module::new(&mut gctx, lib_name);
     let file_scope = gctx.create_child_scope(module.global_scope);
     let path = Path::new("<input>");
@@ -1271,7 +1315,7 @@ fn is_value(kind: &crate::ir::TypeKind) -> bool {
 }
 
 /// Extract the name from a declaration kind, if it has one.
-fn declaration_name(kind: &crate::ir::TypeKind) -> Option<String> {
+pub(crate) fn declaration_name(kind: &crate::ir::TypeKind) -> Option<String> {
     use crate::ir::TypeKind;
     match kind {
         TypeKind::Class(c) => Some(c.name.clone()),
@@ -1605,6 +1649,7 @@ mod tests {
         };
         m.params = vec![crate::ir::Param {
             name: "x".to_string(),
+            js_name: None,
             type_ref: ty,
             optional: false,
             variadic: false,
@@ -1693,6 +1738,7 @@ mod tests {
             Member::Constructor(crate::ir::ConstructorMember {
                 params: vec![crate::ir::Param {
                     name: "x".to_string(),
+                    js_name: None,
                     type_ref: ty,
                     optional: false,
                     variadic: false,
@@ -1700,6 +1746,7 @@ mod tests {
                 }],
                 scope: ScopeId::DUMMY,
                 type_params: vec![],
+                result: None,
                 doc: None,
                 throws: crate::ir::Throws::None,
             })

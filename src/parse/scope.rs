@@ -166,6 +166,19 @@ impl TypeScope {
 pub struct ScopeArena {
     scopes: Vec<TypeScope>,
     erased_positions: HashMap<ScopeId, Vec<usize>>,
+    /// The bound of each erased type parameter, by its scope and name: an
+    /// indexed access by one reads at the bound's keys.
+    erased_bounds: HashMap<(ScopeId, String), crate::ir::TypeRef>,
+    /// Members tagged `@tw-nullish`, by their scope (a callable's body
+    /// scope, a property's declaration's) and JS name, so `--annotate` can
+    /// carry the tag from a side file.
+    nullish: std::collections::HashSet<(ScopeId, String)>,
+    /// Instance methods keyed by a well-known symbol (`[Symbol.iterator]`),
+    /// by the scope their declaration is declared in and its name. Only the
+    /// IR producer reads them.
+    symbol_members: HashMap<(ScopeId, String), Vec<crate::ir::Member>>,
+    /// See [`super::Options::legacy_rust`].
+    pub legacy_rust: bool,
 }
 
 impl ScopeArena {
@@ -173,7 +186,49 @@ impl ScopeArena {
         Self {
             scopes: Vec::new(),
             erased_positions: HashMap::new(),
+            erased_bounds: HashMap::new(),
+            nullish: Default::default(),
+            symbol_members: HashMap::new(),
+            legacy_rust: false,
         }
+    }
+
+    /// Record symbol-keyed members of the declaration `owner` whose body
+    /// scope is `body`.
+    pub fn add_symbol_members(
+        &mut self,
+        body: ScopeId,
+        owner: &str,
+        members: Vec<crate::ir::Member>,
+    ) {
+        let Some(declared) = self.get(body).parent else {
+            return;
+        };
+        self.symbol_members
+            .entry((declared, owner.to_string()))
+            .or_default()
+            .extend(members);
+    }
+
+    /// The symbol-keyed members of every block declaring a type named
+    /// `owner`, with the scope each block is declared in.
+    pub fn symbol_members(
+        &self,
+        owner: &str,
+    ) -> impl Iterator<Item = (ScopeId, &crate::ir::Member)> + '_ {
+        let owner = owner.to_string();
+        self.symbol_members
+            .iter()
+            .filter(move |((_, n), _)| *n == owner)
+            .flat_map(|((s, _), ms)| ms.iter().map(move |m| (*s, m)))
+    }
+
+    pub fn mark_nullish(&mut self, scope: ScopeId, name: &str) {
+        self.nullish.insert((scope, name.to_string()));
+    }
+
+    pub fn is_nullish(&self, scope: ScopeId, name: &str) -> bool {
+        self.nullish.contains(&(scope, name.to_string()))
     }
 
     /// Create a root scope (no parent).
@@ -289,6 +344,20 @@ impl ScopeArena {
             .push(position);
     }
 
+    /// The bound of the erased type parameter `name` visible from `scope`,
+    /// and the scope declaring it.
+    pub fn erased_bound(
+        &self,
+        scope: ScopeId,
+        name: &str,
+    ) -> Option<(ScopeId, &crate::ir::TypeRef)> {
+        let owner = self
+            .chain(scope)
+            .into_iter()
+            .find(|&s| self.get(s).get_binding(name).is_some())?;
+        Some((owner, self.erased_bounds.get(&(owner, name.to_string()))?))
+    }
+
     /// Bind `type_params` in `scope`. Parameters that erase to a primitive
     /// (see [`crate::ir::TypeParam::erasure`]) are bound as that primitive
     /// and removed from the list, so the owning declaration is emitted
@@ -298,11 +367,24 @@ impl ScopeArena {
         scope: ScopeId,
         type_params: &mut Vec<crate::ir::TypeParam>,
     ) {
+        self.bind_type_params_keeping(scope, type_params, |_| false);
+    }
+
+    /// [`Self::bind_type_params`], binding the parameters `live` selects
+    /// as type parameters even when they would erase.
+    pub fn bind_type_params_keeping(
+        &mut self,
+        scope: ScopeId,
+        type_params: &mut Vec<crate::ir::TypeParam>,
+        live: impl Fn(&crate::ir::TypeParam) -> bool,
+    ) {
         let mut position = 0;
         type_params.retain(|tp| {
-            let keep = match tp.erasure() {
+            let keep = match tp.erasure().filter(|_| !live(tp)) {
                 Some(erasure) => {
                     self.insert_erased_type_param(scope, tp.name.clone(), erasure, position);
+                    self.erased_bounds
+                        .insert((scope, tp.name.clone()), tp.constraint.clone().unwrap());
                     false
                 }
                 None => {
@@ -313,6 +395,28 @@ impl ScopeArena {
             position += 1;
             keep
         });
+    }
+
+    /// Erase the parameters [`Self::bind_type_params_keeping`] kept that
+    /// would otherwise erase, as [`Self::bind_type_params`] does.
+    pub fn erase_kept(&mut self, scope: ScopeId, type_params: &mut Vec<crate::ir::TypeParam>) {
+        let erased = self.erased_positions(scope).to_vec();
+        let mut original = (0..).filter(|i| !erased.contains(i));
+        type_params.retain(|tp| {
+            let position = original.next().unwrap();
+            match tp.erasure() {
+                Some(erasure) => {
+                    self.insert_erased_type_param(scope, tp.name.clone(), erasure, position);
+                    self.erased_bounds
+                        .insert((scope, tp.name.clone()), tp.constraint.clone().unwrap());
+                    false
+                }
+                None => true,
+            }
+        });
+        if let Some(positions) = self.erased_positions.get_mut(&scope) {
+            positions.sort();
+        }
     }
 
     /// Positions (in declaration order) of the type parameters of the

@@ -1,0 +1,42 @@
+ir 1;
+
+interface Env {}
+
+class Request {}
+
+class Response {}
+
+interface DurableObjectState {
+  @js(object)
+  new();
+  get id(): str;
+}
+
+class DurableObject {
+  fetch(request: Request): DurableObjectFetchKind throws;
+}
+
+enum DurableObjectFetchKind {
+  Response(Response);
+  Future(future<Response>);
+}
+
+export version(): str throws;
+export rename(from: str?) throws;
+export rename(from: str?, to: str?) throws;
+
+/// A counter kept in durable storage.
+export class Counter extends DurableObject {
+  new(ctx: DurableObjectState, env: Env) throws;
+  increment(by: f64): future<f64>;
+  get count(): f64;
+  get label(): @js(null) str?;
+  set label(value: str?);
+  fetch(request: Request): future<Response>;
+  static restore(id: str): Counter throws;
+}
+
+export class Registry {
+  static create(): Registry throws;
+  get size(): f64;
+}

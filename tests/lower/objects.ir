@@ -1,0 +1,203 @@
+// `Streaming.Stream`: the literal type `true` widens to `bool`
+ir 1;
+
+interface Upload {
+  @js(object)
+  new();
+  get retry(): UploadRetry?;
+  get headers(): Record<Str>;
+  set headers(value: Record<Str>);
+  get parts(): arr<UploadParts>;
+  set parts(value: arr<UploadParts>);
+  get hooks(): Object;
+  set hooks(value: Object);
+  get extra(): Object;
+  set extra(value: Object);
+}
+
+interface Slot<T> {
+  @js(object)
+  new();
+  get inner(): SlotInner<T>;
+  set inner(value: SlotInner<T>);
+}
+
+enum FilterOp {
+  @js("$eq") $eq;
+  @js("$ne") $ne;
+}
+
+enum CollectionOp {
+  @js("$in") $in;
+  @js("$nin") $nin;
+}
+
+interface Canvas {
+  filter(filter: Filter) throws;
+  draw(listing: arr<ListingItem>, shape: union Shape, border: Border) throws;
+}
+
+interface Search {
+  @js(object)
+  new();
+  get ranking(): SearchRanking?;
+  set ranking(value: SearchRanking);
+}
+
+interface Streaming {
+  @js(object)
+  new();
+  get stream(): bool;
+  @js(name = "stream", args = (true))
+  set streamTrue();
+  get ranking(): SearchRanking?;
+  set ranking(value: SearchRanking);
+}
+
+interface Headers2 {
+  @js(object)
+  new();
+  get "x-custom-cost"(): XCustomCostKind;
+  set "x-custom-cost"(value: Headers2XCustomCostPerToken);
+  set "x-custom-cost"(value: Headers2XCustomCostTotal);
+  set "x-custom-cost"(value: str);
+}
+
+search(s: Search, t: Streaming, h: PartialHeaders2) throws;
+
+interface ListingItem {
+  @js(object)
+  new();
+  get id(): str;
+  set id(value: str);
+}
+
+interface ShapeObject {
+  @js(object)
+  new();
+  get radius(): f64;
+  set radius(value: f64);
+}
+
+interface BorderColor {
+  @js(object)
+  new();
+  get color(): str;
+  set color(value: str);
+}
+
+interface BorderTop {
+  @js(object)
+  new();
+  get top(): f64;
+  set top(value: f64);
+  get left(): f64;
+  set left(value: f64);
+}
+
+interface FilterOpMap {
+  @js(object)
+  new();
+  get $eq(): str?;
+  set $eq(value: str);
+  get $ne(): str?;
+  set $ne(value: str);
+}
+
+interface CollectionOpMap {
+  @js(object)
+  new();
+  get $in(): arr<str>?;
+  set $in(value: arr<str>);
+  get $nin(): arr<str>?;
+  set $nin(value: arr<str>);
+}
+
+interface UploadRetry {
+  @js(object)
+  new();
+  get count(): f64;
+  set count(value: f64);
+  get delay(): f64?;
+  set delay(value: f64);
+}
+
+interface UploadParts {
+  @js(object)
+  new();
+  get name(): str;
+  set name(value: str);
+  get size(): f64;
+  set size(value: f64);
+}
+
+interface SlotInner<T> {
+  @js(object)
+  new();
+  get value(): T;
+  set value(value: T);
+  get label(): str?;
+  set label(value: str);
+}
+
+interface SearchRanking {
+  @js(object)
+  new();
+  get score(): f64?;
+  set score(value: f64);
+}
+
+interface Headers2XCustomCostPerToken {
+  @js(object)
+  new();
+  get per_token(): f64?;
+  set per_token(value: f64);
+}
+
+interface Headers2XCustomCostTotal {
+  @js(object)
+  new();
+  get total(): f64?;
+  set total(value: f64);
+}
+
+interface PartialHeaders2 {
+  @js(object)
+  new();
+  get "x-custom-cost"(): XCustomCostKind?;
+  set "x-custom-cost"(value: Headers2XCustomCostPerToken);
+  set "x-custom-cost"(value: Headers2XCustomCostTotal);
+  set "x-custom-cost"(value: str);
+}
+
+enum Filter {
+  Str(str);
+  FilterOpMap(FilterOpMap);
+  CollectionOpMap(CollectionOpMap);
+}
+
+enum Shape {
+  Str(str);
+  ShapeObject(ShapeObject);
+}
+
+enum Border {
+  F64(f64);
+  BorderColor(BorderColor);
+  BorderTop(BorderTop);
+}
+
+enum XCustomCostKind {
+  Headers2XCustomCostPerToken(Headers2XCustomCostPerToken);
+  Headers2XCustomCostTotal(Headers2XCustomCostTotal);
+  Str(str);
+}
+
+interface Record<V> {
+  @js(index)
+  at(key: str): V?;
+  @js(index)
+  setAt(key: str, value: V);
+}
+
+interface Object {}

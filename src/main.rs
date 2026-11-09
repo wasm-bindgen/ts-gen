@@ -13,8 +13,48 @@ struct Cli {
     input: Vec<PathBuf>,
 
     /// Output file path for the generated .rs file (e.g., `src/bindings.rs`).
-    #[arg(short, long)]
-    output: PathBuf,
+    #[arg(short, long, required_unless_present = "ir")]
+    output: Option<PathBuf>,
+
+    /// Write the ts-gen IR (`IR.md`) to this path (`-` for stdout). With
+    /// no `--output`, only the IR is written.
+    #[arg(long)]
+    ir: Option<PathBuf>,
+
+    /// What the module provides to JS, lowered as IR exports: a `.d.ts`
+    /// whose exports are the module's, or `Name[.member,...]`, an input
+    /// interface the default export implements (`--ir` only).
+    #[arg(long)]
+    provides: Option<String>,
+
+    /// A callback parameter called at most once, `Owner.member.param` or
+    /// `function.param` in JS names: `@once` in the IR (`--ir` only).
+    #[arg(long = "once", num_args = 1..)]
+    once: Vec<String>,
+
+    /// Don't make future-returning calls cancellable through an
+    /// `AbortSignal` dictionary field (`--ir` only).
+    #[arg(long = "no-cancel")]
+    no_cancel: bool,
+
+    /// A concrete bound, `Decl.Param=T,U` in IR types (`Map.K=Str,f64`)
+    /// (`--ir` only).
+    #[arg(long = "bound", num_args = 1..)]
+    bound: Vec<String>,
+
+    /// A lib IR (`lib name;`) to resolve the input's lib types against
+    /// instead of stubbing them (`--ir` only).
+    #[arg(long = "with", num_args = 1..)]
+    with: Vec<PathBuf>,
+
+    /// Produce the lib IR `name` of the `--root` declarations (`--ir`
+    /// only).
+    #[arg(long = "emit-lib", value_name = "NAME", requires = "root")]
+    emit_lib: Option<String>,
+
+    /// A root declaration of `--emit-lib`, by global name.
+    #[arg(long = "root", num_args = 1.., value_delimiter = ',')]
+    root: Vec<String>,
 
     /// Output surface: files and/or JS module specifiers to emit. The
     /// `--input` set defines the full type universe for resolution;
@@ -40,6 +80,19 @@ struct Cli {
     /// contributes to the output.
     #[arg(short = 'E', long = "export", num_args = 1..)]
     export: Vec<String>,
+
+    /// Side `.d.ts` files whose `@tw-abi` and `@throws` JSDoc tags are
+    /// layered onto the input declarations, matched by declaration and
+    /// member name.
+    ///
+    /// Upstream declaration files carry no such tags and editing a
+    /// vendored copy does not survive an upgrade. A side file re-declares
+    /// only the members it annotates (`interface Response { /** @tw-abi u16
+    /// */ readonly status: number; }`); the tags are applied to the input's
+    /// declarations and the side file itself is not emitted. A name that
+    /// matches nothing is an error.
+    #[arg(long = "annotate", num_args = 1..)]
+    annotate: Vec<PathBuf>,
 
     /// JS module specifier (required when .d.ts has top-level exports).
     /// This module is the library the output binds, so it is emitted at
@@ -139,6 +192,11 @@ struct Cli {
     /// `None`. With this flag a read of `T | null` is `Nullable<T>` and
     /// one of `T | null | undefined` is `Option<Nullable<T>>`, telling the
     /// two empties apart. Writes are exact under either setting.
+    ///
+    /// With `--ir`, it also keeps `T | null | undefined` three-state in the
+    /// IR, as `T??`. By default it's `T?`, which writes `undefined`, a value
+    /// TS accepts there. `T | null` is `@js(null) T?` either way, since TS
+    /// rejects `undefined` for it.
     #[arg(long = "strict-nullable")]
     strict_nullable: bool,
 }
@@ -154,19 +212,18 @@ fn main() -> Result<()> {
 
     eprintln!("[ts-gen] Processing {} file(s)...", input_files.len());
 
-    // Parse
-    let (module, mut gctx) = ts_gen::parse::parse_dts_files(&input_files, cli.lib_name.as_deref())?;
-
-    if cli.no_web_sys {
-        gctx.external_map.clear_defaults();
+    // `--ir` and `--output` parse the inputs differently, so each loads them;
+    // a diagnostic both report prints once.
+    let mut seen = Default::default();
+    if let Some(ir_path) = &cli.ir {
+        let (module, mut gctx) = load(&cli, &input_files, ts_gen::parse::Options::IR, &mut seen)?;
+        produce_ir(&cli, ir_path, &module, &mut gctx)?;
     }
-
-    // Apply external type mappings
-    for mapping in &cli.external {
-        gctx.external_map.add_mappings(mapping);
-    }
-
-    gctx.diagnostics.emit();
+    let Some(output) = cli.output.clone() else {
+        return Ok(());
+    };
+    let legacy = ts_gen::parse::Options { legacy_rust: true };
+    let (module, gctx) = load(&cli, &input_files, legacy, &mut seen)?;
 
     if cli.verbose {
         eprintln!("[ts-gen] Parsed {} declarations", module.types.len());
@@ -225,17 +282,17 @@ fn main() -> Result<()> {
     let rust_source = ts_gen::codegen::generate_with_options(&module, &gctx, &options)?;
 
     // Write output file, creating parent directories if needed
-    if let Some(parent) = cli.output.parent() {
+    if let Some(parent) = output.parent() {
         if !parent.as_os_str().is_empty() {
             std::fs::create_dir_all(parent)
                 .with_context(|| format!("Failed to create directory: {}", parent.display()))?;
         }
     }
 
-    std::fs::write(&cli.output, &rust_source)
-        .with_context(|| format!("Failed to write {}", cli.output.display()))?;
+    std::fs::write(&output, &rust_source)
+        .with_context(|| format!("Failed to write {}", output.display()))?;
 
-    eprintln!("[ts-gen] Wrote {}", cli.output.display());
+    eprintln!("[ts-gen] Wrote {}", output.display());
     eprintln!("[ts-gen] Done");
 
     Ok(())
@@ -425,4 +482,106 @@ fn print_member(member: &ts_gen::ir::Member, indent: usize) {
             );
         }
     }
+}
+
+/// Parse the inputs, with `--external` and `--annotate` applied, printing
+/// the diagnostics not in `seen`.
+fn load(
+    cli: &Cli,
+    input_files: &[PathBuf],
+    opts: ts_gen::parse::Options,
+    seen: &mut std::collections::HashSet<String>,
+) -> Result<(ts_gen::ir::Module, ts_gen::context::GlobalContext)> {
+    let lib_name = cli.lib_name.as_deref();
+    let (module, mut gctx) = ts_gen::parse_with(input_files, lib_name, opts)?;
+
+    if cli.no_web_sys {
+        gctx.external_map.clear_defaults();
+    }
+
+    // Apply external type mappings
+    for mapping in &cli.external {
+        gctx.external_map.add_mappings(mapping);
+    }
+
+    if !cli.annotate.is_empty() {
+        let files = resolve_input_files(&cli.annotate)?;
+        let (annotations, agctx) = ts_gen::parse_with(&files, lib_name, opts)?;
+        agctx.diagnostics.emit_unseen(seen);
+        if agctx.diagnostics.has_errors() {
+            let files: Vec<String> = cli
+                .annotate
+                .iter()
+                .map(|p| p.display().to_string())
+                .collect();
+            bail!("--annotate: invalid tags in {}", files.join(", "));
+        }
+        let errors = ts_gen::parse::annotate::apply(&mut gctx, &module, &annotations, &agctx);
+        if !errors.is_empty() {
+            bail!("--annotate:\n  {}", errors.join("\n  "));
+        }
+    }
+
+    gctx.diagnostics.emit_unseen(seen);
+    Ok((module, gctx))
+}
+
+fn produce_ir(
+    cli: &Cli,
+    ir_path: &std::path::Path,
+    module: &ts_gen::ir::Module,
+    gctx: &mut ts_gen::context::GlobalContext,
+) -> Result<()> {
+    let mut opts = ts_gen::lower::Options {
+        once: cli.once.clone(),
+        cancel: !cli.no_cancel,
+        strict_nullable: cli.strict_nullable,
+        ..Default::default()
+    };
+    for b in &cli.bound {
+        opts.bounds
+            .push(ts_gen::lower::parse_bound(b).map_err(|e| anyhow::anyhow!("--bound {e}"))?);
+    }
+    if let Some(spec) = &cli.provides {
+        opts.provides = ts_gen::provides::resolve(spec, module, gctx)?;
+    }
+    for path in &cli.with {
+        let src = std::fs::read_to_string(path)
+            .with_context(|| format!("Failed to read --with {}", path.display()))?;
+        let lib = ts_gen_abi::text::parse(&src)
+            .map_err(|e| anyhow::anyhow!("--with {}: {e}", path.display()))?;
+        if lib.lib.is_none() {
+            bail!("--with {}: not a lib IR (no `lib name;`)", path.display());
+        }
+        opts.with.push(lib);
+    }
+    if let Some(name) = &cli.emit_lib {
+        opts.lib = Some(ts_gen::lower::LibOptions {
+            name: name.clone(),
+            roots: cli.root.clone(),
+        });
+    }
+    let lowered = ts_gen::lower::lower_with(module, gctx, &opts);
+    for d in &lowered.diagnostics {
+        eprintln!("[ts-gen] ir: {d}");
+    }
+    let checks = ts_gen_abi::validate::Options {
+        libs: &opts.with,
+        ..Default::default()
+    };
+    if let Err(errors) = ts_gen_abi::validate::validate_with(&lowered.ir, checks) {
+        for e in &errors {
+            eprintln!("[ts-gen] ir: {e}");
+        }
+        bail!("the produced IR doesn't validate");
+    }
+    let text = ts_gen_abi::text::print(&lowered.ir);
+    if ir_path.as_os_str() == "-" {
+        print!("{text}");
+    } else {
+        std::fs::write(ir_path, &text)
+            .with_context(|| format!("Failed to write {}", ir_path.display()))?;
+        eprintln!("[ts-gen] Wrote {}", ir_path.display());
+    }
+    Ok(())
 }

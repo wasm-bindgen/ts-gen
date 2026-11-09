@@ -48,6 +48,19 @@ pub struct JsDocInfo {
     /// body (outside any `@param`) — the property-doc form, applied to the
     /// setter's value argument.
     pub slice_mode: Option<String>,
+
+    /// `@tw-abi <type>` — the ABI scalar of the member's own type (a
+    /// property's type, a callable's return). See
+    /// [`crate::ir::AbiScalar`] for the accepted set.
+    pub abi_type: Option<String>,
+
+    /// `@tw-nullish`: the member treats `null` as `undefined`, so its
+    /// `| null` reads and writes collapse to one absence.
+    pub nullish: bool,
+
+    /// `@tw-abi <param>: <type>` — the ABI scalar of one named
+    /// parameter of the callable.
+    pub abi_params: Vec<(String, String)>,
 }
 
 impl JsDocInfo {
@@ -203,6 +216,17 @@ fn convert_jsdoc_tags(lines: &[&str]) -> (String, JsDocInfo) {
             .or_else(|| line.strip_prefix("@return "))
         {
             returns = Some(rest.to_string());
+        } else if line.trim() == "@tw-nullish" {
+            info.nullish = true;
+        } else if let Some(rest) = line.strip_prefix("@tw-abi ") {
+            // `@tw-abi u16` / `@tw-abi status: u16`. Consumed, not rendered.
+            let rest = rest.trim();
+            match rest.split_once(':') {
+                Some((param, ty)) => info
+                    .abi_params
+                    .push((param.trim().to_string(), ty.trim().to_string())),
+                None => info.abi_type = Some(rest.to_string()),
+            }
         } else if let Some(rest) = line.strip_prefix("@throws ") {
             // Capture both the structured type info (for `info.throws`) and a
             // human-readable line for the Errors section in the rendered doc.

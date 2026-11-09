@@ -793,6 +793,7 @@ fn type_refs(ty: &TypeRef, scope: ScopeId, out: &mut Vec<(String, ScopeId)>) {
         TypeRef::Boolean
         | TypeRef::Number
         | TypeRef::String
+        | TypeRef::Template { .. }
         | TypeRef::BigInt
         | TypeRef::Void
         | TypeRef::Undefined
@@ -804,6 +805,7 @@ fn type_refs(ty: &TypeRef, scope: ScopeId, out: &mut Vec<(String, ScopeId)>) {
         | TypeRef::ArrayBufferView
         | TypeRef::PropertyKey
         | TypeRef::TypedSlice(..)
+        | TypeRef::AbiScalar(_)
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)

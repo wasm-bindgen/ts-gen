@@ -70,6 +70,77 @@ pub(crate) fn apply_slice_hints(
     }
 }
 
+/// Apply `@tw-abi <type>` to the member's own type and `@tw-abi <param>:
+/// <type>` to the named parameters. Unknown scalars, incompatible
+/// leaves and unknown parameter names are error diagnostics (fatal in
+/// an `--annotate` side file), not silent no-ops.
+pub(crate) fn apply_abi_tags(
+    info: &JsDocInfo,
+    own: Option<&mut TypeRef>,
+    params: &mut [Param],
+    member: &str,
+    scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) {
+    use crate::ir::AbiScalar;
+    let mut own = own;
+    if info.nullish {
+        ctx.scopes.mark_nullish(scope, member);
+        if let Some(ty) = own.as_deref_mut() {
+            *ty = ty.nullish();
+        }
+        for p in params.iter_mut() {
+            p.type_ref = p.type_ref.nullish();
+        }
+    }
+    if let Some(name) = &info.abi_type {
+        match (AbiScalar::parse(name), own) {
+            (Some(scalar), Some(ty)) => match ty.with_abi_scalar(scalar) {
+                Some(forced) => *ty = forced,
+                None => ctx.diag.error(incompatible(name, member, ty)),
+            },
+            (Some(_), None) => ctx.diag.error(format!(
+                "`@tw-abi {name}` on `{member}` has no type to apply to"
+            )),
+            (None, _) => ctx.diag.error(format!(
+                "`@tw-abi {name}` on `{member}`: unknown scalar type"
+            )),
+        }
+    }
+    for (param, name) in &info.abi_params {
+        let Some(scalar) = AbiScalar::parse(name) else {
+            ctx.diag.error(format!(
+                "`@tw-abi {param}: {name}` on `{member}`: unknown scalar type"
+            ));
+            continue;
+        };
+        // IR parameter names are already snake_case; tags use the TS name.
+        let ir_name = to_snake_case(param);
+        match params.iter_mut().find(|p| p.name == ir_name) {
+            Some(p) => match p.type_ref.with_abi_scalar(scalar) {
+                Some(forced) => p.type_ref = forced,
+                None => ctx.diag.error(incompatible(
+                    name,
+                    &format!("{member}({param})"),
+                    &p.type_ref,
+                )),
+            },
+            None => ctx.diag.error(format!(
+                "`@tw-abi {param}: {name}` on `{member}`: no such parameter"
+            )),
+        }
+    }
+}
+
+/// Diagnostic for a `@tw-abi` scalar whose target type cannot carry it.
+pub(crate) fn incompatible(scalar: &str, member: &str, ty: &TypeRef) -> String {
+    format!(
+        "`@tw-abi {scalar}` on `{member}`: `{}` cannot cross as `{scalar}` (a `number` takes \
+         any scalar, a `bigint` only `i64`/`u64`)",
+        ty.format_ts()
+    )
+}
+
 /// Push the given type parameters into a fresh child of `parent_scope`
 /// and return the new scope. Used by every member converter that
 /// declares its own `<T, U, ...>` — methods, free functions, hoisted
@@ -87,6 +158,22 @@ pub(crate) fn create_body_scope(
 ) -> ScopeId {
     let body_scope = ctx.scopes.create_child(parent_scope);
     ctx.scopes.bind_type_params(body_scope, type_params);
+    body_scope
+}
+
+/// [`create_body_scope`] for an interface, keeping a parameter
+/// constrained to string literals only.
+pub(crate) fn create_interface_body_scope(
+    type_params: &mut Vec<TypeParam>,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> ScopeId {
+    let body_scope = ctx.scopes.create_child(parent_scope);
+    ctx.scopes.bind_type_params_keeping(
+        body_scope,
+        type_params,
+        TypeParam::selects_string_literals,
+    );
     body_scope
 }
 
@@ -301,11 +388,26 @@ pub(crate) fn convert_formal_params_with_synthesis(
             .map(to_snake_case)
             .unwrap_or_else(|| format!("arg{i}"));
 
+        // A parameter name another member's hoist took (`R2Bucket.get` and
+        // `put` both take `options`) is qualified by its member before a
+        // number: `R2BucketPutOptions`.
+        let segment = match raw_param_name.as_deref() {
+            Some(p)
+                if !ctx.scopes.legacy_rust
+                    && ctx
+                        .used_type_names
+                        .contains(&format!("{parent_name}{}", to_pascal_case(p))) =>
+            {
+                format!("{member_name}{}", to_pascal_case(p))
+            }
+            Some(p) => p.to_string(),
+            None => member_name.to_string(),
+        };
         let type_ref = match param.type_annotation.as_ref() {
             Some(ann) => match try_synthesize_inline_param(
                 &ann.type_annotation,
                 parent_name,
-                raw_param_name.as_deref().unwrap_or(member_name),
+                &segment,
                 scope,
                 ctx,
             ) {
@@ -317,6 +419,7 @@ pub(crate) fn convert_formal_params_with_synthesis(
 
         let optional = param.optional || param.initializer.is_some();
         result_params.push(Param {
+            js_name: raw_param_name.filter(|r| *r != name),
             name,
             type_ref,
             optional,
@@ -334,6 +437,7 @@ pub(crate) fn convert_formal_params_with_synthesis(
             .unwrap_or(TypeRef::Array(Box::new(TypeRef::Any)));
         result_params.push(Param {
             name,
+            js_name: None,
             type_ref,
             optional: false,
             variadic: true,
@@ -741,7 +845,7 @@ pub fn convert_ts_signature(
 ) -> Vec<Member> {
     match sig {
         TSSignature::TSPropertySignature(prop) => {
-            convert_property_signature(prop, parent_scope, ctx)
+            convert_property_signature(prop, parent, parent_scope, ctx)
         }
         TSSignature::TSMethodSignature(method) => {
             convert_method_signature(method, parent, parent_scope, ctx)
@@ -760,8 +864,10 @@ pub fn convert_ts_signature(
             vec![]
         }
         TSSignature::TSCallSignatureDeclaration(_) => {
-            ctx.diag
-                .warn("Call signatures on interfaces are not supported, skipping");
+            ctx.diag.warn(format!(
+                "Call signature on `{}` is not supported, skipping",
+                parent.unwrap_or("<anonymous>")
+            ));
             vec![]
         }
     }
@@ -778,8 +884,12 @@ pub fn convert_class_element(
         ClassElement::MethodDefinition(method) => {
             convert_class_method(method, parent, parent_scope, ctx)
         }
-        ClassElement::PropertyDefinition(prop) => convert_class_property(prop, parent_scope, ctx),
-        ClassElement::AccessorProperty(acc) => convert_accessor_property(acc, parent_scope, ctx),
+        ClassElement::PropertyDefinition(prop) => {
+            convert_class_property(prop, parent, parent_scope, ctx)
+        }
+        ClassElement::AccessorProperty(acc) => {
+            convert_accessor_property(acc, parent, parent_scope, ctx)
+        }
         ClassElement::TSIndexSignature(idx) => convert_index_signature(idx, parent_scope, ctx)
             .into_iter()
             .collect(),
@@ -791,21 +901,45 @@ pub fn convert_class_element(
 
 fn convert_property_signature(
     prop: &TSPropertySignature<'_>,
+    parent: Option<&str>,
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
-    let js_name = match property_key_name(&prop.key) {
-        Some(n) => n,
-        None => return vec![],
+    let Some(js_name) = property_key_name(&prop.key) else {
+        let (Some(s), Some(owner)) = (well_known_symbol(&prop.key), parent) else {
+            skip_computed(&prop.key, parent, ctx);
+            return vec![];
+        };
+        let members =
+            convert_property_signature_named(format!("[Symbol.{s}]"), prop, parent_scope, ctx);
+        ctx.scopes.add_symbol_members(parent_scope, owner, members);
+        return vec![];
     };
+    convert_property_signature_named(js_name, prop, parent_scope, ctx)
+}
+
+fn convert_property_signature_named(
+    js_name: String,
+    prop: &TSPropertySignature<'_>,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> Vec<Member> {
     let (doc, info) = split_info(ctx.docs.info_for_span(prop.span.start));
     let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag);
 
-    let type_ref = prop
+    let mut type_ref = prop
         .type_annotation
         .as_ref()
         .map(|ann| convert_ts_type_scoped(&ann.type_annotation, parent_scope, ctx))
         .unwrap_or(TypeRef::Any);
+    apply_abi_tags(
+        &info,
+        Some(&mut type_ref),
+        &mut [],
+        &js_name,
+        parent_scope,
+        ctx,
+    );
 
     let mut members = vec![Member::Getter(GetterMember {
         scope: parent_scope,
@@ -835,10 +969,29 @@ fn convert_method_signature(
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
-    let js_name = match property_key_name(&method.key) {
-        Some(n) => n,
-        None => return vec![],
-    };
+    match property_key_name(&method.key) {
+        Some(n) => method_signature(n, method, parent, parent_scope, ctx),
+        None => {
+            if let (Some(s), Some(owner)) = (well_known_symbol(&method.key), parent) {
+                // No owner name, so nothing is synthesized for the Rust side.
+                let members =
+                    method_signature(format!("[Symbol.{s}]"), method, None, parent_scope, ctx);
+                ctx.scopes.add_symbol_members(parent_scope, owner, members);
+            } else {
+                skip_computed(&method.key, parent, ctx);
+            }
+            vec![]
+        }
+    }
+}
+
+fn method_signature(
+    js_name: String,
+    method: &TSMethodSignature<'_>,
+    parent: Option<&str>,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> Vec<Member> {
     let (doc, info) = split_info(ctx.docs.info_for_span(method.span.start));
 
     let mut type_params = convert_type_params(method.type_parameters.as_ref(), ctx.diag);
@@ -869,6 +1022,14 @@ fn convert_method_signature(
         (Some(rt), _) => convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx),
         (None, _) => TypeRef::Void,
     };
+    apply_abi_tags(
+        &info,
+        Some(&mut return_type),
+        &mut params,
+        &js_name,
+        body_scope,
+        ctx,
+    );
 
     // Hoist top-level `Iterable<T>` / `AsyncIterable<T>` returns into
     // synthesized wrapper interfaces with a `[Symbol.iterator]` method.
@@ -948,10 +1109,28 @@ fn convert_class_method(
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
-    let js_name = match property_key_name(&method.key) {
-        Some(n) => n,
-        None => return vec![],
-    };
+    match property_key_name(&method.key) {
+        Some(n) => class_method(n, method, parent, parent_scope, ctx),
+        None => {
+            if let (Some(s), Some(owner)) = (well_known_symbol(&method.key), parent) {
+                let members =
+                    class_method(format!("[Symbol.{s}]"), method, None, parent_scope, ctx);
+                ctx.scopes.add_symbol_members(parent_scope, owner, members);
+            } else {
+                skip_computed(&method.key, parent, ctx);
+            }
+            vec![]
+        }
+    }
+}
+
+fn class_method(
+    js_name: String,
+    method: &MethodDefinition<'_>,
+    parent: Option<&str>,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> Vec<Member> {
     let (doc, info) = split_info(ctx.docs.info_for_span(method.span.start));
 
     let func = &method.value;
@@ -989,6 +1168,14 @@ fn convert_class_method(
         (Some(rt), _) => convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx),
         (None, _) => TypeRef::Void,
     };
+    apply_abi_tags(
+        &info,
+        Some(&mut return_type),
+        &mut params,
+        &js_name,
+        body_scope,
+        ctx,
+    );
 
     // Same iterable hoisting as `convert_method_signature`. Skip for
     // constructors — they don't have a meaningful return type.
@@ -1010,6 +1197,7 @@ fn convert_class_method(
                 scope: parent_scope,
                 type_params,
                 params,
+                result: None,
                 doc,
                 throws: info.throws(),
             })]
@@ -1091,21 +1279,45 @@ fn convert_class_method(
 
 fn convert_class_property(
     prop: &PropertyDefinition<'_>,
+    parent: Option<&str>,
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
-    let js_name = match property_key_name(&prop.key) {
-        Some(n) => n,
-        None => return vec![],
+    let Some(js_name) = property_key_name(&prop.key) else {
+        let (Some(s), Some(owner)) = (well_known_symbol(&prop.key), parent) else {
+            skip_computed(&prop.key, parent, ctx);
+            return vec![];
+        };
+        let members =
+            convert_class_property_named(format!("[Symbol.{s}]"), prop, parent_scope, ctx);
+        ctx.scopes.add_symbol_members(parent_scope, owner, members);
+        return vec![];
     };
+    convert_class_property_named(js_name, prop, parent_scope, ctx)
+}
+
+fn convert_class_property_named(
+    js_name: String,
+    prop: &PropertyDefinition<'_>,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> Vec<Member> {
     let (doc, info) = split_info(ctx.docs.info_for_span(prop.span.start));
     let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag);
 
-    let type_ref = prop
+    let mut type_ref = prop
         .type_annotation
         .as_ref()
         .map(|ann| convert_ts_type_scoped(&ann.type_annotation, parent_scope, ctx))
         .unwrap_or(TypeRef::Any);
+    apply_abi_tags(
+        &info,
+        Some(&mut type_ref),
+        &mut [],
+        &js_name,
+        parent_scope,
+        ctx,
+    );
 
     if prop.r#static {
         let mut members = vec![Member::StaticGetter(StaticGetterMember {
@@ -1149,13 +1361,29 @@ fn convert_class_property(
 
 fn convert_accessor_property(
     acc: &AccessorProperty<'_>,
+    parent: Option<&str>,
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
-    let js_name = match property_key_name(&acc.key) {
-        Some(n) => n,
-        None => return vec![],
+    let Some(js_name) = property_key_name(&acc.key) else {
+        let (Some(s), Some(owner)) = (well_known_symbol(&acc.key), parent) else {
+            skip_computed(&acc.key, parent, ctx);
+            return vec![];
+        };
+        let members =
+            convert_accessor_property_named(format!("[Symbol.{s}]"), acc, parent_scope, ctx);
+        ctx.scopes.add_symbol_members(parent_scope, owner, members);
+        return vec![];
     };
+    convert_accessor_property_named(js_name, acc, parent_scope, ctx)
+}
+
+fn convert_accessor_property_named(
+    js_name: String,
+    acc: &AccessorProperty<'_>,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> Vec<Member> {
     let (doc, info) = split_info(ctx.docs.info_for_span(acc.span.start));
 
     let type_ref = acc
@@ -1203,6 +1431,34 @@ fn convert_accessor_property(
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────
+
+/// `Symbol.x` in a computed key `[Symbol.x]`: `x`.
+fn well_known_symbol(key: &PropertyKey<'_>) -> Option<String> {
+    let PropertyKey::StaticMemberExpression(m) = key else {
+        return None;
+    };
+    match &m.object {
+        Expression::Identifier(id) if id.name == "Symbol" => Some(m.property.name.to_string()),
+        _ => None,
+    }
+}
+
+/// A member keyed by an expression other than `Symbol.x`, or a symbol
+/// member of an inline object type, has no key a binding can name.
+fn skip_computed(key: &PropertyKey<'_>, parent: Option<&str>, ctx: &mut ParseCtx<'_, '_>) {
+    let spelled = match key {
+        PropertyKey::Identifier(id) => id.name.to_string(),
+        PropertyKey::StaticMemberExpression(m) => match &m.object {
+            Expression::Identifier(o) => format!("{}.{}", o.name, m.property.name),
+            _ => format!("….{}", m.property.name),
+        },
+        _ => "…".to_string(),
+    };
+    let owner = parent.map_or_else(String::new, |p| format!("{p}."));
+    ctx.diag.warn(format!(
+        "`{owner}[{spelled}]`: a member with a computed key is not lowered"
+    ));
+}
 
 /// Extract a string name from a `PropertyKey`.
 pub fn property_key_name(key: &PropertyKey<'_>) -> Option<String> {

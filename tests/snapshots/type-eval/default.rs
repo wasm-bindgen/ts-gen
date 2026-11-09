@@ -74,7 +74,7 @@ extern "C" {
         frozen: &ReadonlyOptions,
         picked: &PickOptionsNameOrSize,
         omitted: &PickOptionsNameOrSize,
-        unchanged: &Sized_,
+        unchanged: &PickOptionsSize,
     );
 }
 #[wasm_bindgen(module = "type-eval")]
@@ -86,7 +86,7 @@ extern "C" {
         frozen: &ReadonlyOptions,
         picked: &PickOptionsNameOrSize,
         omitted: &PickOptionsNameOrSize,
-        unchanged: &Sized_,
+        unchanged: &PickOptionsSize,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval")]
@@ -146,12 +146,12 @@ pub enum NotMinute {
 }
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {
-    pub fn keyed(picked: &PickOptionsNameOrSize);
+    pub fn keyed(picked: &PickOptionsExcludeOptionKeyFixed);
 }
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "keyed")]
-    pub fn try_keyed(picked: &PickOptionsNameOrSize) -> Result<(), JsValue>;
+    pub fn try_keyed(picked: &PickOptionsExcludeOptionKeyFixed) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {
@@ -224,9 +224,9 @@ pub type Patch = JsValue;
 extern "C" {
     pub fn mapped(
         loose: &LooseOptions,
-        strict: &RequiredOptions,
+        strict: &StrictOptions,
         flags: &FlagsAOrB,
-        patch: &PartialOptions,
+        patch: &PatchOptions,
     );
 }
 #[wasm_bindgen(module = "type-eval")]
@@ -234,9 +234,9 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "mapped")]
     pub fn try_mapped(
         loose: &LooseOptions,
-        strict: &RequiredOptions,
+        strict: &StrictOptions,
         flags: &FlagsAOrB,
-        patch: &PartialOptions,
+        patch: &PatchOptions,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "type-eval")]
@@ -291,6 +291,11 @@ extern "C" {
     ) -> Option<LargestUnitKind>;
     #[wasm_bindgen(method, setter, js_name = "largestUnit")]
     pub fn set_largest_unit<U: ::wasm_bindgen::JsGeneric>(this: &Rounding<U>, val: LargestUnitKind);
+    #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+    pub fn set_largest_unit_with_plural<U: ::wasm_bindgen::JsGeneric>(
+        this: &Rounding<U>,
+        val: Plural,
+    );
 }
 impl<U: ::wasm_bindgen::JsGeneric> Rounding<U> {
     pub fn new() -> Rounding<U> {
@@ -317,6 +322,10 @@ impl<U: ::wasm_bindgen::JsGeneric> RoundingBuilder<U> {
     }
     pub fn largest_unit(self, val: LargestUnitKind) -> Self {
         self.inner.set_largest_unit(val);
+        self
+    }
+    pub fn largest_unit_with_plural(self, val: Plural) -> Self {
+        self.inner.set_largest_unit_with_plural(val);
         self
     }
     pub fn build(self) -> Rounding<U> {
@@ -689,6 +698,82 @@ impl PickOptionsNameOrSizeBuilder {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PickOptionsSize;
+    #[wasm_bindgen(method, getter)]
+    pub fn size(this: &PickOptionsSize) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_size(this: &PickOptionsSize, val: f64);
+}
+impl PickOptionsSize {
+    pub fn new() -> PickOptionsSize {
+        Self::builder().build()
+    }
+    pub fn builder() -> PickOptionsSizeBuilder {
+        PickOptionsSizeBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for PickOptionsSize {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct PickOptionsSizeBuilder {
+    inner: PickOptionsSize,
+}
+impl PickOptionsSizeBuilder {
+    pub fn size(self, val: f64) -> Self {
+        self.inner.set_size(val);
+        self
+    }
+    pub fn build(self) -> PickOptionsSize {
+        self.inner
+    }
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PickOptionsExcludeOptionKeyFixed;
+    #[doc = " The name."]
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &PickOptionsExcludeOptionKeyFixed) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &PickOptionsExcludeOptionKeyFixed, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn size(this: &PickOptionsExcludeOptionKeyFixed) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_size(this: &PickOptionsExcludeOptionKeyFixed, val: f64);
+}
+impl PickOptionsExcludeOptionKeyFixed {
+    #[doc = " * `name` - The name."]
+    pub fn new(name: &str) -> PickOptionsExcludeOptionKeyFixed {
+        Self::builder(name).build()
+    }
+    #[doc = " * `name` - The name."]
+    pub fn builder(name: &str) -> PickOptionsExcludeOptionKeyFixedBuilder {
+        let inner: PickOptionsExcludeOptionKeyFixed = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_name(name);
+        PickOptionsExcludeOptionKeyFixedBuilder { inner }
+    }
+}
+pub struct PickOptionsExcludeOptionKeyFixedBuilder {
+    inner: PickOptionsExcludeOptionKeyFixed,
+}
+impl PickOptionsExcludeOptionKeyFixedBuilder {
+    pub fn size(self, val: f64) -> Self {
+        self.inner.set_size(val);
+        self
+    }
+    pub fn build(self) -> PickOptionsExcludeOptionKeyFixed {
+        self.inner
+    }
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type LooseOptions;
     #[doc = " The name."]
     #[wasm_bindgen(method, getter)]
@@ -720,6 +805,32 @@ impl Default for LooseOptions {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StrictOptions;
+    #[doc = " The name."]
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &StrictOptions) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &StrictOptions, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn size(this: &StrictOptions) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_size(this: &StrictOptions, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn fixed(this: &StrictOptions) -> bool;
+}
+impl StrictOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> StrictOptions {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FlagsAOrB;
     #[wasm_bindgen(method, getter)]
     pub fn a(this: &FlagsAOrB) -> bool;
@@ -736,6 +847,37 @@ impl FlagsAOrB {
         inner.set_a(a);
         inner.set_b(b);
         inner
+    }
+}
+#[wasm_bindgen(module = "type-eval")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PatchOptions;
+    #[doc = " The name."]
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &PatchOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &PatchOptions, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn size(this: &PatchOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_size(this: &PatchOptions, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn fixed(this: &PatchOptions) -> Option<bool>;
+}
+impl PatchOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> PatchOptions {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+impl Default for PatchOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 #[wasm_bindgen(private)]
@@ -835,13 +977,8 @@ impl Default for PartialExtended {
     }
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Debug)]
 pub enum LargestUnitKind {
     Auto = "auto",
-    Hour = "hour",
-    Minute = "minute",
-    Second = "second",
-    Hours = "hours",
-    Minutes = "minutes",
-    Seconds = "seconds",
+    Plural(Plural),
 }

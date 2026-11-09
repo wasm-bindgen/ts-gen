@@ -1381,30 +1381,30 @@ impl ServiceWorkerGlobalScope {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "addEventListener")]
-    pub fn add_event_listener(r#type: &str, handler: &Function<fn(JsValue) -> Undefined>);
+    pub fn add_event_listener(r#type: &str, handler: &Function<fn(Event) -> Undefined>);
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
     pub fn try_add_event_listener(
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object<EventType: ::wasm_bindgen::JsGeneric>(
+    pub fn add_event_listener_with_event_listener_object(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
     );
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_event_listener_object<EventType: ::wasm_bindgen::JsGeneric>(
+    pub fn try_add_event_listener_with_event_listener_object(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
@@ -1412,7 +1412,7 @@ extern "C" {
     #[wasm_bindgen(js_name = "addEventListener")]
     pub fn add_event_listener_with_function_and_event_target_add_event_listener_options(
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
     );
 }
@@ -1421,29 +1421,25 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
     pub fn try_add_event_listener_with_function_and_event_target_add_event_listener_options(
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options<
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: &EventTargetAddEventListenerOptions,
     );
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options<
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn try_add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: &EventTargetAddEventListenerOptions,
     ) -> Result<(), JsValue>;
 }
@@ -1452,7 +1448,7 @@ extern "C" {
     #[wasm_bindgen(js_name = "addEventListener")]
     pub fn add_event_listener_with_function_and_bool(
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: bool,
     );
 }
@@ -1461,61 +1457,55 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
     pub fn try_add_event_listener_with_function_and_bool(
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: bool,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object_and_bool<
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn add_event_listener_with_event_listener_object_and_bool(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: bool,
     );
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_event_listener_object_and_bool<
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn try_add_event_listener_with_event_listener_object_and_bool(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: bool,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
-    pub fn remove_event_listener(r#type: &str, handler: &Function<fn(JsValue) -> Undefined>);
+    pub fn remove_event_listener(r#type: &str, handler: &Function<fn(Event) -> Undefined>);
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
     pub fn try_remove_event_listener(
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object<EventType: ::wasm_bindgen::JsGeneric>(
+    pub fn remove_event_listener_with_event_listener_object(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
     );
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_event_listener_object<
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn try_remove_event_listener_with_event_listener_object(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
@@ -1523,7 +1513,7 @@ extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
     pub fn remove_event_listener_with_function_and_event_target_event_listener_options(
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetEventListenerOptions,
     );
 }
@@ -1532,29 +1522,25 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
     pub fn try_remove_event_listener_with_function_and_event_target_event_listener_options(
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetEventListenerOptions,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object_and_event_target_event_listener_options<
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn remove_event_listener_with_event_listener_object_and_event_target_event_listener_options(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: &EventTargetEventListenerOptions,
     );
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_event_listener_object_and_event_target_event_listener_options<
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn try_remove_event_listener_with_event_listener_object_and_event_target_event_listener_options(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: &EventTargetEventListenerOptions,
     ) -> Result<(), JsValue>;
 }
@@ -1563,7 +1549,7 @@ extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
     pub fn remove_event_listener_with_function_and_bool(
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: bool,
     );
 }
@@ -1572,29 +1558,25 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
     pub fn try_remove_event_listener_with_function_and_bool(
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: bool,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object_and_bool<
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn remove_event_listener_with_event_listener_object_and_bool(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: bool,
     );
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn try_remove_event_listener_with_event_listener_object_and_bool<
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn try_remove_event_listener_with_event_listener_object_and_bool(
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: bool,
     ) -> Result<(), JsValue>;
 }
@@ -4267,7 +4249,7 @@ extern "C" {
     pub fn add_event_listener<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
     );
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
@@ -4276,31 +4258,25 @@ extern "C" {
     pub fn try_add_event_listener<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
     ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object<
-        EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn add_event_listener_with_event_listener_object<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
     );
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn try_add_event_listener_with_event_listener_object<
-        EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn try_add_event_listener_with_event_listener_object<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
     ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
@@ -4311,7 +4287,7 @@ extern "C" {
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
     );
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
@@ -4323,7 +4299,7 @@ extern "C" {
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
@@ -4332,11 +4308,10 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "addEventListener")]
     pub fn add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: &EventTargetAddEventListenerOptions,
     );
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
@@ -4345,11 +4320,10 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     pub fn try_add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: &EventTargetAddEventListenerOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
@@ -4359,7 +4333,7 @@ extern "C" {
     pub fn add_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: bool,
     );
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
@@ -4369,7 +4343,7 @@ extern "C" {
     pub fn try_add_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: bool,
     ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
@@ -4378,11 +4352,10 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "addEventListener")]
     pub fn add_event_listener_with_event_listener_object_and_bool<
         EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: bool,
     );
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
@@ -4391,11 +4364,10 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     pub fn try_add_event_listener_with_event_listener_object_and_bool<
         EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: bool,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
@@ -4405,7 +4377,7 @@ extern "C" {
     pub fn remove_event_listener<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
     );
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
@@ -4414,19 +4386,16 @@ extern "C" {
     pub fn try_remove_event_listener<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object<
-        EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn remove_event_listener_with_event_listener_object<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
     );
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
@@ -4434,11 +4403,10 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     pub fn try_remove_event_listener_with_event_listener_object<
         EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
@@ -4449,7 +4417,7 @@ extern "C" {
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetEventListenerOptions,
     );
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
@@ -4461,7 +4429,7 @@ extern "C" {
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetEventListenerOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
@@ -4470,11 +4438,10 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "removeEventListener")]
     pub fn remove_event_listener_with_event_listener_object_and_event_target_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: &EventTargetEventListenerOptions,
     );
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
@@ -4483,11 +4450,10 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     pub fn try_remove_event_listener_with_event_listener_object_and_event_target_event_listener_options<
         EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: &EventTargetEventListenerOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
@@ -4497,7 +4463,7 @@ extern "C" {
     pub fn remove_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: bool,
     );
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
@@ -4507,7 +4473,7 @@ extern "C" {
     pub fn try_remove_event_listener_with_function_and_bool<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(Event) -> Undefined>,
         options: bool,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
@@ -4516,11 +4482,10 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "removeEventListener")]
     pub fn remove_event_listener_with_event_listener_object_and_bool<
         EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: bool,
     );
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
@@ -4529,11 +4494,10 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     pub fn try_remove_event_listener_with_event_listener_object_and_bool<
         EventMap: ::wasm_bindgen::JsGeneric,
-        EventType: ::wasm_bindgen::JsGeneric,
     >(
         this: &EventTarget<EventMap>,
         r#type: &str,
-        handler: &EventListenerObject<EventType>,
+        handler: &EventListenerObject,
         options: bool,
     ) -> Result<(), JsValue>;
     #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
@@ -4542,7 +4506,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "dispatchEvent")]
     pub fn dispatch_event<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
-        event: &JsValue,
+        event: &Event,
     ) -> bool;
     #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
     #[doc = ""]
@@ -4550,7 +4514,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "dispatchEvent")]
     pub fn try_dispatch_event<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
-        event: &JsValue,
+        event: &Event,
     ) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen]
@@ -34520,6 +34484,38 @@ extern "C" {
     pub fn id(this: &UniversalGatewayOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &UniversalGatewayOptions, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cacheKey")]
+    pub fn cache_key(this: &UniversalGatewayOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "cacheKey")]
+    pub fn set_cache_key(this: &UniversalGatewayOptions, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
+    pub fn cache_ttl(this: &UniversalGatewayOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
+    pub fn set_cache_ttl(this: &UniversalGatewayOptions, val: f64);
+    #[wasm_bindgen(method, getter, js_name = "skipCache")]
+    pub fn skip_cache(this: &UniversalGatewayOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "skipCache")]
+    pub fn set_skip_cache(this: &UniversalGatewayOptions, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn metadata(this: &UniversalGatewayOptions) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_metadata(this: &UniversalGatewayOptions, val: &Object);
+    #[wasm_bindgen(method, getter, js_name = "collectLog")]
+    pub fn collect_log(this: &UniversalGatewayOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "collectLog")]
+    pub fn set_collect_log(this: &UniversalGatewayOptions, val: bool);
+    #[wasm_bindgen(method, getter, js_name = "eventId")]
+    pub fn event_id(this: &UniversalGatewayOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "eventId")]
+    pub fn set_event_id(this: &UniversalGatewayOptions, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "requestTimeoutMs")]
+    pub fn request_timeout_ms(this: &UniversalGatewayOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "requestTimeoutMs")]
+    pub fn set_request_timeout_ms(this: &UniversalGatewayOptions, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn retries(this: &UniversalGatewayOptions) -> Option<GatewayRetries>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_retries(this: &UniversalGatewayOptions, val: &GatewayRetries);
 }
 impl UniversalGatewayOptions {
     pub fn new() -> UniversalGatewayOptions {
@@ -34542,6 +34538,38 @@ pub struct UniversalGatewayOptionsBuilder {
 impl UniversalGatewayOptionsBuilder {
     pub fn id(self, val: &str) -> Self {
         self.inner.set_id(val);
+        self
+    }
+    pub fn cache_key(self, val: &str) -> Self {
+        self.inner.set_cache_key(val);
+        self
+    }
+    pub fn cache_ttl(self, val: f64) -> Self {
+        self.inner.set_cache_ttl(val);
+        self
+    }
+    pub fn skip_cache(self, val: bool) -> Self {
+        self.inner.set_skip_cache(val);
+        self
+    }
+    pub fn metadata(self, val: &Object) -> Self {
+        self.inner.set_metadata(val);
+        self
+    }
+    pub fn collect_log(self, val: bool) -> Self {
+        self.inner.set_collect_log(val);
+        self
+    }
+    pub fn event_id(self, val: &str) -> Self {
+        self.inner.set_event_id(val);
+        self
+    }
+    pub fn request_timeout_ms(self, val: f64) -> Self {
+        self.inner.set_request_timeout_ms(val);
+        self
+    }
+    pub fn retries(self, val: &GatewayRetries) -> Self {
+        self.inner.set_retries(val);
         self
     }
     pub fn build(self) -> UniversalGatewayOptions {
@@ -51458,81 +51486,87 @@ pub enum ExcludeCertVerificationStatusNone {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type VectorizeVectorMetadataFilter2;
+    pub type VectorizeVectorMetadataFilterOpMap;
     #[wasm_bindgen(method, getter, js_name = "$eq")]
-    pub fn eq(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
+    pub fn eq(this: &VectorizeVectorMetadataFilterOpMap) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$eq")]
-    pub fn set_eq(this: &VectorizeVectorMetadataFilter2, val: &str);
+    pub fn set_eq(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$eq")]
-    pub fn set_eq_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    pub fn set_eq_with_f64(this: &VectorizeVectorMetadataFilterOpMap, val: f64);
     #[wasm_bindgen(method, setter, js_name = "$eq")]
-    pub fn set_eq_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    pub fn set_eq_with_bool(this: &VectorizeVectorMetadataFilterOpMap, val: bool);
     #[wasm_bindgen(method, setter, js_name = "$eq")]
-    pub fn set_eq_with_slice(this: &VectorizeVectorMetadataFilter2, val: &[String]);
+    pub fn set_eq_with_slice(this: &VectorizeVectorMetadataFilterOpMap, val: &[String]);
     #[wasm_bindgen(method, setter, js_name = "$eq")]
-    fn __set_eq_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    fn __set_eq_with_null(this: &VectorizeVectorMetadataFilterOpMap, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$ne")]
-    pub fn ne(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
+    pub fn ne(this: &VectorizeVectorMetadataFilterOpMap) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$ne")]
-    pub fn set_ne(this: &VectorizeVectorMetadataFilter2, val: &str);
+    pub fn set_ne(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$ne")]
-    pub fn set_ne_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    pub fn set_ne_with_f64(this: &VectorizeVectorMetadataFilterOpMap, val: f64);
     #[wasm_bindgen(method, setter, js_name = "$ne")]
-    pub fn set_ne_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    pub fn set_ne_with_bool(this: &VectorizeVectorMetadataFilterOpMap, val: bool);
     #[wasm_bindgen(method, setter, js_name = "$ne")]
-    pub fn set_ne_with_slice(this: &VectorizeVectorMetadataFilter2, val: &[String]);
+    pub fn set_ne_with_slice(this: &VectorizeVectorMetadataFilterOpMap, val: &[String]);
     #[wasm_bindgen(method, setter, js_name = "$ne")]
-    fn __set_ne_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    fn __set_ne_with_null(this: &VectorizeVectorMetadataFilterOpMap, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lt")]
-    pub fn lt(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
+    pub fn lt(this: &VectorizeVectorMetadataFilterOpMap) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$lt")]
-    pub fn set_lt(this: &VectorizeVectorMetadataFilter2, val: &str);
+    pub fn set_lt(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$lt")]
-    pub fn set_lt_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    pub fn set_lt_with_f64(this: &VectorizeVectorMetadataFilterOpMap, val: f64);
     #[wasm_bindgen(method, setter, js_name = "$lt")]
-    pub fn set_lt_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    pub fn set_lt_with_bool(this: &VectorizeVectorMetadataFilterOpMap, val: bool);
     #[wasm_bindgen(method, setter, js_name = "$lt")]
-    pub fn set_lt_with_slice(this: &VectorizeVectorMetadataFilter2, val: &[String]);
+    pub fn set_lt_with_slice(this: &VectorizeVectorMetadataFilterOpMap, val: &[String]);
     #[wasm_bindgen(method, setter, js_name = "$lt")]
-    fn __set_lt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    fn __set_lt_with_null(this: &VectorizeVectorMetadataFilterOpMap, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lte")]
-    pub fn lte(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
+    pub fn lte(this: &VectorizeVectorMetadataFilterOpMap) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$lte")]
-    pub fn set_lte(this: &VectorizeVectorMetadataFilter2, val: &str);
+    pub fn set_lte(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$lte")]
-    pub fn set_lte_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    pub fn set_lte_with_f64(this: &VectorizeVectorMetadataFilterOpMap, val: f64);
     #[wasm_bindgen(method, setter, js_name = "$lte")]
-    pub fn set_lte_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    pub fn set_lte_with_bool(this: &VectorizeVectorMetadataFilterOpMap, val: bool);
     #[wasm_bindgen(method, setter, js_name = "$lte")]
-    pub fn set_lte_with_slice(this: &VectorizeVectorMetadataFilter2, val: &[String]);
+    pub fn set_lte_with_slice(this: &VectorizeVectorMetadataFilterOpMap, val: &[String]);
     #[wasm_bindgen(method, setter, js_name = "$lte")]
-    fn __set_lte_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    fn __set_lte_with_null(
+        this: &VectorizeVectorMetadataFilterOpMap,
+        val: &::wasm_bindgen::JsValue,
+    );
     #[wasm_bindgen(method, getter, js_name = "$gt")]
-    pub fn gt(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
+    pub fn gt(this: &VectorizeVectorMetadataFilterOpMap) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$gt")]
-    pub fn set_gt(this: &VectorizeVectorMetadataFilter2, val: &str);
+    pub fn set_gt(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$gt")]
-    pub fn set_gt_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    pub fn set_gt_with_f64(this: &VectorizeVectorMetadataFilterOpMap, val: f64);
     #[wasm_bindgen(method, setter, js_name = "$gt")]
-    pub fn set_gt_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    pub fn set_gt_with_bool(this: &VectorizeVectorMetadataFilterOpMap, val: bool);
     #[wasm_bindgen(method, setter, js_name = "$gt")]
-    pub fn set_gt_with_slice(this: &VectorizeVectorMetadataFilter2, val: &[String]);
+    pub fn set_gt_with_slice(this: &VectorizeVectorMetadataFilterOpMap, val: &[String]);
     #[wasm_bindgen(method, setter, js_name = "$gt")]
-    fn __set_gt_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    fn __set_gt_with_null(this: &VectorizeVectorMetadataFilterOpMap, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gte")]
-    pub fn gte(this: &VectorizeVectorMetadataFilter2) -> Option<EqKind>;
+    pub fn gte(this: &VectorizeVectorMetadataFilterOpMap) -> Option<EqKind>;
     #[wasm_bindgen(method, setter, js_name = "$gte")]
-    pub fn set_gte(this: &VectorizeVectorMetadataFilter2, val: &str);
+    pub fn set_gte(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$gte")]
-    pub fn set_gte_with_f64(this: &VectorizeVectorMetadataFilter2, val: f64);
+    pub fn set_gte_with_f64(this: &VectorizeVectorMetadataFilterOpMap, val: f64);
     #[wasm_bindgen(method, setter, js_name = "$gte")]
-    pub fn set_gte_with_bool(this: &VectorizeVectorMetadataFilter2, val: bool);
+    pub fn set_gte_with_bool(this: &VectorizeVectorMetadataFilterOpMap, val: bool);
     #[wasm_bindgen(method, setter, js_name = "$gte")]
-    pub fn set_gte_with_slice(this: &VectorizeVectorMetadataFilter2, val: &[String]);
+    pub fn set_gte_with_slice(this: &VectorizeVectorMetadataFilterOpMap, val: &[String]);
     #[wasm_bindgen(method, setter, js_name = "$gte")]
-    fn __set_gte_with_null(this: &VectorizeVectorMetadataFilter2, val: &::wasm_bindgen::JsValue);
+    fn __set_gte_with_null(
+        this: &VectorizeVectorMetadataFilterOpMap,
+        val: &::wasm_bindgen::JsValue,
+    );
 }
-impl VectorizeVectorMetadataFilter2 {
+impl VectorizeVectorMetadataFilterOpMap {
     pub fn set_eq_with_null(&self) {
         self.__set_eq_with_null(&::wasm_bindgen::JsValue::NULL)
     }
@@ -51552,25 +51586,25 @@ impl VectorizeVectorMetadataFilter2 {
         self.__set_gte_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
-impl VectorizeVectorMetadataFilter2 {
-    pub fn new() -> VectorizeVectorMetadataFilter2 {
+impl VectorizeVectorMetadataFilterOpMap {
+    pub fn new() -> VectorizeVectorMetadataFilterOpMap {
         Self::builder().build()
     }
-    pub fn builder() -> VectorizeVectorMetadataFilter2Builder {
-        VectorizeVectorMetadataFilter2Builder {
+    pub fn builder() -> VectorizeVectorMetadataFilterOpMapBuilder {
+        VectorizeVectorMetadataFilterOpMapBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-impl Default for VectorizeVectorMetadataFilter2 {
+impl Default for VectorizeVectorMetadataFilterOpMap {
     fn default() -> Self {
         Self::new()
     }
 }
-pub struct VectorizeVectorMetadataFilter2Builder {
-    inner: VectorizeVectorMetadataFilter2,
+pub struct VectorizeVectorMetadataFilterOpMapBuilder {
+    inner: VectorizeVectorMetadataFilterOpMap,
 }
-impl VectorizeVectorMetadataFilter2Builder {
+impl VectorizeVectorMetadataFilterOpMapBuilder {
     pub fn eq(self, val: &str) -> Self {
         self.inner.set_eq(val);
         self
@@ -51691,7 +51725,7 @@ impl VectorizeVectorMetadataFilter2Builder {
         self.inner.set_gte_with_null();
         self
     }
-    pub fn build(self) -> VectorizeVectorMetadataFilter2 {
+    pub fn build(self) -> VectorizeVectorMetadataFilterOpMap {
         self.inner
     }
 }
@@ -51699,35 +51733,35 @@ impl VectorizeVectorMetadataFilter2Builder {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type VectorizeVectorMetadataFilter3;
+    pub type VectorizeVectorMetadataFilterCollectionOpMap;
     #[wasm_bindgen(method, getter, js_name = "$in")]
-    pub fn in_(this: &VectorizeVectorMetadataFilter3) -> Option<Vec<JsValue>>;
+    pub fn in_(this: &VectorizeVectorMetadataFilterCollectionOpMap) -> Option<Vec<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$in")]
-    pub fn set_in(this: &VectorizeVectorMetadataFilter3, val: &[JsValue]);
+    pub fn set_in(this: &VectorizeVectorMetadataFilterCollectionOpMap, val: &[JsValue]);
     #[wasm_bindgen(method, getter, js_name = "$nin")]
-    pub fn nin(this: &VectorizeVectorMetadataFilter3) -> Option<Vec<JsValue>>;
+    pub fn nin(this: &VectorizeVectorMetadataFilterCollectionOpMap) -> Option<Vec<JsValue>>;
     #[wasm_bindgen(method, setter, js_name = "$nin")]
-    pub fn set_nin(this: &VectorizeVectorMetadataFilter3, val: &[JsValue]);
+    pub fn set_nin(this: &VectorizeVectorMetadataFilterCollectionOpMap, val: &[JsValue]);
 }
-impl VectorizeVectorMetadataFilter3 {
-    pub fn new() -> VectorizeVectorMetadataFilter3 {
+impl VectorizeVectorMetadataFilterCollectionOpMap {
+    pub fn new() -> VectorizeVectorMetadataFilterCollectionOpMap {
         Self::builder().build()
     }
-    pub fn builder() -> VectorizeVectorMetadataFilter3Builder {
-        VectorizeVectorMetadataFilter3Builder {
+    pub fn builder() -> VectorizeVectorMetadataFilterCollectionOpMapBuilder {
+        VectorizeVectorMetadataFilterCollectionOpMapBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-impl Default for VectorizeVectorMetadataFilter3 {
+impl Default for VectorizeVectorMetadataFilterCollectionOpMap {
     fn default() -> Self {
         Self::new()
     }
 }
-pub struct VectorizeVectorMetadataFilter3Builder {
-    inner: VectorizeVectorMetadataFilter3,
+pub struct VectorizeVectorMetadataFilterCollectionOpMapBuilder {
+    inner: VectorizeVectorMetadataFilterCollectionOpMap,
 }
-impl VectorizeVectorMetadataFilter3Builder {
+impl VectorizeVectorMetadataFilterCollectionOpMapBuilder {
     pub fn in_(self, val: &[JsValue]) -> Self {
         self.inner.set_in(val);
         self
@@ -51736,7 +51770,7 @@ impl VectorizeVectorMetadataFilter3Builder {
         self.inner.set_nin(val);
         self
     }
-    pub fn build(self) -> VectorizeVectorMetadataFilter3 {
+    pub fn build(self) -> VectorizeVectorMetadataFilterCollectionOpMap {
         self.inner
     }
 }

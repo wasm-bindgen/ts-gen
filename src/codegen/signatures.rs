@@ -380,6 +380,7 @@ pub fn collect_type_params(
         TypeRef::Boolean
         | TypeRef::Number
         | TypeRef::String
+        | TypeRef::Template { .. }
         | TypeRef::BigInt
         | TypeRef::Void
         | TypeRef::Undefined
@@ -391,6 +392,7 @@ pub fn collect_type_params(
         | TypeRef::ArrayBufferView
         | TypeRef::PropertyKey
         | TypeRef::TypedSlice(..)
+        | TypeRef::AbiScalar(_)
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)
@@ -2806,6 +2808,7 @@ mod tests {
     fn string_param(name: &str) -> Param {
         Param {
             name: name.into(),
+            js_name: None,
             type_ref: TypeRef::String,
             optional: false,
             variadic: false,
@@ -3210,6 +3213,7 @@ mod tests {
     fn param(name: &str) -> Param {
         Param {
             name: name.to_string(),
+            js_name: None,
             type_ref: TypeRef::Any,
             optional: false,
             variadic: false,
@@ -3220,6 +3224,7 @@ mod tests {
     fn typed_param(name: &str, ty: TypeRef) -> Param {
         Param {
             name: name.to_string(),
+            js_name: None,
             type_ref: ty,
             optional: false,
             variadic: false,
@@ -3230,6 +3235,7 @@ mod tests {
     fn opt_param(name: &str) -> Param {
         Param {
             name: name.to_string(),
+            js_name: None,
             type_ref: TypeRef::Any,
             optional: true,
             variadic: false,
@@ -3240,6 +3246,7 @@ mod tests {
     fn opt_typed_param(name: &str, ty: TypeRef) -> Param {
         Param {
             name: name.to_string(),
+            js_name: None,
             type_ref: ty,
             optional: true,
             variadic: false,
@@ -3250,6 +3257,7 @@ mod tests {
     fn variadic_param(name: &str) -> Param {
         Param {
             name: name.to_string(),
+            js_name: None,
             type_ref: TypeRef::Any,
             optional: false,
             variadic: true,

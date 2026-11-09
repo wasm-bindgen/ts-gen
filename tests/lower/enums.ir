@@ -1,0 +1,103 @@
+// `Ratio`: the literal type `0.5 | 1` widens to `f64`
+ir 1;
+
+enum Level: i32 {
+  Low = 1;
+  High = 2;
+  Max = .High;
+}
+
+enum Format {
+  @js("text") Text;
+  @js("json") Json;
+  Default = .Text;
+}
+
+@js(name = "Unit")
+enum Unit_ {
+  @js("day") Day;
+  @js("hour") Hour;
+}
+
+namespace Time {
+  add(amount: f64, unit: Unit_) throws;
+  send(body: union Body) throws;
+  round<U in (Unit_)>(unit: U): U throws;
+
+  enum Body {
+    Str(str);
+    ArrayBuffer(ArrayBuffer);
+    ReadableStream(ReadableStream);
+  }
+}
+
+level(): Level throws;
+format(f: Format) throws;
+align(where: WhereKind) throws;
+
+enum Base {
+  @js("a") A;
+  @js("b") B;
+}
+
+more(m: More) throws;
+base(): Base throws;
+code(): Code throws;
+retry(c: CKind) throws;
+ratio(): f64 throws;
+big(n: bigint): bigint throws;
+
+enum Color: i32 {
+  Red = 1;
+  Green = 2;
+  static parse(s: str): Color throws;
+  static get all(): arr<Color>;
+}
+
+mode(m: Mode): Mode throws;
+speed(m: Mode) throws;
+speed(m: Mode, hint: HintKind) throws;
+tier(): @js(null) TierKind? throws;
+
+enum WhereKind {
+  @js("start") Start;
+  @js("end") End;
+}
+
+enum More extends Base {
+  @js("c") C;
+}
+
+enum Code: i32 {
+  V200 = 200;
+  V404 = 404;
+  Neg1 = -1;
+}
+
+enum CKind: i32 {
+  V1 = 1;
+  V2 = 2;
+  V3 = 3;
+}
+
+enum Mode {
+  @js("fast") Fast;
+  @js("slow") Slow;
+  @fallback Other(Str);
+}
+
+enum HintKind {
+  @js("x") X;
+  @fallback Other(Str);
+}
+
+enum TierKind {
+  @js("lo") Lo;
+  @js("hi") Hi;
+  F64(f64);
+  @fallback Other(Str);
+}
+
+class ArrayBuffer {}
+
+class ReadableStream {}

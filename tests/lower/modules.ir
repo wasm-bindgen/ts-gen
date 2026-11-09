@@ -1,0 +1,69 @@
+ir 1;
+
+read(): StrOrArrayBufferOrF64 throws;
+
+enum StrOrArrayBufferOrF64 {
+  Str(str);
+  ArrayBuffer(ArrayBuffer);
+  F64(f64);
+}
+
+module "store" {
+  interface Entry {
+    @js(object)
+    new();
+    get key(): str;
+  }
+
+  class Store {
+    new() throws;
+    get(key: str): @js(null) Entry? throws;
+  }
+
+  open(name: str): Store throws;
+
+  export { Store, open, Store as default };
+}
+
+module "client" {
+  connect(store: "store".Store) throws;
+
+  interface Local {
+    @js(object)
+    new();
+    get x(): f64;
+    set x(value: f64);
+  }
+
+  local(): Local throws;
+
+  export { connect, local };
+}
+
+module "steps" {
+  interface StepConfig {
+    @js(object)
+    new();
+    get retries(): StepConfigRetries?;
+    set retries(value: StepConfigRetries);
+  }
+
+  step(config: StepConfig) throws;
+
+  interface StepConfigRetries {
+    @js(object)
+    new();
+    get limit(): f64;
+    set limit(value: f64);
+  }
+
+  export { step };
+}
+
+module "sink" {
+  peek(): StrOrArrayBufferOrF64 throws;
+
+  export { peek };
+}
+
+class ArrayBuffer {}

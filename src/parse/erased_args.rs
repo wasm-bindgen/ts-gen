@@ -19,6 +19,18 @@ use crate::ir::{
 use crate::parse::scope::ScopeId;
 
 pub(crate) fn drop_erased_args(gctx: &mut GlobalContext) {
+    // An interface's literal-only parameter stays, but a class's
+    // instantiations are the class, including an interface merged into one.
+    let ids: Vec<TypeId> = gctx.iter_types().map(|(id, _)| id).collect();
+    for &id in &ids {
+        if let TypeKind::Class(c) = &gctx.get_type(id).kind {
+            let (scope, mut ps) = (c.body_scope, c.type_params.clone());
+            gctx.scopes.erase_kept(scope, &mut ps);
+            if let TypeKind::Class(c) = &mut gctx.get_type_mut(id).kind {
+                c.type_params = ps;
+            }
+        }
+    }
     let erased: HashMap<TypeId, Vec<usize>> = gctx
         .iter_types()
         .filter_map(|(id, decl)| {
@@ -36,7 +48,6 @@ pub(crate) fn drop_erased_args(gctx: &mut GlobalContext) {
     if erased.is_empty() {
         return;
     }
-    let ids: Vec<TypeId> = gctx.iter_types().map(|(id, _)| id).collect();
     for id in ids {
         let pass = Pass {
             gctx,
@@ -200,6 +211,10 @@ impl Pass<'_> {
                 return_type: Box::new(sub(&sig.return_type)),
             }),
             TypeRef::KeyOf(t) => TypeRef::KeyOf(Box::new(sub(t))),
+            TypeRef::Template { quasis, types } => TypeRef::Template {
+                quasis: quasis.clone(),
+                types: types.iter().map(sub).collect(),
+            },
             TypeRef::IndexedAccess(o, i) => {
                 TypeRef::IndexedAccess(Box::new(sub(o)), Box::new(sub(i)))
             }
@@ -219,6 +234,7 @@ impl Pass<'_> {
             ),
             // Leaves: nothing nested to visit.
             TypeRef::Reference { .. }
+            | TypeRef::AbiScalar(_)
             | TypeRef::Boolean
             | TypeRef::Number
             | TypeRef::String

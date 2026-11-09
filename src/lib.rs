@@ -18,7 +18,9 @@ pub mod codegen;
 pub mod context;
 pub mod external_map;
 pub mod ir;
+pub mod lower;
 pub mod parse;
+pub mod provides;
 pub mod util;
 
 use std::path::Path;
@@ -41,10 +43,28 @@ pub fn parse(
     parse::parse_dts_files(paths, lib_name)
 }
 
+/// [`parse`] with [`parse::Options`].
+pub fn parse_with(
+    paths: &[impl AsRef<Path>],
+    lib_name: Option<&str>,
+    opts: parse::Options,
+) -> Result<(ir::Module, GlobalContext)> {
+    parse::parse_dts_files_with(paths, lib_name, opts)
+}
+
 /// Parse a single `.d.ts` source string and return the module + global context.
 ///
 /// Diagnostics are collected on `GlobalContext.diagnostics` — callers should
 /// inspect or display them as needed (e.g., `ctx.diagnostics.emit()`).
 pub fn parse_source(source: &str, lib_name: Option<&str>) -> Result<(ir::Module, GlobalContext)> {
     parse::parse_single_source(source, lib_name)
+}
+
+/// [`parse_source`] with [`parse::Options`].
+pub fn parse_source_with(
+    source: &str,
+    lib_name: Option<&str>,
+    opts: parse::Options,
+) -> Result<(ir::Module, GlobalContext)> {
+    parse::parse_single_source_with(source, lib_name, opts)
 }
