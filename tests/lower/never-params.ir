@@ -1,0 +1,16 @@
+// `Fallback`: parameter `value` is `never`, so the overload is uncallable and isn't lowered
+// `Second`: parameter `b` is `never`, so the overload is uncallable and isn't lowered
+// `Gone`: parameter `x` is `never`, so the overload is uncallable and isn't lowered
+ir 1;
+
+@js(name = "Unit")
+enum Unit_ {
+  @js("a") A;
+  @js("b") B;
+}
+
+module "m" {
+  kept(x: str) throws;
+
+  export { kept };
+}

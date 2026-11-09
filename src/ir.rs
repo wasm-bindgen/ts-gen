@@ -270,6 +270,11 @@ pub enum TypeRef {
     /// flattening, never parsed.
     TypedSlice(TypedArrayElement, SharedMemory),
 
+    /// The ABI scalar a `@tw-abi <type>` JSDoc tag gives a `number` or
+    /// `bigint`. TS `number` is `f64`; declarations that know better
+    /// (`status: number` is a `u16`) say so here.
+    AbiScalar(AbiScalar),
+
     // === Syntactic constructs ===
     /// `T[]` — the syntactic array shortcut. Distinct from
     /// `Array<T>` (which is a [`TypeRef::Reference`] to the global
@@ -330,6 +335,13 @@ pub enum TypeRef {
     IndexedAccess(Box<TypeRef>, Box<TypeRef>),
     /// `{ [P in K]?: V }`.
     Mapped(Box<MappedType>),
+    /// `` `a${T}b` ``: `quasis` around `types`, one more quasi than types.
+    /// Only the IR producer's parse keeps one, so evaluation can apply it
+    /// to literals; otherwise it's [`TypeRef::String`].
+    Template {
+        quasis: Vec<String>,
+        types: Vec<TypeRef>,
+    },
     /// An inline `{ … }` whose members evaluation reads: the object of an
     /// indexed access. Elsewhere an inline object type is [`TypeRef::Object`]
     /// or hoists to an interface.
@@ -438,6 +450,11 @@ impl TypedArrayElement {
         Self::ALL.iter().find(|(e, ..)| *e == self).unwrap()
     }
 
+    /// Every typed array's name, e.g. `Uint8Array`.
+    pub fn typed_arrays() -> impl Iterator<Item = &'static str> {
+        Self::ALL.iter().map(|(_, n, _)| *n)
+    }
+
     pub fn typed_array(self) -> &'static str {
         self.entry().1
     }
@@ -458,7 +475,119 @@ impl TypedArrayElement {
     }
 }
 
+/// The scalar set a `@tw-abi` tag may name: the IR's numeric scalars.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AbiScalar {
+    I8,
+    U8,
+    I16,
+    U16,
+    I32,
+    U32,
+    I53,
+    U53,
+    I64,
+    U64,
+    F16,
+    F32,
+    F64,
+}
+
+impl AbiScalar {
+    pub fn parse(name: &str) -> Option<Self> {
+        Some(match name {
+            "i8" => Self::I8,
+            "u8" => Self::U8,
+            "i16" => Self::I16,
+            "u16" => Self::U16,
+            "i32" => Self::I32,
+            "u32" => Self::U32,
+            "i53" => Self::I53,
+            "u53" => Self::U53,
+            "i64" => Self::I64,
+            "u64" => Self::U64,
+            "f16" => Self::F16,
+            "f32" => Self::F32,
+            "f64" => Self::F64,
+            _ => return None,
+        })
+    }
+
+    /// Whether the scalar crosses as a JS `BigInt`.
+    pub fn is_bigint(self) -> bool {
+        matches!(self, Self::U64 | Self::I64)
+    }
+
+    /// The scalar a tag gives `leaf`, or `None` when the leaf can't carry
+    /// it. A JS number holds `i64`/`u64` only up to 2^53, so on a `number`
+    /// they lift to `i53`/`u53`; on a `bigint` only `i64`/`u64` apply.
+    pub fn on(self, leaf: &TypeRef) -> Option<Self> {
+        match (leaf, self) {
+            (TypeRef::Number, Self::I64) => Some(Self::I53),
+            (TypeRef::Number, Self::U64) => Some(Self::U53),
+            (TypeRef::Number, s) => Some(s),
+            (TypeRef::BigInt, s) if s.is_bigint() => Some(s),
+            _ => None,
+        }
+    }
+
+    /// The IR spelling.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::I8 => "i8",
+            Self::U8 => "u8",
+            Self::I16 => "i16",
+            Self::U16 => "u16",
+            Self::I32 => "i32",
+            Self::U32 => "u32",
+            Self::I53 => "i53",
+            Self::U53 => "u53",
+            Self::I64 => "i64",
+            Self::U64 => "u64",
+            Self::F16 => "f16",
+            Self::F32 => "f32",
+            Self::F64 => "f64",
+        }
+    }
+
+    /// The Rust scalar wasm-bindgen carries it as: `i53`/`u53` the
+    /// `i64`/`u64` a `SafeInteger` holds as a JS number, and `f16`, which
+    /// Rust has no stable type for, the JS number's `f64`.
+    pub fn rust_ident(self) -> &'static str {
+        match self {
+            Self::I53 => "i64",
+            Self::U53 => "u64",
+            Self::F16 => "f64",
+            s => s.as_str(),
+        }
+    }
+
+    /// Whether wasm-bindgen carries it as a `SafeInteger` of
+    /// [`AbiScalar::rust_ident`].
+    pub fn is_safe_integer(self) -> bool {
+        matches!(self, Self::I53 | Self::U53)
+    }
+}
+
 impl TypeRef {
+    /// `null` read as `undefined`, through unions, arrays and type
+    /// arguments (`@tw-nullish`).
+    pub fn nullish(&self) -> TypeRef {
+        match self {
+            TypeRef::Null => TypeRef::Undefined,
+            TypeRef::Union(u) => TypeRef::union(u.members().iter().map(TypeRef::nullish)),
+            TypeRef::Array(e) => TypeRef::Array(Box::new(e.nullish())),
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => TypeRef::Reference {
+                segments: segments.clone(),
+                generic_args: generic_args.iter().map(TypeRef::nullish).collect(),
+            },
+            other => other.clone(),
+        }
+    }
+
     /// The union of `members` in normal form (see [`Union`]). A single
     /// surviving member is returned bare, so this is also how a union is
     /// widened (`TypeRef::union([ty, TypeRef::Undefined])`).
@@ -530,6 +659,42 @@ impl TypeRef {
 
     fn is_empty_type(&self) -> bool {
         matches!(self, TypeRef::Null | TypeRef::Undefined)
+    }
+
+    /// Replace the scalar leaf of `self` (through `| null` / `| undefined`,
+    /// `Promise`, and `T[]`) with `scalar`, i.e. what a `@tw-abi` tag applies
+    /// to. `None` when the leaf cannot carry `scalar` (see
+    /// [`AbiScalar::accepts`]).
+    pub fn with_abi_scalar(&self, scalar: AbiScalar) -> Option<TypeRef> {
+        if let Some((core, n)) = self.split_empties() {
+            return Some(core.with_abi_scalar(scalar)?.with_empties(n));
+        }
+        Some(match self {
+            TypeRef::Array(inner) => TypeRef::Array(Box::new(inner.with_abi_scalar(scalar)?)),
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } if segments.len() == 1 && segments[0] == "Promise" && generic_args.len() == 1 => {
+                TypeRef::generic("Promise", vec![generic_args[0].with_abi_scalar(scalar)?])
+            }
+            leaf => TypeRef::AbiScalar(scalar.on(leaf)?),
+        })
+    }
+
+    /// Whether a `@tw-abi` scalar appears anywhere in `self`.
+    pub fn has_abi_scalar(&self) -> bool {
+        match self {
+            TypeRef::AbiScalar(_) => true,
+            TypeRef::Array(inner) => inner.has_abi_scalar(),
+            TypeRef::Reference { generic_args, .. } => {
+                generic_args.iter().any(TypeRef::has_abi_scalar)
+            }
+            TypeRef::Union(u) => u.members().iter().any(TypeRef::has_abi_scalar),
+            TypeRef::Intersection(items) | TypeRef::Tuple(items) => {
+                items.iter().any(TypeRef::has_abi_scalar)
+            }
+            _ => false,
+        }
     }
 
     /// Construct a single-segment, non-generic reference: `Foo`.
@@ -643,6 +808,17 @@ impl TypeRef {
             TypeRef::Boolean => "boolean".into(),
             TypeRef::Number => "number".into(),
             TypeRef::String => "string".into(),
+            TypeRef::Template { quasis, types } => {
+                let mut s = String::from("`");
+                for (i, q) in quasis.iter().enumerate() {
+                    s.push_str(q);
+                    if let Some(t) = types.get(i) {
+                        s.push_str(&format!("${{{}}}", t.format_ts()));
+                    }
+                }
+                s.push('`');
+                s
+            }
             TypeRef::BigInt => "bigint".into(),
             TypeRef::Void => "void".into(),
             TypeRef::Undefined => "undefined".into(),
@@ -655,6 +831,7 @@ impl TypeRef {
             TypeRef::PropertyKey => "PropertyKey".into(),
             TypeRef::TypedSlice(e, _) if e.is_bigint() => "bigint[]".into(),
             TypeRef::TypedSlice(..) => "number[]".into(),
+            TypeRef::AbiScalar(s) => s.as_str().into(),
             TypeRef::Array(inner) => {
                 // Wrap composite inner types in parens so e.g.
                 // `(A | B)[]` doesn't render as the wrong-precedence
@@ -763,6 +940,8 @@ pub struct FunctionSig {
 
 pub struct Param {
     pub name: String,
+    /// The TypeScript spelling, where `name` snake_cases it.
+    pub js_name: Option<String>,
     pub type_ref: TypeRef,
     /// `x?: T`, or a default initializer: whether the argument may be
     /// left out. Says nothing about the type, which is as written.
@@ -856,6 +1035,9 @@ impl TypeParam {
                 TypeRef::Number | TypeRef::NumberLiteral(_) => Some(Erasure::Number),
                 TypeRef::Boolean | TypeRef::BooleanLiteral(_) => Some(Erasure::Boolean),
                 TypeRef::BigInt => Some(Erasure::BigInt),
+                // `keyof X` is a union of property names; the string reading
+                // is what every JS API does with it.
+                TypeRef::KeyOf(_) => Some(Erasure::String),
                 TypeRef::Union(items) => {
                     let mut iter = items.members().iter().map(of);
                     let first = iter.next()??;
@@ -865,6 +1047,21 @@ impl TypeParam {
             }
         }
         of(self.constraint.as_ref()?)
+    }
+
+    /// Whether the constraint is written as string literals only (`S
+    /// extends "hour" | "minute"`). On an interface such a parameter is
+    /// literal-only, like one bounded by a literal alias, rather than
+    /// reading as `string`.
+    pub fn selects_string_literals(&self) -> bool {
+        match &self.constraint {
+            Some(TypeRef::StringLiteral(_)) => true,
+            Some(TypeRef::Union(items)) => items
+                .members()
+                .iter()
+                .all(|m| matches!(m, TypeRef::StringLiteral(_))),
+            _ => false,
+        }
     }
 }
 
@@ -1290,6 +1487,7 @@ impl Member {
             }),
             Member::Constructor(c) => Member::Constructor(ConstructorMember {
                 params: params(&c.params),
+                result: c.result.as_ref().map(|r| r.substitute(map)),
                 ..c.clone()
             }),
             Member::IndexSignature(i) => Member::IndexSignature(IndexSigMember {
@@ -1389,6 +1587,8 @@ pub struct ConstructorMember {
     /// Class `constructor(…)` members have none.
     pub type_params: Vec<TypeParam>,
     pub params: Vec<Param>,
+    /// A construct signature's declared result (`Slot<T>`).
+    pub result: Option<TypeRef>,
     pub doc: Option<String>,
     /// Failure-mode info from `@throws` — see [`Throws`].
     ///

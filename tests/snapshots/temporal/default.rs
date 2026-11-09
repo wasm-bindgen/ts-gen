@@ -1439,6 +1439,11 @@ pub mod temporal {
             this: &RoundingOptionsWithLargestUnit<Units>,
             val: LargestUnitKind,
         );
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit_with_pluralize_unit<Units: ::wasm_bindgen::JsGeneric>(
+            this: &RoundingOptionsWithLargestUnit<Units>,
+            val: PluralizeUnit,
+        );
     }
     impl<Units: ::wasm_bindgen::JsGeneric> RoundingOptionsWithLargestUnit<Units> {
         pub fn new() -> RoundingOptionsWithLargestUnit<Units> {
@@ -1473,6 +1478,10 @@ pub mod temporal {
         }
         pub fn largest_unit(self, val: LargestUnitKind) -> Self {
             self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn largest_unit_with_pluralize_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_largest_unit_with_pluralize_unit(val);
             self
         }
         pub fn build(self) -> RoundingOptionsWithLargestUnit<Units> {
@@ -4800,9 +4809,19 @@ pub mod temporal {
         #[wasm_bindgen(method, setter, js_name = "roundingMode")]
         pub fn set_rounding_mode(this: &DurationRoundingOptions, val: RoundingModeKind);
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
-        pub fn largest_unit(this: &DurationRoundingOptions) -> Option<LargestUnitKind>;
+        pub fn largest_unit(
+            this: &DurationRoundingOptions,
+        ) -> Option<DurationRoundingOptionsLargestUnitKind>;
         #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-        pub fn set_largest_unit(this: &DurationRoundingOptions, val: LargestUnitKind);
+        pub fn set_largest_unit(
+            this: &DurationRoundingOptions,
+            val: DurationRoundingOptionsLargestUnitKind,
+        );
+        #[wasm_bindgen(method, setter, js_name = "largestUnit")]
+        pub fn set_largest_unit_with_pluralize_unit(
+            this: &DurationRoundingOptions,
+            val: PluralizeUnit,
+        );
     }
     impl DurationRoundingOptions {
         pub fn new() -> DurationRoundingOptions {
@@ -4846,8 +4865,12 @@ pub mod temporal {
             self.inner.set_rounding_mode(val);
             self
         }
-        pub fn largest_unit(self, val: LargestUnitKind) -> Self {
+        pub fn largest_unit(self, val: DurationRoundingOptionsLargestUnitKind) -> Self {
             self.inner.set_largest_unit(val);
+            self
+        }
+        pub fn largest_unit_with_pluralize_unit(self, val: PluralizeUnit) -> Self {
+            self.inner.set_largest_unit_with_pluralize_unit(val);
             self
         }
         pub fn build(self) -> DurationRoundingOptions {
@@ -6512,7 +6535,10 @@ pub mod temporal {
         #[doc = " * `RangeError` — if a field is out of range"]
         #[doc = " * `TypeError` — if the object has no recognised fields"]
         #[wasm_bindgen(method)]
-        pub fn with(this: &PlainMonthDay, month_day_like: &PartialDateLikeObject) -> PlainMonthDay;
+        pub fn with(
+            this: &PlainMonthDay,
+            month_day_like: &PartialTemporalLikeDateLikeObject,
+        ) -> PlainMonthDay;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if a field is out of range"]
@@ -6520,7 +6546,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn try_with(
             this: &PlainMonthDay,
-            month_day_like: &PartialDateLikeObject,
+            month_day_like: &PartialTemporalLikeDateLikeObject,
         ) -> Result<PlainMonthDay, Error>;
         #[doc = " ## Errors"]
         #[doc = ""]
@@ -6529,7 +6555,7 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "with")]
         pub fn with_and_options(
             this: &PlainMonthDay,
-            month_day_like: &PartialDateLikeObject,
+            month_day_like: &PartialTemporalLikeDateLikeObject,
             options: &OverflowOptions,
         ) -> PlainMonthDay;
         #[doc = " ## Errors"]
@@ -6539,7 +6565,7 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "with")]
         pub fn try_with_and_options(
             this: &PlainMonthDay,
-            month_day_like: &PartialDateLikeObject,
+            month_day_like: &PartialTemporalLikeDateLikeObject,
             options: &OverflowOptions,
         ) -> Result<PlainMonthDay, Error>;
         #[wasm_bindgen(method, js_name = "equals")]
@@ -7163,6 +7189,83 @@ pub mod temporal {
             self.inner
         }
     }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type PartialTemporalLikeDateLikeObject;
+        #[wasm_bindgen(method, getter)]
+        pub fn year(this: &PartialTemporalLikeDateLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_year(this: &PartialTemporalLikeDateLikeObject, val: f64);
+        #[wasm_bindgen(method, getter)]
+        pub fn era(this: &PartialTemporalLikeDateLikeObject) -> Option<String>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_era(this: &PartialTemporalLikeDateLikeObject, val: &str);
+        #[wasm_bindgen(method, getter, js_name = "eraYear")]
+        pub fn era_year(this: &PartialTemporalLikeDateLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter, js_name = "eraYear")]
+        pub fn set_era_year(this: &PartialTemporalLikeDateLikeObject, val: f64);
+        #[wasm_bindgen(method, getter)]
+        pub fn month(this: &PartialTemporalLikeDateLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_month(this: &PartialTemporalLikeDateLikeObject, val: f64);
+        #[wasm_bindgen(method, getter, js_name = "monthCode")]
+        pub fn month_code(this: &PartialTemporalLikeDateLikeObject) -> Option<String>;
+        #[wasm_bindgen(method, setter, js_name = "monthCode")]
+        pub fn set_month_code(this: &PartialTemporalLikeDateLikeObject, val: &str);
+        #[wasm_bindgen(method, getter)]
+        pub fn day(this: &PartialTemporalLikeDateLikeObject) -> Option<f64>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_day(this: &PartialTemporalLikeDateLikeObject, val: f64);
+    }
+    impl PartialTemporalLikeDateLikeObject {
+        pub fn new() -> PartialTemporalLikeDateLikeObject {
+            Self::builder().build()
+        }
+        pub fn builder() -> PartialTemporalLikeDateLikeObjectBuilder {
+            PartialTemporalLikeDateLikeObjectBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
+        }
+    }
+    impl Default for PartialTemporalLikeDateLikeObject {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    pub struct PartialTemporalLikeDateLikeObjectBuilder {
+        inner: PartialTemporalLikeDateLikeObject,
+    }
+    impl PartialTemporalLikeDateLikeObjectBuilder {
+        pub fn year(self, val: f64) -> Self {
+            self.inner.set_year(val);
+            self
+        }
+        pub fn era(self, val: &str) -> Self {
+            self.inner.set_era(val);
+            self
+        }
+        pub fn era_year(self, val: f64) -> Self {
+            self.inner.set_era_year(val);
+            self
+        }
+        pub fn month(self, val: f64) -> Self {
+            self.inner.set_month(val);
+            self
+        }
+        pub fn month_code(self, val: &str) -> Self {
+            self.inner.set_month_code(val);
+            self
+        }
+        pub fn day(self, val: f64) -> Self {
+            self.inner.set_day(val);
+            self
+        }
+        pub fn build(self) -> PartialTemporalLikeDateLikeObject {
+            self.inner
+        }
+    }
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -7198,29 +7301,10 @@ pub enum RoundingModeKind {
     HalfEven = "halfEven",
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Debug)]
 pub enum LargestUnitKind {
     Auto = "auto",
-    Year = "year",
-    Month = "month",
-    Week = "week",
-    Day = "day",
-    Hour = "hour",
-    Minute = "minute",
-    Second = "second",
-    Millisecond = "millisecond",
-    Microsecond = "microsecond",
-    Nanosecond = "nanosecond",
-    Years = "years",
-    Months = "months",
-    Weeks = "weeks",
-    Days = "days",
-    Hours = "hours",
-    Minutes = "minutes",
-    Seconds = "seconds",
-    Milliseconds = "milliseconds",
-    Microseconds = "microseconds",
-    Nanoseconds = "nanoseconds",
+    PluralizeUnit(temporal::PluralizeUnit),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
@@ -7265,4 +7349,10 @@ pub enum RelativeToKind {
     PlainDate(temporal::PlainDate),
     PlainDateTime(temporal::PlainDateTime),
     Object(Object),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum DurationRoundingOptionsLargestUnitKind {
+    Auto = "auto",
+    PluralizeUnit(temporal::PluralizeUnit),
 }

@@ -1114,8 +1114,13 @@ dependencies = [
  "quote",
  "similar",
  "syn 2.0.117",
+ "ts-gen-abi",
  "walkdir",
 ]
+
+[[package]]
+name = "ts-gen-abi"
+version = "0.1.0"
 
 [[package]]
 name = "ts-gen-integration-tests"

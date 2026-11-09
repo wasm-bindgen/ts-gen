@@ -9,7 +9,9 @@ use crate::ir;
 use crate::parse::classify::classify_interface;
 use crate::parse::ctx::ParseCtx;
 use crate::parse::docs::DocComments;
-use crate::parse::members::{convert_class_element, convert_ts_signature, create_body_scope};
+use crate::parse::members::{
+    convert_class_element, convert_ts_signature, create_body_scope, create_interface_body_scope,
+};
 use crate::parse::scope::ScopeId;
 use crate::parse::types::{
     convert_formal_params_scoped, convert_ts_type_scoped, convert_type_params,
@@ -28,19 +30,6 @@ pub fn convert_class_decl(
 
     let mut type_params = convert_type_params(class.type_parameters.as_ref(), ctx.diag);
 
-    let extends =
-        class
-            .heritage
-            .as_ref()
-            .and_then(|h| match expression_to_dotted_name(&h.expression) {
-                Some(name) => Some(ir::TypeRef::ident(name)),
-                None => {
-                    ctx.diag
-                        .warn("Complex super class expression is not supported");
-                    None
-                }
-            });
-
     let implements: Vec<ir::TypeRef> = class
         .implements
         .iter()
@@ -51,6 +40,25 @@ pub fn convert_class_decl(
 
     // Class body scope holds the class's own `<T, ...>` parameters.
     let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
+
+    let extends = class.heritage.as_ref().and_then(|h| {
+        let Some(name) = expression_to_dotted_name(&h.expression) else {
+            ctx.diag
+                .warn("Complex super class expression is not supported");
+            return None;
+        };
+        let mut parent = ir::TypeRef::ident(name);
+        if let (ir::TypeRef::Reference { generic_args, .. }, Some(args)) =
+            (&mut parent, h.type_arguments.as_ref())
+        {
+            generic_args.extend(
+                args.params
+                    .iter()
+                    .map(|t| convert_ts_type_scoped(t, body_scope, ctx)),
+            );
+        }
+        Some(parent)
+    });
 
     let members: Vec<ir::Member> = class
         .body
@@ -131,7 +139,7 @@ pub fn interface_from_signatures(
 ) -> ir::InterfaceDecl {
     let js_name = name.clone();
     let parent = name.clone();
-    let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
+    let body_scope = create_interface_body_scope(&mut type_params, parent_scope, ctx);
     let mut construct = Vec::new();
     let mut members: Vec<ir::Member> = Vec::new();
     for sig in signatures {
@@ -166,7 +174,7 @@ pub fn interface_from_signatures(
 
 pub fn convert_function_decl(
     func: &ast::Function<'_>,
-    throws: ir::Throws,
+    info: &crate::parse::docs::JsDocInfo,
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<ir::FunctionDecl> {
@@ -177,12 +185,20 @@ pub fn convert_function_decl(
     let mut type_params = convert_type_params(func.type_parameters.as_ref(), ctx.diag);
     let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
 
-    let params = convert_formal_params_scoped(&func.params, body_scope, ctx);
-    let return_type = func
+    let mut params = convert_formal_params_scoped(&func.params, body_scope, ctx);
+    let mut return_type = func
         .return_type
         .as_ref()
         .map(|rt| convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx))
         .unwrap_or(ir::TypeRef::Void);
+    crate::parse::members::apply_abi_tags(
+        info,
+        Some(&mut return_type),
+        &mut params,
+        &js_name,
+        body_scope,
+        ctx,
+    );
 
     Some(ir::FunctionDecl {
         name: rust_name,
@@ -191,7 +207,7 @@ pub fn convert_function_decl(
         params,
         return_type,
         overloads: vec![],
-        throws,
+        throws: info.throws(),
         async_modifier: func.r#async,
         body_scope,
     })

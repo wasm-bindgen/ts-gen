@@ -1,0 +1,9 @@
+[package]
+description = "The ts-gen IR and the `tw` bridge ABI: model, text format, keys and profiles"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+name = "ts-gen-abi"
+repository = "https://github.com/wasm-bindgen/ts-gen"
+version = "0.1.0"
+
+[dependencies]

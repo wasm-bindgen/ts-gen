@@ -271,12 +271,22 @@ impl DiagnosticCollector {
     /// Print all diagnostics to stderr, deduplicating identical messages.
     /// Colour is used when stderr is a terminal and `NO_COLOR` is unset.
     pub fn emit(&self) {
+        self.emit_unseen(&mut Default::default());
+    }
+
+    /// [`emit`](Self::emit), skipping the diagnostics `seen` holds and
+    /// adding the rest, so a diagnostic repeated across sessions prints once.
+    pub fn emit_unseen(&self, seen: &mut std::collections::HashSet<String>) {
         let color = std::io::stderr().is_terminal() && std::env::var_os("NO_COLOR").is_none();
-        eprint!("{}", self.render(color));
+        eprint!("{}", self.render_unseen(color, seen));
     }
 
     /// The text `emit` prints, with ANSI colour when `color` is set.
     pub fn render(&self, color: bool) -> String {
+        self.render_unseen(color, &mut Default::default())
+    }
+
+    fn render_unseen(&self, color: bool, seen: &mut std::collections::HashSet<String>) -> String {
         let paint = |code: &str, text: &str| {
             if color && !text.is_empty() {
                 format!("\x1b[{code}m{text}\x1b[0m")
@@ -285,7 +295,6 @@ impl DiagnosticCollector {
             }
         };
         let mut out = String::new();
-        let mut seen = std::collections::HashSet::new();
         for diag in &self.diagnostics {
             let location = diag.location.as_ref().map(|l| l.to_string());
             let key = format!("{:?}:{location:?}:{}", diag.level, diag.message);

@@ -1,0 +1,39 @@
+ir 1;
+
+interface Init {
+  @js(object)
+  new();
+  get signal(): Signal??;
+  set signal(value: @js(null) Signal?);
+  get body(): str?;
+  set body(value: str);
+}
+
+class Signal {}
+
+class Res {
+  get body(): @js(null) str?;
+  get text(): str?;
+  get(name: @js(null) str?): @js(null) str? throws;
+  find(): str? throws;
+  find(name: str): str? throws;
+}
+
+nested(xs: future<@js(null) str?>, ys: arr<@js(null) str?>, r: Record<@js(null) Str?>, cb: fn(@js(null) str?) -> @js(null) str?): future<@js(null) str?>;
+greet() throws;
+greet(name: @js(null) str?) throws;
+both() throws;
+both(x: @js(null) str?) throws;
+optional() throws;
+optional(x: str) throws;
+lead(x: str??, y: f64) throws;
+leadOpt() throws;
+leadOpt(x: @js(null) str?) throws;
+leadOpt(x: str??, y: f64) throws;
+
+interface Record<V> {
+  @js(index)
+  at(key: str): V?;
+  @js(index)
+  setAt(key: str, value: V);
+}

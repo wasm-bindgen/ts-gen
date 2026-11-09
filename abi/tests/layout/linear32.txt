@@ -1,0 +1,169 @@
+# profile: all-linear
+
+## Producers, bridges and generators
+import tw:js/global Request#get:url(): (externref) -> (i32, i32)
+
+## Type aliases
+import tw:js/global on(fn(Event)): (i32)
+  trampoline fn(Event): (i32, externref)
+import tw:js/global next(fn(Next<f64>,f64)->f64): (i32)
+  trampoline fn(Next<f64>,f64)->f64: (i32, externref, f64) -> (f64)
+
+## Namespaces
+import tw:js/global foo(): ()
+import tw:js/global foo.baz(): ()
+
+## Classes and interfaces
+import tw:js/global Response.new(str): (i32, i32) -> (externref)
+import tw:js/global Response#get:status(): (externref) -> (i32)
+
+## 5. Modules and import modules
+import cloudflare:workers DurableObject.new(DurableObjectState,Env): (externref, externref) -> (externref)
+import cloudflare:workers DurableObject#get:ctx(): (externref) -> (externref)
+
+## Lib IRs
+import tw:js/global Date#getTime(): (externref) -> (f64)
+
+## Lib IRs
+import tw:js/global Event#get:timeStamp(): (externref) -> (externref)
+
+## Generic members in keys
+import tw:js/global Headers.new(): () -> (externref)
+import tw:js/global Headers#get(str): (externref, i32, i32) -> (i32, i32)
+import tw:js/global Headers#set(str,str): (externref, i32, i32, i32, i32)
+import tw:js/global Headers.from(arr<(str,str)>): (i32, i32) -> (externref)
+  elem arr<(str,str)>: memory 16 align 4 [ptr@0 len@4 ptr@8 len@12] table []
+
+## Other `@js` entries
+import tw:js/global KVNamespace#getText(str): (externref, i32, i32) -> (externref)
+  enum err: slots (externref); TypeError=1[0] Error=-1[0]
+  future future<str?>: take (i32, i32) error (i32, externref)
+import tw:js/global KVNamespace#getJson(str): (externref, i32, i32) -> (externref)
+  future future<Any?>: take (externref) error (i32, externref)
+import tw:js/global RequestInit.new(): () -> (externref)
+import tw:js/global RequestInit#set:signal(AbortSignal?): (externref, externref)
+
+## 8. Enums
+enum Method: (i32)
+  enum Method: index; Get=1 Post=2
+enum Flags: (i32)
+  enum Flags: carrier u32; Read=1 Write=2 ReadWrite=3
+enum Body: (i32, i32, i32, externref)
+  enum Body: slots (i32, i32, externref); Text=1[0,1] Bytes=2[0,1] Stream=3[2]
+
+## Inheritance
+enum KvError: (i32, externref)
+  enum KvError: slots (externref); TypeError=1[0] Error=-1[0] NotFound=2[0]
+
+## Inheritance
+enum DateUnit: (i32)
+  enum DateUnit: index; Year=1 Month=2 Day=3
+enum TimeUnit: (i32)
+  enum TimeUnit: index; Hour=4 Minute=5 Second=6
+enum DateUnitOrTimeUnit: (i32)
+  enum DateUnitOrTimeUnit: index; Year=1 Month=2 Day=3 Hour=4 Minute=5 Second=6
+
+## 9. Nullability
+import tw:js/global RequestInit#get:signal(): (externref) -> (externref)
+import tw:js/global RequestInit#set:signal(AbortSignal?): (externref, externref)
+
+## Views: `*T[]` and `*mut T[]`
+import tw:js/global Crypto#getRandomValues(*mut u8[]): (externref, i32, i32)
+import tw:js/global GPUQueue#writeBuffer(GPUBuffer,u53,*u8[]): (externref, externref, i64, i32, i32)
+
+## Defaults
+import tw:js/global D1PreparedStatement#all(): (externref) -> (externref)
+  enum err: slots (externref); TypeError=1[0] Error=-1[0]
+  future future<D1Result<T>>: take (externref) error (i32, externref)
+
+## Associated types
+import tw:js/global RoundingOptions#get:smallestUnit(): (externref) -> (externref)
+import tw:js/global RoundingOptions#set:smallestUnit(PluralUnit): (externref, externref)
+
+## The built-in `err`
+enum err: (i32, externref)
+  enum err: slots (externref); TypeError=1[0] Error=-1[0]
+
+## Bridge unwind and memory safety
+import tw:js/global Kv#get(str): (externref, i32, i32) -> (i32, i32) throws KvError
+  enum KvError: slots (externref); TypeError=1[0] Error=-1[0] NotFound=2[0]
+enum KvError: (i32, externref)
+
+## Cancellation (guest only)
+import tw:js/global fetch(Request,RequestInit?): (externref, externref) -> (externref)
+  enum FetchError: slots (externref); TypeError=1[0] Error=-1[0]
+  future future<Response,FetchError>: take (externref) error (i32, externref)
+enum FetchError: (i32, externref)
+
+## 17. Exports
+export default.fetch(Request,Env,ExecutionContext): (externref, externref, externref) -> (externref)
+  enum err: slots (externref); TypeError=1[0] Error=-1[0]
+  future future<Response>: take (externref) error (i32, externref)
+export version(): () -> (i32, i32)
+
+## `export class`
+export Counter.new(DurableObjectState,Env): (externref, externref, externref) -> (i32)
+export Counter#increment(u32): (externref, i32, i32) -> (externref)
+  enum err: slots (externref); TypeError=1[0] Error=-1[0]
+  future future<u32>: take (i32) error (i32, externref)
+export Counter#get:count(): (externref, i32) -> (i32)
+export Counter.create(): () -> (i32)
+
+## 18. Callbacks
+import tw:js/global EventTarget#addEventListener(str,fn(Event)): (externref, i32, i32, i32)
+  trampoline fn(Event): (i32, externref)
+
+## 20. End-to-end example
+import tw:js/global Request#get:url(): (externref) -> (i32, i32)
+import tw:js/global Response.new(str): (i32, i32) -> (externref)
+import tw:js/global fetch(Request,RequestInit?): (externref, externref) -> (externref)
+  enum FetchError: slots (externref); TypeError=1[0] Error=-1[0] Aborted=2[0]
+  future future<Response,FetchError>: take (externref) error (i32, externref)
+export default.fetch(Request,Env,ExecutionContext): (externref, externref, externref) -> (externref)
+  enum err: slots (externref); TypeError=1[0] Error=-1[0]
+  future future<Response>: take (externref) error (i32, externref)
+enum FetchError: (i32, externref)
+
+## fixture
+export Counter.new(): (externref) -> (i32)
+import tw:js/global Fixture#scalars(bool,i8,u16,i53,u64,f16,f64): (externref, i32, i32, i32, i64, i64, f32, f64) -> (i32)
+import tw:js/global Fixture#nullables(bool?,u8?,i53?,u32?,f32?,Method?,Flags?,Body?): (externref, i32, i32, i64, i32, i32, i32, f32, i32, i32, i32, i32, i32, i32, externref) -> (i32, i32)
+  enum Method: index; Get=1 Post=2
+  enum Flags: carrier u8; Read=1 Write=2
+  enum Body: slots (i32, i32, externref); Text=1[0,1] Bytes=2[0,1] Stream=3[2]
+import tw:js/global Fixture#sequences(u8[],mut f32[],i64[]?,arr<u8>,arr<str>?,arr<Request>): (externref, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32) -> (i32, i32)
+  elem arr<u8>: memory 1 align 1 [u8@0] table []
+  elem arr<str>?: memory 8 align 4 [ptr@0 len@4] table []
+  elem arr<Request>: memory 0 align 1 [] table [externref]
+  elem arr<(u32,str)>: memory 12 align 4 [u32@0 ptr@4 len@8] table []
+import tw:js/global Fixture#nested(arr<arr<(u32,str)>>,arr<Body>,arr<(Flags?,Method,f64?)>,arr<Counter>,arr<fn(Event)>,arr<Value>): (externref, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32)
+  elem arr<arr<(u32,str)>>: memory 8 align 4 [ptr@0 len@4] table []
+  elem arr<Body>: memory 12 align 4 [arm@0 slot:i32@4 slot:i32@8] table [externref]
+  elem arr<(Flags?,Method,f64?)>: memory 15 align 8 [present@0 u8@1 arm@2 present@6 f64@7] table []
+  elem arr<Counter>: memory 4 align 4 [handle@0] table []
+  trampoline fn(Event): (i32, externref)
+  elem arr<fn(Event)>: memory 4 align 4 [handle@0] table []
+  enum Value: slots (f64, i32, externref); Num=1[0] Flag=2[1] Pair=3[1,2] Other=-1[2]
+  elem arr<Value>: memory 16 align 8 [arm@0 slot:f64@4 slot:i32@12] table [externref]
+import tw:js/global Fixture#boxes(Str,U32,Vec<u8>,Arr<str>,Tuple<str,u16>,Any?): (externref, externref, externref, externref, externref, externref, externref) -> (externref)
+  elem arr<str>: memory 8 align 4 [ptr@0 len@4] table []
+import tw:js/global Fixture#callbacks(fn(Event,u32)->str,fn(str?)->Body throws err): (externref, i32, i32) -> (externref)
+  trampoline fn(Event,u32)->str: (i32, externref, i32) -> (i32, i32)
+  trampoline fn(str?)->Body throws err: (i32, i32, i32) -> (i32, i32, i32, externref)
+  call fn(Request)->u32: (externref, externref) -> (i32)
+import tw:js/global Fixture#handles(Counter,Counter?): (externref, i32, i32) -> (i32, i32)
+import tw:js/global Fixture#erased(T,T?,arr<T>): (externref, externref, externref, i32, i32) -> (externref)
+  elem arr<T>: memory 0 align 1 [] table [externref]
+  call fn(T)->T: (externref, externref) -> (externref)
+import tw:js/global Fixture#undef(str??): (externref, i32, i32, i32) -> (i32, externref)
+  enum str??: slots (i32, i32); Undefined=1 Value=2[0,1]
+  enum Request??: slots (externref); Undefined=1 Value=2[0]
+import tw:js/global Fixture#view(*u8[],*mut f64[]): (externref, i32, i32, i32, i32)
+export takeCallback(fn(Event)): (externref) -> (i32)
+  call fn(Event): (externref, externref)
+  trampoline fn(u32)->str: (i32, i32) -> (i32, i32)
+enum Method: (i32)
+enum Flags: (i32)
+enum Body: (i32, i32, i32, externref)
+enum Value: (i32, f64, i32, externref)
+

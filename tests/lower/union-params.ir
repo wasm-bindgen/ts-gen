@@ -1,0 +1,101 @@
+ir 1;
+
+class Blob {}
+
+class Stream {}
+
+interface Chunk {
+  @js(object)
+  new();
+  get size(): f64;
+  set size(value: f64);
+}
+
+interface Part {
+  @js(object)
+  new();
+  get name(): str;
+  set name(value: str);
+}
+
+send(body: union Body) throws;
+sendMaybe() throws;
+sendMaybe(body: union Body) throws;
+sendAny(body: union BodyKind) throws;
+sendPiece(piece: Piece) throws;
+sendPayload(body: union Body) throws;
+sendLoose(body: union Body) throws;
+wrapDefault(w: Wrapped) throws;
+wrapBlob(w: union WrappedBlob) throws;
+tagged(t: union Tagged) throws;
+
+interface Handler {
+  receive(body: union Body) throws;
+  take(piece: Piece) throws;
+}
+
+scalar(v: @js(null) union VKind?) throws;
+
+interface Settings {
+  @js(object)
+  new();
+  get id(): str;
+  set id(value: str);
+  get cache(): bool?;
+  set cache(value: bool);
+}
+
+interface Universal {
+  @js(object)
+  new();
+  get extra(): str?;
+  set extra(value: str);
+  get id(): str;
+  set id(value: str);
+  get cache(): bool?;
+  set cache(value: bool);
+}
+
+configure(s: Universal) throws;
+
+enum Body {
+  Str(str);
+  Blob(Blob);
+  Stream(Stream);
+}
+
+enum BodyKind {
+  Str(str);
+  Blob(Blob);
+}
+
+enum Piece {
+  Chunk(Chunk);
+  Part(Part);
+}
+
+enum Wrapped {
+  Chunk(Chunk);
+  Part(Part);
+}
+
+enum WrappedBlob {
+  Blob(Blob);
+  Part(Part);
+}
+
+enum Tagged {
+  Blob(Blob);
+  Stream(Stream);
+}
+
+enum VKind {
+  Str(str);
+  F64(f64);
+}
+
+export namespace default {
+  receive(body: Body) throws;
+  take(piece: Chunk) throws;
+  take(piece: Part) throws;
+}

@@ -1,0 +1,114 @@
+// `Store.Options`: the literal type `"text"` widens to `str`
+// `Store.Options`: the literal type `"json"` widens to `str`
+// `Store.Options`: the literal type `"arrayBuffer"` widens to `str`
+// `PartialGetOptionsUndefined.type: undefined` holds no value, so it is not lowered
+ir 1;
+
+interface KV {
+  @js(name = "get", args = (key, "text"))
+  getText(key: str): future<@js(null) str?>;
+  @js(name = "get", args = (key, "json"))
+  getJson(key: str): future<Any?>;
+  put(key: str, value: union KVValueKind): future<unit>;
+  put(key: str, value: union KVValueKind, options: PutOptions): future<unit>;
+}
+
+interface PutOptions {
+  @js(object)
+  new();
+  get ttl(): f64?;
+  set ttl(value: f64);
+}
+
+class Node {
+  append(child: union NodeChildKind) throws;
+  remove() throws;
+  get signal(): @js(null) AbortSignal?;
+  set signal(value: @js(null) AbortSignal?);
+}
+
+draw(x: f64, y: f64) throws;
+draw(p: Point) throws;
+pick(mode: ModeKind): str throws;
+pick(mode: ModeKind, n: f64): str throws;
+@js(args = (first, ...more))
+rest(first: str, more: arr<f64>) throws;
+optionalRest() throws;
+@js(args = (label, ...data))
+optionalRest(label: str?, data: arr<Any?>) throws;
+tupleRest(cb: fn(...arr<Any?>)): f64 throws;
+@js(args = (cb, ms, ...args))
+tupleRest(cb: fn(...arr<Any?>), ms: f64?, args: arr<Any?>): f64 throws;
+middle(a: str, b: f64?, c: str) throws;
+
+interface Point {
+  @js(object)
+  new();
+  get x(): f64;
+  set x(value: f64);
+  get y(): f64;
+  set y(value: f64);
+}
+
+interface GetOptions<Type> {
+  @js(object)
+  new();
+  get type(): Type;
+  set type(value: Type);
+  get ttl(): f64?;
+  set ttl(value: f64);
+}
+
+interface Store {
+  read(key: str): future<@js(null) str?>;
+  read(key: str, options: PartialGetOptionsUndefined): future<@js(null) str?>;
+  @js(name = "read")
+  readText(key: str, options: GetOptions<Str>): future<@js(null) str?>;
+  @js(name = "read")
+  readJson<T = Any?>(key: str, options: GetOptions<Str>): future<@js(null) T?>;
+  @js(name = "read")
+  readArrayBuffer(key: str, options: GetOptions<Str>): future<@js(null) ArrayBuffer?>;
+  write(key: str, value: str): future<@js(null) bool?>;
+  write(key: str, value: str, options: StoreOptions): future<@js(null) bool?>;
+  write(key: str, value: str, options: StoreWriteOptions): future<bool>;
+}
+
+interface StoreOptions {
+  @js(object)
+  new();
+  get onlyIf(): str;
+  set onlyIf(value: str);
+}
+
+interface StoreWriteOptions {
+  @js(object)
+  new();
+  get ttl(): f64;
+  set ttl(value: f64);
+}
+
+interface PartialGetOptionsUndefined {
+  @js(object)
+  new();
+  get ttl(): f64?;
+  set ttl(value: f64);
+}
+
+enum KVValueKind {
+  Str(str);
+  ArrayBuffer(ArrayBuffer);
+}
+
+enum NodeChildKind {
+  Node(Node);
+  Str(str);
+}
+
+enum ModeKind {
+  @js("fast") Fast;
+  @js("slow") Slow;
+}
+
+class ArrayBuffer {}
+
+class AbortSignal {}

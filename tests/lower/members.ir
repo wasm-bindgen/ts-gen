@@ -1,0 +1,72 @@
+ir 1;
+
+class Counter {
+  new() throws;
+  new(start: f64) throws;
+  get value(): f64;
+  set value(value: f64);
+  get label(): str;
+  get maybe(): @js(null) str?;
+  set maybe(value: @js(null) str?);
+  get missing(): str?;
+  set missing(value: str);
+  get either(): str?;
+  set either(value: str?);
+  get handler(): Any?;
+  set handler(value: @js(null) Any?);
+  static get zero(): Counter;
+  static from(n: f64): Counter throws;
+  increment(): f64 throws;
+  increment(by: f64): f64 throws;
+  reset() throws;
+  done(): future<unit>;
+}
+
+interface Options {
+  @js(object)
+  new();
+  get name(): str;
+  set name(value: str);
+  get retries(): f64?;
+  set retries(value: f64);
+  get signal(): AbortSignal?;
+  set signal(value: @js(null) AbortSignal?);
+}
+
+interface Bag {
+  @js(index)
+  at(key: str): f64?;
+  @js(index)
+  setAt(key: str, value: f64);
+}
+
+configure(options: Options) throws;
+bag(): Bag throws;
+
+interface Lines {
+  @js(object)
+  new();
+  get count(): f64;
+  @js(symbol = iterator)
+  iterator(): Iterator<Str> throws;
+  @js(symbol = toStringTag)
+  get toStringTag(): str;
+}
+
+class Lock {
+  release() throws;
+  dispose(force: bool) throws;
+  toPrimitive(hint: str): f64 throws;
+  @js(symbol = dispose)
+  dispose() throws;
+  @js(symbol = hasInstance)
+  static hasInstance(value: Any?): bool throws;
+  @js(symbol = species)
+  get species(): Lock;
+  @js(symbol = toPrimitive)
+  toPrimitive2(hint: str): str throws;
+}
+
+class AbortSignal {}
+
+interface Iterator<T> {}
