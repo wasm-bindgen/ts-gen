@@ -1,0 +1,3 @@
+all-gc
+eh = legacy
+str = gc+utf8

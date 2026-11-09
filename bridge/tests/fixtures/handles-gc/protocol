@@ -1,0 +1,11 @@
+tw:tag KvError
+tw:destroy fn(u32)
+tw:destroy Counter
+tw:call fn(u32)->u32
+tw:box Counter
+tw:unbox Counter
+tw:unbox fn(str)->str
+tw:tryUnbox Counter
+tw:tryUnbox fn(str)->str
+export tw:call:fn(u32)
+export tw:call:fn(str)->str
