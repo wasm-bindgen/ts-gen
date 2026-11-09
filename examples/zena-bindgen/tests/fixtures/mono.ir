@@ -1,0 +1,28 @@
+ir 1;
+
+class Item {
+  get id(): u32;
+}
+
+class Map<K, V> {
+  new();
+  get(key: K): V;
+  set(key: K, value: V): Map<K, V>;
+  has(key: K): bool;
+  get size(): u32;
+  static of<T>(value: T): Map<str, T>;
+  keys(): arr<K>;
+  find(key: K): V?;
+}
+
+class Box<T> {
+  get value(): T;
+  set value(v: T);
+}
+
+identity<T>(x: T): T;
+wrap<T>(x: T): Box<T>;
+later<T>(x: T): future<T>;
+pick<T: Item>(items: arr<Item>, key: str): T;
+pair<T>(key: str, value: T): (str, T);
+store<T>(entry: (T, f64?)): unit;

@@ -1,0 +1,12 @@
+import { first, reversed, rows, count, entries, singles } from './generic-arrays.zena';
+
+export function run(): f64 {
+  let s = first<String>(["a"]);
+  let n = first<f64>([1.0]);
+  let r = reversed<String>(["a", "b"]);
+  let g = rows<String>([["a"]]);
+  let c = count<String, f64>([("a", 1.0)]);
+  let e = entries<String, f64>("a", 1.0);
+  let o = singles<String>(["a"]);
+  return n + (c as f64) + (s.length as f64);
+}

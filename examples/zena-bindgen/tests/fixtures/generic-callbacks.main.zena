@@ -1,0 +1,15 @@
+import { BoxStr, Boxf64, List, each } from './generic-callbacks.zena';
+
+export function run(b: Boxf64, s: BoxStr, l: List<f64>): f64 {
+  let doubled = b.map<f64>((x: f64): f64 => x * 2.0);
+  let lengths = s.map<f64>((x: externref): f64 => 1.0);
+  l.forEach((x: f64, all: List<f64>): void => {});
+  let above = l.map<boolean>((x: f64, i: f64): boolean => x > i);
+  let found = l.find((x: f64): boolean => x > 1.0);
+  l.sort((a: f64, b: f64): f64 => a - b);
+  l.sort(null);
+  let pairs = l.pairs();
+  let same = l.wrap((x: f64): List<f64> => l);
+  each<f64>(l, (x: f64): void => {});
+  return 0.0;
+}
