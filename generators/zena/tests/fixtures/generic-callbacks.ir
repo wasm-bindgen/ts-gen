@@ -1,0 +1,18 @@
+ir 1;
+
+class Box<T in (Str, f64)> {
+  new(value: T) throws;
+  get(): T throws;
+  map<U>(f: fn(T) -> U): Box<U> throws;
+}
+
+class List<T> {
+  forEach(f: fn(T, List<T>));
+  map<U>(f: fn(T, f64) -> U): List<U>;
+  find(f: fn(T) -> bool): T?;
+  sort(compare: (fn(T, T) -> f64)?);
+  pairs(): List<Tuple<T, f64>>;
+  wrap(f: fn(T) -> List<T>): List<T>;
+}
+
+each<T>(items: List<T>, f: fn(T) throws);

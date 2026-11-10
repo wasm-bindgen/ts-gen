@@ -2,7 +2,7 @@
 
 Generate bindings from TypeScript `.d.ts` declaration files: Rust for
 [`wasm-bindgen`](https://github.com/wasm-bindgen/wasm-bindgen), and, through
-the ts-gen IR and the `tw` bridge, other Wasm languages.
+the ts-gen IR and the `tw` bridge, Kotlin/Wasm and Zena.
 
 ## Overview
 
@@ -13,7 +13,7 @@ language can bind against.
 
 ```text
 .d.ts -ts-gen-------> Rust (#[wasm_bindgen])
-.d.ts -ts-gen --ir--> app.ir -ts-gen-abi lower-> JSON -> language bindings -> app.wasm
+.d.ts -ts-gen --ir--> app.ir -ts-gen-abi lower-> JSON -> Kotlin / Zena bindings -> app.wasm
                       app.ir + app.wasm -ts-gen-bridge-> bridge.js + bridge.wasm
 ```
 
@@ -49,15 +49,39 @@ validates values, dispatches overloads and maps errors, and exports the
 IR's exports as JS classes and functions. `bridge.wasm` translates GC values
 that JS can't read. See [bridge/README.md](bridge/README.md).
 
+## Languages
+
+| language | profile | generator | status |
+|---|---|---|---|
+| Rust | wasm-bindgen | `ts-gen` (this crate) | the CLI below; every type read from the IR |
+| Kotlin/Wasm | `all-host, results = single, throws = js` | [generators/kotlin](generators/kotlin) | imports, exports and async, through the bridge |
+| Zena | `all-gc` with host strings | [generators/zena](generators/zena) | imports, monomorphized generics |
+
+**Kotlin**: `ts-gen-kotlin <lowered.json> <out-dir> [--package <pkg>]
+[--runtime]` writes Kotlin externals from `ts-gen-abi lower`'s JSON. It also
+writes a `links.tsv` for `ts-gen-bridge link`, since Kotlin names its own
+imports. Build the generator with `./gradlew installDist` in
+`generators/kotlin` (JDK 21). [examples/kotlin-worker](examples/kotlin-worker)
+runs a Worker end to end.
+
+**Zena**: `ts-gen-zena <input.ir> [-o <out.zena>]` writes `@external`
+declarations. They need the Zena compiler fork with the `tw` option on
+`@external`.
+
 ## Development
 
 ```sh
 just test          # unit, snapshot and bridge runtime tests (Node 26)
+just test-kotlin   # the Kotlin generator: snapshots, Kotlin/Wasm compiles, runtime (JDK 21, Node 26)
+just test-zena     # the Zena generator; compiles with ZENA=<zena-cli> ZENA_REPO_ROOT=<checkout>
 just test-integration  # wasm-bindgen integration (wasm32 target, wasm-bindgen-cli)
 just fmt-check && just clippy
 ```
 
-`BLESS=1` re-blesses snapshots.
+`just test` runs the Kotlin and Zena tests too when their tools are present,
+and skips them otherwise. Under `CI` a missing tool is a failure, unless
+`TSGEN_SKIP_KOTLIN` or `TSGEN_SKIP_ZENA` is set. The main CI job sets both,
+and separate jobs run each toolchain. `BLESS=1` re-blesses snapshots.
 
 ## Rust (wasm-bindgen)
 

@@ -19,15 +19,23 @@ fmt-check:
 clippy:
     cargo +stable clippy --no-deps --workspace --all-features --exclude ts-gen-integration-tests -- -D warnings
 
-# Run the unit, snapshot and bridge runtime tests (Node 26)
+# Run the unit, snapshot and runtime tests (Node 26; TSGEN_SKIP_KOTLIN / TSGEN_SKIP_ZENA skip those toolchains)
 test *ARGS="":
-    RUST_BACKTRACE=1 cargo +stable test -p ts-gen -p ts-gen-abi -p ts-gen-bridge {{ARGS}}
+    RUST_BACKTRACE=1 cargo +stable test -p ts-gen -p ts-gen-abi -p ts-gen-bridge -p ts-gen-zena {{ARGS}}
 
 # Run the bridge microbenchmarks (Node 26; BENCH=<dir> filters) and print a ns/op table
 bench:
     rm -f target/tmp/bench/results.jsonl
     cargo +stable test -q -p ts-gen-bridge --test bridge -- --ignored bench --nocapture
     python3 bridge/benches/table.py target/tmp/bench/results.jsonl
+
+# Run the Kotlin generator tests: snapshots, Kotlin/Wasm compiles and runtime (requires a JDK + Node 26)
+test-kotlin *ARGS="":
+    RUST_BACKTRACE=1 cargo +stable test -p ts-gen --test kotlin {{ARGS}}
+
+# Run the Zena generator tests; ZENA (a zena-cli) and ZENA_REPO_ROOT enable the compile checks (requires Node 26)
+test-zena *ARGS="":
+    RUST_BACKTRACE=1 cargo +stable test -p ts-gen-zena {{ARGS}}
 
 # List, per fixture and configuration, the types the IR zip reads from the parse, into target/zip-diffs
 zip-diffs:
@@ -50,7 +58,7 @@ zip-diffs:
 
 # Re-bless all snapshots
 test-overwrite:
-    RUST_BACKTRACE=1 BLESS=1 cargo +stable test -p ts-gen
+    RUST_BACKTRACE=1 BLESS=1 cargo +stable test -p ts-gen -p ts-gen-zena
 
 # Run wasm-bindgen integration tests (requires wasm32-unknown-unknown target + Node)
 # package.json must live alongside the crate's Cargo.toml: wasm-bindgen-test-runner

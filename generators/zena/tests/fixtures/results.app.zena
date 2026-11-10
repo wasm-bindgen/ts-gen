@@ -1,0 +1,27 @@
+// The app behind tests/fixtures/results.ir's exports.
+import { Shape, ShapeLabel, ShapeRadius } from './results.zena';
+
+export function half(n: f64): Option<f64> {
+  if (n > 0.0) {
+    return new Some<f64>(n / 2.0);
+  }
+  return new None<f64>();
+}
+
+export function pair(n: f64): (f64, String) {
+  return (n, "n");
+}
+
+export function shape(round: boolean): Shape {
+  if (round) {
+    return new ShapeRadius(1.0);
+  }
+  return new ShapeLabel("square");
+}
+
+export function maybeShape(n: f64): Shape | null {
+  if (n > 0.0) {
+    return new ShapeRadius(n);
+  }
+  return null;
+}

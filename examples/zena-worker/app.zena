@@ -1,0 +1,123 @@
+// The worker: the default export's fetch, over the generated bindings.
+// Replies with the request's method, URL, `x-zena` header and body, and
+// the GREETING binding. Host strings are JS strings, so nothing is
+// copied.
+//
+// Along the way it lists the `x-` headers through a `forEach` callback,
+// waits for a `queueMicrotask` callback, catches the `TypeError` a bad
+// `URL` throws and the rejection of a fetch of one, and, given an
+// `x-hang` URL, races a fetch of it against a timeout, which cancels the
+// fetch. `/fail` rejects with a `TypeError` of its own.
+import { Future, Completer, TaskGroup } from 'zena:async';
+import { div } from 'zena:math';
+import {
+  BodyInitStr, DurableObjectState, Env, ErrArm, ErrException, URL, ExecutionContext, Headers, HeadersInitHeaders,
+  IncomingRequestCfProperties, Request, CfProperties, Response, ResponseInit,
+  RequestInfoStr, StrOrURLStr, fetch as jsFetch, fetchWithInit, queueMicrotask, scheduler
+} from './bindings.zena';
+
+function microtask(): Future<void> {
+  let done = new Completer<void>();
+  queueMicrotask((): externref | null => {
+    done.complete();
+    return null;
+  });
+  return done.future;
+}
+
+async function hang(url: String): Future<String> {
+  await fetchWithInit(new RequestInfoStr(url), null);
+  return "responded";
+}
+
+async function timeout(ms: f64): Future<String> {
+  await scheduler().wait(ms);
+  return "timed out";
+}
+
+export async function fetch(
+    request: Request<externref | null, IncomingRequestCfProperties<externref | null>>,
+    env: Env, ctx: ExecutionContext<externref | null>): Future<Response> {
+  if (request.url.endsWith("/fail")) {
+    throw new ErrException(ErrArm.TypeError, "zena says no");
+  }
+  if (request.url.endsWith("/count")) {
+    return await env.COUNTER.getByName("counter").fetch(new RequestInfoStr(request.url));
+  }
+  let body = await request.text();
+  await microtask();
+  var names = "";
+  request.headers.forEach<externref>((value: String, name: String, h: Headers): void => {
+    if (name.startsWith("x-")) {
+      names = names + " " + name;
+    }
+  });
+  let invalid = try {
+    new URL(new StrOrURLStr("not a url"));
+    "nothing"
+  } catch (e) {
+    if (e is ErrException && e.arm == ErrArm.TypeError) "TypeError" else "other"
+  };
+  let caught = try {
+    await jsFetch(new RequestInfoStr("not a url"));
+    "nothing"
+  } catch (e) {
+    e.message
+  };
+  var race = "(no x-hang)";
+  let hangUrl = request.headers.get("x-hang");
+  if (hangUrl != null) {
+    let url = hangUrl as String;
+    let bodies = new Array<() => Future<String>>();
+    bodies.push(() => hang(url));
+    bodies.push(() => timeout(5.0));
+    race = await TaskGroup.race<String>(bodies);
+  }
+  let header = request.headers.get("x-zena");
+  let greeting = env.GREETING;
+  let reply = request.method + " " + request.url + "\n" +
+    "x-zena: " + (if (header == null) "(none)" else header) + "\n" +
+    "body: " + body + "\n" +
+    "headers:" + names + "\n" +
+    "invalid URL: " + invalid + "\n" +
+    "caught: " + caught + "\n" +
+    "race: " + race + "\n" +
+    "GREETING: " + greeting + "\n";
+  let headers = new Headers();
+  headers.set("content-type", "text/plain; charset=utf-8");
+  let init = new ResponseInit();
+  init.setStatus(200.0);
+  init.setHeaders(new HeadersInitHeaders(headers));
+  return new Response.newWithBodyAndInit(new BodyInitStr(reply), init);
+}
+
+// Zena's i32ToString imports a host formatter; the bridge provides only
+// tw imports.
+function decimal(n: i32): String {
+  let digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  var out = digits[n % 10];
+  var rest = div(n, 10);
+  while (rest > 0) {
+    out = digits[rest % 10] + out;
+    rest = div(rest, 10);
+  }
+  return out;
+}
+
+/** The Durable Object: replies with how many requests it has served. */
+export class Counter {
+  var #count: i32 = 0;
+
+  new(ctx: DurableObjectState<externref | null>, env: Env) {
+    if (env.GREETING == "") {
+      throw new Error("no greeting");
+    }
+  }
+
+  async fetch(request: Request<externref | null, CfProperties>): Future<Response> {
+    this.#count += 1;
+    await microtask();
+    return new Response.newWithBodyAndInit(
+      new BodyInitStr("count: " + decimal(this.#count) + "\n"), new ResponseInit());
+  }
+}
