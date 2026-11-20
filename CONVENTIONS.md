@@ -3800,13 +3800,14 @@ Derived & any                        -> any
 Derived & Unrelated                  -> JsValue     (no member subtypes the other)
 ```
 
-The IR reads an intersection as its first named member. A read takes
-that part (`Derived & Unrelated` reads as `Derived`). A write must be
-every part, so it takes the member that is every other, wherever it's
-listed (`Base & Derived` writes `Derived`, and `D1Meta & Record<string,
-unknown>` writes `D1Meta`, as every object is an open record). With no
-such member it erases to `JsValue`, with a warning at the parameter or
-setter, a static one too:
+The IR reads an intersection as the member that is every other, wherever
+it's listed (`Base & Derived` is `Derived`), and with none as its first
+named member. A read takes that part (`Derived & Unrelated` reads as
+`Derived`). A write must be every part, so it takes the member that is
+every other (`Base & Derived` writes `Derived`, and `D1Meta &
+Record<string, unknown>` writes `D1Meta`, as every object is an open
+record). With no such member it erases to `JsValue`, with a warning at
+the parameter or setter, a static one too:
 
 ```rust
 pub fn covered(this: &Store, value: &Derived); // `value: Base & Derived`
@@ -5360,7 +5361,8 @@ lists them for workers-types. The kinds are:
     a value named as a type.
   * Type parameters of a generic `--provides` class.
 * **Narrowed**
-  * An intersection reads as its first named member alone.
+  * An intersection with no member that is every other (`Derived` of
+    `Base & Derived`) reads as its first named member alone.
   * A type parameter bounded by anything but a class, interface or enum
     is unbounded.
 * **Dropped**

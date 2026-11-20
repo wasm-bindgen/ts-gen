@@ -281,11 +281,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Shelf;
     #[wasm_bindgen(method, getter)]
-    pub fn top(this: &Shelf) -> Base;
+    pub fn top(this: &Shelf) -> Derived;
     #[wasm_bindgen(method, setter)]
     pub fn set_top(this: &Shelf, val: &Derived);
     # [wasm_bindgen (static_method_of = Shelf , getter)]
-    pub fn spare() -> Base;
+    pub fn spare() -> Derived;
     # [wasm_bindgen (static_method_of = Shelf , setter)]
     pub fn set_spare(val: &Derived);
     # [wasm_bindgen (static_method_of = Shelf , getter)]

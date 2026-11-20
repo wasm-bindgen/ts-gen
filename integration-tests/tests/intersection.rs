@@ -31,6 +31,8 @@ async fn intersection_bindings_compile(
     store.covered(derived);
     store.covered_with_again(derived, derived);
     shelf.set_top(derived);
+    let _: Derived = shelf.top();
+    let _: Derived = Shelf::spare();
     Shelf::set_spare(derived);
     Shelf::set_odd(&JsValue::NULL);
     store.unrelated(&JsValue::NULL);

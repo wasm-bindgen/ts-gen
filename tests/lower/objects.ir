@@ -1,4 +1,6 @@
 // `Streaming.Stream`: the literal type `true` widens to `bool`
+// `Board.None`: `Outline & Label` reads as `Outline` alone
+// `Board.Label`: `Label & Circle` reads as `Label` alone
 ir 1;
 
 interface Upload {
@@ -64,6 +66,38 @@ interface Headers2 {
 }
 
 search(s: Search, t: Streaming, h: PartialHeaders2) throws;
+
+interface Outline {
+  @js(object)
+  new();
+  get id(): str;
+  set id(value: str);
+}
+
+interface Circle extends Outline {
+  @js(object)
+  new();
+  get radius(): f64;
+  set radius(value: f64);
+}
+
+interface Label {
+  @js(object)
+  new();
+  get text(): str;
+  set text(value: str);
+}
+
+interface Board {
+  get first(): Circle;
+  set first(value: Circle);
+  get last(): Circle;
+  set last(value: Circle);
+  get none(): Outline;
+  set none(value: Outline);
+  put(circle: Circle): arr<Circle> throws;
+  put(circle: Circle, label: Label): arr<Circle> throws;
+}
 
 interface ListingItem {
   @js(object)

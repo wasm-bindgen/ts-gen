@@ -1429,6 +1429,11 @@ impl Lowerer<'_> {
         if let Some(elems) = elems.filter(|e| !e.is_empty()) {
             return abi::Type::Array(Box::new(self.intersection(&elems, cx)));
         }
+        if let Some(whole) = self.covering_part(items, cx) {
+            if let t @ abi::Type::Named(_) = self.ty(whole, cx) {
+                return t;
+            }
+        }
         let spelled = TypeRef::Intersection(items.to_vec()).format_ts();
         for i in items {
             if let t @ abi::Type::Named(_) = self.ty(i, cx) {
@@ -1447,6 +1452,45 @@ impl Lowerer<'_> {
             cx.location()
         ));
         abi::Type::Any
+    }
+
+    /// The part of an intersection that is every other: a class or
+    /// interface that is, or extends, each of the rest (`Derived` of
+    /// `Base & Derived`).
+    fn covering_part<'t>(&self, items: &'t [TypeRef], cx: &Tcx) -> Option<&'t TypeRef> {
+        let ids: Vec<TypeId> = items
+            .iter()
+            .map(|i| match i {
+                TypeRef::Reference {
+                    segments,
+                    generic_args,
+                } if generic_args.is_empty() => self.resolve_id(segments, cx),
+                _ => None,
+            })
+            .collect::<Option<_>>()?;
+        let whole = ids
+            .iter()
+            .position(|&id| ids.iter().all(|&part| self.extends_decl(id, part, 0)))?;
+        Some(&items[whole])
+    }
+
+    /// Whether the declaration `sub` is `sup` or extends it.
+    fn extends_decl(&self, sub: TypeId, sup: TypeId, depth: usize) -> bool {
+        if sub == sup {
+            return true;
+        }
+        let parents: Vec<&crate::ir::Heritage> = match &self.gctx.get_type(sub).kind {
+            TypeKind::Class(c) => c.extends.iter().collect(),
+            TypeKind::Interface(i) => i.extends.iter().collect(),
+            _ => return false,
+        };
+        depth < 32
+            && parents.iter().any(|h| match &h.type_ref {
+                TypeRef::Reference { segments, .. } => self
+                    .resolve_id(segments, &Tcx::new(h.scope, &Place::default(), ""))
+                    .is_some_and(|parent| self.extends_decl(parent, sup, depth + 1)),
+                _ => false,
+            })
     }
 
     pub(crate) fn fn_type(&mut self, sig: &FunctionSig, cx: &Tcx) -> abi::FnType {

@@ -136,6 +136,78 @@ fun Headers2.setX_custom_cost(value: String) {
     fixtures.objects.flat.Headers2_set_x_custom_cost_str(this, value.toJsString())
 }
 
+external interface Outline : JsAny
+
+var Outline.id: String
+    get() {
+        val r0 = fixtures.objects.flat.Outline_get_id(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+    set(value) {
+        fixtures.objects.flat.Outline_set_id_str(this, value.toJsString())
+    }
+
+external interface Circle : Outline
+
+var Circle.radius: Double
+    get() {
+        val r0 = fixtures.objects.flat.Circle_get_radius(this)
+        return r0
+    }
+    set(value) {
+        fixtures.objects.flat.Circle_set_radius_f64(this, value)
+    }
+
+external interface Label : JsAny
+
+var Label.text: String
+    get() {
+        val r0 = fixtures.objects.flat.Label_get_text(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+    set(value) {
+        fixtures.objects.flat.Label_set_text_str(this, value.toJsString())
+    }
+
+external interface Board : JsAny
+
+var Board.first: Circle
+    get() {
+        val r0 = fixtures.objects.flat.Board_get_first(this)
+        return r0!!.unsafeCast<Circle>()
+    }
+    set(value) {
+        fixtures.objects.flat.Board_set_first_Circle(this, value)
+    }
+
+var Board.last: Circle
+    get() {
+        val r0 = fixtures.objects.flat.Board_get_last(this)
+        return r0!!.unsafeCast<Circle>()
+    }
+    set(value) {
+        fixtures.objects.flat.Board_set_last_Circle(this, value)
+    }
+
+var Board.none: Outline
+    get() {
+        val r0 = fixtures.objects.flat.Board_get_none(this)
+        return r0!!.unsafeCast<Outline>()
+    }
+    set(value) {
+        fixtures.objects.flat.Board_set_none_Outline(this, value)
+    }
+
+fun Board.put(circle: Circle): List<Circle> {
+    val r0 = try { fixtures.objects.flat.Board_put_Circle(this, circle) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<JsArray<Circle>>().let { a -> a.toList() }
+}
+
+fun Board.put(circle: Circle, label: Label): List<Circle> {
+    val r0 = try { fixtures.objects.flat.Board_put_Circle_Label(this, circle, label) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<JsArray<Circle>>().let { a -> a.toList() }
+}
+
 external interface ListingItem : JsAny
 
 var ListingItem.id: String
@@ -396,6 +468,21 @@ fun Headers2(): Headers2 {
 
 fun search(s: Search, t: Streaming, h: PartialHeaders2) {
     try { fixtures.objects.flat.search_Search_Streaming_PartialHeaders2(s, t, h) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+fun Outline(): Outline {
+    val r0 = fixtures.objects.flat.Outline_new()
+    return r0!!.unsafeCast<Outline>()
+}
+
+fun Circle(): Circle {
+    val r0 = fixtures.objects.flat.Circle_new()
+    return r0!!.unsafeCast<Circle>()
+}
+
+fun Label(): Label {
+    val r0 = fixtures.objects.flat.Label_new()
+    return r0!!.unsafeCast<Label>()
 }
 
 fun ListingItem(): ListingItem {
