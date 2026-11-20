@@ -317,6 +317,9 @@ fn whole(cx: &Cx<'_>, t: &abi::Type) -> bool {
         abi::Type::Nullable(t, _) => t,
         t => t,
     };
+    if *t == abi::Type::Buffer {
+        return true;
+    }
     let abi::Type::Named(r) = t else {
         return false;
     };
@@ -348,6 +351,7 @@ fn whole(cx: &Cx<'_>, t: &abi::Type) -> bool {
                 abi::Type::Scalar(_)
                 | abi::Type::ScalarBox(_)
                 | abi::Type::Str
+                | abi::Type::Buffer
                 | abi::Type::StrBox => true,
                 abi::Type::Named(r) => {
                     r.args.is_empty()
@@ -371,6 +375,9 @@ fn members(cx: &Cx<'_>, t: &abi::Type) -> Option<Vec<TypeRef>> {
             .map(|a| TypeRef::union([a.clone(), TypeRef::Undefined]));
         return Some(arms.iter().cloned().chain(omitted).collect());
     }
+    if *t == abi::Type::Buffer {
+        return buffer_handles(cx);
+    }
     let abi::Type::Named(r) = t else {
         return None;
     };
@@ -385,16 +392,45 @@ fn members(cx: &Cx<'_>, t: &abi::Type) -> Option<Vec<TypeRef>> {
         },
     )
     .ok()?;
-    flat.arms
+    let arms = flat
+        .arms
         .iter()
         .map(|a| match &a.arm.payload[..] {
-            [] => a.arm.meta.attrs.js.iter().find_map(|e| match e {
+            [] => Some(vec![a.arm.meta.attrs.js.iter().find_map(|e| match e {
                 abi::JsEntry::Literal(s) => Some(TypeRef::StringLiteral(s.clone())),
                 _ => None,
-            }),
-            [p] => ty(cx, p),
+            })?]),
+            [abi::Type::Buffer] => buffer_handles(cx),
+            [p] => Some(vec![ty(cx, p)?]),
             _ => None,
         })
+        .collect::<Option<Vec<_>>>()?;
+    Some(arms.into_iter().flatten().collect())
+}
+
+/// Whether `t` is the two classes of a `buffer`, in either order.
+pub fn buffer_pair(t: &TypeRef) -> bool {
+    let is = |m: &TypeRef, name: &str| match m {
+        TypeRef::ArrayBufferView => name == "ArrayBufferView",
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => generic_args.is_empty() && segments.len() == 1 && segments[0] == name,
+        _ => false,
+    };
+    let TypeRef::Union(u) = t else {
+        return false;
+    };
+    matches!(u.members(), [a, b]
+        if is(a, "ArrayBuffer") && is(b, "ArrayBufferView")
+            || is(a, "ArrayBufferView") && is(b, "ArrayBuffer"))
+}
+
+/// The two classes a `buffer` is one of, which Rust takes each as itself.
+fn buffer_handles(cx: &Cx<'_>) -> Option<Vec<TypeRef>> {
+    ts_gen_abi::union::BUFFER_HANDLES
+        .iter()
+        .map(|n| named(cx, &abi::Path::new([*n])))
         .collect()
 }
 
@@ -503,6 +539,14 @@ fn ty(cx: &Cx<'_>, t: &abi::Type) -> Option<TypeRef> {
         T::Str => TypeRef::String,
         T::Any => TypeRef::Any,
         T::Scalar(s) => scalar(*s)?,
+        T::Buffer => TypeRef::union(buffer_handles(cx)?),
+        T::View {
+            mutable: false,
+            elem,
+        } if **elem == T::Buffer => TypeRef::TypedSlice(
+            crate::ir::TypedArrayElement::U8,
+            crate::ir::SharedMemory::Accepted,
+        ),
         // `any` already holds `null` and `undefined`.
         T::Nullable(inner, _) if **inner == T::Any => TypeRef::Any,
         // A three-state read, `x?: T | null`.

@@ -728,6 +728,12 @@ impl<'a> Parser<'a> {
     fn prefix(&mut self) -> Res<Type> {
         if self.eat("*") {
             let mutable = self.eat_kw("mut");
+            if !mutable && self.eat_kw("buffer") {
+                return Ok(Type::View {
+                    mutable,
+                    elem: Box::new(Type::Buffer),
+                });
+            }
             let elem = self.whole_vec(if mutable { "*mut" } else { "*" })?;
             return Ok(Type::View { mutable, elem });
         }
@@ -820,6 +826,7 @@ impl<'a> Parser<'a> {
             "unit" => Some(Type::Unit),
             "never" => Some(Type::Never),
             "str" => Some(Type::Str),
+            "buffer" => Some(Type::Buffer),
             "Str" => Some(Type::StrBox),
             "bigint" => Some(Type::BigInt),
             "BigInt" => Some(Type::BigIntBox),

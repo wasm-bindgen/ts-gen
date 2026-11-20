@@ -145,6 +145,7 @@ an opaque value the bridge hasn't converted
 | `str` | `Str` | string | |
 | `T[]` | `Vec<T>` | typed array | `T` is a typed-array element type |
 | `arr<T>` | `Arr<T>` | Array | any element type |
+| `buffer` | — | `ArrayBuffer` or any view of one | its bytes ([§11](#11-sequences-and-memory)) |
 | `(A, B, …)` | `Tuple<A, B, …>` | fixed-length Array | `(A,)` is a one-tuple; `()` is invalid |
 | `enum` path | itself, as a type argument | per arm | the box is the arm's host value ([§13](#13-boxes-reference-wire-types-and-generics)) |
 | class or interface path | itself | the object | always a reference |
@@ -152,7 +153,7 @@ an opaque value the bridge hasn't converted
 | std `Symbol` | itself | symbol | a class the bridge tests with `typeof === "symbol"`, not `instanceof` |
 | `future<T>`, `future<T, E>` | — | Promise | [§16](#16-async) |
 | `fn(A, …) -> R throws E`, `fn(A, ...arr<T>)` | — | function | [§18](#18-callbacks) |
-| `*T[]`, `*mut T[]` | — | typed array over the memory | zero-copy view, import parameters only ([§11](#11-sequences-and-memory)) |
+| `*T[]`, `*mut T[]`, `*buffer` | — | typed array over the memory | zero-copy view, import parameters only ([§11](#11-sequences-and-memory)) |
 | `mut T[]` | — | typed array | writeback, parameters only |
 | type parameter `T` | — | per instantiation | [§13](#13-boxes-reference-wire-types-and-generics) |
 | associated type | — | per instantiation | [§13](#13-boxes-reference-wire-types-and-generics) |
@@ -193,7 +194,7 @@ an opaque value the bridge hasn't converted
   operand of a postfix operator it's parenthesized, `(@js(null) T?)[]`.
 * `*`, `*mut` and `mut` are prefixes that apply only to a whole `T[]`, and
   to nothing else: `*u8[]` is a view, not an array of pointers, and `*u8`
-  is a syntax error.
+  is a syntax error. `*buffer` is the one other view.
 
 * `?` is invalid on `*T[]` and `*mut T[]`. `mut T[]?` is allowed and uses
   the `T[]?` encoding ([§11](#11-sequences-and-memory)); an absent value
@@ -554,6 +555,12 @@ class Response {
   payload is its type, several a tuple. Each such key is a valid import,
   `Response#new(str?)`, `Response#new(u8[]?)` and so on, generated only
   when a language imports it, as with mono instantiations (§13).
+* **Derived buffer variants.** A `buffer` parameter, `union` or not, and
+  a `buffer` payload an arm variant takes, can each take `ArrayBuffer` or
+  `ArrayBufferView` in its place, keeping its `?`s: the object itself,
+  which the bridge passes as it is ([§11](#11-sequences-and-memory)).
+  `Kv#put(str,buffer)` is so also `Kv#put(str,ArrayBuffer)` and
+  `Kv#put(str,ArrayBufferView)`, derived the same way.
 
 Validation:
 
@@ -802,6 +809,7 @@ Arm tests are derived from the arm type:
 | interface | non-null object |
 | `str`, numbers, `bool`, `i64`/`u64`, std `Symbol` | `typeof` (plus the scalar validation) |
 | `T[]` | `instanceof` the typed-array class |
+| `buffer` | `instanceof ArrayBuffer`, or `ArrayBuffer.isView` |
 | `arr<T>`, tuples | `Array.isArray` (plus length for tuples) |
 | `fn(...)` | `typeof === "function"` |
 | `future<T, E>` | thenable: `typeof v?.then === "function"` |
@@ -849,7 +857,8 @@ with `ZonedLike { Zoned(Zoned); ZonedFields(ZonedFields); Str(str); }` and
 
 This order is separate from index order: `BodyInit`'s `Blob` arm (a class)
 is tested before its `ArrayBufferView` arm (an interface) even when it's
-declared after it.
+declared after it. A `buffer` arm is tested after the classes, since it
+takes every view class, and before the interfaces.
 
 Arm tests are dispatch, not validation, so they run even with validation
 disabled. Tagged unions (`@js(when)`) are deferred.
@@ -1116,6 +1125,32 @@ For `size(): u53`, a JS result of `2 ** 53` is a `TypeError`. For
   makes the call, and copies back over the same storage.
 * `*T[]` and `*mut T[]` (import parameters only) are zero-copy **views**
   ([below](#views-t-and-mut-t)).
+* `buffer` is a JS `ArrayBuffer` or any view of one (a typed array or a
+  `DataView`), and the language's bytes: it's laid out as `u8[]`, in every
+  position a `u8[]` is.
+
+  ```ts
+  class Kv {
+    put(key: str, value: buffer);
+    get(key: str): buffer?;
+  }
+  ```
+
+  * JS → language the bridge takes either, as a fresh copy of its bytes: a
+    view gives exactly its window (`byteOffset`, `byteLength`), whatever its
+    element type, and anything else is a `TypeError`.
+  * Language → JS the bytes are a fresh `Uint8Array`.
+  * `*buffer` (import parameters only) is the bytes as a zero-copy
+    `Uint8Array` over the memory, a view like `*u8[]`.
+  * It is exactly `ArrayBuffer | ArrayBufferView`, and nothing is lost by
+    it: a parameter takes either class as the object itself through its
+    derived variants ([§7](#7-overloads-and-the-js-call-dsl)), every one
+    the same JS call, and a consumer may read it back as the two classes.
+    A producer writes it wherever a union holds both, whatever else the
+    union holds; `ArrayBuffer` alone, or a typed array alone, stays its
+    class.
+  * It has no box, so it isn't a type argument: there the two classes
+    stay an enum.
 * `Uint8Array`, `ArrayBuffer`, `DataView`, `Uint8ClampedArray` and the other
   buffer types are ordinary classes (externref). They convert to and from
   memory through `("tw:box", T[])` and `("tw:unbox", T[])`
@@ -2362,9 +2397,9 @@ tparams     = "<" tparam ("," tparam)* ">"
 tparam      = ident (":" type | "in" "(" type ("," type)* ")")? ("=" type)?
 type        = "@js" "(" "null" ")" type | prefix postfix*  // the attribute needs a `T?`
 postfix     = "?" | "[" "]"
-prefix      = "*" "mut"? primary "[" "]" | "mut" primary "[" "]" | fntype | primary
+prefix      = "*" "mut"? primary "[" "]" | "*" "buffer" | "mut" primary "[" "]" | fntype | primary
 fntype      = "fn" "(" ((type ",")* "..."? type)? ")" ("->" type)? throws?
-primary     = scalar | "bigint" | "str" | "unit" | "never" | "Any" | box
+primary     = scalar | "bigint" | "str" | "buffer" | "unit" | "never" | "Any" | box
             | "arr" "<" type ">" | "future" "<" type ("," path)? ">"
             | "(" type ")" | "(" type "," ")" | "(" type ("," type)+ ")"
             | typeref

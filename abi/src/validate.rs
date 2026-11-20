@@ -1442,6 +1442,7 @@ impl<'a> Validator<'a> {
             | Type::StrBox
             | Type::BigInt
             | Type::BigIntBox
+            | Type::Buffer
             | Type::UnitBox => {}
             Type::Vec(e) | Type::VecBox(e) => self.element(t, e, cx, span),
             Type::MutVec(e) => {
@@ -1512,6 +1513,9 @@ impl<'a> Validator<'a> {
         if matches!(e, Type::Scalar(s) if is_vec_element(*s)) {
             return;
         }
+        if matches!(seq, Type::View { mutable: false, .. }) && *e == Type::Buffer {
+            return;
+        }
         self.ty(e, Pos::Inner, cx, span);
         let e = crate::text::print_type(e);
         let arr = match seq {
@@ -1529,6 +1533,12 @@ impl<'a> Validator<'a> {
 
     fn named(&self, r: &'a TypeRef, cx: &Context<'a>, span: Span) {
         for a in &r.args {
+            if crate::union::is_buffer(a) {
+                self.err(
+                    span,
+                    "`buffer` has no box, so it isn't a type argument".to_string(),
+                );
+            }
             self.ty(a, Pos::Inner, cx, span);
         }
         if let [head, _, ..] = r.path.segments.as_slice() {

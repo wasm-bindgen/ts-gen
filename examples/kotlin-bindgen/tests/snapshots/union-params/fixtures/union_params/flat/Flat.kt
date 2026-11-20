@@ -139,6 +139,91 @@ external fun Universal_set_cache_bool(p0: JsAny?, p1: Int)
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun configure_Universal(p0: JsAny?)
 
+/** tw:js/global Box#set:value(T) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Box_set_value_T(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global Box#get:value() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Box_get_value(p0: JsAny?): JsAny?
+
+/** tw:js/global digest(buffer) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun digest_buffer(p0: JsAny?): JsAny?
+
+/** tw:js/global store(str,ValueKind) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun store_str_ValueKind(p0: JsAny?, p1: Int, p2: JsAny?)
+
+/** tw:js/global storeBlob(ValueKind2) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun storeBlob_ValueKind2(p0: Int, p1: JsAny?)
+
+/** tw:js/global load() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun load(): JsAny?
+
+/** tw:js/global loadText() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun loadText(): Int
+
+/** tw:future take<buffer> */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun take_buffer(p0: JsAny?): JsAny?
+
+/** tw:future error<err> */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun error_err(p0: JsAny?): Int
+
+/** tw:js/global join(arr<buffer>) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun join_arr_buffer(p0: JsAny?): JsAny?
+
+/** tw:js/global boxed() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun boxed(): JsAny?
+
+/**
+ * * `data`
+ */
+/** tw:js/global hash(buffer) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun hash_buffer(p0: JsAny?)
+
+/**
+ * * `data`
+ */
+/** tw:js/global hashText(str) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun hashText_str(p0: JsAny?)
+
+/**
+ * * `data`
+ */
+/** tw:js/global hashText(buffer) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun hashText_buffer(p0: JsAny?)
+
+/** tw:js/global Frame.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun Frame_new(): JsAny?
+
+/** tw:js/global Frame#set:payload(buffer) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Frame_set_payload_buffer(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global Frame#get:payload() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Frame_get_payload(p0: JsAny?): JsAny?
+
+/** tw:js/global Frame#get:tag() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Frame_get_tag(p0: JsAny?): Int
+
+/** tw:js/global Frame#set:tag(BufferOrStr) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun Frame_set_tag_BufferOrStr(p0: JsAny?, p1: Int, p2: JsAny?)
+
 /** tw:err set:err */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun err_set_err(p0: Int, p1: JsAny?)
@@ -202,4 +287,36 @@ external fun ret_f64(): Double
 /** tw:box VKind */
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_VKind(p0: Int, p1: JsAny?, p2: Double): JsAny?
+
+/** tw:unbox ValueKind */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_ValueKind(p0: JsAny?): Int
+
+/** tw:box ValueKind */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_ValueKind(p0: Int, p1: JsAny?): JsAny?
+
+/** tw:unbox ValueKind2 */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_ValueKind2(p0: JsAny?): Int
+
+/** tw:box ValueKind2 */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_ValueKind2(p0: Int, p1: JsAny?): JsAny?
+
+/** tw:unbox BufferOrStr */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_BufferOrStr(p0: JsAny?): Int
+
+/** tw:box BufferOrStr */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_BufferOrStr(p0: Int, p1: JsAny?): JsAny?
+
+/** tw:unbox BufferSource */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_BufferSource(p0: JsAny?): Int
+
+/** tw:box BufferSource */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_BufferSource(p0: Int, p1: JsAny?): JsAny?
 

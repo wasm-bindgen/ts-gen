@@ -65,3 +65,25 @@ fn generic_array_spellings_lower_like_arrays() {
         wasm_bindgen::JsCast::unchecked_into(js_sys::Array::from_iter([JsString::from("h")]));
     assert_eq!(array_like(&handle), "Array(h)");
 }
+
+#[wasm_bindgen_test]
+fn a_buffer_is_written_as_either_class() {
+    let bytes = Uint8Array::new_from_slice(&[1, 2]);
+    assert_eq!(hash(&bytes), "Uint8Array(1,2)");
+    assert_eq!(hash(bytes.buffer()), "ArrayBuffer(1,2)");
+    assert_eq!(peek(&bytes), "Uint8Array(1,2)");
+    assert_eq!(store("k", "v"), "k=v");
+    assert_eq!(
+        store_with_array_buffer("k", &bytes.buffer()),
+        "k=ArrayBuffer(1,2)"
+    );
+    assert_eq!(store_with_typed_array("k", &bytes), "k=Uint8Array(1,2)");
+    assert!(matches!(
+        echo(&bytes.buffer()),
+        EchoReturnKind::ArrayBuffer(b) if b.byte_length() == 2
+    ));
+    assert!(matches!(
+        echo_with_typed_array(&bytes),
+        EchoReturnKind::Uint8Array(b) if b.to_vec() == [1, 2]
+    ));
+}

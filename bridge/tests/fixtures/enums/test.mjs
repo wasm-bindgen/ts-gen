@@ -8,7 +8,7 @@ class Probe {
     this.next = undefined;
   }
 }
-for (const m of ["method", "optMethod", "mode", "flags", "optFlags", "small", "body", "optBody", "value", "strict", "maybe", "arg", "unit", "time", "gapped"]) {
+for (const m of ["method", "optMethod", "mode", "flags", "optFlags", "small", "body", "optBody", "data", "value", "strict", "maybe", "arg", "unit", "time", "gapped"]) {
   Probe.prototype[m] = function (v) {
     this.seen.push(v);
     return this.next;
@@ -85,6 +85,23 @@ L.balanced(() => {
 L.throwsType(() => call("Probe#body(Body)", 5, 1, 1, 0, null), /Body/);
 L.throwsType(() => call("Probe#body(Body)", new Request(), 1, 1, 0, null), /Body/);
 assert.deepEqual(call("Probe#optBody(Body?)", null, 0, 0, 0, null), [0, 0, 0, null]);
+// A `buffer` arm takes an `ArrayBuffer` or any view, as its bytes.
+for (const [v, bytes] of [[new ArrayBuffer(2), 2], [new Float64Array(1), 8], [new DataView(new ArrayBuffer(4), 1), 3]]) {
+  L.balanced(() => {
+    const [arm, ptr, len] = call("Probe#data(Data)", v, 1, 1, 0);
+    assert.equal(p.seen.pop(), "");
+    assert.equal(arm, 2);
+    assert.equal(L.take(ptr, len).length, bytes);
+  });
+}
+L.balanced(() => {
+  const [arm, ptr, len] = call("Probe#data(Data)", "s", 1, 1, 0);
+  assert.equal(p.seen.pop(), "");
+  assert.equal(arm, 1);
+  assert.equal(L.takeStr(ptr, len), "s");
+});
+L.throwsType(() => call("Probe#data(Data)", 5, 1, 1, 0), /Data/);
+p.seen.pop();
 assert.equal(seen(), undefined);
 
 // Discrimination order, nested enums, multi-payload arms, and a payload fallback.

@@ -125,7 +125,7 @@ class Counter(private val ctx: DurableObjectState<JsAny?>, private val env: Env)
     }
 
     suspend fun webSocketMessage(ws: WebSocket, message: std.ArrayBuffer) {
-        ws.send(message)
+        ws.send(std.Uint8Array(message).bytes())
     }
 }
 

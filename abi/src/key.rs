@@ -131,6 +131,7 @@ impl<'a> Keys<'a> {
             Type::ScalarBox(s) => s.box_name().into(),
             Type::StrBox => "Str".into(),
             Type::BigInt => "bigint".into(),
+            Type::Buffer => "buffer".into(),
             Type::BigIntBox => "BigInt".into(),
             Type::UnitBox => "Unit".into(),
             Type::Vec(t) => format!("{}[]", self.operand(t, cx)),
@@ -160,6 +161,7 @@ impl<'a> Keys<'a> {
                 s.push_str(&self.throws(&f.throws, cx));
                 s
             }
+            Type::View { elem, .. } if **elem == Type::Buffer => "*buffer".into(),
             Type::View { mutable, elem } => {
                 let m = if *mutable { "mut " } else { "" };
                 format!("*{m}{}", self.whole_vec(elem, cx))

@@ -67,6 +67,10 @@ enum DateUnitOrTimeUnit: (i32)
 import tw:js/global RequestInit#get:signal(): (externref) -> (externref)
 import tw:js/global RequestInit#set:signal(AbortSignal?): (externref, externref)
 
+## Sequence types
+import tw:js/global Kv#put(str,buffer): (externref, externref, (ref (array (mut i8))))
+import tw:js/global Kv#get(str): (externref, externref) -> ((ref null (array (mut i8))))
+
 ## Views: `*T[]` and `*mut T[]`
 import tw:js/global Crypto#getRandomValues(*mut u8[]): (externref, i32, i32)
 import tw:js/global GPUQueue#writeBuffer(GPUBuffer,u53,*u8[]): (externref, externref, i64, i32, i32)

@@ -192,6 +192,16 @@ pub(crate) fn lit(l: &Literal) -> String {
     }
 }
 
+/// `v` as the bytes of a `buffer`: a view over the object's byte window.
+fn bytes_of(v: &str, checked: bool) -> String {
+    match checked {
+        true => format!("$bytes({v})"),
+        false => format!(
+            "({v} instanceof ArrayBuffer ? new Uint8Array({v}) : ArrayBuffer.isView({v}) ? new Uint8Array({v}.buffer, {v}.byteOffset, {v}.byteLength) : new Uint8Array(0))"
+        ),
+    }
+}
+
 fn typed_array(s: Scalar) -> &'static str {
     match s {
         Scalar::I8 => "Int8Array",
@@ -493,6 +503,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 nullable,
                 writeback: false,
                 bigint: false,
+                ..
             } => {
                 let ta = typed_array(*elem);
                 if *nullable {
@@ -1112,10 +1123,13 @@ impl<'a, 'b> Glue<'a, 'b> {
                 carrier: Carrier::Host,
                 nullable,
                 writeback,
+                buffer,
                 ..
             } => {
                 let ta = typed_array(*elem);
-                let check = if m.checked {
+                let check = if *buffer {
+                    bytes_of(v, m.checked)
+                } else if m.checked {
                     format!("$typed({v}, {ta}, {what})")
                 } else {
                     format!("({v} instanceof {ta} ? {v} : new {ta}(0))")
@@ -1149,11 +1163,14 @@ impl<'a, 'b> Glue<'a, 'b> {
                 elem,
                 carrier,
                 nullable,
+                buffer,
                 ..
             } => {
                 let s = Space::of(*carrier);
                 let ta = typed_array(*elem);
-                let check = if m.checked {
+                let check = if *buffer {
+                    bytes_of(v, m.checked)
+                } else if m.checked {
                     format!("$typed({v}, {ta}, {what})")
                 } else {
                     format!("({v} instanceof {ta} ? {v} : new {ta}(0))")
@@ -1725,6 +1742,9 @@ impl<'a, 'b> Glue<'a, 'b> {
             // A `unit` value is ignored, not checked (§3).
             Kind::Unit => "true".into(),
             Kind::Vec { bigint: true, .. } => format!("typeof {v} === \"bigint\""),
+            Kind::Vec { buffer: true, .. } => {
+                format!("({v} instanceof ArrayBuffer || ArrayBuffer.isView({v}))")
+            }
             Kind::Vec { elem, .. } => format!("{v} instanceof {}", typed_array(*elem)),
             Kind::Array { .. } => format!("Array.isArray({v})"),
             Kind::Tuple { elems, .. } => {
