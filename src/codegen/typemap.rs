@@ -1383,6 +1383,17 @@ impl<'a> CodegenContext<'a> {
         self.name_ir_enum(key, scope, name);
     }
 
+    /// The IR's enum for a union of `members`, as `scope` reads them.
+    fn ir_enum_name(&self, members: &[TypeRef], scope: ScopeId) -> Option<String> {
+        let key: Vec<String> = members.iter().map(format_type_ref_key).collect();
+        let name = self.ir_enum_names.borrow().get(&key).cloned();
+        self.ir_enum_uses
+            .borrow()
+            .get(&(scope, key))
+            .cloned()
+            .or(name)
+    }
+
     fn name_ir_enum(&self, key: Vec<String>, scope: ScopeId, name: &str) {
         if let Some(site) = &*self.ir_site.borrow() {
             self.ir_enum_uses
@@ -2433,6 +2444,12 @@ pub fn to_syn_type(
         TypeRef::Array(inner) => {
             if pos.inner {
                 generic_container(quote! { Array }, inner, pos, ctx, scope, from_module)
+            } else if let Some(elem) = union_element(inner, pos, ctx, scope, from_module) {
+                if pos.is_argument() {
+                    quote! { &[#elem] }
+                } else {
+                    quote! { Vec<#elem> }
+                }
             } else {
                 let repr = ctx.and_then(|c| c.enum_repr(inner, scope));
                 let inner = repr.as_ref().unwrap_or(inner);
@@ -4554,6 +4571,55 @@ fn is_mono_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: Sco
                     Some(crate::parse::scope::Binding::TypeParam),
                 )
     )
+}
+
+/// Under per-monomorphization, the enum the IR names for a top-level `T[]`
+/// element that is a union, so the list can mix its arms. An element admitting
+/// empties takes its carrier: the read one in a `Vec`, the exact one in a
+/// slice, which has to choose what an empty crosses as.
+fn union_element(
+    elem: &TypeRef,
+    pos: TypePosition,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> Option<TokenStream> {
+    let c = ctx.filter(|c| c.experimental_generic_mono)?;
+    let read = resolve_union_aliases(elem, ctx, scope);
+    let (core, n) = match read.split_empties() {
+        Some((core, n)) => (core, Some(n)),
+        None => (read, None),
+    };
+    let TypeRef::Union(u) = &core else {
+        return None;
+    };
+    let members = u.members();
+    // An enum of literals alone crosses as the primitive it carries.
+    if is_integer_literal_union(members)
+        || members
+            .iter()
+            .all(|m| matches!(m, TypeRef::StringLiteral(_)))
+    {
+        return None;
+    }
+    let name = c.ir_enum_name(members, scope)?;
+    let arms = dynamic_union_members(members, ctx, scope, from_module)?;
+    let name = c.synthesise_dynamic_union(
+        members,
+        &arms,
+        &name,
+        None,
+        IrEnum::Named(&name),
+        scope,
+        from_module,
+    );
+    let ident = make_ident(&name);
+    let elem = quote! { #ident };
+    Some(match n {
+        None => elem,
+        Some(n) if pos.is_argument() => nullable_carrier(elem, n, true),
+        Some(n) => read_carrier(elem, n, true),
+    })
 }
 
 /// Whether a top-level `T[]` element keeps its Rust-native form

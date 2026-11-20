@@ -303,6 +303,102 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value(this: &Total) -> f64;
 }
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Mark;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new(text: &str) -> Result<Mark, JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &Mark) -> String;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    pub fn marks() -> Vec<JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "marks")]
+    pub fn try_marks() -> Result<Vec<JsValue>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(js_name = "maybeMarks")]
+    pub fn maybe_marks() -> Vec<JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeMarks")]
+    pub fn try_maybe_marks() -> Result<Vec<JsValue>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(js_name = "describeMarks")]
+    pub fn describe_marks(values: &[JsValue]) -> String;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeMarks")]
+    pub fn try_describe_marks(values: &[JsValue]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(js_name = "describeMaybeMarks")]
+    pub fn describe_maybe_marks(values: &[JsValue]) -> String;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeMaybeMarks")]
+    pub fn try_describe_maybe_marks(values: &[JsValue]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MarkOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn marks(this: &MarkOptions) -> Option<Vec<JsValue>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_marks(this: &MarkOptions, val: &[JsValue]);
+}
+impl MarkOptions {
+    pub fn new() -> MarkOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> MarkOptionsBuilder {
+        MarkOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for MarkOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct MarkOptionsBuilder {
+    inner: MarkOptions,
+}
+impl MarkOptionsBuilder {
+    pub fn marks(self, val: &[JsValue]) -> Self {
+        self.inner.set_marks(val);
+        self
+    }
+    pub fn build(self) -> MarkOptions {
+        self.inner
+    }
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(js_name = "describeMarkOptions")]
+    pub fn describe_mark_options(options: &MarkOptions) -> String;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeMarkOptions")]
+    pub fn try_describe_mark_options(options: &MarkOptions) -> Result<String, JsValue>;
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum GetValueKind {

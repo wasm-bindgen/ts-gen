@@ -3518,9 +3518,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AnalyticsEngineDataPoint;
     #[wasm_bindgen(method, getter)]
-    pub fn indexes(this: &AnalyticsEngineDataPoint) -> Option<Vec<JsValue>>;
+    pub fn indexes(this: &AnalyticsEngineDataPoint) -> Option<Vec<Option<ArrayBufferOrStr>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &[JsValue]);
+    pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &[Nullable<ArrayBufferOrStr>]);
     #[wasm_bindgen(method, getter)]
     pub fn doubles(this: &AnalyticsEngineDataPoint) -> Option<Vec<f64>>;
     #[wasm_bindgen(method, setter)]
@@ -3529,9 +3529,9 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] val: &[f64],
     );
     #[wasm_bindgen(method, getter)]
-    pub fn blobs(this: &AnalyticsEngineDataPoint) -> Option<Vec<JsValue>>;
+    pub fn blobs(this: &AnalyticsEngineDataPoint) -> Option<Vec<Option<ArrayBufferOrStr>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &[JsValue]);
+    pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &[Nullable<ArrayBufferOrStr>]);
 }
 impl AnalyticsEngineDataPoint {
     pub fn new() -> AnalyticsEngineDataPoint {
@@ -3552,7 +3552,7 @@ pub struct AnalyticsEngineDataPointBuilder {
     inner: AnalyticsEngineDataPoint,
 }
 impl AnalyticsEngineDataPointBuilder {
-    pub fn indexes(self, val: &[JsValue]) -> Self {
+    pub fn indexes(self, val: &[Nullable<ArrayBufferOrStr>]) -> Self {
         self.inner.set_indexes(val);
         self
     }
@@ -3560,7 +3560,7 @@ impl AnalyticsEngineDataPointBuilder {
         self.inner.set_doubles(val);
         self
     }
-    pub fn blobs(self, val: &[JsValue]) -> Self {
+    pub fn blobs(self, val: &[Nullable<ArrayBufferOrStr>]) -> Self {
         self.inner.set_blobs(val);
         self
     }
@@ -4236,10 +4236,10 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_type(r#type: &[JsValue]) -> Result<Blob, JsValue>;
+    pub fn new_with_type(r#type: &[BlobTypeKind]) -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_type_and_options(
-        r#type: Option<&[JsValue]>,
+        r#type: Option<&[BlobTypeKind]>,
         options: &BlobOptions,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`size`** read-only property of the Blob interface returns the size of the Blob or File in bytes."]
@@ -4373,12 +4373,12 @@ extern "C" {
     pub type File;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(
-        bits: Option<&[JsValue]>,
+        bits: Option<&[BlobTypeKind]>,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<File, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_options(
-        bits: Option<&[JsValue]>,
+        bits: Option<&[BlobTypeKind]>,
         name: impl ::wasm_bindgen::JsStringLike,
         options: &FileOptions,
     ) -> Result<File, JsValue>;
@@ -7409,7 +7409,7 @@ extern "C" {
     pub fn get_all(
         this: &FormData,
         name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Vec<JsValue>, JsValue>;
+    ) -> Result<Vec<FileOrStr>, JsValue>;
     #[doc = " The **`has()`** method of the FormData interface returns whether a `FormData` object contains a certain key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/has)"]
@@ -15073,9 +15073,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type URLPatternResult;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &URLPatternResult) -> Vec<JsValue>;
+    pub fn inputs(this: &URLPatternResult) -> Vec<StrOrURLPatternInit>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &URLPatternResult, val: &[JsValue]);
+    pub fn set_inputs(this: &URLPatternResult, val: &[StrOrURLPatternInit]);
     #[wasm_bindgen(method, getter)]
     pub fn protocol(this: &URLPatternResult) -> URLPatternComponentResult;
     #[wasm_bindgen(method, setter)]
@@ -15111,7 +15111,7 @@ extern "C" {
 }
 impl URLPatternResult {
     pub fn new(
-        inputs: &[JsValue],
+        inputs: &[StrOrURLPatternInit],
         protocol: &URLPatternComponentResult,
         username: &URLPatternComponentResult,
         password: &URLPatternComponentResult,
@@ -65089,13 +65089,23 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilterCollectionOpMap;
     #[wasm_bindgen(method, getter, js_name = "$in")]
-    pub fn in_(this: &VectorizeVectorMetadataFilterCollectionOpMap) -> Option<Vec<JsValue>>;
+    pub fn in_(
+        this: &VectorizeVectorMetadataFilterCollectionOpMap,
+    ) -> Option<Vec<ExcludeVectorizeVectorMetadataValueStringArray>>;
     #[wasm_bindgen(method, setter, js_name = "$in")]
-    pub fn set_in(this: &VectorizeVectorMetadataFilterCollectionOpMap, val: &[JsValue]);
+    pub fn set_in(
+        this: &VectorizeVectorMetadataFilterCollectionOpMap,
+        val: &[ExcludeVectorizeVectorMetadataValueStringArray],
+    );
     #[wasm_bindgen(method, getter, js_name = "$nin")]
-    pub fn nin(this: &VectorizeVectorMetadataFilterCollectionOpMap) -> Option<Vec<JsValue>>;
+    pub fn nin(
+        this: &VectorizeVectorMetadataFilterCollectionOpMap,
+    ) -> Option<Vec<ExcludeVectorizeVectorMetadataValueStringArray>>;
     #[wasm_bindgen(method, setter, js_name = "$nin")]
-    pub fn set_nin(this: &VectorizeVectorMetadataFilterCollectionOpMap, val: &[JsValue]);
+    pub fn set_nin(
+        this: &VectorizeVectorMetadataFilterCollectionOpMap,
+        val: &[ExcludeVectorizeVectorMetadataValueStringArray],
+    );
 }
 impl VectorizeVectorMetadataFilterCollectionOpMap {
     pub fn new() -> VectorizeVectorMetadataFilterCollectionOpMap {
@@ -65116,11 +65126,11 @@ pub struct VectorizeVectorMetadataFilterCollectionOpMapBuilder {
     inner: VectorizeVectorMetadataFilterCollectionOpMap,
 }
 impl VectorizeVectorMetadataFilterCollectionOpMapBuilder {
-    pub fn in_(self, val: &[JsValue]) -> Self {
+    pub fn in_(self, val: &[ExcludeVectorizeVectorMetadataValueStringArray]) -> Self {
         self.inner.set_in(val);
         self
     }
-    pub fn nin(self, val: &[JsValue]) -> Self {
+    pub fn nin(self, val: &[ExcludeVectorizeVectorMetadataValueStringArray]) -> Self {
         self.inner.set_nin(val);
         self
     }
@@ -65218,6 +65228,20 @@ pub enum ResponseOrFuture {
     Response(Response),
     Promise(Promise<Response>),
 }
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum ArrayBufferOrStr {
+    ArrayBuffer(ArrayBuffer),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum BlobTypeKind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+    String(String),
+    Blob(Blob),
+}
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
 pub enum CryptoKeyOrCryptoKeyPair {
@@ -65247,12 +65271,6 @@ pub enum StrOrSubtleCryptoHashAlgorithm {
 pub enum F64OrBigInt2 {
     F64(f64),
     BigInt(BigInt),
-}
-#[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
-pub enum ArrayBufferOrStr {
-    ArrayBuffer(ArrayBuffer),
-    String(String),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
@@ -65347,6 +65365,12 @@ pub enum DecompressionStreamFormat {
     Gzip = "gzip",
     Deflate = "deflate",
     DeflateRaw = "deflate-raw",
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum StrOrURLPatternInit {
+    String(String),
+    UrlPatternInit(URLPatternInit),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
