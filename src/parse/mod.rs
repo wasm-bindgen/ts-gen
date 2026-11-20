@@ -529,6 +529,32 @@ impl InsertCtx<'_> {
     }
 }
 
+/// Binds `import` to a module the inputs already hold, a `declare module`
+/// block or a parsed file, without reading one.
+pub(crate) fn bind_declared_import(
+    gctx: &mut crate::context::GlobalContext,
+    import: &scope::PendingImport,
+) -> bool {
+    let ambient = gctx
+        .ambient_module_scopes
+        .get(&import.from_module)
+        .cloned()
+        .unwrap_or_default();
+    if ambient
+        .into_iter()
+        .any(|scope| bind_import(gctx, import, scope, true))
+    {
+        return true;
+    }
+    match gctx.find_module(&import.from_module) {
+        Some(id) => {
+            let target = gctx.get_module(id).scope;
+            bind_import(gctx, import, target, false)
+        }
+        None => false,
+    }
+}
+
 /// Bind an import to what its name means in the exporting scope: a type, a
 /// namespace, or both when they merge. Returns whether either was found.
 ///

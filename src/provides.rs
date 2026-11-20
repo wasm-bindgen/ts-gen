@@ -494,7 +494,8 @@ fn child(path: &[String], name: &str) -> Vec<String> {
 }
 
 /// A `.d.ts` whose export surface is the module's. Types resolve against
-/// the inputs through a scope under theirs. A default export of an
+/// the inputs through a scope under theirs, and an `import` binds a
+/// declaration of a module they describe. A default export of an
 /// interface type may select optional members with a JSDoc
 /// `@provides a, b` on the `export default`.
 fn from_file(
@@ -512,6 +513,37 @@ fn from_file(
     let program = &parsed.program;
     let docs = DocComments::new(&program.comments, &source);
     let scope = gctx.create_child_scope(types_scope(module));
+
+    // An import names a declaration of a module the inputs describe, such
+    // as the base class an exported class extends.
+    for stmt in &program.body {
+        let ast::Statement::ImportDeclaration(import) = stmt else {
+            continue;
+        };
+        for spec in import.specifiers.iter().flatten() {
+            let original_name = match spec {
+                ast::ImportDeclarationSpecifier::ImportSpecifier(s) => {
+                    s.imported.name().to_string()
+                }
+                ast::ImportDeclarationSpecifier::ImportDefaultSpecifier(_) => "default".into(),
+                ast::ImportDeclarationSpecifier::ImportNamespaceSpecifier(_) => "*".into(),
+            };
+            let pending = crate::parse::scope::PendingImport {
+                scope,
+                local_name: spec.local().name.to_string(),
+                from_module: import.source.value.to_string(),
+                original_name,
+            };
+            if !crate::parse::bind_declared_import(gctx, &pending) {
+                bail!(
+                    "--provides {}: no input declares `{}` of \"{}\"",
+                    path.display(),
+                    pending.original_name,
+                    pending.from_module
+                );
+            }
+        }
+    }
 
     // `export default x` names a `declare const x: T` in the same file.
     let mut consts: Vec<(&str, &ast::TSType<'_>, Option<String>)> = Vec::new();
