@@ -1,0 +1,11 @@
+ir 1;
+
+enum Shape {
+  Radius(f64);
+  Label(str);
+}
+
+export half(n: f64): f64?;
+export pair(n: f64): (f64, str);
+export shape(round: bool): Shape;
+export maybeShape(n: f64): Shape?;

@@ -1,0 +1,102 @@
+ir 1;
+
+/// Every scalar, nullable scalar and string position.
+class Scalars {
+  all(a: bool, b: i8, c: u8, d: i16, e: u16, f: i32, g: u32, h: i53, i: u53, j: i64, k: u64, l: f16, m: f32, n: f64): f64;
+  niches(a: bool?, b: u8?, c: i16?, d: i53?): u53?;
+  present(a: i32?, b: f64?, c: u64?): f32?;
+  strings(a: str, b: str?): str?;
+  toBool(): bool;
+  toU8(): u8;
+  toI53(): i53;
+  toF16(): f16;
+}
+
+class Sequences {
+  bytes(a: u8[], b: f16[]?, c: mut i32[]): f64[];
+  numbers(a: arr<f64>, b: arr<u32>?): arr<i53>;
+  narrow(a: arr<u8>, b: arr<bool>): arr<u16>;
+  strings(a: arr<str>, b: arr<str?>): arr<str>?;
+  hosts(a: arr<Sequences>): arr<Sequences?>;
+  tuple(a: (u32, str), b: (f64, bool)?): (i32, str?);
+}
+
+enum Method {
+  @js("GET") Get;
+  @js("POST") Post;
+  Latest = .Post;
+  @fallback Unknown;
+}
+
+enum Flags: i32 {
+  None = 0;
+  Neg = -1;
+  Both = 3;
+}
+
+enum Wide: i64 {
+  Small = 1;
+  Big = 4294967296;
+}
+
+enum Body {
+  Text(str);
+  Bytes(u8[]);
+  Pair(u32, Sequences);
+  Empty;
+  @fallback Other(Any);
+}
+
+class Enums {
+  index(a: Method, b: Method?): Method?;
+  carrier(a: Flags, b: Flags?): Flags;
+  payload(a: Body, b: Body?): Body;
+  maybe(a: str??): Str??;
+  boxed(a: Str?): Str?;
+  any(a: Any, b: Any?): Any?;
+}
+
+/// Accessors, statics and constructors.
+class Widget {
+  new(name: str);
+  new sized(name: str, size: u32);
+  get name(): str;
+  set name(value: str);
+  get size(): u32?;
+  set size(value: u32);
+  static get count(): u53;
+  static set count(value: u53);
+  static create(): Widget;
+  resize(by: u32): unit;
+  resize(w: u32, h: u32): unit;
+  "class"(): str;
+  "kebab-name"(): Widget?;
+}
+
+interface Options {
+  @js(object)
+  new();
+  get signal(): Widget??;
+  set signal(value: Widget);
+}
+
+class Child extends Widget {
+  grow(): unit;
+}
+
+namespace util {
+  hash(s: str): u32;
+  namespace "inner-ns" {
+    deep(): unit;
+  }
+}
+
+foo(): unit;
+foo(x: f64): unit;
+
+module "node:events" {
+  class Widget {
+    emit(name: str): bool;
+  }
+  once(w: Widget): Widget;
+}

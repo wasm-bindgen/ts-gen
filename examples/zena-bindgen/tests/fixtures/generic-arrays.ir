@@ -1,0 +1,8 @@
+ir 1;
+
+first<T>(items: arr<T>): T;
+reversed<T>(items: arr<T>): arr<T>;
+rows<T>(rows: arr<arr<T>>): arr<arr<T>>;
+count<K, V>(entries: arr<(K, V)>): u32;
+entries<K, V>(key: K, value: V): arr<(K, V)>;
+singles<T>(items: arr<(T,)>): arr<(T,)>;

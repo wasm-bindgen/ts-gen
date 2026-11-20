@@ -1,0 +1,52 @@
+// The app behind tests/lower/export-class.ir's exports.
+import { Future } from 'zena:async';
+import { DurableObjectState, Env, Request, Response, newCounter } from './export-class.zena';
+
+export function version(): String {
+  return "1";
+}
+
+export function rename(from: String | null, to: String | null = null): void {}
+
+export class Counter {
+  #ctx: DurableObjectState;
+  var #n: f64 = 0.0;
+  var label: String | null;
+
+  new(ctx: DurableObjectState, env: Env) : #ctx = ctx {}
+
+  async increment(by: f64): Future<f64> {
+    this.#n = this.#n + by;
+    return this.#n;
+  }
+
+  count: f64 {
+    get {
+      return this.#n;
+    }
+  }
+
+  async fetch(request: Request): Future<Response> {
+    return (request as externref) as Response;
+  }
+
+  // An imported base's internals need a real `new`, so a factory
+  // constructs through JS (`tw:new`), which makes the wrapper.
+  static restore(id: String): Counter {
+    let ctx = new DurableObjectState();
+    return newCounter(ctx, (ctx as externref) as Env) as Counter;
+  }
+}
+
+export class Registry {
+  // A base-less class is constructed natively, and wrapped on crossing.
+  static create(): Registry {
+    return new Registry();
+  }
+
+  size: f64 {
+    get {
+      return 0.0;
+    }
+  }
+}

@@ -1,0 +1,23 @@
+import { some, none } from 'zena:core';
+import { Item, Map, Box, identity, wrap, later, pair, store } from './mono.zena';
+
+export function run(item: Item, b: Box<Item>): f64 {
+  let m = new Map<String, f64>();
+  m.set('a', 1.0);
+  let n = new Map<Item, Box<Item>>();
+  n.set(item, b);
+  let h = n.has(item);
+  let ks = n.keys();
+  let s = Map.of<String, f64, i32>(3);
+  let i = identity<String>('x');
+  let w = wrap<f64>(2.0);
+  b.value = item;
+  let p = later<boolean>(true);
+  let f = m.find('a');
+  let g = n.find(item);
+  let c = m.find('c');
+  let e = pair<Item>('k', item);
+  store<f64>((1.0, some<f64>(2.0)));
+  store<Item>((e[1], none));
+  return m.get('a') + (b.value.id as f64);
+}

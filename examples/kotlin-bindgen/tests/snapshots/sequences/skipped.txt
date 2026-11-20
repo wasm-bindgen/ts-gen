@@ -1,0 +1,2 @@
+random(*u8[]): `*T[]` needs a linear memory
+write(f64,*f32[]): `*T[]` needs a linear memory
