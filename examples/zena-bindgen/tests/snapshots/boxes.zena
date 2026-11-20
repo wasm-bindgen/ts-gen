@@ -87,6 +87,14 @@ export extension class Table on externref {
   }
 }
 
+/** The box `Tuple<T0, T1>`: the JS value, which `unbox` converts. */
+@spelling("Tuple")
+export extension class Tuple2<T0, T1> on externref {
+  unbox(): (T0, T1) {
+    return __tw_unbox_Tuple2<T0, T1>((this as externref));
+  }
+}
+
 @external("tw:js/global", "Cell#get:value<{T}>()", "tw")
 declare function __Cell_value<T>(p0: externref): T;
 
@@ -135,8 +143,11 @@ declare function __Table_nested(p0: externref): Cell<Cell<TupleStrF64>>;
 @external("tw:js/global", "Table#put(Cell<Tuple<str,f64>>)", "tw")
 declare function __Table_put(p0: externref, p1: Cell<TupleStrF64>): void;
 
+@external("tw:unbox", "({T0},{T1})", "tw")
+declare function __tw_unbox_Tuple2<T0, T1>(p0: externref): inline (T0, T1);
+
 @external("tw:js/global", "pairs<{T}>(T)", "tw")
-declare function __pairs<T>(p0: T): Cell<externref>;
+declare function __pairs<T>(p0: T): Cell<Tuple2<String, T>>;
 
 export function __Shape_decode(arm: i32, s0: externref | null, s1: f64): Shape | null {
   if (arm == 1) { return new ShapeName(String.fromHandle(s0 as externref)); }
@@ -153,6 +164,6 @@ export function __str_array_in(a: array<var externref | null>): FixedArray<Strin
   return out;
 }
 
-export function pairs<T>(of: T): Cell<externref> {
+export function pairs<T>(of: T): Cell<Tuple2<String, T>> {
   return __pairs<T>(of);
 }

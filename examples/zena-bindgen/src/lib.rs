@@ -21,7 +21,14 @@
 //! A box as a type argument is typed for its conversion: `Str` and the
 //! scalar boxes are the instantiation at the unboxed type, and a tuple,
 //! array or typed array box is a handle class whose `unbox` converts it.
-//! An enum argument is such a handle class too, instantiating as `Any`.
+//! An enum argument is such a handle class too (`EntryBox`), instantiating
+//! as `Any`: the IR spells no box for an enum, and at the enum itself the
+//! member lays out its flattened value, which no one Zena type argument
+//! is. A box over type parameters is a generic handle class (`Tuple2<K,
+//! V>`, `ArrBox<T>`), and a future argument is `FutureBox<T>`, whose
+//! `unbox` is the Zena future. No type argument is left the `externref`
+//! of `Any` but in a class's own instantiation at a box of its type
+//! parameters, which has no end.
 //!
 //! The standard library's `Iterator<T>` gains `step()`, which reads one
 //! `next()` result through `IteratorYieldResult<T>` as `(true, value)` or
@@ -448,6 +455,8 @@ impl<'a> Gen<'a> {
             lib: false,
             runtime: false,
             tags: HashMap::new(),
+            owner: None,
+            opaque_boxes: false,
         }
     }
 
@@ -524,6 +533,11 @@ struct Gen<'a> {
     runtime: bool,
     /// The tag classes of `throws` enums, by canonical spelling.
     tags: HashMap<String, Tag>,
+    /// The class whose members are being generated, by canonical location.
+    owner: Option<String>,
+    /// Inside the type arguments of a reference to [`Gen::owner`], where a
+    /// box over type parameters isn't typed ([`Gen::host_ref`]).
+    opaque_boxes: bool,
 }
 
 /// The class a `throws` enum's tag carries, the enum of its arms, and the
@@ -1346,6 +1360,7 @@ impl<'a> Gen<'a> {
                 }
                 continue;
             }
+            self.owner = Some(location(&self.decls[i].loc));
             self.class(i, c, parent, members, None)?;
             let canonical = location(&self.decls[i].loc);
             let specs = self.specs.remove(&canonical).unwrap_or_default();
@@ -1353,6 +1368,7 @@ impl<'a> Gen<'a> {
                 self.class(i, c, None, members, Some(s))?;
             }
             self.specs.insert(canonical, specs);
+            self.owner = None;
         }
         Ok(())
     }
@@ -1752,7 +1768,14 @@ impl<'a> Gen<'a> {
         if let Some(s) = self.spec_of(&canonical, &r.args, cx) {
             return Ok(s);
         }
+        // A class's own instantiation at a box of its type parameters has
+        // no end (`List<T>#pairs(): List<Tuple<T, f64>>`): the box stays
+        // the JS value there.
+        let own = self.owner.as_deref() == Some(canonical.as_str());
+        let outer = self.opaque_boxes;
+        self.opaque_boxes |= own;
         let args: R<Vec<String>> = r.args.iter().map(|a| self.targ_surface(a, cx)).collect();
+        self.opaque_boxes = outer;
         Ok(format!("{name}<{}>", args?.join(", ")))
     }
 
@@ -2448,8 +2471,8 @@ impl<'a> Gen<'a> {
     /// A type argument's Zena type. A box (§13) is a value the bridge
     /// hasn't converted, so each is typed for the conversion it takes: a
     /// `Str` or scalar box is the instantiation at its unboxed type, which
-    /// reads the same JS value, and a tuple, array or typed array box is a
-    /// handle class with an `unbox`.
+    /// reads the same JS value, and a tuple, array or typed array box, an
+    /// enum or a future is a handle class with an `unbox`.
     fn targ_surface(&mut self, t: &Type, cx: &Context<'_>) -> R<String> {
         match t {
             Type::StrBox => Ok("String".into()),
@@ -2457,21 +2480,130 @@ impl<'a> Gen<'a> {
             Type::Nullable(inner, _) if matches!(**inner, Type::StrBox) => {
                 Ok("String | null".into())
             }
-            Type::TupleBox(_) | Type::ArrBox(_) | Type::VecBox(_) if !mentions_tparam(t, cx) => {
-                Ok(self.box_class(t, cx).unwrap_or_else(|_| "externref".into()))
+            t if self.opaque_boxes && mentions_tparam(t, cx) && self.handle_arg(t, cx) => {
+                self.generic_surface(t, cx)
+            }
+            Type::Nullable(inner, _) if self.handle_arg(inner, cx) => {
+                Ok(format!("{} | null", self.targ_surface(inner, cx)?))
+            }
+            Type::TupleBox(_) | Type::ArrBox(_) | Type::VecBox(_) => {
+                let class = if mentions_tparam(t, cx) {
+                    self.generic_box(t, cx)
+                } else {
+                    self.box_class(t, cx)
+                };
+                Ok(class.unwrap_or_else(|_| "externref".into()))
             }
             // An enum's Zena class is no host type: its JS value crosses.
-            Type::Named(r)
-                if r.args.is_empty()
-                    && matches!(
-                        self.layouts.keys.symbols.resolve_decl(&r.path, cx),
-                        Some((_, TypeDecl::Enum(_)))
-                    ) =>
-            {
+            Type::Named(_) if self.handle_arg(t, cx) => {
                 Ok(self.box_class(t, cx).unwrap_or_else(|_| "externref".into()))
+            }
+            Type::Future(v, e)
+                if e.is_err() && !matches!(**v, Type::Array(_) | Type::Vec(_) | Type::Tuple(_)) =>
+            {
+                let value = self.targ_surface(v, cx)?;
+                Ok(format!("{}<{value}>", self.future_box()))
             }
             t => self.generic_surface(t, cx),
         }
+    }
+
+    /// Whether a type argument is a handle class ([`Self::targ_surface`]),
+    /// whose none is `null`.
+    fn handle_arg(&self, t: &Type, cx: &Context<'_>) -> bool {
+        match t {
+            Type::TupleBox(_) | Type::ArrBox(_) | Type::VecBox(_) => true,
+            Type::Future(_, e) => e.is_err(),
+            Type::Named(r) => {
+                r.args.is_empty()
+                    && matches!(
+                        self.layouts.keys.symbols.resolve_decl(&r.path, cx),
+                        Some((_, TypeDecl::Enum(_)))
+                    )
+            }
+            _ => false,
+        }
+    }
+
+    /// The handle class of a future as a type argument: the JS promise,
+    /// spelled `future<T>`, whose `unbox` is the Zena future over it.
+    fn future_box(&mut self) -> String {
+        if let Some(name) = self.boxes.get("future") {
+            return name.clone();
+        }
+        self.uses_async();
+        let name = unique(&mut self.used, "FutureBox".into());
+        let _ = writeln!(
+            self.types,
+            "/** The box `future<T>`: the JS promise, which `unbox` awaits. */\n@spelling(\"future\")\nexport extension class {name}<T> on externref {{\n  unbox(): Future<T> {{\n    return __tw_await<T>((this as externref));\n  }}\n}}\n"
+        );
+        self.boxes.insert("future".into(), name.clone());
+        name
+    }
+
+    /// The handle class of a tuple or array box over type parameters,
+    /// generic in its elements: `Tuple2<K, V>` spells `Tuple<K,V>`, and its
+    /// `unbox` is `("tw:unbox", "(K,V)")` at each instantiation.
+    fn generic_box(&mut self, t: &Type, cx: &Context<'_>) -> R<String> {
+        let (elems, key) = match t {
+            Type::TupleBox(es) => (es.as_slice(), format!("Tuple{}", es.len())),
+            Type::ArrBox(e) => (std::slice::from_ref(&**e), "Arr".to_string()),
+            _ => return skip("a typed array box over a type parameter"),
+        };
+        // An element crosses in the box's wire, so it is a value whose Zena
+        // type lowers to it: a scalar, a string, a host reference or a type
+        // parameter.
+        let args: R<Vec<String>> = elems
+            .iter()
+            .map(|e| match e {
+                Type::Scalar(s) => Ok(scalar(*s).to_string()),
+                Type::Str => Ok("String".to_string()),
+                Type::Named(r) if r.args.is_empty() && is_tparam(&r.path, cx) => {
+                    Ok(ident(&r.path.segments[0]))
+                }
+                Type::Named(r) => self.host_ref(r, cx),
+                _ => skip("a box element that is converted"),
+            })
+            .collect();
+        let args = args?.join(", ");
+        if let Some(name) = self.boxes.get(&key) {
+            return Ok(format!("{name}<{args}>"));
+        }
+        let tparams: Vec<String> = (0..elems.len()).map(|i| format!("T{i}")).collect();
+        let list = tparams.join(", ");
+        let (base, spelling, external, result) = match t {
+            Type::TupleBox(_) => {
+                let holes: Vec<String> = tparams.iter().map(|p| format!("{{{p}}}")).collect();
+                (
+                    key.clone(),
+                    "Tuple",
+                    format!("({})", holes.join(",")),
+                    (format!("inline ({list})"), tuple_type(&tparams)),
+                )
+            }
+            _ => (
+                "ArrBox".to_string(),
+                "Arr",
+                "arr<{T0}>".to_string(),
+                ("FixedArray<T0>".to_string(), "FixedArray<T0>".to_string()),
+            ),
+        };
+        let name = unique(&mut self.used, base);
+        let unbox = unique(&mut self.used, format!("__tw_unbox_{name}"));
+        let _ = writeln!(
+            self.externs,
+            "@external(\"tw:unbox\", {}, \"tw\")\ndeclare function {unbox}<{list}>(p0: externref): {};\n",
+            zena_string(&external),
+            result.0
+        );
+        let _ = writeln!(
+            self.types,
+            "/** The box `{spelling}<{list}>`: the JS value, which `unbox` converts. */\n@spelling({})\nexport extension class {name}<{list}> on externref {{\n  unbox(): {} {{\n    return {unbox}<{list}>((this as externref));\n  }}\n}}\n",
+            zena_string(spelling),
+            result.1
+        );
+        self.boxes.insert(key, name.clone());
+        Ok(format!("{name}<{args}>"))
     }
 
     /// The handle class of a concrete box: an extension class on the JS

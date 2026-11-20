@@ -1,0 +1,25 @@
+ir 1;
+
+enum Entry {
+  Name(str);
+  Size(f64);
+}
+
+class List<T> {
+  get(i: f64): T;
+  first(): T?;
+}
+
+class Dict<K, V> {
+  entries(): List<Tuple<K, V>>;
+  indexed(): List<Tuple<f64, V>>;
+  rows(): List<Arr<V>>;
+}
+
+class Api {
+  entries(): List<Entry>;
+  maybe(): List<Entry?>;
+  pending(): List<future<Str>>;
+  sizes(): Dict<Str, F64>;
+  lists(): Dict<Str, List<Entry>>;
+}

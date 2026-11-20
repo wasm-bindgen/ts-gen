@@ -182,6 +182,25 @@ fn fn_payloads() {
         .contains("case ListenerFunction(value: (a0: Event) => void)"));
 }
 
+/// A type argument stays typed: an enum, a future or a box over type
+/// parameters is its handle class, never the `externref` of `Any`.
+#[test]
+fn type_arguments_are_typed() {
+    let ir = read_ir(&crate_root().join("tests/fixtures/type-args.ir"));
+    let out = generate(&ir, &[], &zena_bindgen::Options::default());
+    assert_eq!(out.skipped, [], "type-args skips members");
+    for member in [
+        "  entries(): List<EntryBox> {",
+        "  maybe(): List<EntryBox | null> {",
+        "  pending(): List<FutureBox<String>> {",
+        "  entries(): List<Tuple2<K, V>> {",
+        "  indexed(): List<Tuple2<f64, V>> {",
+        "  rows(): List<ArrBox<V>> {",
+    ] {
+        assert!(out.zena.contains(member), "no `{}`", member.trim());
+    }
+}
+
 /// A lib's bindings carry the `err` tag class and the tw loop, and the
 /// bindings over it import them: a module has one of each.
 #[test]
