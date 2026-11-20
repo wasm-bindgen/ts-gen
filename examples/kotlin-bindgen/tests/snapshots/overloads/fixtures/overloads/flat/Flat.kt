@@ -139,13 +139,13 @@ external fun Point_get_y(p0: JsAny?): Double
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun GetOptions_new(): JsAny?
 
-/** tw:js/global GetOptions#set:type(Type) */
-@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
-external fun GetOptions_set_type_Type(p0: JsAny?, p1: JsAny?)
-
 /** tw:js/global GetOptions#get:type() */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun GetOptions_get_type(p0: JsAny?): JsAny?
+
+/** tw:js/global GetOptions#set:type(Type) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun GetOptions_set_type_Type(p0: JsAny?, p1: JsAny?)
 
 /** tw:js/global GetOptions#get:ttl() */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -163,21 +163,29 @@ external fun Store_read_str(p0: JsAny?, p1: JsAny?): JsAny?
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun Store_read_str_PartialGetOptionsUndefined(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
 
-/** tw:js/global Store#readText(str,GetOptions<Str>) */
+/** tw:js/global Store#readText(str,GetOptions<Any?>?) */
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
-external fun Store_readText_str_GetOptions_Str(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
+external fun Store_readText_str_GetOptions_Any(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
 
-/** tw:js/global Store#readJson(str,GetOptions<Str>) */
+/** tw:js/global Store#readJson(str,GetOptions<Any?>?) */
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
-external fun Store_readJson_str_GetOptions_Str(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
+external fun Store_readJson_str_GetOptions_Any(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
 
 /** tw:future take<ArrayBuffer?> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun take_ArrayBuffer(p0: JsAny?): JsAny?
 
-/** tw:js/global Store#readArrayBuffer(str,GetOptions<Str>) */
+/** tw:js/global Store#readArrayBuffer(str,GetOptions<Any?>?) */
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
-external fun Store_readArrayBuffer_str_GetOptions_Str(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
+external fun Store_readArrayBuffer_str_GetOptions_Any(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
+
+/** tw:js/global Store#tail(GetOptions<Any?>?) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Store_tail_GetOptions_Any(p0: JsAny?, p1: JsAny?): JsAny?
+
+/** tw:js/global Store#open(StoreReader?) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Store_open_StoreReader(p0: JsAny?, p1: JsAny?): JsAny?
 
 /** tw:future take<bool?> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -198,6 +206,26 @@ external fun take_bool_2(p0: JsAny?): Int
 /** tw:js/global Store#write(str,str,StoreWriteOptions) */
 @JsFun("(p0, p1, p2, p3) => { throw new Error('ts-gen: unlinked import') }")
 external fun Store_write_str_str_StoreWriteOptions(p0: JsAny?, p1: JsAny?, p2: JsAny?, p3: JsAny?): JsAny?
+
+/** tw:js/global StoreReader.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreReader_new(): JsAny?
+
+/** tw:js/global StoreReader#get:mode() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreReader_get_mode(p0: JsAny?): JsAny?
+
+/** tw:js/global StoreReader#set:modeByob() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreReader_set_modeByob(p0: JsAny?)
+
+/** tw:js/global StoreReader#get:size() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreReader_get_size(p0: JsAny?): Int
+
+/** tw:js/global StoreReader#set:size(f64) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreReader_set_size_f64(p0: JsAny?, p1: Double)
 
 /** tw:js/global StoreOptions.new() */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")

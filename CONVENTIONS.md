@@ -3583,7 +3583,7 @@ is emitted under a private name and a non-extern `pub fn` of the public
 name converts over it. The rule is narrow on purpose: a wrapper is
 never emitted for ergonomics, only where no extern signature can carry
 the type, and the extern form stays reachable (within the module) under
-a `__`-prefixed name (`__<name>`). Three constructs qualify today:
+a `__`-prefixed name (`__<name>`). Four constructs qualify today:
 
 * **`null` arms.** The extern ABI has no type that only admits `null`,
   so `f(x: T | null)`'s `f_with_null()` binds `__f_with_null(x:
@@ -3596,6 +3596,7 @@ a `__`-prefixed name (`__<name>`). Three constructs qualify today:
   `--experimental-generic-mono` the extern takes the alias's trait,
   `impl PlainDateLike`, itself, and needs no wrapper.
 * **Overloads keyed by a string literal**, below.
+* **Literal fields of a dictionary argument**, after it.
 
 **Overloads distinguished only by a string literal.** Rust has no
 literal types, so `get(key, type: "json")` and `get(key, type:
@@ -3709,6 +3710,48 @@ impl KVNamespace {
 * Setters are exempt: `set_disposition("inline")` takes the value. A
   setter taking a named union alias is wrapped like any binding
   (`set_relative_to(&self, val: impl Into<ZonedDateTimeLike>)`).
+
+**A literal a dictionary argument's type fixes.** `get(key, options:
+GetOptions<"json">)` and its `"arrayBuffer"` sibling take the same
+dictionary, whose `type: Type` field can hold only the literal. The IR
+states the literal as a constant the call fills (IR.md §7), so each
+overload is a binding of its own, named by the literal and then by the
+parameters it keeps, whose wrapper sets the field on a copy of the
+caller's options:
+
+```ts
+interface GetOptions<Type> { type: Type; cacheTtl?: number }
+interface KVNamespace {
+  get(key: string, options?: GetOptions<"text">): Promise<string | null>;
+  get<T>(key: string, options?: GetOptions<"json">): Promise<T | null>;
+  get(key: string, options?: GetOptions<"arrayBuffer">): Promise<ArrayBuffer | null>;
+}
+```
+
+```rust
+extern "C" {
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_array_buffer_with_options(this: &KVNamespace, key: &str, options: &GetOptions) -> Result<Option<ArrayBuffer>, JsValue>;
+}
+impl KVNamespace {
+    pub async fn get_array_buffer_with_options(&self, key: &str, options: &GetOptions) -> Result<Option<ArrayBuffer>, JsValue> {
+        let options: Object = Object::assign(&Object::new(), options.unchecked_ref());
+        let _ = Reflect::set_str(&options, &"type".into(), &"arrayBuffer".into());
+        self.__get_array_buffer_with_options(key, options.unchecked_ref()).await
+    }
+}
+```
+
+* The field is optional on the dictionary and its type argument is left
+  open, so every arm takes `&GetOptions` and `GetOptions::new()` builds
+  it without the literal. A value the caller sets is overridden, and the
+  caller's object is not written.
+* A single overload fills the same way under its plain name.
+* Only a required field typed by exactly an unbounded type parameter is
+  filled. One the declaration types by a literal (`mode: "byob"`) is set
+  by the dictionary's own factories ([literal-type discriminator
+  collapse](#literal-type-discriminator-collapse)), and a parameter
+  bounded by literals takes its enum.
 
 ## `@tw-abi` JSDoc → Rust scalar
 

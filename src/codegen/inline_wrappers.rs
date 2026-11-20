@@ -45,12 +45,17 @@ pub(crate) fn literal_attr(sig: &crate::codegen::signatures::FunctionSignature) 
         let name = format_ident!("{name}");
         quote! { arm(#(#lits),*, #name) }
     });
-    quote! { #[#attr(binding(#binding), positions(#(#positions),*), #(#arms),*)] }
+    let fields = &spec.fields;
+    let fields = (!fields.is_empty()).then(|| quote! { fields(#(#fields),*), });
+    quote! { #[#attr(binding(#binding), positions(#(#positions),*), #fields #(#arms),*)] }
 }
 
 struct LiteralArms {
     binding: Ident,
     positions: Vec<usize>,
+    /// `fields("type")`: the literals fill these fields of the parameters
+    /// at the positions, which the wrapper keeps.
+    fields: Vec<String>,
     arms: Vec<(Vec<String>, Ident)>,
 }
 
@@ -70,6 +75,7 @@ impl syn::parse::Parse for LiteralArms {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let mut binding = None;
         let mut positions = Vec::new();
+        let mut fields = Vec::new();
         let mut arms = Vec::new();
         while !input.is_empty() {
             let key: Ident = input.parse()?;
@@ -82,6 +88,10 @@ impl syn::parse::Parse for LiteralArms {
                 for lit in list {
                     positions.push(lit.base10_parse()?);
                 }
+            } else if key == "fields" {
+                let list = content
+                    .parse_terminated(<syn::LitStr as syn::parse::Parse>::parse, syn::Token![,])?;
+                fields.extend(list.iter().map(syn::LitStr::value));
             } else {
                 let mut lits = Vec::new();
                 while content.peek(syn::LitStr) {
@@ -100,6 +110,7 @@ impl syn::parse::Parse for LiteralArms {
         Ok(Self {
             binding,
             positions,
+            fields,
             arms,
         })
     }
@@ -489,6 +500,7 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
 
     // One wrapper per literal arm: the literal and `null` parameters
     // dropped from the public signature, their values passed through.
+    let filled = !literal.fields.is_empty();
     let typed_inputs: Vec<FnArg> = public_sig.inputs.iter().skip(skip).cloned().collect();
     let receiver: Vec<FnArg> = public_sig.inputs.iter().take(skip).cloned().collect();
     literal
@@ -499,6 +511,9 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
                 literal.positions.iter().copied().zip(lits).collect();
             let call_args = param_names.iter().enumerate().map(|(i, pname)| {
                 match values.iter().find(|(pos, _)| *pos == i) {
+                    Some(_) if filled => {
+                        quote! { ::wasm_bindgen::JsCast::unchecked_ref(&#pname) }
+                    }
                     Some((_, lit)) => quote! { #lit },
                     None if null_positions.contains(&i) => {
                         quote! { &::wasm_bindgen::JsValue::NULL }
@@ -508,6 +523,32 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
                 }
             });
             let body = quote! { #callee(#(#call_args),*)#await_tokens };
+            // A filled parameter is passed as a copy with its fields set.
+            let fills =
+                values
+                    .iter()
+                    .zip(&literal.fields)
+                    .enumerate()
+                    .map(|(n, ((pos, lit), field))| {
+                        let pname = &param_names[*pos];
+                        let copy = (!values[..n].iter().any(|(p, _)| p == pos)).then(|| {
+                            quote! {
+                                let #pname: ::js_sys::Object = ::js_sys::Object::assign(
+                                    &::js_sys::Object::new(),
+                                    ::wasm_bindgen::JsCast::unchecked_ref(#pname),
+                                );
+                            }
+                        });
+                        quote! {
+                            #copy
+                            let _ = ::js_sys::Reflect::set_str(
+                                &#pname,
+                                &::js_sys::JsString::from(#field),
+                                &::wasm_bindgen::JsValue::from_str(#lit),
+                            );
+                        }
+                    });
+            let body = quote! { #(#fills)* #body };
             let mut sig = public_sig.clone();
             sig.ident = name;
             sig.inputs = receiver
@@ -518,7 +559,8 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
                         .iter()
                         .enumerate()
                         .filter(|(i, _)| {
-                            !values.iter().any(|(pos, _)| pos == i) && !null_positions.contains(i)
+                            (filled || !values.iter().any(|(pos, _)| pos == i))
+                                && !null_positions.contains(i)
                         })
                         .map(|(_, a)| a.clone()),
                 )
