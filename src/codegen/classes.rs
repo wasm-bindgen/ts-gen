@@ -27,6 +27,7 @@ use quote::quote;
 
 use std::collections::HashMap;
 
+use crate::codegen::signatures::PromiseForm;
 use crate::codegen::signatures::{
     build_signatures, generate_callable_params, generate_dictionary_params, is_void_return,
     public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam, DictionaryParams,
@@ -1225,6 +1226,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             return_type: &void,
             body_scope,
             throws: &crate::ir::Throws::None,
+            async_modifier: false,
             doc: &None,
         }];
         let setter_name = config.setter_name(MemberKind::Property, &g.js_name);
@@ -2180,6 +2182,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &return_type,
                         body_scope: c.scope,
                         throws: &c.throws,
+                        async_modifier: false,
                         doc: &c.doc,
                     })
                     .collect();
@@ -2213,6 +2216,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &m.return_type,
                         body_scope: m.body_scope,
                         throws: &m.throws,
+                        async_modifier: m.async_modifier,
                         doc: &m.doc,
                     })
                     .collect();
@@ -2252,6 +2256,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &m.return_type,
                         body_scope: m.body_scope,
                         throws: &m.throws,
+                        async_modifier: m.async_modifier,
                         doc: &m.doc,
                     })
                     .collect();
@@ -2357,6 +2362,7 @@ fn display_to_string(
     let is_plain_to_string = |sig: &FunctionSignature| {
         sig.js_name == "toString"
             && sig.params.is_empty()
+            && sig.form == PromiseForm::Value
             && !sig.js_string_return
             && sig.literal.is_none()
             && matches!(sig.return_type, TypeRef::String)
@@ -2546,7 +2552,44 @@ fn generic_bounds_for_method(config: &ClassConfig, sig: &FunctionSignature) -> V
         .chain(std::iter::once(&sig.return_type))
         .collect();
     bounds.extend(config.local_generic_bounds(sig.body_scope, &sig_tys));
+    widen_async_return_param(bounds, config.cgctx, sig)
+}
+
+/// An `async fn` resolving to a bare type parameter is converted from
+/// the settled `JsValue` by wasm-bindgen's `JsFuture<T>`, which needs
+/// `T: FromWasmAbi` on top of `JsGeneric`.
+pub(super) fn widen_async_return_param(
+    bounds: Vec<TokenStream>,
+    cgctx: Option<&CodegenContext<'_>>,
+    sig: &FunctionSignature,
+) -> Vec<TokenStream> {
+    if !sig.is_async() || CodegenContext::generic_mono(cgctx) {
+        return bounds;
+    }
+    let Some(cgctx) = cgctx else {
+        return bounds;
+    };
+    let Some(name) = sig.return_type.as_ident() else {
+        return bounds;
+    };
+    if !matches!(
+        cgctx.gctx.scopes.resolve_binding(sig.body_scope, name),
+        Some(crate::parse::scope::Binding::TypeParam)
+    ) {
+        return bounds;
+    }
+    let plain = CodegenContext::type_param_decl(Some(cgctx), name).to_string();
+    let ident = super::typemap::make_ident(name);
     bounds
+        .into_iter()
+        .map(|b| {
+            if b.to_string() == plain {
+                quote! { #ident: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi }
+            } else {
+                b
+            }
+        })
+        .collect()
 }
 
 /// Generate a constructor binding from a resolved signature.
@@ -2590,6 +2633,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     let ret = to_return_type(
         &return_type,
         sig.catch,
+        &sig.form,
         sig.js_string_return,
         sig.error_type.as_ref(),
         config.cgctx,
@@ -2674,6 +2718,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
+        &sig.form,
         sig.js_string_return,
         sig.error_type.as_ref(),
         config.cgctx,
@@ -2691,6 +2736,8 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         quote! { -> #ret_ty }
     };
 
+    let async_kw = sig.is_async().then(|| quote! { async });
+
     let method_generics = render_generic_bounds(&bounds);
     let this_generics = config.type_generics_args();
 
@@ -2699,7 +2746,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         #doc
         #literal
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub fn #rust_ident #method_generics (this: &#this_type #this_generics, #params) #ret;
+        pub #async_kw fn #rust_ident #method_generics (this: &#this_type #this_generics, #params) #ret;
     }
 }
 
@@ -2722,6 +2769,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
         .collect();
     bounds.extend(config.local_generic_bounds(scope, &sig_tys));
+    let mut bounds = widen_async_return_param(bounds, config.cgctx, sig);
     let params = generate_callable_params(
         &sig.params,
         config.cgctx,
@@ -2748,6 +2796,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
+        &sig.form,
         sig.js_string_return,
         sig.error_type.as_ref(),
         config.cgctx,
@@ -2765,6 +2814,8 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         quote! { -> #ret_ty }
     };
 
+    let async_kw = sig.is_async().then(|| quote! { async });
+
     let generics = render_generic_bounds(&bounds);
 
     let literal = super::inline_wrappers::literal_attr(sig);
@@ -2772,7 +2823,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         #doc
         #literal
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub fn #rust_ident #generics (#params) #ret;
+        pub #async_kw fn #rust_ident #generics (#params) #ret;
     }
 }
 
@@ -3003,6 +3054,7 @@ fn generate_setter(
         return_type: &void,
         body_scope: setter.scope,
         throws: &crate::ir::Throws::None,
+        async_modifier: false,
         doc: &doc,
     }];
     let setter_name = config.setter_name(MemberKind::Property, &setter.js_name);
@@ -3186,6 +3238,7 @@ fn generate_static_setter(
         return_type: &void,
         body_scope: setter.scope,
         throws: &crate::ir::Throws::None,
+        async_modifier: false,
         doc: &doc,
     }];
     let setter_name = config.setter_name(MemberKind::StaticProperty, &setter.js_name);

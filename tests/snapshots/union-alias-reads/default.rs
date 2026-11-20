@@ -76,7 +76,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "between")]
     fn __try_between(this: &Day, start: Option<DayLike>, end: DayLike) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "later")]
-    fn __later(this: &Day, other: DayLike) -> Promise<String>;
+    async fn __later(this: &Day, other: DayLike) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "later")]
+    fn __later_promise(this: &Day, other: DayLike) -> Promise<JsString>;
 }
 impl Day {
     pub fn from(item: impl ::core::convert::Into<DayLike>) -> Day {
@@ -178,8 +180,14 @@ impl Day {
     ) -> Result<String, JsValue> {
         self.__try_between(start, end.into())
     }
-    pub fn later(&self, other: impl ::core::convert::Into<DayLike>) -> Promise<String> {
-        self.__later(other.into())
+    pub async fn later(
+        &self,
+        other: impl ::core::convert::Into<DayLike>,
+    ) -> Result<String, JsValue> {
+        self.__later(other.into()).await
+    }
+    pub fn later_promise(&self, other: impl ::core::convert::Into<DayLike>) -> Promise<JsString> {
+        self.__later_promise(other.into())
     }
 }
 #[wasm_bindgen(module = "union-alias-reads")]

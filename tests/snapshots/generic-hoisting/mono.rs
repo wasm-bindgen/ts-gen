@@ -108,15 +108,20 @@ extern "C" {
         envelope: &Envelope<String, Body>,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendAsync")]
-    pub fn send_async<Meta, Body>(
+    pub async fn send_async<Meta, Body>(
         this: &Courier,
         envelope: &Envelope<Meta, Body>,
-    ) -> Promise<String>;
+    ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendAsync")]
-    pub fn send_async_js_string<Meta, Body>(
+    pub async fn send_async_js_string<Meta, Body>(
         this: &Courier,
         envelope: &Envelope<Meta, Body>,
-    ) -> Promise<JsString>;
+    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "sendAsync")]
+    pub fn send_async_promise<Meta, Body>(
+        this: &Courier,
+        envelope: &Envelope<Meta, Body>,
+    ) -> Result<Promise<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendEither")]
     pub fn send_either<Meta, Body>(
         this: &Courier,
@@ -170,12 +175,22 @@ extern "C" {
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "postAsync")]
-    pub fn post_async<Meta, Body>(envelope: &Envelope<Meta, Body>) -> Promise<String>;
+    pub async fn post_async<Meta, Body>(envelope: &Envelope<Meta, Body>)
+        -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "postAsync")]
-    pub fn post_async_js_string<Meta, Body>(envelope: &Envelope<Meta, Body>) -> Promise<JsString>;
+    pub async fn post_async_js_string<Meta, Body>(
+        envelope: &Envelope<Meta, Body>,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "postAsync")]
+    pub fn post_async_promise<Meta, Body>(
+        envelope: &Envelope<Meta, Body>,
+    ) -> Result<Promise<JsString>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {

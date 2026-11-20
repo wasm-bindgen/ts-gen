@@ -191,8 +191,16 @@ impl ::core::convert::From<&Request> for RequestInfo {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
-    fn __fetch(input: RequestInfo) -> Promise<Response>;
+    async fn __fetch(input: RequestInfo) -> Result<Response, JsValue>;
 }
-pub fn fetch(input: impl ::core::convert::Into<RequestInfo>) -> Promise<Response> {
-    __fetch(input.into())
+pub async fn fetch(input: impl ::core::convert::Into<RequestInfo>) -> Result<Response, JsValue> {
+    __fetch(input.into()).await
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetch")]
+    fn __fetch_promise(input: RequestInfo) -> Promise<Response>;
+}
+pub fn fetch_promise(input: impl ::core::convert::Into<RequestInfo>) -> Promise<Response> {
+    __fetch_promise(input.into())
 }

@@ -32,7 +32,7 @@ Rust externref work names it. Classes are newtypes over it.
 | Handles: callbacks, exported classes (§14) | `Closure` / `Function<fn(..)>` | A handle table entry. `@once` is `FnOnce`, and drop calls `tw:destroy` | Pairing gives `removeEventListener` identity for free |
 | `throws E` (§15) | `catch` → `Result<T, JsValue>` or an error enum | `Result<T, E>`, with `E` the Rust enum of the throws arms. `err` is `JsError(ExternRef)` | — |
 | `never` results (§3, §15) | `Result<(), E>` (always `Err`), the stable reading the parse emitted | `-> Result<!, E>`, or `-> !` with no `throws`, once `!` is stable | Reading 1 keeps `Result<(), E>`. Don't let `()` leak into the IR |
-| `future<T, E>` (§16) | `Promise<T>` via `JsFuture` | `impl Future<Output = Result<T, E>>` over `tw:future`, polled by the cooperative loop | — |
+| `future<T, E>` (§16) | By `--promise-returns`: an `async fn` returning `Result<T, E>` beside a sync `_promise` form returning `Promise<T, E>` (`both`), either alone (`async`), or one sync `Promise<T, E>` (`promise`) | `impl Future<Output = Result<T, E>>` over `tw:future`, polled by the cooperative loop | — |
 | Cancellation, `@js(let …, cancel …)` (§16) | **Ignored**: the `let` and `cancel` entries are skipped, and a filled argument (`init? { signal = c.signal }`) is read at its own type, without `undefined` | Dropping the future calls the bridge's `drop`, which runs `cancel`. Rust needs nothing extra | Reading 1 can't cancel. That's acceptable until reading 2. Keep the call shape in the IR exact |
 | `$result` cancel handles (§16) | Ignored | The same: the bridge holds `$result` | — |
 | Exports, `export class` (§17) | `#[wasm_bindgen]` on Rust items | Language exports per §19, with Rust traits for `export class … extends` | — |

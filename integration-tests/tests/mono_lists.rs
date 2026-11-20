@@ -73,6 +73,8 @@ async fn awaited_string_lists_have_a_handle_variant() {
     assert_eq!(fetch_tags().await.unwrap(), ["x"]);
     let handle: Array<JsString> = fetch_tags_js_string().await.unwrap();
     assert_eq!(handle.length(), 1);
+    let handle: Array<JsString> = fetch_tags_promise().await.unwrap();
+    assert_eq!(handle.length(), 1);
     let maybe: Option<Vec<String>> = fetch_maybe_tags().await.unwrap();
     assert_eq!(maybe, Some(vec!["y".to_string(), "z".to_string()]));
     let maybe: Option<Array<JsString>> = fetch_maybe_tags_js_string().await.unwrap();

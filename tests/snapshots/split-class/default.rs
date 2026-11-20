@@ -10,7 +10,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ForwardableEmailMessage;
     #[wasm_bindgen(method, catch)]
-    pub fn reply(
+    pub async fn reply(
+        this: &ForwardableEmailMessage,
+        message: &cloudflare::email::EmailMessage,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "reply")]
+    pub fn reply_promise(
         this: &ForwardableEmailMessage,
         message: &cloudflare::email::EmailMessage,
     ) -> Promise<Undefined>;

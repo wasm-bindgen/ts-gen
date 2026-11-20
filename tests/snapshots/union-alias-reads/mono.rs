@@ -76,9 +76,11 @@ extern "C" {
         end: impl DayLike,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn later(this: &Day, other: impl DayLike) -> Promise<String>;
+    pub async fn later(this: &Day, other: impl DayLike) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "later")]
-    pub fn later_js_string(this: &Day, other: impl DayLike) -> Promise<JsString>;
+    pub async fn later_js_string(this: &Day, other: impl DayLike) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "later")]
+    pub fn later_promise(this: &Day, other: impl DayLike) -> Result<Promise<JsString>, JsValue>;
 }
 #[wasm_bindgen(module = "union-alias-reads", experimental_generic_mono)]
 extern "C" {

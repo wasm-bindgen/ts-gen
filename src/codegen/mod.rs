@@ -58,6 +58,24 @@ pub(crate) fn doc_tokens(doc: &Option<String>) -> TokenStream {
     }
 }
 
+/// How a `Promise<T>`-returning method or function is bound.
+///
+/// An `async fn` import calls JS when it is first polled. A sync binding
+/// returning the promise starts the call at once, so the promise can be
+/// handed on (`ctx.wait_until(..)`, `Promise::race`) or awaited later.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum PromiseReturns {
+    /// An `async fn name()` beside a sync `name_promise()` returning the
+    /// promise.
+    #[default]
+    Both,
+    /// One sync `name()` returning `Promise<T, E>`, started at the call. A
+    /// synchronous throw is its rejection.
+    Promise,
+    /// Only the `async fn name()`.
+    Async,
+}
+
 /// Options for controlling code generation output.
 #[derive(Debug, Clone, Default)]
 pub struct GenerateOptions {
@@ -80,6 +98,9 @@ pub struct GenerateOptions {
     /// `@throws {never}` still yields an infallible binding; async
     /// callables, constructors and setters are unaffected.
     fallible: bool,
+
+    /// How promise returns are bound (see [`PromiseReturns`]).
+    promise_returns: PromiseReturns,
 
     /// Name of a generated error enum collecting every type named in a
     /// `@throws` across the output, with `From<JsValue>` dispatching by
@@ -148,6 +169,12 @@ impl GenerateOptions {
     /// Configure whether sync callables emit a single `Result` form.
     pub fn fallible(mut self, enabled: bool) -> Self {
         self.fallible = enabled;
+        self
+    }
+
+    /// Choose how promise returns are bound.
+    pub fn promise_returns(mut self, mode: PromiseReturns) -> Self {
+        self.promise_returns = mode;
         self
     }
 
@@ -228,7 +255,10 @@ pub fn generate_with_options(
     })?;
     inline_wrappers::apply(&mut file);
     split_unshared_views(&mut file.items);
-    signatures::state_abi_bounds(&mut file.items);
+    signatures::state_abi_bounds(
+        &mut file.items,
+        options.promise_returns == PromiseReturns::Promise,
+    );
     inline_wrappers::copy_abi_bounds(&mut file.items);
     null_arms::apply(&mut file.items);
     let formatted = rustfmt(&quote::ToTokens::to_token_stream(&file).to_string())?;

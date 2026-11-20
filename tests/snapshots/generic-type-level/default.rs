@@ -163,7 +163,10 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Labelled , catch , js_name = "of")]
     pub fn try_of<T: ::wasm_bindgen::JsGeneric>(value: &T) -> Result<Labelled<T>, JsValue>;
     # [wasm_bindgen (static_method_of = Labelled , catch)]
-    pub fn load<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
+    pub async fn load<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+    ) -> Result<T, JsValue>;
+    # [wasm_bindgen (static_method_of = Labelled , js_name = "load")]
+    pub fn load_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Labelled<T>) -> T;
 }
@@ -187,14 +190,27 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage<Props: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn get<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+    pub async fn get<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
         this: &Storage<Props>,
         key: &str,
-    ) -> Promise<Option<T>>
+    ) -> Result<Option<T>, JsValue>
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_promise<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+        this: &Storage<Props>,
+        key: &str,
+    ) -> Promise<JsOption<T>>;
     #[wasm_bindgen(method, catch)]
-    pub fn run<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+    pub async fn run<
+        Props: ::wasm_bindgen::JsGeneric,
+        T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi,
+    >(
+        this: &Storage<Props>,
+        callback: &Function<fn() -> Promise<T>>,
+    ) -> Result<T, JsValue>;
+    #[wasm_bindgen(method, js_name = "run")]
+    pub fn run_promise<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
         this: &Storage<Props>,
         callback: &Function<fn() -> Promise<T>>,
     ) -> Promise<T>;
@@ -208,5 +224,11 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "loadValue")]
-    pub fn load_value<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
+    pub async fn load_value<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+    ) -> Result<T, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "loadValue")]
+    pub fn load_value_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
 }

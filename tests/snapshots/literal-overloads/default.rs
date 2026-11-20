@@ -10,27 +10,69 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespace;
     #[wasm_bindgen(method, catch)]
-    pub fn get(this: &KVNamespace, key: &str) -> Promise<Option<String>>;
+    pub async fn get(this: &KVNamespace, key: &str) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_promise(this: &KVNamespace, key: &str) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn __get_text(this: &KVNamespace, key: &str, r#type: &str) -> Promise<Option<String>>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    fn __get_json(this: &KVNamespace, key: &str, r#type: &str) -> Promise<JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    fn __get_array_buffer(
+    async fn __get_text(
         this: &KVNamespace,
         key: &str,
         r#type: &str,
-    ) -> Promise<Option<ArrayBuffer>>;
+    ) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_text_promise(
+        this: &KVNamespace,
+        key: &str,
+        r#type: &str,
+    ) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn __get_stream(this: &KVNamespace, key: &str, r#type: &str) -> Promise<Option<Uint8Array>>;
+    async fn __get_json(this: &KVNamespace, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_promise(this: &KVNamespace, key: &str, r#type: &str) -> Promise;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn __get_text_with_slice(
+    async fn __get_array_buffer(
+        this: &KVNamespace,
+        key: &str,
+        r#type: &str,
+    ) -> Result<Option<ArrayBuffer>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_array_buffer_promise(
+        this: &KVNamespace,
+        key: &str,
+        r#type: &str,
+    ) -> Promise<JsNullable<ArrayBuffer>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_stream(
+        this: &KVNamespace,
+        key: &str,
+        r#type: &str,
+    ) -> Result<Option<Uint8Array>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_stream_promise(
+        this: &KVNamespace,
+        key: &str,
+        r#type: &str,
+    ) -> Promise<JsNullable<Uint8Array>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_text_with_slice(
+        this: &KVNamespace,
+        key: &[String],
+        r#type: &str,
+    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_text_with_slice_promise(
         this: &KVNamespace,
         key: &[String],
         r#type: &str,
     ) -> Promise<Map<JsString, JsNullable<JsString>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn __get_json_with_slice(
+    async fn __get_json_with_slice(
+        this: &KVNamespace,
+        key: &[String],
+        r#type: &str,
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_with_slice_promise(
         this: &KVNamespace,
         key: &[String],
         r#type: &str,
@@ -43,26 +85,50 @@ extern "C" {
     pub fn try_mode(this: &KVNamespace, kind: KVNamespaceKind) -> Result<bool, JsValue>;
 }
 impl KVNamespace {
-    pub fn get_text(&self, key: &str) -> Promise<Option<String>> {
-        self.__get_text(key, "text")
+    pub async fn get_text(&self, key: &str) -> Result<Option<String>, JsValue> {
+        self.__get_text(key, "text").await
     }
-    pub fn get_json(&self, key: &str) -> Promise<JsValue> {
-        self.__get_json(key, "json")
+    pub fn get_text_promise(&self, key: &str) -> Promise<JsNullable<JsString>> {
+        self.__get_text_promise(key, "text")
     }
-    pub fn get_array_buffer(&self, key: &str) -> Promise<Option<ArrayBuffer>> {
-        self.__get_array_buffer(key, "arrayBuffer")
+    pub async fn get_json(&self, key: &str) -> Result<JsValue, JsValue> {
+        self.__get_json(key, "json").await
     }
-    pub fn get_stream(&self, key: &str) -> Promise<Option<Uint8Array>> {
-        self.__get_stream(key, "stream")
+    pub fn get_json_promise(&self, key: &str) -> Promise {
+        self.__get_json_promise(key, "json")
     }
-    pub fn get_text_with_slice(
+    pub async fn get_array_buffer(&self, key: &str) -> Result<Option<ArrayBuffer>, JsValue> {
+        self.__get_array_buffer(key, "arrayBuffer").await
+    }
+    pub fn get_array_buffer_promise(&self, key: &str) -> Promise<JsNullable<ArrayBuffer>> {
+        self.__get_array_buffer_promise(key, "arrayBuffer")
+    }
+    pub async fn get_stream(&self, key: &str) -> Result<Option<Uint8Array>, JsValue> {
+        self.__get_stream(key, "stream").await
+    }
+    pub fn get_stream_promise(&self, key: &str) -> Promise<JsNullable<Uint8Array>> {
+        self.__get_stream_promise(key, "stream")
+    }
+    pub async fn get_text_with_slice(
+        &self,
+        key: &[String],
+    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue> {
+        self.__get_text_with_slice(key, "text").await
+    }
+    pub fn get_text_with_slice_promise(
         &self,
         key: &[String],
     ) -> Promise<Map<JsString, JsNullable<JsString>>> {
-        self.__get_text_with_slice(key, "text")
+        self.__get_text_with_slice_promise(key, "text")
     }
-    pub fn get_json_with_slice(&self, key: &[String]) -> Promise<Map<JsString, JsValue>> {
-        self.__get_json_with_slice(key, "json")
+    pub async fn get_json_with_slice(
+        &self,
+        key: &[String],
+    ) -> Result<Map<JsString, JsValue>, JsValue> {
+        self.__get_json_with_slice(key, "json").await
+    }
+    pub fn get_json_with_slice_promise(&self, key: &[String]) -> Promise<Map<JsString, JsValue>> {
+        self.__get_json_with_slice_promise(key, "json")
     }
 }
 #[wasm_bindgen(module = "literal-overloads")]
@@ -81,26 +147,54 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SubtleCrypto;
     #[wasm_bindgen(method, catch, js_name = "exportKey")]
-    fn __export_key_jwk(this: &SubtleCrypto, format: &str, key: &str) -> Promise<Object>;
+    async fn __export_key_jwk(
+        this: &SubtleCrypto,
+        format: &str,
+        key: &str,
+    ) -> Result<Object, JsValue>;
+    #[wasm_bindgen(method, js_name = "exportKey")]
+    fn __export_key_jwk_promise(this: &SubtleCrypto, format: &str, key: &str) -> Promise<Object>;
     #[wasm_bindgen(method, catch, js_name = "exportKey")]
-    fn __export_key_raw(this: &SubtleCrypto, format: &str, key: &str) -> Promise<ArrayBuffer>;
+    async fn __export_key_raw(
+        this: &SubtleCrypto,
+        format: &str,
+        key: &str,
+    ) -> Result<ArrayBuffer, JsValue>;
+    #[wasm_bindgen(method, js_name = "exportKey")]
+    fn __export_key_raw_promise(
+        this: &SubtleCrypto,
+        format: &str,
+        key: &str,
+    ) -> Promise<ArrayBuffer>;
     # [wasm_bindgen (static_method_of = SubtleCrypto , js_name = "describe")]
     fn __describe(format: &str) -> String;
     # [wasm_bindgen (static_method_of = SubtleCrypto , catch , js_name = "describe")]
     fn __try_describe(format: &str) -> Result<String, JsValue>;
 }
 impl SubtleCrypto {
-    pub fn export_key_jwk(&self, key: &str) -> Promise<Object> {
-        self.__export_key_jwk("jwk", key)
+    pub async fn export_key_jwk(&self, key: &str) -> Result<Object, JsValue> {
+        self.__export_key_jwk("jwk", key).await
     }
-    pub fn export_key_raw(&self, key: &str) -> Promise<ArrayBuffer> {
-        self.__export_key_raw("raw", key)
+    pub fn export_key_jwk_promise(&self, key: &str) -> Promise<Object> {
+        self.__export_key_jwk_promise("jwk", key)
     }
-    pub fn export_key_pkcs8(&self, key: &str) -> Promise<ArrayBuffer> {
-        self.__export_key_raw("pkcs8", key)
+    pub async fn export_key_raw(&self, key: &str) -> Result<ArrayBuffer, JsValue> {
+        self.__export_key_raw("raw", key).await
     }
-    pub fn export_key_spki(&self, key: &str) -> Promise<ArrayBuffer> {
-        self.__export_key_raw("spki", key)
+    pub async fn export_key_pkcs8(&self, key: &str) -> Result<ArrayBuffer, JsValue> {
+        self.__export_key_raw("pkcs8", key).await
+    }
+    pub async fn export_key_spki(&self, key: &str) -> Result<ArrayBuffer, JsValue> {
+        self.__export_key_raw("spki", key).await
+    }
+    pub fn export_key_raw_promise(&self, key: &str) -> Promise<ArrayBuffer> {
+        self.__export_key_raw_promise("raw", key)
+    }
+    pub fn export_key_pkcs8_promise(&self, key: &str) -> Promise<ArrayBuffer> {
+        self.__export_key_raw_promise("pkcs8", key)
+    }
+    pub fn export_key_spki_promise(&self, key: &str) -> Promise<ArrayBuffer> {
+        self.__export_key_raw_promise("spki", key)
     }
     pub fn describe_jwk() -> String {
         Self::__describe("jwk")
@@ -121,19 +215,34 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVStore<Key: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn __get_text<Key: ::wasm_bindgen::JsGeneric>(
+    async fn __get_text<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVStore<Key>,
         key: &Key,
         r#type: &str,
-    ) -> Promise<Option<String>>;
+    ) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_text_promise<Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        r#type: &str,
+    ) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn __get_json<Key: ::wasm_bindgen::JsGeneric, ExpectedValue: ::wasm_bindgen::JsGeneric>(
+    async fn __get_json<Key: ::wasm_bindgen::JsGeneric, ExpectedValue: ::wasm_bindgen::JsGeneric>(
         this: &KVStore<Key>,
         key: &Key,
         r#type: &str,
-    ) -> Promise<Option<ExpectedValue>>
+    ) -> Result<Option<ExpectedValue>, JsValue>
     where
         Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_promise<
+        Key: ::wasm_bindgen::JsGeneric,
+        ExpectedValue: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &KVStore<Key>,
+        key: &Key,
+        r#type: &str,
+    ) -> Promise<JsNullable<ExpectedValue>>;
     #[doc = " A `null` arm on a generic receiver keeps the receiver's `Key`."]
     #[wasm_bindgen(method)]
     pub fn put<Key: ::wasm_bindgen::JsGeneric>(
@@ -176,17 +285,26 @@ impl<Key: ::wasm_bindgen::JsGeneric> KVStore<Key> {
     }
 }
 impl<Key: ::wasm_bindgen::JsGeneric> KVStore<Key> {
-    pub fn get_text(&self, key: &Key) -> Promise<Option<String>> {
-        self.__get_text(key, "text")
+    pub async fn get_text(&self, key: &Key) -> Result<Option<String>, JsValue> {
+        self.__get_text(key, "text").await
     }
-    pub fn get_json<ExpectedValue: ::wasm_bindgen::JsGeneric>(
+    pub fn get_text_promise(&self, key: &Key) -> Promise<JsNullable<JsString>> {
+        self.__get_text_promise(key, "text")
+    }
+    pub async fn get_json<ExpectedValue: ::wasm_bindgen::JsGeneric>(
         &self,
         key: &Key,
-    ) -> Promise<Option<ExpectedValue>>
+    ) -> Result<Option<ExpectedValue>, JsValue>
     where
         Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
     {
-        self.__get_json(key, "json")
+        self.__get_json(key, "json").await
+    }
+    pub fn get_json_promise<ExpectedValue: ::wasm_bindgen::JsGeneric>(
+        &self,
+        key: &Key,
+    ) -> Promise<JsNullable<ExpectedValue>> {
+        self.__get_json_promise(key, "json")
     }
 }
 #[wasm_bindgen(module = "literal-overloads")]
@@ -248,13 +366,30 @@ extern "C" {
     ) -> Result<String, JsValue>;
     #[doc = " Each `null` arm is its own promise."]
     #[wasm_bindgen(method, catch)]
-    pub fn load(this: &Picker, kind: AOrB, x: &ArrayBuffer) -> Promise<Option<String>>;
+    pub async fn load(
+        this: &Picker,
+        kind: AOrB,
+        x: &ArrayBuffer,
+    ) -> Result<Option<String>, JsValue>;
+    #[doc = " Each `null` arm is its own promise."]
+    #[wasm_bindgen(method, js_name = "load")]
+    pub fn load_promise(
+        this: &Picker,
+        kind: AOrB,
+        x: &ArrayBuffer,
+    ) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "load")]
-    fn __load_with_null(
+    async fn __load_with_null(
         this: &Picker,
         kind: AOrB,
         x: &::wasm_bindgen::JsValue,
-    ) -> Promise<Option<String>>;
+    ) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "load")]
+    fn __load_with_null_promise(
+        this: &Picker,
+        kind: AOrB,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Promise<JsNullable<JsString>>;
 }
 impl Picker {
     pub fn pick_with_null(&self, kind: AOrB) {
@@ -286,8 +421,13 @@ impl Picker {
         self.__try_name_with_null(kind, &::wasm_bindgen::JsValue::NULL)
     }
     #[doc = " Each `null` arm is its own promise."]
-    pub fn load_with_null(&self, kind: AOrB) -> Promise<Option<String>> {
+    pub async fn load_with_null(&self, kind: AOrB) -> Result<Option<String>, JsValue> {
         self.__load_with_null(kind, &::wasm_bindgen::JsValue::NULL)
+            .await
+    }
+    #[doc = " Each `null` arm is its own promise."]
+    pub fn load_with_null_promise(&self, kind: AOrB) -> Promise<JsNullable<JsString>> {
+        self.__load_with_null_promise(kind, &::wasm_bindgen::JsValue::NULL)
     }
 }
 #[wasm_bindgen(module = "literal-overloads")]

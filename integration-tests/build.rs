@@ -26,10 +26,13 @@ use std::path::{Path, PathBuf};
 /// so a configuration flag belongs to the test file rather than the fixture:
 /// a `//! @ts-gen --experimental-generic-mono` header on the test `.rs`
 /// compiles it against the per-monomorphization bindings, and
-/// `//! @ts-gen --fallible` against the single `Result` forms, and
+/// `//! @ts-gen --fallible` against the single `Result` forms,
 /// `//! @ts-gen --strict-nullable` against the IR's three-state
-/// `T | null | undefined`. A `<name>_mono.rs` or `<name>_strict.rs` test
-/// may share `<name>.d.ts` with `<name>.rs`.
+/// `T | null | undefined`, and `//! @ts-gen --promise-returns <mode>`
+/// against that binding of promise returns. A `<name>_mono.rs`,
+/// `<name>_strict.rs`, `<name>_promise.rs` or `<name>_async.rs` test, or
+/// one with several of those suffixes, may share `<name>.d.ts` with
+/// `<name>.rs`.
 fn main() {
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let crate_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -84,6 +87,8 @@ struct Entry {
     fallible: bool,
     /// Whether the test file opts into the strict nullable IR.
     strict_nullable: bool,
+    /// How the test file binds promise returns.
+    promise_returns: ts_gen::codegen::PromiseReturns,
     /// Whether the fixture declares its own `--lib-name` (module mode).
     /// Script-mode fixtures parse without one and export by `--export`.
     module_mode: bool,
@@ -119,22 +124,24 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
 
         // Conventionally test stems are snake_case; the matching fixture is
         // the kebab-case form. (Stems without underscores are unchanged.)
-        // A `<name>_mono` or `<name>_strict` test without a fixture of its
-        // own compiles the `<name>` fixture under the flags its directive
-        // sets.
+        // A `<name>_mono`, `<name>_strict`, `<name>_promise` or
+        // `<name>_async` test without a fixture of its own compiles the
+        // `<name>` fixture under the flags its directive sets.
         let mut kebab = stem.replace('_', "-");
         let mut dts_path = fixtures_dir.join(format!("{kebab}.d.ts"));
-        if !dts_path.is_file() {
-            if let Some(base) = kebab
-                .strip_suffix("-mono")
-                .or_else(|| kebab.strip_suffix("-strict"))
-            {
-                let base_path = fixtures_dir.join(format!("{base}.d.ts"));
-                if base_path.is_file() {
-                    kebab = base.to_string();
-                    dts_path = base_path;
-                }
-            }
+        let mut base = kebab.as_str();
+        while !dts_path.is_file() {
+            let Some(shorter) = ["-mono", "-strict", "-promise", "-async"]
+                .iter()
+                .find_map(|suffix| base.strip_suffix(suffix))
+            else {
+                break;
+            };
+            base = shorter;
+            dts_path = fixtures_dir.join(format!("{base}.d.ts"));
+        }
+        if dts_path.is_file() {
+            kebab = base.to_string();
         }
         if !dts_path.is_file() {
             panic!(
@@ -159,6 +166,7 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
             experimental_generic_mono: test_directive.experimental_generic_mono,
             fallible: test_directive.fallible,
             strict_nullable: test_directive.strict_nullable,
+            promise_returns: test_directive.promise_returns,
             export_specs: directive.export_specs,
             inputs: directive
                 .inputs
@@ -185,6 +193,8 @@ struct Directive {
     fallible: bool,
     /// Whether `--strict-nullable` is present.
     strict_nullable: bool,
+    /// The `--promise-returns <mode>`, `both` when absent.
+    promise_returns: ts_gen::codegen::PromiseReturns,
     /// All `--export <spec>` (or `-E <spec>`) values.
     export_specs: Vec<String>,
     /// All `--input <path>` (or `-i <path>`) values.
@@ -204,6 +214,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let mut experimental_generic_mono = false;
     let mut fallible = false;
     let mut strict_nullable = false;
+    let mut promise_returns = ts_gen::codegen::PromiseReturns::Both;
     let mut export_specs = Vec::new();
     let mut inputs = Vec::new();
     let mut error_enum = None;
@@ -235,6 +246,15 @@ fn parse_directive(dts_path: &Path) -> Directive {
                     "--strict-nullable" => {
                         strict_nullable = true;
                         i += 1;
+                    }
+                    "--promise-returns" if i + 1 < args.len() => {
+                        promise_returns = match args[i + 1].as_str() {
+                            "both" => ts_gen::codegen::PromiseReturns::Both,
+                            "promise" => ts_gen::codegen::PromiseReturns::Promise,
+                            "async" => ts_gen::codegen::PromiseReturns::Async,
+                            mode => panic!("unknown `--promise-returns {mode}`"),
+                        };
+                        i += 2;
                     }
                     "--export" | "-E" if i + 1 < args.len() => {
                         export_specs.push(args[i + 1].clone());
@@ -273,6 +293,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
         experimental_generic_mono,
         fallible,
         strict_nullable,
+        promise_returns,
         export_specs,
         inputs,
         error_enum,
@@ -366,6 +387,7 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
         .experimental_generic_mono(entry.experimental_generic_mono)
         .fallible(entry.fallible)
         .strict_nullable(entry.strict_nullable)
+        .promise_returns(entry.promise_returns)
         .exports(exports);
     if let Some(name) = &entry.error_enum {
         options = options.error_enum(name);

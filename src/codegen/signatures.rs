@@ -46,6 +46,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::codegen::typemap::{self, CodegenContext, TypePosition};
+use crate::codegen::PromiseReturns;
 use crate::ir::{ModuleContext, Nullability, Param, SharedMemory, Throws, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::naming::{ident_chars, snake_ident, to_snake_case, LocalScope, Suffix};
@@ -74,8 +75,8 @@ impl SignatureKind {
         !matches!(self, Self::Constructor | Self::Setter | Self::StaticSetter)
     }
 
-    /// Whether this kind binds a `Promise<T>` return as a catching
-    /// `Promise<T, E>`.
+    /// Whether this kind binds a `Promise<T>` return by
+    /// [`PromiseReturns`], rather than as a value.
     pub fn binds_promise(self) -> bool {
         !matches!(self, Self::Constructor | Self::Setter | Self::StaticSetter)
     }
@@ -293,9 +294,12 @@ pub struct FunctionSignature {
     /// JS function name, copied from the source for `js_name = "..."`.
     pub js_name: String,
     pub params: Vec<ConcreteParam>,
-    /// Wrap return in `Result<T, ErrTy>`, or a `Promise<T>` return in
-    /// `Promise<T, ErrTy>`.
+    /// Wrap return in `Result<T, ErrTy>`, or a [`PromiseForm::Value`]'s
+    /// `Promise<T>` return in `Promise<T, ErrTy>`.
     pub catch: bool,
+    /// How a promise return is bound. Under [`PromiseForm::Async`],
+    /// `return_type` is the awaited `T`.
+    pub form: PromiseForm,
     pub return_type: TypeRef,
     /// Lower eligible string leaves to `JsString` for the additive
     /// `_js_string` variant. Keeping this as metadata avoids representing a
@@ -315,6 +319,28 @@ pub struct FunctionSignature {
     /// arm's wrapper name, and the extern itself is emitted privately as
     /// [`LiteralSpec::binding`].
     pub literal: Option<LiteralSpec>,
+}
+
+/// How a signature binds a promise return (see [`PromiseReturns`]).
+#[derive(Clone, Debug, Default, PartialEq)]
+pub enum PromiseForm {
+    /// A sync return. A `Promise<T>` one, under
+    /// [`PromiseReturns::Promise`], is a catching `Promise<T, E>` whose `T`
+    /// lowers like a sync return.
+    #[default]
+    Value,
+    /// An `async fn` returning the awaited value.
+    Async,
+    /// The sync `_promise` form beside an `async fn`: the promise itself,
+    /// as a handle (`Promise<JsString>`) rejecting with what its `async fn`
+    /// returns as `Err`.
+    Handle(Throws),
+}
+
+impl FunctionSignature {
+    pub fn is_async(&self) -> bool {
+        self.form == PromiseForm::Async
+    }
 }
 
 /// Recursively collect every in-scope type-parameter name reachable
@@ -751,9 +777,11 @@ pub struct Overload<'a> {
     ///   error).
     /// * `Throws::Never` → caller declares the callable never throws.
     ///   Sync callables get *no* `try_` companion; a promise-returning
-    ///   one drops `catch` and returns `Promise<T>`. Constructors ignore this and
-    ///   still catch (per JS `new` semantics).
+    ///   one drops `catch` and returns `T` or `Promise<T>`. Constructors
+    ///   ignore this and still catch (per JS `new` semantics).
     pub throws: &'a Throws,
+    /// Declared `async`: see [`CallableSpec::call_never_throws`].
+    pub async_modifier: bool,
     /// Its doc comment, attached to each signature it expands to.
     pub doc: &'a Option<String>,
 }
@@ -778,29 +806,47 @@ pub struct CallableSpec<'a> {
     pub module: &'a ModuleContext,
 }
 
+impl CallableSpec<'_> {
+    /// Whether calling `overload` never throws synchronously. A builtin or
+    /// global callable, or one declared `async`, reports failure by
+    /// rejecting the promise it returns, so its sync `_promise` form needs
+    /// no `catch`. `@throws` on such a callable describes the rejection.
+    fn call_never_throws(&self, overload: &Overload<'_>) -> bool {
+        overload.async_modifier || self.module.is_builtin_or_global()
+    }
+}
+
 /// Resolve a [`CallableSpec`] into the full set of [`FunctionSignature`]s
 /// that should be emitted in the surrounding extern block.
 ///
 /// Decisions made here:
 ///
 /// * **Promise**: when [`SignatureKind::binds_promise`] and the return type
-///   is `Promise<T>`, one catching binding returns `Promise<T, E>`. The
-///   import starts the call eagerly, and a synchronous throw rejects the
-///   promise, so it has no `try_` companion.
+///   is `Promise<T>`, it is bound by [`PromiseReturns`], with no `try_`
+///   companion in any mode:
+///   * `Both`: an `async fn` with `catch: true`, carrying the unwrapped `T`
+///     as `return_type`, and a sync `<name>_promise` sibling returning the
+///     promise itself. The sibling catches a synchronous throw under
+///     `--fallible`, unless the callable is a builtin or global one or
+///     declared `async`, whose calls never throw.
+///   * `Async`: the `async fn` alone.
+///   * `Promise`: one catching binding returning `Promise<T, E>`. The
+///     import starts the call eagerly, and a synchronous throw rejects the
+///     promise.
 /// * **`try_` companion**: for sync, non-setter, non-constructor callables,
 ///   each primary `name` gets a fallible `try_name` sibling.
 /// * **Constructor catches always**: per JS semantics; the primary signature
 ///   is `catch: true` and there's no `try_` variant.
 /// * **`Throws::Never`**: the caller declared the callable never throws
 ///   (`@throws {never}`). Sync callables get *no* `try_` companion, and a
-///   promise-returning one drops `catch` and returns `Promise<T>`.
+///   promise-returning one drops `catch` and returns `T` or `Promise<T>`.
 ///   Constructors ignore this — they always catch per JS `new` semantics.
 /// * **`never` returns**: a callable returning `never` (or `Promise<never>`)
 ///   never completes normally, so only its catching form is emitted, typed
 ///   `()`: the primary itself catches, under every policy, with no `try_`
-///   twin; for `Promise<never>`, a `Promise<Undefined, E>`. It overrides
-///   `@throws {never}`. Decided per expansion, so overloads that return
-///   something else keep their usual forms.
+///   twin; for `Promise<never>`, the promise forms awaiting `()`. It
+///   overrides `@throws {never}`. Decided per expansion, so overloads that
+///   return something else keep their usual forms.
 /// * **Naming**: each surviving expansion gets `base + suffix` deduped against
 ///   `names`; `try_` variants prepend `try_` and declare again.
 pub fn build_signatures(
@@ -826,6 +872,7 @@ pub(crate) fn build_signatures_from(
 
     let per_mono = CodegenContext::generic_mono(cgctx);
     let fallible = cgctx.is_some_and(|ctx| ctx.fallible);
+    let promise_returns = cgctx.map_or(PromiseReturns::default(), |ctx| ctx.promise_returns);
     let mut out = Vec::with_capacity(expansions.len());
 
     // One emitted binding per expansion, except a literal-keyed cohort,
@@ -898,11 +945,13 @@ pub(crate) fn build_signatures_from(
         let overload = spec.overloads[overload];
         let scope = overload.body_scope;
         let error_type = overload.throws.as_type();
-        // A promise is returned as `Promise<T, E>` from a catching import,
-        // which starts the call eagerly and folds a synchronous throw into
-        // the rejection.
         let promise =
             spec.kind.binds_promise() && overload.return_type.as_promise_inner().is_some();
+        // Under `PromiseReturns::Promise` it is returned as `Promise<T, E>`
+        // from a catching import, which starts the call eagerly and folds
+        // a synchronous throw into the rejection. Otherwise an `async fn`
+        // returns the awaited value.
+        let is_async = promise && promise_returns != PromiseReturns::Promise;
         // A `never` return (awaited, for `Promise<never>`) means the call
         // never completes normally: it throws, rejects or does not return.
         // Only the catching form is emitted, under the bare name (`try_`
@@ -910,10 +959,11 @@ pub(crate) fn build_signatures_from(
         let never_returns = spec.kind.allows_try_variant()
             && (overload.return_type == &TypeRef::Never
                 || promise && overload.return_type.as_promise_inner() == Some(&TypeRef::Never));
-        let return_type = match (never_returns, promise) {
-            (true, true) => overload.return_type.clone(),
-            (true, false) => TypeRef::Void,
-            (false, _) => overload.return_type.clone(),
+        let return_type = match (overload.return_type.as_promise_inner(), never_returns) {
+            (Some(_), true) if is_async => TypeRef::Void,
+            (Some(awaited), false) if is_async => awaited.clone(),
+            (None, true) => TypeRef::Void,
+            _ => overload.return_type.clone(),
         };
         // `Throws::Never` suppresses every fallible form — except for
         // constructors, which always catch (`new` can always throw in JS),
@@ -949,6 +999,10 @@ pub(crate) fn build_signatures_from(
             js_name: spec.js_name.to_string(),
             params: exp_params.clone(),
             catch: primary_catches,
+            form: match is_async {
+                true => PromiseForm::Async,
+                false => PromiseForm::Value,
+            },
             return_type: return_type.clone(),
             js_string_return: false,
             error_type: if primary_catches {
@@ -962,6 +1016,49 @@ pub(crate) fn build_signatures_from(
         };
         push_with_js_string_return(&mut out, primary, names, cgctx, scope);
 
+        // An `async fn` import only calls JS when first polled, so a
+        // caller that needs the call started now (handing the promise
+        // to `waitUntil`, gating a constructor on it, racing it) gets
+        // the un-awaited form too. Rejection travels inside the
+        // returned promise; `catch` here covers only a synchronous
+        // throw, which the sync-callable policy decides, unless the
+        // call cannot throw synchronously at all.
+        if is_async && promise_returns == PromiseReturns::Both {
+            let promise_literal = derive(names, &|n| format!("{n}_promise"));
+            let promise_name = match &promise_literal {
+                Some(l) => l.arms[0].1.clone(),
+                None => names.declare(&format!("{primary_name}_promise"), Suffix::Snake),
+            };
+            let promise_catches = !nothrow
+                && !spec.call_never_throws(&overload)
+                && fallible
+                && spec.kind.allows_try_variant();
+            out.push(FunctionSignature {
+                rust_name: promise_name,
+                js_name: spec.js_name.to_string(),
+                params: exp_params.clone(),
+                catch: promise_catches,
+                form: PromiseForm::Handle(match nothrow {
+                    true => Throws::Never,
+                    false => overload.throws.clone(),
+                }),
+                return_type: if never_returns {
+                    awaiting_void(overload.return_type)
+                } else {
+                    overload.return_type.clone()
+                },
+                js_string_return: false,
+                error_type: if promise_catches {
+                    error_type.cloned()
+                } else {
+                    None
+                },
+                doc: overload.doc.clone(),
+                body_scope: scope,
+                literal: promise_literal,
+            });
+        }
+
         if allow_try {
             let try_literal = derive(names, &|n| format!("try_{n}"));
             let try_name = match &try_literal {
@@ -973,6 +1070,7 @@ pub(crate) fn build_signatures_from(
                 js_name: spec.js_name.to_string(),
                 params: exp_params,
                 catch: true,
+                form: PromiseForm::Value,
                 return_type: return_type.clone(),
                 js_string_return: false,
                 error_type: error_type.cloned(),
@@ -1005,6 +1103,18 @@ pub(crate) fn build_signatures_from(
     out
 }
 
+/// `Promise<never>` → `Promise<void>`: the `_promise` form of a
+/// `Promise<never>` callable, typed like its `async fn`'s `()`.
+fn awaiting_void(promise: &TypeRef) -> TypeRef {
+    match promise {
+        TypeRef::Reference { segments, .. } => TypeRef::Reference {
+            segments: segments.clone(),
+            generic_args: vec![TypeRef::Void],
+        },
+        other => other.clone(),
+    }
+}
+
 /// `base` with an expansion's `_with_…` suffix. A base that already reads
 /// `with` (`with`, `set_with`) continues with `_and_` instead, so
 /// `with(fields, options?)` gives `with_and_options` rather than
@@ -1034,10 +1144,13 @@ fn push_with_js_string_return(
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) {
-    let value = sig
-        .return_type
-        .as_promise_inner()
-        .unwrap_or(&sig.return_type);
+    let value = match sig.form {
+        PromiseForm::Value => sig
+            .return_type
+            .as_promise_inner()
+            .unwrap_or(&sig.return_type),
+        _ => &sig.return_type,
+    };
     let has_js_return = cgctx.is_some_and(|ctx| {
         ctx.experimental_generic_mono
             && (typemap::has_mono_js_string_return(value, ctx, scope)
@@ -2337,20 +2450,24 @@ pub fn generate_dictionary_params_in(
 /// An erased import's type parameter is a `JsGeneric` handle, but an
 /// awaited carrier of one (`Nullable<T>`) converts through the carrier's
 /// ABI, so it is bounded by that carrier's trait.
-pub(crate) fn state_abi_bounds(items: &mut [syn::Item]) {
+///
+/// `awaits_promise` is [`PromiseReturns::Promise`], under which a returned
+/// `Promise<T>` converts `T` when awaited. Otherwise only an `async fn`
+/// does, and a returned promise is a handle.
+pub(crate) fn state_abi_bounds(items: &mut [syn::Item], awaits_promise: bool) {
     for item in items {
         match item {
             syn::Item::Mod(m) => {
                 if let Some((_, items)) = &mut m.content {
-                    state_abi_bounds(items);
+                    state_abi_bounds(items, awaits_promise);
                 }
             }
             syn::Item::ForeignMod(block) => {
                 let mono = has_wasm_bindgen_flag(&block.attrs, "experimental_generic_mono");
                 for item in &mut block.items {
                     match item {
-                        syn::ForeignItem::Fn(f) if mono => state_fn_abi_bounds(f),
-                        syn::ForeignItem::Fn(f) => state_awaited_carrier_bound(f),
+                        syn::ForeignItem::Fn(f) if mono => state_fn_abi_bounds(f, awaits_promise),
+                        syn::ForeignItem::Fn(f) => state_awaited_carrier_bound(f, awaits_promise),
                         _ => {}
                     }
                 }
@@ -2360,12 +2477,16 @@ pub(crate) fn state_abi_bounds(items: &mut [syn::Item]) {
     }
 }
 
-fn state_awaited_carrier_bound(f: &mut syn::ForeignItemFn) {
+fn state_awaited_carrier_bound(f: &mut syn::ForeignItemFn, awaits_promise: bool) {
     let syn::ReturnType::Type(_, ret) = &f.sig.output else {
         return;
     };
-    let Some(ret) = awaited_type(ret) else {
-        return;
+    let ret = match f.sig.asyncness {
+        Some(_) => result_ok_type(ret).unwrap_or(ret),
+        None => match awaited_type(ret).filter(|_| awaits_promise) {
+            Some(ret) => ret,
+            None => return,
+        },
     };
     let params: std::collections::HashSet<String> = f
         .sig
@@ -2457,7 +2578,7 @@ fn mentions_param(tokens: TokenStream, params: &std::collections::HashSet<String
     })
 }
 
-fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn) {
+fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn, awaits_promise: bool) {
     use quote::ToTokens;
     let params: std::collections::HashSet<String> = f
         .sig
@@ -2540,8 +2661,11 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn) {
     }
 
     if let syn::ReturnType::Type(_, ret) = &f.sig.output {
-        let awaited = awaited_type(ret);
-        let is_async = awaited.is_some();
+        let awaited = match f.sig.asyncness {
+            Some(_) => None,
+            None => awaited_type(ret).filter(|_| awaits_promise),
+        };
+        let is_async = f.sig.asyncness.is_some() || awaited.is_some();
         let ret = match awaited {
             Some(ret) => ret,
             None if has_wasm_bindgen_flag(&f.attrs, "catch") => result_ok_type(ret).unwrap_or(ret),
@@ -2697,13 +2821,13 @@ mod tests {
             #[wasm_bindgen(experimental_generic_mono)]
             extern "C" {
                 #[wasm_bindgen(method, catch)]
-                pub fn load<T, U>(this: &Store<T>, u: U, key: impl JsStringLike) -> Promise<Holder<T>>;
+                pub async fn load<T, U>(this: &Store<T>, u: U, key: impl JsStringLike) -> Result<Holder<T>, JsValue>;
                 pub fn find<T>(value: &T, rest: Vec<T>) -> Option<T>;
                 pub fn plain(value: f64) -> f64;
                 pub fn nullable<T, U>(value: Nullable<T>, both: Option<Nullable<U>>) -> Option<Nullable<T>>;
             }
         };
-        state_abi_bounds(&mut file.items);
+        state_abi_bounds(&mut file.items, false);
         let syn::Item::ForeignMod(block) = &file.items[0] else {
             unreachable!()
         };
@@ -2810,6 +2934,7 @@ mod tests {
                     return_type: ret,
                     body_scope: scope,
                     throws: &Throws::None,
+                    async_modifier: false,
                     doc: &None,
                 }],
             },
@@ -2845,42 +2970,208 @@ mod tests {
     }
 
     #[test]
-    fn promise_returns_bind_one_catching_promise_under_every_policy() {
+    fn fallible_policy_promise_form_catches_sync_throws() {
+        let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
+        let op = |throws: &Throws| {
+            expand_fallible(
+                "op",
+                &[],
+                &promise,
+                SignatureKind::Method,
+                throws,
+                &mut no_used(),
+            )
+        };
+        let sigs = op(&Throws::None);
+        assert_eq!(sigs.len(), 2);
+        assert_eq!(sigs[1].rust_name, "op_promise");
+        assert!(!sigs[1].is_async() && sigs[1].catch);
+        assert_eq!(sigs[1].return_type, promise);
+        let typed = op(&Throws::Type(TypeRef::ident("TypeError")));
+        assert_eq!(typed[1].error_type, Some(TypeRef::ident("TypeError")));
+        let never = op(&Throws::Never);
+        assert!(!never[1].catch && never[1].error_type.is_none());
+    }
+
+    /// `op(): Promise<string>` on a user module's class, under `mode`.
+    fn promise_op(mode: PromiseReturns, fallible: bool, throws: &Throws) -> Vec<FunctionSignature> {
+        let (gctx, scope) = test_ctx();
+        let mut cgctx = CodegenContext::empty(&gctx, scope);
+        cgctx.fallible = fallible;
+        cgctx.promise_returns = mode;
+        build_signatures(
+            &CallableSpec {
+                js_name: "op",
+                rust_name: None,
+                kind: SignatureKind::Method,
+                module: &ModuleContext::Module("user-lib".into()),
+                overloads: &[Overload {
+                    params: &[],
+                    return_type: &TypeRef::generic("Promise", vec![TypeRef::String]),
+                    body_scope: scope,
+                    throws,
+                    async_modifier: false,
+                    doc: &None,
+                }],
+            },
+            &mut no_used(),
+            Some(&cgctx),
+        )
+    }
+
+    #[test]
+    fn the_promise_form_rejects_with_what_the_async_fn_returns() {
+        let type_error = Throws::Type(TypeRef::ident("TypeError"));
+        for fallible in [false, true] {
+            for throws in [&Throws::None, &type_error] {
+                let sigs = promise_op(PromiseReturns::Both, fallible, throws);
+                assert_eq!(sigs[0].form, PromiseForm::Async);
+                assert_eq!(sigs[0].error_type.as_ref(), throws.as_type());
+                assert_eq!(sigs[1].form, PromiseForm::Handle(throws.clone()));
+            }
+            let never = promise_op(PromiseReturns::Both, fallible, &Throws::Never);
+            assert_eq!(never[1].form, PromiseForm::Handle(Throws::Never));
+        }
+    }
+
+    #[test]
+    fn promise_mode_binds_one_catching_promise_under_every_policy() {
         let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
         let type_error = TypeRef::ident("TypeError");
         for fallible in [false, true] {
-            let op = |throws: &Throws| {
-                let (gctx, scope) = test_ctx();
-                let mut cgctx = CodegenContext::empty(&gctx, scope);
-                cgctx.fallible = fallible;
-                build_signatures(
-                    &CallableSpec {
-                        js_name: "op",
-                        rust_name: None,
-                        kind: SignatureKind::Method,
-                        module: &ModuleContext::Global,
-                        overloads: &[Overload {
-                            params: &[],
-                            return_type: &promise,
-                            body_scope: scope,
-                            throws,
-                            doc: &None,
-                        }],
-                    },
-                    &mut no_used(),
-                    Some(&cgctx),
-                )
-            };
+            let op = |throws: &Throws| promise_op(PromiseReturns::Promise, fallible, throws);
             let sigs = op(&Throws::None);
             assert_eq!(sigs.len(), 1);
             assert_eq!(sigs[0].rust_name, "op");
             assert!(sigs[0].catch);
+            assert_eq!(sigs[0].form, PromiseForm::Value);
             assert_eq!(sigs[0].return_type, promise);
             let typed = op(&Throws::Type(type_error.clone()));
             assert_eq!(typed[0].error_type.as_ref(), Some(&type_error));
             let never = op(&Throws::Never);
             assert_eq!(never.len(), 1);
             assert!(!never[0].catch && never[0].error_type.is_none());
+        }
+    }
+
+    #[test]
+    fn async_mode_binds_the_async_fn_alone() {
+        let type_error = TypeRef::ident("TypeError");
+        for fallible in [false, true] {
+            let op = |throws: &Throws| promise_op(PromiseReturns::Async, fallible, throws);
+            let sigs = op(&Throws::None);
+            assert_eq!(sigs.len(), 1);
+            assert_eq!(sigs[0].rust_name, "op");
+            assert!(sigs[0].is_async() && sigs[0].catch);
+            assert_eq!(sigs[0].return_type, TypeRef::String);
+            let typed = op(&Throws::Type(type_error.clone()));
+            assert_eq!(typed[0].error_type.as_ref(), Some(&type_error));
+            let never = op(&Throws::Never);
+            assert_eq!(never.len(), 1);
+            assert!(never[0].is_async() && !never[0].catch);
+        }
+    }
+
+    #[test]
+    fn promise_never_awaits_unit_in_every_mode() {
+        let promise_never = TypeRef::generic("Promise", vec![TypeRef::Never]);
+        let (gctx, scope) = test_ctx();
+        let build = |mode| {
+            let mut cgctx = CodegenContext::empty(&gctx, scope);
+            cgctx.promise_returns = mode;
+            build_signatures(
+                &CallableSpec {
+                    js_name: "rejectLater",
+                    rust_name: None,
+                    kind: SignatureKind::Function,
+                    module: &ModuleContext::Global,
+                    overloads: &[Overload {
+                        params: &[],
+                        return_type: &promise_never,
+                        body_scope: scope,
+                        throws: &Throws::Never,
+                        async_modifier: false,
+                        doc: &None,
+                    }],
+                },
+                &mut no_used(),
+                Some(&cgctx),
+            )
+        };
+        // The promise itself, which `to_return_type` awaits as `()`.
+        let sigs = build(PromiseReturns::Promise);
+        assert_eq!(sigs.len(), 1);
+        assert!(sigs[0].catch);
+        assert_eq!(sigs[0].return_type, promise_never);
+        let sigs = build(PromiseReturns::Async);
+        assert_eq!(sigs.len(), 1);
+        assert!(sigs[0].is_async() && sigs[0].catch);
+        assert_eq!(sigs[0].return_type, TypeRef::Void);
+    }
+
+    #[test]
+    fn builtin_global_and_async_promise_forms_never_catch() {
+        let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
+        let type_error = Throws::Type(TypeRef::ident("TypeError"));
+        let module = |m: &str| ModuleContext::Module(m.into());
+        for (ctx, async_modifier) in [
+            (ModuleContext::Global, false),
+            (module("node:fs"), false),
+            (module("fs"), false),
+            (module("fs/promises"), false),
+            (module("cloudflare:sockets"), false),
+            (module("bun:sqlite"), false),
+            (module("workerd:x"), false),
+            (module("user-lib"), true),
+        ] {
+            for kind in [SignatureKind::Function, SignatureKind::Method] {
+                for throws in [&Throws::None, &type_error] {
+                    let sigs = expand_fallible_in(
+                        &ctx,
+                        async_modifier,
+                        "op",
+                        &[],
+                        &promise,
+                        kind,
+                        throws,
+                        &mut no_used(),
+                    );
+                    assert_eq!(sigs[1].rust_name, "op_promise");
+                    assert!(!sigs[1].catch, "{ctx:?} {async_modifier}");
+                    assert_eq!(sigs[1].error_type, None);
+                    // `@throws` on an async callable types the rejection,
+                    // which the `async fn` form keeps carrying.
+                    assert!(sigs[0].is_async() && sigs[0].catch);
+                    assert_eq!(sigs[0].error_type.as_ref(), throws.as_type());
+                }
+            }
+        }
+        // A module that only resembles a builtin is the user's: a package
+        // registry's scheme, a URL, a `data:` or `blob:` URL, or a
+        // lookalike name.
+        for name in [
+            "npm:lodash",
+            "jsr:@std/path",
+            "https://esm.sh/foo",
+            "http://x",
+            "file:///x",
+            "data:text/javascript,export{}",
+            "blob:https://x/uuid",
+            "fsx",
+            "node-fetch",
+            "@cloudflare/workers-types",
+        ] {
+            let sigs = expand_fallible_in(
+                &module(name),
+                false,
+                "op",
+                &[],
+                &promise,
+                SignatureKind::Function,
+                &Throws::None,
+                &mut no_used(),
+            );
+            assert!(sigs[1].catch, "{name}");
         }
     }
 
@@ -3027,6 +3318,7 @@ mod tests {
                     return_type: ret,
                     body_scope: scope,
                     throws,
+                    async_modifier: false,
                     doc,
                 }],
             },
@@ -3036,7 +3328,25 @@ mod tests {
     }
 
     /// Like [`expand_throws`] under `--fallible`.
+    /// The callable is a user module's, whose calls can throw synchronously.
     fn expand_fallible(
+        js: &str,
+        params: &[Param],
+        ret: &TypeRef,
+        kind: SignatureKind,
+        throws: &Throws,
+        used: &mut LocalScope,
+    ) -> Vec<FunctionSignature> {
+        let user = ModuleContext::Module("user-lib".into());
+        expand_fallible_in(&user, false, js, params, ret, kind, throws, used)
+    }
+
+    /// Like [`expand_fallible`], for a callable in `module`, declared
+    /// `async` or not.
+    #[allow(clippy::too_many_arguments)]
+    fn expand_fallible_in(
+        module: &ModuleContext,
+        async_modifier: bool,
         js: &str,
         params: &[Param],
         ret: &TypeRef,
@@ -3052,12 +3362,13 @@ mod tests {
                 js_name: js,
                 rust_name: None,
                 kind,
-                module: &ModuleContext::Module("user-lib".into()),
+                module,
                 overloads: &[Overload {
                     params,
                     return_type: ret,
                     body_scope: scope,
                     throws,
+                    async_modifier,
                     doc: &None,
                 }],
             },
@@ -3084,6 +3395,7 @@ mod tests {
                 return_type: ret,
                 body_scope: scope,
                 throws: &Throws::None,
+                async_modifier: false,
                 doc,
             })
             .collect();
@@ -3225,53 +3537,73 @@ mod tests {
         assert_eq!(sigs.len(), 1);
         assert_eq!(sigs[0].rust_name, "new");
         assert!(sigs[0].catch);
+        assert!(!sigs[0].is_async());
     }
 
     #[test]
-    fn test_promise_method_binds_a_catching_promise() {
-        // `foo(): Promise<string>` binds one catching `foo() -> Promise<JsString>`:
-        // no `try_foo`, since a synchronous throw rejects the promise.
-        let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
+    fn test_promise_method_collapses_to_async() {
+        // `foo(): Promise<string>` on a method should produce a single
+        // `async fn foo() -> Result<string, JsValue>` signature — no `try_foo`
+        // companion, since the async + catch form is already fallible.
+        let mut used = no_used();
         let sigs = expand(
             "foo",
             &[],
-            &promise,
+            &TypeRef::generic("Promise", vec![TypeRef::String]),
             SignatureKind::Method,
             &None,
-            &mut no_used(),
+            &mut used,
         );
-        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs.len(), 2, "async primary plus its `_promise` form");
         assert_eq!(sigs[0].rust_name, "foo");
-        assert!(sigs[0].catch);
-        assert_eq!(sigs[0].return_type, promise);
+        assert!(sigs[0].is_async(), "promise method must be async");
+        assert!(sigs[0].catch, "async promise method must catch");
+        // Return type is unwrapped from Promise<T> — wasm-bindgen rewraps as a
+        // Promise on the JS side automatically when `async fn` is used.
+        assert_eq!(sigs[0].return_type, TypeRef::String);
+        // The sync form hands back the promise itself, un-unwrapped, and
+        // does not catch under the default policy.
+        assert_eq!(sigs[1].rust_name, "foo_promise");
+        assert!(!sigs[1].is_async());
+        assert!(!sigs[1].catch);
+        assert_eq!(
+            sigs[1].return_type,
+            TypeRef::generic("Promise", vec![TypeRef::String])
+        );
     }
 
     #[test]
-    fn test_promise_function_binds_a_catching_promise() {
+    fn test_promise_function_collapses_to_async() {
+        let mut used = no_used();
         let sigs = expand(
             "fetch",
             &[param("url")],
             &TypeRef::generic("Promise", vec![TypeRef::ident("Response")]),
             SignatureKind::Function,
             &None,
-            &mut no_used(),
+            &mut used,
         );
-        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs.len(), 2);
         assert_eq!(sigs[0].rust_name, "fetch");
+        assert!(sigs[0].is_async());
         assert!(sigs[0].catch);
+        assert_eq!(sigs[0].return_type, TypeRef::ident("Response"));
+        assert_eq!(sigs[1].rust_name, "fetch_promise");
     }
 
     #[test]
-    fn test_promise_static_method_binds_a_catching_promise() {
+    fn test_promise_static_method_collapses_to_async() {
+        let mut used = no_used();
         let sigs = expand(
             "all",
             &[param("promises")],
             &TypeRef::generic("Promise", vec![TypeRef::Any]),
             SignatureKind::StaticMethod,
             &None,
-            &mut no_used(),
+            &mut used,
         );
-        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs.len(), 2);
+        assert!(sigs[0].is_async());
         assert!(sigs[0].catch);
     }
 
@@ -3291,15 +3623,19 @@ mod tests {
         );
         assert_eq!(sigs.len(), 2);
         assert_eq!(sigs[0].rust_name, "compute");
+        assert!(!sigs[0].is_async());
         assert!(!sigs[0].catch);
         assert_eq!(sigs[1].rust_name, "try_compute");
+        assert!(!sigs[1].is_async());
         assert!(sigs[1].catch);
     }
 
     #[test]
-    fn test_promise_overloads_each_bind_a_catching_promise() {
-        // Two overloads, both promise-returning: each binds one catching
-        // promise, with no `try_` sibling.
+    fn test_promise_overloads_each_collapse() {
+        // Two overloads, both promise-returning. Each surviving expanded
+        // signature should be a standalone async fn — no `try_` siblings, even
+        // when overload disambiguation produces multiple bindings.
+        let mut used = no_used();
         let sigs = expand_overloads(
             "send",
             &[
@@ -3309,11 +3645,29 @@ mod tests {
             &TypeRef::generic("Promise", vec![TypeRef::ident("EmailSendResult")]),
             SignatureKind::Method,
             &None,
-            &mut no_used(),
+            &mut used,
         );
-        let names: Vec<_> = sigs.iter().map(|s| s.rust_name.as_str()).collect();
-        assert_eq!(names, ["send", "send_with_builder"]);
-        assert!(sigs.iter().all(|s| s.catch));
+        assert_eq!(
+            sigs.len(),
+            4,
+            "two overloads → two async sigs + two `_promise`"
+        );
+        for sig in &sigs {
+            assert!(
+                !sig.rust_name.starts_with("try_"),
+                "no try_ variant expected for promise overloads, got {}",
+                sig.rust_name,
+            );
+        }
+        for sig in sigs.iter().filter(|s| s.is_async()) {
+            assert!(sig.catch, "{} should catch", sig.rust_name);
+        }
+        // Names should disambiguate via the standard `_with_<param>` suffix;
+        // the promise form appends to the disambiguated name.
+        assert_eq!(sigs[0].rust_name, "send");
+        assert_eq!(sigs[1].rust_name, "send_promise");
+        assert_eq!(sigs[2].rust_name, "send_with_builder");
+        assert_eq!(sigs[3].rust_name, "send_with_builder_promise");
     }
 
     #[test]
@@ -3336,6 +3690,7 @@ mod tests {
                         return_type: &promise,
                         body_scope: outer,
                         throws: &Throws::None,
+                        async_modifier: false,
                         doc: &None,
                     },
                     Overload {
@@ -3343,6 +3698,7 @@ mod tests {
                         return_type: &TypeRef::Number,
                         body_scope: inner,
                         throws: &Throws::None,
+                        async_modifier: false,
                         doc: &None,
                     },
                 ],
@@ -3352,14 +3708,22 @@ mod tests {
         );
         let summary: Vec<_> = sigs
             .iter()
-            .map(|s| (s.rust_name.as_str(), s.catch, &s.return_type, s.body_scope))
+            .map(|s| {
+                (
+                    s.rust_name.as_str(),
+                    s.is_async(),
+                    &s.return_type,
+                    s.body_scope,
+                )
+            })
             .collect();
         assert_eq!(
             summary,
             [
-                ("f", true, &promise, outer),
+                ("f", true, &TypeRef::String, outer),
+                ("f_promise", false, &promise, outer),
                 ("f_with_f64", false, &TypeRef::Number, inner),
-                ("try_f_with_f64", true, &TypeRef::Number, inner),
+                ("try_f_with_f64", false, &TypeRef::Number, inner),
             ]
         );
     }
@@ -3382,6 +3746,7 @@ mod tests {
         );
         assert_eq!(sigs.len(), 1);
         assert_eq!(sigs[0].rust_name, "set_value");
+        assert!(!sigs[0].is_async());
         // Setters never get `try_` either.
     }
 
@@ -3593,6 +3958,7 @@ mod tests {
         assert_eq!(sigs.len(), 1, "nothrow methods get no try_ companion");
         assert_eq!(sigs[0].rust_name, "count");
         assert!(!sigs[0].catch);
+        assert!(!sigs[0].is_async());
     }
 
     #[test]
@@ -3626,14 +3992,17 @@ mod tests {
             &None,
             &mut used,
         );
-        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs.len(), 2);
         assert_eq!(sigs[0].rust_name, "loaded");
-        assert!(!sigs[0].catch, "nothrow drops catch: a plain `Promise<T>`");
-        assert!(sigs[0].error_type.is_none());
-        assert_eq!(
-            sigs[0].return_type,
-            TypeRef::generic("Promise", vec![TypeRef::String])
+        assert!(sigs[0].is_async());
+        assert!(
+            !sigs[0].catch,
+            "nothrow async drops catch — return type is T directly"
         );
+        assert!(sigs[0].error_type.is_none());
+        assert_eq!(sigs[0].return_type, TypeRef::String);
+        assert_eq!(sigs[1].rust_name, "loaded_promise");
+        assert!(!sigs[1].catch);
     }
 
     #[test]
@@ -3676,6 +4045,7 @@ mod tests {
         assert_eq!(sigs.len(), 1);
         assert_eq!(sigs[0].rust_name, "new");
         assert!(sigs[0].catch, "constructors always catch even with nothrow");
+        assert!(!sigs[0].is_async());
     }
 
     #[test]
@@ -3716,6 +4086,7 @@ mod tests {
         assert_eq!(sigs.len(), 1);
         assert_eq!(sigs[0].rust_name, "compute");
         assert!(sigs[0].catch);
+        assert!(!sigs[0].is_async());
         assert!(sigs[0].error_type.is_none(), "untyped error defaults later");
     }
 
@@ -3791,9 +4162,14 @@ mod tests {
             let plain = expand_throws(js, params, &ret, kind, &Throws::None, &None, &mut no_used());
             let fallible = expand_fallible(js, params, &ret, kind, &Throws::None, &mut no_used());
             assert_eq!(plain.len(), fallible.len(), "{js}");
-            for (a, b) in plain.iter().zip(&fallible) {
+            // An async callable's `_promise` form is a sync callable and
+            // follows the policy (see
+            // `fallible_policy_promise_form_catches_sync_throws`).
+            let pairs = plain.iter().zip(&fallible);
+            for (a, b) in pairs.filter(|(a, _)| !a.rust_name.ends_with("_promise")) {
                 assert_eq!(a.rust_name, b.rust_name, "{js}");
                 assert_eq!(a.catch, b.catch, "{js}");
+                assert_eq!(a.is_async(), b.is_async(), "{js}");
                 assert_eq!(a.error_type, b.error_type, "{js}");
             }
         }
@@ -3820,7 +4196,7 @@ mod tests {
             );
             assert_eq!(sigs.len(), 1, "{kind:?}");
             assert_eq!(sigs[0].rust_name, "value_of");
-            assert!(sigs[0].catch);
+            assert!(sigs[0].catch && !sigs[0].is_async());
             assert_eq!(sigs[0].return_type, TypeRef::Void);
             // No `try_` name is claimed.
             assert_eq!(used.declare("try_value_of", Suffix::Snake), "try_value_of");
@@ -3893,10 +4269,16 @@ mod tests {
                 &None,
                 &mut no_used(),
             );
-            assert_eq!(sigs.len(), 1, "{throws:?}");
+            assert_eq!(sigs.len(), 2, "{throws:?}");
             assert_eq!(sigs[0].rust_name, "reject_later");
-            assert!(sigs[0].catch, "{throws:?}");
-            assert_eq!(sigs[0].return_type, promise_never);
+            assert!(sigs[0].is_async() && sigs[0].catch, "{throws:?}");
+            assert_eq!(sigs[0].return_type, TypeRef::Void);
+            assert_eq!(sigs[1].rust_name, "reject_later_promise");
+            assert!(!sigs[1].is_async());
+            assert_eq!(
+                sigs[1].return_type,
+                TypeRef::generic("Promise", vec![TypeRef::Void])
+            );
         }
     }
 
@@ -3911,6 +4293,7 @@ mod tests {
             return_type,
             body_scope: scope,
             throws: &Throws::None,
+            async_modifier: false,
             doc: &None,
         };
         let sigs = build_signatures(
@@ -3944,6 +4327,7 @@ mod tests {
             return_type,
             body_scope: scope,
             throws: &Throws::None,
+            async_modifier: false,
             doc: &None,
         };
         let build = |overloads: &[Overload<'_>], used: &mut LocalScope| {
@@ -4021,7 +4405,7 @@ mod tests {
     }
 
     #[test]
-    fn test_throws_typed_promise_carries_error_type() {
+    fn test_throws_typed_async_carries_error_type() {
         let err = TypeRef::ident("ImagesError");
         let mut used = no_used();
         let sigs = expand_throws(
@@ -4033,9 +4417,15 @@ mod tests {
             &None,
             &mut used,
         );
-        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs.len(), 2);
+        assert!(sigs[0].is_async());
         assert!(sigs[0].catch);
         assert_eq!(sigs[0].error_type.as_ref(), Some(&err));
+        // Default policy: the sync promise form does not catch, so the
+        // typed error does not apply to it.
+        assert_eq!(sigs[1].rust_name, "upload_promise");
+        assert!(!sigs[1].catch);
+        assert!(sigs[1].error_type.is_none());
     }
 
     #[test]
@@ -4352,6 +4742,7 @@ mod tests {
                 body_scope: scope,
                 throws: &Throws::Never,
                 doc: &None,
+                async_modifier: false,
             })
             .collect();
         let sigs = build_signatures(

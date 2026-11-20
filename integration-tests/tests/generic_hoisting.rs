@@ -45,7 +45,8 @@ async fn methods_take_any_instantiation() {
     assert_eq!(courier.send_either(&typed), "env:typed");
     assert_eq!(courier.send_either_with_str("s"), "str:s");
     assert_eq!(courier.send_async(&typed).await.unwrap(), "async:typed");
-    assert_eq!(courier.send_async(&plain).await.unwrap(), "async:plain");
+    let promised: JsString = courier.send_async_promise(&plain).await.unwrap();
+    assert_eq!(promised, "async:plain");
     assert_eq!(Courier::check(&typed), "check:typed");
     // The receiver's parameters and the argument's are independent.
     assert_eq!(typed.forward(&plain), "typed->plain");

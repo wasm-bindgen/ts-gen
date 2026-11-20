@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{ArrayBuffer, JsString, Map, Object};
+use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Object, Promise};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads::{
@@ -24,6 +24,7 @@ async fn arms_compile(
     let _: Option<String> = kv.get_text("k").await?;
     let _: JsValue = kv.get_json("k").await?;
     let _: Option<ArrayBuffer> = kv.get_array_buffer("k").await?;
+    let _: Promise<JsNullable<JsString>> = kv.get_text_promise("k");
     let _: Map<JsString, JsValue> = kv.get_json_with_slice(&["a".to_string()]).await?;
     let _: bool = kv.mode(KVNamespaceKind::Fast);
     let _: Result<bool, JsValue> = kv.try_mode(KVNamespaceKind::Safe);

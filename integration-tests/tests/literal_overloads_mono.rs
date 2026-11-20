@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Object, Uint8Array};
+use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Object, Promise, Uint8Array};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads_mono::{
@@ -26,6 +26,7 @@ async fn mono_arms_compile(
     let _: Option<JsString> = kv.get_text_js_string("k").await?;
     let _: JsValue = kv.get_json("k").await?;
     let _: Option<ArrayBuffer> = kv.get_array_buffer("k").await?;
+    let _: Promise<Option<JsString>> = kv.get_text_promise("k");
     let _: Option<Uint8Array> = kv.get_stream("k").await?;
     let _: Map<JsString, JsNullable<JsString>> = kv.get_text_with_slice(&["a"]).await?;
     let _: Map<JsString, JsValue> = kv.get_json_with_slice(&["a"]).await?;

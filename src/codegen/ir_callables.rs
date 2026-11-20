@@ -123,7 +123,7 @@ pub fn build(
     let overloads: Vec<Overload> = ir
         .iter()
         .zip(scopes)
-        .map(|(o, body_scope)| Overload {
+        .map(|(o, (body_scope, async_modifier))| Overload {
             params: &o.params,
             // A constructor's result is its class, which the IR leaves out.
             return_type: match spec.kind {
@@ -132,6 +132,7 @@ pub fn build(
             },
             body_scope,
             throws: &o.throws,
+            async_modifier,
             doc: &o.doc,
         })
         .collect();
@@ -148,13 +149,13 @@ pub fn build(
 
 type Restated = (
     Vec<super::ir_types::Overload>,
-    Vec<ScopeId>,
+    Vec<(ScopeId, bool)>,
     Vec<ExpandedSignature>,
 );
 
-/// The IR overloads at `site`, each with the scope of the parse overload it
-/// restates, and the parse's expansions restated over them, when the
-/// parse's reading of the callable is one the IR carries.
+/// The IR overloads at `site`, each with the scope and `async` modifier of
+/// the parse overload it restates, and the parse's expansions restated over
+/// them, when the parse's reading of the callable is one the IR carries.
 ///
 /// The Rust forms (the `_with_` names, literal-keyed cohorts, `null` arms,
 /// slice hints) are still the parse's expansions; each of their calls
@@ -199,7 +200,7 @@ fn restated(
         })
         .collect();
     let mut used = vec![false; overloads.len()];
-    let mut scopes = vec![scope; overloads.len()];
+    let mut scopes = vec![(scope, first.async_modifier); overloads.len()];
     let mut covered = Vec::new();
     let mut expansions = Vec::with_capacity(legacy.len());
     let mut collapsed = false;
@@ -236,7 +237,7 @@ fn restated(
                 return None;
             };
             covered.extend(merged);
-            scopes[i] = scope;
+            scopes[i] = (scope, source.async_modifier);
             let o = &mut overloads[i];
             if source.throws.is_never() && matches!(o.throws, Throws::None) {
                 o.throws = Throws::Never;

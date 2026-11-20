@@ -170,10 +170,23 @@ struct Cli {
     /// and returns `Result<T, E>`; `E` follows the usual rules
     /// (`@throws {T}`, else `JsValue`, or `js_sys::Error` under
     /// `--errors-as-error`). `@throws {never}` keeps a binding
-    /// infallible. Promise-returning callables (which always catch, as a
-    /// rejection), constructors, setters and getters are unchanged.
+    /// infallible. Constructors, setters and getters are unchanged, and so
+    /// is an `async fn` or a returned `Promise<T, E>`, which reports a
+    /// throw as a rejection. A sync `name_promise()` form catches too,
+    /// as `Result<Promise<T>, E>`, unless its callable is a builtin or
+    /// global one or declared `async`.
     #[arg(long = "fallible")]
     fallible: bool,
+
+    /// How a `Promise`-returning method or function is bound.
+    ///
+    /// `both` binds an `async fn name()` beside a sync `name_promise()`
+    /// that returns the promise. `promise` binds one sync `name()`
+    /// returning `Promise<T, E>`: the call starts at once, and a
+    /// synchronous throw is its rejection. `async` binds only the
+    /// `async fn`, which calls JS when it is first polled.
+    #[arg(long = "promise-returns", value_enum, value_name = "MODE", default_value_t = PromiseReturns::Both)]
+    promise_returns: PromiseReturns,
 
     /// Report each type the IR zip reads from the parse in place of the
     /// IR's.
@@ -192,6 +205,23 @@ struct Cli {
     /// `undefined` for it. Every target reads the IR this produces.
     #[arg(long = "strict-nullable")]
     strict_nullable: bool,
+}
+
+#[derive(Clone, Copy, Debug, clap::ValueEnum)]
+enum PromiseReturns {
+    Both,
+    Promise,
+    Async,
+}
+
+impl From<PromiseReturns> for ts_gen::codegen::PromiseReturns {
+    fn from(mode: PromiseReturns) -> Self {
+        match mode {
+            PromiseReturns::Both => Self::Both,
+            PromiseReturns::Promise => Self::Promise,
+            PromiseReturns::Async => Self::Async,
+        }
+    }
 }
 
 fn main() -> Result<()> {
@@ -262,6 +292,7 @@ fn main() -> Result<()> {
     let mut options = ts_gen::codegen::GenerateOptions::new()
         .errors_as_error(cli.errors_as_error)
         .fallible(cli.fallible)
+        .promise_returns(cli.promise_returns.into())
         .experimental_generic_mono(cli.experimental_generic_mono)
         .zip_diffs(cli.zip_diffs)
         .strict_nullable(cli.strict_nullable)

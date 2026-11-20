@@ -18,9 +18,10 @@ use std::collections::{HashMap, HashSet};
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use crate::codegen::signatures::PromiseForm;
 use crate::codegen::GenerateOptions;
 use crate::context::{GlobalContext, TypeId};
-use crate::ir::{self, ModuleContext, TypeKind, TypeRef};
+use crate::ir::{self, ModuleContext, Throws, TypeKind, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::{LocalScope, Suffix};
@@ -278,6 +279,9 @@ pub struct CodegenContext<'a> {
     /// primary name instead of a trapping primary plus `try_<name>`. See
     /// [`crate::codegen::GenerateOptions::fallible`].
     pub fallible: bool,
+    /// How promise returns are bound. See
+    /// [`crate::codegen::GenerateOptions::promise_returns`].
+    pub promise_returns: crate::codegen::PromiseReturns,
     /// Name of the generated `@throws` enum; every `@throws`-typed
     /// binding returns it. See
     /// [`crate::codegen::GenerateOptions::error_enum`].
@@ -1167,6 +1171,7 @@ impl<'a> CodegenContext<'a> {
             naming_module: RefCell::new(ModuleContext::Global),
             error_type,
             fallible: options.fallible,
+            promise_returns: options.promise_returns,
             error_enum: options.error_enum.clone(),
             experimental_generic_mono: options.experimental_generic_mono,
             exported_modules,
@@ -1238,6 +1243,7 @@ impl<'a> CodegenContext<'a> {
             naming_module: RefCell::new(ModuleContext::Global),
             error_type: None,
             fallible: false,
+            promise_returns: Default::default(),
             error_enum: None,
             experimental_generic_mono: false,
             exported_modules: HashSet::new(),
@@ -3370,12 +3376,21 @@ pub(crate) fn needs_js_name(ident: &syn::Ident, js_name: &str) -> bool {
 /// Map an IR `TypeRef` to the type used in a wasm_bindgen return position,
 /// wrapping in `Result<T, ErrTy>` when `catch` is true.
 ///
-/// A `Promise<T>` is bound as `Promise<T, ErrTy>` instead, and awaiting it
-/// converts the settled value through `FromWasmAbi`, so its `T` lowers
-/// like a sync return: bare primitives, the read carriers (`Option<T>`,
-/// `Nullable<T>`, `Option<Nullable<T>>`), `Vec<T>` and synthesized return
-/// unions. A list over a type parameter is the exception (see
-/// [`is_generic_rust_list`]).
+/// A promise return follows `form`:
+///
+/// * [`PromiseForm::Async`]: `ty` is the awaited value of an `async fn`
+///   import. It crosses the boundary through `JsFuture<T>`'s resolve
+///   closure, whose argument only needs `FromWasmAbi`, so it lowers like a
+///   sync return: bare primitives, the read carriers (`Option<T>`,
+///   `Nullable<T>`, `Option<Nullable<T>>`), `Vec<T>` and synthesized return
+///   unions. A list over a type parameter is the exception (see
+///   [`is_generic_rust_list`]).
+/// * [`PromiseForm::Handle`]: the `Promise<T>` itself, with the
+///   inside-generic lowering (`Promise<JsString>`), rejecting with what its
+///   `async fn` returns as `Err`.
+/// * [`PromiseForm::Value`]: a `Promise<T>` is bound as `Promise<T, ErrTy>`
+///   instead of a `Result`, and awaiting it converts the settled value
+///   through `FromWasmAbi`, so its `T` lowers like an `async fn`'s.
 ///
 /// `error_ty`, when supplied, replaces the default `JsValue` error type —
 /// callers pass the simplified throws union here. Resolution goes through
@@ -3385,6 +3400,7 @@ pub(crate) fn needs_js_name(ident: &syn::Ident, js_name: &str) -> bool {
 pub fn to_return_type(
     ty: &TypeRef,
     catch: bool,
+    form: &PromiseForm,
     js_string_return: bool,
     error_ty: Option<&TypeRef>,
     ctx: Option<&CodegenContext<'_>>,
@@ -3393,32 +3409,73 @@ pub fn to_return_type(
     anchor: ReturnAnchor<'_>,
 ) -> TokenStream {
     let err = catch.then(|| error_type_tokens(error_ty, ctx, scope, from_module));
-    let Some(awaited) = ty.as_promise_inner() else {
-        let inner = return_value(ty, false, js_string_return, ctx, scope, from_module, anchor);
-        return match err {
-            Some(err) => quote! { Result<#inner, #err> },
-            None => inner,
-        };
+    let value = |ty: &TypeRef, awaited: Awaited| {
+        return_value(
+            ty,
+            awaited,
+            js_string_return,
+            ctx,
+            scope,
+            from_module,
+            anchor,
+        )
     };
-    let inner = return_value(
-        awaited,
-        true,
-        js_string_return,
-        ctx,
-        scope,
-        from_module,
-        anchor,
-    );
-    match err {
-        Some(err) if !is_jsvalue_arg(&err) => quote! { Promise<#inner, #err> },
-        _ => quote! { Promise<#inner> },
+    let result = |inner: TokenStream| match &err {
+        Some(err) => quote! { Result<#inner, #err> },
+        None => inner,
+    };
+    match (form, ty.as_promise_inner()) {
+        (PromiseForm::Async, _) => result(value(ty, Awaited::Async)),
+        (PromiseForm::Handle(throws), _) => {
+            let rejects = match throws {
+                Throws::Never => None,
+                throws => Some(error_type_tokens(throws.as_type(), ctx, scope, from_module)),
+            };
+            let promise = to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module);
+            result(rejecting_with(promise, rejects))
+        }
+        (PromiseForm::Value, None) => result(value(ty, Awaited::No)),
+        (PromiseForm::Value, Some(awaited)) => {
+            let inner = value(awaited, Awaited::Promise);
+            match err {
+                Some(err) if !is_jsvalue_arg(&err) => quote! { Promise<#inner, #err> },
+                _ => quote! { Promise<#inner> },
+            }
+        }
     }
+}
+
+/// `Promise<T>` as `Promise<T, E>`, unless `E` is the `JsValue` default.
+fn rejecting_with(promise: TokenStream, rejects: Option<TokenStream>) -> TokenStream {
+    let Some(rejects) = rejects.filter(|e| !is_jsvalue_arg(e)) else {
+        return promise;
+    };
+    let Ok(mut ty) = syn::parse2::<syn::TypePath>(promise.clone()) else {
+        return promise;
+    };
+    match ty.path.segments.last_mut().map(|s| &mut s.arguments) {
+        Some(syn::PathArguments::AngleBracketed(args)) if args.args.len() == 1 => {
+            args.args.push(syn::parse_quote! { #rejects });
+            quote! { #ty }
+        }
+        _ => promise,
+    }
+}
+
+/// How a returned value is awaited.
+#[derive(Clone, Copy, PartialEq)]
+enum Awaited {
+    No,
+    /// By an `async fn` import.
+    Async,
+    /// From the `Promise<T, E>` a sync import returns.
+    Promise,
 }
 
 /// A returned value, or what a returned promise resolves to.
 fn return_value(
     ty: &TypeRef,
-    awaited: bool,
+    awaited: Awaited,
     js_string_return: bool,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
@@ -3430,7 +3487,7 @@ fn return_value(
     if let Some(ctx) = ctx.filter(|_| js_string_return) {
         return to_mono_js_string_return_type(ty, ctx, scope, from_module);
     }
-    if awaited && ctx.is_some_and(|c| is_generic_rust_list(ty, c, scope)) {
+    if awaited != Awaited::No && ctx.is_some_and(|c| is_generic_rust_list(ty, c, scope)) {
         // The list keeps its `Array<T>` handle; the awaited value's own
         // empties still take the read carriers around it.
         return match split_empties_in(ty, ctx, scope) {
@@ -3447,16 +3504,18 @@ fn return_value(
             None => to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module),
         };
     }
-    // Under erasure a promise's argument is a JS type, but for one that
-    // never resolves.
-    if awaited && *ty == TypeRef::Never {
-        return quote! { () };
-    }
-    if awaited && matches!(ty, TypeRef::Void | TypeRef::Undefined) {
-        return match ctx.is_some_and(|c| c.experimental_generic_mono) {
-            true => quote! { () },
-            false => quote! { Undefined },
-        };
+    if awaited == Awaited::Promise {
+        // Under erasure a promise's argument is a JS type, but for one that
+        // never resolves.
+        if *ty == TypeRef::Never {
+            return quote! { () };
+        }
+        if matches!(ty, TypeRef::Void | TypeRef::Undefined) {
+            return match ctx.is_some_and(|c| c.experimental_generic_mono) {
+                true => quote! { () },
+                false => quote! { Undefined },
+            };
+        }
     }
     if let Some(tokens) = union_alias_read(ty, ctx, scope) {
         return tokens;
@@ -5115,10 +5174,11 @@ mod tests {
 
     #[test]
     fn test_return_with_catch() {
-        let catching = |ty: &TypeRef| {
+        let catching = |ty: &TypeRef, form: PromiseForm| {
             to_return_type(
                 ty,
                 true,
+                &form,
                 false,
                 None,
                 None,
@@ -5132,12 +5192,32 @@ mod tests {
             )
             .to_string()
         };
-        assert_eq!(catching(&TypeRef::String), "Result < String , JsValue >");
+        let value = |ty: &TypeRef| catching(ty, PromiseForm::Value);
+        assert_eq!(value(&TypeRef::String), "Result < String , JsValue >");
         // A promise rejects with the error rather than returning a `Result`.
         let promise = TypeRef::generic("Promise", vec![TypeRef::Void]);
-        assert_eq!(catching(&promise), "Promise < Undefined >");
+        assert_eq!(value(&promise), "Promise < Undefined >");
         let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
-        assert_eq!(catching(&promise), "Promise < String >");
+        assert_eq!(value(&promise), "Promise < String >");
+        // An `async fn` returns what it awaits.
+        assert_eq!(
+            catching(&TypeRef::Void, PromiseForm::Async),
+            "Result < () , JsValue >"
+        );
+        // The promise beside it is a handle, typed by what it rejects with.
+        let handle = |throws| catching(&promise, PromiseForm::Handle(throws));
+        assert_eq!(
+            handle(Throws::None),
+            "Result < Promise < JsString > , JsValue >"
+        );
+        assert_eq!(
+            handle(Throws::Type(TypeRef::ident("TypeError"))),
+            "Result < Promise < JsString , TypeError > , JsValue >"
+        );
+        assert_eq!(
+            handle(Throws::Never),
+            "Result < Promise < JsString > , JsValue >"
+        );
     }
 
     #[test]
