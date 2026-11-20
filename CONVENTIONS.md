@@ -4013,6 +4013,11 @@ qualify. The awaited value of an `async fn` is a top-level return and
 does synthesise (`fetchValue(): Promise<32 | "foo">` →
 `Result<FetchValueKind, E>`).
 
+A read admitting an empty synthesises the enum for its other members,
+inside its [read carrier](#reads), for a getter, a callable's result and
+an awaited value alike: `find(): string | ArrayBuffer | null` →
+`Option<FindKind>`.
+
 #### Union aliases flatten into the read
 
 A read of a [named union alias](#named-union-aliases) whose arms it can

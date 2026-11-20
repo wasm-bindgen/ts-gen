@@ -8026,12 +8026,12 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/get)"]
     #[wasm_bindgen(method)]
-    pub fn get(this: &FormData, name: &str) -> Option<JsValue>;
+    pub fn get(this: &FormData, name: &str) -> Option<FileOrStr>;
     #[doc = " The **`get()`** method of the FormData interface returns the first value associated with a given key from within a `FormData` object."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/get)"]
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(this: &FormData, name: &str) -> Result<Option<JsValue>, JsValue>;
+    pub fn try_get(this: &FormData, name: &str) -> Result<Option<FileOrStr>, JsValue>;
     #[doc = " The **`getAll()`** method of the FormData interface returns all the values associated with a given key from within a `FormData` object."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/getAll)"]
@@ -62335,6 +62335,12 @@ pub enum F64OrBigInt2 {
 #[derive(Clone, Debug)]
 pub enum ArrayBufferOrStr {
     ArrayBuffer(ArrayBuffer),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum FileOrStr {
+    File(File),
     String(String),
 }
 #[wasm_bindgen(private)]

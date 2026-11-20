@@ -7401,7 +7401,7 @@ extern "C" {
     pub fn get(
         this: &FormData,
         name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<JsValue>, JsValue>;
+    ) -> Result<Option<FileOrStr>, JsValue>;
     #[doc = " The **`getAll()`** method of the FormData interface returns all the values associated with a given key from within a `FormData` object."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/getAll)"]
@@ -65252,6 +65252,12 @@ pub enum F64OrBigInt2 {
 #[derive(Clone, Debug)]
 pub enum ArrayBufferOrStr {
     ArrayBuffer(ArrayBuffer),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum FileOrStr {
+    File(File),
     String(String),
 }
 #[wasm_bindgen(private)]
