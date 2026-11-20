@@ -632,7 +632,7 @@ function $f17(w0_0, w1_0, w1_1, w2_0, w2_1) {
 function $f18(w0_0, w1_0, w2_0) {
   const t1 = (w1_0 & 255);
   const t2 = (w2_0 ?? undefined);
-  const t3 = t2 ?? {};
+  const t3 = { ...t2 };
   t3.mode = "fill";
   const cx = $cx;
   const cxm = cx.n;
@@ -657,7 +657,7 @@ function $f19(w0_0, w1_0, w2_0, w2_1, w3_0, w3_1) {
   const t1 = (w1_0 ?? undefined);
   const t2 = $liftUtf8($L, w2_0, w2_1);
   const t3 = (w3_1 === -1 ? undefined : $liftUtf8($L, w3_0, w3_1));
-  const t4 = t1 ?? {};
+  const t4 = { ...t1 };
   if (t2 !== undefined) t4.mode = t2;
   if (t3 !== undefined) t4.tag = t3;
   const cx = $cx;

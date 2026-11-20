@@ -107,6 +107,8 @@ assert.equal(str(L.call("Bag#withOpts(u8,Options?)", bag, 3, null)), '3:{"mode":
 {
   const o = { keep: 1 };
   assert.equal(str(L.call("Bag#withOpts(u8,Options?)", bag, 3, o)), '3:{"keep":1,"mode":"fill"}');
+  // The fill is a copy: the caller's object is as it was.
+  assert.deepEqual(o, { keep: 1 });
 }
 // A field filled from a parameter, and left off when that parameter is absent.
 assert.equal(str(L.call("Bag#fieldKeys(Options?,str,str?)", bag, null, ...L.str("m"), ...L.str("t"))), "mode,tag");

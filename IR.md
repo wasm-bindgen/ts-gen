@@ -599,7 +599,7 @@ declaration's role:
 | constant | supply it | match by `===`, or the arm doesn't apply |
 | `undefined` | supply it | match an absent argument or `undefined` |
 | `...rest` | spread | bind the remaining arguments into the sequence |
-| `p? { f = <expr>, ... }` | fill the object, creating it when absent; a field whose value is `undefined` isn't created | bind `p` to the argument, `null` when absent; each field matches its expression as a pattern on the object |
+| `p? { f = <expr>, ... }` | pass a shallow copy of the object with the fields set, `{}` with them when it's absent; a field whose value is `undefined` isn't created | bind `p` to the argument, `null` when absent; each field matches its expression as a pattern on the object |
 | `<expr>` | evaluate it | match its value by `===` |
 | order | permute | permute back |
 
@@ -627,7 +627,7 @@ statically.
 | `this = p` | reserved: binding the JS receiver to a parameter is future work (§22), and validation rejects it |
 | `super = (...)` | the `super(...)` arguments of an exported class constructor (§17); the default passes the constructor's arguments through |
 | `let x = <expr>` | bind a value created by the bridge for this call |
-| `p? { field = <expr>, ... }` | in `args`: set fields on a nullable object argument, creating it (`{}`) when it's absent. A field whose value is `undefined` isn't created, since a dictionary reads its own keys, so an absent optional parameter leaves its field absent |
+| `p? { field = <expr>, ... }` | in `args`: pass a nullable object argument with fields set. The fields are set on a shallow copy (`{...p}`, or `{}` when it's absent), so the caller's object is never changed. A field whose value is `undefined` isn't created, since a dictionary reads its own keys, so an absent optional parameter leaves its field absent |
 | `cancel = <path>` | the function to call when the language drops the returned future (§16) |
 | `$result` | predefined: the call's JS result, usable in `cancel` |
 

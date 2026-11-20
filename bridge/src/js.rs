@@ -2538,8 +2538,9 @@ impl<'a, 'b> Glue<'a, 'b> {
                     let v = args
                         .get(param.as_str())
                         .ok_or_else(|| Error::Import(format!("`{param}` isn't a parameter")))?;
+                    // A copy, so the caller's object is as it was (§7).
                     let o = b.fresh();
-                    b.line(format!("const {o} = {v} ?? {{}};"));
+                    b.line(format!("const {o} = {{ ...{v} }};"));
                     // An undefined field is left off, as an absent optional
                     // member is: dictionaries enumerate own keys.
                     for (f, x) in fields {
