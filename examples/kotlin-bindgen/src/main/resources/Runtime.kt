@@ -215,6 +215,15 @@ suspend fun delay(ms: Double) {
     suspendCoroutine<Unit> { c -> loop.after(ms) { c.resume(Unit) } }
 }
 
+/**
+ * Suspends the task until `resume` is called, from a callback JS calls
+ * later: the task continues on its loop, not inside the callback.
+ */
+suspend fun <T> awaitCallback(block: (resume: (T) -> Unit) -> Unit): T {
+    val loop = Loop.current ?: error("waiting for a callback outside a ts-gen task")
+    return suspendCoroutine { c -> block { v -> loop.post { c.resume(v) } } }
+}
+
 @WasmExport("tw:loop/tick")
 fun twLoopTick(loop: Int, max: Int): Int = Loop.get(loop)?.tick(max) ?: 0
 

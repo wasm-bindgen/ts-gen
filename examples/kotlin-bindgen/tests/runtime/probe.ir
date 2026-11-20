@@ -21,6 +21,7 @@ namespace ext {
   @js(args = (sep, ...parts))
   join(sep: str, parts: arr<str>): str;
   pick<This = Any?>(x: u32): u32;
+  soon(f: fn());
 }
 
 export class Counter {
@@ -47,4 +48,5 @@ export namespace probe {
   bytes(): u32;
   words(): str;
   join(): str;
+  soon(): future<str>;
 }

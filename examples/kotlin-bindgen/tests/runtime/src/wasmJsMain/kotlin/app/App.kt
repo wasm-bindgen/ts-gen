@@ -8,6 +8,7 @@ import probe.toCounter
 import probe.toFnUIntToUInt
 import probe.toJs
 import probe.toMode
+import tsgen.runtime.awaitCallback
 import tsgen.runtime.delay
 
 /** A tuple result: slot 1 is pushed through tw:ret. */
@@ -76,3 +77,10 @@ fun probe_words(): String = probe.ext.words(listOf("a", "b")).joinToString("")
 
 /** A spread parameter is a vararg, and a type parameter no argument infers is dropped. */
 fun probe_join(): String = probe.ext.join("-", "a", "b") + probe.ext.pick(3u)
+
+/** Waits for a callback JS calls later, and is back on the loop after it. */
+suspend fun probe_soon(): String {
+    val word = awaitCallback<String> { resume -> probe.ext.soon { resume("soon") } }
+    delay(1.0)
+    return word
+}
