@@ -117,8 +117,15 @@ pub fn collect_type_names(
     // Every block's exports, its `export default` too, are the module's.
     // A declaration the block exports resolves in the module's exports,
     // merged with every block's, and an export specifier in its block.
-    let blocks: Vec<ScopeId> = ccx.registry.module_blocks.values().map(|b| b.1).collect();
-    for block_scope in blocks {
+    // In source order, which orders the module's exports.
+    let mut blocks: Vec<(u32, ScopeId)> = ccx
+        .registry
+        .module_blocks
+        .iter()
+        .map(|(&start, b)| (start, b.1))
+        .collect();
+    blocks.sort_by_key(|&(start, _)| start);
+    for (_, block_scope) in blocks {
         ccx.move_block_exports(block_scope);
     }
     registry.globals = ccx.globals;

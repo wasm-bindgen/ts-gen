@@ -36,7 +36,7 @@ use crate::ir::{
 };
 use crate::parse::classify::classify_interface;
 use crate::parse::scope::{Binding, ScopeId};
-use crate::parse::types::simplify_intersection;
+use crate::parse::types::{primitive, simplify_intersection};
 use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::{dedup_names, to_enum_variant, to_pascal_case, LocalScope, Suffix};
 
@@ -59,9 +59,15 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
     });
 
     let mut params_of: HashMap<ScopeId, Vec<TypeParam>> = HashMap::new();
+    let mut holders = HashMap::new();
     let mut names = Vec::new();
-    for (_, decl) in gctx.iter_types() {
+    for (id, decl) in gctx.iter_types() {
         names.extend(super::binding_name(&decl.kind));
+        match &decl.kind {
+            TypeKind::Class(c) => holders.insert(c.body_scope, id),
+            TypeKind::Interface(i) => holders.insert(i.body_scope, id),
+            _ => None,
+        };
         let (scope, params): (ScopeId, &[TypeParam]) = match &decl.kind {
             TypeKind::Class(c) => (c.body_scope, &c.type_params),
             TypeKind::Interface(i) => (i.body_scope, &i.type_params),
@@ -98,10 +104,13 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
 
     let diag = std::mem::take(&mut gctx.diagnostics);
     let mut type_level_only = HashSet::new();
-    let (rewritten, synths, diag) = {
+    let (rewritten, synths, diag, projections, utilities) = {
         let mut eval = Eval {
             gctx,
             params_of,
+            holders,
+            projections: HashMap::new(),
+            utilities: HashMap::new(),
             needs: HashMap::new(),
             synths: Vec::new(),
             enum_names: HashMap::new(),
@@ -110,6 +119,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             used: LocalScope::with_claimed(names),
             diag,
             depth: 0,
+            owner: None,
         };
         let mut rewritten = Vec::new();
         for id in ids {
@@ -138,9 +148,17 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
                 rewritten.push((id, kind));
             }
         }
-        (rewritten, eval.synths, eval.diag)
+        (
+            rewritten,
+            eval.synths,
+            eval.diag,
+            eval.projections,
+            eval.utilities,
+        )
     };
     gctx.diagnostics = diag;
+    gctx.projections.extend(projections);
+    gctx.utilities.extend(utilities);
     gctx.type_level_only.extend(type_level_only);
 
     for (id, kind) in rewritten {
@@ -188,7 +206,10 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
         if anchor_name.is_some_and(|name| gctx.exports.local_name(exports, &name).is_some()) {
             gctx.exports.insert(exports, &synth.name, &synth.name);
         }
-        if let Some(&ns) = namespace_of.get(&listing) {
+        // An `export =` namespace's members are listed in the module it is.
+        if module.types.contains(&synth.place.anchor) {
+            module.types.push(id);
+        } else if let Some(&ns) = namespace_of.get(&listing) {
             if let TypeKind::Namespace(ns) = &mut gctx.get_type_mut(ns).kind {
                 ns.declarations.push(id);
             }
@@ -235,6 +256,9 @@ impl Utility {
         )
     }
 }
+
+/// A dictionary's anchor, the name asked for and the name given.
+type DictName = (TypeId, String, String);
 
 /// Where a synthesised declaration goes: beside the declaration being
 /// rewritten, in its scope, so the rewritten type resolves it.
@@ -313,20 +337,34 @@ struct Eval<'g> {
     gctx: &'g GlobalContext,
     /// Each body scope's type parameters, for a parameter's bound.
     params_of: HashMap<ScopeId, Vec<TypeParam>>,
+    /// The class or interface of each body scope, whose literal-only
+    /// parameters' projections are kept.
+    holders: HashMap<ScopeId, TypeId>,
+    projections: HashMap<(ScopeId, String), crate::context::Projection>,
+    utilities: HashMap<String, TypeRef>,
     /// Whether an alias's target needs evaluation; `None` while computing.
     needs: HashMap<TypeId, Option<bool>>,
     synths: Vec<Synth>,
     enum_names: HashMap<(ScopeId, Vec<String>), String>,
-    dict_names: HashMap<(ScopeId, DictKey), String>,
+    /// Each dictionary's names by scope and shape. One is reused by its
+    /// anchor's other uses, and by another anchor asking for the same
+    /// name: structurally equal dictionaries named for unrelated anchors
+    /// stay apart.
+    dict_names: HashMap<(ScopeId, DictKey), Vec<DictName>>,
     /// Non-generic aliases rewritten so far. One is evaluated when first
     /// used, so a utility over an alias reads its result, not its target.
     done: HashMap<TypeId, TypeKind>,
     used: LocalScope,
     diag: DiagnosticCollector,
     depth: u32,
+    /// The declaration a shape is reading, whose name prefixes the names
+    /// of its inline types, as its own rewrite names them.
+    owner: Option<String>,
 }
 
 const MAX_DEPTH: u32 = 64;
+/// The most literals a template evaluates to before it reads as `string`.
+const MAX_TEMPLATE: usize = 256;
 
 impl<'g> Eval<'g> {
     /// The kind of `id`, a non-generic alias's rewritten on demand.
@@ -500,11 +538,9 @@ impl<'g> Eval<'g> {
             Some(result) => *ty = result,
             None => {
                 let approx = fallback(ty);
-                self.diag.warn(format!(
-                    "`{}` could not be evaluated, approximating as `{}`",
-                    ty.format_ts(),
-                    approx.format_ts()
-                ));
+                if let Some(why) = not_evaluated(ty, &approx) {
+                    self.diag.warn(why);
+                }
                 *ty = approx;
             }
         }
@@ -567,7 +603,9 @@ impl<'g> Eval<'g> {
                 return None;
             }
             self.dict_names
-                .insert((place.scope, dict_key(&props)), alias.name.clone());
+                .entry((place.scope, dict_key(&props)))
+                .or_default()
+                .push((place.anchor, alias.name.clone(), alias.name.clone()));
             let members = props_to_members(&props, scope);
             return Some(TypeKind::Interface(InterfaceDecl {
                 classification: classify_interface(&members),
@@ -586,11 +624,9 @@ impl<'g> Eval<'g> {
             // declaration erasing is expected and codegen reports it.
             let approx = fallback(&alias.target);
             if alias.type_params.is_empty() {
-                self.diag.warn(format!(
-                    "`{}` could not be evaluated, approximating as `{}`",
-                    alias.target.format_ts(),
-                    approx.format_ts()
-                ));
+                if let Some(why) = not_evaluated(&alias.target, &approx) {
+                    self.diag.warn(why);
+                }
             }
             alias.target = approx;
             return None;
@@ -696,7 +732,8 @@ impl<'g> Eval<'g> {
             TypeRef::KeyOf(_)
             | TypeRef::IndexedAccess(..)
             | TypeRef::Mapped(_)
-            | TypeRef::ObjectLiteral(_) => true,
+            | TypeRef::ObjectLiteral(_)
+            | TypeRef::Template { .. } => true,
             TypeRef::Array(e) => self.needs_eval(e, scope),
             TypeRef::Union(u) => u.members().iter().any(|m| self.needs_eval(m, scope)),
             TypeRef::Intersection(v) | TypeRef::Tuple(v) => {
@@ -783,20 +820,67 @@ impl<'g> Eval<'g> {
     ) -> Option<TypeRef> {
         Some(match ty {
             TypeRef::Array(e) => {
-                TypeRef::Array(Box::new(self.eval(e, scope, env, dest, hint, place)?))
+                let hint = self.part_hint(hint, "Item");
+                TypeRef::Array(Box::new(self.eval(e, scope, env, dest, &hint, place)?))
             }
             TypeRef::Union(u) => {
+                let objects = u
+                    .members()
+                    .iter()
+                    .filter(|m| matches!(m, TypeRef::ObjectLiteral(_)))
+                    .count();
+                let arm = |this: &Self, props: &[crate::ir::ObjectProp]| match objects {
+                    1 => this.part_hint(hint, "Object"),
+                    _ => own_prop(props, u.members()).map_or_else(
+                        || hint.to_string(),
+                        |p| format!("{hint}{}", to_pascal_case(p)),
+                    ),
+                };
+                let shapes = objects
+                    + u.members()
+                        .iter()
+                        .filter(|m| matches!(m, TypeRef::Mapped(_)))
+                        .count();
                 let members = u
                     .members()
                     .iter()
-                    .map(|m| self.eval(m, scope, env, dest, hint, place))
+                    .map(|m| match m {
+                        TypeRef::ObjectLiteral(props) => {
+                            let hint = arm(self, props);
+                            self.eval(m, scope, env, dest, &hint, place)
+                        }
+                        // One of several object arms keyed by an alias,
+                        // `{ [Op in FilterOp]?: V }`, is a map by it.
+                        TypeRef::Mapped(mt) if shapes > 1 => {
+                            let hint = match &mt.keys {
+                                TypeRef::Reference {
+                                    segments,
+                                    generic_args,
+                                } if segments.len() == 1 && generic_args.is_empty() => {
+                                    format!("{}Map", segments[0])
+                                }
+                                _ => hint.to_string(),
+                            };
+                            self.eval(m, scope, env, dest, &hint, place)
+                        }
+                        _ => self.eval(m, scope, env, dest, hint, place),
+                    })
                     .collect::<Option<Vec<_>>>()?;
                 self.literal_union(members, dest)
             }
+            // An inline object type beside an alias of a primitive only
+            // brands it (`Str & { extra: string }`).
             TypeRef::Intersection(v) => {
+                let branded = v.iter().any(|m| self.primitive_alias(m, scope, 0));
+                if branded {
+                    crate::parse::types::warn_branded(v, &mut self.diag);
+                }
                 let parts = v
                     .iter()
-                    .map(|m| self.eval(m, scope, env, dest, hint, place))
+                    .map(|m| match m {
+                        TypeRef::ObjectLiteral(_) if branded => Some(TypeRef::Object),
+                        m => self.eval(m, scope, env, dest, hint, place),
+                    })
                     .collect::<Option<Vec<_>>>()?;
                 simplify_intersection(parts)
             }
@@ -818,12 +902,86 @@ impl<'g> Eval<'g> {
                 segments,
                 generic_args,
             } => return self.eval_reference(segments, generic_args, scope, env, dest, hint, place),
+            // Over literals a template is each concatenation; over anything
+            // else, any string.
+            TypeRef::Template { quasis, types } => {
+                let mut out = vec![quasis[0].clone()];
+                for (t, after) in types.iter().zip(&quasis[1..]) {
+                    let Some(set) = self.literal_set(t, scope, env, dest, place) else {
+                        return Some(TypeRef::String);
+                    };
+                    if out.len() * set.len() > MAX_TEMPLATE {
+                        return Some(TypeRef::String);
+                    }
+                    out = out
+                        .iter()
+                        .flat_map(|s| set.iter().map(move |l| format!("{s}{l}{after}")))
+                        .collect();
+                }
+                TypeRef::union(out.into_iter().map(TypeRef::StringLiteral))
+            }
             TypeRef::KeyOf(t) => {
                 let props = self.shape(t, scope, env, dest, place)?;
                 TypeRef::union(props.into_iter().map(|p| TypeRef::StringLiteral(p.js_name)))
             }
             TypeRef::IndexedAccess(object, index) => {
-                let keys = self.literal_set(index, scope, env, dest, place)?;
+                // A type parameter bounded by `Record<K, V>` reads as `V` at
+                // any key: `EventMap[Type]` is an `Event`.
+                if let TypeRef::Reference {
+                    segments,
+                    generic_args,
+                } = &**object
+                {
+                    if let ([name], true) = (segments.as_slice(), generic_args.is_empty()) {
+                        let owner =
+                            (env.get(name).is_none()).then(|| self.param_owner(scope, name));
+                        if let Some(owner) = owner.flatten() {
+                            return match self.param_bound(owner, name)? {
+                                TypeRef::Reference {
+                                    segments,
+                                    generic_args,
+                                } if segments == ["Record"] && generic_args.len() == 2 => self
+                                    .eval(
+                                        &generic_args[1],
+                                        owner,
+                                        &Env::default(),
+                                        dest,
+                                        hint,
+                                        place,
+                                    ),
+                                _ => None,
+                            };
+                        }
+                    }
+                }
+                // A parameter key, `Type extends keyof M`, reads at its
+                // bound's keys: `M[Type]` is any of their values.
+                let keys = match self.literal_set(index, scope, env, dest, place) {
+                    Some(keys) => keys,
+                    None => {
+                        let TypeRef::Reference {
+                            segments,
+                            generic_args,
+                        } = &**index
+                        else {
+                            return None;
+                        };
+                        let ([name], true) = (segments.as_slice(), generic_args.is_empty()) else {
+                            return None;
+                        };
+                        if env.get(name).is_some() {
+                            return None;
+                        }
+                        let (owner, bound) = match self.param_owner(scope, name) {
+                            Some(owner) => (owner, self.param_bound(owner, name)?),
+                            None => {
+                                let (owner, bound) = self.gctx.scopes.erased_bound(scope, name)?;
+                                (owner, bound.clone())
+                            }
+                        };
+                        self.literal_set(&bound, owner, &Env::default(), dest, place)?
+                    }
+                };
                 let props = self.shape(object, scope, env, dest, place)?;
                 let mut members = Vec::new();
                 for key in keys {
@@ -845,9 +1003,38 @@ impl<'g> Eval<'g> {
                 }
                 return self.synth_dict(props, hint, dest, place);
             }
+            // The IR producer names an inline object type as a dictionary.
+            TypeRef::ObjectLiteral(props) if !self.gctx.scopes.legacy_rust => {
+                let props = props
+                    .iter()
+                    .map(|p| {
+                        let hint = format!("{hint}{}", to_pascal_case(&p.name));
+                        Some(Prop {
+                            js_name: p.name.clone(),
+                            type_ref: self.eval(&p.type_ref, scope, env, dest, &hint, place)?,
+                            optional: p.optional,
+                            readonly: p.readonly,
+                            doc: None,
+                            method: false,
+                        })
+                    })
+                    .collect::<Option<Vec<_>>>()?;
+                return self.synth_dict(props, hint, dest, place);
+            }
             TypeRef::ObjectLiteral(_) => TypeRef::Object,
             other => other.clone(),
         })
+    }
+
+    /// The name a part of a type takes when the whole already holds `hint`
+    /// (an alias's own name): `AutoRagListResponse = {…}[]` names its
+    /// element `AutoRagListResponseItem`, and the lone object arm of a union
+    /// `<Alias>Object`, before any number.
+    fn part_hint(&self, hint: &str, part: &str) -> String {
+        match self.used.contains(hint) {
+            true => format!("{hint}{part}"),
+            false => hint.to_string(),
+        }
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -897,6 +1084,11 @@ impl<'g> Eval<'g> {
                 if let TypeKind::TypeAlias(alias) = &self.gctx.get_type(id).kind {
                     if !alias.type_params.is_empty() && self.alias_needs_eval(id) {
                         let alias = alias.clone();
+                        if let Some(kept) =
+                            self.projection(&alias, segments, generic_args, scope, env, dest)
+                        {
+                            return Some(kept);
+                        }
                         return self.instantiate(&alias, generic_args, scope, env, dest, place);
                     }
                 }
@@ -918,6 +1110,79 @@ impl<'g> Eval<'g> {
                 }),
             },
         }
+    }
+
+    /// `alias<args>` kept as written, when one argument is a literal-only
+    /// type parameter of the class or interface at `dest` and the alias
+    /// maps each of its literals to literals: a [`Projection`] of it.
+    ///
+    /// [`Projection`]: crate::context::Projection
+    fn projection(
+        &mut self,
+        alias: &TypeAliasDecl,
+        segments: &[String],
+        generic_args: &[TypeRef],
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+    ) -> Option<TypeRef> {
+        let holders = &self.holders;
+        let [arg] = generic_args else { return None };
+        let mut name = arg.as_ident()?.to_string();
+        let mut scope = scope;
+        // A parameter bound to another, as `Pick` reads a parent's member.
+        if let Some(bound) = env.get(&name) {
+            name = bound.ty.as_ident()?.to_string();
+            scope = bound.scope;
+        }
+        let name = name.as_str();
+        if self.gctx.scopes.resolve_binding(scope, name) != Some(Binding::TypeParam) {
+            return None;
+        }
+        let owner = self.param_owner(scope, name)?;
+        let holder = *holders.get(&owner)?;
+        if self.param_owner(dest, name) != Some(owner) || alias.type_params.len() != 1 {
+            return None;
+        }
+        let bound = self.param_bound(owner, name)?;
+        let bound = self.string_literals(&bound, owner)?;
+        let p = &alias.type_params[0].name;
+        let mut literals = Vec::new();
+        for lit in bound {
+            let env = Env::default().bind(
+                p.clone(),
+                TypeRef::StringLiteral(lit.clone()),
+                dest,
+                Env::default(),
+            );
+            let place = Placement {
+                anchor: holder,
+                scope: owner,
+            };
+            let result = self.eval(
+                &alias.target,
+                alias.body_scope,
+                &env,
+                dest,
+                &alias.name,
+                place,
+            )?;
+            literals.push((lit, self.string_literals(&result, dest)?));
+        }
+        let kept = TypeRef::Reference {
+            segments: segments.to_vec(),
+            generic_args: vec![TypeRef::ident(name)],
+        };
+        self.projections.insert(
+            (owner, kept.format_ts()),
+            crate::context::Projection {
+                owner: holder,
+                param: name.to_string(),
+                alias: alias.name.clone(),
+                literals,
+            },
+        );
+        Some(kept)
     }
 
     /// Instantiate a generic alias whose target needs evaluation. An
@@ -998,6 +1263,14 @@ impl<'g> Eval<'g> {
             });
         }
         let test = self.eval(args.get(1)?, scope, env, dest, hint, place)?;
+        let written = TypeRef::Reference {
+            segments: vec![match utility {
+                Utility::Extract => "Extract",
+                _ => "Exclude",
+            }
+            .to_string()],
+            generic_args: vec![subject.clone(), test.clone()],
+        };
         // A string enum tests as its literals.
         let mut expanded_test = Vec::new();
         for t in union_members(&test) {
@@ -1010,8 +1283,13 @@ impl<'g> Eval<'g> {
         }
         let test = expanded_test;
         let has_literals = test.iter().any(|t| matches!(t, TypeRef::StringLiteral(_)));
+        let members = match self.gctx.scopes.legacy_rust {
+            true => union_members(&subject),
+            false => self.alias_members(&subject, dest, place, 0),
+        };
         let mut kept = Vec::new();
-        for member in union_members(&subject) {
+        let mut tested = 0;
+        for member in members {
             // Testing an enum's variants against literals reads the enum
             // as its literals.
             let expanded = match (&member, has_literals) {
@@ -1021,10 +1299,23 @@ impl<'g> Eval<'g> {
                 _ => None,
             };
             for m in expanded.unwrap_or_else(|| vec![member.clone()]) {
+                tested += 1;
                 let matched = test.iter().any(|t| assignable(&m, t));
                 if matched == (utility == Utility::Extract) {
                     kept.push(m);
                 }
+            }
+        }
+        // Filtering an alias's values keeps the utility, which the lowering
+        // names, and nothing filtered keeps the subject.
+        if union_members(&subject).len() < tested {
+            if kept.len() == tested {
+                return Some(subject);
+            }
+            if kept.len() > 1 && !kept.iter().all(|k| matches!(k, TypeRef::StringLiteral(_))) {
+                self.utilities
+                    .insert(written.format_ts(), TypeRef::union(kept));
+                return Some(written);
             }
         }
         Some(if kept.is_empty() {
@@ -1227,9 +1518,11 @@ impl<'g> Eval<'g> {
             TypeRef::ObjectLiteral(props) => props
                 .iter()
                 .map(|p| {
+                    let owner = self.owner.as_deref().unwrap_or_default();
+                    let hint = format!("{owner}{}", to_pascal_case(&p.name));
                     Some(Prop {
                         js_name: p.name.clone(),
-                        type_ref: self.eval(&p.type_ref, scope, env, dest, &p.name, place)?,
+                        type_ref: self.eval(&p.type_ref, scope, env, dest, &hint, place)?,
                         optional: p.optional,
                         readonly: p.readonly,
                         doc: None,
@@ -1268,8 +1561,14 @@ impl<'g> Eval<'g> {
                         Some(Binding::Erased(_)) => return None,
                         None => {
                             let utility = Utility::parse(&segments[0])?;
+                            // `Exclude<Options, "id">` filters a union, so an
+                            // object passes through whole.
                             if !utility.is_object() {
-                                return None;
+                                let t = self.eval(ty, scope, env, dest, "", place)?;
+                                if matches!(t, TypeRef::Never) || &t == ty {
+                                    return None;
+                                }
+                                return self.shape(&t, dest, &Env::default(), dest, place);
                             }
                             let source =
                                 self.shape(generic_args.first()?, scope, env, dest, place)?;
@@ -1296,6 +1595,27 @@ impl<'g> Eval<'g> {
     }
 
     fn shape_of_decl(
+        &mut self,
+        id: TypeId,
+        generic_args: &[TypeRef],
+        scope: ScopeId,
+        env: &Env,
+        dest: ScopeId,
+        place: Placement,
+    ) -> Option<Vec<Prop>> {
+        let name = match &*self.evaluated(id) {
+            TypeKind::Interface(i) => i.name.clone(),
+            TypeKind::Class(c) => c.name.clone(),
+            TypeKind::TypeAlias(a) => a.name.clone(),
+            _ => return None,
+        };
+        let outer = self.owner.replace(name);
+        let props = self.decl_props(id, generic_args, scope, env, dest, place);
+        self.owner = outer;
+        props
+    }
+
+    fn decl_props(
         &mut self,
         id: TypeId,
         generic_args: &[TypeRef],
@@ -1362,6 +1682,11 @@ impl<'g> Eval<'g> {
             let readonly = !members
                 .iter()
                 .any(|m| matches!(m, Member::Setter(s) if &s.js_name == js_name));
+            let hint = format!(
+                "{}{}",
+                self.owner.as_deref().unwrap_or_default(),
+                to_pascal_case(js_name)
+            );
             props.push(Prop {
                 js_name: js_name.clone(),
                 type_ref: self.eval_named(
@@ -1369,7 +1694,7 @@ impl<'g> Eval<'g> {
                     member_scope,
                     &bound_env,
                     dest,
-                    js_name,
+                    &hint,
                     place,
                 )?,
                 optional,
@@ -1427,6 +1752,75 @@ impl<'g> Eval<'g> {
     ) -> Option<Vec<String>> {
         let evaluated = self.eval(ty, scope, env, dest, "", place)?;
         self.string_literals(&evaluated, dest)
+    }
+
+    /// Whether `t` names a primitive through non-generic aliases.
+    fn primitive_alias(&mut self, t: &TypeRef, scope: ScopeId, depth: u32) -> bool {
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = t
+        else {
+            return false;
+        };
+        if !generic_args.is_empty() || depth >= 32 {
+            return false;
+        }
+        let Some(id) = self.gctx.resolve_path(scope, &segments.join(".")) else {
+            return false;
+        };
+        let TypeKind::TypeAlias(a) = &*self.evaluated(id) else {
+            return false;
+        };
+        if !a.type_params.is_empty() {
+            return false;
+        }
+        let (target, at) = (a.target.clone(), a.body_scope);
+        match &target {
+            TypeRef::Intersection(parts) => parts
+                .iter()
+                .any(|p| primitive(p) || self.primitive_alias(p, at, depth + 1)),
+            t => primitive(t) || self.primitive_alias(t, at, depth + 1),
+        }
+    }
+
+    /// The members of the union `ty`, through plain aliases of unions that
+    /// aren't string literals alone (`Exclude<Filter, string[]>` filters
+    /// `Filter`'s members).
+    fn alias_members(
+        &mut self,
+        ty: &TypeRef,
+        scope: ScopeId,
+        place: Placement,
+        depth: u32,
+    ) -> Vec<TypeRef> {
+        let mut out = Vec::new();
+        for member in union_members(ty) {
+            let target = match &member {
+                TypeRef::Reference {
+                    segments,
+                    generic_args,
+                } if generic_args.is_empty() && depth < 32 => self
+                    .gctx
+                    .resolve_path(scope, &segments.join("."))
+                    .and_then(|id| match &*self.evaluated(id) {
+                        TypeKind::TypeAlias(a)
+                            if a.type_params.is_empty()
+                                && matches!(a.target, TypeRef::Union(_)) =>
+                        {
+                            Some((a.target.clone(), a.body_scope))
+                        }
+                        _ => None,
+                    })
+                    .filter(|_| self.string_literals(&member, scope).is_none()),
+                _ => None,
+            };
+            match target.and_then(|(t, at)| self.eval(&t, at, &Env::default(), scope, "", place)) {
+                Some(t) => out.extend(self.alias_members(&t, scope, place, depth + 1)),
+                None => out.push(member),
+            }
+        }
+        out
     }
 
     /// The string literals of an evaluated type, reading a string enum
@@ -1628,11 +2022,20 @@ impl<'g> Eval<'g> {
             generic_args: captured.iter().map(TypeRef::ident).collect(),
         };
         let key = (place.scope, dict_key(&props));
-        if let Some(name) = self.dict_names.get(&key) {
+        let same = self.dict_names.get(&key).and_then(|named| {
+            named
+                .iter()
+                .find(|(anchor, asked, _)| *anchor == place.anchor || asked == hint)
+        });
+        if let Some((_, _, name)) = same {
             return Some(reference(name.clone()));
         }
         let name = self.used.declare(hint, Suffix::Pascal);
-        self.dict_names.insert(key, name.clone());
+        self.dict_names.entry(key).or_default().push((
+            place.anchor,
+            hint.to_string(),
+            name.clone(),
+        ));
         let type_params = captured
             .iter()
             .map(|name| TypeParam {
@@ -1663,6 +2066,23 @@ fn homomorphic_source(keys: &TypeRef) -> Option<&TypeRef> {
         }
         _ => None,
     }
+}
+
+/// The first property of one object arm of a union that no other object arm
+/// has, which tells the arm apart: `{ color } | { top, left }` names its
+/// arms `…Color` and `…Top`.
+fn own_prop<'a>(props: &'a [crate::ir::ObjectProp], members: &[TypeRef]) -> Option<&'a str> {
+    props
+        .iter()
+        .find(|p| {
+            members.iter().all(|m| match m {
+                TypeRef::ObjectLiteral(other) if !std::ptr::eq(other.as_slice(), props) => {
+                    !other.iter().any(|o| o.name == p.name)
+                }
+                _ => true,
+            })
+        })
+        .map(|p| p.name.as_str())
 }
 
 /// The identity of a dictionary's members, so one shape is one type.
@@ -1747,6 +2167,35 @@ fn assignable(ty: &TypeRef, to: &TypeRef) -> bool {
         || matches!(to, TypeRef::Any | TypeRef::Unknown)
 }
 
+/// Why `ty` reads as `approx`, unless it only drops a `Readonly`, which
+/// is the type itself to the IR.
+fn not_evaluated(ty: &TypeRef, approx: &TypeRef) -> Option<String> {
+    if without_readonly(ty) == *approx {
+        return None;
+    }
+    let (ty, approx) = (ty.format_ts(), approx.format_ts());
+    Some(match ty == approx {
+        true => format!("`{ty}` could not be evaluated"),
+        false => format!("`{ty}` could not be evaluated, approximating as `{approx}`"),
+    })
+}
+
+fn without_readonly(ty: &TypeRef) -> TypeRef {
+    match ty {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => match (segments.as_slice(), generic_args.as_slice()) {
+            ([n], [t]) if n == "Readonly" => without_readonly(t),
+            _ => TypeRef::Reference {
+                segments: segments.clone(),
+                generic_args: generic_args.iter().map(without_readonly).collect(),
+            },
+        },
+        other => other.clone(),
+    }
+}
+
 /// The lowering a type had before evaluation existed, for one that can't
 /// be evaluated: a utility is its first argument, the rest erase.
 fn fallback(ty: &TypeRef) -> TypeRef {
@@ -1770,6 +2219,7 @@ fn fallback(ty: &TypeRef) -> TypeRef {
         TypeRef::KeyOf(_) => TypeRef::Unresolved("keyof".into()),
         TypeRef::IndexedAccess(..) => TypeRef::Unresolved("indexed access type".into()),
         TypeRef::Mapped(_) => TypeRef::Unresolved("mapped type".into()),
+        TypeRef::Template { .. } => TypeRef::String,
         TypeRef::ObjectLiteral(_) => TypeRef::Object,
         other => other.clone(),
     }
@@ -1777,7 +2227,7 @@ fn fallback(ty: &TypeRef) -> TypeRef {
 
 /// The spelling of `name<args>`: its [`instance_name`] unless that is
 /// `taken`, else the name followed by each argument.
-fn instance_spelling(name: &str, args: &[String], taken: Option<&LocalScope>) -> String {
+pub(crate) fn instance_spelling(name: &str, args: &[String], taken: Option<&LocalScope>) -> String {
     match instance_name(name, args) {
         Some(short) if !taken.is_some_and(|t| t.contains(&short)) => short,
         _ => format!("{name}{}", args.concat()),
@@ -1911,7 +2361,7 @@ mod tests {
     use crate::ir::InterfaceClassification;
 
     fn parse(src: &str) -> (Module, GlobalContext) {
-        super::super::parse_single_source(src, None).unwrap()
+        super::super::parse_single_source_with(src, None, super::super::Options::IR).unwrap()
     }
 
     fn kind<'g>(gctx: &'g GlobalContext, module: &Module, name: &str) -> &'g TypeKind {
@@ -1983,6 +2433,41 @@ mod tests {
             &TypeRef::ident("NotHour")
         );
         assert_eq!(param_type(&gctx, &module, "f", 1), &TypeRef::String);
+    }
+
+    #[test]
+    fn an_inline_object_type_brands_a_primitive_or_type_parameter() {
+        let (module, gctx) = parse(
+            "type Str = string;
+             type ViaStr = Str & { extra: string };
+             type Branded<T> = T & { __brand: string };
+             declare function f(a: Str & { c: string }, b: string & {}): void;",
+        );
+        let target = |name| match kind(&gctx, &module, name) {
+            TypeKind::TypeAlias(a) => a.target.clone(),
+            _ => panic!("{name} should stay an alias"),
+        };
+        assert_eq!(target("ViaStr"), TypeRef::ident("Str"));
+        assert_eq!(target("Branded"), TypeRef::ident("T"));
+        assert_eq!(param_type(&gctx, &module, "f", 0), &TypeRef::ident("Str"));
+        assert_eq!(param_type(&gctx, &module, "f", 1), &TypeRef::String);
+    }
+
+    #[test]
+    fn a_kept_utility_records_the_union_it_keeps() {
+        let (module, gctx) = parse(
+            "type Value = string | number | boolean | string[];
+             declare function f(a: Exclude<Value, string[]>): void;",
+        );
+        let kept = param_type(&gctx, &module, "f", 0);
+        assert_eq!(
+            gctx.utilities.get(&kept.format_ts()),
+            Some(&TypeRef::union([
+                TypeRef::String,
+                TypeRef::Number,
+                TypeRef::Boolean
+            ]))
+        );
     }
 
     #[test]
@@ -2113,19 +2598,33 @@ mod tests {
     }
 
     #[test]
-    fn out_of_scope_parameters_evaluate_at_their_bound() {
-        let (module, gctx) = parse(
-            "type Unit = \"hour\" | \"minute\";
+    fn projections_keep_what_each_literal_maps_to() {
+        let src = "type Unit = \"hour\" | \"minute\";
              type Plural<T extends Unit> = T | { hour: \"hours\"; minute: \"minutes\" }[T];
-             interface Rounding<U extends Unit> { smallestUnit?: Plural<U> }",
-        );
+             interface Rounding<U extends Unit> { smallestUnit?: Plural<U> }";
+        let (module, gctx) = parse(src);
         let TypeKind::Interface(rounding) = kind(&gctx, &module, "Rounding") else {
             unreachable!()
         };
         let Member::Getter(g) = &rounding.members[0] else {
             unreachable!()
         };
-        assert_eq!(g.type_ref, TypeRef::ident("Plural"));
+        let kept = TypeRef::generic("Plural", vec![TypeRef::ident("U")]);
+        assert_eq!(g.type_ref.without_undefined(), kept);
+        let p = &gctx.projections[&(rounding.body_scope, kept.format_ts())];
+        assert_eq!(p.param, "U");
+        let literals: Vec<(&str, Vec<&str>)> = p
+            .literals
+            .iter()
+            .map(|(l, to)| (l.as_str(), to.iter().map(String::as_str).collect()))
+            .collect();
+        assert_eq!(
+            literals,
+            [
+                ("hour", vec!["hour", "hours"]),
+                ("minute", vec!["minute", "minutes"])
+            ]
+        );
     }
 
     #[test]
@@ -2228,9 +2727,10 @@ mod tests {
             getter("note"),
             Some((TypeRef::union([TypeRef::String, TypeRef::Undefined]), false))
         );
+        // `Strict` is unrelated to `f`, so its equal shape isn't shared.
         assert_eq!(
             param_type(&gctx, &module, "f", 2),
-            &TypeRef::ident("Strict")
+            &TypeRef::ident("RequiredOptions")
         );
     }
 

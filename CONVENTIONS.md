@@ -46,6 +46,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Multiple-context name resolution](#multiple-context-name-resolution)
 * [Duplicate identifiers](#duplicate-identifiers)
 * [External type mapping and web platform defaults](#external-type-mapping-and-web-platform-defaults)
+* [IR lowering warnings](#ir-lowering-warnings)
 
 ---
 
@@ -4995,3 +4996,51 @@ Under [per-monomorphization](#in-scope-generic-type-parameters) the single
 locale takes `impl JsStringLike` and the list `&[impl JsStringLike]`, as
 every `string` and `string[]` argument does, and the locale before options
 `Option<&str>`.
+
+## IR lowering warnings
+
+Whatever the IR producer (`src/lower`) reads less precisely than the
+TypeScript says, by widening, dropping or merging, it reports as a
+warning located at its use (`` `Owner.Anchor` ``), so every known loss
+can be reviewed and later improved on. tests/workers-types.diagnostics
+lists them for workers-types. The kinds are:
+
+* **Widened**
+  * A literal type widens to its primitive: `"text"` to `str`, `0.5 | 1`
+    to `f64`, `true` to `bool`. A lone string literal result and a
+    literal type argument (`KVNamespaceGetOptions<"text">`) are the usual
+    cases. Literal parameters are kept as `@js(args)` constants instead.
+  * `null` alone reads as `Any?`.
+  * A constructor's own type parameter, which the IR has no place for,
+    reads as its default, its class or interface bound, or `Any?`.
+  * A union over type parameters reads as `Any`, since an enum has no
+    type parameters to carry it.
+* **Absent values merged**
+  * `T | null | undefined` reads as `T?`, one absence writing
+    `undefined`, or as `T??` under `--strict-nullable`. `T | null` keeps
+    `null` at any depth (`@js(null) T?`).
+  * `undefined`, `void` or `never` inside another type, other than as a
+    type argument, reads as `Any?`.
+  * `never` as a type argument reads as `unit`, except `Promise<never>`,
+    which reads as `future<never>`. An `undefined` or `void` argument, or
+    default, reads as `unit` too.
+* **Read as `Any`**
+  * A type with no IR form (a conditional type, `typeof x`, an
+    unevaluated intersection), a recursive alias, an empty tuple, a lib
+    type outside the `with` libs, a type declared outside the input, and
+    a value named as a type.
+  * Type parameters of a generic `--provides` class.
+* **Narrowed**
+  * An intersection reads as its first named member alone.
+  * A type parameter bounded by anything but a class, interface or enum
+    is unbounded.
+* **Dropped**
+  * A member or parameter of type `never`: the overload is uncallable.
+  * A property whose type holds no value (`undefined`, `never`).
+  * An index signature keyed by neither string nor number.
+  * Construct signatures returning anything but a class or interface:
+    the value keeps its getter.
+  * An unevaluated TS `enum`.
+* **Renamed**
+  * Overloads whose keys collide, and a parameter repeating an earlier
+    one's name.

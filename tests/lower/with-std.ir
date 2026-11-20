@@ -1,0 +1,57 @@
+ir 1;
+with std;
+
+interface Entry {
+  @js(object)
+  new();
+  get created(): Date;
+  get tags(): Map<Str, F64>;
+  get body(): Uint8Array;
+  get pattern(): @js(null) RegExp?;
+  get other(): WeakRef<Entry>;
+}
+
+interface Error {
+  @js(object)
+  new();
+  get code(): f64;
+}
+
+fail(reason: str): Error throws;
+
+namespace Intl {
+  enum LocalesArgument {
+    Str(str);
+    StrArray(arr<str>);
+  }
+}
+
+interface FormatSettings {
+  @js(object)
+  new();
+  get locales(): Intl.LocalesArgument?;
+  set locales(value: union Intl.LocalesArgument);
+  get required(): Intl.LocalesArgument?;
+  set required(value: union Intl.LocalesArgument);
+  get nullable(): Intl.LocalesArgument?;
+  set nullable(value: union Intl.LocalesArgument?);
+}
+
+display(style: Intl.CompactDisplayKind) throws;
+
+interface Store<Env = unit> {
+  env(): Env throws;
+}
+
+store(s: Store<unit>): future<never>;
+describe(s: Symbol): str throws;
+keyOf(k: union KKind) throws;
+get tag(): Symbol;
+
+enum KKind {
+  Str(str);
+  F64(f64);
+  Symbol(Symbol);
+}
+
+class WeakRef<T> {}

@@ -1,0 +1,115 @@
+ir 1;
+
+/// A response body.
+enum Body {
+  Text(str);
+  Bytes(u8[]);
+  Stream(ReadableStream);
+}
+
+enum Method {
+  @js("GET") Get;
+  @js("POST") Post;
+  @fallback Other;
+}
+
+enum Flags: u32 {
+  Read = 1;
+  Write = 2;
+}
+
+enum KvError extends err {
+  @js(DOMException[name = "NotFoundError"]) NotFound(Str);
+}
+
+class ReadableStream {}
+
+class Event {
+  get type(): str;
+}
+
+class EventTarget {
+  addEventListener(type: str, listener: fn(Event));
+}
+
+/// An HTTP response.
+class Response {
+  new(body: str?);
+  static error(): Response;
+  static json(data: Any): Response;
+  get status(): u16;
+  get ok(): bool;
+  get headers(): Headers;
+  get statusText(): str;
+  set statusText(value: str);
+  clone(): Response throws err;
+  text(): future<str>;
+  bytes(): future<u8[]>;
+}
+
+class Headers {
+  new();
+  get(name: str): str?;
+  set(name: str, value: str);
+  entries(): arr<(str, str)>;
+  forEach(f: fn(str, str));
+}
+
+class Map<K, V> {
+  new();
+  get(key: K): V?;
+  set(key: K, value: V);
+  get size(): u32;
+}
+
+class Bytes {
+  static from(items: Map<str, f64>): Bytes;
+  static from<T>(items: Map<str, T>): Bytes;
+  at(index: u32): f64;
+  at(index: i32): f64;
+  one(): (str,);
+  quad(): (u32, bool, f64, str);
+}
+
+class KVNamespace {
+  get(key: str): future<str?, KvError>;
+  put(key: str, value: str, ttl: u53?): future<unit, KvError>;
+  list(prefix: str?, limit: u32?): future<arr<Str>>;
+}
+
+namespace crypto {
+  randomUUID(): str;
+  getRandomValues(into: mut u8[]);
+}
+
+module "node:buffer" {
+  class Buffer {
+    static byteLength(s: str): u53;
+  }
+  export { Buffer };
+}
+
+atob(data: str): str throws err;
+setTimeout(f: fn(), ms: f64?): i32;
+parse(s: str): Body?;
+methodOf(m: Method, f: Flags?): Flags;
+pair(): (u32, bool);
+total(xs: arr<f64>): f64;
+big(n: i64, m: u64): i64;
+maybe(): Str??;
+
+export class Counter {
+  new(start: u32);
+  increment(by: u32): u32;
+  get count(): u32;
+  static create(): Counter;
+}
+
+export namespace default {
+  fetch(request: Response, body: Body): future<Response>;
+}
+
+export namespace stats {
+  total(): future<i64>;
+  size(): future<u64>;
+}

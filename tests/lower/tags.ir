@@ -1,0 +1,13 @@
+ir 1;
+
+class Pixels {
+  get width(): u16;
+  get count(): u53;
+  get big(): i64;
+  sample(x: u8, y: f64): f32 throws;
+  sizes(): arr<u32> throws;
+  first(): @js(null) u32? throws;
+  load(): future<u32>;
+  clear();
+  fail(): never throws;
+}

@@ -1,0 +1,23 @@
+ir 1;
+
+interface Env {}
+
+class Request {}
+
+class Response {}
+
+interface Handler {
+  fetch(request: Request, env: Env): HandlerFetchKind throws;
+  scheduled(time: f64) throws;
+  queue(batch: arr<str>) throws;
+}
+
+enum HandlerFetchKind {
+  Response(Response);
+  Future(future<Response>);
+}
+
+export namespace default {
+  fetch(request: Request, env: Env): future<Response>;
+  scheduled(time: f64) throws;
+}

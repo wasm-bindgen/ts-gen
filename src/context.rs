@@ -49,6 +49,13 @@ pub struct ParsedModule {
 pub struct GlobalContext {
     pub scopes: ScopeArena,
     pub diagnostics: DiagnosticCollector,
+    /// Projections of a class's or interface's literal-only type parameter
+    /// (`PluralizeUnit<Units>`), kept unevaluated for the IR producer, by
+    /// the declaration's body scope and the reference's TS spelling.
+    pub projections: std::collections::HashMap<(ScopeId, String), Projection>,
+    /// An `Exclude` or `Extract` over an alias's values, kept for the IR
+    /// producer to name, by its TS spelling: the union it keeps.
+    pub utilities: std::collections::HashMap<String, crate::ir::TypeRef>,
     pub external_map: ExternalMap,
     /// Pending imports that need to be resolved during import resolution.
     pub pending_imports: Vec<PendingImport>,
@@ -198,6 +205,8 @@ impl GlobalContext {
         Self {
             scopes: ScopeArena::new(),
             diagnostics: DiagnosticCollector::new(),
+            projections: Default::default(),
+            utilities: Default::default(),
             external_map: ExternalMap::new(),
             pending_imports: Vec::new(),
             builtin_type_ids: std::collections::HashSet::new(),
@@ -333,7 +342,15 @@ impl GlobalContext {
     ///
     /// The first namespace resolves from `scope` up the chain; each later
     /// segment must be declared directly in the namespace before it.
+    ///
+    /// `#decl.<index>` is a declaration the IR names by its id, where its
+    /// name resolves to another from the use site (see
+    /// [`crate::codegen::ir_types::DECLARED`]).
     pub fn resolve_path(&self, scope: ScopeId, path: &str) -> Option<TypeId> {
+        if let Some(index) = path.strip_prefix("#decl.") {
+            let index: u32 = index.parse().ok()?;
+            return ((index as usize) < self.types.len()).then_some(TypeId(index));
+        }
         let Some((namespaces, member)) = path.rsplit_once('.') else {
             return self.scopes.resolve(scope, path);
         };
@@ -404,4 +421,19 @@ impl Default for GlobalContext {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// A type of a literal-only type parameter, by what each literal of its
+/// bound maps to. The projections TS writes distribute over the
+/// parameter's union, so an argument's result is the union of its
+/// literals'.
+#[derive(Clone, Debug)]
+pub struct Projection {
+    /// The class or interface whose parameter it is.
+    pub owner: TypeId,
+    pub param: String,
+    /// The alias projected through (`PluralizeUnit`).
+    pub alias: String,
+    /// Each literal of the bound, with the literals it maps to.
+    pub literals: Vec<(String, Vec<String>)>,
 }

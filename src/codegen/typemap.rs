@@ -431,7 +431,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::Boolean => buf.push_str("bool"),
         TypeRef::Number => buf.push_str("num"),
         TypeRef::BigInt => buf.push_str("bigint"),
-        TypeRef::String => buf.push_str("str"),
+        TypeRef::String | TypeRef::Template { .. } => buf.push_str("str"),
         TypeRef::Void => buf.push_str("void"),
         TypeRef::Undefined => buf.push_str("undef"),
         TypeRef::Null => buf.push_str("null"),
@@ -442,6 +442,8 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::ArrayBufferView => buf.push_str("ArrayBufferView"),
         TypeRef::PropertyKey => buf.push_str("PropertyKey"),
         TypeRef::TypedSlice(e, _) => write!(buf, "slice:{}", e.typed_array()).unwrap(),
+        TypeRef::AbiScalar(s) if s.is_bigint() => buf.push_str("bigint"),
+        TypeRef::AbiScalar(_) => buf.push_str("num"),
         TypeRef::StringLiteral(s) => write!(buf, "lit:{s:?}").unwrap(),
         TypeRef::NumberLiteral(n) => write!(buf, "lit:{n}").unwrap(),
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
@@ -1372,6 +1374,7 @@ impl<'a> CodegenContext<'a> {
             TypeRef::Boolean
             | TypeRef::Number
             | TypeRef::String
+            | TypeRef::Template { .. }
             | TypeRef::BigInt
             | TypeRef::Void
             | TypeRef::Undefined
@@ -1383,6 +1386,7 @@ impl<'a> CodegenContext<'a> {
             | TypeRef::ArrayBufferView
             | TypeRef::PropertyKey
             | TypeRef::TypedSlice(..)
+            | TypeRef::AbiScalar(_)
             | TypeRef::StringLiteral(_)
             | TypeRef::NumberLiteral(_)
             | TypeRef::BooleanLiteral(_)
@@ -2030,6 +2034,16 @@ pub fn to_syn_type(
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
+    // The Rust bindings don't read `@tw-abi` yet: a scalar keeps the JS
+    // number or bigint it narrows.
+    if let TypeRef::AbiScalar(s) = ty {
+        let leaf = if s.is_bigint() {
+            TypeRef::BigInt
+        } else {
+            TypeRef::Number
+        };
+        return to_syn_type(&leaf, pos, ctx, scope, from_module);
+    }
     // `PropertyKey` lowers as the union it abbreviates.
     if matches!(ty, TypeRef::PropertyKey) {
         return to_syn_type(
@@ -2099,7 +2113,7 @@ pub fn to_syn_type(
         // === Primitives (outer position only reaches here) ===
         TypeRef::Boolean => quote! { bool },
         TypeRef::Number => quote! { f64 },
-        TypeRef::String => {
+        TypeRef::String | TypeRef::Template { .. } => {
             if borrow {
                 quote! { &str }
             } else {
@@ -2114,6 +2128,7 @@ pub fn to_syn_type(
         TypeRef::Unknown => maybe_ref(quote! { JsValue }, borrow),
         TypeRef::Object => maybe_ref(quote! { Object }, borrow),
         TypeRef::Symbol => maybe_ref(quote! { Symbol }, borrow),
+        TypeRef::AbiScalar(_) => unreachable!("read as its leaf above"),
 
         // === TS-only synthetic ===
         // `ArrayBufferView` is a TS-only union alias (typed-array
@@ -3284,7 +3299,8 @@ fn is_mono_native_leaf(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -
             | TypeRef::NumberLiteral(_)
             | TypeRef::String
             | TypeRef::StringLiteral(_)
-    ) || ctx.enum_kind(ty, scope).is_some()
+    ) || matches!(ty, TypeRef::AbiScalar(s) if !s.is_bigint())
+        || ctx.enum_kind(ty, scope).is_some()
 }
 
 /// The generic arguments of `ty` if it instantiates a locally declared
@@ -4125,6 +4141,9 @@ fn is_native_array_element(
             | TypeRef::NumberLiteral(_)
             | TypeRef::Boolean
             | TypeRef::BooleanLiteral(_)
+    ) || matches!(
+        native_array_leaf(elem, ctx, scope).as_ref(),
+        TypeRef::AbiScalar(s) if !s.is_bigint()
     )
 }
 
@@ -4243,7 +4262,7 @@ fn is_numeric_array_element(
     matches!(
         native_array_leaf(elem, ctx, scope).as_ref(),
         TypeRef::Number | TypeRef::NumberLiteral(_)
-    )
+    ) || matches!(native_array_leaf(elem, ctx, scope).as_ref(), TypeRef::AbiScalar(s) if !s.is_bigint())
 }
 
 fn native_array_leaf<'t>(
@@ -4819,6 +4838,7 @@ mod tests {
         let sig = ir::FunctionSig {
             params: vec![ir::Param {
                 name: "x".into(),
+                js_name: None,
                 type_ref: TypeRef::Number,
                 optional: false,
                 variadic: false,
@@ -4836,6 +4856,7 @@ mod tests {
         let sig = ir::FunctionSig {
             params: vec![ir::Param {
                 name: "x".into(),
+                js_name: None,
                 type_ref: TypeRef::Any,
                 optional: false,
                 variadic: false,

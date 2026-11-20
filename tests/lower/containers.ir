@@ -1,0 +1,38 @@
+ir 1;
+
+namespace Outer {
+  namespace Inner {
+    interface Leaf {
+      @js(object)
+      new();
+      get id(): str;
+    }
+
+    make(): Leaf throws;
+  }
+
+  root(): Inner.Leaf throws;
+}
+
+class Widget {
+  new(name: str) throws;
+  get name(): str;
+  static create(name: str): Widget throws;
+  static get version(): str;
+}
+
+class String {
+  length(): f64 throws;
+}
+
+bytes(): Uint8Array throws;
+later(): future<str>;
+
+@js(name = "Any")
+class Any_ {
+  get kind(): str;
+}
+
+any(): Any_ throws;
+
+class Uint8Array {}

@@ -1,0 +1,50 @@
+ir 1;
+
+interface Env {
+  get vars(): Record<Str>;
+  set vars(value: Record<Str>);
+  get flags(): NumberRecord<Bool>;
+  lookup(headers: Record<EnvHeadersKind>): Record<Env> throws;
+  configure(options: EnvOptions) throws;
+}
+
+interface EnvOptions {
+  @js(index)
+  at(key: str): f64?;
+  @js(index)
+  setAt(key: str, value: f64);
+}
+
+interface Bag {
+  @js(index)
+  at(key: str): Any?;
+}
+
+interface List {
+  @js(object)
+  new();
+  @js(index)
+  at(i: u32): str?;
+  @js(index)
+  setAt(i: u32, value: str);
+  get length(): f64;
+}
+
+enum EnvHeadersKind {
+  Str(str);
+  StrArray(arr<str>);
+}
+
+interface Record<V> {
+  @js(index)
+  at(key: str): V?;
+  @js(index)
+  setAt(key: str, value: V);
+}
+
+interface NumberRecord<V> {
+  @js(index)
+  at(i: u32): V?;
+  @js(index)
+  setAt(i: u32, value: V);
+}

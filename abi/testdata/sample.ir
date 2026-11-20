@@ -1,0 +1,124 @@
+ir 1;
+
+/// An HTTP request.
+///
+///   Indented, and "quoted" \ text.
+class Request extends Body, "content-source" {
+  new(input: str, init: RequestInit?);
+  new withRequest(input: Request);
+  get url(): str;
+  get "content-type"(): str?;
+  set "content-type"(value: str);
+  static get count(): u53;
+  static set count(value: u53);
+  clone(): Request throws;
+  @js(symbol = iterator)
+  iterator(): Any;
+  @js(index)
+  at(i: u32): Str?;
+}
+
+interface RequestInit {
+  @js(object)
+  new();
+  get signal(): @js(null) AbortSignal?;
+  set signal(value: AbortSignal);
+  @js(args = (null))
+  set signalWithNull();
+}
+
+class Map<K, V> {
+  new();
+  get(key: K): V?;
+  set(key: K, value: V): Map<K, V>;
+  map<U: Any, W in (Str, f64)>(f: fn(V, u32) -> U): Arr<W>;
+}
+
+class Types {
+  scalars(a: bool, b: i8, c: u8, d: i16, e: u16, f: i32, g: u32, h: i53, i: u53, j: i64, k: u64, l: f16, m: f32, n: f64);
+  boxes(a: Bool, b: U32, c: F64, d: Str, e: Vec<u8>, f: Arr<Str>, g: Tuple<str, u16>, h: Tuple<str>): Any?;
+  sequences(a: u8[], b: arr<str?>, c: arr<str>?, d: arr<(u32, str)>, e: (f64,), f: (u32, (f64, bool)), g: mut u8[]?): str??;
+  functions(a: fn(Event), b: fn(Event)?, c: (fn(Event) -> str)?, d: fn(Event) -> str?, e: fn(Event) -> unit throws KvError, f: fn() -> (fn(u8)) throws, g: arr<fn() -> unit throws>): fn(f64, u32) -> Str;
+  pointers(a: *u8[], b: *mut f32[], c: arr<*u8[]>, d: *(u8?)[], e: *mut Uint8Array[]);
+  futures(): future<unit>;
+  futures2(): future<Response, FetchError> throws FetchError;
+  quoted(a: "node:buffer".Buffer, b: "Str", c: ns."weird-name"<u8>);
+}
+
+export class Counter extends DurableObject {
+  @js(super = (ctx, env, "counter"))
+  new(ctx: DurableObjectState, env: Env);
+  increment(by: u32): future<u32>;
+  get count(): u32;
+  static create(): Counter;
+}
+
+class EventTarget {
+  addEventListener(type: str, @once listener: fn(Event), @once options: @js(null) fn(Event)?);
+  @js(this = target)
+  onEvent(target: Any, cb: fn(Event));
+  @js(args = (...rest))
+  log(rest: arr<Any>);
+  @js(args = (a, undefined, 1, true, false, -2, "x"))
+  padded(a: str);
+}
+
+enum Method {
+  @js("GET") Get;
+  @js("POST") Post;
+  /// The latest method.
+  Latest = .Post;
+  @fallback Unknown;
+}
+
+enum Flags: i32 {
+  None = 0;
+  Neg = -1;
+  Both = 3;
+}
+
+enum Body {
+  Text(str);
+  Bytes(u8[]);
+  Pair(u32, Request);
+  @fallback Other(Any);
+}
+
+enum KvError extends err, ns.Base {
+  @js(DOMException[name = "NotFoundError", code = 8] | TypeError) NotFound(Str);
+}
+
+@js(let c = AbortController.new(), args = (input, init? { signal = c.signal, "x-y" = 1 }), cancel = $result.cancel)
+fetch(input: Request, init: RequestInit?): future<Response, FetchError>;
+foo();
+get version(): str;
+set version(value: str);
+
+namespace foo {
+  baz() throws;
+
+  namespace "inner-ns" {
+    static();
+  }
+}
+
+export namespace default {
+  fetch(request: Request, env: Env, ctx: ExecutionContext): future<Response>;
+}
+
+export version(): str;
+
+module "node:buffer" {
+  class Buffer extends Uint8Array {
+    static concat(list: arr<Buffer>): Buffer;
+  }
+
+  class Hidden {
+    static make(): Hidden;
+    read(): u8;
+  }
+
+  export { Buffer, Buffer as default };
+}
+
+module "empty" {}

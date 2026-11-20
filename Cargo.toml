@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "abi",
     "integration-tests",
 ]
 exclude = [
@@ -54,6 +55,7 @@ path = "src/lib.rs"
 
 [dependencies]
 anyhow = "1"
+ts-gen-abi = { path = "abi" }
 clap = { version = "4", features = ["derive"], optional = true }
 convert_case = "0.6"
 indexmap = "2"

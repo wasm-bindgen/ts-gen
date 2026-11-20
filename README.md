@@ -1,10 +1,56 @@
 # ts-gen
 
-Generate [`wasm-bindgen`](https://github.com/wasm-bindgen/wasm-bindgen) Rust bindings from TypeScript `.d.ts` declaration files.
+Generate bindings from TypeScript `.d.ts` declaration files: Rust for
+[`wasm-bindgen`](https://github.com/wasm-bindgen/wasm-bindgen), and the ts-gen
+IR, which other Wasm languages bind against.
 
 ## Overview
 
-`ts-gen` reads TypeScript `.d.ts` files and produces Rust source code containing `#[wasm_bindgen]` extern blocks, ready to compile against `wasm-bindgen`.
+`ts-gen` reads TypeScript `.d.ts` files. It writes Rust source with
+`#[wasm_bindgen]` extern blocks directly ([Rust](#rust-wasm-bindgen)), or the
+**ts-gen IR**, a language-neutral description of a JS API that any Wasm
+language can bind against.
+
+```text
+.d.ts -ts-gen-------> Rust (#[wasm_bindgen])
+.d.ts -ts-gen --ir--> app.ir -ts-gen-abi lower-> JSON (per-member wire layouts)
+```
+
+## The ts-gen IR
+
+[IR.md](IR.md) is the spec. An IR file declares classes, interfaces, enums,
+callbacks, generics, async and exceptions in a small text format. Each
+member is keyed by its canonical signature (`Request#text()`), which is also
+its Wasm import name. A **profile** fixes how values cross the boundary:
+
+* linear memory, WasmGC or host carriers;
+* the string encoding;
+* the exception and result conventions.
+
+The [`ts-gen-abi`](abi) crate holds the IR's parser, printer and validator,
+the profile and layout rules, and the `tw` protocol names. It lowers an IR
+to per-member wire layouts for generators that don't link it:
+
+```sh
+ts-gen --input worker.d.ts --provides ExportedHandler.fetch --ir worker.ir
+ts-gen-abi lower worker.ir --profile "all-host, results = single, throws = js" > worker.json
+```
+
+`--ir` takes the producer options: `--provides`, `--once`, `--no-cancel`,
+`--bound`, `--with`, `--emit-lib`, `--root` and `--strict-nullable`. See
+`ts-gen --help` for each.
+
+## Development
+
+```sh
+just test          # unit and snapshot tests
+just test-integration  # wasm-bindgen integration (wasm32 target, wasm-bindgen-cli)
+just fmt-check && just clippy
+```
+
+`BLESS=1` re-blesses snapshots.
+
+## Rust (wasm-bindgen)
 
 ### Pipeline
 
@@ -17,15 +63,15 @@ Generate [`wasm-bindgen`](https://github.com/wasm-bindgen/wasm-bindgen) Rust bin
   -> Code Generation: IR -> syn::File -> prettyplease -> .rs files
 ```
 
-## Installation
+### Installation
 
-### CLI
+#### CLI
 
 ```sh
 cargo install ts-gen
 ```
 
-### Library
+#### Library
 
 ```sh
 cargo add ts-gen --no-default-features
@@ -34,9 +80,9 @@ cargo add ts-gen --no-default-features
 The `cli` feature (enabled by default) pulls in `clap` and `walkdir` for the
 binary. Disable it if you only need the library API.
 
-## Usage
+### Usage
 
-### CLI
+#### CLI
 
 ```sh
 ts-gen --input types.d.ts --output src/bindings.rs
@@ -104,7 +150,7 @@ with the flag `T | null` reads as `Nullable<T>` and `T | null | undefined` as
 ts-gen --input types.d.ts --output src/bindings.rs --strict-nullable
 ```
 
-### Library API
+#### Library API
 
 ```rust
 use ts_gen::{parse_source, codegen};
@@ -132,7 +178,7 @@ let options = codegen::GenerateOptions::new()
 let rust_code = codegen::generate_with_options(&module, &gctx, &options)?;
 ```
 
-## Supported TypeScript constructs
+### Supported TypeScript constructs
 
 - Classes (including abstract classes and inheritance)
 - Interfaces (classified as class-like or dictionary types)
@@ -144,7 +190,7 @@ let rust_code = codegen::generate_with_options(&module, &gctx, &options)?;
 - Generics (`JsGeneric` erasure by default, with experimental
   per-monomorphization support)
 
-## Known limitations
+### Known limitations
 
 - **External generic type arguments** are not preserved unless the target is a
   recognized `js_sys` container; locally declared generic types keep theirs.

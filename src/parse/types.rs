@@ -58,7 +58,7 @@ pub fn convert_ts_type_scoped(
 /// Public converters route through this so they can be called either
 /// with a full `ParseCtx` (production paths) or with a throwaway
 /// arena (the bare `convert_ts_type` helper).
-fn convert_ts_type_with_arena(
+pub(crate) fn convert_ts_type_with_arena(
     ts_type: &TSType<'_>,
     scope: ScopeId,
     scopes: &mut ScopeArena,
@@ -108,6 +108,28 @@ fn convert_ts_type_with_arena(
                 .iter()
                 .map(|t| convert_ts_type_with_arena(t, scope, scopes, diag))
                 .collect();
+            // An inline object type beside a primitive or a type parameter
+            // only brands it (`T & { __brand: B }`).
+            let branded = types.iter().any(|t| match t {
+                TypeRef::Reference {
+                    segments,
+                    generic_args,
+                } if segments.len() == 1 && generic_args.is_empty() => matches!(
+                    scopes.resolve_binding(scope, &segments[0]),
+                    Some(Binding::TypeParam | Binding::Erased(_))
+                ),
+                t => primitive(t),
+            });
+            if branded {
+                warn_branded(&types, diag);
+            }
+            let types = types
+                .into_iter()
+                .map(|t| match t {
+                    TypeRef::ObjectLiteral(_) if branded => TypeRef::Object,
+                    t => t,
+                })
+                .collect();
             simplify_intersection(types)
         }
 
@@ -131,23 +153,33 @@ fn convert_ts_type_with_arena(
         TSType::TSLiteralType(lit) => convert_literal_type(lit, diag),
 
         // === Type literal (object type) ===
+        TSType::TSTypeLiteral(lit) if !scopes.legacy_rust => {
+            inline_object(lit, scope, scopes, diag).unwrap_or_else(|| {
+                if !lit.members.is_empty() {
+                    diag.warn(
+                        "Inline object types other than properties alone or one index signature are not supported, reading as an untyped value",
+                    );
+                }
+                TypeRef::Object
+            })
+        }
         TSType::TSTypeLiteral(_) => TypeRef::Object,
 
         // === Constructor type ===
         TSType::TSConstructorType(_) => {
-            diag.warn("Constructor types are not supported, erasing to JsValue");
+            diag.warn("Constructor types are not supported, reading as an untyped value");
             TypeRef::Any
         }
 
         // === Conditional types, mapped types, template literals, etc. ===
         TSType::TSConditionalType(_) => {
-            diag.warn("Conditional types are not supported, erasing to JsValue");
+            diag.warn("Conditional types are not supported, reading as an untyped value");
             TypeRef::Unresolved("conditional type".to_string())
         }
         TSType::TSMappedType(mapped) => {
             // An `as` clause remaps keys, which evaluation doesn't follow.
             if mapped.name_type.is_some() {
-                diag.warn("Mapped types with an `as` clause are not supported, erasing to JsValue");
+                diag.warn("Mapped types with an `as` clause are not supported, reading as an untyped value");
                 return TypeRef::Unresolved("mapped type".to_string());
             }
             let modifier = |m: Option<TSMappedTypeModifierOperator>| match m {
@@ -168,49 +200,45 @@ fn convert_ts_type_with_arena(
                 readonly: modifier(mapped.readonly),
             }))
         }
+        // Only evaluation reads a template, applying it to literals.
+        TSType::TSTemplateLiteralType(t) if !scopes.legacy_rust && !t.types.is_empty() => {
+            TypeRef::Template {
+                quasis: t
+                    .quasis
+                    .iter()
+                    .map(|q| q.value.cooked.as_ref().unwrap_or(&q.value.raw).to_string())
+                    .collect(),
+                types: t
+                    .types
+                    .iter()
+                    .map(|t| convert_ts_type_with_arena(t, scope, scopes, diag))
+                    .collect(),
+            }
+        }
         TSType::TSTemplateLiteralType(_) => TypeRef::String,
         TSType::TSIndexedAccessType(access) => {
             let object = match &access.object_type {
-                TSType::TSTypeLiteral(lit) => TypeRef::ObjectLiteral(
-                    lit.members
-                        .iter()
-                        .filter_map(|member| {
-                            let TSSignature::TSPropertySignature(prop) = member else {
-                                return None;
-                            };
-                            Some(crate::ir::ObjectProp {
-                                name: crate::parse::members::property_key_name(&prop.key)?,
-                                type_ref: prop.type_annotation.as_ref().map_or(
-                                    TypeRef::Any,
-                                    |ann| {
-                                        convert_ts_type_with_arena(
-                                            &ann.type_annotation,
-                                            scope,
-                                            scopes,
-                                            diag,
-                                        )
-                                    },
-                                ),
-                                optional: prop.optional,
-                                readonly: prop.readonly,
-                            })
-                        })
-                        .collect(),
-                ),
+                TSType::TSTypeLiteral(lit) => {
+                    TypeRef::ObjectLiteral(object_props(lit, scope, scopes, diag))
+                }
                 other => convert_ts_type_with_arena(other, scope, scopes, diag),
             };
-            TypeRef::IndexedAccess(
-                Box::new(object),
-                Box::new(convert_ts_type_with_arena(
-                    &access.index_type,
-                    scope,
-                    scopes,
-                    diag,
-                )),
-            )
+            // An erased parameter key stays a reference, so evaluation
+            // reads it at its bound's keys (`M[K]`, `K extends keyof M`).
+            let index = match &access.index_type {
+                TSType::TSTypeReference(r)
+                    if r.type_arguments.is_none()
+                        && matches!(&r.type_name, TSTypeName::IdentifierReference(id)
+                            if matches!(scopes.resolve_binding(scope, &id.name), Some(Binding::Erased(_)))) =>
+                {
+                    TypeRef::ident(r.type_name.to_string())
+                }
+                other => convert_ts_type_with_arena(other, scope, scopes, diag),
+            };
+            TypeRef::IndexedAccess(Box::new(object), Box::new(index))
         }
         TSType::TSInferType(_) => {
-            diag.warn("Infer types are not supported, erasing to JsValue");
+            diag.warn("Infer types are not supported, reading as an untyped value");
             TypeRef::Unresolved("infer type".to_string())
         }
         TSType::TSTypeOperatorType(op) => {
@@ -225,11 +253,11 @@ fn convert_ts_type_with_arena(
         }
         TSType::TSTypePredicate(_) => TypeRef::Boolean,
         TSType::TSTypeQuery(_) => {
-            diag.warn("typeof type queries are not supported, erasing to JsValue");
+            diag.warn("typeof type queries are not supported, reading as an untyped value");
             TypeRef::Unresolved("typeof query".to_string())
         }
         TSType::TSImportType(_) => {
-            diag.warn("Import types are not supported, erasing to JsValue");
+            diag.warn("Import types are not supported, reading as an untyped value");
             TypeRef::Unresolved("import type".to_string())
         }
         TSType::TSThisType(_) => TypeRef::Unresolved("this".to_string()),
@@ -399,6 +427,57 @@ fn convert_tuple_element(
     }
 }
 
+fn object_props(
+    lit: &TSTypeLiteral<'_>,
+    scope: ScopeId,
+    scopes: &mut ScopeArena,
+    diag: &mut DiagnosticCollector,
+) -> Vec<crate::ir::ObjectProp> {
+    lit.members
+        .iter()
+        .filter_map(|member| {
+            let TSSignature::TSPropertySignature(prop) = member else {
+                return None;
+            };
+            Some(crate::ir::ObjectProp {
+                name: crate::parse::members::property_key_name(&prop.key)?,
+                type_ref: prop.type_annotation.as_ref().map_or(TypeRef::Any, |ann| {
+                    convert_ts_type_with_arena(&ann.type_annotation, scope, scopes, diag)
+                }),
+                optional: prop.optional,
+                readonly: prop.readonly,
+            })
+        })
+        .collect()
+}
+
+/// An inline object type the IR producer can name: properties only, as an
+/// [`TypeRef::ObjectLiteral`], or a lone index signature, as a `Record`.
+fn inline_object(
+    lit: &TSTypeLiteral<'_>,
+    scope: ScopeId,
+    scopes: &mut ScopeArena,
+    diag: &mut DiagnosticCollector,
+) -> Option<TypeRef> {
+    if let [TSSignature::TSIndexSignature(idx)] = lit.members.as_slice() {
+        let key = convert_ts_type_with_arena(
+            &idx.parameter.type_annotation.type_annotation,
+            scope,
+            scopes,
+            diag,
+        );
+        let value =
+            convert_ts_type_with_arena(&idx.type_annotation.type_annotation, scope, scopes, diag);
+        return Some(TypeRef::generic("Record", vec![key, value]));
+    }
+    let props_only = !lit.members.is_empty()
+        && lit
+            .members
+            .iter()
+            .all(|m| matches!(m, TSSignature::TSPropertySignature(p) if crate::parse::members::property_key_name(&p.key).is_some()));
+    props_only.then(|| TypeRef::ObjectLiteral(object_props(lit, scope, scopes, diag)))
+}
+
 /// Convert a `TSFunctionType` to our IR `FunctionSig`.
 ///
 /// Function-type literals may declare their own type parameters
@@ -453,7 +532,7 @@ pub fn convert_formal_params_scoped(
     convert_formal_params_with_arena(params, scope, ctx.scopes, ctx.diag)
 }
 
-fn convert_formal_params_with_arena(
+pub(crate) fn convert_formal_params_with_arena(
     params: &FormalParameters<'_>,
     scope: ScopeId,
     scopes: &mut ScopeArena,
@@ -461,8 +540,10 @@ fn convert_formal_params_with_arena(
 ) -> Vec<crate::ir::Param> {
     let mut result = Vec::new();
     for (i, param) in params.items.iter().enumerate() {
-        let name = binding_pattern_name(&param.pattern)
-            .map(|n| to_snake_case(&n))
+        let raw = binding_pattern_name(&param.pattern);
+        let name = raw
+            .as_deref()
+            .map(to_snake_case)
             .unwrap_or_else(|| format!("arg{i}"));
 
         let type_ref = param
@@ -472,6 +553,7 @@ fn convert_formal_params_with_arena(
             .unwrap_or(TypeRef::Any);
 
         result.push(crate::ir::Param {
+            js_name: raw.filter(|r| *r != name),
             name,
             type_ref,
             optional: param.optional || param.initializer.is_some(),
@@ -491,6 +573,7 @@ fn convert_formal_params_with_arena(
 
         result.push(crate::ir::Param {
             name,
+            js_name: None,
             type_ref,
             optional: false,
             variadic: true,
@@ -526,6 +609,35 @@ fn convert_literal_type(lit: &TSLiteralType<'_>, _diag: &mut DiagnosticCollector
             _ => TypeRef::Number,
         },
     }
+}
+
+/// An intersection whose inline object types only brand it, which drops
+/// their members.
+pub(crate) fn warn_branded(parts: &[TypeRef], diag: &mut DiagnosticCollector) {
+    let dropped = parts
+        .iter()
+        .any(|t| matches!(t, TypeRef::ObjectLiteral(props) if !props.is_empty()));
+    if dropped {
+        diag.warn(format!(
+            "`{}` reads without its inline object type, whose members are dropped",
+            TypeRef::Intersection(parts.to_vec()).format_ts()
+        ));
+    }
+}
+
+/// A primitive or a literal of one.
+pub(crate) fn primitive(t: &TypeRef) -> bool {
+    matches!(
+        t,
+        TypeRef::String
+            | TypeRef::Number
+            | TypeRef::Boolean
+            | TypeRef::BigInt
+            | TypeRef::Symbol
+            | TypeRef::StringLiteral(_)
+            | TypeRef::NumberLiteral(_)
+            | TypeRef::BooleanLiteral(_)
+    )
 }
 
 /// Normalise an intersection: inline nested `&`, drop repeats and the
@@ -574,16 +686,7 @@ pub fn convert_type_params(
                 .iter()
                 .map(|p| crate::ir::TypeParam {
                     name: p.name.to_string(),
-                    constraint: p.constraint.as_ref().map(|c| match c {
-                        // `keyof X` is a union of property names; the
-                        // string reading is what every JS API does with it.
-                        TSType::TSTypeOperatorType(op)
-                            if op.operator == TSTypeOperatorOperator::Keyof =>
-                        {
-                            TypeRef::String
-                        }
-                        _ => convert_ts_type(c, diag),
-                    }),
+                    constraint: p.constraint.as_ref().map(|c| convert_ts_type(c, diag)),
                     default: p.default.as_ref().map(|d| convert_ts_type(d, diag)),
                 })
                 .collect()

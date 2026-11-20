@@ -407,3 +407,39 @@ fn ambient_module_imports_resolve_independently_of_cwd() {
     .unwrap();
     assert_eq!(actual, expected);
 }
+
+/// The README's library example, `parse_source` then `codegen::generate`,
+/// gives the CLI's output.
+#[test]
+fn library_api_matches_the_cli() {
+    let source =
+        std::fs::read_to_string(crate_root().join("tests/fixtures/inline-return.d.ts")).unwrap();
+    let (module, gctx) = ts_gen::parse_source(&source, None).unwrap();
+    let actual = ts_gen::codegen::generate(&module, &gctx).unwrap();
+    let snapshot = "tests/snapshots/inline-return/default.rs";
+    let expected = std::fs::read_to_string(crate_root().join(snapshot)).unwrap();
+    assert!(
+        actual == expected,
+        "the library's output differs from {snapshot}"
+    );
+}
+
+/// With both `--ir` and `--output`, each parse diagnostic is reported once.
+#[test]
+fn ir_and_output_report_a_warning_once() {
+    let fixture = crate_root().join("tests/fixtures/duplicate-identifiers.d.ts");
+    let out_dir = TempDir::new("ir-and-output");
+    let output = Command::new(ts_gen_bin())
+        .arg("--input")
+        .arg(&fixture)
+        .arg("--ir")
+        .arg(out_dir.0.join("bindings.ir"))
+        .arg("--output")
+        .arg(out_dir.0.join("bindings.rs"))
+        .output()
+        .expect("Failed to execute ts-gen binary");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(output.status.success(), "{stderr}");
+    let warning = "duplicate-identifiers.d.ts:11:11: Duplicate identifier `Dup`";
+    assert_eq!(stderr.matches(warning).count(), 1, "{stderr}");
+}

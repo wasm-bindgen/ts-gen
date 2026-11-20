@@ -1,0 +1,244 @@
+// Produced by tests/std.rs: the parse, then the lowering, diagnostics of
+// tests/fixtures/workers-types.d.ts against std.
+parse (x46) warning: Found export declaration without --lib-name; treating as global
+parse (x65) warning: typeof type queries are not supported, reading as an untyped value
+parse (x2) warning: Constructor types are not supported, reading as an untyped value
+parse (x17) warning: Conditional types are not supported, reading as an untyped value
+parse (x1) warning: Intersection `Fetcher`: dropping a conditional type part (no structural reading)
+parse (x1) warning: Intersection `LoopbackServiceStub`: dropping a conditional type part (no structural reading)
+parse (x1) warning: Intersection `LoopbackDurableObjectClass`: dropping a conditional type part (no structural reading)
+parse (x4) warning: Inline object types other than properties alone or one index signature are not supported, reading as an untyped value
+parse (x2) warning: `Env & { ASSETS: { fetch: typeof query } }` reads without its inline object type, whose members are dropped
+parse (x1) warning: `RpcTargetBranded.[__RPC_TARGET_BRAND]`: a member with a computed key is not lowered
+parse (x1) warning: `WorkerEntrypointBranded.[__WORKER_ENTRYPOINT_BRAND]`: a member with a computed key is not lowered
+parse (x1) warning: `DurableObjectBranded.[__DURABLE_OBJECT_BRAND]`: a member with a computed key is not lowered
+parse (x1) warning: `WorkflowEntrypointBranded.[__WORKFLOW_ENTRYPOINT_BRAND]`: a member with a computed key is not lowered
+parse (x1) warning: `StubBase.[__RPC_STUB_BRAND]`: a member with a computed key is not lowered
+parse (x1) warning: `RpcTarget.[Rpc.__RPC_TARGET_BRAND]`: a member with a computed key is not lowered
+parse (x1) warning: `WorkerEntrypoint.[Rpc.__WORKER_ENTRYPOINT_BRAND]`: a member with a computed key is not lowered
+parse (x1) warning: `DurableObject.[Rpc.__DURABLE_OBJECT_BRAND]`: a member with a computed key is not lowered
+parse (x1) warning: `WorkflowEntrypoint.[Rpc.__WORKFLOW_ENTRYPOINT_BRAND]`: a member with a computed key is not lowered
+parse (x1) warning: `{ [K in keyof MainModule]: LoopbackForExport<MainModule[K]> & conditional type }` could not be evaluated, approximating as `mapped type`
+parse (x1) warning: `AiModelList[Name]["inputs"]` could not be evaluated, approximating as `indexed access type`
+parse (x1) warning: `Pick<{ [K in keyof T]: MethodOrProperty<T[K]> }, Exclude<keyof T, string | symbol | keyof StubBase<never>>>` in the extends of `Provider` could not be evaluated, ignored
+ir: `onmessage: never` holds no value, so it is not lowered
+ir: `WorkerGlobalScope.EventTarget`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.DOMException`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.WorkerGlobalScope`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.Event`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.ExtendableEvent`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.CustomEvent`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.PromiseRejectionEvent`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.FetchEvent`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.TailEvent`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.TraceEvent`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.ScheduledEvent`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.MessageEvent`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.CloseEvent`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.ReadableStreamDefaultReader`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.ReadableStreamBYOBReader`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.ReadableStream`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.WritableStream`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.WritableStreamDefaultWriter`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.TransformStream`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.ByteLengthQueuingStrategy`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.CountQueuingStrategy`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.ErrorEvent`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.MessageChannel`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.MessagePort`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.EventSource`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.ReadableStreamBYOBRequest`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.ReadableStreamDefaultController`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.ReadableByteStreamController`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.WritableStreamDefaultController`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.TransformStreamDefaultController`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.CompressionStream`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.DecompressionStream`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.TextEncoderStream`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.TextDecoderStream`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.Headers`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.Body`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.Request`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.Response`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.WebSocket`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.WebSocketPair`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.WebSocketRequestResponsePair`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.AbortController`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.AbortSignal`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.TextDecoder`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.TextEncoder`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.Navigator`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.URL`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.URLSearchParams`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.URLPattern`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.Blob`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.File`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.FormData`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.Crypto`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.SubtleCrypto`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.CryptoKey`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.CacheStorage`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.Cache`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.FixedLengthStream`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.IdentityTransformStream`: `typeof query` has no IR type and reads as `Any`
+ir: `ServiceWorkerGlobalScope.HTMLRewriter`: `typeof query` has no IR type and reads as `Any`
+ir: `ExecutionContext.Exports`: `mapped type` has no IR type and reads as `Any`
+ir: `DurableObjectStub.T extends Rpc.DurableObjectBranded | undefined`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `DurableObjectNamespace.T extends Rpc.DurableObjectBranded | undefined`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `DurableObjectClass._T extends Rpc.DurableObjectBranded | undefined`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `DurableObjectState.Exports`: `mapped type` has no IR type and reads as `Any`
+ir: `Crypto.getRandomValues.T extends Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | BigInt64Array | BigUint64Array`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `Crypto.DigestStream`: `typeof query` has no IR type and reads as `Any`
+ir: `Cf`: a union over type parameters (IncomingRequestCfProperties<CfHostMetadata> | RequestInitCfProperties) reads as `Any`
+ir: `Fetcher.T extends Rpc.EntrypointBranded | undefined`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `KVNamespace.Options`: the literal type `"text"` widens to `str`
+ir: `KVNamespace.Options`: the literal type `"json"` widens to `str`
+ir: `KVNamespace.Options`: the literal type `"arrayBuffer"` widens to `str`
+ir: `KVNamespace.Options`: the literal type `"stream"` widens to `str`
+ir: `UnderlyingByteSource.Type`: the literal type `"bytes"` widens to `str`
+ir: `UnderlyingSource.Type`: the literal type `""` widens to `str`
+ir: `ReadableStreamGetReaderOptions.Mode`: the literal type `"byob"` widens to `str`
+ir: `SqlStorage.Cursor`: `typeof query` has no IR type and reads as `Any`
+ir: `SqlStorage.Statement`: `typeof query` has no IR type and reads as `Any`
+ir: `SqlStorageCursor.raw.U extends SqlStorageValue[]`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `LoopbackServiceStub.T extends Rpc.WorkerEntrypointBranded | undefined`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `LoopbackDurableObjectClass.T extends Rpc.DurableObjectBranded | undefined`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `WorkerStub.getEntrypoint.T extends Rpc.WorkerEntrypointBranded | undefined`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `AiTextGenerationToolOutput.Type`: the literal type `"function"` widens to `str`
+ir: `AiTextGenerationOutput.ToolCalls`: `AiTextGenerationToolLegacyOutput & AiTextGenerationToolOutput` reads as `AiTextGenerationToolLegacyOutput` alone
+ir: `ResponsesOutput.Object`: the literal type `"response"` widens to `str`
+ir: `EasyInputMessage.Type`: the literal type `"message"` widens to `str`
+ir: `ResponsesFunctionTool.Type`: the literal type `"function"` widens to `str`
+ir: `ResponseContentReasoningText.Type`: the literal type `"reasoning_text"` widens to `str`
+ir: `ResponseCreatedEvent.Type`: the literal type `"response.created"` widens to `str`
+ir: `ResponseCustomToolCallOutput.Type`: the literal type `"custom_tool_call_output"` widens to `str`
+ir: `ResponseErrorEvent.Type`: the literal type `"error"` widens to `str`
+ir: `ResponseFailedEvent.Type`: the literal type `"response.failed"` widens to `str`
+ir: `ResponseFormatText.Type`: the literal type `"text"` widens to `str`
+ir: `ResponseFormatJSONObject.Type`: the literal type `"json_object"` widens to `str`
+ir: `ResponseFormatTextJSONSchemaConfig.Type`: the literal type `"json_schema"` widens to `str`
+ir: `ResponseFunctionCallArgumentsDeltaEvent.Type`: the literal type `"response.function_call_arguments.delta"` widens to `str`
+ir: `ResponseFunctionCallArgumentsDoneEvent.Type`: the literal type `"response.function_call_arguments.done"` widens to `str`
+ir: `ResponseFunctionToolCall.Type`: the literal type `"function_call"` widens to `str`
+ir: `ResponseFunctionToolCallOutputItem.Type`: the literal type `"function_call_output"` widens to `str`
+ir: `ResponseIncompleteEvent.Type`: the literal type `"response.incomplete"` widens to `str`
+ir: `ResponseInputImage.Type`: the literal type `"input_image"` widens to `str`
+ir: `ResponseInputImageContent.Type`: the literal type `"input_image"` widens to `str`
+ir: `ResponseInputItemFunctionCallOutput.Type`: the literal type `"function_call_output"` widens to `str`
+ir: `ResponseInputItemMessage.Type`: the literal type `"message"` widens to `str`
+ir: `ResponseInputMessageItem.Type`: the literal type `"message"` widens to `str`
+ir: `ResponseInputText.Type`: the literal type `"input_text"` widens to `str`
+ir: `ResponseInputTextContent.Type`: the literal type `"input_text"` widens to `str`
+ir: `ResponseOutputItemAddedEvent.Type`: the literal type `"response.output_item.added"` widens to `str`
+ir: `ResponseOutputItemDoneEvent.Type`: the literal type `"response.output_item.done"` widens to `str`
+ir: `ResponseOutputMessage.Role`: the literal type `"assistant"` widens to `str`
+ir: `ResponseOutputMessage.Type`: the literal type `"message"` widens to `str`
+ir: `ResponseOutputRefusal.Type`: the literal type `"refusal"` widens to `str`
+ir: `ResponseOutputText.Type`: the literal type `"output_text"` widens to `str`
+ir: `ResponseReasoningItem.Type`: the literal type `"reasoning"` widens to `str`
+ir: `ResponseReasoningSummaryItem.Type`: the literal type `"summary_text"` widens to `str`
+ir: `ResponseReasoningContentItem.Type`: the literal type `"reasoning_text"` widens to `str`
+ir: `ResponseReasoningTextDeltaEvent.Type`: the literal type `"response.reasoning_text.delta"` widens to `str`
+ir: `ResponseReasoningTextDoneEvent.Type`: the literal type `"response.reasoning_text.done"` widens to `str`
+ir: `ResponseRefusalDeltaEvent.Type`: the literal type `"response.refusal.delta"` widens to `str`
+ir: `ResponseRefusalDoneEvent.Type`: the literal type `"response.refusal.done"` widens to `str`
+ir: `ResponseCompletedEvent.Type`: the literal type `"response.completed"` widens to `str`
+ir: `ResponseTextDeltaEvent.Type`: the literal type `"response.output_text.delta"` widens to `str`
+ir: `ResponseTextDoneEvent.Type`: the literal type `"response.output_text.done"` widens to `str`
+ir: `ToolChoiceFunction.Type`: the literal type `"function"` widens to `str`
+ir: `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response.Object`: the literal type `"chat.completion"` widens to `str`
+ir: `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response.Object`: the literal type `"text_completion"` widens to `str`
+ir: `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response.Object`: the literal type `"chat.completion"` widens to `str`
+ir: `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response.Object`: the literal type `"text_completion"` widens to `str`
+ir: `Ai_Cf_Deepgram_Flux_Input.Encoding`: the literal type `"linear16"` widens to `str`
+ir: `InputOptions`: `indexed access type` has no IR type and reads as `Any`
+ir: `Ai.run.InputOptions extends indexed access type`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `Ai.Run`: `conditional type` has no IR type and reads as `Any`
+ir: `AutoRagAiSearchRequestStreaming.Stream`: the literal type `true` widens to `bool`
+ir: `AutoRagSearchResponse.Object`: the literal type `"vector_store.search_results.page"` widens to `str`
+ir: `BasicImageTransformations.Segment`: the literal type `"foreground"` widens to `str`
+ir: `RequestInitCfPropertiesImageDraw.Repeat`: the literal type `true` widens to `bool`
+ir: `RequestInitCfPropertiesImage.OriginAuth`: the literal type `"share-publicly"` widens to `str`
+ir: `RequestInitCfPropertiesImage.Compression`: the literal type `"fast"` widens to `str`
+ir: `IncomingRequestCfPropertiesBotManagementEnterprise.BotManagement`: `IncomingRequestCfPropertiesBotManagementBase & IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement` reads as `IncomingRequestCfPropertiesBotManagementBase` alone
+ir: `IncomingRequestCfPropertiesGeographicInformation.IsEUCountry`: the literal type `"1"` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuth.CertPresented`: the literal type `"1"` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertPresented`: the literal type `"0"` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertVerified`: the literal type `"NONE"` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertRevoked`: the literal type `"0"` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertIssuerDN`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertSubjectDN`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertIssuerDNRFC2253`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertSubjectDNRFC2253`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertIssuerDNLegacy`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertSubjectDNLegacy`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertSerial`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertIssuerSerial`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertSKI`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertIssuerSKI`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertFingerprintSHA1`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertFingerprintSHA256`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertNotBefore`: the literal type `""` widens to `str`
+ir: `IncomingRequestCfPropertiesTLSClientAuthPlaceholder.CertNotAfter`: the literal type `""` widens to `str`
+ir: `D1Response.Success`: the literal type `true` widens to `bool`
+ir: `D1Response.Meta`: `D1Meta & Record<string, unknown>` reads as `D1Meta` alone
+ir: `D1Response.error: never` holds no value, so it is not lowered
+ir: `D1PreparedStatementOptions.ColumnNames`: the literal type `true` widens to `bool`
+ir: `D1PreparedStatementRawOptions.ColumnNames`: the literal type `false` widens to `bool`
+ir: `ImageTransform.Segment`: the literal type `"foreground"` widens to `str`
+ir: `ImageInputOptions.Encoding`: the literal type `"base64"` widens to `str`
+ir: `ImageUploadOptions.Encoding`: the literal type `"base64"` widens to `str`
+ir: `ImageTransformationOutputOptions.Encoding`: the literal type `"base64"` widens to `str`
+ir: `RPCSTUBBRAND`: the literal type `"__RPC_STUB_BRAND"` widens to `str`
+ir: `RPCTARGETBRAND`: the literal type `"__RPC_TARGET_BRAND"` widens to `str`
+ir: `WORKERENTRYPOINTBRAND`: the literal type `"__WORKER_ENTRYPOINT_BRAND"` widens to `str`
+ir: `DURABLEOBJECTBRAND`: the literal type `"__DURABLE_OBJECT_BRAND"` widens to `str`
+ir: `WORKFLOWENTRYPOINTBRAND`: the literal type `"__WORKFLOW_ENTRYPOINT_BRAND"` widens to `str`
+ir: `StubBase.T extends Stubable`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `Stub.T extends Stubable`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `Provider`: `conditional type` has no IR type and reads as `Any`
+ir: `T`: `conditional type` has no IR type and reads as `Any`
+ir: `T`: `mapped type` has no IR type and reads as `Any`
+ir: `WorkflowStep.do.T extends Rpc.Serializable<T>`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `WorkflowStep.waitForEvent.T extends Rpc.Serializable<T>`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `Exports`: `mapped type` has no IR type and reads as `Any`
+ir: `InternalError.Name`: the literal type `"InternalError"` widens to `str`
+ir: `BadRequestError.Name`: the literal type `"BadRequestError"` widens to `str`
+ir: `NotFoundError.Name`: the literal type `"NotFoundError"` widens to `str`
+ir: `ForbiddenError.Name`: the literal type `"ForbiddenError"` widens to `str`
+ir: `RateLimitedError.Name`: the literal type `"RateLimitedError"` widens to `str`
+ir: `QuotaReachedError.Name`: the literal type `"QuotaReachedError"` widens to `str`
+ir: `MaxFileSizeError.Name`: the literal type `"MaxFileSizeError"` widens to `str`
+ir: `InvalidURLError.Name`: the literal type `"InvalidURLError"` widens to `str`
+ir: `AlreadyUploadedError.Name`: the literal type `"AlreadyUploadedError"` widens to `str`
+ir: `TooManyWatermarksError.Name`: the literal type `"TooManyWatermarksError"` widens to `str`
+ir: `FetchEventInfo.Type`: the literal type `"fetch"` widens to `str`
+ir: `JsRpcEventInfo.Type`: the literal type `"jsrpc"` widens to `str`
+ir: `ScheduledEventInfo.Type`: the literal type `"scheduled"` widens to `str`
+ir: `AlarmEventInfo.Type`: the literal type `"alarm"` widens to `str`
+ir: `QueueEventInfo.Type`: the literal type `"queue"` widens to `str`
+ir: `EmailEventInfo.Type`: the literal type `"email"` widens to `str`
+ir: `TraceEventInfo.Type`: the literal type `"trace"` widens to `str`
+ir: `HibernatableWebSocketEventInfoMessage.Type`: the literal type `"message"` widens to `str`
+ir: `HibernatableWebSocketEventInfoError.Type`: the literal type `"error"` widens to `str`
+ir: `HibernatableWebSocketEventInfoClose.Type`: the literal type `"close"` widens to `str`
+ir: `HibernatableWebSocketEventInfo.Type`: the literal type `"hibernatableWebSocket"` widens to `str`
+ir: `CustomEventInfo.Type`: the literal type `"custom"` widens to `str`
+ir: `FetchResponseInfo.Type`: the literal type `"fetch"` widens to `str`
+ir: `Onset.Type`: the literal type `"onset"` widens to `str`
+ir: `Outcome.Type`: the literal type `"outcome"` widens to `str`
+ir: `SpanOpen.Type`: the literal type `"spanOpen"` widens to `str`
+ir: `SpanClose.Type`: the literal type `"spanClose"` widens to `str`
+ir: `DiagnosticChannelEvent.Type`: the literal type `"diagnosticChannel"` widens to `str`
+ir: `Exception.Type`: the literal type `"exception"` widens to `str`
+ir: `Log.Type`: the literal type `"log"` widens to `str`
+ir: `DroppedEventsDiagnostic.DiagnosticsType`: the literal type `"droppedEvents"` widens to `str`
+ir: `StreamDiagnostic.Type`: the literal type `"streamDiagnostic"` widens to `str`
+ir: `Return.Type`: the literal type `"return"` widens to `str`
+ir: `Attributes.Type`: the literal type `"attributes"` widens to `str`
+ir: `TailEvent.Event extends EventType`: only a class, interface or enum bounds a type parameter, so it is unbounded
+ir: `PartialKvNamespaceGetOptionsUndefined.type: undefined` holds no value, so it is not lowered
+ir: `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseChoicesMessageToolCalls.Type`: the literal type `"function"` widens to `str`
+ir: `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseChoicesMessageToolCalls.Type`: the literal type `"function"` widens to `str`
+ir: `AutoRagSearchResponseDataContent.Type`: the literal type `"text"` widens to `str`
+ir: `ConversionOptionsHtml.Images`: `EmbeddedImageConversionOptions & ConversionOptionsHtmlImages` reads as `EmbeddedImageConversionOptions` alone

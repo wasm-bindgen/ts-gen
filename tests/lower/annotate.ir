@@ -1,0 +1,82 @@
+ir 1;
+
+class Response {
+  get status(): u16;
+  get ok(): bool;
+  /// Creates a clone of the response.
+  ///
+  /// ## Errors
+  ///
+  /// * `TypeError` — if the body has already been used
+  clone(): Response throws TypeErr;
+}
+
+interface ResponseInit {
+  @js(object)
+  new();
+  get status(): u16?;
+  set status(value: u16);
+  get statusText(): str?;
+  set statusText(value: str);
+}
+
+class Cache {
+  put(url: str): future<unit>;
+  put(url: str, ttl: u32): future<unit>;
+  put(request: Response): future<unit>;
+  put(request: Response, ttl: u32): future<unit>;
+}
+
+interface Storage {
+  delete(key: str): future<bool>;
+  delete(keys: arr<str>): future<u32>;
+}
+
+interface Console {
+  @js(args = (...data))
+  log(data: arr<Any?>);
+}
+
+get console(): Console;
+setTimeout(callback: fn()): i32 throws;
+setTimeout(callback: fn(), ms: f64): i32 throws;
+setInterval(callback: fn()): i32;
+setInterval(callback: fn(), ms: f64): i32;
+size(key: str): u32 throws;
+size(keys: arr<str>, n: u32): u32 throws;
+
+interface Incoming {
+  @js(object)
+  new();
+  get colo(): str;
+}
+
+interface Outgoing {
+  @js(object)
+  new();
+  get cacheTtl(): f64;
+}
+
+interface Request<Meta = Any?, Cf = Incoming> {
+  @js(object)
+  new();
+  get cf(): Cf?;
+}
+
+fetch(input: union RequestInfo): future<Request<Any?, Incoming>>;
+
+interface Lookup {
+  get cached(): str?;
+  find(): str? throws;
+  find(key: str): str? throws;
+}
+
+enum TypeErr {
+  @js(TypeError) TypeError(Str);
+  @fallback Error(Str);
+}
+
+enum RequestInfo {
+  Request(Request<Any?, Incoming>);
+  Str(str);
+}

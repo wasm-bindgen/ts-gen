@@ -1,0 +1,15 @@
+ir 1;
+
+interface Thenable {
+  then(@once onfulfilled: fn(str)) throws;
+  then(@once onfulfilled: fn(str), onrejected: fn(Any?)) throws;
+}
+
+queueMicrotask(@once callback: fn()) throws;
+on(listener: @js(null) (fn(str) -> f64)?) throws;
+listen(l: Listener, again: @js(null) Listener?) throws;
+step(n: Next<f64>) throws;
+
+type Listener = fn(str);
+
+type Next<T> = fn(Next<T>, T) -> T;

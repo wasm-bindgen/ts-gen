@@ -1,0 +1,45 @@
+// `Num`: construct signatures returning other than a class or interface are not lowered
+ir 1;
+
+interface Stub<T> {
+  get(): T throws;
+  @js(new = Wrap)
+  new(value: T) throws;
+  @js(new = Wrap2)
+  new wrap2(value: T) throws;
+  @js(new = "remote".Remote)
+  new remote(value: T, at: str) throws;
+}
+
+namespace Shapes {
+  interface Labelled {
+    text(): str throws;
+    @js(new = Shapes.Label)
+    new(text: str) throws;
+    @js(new = Shapes.Label)
+    new(n: f64, unit: str) throws;
+  }
+}
+
+interface Options {
+  @js(object)
+  new();
+  get depth(): f64?;
+  set depth(value: f64);
+  @js(new = Opts)
+  new opts(depth: f64) throws;
+}
+
+get Num(): Object;
+
+module "remote" {
+  interface Count {
+    count(): f64 throws;
+    @js(new = Counter)
+    new(start: f64) throws;
+  }
+
+  export { Remote, Counter };
+}
+
+interface Object {}

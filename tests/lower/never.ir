@@ -1,0 +1,35 @@
+// `impossible: never` holds no value, so it is not lowered
+// `Result.error: never` holds no value, so it is not lowered
+// `Result.absent: undefined` holds no value, so it is not lowered
+// `Result.Both`: `A & B` reads as `A` alone
+ir 1;
+
+fail(message: str): never throws;
+failAnyway(): never throws;
+rejectLater(): future<never>;
+
+interface A {
+  @js(object)
+  new();
+  get a(): str;
+  set a(value: str);
+}
+
+interface B {
+  @js(object)
+  new();
+  get b(): str;
+  set b(value: str);
+}
+
+interface Result<T = unit> {
+  @js(object)
+  new();
+  get value(): T;
+  set value(value: T);
+  get both(): arr<A>;
+  set both(value: arr<A>);
+}
+
+result(r: Result<unit>) throws;
+fetcher(f: Result<unit>) throws;

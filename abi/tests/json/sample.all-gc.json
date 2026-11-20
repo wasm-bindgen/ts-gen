@@ -1,0 +1,4893 @@
+{
+  "format": "ts-gen-abi/lowered",
+  "version": 1,
+  "profile": {
+    "vec": "gc",
+    "array": "gc",
+    "str": "gc+wtf16",
+    "handles": "gc",
+    "memory": "none",
+    "eh": "modern",
+    "validation": "on",
+    "strict-null": "off",
+    "box-none": "null",
+    "termination": "off",
+    "finalizers": "on",
+    "results": "multi",
+    "throws": "tag"
+  },
+  "lib": null,
+  "with": [],
+  "libs": [],
+  "decls": [
+    {
+      "kind": "enum",
+      "path": "Body",
+      "module": null,
+      "name": "Body",
+      "jsName": null,
+      "doc": "A response body.",
+      "layout": {
+        "path": "Body",
+        "origin": "decl",
+        "shape": {
+          "kind": "payload",
+          "slots": ["(ref null (array (mut i16)))", "(ref null (array (mut i8)))", "externref"]
+        },
+        "arms": [
+          {
+            "name": "Text",
+            "index": 1,
+            "fallback": false,
+            "literal": null,
+            "payload": [
+              {
+                "ty": "str",
+                "wire": ["(ref (array (mut i16)))"],
+                "kind": "str",
+                "carrier": "gc+wtf16",
+                "nullable": false
+              }
+            ],
+            "slots": [0]
+          },
+          {
+            "name": "Bytes",
+            "index": 2,
+            "fallback": false,
+            "literal": null,
+            "payload": [
+              {
+                "ty": "u8[]",
+                "wire": ["(ref (array (mut i8)))"],
+                "kind": "vec",
+                "elem": "u8",
+                "carrier": "gc",
+                "writeback": false,
+                "nullable": false
+              }
+            ],
+            "slots": [1]
+          },
+          {
+            "name": "Stream",
+            "index": 3,
+            "fallback": false,
+            "literal": null,
+            "payload": [
+              {
+                "ty": "ReadableStream",
+                "wire": ["externref"],
+                "kind": "host",
+                "of": "class",
+                "path": "ReadableStream",
+                "nullable": false
+              }
+            ],
+            "slots": [2]
+          }
+        ]
+      },
+      "box": {
+        "import": {
+          "module": "tw:box",
+          "name": "Body"
+        },
+        "params": ["i32", "(ref null (array (mut i16)))", "(ref null (array (mut i8)))", "externref"],
+        "results": ["externref"],
+        "spill": []
+      },
+      "unbox": {
+        "import": {
+          "module": "tw:unbox",
+          "name": "Body"
+        },
+        "params": ["externref"],
+        "results": ["i32", "(ref null (array (mut i16)))", "(ref null (array (mut i8)))", "externref"],
+        "spill": []
+      }
+    },
+    {
+      "kind": "enum",
+      "path": "Method",
+      "module": null,
+      "name": "Method",
+      "jsName": null,
+      "doc": null,
+      "layout": {
+        "path": "Method",
+        "origin": "decl",
+        "shape": {
+          "kind": "index"
+        },
+        "arms": [
+          {
+            "name": "Get",
+            "index": 1,
+            "fallback": false,
+            "literal": "GET",
+            "payload": [],
+            "slots": []
+          },
+          {
+            "name": "Post",
+            "index": 2,
+            "fallback": false,
+            "literal": "POST",
+            "payload": [],
+            "slots": []
+          },
+          {
+            "name": "Other",
+            "index": -1,
+            "fallback": true,
+            "literal": null,
+            "payload": [],
+            "slots": []
+          }
+        ]
+      },
+      "box": {
+        "import": {
+          "module": "tw:box",
+          "name": "Method"
+        },
+        "params": ["i32"],
+        "results": ["externref"],
+        "spill": []
+      },
+      "unbox": {
+        "import": {
+          "module": "tw:unbox",
+          "name": "Method"
+        },
+        "params": ["externref"],
+        "results": ["i32"],
+        "spill": []
+      }
+    },
+    {
+      "kind": "enum",
+      "path": "Flags",
+      "module": null,
+      "name": "Flags",
+      "jsName": null,
+      "doc": null,
+      "layout": {
+        "path": "Flags",
+        "origin": "decl",
+        "shape": {
+          "kind": "carrier",
+          "scalar": "u32"
+        },
+        "arms": [
+          {
+            "name": "Read",
+            "index": 1,
+            "fallback": false,
+            "literal": null,
+            "payload": [],
+            "slots": []
+          },
+          {
+            "name": "Write",
+            "index": 2,
+            "fallback": false,
+            "literal": null,
+            "payload": [],
+            "slots": []
+          }
+        ]
+      },
+      "box": {
+        "import": {
+          "module": "tw:box",
+          "name": "Flags"
+        },
+        "params": ["i32"],
+        "results": ["externref"],
+        "spill": []
+      },
+      "unbox": {
+        "import": {
+          "module": "tw:unbox",
+          "name": "Flags"
+        },
+        "params": ["externref"],
+        "results": ["i32"],
+        "spill": []
+      }
+    },
+    {
+      "kind": "enum",
+      "path": "KvError",
+      "module": null,
+      "name": "KvError",
+      "jsName": null,
+      "doc": null,
+      "layout": {
+        "path": "KvError",
+        "origin": "decl",
+        "shape": {
+          "kind": "payload",
+          "slots": ["externref"]
+        },
+        "arms": [
+          {
+            "name": "TypeError",
+            "index": 1,
+            "fallback": false,
+            "literal": null,
+            "payload": [
+              {
+                "ty": "Str",
+                "wire": ["externref"],
+                "kind": "host",
+                "of": "box",
+                "inner": {
+                  "ty": "str",
+                  "wire": ["(ref (array (mut i16)))"],
+                  "kind": "str",
+                  "carrier": "gc+wtf16",
+                  "nullable": false
+                },
+                "box": {
+                  "module": "tw:box",
+                  "name": "str"
+                },
+                "unbox": {
+                  "module": "tw:unbox",
+                  "name": "str"
+                },
+                "nullable": false
+              }
+            ],
+            "slots": [0]
+          },
+          {
+            "name": "Error",
+            "index": -1,
+            "fallback": true,
+            "literal": null,
+            "payload": [
+              {
+                "ty": "Str",
+                "wire": ["externref"],
+                "kind": "host",
+                "of": "box",
+                "inner": {
+                  "ty": "str",
+                  "wire": ["(ref (array (mut i16)))"],
+                  "kind": "str",
+                  "carrier": "gc+wtf16",
+                  "nullable": false
+                },
+                "box": {
+                  "module": "tw:box",
+                  "name": "str"
+                },
+                "unbox": {
+                  "module": "tw:unbox",
+                  "name": "str"
+                },
+                "nullable": false
+              }
+            ],
+            "slots": [0]
+          },
+          {
+            "name": "NotFound",
+            "index": 2,
+            "fallback": false,
+            "literal": null,
+            "payload": [
+              {
+                "ty": "Str",
+                "wire": ["externref"],
+                "kind": "host",
+                "of": "box",
+                "inner": {
+                  "ty": "str",
+                  "wire": ["(ref (array (mut i16)))"],
+                  "kind": "str",
+                  "carrier": "gc+wtf16",
+                  "nullable": false
+                },
+                "box": {
+                  "module": "tw:box",
+                  "name": "str"
+                },
+                "unbox": {
+                  "module": "tw:unbox",
+                  "name": "str"
+                },
+                "nullable": false
+              }
+            ],
+            "slots": [0]
+          }
+        ]
+      },
+      "box": {
+        "import": {
+          "module": "tw:box",
+          "name": "KvError"
+        },
+        "params": ["i32", "externref"],
+        "results": ["externref"],
+        "spill": []
+      },
+      "unbox": {
+        "import": {
+          "module": "tw:unbox",
+          "name": "KvError"
+        },
+        "params": ["externref"],
+        "results": ["i32", "externref"],
+        "spill": []
+      }
+    },
+    {
+      "kind": "class",
+      "path": "ReadableStream",
+      "module": null,
+      "name": "ReadableStream",
+      "jsName": null,
+      "export": false,
+      "tparams": [],
+      "assoc": [],
+      "extends": [],
+      "doc": null
+    },
+    {
+      "kind": "class",
+      "path": "Event",
+      "module": null,
+      "name": "Event",
+      "jsName": null,
+      "export": false,
+      "tparams": [],
+      "assoc": [],
+      "extends": [],
+      "doc": null
+    },
+    {
+      "kind": "class",
+      "path": "EventTarget",
+      "module": null,
+      "name": "EventTarget",
+      "jsName": null,
+      "export": false,
+      "tparams": [],
+      "assoc": [],
+      "extends": [],
+      "doc": null
+    },
+    {
+      "kind": "class",
+      "path": "Response",
+      "module": null,
+      "name": "Response",
+      "jsName": null,
+      "export": false,
+      "tparams": [],
+      "assoc": [],
+      "extends": [],
+      "doc": "An HTTP response."
+    },
+    {
+      "kind": "class",
+      "path": "Headers",
+      "module": null,
+      "name": "Headers",
+      "jsName": null,
+      "export": false,
+      "tparams": [],
+      "assoc": [],
+      "extends": [],
+      "doc": null
+    },
+    {
+      "kind": "class",
+      "path": "Map",
+      "module": null,
+      "name": "Map",
+      "jsName": null,
+      "export": false,
+      "tparams": [
+        {
+          "name": "K",
+          "bound": null,
+          "default": null
+        },
+        {
+          "name": "V",
+          "bound": null,
+          "default": null
+        }
+      ],
+      "assoc": [],
+      "extends": [],
+      "doc": null
+    },
+    {
+      "kind": "class",
+      "path": "Bytes",
+      "module": null,
+      "name": "Bytes",
+      "jsName": null,
+      "export": false,
+      "tparams": [],
+      "assoc": [],
+      "extends": [],
+      "doc": null
+    },
+    {
+      "kind": "class",
+      "path": "KVNamespace",
+      "module": null,
+      "name": "KVNamespace",
+      "jsName": null,
+      "export": false,
+      "tparams": [],
+      "assoc": [],
+      "extends": [],
+      "doc": null
+    },
+    {
+      "kind": "namespace",
+      "path": "crypto",
+      "module": null,
+      "name": "crypto",
+      "export": false,
+      "doc": null
+    },
+    {
+      "kind": "module",
+      "spec": "node:buffer",
+      "exports": [
+        {
+          "name": "Buffer",
+          "alias": null
+        }
+      ],
+      "doc": null
+    },
+    {
+      "kind": "class",
+      "path": "\"node:buffer\".Buffer",
+      "module": "node:buffer",
+      "name": "Buffer",
+      "jsName": null,
+      "export": false,
+      "tparams": [],
+      "assoc": [],
+      "extends": [],
+      "doc": null
+    },
+    {
+      "kind": "class",
+      "path": "Counter",
+      "module": null,
+      "name": "Counter",
+      "jsName": null,
+      "export": true,
+      "tparams": [],
+      "assoc": [],
+      "extends": [],
+      "doc": null,
+      "box": {
+        "import": {
+          "module": "tw:box",
+          "name": "Counter"
+        },
+        "params": ["anyref"],
+        "results": ["externref"],
+        "spill": []
+      },
+      "unbox": {
+        "import": {
+          "module": "tw:unbox",
+          "name": "Counter"
+        },
+        "params": ["externref"],
+        "results": ["anyref"],
+        "spill": []
+      }
+    },
+    {
+      "kind": "namespace",
+      "path": "default",
+      "module": null,
+      "name": "default",
+      "export": true,
+      "doc": null
+    },
+    {
+      "kind": "namespace",
+      "path": "stats",
+      "module": null,
+      "name": "stats",
+      "export": true,
+      "doc": null
+    }
+  ],
+  "members": [
+    {
+      "key": "Event#get:type()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Event",
+      "scope": null,
+      "namespace": [],
+      "kind": "get",
+      "name": "type",
+      "variant": "type",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Event",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Event",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["(ref (array (mut i16)))"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "EventTarget#addEventListener(str,fn(Event))",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "EventTarget",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "addEventListener",
+      "variant": "addEventListener",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "type",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        },
+        {
+          "name": "listener",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "EventTarget",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "EventTarget",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 1,
+            "repr": {
+              "ty": "fn(Event)",
+              "wire": ["anyref"],
+              "kind": "fn",
+              "params": [
+                {
+                  "ty": "Event",
+                  "wire": ["externref"],
+                  "kind": "host",
+                  "of": "class",
+                  "path": "Event",
+                  "nullable": false
+                }
+              ],
+              "result": {
+                "ty": "unit",
+                "wire": [],
+                "kind": "unit"
+              },
+              "throws": null,
+              "provided": "gc",
+              "trampoline": "tw:call:fn(Event)",
+              "box": {
+                "import": {
+                  "module": "tw:box",
+                  "name": "fn(Event)"
+                },
+                "params": ["anyref"],
+                "results": ["externref"],
+                "spill": []
+              },
+              "unbox": {
+                "import": {
+                  "module": "tw:unbox",
+                  "name": "fn(Event)"
+                },
+                "params": ["externref"],
+                "results": ["anyref"],
+                "spill": []
+              },
+              "op": {
+                "params": [
+                  {
+                    "role": "env",
+                    "wire": ["anyref"]
+                  },
+                  {
+                    "role": "param",
+                    "index": 0,
+                    "repr": {
+                      "ty": "Event",
+                      "wire": ["externref"],
+                      "kind": "host",
+                      "of": "class",
+                      "path": "Event",
+                      "nullable": false
+                    }
+                  }
+                ],
+                "results": [],
+                "throws": null,
+                "core": {
+                  "params": ["anyref", "externref"],
+                  "results": [],
+                  "spill": []
+                }
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "results": [],
+        "throws": null,
+        "core": {
+          "params": ["externref", "(ref (array (mut i16)))", "anyref"],
+          "results": [],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response.new(str?)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "new",
+      "name": null,
+      "variant": "new",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "body",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str?",
+              "wire": ["(ref null (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": true
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["(ref null (array (mut i16)))"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response.error()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "error",
+      "variant": "error",
+      "static": true,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": [],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response.json(Any)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "json",
+      "variant": "json",
+      "static": true,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "data",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "Any",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "any",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response#get:status()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "get",
+      "name": "status",
+      "variant": "status",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "u16",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "u16"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["i32"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response#get:ok()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "get",
+      "name": "ok",
+      "variant": "ok",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "bool",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "bool"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["i32"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response#get:headers()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "get",
+      "name": "headers",
+      "variant": "headers",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Headers",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Headers",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response#get:statusText()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "get",
+      "name": "statusText",
+      "variant": "statusText",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["(ref (array (mut i16)))"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response#set:statusText(str)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "set",
+      "name": "statusText",
+      "variant": "statusText",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "value",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [],
+        "throws": null,
+        "core": {
+          "params": ["externref", "(ref (array (mut i16)))"],
+          "results": [],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response#clone()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "clone",
+      "variant": "clone",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": {
+          "tag": {
+            "module": "tw:tag",
+            "name": "err"
+          },
+          "enum": {
+            "path": "err",
+            "origin": "err",
+            "shape": {
+              "kind": "payload",
+              "slots": ["externref"]
+            },
+            "arms": [
+              {
+                "name": "TypeError",
+                "index": 1,
+                "fallback": false,
+                "literal": null,
+                "payload": [
+                  {
+                    "ty": "Str",
+                    "wire": ["externref"],
+                    "kind": "host",
+                    "of": "box",
+                    "inner": {
+                      "ty": "str",
+                      "wire": ["(ref (array (mut i16)))"],
+                      "kind": "str",
+                      "carrier": "gc+wtf16",
+                      "nullable": false
+                    },
+                    "box": {
+                      "module": "tw:box",
+                      "name": "str"
+                    },
+                    "unbox": {
+                      "module": "tw:unbox",
+                      "name": "str"
+                    },
+                    "nullable": false
+                  }
+                ],
+                "slots": [0]
+              },
+              {
+                "name": "Error",
+                "index": -1,
+                "fallback": true,
+                "literal": null,
+                "payload": [
+                  {
+                    "ty": "Str",
+                    "wire": ["externref"],
+                    "kind": "host",
+                    "of": "box",
+                    "inner": {
+                      "ty": "str",
+                      "wire": ["(ref (array (mut i16)))"],
+                      "kind": "str",
+                      "carrier": "gc+wtf16",
+                      "nullable": false
+                    },
+                    "box": {
+                      "module": "tw:box",
+                      "name": "str"
+                    },
+                    "unbox": {
+                      "module": "tw:unbox",
+                      "name": "str"
+                    },
+                    "nullable": false
+                  }
+                ],
+                "slots": [0]
+              }
+            ]
+          }
+        },
+        "core": {
+          "params": ["externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response#text()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "text",
+      "variant": "text",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "future<str>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "future",
+              "value": {
+                "ty": "str",
+                "wire": ["(ref (array (mut i16)))"],
+                "kind": "str",
+                "carrier": "gc+wtf16",
+                "nullable": false
+              },
+              "rejection": {
+                "path": "err",
+                "origin": "err",
+                "shape": {
+                  "kind": "payload",
+                  "slots": ["externref"]
+                },
+                "arms": [
+                  {
+                    "name": "TypeError",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "Error",
+                    "index": -1,
+                    "fallback": true,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  }
+                ]
+              },
+              "take": {
+                "module": "tw:future",
+                "name": "take<str>"
+              },
+              "errorOp": {
+                "module": "tw:future",
+                "name": "error<err>"
+              },
+              "new": {
+                "module": "tw:future",
+                "name": "new"
+              },
+              "resolve": {
+                "module": "tw:future",
+                "name": "resolve<str>"
+              },
+              "reject": {
+                "module": "tw:future",
+                "name": "reject<err>"
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Response#bytes()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Response",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "bytes",
+      "variant": "bytes",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "future<u8[]>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "future",
+              "value": {
+                "ty": "u8[]",
+                "wire": ["(ref (array (mut i8)))"],
+                "kind": "vec",
+                "elem": "u8",
+                "carrier": "gc",
+                "writeback": false,
+                "nullable": false
+              },
+              "rejection": {
+                "path": "err",
+                "origin": "err",
+                "shape": {
+                  "kind": "payload",
+                  "slots": ["externref"]
+                },
+                "arms": [
+                  {
+                    "name": "TypeError",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "Error",
+                    "index": -1,
+                    "fallback": true,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  }
+                ]
+              },
+              "take": {
+                "module": "tw:future",
+                "name": "take<u8[]>"
+              },
+              "errorOp": {
+                "module": "tw:future",
+                "name": "error<err>"
+              },
+              "new": {
+                "module": "tw:future",
+                "name": "new"
+              },
+              "resolve": {
+                "module": "tw:future",
+                "name": "resolve<u8[]>"
+              },
+              "reject": {
+                "module": "tw:future",
+                "name": "reject<err>"
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Headers.new()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Headers",
+      "scope": null,
+      "namespace": [],
+      "kind": "new",
+      "name": null,
+      "variant": "new",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Headers",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Headers",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": [],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Headers#get(str)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Headers",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "get",
+      "variant": "get",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "name",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Headers",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Headers",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "str?",
+              "wire": ["(ref null (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": true
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "(ref (array (mut i16)))"],
+          "results": ["(ref null (array (mut i16)))"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Headers#set(str,str)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Headers",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "set",
+      "variant": "set",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "name",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        },
+        {
+          "name": "value",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Headers",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Headers",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 1,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [],
+        "throws": null,
+        "core": {
+          "params": ["externref", "(ref (array (mut i16)))", "(ref (array (mut i16)))"],
+          "results": [],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Headers#entries()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Headers",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "entries",
+      "variant": "entries",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Headers",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Headers",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "arr<(str,str)>",
+              "wire": ["(ref (array (mut (ref null (struct (field (ref (array (mut i16)))) (field (ref (array (mut i16)))))))))"],
+              "kind": "array",
+              "elem": {
+                "ty": "(str,str)",
+                "wire": ["(ref (array (mut i16)))", "(ref (array (mut i16)))"],
+                "kind": "tuple",
+                "elems": [
+                  {
+                    "ty": "str",
+                    "wire": ["(ref (array (mut i16)))"],
+                    "kind": "str",
+                    "carrier": "gc+wtf16",
+                    "nullable": false
+                  },
+                  {
+                    "ty": "str",
+                    "wire": ["(ref (array (mut i16)))"],
+                    "kind": "str",
+                    "carrier": "gc+wtf16",
+                    "nullable": false
+                  }
+                ],
+                "nullable": false
+              },
+              "carrier": "gc",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["(ref (array (mut (ref null (struct (field (ref (array (mut i16)))) (field (ref (array (mut i16)))))))))"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Headers#forEach(fn(str,str))",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Headers",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "forEach",
+      "variant": "forEach",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "f",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Headers",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Headers",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "fn(str,str)",
+              "wire": ["anyref"],
+              "kind": "fn",
+              "params": [
+                {
+                  "ty": "str",
+                  "wire": ["(ref (array (mut i16)))"],
+                  "kind": "str",
+                  "carrier": "gc+wtf16",
+                  "nullable": false
+                },
+                {
+                  "ty": "str",
+                  "wire": ["(ref (array (mut i16)))"],
+                  "kind": "str",
+                  "carrier": "gc+wtf16",
+                  "nullable": false
+                }
+              ],
+              "result": {
+                "ty": "unit",
+                "wire": [],
+                "kind": "unit"
+              },
+              "throws": null,
+              "provided": "gc",
+              "trampoline": "tw:call:fn(str,str)",
+              "box": {
+                "import": {
+                  "module": "tw:box",
+                  "name": "fn(str,str)"
+                },
+                "params": ["anyref"],
+                "results": ["externref"],
+                "spill": []
+              },
+              "unbox": {
+                "import": {
+                  "module": "tw:unbox",
+                  "name": "fn(str,str)"
+                },
+                "params": ["externref"],
+                "results": ["anyref"],
+                "spill": []
+              },
+              "op": {
+                "params": [
+                  {
+                    "role": "env",
+                    "wire": ["anyref"]
+                  },
+                  {
+                    "role": "param",
+                    "index": 0,
+                    "repr": {
+                      "ty": "str",
+                      "wire": ["(ref (array (mut i16)))"],
+                      "kind": "str",
+                      "carrier": "gc+wtf16",
+                      "nullable": false
+                    }
+                  },
+                  {
+                    "role": "param",
+                    "index": 1,
+                    "repr": {
+                      "ty": "str",
+                      "wire": ["(ref (array (mut i16)))"],
+                      "kind": "str",
+                      "carrier": "gc+wtf16",
+                      "nullable": false
+                    }
+                  }
+                ],
+                "results": [],
+                "throws": null,
+                "core": {
+                  "params": ["anyref", "(ref (array (mut i16)))", "(ref (array (mut i16)))"],
+                  "results": [],
+                  "spill": []
+                }
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "results": [],
+        "throws": null,
+        "core": {
+          "params": ["externref", "anyref"],
+          "results": [],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Map.new()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Map",
+      "scope": null,
+      "namespace": [],
+      "kind": "new",
+      "name": null,
+      "variant": "new",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Map",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Map",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": [],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Map#get(K)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Map",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "get",
+      "variant": "get",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "key",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Map",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Map",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "K",
+              "wire": ["anyref"],
+              "kind": "erased",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "V?",
+              "wire": ["anyref"],
+              "kind": "erased",
+              "nullable": true
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "anyref"],
+          "results": ["anyref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Map#set(K,V)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Map",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "set",
+      "variant": "set",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "key",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        },
+        {
+          "name": "value",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Map",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Map",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "K",
+              "wire": ["anyref"],
+              "kind": "erased",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 1,
+            "repr": {
+              "ty": "V",
+              "wire": ["anyref"],
+              "kind": "erased",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [],
+        "throws": null,
+        "core": {
+          "params": ["externref", "anyref", "anyref"],
+          "results": [],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Map#get:size()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Map",
+      "scope": null,
+      "namespace": [],
+      "kind": "get",
+      "name": "size",
+      "variant": "size",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Map",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Map",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "u32",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "u32"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["i32"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Bytes.from(Map<str,f64>)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Bytes",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "from",
+      "variant": "from",
+      "static": true,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "items",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "Map<str,f64>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Map",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Bytes",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Bytes",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Bytes.from(Map<str,T>)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Bytes",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "from",
+      "variant": "fromWithMapStrT",
+      "static": true,
+      "jsName": null,
+      "tparams": [
+        {
+          "name": "T",
+          "bound": null,
+          "default": null
+        }
+      ],
+      "params": [
+        {
+          "name": "items",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "Map<str,T>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Map",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Bytes",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Bytes",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Bytes#at(u32)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Bytes",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "at",
+      "variant": "at",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "index",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Bytes",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Bytes",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "u32",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "u32"
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "f64",
+              "wire": ["f64"],
+              "kind": "scalar",
+              "scalar": "f64"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "i32"],
+          "results": ["f64"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Bytes#at(i32)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Bytes",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "at",
+      "variant": "atWithI32",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "index",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Bytes",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Bytes",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "i32",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "i32"
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "f64",
+              "wire": ["f64"],
+              "kind": "scalar",
+              "scalar": "f64"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "i32"],
+          "results": ["f64"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Bytes#one()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Bytes",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "one",
+      "variant": "one",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Bytes",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Bytes",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "(str,)",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "tuple",
+              "elems": [
+                {
+                  "ty": "str",
+                  "wire": ["(ref (array (mut i16)))"],
+                  "kind": "str",
+                  "carrier": "gc+wtf16",
+                  "nullable": false
+                }
+              ],
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["(ref (array (mut i16)))"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Bytes#quad()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Bytes",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "quad",
+      "variant": "quad",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Bytes",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Bytes",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "(u32,bool,f64,str)",
+              "wire": ["i32", "i32", "f64", "(ref (array (mut i16)))"],
+              "kind": "tuple",
+              "elems": [
+                {
+                  "ty": "u32",
+                  "wire": ["i32"],
+                  "kind": "scalar",
+                  "scalar": "u32"
+                },
+                {
+                  "ty": "bool",
+                  "wire": ["i32"],
+                  "kind": "scalar",
+                  "scalar": "bool"
+                },
+                {
+                  "ty": "f64",
+                  "wire": ["f64"],
+                  "kind": "scalar",
+                  "scalar": "f64"
+                },
+                {
+                  "ty": "str",
+                  "wire": ["(ref (array (mut i16)))"],
+                  "kind": "str",
+                  "carrier": "gc+wtf16",
+                  "nullable": false
+                }
+              ],
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["i32", "i32", "f64", "(ref (array (mut i16)))"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "KVNamespace#get(str)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "KVNamespace",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "get",
+      "variant": "get",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "key",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "KVNamespace",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "KVNamespace",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "future<str?,KvError>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "future",
+              "value": {
+                "ty": "str?",
+                "wire": ["(ref null (array (mut i16)))"],
+                "kind": "str",
+                "carrier": "gc+wtf16",
+                "nullable": true
+              },
+              "rejection": {
+                "path": "KvError",
+                "origin": "decl",
+                "shape": {
+                  "kind": "payload",
+                  "slots": ["externref"]
+                },
+                "arms": [
+                  {
+                    "name": "TypeError",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "Error",
+                    "index": -1,
+                    "fallback": true,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "NotFound",
+                    "index": 2,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  }
+                ]
+              },
+              "take": {
+                "module": "tw:future",
+                "name": "take<str?>"
+              },
+              "errorOp": {
+                "module": "tw:future",
+                "name": "error<KvError>"
+              },
+              "new": {
+                "module": "tw:future",
+                "name": "new"
+              },
+              "resolve": {
+                "module": "tw:future",
+                "name": "resolve<str?>"
+              },
+              "reject": {
+                "module": "tw:future",
+                "name": "reject<KvError>"
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "(ref (array (mut i16)))"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "KVNamespace#put(str,str,u53?)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "KVNamespace",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "put",
+      "variant": "put",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "key",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        },
+        {
+          "name": "value",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        },
+        {
+          "name": "ttl",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "KVNamespace",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "KVNamespace",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 1,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 2,
+            "repr": {
+              "ty": "u53?",
+              "wire": ["i64"],
+              "kind": "scalar",
+              "scalar": "u53",
+              "nullable": true,
+              "niche": -9223372036854775808
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "future<unit,KvError>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "future",
+              "value": {
+                "ty": "unit",
+                "wire": [],
+                "kind": "unit"
+              },
+              "rejection": {
+                "path": "KvError",
+                "origin": "decl",
+                "shape": {
+                  "kind": "payload",
+                  "slots": ["externref"]
+                },
+                "arms": [
+                  {
+                    "name": "TypeError",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "Error",
+                    "index": -1,
+                    "fallback": true,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "NotFound",
+                    "index": 2,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  }
+                ]
+              },
+              "take": {
+                "module": "tw:future",
+                "name": "take<unit>"
+              },
+              "errorOp": {
+                "module": "tw:future",
+                "name": "error<KvError>"
+              },
+              "new": {
+                "module": "tw:future",
+                "name": "new"
+              },
+              "resolve": {
+                "module": "tw:future",
+                "name": "resolve<unit>"
+              },
+              "reject": {
+                "module": "tw:future",
+                "name": "reject<KvError>"
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "(ref (array (mut i16)))", "(ref (array (mut i16)))", "i64"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "KVNamespace#list(str?,u32?)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "KVNamespace",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "list",
+      "variant": "list",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "prefix",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        },
+        {
+          "name": "limit",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "KVNamespace",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "KVNamespace",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str?",
+              "wire": ["(ref null (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": true
+            }
+          },
+          {
+            "role": "param",
+            "index": 1,
+            "repr": {
+              "ty": "u32?",
+              "wire": ["i32", "i32"],
+              "kind": "scalar",
+              "scalar": "u32",
+              "nullable": true,
+              "niche": null
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "future<arr<Str>>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "future",
+              "value": {
+                "ty": "arr<Str>",
+                "wire": ["(ref (array (mut externref)))"],
+                "kind": "array",
+                "elem": {
+                  "ty": "Str",
+                  "wire": ["externref"],
+                  "kind": "host",
+                  "of": "box",
+                  "inner": {
+                    "ty": "str",
+                    "wire": ["(ref (array (mut i16)))"],
+                    "kind": "str",
+                    "carrier": "gc+wtf16",
+                    "nullable": false
+                  },
+                  "box": {
+                    "module": "tw:box",
+                    "name": "str"
+                  },
+                  "unbox": {
+                    "module": "tw:unbox",
+                    "name": "str"
+                  },
+                  "nullable": false
+                },
+                "carrier": "gc",
+                "nullable": false
+              },
+              "rejection": {
+                "path": "err",
+                "origin": "err",
+                "shape": {
+                  "kind": "payload",
+                  "slots": ["externref"]
+                },
+                "arms": [
+                  {
+                    "name": "TypeError",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "Error",
+                    "index": -1,
+                    "fallback": true,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  }
+                ]
+              },
+              "take": {
+                "module": "tw:future",
+                "name": "take<arr<Str>>"
+              },
+              "errorOp": {
+                "module": "tw:future",
+                "name": "error<err>"
+              },
+              "new": {
+                "module": "tw:future",
+                "name": "new"
+              },
+              "resolve": {
+                "module": "tw:future",
+                "name": "resolve<arr<Str>>"
+              },
+              "reject": {
+                "module": "tw:future",
+                "name": "reject<err>"
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "(ref null (array (mut i16)))", "i32", "i32"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "crypto.randomUUID()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": null,
+      "scope": null,
+      "namespace": ["crypto"],
+      "kind": "method",
+      "name": "randomUUID",
+      "variant": "randomUUID",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": [],
+          "results": ["(ref (array (mut i16)))"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "crypto.getRandomValues(mut u8[])",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": null,
+      "scope": null,
+      "namespace": ["crypto"],
+      "kind": "method",
+      "name": "getRandomValues",
+      "variant": "getRandomValues",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "into",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "mut u8[]",
+              "wire": ["(ref (array (mut i8)))"],
+              "kind": "vec",
+              "elem": "u8",
+              "carrier": "gc",
+              "writeback": true,
+              "nullable": false
+            }
+          }
+        ],
+        "results": [],
+        "throws": null,
+        "core": {
+          "params": ["(ref (array (mut i8)))"],
+          "results": [],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Buffer.byteLength(str)",
+      "role": "import",
+      "module": "node:buffer",
+      "owner": "\"node:buffer\".Buffer",
+      "scope": "node:buffer",
+      "namespace": [],
+      "kind": "method",
+      "name": "byteLength",
+      "variant": "byteLength",
+      "static": true,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "s",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "u53",
+              "wire": ["i64"],
+              "kind": "scalar",
+              "scalar": "u53"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["(ref (array (mut i16)))"],
+          "results": ["i64"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "atob(str)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": null,
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "atob",
+      "variant": "atob",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "data",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": {
+          "tag": {
+            "module": "tw:tag",
+            "name": "err"
+          },
+          "enum": {
+            "path": "err",
+            "origin": "err",
+            "shape": {
+              "kind": "payload",
+              "slots": ["externref"]
+            },
+            "arms": [
+              {
+                "name": "TypeError",
+                "index": 1,
+                "fallback": false,
+                "literal": null,
+                "payload": [
+                  {
+                    "ty": "Str",
+                    "wire": ["externref"],
+                    "kind": "host",
+                    "of": "box",
+                    "inner": {
+                      "ty": "str",
+                      "wire": ["(ref (array (mut i16)))"],
+                      "kind": "str",
+                      "carrier": "gc+wtf16",
+                      "nullable": false
+                    },
+                    "box": {
+                      "module": "tw:box",
+                      "name": "str"
+                    },
+                    "unbox": {
+                      "module": "tw:unbox",
+                      "name": "str"
+                    },
+                    "nullable": false
+                  }
+                ],
+                "slots": [0]
+              },
+              {
+                "name": "Error",
+                "index": -1,
+                "fallback": true,
+                "literal": null,
+                "payload": [
+                  {
+                    "ty": "Str",
+                    "wire": ["externref"],
+                    "kind": "host",
+                    "of": "box",
+                    "inner": {
+                      "ty": "str",
+                      "wire": ["(ref (array (mut i16)))"],
+                      "kind": "str",
+                      "carrier": "gc+wtf16",
+                      "nullable": false
+                    },
+                    "box": {
+                      "module": "tw:box",
+                      "name": "str"
+                    },
+                    "unbox": {
+                      "module": "tw:unbox",
+                      "name": "str"
+                    },
+                    "nullable": false
+                  }
+                ],
+                "slots": [0]
+              }
+            ]
+          }
+        },
+        "core": {
+          "params": ["(ref (array (mut i16)))"],
+          "results": ["(ref (array (mut i16)))"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "setTimeout(fn(),f64?)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": null,
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "setTimeout",
+      "variant": "setTimeout",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "f",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        },
+        {
+          "name": "ms",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "fn()",
+              "wire": ["anyref"],
+              "kind": "fn",
+              "params": [],
+              "result": {
+                "ty": "unit",
+                "wire": [],
+                "kind": "unit"
+              },
+              "throws": null,
+              "provided": "gc",
+              "trampoline": "tw:call:fn()",
+              "box": {
+                "import": {
+                  "module": "tw:box",
+                  "name": "fn()"
+                },
+                "params": ["anyref"],
+                "results": ["externref"],
+                "spill": []
+              },
+              "unbox": {
+                "import": {
+                  "module": "tw:unbox",
+                  "name": "fn()"
+                },
+                "params": ["externref"],
+                "results": ["anyref"],
+                "spill": []
+              },
+              "op": {
+                "params": [
+                  {
+                    "role": "env",
+                    "wire": ["anyref"]
+                  }
+                ],
+                "results": [],
+                "throws": null,
+                "core": {
+                  "params": ["anyref"],
+                  "results": [],
+                  "spill": []
+                }
+              },
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 1,
+            "repr": {
+              "ty": "f64?",
+              "wire": ["i32", "f64"],
+              "kind": "scalar",
+              "scalar": "f64",
+              "nullable": true,
+              "niche": null
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "i32",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "i32"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["anyref", "i32", "f64"],
+          "results": ["i32"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "parse(str)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": null,
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "parse",
+      "variant": "parse",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "s",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str",
+              "wire": ["(ref (array (mut i16)))"],
+              "kind": "str",
+              "carrier": "gc+wtf16",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Body?",
+              "wire": ["i32", "(ref null (array (mut i16)))", "(ref null (array (mut i8)))", "externref"],
+              "kind": "enum",
+              "enum": {
+                "path": "Body",
+                "origin": "decl",
+                "shape": {
+                  "kind": "payload",
+                  "slots": ["(ref null (array (mut i16)))", "(ref null (array (mut i8)))", "externref"]
+                },
+                "arms": [
+                  {
+                    "name": "Text",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "str",
+                        "wire": ["(ref (array (mut i16)))"],
+                        "kind": "str",
+                        "carrier": "gc+wtf16",
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "Bytes",
+                    "index": 2,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "u8[]",
+                        "wire": ["(ref (array (mut i8)))"],
+                        "kind": "vec",
+                        "elem": "u8",
+                        "carrier": "gc",
+                        "writeback": false,
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [1]
+                  },
+                  {
+                    "name": "Stream",
+                    "index": 3,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "ReadableStream",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "class",
+                        "path": "ReadableStream",
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [2]
+                  }
+                ]
+              },
+              "nullable": true
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["(ref (array (mut i16)))"],
+          "results": ["i32", "(ref null (array (mut i16)))", "(ref null (array (mut i8)))", "externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "methodOf(Method,Flags?)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": null,
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "methodOf",
+      "variant": "methodOf",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "m",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        },
+        {
+          "name": "f",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "Method",
+              "wire": ["i32"],
+              "kind": "enum",
+              "enum": {
+                "path": "Method",
+                "origin": "decl",
+                "shape": {
+                  "kind": "index"
+                },
+                "arms": [
+                  {
+                    "name": "Get",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": "GET",
+                    "payload": [],
+                    "slots": []
+                  },
+                  {
+                    "name": "Post",
+                    "index": 2,
+                    "fallback": false,
+                    "literal": "POST",
+                    "payload": [],
+                    "slots": []
+                  },
+                  {
+                    "name": "Other",
+                    "index": -1,
+                    "fallback": true,
+                    "literal": null,
+                    "payload": [],
+                    "slots": []
+                  }
+                ]
+              },
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 1,
+            "repr": {
+              "ty": "Flags?",
+              "wire": ["i32", "i32"],
+              "kind": "enum",
+              "enum": {
+                "path": "Flags",
+                "origin": "decl",
+                "shape": {
+                  "kind": "carrier",
+                  "scalar": "u32"
+                },
+                "arms": [
+                  {
+                    "name": "Read",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [],
+                    "slots": []
+                  },
+                  {
+                    "name": "Write",
+                    "index": 2,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [],
+                    "slots": []
+                  }
+                ]
+              },
+              "nullable": true
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Flags",
+              "wire": ["i32"],
+              "kind": "enum",
+              "enum": {
+                "path": "Flags",
+                "origin": "decl",
+                "shape": {
+                  "kind": "carrier",
+                  "scalar": "u32"
+                },
+                "arms": [
+                  {
+                    "name": "Read",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [],
+                    "slots": []
+                  },
+                  {
+                    "name": "Write",
+                    "index": 2,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [],
+                    "slots": []
+                  }
+                ]
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["i32", "i32", "i32"],
+          "results": ["i32"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "pair()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": null,
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "pair",
+      "variant": "pair",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "(u32,bool)",
+              "wire": ["i32", "i32"],
+              "kind": "tuple",
+              "elems": [
+                {
+                  "ty": "u32",
+                  "wire": ["i32"],
+                  "kind": "scalar",
+                  "scalar": "u32"
+                },
+                {
+                  "ty": "bool",
+                  "wire": ["i32"],
+                  "kind": "scalar",
+                  "scalar": "bool"
+                }
+              ],
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": [],
+          "results": ["i32", "i32"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "total(arr<f64>)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": null,
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "total",
+      "variant": "total",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "xs",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "arr<f64>",
+              "wire": ["(ref (array (mut f64)))"],
+              "kind": "array",
+              "elem": {
+                "ty": "f64",
+                "wire": ["f64"],
+                "kind": "scalar",
+                "scalar": "f64"
+              },
+              "carrier": "gc",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "f64",
+              "wire": ["f64"],
+              "kind": "scalar",
+              "scalar": "f64"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["(ref (array (mut f64)))"],
+          "results": ["f64"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "big(i64,u64)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": null,
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "big",
+      "variant": "big",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "n",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        },
+        {
+          "name": "m",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "i64",
+              "wire": ["i64"],
+              "kind": "scalar",
+              "scalar": "i64"
+            }
+          },
+          {
+            "role": "param",
+            "index": 1,
+            "repr": {
+              "ty": "u64",
+              "wire": ["i64"],
+              "kind": "scalar",
+              "scalar": "u64"
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "i64",
+              "wire": ["i64"],
+              "kind": "scalar",
+              "scalar": "i64"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["i64", "i64"],
+          "results": ["i64"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "maybe()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": null,
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "maybe",
+      "variant": "maybe",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Str??",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "box",
+              "inner": {
+                "ty": "str",
+                "wire": ["(ref (array (mut i16)))"],
+                "kind": "str",
+                "carrier": "gc+wtf16",
+                "nullable": false
+              },
+              "box": {
+                "module": "tw:box",
+                "name": "str"
+              },
+              "unbox": {
+                "module": "tw:unbox",
+                "name": "str"
+              },
+              "nullable": true
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": [],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null,
+      "warnings": ["a `Str??` box is `Str?` under `box-none = null`: its two nones are one"]
+    },
+    {
+      "key": "Counter.new(u32)",
+      "role": "export",
+      "module": null,
+      "owner": "Counter",
+      "scope": null,
+      "namespace": [],
+      "kind": "new",
+      "name": null,
+      "variant": "new",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "start",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Counter",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Counter",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "u32",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "u32"
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Counter",
+              "wire": ["anyref"],
+              "kind": "handle",
+              "class": "Counter",
+              "carrier": "gc",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "i32"],
+          "results": ["anyref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Counter#increment(u32)",
+      "role": "export",
+      "module": null,
+      "owner": "Counter",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "increment",
+      "variant": "increment",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "by",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Counter",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Counter",
+              "nullable": false
+            }
+          },
+          {
+            "role": "handle",
+            "repr": {
+              "ty": "Counter",
+              "wire": ["anyref"],
+              "kind": "handle",
+              "class": "Counter",
+              "carrier": "gc",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "u32",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "u32"
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "u32",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "u32"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "anyref", "i32"],
+          "results": ["i32"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Counter#get:count()",
+      "role": "export",
+      "module": null,
+      "owner": "Counter",
+      "scope": null,
+      "namespace": [],
+      "kind": "get",
+      "name": "count",
+      "variant": "count",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Counter",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Counter",
+              "nullable": false
+            }
+          },
+          {
+            "role": "handle",
+            "repr": {
+              "ty": "Counter",
+              "wire": ["anyref"],
+              "kind": "handle",
+              "class": "Counter",
+              "carrier": "gc",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "u32",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "u32"
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "anyref"],
+          "results": ["i32"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Counter.create()",
+      "role": "export",
+      "module": null,
+      "owner": "Counter",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "create",
+      "variant": "create",
+      "static": true,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Counter",
+              "wire": ["anyref"],
+              "kind": "handle",
+              "class": "Counter",
+              "carrier": "gc",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": [],
+          "results": ["anyref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "default.fetch(Response,Body)",
+      "role": "export",
+      "module": null,
+      "owner": null,
+      "scope": null,
+      "namespace": ["default"],
+      "kind": "method",
+      "name": "fetch",
+      "variant": "fetch",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "request",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        },
+        {
+          "name": "body",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "Response",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Response",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 1,
+            "repr": {
+              "ty": "Body",
+              "wire": ["i32", "(ref null (array (mut i16)))", "(ref null (array (mut i8)))", "externref"],
+              "kind": "enum",
+              "enum": {
+                "path": "Body",
+                "origin": "decl",
+                "shape": {
+                  "kind": "payload",
+                  "slots": ["(ref null (array (mut i16)))", "(ref null (array (mut i8)))", "externref"]
+                },
+                "arms": [
+                  {
+                    "name": "Text",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "str",
+                        "wire": ["(ref (array (mut i16)))"],
+                        "kind": "str",
+                        "carrier": "gc+wtf16",
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "Bytes",
+                    "index": 2,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "u8[]",
+                        "wire": ["(ref (array (mut i8)))"],
+                        "kind": "vec",
+                        "elem": "u8",
+                        "carrier": "gc",
+                        "writeback": false,
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [1]
+                  },
+                  {
+                    "name": "Stream",
+                    "index": 3,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "ReadableStream",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "class",
+                        "path": "ReadableStream",
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [2]
+                  }
+                ]
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "future<Response>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "future",
+              "value": {
+                "ty": "Response",
+                "wire": ["externref"],
+                "kind": "host",
+                "of": "class",
+                "path": "Response",
+                "nullable": false
+              },
+              "rejection": {
+                "path": "err",
+                "origin": "err",
+                "shape": {
+                  "kind": "payload",
+                  "slots": ["externref"]
+                },
+                "arms": [
+                  {
+                    "name": "TypeError",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "Error",
+                    "index": -1,
+                    "fallback": true,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  }
+                ]
+              },
+              "take": {
+                "module": "tw:future",
+                "name": "take<Response>"
+              },
+              "errorOp": {
+                "module": "tw:future",
+                "name": "error<err>"
+              },
+              "new": {
+                "module": "tw:future",
+                "name": "new"
+              },
+              "resolve": {
+                "module": "tw:future",
+                "name": "resolve<Response>"
+              },
+              "reject": {
+                "module": "tw:future",
+                "name": "reject<err>"
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "i32", "(ref null (array (mut i16)))", "(ref null (array (mut i8)))", "externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "stats.total()",
+      "role": "export",
+      "module": null,
+      "owner": null,
+      "scope": null,
+      "namespace": ["stats"],
+      "kind": "method",
+      "name": "total",
+      "variant": "total",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "future<i64>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "future",
+              "value": {
+                "ty": "i64",
+                "wire": ["i64"],
+                "kind": "scalar",
+                "scalar": "i64"
+              },
+              "rejection": {
+                "path": "err",
+                "origin": "err",
+                "shape": {
+                  "kind": "payload",
+                  "slots": ["externref"]
+                },
+                "arms": [
+                  {
+                    "name": "TypeError",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "Error",
+                    "index": -1,
+                    "fallback": true,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  }
+                ]
+              },
+              "take": {
+                "module": "tw:future",
+                "name": "take<i64>"
+              },
+              "errorOp": {
+                "module": "tw:future",
+                "name": "error<err>"
+              },
+              "new": {
+                "module": "tw:future",
+                "name": "new"
+              },
+              "resolve": {
+                "module": "tw:future",
+                "name": "resolve<i64>"
+              },
+              "reject": {
+                "module": "tw:future",
+                "name": "reject<err>"
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": [],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "stats.size()",
+      "role": "export",
+      "module": null,
+      "owner": null,
+      "scope": null,
+      "namespace": ["stats"],
+      "kind": "method",
+      "name": "size",
+      "variant": "size",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "future<u64>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "future",
+              "value": {
+                "ty": "u64",
+                "wire": ["i64"],
+                "kind": "scalar",
+                "scalar": "u64"
+              },
+              "rejection": {
+                "path": "err",
+                "origin": "err",
+                "shape": {
+                  "kind": "payload",
+                  "slots": ["externref"]
+                },
+                "arms": [
+                  {
+                    "name": "TypeError",
+                    "index": 1,
+                    "fallback": false,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  },
+                  {
+                    "name": "Error",
+                    "index": -1,
+                    "fallback": true,
+                    "literal": null,
+                    "payload": [
+                      {
+                        "ty": "Str",
+                        "wire": ["externref"],
+                        "kind": "host",
+                        "of": "box",
+                        "inner": {
+                          "ty": "str",
+                          "wire": ["(ref (array (mut i16)))"],
+                          "kind": "str",
+                          "carrier": "gc+wtf16",
+                          "nullable": false
+                        },
+                        "box": {
+                          "module": "tw:box",
+                          "name": "str"
+                        },
+                        "unbox": {
+                          "module": "tw:unbox",
+                          "name": "str"
+                        },
+                        "nullable": false
+                      }
+                    ],
+                    "slots": [0]
+                  }
+                ]
+              },
+              "take": {
+                "module": "tw:future",
+                "name": "take<u64>"
+              },
+              "errorOp": {
+                "module": "tw:future",
+                "name": "error<err>"
+              },
+              "new": {
+                "module": "tw:future",
+                "name": "new"
+              },
+              "resolve": {
+                "module": "tw:future",
+                "name": "resolve<u64>"
+              },
+              "reject": {
+                "module": "tw:future",
+                "name": "reject<err>"
+              },
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": [],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    }
+  ],
+  "recs": []
+}

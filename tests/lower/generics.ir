@@ -1,0 +1,436 @@
+// `Stepper.Next`: a union over type parameters (Step<T> | Done<R>) reads as `Any`
+// `View.New`: the constructor's own type parameter `S` reads as `Store`
+// `View.New`: the constructor's own type parameter `T` reads as `Any?`
+// `first.T extends Signal[]`: only a class, interface or enum bounds a type parameter, so it is unbounded
+// `--bound Crate.T` names no type parameter, so it is unused
+ir 1;
+
+class Box<T in (Str, f64)> {
+  new(value: T) throws;
+  get(): T throws;
+  map<U>(f: fn(T) -> U): Box<U> throws;
+}
+
+class Shape {
+  area(): f64 throws;
+}
+
+biggest<S: Shape>(shapes: arr<S>): S throws;
+wrap(n: f64): Box<F64> throws;
+strings(): Box<Arr<str>> throws;
+
+enum DateUnit {
+  @js("year") Year;
+  @js("month") Month;
+  @js("day") Day;
+}
+
+enum TimeUnit {
+  @js("hour") Hour = 4;
+  @js("minute") Minute;
+  @js("second") Second;
+}
+
+enum Plural {
+  @js("years") Years;
+  @js("months") Months;
+  @js("days") Days;
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum Pluralize {
+  @js("year") Year;
+  @js("month") Month;
+  @js("day") Day;
+  @js("hour") Hour;
+  @js("minute") Minute;
+  @js("second") Second;
+  @js("years") Years;
+  @js("months") Months;
+  @js("days") Days;
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+interface RoundingOptions<Units in (DateUnitOrTimeUnit, ExcludeTimeUnitHour, DateUnit, TimeUnit, YearOrMonth, Hour, DayOrTimeUnit, MonthOrDay, HourOrMinute)> {
+  type PluralUnits = match Units { DateUnitOrTimeUnit => Plural, ExcludeTimeUnitHour => PluralExcludeTimeUnitHour, DateUnit => PluralDateUnit, TimeUnit => PluralTimeUnit, YearOrMonth => PluralYearOrMonth, Hour => PluralHour, DayOrTimeUnit => PluralDayOrTimeUnit, MonthOrDay => PluralMonthOrDay, HourOrMinute => PluralHourOrMinute };
+  type PluralizeUnits = match Units { DateUnitOrTimeUnit => Pluralize, ExcludeTimeUnitHour => PluralizeExcludeTimeUnitHour, DateUnit => PluralizeDateUnit, TimeUnit => PluralizeTimeUnit, YearOrMonth => PluralizeYearOrMonth, Hour => PluralizeHour, DayOrTimeUnit => PluralizeDayOrTimeUnit, MonthOrDay => PluralizeMonthOrDay, HourOrMinute => PluralizeHourOrMinute };
+  type LargestUnit = match Units { DateUnitOrTimeUnit => LargestUnitDateUnitOrTimeUnit, ExcludeTimeUnitHour => LargestUnitExcludeTimeUnitHour, DateUnit => LargestUnitDateUnit, TimeUnit => LargestUnitTimeUnit, YearOrMonth => LargestUnitYearOrMonth, Hour => LargestUnitHour, DayOrTimeUnit => LargestUnitDayOrTimeUnit, MonthOrDay => LargestUnitMonthOrDay, HourOrMinute => LargestUnitHourOrMinute };
+  @js(object)
+  new();
+  get amount(): str?;
+  set amount(value: str);
+  get smallestUnit(): Units?;
+  set smallestUnit(value: Units);
+  get plural(): PluralUnits?;
+  set plural(value: PluralUnits);
+  get unit(): PluralizeUnits?;
+  set unit(value: @js(null) PluralizeUnits?);
+  get largestUnit(): LargestUnit?;
+  set largestUnit(value: LargestUnit);
+}
+
+interface TimeOptions extends RoundingOptions<ExcludeTimeUnitHour> {
+  @js(object)
+  new();
+}
+
+untilDate(options: RoundingOptions<DateUnit>) throws;
+untilTime(options: RoundingOptions<TimeUnit>) throws;
+untilAny(options: RoundingOptions<DateUnitOrTimeUnit>) throws;
+untilMonth(options: RoundingOptions<YearOrMonth>) throws;
+untilHour(options: RoundingOptions<Hour>) throws;
+untilDay(options: RoundingOptions<DayOrTimeUnit>) throws;
+
+namespace Intl {
+  enum LocalesArgument {
+    Str(str);
+    StrArray(arr<str>);
+  }
+}
+
+format(): str throws;
+format(locales: union Intl.LocalesArgument): str throws;
+
+interface RoundToOptions<Units in (DateUnitOrTimeUnit, MonthOrDay)> extends RoundingOptions<Units> {
+  @js(object)
+  new();
+  get smallestUnit(): Units;
+  set smallestUnit(value: Units);
+}
+
+round(options: RoundToOptions<MonthOrDay>) throws;
+
+interface Step<T> {
+  @js(object)
+  new();
+  get value(): T;
+}
+
+interface Done<R> {
+  @js(object)
+  new();
+  get result(): R;
+}
+
+interface Stepper<T, R> {
+  next(): Any throws;
+}
+
+class Store {}
+
+class View {
+  new(store: Store) throws;
+  new(store: Store, offset: f64) throws;
+  new(value: Any?, offset: f64, length: f64) throws;
+}
+
+class Pipe<I = Any?, O = Any?> {
+  write(chunk: I): O throws;
+}
+
+class Encoder extends Pipe<Str, Uint8Array> {}
+
+interface Stepped<S in (HourOrMinute)> extends RoundingOptions<S> {
+  @js(object)
+  new();
+  get step(): S?;
+  set step(value: S);
+}
+
+interface Spanning<U in (HourOrWeek, Hour)> {
+  type LargestUnit = match U { HourOrWeek => LargestUnitHourOrWeek, Hour => SpanningLargestUnitHour };
+  @js(object)
+  new();
+  get smallestUnit(): U?;
+  set smallestUnit(value: U);
+  get largestUnit(): LargestUnit?;
+  set largestUnit(value: LargestUnit);
+}
+
+step(options: Stepped<HourOrMinute>, span: Spanning<HourOrWeek>) throws;
+spanHour(span: Spanning<Hour>) throws;
+
+class Gauge {
+  new() throws;
+  level(): str throws;
+}
+
+class Signal {}
+
+class Bus<M: Record<Signal> = Record<Signal>> {
+  emit(signal: Signal) throws;
+}
+
+class Halt {}
+
+interface SignalMap {
+  @js(object)
+  new();
+  get start(): Signal;
+  set start(value: Signal);
+  get halt(): Halt;
+  set halt(value: Halt);
+}
+
+listen(type: str, handler: fn(SignalOrHalt)) throws;
+first<T>(items: T): T throws;
+
+class Cell<T> {
+  new(value: T) throws;
+  get value(): T;
+}
+
+enum DateUnitOrTimeUnit extends DateUnit, TimeUnit {}
+
+enum ExcludeTimeUnitHour {
+  @js("minute") Minute;
+  @js("second") Second;
+}
+
+enum YearOrMonth {
+  @js("year") Year;
+  @js("month") Month;
+}
+
+enum Hour {
+  @js("hour") Hour;
+}
+
+enum DayOrTimeUnit extends TimeUnit {
+  @js("day") Day;
+}
+
+enum MonthOrDay {
+  @js("month") Month;
+  @js("day") Day;
+}
+
+enum HourOrMinute {
+  @js("hour") Hour;
+  @js("minute") Minute;
+}
+
+enum HourOrWeek {
+  @js("hour") Hour;
+  @js("week") Week;
+}
+
+enum SignalOrHalt {
+  Signal(Signal);
+  Halt(Halt);
+}
+
+enum PluralExcludeTimeUnitHour {
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum PluralDateUnit {
+  @js("years") Years;
+  @js("months") Months;
+  @js("days") Days;
+}
+
+enum PluralTimeUnit {
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum PluralYearOrMonth {
+  @js("years") Years;
+  @js("months") Months;
+}
+
+enum PluralHour {
+  @js("hours") Hours;
+}
+
+enum PluralDayOrTimeUnit {
+  @js("days") Days;
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum PluralMonthOrDay {
+  @js("months") Months;
+  @js("days") Days;
+}
+
+enum PluralHourOrMinute {
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+}
+
+enum PluralizeExcludeTimeUnitHour {
+  @js("minute") Minute;
+  @js("second") Second;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum PluralizeDateUnit {
+  @js("year") Year;
+  @js("month") Month;
+  @js("day") Day;
+  @js("years") Years;
+  @js("months") Months;
+  @js("days") Days;
+}
+
+enum PluralizeTimeUnit {
+  @js("hour") Hour;
+  @js("minute") Minute;
+  @js("second") Second;
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum PluralizeYearOrMonth {
+  @js("year") Year;
+  @js("month") Month;
+  @js("years") Years;
+  @js("months") Months;
+}
+
+enum PluralizeHour {
+  @js("hour") Hour;
+  @js("hours") Hours;
+}
+
+enum PluralizeDayOrTimeUnit {
+  @js("day") Day;
+  @js("hour") Hour;
+  @js("minute") Minute;
+  @js("second") Second;
+  @js("days") Days;
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum PluralizeMonthOrDay {
+  @js("month") Month;
+  @js("day") Day;
+  @js("months") Months;
+  @js("days") Days;
+}
+
+enum PluralizeHourOrMinute {
+  @js("hour") Hour;
+  @js("minute") Minute;
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+}
+
+enum LargestUnitDateUnitOrTimeUnit {
+  @js("auto") Auto;
+  @js("year") Year;
+  @js("month") Month;
+  @js("day") Day;
+  @js("hour") Hour;
+  @js("minute") Minute;
+  @js("second") Second;
+  @js("years") Years;
+  @js("months") Months;
+  @js("days") Days;
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum LargestUnitExcludeTimeUnitHour {
+  @js("auto") Auto;
+  @js("minute") Minute;
+  @js("second") Second;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum LargestUnitDateUnit {
+  @js("auto") Auto;
+  @js("year") Year;
+  @js("month") Month;
+  @js("day") Day;
+  @js("years") Years;
+  @js("months") Months;
+  @js("days") Days;
+}
+
+enum LargestUnitTimeUnit {
+  @js("auto") Auto;
+  @js("hour") Hour;
+  @js("minute") Minute;
+  @js("second") Second;
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum LargestUnitYearOrMonth {
+  @js("auto") Auto;
+  @js("year") Year;
+  @js("month") Month;
+  @js("years") Years;
+  @js("months") Months;
+}
+
+enum LargestUnitHour {
+  @js("auto") Auto;
+  @js("hour") Hour;
+  @js("hours") Hours;
+}
+
+enum LargestUnitDayOrTimeUnit {
+  @js("auto") Auto;
+  @js("day") Day;
+  @js("hour") Hour;
+  @js("minute") Minute;
+  @js("second") Second;
+  @js("days") Days;
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+  @js("seconds") Seconds;
+}
+
+enum LargestUnitMonthOrDay {
+  @js("auto") Auto;
+  @js("month") Month;
+  @js("day") Day;
+  @js("months") Months;
+  @js("days") Days;
+}
+
+enum LargestUnitHourOrMinute {
+  @js("auto") Auto;
+  @js("hour") Hour;
+  @js("minute") Minute;
+  @js("hours") Hours;
+  @js("minutes") Minutes;
+}
+
+enum LargestUnitHourOrWeek {
+  @js("auto") Auto;
+  @js("hour") Hour;
+  @js("week") Week;
+}
+
+enum SpanningLargestUnitHour {
+  @js("auto") Auto;
+  @js("hour") Hour;
+}
+
+interface Record<V> {
+  @js(index)
+  at(key: str): V?;
+  @js(index)
+  setAt(key: str, value: V);
+}
+
+class Uint8Array {}

@@ -1,0 +1,104 @@
+ir 1;
+
+class DOMException extends Error {
+  new() throws;
+  new(message: str) throws;
+  new(message: str?, name: str) throws;
+  get name(): str;
+}
+
+class QuotaExceededError extends Error {}
+
+interface Kv {
+  /// ## Errors
+  ///
+  /// * `DOMException`
+  get(key: str): str throws DOMExceptionErr;
+  /// ## Errors
+  ///
+  /// * `DOMException | QuotaExceededError`
+  put(key: str, value: str): future<unit, DOMExceptionOrQuotaExceededErr>;
+  /// ## Errors
+  ///
+  /// * `TypeError`
+  list(): arr<str> throws TypeErr;
+  /// ## Errors
+  ///
+  /// * `DOMException`
+  get size(): f64 throws DOMExceptionErr;
+  /// ## Errors
+  ///
+  /// * `TypeError | RangeError`
+  check(key: str) throws TypeOrRangeErr;
+  /// ## Errors
+  ///
+  /// * `Error | QuotaExceededError | DOMException`
+  grow() throws DOMExceptionOrQuotaExceededErr;
+  /// ## Errors
+  ///
+  /// * `Error`
+  close() throws ErrorErr;
+  count(): f64 throws;
+}
+
+class StorageError extends DOMException {}
+
+/// ## Errors
+///
+/// * `DOMException | StorageError`
+open() throws StorageOrDOMExceptionErr;
+
+interface AbortSignal {
+  @js(object)
+  new();
+  get aborted(): bool;
+}
+
+class AbortController {
+  new() throws;
+  get signal(): AbortSignal;
+  abort() throws;
+  abort(reason: Any?) throws;
+}
+
+interface RequestInit {
+  @js(object)
+  new();
+  get method(): str?;
+  set method(value: str);
+  get signal(): AbortSignal?;
+  set signal(value: @js(null) AbortSignal?);
+}
+
+fetch(input: str): future<str>;
+@js(args = (input, init? { signal = ctl.signal }), let ctl = AbortController.new(), cancel = ctl.abort)
+fetch(input: str, init: RequestInit?): future<str>;
+
+enum DOMExceptionErr extends err {
+  @js(DOMException) DOMException(Str);
+}
+
+enum DOMExceptionOrQuotaExceededErr extends err {
+  @js(DOMException) DOMException(Str);
+  @js(QuotaExceededError) QuotaExceededError(Str);
+}
+
+enum TypeErr {
+  @js(TypeError) TypeError(Str);
+  @fallback Error(Str);
+}
+
+enum TypeOrRangeErr {
+  @js(TypeError) TypeError(Str);
+  @js(RangeError) RangeError(Str);
+  @fallback Error(Str);
+}
+
+enum ErrorErr extends err {}
+
+enum StorageOrDOMExceptionErr extends err {
+  @js(StorageError) StorageError(Str);
+  @js(DOMException) DOMException(Str);
+}
+
+class Error {}

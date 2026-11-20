@@ -19,9 +19,9 @@ fmt-check:
 clippy:
     cargo +stable clippy --no-deps --workspace --all-features --exclude ts-gen-integration-tests -- -D warnings
 
-# Run ts-gen unit + snapshot tests
+# Run the unit and snapshot tests
 test *ARGS="":
-    RUST_BACKTRACE=1 cargo +stable test -p ts-gen {{ARGS}}
+    RUST_BACKTRACE=1 cargo +stable test -p ts-gen -p ts-gen-abi {{ARGS}}
 
 # Re-bless all snapshots
 test-overwrite:

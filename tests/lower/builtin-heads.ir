@@ -1,0 +1,37 @@
+ir 1;
+
+@js(name = "str")
+namespace str_ {
+  interface X {
+    @js(object)
+    new();
+    get a(): f64;
+    set a(value: f64);
+  }
+}
+
+@js(name = "mut")
+namespace mut_ {
+  interface Y {
+    @js(object)
+    new();
+    get b(): f64;
+    set b(value: f64);
+  }
+}
+
+take(x: str_.X, y: mut_.Y) throws;
+
+namespace Outer {
+  @js(name = "f64")
+  namespace f64_ {
+    interface Z {
+      @js(object)
+      new();
+      get c(): f64;
+      set c(value: f64);
+    }
+  }
+
+  take(z: f64_.Z) throws;
+}

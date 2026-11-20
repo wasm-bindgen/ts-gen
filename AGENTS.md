@@ -19,7 +19,8 @@ src/
 ├── context.rs                 # GlobalContext (scopes, registry, externals)
 ├── external_map.rs            # `--external Foo=::path::Bar` resolution
 ├── parse/                     # .d.ts → IR
-│   ├── docs.rs                # JSDoc extraction (incl. @throws)
+│   ├── annotate.rs            # `--annotate` side files: layer @tw-abi/@throws by name
+│   ├── docs.rs                # JSDoc extraction (incl. @throws, @tw-abi)
 │   ├── members.rs             # interface / class member converters
 │   ├── merge.rs               # var + interface merging
 │   ├── classify.rs            # interface classification (class-like vs dictionary)

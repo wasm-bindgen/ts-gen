@@ -1,0 +1,39 @@
+ir 1;
+
+digest(data: Uint8Array): Uint8Array throws;
+digest(data: u8[]): Uint8Array throws;
+fill(values: Float32Array) throws;
+fill(values: f32[]) throws;
+big(values: BigInt64Array) throws;
+big(values: i64[]) throws;
+clamp(px: Uint8ClampedArray) throws;
+pairs(): arr<(str, f64)> throws;
+list(xs: arr<str>): arr<f64> throws;
+
+class Stream<T> {
+  read(): T throws;
+}
+
+bytes(): Stream<Uint8Array> throws;
+arrays(): Stream<Arr<str>> throws;
+tuples(): Stream<Tuple<str, f64>> throws;
+/// * `buf` - filled with random bytes
+random(buf: Uint8Array) throws;
+/// * `buf` - filled with random bytes
+random(buf: u8[]) throws;
+/// * `buf` - filled with random bytes
+random(@js(unshared) buf: *u8[]) throws;
+/// * `data` - copied by the callee
+write(offset: f64, data: Float32Array) throws;
+/// * `data` - copied by the callee
+write(offset: f64, data: f32[]) throws;
+/// * `data` - copied by the callee
+write(offset: f64, data: *f32[]) throws;
+
+class Uint8Array {}
+
+class Float32Array {}
+
+class BigInt64Array {}
+
+class Uint8ClampedArray {}

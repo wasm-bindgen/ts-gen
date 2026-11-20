@@ -311,6 +311,7 @@ impl ClassConfig<'_> {
         }
         crate::ir::Param {
             name: "val".to_string(),
+            js_name: None,
             type_ref,
             optional: false,
             variadic: false,
