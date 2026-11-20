@@ -7,7 +7,7 @@
 //! shapes, enum discrimination and error mapping all happen here, in one
 //! crossing per call.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::Write;
 use std::rc::Rc;
 
@@ -153,6 +153,9 @@ pub struct Glue<'a, 'b> {
     /// Whether the glue wrote `ret`; a glue returning a helper's array
     /// leaves it to a wrapper.
     pub ret_used: bool,
+    /// The nullable parameters of the member being written: a path
+    /// through one is `undefined` when it's absent (§7).
+    nullable: HashSet<String>,
     /// Whether an `arr<str>` lowers through the bridge's `allocn`.
     pub allocn: bool,
     /// The GC values the bridge module converts in and out of the
@@ -283,6 +286,7 @@ impl<'a, 'b> Glue<'a, 'b> {
             loops: false,
             ret: None,
             ret_used: false,
+            nullable: HashSet::new(),
             allocn: false,
             convs: Vec::new(),
             lang_exports: Vec::new(),
@@ -2211,6 +2215,12 @@ impl<'a, 'b> Glue<'a, 'b> {
                 _ => return unsupported(format!("{}: a {:?} position", k.key, p.role)),
             }
         }
+        self.nullable = m
+            .params
+            .iter()
+            .filter(|p| matches!(p.ty, Type::Nullable(..)))
+            .map(|p| p.name.clone())
+            .collect();
         let cx = k.cx.clone();
         let result = func.sig.results.first();
         let future = result.and_then(|r| match &r.repr.kind {
@@ -2569,9 +2579,20 @@ impl<'a, 'b> Glue<'a, 'b> {
         args: &HashMap<&str, String>,
         cx: &Context<'_>,
     ) -> Result<String> {
-        let Expr::Ref { path, call } = e else {
-            let Expr::Lit(l) = e else { unreachable!() };
-            return Ok(lit(l));
+        let (path, call) = match e {
+            Expr::Lit(l) => return Ok(lit(l)),
+            // Without its `undefined` elements.
+            Expr::Array(elems) => {
+                let elems = elems
+                    .iter()
+                    .map(|x| self.expr(x, args, cx))
+                    .collect::<Result<Vec<_>>>()?;
+                return Ok(format!(
+                    "[{}].filter((v) => v !== undefined)",
+                    elems.join(", ")
+                ));
+            }
+            Expr::Ref { path, call } => (path, call),
         };
         let call_args = match call {
             Some(xs) => Some(
@@ -2583,8 +2604,12 @@ impl<'a, 'b> Glue<'a, 'b> {
         };
         if let Some(v) = args.get(path[0].as_str()) {
             let mut s = v.clone();
-            for p in &path[1..] {
-                s = prop(&s, p);
+            for (i, p) in path[1..].iter().enumerate() {
+                s = if i == 0 && self.nullable.contains(&path[0]) {
+                    opt_prop(&s, p)
+                } else {
+                    prop(&s, p)
+                };
             }
             if let Some(a) = call_args {
                 let _ = write!(s, "({})", a.join(", "));
