@@ -16,7 +16,8 @@
 //! namespaces. `"variant"` is the member's name within its group of
 //! same-named siblings (§7 conflict renaming, with type arguments spelled),
 //! for a generator whose own overloading conflates signatures the IR keeps
-//! apart.
+//! apart. A parameter `@js(args)` spreads (`...rest`) has `"spread"`, for a
+//! generator with variadic parameters.
 //!
 //! A function type reaching itself through a recursive alias (§3) has
 //! `"kind": "rec"` where it recurs: its layouts, each way, are under
@@ -632,6 +633,13 @@ fn member(l: &Layouts<'_>, k: &Keyed<'_>, variant: Option<String>) -> Json {
         MemberKind::New(n) => ("new", n.clone()),
     };
     let tparams = m.tparams.iter().map(|p| tparam(l, p, &k.cx)).collect();
+    // `...p` in `@js(args)`: the array's elements are the call's arguments.
+    let spread = |p: String| {
+        m.meta.attrs.js.args().is_some_and(|args| {
+            args.iter()
+                .any(|t| matches!(t, Telem::Spread(n) if name(n) == p))
+        })
+    };
     let params = m
         .params
         .iter()
@@ -653,6 +661,7 @@ fn member(l: &Layouts<'_>, k: &Keyed<'_>, variant: Option<String>) -> Json {
                 .set("once", Json::Bool(p.once || m.meta.attrs.once))
                 .set("unshared", Json::Bool(p.unshared))
                 .set("union", Json::Bool(p.union))
+                .set("spread", Json::Bool(spread(name(&p.name))))
                 .done()
         })
         .collect();
