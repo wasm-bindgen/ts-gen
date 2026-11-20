@@ -181,11 +181,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_results<T>(this: &Row<T>, #[wasm_bindgen(slice = "array")] val: &[T])
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::VectorRefIntoWasmAbi>
-    Row<T>
-{
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::RefIntoWasmAbi> Row<T> {
     pub fn new(results: &[T]) -> Row<T> {
         let inner: Row<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_results(results);
@@ -226,7 +224,7 @@ extern "C" {
     #[wasm_bindgen(method, variadic, catch)]
     pub fn append<T>(this: &Store, items: &[T]) -> Result<Row<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub async fn get<T>(
         this: &Store,
@@ -319,7 +317,7 @@ extern "C" {
     #[wasm_bindgen(variadic, catch)]
     pub fn of<T>(items: &[T]) -> Result<Row<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {

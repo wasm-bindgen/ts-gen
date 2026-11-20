@@ -120,7 +120,7 @@ extern "C" {
     #[wasm_bindgen(catch)]
     pub fn generic<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> Result<String, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
@@ -129,7 +129,7 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] values: &[T],
     ) -> Result<JsString, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
@@ -474,14 +474,14 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] values: &[T],
     ) -> Result<String, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "take")]
     pub fn take_js_string<T>(
         this: &Bag<T>,
         #[wasm_bindgen(slice = "array")] values: &[T],
     ) -> Result<JsString, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
@@ -492,7 +492,7 @@ extern "C" {
         #[wasm_bindgen(slice = "copy")] data: &[f64],
     ) -> Result<String, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
@@ -503,7 +503,7 @@ extern "C" {
         #[wasm_bindgen(slice = "copy")] data: &[f64],
     ) -> Result<JsString, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
@@ -514,7 +514,7 @@ extern "C" {
         data: &Float64Array,
     ) -> Result<String, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
@@ -525,5 +525,5 @@ extern "C" {
         data: &Float64Array,
     ) -> Result<JsString, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }

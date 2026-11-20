@@ -103,9 +103,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_results<T>(this: &QueryResult<T>, #[wasm_bindgen(slice = "array")] val: &[T])
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::VectorRefIntoWasmAbi>
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::RefIntoWasmAbi>
     QueryResult<T>
 {
     #[allow(clippy::new_without_default)]
