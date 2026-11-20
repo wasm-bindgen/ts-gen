@@ -1,0 +1,23 @@
+// The Cache API.
+import { Future } from 'zena:async';
+import {
+  BodyInitStr, Headers, HeadersInitHeaders, RequestInfoStr, Response, ResponseInit, caches
+} from '../bindings.zena';
+import { ok } from './reply.zena';
+
+/** `/cache`: a miss, a put, and a hit. */
+export async function cache(): Future<Response> {
+  let store = caches().default;
+  let key = new RequestInfoStr("http://cache.example/greeting");
+  await store.delete(key);
+  // A miss is `null`.
+  let miss = await store.match_(key);
+  let headers = new Headers();
+  headers.set("cache-control", "max-age=60");
+  let init = new ResponseInit();
+  init.setHeaders(new HeadersInitHeaders(headers));
+  await store.put(key, new Response.newWithBodyAndInit(new BodyInitStr("kept in the cache"), init));
+  let hit = await store.match_(key);
+  return ok(`before put: ${if (miss == null) "a miss" else "a hit"}\n` +
+    `after put: ${if (hit == null) "a miss" else await hit.text()}\n`);
+}

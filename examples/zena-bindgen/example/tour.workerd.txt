@@ -1,0 +1,141 @@
+== GET /
+Hello from workerd. The routes:
+/echo
+/url
+/form
+/json
+/crypto
+/stream
+/timers
+/fetch
+/rewrite
+/cache
+/counter/kv
+/counter/transaction
+/counter/sql
+/counter/alarm
+/ws
+/rpc
+/fail
+/fail/typed
+/fail/plain
+/scheduled
+/queue
+[200]
+
+== POST /echo
+POST /echo
+user-agent: tour
+7 headers, the x- ones: x-tour=1 x-zena=hi
+body: Hello!
+[202]
+
+== GET /url?b=2&a=1
+host: 127.0.0.1:8788
+path: /url
+query: a=1&added=by+zena&b=2
+  a = 1
+  added = by zena
+  b = 2
+new URL("not a url"): TypeError: Invalid URL string.
+URL.parse("also not a url"): null
+URL.canParse("https://example.com/"): true
+[200]
+
+== POST /form (a field and a file)
+name: the string "zena"
+upload: the file upload.txt (text/plain, 18 bytes): "hello from a file
+"
+[200]
+
+== POST /json
+{"item":"WIDGET","quantity":4,"tags":["a","b"]}[200]
+
+== GET /crypto
+"hello" is 5 bytes: 68656c6c6f
+SHA-256 of its ArrayBuffer: 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+SHA-256 of a Zena u8 array: 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+decoded again: hello
+8 random bytes: 8 bytes
+a random UUID is 36 characters
+btoa: aGVsbG8=, atob: hello
+[200]
+
+== GET /stream
+read through the transform: ONE TWO THREE
+and this body is streamed, a chunk at a time
+[200]
+
+== GET /timers
+waited for a setTimeout callback, a microtask and scheduler.wait
+waitUntil: a note reaches the helper after this response
+[200]
+
+== GET /fetch
+service binding: helper's notes: the waitUntil of /timers ran
+global fetch: helper saw POST /echo "ping"
+race: gave up after 20ms, which cancelled the fetch
+AbortController: the listener heard an "abort" event, signal.aborted is true
+[200]
+
+== GET /rewrite
+<h1 class="h1">Tour of the rewriter</h1><a href="https://example.com/a">a</a> <a href="/b">b</a>
+links seen: 2
+[200]
+
+== GET /cache
+before put: a miss
+after put: kept in the cache
+[200]
+
+== GET /counter/kv
+count: 1
+2 keys: color count
+deleted "color": true
+[200]
+
+== GET /counter/transaction
+count: 2, read and written in one transaction
+[200]
+
+== GET /counter/sql
+columns: id, path
+visit 1: /counter/sql
+rows read: 1
+[200]
+
+== GET /counter/alarm
+alarm set for 20ms from now; 200ms later the alarm handler has run, after 0 retries
+[200]
+
+== GET /ws
+pair: sent "ping", the other end replied: echo: ping
+room: upgraded with status 101, sent "hello", the object replied: the room of 1 heard "hello"
+[200]
+
+== GET /rpc
+Counter.add(5) over RPC returned 7
+Greeter.greet("Zena") over RPC returned "Hello from workerd, Zena"
+[200]
+
+== GET /fail
+atob("not base64!") threw a DOMException: atob() called with invalid base64-encoded data.
+new URL("not a url") threw a TypeError: Invalid URL string.
+JSON.parse("{oops") threw another Error: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+fetch("not a url") rejected with a TypeError: Invalid URL: not a url
+/fail/typed rejected with a JS TypeError: Zena threw a TypeError
+/fail/plain rejected with a JS Error: Zena threw a plain Error
+[200]
+
+== GET /scheduled
+scheduled: ok; scheduled ran for the cron */5 * * * *
+[200]
+
+== GET /queue
+queue: ok; queue "tour" delivered 2 messages: first second
+[200]
+
+== GET /nowhere
+no route /nowhere
+[404]
+

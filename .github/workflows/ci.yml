@@ -110,6 +110,8 @@ jobs:
         npm run build -w @zena-lang/zena-cli
         echo "ZENA=$PWD/target/release/zena-cli" >> "$GITHUB_ENV"
         echo "ZENA_REPO_ROOT=$PWD" >> "$GITHUB_ENV"
+    # Serves examples/zena-bindgen/example for its tour.
+    - run: npm i -g workerd@1.20261110.1
     - run: just test-zena
 
   test_integration:

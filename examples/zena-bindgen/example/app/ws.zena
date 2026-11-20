@@ -1,0 +1,79 @@
+// WebSockets: a pair inside the worker, and a Durable Object that holds one.
+import { Completer, Future } from 'zena:async';
+import {
+  CfPropertiesBox, DurableObjectState, Env, Event, EventListenerOrEventListenerObjectEventListener, Headers,
+  HeadersInitHeaders, MessageEvent, RequestInfoStr, RequestInit, Response, ResponseInit, WebSocket, WebSocketPair
+} from '../bindings.zena';
+import { ArrayBuffer } from '../std.zena';
+import { ObjectReq, ok } from './reply.zena';
+
+/** The next message a socket receives: JS calls the listener per event. */
+function nextMessage(socket: WebSocket): Future<String> {
+  let received = new Completer<String>();
+  socket.addEventListener("message", new EventListenerOrEventListenerObjectEventListener((event: Event): void => {
+    let data = ((event as externref) as MessageEvent).data;
+    received.complete(String.fromHandle(data as externref));
+  }));
+  return received.future;
+}
+
+/** `/ws`: a message echoed across a pair, and one answered by a Durable Object. */
+export async function ws(env: Env): Future<Response> {
+  // Both ends of a pair, in this worker: the server end echoes.
+  let pair = new WebSocketPair();
+  let server = pair._1;
+  server.accept();
+  server.addEventListener("message", new EventListenerOrEventListenerObjectEventListener((event: Event): void => {
+    let data = ((event as externref) as MessageEvent).data;
+    server.send("echo: " + String.fromHandle(data as externref));
+  }));
+  let client = pair._0;
+  client.accept();
+  let echoed = nextMessage(client);
+  client.send("ping");
+  let local = await echoed;
+  client.close();
+
+  // An upgrade request to the Room object, which keeps the server end.
+  let headers = new Headers();
+  headers.set("upgrade", "websocket");
+  let init = new RequestInit<CfPropertiesBox>();
+  init.setHeaders(new HeadersInitHeaders(headers));
+  let upgrade = await env.ROOM.getByName("lobby").fetch(new RequestInfoStr("http://room/join"), init);
+  let socket = upgrade.webSocket;
+  if (socket == null) {
+    return ok("the room did not upgrade\n");
+  }
+  socket.accept();
+  let answered = nextMessage(socket);
+  socket.send("hello");
+  let remote = await answered;
+  socket.close();
+  return ok(`pair: sent "ping", the other end replied: ${local}\n` +
+    `room: upgraded with status ${upgrade.status}, sent "hello", the object replied: ${remote}\n`);
+}
+
+/** A Durable Object without a base class, using the hibernation API. */
+export class Room {
+  #state: DurableObjectState<externref | null>;
+
+  new(state: DurableObjectState<externref | null>, env: Env) : #state = state {}
+
+  async fetch(request: ObjectReq): Future<Response> {
+    let pair = new WebSocketPair();
+    // The runtime holds the socket, and calls `webSocketMessage` for it.
+    this.#state.acceptWebSocket(pair._1);
+    let init = new ResponseInit();
+    init.setStatus(101 as u16);
+    init.webSocket = pair._0;
+    return new Response.newWithBodyAndInit(null, init);
+  }
+
+  async webSocketMessage(ws: WebSocket, message: String): Future<void> {
+    ws.send(`the room of ${this.#state.getWebSockets().length} heard "${message}"`);
+  }
+
+  async webSocketMessage(ws: WebSocket, message: ArrayBuffer): Future<void> {
+    ws.send(`the room heard ${message.byteLength} bytes`);
+  }
+}
