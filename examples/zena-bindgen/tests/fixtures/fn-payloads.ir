@@ -1,0 +1,22 @@
+ir 1;
+
+class Event {
+  get type(): str;
+}
+
+interface EventListenerObject {
+  handleEvent(event: Event);
+}
+
+enum Listener {
+  Function(fn(Event));
+  Object(EventListenerObject);
+}
+
+class EventTarget<EventMap = Any?> {
+  new();
+  addEventListener(type: str, listener: union Listener);
+  get onevent(): Listener?;
+}
+
+listen(type: str, listener: union Listener);

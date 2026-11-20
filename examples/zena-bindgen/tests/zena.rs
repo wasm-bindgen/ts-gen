@@ -165,6 +165,18 @@ fn snapshots() {
     }
 }
 
+/// A function in a payload enum crosses as one alone does: the language's
+/// as its handle, through a trampoline, and JS's as a wrapper that calls it.
+#[test]
+fn fn_payloads() {
+    let ir = read_ir(&crate_root().join("tests/fixtures/fn-payloads.ir"));
+    let out = generate(&ir, &[], &zena_bindgen::Options::default());
+    assert_eq!(out.skipped, [], "fn-payloads skips members");
+    assert!(out
+        .zena
+        .contains("case ListenerFunction(value: (a0: Event) => void)"));
+}
+
 /// The Zena compiler and its checkout, or `None` to skip.
 fn zena() -> Option<(PathBuf, PathBuf)> {
     if std::env::var_os("TSGEN_SKIP_ZENA").is_some() {

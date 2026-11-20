@@ -3198,6 +3198,20 @@ impl<'a> Gen<'a> {
                 of: Host::Future { value, error },
                 nullable,
             } => self.future_in(value, error, &vals[0], *nullable)?,
+            // A JS function, called through `("tw:call", F)`.
+            Kind::Fn {
+                provided: None,
+                nullable,
+                ..
+            } => {
+                let wrap = self.fn_wrapper(p)?;
+                let x = &vals[0];
+                if *nullable {
+                    format!("(if ({x} == null) null else {wrap}({x} as externref))")
+                } else {
+                    format!("{wrap}({x} as externref)")
+                }
+            }
             Kind::Host { nullable, .. } => {
                 let t = self.surface(&Repr {
                     ty: p.ty.clone(),
@@ -3275,6 +3289,19 @@ impl<'a> Gen<'a> {
                     vec![format!("(if ({v} == null) null else {promise}<{t}>({v}))")]
                 } else {
                     vec![format!("{promise}<{t}>({v})")]
+                }
+            }
+            // A function the language provides is its handle (§18).
+            Kind::Fn {
+                provided: Some(_),
+                nullable,
+                ..
+            } => {
+                self.trampoline(p)?;
+                if *nullable {
+                    vec![format!("(if ({v} == null) null else ({v} as anyref))")]
+                } else {
+                    vec![format!("({v} as anyref)")]
                 }
             }
             Kind::Host { of: Host::Any, .. } => vec![v.into()],
