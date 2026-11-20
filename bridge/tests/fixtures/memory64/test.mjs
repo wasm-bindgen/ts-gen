@@ -2,7 +2,7 @@ import { assert, lang } from "./harness.mjs";
 
 class Request {}
 class Probe {}
-for (const m of ["str", "optStr", "floats", "strs", "rows", "body"]) {
+for (const m of ["str", "optStr", "floats", "strs", "rows", "optRows", "body"]) {
   Probe.prototype[m] = function (v) {
     this.seen = v;
     return typeof this.next === "function" ? this.next(v) : this.next;
@@ -78,6 +78,9 @@ L.balanced(() => {
   L.take(rp, rl, 20, 8);
   L.ex["tw:table/free"](rx, 1);
 });
+
+// A null array's table base stays an i32.
+assert.deepEqual(call("Probe#optRows(arr<(u32,str,Request)>?)", null, 0n, 0, -1n), [0n, 0, -1n]);
 
 // Payload enum slots are pointer-sized.
 L.balanced(() => {

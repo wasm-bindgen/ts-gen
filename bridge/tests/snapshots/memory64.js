@@ -624,8 +624,31 @@ function $f4(w0_0, w1_0, w1_1, w1_2) {
   }
 }
 
+// ("tw:js/global", "Probe#optRows(arr<(u32,str,Request)>?)")
+function $f5(w0_0, w1_0, w1_1, w1_2) {
+  const t1 = (w1_2 === -1n ? undefined : $h3(w1_0, w1_1, w1_2));
+  const cx = $cx;
+  const cxm = cx.n;
+  try {
+    const r = w0_0.optRows(t1);
+    const t2 = (r == null ? [0n, 0, -1n] : $h4(r, cx));
+    const t3 = t2[0];
+    const t4 = t2[1];
+    const t5 = t2[2];
+    const ra = $ret();
+    ra.i32[0] = t4;
+    ra.i64[1] = t5;
+    return t3;
+  } catch (e) {
+    $release(cx, cxm);
+    throw e;
+  } finally {
+    cx.n = cxm;
+  }
+}
+
 // ("tw:js/global", "Probe#body(Body)")
-function $f5(w0_0, w1_0, w1_1, w1_2, w1_3) {
+function $f6(w0_0, w1_0, w1_1, w1_2, w1_3) {
   const t1 = $h5(w1_0, w1_1, w1_2, w1_3);
   const cx = $cx;
   const cxm = cx.n;
@@ -650,7 +673,7 @@ function $f5(w0_0, w1_0, w1_1, w1_2, w1_3) {
 }
 
 // ("tw:js/global", "Probe#fill(*mut u8[])")
-function $f6(w0_0, w1_0, w1_1) {
+function $f7(w0_0, w1_0, w1_1) {
   const t1 = $view(Uint8Array, Number(w1_0), Number(w1_1), false);
   w0_0.fill(t1);
 }
@@ -659,7 +682,7 @@ export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Request);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { r0: $f0, r1: $f1, r2: $f2, r3: $f3, r4: $f4, r5: $f5 },
+    "tw:glue": { r0: $f0, r1: $f1, r2: $f2, r3: $f3, r4: $f4, r5: $f5, r6: $f6 },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -670,8 +693,9 @@ export function instantiate(language, bridge, imports = {}) {
       "Probe#floats(f64[])": $B.f2,
       "Probe#strs(arr<str>)": $B.f3,
       "Probe#rows(arr<(u32,str,Request)>)": $B.f4,
-      "Probe#body(Body)": $B.f5,
-      "Probe#fill(*mut u8[])": $f6,
+      "Probe#optRows(arr<(u32,str,Request)>?)": $B.f5,
+      "Probe#body(Body)": $B.f6,
+      "Probe#fill(*mut u8[])": $f7,
     },
   });
   $X = instance.exports;

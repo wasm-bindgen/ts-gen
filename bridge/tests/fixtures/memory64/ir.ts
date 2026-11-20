@@ -12,6 +12,7 @@ class Probe {
   floats(v: f64[]): f64[];
   strs(v: arr<str>): arr<str>;
   rows(v: arr<(u32, str, Request)>): arr<(u32, str, Request)>;
+  optRows(v: arr<(u32, str, Request)>?): arr<(u32, str, Request)>?;
   body(v: Body): Body;
   fill(p: *mut u8[]);
 }

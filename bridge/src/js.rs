@@ -1164,11 +1164,11 @@ impl<'a, 'b> Glue<'a, 'b> {
             } => {
                 let s = Space::of(*carrier);
                 let h = self.array_lower(elem, s, m)?;
-                let n = self.f.jsw(r)?.len();
+                let jsw = self.f.jsw(r)?;
+                let n = jsw.len();
                 let t = if *nullable {
-                    let mut zeros: Vec<String> = vec!["0".into(); n - 1];
-                    zeros = zeros.into_iter().map(|z| self.wire_ptr_lit(s, z)).collect();
-                    zeros.push(self.null_len(s).into());
+                    let mut zeros: Vec<&str> = jsw[..n - 1].iter().map(|j| j.zero()).collect();
+                    zeros.push(self.null_len(s));
                     b.bind(format!(
                         "({v} == null ? [{}] : {h}({v}, {cx}))",
                         zeros.join(", ")
