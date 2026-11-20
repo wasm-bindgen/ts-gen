@@ -12,6 +12,8 @@ kotlin {
         nodejs()
         binaries.executable()
     }
+    // The bindings are Kotlin/Wasm's JS interop, which is still experimental.
+    compilerOptions { optIn.add("kotlin.js.ExperimentalWasmJsInterop") }
     // The bindings kotlin-bindgen writes (see run.sh).
     sourceSets.wasmJsMain { kotlin.srcDir("build/std"); kotlin.srcDir("build/bindings") }
 }
