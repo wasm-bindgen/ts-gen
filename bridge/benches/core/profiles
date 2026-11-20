@@ -1,0 +1,7 @@
+linear: all-linear
+gc: all-gc
+gc-wtf16: all-gc, str = gc+wtf16
+gc-hoststr: all-gc, str = host
+host: all-host
+linear-single: all-linear, results = single
+gc-single: all-gc, results = single

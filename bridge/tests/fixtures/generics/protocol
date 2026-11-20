@@ -1,0 +1,6 @@
+mono tw:js/global Map.new<str,u32>()
+mono tw:js/global Map#get<str,u32>(K)
+mono tw:js/global Map#set<str,u32>(K,V)
+mono tw:js/global Util.first<u32>(arr<T>)
+mono tw:js/global Util.pair<str,bool>(A,B)
+mono tw:js/global Bag#put<str>(T)

@@ -1,0 +1,38 @@
+tw:box str
+tw:box arr<u8>
+tw:box (u32,str)
+tw:box u8[]
+tw:box Method
+tw:box i64
+tw:box bigint
+tw:box BigInt?
+tw:unbox bigint
+tw:unbox bigint?
+tw:unbox str
+tw:unbox u8[]
+tw:unbox arr<u16>
+tw:unbox (u32,str)
+tw:unbox Method
+tw:unbox Request
+tw:unbox f64
+tw:unbox i53
+tw:unbox str?
+tw:unbox Request?
+tw:unboxUnchecked str
+tw:unboxUnchecked u8
+tw:unboxUnchecked Request?
+tw:arr len
+tw:arr get<str>
+tw:arr get<u16>
+tw:arr get<Request>
+tw:arr get<Str>
+tw:arr get<U16>
+tw:arr get<Arr<u8>>
+tw:arr get<Str?>
+tw:isNullish
+tw:isUndefined
+tw:instanceof Request
+tw:unit
+tw:true
+tw:false
+tw:box bool?

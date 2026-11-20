@@ -46,6 +46,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
+    # The bridge runtime tests need WasmGC, exnref, JS string builtins and
+    # memory64, and require Node 26 under CI.
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '26'
     - uses: extractions/setup-just@v2
     - run: just test
 

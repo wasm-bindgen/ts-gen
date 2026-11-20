@@ -1,0 +1,16 @@
+mono tw:js/global Map#get<str,u32>(K)
+tw:unbox str
+tw:box Counter
+tw:unbox Counter
+tw:box u8
+tw:box f64
+tw:box bool
+tw:unbox f64
+tw:box fn(u32)->u32
+export tw:call:fn(u32)->u32
+tw:box Mode
+tw:unbox Mode
+tw:unbox Mode?
+tw:box bigint
+tw:unbox bigint
+probes

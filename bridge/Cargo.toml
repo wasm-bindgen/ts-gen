@@ -1,0 +1,16 @@
+[package]
+name = "ts-gen-bridge"
+version = "0.1.0"
+edition = "2021"
+description = "The tw bridge generator: JS glue and a Wasm bridge module for a language module bound through the ts-gen IR"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/wasm-bindgen/ts-gen"
+
+[dependencies]
+ts-gen-abi = { path = "../abi" }
+wasmparser = "0.263"
+wasm-encoder = { version = "0.263", features = ["wasmparser"] }
+wat = "1.263"
+
+[dev-dependencies]
+similar = "2"

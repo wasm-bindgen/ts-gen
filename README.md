@@ -1,8 +1,8 @@
 # ts-gen
 
 Generate bindings from TypeScript `.d.ts` declaration files: Rust for
-[`wasm-bindgen`](https://github.com/wasm-bindgen/wasm-bindgen), and the ts-gen
-IR, which other Wasm languages bind against.
+[`wasm-bindgen`](https://github.com/wasm-bindgen/wasm-bindgen), and, through
+the ts-gen IR and the `tw` bridge, other Wasm languages.
 
 ## Overview
 
@@ -13,7 +13,8 @@ language can bind against.
 
 ```text
 .d.ts -ts-gen-------> Rust (#[wasm_bindgen])
-.d.ts -ts-gen --ir--> app.ir -ts-gen-abi lower-> JSON (per-member wire layouts)
+.d.ts -ts-gen --ir--> app.ir -ts-gen-abi lower-> JSON -> language bindings -> app.wasm
+                      app.ir + app.wasm -ts-gen-bridge-> bridge.js + bridge.wasm
 ```
 
 ## The ts-gen IR
@@ -40,10 +41,18 @@ ts-gen-abi lower worker.ir --profile "all-host, results = single, throws = js" >
 `--bound`, `--with`, `--emit-lib`, `--root` and `--strict-nullable`. See
 `ts-gen --help` for each.
 
+## The tw bridge
+
+[`ts-gen-bridge`](bridge) generates the JS side for a compiled language
+module, its IR and its profile. `bridge.js` is the ESM glue: it converts and
+validates values, dispatches overloads and maps errors, and exports the
+IR's exports as JS classes and functions. `bridge.wasm` translates GC values
+that JS can't read. See [bridge/README.md](bridge/README.md).
+
 ## Development
 
 ```sh
-just test          # unit and snapshot tests
+just test          # unit, snapshot and bridge runtime tests (Node 26)
 just test-integration  # wasm-bindgen integration (wasm32 target, wasm-bindgen-cli)
 just fmt-check && just clippy
 ```
