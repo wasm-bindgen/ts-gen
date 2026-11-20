@@ -357,6 +357,44 @@ impl ClassConfig<'_> {
     }
 }
 
+const ITERATOR: &str = "[Symbol.iterator]";
+
+/// The `[Symbol.iterator]()` methods of the blocks declaring the type whose
+/// body scope is `body`, which the parser keeps out of its members.
+fn iterator_members(
+    js_name: &str,
+    body: ScopeId,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<Member> {
+    let Some(c) = cgctx else {
+        return Vec::new();
+    };
+    let scopes = &c.gctx.scopes;
+    let Some(id) = scopes
+        .get(body)
+        .parent
+        .and_then(|declared| c.gctx.resolve_path(declared, js_name))
+    else {
+        return Vec::new();
+    };
+    let mut found: Vec<(ScopeId, crate::ir::MethodMember)> = scopes
+        .symbol_members(js_name)
+        .filter(|(s, _)| c.gctx.resolve_path(*s, js_name) == Some(id))
+        .filter_map(|(s, m)| match m {
+            Member::Method(m) if m.js_name == ITERATOR => Some((s, m.clone())),
+            _ => None,
+        })
+        .collect();
+    found.sort_by_key(|(s, _)| s.0);
+    found
+        .into_iter()
+        .map(|(_, mut m)| {
+            m.name = "iterator".to_string();
+            Member::Method(m)
+        })
+        .collect()
+}
+
 impl<'a> ClassConfig<'a> {
     fn from_class(
         decl: &ClassDecl,
@@ -375,6 +413,7 @@ impl<'a> ClassConfig<'a> {
         };
 
         let mut members = decl.members.clone();
+        members.extend(iterator_members(&decl.js_name, scope, cgctx));
         let typed = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
@@ -412,6 +451,7 @@ impl<'a> ClassConfig<'a> {
 
         let inherited = inherited_members(&decl.extends, cgctx);
         let mut members = inherit_into(inherited.beyond_first, &decl.members);
+        members.extend(iterator_members(&decl.js_name, scope, cgctx));
         let typed = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
@@ -2444,6 +2484,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     items.extend(display.binding);
                     impls.push(display.impl_);
                 }
+                impls.extend(into_iterator(config, &sigs));
                 for sig in sigs.iter().chain(&twins) {
                     items.push(generate_expanded_method(config, sig));
                 }
@@ -2625,6 +2666,122 @@ fn display_to_string(
         }
     };
     Some(DisplayToString { binding, impl_ })
+}
+
+/// A `[Symbol.iterator]()` makes `&Type` iterable (`for (k, v) in &headers`)
+/// over what its bound `iterator()` returns: an `ArrayTuple<(K, V)>` item
+/// as the tuple, any other as itself. A throwing `[Symbol.iterator]()` or
+/// `next()` rethrows, as `for…of` does.
+///
+/// The adapter calls only what js-sys has both with and without
+/// `js_sys_unstable_apis`, where its own iteration of an `Iterator<T>`
+/// differs.
+fn into_iterator(config: &ClassConfig, sigs: &[FunctionSignature]) -> Option<TokenStream> {
+    let sig = sigs
+        .iter()
+        .filter(|sig| {
+            sig.js_name == ITERATOR
+                && sig.params.is_empty()
+                && sig.form == PromiseForm::Value
+                && sig.literal.is_none()
+        })
+        .min_by_key(|sig| sig.catch)?;
+    let binding: syn::ForeignItemFn = syn::parse2(generate_expanded_method(config, sig)).ok()?;
+    let syn::ReturnType::Type(_, returned) = &binding.sig.output else {
+        return None;
+    };
+    let iter = match sig.catch {
+        true => type_args(returned, "Result")?.first().copied()?,
+        false => returned,
+    };
+    // A bare `Iterator` yields `JsValue`.
+    let any: syn::Type = syn::parse_quote!(JsValue);
+    let elem = type_args(iter, "Iterator")?
+        .first()
+        .copied()
+        .unwrap_or(&any);
+    let tuple = match type_args(elem, "ArrayTuple").as_deref() {
+        Some([syn::Type::Tuple(tuple)]) => Some(tuple),
+        _ => None,
+    };
+
+    // Every generic of the binding has to be the type's own: a method
+    // parameter would be unconstrained on the impl.
+    let own = |ident: &syn::Ident| config.type_params.iter().any(|tp| ident == &tp.name);
+    let mut params = Vec::new();
+    let mut open = HashSet::new();
+    for param in &binding.sig.generics.params {
+        match param {
+            syn::GenericParam::Type(t) if own(&t.ident) => {
+                params.push(quote! { #t });
+                open.insert(t.ident.to_string());
+            }
+            _ => return None,
+        }
+    }
+    let mut predicates: Vec<TokenStream> = binding
+        .sig
+        .generics
+        .where_clause
+        .iter()
+        .flat_map(|w| w.predicates.iter().map(|p| quote! { #p }))
+        .collect();
+    // What js-sys asks of a type it reads out of the iterator, stated for
+    // the ones naming a parameter: `JsGeneric` without
+    // `js_sys_unstable_apis`, `FromWasmAbi` with it.
+    let read = tuple.map_or_else(|| vec![elem], |t| t.elems.iter().collect());
+    predicates.extend(
+        read.into_iter()
+            .filter(|t| super::signatures::mentions_param(quote! { #t }, &open))
+            .map(|t| {
+                quote! { #t: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi }
+            }),
+    );
+    let where_clause = (!predicates.is_empty()).then(|| quote! { where #(#predicates),* });
+
+    let item = tuple.map_or_else(|| quote! { #elem }, |t| quote! { #t });
+    let into_item = tuple.map(|_| quote! { .into_tuple() });
+    let rethrow = quote! { .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)) };
+    let opened = sig.catch.then_some(&rethrow);
+    let method = &binding.sig.ident;
+    let rust_type = super::typemap::make_ident(&config.effective_rust_name());
+    let type_args = config.type_generics_args();
+    Some(quote! {
+        impl<'a, #(#params),*> ::core::iter::IntoIterator for &'a #rust_type #type_args #where_clause {
+            type Item = #item;
+            type IntoIter = ::core::iter::Scan<
+                ::core::iter::Repeat<()>,
+                #iter,
+                fn(&mut #iter, ()) -> Option<#item>,
+            >;
+            fn into_iter(self) -> Self::IntoIter {
+                ::core::iter::repeat(()).scan(self.#method() #opened, |iter, ()| {
+                    let next = iter.next() #rethrow;
+                    (!next.done()).then(|| next.value() #into_item)
+                })
+            }
+        }
+    })
+}
+
+/// The type arguments of `ty` when its head is `head`.
+fn type_args<'t>(ty: &'t syn::Type, head: &str) -> Option<Vec<&'t syn::Type>> {
+    let syn::Type::Path(path) = ty else {
+        return None;
+    };
+    let last = path.path.segments.last().filter(|s| s.ident == head)?;
+    let syn::PathArguments::AngleBracketed(args) = &last.arguments else {
+        return Some(Vec::new());
+    };
+    Some(
+        args.args
+            .iter()
+            .filter_map(|arg| match arg {
+                syn::GenericArgument::Type(t) => Some(t),
+                _ => None,
+            })
+            .collect(),
+    )
 }
 
 /// `Parent<A>` as the `Parent::<A>` an attribute takes.

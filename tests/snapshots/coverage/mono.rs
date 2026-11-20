@@ -346,6 +346,26 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Iterable;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &Iterable) -> Result<Iterator, JsValue>;
+}
+impl<'a> ::core::iter::IntoIterator for &'a Iterable {
+    type Item = JsValue;
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator,
+        fn(&mut Iterator, ()) -> Option<JsValue>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(
+            self.iterator()
+                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
+            |iter, ()| {
+                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+                (!next.done()).then(|| next.value())
+            },
+        )
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

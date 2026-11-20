@@ -8248,6 +8248,26 @@ extern "C" {
         callback: &Function<fn(JsValue, JsString, FormData) -> Undefined>,
         this_arg: &This,
     ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &FormData) -> Iterator<ArrayTuple<(JsString, JsValue)>>;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn try_iterator(
+        this: &FormData,
+    ) -> Result<Iterator<ArrayTuple<(JsString, JsValue)>>, JsValue>;
+}
+impl<'a> ::core::iter::IntoIterator for &'a FormData {
+    type Item = (JsString, JsValue);
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<ArrayTuple<(JsString, JsValue)>>,
+        fn(&mut Iterator<ArrayTuple<(JsString, JsValue)>>, ()) -> Option<(JsString, JsValue)>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -9363,6 +9383,26 @@ extern "C" {
     pub fn values(this: &Headers) -> Iterator<JsString>;
     #[wasm_bindgen(method, catch, js_name = "values")]
     pub fn try_values(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &Headers) -> Iterator<ArrayTuple<(JsString, JsString)>>;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn try_iterator(
+        this: &Headers,
+    ) -> Result<Iterator<ArrayTuple<(JsString, JsString)>>, JsValue>;
+}
+impl<'a> ::core::iter::IntoIterator for &'a Headers {
+    type Item = (JsString, JsString);
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<ArrayTuple<(JsString, JsString)>>,
+        fn(&mut Iterator<ArrayTuple<(JsString, JsString)>>, ()) -> Option<(JsString, JsString)>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -16352,10 +16392,30 @@ extern "C" {
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toString")]
     pub fn try_to_string(this: &URLSearchParams) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &URLSearchParams) -> Iterator<ArrayTuple<(JsString, JsString)>>;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn try_iterator(
+        this: &URLSearchParams,
+    ) -> Result<Iterator<ArrayTuple<(JsString, JsString)>>, JsValue>;
 }
 impl core::fmt::Display for URLSearchParams {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+    }
+}
+impl<'a> ::core::iter::IntoIterator for &'a URLSearchParams {
+    type Item = (JsString, JsString);
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<ArrayTuple<(JsString, JsString)>>,
+        fn(&mut Iterator<ArrayTuple<(JsString, JsString)>>, ()) -> Option<(JsString, JsString)>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
     }
 }
 #[wasm_bindgen]
@@ -17211,6 +17271,29 @@ extern "C" {
     pub fn rows_read<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> f64;
     #[wasm_bindgen(method, getter, js_name = "rowsWritten")]
     pub fn rows_written<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> f64;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    pub fn iterator<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> Iterator<T>;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn try_iterator<T: ::wasm_bindgen::JsGeneric>(
+        this: &SqlStorageCursor<T>,
+    ) -> Result<Iterator<T>, JsValue>;
+}
+impl<'a, T: ::wasm_bindgen::JsGeneric> ::core::iter::IntoIterator for &'a SqlStorageCursor<T>
+where
+    T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi,
+{
+    type Item = T;
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<T>,
+        fn(&mut Iterator<T>, ()) -> Option<T>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value())
+        })
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -17923,6 +18006,23 @@ extern "C" {
     pub fn try_iterator<T: ::wasm_bindgen::JsGeneric>(
         this: &SyncKvStorageList<T>,
     ) -> Result<Iterator<ArrayTuple<(JsString, T)>>, JsValue>;
+}
+impl<'a, T: ::wasm_bindgen::JsGeneric> ::core::iter::IntoIterator for &'a SyncKvStorageList<T>
+where
+    T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi,
+{
+    type Item = (JsString, T);
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<ArrayTuple<(JsString, T)>>,
+        fn(&mut Iterator<ArrayTuple<(JsString, T)>>, ()) -> Option<(JsString, T)>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
+    }
 }
 #[wasm_bindgen]
 extern "C" {
