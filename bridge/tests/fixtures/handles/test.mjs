@@ -33,7 +33,7 @@ class Mode {
 class Plain {}
 Object.assign(globalThis, { Base, Needy, Target, Mode, Plain });
 
-const { instantiate, Counter, Sub, Orphan, Dual, util, version } = await import("./bridge.js");
+const { instantiate, Counter, Sub, Orphan, Dual, Rest, util, version } = await import("./bridge.js");
 const fs = await import("node:fs");
 const compile = (f) => new WebAssembly.Module(fs.readFileSync(f));
 
@@ -79,6 +79,8 @@ const impl = {
   "Orphan.make()": () => L.call("unbox:Orphan", L.call("new:Orphan.new(u32)", 1)),
   "Dual.new(Any)": (self) => alloc({ kind: "Any" }),
   "Dual.new(str)": (self) => alloc({ kind: "str" }),
+  "Rest.new()": (self) => alloc({ kind: "none" }),
+  "Rest.new(Any?,Any?)": (self) => alloc({ kind: "opts" }),
   "util.twice(u32)": (x) => x * 2,
   "util.make(u32)": (n) => alloc({ n }),
   "util.stray()": () => kept,
@@ -111,6 +113,7 @@ const impl = {
   "tw:drop:Sub": (h) => drops.push(["Sub", h]),
   "tw:drop:Orphan": (h) => drops.push(["Orphan", h]),
   "tw:drop:Dual": (h) => drops.push(["Dual", h]),
+  "tw:drop:Rest": (h) => drops.push(["Rest", h]),
 };
 L = lang(instantiate(compile("lang.wasm"), compile("bridge.wasm"), { "test:impl": impl }));
 const handleOf = (w) => L.call("unbox:Counter", w);
@@ -184,6 +187,11 @@ const dual = (w) => objs.get(L.call("unbox:Dual", w)).kind;
 assert.equal(dual(new Dual("s")), "Any");
 assert.equal(dual(L.call("new:Dual.new(str)", ...L.own("s"))), "str");
 assert.equal(dual(new Dual("s")), "Any", "the pick is spent");
+// An arm with nothing to test is still taken by name.
+const rest = (w) => objs.get(L.call("unbox:Rest", w)).kind;
+assert.equal(rest(new Rest()), "none");
+assert.equal(rest(new Rest({ tag: 1 })), "opts");
+assert.equal(rest(L.call("new:Rest.new(Any?,Any?)", null, null)), "opts");
 
 // Namespaces and functions.
 assert.equal(util.twice(21), 42);

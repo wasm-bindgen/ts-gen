@@ -1075,7 +1075,12 @@ impl<'a, 'b> Glue<'a, 'b> {
             // arm its arguments match.
             let cond = if pick {
                 let key = js_str(&k.key);
-                format!("(arm ?? {key}) === {key} && {cond}")
+                let pick = format!("(arm ?? {key}) === {key}");
+                if cond.is_empty() {
+                    pick
+                } else {
+                    format!("{pick} && {cond}")
+                }
             } else {
                 cond
             };

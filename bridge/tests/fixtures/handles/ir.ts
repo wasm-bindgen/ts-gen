@@ -46,6 +46,11 @@ export class Dual extends Plain {
   new(x: str);
 }
 
+export class Rest extends Plain {
+  new();
+  @js(args = (opts? { tag = t })) new(opts: Any?, t: Any?);
+}
+
 export namespace util {
   twice(x: u32): u32;
   make(n: u32): Counter;

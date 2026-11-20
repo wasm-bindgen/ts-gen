@@ -745,34 +745,59 @@ function $f16(v) {
   }
 }
 
+// ("tw:unbox", "Rest")
+function $f17(v) {
+  const cx = $cx;
+  const cxm = cx.n;
+  try {
+    const t1 = $HC.unwrap(v, $C4, "Rest");
+    return t1;
+  } catch (e) {
+    $release(cx, cxm);
+    throw e;
+  } finally {
+    cx.n = cxm;
+  }
+}
+
 // ("tw:new", "Sub.new(u32)")
-function $f17(w0_0) {
+function $f18(w0_0) {
   const t1 = (w0_0 >>> 0);
   const r = ($newArm = "Sub.new(u32)", new $C1(t1));
   return r;
 }
 
 // ("tw:new", "Orphan.new(u32)")
-function $f18(w0_0) {
+function $f19(w0_0) {
   const t1 = (w0_0 >>> 0);
   const r = ($newArm = "Orphan.new(u32)", new $C2(t1));
   return r;
 }
 
 // ("tw:new", "Dual.new(str)")
-function $f19(w0_0, w0_1) {
+function $f20(w0_0, w0_1) {
   const t1 = $liftUtf8($L, w0_0, w0_1);
   const r = ($newArm = "Dual.new(str)", new $C3(t1));
   return r;
 }
 
+// ("tw:new", "Rest.new(Any?,Any?)")
+function $f21(w0_0, w1_0) {
+  const t1 = (w0_0 ?? undefined);
+  const t2 = (w1_0 ?? undefined);
+  const t3 = { ...t1 };
+  if (t2 !== undefined) t3.tag = t2;
+  const r = ($newArm = "Rest.new(Any?,Any?)", new $C4(t3));
+  return r;
+}
+
 // ("tw:box", "fn(u32)->str")
-function $f20(w0_0) {
+function $f22(w0_0) {
   return $h3(w0_0);
 }
 
 // ("tw:unbox", "fn(u32)->str")
-function $f21(v) {
+function $f23(v) {
   const cx = $cx;
   const cxm = cx.n;
   try {
@@ -787,7 +812,7 @@ function $f21(v) {
 }
 
 // ("tw:tryUnbox", "fn(u32)->str")
-function $f22(v) {
+function $f24(v) {
   const h = $H1.tryUnwrap(v, Function);
   return (h == null ? 0 : h);
 }
@@ -1054,9 +1079,41 @@ class $C3 extends globalThis.Plain {
   }
 }
 
+class $C4 extends globalThis.Plain {
+  constructor(...a) {
+    const arm = $newArm;
+    $newArm = undefined;
+    if ((arm ?? "Rest.new()") === "Rest.new()" && $upTo(a, 0)) {
+      super(...a);
+      try {
+        const r = $E[20](this);
+        $HC.pair(this, r, "tw:drop:Rest");
+      } catch (e) {
+        throw $outgoing(e);
+      }
+      return;
+    }
+    if ((arm ?? "Rest.new(Any?,Any?)") === "Rest.new(Any?,Any?)") {
+      super(...a);
+      try {
+        const t1 = a[0];
+        const t2 = (t1 == null ? null : $some(t1, "Any?"));
+        const t3 = a[0]?.tag;
+        const t4 = (t3 == null ? null : $some(t3, "Any?"));
+        const r = $E[21](this, t2, t4);
+        $HC.pair(this, r, "tw:drop:Rest");
+      } catch (e) {
+        throw $outgoing(e);
+      }
+      return;
+    }
+    throw new TypeError("no overload of `new Rest` matches its arguments");
+  }
+}
+
 const $X0 = function version(...a) {
   try {
-    const r = $E[32]();
+    const r = $E[34]();
     const t1 = r[0];
     const t2 = r[1];
     try {
@@ -1075,7 +1132,7 @@ const $N1 = {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
-        const r = $E[20](t2);
+        const r = $E[22](t2);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -1088,7 +1145,7 @@ const $N1 = {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
-        const r = $E[21](t2);
+        const r = $E[23](t2);
         return $HC.wrap(r, () => Object.create($C0.prototype), "tw:drop:Counter");
       } catch (e) {
         throw $outgoing(e);
@@ -1098,7 +1155,7 @@ const $N1 = {
   },
   stray(...a) {
     try {
-      const r = $E[22]();
+      const r = $E[24]();
       return $HC.wrap(r, () => Object.create($C0.prototype), "tw:drop:Counter");
     } catch (e) {
       throw $outgoing(e);
@@ -1111,7 +1168,7 @@ const $N1 = {
         const t2 = $fn(t1, "fn(u32)->u32");
         const t3 = a[1];
         const t4 = $int(t3, 0, 4294967295, "u32");
-        const r = $E[23](t2, t4);
+        const r = $E[25](t2, t4);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -1124,7 +1181,7 @@ const $N1 = {
       try {
         const t1 = a[0];
         const t2 = (t1 == null ? 0 : $HC.unwrap(t1, $C0, "Counter?"));
-        const r = $E[24](t2);
+        const r = $E[26](t2);
         return (r === 0 ? undefined : $HC.wrap(r, () => Object.create($C0.prototype), "tw:drop:Counter"));
       } catch (e) {
         throw $outgoing(e);
@@ -1134,7 +1191,7 @@ const $N1 = {
   },
   names(...a) {
     try {
-      const r = $E[25]();
+      const r = $E[27]();
       const t1 = r[0];
       const t2 = r[1];
       try {
@@ -1153,7 +1210,7 @@ const $N1 = {
         const t2 = $int(t1, 0, 4294967295, "u32");
         const t3 = a[0];
         const t4 = $int(t3, 0, 4294967295, "u32");
-        const r = $E[26](t2, t4);
+        const r = $E[28](t2, t4);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -1170,7 +1227,7 @@ const $N1 = {
         const t4 = (t3 == null ? null : $some(t3, "Any?"));
         const t5 = a[1]?.tag;
         const t6 = (t5 == null ? null : $some(t5, "Any?"));
-        const r = $E[27](t2, t4, t6);
+        const r = $E[29](t2, t4, t6);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -1182,7 +1239,7 @@ const $N1 = {
         const t8 = $int(t7, 0, 4294967295, "u32");
         const t9 = a[1];
         const t10 = (t9 == null ? null : $some(t9, "Any?"));
-        const r = $E[28](t8, t10);
+        const r = $E[30](t8, t10);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -1193,7 +1250,7 @@ const $N1 = {
   fastOnly(...a) {
     if (a.length >= 1 && a[0] === globalThis.Mode.FAST) {
       try {
-        const r = $E[29]();
+        const r = $E[31]();
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -1204,7 +1261,7 @@ const $N1 = {
   arity(...a) {
     if ($upTo(a, 1)) {
       try {
-        const r = $E[30]();
+        const r = $E[32]();
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -1216,7 +1273,7 @@ const $N1 = {
         const t2 = $int(t1, 0, 4294967295, "u32");
         const t3 = a[1];
         const t4 = $int(t3, 0, 4294967295, "u32");
-        const r = $E[31](t2, t4);
+        const r = $E[33](t2, t4);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -1226,7 +1283,7 @@ const $N1 = {
   },
 };
 
-export { $C0 as Counter, $C1 as Sub, $C2 as Orphan, $C3 as Dual, $X0 as version, $N1 as util };
+export { $C0 as Counter, $C1 as Sub, $C2 as Orphan, $C3 as Dual, $C4 as Rest, $X0 as version, $N1 as util };
 
 export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
@@ -1255,23 +1312,25 @@ export function instantiate(language, bridge, imports = {}) {
     },
     "tw:box": {
       "Counter": $f11,
-      "fn(u32)->str": $f20,
+      "fn(u32)->str": $f22,
     },
     "tw:unbox": {
       "Counter": $f12,
       "Sub": $f14,
       "Orphan": $f15,
       "Dual": $f16,
-      "fn(u32)->str": $f21,
+      "Rest": $f17,
+      "fn(u32)->str": $f23,
     },
     "tw:tryUnbox": {
       "Counter": $f13,
-      "fn(u32)->str": $f22,
+      "fn(u32)->str": $f24,
     },
     "tw:new": {
-      "Sub.new(u32)": $f17,
-      "Orphan.new(u32)": $f18,
-      "Dual.new(str)": $f19,
+      "Sub.new(u32)": $f18,
+      "Orphan.new(u32)": $f19,
+      "Dual.new(str)": $f20,
+      "Rest.new(Any?,Any?)": $f21,
     },
     "tw:tag": {
       "KvError": $tag0,
@@ -1299,19 +1358,21 @@ export function instantiate(language, bridge, imports = {}) {
   $E[17] = $X["Orphan.make()"];
   $E[18] = $X["Dual.new(Any)"];
   $E[19] = $X["Dual.new(str)"];
-  $E[20] = $X["util.twice(u32)"];
-  $E[21] = $X["util.make(u32)"];
-  $E[22] = $X["util.stray()"];
-  $E[23] = $X["util.apply(fn(u32)->u32,u32)"];
-  $E[24] = $X["util.maybe(Counter?)"];
-  $E[25] = $X["util.names()"];
-  $E[26] = $X["util.swap(u32,u32)"];
-  $E[27] = $X["util.fast(u32,Any?,Any?)"];
-  $E[28] = $X["util.slow(u32,Any?)"];
-  $E[29] = $X["util.fastOnly()"];
-  $E[30] = $X["util.arity0()"];
-  $E[31] = $X["util.arity2(u32,u32)"];
-  $E[32] = $X["version()"];
+  $E[20] = $X["Rest.new()"];
+  $E[21] = $X["Rest.new(Any?,Any?)"];
+  $E[22] = $X["util.twice(u32)"];
+  $E[23] = $X["util.make(u32)"];
+  $E[24] = $X["util.stray()"];
+  $E[25] = $X["util.apply(fn(u32)->u32,u32)"];
+  $E[26] = $X["util.maybe(Counter?)"];
+  $E[27] = $X["util.names()"];
+  $E[28] = $X["util.swap(u32,u32)"];
+  $E[29] = $X["util.fast(u32,Any?,Any?)"];
+  $E[30] = $X["util.slow(u32,Any?)"];
+  $E[31] = $X["util.fastOnly()"];
+  $E[32] = $X["util.arity0()"];
+  $E[33] = $X["util.arity2(u32,u32)"];
+  $E[34] = $X["version()"];
   $L = new $Lang(instance.exports, { memory: "memory", table: "tw:table", realloc: "tw:realloc", free: "tw:free", talloc: "tw:table/alloc", tfree: "tw:table/free" }, false);
   return instance;
 }
