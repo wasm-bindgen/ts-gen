@@ -47297,7 +47297,7 @@ pub mod rpc {
         pub fn dup<T>(this: &Stub<T>) -> Result<StubBase<T>, JsValue>;
     }
     #[allow(dead_code)]
-    pub type BaseType = Option<Nullable<JsValue>>;
+    pub type BaseType = Nullable<Option<JsValue>>;
     #[allow(dead_code)]
     pub type Stubify = JsValue;
     #[allow(dead_code)]
