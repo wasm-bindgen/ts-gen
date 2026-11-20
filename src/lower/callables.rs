@@ -1391,6 +1391,14 @@ impl Lowerer<'_> {
         if !self.opts.cancel || !self.declares_controller(cx) {
             return None;
         }
+        if !self.declares_join(cx) {
+            if self.signal_param(sig, cx).is_some() {
+                self.warn(
+                    "`AbortSignal.any` isn't declared, so no member is cancellable: a cancel signal joins the caller's through it",
+                );
+            }
+            return None;
+        }
         let path = |l: &mut Self, name: &str| {
             let r = TypeRef::Reference {
                 segments: vec![name.into()],
@@ -1403,6 +1411,27 @@ impl Lowerer<'_> {
         };
         let controller = path(self, "AbortController")?;
         let signal = path(self, "AbortSignal")?;
+        let (index, param, ty, id) = self.signal_param(sig, cx)?;
+        let dictionary = match (self.is_dictionary(id, 0), self.ty(&ty, cx)) {
+            (true, abi::Type::Named(r)) => Some(r.path),
+            _ => None,
+        };
+        Some(Cancel {
+            param,
+            index,
+            dictionary,
+            controller,
+            signal,
+        })
+    }
+
+    /// The first parameter typed as an interface with an `AbortSignal`
+    /// `signal`: its position, name, type and declaration.
+    fn signal_param(
+        &mut self,
+        sig: &Sig<'_>,
+        cx: &Tcx,
+    ) -> Option<(usize, String, TypeRef, TypeId)> {
         let names = self.param_names(sig.params, cx);
         for (index, (p, name)) in sig.params.iter().zip(names).enumerate() {
             let ty = p
@@ -1423,43 +1452,39 @@ impl Lowerer<'_> {
                     && g.type_ref.format_ts().contains("AbortSignal"))
             });
             if has_signal {
-                let dictionary = match (self.is_dictionary(id, 0), self.ty(&ty, cx)) {
-                    (true, abi::Type::Named(r)) => Some(r.path),
-                    _ => None,
-                };
-                return Some(Cancel {
-                    param: name,
-                    index,
-                    dictionary,
-                    controller,
-                    signal,
-                });
+                return Some((index, name, ty, id));
             }
         }
         None
     }
 
-    /// Whether the input declares what cancellation calls: an
-    /// `AbortController` with the constructor, `signal` and `abort`, and
-    /// the `AbortSignal.any` that joins its signal with the caller's.
+    /// Whether the input declares the `AbortController` cancellation
+    /// calls: its constructor, `signal` and `abort`.
     fn declares_controller(&self, cx: &Tcx) -> bool {
-        let class = |name: &str| {
-            let id = self.resolve_id(&[name.to_string()], cx)?;
-            match &self.gctx.get_type(id).kind {
-                TypeKind::Class(c) => Some(c),
-                _ => None,
-            }
+        let Some(id) = self.resolve_id(&["AbortController".to_string()], cx) else {
+            return false;
         };
-        let (Some(c), Some(s)) = (class("AbortController"), class("AbortSignal")) else {
+        let TypeKind::Class(c) = &self.gctx.get_type(id).kind else {
             return false;
         };
         let has = |f: &dyn Fn(&Member) -> bool| c.members.iter().any(f);
         has(&|m| matches!(m, Member::Constructor(k) if k.params.is_empty()))
             && has(&|m| matches!(m, Member::Getter(g) if g.js_name == "signal"))
             && has(&|m| matches!(m, Member::Method(f) if f.js_name == "abort"))
-            && s.members
-                .iter()
-                .any(|m| matches!(m, Member::StaticMethod(f) if f.js_name == "any"))
+    }
+
+    /// Whether the input declares the `AbortSignal.any` that joins the
+    /// controller's signal with the caller's.
+    fn declares_join(&self, cx: &Tcx) -> bool {
+        let Some(id) = self.resolve_id(&["AbortSignal".to_string()], cx) else {
+            return false;
+        };
+        let TypeKind::Class(s) = &self.gctx.get_type(id).kind else {
+            return false;
+        };
+        s.members
+            .iter()
+            .any(|m| matches!(m, Member::StaticMethod(f) if f.js_name == "any"))
     }
 
     /// Parameter names as TypeScript spells them, which generators make
