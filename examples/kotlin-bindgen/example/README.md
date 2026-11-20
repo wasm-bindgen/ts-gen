@@ -13,6 +13,10 @@ replies in plain text; `/` lists them.
 
 `tour.txt` is what `serve` prints, and `tour.node.txt` what `node` does.
 
+In an editor, run `./run.sh node` once, so the generated `std` and
+`workers` packages exist under `build/`, then open `examples/kotlin-bindgen/example`
+itself as the project: its `./gradlew` is the generator's Gradle wrapper.
+
 ## The tour
 
 The app is `src/wasmJsMain/kotlin/app/`, one file per topic. `App.kt` is
