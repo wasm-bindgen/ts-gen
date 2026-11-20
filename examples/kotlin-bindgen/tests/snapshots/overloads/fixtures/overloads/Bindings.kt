@@ -123,17 +123,17 @@ fun Store.read(key: String, options: PartialGetOptionsUndefined): tsgen.runtime.
     return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
 }
 
-fun Store.readText(key: String, options: GetOptions<JsAny?>): tsgen.runtime.Future<String?> {
+fun Store.readText(key: String, options: GetOptions<out JsString>): tsgen.runtime.Future<String?> {
     val r0 = fixtures.overloads.flat.Store_readText_str_GetOptions_Str(this, key.toJsString(), options)
     return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
 }
 
-fun <T : JsAny?> Store.readJson(key: String, options: GetOptions<JsAny?>): tsgen.runtime.Future<T?> {
+fun <T : JsAny?> Store.readJson(key: String, options: GetOptions<out JsString>): tsgen.runtime.Future<T?> {
     val r0 = fixtures.overloads.flat.Store_readJson_str_GetOptions_Str(this, key.toJsString(), options)
     return tsgen.runtime.Future<T?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_Any(f); (r1 as T?) }, { f -> futureErrorErr(f) })
 }
 
-fun Store.readArrayBuffer(key: String, options: GetOptions<JsAny?>): tsgen.runtime.Future<ArrayBuffer?> {
+fun Store.readArrayBuffer(key: String, options: GetOptions<out JsString>): tsgen.runtime.Future<ArrayBuffer?> {
     val r0 = fixtures.overloads.flat.Store_readArrayBuffer_str_GetOptions_Str(this, key.toJsString(), options)
     return tsgen.runtime.Future<ArrayBuffer?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_ArrayBuffer(f); r1?.unsafeCast<ArrayBuffer>() }, { f -> futureErrorErr(f) })
 }

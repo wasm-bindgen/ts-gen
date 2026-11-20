@@ -11,10 +11,10 @@ val Entry.created: fixtures.std.Date
         return r0!!.unsafeCast<fixtures.std.Date>()
     }
 
-val Entry.tags: fixtures.std.Map<JsAny?, JsAny?>
+val Entry.tags: fixtures.std.Map<JsString, JsNumber>
     get() {
         val r0 = fixtures.with_std.flat.Entry_get_tags(this)
-        return r0!!.unsafeCast<fixtures.std.Map<JsAny?, JsAny?>>()
+        return r0!!.unsafeCast<fixtures.std.Map<JsString, JsNumber>>()
     }
 
 val Entry.body: fixtures.std.Uint8Array
@@ -29,10 +29,10 @@ val Entry.pattern: fixtures.std.RegExp?
         return r0?.unsafeCast<fixtures.std.RegExp>()
     }
 
-val Entry.other: WeakRef<JsAny?>
+val Entry.other: WeakRef<Entry>
     get() {
         val r0 = fixtures.with_std.flat.Entry_get_other(this)
-        return r0!!.unsafeCast<WeakRef<JsAny?>>()
+        return r0!!.unsafeCast<WeakRef<Entry>>()
     }
 
 external interface Error : JsAny
@@ -119,7 +119,7 @@ fun display(style: fixtures.std.CompactDisplayKind) {
     try { fixtures.with_std.flat.display_Intl_CompactDisplayKind(style.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun store(s: Store<JsAny?>): tsgen.runtime.Future<Nothing> {
+fun store(s: Store<*>): tsgen.runtime.Future<Nothing> {
     val r0 = fixtures.with_std.flat.store_Store_unit(s)
     return tsgen.runtime.Future<Nothing>(r0!!, { f -> fixtures.with_std.flat.take_never(f); error("a never future resolved") }, { f -> futureErrorErr(f) })
 }

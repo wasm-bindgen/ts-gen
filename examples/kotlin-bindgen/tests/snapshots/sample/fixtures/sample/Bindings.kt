@@ -115,6 +115,23 @@ val <K : JsAny?, V : JsAny?> Map<K, V>.size: UInt
         return r0.toUInt()
     }
 
+external interface Index<V : JsAny?> : Map<JsString, V>
+
+fun <V : JsAny?> Index<V>.nested(): Map<JsString, Index<V>?> {
+    val r0 = fixtures.sample.flat.Index_nested(this)
+    return r0!!.unsafeCast<Map<JsString, Index<V>?>>()
+}
+
+fun <V : JsAny?> Index<V>.pairs(): Map<JsString, JsArray<JsAny?>> {
+    val r0 = fixtures.sample.flat.Index_pairs(this)
+    return r0!!.unsafeCast<Map<JsString, JsArray<JsAny?>>>()
+}
+
+fun <V : JsAny?> Index<V>.lists(): Map<JsString, JsArray<V>> {
+    val r0 = fixtures.sample.flat.Index_lists(this)
+    return r0!!.unsafeCast<Map<JsString, JsArray<V>>>()
+}
+
 external interface Bytes : JsAny
 
 fun Bytes.at(index: UInt): Double {
@@ -141,12 +158,12 @@ fun Bytes.quad(): Tuple4<UInt, Boolean, Double, String> {
 }
 
 object BytesStatic {
-    fun from(items: Map<JsAny?, JsAny?>): Bytes {
+    fun from(items: Map<out JsString, out JsNumber>): Bytes {
         val r0 = fixtures.sample.flat.Bytes_from_Map_str_f64(items)
         return r0!!.unsafeCast<Bytes>()
     }
 
-    fun fromWithMapStrT(items: Map<JsAny?, JsAny?>): Bytes {
+    fun <T : JsAny?> from(items: Map<out JsString, out T>): Bytes {
         val r0 = fixtures.sample.flat.Bytes_from_Map_str_T(items)
         return r0!!.unsafeCast<Bytes>()
     }

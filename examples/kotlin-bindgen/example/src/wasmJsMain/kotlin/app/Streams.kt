@@ -4,8 +4,8 @@ package app
 import workers.*
 
 /** A stream of `chunks`, from an underlying source whose `start` JS calls once. */
-private fun streamOf(chunks: List<JsAny>): ReadableStream<JsAny?> {
-    val source = UnderlyingSource<JsAny?>().apply {
+private fun <T : JsAny> streamOf(chunks: List<T>): ReadableStream<T> {
+    val source = UnderlyingSource<T>().apply {
         // `start` may return a promise, so it's a suspend lambda.
         setStart { controller ->
             for (chunk in chunks) controller.enqueue(chunk)
@@ -16,9 +16,9 @@ private fun streamOf(chunks: List<JsAny>): ReadableStream<JsAny?> {
 }
 
 /** Every chunk of `stream`, read to the end: `read()` resolves to `{ done, value }`. */
-private suspend fun readAll(stream: ReadableStream<JsAny?>): List<JsAny?> {
+private suspend fun <T : JsAny> readAll(stream: ReadableStream<T>): List<T?> {
     val reader = stream.getReader()
-    val chunks = mutableListOf<JsAny?>()
+    val chunks = mutableListOf<T?>()
     while (true) {
         val step = reader.read().await()
         if (step.done) break
@@ -30,7 +30,7 @@ private suspend fun readAll(stream: ReadableStream<JsAny?>): List<JsAny?> {
 /** `/stream`: words piped through an upper-casing transform, in a streamed reply. */
 suspend fun stream(): Response {
     val words = streamOf(listOf("one", "two", "three").map { it.toJsString() })
-    val upper = TransformStream<JsAny?, JsAny?>(Transformer<JsAny?, JsAny?>().apply {
+    val upper = TransformStream<JsString, JsString>(Transformer<JsString, JsString>().apply {
         setTransform { chunk, controller -> controller.enqueue(chunk.toString().uppercase().toJsString()) }
     })
     // `pipeTo` is a future: it settles once the readable side below is read.

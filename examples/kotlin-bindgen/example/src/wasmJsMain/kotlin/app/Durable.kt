@@ -61,7 +61,7 @@ class Counter(private val ctx: DurableObjectState<JsAny?>, private val env: Env)
 
     /** `list` with options resolves to a JS `Map`, whose `forEach` takes a callback. */
     private suspend fun stamps(): List<String> {
-        val entries = storage.list(DurableObjectListOptions().apply { setPrefix("at:") }).await()
+        val entries = storage.list<JsNumber>(DurableObjectListOptions().apply { setPrefix("at:") }).await()
         val keys = mutableListOf<String>()
         entries.forEach { _, key, _ -> keys += key.toString() }
         return keys
@@ -82,15 +82,16 @@ class Counter(private val ctx: DurableObjectState<JsAny?>, private val env: Env)
     /** SQL storage: `exec` takes its bindings as varargs, and returns a cursor. */
     private fun sql(agent: String): Response {
         val sql = storage.sql
-        sql.exec("CREATE TABLE IF NOT EXISTS visits (id INTEGER PRIMARY KEY, agent TEXT)")
-        sql.exec("INSERT INTO visits (agent) VALUES (?)", agent.toJsString())
-        val cursor = sql.exec("SELECT id, agent FROM visits ORDER BY id DESC LIMIT ?", 3.toJsNumber())
+        sql.exec<JsAny?>("CREATE TABLE IF NOT EXISTS visits (id INTEGER PRIMARY KEY, agent TEXT)")
+        sql.exec<JsAny?>("INSERT INTO visits (agent) VALUES (?)", agent.toJsString())
+        // `exec<T>` names its rows' type: here `Visit` (env.d.ts).
+        val cursor = sql.exec<Visit>("SELECT id, agent FROM visits ORDER BY id DESC LIMIT ?", 3.toJsNumber())
         val out = StringBuilder("columns ${cursor.columnNames}\n")
-        // The cursor is a JS iterator of rows, each read as a `Visit` (env.d.ts).
+        // The cursor is a JS iterator of its rows.
         while (true) {
             val step = cursor.next()
             if (step.done == true) break
-            val visit = step.value!!.unsafeCast<Visit>()
+            val visit = step.value!!
             out.append("  visit ${visit.id} by ${visit.agent}\n")
         }
         out.append("${cursor.rowsRead.toInt()} rows read\n")

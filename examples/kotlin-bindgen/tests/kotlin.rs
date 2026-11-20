@@ -729,7 +729,8 @@ fn tour(mode: &str, recorded: &str) {
 /// through `reject<E>`, a suspend lambda is a callback's or a parameter's
 /// future, `T[]` and `arr<T>` copy into Kotlin arrays and lists, a spread
 /// parameter is a vararg, a task waits for a callback, an enum's function
-/// arm is a Kotlin lambda, and a future of a type parameter settles.
+/// arm is a Kotlin lambda, a future of a type parameter settles, and host
+/// type arguments stay typed.
 #[test]
 fn kotlin_runtime() {
     if skipped(true) {
@@ -744,7 +745,8 @@ fn kotlin_runtime() {
          absent: true,true,false\nimported: true\ncounter: true 7\n\
          modes: [\"off\",5] 0 9\nadder: function 42 2\n\
          box nones: undefined undefined,null\nasync callback: 15\nmade: made!\n\
-         bytes: 256\nwords: AB\njoin: a-b3\ncallback: soon\nlisten: a!nb\nattempt: attempted\nspill empty: true\n"
+         bytes: 256\nwords: AB\njoin: a-b3\ncallback: soon\nlisten: a!nb\nattempt: attempted\n\
+         generic: word 42 1\nspill empty: true\n"
     );
 }
 

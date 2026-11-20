@@ -111,6 +111,18 @@ external fun Map_set_K_V(p0: JsAny?, p1: JsAny?, p2: JsAny?)
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Map_get_size(p0: JsAny?): Int
 
+/** tw:js/global Index#nested() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Index_nested(p0: JsAny?): JsAny?
+
+/** tw:js/global Index#pairs() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Index_pairs(p0: JsAny?): JsAny?
+
+/** tw:js/global Index#lists() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Index_lists(p0: JsAny?): JsAny?
+
 /** tw:js/global Bytes.from(Map<str,f64>) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Bytes_from_Map_str_f64(p0: JsAny?): JsAny?

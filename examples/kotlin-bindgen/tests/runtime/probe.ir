@@ -14,7 +14,14 @@ enum Listener {
   Name(str);
 }
 
+class Shelf<T> {
+  first(): T;
+}
+
 namespace ext {
+  shelf(): Shelf<Str>;
+  stock<T>(item: T): future<Shelf<T>>;
+  size(s: Shelf<Any?>): u32;
   none(): Str?;
   apply(f: fn(u32) -> u32, x: u32): u32;
   seen(v: Str?);
@@ -58,4 +65,5 @@ export namespace probe {
   soon(): future<str>;
   listen(): str;
   attempt(): future<str>;
+  generic(): future<str>;
 }

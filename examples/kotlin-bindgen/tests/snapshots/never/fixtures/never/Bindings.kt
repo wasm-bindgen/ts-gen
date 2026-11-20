@@ -75,11 +75,11 @@ fun <T : JsAny?> Result(): Result<T> {
     return r0!!.unsafeCast<Result<T>>()
 }
 
-fun result(r: Result<JsAny?>) {
+fun result(r: Result<*>) {
     try { fixtures.never.flat.result_Result_unit(r) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun fetcher(f: Result<JsAny?>) {
+fun fetcher(f: Result<*>) {
     try { fixtures.never.flat.fetcher_Result_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 

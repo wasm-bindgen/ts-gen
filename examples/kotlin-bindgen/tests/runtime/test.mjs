@@ -3,11 +3,18 @@
 // through reject<ProbeError>, `undefined` read as none, the box helpers,
 // a box's none, ref.null, written as each node's default, a suspend lambda
 // as a callback's and a parameter's future, arrays copied each way, and a
-// spread parameter as a vararg.
+// spread parameter as a vararg, and host type arguments kept typed.
 // Prints one line per call.
 import { readFileSync } from 'node:fs';
 const seen = [];
+globalThis.Shelf = class {
+  constructor(...items) { this.items = items; }
+  first() { return this.items[0]; }
+};
 globalThis.ext = {
+  shelf: () => new Shelf('word'),
+  stock: async (item) => new Shelf(item),
+  size: (s) => s.items.length,
   none: () => undefined, seen: (v) => seen.push(v), seenNull: (v) => seen.push(v),
   later: async (f, x) => (await f(x)) + 1,
   settle: async (p) => (await p) + '!',
@@ -64,5 +71,6 @@ lines.push(`join: ${probe.join()}`);
 lines.push(`callback: ${await probe.soon()}`);
 lines.push(`listen: ${probe.listen()}`);
 lines.push(`attempt: ${await probe.attempt()}`);
+lines.push(`generic: ${await probe.generic()}`);
 lines.push(`spill empty: ${spillEmpty()}`);
 process.stdout.write(lines.join('\n') + '\n');

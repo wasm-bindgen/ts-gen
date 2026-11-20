@@ -11,10 +11,10 @@ val Upload.retry: UploadRetry?
         return r0?.unsafeCast<UploadRetry>()
     }
 
-var Upload.headers: Record<JsAny?>
+var Upload.headers: Record<JsString>
     get() {
         val r0 = fixtures.objects.flat.Upload_get_headers(this)
-        return r0!!.unsafeCast<Record<JsAny?>>()
+        return r0!!.unsafeCast<Record<JsString>>()
     }
     set(value) {
         fixtures.objects.flat.Upload_set_headers_Record_Str(this, value)
@@ -49,10 +49,10 @@ var Upload.extra: Object
 
 external interface Slot<T : JsAny?> : JsAny
 
-var <T : JsAny?> Slot<T>.inner: SlotInner<JsAny?>
+var <T : JsAny?> Slot<T>.inner: SlotInner<T>
     get() {
         val r0 = fixtures.objects.flat.Slot_get_inner(this)
-        return r0!!.unsafeCast<SlotInner<JsAny?>>()
+        return r0!!.unsafeCast<SlotInner<T>>()
     }
     set(value) {
         fixtures.objects.flat.Slot_set_inner_SlotInner_T(this, value)

@@ -5,6 +5,7 @@ import probe.Listener
 import probe.Mode
 import probe.ProbeError
 import probe.ProbeErrorException
+import probe.first
 import probe.toCounter
 import probe.toFnUIntToUInt
 import probe.toJs
@@ -88,6 +89,17 @@ suspend fun probe_soon(): String {
 
 /** An enum's function arm is a callback Kotlin provides, of a type no parameter has. */
 fun probe_listen(): String = probe.ext.listen(Listener.Call { "$it!" }, "a") + probe.ext.listen(Listener.Name("n"), "b")
+
+/**
+ * Host type arguments stay typed: a `Shelf<Str>` holds JS strings, a
+ * member's `T` names its result's, and a `Shelf<Any?>` parameter takes any.
+ */
+suspend fun probe_generic(): String {
+    val shelf = probe.ext.shelf()
+    val word: JsString = shelf.first()
+    val n: JsNumber = probe.ext.stock(41.toJsNumber()).await().first()
+    return "$word ${n.toInt() + 1} ${probe.ext.size(shelf)}"
+}
 
 /** A future of an erased `T`, resolved by Kotlin and taken back. */
 suspend fun probe_attempt(): String = probe.ext.attempt { "attempted".toJsString() }.await().toString()

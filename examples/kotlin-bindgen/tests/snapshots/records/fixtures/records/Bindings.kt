@@ -5,24 +5,24 @@ package fixtures.records
 
 external interface Env : JsAny
 
-var Env.vars: Record<JsAny?>
+var Env.vars: Record<JsString>
     get() {
         val r0 = fixtures.records.flat.Env_get_vars(this)
-        return r0!!.unsafeCast<Record<JsAny?>>()
+        return r0!!.unsafeCast<Record<JsString>>()
     }
     set(value) {
         fixtures.records.flat.Env_set_vars_Record_Str(this, value)
     }
 
-val Env.flags: NumberRecord<JsAny?>
+val Env.flags: NumberRecord<JsBoolean>
     get() {
         val r0 = fixtures.records.flat.Env_get_flags(this)
-        return r0!!.unsafeCast<NumberRecord<JsAny?>>()
+        return r0!!.unsafeCast<NumberRecord<JsBoolean>>()
     }
 
-fun Env.lookup(headers: Record<JsAny?>): Record<JsAny?> {
+fun Env.lookup(headers: Record<*>): Record<Env> {
     val r2 = try { fixtures.records.flat.Env_lookup_Record_EnvHeadersKind(this, headers) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r2!!.unsafeCast<Record<JsAny?>>()
+    return r2!!.unsafeCast<Record<Env>>()
 }
 
 fun Env.configure(options: EnvOptions) {

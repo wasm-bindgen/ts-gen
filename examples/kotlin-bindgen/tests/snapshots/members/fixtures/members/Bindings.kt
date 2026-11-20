@@ -140,9 +140,9 @@ val Lines.count: Double
         return r0
     }
 
-fun Lines.iterator(): Iterator<JsAny?> {
+fun Lines.iterator(): Iterator<JsString> {
     val r0 = try { fixtures.members.flat.Lines_iterator(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<Iterator<JsAny?>>()
+    return r0!!.unsafeCast<Iterator<JsString>>()
 }
 
 val Lines.toStringTag: String

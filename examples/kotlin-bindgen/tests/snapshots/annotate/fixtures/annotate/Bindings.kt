@@ -195,7 +195,7 @@ fun fetch(input: RequestInfo): tsgen.runtime.Future<Request<JsAny?, Incoming>> {
     return tsgen.runtime.Future<Request<JsAny?, Incoming>>(r1!!, { f -> val r2 = fixtures.annotate.flat.take_Request_Any_Incoming(f); r2!!.unsafeCast<Request<JsAny?, Incoming>>() }, { f -> futureErrorErr(f) })
 }
 
-fun fetch(input: Request<JsAny?, Incoming>): tsgen.runtime.Future<Request<JsAny?, Incoming>> = fetch(RequestInfo.Request(input))
+fun fetch(input: Request<*, out Incoming>): tsgen.runtime.Future<Request<JsAny?, Incoming>> = fetch(RequestInfo.Request(input))
 fun fetch(input: String): tsgen.runtime.Future<Request<JsAny?, Incoming>> = fetch(RequestInfo.Str(input))
 
 /** `TypeErr` as its box: its arm's JS value. */
@@ -245,7 +245,7 @@ fun decodeTypeErr(arm: Int, s0: JsAny?): TypeErr? = when (arm) {
 }
 
 sealed interface RequestInfo {
-    data class Request(val value: fixtures.annotate.Request<JsAny?, fixtures.annotate.Incoming>) : RequestInfo
+    data class Request(val value: fixtures.annotate.Request<*, out fixtures.annotate.Incoming>) : RequestInfo
     data class Str(val value: String) : RequestInfo
 }
 

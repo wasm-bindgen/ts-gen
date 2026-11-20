@@ -12,7 +12,7 @@ suspend fun echo(request: HttpRequest): Response {
     val custom = mutableListOf<String>()
     headers.forEach { value, name, _ -> if (name.startsWith("x-")) custom += "$name=$value" }
     // `entries()` is a JS iterator of `[name, value]` tuples.
-    val count = headers.entries().values<JsArray<JsString>>().count()
+    val count = headers.entries().values().count()
     val body = request.text().await()
     val reply = """
         ${request.method} ${request.url}
@@ -36,7 +36,7 @@ suspend fun echo(request: HttpRequest): Response {
 fun url(url: URL): Response {
     val params = url.searchParams
     val out = StringBuilder("${url.pathname} on ${url.host} has ${params.size} parameters\n")
-    for (entry in params.entries().values<JsArray<JsString>>()) {
+    for (entry in params.entries().values()) {
         out.append("  ${entry[0]} = ${entry[1]}\n")
     }
     // An `arr<str>` is a List<String>.

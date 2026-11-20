@@ -58,19 +58,19 @@ fun list(xs: List<String>): List<Double> {
     return r0!!.unsafeCast<JsArray<JsNumber>>().let { a -> a.toList().map { it.toDouble() } }
 }
 
-fun bytes(): Stream<JsAny?> {
+fun bytes(): Stream<Uint8Array> {
     val r0 = try { fixtures.sequences.flat.bytes() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<Stream<JsAny?>>()
+    return r0!!.unsafeCast<Stream<Uint8Array>>()
 }
 
-fun arrays(): Stream<JsAny?> {
+fun arrays(): Stream<JsArray<JsString>> {
     val r0 = try { fixtures.sequences.flat.arrays() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<Stream<JsAny?>>()
+    return r0!!.unsafeCast<Stream<JsArray<JsString>>>()
 }
 
-fun tuples(): Stream<JsAny?> {
+fun tuples(): Stream<JsArray<JsAny?>> {
     val r0 = try { fixtures.sequences.flat.tuples() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<Stream<JsAny?>>()
+    return r0!!.unsafeCast<Stream<JsArray<JsAny?>>>()
 }
 
 /**

@@ -72,12 +72,12 @@ fun Init(): Init {
     return r0!!.unsafeCast<Init>()
 }
 
-fun nested(xs: tsgen.runtime.Future<String?>, ys: List<String?>, r: Record<JsAny?>, cb: (String?) -> String?): tsgen.runtime.Future<String?> {
+fun nested(xs: tsgen.runtime.Future<String?>, ys: List<String?>, r: Record<out JsString?>, cb: (String?) -> String?): tsgen.runtime.Future<String?> {
     val r0 = fixtures.nullability_strict.flat.nested_future_str_arr_str_Record_Str_fn_str_str(xs.raw, ys.map { it?.let { it.toJsString() } }.toJsArray(), r, cb.toJsReference())
     return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.nullability_strict.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
 }
 
-fun nested(xs: suspend () -> String?, ys: List<String?>, r: Record<JsAny?>, cb: (String?) -> String?): tsgen.runtime.Future<String?> = nested(futureOfStr(xs), ys, r, cb)
+fun nested(xs: suspend () -> String?, ys: List<String?>, r: Record<out JsString?>, cb: (String?) -> String?): tsgen.runtime.Future<String?> = nested(futureOfStr(xs), ys, r, cb)
 
 fun greet() {
     try { fixtures.nullability_strict.flat.greet() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }

@@ -10,7 +10,7 @@ suspend fun subrequests(env: Env): Response {
     val hello = env.BACKEND.fetch("http://backend/hello").await()
 
     // The global fetch, with an init: its cache mode is a literal enum.
-    val init = RequestInit<JsAny?>().apply {
+    val init = RequestInit<RequestInitCfProperties>().apply {
         setMethod("POST")
         setHeaders(Headers().apply { set("content-type", "text/plain") })
         body = BodyInit.Str("ping")

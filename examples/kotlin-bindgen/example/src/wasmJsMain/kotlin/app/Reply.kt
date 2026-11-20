@@ -10,8 +10,8 @@ import std.next
 import std.value
 import workers.*
 
-/** A request, with its two type parameters erased. */
-typealias HttpRequest = Request<JsAny?, JsAny?>
+/** A request, whatever its body and `cf` types. */
+typealias HttpRequest = Request<*, *>
 
 /**
  * A plain-text response. The init is a dictionary, a JS object built field
@@ -30,8 +30,8 @@ fun Uint8Array.hex(): String =
     (0 until length.toInt()).joinToString("") { at(it)!!.toString(16).padStart(2, '0') }
 
 /**
- * The values of a JS iterator. Its element type is erased, and `next()`
- * returns `Any`, so each step is read as the yield result of `T`.
+ * The values of a JS iterator of `T`. Its `next()` returns `Any`, a union
+ * of its two results, so each step is read as the yield result.
  */
-fun <T : JsAny?> std.Iterator<JsAny?>.values(): Sequence<T> =
+fun <T : JsAny?> std.Iterator<T>.values(): Sequence<T> =
     generateSequence { next()!!.unsafeCast<IteratorYieldResult<T>>().takeUnless { it.done == true } }.map { it.value }

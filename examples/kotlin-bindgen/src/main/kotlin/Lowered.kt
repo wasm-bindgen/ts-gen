@@ -60,6 +60,28 @@ class TParam(val name: String, val default: Repr?) {
     }
 }
 
+/**
+ * What a host class's type argument names; it has no layout. [of] is
+ * `param` (by [name]), `class` or `interface` (by [path], with its own
+ * [args]), `box` (of the [inner] scalar, `str` or `bigint`), `array` or
+ * `tuple` (a JS array of the elements in [args]), `any` or `other`.
+ */
+class TArg(
+    val of: String,
+    val name: String?,
+    val path: String?,
+    val inner: String?,
+    val args: List<TArg>,
+    val nullable: Boolean,
+) {
+    companion object {
+        fun list(v: Any?): List<TArg> = (v as List<*>?).orEmpty().map {
+            val m = it.obj("type argument")
+            TArg(m.str("of"), m.strOrNull("name"), m.strOrNull("path"), m.strOrNull("inner"), list(m["args"]), m.bool("nullable"))
+        }
+    }
+}
+
 class LibL(val name: String, val decls: List<DeclL>)
 
 class DeclL(
@@ -73,6 +95,8 @@ class DeclL(
     val tparams: List<TParam>,
     val assoc: List<AssocL>,
     val extends: List<String>,
+    /** Each base's type arguments; empty when no base has any. */
+    val extendsArgs: List<List<TArg>>,
     val doc: String?,
     val enum: EnumL?,
     /** An alias's layout, when it has no type parameters. */
@@ -94,6 +118,7 @@ class DeclL(
             (m["tparams"] as List<*>?).orEmpty().map { TParam.from(it.obj("tparam")) },
             (m["assoc"] as List<*>?).orEmpty().map { AssocL.from(it.obj("assoc")) },
             (m["extends"] as List<*>?).orEmpty().map { it as String },
+            (m["extendsArgs"] as List<*>?).orEmpty().map { TArg.list(it) },
             m.strOrNull("doc"),
             (m["layout"] as Map<*, *>?)?.let { EnumL.from(it.obj("layout")) },
             (m["repr"] as Map<*, *>?)?.let { Repr.from(it.obj("repr")) },
@@ -271,6 +296,8 @@ class Repr(
     /** For `host`: `class`, `interface`, `any`, `box` or `future`. */
     val of get() = m.str("of")
     val path get() = m.str("path")
+    /** A host class's type arguments; empty when the reference has none. */
+    val args get() = TArg.list(m["args"])
     val inner get() = Repr.from(m.obj("inner"))
     val value get() = Repr.from(m.obj("value"))
     val handleClass get() = m.str("class")
