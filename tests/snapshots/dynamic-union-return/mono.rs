@@ -61,6 +61,30 @@ extern "C" {
     #[wasm_bindgen(js_name = "fetchValue")]
     pub fn fetch_value_promise() -> Promise;
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Lookup;
+    #[doc = " A result admitting `null` keeps the enum, inside its carrier."]
+    #[wasm_bindgen(method, catch)]
+    pub fn find(
+        this: &Lookup,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Option<LookupFindKind>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[doc = " As does an awaited one."]
+    #[wasm_bindgen(catch, js_name = "fetchMaybe")]
+    pub async fn fetch_maybe() -> Result<Option<FooOrF64>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[doc = " As does an awaited one."]
+    #[wasm_bindgen(js_name = "fetchMaybe")]
+    pub fn fetch_maybe_promise() -> Promise;
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum ErasedContentKind {
@@ -79,4 +103,10 @@ pub enum NoErasureVariant {
 pub enum FooOrF64 {
     F64(f64),
     Foo = "foo",
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum LookupFindKind {
+    String(String),
+    ArrayBuffer(ArrayBuffer),
 }
