@@ -69,6 +69,7 @@ interface RequestInit {
   set signal(value: @js(null) AbortSignal?);
 }
 
+@js(args = (input, init? { signal = ctl.signal }), let init = RequestInit.new(), let ctl = AbortController.new(), cancel = ctl.abort)
 fetch(input: str): future<str>;
 @js(args = (input, init? { signal = AbortSignal.any([init.signal, ctl.signal]) }), let ctl = AbortController.new(), cancel = ctl.abort)
 fetch(input: str, init: RequestInit?): future<str>;

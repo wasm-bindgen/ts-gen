@@ -1404,7 +1404,7 @@ impl Lowerer<'_> {
         let controller = path(self, "AbortController")?;
         let signal = path(self, "AbortSignal")?;
         let names = self.param_names(sig.params, cx);
-        for (p, name) in sig.params.iter().zip(names) {
+        for (index, (p, name)) in sig.params.iter().zip(names).enumerate() {
             let ty = p
                 .type_ref
                 .split_empties()
@@ -1423,8 +1423,14 @@ impl Lowerer<'_> {
                     && g.type_ref.format_ts().contains("AbortSignal"))
             });
             if has_signal {
+                let dictionary = match (self.is_dictionary(id, 0), self.ty(&ty, cx)) {
+                    (true, abi::Type::Named(r)) => Some(r.path),
+                    _ => None,
+                };
                 return Some(Cancel {
                     param: name,
+                    index,
+                    dictionary,
                     controller,
                     signal,
                 });
@@ -1923,6 +1929,11 @@ impl Lowerer<'_> {
 /// the `signal`, and the paths of `AbortController` and `AbortSignal`.
 struct Cancel {
     param: String,
+    /// The parameter's position in the JS call.
+    index: usize,
+    /// The dictionary's path, when the bridge can make one (`@js(object)
+    /// new()`).
+    dictionary: Option<abi::Path>,
     controller: abi::Path,
     signal: abi::Path,
 }
@@ -1930,12 +1941,59 @@ struct Cancel {
 /// Make `v` cancellable through the `signal` of its dictionary parameter:
 /// a fresh controller lives with the future, its signal fills the
 /// dictionary, joined with one the caller set there, and dropping the
-/// future aborts it. Returns the `let` and `cancel` entries; a variant
-/// without the parameter is left alone.
+/// future aborts it. A variant without the parameter passes a dictionary
+/// the bridge makes in its place. Returns the `let` and `cancel` entries.
 fn cancellable(v: &mut Variant, cancel: &Cancel) -> Vec<abi::JsEntry> {
     let param = cancel.param.as_str();
+    let path = |segments: Vec<String>, call: Option<Vec<abi::Expr>>| abi::Expr::Ref {
+        path: segments,
+        call,
+    };
+    let new = |class: &abi::Path| {
+        let mut new = class.segments.clone();
+        new.push("new".into());
+        path(new, Some(Vec::new()))
+    };
     let Some(p) = v.params.iter_mut().find(|p| p.name == param) else {
-        return Vec::new();
+        let rest = v
+            .slots
+            .iter()
+            .any(|s| matches!(s, Slot::Param { rest: true, .. }));
+        let args = if v.shaped {
+            v.args.len()
+        } else {
+            v.params.len()
+        };
+        let Some(dictionary) = cancel.dictionary.as_ref().filter(|_| !rest) else {
+            return Vec::new();
+        };
+        if args > cancel.index {
+            return Vec::new();
+        }
+        let taken = |n: &str| v.params.iter().any(|p| p.name == n);
+        let object = names::unique(param, taken);
+        let ctl = names::unique("ctl", |n| taken(n) || n == object);
+        if !v.shaped {
+            v.args = v
+                .params
+                .iter()
+                .map(|p| abi::Telem::Param(p.name.clone()))
+                .collect();
+            v.shaped = true;
+        }
+        v.args.resize(cancel.index, abi::Telem::Undefined);
+        v.args.push(abi::Telem::Fill {
+            param: object.clone(),
+            fields: vec![(
+                "signal".into(),
+                path(vec![ctl.clone(), "signal".into()], None),
+            )],
+        });
+        return vec![
+            abi::JsEntry::Let(object, new(dictionary)),
+            abi::JsEntry::Let(ctl.clone(), new(&cancel.controller)),
+            abi::JsEntry::Cancel(path(vec![ctl, "abort".into()], None)),
+        ];
     };
     // A fill creates the dictionary when it's absent.
     if !matches!(p.ty, abi::Type::Nullable(_, _)) {
@@ -1959,10 +2017,6 @@ fn cancellable(v: &mut Variant, cancel: &Cancel) -> Vec<abi::JsEntry> {
             .collect();
         v.shaped = true;
     }
-    let path = |segments: Vec<String>, call: Option<Vec<abi::Expr>>| abi::Expr::Ref {
-        path: segments,
-        call,
-    };
     let mut any = cancel.signal.segments.clone();
     any.push("any".into());
     let joined = path(
@@ -1980,10 +2034,8 @@ fn cancellable(v: &mut Variant, cancel: &Cancel) -> Vec<abi::JsEntry> {
             };
         }
     }
-    let mut new = cancel.controller.segments.clone();
-    new.push("new".into());
     vec![
-        abi::JsEntry::Let(ctl.clone(), path(new, Some(Vec::new()))),
+        abi::JsEntry::Let(ctl.clone(), new(&cancel.controller)),
         abi::JsEntry::Cancel(path(vec![ctl, "abort".into()], None)),
     ]
 }
