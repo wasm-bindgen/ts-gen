@@ -2583,16 +2583,13 @@ impl<'a, 'b> Glue<'a, 'b> {
     ) -> Result<String> {
         let (path, call) = match e {
             Expr::Lit(l) => return Ok(lit(l)),
-            // Without its `undefined` elements.
+            // Without its `undefined` and `null` elements.
             Expr::Array(elems) => {
                 let elems = elems
                     .iter()
                     .map(|x| self.expr(x, args, cx))
                     .collect::<Result<Vec<_>>>()?;
-                return Ok(format!(
-                    "[{}].filter((v) => v !== undefined)",
-                    elems.join(", ")
-                ));
+                return Ok(format!("[{}].filter((v) => v != null)", elems.join(", ")));
             }
             Expr::Ref { path, call } => (path, call),
         };

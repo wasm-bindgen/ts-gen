@@ -844,7 +844,7 @@ function $f9(w0_0, w1_0, w1_1, w2_0) {
   try {
     const t3 = new globalThis.AbortController();
     const t4 = { ...t2 };
-    const t5 = globalThis.AbortSignal.any([t2?.signal, t3.signal].filter((v) => v !== undefined));
+    const t5 = globalThis.AbortSignal.any([t2?.signal, t3.signal].filter((v) => v != null));
     if (t5 !== undefined) t4.signal = t5;
     const t6 = w0_0.joined(t1, t4);
     const t7 = $future(t6, $h3, () => { t3.abort(); });

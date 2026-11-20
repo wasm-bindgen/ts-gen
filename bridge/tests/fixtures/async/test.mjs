@@ -167,8 +167,10 @@ L.throwsType(() => poll(f), /dropped/);
   assert.ok(api.init.signal.aborted);
   assert.ok(!mine.signal.aborted);
 }
-// With no init, or one without a signal, the signal is the bridge's alone.
-for (const init of [null, {}]) {
+// With no init, or one without a signal (`null` is none too, as `fetch`
+// reads it), the signal is the bridge's alone.
+for (const init of [null, {}, { signal: null }, { signal: undefined }]) {
+  api.init = undefined;
   f = L.call("Api#joined(str,Init?)", api, ...L.str("u"), init);
   assert.equal(poll(f, 12), 0);
   assert.ok(!api.init.signal.aborted);

@@ -690,6 +690,6 @@ pub enum Expr {
         path: Vec<String>,
         call: Option<Vec<Expr>>,
     },
-    /// `[a, b]`: a JS array of the elements that aren't `undefined`.
+    /// `[a, b]`: a JS array of the elements that are neither `undefined` nor `null`.
     Array(Vec<Expr>),
 }

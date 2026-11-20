@@ -648,8 +648,9 @@ against IR members, and no JS API gets special treatment.
   is `undefined` when the parameter is absent: `init.signal` with no
   `init`.
 * An array literal is a JS array of its elements, leaving out those that
-  are `undefined`: `AbortSignal.any([init.signal, c.signal])` joins the
-  caller's signal with the bridge's when there is one (§16).
+  are `undefined` or `null`: `AbortSignal.any([init.signal, c.signal])`
+  joins the caller's signal with the bridge's when there is one (§16), and
+  a `signal: null` is none, as `fetch` reads it.
 
 ### Other `@js` entries
 
