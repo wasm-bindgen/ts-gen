@@ -18,6 +18,14 @@
 //! 26 must be the `node` on `PATH`. Without `ZENA` the compile steps are
 //! skipped locally, and fail under `CI` unless `TSGEN_SKIP_ZENA` is set.
 //!
+//! `errors_reach_the_caller` runs a fixture's exports in node, through
+//! its entry module and bridge (`run_fixture`).
+//!
+//! `zena_worker` and `zena_worker_workerd` run `examples/zena-bindgen/example` in
+//! node and in workerd (`WORKERD`, else the `workerd` on `PATH`) against
+//! the tours beside it, `tour.node.txt` and `tour.workerd.txt`. Without a
+//! workerd the second is skipped locally, and fails under `CI`.
+//!
 //! To update snapshots:
 //!
 //! ```sh
@@ -162,6 +170,64 @@ fn snapshots() {
             Some(e) if e.contains("@export") => assert_snapshot(&entry, e),
             _ => assert!(!entry.exists(), "{} has no exports", entry.display()),
         }
+    }
+}
+
+/// A function in a payload enum crosses as one alone does: the language's
+/// as its handle, through a trampoline, and JS's as a wrapper that calls it.
+#[test]
+fn fn_payloads() {
+    let ir = read_ir(&crate_root().join("tests/fixtures/fn-payloads.ir"));
+    let out = generate(&ir, &[], &zena_bindgen::Options::default());
+    assert_eq!(out.skipped, [], "fn-payloads skips members");
+    assert!(out
+        .zena
+        .contains("case ListenerFunction(value: (a0: Event) => void)"));
+}
+
+/// A type argument stays typed: an enum, a future or a box over type
+/// parameters is its handle class, never the `externref` of `Any`.
+#[test]
+fn type_arguments_are_typed() {
+    let ir = read_ir(&crate_root().join("tests/fixtures/type-args.ir"));
+    let out = generate(&ir, &[], &zena_bindgen::Options::default());
+    assert_eq!(out.skipped, [], "type-args skips members");
+    for member in [
+        "  entries(): List<EntryBox> {",
+        "  maybe(): List<EntryBox | null> {",
+        "  pending(): List<FutureBox<String>> {",
+        "  entries(): List<Tuple2<K, V>> {",
+        "  indexed(): List<Tuple2<f64, V>> {",
+        "  rows(): List<ArrBox<V>> {",
+    ] {
+        assert!(out.zena.contains(member), "no `{}`", member.trim());
+    }
+}
+
+/// A lib's bindings carry the `err` tag class and the tw loop, and the
+/// bindings over it import them: a module has one of each.
+#[test]
+fn lib_runtime() {
+    let ir = read_ir(&repo_root().join("tests/lower/with-std.ir"));
+    let libs = libs(&ir);
+    let std = zena_bindgen::generate(&libs[0], &zena_bindgen::Options::default()).unwrap();
+    let out = generate(&ir, &libs, &zena_bindgen::Options::default());
+    for own in [
+        "@external(\"tw:tag\", \"err\", \"tw\")",
+        "@export(\"tw:future/wake\")",
+        "@export(\"tw:loop/tick\")",
+        "function __tw_entered()",
+    ] {
+        assert!(std.zena.contains(own), "std has no `{own}`");
+        assert!(!out.zena.contains(own), "with-std has its own `{own}`");
+    }
+    let import = out
+        .zena
+        .lines()
+        .find(|l| l.ends_with("from \"./std.zena\";"))
+        .expect("with-std imports from std");
+    for name in ["ErrException", "__tw_await"] {
+        assert!(import.contains(name), "`{name}` isn't in `{import}`");
     }
 }
 
@@ -366,6 +432,18 @@ fn check_imports(zena: &(PathBuf, PathBuf), name: &str, ir: &Ir, main: Option<&P
             continue;
         }
         if module == "tw:loop" {
+            continue;
+        }
+        if module == "tw:unbox" {
+            let t = ts_gen_abi::text::parse_type(&field).unwrap();
+            let sig = layouts
+                .unbox(&t, &Context::default())
+                .unwrap_or_else(|e| panic!("{name}: `tw:unbox` `{field}`: {e}"));
+            assert_eq!(
+                ty,
+                sig.core(),
+                "{name}: `tw:unbox` `{field}` has the wrong type"
+            );
             continue;
         }
         if module == "tw:isNullish" {
@@ -743,6 +821,78 @@ fn skipped_trampoline_skips_each_member() {
     );
 }
 
+/// Builds `tests/fixtures/<name>.ir` with its app, through the entry
+/// module and the bridge, and runs `<name>.run.mjs` over them in node with
+/// `args`: what it prints.
+fn run_fixture(zena: &(PathBuf, PathBuf), name: &str, args: &[&str]) -> String {
+    let fixtures = crate_root().join("tests/fixtures");
+    let ir = read_ir(&fixtures.join(format!("{name}.ir")));
+    let dir = TempDir::new(&format!("{name}-run-{}", args.join("-")));
+    let out = generate(
+        &ir,
+        &[],
+        &zena_bindgen::Options {
+            entry: Some(zena_bindgen::Entry {
+                bindings: format!("./{name}.zena"),
+                app: "./app.zena".into(),
+            }),
+            ..Default::default()
+        },
+    );
+    std::fs::write(dir.0.join(format!("{name}.zena")), &out.zena).unwrap();
+    std::fs::copy(
+        fixtures.join(format!("{name}.app.zena")),
+        dir.0.join("app.zena"),
+    )
+    .unwrap();
+    let entry = dir.0.join("main.zena");
+    std::fs::write(&entry, out.entry.unwrap()).unwrap();
+    let language = compile(zena, &entry, &dir.0.join("language.wasm"));
+    let bridge = ts_gen_bridge::generate(&ir, &zena_bindgen::profile(), &language)
+        .unwrap_or_else(|e| panic!("{name}: {e}"));
+    std::fs::write(dir.0.join("bridge.js"), bridge.js).unwrap();
+    std::fs::write(dir.0.join("bridge.wasm"), bridge.wasm).unwrap();
+    let script = dir.0.join("run.mjs");
+    std::fs::copy(fixtures.join(format!("{name}.run.mjs")), &script).unwrap();
+    let o = Command::new("node")
+        .arg(&script)
+        .args(args)
+        .output()
+        .expect("node runs");
+    assert!(
+        o.status.success(),
+        "{name}.run.mjs:\n{}{}",
+        String::from_utf8_lossy(&o.stdout),
+        String::from_utf8_lossy(&o.stderr)
+    );
+    String::from_utf8_lossy(&o.stdout).into_owned()
+}
+
+/// A JS exception reaches the export's caller: one no `throws` declares
+/// unwinds through Zena as itself, and a declared one fails the Zena
+/// future, which rejects as its arm.
+#[test]
+fn errors_reach_the_caller() {
+    let Some(zena) = zena() else {
+        return;
+    };
+    assert_eq!(
+        run_fixture(&zena, "unwind", &["sync", "before", "typedAfter"]),
+        "sync: SyntaxError: boom!\nbefore: SyntaxError: boom!\ntypedAfter: TypeError: typed!\n"
+    );
+}
+
+/// An exception no `throws` declares, thrown after an await, settles the
+/// export's promise.
+#[test]
+#[ignore = "Zena can't catch a JS exception: it unwinds the tick, and the future stays pending"]
+fn undeclared_error_after_await() {
+    let Some(zena) = zena() else {
+        return;
+    };
+    assert_ne!(run_fixture(&zena, "unwind", &["after"]), "after: pending\n");
+}
+
 /// `std`, the lib other IRs resolve against, binds whole but for the
 /// comparators whose `number | bigint` result Zena has no type for, and
 /// compiles, with its imports' types the IR's.
@@ -784,42 +934,78 @@ fn workers_types() {
     assert!(cov.imports > 1000, "{cov:?}");
 }
 
-/// `examples/zena-bindgen/example` end to end in node: the IR, the bindings and
-/// entry module, the Zena module and its bridge.
+/// One `run.sh` at a time: each rebuilds the example's `out/`.
+static WORKER: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+/// What `examples/zena-bindgen/example/run.sh <mode>` prints after its build: the
+/// IR, the bindings and entry module, the Zena module and its bridge, then
+/// the tour.
+fn zena_worker_tour(mode: &str, zena: &(PathBuf, PathBuf), workerd: Option<&Path>) -> String {
+    let _one = WORKER.lock().unwrap_or_else(|e| e.into_inner());
+    let run = repo_root().join("examples/zena-bindgen/example/run.sh");
+    let mut cmd = Command::new(&run);
+    cmd.arg(mode)
+        .env("ZENA", &zena.0)
+        .env("ZENA_REPO_ROOT", &zena.1);
+    if let Some(workerd) = workerd {
+        cmd.env("WORKERD", workerd);
+    }
+    let out = cmd.output().expect("run.sh runs");
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    assert!(
+        out.status.success(),
+        "run.sh {mode}:\n{stdout}{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let (_, tour) = stdout.split_once("\n").expect("the `built` line");
+    tour.to_string()
+}
+
+/// `examples/zena-bindgen/example` in node: the routes node can serve.
 #[test]
 fn zena_worker() {
     let Some(zena) = zena() else {
         return;
     };
-    let run = repo_root().join("examples/zena-bindgen/example/run.sh");
-    let out = Command::new(&run)
-        .arg("node")
-        .env("ZENA", &zena.0)
-        .env("ZENA_REPO_ROOT", &zena.1)
-        .output()
-        .expect("run.sh runs");
-    let stdout = String::from_utf8_lossy(&out.stdout);
-    assert!(
-        out.status.success(),
-        "run.sh node:\n{stdout}{}",
-        String::from_utf8_lossy(&out.stderr)
+    let tour = zena_worker_tour("node", &zena, None);
+    assert_snapshot(
+        &repo_root().join("examples/zena-bindgen/example/tour.node.txt"),
+        &tour,
     );
-    let reply = stdout.split_once("200 ").map(|(_, r)| r).unwrap_or(&stdout);
-    assert_eq!(
-        reply,
-        "text/plain; charset=utf-8\n\
-         POST http://127.0.0.1/echo\n\
-         x-zena: hi\n\
-         body: Hello!\n\
-         headers: x-hang x-zena\n\
-         invalid URL: TypeError\n\
-         caught: Failed to parse URL from not a url\n\
-         race: timed out\n\
-         GREETING: Hello from node\n\
-         aborted: true\n\
-         count: 1\n\
-         count: 2\n\
-         rejected: TypeError: zena says no\n\
-         constructor threw: Error: no greeting\n"
+}
+
+/// workerd, or `None` to skip: `WORKERD` names it, else the one on `PATH`.
+fn workerd() -> Option<PathBuf> {
+    if let Some(path) = std::env::var_os("WORKERD") {
+        return Some(PathBuf::from(path));
+    }
+    let on_path = Command::new("workerd")
+        .arg("--version")
+        .output()
+        .is_ok_and(|o| o.status.success());
+    if on_path {
+        return Some(PathBuf::from("workerd"));
+    }
+    assert!(
+        std::env::var_os("CI").is_none(),
+        "WORKERD must name a workerd, or one be on PATH, under CI"
+    );
+    eprintln!("no workerd, skipping the workerd tour");
+    None
+}
+
+/// `examples/zena-bindgen/example` served by workerd: every route of the tour.
+#[test]
+fn zena_worker_workerd() {
+    let Some(zena) = zena() else {
+        return;
+    };
+    let Some(workerd) = workerd() else {
+        return;
+    };
+    let tour = zena_worker_tour("serve", &zena, Some(&workerd));
+    assert_snapshot(
+        &repo_root().join("examples/zena-bindgen/example/tour.workerd.txt"),
+        &tour,
     );
 }

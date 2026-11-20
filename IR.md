@@ -599,14 +599,14 @@ declaration's role:
 | constant | supply it | match by `===`, or the arm doesn't apply |
 | `undefined` | supply it | match an absent argument or `undefined` |
 | `...rest` | spread | bind the remaining arguments into the sequence |
-| `p? { f = <expr>, ... }` | fill the object, creating it when absent; a field whose value is `undefined` isn't created | bind `p` to the argument, `null` when absent; each field matches its expression as a pattern on the object |
+| `p? { f = <expr>, ... }` | pass a shallow copy of the object with the fields set, `{}` with them when it's absent; a field whose value is `undefined` isn't created | bind `p` to the argument, `null` when absent; each field matches its expression as a pattern on the object |
 | `<expr>` | evaluate it | match its value by `===` |
 | order | permute | permute back |
 
 An incoming pattern is a parameter (which binds), a constant, or a constant
-path through IR members (which match). Calls, `let`s and paths through
-parameters can't be inverted, so on an export they're validation errors,
-and so is a `let`.
+path through IR members (which match). Calls, array literals and paths
+through parameters can't be inverted, so on an export they're validation
+errors, and so is a `let`.
 
 **Incoming dispatch.** When several arms share one JS entry point, the
 bridge picks one at runtime. It tests, in order:
@@ -614,6 +614,12 @@ bridge picks one at runtime. It tests, in order:
 1. arity;
 2. constant patterns;
 3. type tests, in declaration order.
+
+An export ignores arguments past its parameters, as a JS function does, so
+arity only chooses between arms: the arm whose parameter count matches,
+else the longest arm the arguments cover. Trailing `undefined`s don't
+count as arguments here. An arm given fewer arguments than its parameters
+doesn't match.
 
 With a single arm, a pattern mismatch throws `TypeError` **even with
 validation disabled**: running the wrong arm would be incorrect, not merely
@@ -627,16 +633,24 @@ statically.
 | `this = p` | reserved: binding the JS receiver to a parameter is future work (§22), and validation rejects it |
 | `super = (...)` | the `super(...)` arguments of an exported class constructor (§17); the default passes the constructor's arguments through |
 | `let x = <expr>` | bind a value created by the bridge for this call |
-| `p? { field = <expr>, ... }` | in `args`: set fields on a nullable object argument, creating it (`{}`) when it's absent. A field whose value is `undefined` isn't created, since a dictionary reads its own keys, so an absent optional parameter leaves its field absent |
+| `p? { field = <expr>, ... }` | in `args`: pass a nullable object argument with fields set. The fields are set on a shallow copy (`{...p}`, or `{}` when it's absent), so the caller's object is never changed. A field whose value is `undefined` isn't created, since a dictionary reads its own keys, so an absent optional parameter leaves its field absent. Outgoing, `p` may be a `let` instead: an object the bridge makes for the call, passed where the member has no parameter for it |
 | `cancel = <path>` | the function to call when the language drops the returned future (§16) |
 | `$result` | predefined: the call's JS result, usable in `cancel` |
 
 Expressions are parameters, `let` bindings, paths through either or
-through IR members (`AbortController.new()`, `c.signal`, `c.abort`), and
-constants. A field fill can take a parameter, so a flattened overload
-builds its dictionary in one call: `args = (m? { from = from, text = text
-})`. They're type-checked against IR
-members, and no JS API gets special treatment.
+through IR members (`AbortController.new()`, `c.signal`, `c.abort`),
+constants, and array literals of expressions (`[a, b]`). A field fill can
+take a parameter, so a flattened overload builds its dictionary in one
+call: `args = (m? { from = from, text = text })`. They're type-checked
+against IR members, and no JS API gets special treatment.
+
+* A path through a nullable parameter reads it without supplying it, and
+  is `undefined` when the parameter is absent: `init.signal` with no
+  `init`.
+* An array literal is a JS array of its elements, leaving out those that
+  are `undefined` or `null`: `AbortSignal.any([init.signal, c.signal])`
+  joins the caller's signal with the bridge's when there is one (§16), and
+  a `signal: null` is none, as `fetch` reads it.
 
 ### Other `@js` entries
 
@@ -1963,13 +1977,20 @@ shape:
 ```ts
 @js(
   let c = AbortController.new(),
-  args = (input, init? { signal = c.signal }),
+  args = (input, init? { signal = AbortSignal.any([init.signal, c.signal]) }),
   cancel = c.abort,
 )
 fetch(input: Request, init: RequestInit?): future<Response, FetchError>;
 ```
 
 * `let` values live with the future until it settles or is dropped.
+* A cancel signal joins the caller's and never replaces it: the fill
+  passes `AbortSignal.any` of the signal `init` came with, when it has
+  one, and the controller's (§7). The caller's signal still aborts the
+  call, and its `init` is unchanged.
+* An overload without the dictionary parameter cancels through one the
+  bridge makes: `let i = RequestInit.new()`, filled as `i? { signal =
+  c.signal }` in the dictionary's position.
 * On `drop`, the bridge calls `cancel` once.
   * A failing cancel function is swallowed, and doesn't settle the promise.
   * A later settlement is ignored.
@@ -1980,8 +2001,8 @@ fetch(input: Request, init: RequestInit?): future<Response, FetchError>;
 Example:
 
 1. Rust awaits `fetch(req)`. The bridge creates `c`, calls
-   `fetch(req, { signal: c.signal })`, and returns the Promise as an
-   `externref`.
+   `fetch(req, { signal: AbortSignal.any([c.signal]) })`, and returns the
+   Promise as an `externref`.
 2. The language polls it with its waker.
 3. The language drops the future: `("tw:future", "drop")` runs `c.abort()`.
 4. The resulting rejection is ignored.
@@ -2007,6 +2028,8 @@ export version(): str;
   `default.fetch(Request,Env,ExecutionContext)`, `version()`.
 * Exports are **incoming**: `@js(args)` reads as a pattern, and dispatch
   applies (§7).
+* Arguments past an export's parameters are ignored: the host calls
+  `alarm(alarmInfo)`, and an export declared `alarm()` runs.
 * `export { A as default };` (a list, inside a `module` block) is an
   imported module's export list. The syntax disambiguates the two.
 * The export boundary is the top-level exports. Callbacks aren't entry
@@ -2250,7 +2273,7 @@ class Response {
 
 @js(
   let c = AbortController.new(),
-  args = (input, init? { signal = c.signal }),
+  args = (input, init? { signal = AbortSignal.any([init.signal, c.signal]) }),
   cancel = c.abort,
 )
 fetch(input: Request, init: RequestInit?): future<Response, FetchError>;
@@ -2349,7 +2372,8 @@ tmpl        = telem ("," telem)* ","?
 telem       = ident | literal | "undefined" | "..." ident
             | ident "?" "{" ident "=" expr ("," ident "=" expr)* "}"
             | expr
-expr        = literal | ("$result" | ident | path) ("." name)* ("(" (expr ("," expr)*)? ")")?
+expr        = literal | "[" (expr ("," expr)*)? "]"
+            | ("$result" | ident | path) ("." name)* ("(" (expr ("," expr)*)? ")")?
 literal     = string | int | "true" | "false" | "null"
 
 key         = path ("#" | ".") mname targs? "(" (ctype ("," ctype)*)? ")"

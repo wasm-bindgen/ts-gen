@@ -61,9 +61,9 @@ fun Response.text(): tsgen.runtime.Future<String> {
     return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = fixtures.sample.flat.take_str(f); r1!!.unsafeCast<JsString>().toString() }, { f -> futureErrorErr(f) })
 }
 
-fun Response.bytes(): tsgen.runtime.Future<VecU8> {
+fun Response.bytes(): tsgen.runtime.Future<ByteArray> {
     val r0 = fixtures.sample.flat.Response_bytes(this)
-    return tsgen.runtime.Future<VecU8>(r0!!, { f -> val r1 = fixtures.sample.flat.take_u8(f); r1!!.unsafeCast<VecU8>() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<ByteArray>(r0!!, { f -> val r1 = fixtures.sample.flat.take_u8(f); tsgen.runtime.byteArray(r1!!) }, { f -> futureErrorErr(f) })
 }
 
 object ResponseStatic {
@@ -115,6 +115,23 @@ val <K : JsAny?, V : JsAny?> Map<K, V>.size: UInt
         return r0.toUInt()
     }
 
+external interface Index<V : JsAny?> : Map<JsString, V>
+
+fun <V : JsAny?> Index<V>.nested(): Map<JsString, Index<V>?> {
+    val r0 = fixtures.sample.flat.Index_nested(this)
+    return r0!!.unsafeCast<Map<JsString, Index<V>?>>()
+}
+
+fun <V : JsAny?> Index<V>.pairs(): Map<JsString, JsArray<JsAny?>> {
+    val r0 = fixtures.sample.flat.Index_pairs(this)
+    return r0!!.unsafeCast<Map<JsString, JsArray<JsAny?>>>()
+}
+
+fun <V : JsAny?> Index<V>.lists(): Map<JsString, JsArray<V>> {
+    val r0 = fixtures.sample.flat.Index_lists(this)
+    return r0!!.unsafeCast<Map<JsString, JsArray<V>>>()
+}
+
 external interface Bytes : JsAny
 
 fun Bytes.at(index: UInt): Double {
@@ -141,12 +158,12 @@ fun Bytes.quad(): Tuple4<UInt, Boolean, Double, String> {
 }
 
 object BytesStatic {
-    fun from(items: Map<JsAny?, JsAny?>): Bytes {
+    fun from(items: Map<out JsString, out JsNumber>): Bytes {
         val r0 = fixtures.sample.flat.Bytes_from_Map_str_f64(items)
         return r0!!.unsafeCast<Bytes>()
     }
 
-    fun <T : JsAny?> fromWithMapStrT(items: Map<JsAny?, JsAny?>): Bytes {
+    fun <T : JsAny?> from(items: Map<out JsString, out T>): Bytes {
         val r0 = fixtures.sample.flat.Bytes_from_Map_str_T(items)
         return r0!!.unsafeCast<Bytes>()
     }
@@ -164,9 +181,9 @@ fun KVNamespace.put(key: String, value: String, ttl: Long?): tsgen.runtime.Futur
     return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.sample.flat.take_unit(f); Unit }, { f -> futureErrorKvError(f) })
 }
 
-fun KVNamespace.list(prefix: String?, limit: UInt?): tsgen.runtime.Future<JsArray<JsString?>> {
+fun KVNamespace.list(prefix: String?, limit: UInt?): tsgen.runtime.Future<List<JsString>> {
     val r0 = fixtures.sample.flat.KVNamespace_list_str_u32(this, prefix?.toJsString(), (if (limit == null) 0 else 1), (limit?.let { it.toInt() } ?: 0))
-    return tsgen.runtime.Future<JsArray<JsString?>>(r0!!, { f -> val r1 = fixtures.sample.flat.take_arr_Str(f); r1!!.unsafeCast<JsArray<JsString?>>() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<List<JsString>>(r0!!, { f -> val r1 = fixtures.sample.flat.take_arr_Str(f); r1!!.unsafeCast<JsArray<JsString>>().let { a -> a.toList() } }, { f -> futureErrorErr(f) })
 }
 
 external interface Buffer : JsAny
@@ -220,8 +237,8 @@ fun pair(): Pair<UInt, Boolean> {
     return Pair(r0.toUInt(), (s1 != 0))
 }
 
-fun total(xs: JsArray<JsNumber?>): Double {
-    val r0 = fixtures.sample.flat.total_arr_f64(xs)
+fun total(xs: List<Double>): Double {
+    val r0 = fixtures.sample.flat.total_arr_f64(xs.map { it.toJsNumber() }.toJsArray())
     return r0
 }
 
@@ -241,8 +258,10 @@ object crypto {
         return r0!!.unsafeCast<JsString>().toString()
     }
 
-    fun getRandomValues(into: VecU8) {
-        fixtures.sample.flat.crypto_getRandomValues_mut_u8(into)
+    fun getRandomValues(into: ByteArray) {
+        val v0 = tsgen.runtime.typedArray("Uint8Array", into)
+        fixtures.sample.flat.crypto_getRandomValues_mut_u8(v0)
+        tsgen.runtime.copyInto(v0, into)
     }
 }
 
@@ -296,7 +315,7 @@ fun JsAny.toKvError(): KvError {
 
 sealed interface Body {
     data class Text(val value: String) : Body
-    data class Bytes(val value: VecU8) : Body
+    data class Bytes(val value: ByteArray) : Body
     data class Stream(val value: fixtures.sample.ReadableStream) : Body
 }
 
@@ -305,14 +324,14 @@ class BodyWire(val arm: Int, val s0: JsAny?)
 fun encodeBody(v: Body?): BodyWire = when (v) {
     null -> BodyWire(0, null)
     is Body.Text -> BodyWire(1, v.value.toJsString())
-    is Body.Bytes -> BodyWire(2, v.value)
+    is Body.Bytes -> BodyWire(2, tsgen.runtime.typedArray("Uint8Array", v.value))
     is Body.Stream -> BodyWire(3, v.value)
 }
 
 fun decodeBody(arm: Int, s0: JsAny?): Body? = when (arm) {
     0 -> null
     1 -> Body.Text(s0!!.unsafeCast<JsString>().toString())
-    2 -> Body.Bytes(s0!!.unsafeCast<VecU8>())
+    2 -> Body.Bytes(tsgen.runtime.byteArray(s0!!))
     3 -> Body.Stream(s0!!.unsafeCast<ReadableStream>())
     else -> throw IllegalStateException("Body: arm $arm")
 }

@@ -40,14 +40,6 @@ function $str(v) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 function $tuple(v, n, what) {
   if (!Array.isArray(v) || v.length !== n) $fail(what, v);
   return v;
@@ -267,7 +259,7 @@ function $outgoing(e) {
 }
 const $N0 = {
   trio(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       const m = $S.mark();
       try {
         const t1 = a[0];

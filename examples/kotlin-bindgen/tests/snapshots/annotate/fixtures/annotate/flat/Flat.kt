@@ -170,14 +170,6 @@ external fun Lookup_find(p0: JsAny?): JsAny?
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun Lookup_find_str(p0: JsAny?, p1: JsAny?): JsAny?
 
-/** tw:box fn() */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_fn(p0: JsAny?): JsAny?
-
-/** tw:unbox fn() */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_fn(p0: JsAny?): JsAny?
-
 /** tw:unbox TypeErr */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun unbox_TypeErr(p0: JsAny?): Int
@@ -193,4 +185,12 @@ external fun unbox_RequestInfo(p0: JsAny?): Int
 /** tw:box RequestInfo */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_RequestInfo(p0: Int, p1: JsAny?): JsAny?
+
+/** tw:box fn() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_fn(p0: JsAny?): JsAny?
+
+/** tw:unbox fn() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_fn(p0: JsAny?): JsAny?
 

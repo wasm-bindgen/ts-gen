@@ -3,6 +3,12 @@
 
 package fixtures.modules
 
+external interface Retrier : Runner
+
+fun Retrier.retry() {
+    try { fixtures.modules.flat.Retrier_retry(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
 external interface Entry : JsAny
 
 val Entry.key: String
@@ -41,6 +47,12 @@ fun StepConfig.setRetries(value: StepConfigRetries) {
     fixtures.modules.flat.StepConfig_set_retries_steps_StepConfigRetries(this, value)
 }
 
+external interface Runner : JsAny
+
+fun Runner.run() {
+    try { fixtures.modules.flat.Runner_run(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
 external interface StepConfigRetries : JsAny
 
 var StepConfigRetries.limit: Double
@@ -55,10 +67,10 @@ var StepConfigRetries.limit: Double
 external interface ArrayBuffer : JsAny
 
 fun read(): StrOrArrayBufferOrF64 {
-    val r2 = try { fixtures.modules.flat.read() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    val s3 = fixtures.modules.flat.ret_externref()
-    val s4 = fixtures.modules.flat.ret_f64()
-    return decodeStrOrArrayBufferOrF64(r2, s3, s4)!!
+    val r0 = try { fixtures.modules.flat.read() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    val s1 = fixtures.modules.flat.ret_externref()
+    val s2 = fixtures.modules.flat.ret_f64()
+    return decodeStrOrArrayBufferOrF64(r0, s1, s2)!!
 }
 
 fun Store(): Store {

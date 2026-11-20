@@ -181,6 +181,26 @@ fn variants() {
     assert_eq!(variant("Bytes#get:size()"), "\"size\"");
 }
 
+/// A parameter `@js(args)` spreads is marked, for a generator with
+/// variadic parameters.
+#[test]
+fn spread_params() {
+    let ir = text::parse(
+        "ir 1;\n\ninterface Console {\n  @js(args = (label, ...data))\n  log(label: str, data: arr<Any?>);\n}\n",
+    )
+    .unwrap();
+    let out = json::lower(&ir, &Profile::all_host()).pretty();
+    check(&out);
+    let spread = |param: &str| {
+        let at = out.find(&format!("\"name\": \"{param}\"")).unwrap();
+        let rest = &out[at..];
+        let v = &rest[rest.find("\"spread\": ").unwrap() + 10..];
+        v[..v.find(['\n', ',']).unwrap()].to_string()
+    };
+    assert_eq!(spread("label"), "false");
+    assert_eq!(spread("data"), "true");
+}
+
 #[test]
 fn box_nested_warns_under_box_none_null() {
     let ir = text::parse("ir 1;\nf(v: Str??): Str??;\ng(v: Str?);").unwrap();

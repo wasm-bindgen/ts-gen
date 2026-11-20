@@ -135,9 +135,9 @@ external fun err_StorageOrDOMExceptionErr(p0: JsAny?): Int
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun open()
 
-/** tw:js/global AbortSignal.new() */
-@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
-external fun AbortSignal_new(): JsAny?
+/** tw:js/global AbortSignal.any(arr<AbortSignal>) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun AbortSignal_any_arr_AbortSignal(p0: JsAny?): JsAny?
 
 /** tw:js/global AbortSignal#get:aborted() */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

@@ -227,6 +227,7 @@ fn expr(e: &Expr, at: &dyn Fn(&str) -> String) -> Expr {
                 .as_ref()
                 .map(|c| c.iter().map(|x| expr(x, at)).collect()),
         },
+        Expr::Array(elems) => Expr::Array(elems.iter().map(|x| expr(x, at)).collect()),
         e => e.clone(),
     }
 }

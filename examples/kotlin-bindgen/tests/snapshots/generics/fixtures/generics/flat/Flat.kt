@@ -267,22 +267,6 @@ external fun Record_at_str(p0: JsAny?, p1: JsAny?): JsAny?
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun Record_setAt_str_V(p0: JsAny?, p1: JsAny?, p2: JsAny?)
 
-/** tw:box fn(T)->U */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_fn_T_U(p0: JsAny?): JsAny?
-
-/** tw:unbox fn(T)->U */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_fn_T_U(p0: JsAny?): JsAny?
-
-/** tw:box fn(SignalOrHalt) */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_fn_SignalOrHalt(p0: JsAny?): JsAny?
-
-/** tw:unbox fn(SignalOrHalt) */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_fn_SignalOrHalt(p0: JsAny?): JsAny?
-
 /** tw:unbox DateUnit */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun unbox_DateUnit(p0: JsAny?): Int
@@ -610,4 +594,20 @@ external fun unbox_SpanningLargestUnitHour(p0: JsAny?): Int
 /** tw:box SpanningLargestUnitHour */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_SpanningLargestUnitHour(p0: Int): JsAny?
+
+/** tw:box fn(T)->U */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_fn_T_U(p0: JsAny?): JsAny?
+
+/** tw:unbox fn(T)->U */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_fn_T_U(p0: JsAny?): JsAny?
+
+/** tw:box fn(SignalOrHalt) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_fn_SignalOrHalt(p0: JsAny?): JsAny?
+
+/** tw:unbox fn(SignalOrHalt) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_fn_SignalOrHalt(p0: JsAny?): JsAny?
 

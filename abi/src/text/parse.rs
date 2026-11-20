@@ -1003,6 +1003,9 @@ impl<'a> Parser<'a> {
         if let Some(l) = self.try_literal() {
             return Ok(Telem::Lit(l));
         }
+        if self.is("[") {
+            return Ok(Telem::Expr(self.expr()?));
+        }
         let Tok::Ident(id) = self.peek() else {
             return self.unexpected("a template element");
         };
@@ -1034,6 +1037,11 @@ impl<'a> Parser<'a> {
     fn expr(&mut self) -> Res<Expr> {
         if let Some(l) = self.try_literal() {
             return Ok(Expr::Lit(l));
+        }
+        if self.eat("[") {
+            let elems = self.list("]", false, Self::expr)?;
+            self.expect("]")?;
+            return Ok(Expr::Array(elems));
         }
         let mut path = vec![self.ident("an expression")?];
         while self.is(".") && self.is_name_at(1) {

@@ -1,0 +1,33 @@
+// HTMLRewriter: handlers JS calls as it parses.
+import { Future } from 'zena:async';
+import {
+  BodyInitStr, Element, ElementHandlers, HTMLRewriter, Headers, HeadersInitHeaders, Response, ResponseInit
+} from '../bindings.zena';
+
+/** `/rewrite`: a page whose links and heading are rewritten as it streams. */
+export async function rewrite(): Future<Response> {
+  let headers = new Headers();
+  headers.set("content-type", "text/html");
+  let init = new ResponseInit();
+  init.setHeaders(new HeadersInitHeaders(headers));
+  let page = new Response.newWithBodyAndInit(
+    new BodyInitStr("<h1>Tour</h1><a href=\"http://example.com/a\">a</a> <a href=\"/b\">b</a>\n"), init);
+  var links = 0;
+  let anchors = new ElementHandlers();
+  anchors.setElement((a: Element): void => {
+    links += 1;
+    let href = a.getAttribute("href");
+    if (href != null && href.startsWith("http://")) {
+      a.setAttribute("href", href.replace("http://", "https://"));
+    }
+  });
+  let heading = new ElementHandlers();
+  heading.setElement((h1: Element): void => {
+    // `append` takes `string | ReadableStream | Response`: the string's overload.
+    h1.append(" of the rewriter");
+    h1.setAttribute("class", h1.tagName);
+  });
+  let rewritten = new HTMLRewriter().on_("a", anchors).on_("h1", heading).transform(page);
+  let html = await rewritten.text();
+  return new Response.newWithBodyAndInit(new BodyInitStr(`${html}links seen: ${links}\n`), new ResponseInit());
+}

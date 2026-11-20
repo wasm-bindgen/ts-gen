@@ -60,6 +60,28 @@ class TParam(val name: String, val default: Repr?) {
     }
 }
 
+/**
+ * What a host class's type argument names; it has no layout. [of] is
+ * `param` (by [name]), `class` or `interface` (by [path], with its own
+ * [args]), `box` (of the [inner] scalar, `str` or `bigint`), `array` or
+ * `tuple` (a JS array of the elements in [args]), `any` or `other`.
+ */
+class TArg(
+    val of: String,
+    val name: String?,
+    val path: String?,
+    val inner: String?,
+    val args: List<TArg>,
+    val nullable: Boolean,
+) {
+    companion object {
+        fun list(v: Any?): List<TArg> = (v as List<*>?).orEmpty().map {
+            val m = it.obj("type argument")
+            TArg(m.str("of"), m.strOrNull("name"), m.strOrNull("path"), m.strOrNull("inner"), list(m["args"]), m.bool("nullable"))
+        }
+    }
+}
+
 class LibL(val name: String, val decls: List<DeclL>)
 
 class DeclL(
@@ -73,6 +95,8 @@ class DeclL(
     val tparams: List<TParam>,
     val assoc: List<AssocL>,
     val extends: List<String>,
+    /** Each base's type arguments; empty when no base has any. */
+    val extendsArgs: List<List<TArg>>,
     val doc: String?,
     val enum: EnumL?,
     /** An alias's layout, when it has no type parameters. */
@@ -94,6 +118,7 @@ class DeclL(
             (m["tparams"] as List<*>?).orEmpty().map { TParam.from(it.obj("tparam")) },
             (m["assoc"] as List<*>?).orEmpty().map { AssocL.from(it.obj("assoc")) },
             (m["extends"] as List<*>?).orEmpty().map { it as String },
+            (m["extendsArgs"] as List<*>?).orEmpty().map { TArg.list(it) },
             m.strOrNull("doc"),
             (m["layout"] as Map<*, *>?)?.let { EnumL.from(it.obj("layout")) },
             (m["repr"] as Map<*, *>?)?.let { Repr.from(it.obj("repr")) },
@@ -131,8 +156,8 @@ class Import(val module: String, val name: String) {
     }
 }
 
-/** A param, with the alias its type names, if any. */
-class ParamL(val name: String, val once: Boolean, val alias: String?)
+/** A param, with the alias its type names, if any; [spread] when its elements are the call's arguments. */
+class ParamL(val name: String, val once: Boolean, val alias: String?, val spread: Boolean)
 
 /** A function type a recursive alias reaches again: its layouts each way. */
 class RecL(val ty: String, val name: String, val toJs: Repr, val toLang: Repr) {
@@ -184,7 +209,7 @@ class MemberL(
             m.strOrNull("variant"),
             m.bool("static"),
             m.list("tparams").map { TParam.from(it.obj("tparam")) },
-            m.list("params").map { it.obj("param").let { p -> ParamL(p.str("name"), p.bool("once"), p.strOrNull("alias")) } },
+            m.list("params").map { it.obj("param").let { p -> ParamL(p.str("name"), p.bool("once"), p.strOrNull("alias"), p.bool("spread")) } },
             m.strOrNull("doc"),
             (m["sig"] as Map<*, *>?)?.let { Sig.from(it.obj("sig")) },
             m.strOrNull("error"),
@@ -271,6 +296,8 @@ class Repr(
     /** For `host`: `class`, `interface`, `any`, `box` or `future`. */
     val of get() = m.str("of")
     val path get() = m.str("path")
+    /** A host class's type arguments; empty when the reference has none. */
+    val args get() = TArg.list(m["args"])
     val inner get() = Repr.from(m.obj("inner"))
     val value get() = Repr.from(m.obj("value"))
     val handleClass get() = m.str("class")
@@ -284,15 +311,23 @@ class Repr(
     val unbox get() = BoxOp.of(m, "unbox")
     val call get() = Import.from(m.obj("call"))
     /** A future's `take<T>` import. */
-    val take get() = Import.from(m.obj("take"))
+    val take get() = valueOp("take")
     /** A future's `error<E>`, `new`, `resolve<T>` and `reject<E>` imports. */
     val errorOp get() = Import.from(m.obj("errorOp"))
     val futureNew get() = Import.from(m.obj("new"))
-    val resolve get() = Import.from(m.obj("resolve"))
+    val resolve get() = valueOp("resolve")
     val reject get() = Import.from(m.obj("reject"))
     /** A future's rejection enum. */
     val rejection get() = EnumL.from(m.obj("rejection"))
     val op get() = (m["op"] as Map<*, *>?)?.obj("op")?.takeIf { "error" !in it }?.let { Sig.from(it) }
+
+    /**
+     * A future's operation on its value. A type parameter names nothing
+     * outside its member, so an erased value's is the operation on `Any?`:
+     * the same wire, the value as it is.
+     */
+    private fun valueOp(op: String) =
+        Import.from(m.obj(op)).let { if (value.kind == "erased") Import(it.module, "$op<Any?>") else it }
 
     companion object {
         fun from(m: Map<String, Any?>) = Repr(

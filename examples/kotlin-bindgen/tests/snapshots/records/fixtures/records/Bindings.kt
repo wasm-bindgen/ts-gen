@@ -5,24 +5,24 @@ package fixtures.records
 
 external interface Env : JsAny
 
-var Env.vars: Record<JsAny?>
+var Env.vars: Record<JsString>
     get() {
         val r0 = fixtures.records.flat.Env_get_vars(this)
-        return r0!!.unsafeCast<Record<JsAny?>>()
+        return r0!!.unsafeCast<Record<JsString>>()
     }
     set(value) {
         fixtures.records.flat.Env_set_vars_Record_Str(this, value)
     }
 
-val Env.flags: NumberRecord<JsAny?>
+val Env.flags: NumberRecord<JsBoolean>
     get() {
         val r0 = fixtures.records.flat.Env_get_flags(this)
-        return r0!!.unsafeCast<NumberRecord<JsAny?>>()
+        return r0!!.unsafeCast<NumberRecord<JsBoolean>>()
     }
 
-fun Env.lookup(headers: Record<JsAny?>): Record<JsAny?> {
+fun Env.lookup(headers: Record<*>): Record<Env> {
     val r2 = try { fixtures.records.flat.Env_lookup_Record_EnvHeadersKind(this, headers) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r2!!.unsafeCast<Record<JsAny?>>()
+    return r2!!.unsafeCast<Record<Env>>()
 }
 
 fun Env.configure(options: EnvOptions) {
@@ -48,18 +48,18 @@ fun Bag.at(key: String): JsAny? {
     return r0
 }
 
-external interface List : JsAny
+external interface List_ : JsAny
 
-fun List.at(i: UInt): String? {
+fun List_.at(i: UInt): String? {
     val r0 = fixtures.records.flat.List_at_u32(this, i.toInt())
     return r0?.unsafeCast<JsString>()?.toString()
 }
 
-fun List.setAt(i: UInt, value: String) {
+fun List_.setAt(i: UInt, value: String) {
     fixtures.records.flat.List_setAt_u32_str(this, i.toInt(), value.toJsString())
 }
 
-val List.length: Double
+val List_.length: Double
     get() {
         val r0 = fixtures.records.flat.List_get_length(this)
         return r0
@@ -87,9 +87,9 @@ fun <V : JsAny?> NumberRecord<V>.setAt(i: UInt, value: V) {
     fixtures.records.flat.NumberRecord_setAt_u32_V(this, i.toInt(), value)
 }
 
-fun List(): List {
+fun List_(): List_ {
     val r0 = fixtures.records.flat.List_new()
-    return r0!!.unsafeCast<List>()
+    return r0!!.unsafeCast<List_>()
 }
 
 /** `EnvHeadersKind` as its box: its arm's JS value. */
@@ -107,7 +107,7 @@ fun JsAny.toEnvHeadersKind(): EnvHeadersKind {
 
 sealed interface EnvHeadersKind {
     data class Str(val value: String) : EnvHeadersKind
-    data class StrArray(val value: JsArray<JsString?>) : EnvHeadersKind
+    data class StrArray(val value: List<String>) : EnvHeadersKind
 }
 
 class EnvHeadersKindWire(val arm: Int, val s0: JsAny?)
@@ -115,13 +115,13 @@ class EnvHeadersKindWire(val arm: Int, val s0: JsAny?)
 fun encodeEnvHeadersKind(v: EnvHeadersKind?): EnvHeadersKindWire = when (v) {
     null -> EnvHeadersKindWire(0, null)
     is EnvHeadersKind.Str -> EnvHeadersKindWire(1, v.value.toJsString())
-    is EnvHeadersKind.StrArray -> EnvHeadersKindWire(2, v.value)
+    is EnvHeadersKind.StrArray -> EnvHeadersKindWire(2, v.value.map { it.toJsString() }.toJsArray())
 }
 
 fun decodeEnvHeadersKind(arm: Int, s0: JsAny?): EnvHeadersKind? = when (arm) {
     0 -> null
     1 -> EnvHeadersKind.Str(s0!!.unsafeCast<JsString>().toString())
-    2 -> EnvHeadersKind.StrArray(s0!!.unsafeCast<JsArray<JsString?>>())
+    2 -> EnvHeadersKind.StrArray(s0!!.unsafeCast<JsArray<JsString>>().let { a -> a.toList().map { it.toString() } })
     else -> throw IllegalStateException("EnvHeadersKind: arm $arm")
 }
 

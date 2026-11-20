@@ -64,10 +64,6 @@ js_code	fixtures.generics.flat.Cell_new_T	tw:js/global	Cell.new(T)
 js_code	fixtures.generics.flat.Cell_get_value	tw:js/global	Cell#get:value()
 js_code	fixtures.generics.flat.Record_at_str	tw:js/global	Record#at(str)
 js_code	fixtures.generics.flat.Record_setAt_str_V	tw:js/global	Record#setAt(str,V)
-js_code	fixtures.generics.flat.box_fn_T_U	tw:box	fn(T)->U
-js_code	fixtures.generics.flat.unbox_fn_T_U	tw:unbox	fn(T)->U
-js_code	fixtures.generics.flat.box_fn_SignalOrHalt	tw:box	fn(SignalOrHalt)
-js_code	fixtures.generics.flat.unbox_fn_SignalOrHalt	tw:unbox	fn(SignalOrHalt)
 js_code	fixtures.generics.flat.unbox_DateUnit	tw:unbox	DateUnit
 js_code	fixtures.generics.flat.box_DateUnit	tw:box	DateUnit
 js_code	fixtures.generics.flat.unbox_TimeUnit	tw:unbox	TimeUnit
@@ -150,6 +146,10 @@ js_code	fixtures.generics.flat.unbox_LargestUnitHourOrWeek	tw:unbox	LargestUnitH
 js_code	fixtures.generics.flat.box_LargestUnitHourOrWeek	tw:box	LargestUnitHourOrWeek
 js_code	fixtures.generics.flat.unbox_SpanningLargestUnitHour	tw:unbox	SpanningLargestUnitHour
 js_code	fixtures.generics.flat.box_SpanningLargestUnitHour	tw:box	SpanningLargestUnitHour
+js_code	fixtures.generics.flat.box_fn_T_U	tw:box	fn(T)->U
+js_code	fixtures.generics.flat.unbox_fn_T_U	tw:unbox	fn(T)->U
+js_code	fixtures.generics.flat.box_fn_SignalOrHalt	tw:box	fn(SignalOrHalt)
+js_code	fixtures.generics.flat.unbox_fn_SignalOrHalt	tw:unbox	fn(SignalOrHalt)
 js_code	tsgen.runtime.futurePoll	tw:future	poll
 js_code	tsgen.runtime.futureDrop	tw:future	drop
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

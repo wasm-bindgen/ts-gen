@@ -71,10 +71,12 @@ fun Init(): Init {
     return r0!!.unsafeCast<Init>()
 }
 
-fun nested(xs: tsgen.runtime.Future<String?>, ys: JsArray<JsString?>, r: Record<JsAny?>, cb: (String?) -> String?): tsgen.runtime.Future<String?> {
-    val r0 = fixtures.nullability.flat.nested_future_str_arr_str_Record_Str_fn_str_str(xs.raw, ys, r, cb.toJsReference())
+fun nested(xs: tsgen.runtime.Future<String?>, ys: List<String?>, r: Record<out JsString?>, cb: (String?) -> String?): tsgen.runtime.Future<String?> {
+    val r0 = fixtures.nullability.flat.nested_future_str_arr_str_Record_Str_fn_str_str(xs.raw, ys.map { it?.let { it.toJsString() } }.toJsArray(), r, cb.toJsReference())
     return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.nullability.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
 }
+
+fun nested(xs: suspend () -> String?, ys: List<String?>, r: Record<out JsString?>, cb: (String?) -> String?): tsgen.runtime.Future<String?> = nested(futureOfStr(xs), ys, r, cb)
 
 fun greet() {
     try { fixtures.nullability.flat.greet() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
@@ -114,6 +116,14 @@ fun leadOpt(x: String) {
 
 fun leadOpt(x: String?, y: Double) {
     try { fixtures.nullability.flat.leadOpt_str_f64(x?.toJsString(), y) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+/** A `future<str?>` that runs `block` as a task and settles with its outcome. */
+fun futureOfStr(block: suspend () -> String?): tsgen.runtime.Future<String?> {
+    val future = fixtures.nullability.flat.future_new()
+    val resolver = fixtures.nullability.flat.ret_externref()
+    tsgen.runtime.Loop.main.launch({ block() }) { o -> o.fold({ r -> fixtures.nullability.flat.future_resolve_str(resolver, r?.toJsString()) }, { e -> rejectErr(resolver, e) }) }
+    return tsgen.runtime.Future<String?>(future!!, { f -> val r4 = fixtures.nullability.flat.take_str(f); r4?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
 }
 
 sealed interface Err {
@@ -157,5 +167,10 @@ fun futureErrorErr(f: JsAny): ErrException {
     val r2 = fixtures.nullability.flat.error_err(f)
     val s3 = fixtures.nullability.flat.ret_externref()
     return ErrException(decodeErr(r2, s3)!!)
+}
+
+fun rejectErr(resolver: JsAny?, e: kotlin.Throwable) {
+    val w = encodeErr(toErr(e))
+    fixtures.nullability.flat.reject_err(resolver, w.arm, w.s0)
 }
 

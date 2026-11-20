@@ -228,6 +228,13 @@ function $f1(w0_0, w1_0) {
   return t1;
 }
 
+// ("tw:js/global", "Date#getTime()")
+function $f2(w0_0) {
+  const r = w0_0.getTime();
+  const t1 = $num(r, "f64");
+  return t1;
+}
+
 export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Date);
@@ -240,6 +247,7 @@ export function instantiate(language, bridge, imports = {}) {
     "tw:js/global": {
       "Event#get:stamp()": $f0,
       "Event#at(Date)": $f1,
+      "Date#getTime()": $f2,
     },
   });
   $X = instance.exports;

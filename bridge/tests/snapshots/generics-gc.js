@@ -45,14 +45,6 @@ function $str(v) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 // A class's value, or null when its path holds no function: its checks
 // then degrade to the interface test, and its arm tests never match (§8).
 function $class(C) {
@@ -623,19 +615,16 @@ function $outgoing(e) {
 }
 class $C0 {
   constructor(...a) {
-    if ($upTo(a, 0)) {
-      const m = $S.mark();
-      try {
-        const r = $E[1](this);
-        $HC.pair(this, r, null);
-      } catch (e) {
-        throw $outgoing(e);
-      } finally {
-        $S.reset(m);
-      }
-      return;
+    const m = $S.mark();
+    try {
+      const r = $E[1](this);
+      $HC.pair(this, r, null);
+    } catch (e) {
+      throw $outgoing(e);
+    } finally {
+      $S.reset(m);
     }
-    throw new TypeError("`new Counter` doesn't match its arguments");
+    return;
   }
 }
 

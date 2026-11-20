@@ -10,9 +10,9 @@ fun <T : JsAny?> Box<T>.get(): T {
     return (r0 as T)
 }
 
-fun <T : JsAny?, U : JsAny?> Box<T>.map(f: (T) -> U): Box<JsAny?> {
+fun <T : JsAny?, U : JsAny?> Box<T>.map(f: (T) -> U): Box<U> {
     val r0 = try { fixtures.generics.flat.Box_map_fn_T_U(this, f.toJsReference()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<Box<JsAny?>>()
+    return r0!!.unsafeCast<Box<U>>()
 }
 
 external interface Shape : JsAny
@@ -80,7 +80,7 @@ fun <Units : JsAny?> RoundingOptions<Units>.setLargestUnit(value: LargestUnitDat
 
 external interface TimeOptions : RoundingOptions<JsAny?>
 
-external interface RoundToOptions<Units : JsAny?> : RoundingOptions<JsAny?>
+external interface RoundToOptions<Units : JsAny?> : RoundingOptions<Units>
 
 var <Units : JsAny?> RoundToOptions<Units>.smallestUnit: Units
     get() {
@@ -125,9 +125,9 @@ fun <I : JsAny?, O : JsAny?> Pipe<I, O>.write(chunk: I): O {
     return (r0 as O)
 }
 
-external interface Encoder : Pipe<JsAny?, JsAny?>
+external interface Encoder : Pipe<JsString, Uint8Array>
 
-external interface Stepped<S : JsAny?> : RoundingOptions<JsAny?>
+external interface Stepped<S : JsAny?> : RoundingOptions<S>
 
 val <S : JsAny?> Stepped<S>.step: S?
     get() {
@@ -227,19 +227,19 @@ fun <T : JsAny?> Box(value: T): Box<T> {
     return r2!!.unsafeCast<Box<T>>()
 }
 
-fun <S : JsAny?> biggest(shapes: JsArray<JsAny?>): S {
-    val r0 = try { fixtures.generics.flat.biggest_arr_S(shapes) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun <S : JsAny?> biggest(shapes: List<S>): S {
+    val r0 = try { fixtures.generics.flat.biggest_arr_S(shapes.toJsArray()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
     return (r0 as S)
 }
 
-fun wrap(n: Double): Box<JsAny?> {
+fun wrap(n: Double): Box<JsNumber> {
     val r0 = try { fixtures.generics.flat.wrap_f64(n) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<Box<JsAny?>>()
+    return r0!!.unsafeCast<Box<JsNumber>>()
 }
 
-fun strings(): Box<JsAny?> {
+fun strings(): Box<JsArray<JsString>> {
     val r0 = try { fixtures.generics.flat.strings() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<Box<JsAny?>>()
+    return r0!!.unsafeCast<Box<JsArray<JsString>>>()
 }
 
 fun <Units : JsAny?> RoundingOptions(): RoundingOptions<Units> {
@@ -252,27 +252,27 @@ fun TimeOptions(): TimeOptions {
     return r0!!.unsafeCast<TimeOptions>()
 }
 
-fun untilDate(options: RoundingOptions<JsAny?>) {
+fun untilDate(options: RoundingOptions<*>) {
     try { fixtures.generics.flat.untilDate_RoundingOptions_DateUnit(options) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun untilTime(options: RoundingOptions<JsAny?>) {
+fun untilTime(options: RoundingOptions<*>) {
     try { fixtures.generics.flat.untilTime_RoundingOptions_TimeUnit(options) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun untilAny(options: RoundingOptions<JsAny?>) {
+fun untilAny(options: RoundingOptions<*>) {
     try { fixtures.generics.flat.untilAny_RoundingOptions_DateUnitOrTimeUnit(options) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun untilMonth(options: RoundingOptions<JsAny?>) {
+fun untilMonth(options: RoundingOptions<*>) {
     try { fixtures.generics.flat.untilMonth_RoundingOptions_YearOrMonth(options) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun untilHour(options: RoundingOptions<JsAny?>) {
+fun untilHour(options: RoundingOptions<*>) {
     try { fixtures.generics.flat.untilHour_RoundingOptions_Hour(options) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun untilDay(options: RoundingOptions<JsAny?>) {
+fun untilDay(options: RoundingOptions<*>) {
     try { fixtures.generics.flat.untilDay_RoundingOptions_DayOrTimeUnit(options) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
@@ -288,14 +288,14 @@ fun format(locales: LocalesArgument): String {
 }
 
 fun format(locales: String): String = format(LocalesArgument.Str(locales))
-fun format(locales: JsArray<JsString?>): String = format(LocalesArgument.StrArray(locales))
+fun format(locales: List<String>): String = format(LocalesArgument.StrArray(locales))
 
 fun <Units : JsAny?> RoundToOptions(): RoundToOptions<Units> {
     val r0 = fixtures.generics.flat.RoundToOptions_new()
     return r0!!.unsafeCast<RoundToOptions<Units>>()
 }
 
-fun round(options: RoundToOptions<JsAny?>) {
+fun round(options: RoundToOptions<*>) {
     try { fixtures.generics.flat.round_RoundToOptions_MonthOrDay(options) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
@@ -334,11 +334,11 @@ fun <U : JsAny?> Spanning(): Spanning<U> {
     return r0!!.unsafeCast<Spanning<U>>()
 }
 
-fun step(options: Stepped<JsAny?>, span: Spanning<JsAny?>) {
+fun step(options: Stepped<*>, span: Spanning<*>) {
     try { fixtures.generics.flat.step_Stepped_HourOrMinute_Spanning_HourOrWeek(options, span) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun spanHour(span: Spanning<JsAny?>) {
+fun spanHour(span: Spanning<*>) {
     try { fixtures.generics.flat.spanHour_Spanning_Hour(span) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
@@ -875,7 +875,7 @@ enum class Pluralize(val index: Int) {
 
 sealed interface LocalesArgument {
     data class Str(val value: String) : LocalesArgument
-    data class StrArray(val value: JsArray<JsString?>) : LocalesArgument
+    data class StrArray(val value: List<String>) : LocalesArgument
 }
 
 class LocalesArgumentWire(val arm: Int, val s0: JsAny?)
@@ -883,13 +883,13 @@ class LocalesArgumentWire(val arm: Int, val s0: JsAny?)
 fun encodeLocalesArgument(v: LocalesArgument?): LocalesArgumentWire = when (v) {
     null -> LocalesArgumentWire(0, null)
     is LocalesArgument.Str -> LocalesArgumentWire(1, v.value.toJsString())
-    is LocalesArgument.StrArray -> LocalesArgumentWire(2, v.value)
+    is LocalesArgument.StrArray -> LocalesArgumentWire(2, v.value.map { it.toJsString() }.toJsArray())
 }
 
 fun decodeLocalesArgument(arm: Int, s0: JsAny?): LocalesArgument? = when (arm) {
     0 -> null
     1 -> LocalesArgument.Str(s0!!.unsafeCast<JsString>().toString())
-    2 -> LocalesArgument.StrArray(s0!!.unsafeCast<JsArray<JsString?>>())
+    2 -> LocalesArgument.StrArray(s0!!.unsafeCast<JsArray<JsString>>().let { a -> a.toList().map { it.toString() } })
     else -> throw IllegalStateException("LocalesArgument: arm $arm")
 }
 

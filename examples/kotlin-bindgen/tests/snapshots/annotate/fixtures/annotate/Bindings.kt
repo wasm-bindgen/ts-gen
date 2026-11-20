@@ -80,15 +80,15 @@ fun Storage.delete(key: String): tsgen.runtime.Future<Boolean> {
     return tsgen.runtime.Future<Boolean>(r0!!, { f -> val r1 = fixtures.annotate.flat.take_bool(f); (r1 != 0) }, { f -> futureErrorErr(f) })
 }
 
-fun Storage.delete(keys: JsArray<JsString?>): tsgen.runtime.Future<UInt> {
-    val r0 = fixtures.annotate.flat.Storage_delete_arr_str(this, keys)
+fun Storage.delete(keys: List<String>): tsgen.runtime.Future<UInt> {
+    val r0 = fixtures.annotate.flat.Storage_delete_arr_str(this, keys.map { it.toJsString() }.toJsArray())
     return tsgen.runtime.Future<UInt>(r0!!, { f -> val r1 = fixtures.annotate.flat.take_u32(f); r1.toUInt() }, { f -> futureErrorErr(f) })
 }
 
 external interface Console : JsAny
 
-fun Console.log(data: JsArray<JsAny?>) {
-    fixtures.annotate.flat.Console_log_arr_Any(this, data)
+fun Console.log(vararg data: JsAny?) {
+    fixtures.annotate.flat.Console_log_arr_Any(this, data.toList().toJsArray())
 }
 
 external interface Incoming : JsAny
@@ -169,8 +169,8 @@ fun size(key: String): UInt {
     return r0.toUInt()
 }
 
-fun size(keys: JsArray<JsString?>, n: UInt): UInt {
-    val r0 = try { fixtures.annotate.flat.size_arr_str_u32(keys, n.toInt()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun size(keys: List<String>, n: UInt): UInt {
+    val r0 = try { fixtures.annotate.flat.size_arr_str_u32(keys.map { it.toJsString() }.toJsArray(), n.toInt()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
     return r0.toUInt()
 }
 
@@ -195,7 +195,7 @@ fun fetch(input: RequestInfo): tsgen.runtime.Future<Request<JsAny?, Incoming>> {
     return tsgen.runtime.Future<Request<JsAny?, Incoming>>(r1!!, { f -> val r2 = fixtures.annotate.flat.take_Request_Any_Incoming(f); r2!!.unsafeCast<Request<JsAny?, Incoming>>() }, { f -> futureErrorErr(f) })
 }
 
-fun fetch(input: Request<JsAny?, Incoming>): tsgen.runtime.Future<Request<JsAny?, Incoming>> = fetch(RequestInfo.Request(input))
+fun fetch(input: Request<*, out Incoming>): tsgen.runtime.Future<Request<JsAny?, Incoming>> = fetch(RequestInfo.Request(input))
 fun fetch(input: String): tsgen.runtime.Future<Request<JsAny?, Incoming>> = fetch(RequestInfo.Str(input))
 
 /** `TypeErr` as its box: its arm's JS value. */
@@ -245,7 +245,7 @@ fun decodeTypeErr(arm: Int, s0: JsAny?): TypeErr? = when (arm) {
 }
 
 sealed interface RequestInfo {
-    data class Request(val value: fixtures.annotate.Request<JsAny?, fixtures.annotate.Incoming>) : RequestInfo
+    data class Request(val value: fixtures.annotate.Request<*, out fixtures.annotate.Incoming>) : RequestInfo
     data class Str(val value: String) : RequestInfo
 }
 

@@ -35,10 +35,6 @@ external fun listen_fn_str_fn_str(p0: JsAny?, p1: JsAny?)
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun step_fn_Next_f64_f64_f64(p0: JsAny?)
 
-/** tw:call fn(Next<f64>,f64)->f64 */
-@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
-external fun call_fn_Next_f64_f64_f64(p0: JsAny?, p1: JsAny?, p2: Double): Double
-
 /** tw:box fn(str) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_fn_str(p0: JsAny?): JsAny?
@@ -70,6 +66,10 @@ external fun box_fn_str_f64(p0: JsAny?): JsAny?
 /** tw:unbox (fn(str)->f64) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun unbox_fn_str_f64(p0: JsAny?): JsAny?
+
+/** tw:call fn(Next<f64>,f64)->f64 */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun call_fn_Next_f64_f64_f64(p0: JsAny?, p1: JsAny?, p2: Double): Double
 
 /** tw:box fn(Next<f64>,f64)->f64 */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

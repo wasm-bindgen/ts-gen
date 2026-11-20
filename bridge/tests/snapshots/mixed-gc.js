@@ -43,14 +43,6 @@ function $str(v) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 function $array(v, what) {
   if (!Array.isArray(v)) $fail(what, v);
   return v;
@@ -860,19 +852,16 @@ function $outgoing(e) {
 }
 class $C0 {
   constructor(...a) {
-    if ($upTo(a, 0)) {
-      const m = $S.mark();
-      try {
-        const r = $E[0](this);
-        $HC.pair(this, r, null);
-      } catch (e) {
-        throw $outgoing(e);
-      } finally {
-        $S.reset(m);
-      }
-      return;
+    const m = $S.mark();
+    try {
+      const r = $E[0](this);
+      $HC.pair(this, r, null);
+    } catch (e) {
+      throw $outgoing(e);
+    } finally {
+      $S.reset(m);
     }
-    throw new TypeError("`new Counter` doesn't match its arguments");
+    return;
   }
 }
 

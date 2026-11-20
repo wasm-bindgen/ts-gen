@@ -17,4 +17,5 @@ ts-gen-abi = { path = "../../abi" }
 [dev-dependencies]
 similar = "2"
 ts-gen = { path = "../..", default-features = false }
+ts-gen-bridge = { path = "../../bridge" }
 wasmparser = "0.263"

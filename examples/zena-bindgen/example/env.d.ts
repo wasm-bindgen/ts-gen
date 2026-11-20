@@ -1,14 +1,55 @@
-// The worker's bindings from config.capnp, merged into the fixture's `Env`.
+// The worker's own declarations, beside workers-types.
+
+// Its bindings, from config.capnp.
 interface Env {
   readonly GREETING: string;
-}
-interface Env {
-  readonly COUNTER: CounterNamespace;
+  readonly HELPER: Fetcher;
+  readonly COUNTER: DurableObjectNamespace;
+  readonly ROOM: DurableObjectNamespace;
+  readonly GREETER: GreeterStub;
 }
 
-// workerd's namespace binding isn't an instance of a global
-// `DurableObjectNamespace`, which the bridge would check for the class
-// workers-types declares; an interface isn't checked.
-interface CounterNamespace {
-  getByName(name: string): DurableObjectStub;
+// TypeScript derives a stub's methods from its class with mapped types,
+// which the IR doesn't carry: the RPC stubs are declared.
+interface CounterStub extends DurableObjectStub {
+  add(by: number): Promise<number>;
+}
+interface GreeterStub extends Fetcher {
+  greet(name: string): Promise<string>;
+}
+
+// The JSON `/json` reads.
+interface Order {
+  item: string;
+  quantity?: number;
+  tags?: string[];
+}
+
+// A row of the Durable Object's SQL table.
+interface Visit {
+  id: number;
+  path: string;
+}
+
+// JS globals the tour uses that neither workers-types nor std.ir declares.
+interface Json {
+  parse(text: string): any;
+  stringify(value: any): string;
+}
+declare const JSON: Json;
+
+// A typed array is an `ArrayBufferView`, so `digest` takes one: beside the
+// class, the IR gives it the copy `u8[]`, a Zena array.
+interface SubtleCrypto {
+  digest(algorithm: string, data: Uint8Array): Promise<ArrayBuffer>;
+}
+
+// workers-types declares the rewriter's handlers as optional methods,
+// which lower as methods to call. As a property the handler is a
+// function to set.
+interface ElementHandlers {
+  element?: (element: Element) => void;
+}
+interface HTMLRewriter {
+  on(selector: string, handlers: ElementHandlers): HTMLRewriter;
 }

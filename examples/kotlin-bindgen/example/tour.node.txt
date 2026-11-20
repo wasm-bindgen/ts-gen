@@ -1,0 +1,82 @@
+== GET /
+A tour of the Workers API from Kotlin/Wasm. Routes:
+  /echo        the request read back: method, URL, headers, body
+  /url         URL and URLSearchParams
+  /form        FormData fields: strings and files
+  /json        JSON in and out
+  /crypto      digest, random values, text encoding, base64
+  /stream      ReadableStream, TransformStream, a streamed body
+  /fetch       subrequests: a service binding, fetch, cancellation
+  /timers      scheduler.wait, setTimeout, queueMicrotask, waitUntil
+  /rewrite     HTMLRewriter
+  /counter/*   a Durable Object: increment, list, reset, sql, alarm
+  /ws          a WebSocket echo (/counter/ws hibernates)
+  /rpc         an RPC entrypoint called through its stub
+  /errors      JS errors caught as typed exceptions
+  /fail        a typed exception thrown to JS (/fail/plain: any other)
+  /scheduled   runs the scheduled handler
+  /queue       runs the queue handler
+
+== POST /echo
+POST http://127.0.0.1/echo
+user-agent: (none)
+x- headers: x-kotlin=hi
+2 headers in all
+body: Hello!
+
+== GET /url?tag=a&tag=b&q=kotlin
+/url on 127.0.0.1 has 3 parameters
+  tag = a
+  tag = b
+  q = kotlin
+every tag: [a, b]
+a relative URL: http://127.0.0.1/next?page=2&from=%2Furl#top
+URL("not a url") is a TypeError (Invalid URL)
+
+== POST /form (a string and a file)
+title: the string "Kotlin"
+upload: the file note.txt (text/plain), 13 bytes: 66696c6520636f6e74656e7473
+missing: not in the form
+
+== POST /json
+{"item":"tea","quantity":4,"tags":["hot","green","doubled"],"note":"2 x tea, tags [hot, green]; parsing \"{oops\" threw a SyntaxError"}
+
+== POST /json (not JSON)
+the body is not JSON: an Error (Expected property name or '}' in JSON at position 1 (line 1 column 2))
+
+== GET /crypto
+"hello kotlin" is 68656c6c6f206b6f746c696e in UTF-8
+decoded again: hello kotlin
+SHA-256: 1def78528a6b793139fa2c939a01001fc01ac3a6226e0aa44fa2b0badda39530
+8 random bytes: 8 read back
+a UUID: 36 characters
+base64: aGVsbG8ga290bGlu, and back: hello kotlin
+atob("not base64!"): DOMException (Invalid character)
+
+== GET /stream
+3 chunks through a TransformStream: ONE TWO THREE
+this body was streamed in two chunks
+
+== GET /timers
+scheduler.wait(5) resolved, then setTimeout(5) called back
+queueMicrotask ran in the order: before, after, microtask
+waitUntil: 0 tasks had finished, and one more is running
+
+== GET /timers (again)
+scheduler.wait(5) resolved, then setTimeout(5) called back
+queueMicrotask ran in the order: before, after, microtask
+waitUntil: 1 tasks had finished, and one more is running
+
+== GET /rpc
+greet("Kotlin"): Hello from node, Kotlin
+greet("Kotlin", "loud"): HELLO FROM NODE, KOTLIN!
+checksum(bytes 1 2 3 250): 256
+factorial(20): 2432902008176640000
+divide(17, 5): 3.0 remainder 2.0
+divide(1, 0): rejected (division by zero)
+
+== GET /fail
+rejected: TypeError: Kotlin says no
+
+== GET /fail/plain
+rejected: Error: a plain Kotlin exception

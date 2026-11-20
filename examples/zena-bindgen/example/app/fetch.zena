@@ -1,0 +1,74 @@
+// Subrequests: a service binding, the global fetch, a timeout, and cancellation.
+import { Future, TaskGroup } from 'zena:async';
+import {
+  AbortController, AbortSignal, BodyInitStr, Env, Event, EventListenerOrEventListenerObjectEventListener,
+  NoStoreOrNoCache, RequestInfoStr, RequestInit, RequestInitCfProperties, Response, fetch as jsFetch, fetchWithInit,
+  scheduler
+} from '../bindings.zena';
+import { ErrArm, ErrException } from '../std.zena';
+import { ok } from './reply.zena';
+
+async function slow(): Future<String> {
+  return await (await jsFetch(new RequestInfoStr("http://helper/slow"))).text();
+}
+
+async function giveUp(ms: f64): Future<String> {
+  await scheduler().wait(ms);
+  return "gave up";
+}
+
+/** How many of its requests the helper saw abort, once it has seen one. */
+async function aborts(env: Env): Future<String> {
+  for (var attempt = 0; attempt < 50; attempt += 1) {
+    let seen = await (await env.HELPER.fetch(new RequestInfoStr("http://helper/aborts"))).text();
+    if (seen != "0") {
+      return seen;
+    }
+    await scheduler().wait(20.0);
+  }
+  return "0";
+}
+
+/** `/fetch`: the helper service through its binding and through `fetch`. */
+export async function fetchRoute(env: Env): Future<Response> {
+  let bound = await (await env.HELPER.fetch(new RequestInfoStr("http://helper/notes"))).text();
+  // The options object: a method, a body, and a literal enum.
+  let init = new RequestInit<RequestInitCfProperties>();
+  init.setMethod("POST");
+  init.body = new BodyInitStr("ping");
+  init.setCache(NoStoreOrNoCache.NoStore);
+  let global = await (await fetchWithInit(new RequestInfoStr("http://helper/echo"), init)).text();
+  // A caller's own signal is kept: the bridge joins it with the one it
+  // aborts on a drop, so the timeout still rejects the future.
+  let timed = new RequestInit<RequestInitCfProperties>();
+  timed.signal = AbortSignal.timeout(50.0);
+  let timeout = try {
+    await fetchWithInit(new RequestInfoStr("http://helper/slow"), timed);
+    "nothing"
+  } catch (e) {
+    if (e is ErrException && e.arm == ErrArm.Error) `an Error (${e.message})` else "something else"
+  };
+  let timedOut = await aborts(env);
+  // Whichever finishes first wins, and the other is dropped. Dropping a
+  // pending future cancels it: the bridge aborts a signal of its own,
+  // which the helper sees as its request aborting. With no init to carry
+  // the signal, the bridge makes one.
+  let tasks = new Array<() => Future<String>>();
+  tasks.push(() => slow());
+  tasks.push(() => giveUp(50.0));
+  await TaskGroup.race<String>(tasks);
+  let dropped = await aborts(env);
+  // An AbortController made here: JS calls the listener on `abort()`.
+  let controller = new AbortController();
+  var heard = "nothing";
+  let listener = new EventListenerOrEventListenerObjectEventListener((event: Event): void => {
+    heard = `an "${event.type_}" event`;
+  });
+  controller.signal.addEventListener("abort", listener);
+  controller.abort();
+  return ok(`service binding: ${bound}global fetch: ${global}` +
+    `a fetch with AbortSignal.timeout(50) rejected with ${timeout}\n` +
+    `the helper saw ${timedOut} of its requests abort\n` +
+    `a fetch dropped by TaskGroup.race: the helper saw ${dropped} of its requests abort\n` +
+    `AbortController: the listener heard ${heard}, signal.aborted is ${controller.signal.aborted}\n`);
+}

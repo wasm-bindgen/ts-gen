@@ -7,7 +7,7 @@
 //! shapes, enum discrimination and error mapping all happen here, in one
 //! crossing per call.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::Write;
 use std::rc::Rc;
 
@@ -153,6 +153,9 @@ pub struct Glue<'a, 'b> {
     /// Whether the glue wrote `ret`; a glue returning a helper's array
     /// leaves it to a wrapper.
     pub ret_used: bool,
+    /// The nullable parameters of the member being written: a path
+    /// through one is `undefined` when it's absent (§7).
+    nullable: HashSet<String>,
     /// Whether an `arr<str>` lowers through the bridge's `allocn`.
     pub allocn: bool,
     /// The GC values the bridge module converts in and out of the
@@ -283,6 +286,7 @@ impl<'a, 'b> Glue<'a, 'b> {
             loops: false,
             ret: None,
             ret_used: false,
+            nullable: HashSet::new(),
             allocn: false,
             convs: Vec::new(),
             lang_exports: Vec::new(),
@@ -1275,6 +1279,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                         Host::Class {
                             path,
                             interface: false,
+                            ..
                         } => {
                             let c = self.class_value(path)?;
                             format!("$instance({v}, {c}, {what})")
@@ -1730,6 +1735,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 Host::Class {
                     path,
                     interface: false,
+                    ..
                 } => format!("$isInstance({v}, {})", self.class_value(path)?),
                 Host::Class { .. } => format!("$isObject({v})"),
                 Host::Any => format!("{v} != null"),
@@ -2211,6 +2217,12 @@ impl<'a, 'b> Glue<'a, 'b> {
                 _ => return unsupported(format!("{}: a {:?} position", k.key, p.role)),
             }
         }
+        self.nullable = m
+            .params
+            .iter()
+            .filter(|p| matches!(p.ty, Type::Nullable(..)))
+            .map(|p| p.name.clone())
+            .collect();
         let cx = k.cx.clone();
         let result = func.sig.results.first();
         let future = result.and_then(|r| match &r.repr.kind {
@@ -2538,8 +2550,9 @@ impl<'a, 'b> Glue<'a, 'b> {
                     let v = args
                         .get(param.as_str())
                         .ok_or_else(|| Error::Import(format!("`{param}` isn't a parameter")))?;
+                    // A copy, so the caller's object is as it was (§7).
                     let o = b.fresh();
-                    b.line(format!("const {o} = {v} ?? {{}};"));
+                    b.line(format!("const {o} = {{ ...{v} }};"));
                     // An undefined field is left off, as an absent optional
                     // member is: dictionaries enumerate own keys.
                     for (f, x) in fields {
@@ -2568,9 +2581,17 @@ impl<'a, 'b> Glue<'a, 'b> {
         args: &HashMap<&str, String>,
         cx: &Context<'_>,
     ) -> Result<String> {
-        let Expr::Ref { path, call } = e else {
-            let Expr::Lit(l) = e else { unreachable!() };
-            return Ok(lit(l));
+        let (path, call) = match e {
+            Expr::Lit(l) => return Ok(lit(l)),
+            // Without its `undefined` and `null` elements.
+            Expr::Array(elems) => {
+                let elems = elems
+                    .iter()
+                    .map(|x| self.expr(x, args, cx))
+                    .collect::<Result<Vec<_>>>()?;
+                return Ok(format!("[{}].filter((v) => v != null)", elems.join(", ")));
+            }
+            Expr::Ref { path, call } => (path, call),
         };
         let call_args = match call {
             Some(xs) => Some(
@@ -2582,8 +2603,12 @@ impl<'a, 'b> Glue<'a, 'b> {
         };
         if let Some(v) = args.get(path[0].as_str()) {
             let mut s = v.clone();
-            for p in &path[1..] {
-                s = prop(&s, p);
+            for (i, p) in path[1..].iter().enumerate() {
+                s = if i == 0 && self.nullable.contains(&path[0]) {
+                    opt_prop(&s, p)
+                } else {
+                    prop(&s, p)
+                };
             }
             if let Some(a) = call_args {
                 let _ = write!(s, "({})", a.join(", "));
@@ -2593,9 +2618,17 @@ impl<'a, 'b> Glue<'a, 'b> {
         // The longest prefix naming a declaration.
         for n in (1..=path.len()).rev() {
             let p = Path::new(path[..n].iter().cloned());
-            if let Some((loc, TypeDecl::Class(_))) = self.l.keys.symbols.resolve_decl(&p, cx) {
-                let c = self.decl_value(&loc)?;
+            if let Some((loc, TypeDecl::Class(class))) = self.l.keys.symbols.resolve_decl(&p, cx) {
                 let rest = &path[n..];
+                // `@js(object) new()` is a plain object, of no JS class.
+                let object = class.members.iter().any(|m| {
+                    matches!(m.kind, MemberKind::New(None))
+                        && m.meta.attrs.js.iter().any(|j| matches!(j, JsEntry::Object))
+                });
+                if object && call_args.is_some() && matches!(rest, [m] if m == "new") {
+                    return Ok("{}".into());
+                }
+                let c = self.decl_value(&loc)?;
                 return Ok(match (rest, call_args) {
                     ([m], Some(a)) if m == "new" => format!("new {c}({})", a.join(", ")),
                     (rest, a) => {

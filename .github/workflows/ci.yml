@@ -75,6 +75,8 @@ jobs:
       with:
         gradle-version: '9.0.0'
     - uses: extractions/setup-just@v2
+    # The Kotlin worker example's tour runs in workerd.
+    - run: npm i -g workerd@1.20261119.1
     - run: just test-kotlin
 
   # Compiles the Zena bindings with the Zena fork that carries the `tw`
@@ -108,6 +110,8 @@ jobs:
         npm run build -w @zena-lang/zena-cli
         echo "ZENA=$PWD/target/release/zena-cli" >> "$GITHUB_ENV"
         echo "ZENA_REPO_ROOT=$PWD" >> "$GITHUB_ENV"
+    # Serves examples/zena-bindgen/example for its tour.
+    - run: npm i -g workerd@1.20261110.1
     - run: just test-zena
 
   test_integration:

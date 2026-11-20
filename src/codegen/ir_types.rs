@@ -158,8 +158,11 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
     let index = |n: &str| m.params.iter().position(|p| p.name == n);
     let args = match template {
         None => (0..m.params.len()).map(Arg::Param).collect(),
+        // A fill of a `let` is an object the bridge makes, which a
+        // wasm-bindgen binding doesn't pass.
         Some(t) => t
             .iter()
+            .filter(|e| !matches!(e, abi::Telem::Fill { param, .. } if index(param).is_none()))
             .map(|e| match e {
                 abi::Telem::Param(n)
                 | abi::Telem::Spread(n)

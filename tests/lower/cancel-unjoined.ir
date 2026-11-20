@@ -1,0 +1,28 @@
+// `AbortSignal.any` isn't declared, so no member is cancellable: a cancel signal joins the caller's through it
+ir 1;
+
+class AbortSignal {
+  get aborted(): bool;
+}
+
+class AbortController {
+  new() throws;
+  get signal(): AbortSignal;
+  abort() throws;
+  abort(reason: Any?) throws;
+}
+
+interface RequestInit {
+  @js(object)
+  new();
+  get method(): str?;
+  set method(value: str);
+  get signal(): AbortSignal?;
+  set signal(value: @js(null) AbortSignal?);
+}
+
+fetch(input: str): future<str>;
+fetch(input: str, init: RequestInit): future<str>;
+send(body: str): future<unit>;
+send(body: str, init: RequestInit): future<unit>;
+ping(): future<unit>;

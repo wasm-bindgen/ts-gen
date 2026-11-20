@@ -11,10 +11,10 @@ val Entry.created: fixtures.std.Date
         return r0!!.unsafeCast<fixtures.std.Date>()
     }
 
-val Entry.tags: fixtures.std.Map<JsAny?, JsAny?>
+val Entry.tags: fixtures.std.Map<JsString, JsNumber>
     get() {
         val r0 = fixtures.with_std.flat.Entry_get_tags(this)
-        return r0!!.unsafeCast<fixtures.std.Map<JsAny?, JsAny?>>()
+        return r0!!.unsafeCast<fixtures.std.Map<JsString, JsNumber>>()
     }
 
 val Entry.body: fixtures.std.Uint8Array
@@ -29,10 +29,10 @@ val Entry.pattern: fixtures.std.RegExp?
         return r0?.unsafeCast<fixtures.std.RegExp>()
     }
 
-val Entry.other: WeakRef<JsAny?>
+val Entry.other: WeakRef<Entry>
     get() {
         val r0 = fixtures.with_std.flat.Entry_get_other(this)
-        return r0!!.unsafeCast<WeakRef<JsAny?>>()
+        return r0!!.unsafeCast<WeakRef<Entry>>()
     }
 
 external interface Error : JsAny
@@ -58,7 +58,7 @@ fun FormatSettings.setLocales(value: LocalesArgument) {
 }
 
 fun FormatSettings.setLocales(value: String) = setLocales(LocalesArgument.Str(value))
-fun FormatSettings.setLocales(value: JsArray<JsString?>) = setLocales(LocalesArgument.StrArray(value))
+fun FormatSettings.setLocales(value: List<String>) = setLocales(LocalesArgument.StrArray(value))
 
 val FormatSettings.required: LocalesArgument?
     get() {
@@ -73,7 +73,7 @@ fun FormatSettings.setRequired(value: LocalesArgument) {
 }
 
 fun FormatSettings.setRequired(value: String) = setRequired(LocalesArgument.Str(value))
-fun FormatSettings.setRequired(value: JsArray<JsString?>) = setRequired(LocalesArgument.StrArray(value))
+fun FormatSettings.setRequired(value: List<String>) = setRequired(LocalesArgument.StrArray(value))
 
 var FormatSettings.nullable: LocalesArgument?
     get() {
@@ -119,7 +119,7 @@ fun display(style: fixtures.std.CompactDisplayKind) {
     try { fixtures.with_std.flat.display_Intl_CompactDisplayKind(style.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun store(s: Store<JsAny?>): tsgen.runtime.Future<Nothing> {
+fun store(s: Store<*>): tsgen.runtime.Future<Nothing> {
     val r0 = fixtures.with_std.flat.store_Store_unit(s)
     return tsgen.runtime.Future<Nothing>(r0!!, { f -> fixtures.with_std.flat.take_never(f); error("a never future resolved") }, { f -> futureErrorErr(f) })
 }
@@ -173,7 +173,7 @@ fun JsAny.toKKind(): KKind {
 
 sealed interface LocalesArgument {
     data class Str(val value: String) : LocalesArgument
-    data class StrArray(val value: JsArray<JsString?>) : LocalesArgument
+    data class StrArray(val value: List<String>) : LocalesArgument
 }
 
 class LocalesArgumentWire(val arm: Int, val s0: JsAny?)
@@ -181,13 +181,13 @@ class LocalesArgumentWire(val arm: Int, val s0: JsAny?)
 fun encodeLocalesArgument(v: LocalesArgument?): LocalesArgumentWire = when (v) {
     null -> LocalesArgumentWire(0, null)
     is LocalesArgument.Str -> LocalesArgumentWire(1, v.value.toJsString())
-    is LocalesArgument.StrArray -> LocalesArgumentWire(2, v.value)
+    is LocalesArgument.StrArray -> LocalesArgumentWire(2, v.value.map { it.toJsString() }.toJsArray())
 }
 
 fun decodeLocalesArgument(arm: Int, s0: JsAny?): LocalesArgument? = when (arm) {
     0 -> null
     1 -> LocalesArgument.Str(s0!!.unsafeCast<JsString>().toString())
-    2 -> LocalesArgument.StrArray(s0!!.unsafeCast<JsArray<JsString?>>())
+    2 -> LocalesArgument.StrArray(s0!!.unsafeCast<JsArray<JsString>>().let { a -> a.toList().map { it.toString() } })
     else -> throw IllegalStateException("LocalesArgument: arm $arm")
 }
 

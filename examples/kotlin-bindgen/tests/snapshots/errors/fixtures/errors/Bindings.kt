@@ -40,9 +40,9 @@ fun Kv.put(key: String, value: String): tsgen.runtime.Future<Unit> {
  *
  * * `TypeError`
  */
-fun Kv.list(): JsArray<JsString?> {
+fun Kv.list(): List<String> {
     val r2 = try { fixtures.errors.flat.Kv_list(this) } catch (e: kotlin.js.JsException) { throw raiseTypeErr(e) }
-    return r2!!.unsafeCast<JsArray<JsString?>>()
+    return r2!!.unsafeCast<JsArray<JsString>>().let { a -> a.toList().map { it.toString() } }
 }
 
 /**
@@ -97,6 +97,13 @@ val AbortSignal.aborted: Boolean
         val r0 = fixtures.errors.flat.AbortSignal_get_aborted(this)
         return (r0 != 0)
     }
+
+object AbortSignalStatic {
+    fun any(signals: List<AbortSignal>): AbortSignal {
+        val r0 = try { fixtures.errors.flat.AbortSignal_any_arr_AbortSignal(signals.toJsArray()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+        return r0!!.unsafeCast<AbortSignal>()
+    }
+}
 
 external interface AbortController : JsAny
 
@@ -159,11 +166,6 @@ fun DOMException(message: String?, name: String): DOMException {
  */
 fun open() {
     try { fixtures.errors.flat.open() } catch (e: kotlin.js.JsException) { throw raiseStorageOrDOMExceptionErr(e) }
-}
-
-fun AbortSignal(): AbortSignal {
-    val r0 = fixtures.errors.flat.AbortSignal_new()
-    return r0!!.unsafeCast<AbortSignal>()
 }
 
 fun AbortController(): AbortController {

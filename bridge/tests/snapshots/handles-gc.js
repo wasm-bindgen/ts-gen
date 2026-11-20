@@ -35,14 +35,6 @@ function $str(v) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 function $array(v, what) {
   if (!Array.isArray(v)) $fail(what, v);
   return v;
@@ -486,7 +478,7 @@ function $outgoing(e) {
 }
 class $C0 {
   constructor(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       $checkLive();
       const m = $S.mark();
       try {
@@ -504,7 +496,7 @@ class $C0 {
     throw new TypeError("`new Counter` doesn't match its arguments");
   }
   inc(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       $checkLive();
       try {
         const t1 = a[0];
@@ -518,7 +510,7 @@ class $C0 {
     throw new TypeError("`Counter.inc` doesn't match its arguments");
   }
   label(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       $checkLive();
       try {
         const t1 = a[0];
@@ -532,7 +524,7 @@ class $C0 {
     throw new TypeError("`Counter.label` doesn't match its arguments");
   }
   same(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       $checkLive();
       const m = $S.mark();
       try {
@@ -549,37 +541,31 @@ class $C0 {
     throw new TypeError("`Counter.same` doesn't match its arguments");
   }
   fail(...a) {
-    if ($upTo(a, 0)) {
-      $checkLive();
-      try {
-        $E[6](this, $HC.unwrap(this, $C0, "Counter"));
-      } catch (e) {
-        throw $outgoing(e);
-      }
-      return;
+    $checkLive();
+    try {
+      $E[6](this, $HC.unwrap(this, $C0, "Counter"));
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Counter.fail` doesn't match its arguments");
+    return;
   }
   static zero(...a) {
-    if ($upTo(a, 0)) {
-      $checkLive();
-      const m = $S.mark();
-      try {
-        const r = $E[7]();
-        return $HC.wrap(r, () => Object.create($C0.prototype), null);
-      } catch (e) {
-        throw $outgoing(e);
-      } finally {
-        $S.reset(m);
-      }
+    $checkLive();
+    const m = $S.mark();
+    try {
+      const r = $E[7]();
+      return $HC.wrap(r, () => Object.create($C0.prototype), null);
+    } catch (e) {
+      throw $outgoing(e);
+    } finally {
+      $S.reset(m);
     }
-    throw new TypeError("`Counter.zero` doesn't match its arguments");
   }
 }
 
 const $N0 = {
   maybe(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       $checkLive();
       const m = $S.mark();
       try {
@@ -596,7 +582,7 @@ const $N0 = {
     throw new TypeError("`maybe` doesn't match its arguments");
   },
   apply(...a) {
-    if (a.length >= 2 && $upTo(a, 2)) {
+    if (a.length >= 2) {
       $checkLive();
       try {
         const t1 = a[0];
@@ -612,7 +598,7 @@ const $N0 = {
     throw new TypeError("`apply` doesn't match its arguments");
   },
   each(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       $checkLive();
       const m = $S.mark();
       try {

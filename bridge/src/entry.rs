@@ -931,6 +931,8 @@ impl<'a, 'b> Glue<'a, 'b> {
     /// Incoming dispatch over the overloads sharing one JS entry (§7):
     /// arity, then constant patterns, then type tests in declaration order.
     /// A single arm still checks its pattern, even with validation off.
+    /// Arguments past an arm's parameters are ignored, so arity only
+    /// chooses between arms.
     #[allow(clippy::type_complexity)]
     fn dispatch(
         &mut self,
@@ -956,37 +958,54 @@ impl<'a, 'b> Glue<'a, 'b> {
             b.open("try {");
         }
         let mut seen: Vec<(String, &str)> = Vec::new();
-        for k in arms {
-            let targs = self.mono_targs.get(&k.key).cloned().unwrap_or_default();
-            let sig = self.l.member(k, &targs)?;
-            let m = k.member;
-            let template: Vec<Telem> = match m.meta.attrs.js.args().map(<[_]>::to_vec) {
-                Some(t) => t,
-                None => m
+        let mut total = false;
+        let templates: Vec<Vec<Telem>> = arms
+            .iter()
+            .map(|k| match k.member.meta.attrs.js.args() {
+                Some(t) => t.to_vec(),
+                None => k
+                    .member
                     .params
                     .iter()
                     .map(|p| Telem::Param(p.name.clone()))
                     .collect(),
-            };
-            let mut conds = Vec::new();
-            let mut binds: Vec<(String, String)> = Vec::new();
-            let spread = matches!(template.last(), Some(Telem::Spread(_)));
-            let n = template.len();
-            if spread {
-                conds.push(format!("a.length >= {}", n - 1));
-            } else {
-                let required = template
+            })
+            .collect();
+        // The fewest arguments each arm takes, and the most (none for a
+        // spread).
+        let counts: Vec<(usize, Option<usize>)> = templates
+            .iter()
+            .map(|t| {
+                if matches!(t.last(), Some(Telem::Spread(_))) {
+                    return (t.len() - 1, None);
+                }
+                let required = t
                     .iter()
                     .rposition(|t| !matches!(t, Telem::Undefined | Telem::Fill { .. }))
                     .map_or(0, |i| i + 1);
-                // Past the parameters, only `undefined`s: WebIDL drops
-                // trailing undefined arguments, and workerd calls a Durable
-                // Object's `fetch(request)` with `(request, undefined,
-                // undefined)`.
-                if required > 0 {
-                    conds.push(format!("a.length >= {required}"));
-                }
-                conds.push(format!("$upTo(a, {n})"));
+                (required, Some(t.len()))
+            })
+            .collect();
+        for ((k, template), &(required, most)) in arms.iter().zip(templates).zip(&counts) {
+            let targs = self.mono_targs.get(&k.key).cloned().unwrap_or_default();
+            let sig = self.l.member(k, &targs)?;
+            let m = k.member;
+            let mut conds = Vec::new();
+            let mut binds: Vec<(String, String)> = Vec::new();
+            if required > 0 {
+                conds.push(format!("a.length >= {required}"));
+            }
+            // More arguments go to a longer arm they cover, and are ignored
+            // without one. Trailing `undefined`s don't count, as WebIDL
+            // drops them: workerd calls a Durable Object's `fetch(request)`
+            // with `(request, undefined, undefined)`.
+            let longer = most.and_then(|n| {
+                let takes_more = |c: &&(usize, Option<usize>)| c.1.is_none_or(|m| m > n);
+                let covers = counts.iter().filter(takes_more).map(|c| c.0.max(n + 1));
+                covers.min()
+            });
+            if let Some(next) = longer {
+                conds.push(format!("$upTo(a, {})", next - 1));
             }
             for (i, t) in template.iter().enumerate() {
                 match t {
@@ -1056,22 +1075,40 @@ impl<'a, 'b> Glue<'a, 'b> {
             // arm its arguments match.
             let cond = if pick {
                 let key = js_str(&k.key);
-                format!("(arm ?? {key}) === {key} && {cond}")
+                let pick = format!("(arm ?? {key}) === {key}");
+                if cond.is_empty() {
+                    pick
+                } else {
+                    format!("{pick} && {cond}")
+                }
             } else {
                 cond
             };
+            // With nothing to test, the arm takes every call.
+            if total {
+                continue;
+            }
+            if cond.is_empty() {
+                if !body(self, b, k, &sig, &binds)? {
+                    b.line("return;");
+                }
+                total = true;
+                continue;
+            }
             b.open(format!("if ({cond}) {{"));
             if !body(self, b, k, &sig, &binds)? {
                 b.line("return;");
             }
             b.close("}");
         }
-        let msg = if single {
-            format!("`{label}` doesn't match its arguments")
-        } else {
-            format!("no overload of `{label}` matches its arguments")
-        };
-        b.line(format!("throw new TypeError({});", js_str(&msg)));
+        if !total {
+            let msg = if single {
+                format!("`{label}` doesn't match its arguments")
+            } else {
+                format!("no overload of `{label}` matches its arguments")
+            };
+            b.line(format!("throw new TypeError({});", js_str(&msg)));
+        }
         if fold {
             b.close("} catch (e) {");
             b.depth += 1;

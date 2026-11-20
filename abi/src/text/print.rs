@@ -459,6 +459,10 @@ pub(crate) fn expr(e: &Expr) -> String {
             }
             s
         }
+        Expr::Array(elems) => {
+            let elems: Vec<String> = elems.iter().map(expr).collect();
+            format!("[{}]", elems.join(", "))
+        }
     }
 }
 

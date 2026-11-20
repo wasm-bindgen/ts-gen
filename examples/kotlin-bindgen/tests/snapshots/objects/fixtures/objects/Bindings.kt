@@ -11,22 +11,22 @@ val Upload.retry: UploadRetry?
         return r0?.unsafeCast<UploadRetry>()
     }
 
-var Upload.headers: Record<JsAny?>
+var Upload.headers: Record<JsString>
     get() {
         val r0 = fixtures.objects.flat.Upload_get_headers(this)
-        return r0!!.unsafeCast<Record<JsAny?>>()
+        return r0!!.unsafeCast<Record<JsString>>()
     }
     set(value) {
         fixtures.objects.flat.Upload_set_headers_Record_Str(this, value)
     }
 
-var Upload.parts: JsArray<UploadParts?>
+var Upload.parts: List<UploadParts>
     get() {
         val r0 = fixtures.objects.flat.Upload_get_parts(this)
-        return r0!!.unsafeCast<JsArray<UploadParts?>>()
+        return r0!!.unsafeCast<JsArray<UploadParts>>().let { a -> a.toList() }
     }
     set(value) {
-        fixtures.objects.flat.Upload_set_parts_arr_UploadParts(this, value)
+        fixtures.objects.flat.Upload_set_parts_arr_UploadParts(this, value.toJsArray())
     }
 
 var Upload.hooks: Object
@@ -49,10 +49,10 @@ var Upload.extra: Object
 
 external interface Slot<T : JsAny?> : JsAny
 
-var <T : JsAny?> Slot<T>.inner: SlotInner<JsAny?>
+var <T : JsAny?> Slot<T>.inner: SlotInner<T>
     get() {
         val r0 = fixtures.objects.flat.Slot_get_inner(this)
-        return r0!!.unsafeCast<SlotInner<JsAny?>>()
+        return r0!!.unsafeCast<SlotInner<T>>()
     }
     set(value) {
         fixtures.objects.flat.Slot_set_inner_SlotInner_T(this, value)
@@ -69,17 +69,17 @@ fun Canvas.filter(filter: String) = filter(Filter.Str(filter))
 fun Canvas.filter(filter: FilterOpMap) = filter(Filter.FilterOpMap(filter))
 fun Canvas.filter(filter: CollectionOpMap) = filter(Filter.CollectionOpMap(filter))
 
-fun Canvas.draw(listing: JsArray<ListingItem?>, shape: Shape, border: Border) {
+fun Canvas.draw(listing: List<ListingItem>, shape: Shape, border: Border) {
     val w0 = encodeShape(shape)
     val w1 = encodeBorder(border)
-    try { fixtures.objects.flat.Canvas_draw_arr_ListingItem_Shape_Border(this, listing, w0.arm, w0.s0, w1.arm, w1.s0, w1.s1) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    try { fixtures.objects.flat.Canvas_draw_arr_ListingItem_Shape_Border(this, listing.toJsArray(), w0.arm, w0.s0, w1.arm, w1.s0, w1.s1) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun Canvas.draw(listing: JsArray<ListingItem?>, shape: String, border: Border) = draw(listing, Shape.Str(shape), border)
-fun Canvas.draw(listing: JsArray<ListingItem?>, shape: ShapeObject, border: Border) = draw(listing, Shape.ShapeObject(shape), border)
-fun Canvas.draw(listing: JsArray<ListingItem?>, shape: Shape, border: Double) = draw(listing, shape, Border.F64(border))
-fun Canvas.draw(listing: JsArray<ListingItem?>, shape: Shape, border: BorderColor) = draw(listing, shape, Border.BorderColor(border))
-fun Canvas.draw(listing: JsArray<ListingItem?>, shape: Shape, border: BorderTop) = draw(listing, shape, Border.BorderTop(border))
+fun Canvas.draw(listing: List<ListingItem>, shape: String, border: Border) = draw(listing, Shape.Str(shape), border)
+fun Canvas.draw(listing: List<ListingItem>, shape: ShapeObject, border: Border) = draw(listing, Shape.ShapeObject(shape), border)
+fun Canvas.draw(listing: List<ListingItem>, shape: Shape, border: Double) = draw(listing, shape, Border.F64(border))
+fun Canvas.draw(listing: List<ListingItem>, shape: Shape, border: BorderColor) = draw(listing, shape, Border.BorderColor(border))
+fun Canvas.draw(listing: List<ListingItem>, shape: Shape, border: BorderTop) = draw(listing, shape, Border.BorderTop(border))
 
 external interface Search : JsAny
 
@@ -213,24 +213,24 @@ fun FilterOpMap.set_ne(value: String) {
 
 external interface CollectionOpMap : JsAny
 
-val CollectionOpMap._in: JsArray<JsString?>?
+val CollectionOpMap._in: List<String>?
     get() {
         val r0 = fixtures.objects.flat.CollectionOpMap_get_in(this)
-        return r0?.unsafeCast<JsArray<JsString?>>()
+        return r0?.unsafeCast<JsArray<JsString>>()?.let { a -> a.toList().map { it.toString() } }
     }
 
-fun CollectionOpMap.set_in(value: JsArray<JsString?>) {
-    fixtures.objects.flat.CollectionOpMap_set_in_arr_str(this, value)
+fun CollectionOpMap.set_in(value: List<String>) {
+    fixtures.objects.flat.CollectionOpMap_set_in_arr_str(this, value.map { it.toJsString() }.toJsArray())
 }
 
-val CollectionOpMap._nin: JsArray<JsString?>?
+val CollectionOpMap._nin: List<String>?
     get() {
         val r0 = fixtures.objects.flat.CollectionOpMap_get_nin(this)
-        return r0?.unsafeCast<JsArray<JsString?>>()
+        return r0?.unsafeCast<JsArray<JsString>>()?.let { a -> a.toList().map { it.toString() } }
     }
 
-fun CollectionOpMap.set_nin(value: JsArray<JsString?>) {
-    fixtures.objects.flat.CollectionOpMap_set_nin_arr_str(this, value)
+fun CollectionOpMap.set_nin(value: List<String>) {
+    fixtures.objects.flat.CollectionOpMap_set_nin_arr_str(this, value.map { it.toJsString() }.toJsArray())
 }
 
 external interface UploadRetry : JsAny

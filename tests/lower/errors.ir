@@ -48,9 +48,8 @@ class StorageError extends DOMException {}
 /// * `DOMException | StorageError`
 open() throws StorageOrDOMExceptionErr;
 
-interface AbortSignal {
-  @js(object)
-  new();
+class AbortSignal {
+  static any(signals: arr<AbortSignal>): AbortSignal throws;
   get aborted(): bool;
 }
 
@@ -70,8 +69,9 @@ interface RequestInit {
   set signal(value: @js(null) AbortSignal?);
 }
 
+@js(args = (input, init? { signal = ctl.signal }), let init = RequestInit.new(), let ctl = AbortController.new(), cancel = ctl.abort)
 fetch(input: str): future<str>;
-@js(args = (input, init? { signal = ctl.signal }), let ctl = AbortController.new(), cancel = ctl.abort)
+@js(args = (input, init? { signal = AbortSignal.any([init.signal, ctl.signal]) }), let ctl = AbortController.new(), cancel = ctl.abort)
 fetch(input: str, init: RequestInit?): future<str>;
 
 enum DOMExceptionErr extends err {

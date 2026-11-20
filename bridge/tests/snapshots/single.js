@@ -40,14 +40,6 @@ function $str(v) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 function $isInstance(v, C) {
   return typeof C === "function" && v instanceof C;
 }
@@ -563,7 +555,7 @@ function $outgoing(e) {
 }
 const $N0 = {
   pair(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -578,7 +570,7 @@ const $N0 = {
     throw new TypeError("`pair` doesn't match its arguments");
   },
   maybe(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = (t1 == null ? 0 : 1);
@@ -594,7 +586,7 @@ const $N0 = {
     throw new TypeError("`maybe` doesn't match its arguments");
   },
   lookup(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $str(t1);
@@ -607,7 +599,7 @@ const $N0 = {
     throw new TypeError("`lookup` doesn't match its arguments");
   },
   count(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $str(t1);

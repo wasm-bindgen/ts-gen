@@ -1,0 +1,57 @@
+// Errors, in both directions.
+import { Future } from 'zena:async';
+import {
+  DOMExceptionErrArm, DOMExceptionErrException, Env, JSON, RequestInfoStr, Response, StrOrURLStr, URL, atob,
+  fetch as jsFetch
+} from '../bindings.zena';
+import { ErrArm, ErrException } from '../std.zena';
+import { ok } from './reply.zena';
+
+/** `/fail`: what JS throws, as Zena catches it. */
+export async function fail(env: Env): Future<Response> {
+  // annotate.d.ts tags `atob` `@throws {DOMException}`: its error is an
+  // enum with that arm, beside the arms every JS call can throw.
+  let typed = try {
+    atob("not base64!")
+  } catch (e) {
+    if (e is DOMExceptionErrException && e.arm == DOMExceptionErrArm.DOMException) {
+      "a DOMException: " + e.message.split(" (")[0]
+    } else {
+      "something else"
+    }
+  };
+  // Without a tag a call throws `err`: a TypeError or RangeError, or any
+  // other Error.
+  let typeError = try {
+    new URL(new StrOrURLStr("not a url")).href
+  } catch (e) {
+    if (e is ErrException && e.arm == ErrArm.TypeError) "a TypeError: " + e.message else "something else"
+  };
+  let other = try {
+    JSON().parse("{oops");
+    "nothing"
+  } catch (e) {
+    if (e is ErrException && e.arm == ErrArm.Error) "another Error: " + e.message else "something else"
+  };
+  // A rejected promise is the same error, thrown by the `await`.
+  let rejected = try {
+    await jsFetch(new RequestInfoStr("not a url"));
+    "nothing"
+  } catch (e) {
+    if (e is ErrException && e.arm == ErrArm.TypeError) "a TypeError: " + e.message else "another Error: " + e.message
+  };
+  // What Zena throws, as JS catches it: the helper calls the two routes below.
+  let outward = await (await env.HELPER.fetch(new RequestInfoStr("http://helper/catch"))).text();
+  return ok(`atob("not base64!") threw ${typed}\nnew URL("not a url") threw ${typeError}\n` +
+    `JSON.parse("{oops") threw ${other}\nfetch("not a url") rejected with ${rejected}\n${outward}`);
+}
+
+/** `/fail/typed`: an arm of `err` leaves as its JS class. */
+export function failTyped(): Response {
+  throw new ErrException(ErrArm.TypeError, "Zena threw a TypeError");
+}
+
+/** `/fail/plain`: any other Zena error leaves as a JS Error. */
+export function failPlain(): Response {
+  throw new Error("Zena threw a plain Error");
+}

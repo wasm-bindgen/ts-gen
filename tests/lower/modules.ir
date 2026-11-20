@@ -1,5 +1,9 @@
 ir 1;
 
+class Retrier extends "steps".Runner {
+  retry() throws;
+}
+
 read(): StrOrArrayBufferOrF64 throws;
 
 enum StrOrArrayBufferOrF64 {
@@ -50,6 +54,10 @@ module "steps" {
 
   step(config: StepConfig) throws;
 
+  class Runner {
+    run() throws;
+  }
+
   interface StepConfigRetries {
     @js(object)
     new();
@@ -57,7 +65,7 @@ module "steps" {
     set limit(value: f64);
   }
 
-  export { step };
+  export { step, Runner };
 }
 
 module "sink" {

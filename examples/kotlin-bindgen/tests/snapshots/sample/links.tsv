@@ -25,6 +25,9 @@ js_code	fixtures.sample.flat.Map_new	tw:js/global	Map.new()
 js_code	fixtures.sample.flat.Map_get_K	tw:js/global	Map#get(K)
 js_code	fixtures.sample.flat.Map_set_K_V	tw:js/global	Map#set(K,V)
 js_code	fixtures.sample.flat.Map_get_size	tw:js/global	Map#get:size()
+js_code	fixtures.sample.flat.Index_nested	tw:js/global	Index#nested()
+js_code	fixtures.sample.flat.Index_pairs	tw:js/global	Index#pairs()
+js_code	fixtures.sample.flat.Index_lists	tw:js/global	Index#lists()
 js_code	fixtures.sample.flat.Bytes_from_Map_str_f64	tw:js/global	Bytes.from(Map<str,f64>)
 js_code	fixtures.sample.flat.Bytes_from_Map_str_T	tw:js/global	Bytes.from(Map<str,T>)
 js_code	fixtures.sample.flat.Bytes_at_u32	tw:js/global	Bytes#at(u32)
@@ -56,12 +59,6 @@ js_code	fixtures.sample.flat.future_resolve_Response	tw:future	resolve<Response>
 js_code	fixtures.sample.flat.reject_err	tw:future	reject<err>
 js_code	fixtures.sample.flat.future_resolve_i64	tw:future	resolve<i64>
 js_code	fixtures.sample.flat.future_resolve_u64	tw:future	resolve<u64>
-js_code	fixtures.sample.flat.box_fn_Event	tw:box	fn(Event)
-js_code	fixtures.sample.flat.unbox_fn_Event	tw:unbox	fn(Event)
-js_code	fixtures.sample.flat.box_fn_str_str	tw:box	fn(str,str)
-js_code	fixtures.sample.flat.unbox_fn_str_str	tw:unbox	fn(str,str)
-js_code	fixtures.sample.flat.box_fn	tw:box	fn()
-js_code	fixtures.sample.flat.unbox_fn	tw:unbox	fn()
 js_code	fixtures.sample.flat.box_Counter	tw:box	Counter
 js_code	fixtures.sample.flat.unbox_Counter	tw:unbox	Counter
 js_code	fixtures.sample.flat.unbox_Body	tw:unbox	Body
@@ -72,6 +69,12 @@ js_code	fixtures.sample.flat.unbox_Flags	tw:unbox	Flags
 js_code	fixtures.sample.flat.box_Flags	tw:box	Flags
 js_code	fixtures.sample.flat.unbox_KvError	tw:unbox	KvError
 js_code	fixtures.sample.flat.box_KvError	tw:box	KvError
+js_code	fixtures.sample.flat.box_fn_Event	tw:box	fn(Event)
+js_code	fixtures.sample.flat.unbox_fn_Event	tw:unbox	fn(Event)
+js_code	fixtures.sample.flat.box_fn_str_str	tw:box	fn(str,str)
+js_code	fixtures.sample.flat.unbox_fn_str_str	tw:unbox	fn(str,str)
+js_code	fixtures.sample.flat.box_fn	tw:box	fn()
+js_code	fixtures.sample.flat.unbox_fn	tw:unbox	fn()
 js_code	tsgen.runtime.futurePoll	tw:future	poll
 js_code	tsgen.runtime.futureDrop	tw:future	drop
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

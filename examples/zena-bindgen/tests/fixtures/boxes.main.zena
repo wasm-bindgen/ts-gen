@@ -1,0 +1,15 @@
+import { Table, Shape } from './boxes.zena';
+
+export function run(t: Table): f64 {
+  let (name, n) = t.entry().value.unbox();
+  let (label, shape) = t.shape().value.unbox();
+  let key: String = t.key().value;
+  let maybe: String | null = t.maybeKey().value;
+  let flag: boolean = t.flag().value;
+  let count: u32 = t.count().value;
+  let names: FixedArray<String> = t.names().value.unbox();
+  let bytes: FixedArray<u8> = t.bytes().value.unbox();
+  let (inner, m) = t.nested().value.value.unbox();
+  t.put(t.entry());
+  return n + m + (names.length as f64) + (bytes.length as f64) + (count as f64);
+}

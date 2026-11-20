@@ -493,7 +493,18 @@ impl Lowerer<'_> {
     }
 
     fn parent(&mut self, t: &TypeRef, cx: &Tcx) -> Option<abi::TypeRef> {
-        match self.ty(t, cx) {
+        // A class's `extends` holds a qualified name as one dotted segment.
+        let path = match t {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } if segments.len() == 1 && segments[0].contains('.') => Some(TypeRef::Reference {
+                segments: segments[0].split('.').map(String::from).collect(),
+                generic_args: generic_args.clone(),
+            }),
+            _ => None,
+        };
+        match self.ty(path.as_ref().unwrap_or(t), cx) {
             abi::Type::Named(r) => Some(r),
             _ => None,
         }
@@ -1189,8 +1200,8 @@ impl Lowerer<'_> {
                     p.once = once.contains(&p.name) && self.is_callback(&p.ty, &cx.place);
                 }
                 let mut lets = Vec::new();
-                if let Some((param, controller)) = &cancel {
-                    lets = cancellable(&mut v, param, controller);
+                if let Some(cancel) = &cancel {
+                    lets = cancellable(&mut v, cancel);
                 }
                 let mut o = build(
                     &form,
@@ -1374,25 +1385,55 @@ impl Lowerer<'_> {
     }
 
     /// The parameter whose dictionary takes an `AbortSignal` as `signal`,
-    /// and the path of `AbortController`, when both are declared: a dropped
-    /// future then aborts the call (IR.md §16).
-    fn cancel_param(&mut self, sig: &Sig<'_>, cx: &Tcx) -> Option<(String, abi::Path)> {
-        if !self.opts.cancel {
+    /// with the paths of `AbortController` and `AbortSignal`, when both
+    /// are declared: a dropped future then aborts the call (IR.md §16).
+    fn cancel_param(&mut self, sig: &Sig<'_>, cx: &Tcx) -> Option<Cancel> {
+        if !self.opts.cancel || !self.declares_controller(cx) {
             return None;
         }
-        let controller_ref = TypeRef::Reference {
-            segments: vec!["AbortController".into()],
-            generic_args: Vec::new(),
-        };
-        if !self.declares_controller(cx) {
+        if !self.declares_join(cx) {
+            if self.signal_param(sig, cx).is_some() {
+                self.warn(
+                    "`AbortSignal.any` isn't declared, so no member is cancellable: a cancel signal joins the caller's through it",
+                );
+            }
             return None;
         }
-        let abi::Type::Named(controller) = self.ty(&controller_ref, cx) else {
-            return None;
+        let path = |l: &mut Self, name: &str| {
+            let r = TypeRef::Reference {
+                segments: vec![name.into()],
+                generic_args: Vec::new(),
+            };
+            match l.ty(&r, cx) {
+                abi::Type::Named(r) => Some(r.path),
+                _ => None,
+            }
         };
-        let controller = controller.path;
+        let controller = path(self, "AbortController")?;
+        let signal = path(self, "AbortSignal")?;
+        let (index, param, ty, id) = self.signal_param(sig, cx)?;
+        let dictionary = match (self.is_dictionary(id, 0), self.ty(&ty, cx)) {
+            (true, abi::Type::Named(r)) => Some(r.path),
+            _ => None,
+        };
+        Some(Cancel {
+            param,
+            index,
+            dictionary,
+            controller,
+            signal,
+        })
+    }
+
+    /// The first parameter typed as an interface with an `AbortSignal`
+    /// `signal`: its position, name, type and declaration.
+    fn signal_param(
+        &mut self,
+        sig: &Sig<'_>,
+        cx: &Tcx,
+    ) -> Option<(usize, String, TypeRef, TypeId)> {
         let names = self.param_names(sig.params, cx);
-        for (p, name) in sig.params.iter().zip(names) {
+        for (index, (p, name)) in sig.params.iter().zip(names).enumerate() {
             let ty = p
                 .type_ref
                 .split_empties()
@@ -1411,14 +1452,14 @@ impl Lowerer<'_> {
                     && g.type_ref.format_ts().contains("AbortSignal"))
             });
             if has_signal {
-                return Some((name, controller));
+                return Some((index, name, ty, id));
             }
         }
         None
     }
 
-    /// Whether the input declares an `AbortController` with the
-    /// constructor, `signal` and `abort` that cancellation calls.
+    /// Whether the input declares the `AbortController` cancellation
+    /// calls: its constructor, `signal` and `abort`.
     fn declares_controller(&self, cx: &Tcx) -> bool {
         let Some(id) = self.resolve_id(&["AbortController".to_string()], cx) else {
             return false;
@@ -1430,6 +1471,20 @@ impl Lowerer<'_> {
         has(&|m| matches!(m, Member::Constructor(k) if k.params.is_empty()))
             && has(&|m| matches!(m, Member::Getter(g) if g.js_name == "signal"))
             && has(&|m| matches!(m, Member::Method(f) if f.js_name == "abort"))
+    }
+
+    /// Whether the input declares the `AbortSignal.any` that joins the
+    /// controller's signal with the caller's.
+    fn declares_join(&self, cx: &Tcx) -> bool {
+        let Some(id) = self.resolve_id(&["AbortSignal".to_string()], cx) else {
+            return false;
+        };
+        let TypeKind::Class(s) = &self.gctx.get_type(id).kind else {
+            return false;
+        };
+        s.members
+            .iter()
+            .any(|m| matches!(m, Member::StaticMethod(f) if f.js_name == "any"))
     }
 
     /// Parameter names as TypeScript spells them, which generators make
@@ -1895,13 +1950,75 @@ impl Lowerer<'_> {
     }
 }
 
-/// Make `v` cancellable through `param`'s `signal`: a fresh controller
-/// lives with the future, its signal fills the dictionary, and dropping
-/// the future aborts it. Returns the `let` and `cancel` entries; a variant
-/// without `param` is left alone.
-fn cancellable(v: &mut Variant, param: &str, controller: &abi::Path) -> Vec<abi::JsEntry> {
+/// What makes a member cancellable: the parameter whose dictionary takes
+/// the `signal`, and the paths of `AbortController` and `AbortSignal`.
+struct Cancel {
+    param: String,
+    /// The parameter's position in the JS call.
+    index: usize,
+    /// The dictionary's path, when the bridge can make one (`@js(object)
+    /// new()`).
+    dictionary: Option<abi::Path>,
+    controller: abi::Path,
+    signal: abi::Path,
+}
+
+/// Make `v` cancellable through the `signal` of its dictionary parameter:
+/// a fresh controller lives with the future, its signal fills the
+/// dictionary, joined with one the caller set there, and dropping the
+/// future aborts it. A variant without the parameter passes a dictionary
+/// the bridge makes in its place. Returns the `let` and `cancel` entries.
+fn cancellable(v: &mut Variant, cancel: &Cancel) -> Vec<abi::JsEntry> {
+    let param = cancel.param.as_str();
+    let path = |segments: Vec<String>, call: Option<Vec<abi::Expr>>| abi::Expr::Ref {
+        path: segments,
+        call,
+    };
+    let new = |class: &abi::Path| {
+        let mut new = class.segments.clone();
+        new.push("new".into());
+        path(new, Some(Vec::new()))
+    };
     let Some(p) = v.params.iter_mut().find(|p| p.name == param) else {
-        return Vec::new();
+        let rest = v
+            .slots
+            .iter()
+            .any(|s| matches!(s, Slot::Param { rest: true, .. }));
+        let args = if v.shaped {
+            v.args.len()
+        } else {
+            v.params.len()
+        };
+        let Some(dictionary) = cancel.dictionary.as_ref().filter(|_| !rest) else {
+            return Vec::new();
+        };
+        if args > cancel.index {
+            return Vec::new();
+        }
+        let taken = |n: &str| v.params.iter().any(|p| p.name == n);
+        let object = names::unique(param, taken);
+        let ctl = names::unique("ctl", |n| taken(n) || n == object);
+        if !v.shaped {
+            v.args = v
+                .params
+                .iter()
+                .map(|p| abi::Telem::Param(p.name.clone()))
+                .collect();
+            v.shaped = true;
+        }
+        v.args.resize(cancel.index, abi::Telem::Undefined);
+        v.args.push(abi::Telem::Fill {
+            param: object.clone(),
+            fields: vec![(
+                "signal".into(),
+                path(vec![ctl.clone(), "signal".into()], None),
+            )],
+        });
+        return vec![
+            abi::JsEntry::Let(object, new(dictionary)),
+            abi::JsEntry::Let(ctl.clone(), new(&cancel.controller)),
+            abi::JsEntry::Cancel(path(vec![ctl, "abort".into()], None)),
+        ];
     };
     // A fill creates the dictionary when it's absent.
     if !matches!(p.ty, abi::Type::Nullable(_, _)) {
@@ -1925,34 +2042,26 @@ fn cancellable(v: &mut Variant, param: &str, controller: &abi::Path) -> Vec<abi:
             .collect();
         v.shaped = true;
     }
+    let mut any = cancel.signal.segments.clone();
+    any.push("any".into());
+    let joined = path(
+        any,
+        Some(vec![abi::Expr::Array(vec![
+            path(vec![param.to_string(), "signal".into()], None),
+            path(vec![ctl.clone(), "signal".into()], None),
+        ])]),
+    );
     for t in &mut v.args {
         if matches!(t, abi::Telem::Param(p) if p == param) {
             *t = abi::Telem::Fill {
                 param: param.to_string(),
-                fields: vec![(
-                    "signal".into(),
-                    abi::Expr::Ref {
-                        path: vec![ctl.clone(), "signal".into()],
-                        call: None,
-                    },
-                )],
+                fields: vec![("signal".into(), joined.clone())],
             };
         }
     }
-    let mut new = controller.segments.clone();
-    new.push("new".into());
     vec![
-        abi::JsEntry::Let(
-            ctl.clone(),
-            abi::Expr::Ref {
-                path: new,
-                call: Some(Vec::new()),
-            },
-        ),
-        abi::JsEntry::Cancel(abi::Expr::Ref {
-            path: vec![ctl, "abort".into()],
-            call: None,
-        }),
+        abi::JsEntry::Let(ctl.clone(), new(&cancel.controller)),
+        abi::JsEntry::Cancel(path(vec![ctl, "abort".into()], None)),
     ]
 }
 

@@ -10,12 +10,35 @@ class AbortController {
   abort(): unit;
 }
 
-class AbortSignal {}
+class AbortSignal {
+  static any(signals: arr<AbortSignal>): AbortSignal;
+}
+
+interface Init {
+  @js(object)
+  new();
+  get signal(): AbortSignal?;
+  set signal(value: AbortSignal);
+}
 
 class Api {
   fetch(url: str): future<str, FetchError>;
   @js(let c = AbortController.new(), args = (url, c.signal), cancel = c.abort)
   slow(url: str): future<u32>;
+  @js(
+    let c = AbortController.new(),
+    args = (url, init? { signal = AbortSignal.any([init.signal, c.signal]) }),
+    cancel = c.abort,
+  )
+  joined(url: str, init: Init?): future<u32>;
+  @js(
+    name = "joined",
+    let i = Init.new(),
+    let c = AbortController.new(),
+    args = (url, i? { signal = c.signal }),
+    cancel = c.abort,
+  )
+  short(url: str): future<u32>;
   number(): future<u32>;
   nothing(): future<unit>;
   forever(): future<never>;

@@ -1,0 +1,26 @@
+import { Headers, EntryName, EntrySize } from './iterators.zena';
+
+export function run(h: Headers): f64 {
+  var n = 0.0;
+  let keys = h.keys();
+  while (let (true, key) = keys.step()) {
+    n += key.length as f64;
+  }
+  let entries = h.entries();
+  while (let (true, entry) = entries.step()) {
+    let (name, value) = entry.unbox();
+    n += value.length as f64;
+  }
+  let values = h.values();
+  while (let (true, value) = values.step()) {
+    match (value.unbox()) {
+      case EntryName as name: { n += name.value.length as f64; }
+      case EntrySize as size: { n += size.value; }
+    }
+  }
+  let sizes = h.sizes();
+  while (let (true, size) = sizes.step()) {
+    n += size;
+  }
+  return n;
+}

@@ -432,6 +432,38 @@
     },
     {
       "kind": "class",
+      "path": "Index",
+      "module": null,
+      "name": "Index",
+      "jsName": null,
+      "export": false,
+      "tparams": [
+        {
+          "name": "V",
+          "bound": null,
+          "default": null
+        }
+      ],
+      "assoc": [],
+      "extends": ["Map<Str,V>"],
+      "extendsArgs": [
+        [
+          {
+            "of": "box",
+            "inner": "str",
+            "nullable": false
+          },
+          {
+            "of": "param",
+            "name": "V",
+            "nullable": false
+          }
+        ]
+      ],
+      "doc": null
+    },
+    {
+      "kind": "class",
       "path": "Bytes",
       "module": null,
       "name": "Bytes",
@@ -602,14 +634,16 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         },
         {
           "name": "listener",
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -740,7 +774,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -838,7 +873,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -1096,7 +1132,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -1621,7 +1658,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -1690,14 +1728,16 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         },
         {
           "name": "value",
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -1838,7 +1878,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -2013,7 +2054,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -2080,14 +2122,16 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         },
         {
           "name": "value",
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -2185,6 +2229,219 @@
       "construct": null
     },
     {
+      "key": "Index#nested()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Index",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "nested",
+      "variant": "nested",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Index",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Index",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Map<Str,Index<V>?>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Map",
+              "args": [
+                {
+                  "of": "box",
+                  "inner": "str",
+                  "nullable": false
+                },
+                {
+                  "of": "class",
+                  "path": "Index",
+                  "args": [
+                    {
+                      "of": "param",
+                      "name": "V",
+                      "nullable": false
+                    }
+                  ],
+                  "nullable": true
+                }
+              ],
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Index#pairs()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Index",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "pairs",
+      "variant": "pairs",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Index",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Index",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Map<Str,(Str,f64)>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Map",
+              "args": [
+                {
+                  "of": "box",
+                  "inner": "str",
+                  "nullable": false
+                },
+                {
+                  "of": "tuple",
+                  "args": [
+                    {
+                      "of": "box",
+                      "inner": "str",
+                      "nullable": false
+                    },
+                    {
+                      "of": "box",
+                      "inner": "f64",
+                      "nullable": false
+                    }
+                  ],
+                  "nullable": false
+                }
+              ],
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Index#lists()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Index",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "lists",
+      "variant": "lists",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Index",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Index",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Map<Str,arr<V>>",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Map",
+              "args": [
+                {
+                  "of": "box",
+                  "inner": "str",
+                  "nullable": false
+                },
+                {
+                  "of": "array",
+                  "args": [
+                    {
+                      "of": "param",
+                      "name": "V",
+                      "nullable": false
+                    }
+                  ],
+                  "nullable": false
+                }
+              ],
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
       "key": "Bytes.from(Map<str,f64>)",
       "role": "import",
       "module": "tw:js/global",
@@ -2203,7 +2460,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -2218,6 +2476,18 @@
               "kind": "host",
               "of": "class",
               "path": "Map",
+              "args": [
+                {
+                  "of": "box",
+                  "inner": "str",
+                  "nullable": false
+                },
+                {
+                  "of": "box",
+                  "inner": "f64",
+                  "nullable": false
+                }
+              ],
               "nullable": false
             }
           }
@@ -2269,7 +2539,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -2284,6 +2555,18 @@
               "kind": "host",
               "of": "class",
               "path": "Map",
+              "args": [
+                {
+                  "of": "box",
+                  "inner": "str",
+                  "nullable": false
+                },
+                {
+                  "of": "param",
+                  "name": "T",
+                  "nullable": false
+                }
+              ],
               "nullable": false
             }
           }
@@ -2329,7 +2612,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -2396,7 +2680,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -2597,7 +2882,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -2796,21 +3082,24 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         },
         {
           "name": "value",
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         },
         {
           "name": "ttl",
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -3030,14 +3319,16 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         },
         {
           "name": "limit",
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -3277,7 +3568,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -3326,7 +3618,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -3383,7 +3676,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -3518,14 +3812,16 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         },
         {
           "name": "ms",
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -3635,7 +3931,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -3753,14 +4050,16 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         },
         {
           "name": "f",
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -3962,7 +4261,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -4025,14 +4325,16 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         },
         {
           "name": "m",
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -4152,7 +4454,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -4221,7 +4524,8 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,
@@ -4398,14 +4702,16 @@
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         },
         {
           "name": "body",
           "alias": null,
           "once": false,
           "unshared": false,
-          "union": false
+          "union": false,
+          "spread": false
         }
       ],
       "doc": null,

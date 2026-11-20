@@ -1,0 +1,28 @@
+ir 1;
+
+interface IteratorYieldResult<TYield> {
+  get done(): bool?;
+  get value(): TYield;
+}
+
+interface Iterator<T> {
+  @js(args = (...rest))
+  next(rest: arr<Any?>): Any throws;
+}
+
+interface IterableIterator<T> extends Iterator<T> {
+  @js(symbol = iterator)
+  iterator(): IterableIterator<T> throws;
+}
+
+enum Entry {
+  Name(str);
+  Size(f64);
+}
+
+class Headers {
+  keys(): IterableIterator<Str>;
+  values(): IterableIterator<Entry>;
+  entries(): IterableIterator<Tuple<str, str>>;
+  sizes(): Iterator<F64>;
+}

@@ -1,0 +1,35 @@
+// What the routes share: the handler's types, a text reply, the helper.
+import { Future } from 'zena:async';
+import {
+  BodyInitStr, CfPropertiesBox, Env, ExecutionContext, Headers, HeadersInitHeaders, IncomingRequestCfProperties,
+  Request, RequestInfoStr, RequestInit, Response, ResponseInit
+} from '../bindings.zena';
+
+/** The request and context a fetch handler is given. */
+export type Req = Request<externref | null, IncomingRequestCfProperties<externref | null>>;
+export type Ctx = ExecutionContext<externref | null>;
+
+/** The request a Durable Object's fetch is given. */
+export type ObjectReq = Request<externref | null, CfPropertiesBox>;
+
+/** A plain-text response with a status. */
+export function reply(status: u16, body: String): Response {
+  let headers = new Headers();
+  headers.set("content-type", "text/plain; charset=utf-8");
+  let init = new ResponseInit();
+  init.setStatus(status);
+  init.setHeaders(new HeadersInitHeaders(headers));
+  return new Response.newWithBodyAndInit(new BodyInitStr(body), init);
+}
+
+export function ok(body: String): Response {
+  return reply(200 as u16, body);
+}
+
+/** Leaves a note with the helper service, which the tour reads back. */
+export async function note(env: Env, text: String): Future<void> {
+  let init = new RequestInit<CfPropertiesBox>();
+  init.setMethod("POST");
+  init.body = new BodyInitStr(text);
+  await env.HELPER.fetch(new RequestInfoStr("http://helper/note"), init);
+}

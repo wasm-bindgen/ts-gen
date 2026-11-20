@@ -9,6 +9,10 @@ class Api {
     this.signal = signal;
     return new Promise((_, reject) => signal.addEventListener("abort", () => reject(new Error("aborted"))));
   }
+  joined(url, init) {
+    this.init = init;
+    return new Promise((_, reject) => init.signal.addEventListener("abort", () => reject(new Error("aborted"))));
+  }
   number() {
     return this.next;
   }
@@ -139,6 +143,48 @@ assert.ok(api.signal.aborted);
 await tick();
 assert.ok(!wakes.includes(9));
 L.throwsType(() => poll(f), /dropped/);
+
+// A cancel signal joins the caller's: the caller's own aborts the call,
+// and its init is passed as a copy.
+{
+  const mine = new AbortController();
+  const init = { signal: mine.signal };
+  f = L.call("Api#joined(str,Init?)", api, ...L.str("u"), init);
+  assert.equal(poll(f, 10), 0);
+  assert.notEqual(api.init, init);
+  assert.equal(init.signal, mine.signal);
+  mine.abort();
+  await tick();
+  assert.equal(poll(f), 2);
+  assert.match(L.call("future:error<err>", f)[1], /aborted/);
+}
+// Dropping aborts the call, and not the caller's signal.
+{
+  const mine = new AbortController();
+  f = L.call("Api#joined(str,Init?)", api, ...L.str("u"), { signal: mine.signal });
+  assert.equal(poll(f, 11), 0);
+  L.call("future:drop", f);
+  assert.ok(api.init.signal.aborted);
+  assert.ok(!mine.signal.aborted);
+}
+// With no init, or one without a signal (`null` is none too, as `fetch`
+// reads it), the signal is the bridge's alone.
+for (const init of [null, {}, { signal: null }, { signal: undefined }]) {
+  api.init = undefined;
+  f = L.call("Api#joined(str,Init?)", api, ...L.str("u"), init);
+  assert.equal(poll(f, 12), 0);
+  assert.ok(!api.init.signal.aborted);
+  L.call("future:drop", f);
+  assert.ok(api.init.signal.aborted);
+}
+// An overload without the init cancels through one the bridge makes.
+api.init = undefined;
+f = L.call("Api#short(str)", api, ...L.str("u"));
+assert.equal(poll(f, 13), 0);
+assert.deepEqual(Object.keys(api.init), ["signal"]);
+assert.ok(!api.init.signal.aborted);
+L.call("future:drop", f);
+assert.ok(api.init.signal.aborted);
 
 // A future the language holds reaches JS as its promise.
 const p = Promise.resolve(3);

@@ -1,6 +1,7 @@
-js_code	fixtures.modules.flat.read	tw:js/global	read()
+js_code	fixtures.modules.flat.Retrier_retry	tw:js/global	Retrier#retry()
 js_code	fixtures.modules.flat.err_err	tw:err	err
 js_code	fixtures.modules.flat.ret_externref	tw:ret	externref
+js_code	fixtures.modules.flat.read	tw:js/global	read()
 js_code	fixtures.modules.flat.ret_f64	tw:ret	f64
 js_code	fixtures.modules.flat.Entry_get_key	store	Entry#get:key()
 js_code	fixtures.modules.flat.Store_new	store	Store.new()
@@ -13,6 +14,7 @@ js_code	fixtures.modules.flat.local	client	local()
 js_code	fixtures.modules.flat.StepConfig_get_retries	steps	StepConfig#get:retries()
 js_code	fixtures.modules.flat.StepConfig_set_retries_steps_StepConfigRetries	steps	StepConfig#set:retries("steps".StepConfigRetries)
 js_code	fixtures.modules.flat.step_steps_StepConfig	steps	step("steps".StepConfig)
+js_code	fixtures.modules.flat.Runner_run	steps	Runner#run()
 js_code	fixtures.modules.flat.StepConfigRetries_get_limit	steps	StepConfigRetries#get:limit()
 js_code	fixtures.modules.flat.StepConfigRetries_set_limit_f64	steps	StepConfigRetries#set:limit(f64)
 js_code	fixtures.modules.flat.peek	sink	peek()

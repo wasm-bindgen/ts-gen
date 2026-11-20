@@ -23,8 +23,8 @@ fun digest(data: Uint8Array): Uint8Array {
     return r2!!.unsafeCast<Uint8Array>()
 }
 
-fun digest(data: VecU8): Uint8Array {
-    val r0 = try { fixtures.sequences.flat.digest_u8(data) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun digest(data: ByteArray): Uint8Array {
+    val r0 = try { fixtures.sequences.flat.digest_u8(tsgen.runtime.typedArray("Uint8Array", data)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
     return r0!!.unsafeCast<Uint8Array>()
 }
 
@@ -32,16 +32,16 @@ fun fill(values: Float32Array) {
     try { fixtures.sequences.flat.fill_Float32Array(values) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun fill(values: VecF32) {
-    try { fixtures.sequences.flat.fill_f32(values) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun fill(values: FloatArray) {
+    try { fixtures.sequences.flat.fill_f32(tsgen.runtime.typedArray("Float32Array", values)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 fun big(values: BigInt64Array) {
     try { fixtures.sequences.flat.big_BigInt64Array(values) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun big(values: VecI64) {
-    try { fixtures.sequences.flat.big_i64(values) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun big(values: LongArray) {
+    try { fixtures.sequences.flat.big_i64(tsgen.runtime.typedArray("BigInt64Array", values)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 fun clamp(px: Uint8ClampedArray) {
@@ -53,24 +53,24 @@ fun pairs(): JsArray<JsAny?> {
     return r0!!.unsafeCast<JsArray<JsAny?>>()
 }
 
-fun list(xs: JsArray<JsString?>): JsArray<JsNumber?> {
-    val r0 = try { fixtures.sequences.flat.list_arr_str(xs) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<JsArray<JsNumber?>>()
+fun list(xs: List<String>): List<Double> {
+    val r0 = try { fixtures.sequences.flat.list_arr_str(xs.map { it.toJsString() }.toJsArray()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<JsArray<JsNumber>>().let { a -> a.toList().map { it.toDouble() } }
 }
 
-fun bytes(): Stream<JsAny?> {
+fun bytes(): Stream<Uint8Array> {
     val r0 = try { fixtures.sequences.flat.bytes() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<Stream<JsAny?>>()
+    return r0!!.unsafeCast<Stream<Uint8Array>>()
 }
 
-fun arrays(): Stream<JsAny?> {
+fun arrays(): Stream<JsArray<JsString>> {
     val r0 = try { fixtures.sequences.flat.arrays() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<Stream<JsAny?>>()
+    return r0!!.unsafeCast<Stream<JsArray<JsString>>>()
 }
 
-fun tuples(): Stream<JsAny?> {
+fun tuples(): Stream<JsArray<JsAny?>> {
     val r0 = try { fixtures.sequences.flat.tuples() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<Stream<JsAny?>>()
+    return r0!!.unsafeCast<Stream<JsArray<JsAny?>>>()
 }
 
 /**
@@ -83,8 +83,8 @@ fun random(buf: Uint8Array) {
 /**
  * * `buf` - filled with random bytes
  */
-fun random(buf: VecU8) {
-    try { fixtures.sequences.flat.random_u8(buf) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun random(buf: ByteArray) {
+    try { fixtures.sequences.flat.random_u8(tsgen.runtime.typedArray("Uint8Array", buf)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 /**
@@ -97,8 +97,8 @@ fun write(offset: Double, data: Float32Array) {
 /**
  * * `data` - copied by the callee
  */
-fun write(offset: Double, data: VecF32) {
-    try { fixtures.sequences.flat.write_f64_f32(offset, data) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun write(offset: Double, data: FloatArray) {
+    try { fixtures.sequences.flat.write_f64_f32(offset, tsgen.runtime.typedArray("Float32Array", data)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 sealed interface Err {

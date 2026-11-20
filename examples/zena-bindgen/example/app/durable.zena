@@ -1,0 +1,127 @@
+// A Durable Object: storage, a transaction, an alarm, SQL, and RPC.
+import { Future } from 'zena:async';
+import {
+  AlarmInvocationInfo, CounterStub, DurableObjectState, DurableObjectTransaction, Env, RequestInfoRequest, Response,
+  StrOrURLStr, URL, Visit, scheduler
+} from '../bindings.zena';
+import { Date } from '../std.zena';
+import { Ctx, ObjectReq, Req, ok } from './reply.zena';
+
+/** `/counter/*`: the request goes to the object named "tour". */
+export function counter(request: Req, env: Env): Future<Response> {
+  // An id from a name, and a stub for the object with that id.
+  let id = env.COUNTER.idFromName("tour");
+  let stub = env.COUNTER.get(id);
+  return stub.fetch(new RequestInfoRequest((request as externref) as ObjectReq));
+}
+
+/** `/rpc`: a method of the object, called through its stub. */
+export async function rpc(env: Env): Future<Response> {
+  // env.d.ts declares the stub's methods: the stub is viewed as one.
+  let stub = (env.COUNTER.getByName("tour") as externref) as CounterStub;
+  let total = await stub.add(5.0);
+  let greeting = await env.GREETER.greet("Zena");
+  return ok(`Counter.add(5) over RPC returned ${total}\nGreeter.greet("Zena") over RPC returned "${greeting}"\n`);
+}
+
+async function addOne(txn: DurableObjectTransaction): Future<f64> {
+  let count = await txn.get<f64>("count");
+  let next = (if (count is Some<f64>) count.value else 0.0) + 1.0;
+  await txn.put<f64>("count", next);
+  return next;
+}
+
+/** The exported class. JS constructs it, with `DurableObject` as its base. */
+export class Counter {
+  #state: DurableObjectState<externref | null>;
+
+  new(state: DurableObjectState<externref | null>, env: Env) : #state = state {}
+
+  async fetch(request: ObjectReq): Future<Response> {
+    let path = new URL(new StrOrURLStr(request.url)).pathname;
+    return match (path) {
+      case "/counter/kv": await this.kv()
+      case "/counter/transaction": await this.transaction()
+      case "/counter/sql": await this.sql(path)
+      case "/counter/alarm": await this.setAlarm()
+      case _: ok(`object ${this.#state.id.toString().substring(0, 8)}… has no ${path}\n`)
+    };
+  }
+
+  /** Called over RPC: `stub.add(5)`. */
+  async add(by: f64): Future<f64> {
+    let storage = this.#state.storage;
+    let count = await storage.get<f64>("count");
+    let next = (if (count is Some<f64>) count.value else 0.0) + by;
+    await storage.put<f64>("count", next);
+    return next;
+  }
+
+  /** The runtime calls this when the alarm is due. */
+  async alarm(info: AlarmInvocationInfo): Future<void> {
+    await this.#state.storage.put<f64>("alarm retries", info.retryCount);
+  }
+
+  async kv(): Future<Response> {
+    let storage = this.#state.storage;
+    // `get<T>` reads a value at the type asked for, absent as `none`.
+    let before = await storage.get<f64>("count");
+    await storage.put<f64>("count", (if (before is Some<f64>) before.value else 0.0) + 1.0);
+    await storage.put<String>("color", "teal");
+    let after = await storage.get<f64>("count");
+    // `list` resolves to a JS Map of every key and value.
+    let entries = await storage.list<externref | null>();
+    var keys = "";
+    let names = entries.keys();
+    while (let (true, name) = names.step()) {
+      keys = keys + " " + name;
+    }
+    let deleted = await storage.delete("color");
+    return ok(`count: ${if (after is Some<f64>) after.value else 0.0}\n` +
+      `${entries.size} keys:${keys}\ndeleted "color": ${deleted}\n`);
+  }
+
+  async transaction(): Future<Response> {
+    // JS calls the closure with the transaction and awaits its future.
+    let next = await this.#state.storage.transaction<f64>(
+      (txn: DurableObjectTransaction): Future<f64> => addOne(txn));
+    return ok(`count: ${next}, read and written in one transaction\n`);
+  }
+
+  async sql(path: String): Future<Response> {
+    let sql = this.#state.storage.sql;
+    sql.exec<Visit>("CREATE TABLE IF NOT EXISTS visits (id INTEGER PRIMARY KEY, path TEXT)", []);
+    // The bindings are variadic: any JS values, here a string.
+    sql.exec<Visit>("INSERT INTO visits (path) VALUES (?)", [path.handle]);
+    // A cursor is a JS iterator over rows, each read as a `Visit`.
+    let cursor = sql.exec<Visit>("SELECT id, path FROM visits ORDER BY id DESC LIMIT 3", []);
+    var out = `columns: ${cursor.columnNames[0]}, ${cursor.columnNames[1]}\n`;
+    let rows = cursor.iterator();
+    while (let (true, row) = rows.step()) {
+      out = out + `visit ${row.id}: ${row.path}\n`;
+    }
+    return ok(out + `rows read: ${cursor.rowsRead}\n`);
+  }
+
+  async setAlarm(): Future<Response> {
+    let storage = this.#state.storage;
+    await storage.delete("alarm retries");
+    // `setAlarm` takes `number | Date`: this is the number's overload.
+    await storage.setAlarm(Date.now() + 20.0);
+    await scheduler().wait(200.0);
+    let retries = await storage.get<f64>("alarm retries");
+    return ok("alarm set for 20ms from now; 200ms later the alarm handler " +
+      (if (retries is Some<f64>) `has run, after ${retries.value} retries\n` else "has not run\n"));
+  }
+}
+
+/** An RPC entrypoint: a service binding names it, and calls `greet`. */
+export class Greeter {
+  #greeting: String;
+
+  new(ctx: Ctx, env: Env) : #greeting = env.GREETING {}
+
+  async greet(name: String): Future<String> {
+    return `${this.#greeting}, ${name}`;
+  }
+}

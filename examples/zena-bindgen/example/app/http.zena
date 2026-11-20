@@ -1,0 +1,101 @@
+// The request and the response: methods, URLs, headers, forms, JSON.
+import { Future } from 'zena:async';
+import {
+  BodyInitStr, FileOrStrFile, FileOrStrStr, Headers, HeadersInitHeaders, JSON, Order, Response, ResponseInit,
+  StrOrURLStr, URL
+} from '../bindings.zena';
+import { ErrArm, ErrException } from '../std.zena';
+import { Req, ok } from './reply.zena';
+
+/** `/echo`: what the request carried, in a response built from parts. */
+export async function echo(request: Req): Future<Response> {
+  let body = await request.text();
+  // A header may be absent: `get` returns `String | null`.
+  let agent = request.headers.get("user-agent") ?? "(none)";
+  // JS calls a Zena closure once per header.
+  var custom = "";
+  request.headers.forEach<externref>((value: String, name: String, h: Headers): void => {
+    if (name.startsWith("x-")) {
+      custom = custom + " " + name + "=" + value;
+    }
+  });
+  // The names come from a JS iterator, one `step()` at a time.
+  var count = 0;
+  let names = request.headers.keys();
+  while (let (true, name) = names.step()) {
+    count += 1;
+  }
+  let headers = new Headers();
+  headers.set("content-type", "text/plain; charset=utf-8");
+  headers.append("x-echo", "1");
+  let init = new ResponseInit();
+  init.setStatus(202 as u16);
+  init.setStatusText("Echoed");
+  init.setHeaders(new HeadersInitHeaders(headers));
+  let path = new URL(new StrOrURLStr(request.url)).pathname;
+  let text = `${request.method} ${path}\nuser-agent: ${agent}\n` +
+    `${count} headers, the x- ones:${custom}\nbody: ${body}\n`;
+  return new Response.newWithBodyAndInit(new BodyInitStr(text), init);
+}
+
+/** `/url`: a URL's parts and its query, and a URL that doesn't parse. */
+export function url(request: Req): Response {
+  let u = new URL(new StrOrURLStr(request.url));
+  let query = u.searchParams;
+  query.append("added", "by zena");
+  query.sort();
+  var out = `host: ${u.host}\npath: ${u.pathname}\nquery: ${query.toString()}\n`;
+  // The entries are `[name, value]` arrays in JS: each unboxes to a tuple.
+  let entries = query.entries();
+  while (let (true, entry) = entries.step()) {
+    let (name, value) = entry.unbox();
+    out = out + `  ${name} = ${value}\n`;
+  }
+  // `new URL` throws a TypeError, which the bridge maps to an arm of `err`.
+  let invalid = try {
+    new URL(new StrOrURLStr("not a url")).href
+  } catch (e) {
+    if (e is ErrException && e.arm == ErrArm.TypeError) "TypeError: " + e.message else "another error"
+  };
+  let parsed = URL.parse("also not a url");
+  return ok(out + `new URL("not a url"): ${invalid}\n` +
+    `URL.parse("also not a url"): ${if (parsed == null) "null" else parsed.href}\n` +
+    `URL.canParse("https://example.com/"): ${URL.canParse("https://example.com/")}\n`);
+}
+
+/** `/form`: a multipart form's fields, each a string or a file. */
+export async function form(request: Req): Future<Response> {
+  let data = await request.formData();
+  var out = "";
+  let entries = data.entries();
+  while (let (true, entry) = entries.step()) {
+    let (name, value) = entry.unbox();
+    // A field's value is the payload enum `File | string`.
+    match (value) {
+      case FileOrStrStr as s: { out = out + `${name}: the string "${s.value}"\n`; }
+      case FileOrStrFile as f: {
+        let file = f.value;
+        let bytes = await file.bytes();
+        out = out + `${name}: the file ${file.name} (${file.type_}, ${bytes.length} bytes): "${await file.text()}"\n`;
+      }
+    }
+  }
+  return ok(out);
+}
+
+/** `/json`: JSON in, read through a declared interface, and JSON out. */
+export async function json(request: Req): Future<Response> {
+  // `json<T>()` is generic: at `Order` its result reads as one.
+  let order = await request.clone().json<Order>();
+  // `JSON.parse` returns an untyped value, which is viewed as an `Order`.
+  let parsed = JSON().parse(await request.text()) as Order;
+  let quantity = order.quantity;
+  let tags = parsed.tags;
+  let reply = new Order();
+  reply.item = order.item.toUpperCase();
+  reply.setQuantity(if (quantity is Some<f64>) quantity.value * 2.0 else 1.0);
+  if (tags != null) {
+    reply.setTags(tags);
+  }
+  return Response.json(reply as externref);
+}

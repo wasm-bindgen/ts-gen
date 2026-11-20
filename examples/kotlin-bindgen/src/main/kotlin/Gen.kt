@@ -5,14 +5,20 @@ class Unsupported(message: String) : Exception(message)
 
 private fun unsupported(why: String): Nothing = throw Unsupported(why)
 
-/** Wire values ready to pass: statements to run first, then one expression per value. */
-private class Conv(val pre: List<String>, val exprs: List<String>)
+/**
+ * Wire values ready to pass: statements to run first, then one expression
+ * per value, and statements to run after the call (a `mut T[]`'s writeback).
+ */
+private class Conv(val pre: List<String>, val exprs: List<String>, val post: List<String> = emptyList())
+
+/** An `arr<T>` element as a `List`'s: its Kotlin and JS types, and the conversions of `it` (null for the identity). */
+private class Elem(val kt: String, val js: String, val toJs: String?, val fromJs: String?)
 
 /** Names the generated code uses unqualified, which a declaration must not shadow. */
 private val reserved = setOf(
     "String", "Int", "Boolean", "Double", "Float", "Long", "Short", "Byte", "UInt", "ULong",
-    "UByte", "UShort", "Unit", "Any", "Nothing", "Pair", "Triple", "JsAny", "VecU8", "VecI8", "VecU16", "VecI16", "VecU32", "VecI32", "VecI64", "VecU64", "VecF16", "VecF32", "VecF64",
-    "JsString", "JsNumber", "JsBoolean", "JsArray", "JsReference",
+    "UByte", "UShort", "Unit", "Any", "Nothing", "Pair", "Triple", "JsAny", "List", "ByteArray", "ShortArray", "IntArray", "LongArray", "FloatArray", "DoubleArray",
+    "JsString", "JsNumber", "JsBoolean", "JsBigInt", "JsArray", "JsReference",
 )
 
 /**
@@ -39,6 +45,8 @@ class Gen(
     /** A lib declaration's path, as its lib's bindings name it (`std.Date`). */
     private val libNames = HashMap<String, String>()
     private val enums = LinkedHashMap<String, EnumL>()
+    /** Each enum's layout as Kotlin passes it to JS, where a function arm is one Kotlin provides. */
+    private val enumsToJs = HashMap<String, EnumL>()
     private val flatNames = HashSet<String>()
     private val trampolines = LinkedHashMap<String, Repr>()
     /** The `fun interface`s of recursive function types used, by spelling. */
@@ -96,9 +104,59 @@ class Gen(
     /** Erased type parameters as `JsAny?`, outside any generic scope. */
     private var eraseToAny = false
 
-    /** A host class as a type: its type arguments erased to their defaults, else `JsAny?`. */
-    private fun hostType(path: String) = typeRef(path) +
-        (classes[path]?.tparams?.takeIf { it.isNotEmpty() }?.joinToString(prefix = "<", postfix = ">") { erased(it) } ?: "")
+    /**
+     * Set for a value going to JS, whose type arguments are `out`
+     * projections: JS only reads it, so a `Request<JsAny?, Cf>` passes where
+     * a `Request<JsAny?, JsAny?>` is asked for, as it does in TypeScript.
+     */
+    private var projecting = false
+
+    private fun <R> projected(on: Boolean = true, f: () -> R): R {
+        val outer = projecting
+        projecting = on
+        try {
+            return f()
+        } finally {
+            projecting = outer
+        }
+    }
+
+    private fun projection(t: String) = if (!projecting) t else if (t == "JsAny?") "*" else "out $t"
+
+    /** A host class as a type, with the type arguments its reference names: one it doesn't is erased. */
+    private fun hostType(path: String, args: List<TArg>): String {
+        val ps = classes[path]?.tparams.orEmpty()
+        if (ps.isEmpty()) return typeRef(path)
+        return typeRef(path) + ps.indices.joinToString(prefix = "<", postfix = ">") { i ->
+            projection(args.getOrNull(i)?.let { targ(it) } ?: erased(ps[i]))
+        }
+    }
+
+    private fun hostType(r: Repr) = hostType(r.path, r.args)
+
+    /**
+     * A type argument as the JS reference type it is; `JsAny?` for a type
+     * parameter out of scope, and for a value Kotlin has no reference type
+     * for (an enum, a future, an exported class).
+     */
+    private fun targ(a: TArg): String {
+        val t = when (a.of) {
+            "param" -> if (eraseToAny) return "JsAny?" else sanitize(a.name!!)
+            "class", "interface" ->
+                if (classes[a.path]?.let { it.kind == "class" && it.export } == true) return "JsAny?" else hostType(a.path!!, a.args)
+            "box" -> when (a.inner) {
+                "str" -> "JsString"
+                "bigint" -> "JsBigInt"
+                "bool" -> "JsBoolean"
+                "i64", "u64" -> return "JsAny?"
+                else -> "JsNumber"
+            }
+            // A tuple is a JS array, of its elements' type when they share one.
+            "array", "tuple" -> "JsArray<${projection(a.args.map { targ(it) }.distinct().singleOrNull() ?: "JsAny?")}>"
+            else -> return "JsAny?"
+        }
+        return t + if (a.nullable) "?" else ""
+    }
 
     private val erasing = mutableSetOf<TParam>()
 
@@ -114,6 +172,9 @@ class Gen(
     }
 
     private fun fresh(p: String) = "$p${tmp++}"
+
+    /** Element types whose `vararg` would be an experimental unsigned array. */
+    private val unsignedKt = setOf("UByte", "UShort", "UInt", "ULong")
 
     private fun opt(r: Repr) = if (r.nullable) "?" else ""
 
@@ -198,15 +259,61 @@ class Gen(
         return qual + if (e.origin == "err") "Err" else typeName(e.path)
     }
 
+    private fun noteToJs(l: EnumL) {
+        if (enumsToJs.putIfAbsent(l.path, l) != null) return
+        for (a in l.arms) for (p in a.payload) if (p.kind == "enum") noteToJs(p.enum)
+    }
+
     private fun undefinedValue(e: EnumL) = e.arms.first { it.name == "Value" }.payload[0]
 
     private fun appClass(path: String) = "$appPkg.${typeName(path)}"
+
+    /**
+     * An `arr<T>` element a `List` holds, converted one by one: strings,
+     * scalars and JS references. Any other element leaves the array a
+     * `JsArray` of [jsElem].
+     */
+    private fun elem(r: Repr): Elem? {
+        val e = when (r.kind) {
+            "str" -> Elem("String", "JsString", "it.toJsString()", "it.toString()")
+            "scalar" -> when (val s = r.scalar) {
+                "bool" -> Elem("Boolean", "JsBoolean", "it.toJsBoolean()", "it.toBoolean()")
+                "f64" -> Elem("Double", "JsNumber", "it.toJsNumber()", "it.toDouble()")
+                "f16", "f32" -> Elem("Float", "JsNumber", "it.toDouble().toJsNumber()", "it.toDouble().toFloat()")
+                "i32" -> Elem("Int", "JsNumber", "it.toJsNumber()", "it.toInt()")
+                "i8", "u8", "i16", "u16" -> Elem(scalarKt(s), "JsNumber", "it.toInt().toJsNumber()", sFrom(s, "it.toInt()"))
+                "u32" -> Elem("UInt", "JsNumber", "it.toDouble().toJsNumber()", "it.toDouble().toUInt()")
+                "i53", "u53" -> Elem("Long", "JsNumber", "it.toDouble().toJsNumber()", "it.toDouble().toLong()")
+                else -> return null
+            }
+            "bigint" -> if (r.carrier == "host") Elem("JsBigInt", "JsBigInt", null, null) else return null
+            "host" -> when (r.of) {
+                "class", "interface" -> hostType(r).let { Elem(it, it, null, null) }
+                "any" -> return Elem("JsAny?", "JsAny?", null, null)
+                "box" -> boxKt(r.inner).let { Elem(it, it, null, null) }
+                else -> return null
+            }
+            "erased" -> (if (eraseToAny) "JsAny?" else erasedName(r)).let { Elem(it, it, null, null) }
+            "array" -> {
+                if (r.nullable) return null
+                val i = elem(r.elem) ?: return null
+                Elem("List<${i.kt}>", "JsArray<${i.js}>", listToJs(i, "it"), listFromJs(i, "it"))
+            }
+            else -> return null
+        }
+        if (!r.nullable) return e
+        return Elem(e.kt.removeSuffix("?") + "?", e.js.removeSuffix("?") + "?", e.toJs?.let { "it?.let { $it }" }, e.fromJs?.let { "it?.let { $it }" })
+    }
+
+    private fun listToJs(e: Elem, v: String) = (e.toJs?.let { "$v.map { $it }" } ?: v) + ".toJsArray()"
+
+    private fun listFromJs(e: Elem, v: String) = "$v.toList()" + (e.fromJs?.let { ".map { $it }" } ?: "")
 
     /** The JS-level type of an `arr<T>` element, as a `JsArray` argument. */
     private fun jsElem(r: Repr): String = when (r.kind) {
         "str", "scalar" -> boxKt(r)
         "host" -> when (r.of) {
-            "class", "interface" -> hostType(r.path)
+            "class", "interface" -> hostType(r)
             "box" -> boxKt(r.inner)
             else -> "JsAny"
         }
@@ -253,7 +360,8 @@ class Gen(
         "vec" -> vecKt(r.vecElem) + opt(r)
         // The host carrier's bigint is the JS bigint itself.
         "bigint" -> if (r.carrier == "host") "JsBigInt" + opt(r) else unsupported("`bigint` on the ${r.carrier} carrier")
-        "array" -> "JsArray<${jsElem(r.elem)}>" + opt(r)
+        // A `JsArray` and a `Future` are invariant: what they hold stays exact.
+        "array" -> (elem(r.elem)?.let { "List<${it.kt}>" } ?: "JsArray<${projected(false) { jsElem(r.elem) }}>") + opt(r)
         "tuple" -> {
             if (r.nullable) unsupported("a nullable tuple")
             val e = r.elems.map { kt(it) }
@@ -264,19 +372,53 @@ class Gen(
             if (r.enum.origin == "nested") k else k + opt(r)
         }
         "host" -> when (r.of) {
-            "class", "interface" -> hostType(r.path) + opt(r)
+            "class", "interface" -> hostType(r) + opt(r)
             "any" -> "JsAny?"
             "box" -> boxKt(r.inner) + opt(r)
-            "future" -> "tsgen.runtime.Future<${kt(r.value)}>" + opt(r)
+            "future" -> "tsgen.runtime.Future<${projected(false) { kt(r.value) }}>" + opt(r)
             else -> unsupported("host ${r.of}")
         }
         "handle" -> appClass(r.handleClass) + opt(r)
-        "fn" -> {
-            val t = "(${r.fnParams.joinToString { kt(it) }}) -> ${kt(r.fnResult)}"
-            if (r.nullable) "($t)?" else t
-        }
+        "fn" -> fnKt(r).let { if (r.nullable) "($it)?" else it }
         "erased" -> if (eraseToAny) "JsAny?" else erasedName(r) + opt(r)
         else -> unsupported("`${r.ty}` (${r.kind})")
+    }
+
+    private fun isFuture(r: Repr) = r.kind == "host" && r.of == "future"
+
+    /**
+     * A function type. One the language provides that returns a future is
+     * a `suspend` function, run as a task that settles the future.
+     */
+    private fun fnKt(r: Repr): String = projected(false) {
+        val ps = r.fnParams.joinToString { kt(it) }
+        val res = r.fnResult
+        if (r.provided != null && isFuture(res)) "suspend ($ps) -> ${kt(res.value)}" else "($ps) -> ${kt(res)}"
+    }
+
+    private val futureFactories = HashMap<String, String>()
+    private val futureOut = StringBuilder()
+
+    /**
+     * `futureOfT(block)`: a `future<T>` the language makes, by running
+     * `block` as a task, as [futureExport] does for an export.
+     */
+    private fun futureFactory(r: Repr): String = futureFactories.getOrPut(r.ty.removeSuffix("?")) {
+        val base = "futureOf" + upperFirst(sanitize(r.value.ty))
+        var name = base
+        var i = 2
+        while (name in futureFactories.values) name = "${base}_${i++}"
+        val f = Repr(r.ty, r.wire, r.kind, false, r.m)
+        val outer = eraseToAny
+        eraseToAny = true
+        try {
+            val body = futureExport(f, "block()").dropLast(1) + "return ${fromWire(f, listOf("future"))}"
+            futureOut.append("/** A `${f.ty}` that runs `block` as a task and settles with its outcome. */\n")
+                .append(block("fun $name(block: suspend () -> ${kt(f.value)}): ${kt(f)}", body, 0)).append('\n')
+        } finally {
+            eraseToAny = outer
+        }
+        name
     }
 
     /** A Kotlin value `e` (evaluated more than once) as its wire values. */
@@ -291,7 +433,17 @@ class Gen(
                 else -> Conv(emptyList(), listOf("(if ($e == null) 0 else 1)", "(${orElse(e, r.scalar)} ?: ${zero(r.wire[1])})"))
             }
             "str" -> one(if (n) "$e?.toJsString()" else "$e.toJsString()")
-            "vec", "array", "erased", "bigint" -> one(e)
+            "vec" -> {
+                val ta = typedArray(r.vecElem)
+                val made = if (n) "$e?.let { tsgen.runtime.typedArray(\"$ta\", it) }" else "tsgen.runtime.typedArray(\"$ta\", $e)"
+                if (r.m["writeback"] != true) one(made) else {
+                    val t = fresh("v")
+                    val back = "tsgen.runtime.copyInto($t, $e)"
+                    Conv(listOf("val $t = $made"), listOf(t), listOf(if (n) "if ($t != null && $e != null) $back" else back))
+                }
+            }
+            "array" -> elem(r.elem)?.let { one(if (n) "$e?.let { ${listToJs(it, "it")} }" else listToJs(it, e)) } ?: one(e)
+            "erased", "bigint" -> one(e)
             "host" -> when (r.of) {
                 "future" -> one(if (n) "$e?.raw" else "$e.raw")
                 else -> one(e)
@@ -299,11 +451,12 @@ class Gen(
             "tuple" -> {
                 if (n) unsupported("a nullable tuple")
                 val parts = r.elems.mapIndexed { i, t -> toWire(t, "$e.${tupleField(i)}") }
-                Conv(parts.flatMap { it.pre }, parts.flatMap { it.exprs })
+                Conv(parts.flatMap { it.pre }, parts.flatMap { it.exprs }, parts.flatMap { it.post })
             }
             "enum" -> {
                 val l = r.enum
                 enumKt(l)
+                noteToJs(l)
                 when {
                     l.origin == "nested" || l.shape == "payload" -> {
                         val t = fresh("w")
@@ -340,11 +493,18 @@ class Gen(
                 else -> "(if ($w == 0) null else ${sFrom(r.scalar, ws[1])})"
             }
             "str" -> if (n) "$w?.unsafeCast<JsString>()?.toString()" else "$w!!.unsafeCast<JsString>().toString()"
-            "vec" -> cast(vecKt(r.vecElem))
+            "vec" -> {
+                if (r.m["writeback"] == true) unsupported("a `mut T[]` received")
+                val read = "tsgen.runtime.${vecKt(r.vecElem).replaceFirstChar { it.lowercase() }}"
+                if (n) "$w?.let { $read(it) }" else "$read($w!!)"
+            }
             "bigint" -> cast("JsBigInt")
-            "array" -> cast(kt(r).removeSuffix("?"))
+            "array" -> elem(r.elem)?.let {
+                val list = listFromJs(it, "a")
+                if (n) "$w?.unsafeCast<JsArray<${it.js}>>()?.let { a -> $list }" else "$w!!.unsafeCast<JsArray<${it.js}>>().let { a -> $list }"
+            } ?: cast(kt(r).removeSuffix("?"))
             "host" -> when (r.of) {
-                "class", "interface" -> cast(hostType(r.path))
+                "class", "interface" -> cast(hostType(r))
                 "any" -> w
                 "box" -> cast(boxKt(r.inner))
                 "future" -> {
@@ -406,7 +566,7 @@ class Gen(
                     "never" -> "error(\"a never call returned\")"
                     else -> fromWire(res, ws)
                 }
-                val body = (pre + listOfNotNull(last)).joinToString("; ")
+                val body = (pre + convs.flatMap { it.post } + listOfNotNull(last)).joinToString("; ")
                 val sam = recOf(r)?.let { funInterface(it) + " " } ?: ""
                 val lambda = "{ f -> $sam{ ${ps.joinToString()} -> $body } }"
                 if (n) "$w?.let $lambda" else "$w!!.let $lambda"
@@ -490,6 +650,7 @@ class Gen(
     /** The typed body of an import: converts the parameters, calls `flat`, converts the result. */
     private fun importBody(m: MemberL, sig: Sig, fname: String, args: Map<Int, String>, receiver: String, resultType: String? = null): List<String> {
         val pre = mutableListOf<String>()
+        val post = mutableListOf<String>()
         val wires = mutableListOf<String>()
         for (p in sig.params) {
             when (p.role) {
@@ -498,6 +659,7 @@ class Gen(
                     val c = toWire(p.repr!!, args.getValue(p.index!!))
                     pre += c.pre
                     wires += c.exprs
+                    post += c.post
                 }
                 else -> unsupported("an import position `${p.role}`")
             }
@@ -507,7 +669,7 @@ class Gen(
         val ws = spilled(call, sig.coreResults, sig.coreSpill, pre)
         if (res?.kind == "never") return pre + "error(\"a never call returned\")"
         val read = if (resultType != null) "${ws[0]}!!.unsafeCast<$resultType>()" else res?.let { fromWire(it, ws) }
-        return pre + listOfNotNull(read?.let { "return $it" })
+        return pre + post + listOfNotNull(read?.let { "return $it" })
     }
 
     private val boxImports = HashMap<String, String>()
@@ -691,16 +853,25 @@ class Gen(
         val owner = m.owner?.let { classes[it] }
         val names = paramNames(m)
         val ps = m.params.indices.map { i -> sig.params.first { it.role == "param" && it.index == i }.repr!! }
-        val psDecl = names.indices.joinToString { i -> "${names[i]}: ${paramKt(m.params[i], ps[i])}" }
-        val args = names.indices.associateWith { names[it] }
+        // A spread parameter, last, is a vararg of its elements.
+        val rest = ps.lastOrNull()?.takeIf { m.params.last().spread && it.kind == "array" && !it.nullable }
+        val restElem = rest?.let { projected { elem(it.elem)?.kt ?: jsElem(it.elem) } }?.takeIf { it !in unsignedKt }
+        fun decl(i: Int, type: String) = if (restElem != null && i == names.lastIndex) "vararg ${names[i]}: $restElem" else "${names[i]}: $type"
+        val psDecl = names.indices.joinToString { i -> decl(i, projected { paramKt(m.params[i], ps[i]) }) }
+        val args = names.indices.associateWith { i ->
+            if (restElem == null || i != names.lastIndex) names[i]
+            else names[i] + if (elem(rest!!.elem) != null) ".toList()" else ".toList().toJsArray()"
+        }
         val res = sig.results.firstOrNull()?.repr
         val ctorType = if (m.kind == "new" && owner != null) ownerType(owner) else null
         val resKt = ctorType?.let { ": $it" } ?: res?.let { ": ${kt(it)}" } ?: ""
-        val tps = (owner?.tparams.orEmpty() + m.tparams).map { it.name }
-        val mtps = tparamDecl(m.tparams.map { it.name })
+        // A type parameter of the member's that its signature doesn't name can't be inferred, and is dropped.
+        val mt = m.tparams.map { it.name }.filter { Regex("\\b${Regex.escape(sanitize(it))}\\b").containsMatchIn(psDecl + resKt) }
+        val tps = owner?.tparams.orEmpty().map { it.name } + mt
+        val mtps = tparamDecl(mt)
         val static = owner == null || m.isStatic || m.kind == "new"
         val scope = m.namespace.joinToString(".")
-        fun sigKey(n: String, types: List<String> = ps.map { kt(it) }) = "${owner?.path ?: scope}|$static|${m.kind}|$n(${types.joinToString()})"
+        fun sigKey(n: String, types: List<String> = ps.map { projected { kt(it) } }) = "${owner?.path ?: scope}|$static|${m.kind}|$n(${types.joinToString()})"
         val name = q(sanitize(m.name ?: "new")).let { n ->
             val variant = m.variant?.takeIf { m.kind == "method" || m.kind == "new" }?.let { q(sanitize(it)) }
             when {
@@ -711,20 +882,32 @@ class Gen(
         }
         fun body(receiver: String) = importBody(m, sig, fname, args, receiver, ctorType)
         fun doc(n: Int) = kdoc(" ".repeat(n), m.doc)
-        // A payload enum parameter also takes each single-payload arm's value directly.
+        // A payload enum parameter also takes each single-payload arm's value
+        // directly, and a future parameter a suspend block to run.
         fun overloads(head: String, callee: String, targs: List<String>, n: Int): String {
-            val types = ps.map { kt(it) }
+            val types = ps.map { projected { kt(it) } }
             val call = callee + if (targs.isEmpty()) "" else "<${targs.joinToString { sanitize(it) }}>"
             val out = StringBuilder()
             ps.forEachIndexed { i, r ->
+                if (isFuture(r)) {
+                    val v = kt(r.value)
+                    eraseToAny = true
+                    val closed = try { kt(r.value) == v } finally { eraseToAny = false }
+                    val ts = types.toMutableList().also { it[i] = "suspend () -> $v" }
+                    if (closed && declared.add(sigKey(name, ts))) {
+                        val decl = names.indices.joinToString { j -> decl(j, ts[j]) }
+                        val args = names.mapIndexed { j, pn -> if (j == i) "${futureFactory(r)}($pn)" else if (restElem != null && j == names.lastIndex) "*$pn" else pn }
+                        out.append(" ".repeat(n)).append("fun $head($decl)$resKt = $call(${args.joinToString()})\n")
+                    }
+                }
                 if (r.kind != "enum" || r.enum.shape != "payload" || r.enum.origin != "decl") return@forEachIndexed
                 for (a in r.enum.arms) {
                     val p = a.payload.singleOrNull()?.takeIf { it.kind != "erased" } ?: continue
-                    val t = try { kt(p) } catch (e: Unsupported) { continue }
+                    val t = try { projected { kt(p) } } catch (e: Unsupported) { continue }
                     val ts = types.toMutableList().also { it[i] = t }
                     if (t == "JsAny?" || !declared.add(sigKey(name, ts))) continue
-                    val decl = names.zip(ts).joinToString { (pn, pt) -> "$pn: $pt" }
-                    val args = names.mapIndexed { j, pn -> if (j == i) "${types[i].removeSuffix("?")}.${q(sanitize(a.name))}($pn)" else pn }
+                    val decl = names.indices.joinToString { j -> decl(j, ts[j]) }
+                    val args = names.mapIndexed { j, pn -> if (j == i) "${types[i].removeSuffix("?")}.${q(sanitize(a.name))}($pn)" else if (restElem != null && j == names.lastIndex) "*$pn" else pn }
                     out.append(" ".repeat(n)).append("fun $head($decl)$resKt = $call(${args.joinToString()})\n")
                 }
             }
@@ -752,10 +935,10 @@ class Gen(
             }
             owner == null && m.namespace.isEmpty() ->
                 topLevel.append(doc(0)).append(block("fun $mtps$name($psDecl)$resKt", body(""), 0)).append('\n')
-                    .append(overloads("$mtps$name", name, m.tparams.map { it.name }, 0))
+                    .append(overloads("$mtps$name", name, mt, 0))
             owner == null ->
                 nsText(m.namespace).append(doc(4)).append(block("fun $mtps$name($psDecl)$resKt", body(""), 4)).append('\n')
-                    .append(overloads("$mtps$name", name, m.tparams.map { it.name }, 4))
+                    .append(overloads("$mtps$name", name, mt, 4))
             m.kind == "new" && m.name == null -> {
                 val t = typeName(owner.path)
                 topLevel.append(doc(0)).append(block("fun ${tparamDecl(tps)}$t($psDecl)$resKt", body(""), 0)).append('\n')
@@ -769,7 +952,7 @@ class Gen(
                         "set" -> block("fun set${upperFirst(sanitize(m.name!!))}($psDecl)", body(""), 4) +
                             overloads("set${upperFirst(sanitize(m.name))}", "set${upperFirst(sanitize(m.name))}", emptyList(), 4)
                         "new" -> block("fun ${tparamDecl(tps)}$name($psDecl)$resKt", body(""), 4) + overloads("${tparamDecl(tps)}$name", name, tps, 4)
-                        else -> block("fun $mtps$name($psDecl)$resKt", body(""), 4) + overloads("$mtps$name", name, m.tparams.map { it.name }, 4)
+                        else -> block("fun $mtps$name($psDecl)$resKt", body(""), 4) + overloads("$mtps$name", name, mt, 4)
                     },
                 ).append('\n')
             }
@@ -920,7 +1103,12 @@ class Gen(
     }
 
     /** A parameter's Kotlin type, by its alias when Kotlin declares one. */
-    private fun paramKt(p: ParamL, r: Repr) = p.alias?.takeIf { it in typeAliases }?.let { typeName(it) + opt(r) } ?: kt(r)
+    private fun paramKt(p: ParamL, r: Repr): String {
+        val k = kt(r)
+        // A function type the language provides may differ from the alias's own reading.
+        val t = p.alias?.let { typeAliases[it] }?.takeIf { k == it || k == "$it?" || k == "($it)?" } ?: return k
+        return typeName(p.alias!!) + opt(r)
+    }
 
     /** The aliases Kotlin declares as a `typealias`: those without type parameters that don't recur. */
     private val typeAliases: Map<String, String> by lazy {
@@ -973,8 +1161,6 @@ class Gen(
         return kt(getter) == kt(value) && foldedExportSetters.add(owner.path to m.name)
     }
 
-    private val vecs = HashSet<String>()
-
     /** Arities of the generated `TupleN` classes: Kotlin has only `Pair` and `Triple`. */
     private val tuples = sortedSetOf<Int>()
 
@@ -988,9 +1174,31 @@ class Gen(
         else -> "Tuple$n".also { tuples += n }
     }
 
-    private fun vecKt(elem: String): String {
-        vecs += elem
-        return "Vec${upperFirst(elem)}"
+    /** A `T[]` as Kotlin's array of its element; the unsigned elements share the signed arrays, bit for bit. */
+    private fun vecKt(elem: String) = when (elem) {
+        "i8", "u8" -> "ByteArray"
+        "i16", "u16" -> "ShortArray"
+        "i32", "u32" -> "IntArray"
+        "i64", "u64" -> "LongArray"
+        "f16", "f32" -> "FloatArray"
+        "f64" -> "DoubleArray"
+        else -> unsupported("a typed array of $elem")
+    }
+
+    /** The JS typed array class of a `T[]`. */
+    private fun typedArray(elem: String) = when (elem) {
+        "i8" -> "Int8Array"
+        "u8" -> "Uint8Array"
+        "i16" -> "Int16Array"
+        "u16" -> "Uint16Array"
+        "i32" -> "Int32Array"
+        "u32" -> "Uint32Array"
+        "i64" -> "BigInt64Array"
+        "u64" -> "BigUint64Array"
+        "f16" -> "Float16Array"
+        "f32" -> "Float32Array"
+        "f64" -> "Float64Array"
+        else -> unsupported("a typed array of $elem")
     }
 
     private val foldedExportSetters = HashSet<Pair<String, String?>>()
@@ -1020,14 +1228,16 @@ class Gen(
 
     private fun trampolineText(ty: String, r: Repr): String {
         val op = r.op ?: unsupported("no trampoline signature for `$ty`")
-        val fnType = recOf(r)?.let { funInterface(it) } ?: "(${r.fnParams.joinToString { kt(it) }}) -> ${kt(r.fnResult)}"
+        val rec = recOf(r)
+        val fnType = rec?.let { funInterface(it) } ?: fnKt(r)
         var w = 1
         val args = r.fnParams.map { p -> fromWire(p, p.wire.map { "p${w++}" }) }
         val params = op.coreParams.mapIndexed { i, t -> "p$i: ${wireKt(t)}" }
         val call = "f(${args.joinToString()})"
         val res = r.fnResult
         val body = mutableListOf("val f = p0!!.unsafeCast<JsReference<$fnType>>().get()")
-        if (res.kind == "unit" || res.kind == "never") body += call else {
+        if (rec == null && isFuture(res)) body += futureExport(res, call)
+        else if (res.kind == "unit" || res.kind == "never") body += call else {
             val c = toWire(res, "r")
             body += "val r = $call"
             body += c.pre
@@ -1058,7 +1268,9 @@ class Gen(
         val wireClass = "${sanitize(enumIdent(l))}Wire"
         fun wireDecls() = (listOf("val arm: Int") + slots.mapIndexed { i, t -> "val s$i: ${wireKt(t)}" }).joinToString()
         fun zeros() = slots.map { zero(it) }
-        fun armWire(a: ArmL, values: List<String>): String {
+        val toJs = enumsToJs[l.path] ?: l
+        fun armWire(arm: ArmL, values: List<String>): String {
+            val a = toJs.arms.first { it.index == arm.index }
             val convs = a.payload.zip(values).map { (p, v) -> toWire(p, v) }
             val exprs = convs.flatMap { it.exprs }
             val s = zeros().toMutableList()
@@ -1101,7 +1313,8 @@ class Gen(
                     else {
                         qual = "$pkg."
                         val fields = try {
-                            a.payload.mapIndexed { i, p -> "val ${if (a.payload.size == 1) "value" else "v$i"}: ${kt(p)}" }
+                            // An arm is passed to JS, and made from what JS returns.
+                            projected { a.payload.mapIndexed { i, p -> "val ${if (a.payload.size == 1) "value" else "v$i"}: ${kt(p)}" } }
                         } finally {
                             qual = ""
                         }
@@ -1156,9 +1369,11 @@ class Gen(
         eraseToAny = true
         try {
             val ps = r.fnParams.map { kt(it) }
-            val res = kt(r.fnResult)
-            val fnType = recOf(r)?.let { funInterface(it) } ?: "(${ps.joinToString()}) -> $res"
-            val name = "Fn" + ps.joinToString("") { ktIdent(it) } + "To" + ktIdent(res)
+            val rec = recOf(r)
+            val suspends = rec == null && isFuture(r.fnResult)
+            val res = kt(if (suspends) r.fnResult.value else r.fnResult)
+            val fnType = rec?.let { funInterface(it) } ?: fnKt(r)
+            val name = (if (suspends) "SuspendFn" else "Fn") + ps.joinToString("") { ktIdent(it) } + "To" + ktIdent(res)
             if (!boxHelpers.add(name)) return ""
             return "/** A `${r.ty.removeSuffix("?")}` as its box: a JS function calling it. */\n" +
                 "fun ($fnType).toJs(): JsAny = $box(this.toJsReference())!!\n\n" +
@@ -1228,13 +1443,6 @@ class Gen(
             for (w in m.warnings) warnings += "${m.key}: $w"
             guard(m.key) { if (m.import) importMember(m) else exportMember(m) }
         }
-        val tramp = StringBuilder()
-        var i = 0
-        while (i < trampolines.size) {
-            val (ty, r) = trampolines.entries.elementAt(i++)
-            guard(r.trampoline) { tramp.append(trampoline(ty, r)) }
-        }
-        for ((ty, r) in trampolines.entries.toList()) guard("box ${ty}") { tramp.append(callbackBox(r)) }
         for (d in low.decls) {
             if (d.kind == "class" && d.export) guard("box ${d.path}") { exportOut.append(classBox(d)) }
         }
@@ -1249,18 +1457,31 @@ class Gen(
                 }
             }
         }
+        // A trampoline's conversions may name an enum, and an enum's arm a
+        // function type: each is written once the other has named it.
+        val tramp = StringBuilder()
+        val boxes = StringBuilder()
+        var i = 0
         var j = 0
-        while (j < enums.size) {
-            val l = enums.values.elementAt(j++)
-            guard("enum ${l.path}") {
-                eraseToAny = true
-                try {
-                    enumOut.append(enumText(l))
-                } finally {
-                    eraseToAny = false
+        while (i < trampolines.size || j < enums.size) {
+            while (i < trampolines.size) {
+                val (ty, r) = trampolines.entries.elementAt(i++)
+                guard(r.trampoline) { tramp.append(trampoline(ty, r)) }
+                guard("box ${ty}") { boxes.append(callbackBox(r)) }
+            }
+            while (j < enums.size) {
+                val l = enums.values.elementAt(j++)
+                guard("enum ${l.path}") {
+                    eraseToAny = true
+                    try {
+                        enumOut.append(enumText(l))
+                    } finally {
+                        eraseToAny = false
+                    }
                 }
             }
         }
+        tramp.append(boxes)
         val pdir = pkg.replace('.', '/')
         val files = LinkedHashMap<String, String>()
         val header = "// Generated by kotlin-bindgen from the lowered IR. Do not edit.\n"
@@ -1269,11 +1490,7 @@ class Gen(
             flatOut
         val errorOut = errorTypes.values.joinToString("") { it.text.toString() }
         val aliases = aliasText()
-        files["$pdir/Bindings.kt"] = header + "@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)\n\npackage $pkg\n\n" + aliases + typedText() + enumOut + errorOut
-        if (vecs.isNotEmpty()) {
-            files["$pdir/Vecs.kt"] = header + "package $pkg\n" +
-                vecs.sorted().joinToString("") { "\n/** A `$it[]`: the JS typed array of its element. */\nexternal interface ${vecKt(it)} : JsAny\n" }
-        }
+        files["$pdir/Bindings.kt"] = header + "@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)\n\npackage $pkg\n\n" + aliases + typedText() + futureOut + enumOut + errorOut
         if (tuples.isNotEmpty()) {
             files["$pdir/Tuples.kt"] = header + "package $pkg\n" + tuples.joinToString("") { n ->
                 val ps = (0 until n).map { "T$it" }
@@ -1293,10 +1510,10 @@ class Gen(
         val out = StringBuilder()
         for (d in classes.values) {
             if (d.kind == "class" && d.export || d.path in libNames) continue
-            val parents = d.extends.mapNotNull { e ->
+            val parents = d.extends.mapIndexedNotNull { i, e ->
                 val base = e.substringBefore('<')
-                val pd = classes[base]?.takeIf { !(it.kind == "class" && it.export) } ?: return@mapNotNull null
-                typeName(pd.path) + if (pd.tparams.isEmpty()) "" else "<${pd.tparams.joinToString { erased(it) }}>"
+                val pd = classes[base]?.takeIf { !(it.kind == "class" && it.export) } ?: return@mapIndexedNotNull null
+                hostType(pd.path, d.extendsArgs.getOrNull(i).orEmpty())
             }.ifEmpty { listOf("JsAny") }
             out.append(kdoc("", assocDoc(d)))
             out.append("external interface ${typeName(d.path)}${if (d.tparams.isEmpty()) "" else "<${d.tparams.joinToString { "${sanitize(it.name)} : JsAny?" }}>"} : ${parents.joinToString()}\n\n")

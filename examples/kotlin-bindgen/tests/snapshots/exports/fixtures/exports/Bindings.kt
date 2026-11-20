@@ -21,8 +21,8 @@ fun Handler.scheduled(time: Double) {
     try { fixtures.exports.flat.Handler_scheduled_f64(this, time) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun Handler.queue(batch: JsArray<JsString?>) {
-    try { fixtures.exports.flat.Handler_queue_arr_str(this, batch) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun Handler.queue(batch: List<String>) {
+    try { fixtures.exports.flat.Handler_queue_arr_str(this, batch.map { it.toJsString() }.toJsArray()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 /** `HandlerFetchKind` as its box: its arm's JS value. */

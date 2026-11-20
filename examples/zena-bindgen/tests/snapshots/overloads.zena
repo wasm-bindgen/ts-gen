@@ -297,15 +297,15 @@ export extension class Store on externref {
     let r0 = __Store_read2((this as externref), key, options);
     return __tw_await<String | null>(r0 as externref);
   }
-  readText(key: String, options: GetOptions<externref>): Future<String | null> {
+  readText(key: String, options: GetOptions<String>): Future<String | null> {
     let r0 = __Store_readText((this as externref), key, options);
     return __tw_await<String | null>(r0 as externref);
   }
-  readJson<T>(key: String, options: GetOptions<externref>): Future<Option<T>> {
+  readJson<T>(key: String, options: GetOptions<String>): Future<Option<T>> {
     let r0 = __Store_readJson<T>((this as externref), key, options);
     return __tw_await<Option<T>>(r0);
   }
-  readArrayBuffer(key: String, options: GetOptions<externref>): Future<ArrayBuffer | null> {
+  readArrayBuffer(key: String, options: GetOptions<String>): Future<ArrayBuffer | null> {
     let r0 = __Store_readArrayBuffer((this as externref), key, options);
     return __tw_await<ArrayBuffer | null>(r0 as externref);
   }
@@ -454,13 +454,13 @@ declare function __Store_read(p0: externref, p1: String): externref;
 declare function __Store_read2(p0: externref, p1: String, p2: PartialGetOptionsUndefined): externref;
 
 @external("tw:js/global", "Store#readText(str,GetOptions<Str>)", "tw")
-declare function __Store_readText(p0: externref, p1: String, p2: GetOptions<externref>): externref;
+declare function __Store_readText(p0: externref, p1: String, p2: GetOptions<String>): externref;
 
 @external("tw:js/global", "Store#readJson<{T}>(str,GetOptions<Str>)", "tw")
-declare function __Store_readJson<T>(p0: externref, p1: String, p2: GetOptions<externref>): externref;
+declare function __Store_readJson<T>(p0: externref, p1: String, p2: GetOptions<String>): externref;
 
 @external("tw:js/global", "Store#readArrayBuffer(str,GetOptions<Str>)", "tw")
-declare function __Store_readArrayBuffer(p0: externref, p1: String, p2: GetOptions<externref>): externref;
+declare function __Store_readArrayBuffer(p0: externref, p1: String, p2: GetOptions<String>): externref;
 
 @external("tw:js/global", "Store#write(str,str)", "tw")
 declare function __Store_write(p0: externref, p1: String, p2: String): externref;

@@ -1,0 +1,41 @@
+// Time: timers, microtasks, and work that outlives the response.
+import { Completer, Future } from 'zena:async';
+import { Env, Response, queueMicrotask, scheduler, setTimeoutWithMsDelay } from '../bindings.zena';
+import { Ctx, note, ok } from './reply.zena';
+
+/** A future for a callback JS calls once. */
+function timeout(ms: f64): Future<void> {
+  let done = new Completer<void>();
+  setTimeoutWithMsDelay((args: FixedArray<externref | null>): void => {
+    done.complete();
+  }, ms);
+  return done.future;
+}
+
+function microtask(): Future<void> {
+  let done = new Completer<void>();
+  queueMicrotask((): externref | null => {
+    done.complete();
+    return null;
+  });
+  return done.future;
+}
+
+/** Work for after the response: a note for the helper, after a pause. */
+async function later(env: Env): Future<externref | null> {
+  await scheduler().wait(10.0);
+  await note(env, "the waitUntil of /timers ran");
+  return null;
+}
+
+/** `/timers`: three ways to wait, and `waitUntil`. */
+export async function timers(env: Env, ctx: Ctx): Future<Response> {
+  await timeout(5.0);
+  await microtask();
+  await scheduler().wait(5.0);
+  // The runtime keeps the request alive for this future: /fetch shows
+  // the note it leaves.
+  ctx.waitUntil(later(env));
+  return ok("waited for a setTimeout callback, a microtask and scheduler.wait\n" +
+    "waitUntil: a note reaches the helper after this response\n");
+}

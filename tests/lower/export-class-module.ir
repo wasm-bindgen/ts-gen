@@ -1,0 +1,31 @@
+ir 1;
+
+interface Env {}
+
+interface DurableObjectState {
+  @js(object)
+  new();
+  get id(): str;
+}
+
+interface DurableObject {
+  alarm(): future<unit>? throws;
+}
+
+export class Counter extends "cloudflare:workers".DurableObject {
+  new(ctx: DurableObjectState, env: Env) throws;
+  add(by: f64): future<f64>;
+}
+
+export class Greeter extends "cloudflare:workers".WorkerEntrypoint {
+  new(ctx: DurableObjectState, env: Env) throws;
+  greet(name: str): str throws;
+}
+
+module "cloudflare:workers" {
+  class DurableObject {}
+
+  class WorkerEntrypoint {}
+
+  export { DurableObject, WorkerEntrypoint };
+}

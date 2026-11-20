@@ -32,14 +32,6 @@ function $int(v, lo, hi, what) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 // A memory and its externref table, as the glue reads and writes them.
 // The language's space allocates through its exports and registers each
 // allocation on the call's cleanup list; the scratch space is the
@@ -388,7 +380,7 @@ function $outgoing(e) {
 }
 class $C0 {
   constructor(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       $checkLive();
       try {
         const t1 = a[0];
@@ -403,7 +395,7 @@ class $C0 {
     throw new TypeError("`new Counter` doesn't match its arguments");
   }
   inc(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       $checkLive();
       try {
         const t1 = a[0];
@@ -417,25 +409,22 @@ class $C0 {
     throw new TypeError("`Counter.inc` doesn't match its arguments");
   }
   label(...a) {
-    if ($upTo(a, 0)) {
-      $checkLive();
+    $checkLive();
+    try {
+      const r = $E[3](this, $HC.unwrap(this, $C0, "Counter"));
+      const t1 = r[0];
+      const t2 = r[1];
       try {
-        const r = $E[3](this, $HC.unwrap(this, $C0, "Counter"));
-        const t1 = r[0];
-        const t2 = r[1];
-        try {
-          return $liftUtf8($L, Number(t1), Number(t2));
-        } finally {
-          if (Number(t2) !== 0) $L.free(Number(t1), Number(t2) * 1, 1);
-        }
-      } catch (e) {
-        throw $outgoing(e);
+        return $liftUtf8($L, Number(t1), Number(t2));
+      } finally {
+        if (Number(t2) !== 0) $L.free(Number(t1), Number(t2) * 1, 1);
       }
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Counter.label` doesn't match its arguments");
   }
   static maybe(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       $checkLive();
       try {
         const t1 = a[0];

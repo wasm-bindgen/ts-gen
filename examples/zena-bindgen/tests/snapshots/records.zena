@@ -8,6 +8,15 @@ export sealed class EnvHeadersKind {
   case EnvHeadersKindStrArray(value: FixedArray<String>)
 }
 
+/** The box `EnvHeadersKind`: the JS value, which `unbox` converts. */
+@spelling("Any")
+export extension class EnvHeadersKindBox on externref {
+  unbox(): EnvHeadersKind {
+    let (r0, r1, r2) = __tw_unbox_EnvHeadersKindBox((this as externref));
+    return (__EnvHeadersKind_decode(r0, r1, r2) as EnvHeadersKind);
+  }
+}
+
 /** The arms of `err`, as its tag carries them. */
 export enum ErrArm {
   TypeError = 1,
@@ -22,12 +31,12 @@ export class ErrException extends Error {
 }
 
 export extension class Env on externref {
-  flags: NumberRecord<externref> {
+  flags: NumberRecord<boolean> {
     get {
       return __Env_flags((this as externref));
     }
   }
-  vars: Record<externref> {
+  vars: Record<String> {
     get {
       return __Env_vars((this as externref));
     }
@@ -35,7 +44,7 @@ export extension class Env on externref {
       __Env_vars2((this as externref), value);
     }
   }
-  lookup(headers: Record<EnvHeadersKind>): Record<Env> {
+  lookup(headers: Record<EnvHeadersKindBox>): Record<Env> {
     return __Env_lookup((this as externref), headers);
   }
   configure(options: EnvOptions): void {
@@ -93,16 +102,19 @@ export extension class NumberRecord<V> on externref {
 }
 
 @external("tw:js/global", "Env#get:vars()", "tw")
-declare function __Env_vars(p0: externref): Record<externref>;
+declare function __Env_vars(p0: externref): Record<String>;
 
 @external("tw:js/global", "Env#set:vars(Record<Str>)", "tw")
-declare function __Env_vars2(p0: externref, p1: Record<externref>): void;
+declare function __Env_vars2(p0: externref, p1: Record<String>): void;
 
 @external("tw:js/global", "Env#get:flags()", "tw")
-declare function __Env_flags(p0: externref): NumberRecord<externref>;
+declare function __Env_flags(p0: externref): NumberRecord<boolean>;
+
+@external("tw:unbox", "EnvHeadersKind", "tw")
+declare function __tw_unbox_EnvHeadersKindBox(p0: externref): inline (i32, externref | null, array<var externref | null> | null);
 
 @external("tw:js/global", "Env#lookup(Record<EnvHeadersKind>)", "tw, throws:err")
-declare function __Env_lookup(p0: externref, p1: Record<EnvHeadersKind>): Record<Env>;
+declare function __Env_lookup(p0: externref, p1: Record<EnvHeadersKindBox>): Record<Env>;
 
 @external("tw:js/global", "Env#configure(EnvOptions)", "tw, throws:err")
 declare function __Env_configure(p0: externref, p1: EnvOptions): void;
@@ -139,3 +151,18 @@ declare function __NumberRecord_at<V>(p0: externref, p1: u32): Option<V>;
 
 @external("tw:js/global", "NumberRecord#setAt<{V}>(u32,V)", "tw")
 declare function __NumberRecord_setAt<V>(p0: externref, p1: u32, p2: V): void;
+
+export function __str_array_in(a: array<var externref | null>): FixedArray<String> {
+  let out = new FixedArray<String>(a.length, '');
+  for (var i = 0; i < a.length; i += 1) {
+    let e = a[i];
+    out[i] = String.fromHandle(e as externref);
+  }
+  return out;
+}
+
+export function __EnvHeadersKind_decode(arm: i32, s0: externref | null, s1: array<var externref | null> | null): EnvHeadersKind | null {
+  if (arm == 1) { return new EnvHeadersKindStr(String.fromHandle(s0 as externref)); }
+  if (arm == 2) { return new EnvHeadersKindStrArray(__str_array_in(s1 as array<var externref | null>)); }
+  return null;
+}

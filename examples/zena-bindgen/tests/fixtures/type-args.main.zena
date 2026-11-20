@@ -1,0 +1,22 @@
+import { Future } from 'zena:async';
+import { Api, EntryName, EntrySize } from './type-args.zena';
+
+export async function run(api: Api): Future<f64> {
+  var n = 0.0;
+  match (api.entries().get(0.0).unbox()) {
+    case EntryName as name: { n += name.value.length as f64; }
+    case EntrySize as size: { n += size.value; }
+  }
+  let maybe = api.maybe().get(0.0);
+  if (maybe != null) {
+    if (maybe.unbox() is EntrySize) { n += 1.0; }
+  }
+  let text: String = await api.pending().get(0.0).unbox();
+  n += text.length as f64;
+  let (key, size) = api.sizes().entries().get(0.0).unbox();
+  let (index, other) = api.sizes().indexed().get(0.0).unbox();
+  let row: FixedArray<f64> = api.sizes().rows().get(0.0).unbox();
+  let (name, list) = api.lists().entries().get(0.0).unbox();
+  if (list.get(0.0).unbox() is EntryName) { n += 1.0; }
+  return n + size + index + other + (key.length as f64) + (row.length as f64) + (name.length as f64);
+}

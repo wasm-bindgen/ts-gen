@@ -8,9 +8,11 @@ tw:tryUnbox Counter
 tw:unbox Sub
 tw:unbox Orphan
 tw:unbox Dual
+tw:unbox Rest
 tw:new Sub.new(u32)
 tw:new Orphan.new(u32)
 tw:new Dual.new(str)
+tw:new Rest.new(Any?,Any?)
 tw:box fn(u32)->str
 tw:unbox fn(u32)->str
 tw:tryUnbox fn(u32)->str
@@ -22,3 +24,4 @@ export tw:drop:Counter
 export tw:drop:Sub
 export tw:drop:Orphan
 export tw:drop:Dual
+export tw:drop:Rest

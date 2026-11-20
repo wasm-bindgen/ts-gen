@@ -9,11 +9,33 @@ enum Mode {
   Count(u32);
 }
 
+enum Listener {
+  Call(fn(str) -> str);
+  Name(str);
+}
+
+class Shelf<T> {
+  first(): T;
+}
+
 namespace ext {
+  shelf(): Shelf<Str>;
+  stock<T>(item: T): future<Shelf<T>>;
+  size(s: Shelf<Any?>): u32;
   none(): Str?;
   apply(f: fn(u32) -> u32, x: u32): u32;
   seen(v: Str?);
   seenNull(v: @js(null) Str?);
+  later(f: fn(u32) -> future<u32>, x: u32): future<u32>;
+  settle(p: future<str>): future<str>;
+  bytes(v: u8[]): u8[];
+  words(xs: arr<str>): arr<str>;
+  @js(args = (sep, ...parts))
+  join(sep: str, parts: arr<str>): str;
+  pick<This = Any?>(x: u32): u32;
+  soon(f: fn());
+  listen(l: Listener, x: str): str;
+  attempt<T>(f: fn() -> future<T>): future<T>;
 }
 
 export class Counter {
@@ -35,4 +57,13 @@ export namespace probe {
   callBoxed(f: Any, x: u32): u32;
   none(): Str?;
   writeNones();
+  asyncCallback(x: u32): future<u32>;
+  made(): future<str>;
+  bytes(): u32;
+  words(): str;
+  join(): str;
+  soon(): future<str>;
+  listen(): str;
+  attempt(): future<str>;
+  generic(): future<str>;
 }

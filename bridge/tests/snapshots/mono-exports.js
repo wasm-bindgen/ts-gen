@@ -45,14 +45,6 @@ function $str(v) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 // A memory and its externref table, as the glue reads and writes them.
 // The language's space allocates through its exports and registers each
 // allocation on the call's cleanup list; the scratch space is the
@@ -191,7 +183,7 @@ function $outgoing(e) {
 }
 const $N0 = {
   id(...a) {
-    if (a.length >= 1 && $upTo(a, 1) && typeof a[0] === "number") {
+    if (a.length >= 1 && typeof a[0] === "number") {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -201,7 +193,7 @@ const $N0 = {
         throw $outgoing(e);
       }
     }
-    if (a.length >= 1 && $upTo(a, 1) && typeof a[0] === "string") {
+    if (a.length >= 1 && typeof a[0] === "string") {
       try {
         const t3 = a[0];
         const t4 = $str(t3);
@@ -214,7 +206,7 @@ const $N0 = {
     throw new TypeError("no overload of `id` matches its arguments");
   },
   pick(...a) {
-    if (a.length >= 2 && $upTo(a, 2) && typeof a[0] === "number" && typeof a[1] === "number") {
+    if (a.length >= 2 && typeof a[0] === "number" && typeof a[1] === "number") {
       try {
         const t1 = a[0];
         const t2 = $num(t1, "f64");
@@ -226,7 +218,7 @@ const $N0 = {
         throw $outgoing(e);
       }
     }
-    if (a.length >= 2 && $upTo(a, 2) && typeof a[0] === "boolean" && typeof a[1] === "boolean") {
+    if (a.length >= 2 && typeof a[0] === "boolean" && typeof a[1] === "boolean") {
       try {
         const t5 = a[0];
         const t6 = $bool(t5);
@@ -241,7 +233,7 @@ const $N0 = {
     throw new TypeError("no overload of `pick` matches its arguments");
   },
   either(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = (t1 ?? null);

@@ -46,6 +46,11 @@ export class Dual extends Plain {
   new(x: str);
 }
 
+export class Rest extends Plain {
+  new();
+  @js(args = (opts? { tag = t })) new(opts: Any?, t: Any?);
+}
+
 export namespace util {
   twice(x: u32): u32;
   make(n: u32): Counter;
@@ -57,6 +62,8 @@ export namespace util {
   @js(name = "opt", args = (x, opts? { mode = "fast", tag = t })) fast(x: u32, opts: Any?, t: Any?): u32;
   @js(name = "opt", args = (x, opts? { mode = "slow" })) slow(x: u32, opts: Any?): u32;
   @js(args = (Mode.FAST)) fastOnly(): u32;
+  @js(name = "arity") arity0(): u32;
+  @js(name = "arity") arity2(a: u32, b: u32): u32;
 }
 
 class Mode {

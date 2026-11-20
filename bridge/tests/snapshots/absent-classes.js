@@ -36,14 +36,6 @@ function $some(v, what) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 // A class's value, or null when its path holds no function: its checks
 // then degrade to the interface test, and its arm tests never match (§8).
 function $class(C) {
@@ -359,7 +351,7 @@ function $outgoing(e) {
   return e;
 }
 const $X0 = function take(...a) {
-  if (a.length >= 1 && $upTo(a, 1)) {
+  if (a.length >= 1) {
     try {
       const t1 = a[0];
       const t2 = $instance(t1, $cls0, "Absent");

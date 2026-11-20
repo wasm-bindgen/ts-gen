@@ -1,0 +1,65 @@
+// Streams: a source, a transform, a reader, and a streamed response body.
+import { Future } from 'zena:async';
+import {
+  BodyInitReadableStream, ReadableStream, ReadableStreamDefaultController, ReadableWritablePair, Response,
+  ResponseInit, TextEncoderStream, TransformStream, TransformStreamDefaultController, Transformer, UnderlyingSource
+} from '../bindings.zena';
+import { Uint8Array } from '../std.zena';
+
+/** A stream of the given chunks: JS pulls, the closure enqueues. */
+function chunks(items: Array<String>): ReadableStream<String> {
+  var next = 0;
+  let source = new UnderlyingSource<String>();
+  source.setPull((controller: ReadableStreamDefaultController<String>): Future<void> | null => {
+    if (next < items.length) {
+      controller.enqueue(items[next]);
+      next += 1;
+    } else {
+      controller.close();
+    }
+    return null;
+  });
+  return new ReadableStream<String>.newWithUnderlyingSource(source);
+}
+
+/** A transform that upper-cases each chunk. */
+function upperCase(): TransformStream<String, String> {
+  let transformer = new Transformer<String, String>();
+  transformer.setTransform(
+    (chunk: String, controller: TransformStreamDefaultController<String>): Future<void> | null => {
+      controller.enqueue(chunk.toUpperCase());
+      return null;
+    });
+  return new TransformStream<String, String>.newWithTransformer(transformer);
+}
+
+/** `/stream`: chunks piped through a transform and read one at a time, then a body that streams. */
+export async function stream(): Future<Response> {
+  let upper = upperCase();
+  let words = new Array<String>();
+  words.push("one");
+  words.push("two");
+  words.push("three");
+  let piped = chunks(words).pipeTo(upper.writable);
+  let reader = upper.readable.getReader();
+  let lines = new Array<String>();
+  lines.push("read through the transform:");
+  var result = await reader.read();
+  while (!result.done) {
+    let value = result.value;
+    if (value is Some<String>) {
+      lines.push(` ${value.value}`);
+    }
+    result = await reader.read();
+  }
+  await piped;
+  lines.push("\nand this body is streamed, ");
+  lines.push("a chunk ");
+  lines.push("at a time\n");
+  // The body is a stream of bytes: the text chunks pass through an encoder.
+  // TypeScript takes any `{ readable, writable }` pair structurally: the
+  // encoder is viewed as one.
+  let encoder = (new TextEncoderStream() as externref) as ReadableWritablePair<Uint8Array, String>;
+  let body = chunks(lines).pipeThrough<Uint8Array>(encoder);
+  return new Response.newWithBodyAndInit(new BodyInitReadableStream(body), new ResponseInit());
+}

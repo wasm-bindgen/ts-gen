@@ -18,6 +18,27 @@
 //! whose `@export` name is templated the same way (`tw:call:fn({T})->{U}`),
 //! so it exports at each instantiation it is passed at.
 //!
+//! A box as a type argument is typed for its conversion: `Str` and the
+//! scalar boxes are the instantiation at the unboxed type, and a tuple,
+//! array or typed array box is a handle class whose `unbox` converts it.
+//! An enum argument is such a handle class too (`EntryBox`), instantiating
+//! as `Any`: the IR spells no box for an enum, and at the enum itself the
+//! member lays out its flattened value, which no one Zena type argument
+//! is. A box over type parameters is a generic handle class (`Tuple2<K,
+//! V>`, `ArrBox<T>`), and a future argument is `FutureBox<T>`, whose
+//! `unbox` is the Zena future. No type argument is left the `externref`
+//! of `Any` but in a class's own instantiation at a box of its type
+//! parameters, which has no end.
+//!
+//! The standard library's `Iterator<T>` gains `step()`, which reads one
+//! `next()` result through `IteratorYieldResult<T>` as `(true, value)` or
+//! `(false, _)`, the form a `while (let (true, x) = it.step())` loop takes.
+//!
+//! A lib's bindings carry the runtime: the `err` tag class, those of the
+//! lib's own `throws` enums, and the tw loop. The bindings over a lib
+//! import them from the lib's, so a module has one class per tag and one
+//! loop.
+//!
 //! What has no Zena form yet is left out with a `// skipped` line and
 //! listed in [`Output::skipped`]: type parameters anywhere but whole
 //! positions, host type arguments and generic callbacks' whole positions.
@@ -218,6 +239,19 @@ export function __tw_next_sleep(loop: i32): i64 {
 }
 "#;
 
+/// What the bindings over a lib import from its bindings: the `err` tag
+/// class and the tw loop's functions. A module has one of each: the tag
+/// has one class, and the bridge calls one loop.
+const RUNTIME: &[&str] = &[
+    "ErrException",
+    "ErrArm",
+    "__tw_await",
+    "__tw_await_with",
+    "__tw_promise",
+    "__tw_promise_with",
+    "__tw_entered",
+];
+
 /// Names the generated code relies on, which IR declarations can't take.
 const RESERVED: &[&str] = &[
     "String",
@@ -312,16 +346,48 @@ pub fn generate_with(ir: &Ir, libs: &[Lib<'_>], opts: &Options) -> anyhow::Resul
     let irs: Vec<&Ir> = libs.iter().map(|l| l.ir).collect();
     let layouts = Layouts::with_libs(ir, &irs, &profile);
     let mut g = Gen::new(&layouts, opts);
+    g.lib = ir.lib.is_some();
     g.collect(&ir.items, None, &mut Vec::new());
     g.assign_names();
     g.assign_specs();
+    // The last lib resolves against no other, so the runtime is its.
+    if let Some(root) = libs.last() {
+        for name in RUNTIME {
+            g.used.insert(name.to_string());
+            g.lib_names
+                .insert(name.to_string(), (root.module.clone(), name.to_string()));
+        }
+        g.runtime = true;
+    }
     // A lib's declarations take the names its own bindings give them.
     for (i, lib) in libs.iter().enumerate() {
         let ll = Layouts::with_libs(lib.ir, &irs[i + 1..], &profile);
         let mut lg = Gen::new(&ll, opts);
+        lg.lib = true;
         lg.collect(&lib.ir.items, None, &mut Vec::new());
         lg.assign_names();
         lg.assign_specs();
+        lg.lib_tags();
+        let mut tags: Vec<(String, Tag)> = lg.tags.into_iter().collect();
+        tags.sort_by(|a, b| a.0.cmp(&b.0));
+        for (path, tag) in tags {
+            if g.tags.contains_key(&path) {
+                continue;
+            }
+            let tag = if path == "err" {
+                if i + 1 < libs.len() {
+                    continue;
+                }
+                tag
+            } else {
+                Tag {
+                    class: g.lib_name(&lib.module, &tag.class),
+                    arm: g.lib_name(&lib.module, &tag.arm),
+                    fallback: tag.fallback,
+                }
+            };
+            g.tags.insert(path, tag);
+        }
         let mut specs: Vec<(String, Vec<Spec>)> = lg.specs.into_iter().collect();
         specs.sort_by(|a, b| a.0.cmp(&b.0));
         let mut names: Vec<(String, String)> = lg.names.into_iter().collect();
@@ -346,6 +412,7 @@ pub fn generate_with(ir: &Ir, libs: &[Lib<'_>], opts: &Options) -> anyhow::Resul
             g.specs.insert(canonical, rows);
         }
     }
+    g.lib_tags();
     let members = layouts.keys.members();
     g.enums()?;
     g.classes(&members)?;
@@ -383,6 +450,13 @@ impl<'a> Gen<'a> {
             lib_names: HashMap::new(),
             lib_used: RefCell::new(BTreeSet::new()),
             arm: None,
+            boxes: HashMap::new(),
+            iter_result: None,
+            lib: false,
+            runtime: false,
+            tags: HashMap::new(),
+            owner: None,
+            opaque_boxes: false,
         }
     }
 
@@ -447,6 +521,32 @@ struct Gen<'a> {
     /// The arm variant (IR.md §7) being emitted: its key and parameter
     /// types.
     arm: Option<Arm>,
+    /// Box handle classes, by the box's canonical spelling.
+    boxes: HashMap<String, String>,
+    /// The class of a JS iterator's results, where the IR declares the
+    /// iterator protocol ([`Gen::iterator_protocol`]).
+    iter_result: Option<String>,
+    /// The IR is a lib: its bindings carry the runtime and the tag classes
+    /// of its `throws` enums, for the bindings over it.
+    lib: bool,
+    /// The runtime is a lib's, imported ([`RUNTIME`]).
+    runtime: bool,
+    /// The tag classes of `throws` enums, by canonical spelling.
+    tags: HashMap<String, Tag>,
+    /// The class whose members are being generated, by canonical location.
+    owner: Option<String>,
+    /// Inside the type arguments of a reference to [`Gen::owner`], where a
+    /// box over type parameters isn't typed ([`Gen::host_ref`]).
+    opaque_boxes: bool,
+}
+
+/// The class a `throws` enum's tag carries, the enum of its arms, and the
+/// fallback arm's name there.
+#[derive(Clone)]
+struct Tag {
+    class: String,
+    arm: String,
+    fallback: String,
 }
 
 type Arm = (String, Vec<Type>);
@@ -777,7 +877,9 @@ impl<'a> Gen<'a> {
     }
 
     fn finish(mut self) -> Output {
-        if self.uses_promise {
+        // The tw loop is the bindings' own unless a lib's is imported.
+        let own = !self.runtime && (self.lib || self.uses_promise);
+        if own {
             if let Ok(err) = self.layouts.enum_of(
                 &ts_gen_abi::ir::Path::err(),
                 &Context::default(),
@@ -786,20 +888,39 @@ impl<'a> Gen<'a> {
                 let _ = self.tag_class(&err);
             }
         }
+        let trampolines = self.helper_done.iter().any(|h| h.starts_with("tramp "));
+        if self.runtime {
+            let text = [&self.types, &self.externs, &self.helpers, &self.funcs];
+            for w in text
+                .iter()
+                .flat_map(|t| t.split(|c: char| !(c.is_alphanumeric() || c == '_')))
+            {
+                if w.starts_with("__tw_") {
+                    self.note_lib(w);
+                }
+            }
+        }
         let mut out = String::new();
         out.push_str("// Generated by zena-bindgen from the ts-gen IR. Do not edit.\n");
         out.push_str("// Compile with `zena build -t js` and link against the tw bridge.\n\n");
         out.push_str("import { Option, Some, None, none, some } from 'zena:core';\n");
         out.push_str(&self.lib_imports(self.lib_used.borrow().iter()));
+        if self.runtime && self.uses_promise {
+            out.push_str("import { Future } from 'zena:async';\n");
+        }
         out.push('\n');
-        if self.uses_promise {
+        if own {
             out.push_str(ASYNC_RUNTIME);
             out.push('\n');
         }
         // A callback can complete Zena futures outside a tick, so it asks
         // for one.
-        if self.helper_done.iter().any(|h| h.starts_with("tramp ")) {
-            out.push_str(if self.uses_promise {
+        if self.lib && own {
+            out.push_str(
+                "export function __tw_entered(): void {\n  __tw_work_available(1);\n}\n\n",
+            );
+        } else if trampolines && !self.runtime {
+            out.push_str(if own {
                 "function __tw_entered(): void {\n  __tw_work_available(1);\n}\n\n"
             } else {
                 "function __tw_entered(): void {}\n\n"
@@ -1056,11 +1177,9 @@ impl<'a> Gen<'a> {
         let (option, body) = match &sig.throws {
             Some(layout) => {
                 let body = self.rethrowing(layout, &body)?;
-                let class = self.names[&format!("tag {}", layout.path)].clone();
-                let fallback = &self.names[&format!("tagfallback {}", layout.path)];
-                let arm = fallback.split('.').next().unwrap_or_default().to_string();
-                self.export_uses.insert(class);
-                self.export_uses.insert(arm);
+                let tag = self.tags[&layout.path].clone();
+                self.export_uses.insert(tag.class);
+                self.export_uses.insert(tag.arm);
                 (format!("tw, throws:{}", layout.path), body)
             }
             None => ("tw".to_string(), body),
@@ -1218,6 +1337,11 @@ impl<'a> Gen<'a> {
         for c in self.specs.keys() {
             self.parents.insert(self.names[c].clone());
         }
+        if let Some(result) = self.iterator_protocol() {
+            // `step` views `next()`'s result as one.
+            self.parents.insert(result.clone());
+            self.iter_result = Some(result);
+        }
         for (i, parent) in parents.into_iter().enumerate() {
             let TypeDecl::Class(c) = self.decls[i].decl else {
                 continue;
@@ -1236,6 +1360,7 @@ impl<'a> Gen<'a> {
                 }
                 continue;
             }
+            self.owner = Some(location(&self.decls[i].loc));
             self.class(i, c, parent, members, None)?;
             let canonical = location(&self.decls[i].loc);
             let specs = self.specs.remove(&canonical).unwrap_or_default();
@@ -1243,8 +1368,51 @@ impl<'a> Gen<'a> {
                 self.class(i, c, None, members, Some(s))?;
             }
             self.specs.insert(canonical, specs);
+            self.owner = None;
         }
         Ok(())
+    }
+
+    /// The JS iterator protocol as std declares it: a global
+    /// `Iterator<T>` whose `next()` returns `Any`, TypeScript's union of
+    /// the result types, and `IteratorYieldResult<T>` with `done` and
+    /// `value`. Returns the result class's Zena name.
+    fn iterator_protocol(&self) -> Option<String> {
+        let class = |name: &str| {
+            self.decls.iter().find_map(|d| match d.decl {
+                TypeDecl::Class(c)
+                    if d.loc.module.is_none() && d.loc.path == [name] && c.tparams.len() == 1 =>
+                {
+                    Some(c)
+                }
+                _ => None,
+            })
+        };
+        let named = |m: &Member, name: &str| m.kind.name() == Some(name) && !m.is_static;
+        let next = class("Iterator")?
+            .members
+            .iter()
+            .find(|m| named(m, "next"))?;
+        let rest = next.params.iter().all(|p| matches!(p.ty, Type::Array(_)));
+        if !matches!(next.kind, MemberKind::Method(_)) || next.result != Type::Any || !rest {
+            return None;
+        }
+        let result = class("IteratorYieldResult")?;
+        let getter = |name: &str| {
+            result
+                .members
+                .iter()
+                .find(|m| named(m, name) && matches!(m.kind, MemberKind::Get(_)))
+        };
+        let done = getter("done")?;
+        let value = getter("value")?;
+        let tparam = Type::named([result.tparams[0].name.as_str()]);
+        let nullable_bool =
+            matches!(&done.result, Type::Nullable(t, _) if **t == Type::Scalar(Scalar::Bool));
+        if !nullable_bool || value.result != tparam {
+            return None;
+        }
+        self.names.get("IteratorYieldResult").cloned()
     }
 
     /// A generic class's type parameters, each with its default where Zena
@@ -1469,6 +1637,22 @@ impl<'a> Gen<'a> {
                         call.result,
                         wrapper_body(&call, &invoke, "    ")
                     );
+                    if let (Some(result), "Iterator", "next") =
+                        (&self.iter_result, canonical.as_str(), n.as_str())
+                    {
+                        let t = ident(&c.tparams[0].name);
+                        let mut step = String::new();
+                        for (p, ty) in &call.params {
+                            let _ = writeln!(step, "    let {p}: {ty} = [];");
+                        }
+                        for p in &call.pre {
+                            let _ = writeln!(step, "    {p}");
+                        }
+                        let _ = writeln!(
+                            methods,
+                            "  /** The next value, or `(false, _)` once the iterator is done: `next()` through the iterator protocol. */\n  step(): inline (true, {t}) | inline (false, _) {{\n{step}    let result = new {result}<{t}>.__wrap({invoke});\n    let done = result.done;\n    if (done is Some<boolean> && done.value) {{\n      return (false, _);\n    }}\n    return (true, result.value);\n  }}"
+                        );
+                    }
                 }
             }
         }
@@ -1584,7 +1768,14 @@ impl<'a> Gen<'a> {
         if let Some(s) = self.spec_of(&canonical, &r.args, cx) {
             return Ok(s);
         }
-        let args: R<Vec<String>> = r.args.iter().map(|a| self.generic_surface(a, cx)).collect();
+        // A class's own instantiation at a box of its type parameters has
+        // no end (`List<T>#pairs(): List<Tuple<T, f64>>`): the box stays
+        // the JS value there.
+        let own = self.owner.as_deref() == Some(canonical.as_str());
+        let outer = self.opaque_boxes;
+        self.opaque_boxes |= own;
+        let args: R<Vec<String>> = r.args.iter().map(|a| self.targ_surface(a, cx)).collect();
+        self.opaque_boxes = outer;
         Ok(format!("{name}<{}>", args?.join(", ")))
     }
 
@@ -1759,9 +1950,10 @@ impl<'a> Gen<'a> {
     /// The class a `throws` enum's tag carries (§15): its arm, an enum of
     /// the arms' indices, and its message. Every arm is `(Str)`.
     fn tag_class(&mut self, layout: &EnumLayout) -> R<String> {
-        let key = format!("tag {}", layout.path);
-        if let Some(n) = self.names.get(&key) {
-            return Ok(n.clone());
+        if let Some(t) = self.tags.get(&layout.path) {
+            self.note_lib(&t.class);
+            self.note_lib(&t.arm);
+            return Ok(t.class.clone());
         }
         let base = match layout.origin {
             Origin::Err => "Err".to_string(),
@@ -1803,19 +1995,58 @@ impl<'a> Gen<'a> {
             .find(|a| a.fallback)
             .map(|a| ident(&a.name))
             .unwrap_or_else(|| ident(&layout.arms[0].name));
-        self.names.insert(
-            format!("tagfallback {}", layout.path),
-            format!("{arm}.{fallback}"),
+        self.tags.insert(
+            layout.path.clone(),
+            Tag {
+                class: class.clone(),
+                arm,
+                fallback,
+            },
         );
-        self.names.insert(key, class.clone());
         Ok(class)
+    }
+
+    /// `ErrArm.Error`: the fallback arm of a tag class.
+    fn tag_fallback(&self, layout: &EnumLayout) -> String {
+        let t = &self.tags[&layout.path];
+        format!("{}.{}", t.arm, t.fallback)
+    }
+
+    /// A lib's tag classes, declared whether or not it throws them: `err`
+    /// and its own `throws` enums (§15: a fallback, and `(Str)` arms).
+    fn lib_tags(&mut self) {
+        if !self.lib {
+            return;
+        }
+        let mut layouts = Vec::new();
+        if !self.runtime {
+            layouts.extend(self.layouts.enum_of(
+                &ts_gen_abi::ir::Path::err(),
+                &Context::default(),
+                Flow::ToLang,
+            ));
+        }
+        for d in &self.decls {
+            let TypeDecl::Enum(e) = d.decl else { continue };
+            let path = Path::new([e.name.as_str()]);
+            layouts.extend(self.layouts.enum_of(&path, &class_cx(&d.loc), Flow::ToLang));
+        }
+        for layout in layouts {
+            let thrown = layout.arms.iter().any(|a| a.fallback)
+                && layout.arms.iter().all(|a| {
+                    a.payload.len() == 1 && matches!(a.payload[0].ty.as_str(), "str" | "Str")
+                });
+            if thrown {
+                let _ = self.tag_class(&layout);
+            }
+        }
     }
 
     /// Wraps an entry point's body so an error leaving it is its `throws`
     /// enum's class: another `Error` becomes the fallback arm.
     fn rethrowing(&mut self, layout: &EnumLayout, body: &str) -> R<String> {
         let class = self.tag_class(layout)?;
-        let fallback = self.names[&format!("tagfallback {}", layout.path)].clone();
+        let fallback = self.tag_fallback(layout);
         let inner: String = body.lines().map(|l| format!("  {l}\n")).collect();
         Ok(format!(
             "  try {{\n{inner}  }} catch (e) {{\n    if (e is {class}) {{\n      throw e;\n    }}\n    throw new {class}({fallback}, e.message);\n  }}\n"
@@ -2183,9 +2414,9 @@ impl<'a> Gen<'a> {
             Kind::Host { of, nullable } => {
                 let t = match of {
                     Host::Class { path, .. } => self.class_surface(path, &r.ty)?,
-                    // Every box but `Str` stays opaque, an `externref` the
-                    // bindings only pass back, until a fixture needs typed
-                    // box handles.
+                    // In a direct position a box stays opaque, an
+                    // `externref` the bindings only pass back; as a type
+                    // argument it is typed (`targ_surface`).
                     Host::Any | Host::Box(_) => "externref".into(),
                     Host::Future { value, error } => {
                         self.future_fns(error)?;
@@ -2233,12 +2464,206 @@ impl<'a> Gen<'a> {
         if let Some(s) = self.spec_of(path, &r.args, &cx) {
             return Ok(s);
         }
-        let args: R<Vec<String>> = r
-            .args
-            .iter()
-            .map(|a| self.generic_surface(a, &cx))
-            .collect();
+        let args: R<Vec<String>> = r.args.iter().map(|a| self.targ_surface(a, &cx)).collect();
         Ok(format!("{name}<{}>", args?.join(", ")))
+    }
+
+    /// A type argument's Zena type. A box (§13) is a value the bridge
+    /// hasn't converted, so each is typed for the conversion it takes: a
+    /// `Str` or scalar box is the instantiation at its unboxed type, which
+    /// reads the same JS value, and a tuple, array or typed array box, an
+    /// enum or a future is a handle class with an `unbox`.
+    fn targ_surface(&mut self, t: &Type, cx: &Context<'_>) -> R<String> {
+        match t {
+            Type::StrBox => Ok("String".into()),
+            Type::ScalarBox(s) => Ok(scalar(*s).into()),
+            Type::Nullable(inner, _) if matches!(**inner, Type::StrBox) => {
+                Ok("String | null".into())
+            }
+            t if self.opaque_boxes && mentions_tparam(t, cx) && self.handle_arg(t, cx) => {
+                self.generic_surface(t, cx)
+            }
+            Type::Nullable(inner, _) if self.handle_arg(inner, cx) => {
+                Ok(format!("{} | null", self.targ_surface(inner, cx)?))
+            }
+            Type::TupleBox(_) | Type::ArrBox(_) | Type::VecBox(_) => {
+                let class = if mentions_tparam(t, cx) {
+                    self.generic_box(t, cx)
+                } else {
+                    self.box_class(t, cx)
+                };
+                Ok(class.unwrap_or_else(|_| "externref".into()))
+            }
+            // An enum's Zena class is no host type: its JS value crosses.
+            Type::Named(_) if self.handle_arg(t, cx) => {
+                Ok(self.box_class(t, cx).unwrap_or_else(|_| "externref".into()))
+            }
+            Type::Future(v, e)
+                if e.is_err() && !matches!(**v, Type::Array(_) | Type::Vec(_) | Type::Tuple(_)) =>
+            {
+                let value = self.targ_surface(v, cx)?;
+                Ok(format!("{}<{value}>", self.future_box()))
+            }
+            t => self.generic_surface(t, cx),
+        }
+    }
+
+    /// Whether a type argument is a handle class ([`Self::targ_surface`]),
+    /// whose none is `null`.
+    fn handle_arg(&self, t: &Type, cx: &Context<'_>) -> bool {
+        match t {
+            Type::TupleBox(_) | Type::ArrBox(_) | Type::VecBox(_) => true,
+            Type::Future(_, e) => e.is_err(),
+            Type::Named(r) => {
+                r.args.is_empty()
+                    && matches!(
+                        self.layouts.keys.symbols.resolve_decl(&r.path, cx),
+                        Some((_, TypeDecl::Enum(_)))
+                    )
+            }
+            _ => false,
+        }
+    }
+
+    /// The handle class of a future as a type argument: the JS promise,
+    /// spelled `future<T>`, whose `unbox` is the Zena future over it.
+    fn future_box(&mut self) -> String {
+        if let Some(name) = self.boxes.get("future") {
+            return name.clone();
+        }
+        self.uses_async();
+        let name = unique(&mut self.used, "FutureBox".into());
+        let _ = writeln!(
+            self.types,
+            "/** The box `future<T>`: the JS promise, which `unbox` awaits. */\n@spelling(\"future\")\nexport extension class {name}<T> on externref {{\n  unbox(): Future<T> {{\n    return __tw_await<T>((this as externref));\n  }}\n}}\n"
+        );
+        self.boxes.insert("future".into(), name.clone());
+        name
+    }
+
+    /// The handle class of a tuple or array box over type parameters,
+    /// generic in its elements: `Tuple2<K, V>` spells `Tuple<K,V>`, and its
+    /// `unbox` is `("tw:unbox", "(K,V)")` at each instantiation.
+    fn generic_box(&mut self, t: &Type, cx: &Context<'_>) -> R<String> {
+        let (elems, key) = match t {
+            Type::TupleBox(es) => (es.as_slice(), format!("Tuple{}", es.len())),
+            Type::ArrBox(e) => (std::slice::from_ref(&**e), "Arr".to_string()),
+            _ => return skip("a typed array box over a type parameter"),
+        };
+        // An element crosses in the box's wire, so it is a value whose Zena
+        // type lowers to it: a scalar, a string, a host reference or a type
+        // parameter.
+        let args: R<Vec<String>> = elems
+            .iter()
+            .map(|e| match e {
+                Type::Scalar(s) => Ok(scalar(*s).to_string()),
+                Type::Str => Ok("String".to_string()),
+                Type::Named(r) if r.args.is_empty() && is_tparam(&r.path, cx) => {
+                    Ok(ident(&r.path.segments[0]))
+                }
+                Type::Named(r) => self.host_ref(r, cx),
+                _ => skip("a box element that is converted"),
+            })
+            .collect();
+        let args = args?.join(", ");
+        if let Some(name) = self.boxes.get(&key) {
+            return Ok(format!("{name}<{args}>"));
+        }
+        let tparams: Vec<String> = (0..elems.len()).map(|i| format!("T{i}")).collect();
+        let list = tparams.join(", ");
+        let (base, spelling, external, result) = match t {
+            Type::TupleBox(_) => {
+                let holes: Vec<String> = tparams.iter().map(|p| format!("{{{p}}}")).collect();
+                (
+                    key.clone(),
+                    "Tuple",
+                    format!("({})", holes.join(",")),
+                    (format!("inline ({list})"), tuple_type(&tparams)),
+                )
+            }
+            _ => (
+                "ArrBox".to_string(),
+                "Arr",
+                "arr<{T0}>".to_string(),
+                ("FixedArray<T0>".to_string(), "FixedArray<T0>".to_string()),
+            ),
+        };
+        let name = unique(&mut self.used, base);
+        let unbox = unique(&mut self.used, format!("__tw_unbox_{name}"));
+        let _ = writeln!(
+            self.externs,
+            "@external(\"tw:unbox\", {}, \"tw\")\ndeclare function {unbox}<{list}>(p0: externref): {};\n",
+            zena_string(&external),
+            result.0
+        );
+        let _ = writeln!(
+            self.types,
+            "/** The box `{spelling}<{list}>`: the JS value, which `unbox` converts. */\n@spelling({})\nexport extension class {name}<{list}> on externref {{\n  unbox(): {} {{\n    return {unbox}<{list}>((this as externref));\n  }}\n}}\n",
+            zena_string(spelling),
+            result.1
+        );
+        self.boxes.insert(key, name.clone());
+        Ok(format!("{name}<{args}>"))
+    }
+
+    /// The handle class of a concrete box: an extension class on the JS
+    /// value, spelled as the box, whose `unbox` is `("tw:unbox", T)`.
+    fn box_class(&mut self, t: &Type, cx: &Context<'_>) -> R<String> {
+        let spelled = self.layouts.keys.ty(t, cx);
+        if let Some(name) = self.boxes.get(&spelled) {
+            return Ok(name.clone());
+        }
+        let inner = match t {
+            Type::TupleBox(es) => Type::Tuple(es.clone()),
+            Type::ArrBox(e) => Type::Array(e.clone()),
+            Type::VecBox(e) => Type::Vec(e.clone()),
+            Type::Named(_) => t.clone(),
+            _ => return skip("not a box with a handle class"),
+        };
+        let sig = match self.layouts.unbox(&inner, cx) {
+            Ok(s) => s,
+            Err(e) => return skip(e.to_string()),
+        };
+        let repr = &sig.results[0].repr;
+        let surface = self.surface(repr)?;
+        let raws = self.raw(repr)?;
+        let names: Vec<String> = (0..raws.len()).map(|i| format!("r{i}")).collect();
+        let decode = self.decode(repr, &names)?;
+        let name = match t {
+            Type::Named(_) => format!("{}Box", upper_camel(&spelled)),
+            _ => upper_camel(&spelled),
+        };
+        let name = unique(&mut self.used, type_ident(&name));
+        let unbox = unique(&mut self.used, format!("__tw_unbox_{name}"));
+        let result = match raws.len() {
+            1 => raws[0].clone(),
+            _ => format!("inline ({})", raws.join(", ")),
+        };
+        let _ = writeln!(
+            self.externs,
+            "@external(\"tw:unbox\", {}, \"tw\")\ndeclare function {unbox}(p0: externref): {result};\n",
+            zena_string(&brace_escape(&self.layouts.keys.ty(&inner, cx)))
+        );
+        let body = match raws.len() {
+            1 if decode == "r0" => format!("    return {unbox}((this as externref));\n"),
+            1 => format!("    let r0 = {unbox}((this as externref));\n    return {decode};\n"),
+            _ => format!(
+                "    let ({}) = {unbox}((this as externref));\n    return {decode};\n",
+                names.join(", ")
+            ),
+        };
+        let _ = writeln!(
+            self.types,
+            "/** The box `{spelled}`: the JS value, which `unbox` converts. */\n@spelling({})\nexport extension class {name} on externref {{\n  unbox(): {surface} {{\n{body}  }}\n}}\n",
+            // An enum argument would lay the member out as the enum itself:
+            // it instantiates as `Any`, the JS value.
+            zena_string(match t {
+                Type::Named(_) => "Any",
+                _ => &spelled,
+            })
+        );
+        self.boxes.insert(spelled, name.clone());
+        Ok(name)
     }
 
     /// The import's Zena types for a value, one per wire value. Where the
@@ -2707,8 +3132,8 @@ impl<'a> Gen<'a> {
             ));
         }
         let class = self.tag_class(error)?;
-        let fallback = self.names[&format!("tagfallback {}", error.path)].clone();
-        let arm = fallback.split('.').next().unwrap_or_default().to_string();
+        let fallback = self.tag_fallback(error);
+        let arm = self.tags[&error.path].arm.clone();
         let id = type_ident(&error.path);
         let error_fn = unique(&mut self.used, format!("__tw_future_error_{id}"));
         let reject_fn = unique(&mut self.used, format!("__tw_future_reject_{id}"));
@@ -2847,6 +3272,20 @@ impl<'a> Gen<'a> {
                 "  let result: {t} = {call};\n  __tw_entered();\n  return result;"
             );
             (t.clone(), t)
+        } else if let (Type::Future(v, e), true) = (&fun.result, mentions_tparam(&fun.result, cx)) {
+            // A future of a type parameter settles a JS promise at the
+            // instantiation.
+            let inner = self.generic_surface(v, cx)?;
+            if inner.contains("Future<") {
+                return skip("a future inside a generic callback's result");
+            }
+            let t = self.generic_surface(&fun.result, cx)?;
+            let (_, promise) = self.future_fns_of(e, cx, Flow::ToJs)?;
+            let _ = writeln!(
+                body,
+                "  let result: {t} = {call};\n  let promise = {promise}<{inner}>(result);\n  __tw_entered();\n  return promise;"
+            );
+            ("externref".to_string(), t)
         } else if mentions_tparam(&fun.result, cx) {
             let t = self.generic_surface(&fun.result, cx)?;
             if t.contains("Future<") {
@@ -3126,6 +3565,20 @@ impl<'a> Gen<'a> {
                 of: Host::Future { value, error },
                 nullable,
             } => self.future_in(value, error, &vals[0], *nullable)?,
+            // A JS function, called through `("tw:call", F)`.
+            Kind::Fn {
+                provided: None,
+                nullable,
+                ..
+            } => {
+                let wrap = self.fn_wrapper(p)?;
+                let x = &vals[0];
+                if *nullable {
+                    format!("(if ({x} == null) null else {wrap}({x} as externref))")
+                } else {
+                    format!("{wrap}({x} as externref)")
+                }
+            }
             Kind::Host { nullable, .. } => {
                 let t = self.surface(&Repr {
                     ty: p.ty.clone(),
@@ -3203,6 +3656,19 @@ impl<'a> Gen<'a> {
                     vec![format!("(if ({v} == null) null else {promise}<{t}>({v}))")]
                 } else {
                     vec![format!("{promise}<{t}>({v})")]
+                }
+            }
+            // A function the language provides is its handle (§18).
+            Kind::Fn {
+                provided: Some(_),
+                nullable,
+                ..
+            } => {
+                self.trampoline(p)?;
+                if *nullable {
+                    vec![format!("(if ({v} == null) null else ({v} as anyref))")]
+                } else {
+                    vec![format!("({v} as anyref)")]
                 }
             }
             Kind::Host { of: Host::Any, .. } => vec![v.into()],
@@ -3651,6 +4117,14 @@ fn overload_name(
 
 fn indent(s: &str) -> String {
     s.lines().map(|l| format!("  {l}\n")).collect()
+}
+
+/// A canonical spelling as one `UpperCamel` word: `Tuple<str,f64>` is
+/// `TupleStrF64`.
+fn upper_camel(s: &str) -> String {
+    s.split(|c: char| !(c.is_alphanumeric() || c == '?' || c == '['))
+        .map(|w| upper_first(&w.replace("[", "Array").replace('?', "Opt")))
+        .collect()
 }
 
 fn upper_first(s: &str) -> String {

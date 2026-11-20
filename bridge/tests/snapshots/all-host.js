@@ -35,14 +35,6 @@ function $str(v) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 function $array(v, what) {
   if (!Array.isArray(v)) $fail(what, v);
   return v;
@@ -518,7 +510,7 @@ function $outgoing(e) {
 }
 class $C0 {
   constructor(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -533,32 +525,26 @@ class $C0 {
   }
   get value() {
     const a = [];
-    if ($upTo(a, 0)) {
-      try {
-        const r = $E[2](this, $HC.unwrap(this, $C0, "Counter"));
-        return (r >>> 0);
-      } catch (e) {
-        throw $outgoing(e);
-      }
+    try {
+      const r = $E[2](this, $HC.unwrap(this, $C0, "Counter"));
+      return (r >>> 0);
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Counter.value` doesn't match its arguments");
   }
   static zero(...a) {
-    if ($upTo(a, 0)) {
-      try {
-        const r = $E[3]();
-        return $HC.wrap(r, () => Object.create($C0.prototype), null);
-      } catch (e) {
-        throw $outgoing(e);
-      }
+    try {
+      const r = $E[3]();
+      return $HC.wrap(r, () => Object.create($C0.prototype), null);
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Counter.zero` doesn't match its arguments");
   }
 }
 
 const $N0 = {
   sum(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = Uint32Array.from($typed(t1, Uint32Array, "u32[]"));
@@ -571,7 +557,7 @@ const $N0 = {
     throw new TypeError("`sum` doesn't match its arguments");
   },
   names(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $h6(t1);
@@ -584,7 +570,7 @@ const $N0 = {
     throw new TypeError("`names` doesn't match its arguments");
   },
   counters(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $h7(t1);
@@ -597,7 +583,7 @@ const $N0 = {
     throw new TypeError("`counters` doesn't match its arguments");
   },
   maybe(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = (t1 == null ? null : Float64Array.from($typed(t1, Float64Array, "f64[]?")));
@@ -610,7 +596,7 @@ const $N0 = {
     throw new TypeError("`maybe` doesn't match its arguments");
   },
   apply(...a) {
-    if (a.length >= 2 && $upTo(a, 2)) {
+    if (a.length >= 2) {
       try {
         const t1 = a[0];
         const t2 = $fn(t1, "fn(u32)->u32");

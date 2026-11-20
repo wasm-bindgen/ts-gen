@@ -1,0 +1,38 @@
+// Bytes and text: digests, random values, encoders, base64.
+import { Future } from 'zena:async';
+import { Response, TextDecoder, TextEncoder, atob, btoa, crypto } from '../bindings.zena';
+import { Uint8Array } from '../std.zena';
+import { ok } from './reply.zena';
+
+/** Bytes as hex: JS calls the closure once per byte. */
+function hex(bytes: Uint8Array): String {
+  let digits = "0123456789abcdef";
+  var out = "";
+  bytes.forEach((byte: f64, index: f64, all: Uint8Array): void => {
+    let b = byte as i32;
+    out = out + digits.substring(b >> 4, (b >> 4) + 1) + digits.substring(b & 15, (b & 15) + 1);
+  });
+  return out;
+}
+
+/** `/crypto`: one text hashed three ways, random bytes and base64. */
+export async function crypto_(): Future<Response> {
+  let text = "hello";
+  let encoded = new TextEncoder().encode(text);
+  let subtle = crypto().subtle;
+  // `digest` takes the union `ArrayBuffer | ArrayBufferView`: an overload
+  // for each arm, and for a typed array the copy of a Zena array.
+  let ofBuffer = await subtle.digest("SHA-256", encoded.buffer);
+  let bytes: FixedArray<u8> = [104 as u8, 101 as u8, 108 as u8, 108 as u8, 111 as u8];
+  let ofArray = await subtle.digest("SHA-256", bytes);
+  // A generic member: what goes in comes back, at its own type.
+  let random = crypto().getRandomValues<Uint8Array>(new Uint8Array.newWithLength(8.0));
+  let base64 = btoa(text);
+  return ok(`"${text}" is ${encoded.length} bytes: ${hex(encoded)}\n` +
+    `SHA-256 of its ArrayBuffer: ${hex(new Uint8Array.newWithBuffer(ofBuffer))}\n` +
+    `SHA-256 of a Zena u8 array: ${hex(new Uint8Array.newWithBuffer(ofArray))}\n` +
+    `decoded again: ${new TextDecoder().decode(encoded.buffer)}\n` +
+    `8 random bytes: ${random.length} bytes\n` +
+    `a random UUID is ${crypto().randomUUID().length} characters\n` +
+    `btoa: ${base64}, atob: ${atob(base64)}\n`);
+}

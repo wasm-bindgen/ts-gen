@@ -36,13 +36,13 @@ var <T : JsAny?> Result<T>.value: T
         fixtures.never.flat.Result_set_value_T(this, value)
     }
 
-var <T : JsAny?> Result<T>.both: JsArray<A?>
+var <T : JsAny?> Result<T>.both: List<A>
     get() {
         val r0 = fixtures.never.flat.Result_get_both(this)
-        return r0!!.unsafeCast<JsArray<A?>>()
+        return r0!!.unsafeCast<JsArray<A>>().let { a -> a.toList() }
     }
     set(value) {
-        fixtures.never.flat.Result_set_both_arr_A(this, value)
+        fixtures.never.flat.Result_set_both_arr_A(this, value.toJsArray())
     }
 
 fun fail(message: String): Nothing {
@@ -75,11 +75,11 @@ fun <T : JsAny?> Result(): Result<T> {
     return r0!!.unsafeCast<Result<T>>()
 }
 
-fun result(r: Result<JsAny?>) {
+fun result(r: Result<*>) {
     try { fixtures.never.flat.result_Result_unit(r) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun fetcher(f: Result<JsAny?>) {
+fun fetcher(f: Result<*>) {
     try { fixtures.never.flat.fetcher_Result_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 

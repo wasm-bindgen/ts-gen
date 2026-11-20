@@ -11,6 +11,10 @@ external fun err_err(p0: JsAny?): Int
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun ret_externref(): JsAny?
 
+/** tw:js/global Retrier#retry() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Retrier_retry(p0: JsAny?)
+
 /** tw:ret f64 */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun ret_f64(): Double
@@ -62,6 +66,10 @@ external fun StepConfig_set_retries_steps_StepConfigRetries(p0: JsAny?, p1: JsAn
 /** steps step("steps".StepConfig) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun step_steps_StepConfig(p0: JsAny?)
+
+/** steps Runner#run() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Runner_run(p0: JsAny?)
 
 /** steps StepConfigRetries#set:limit(f64) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
