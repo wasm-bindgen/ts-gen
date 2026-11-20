@@ -5108,8 +5108,10 @@ pub type Sized_;           // size? (`Sized` is in the prelude)
   `…LikeObject`), and `PluralizeUnit<"day" | TimeUnit>` is
   `PluralizeDayOrTimeUnit` (role `Unit`). Otherwise, or with a one-word
   alias name (`Plural`) or several arguments, the name is the alias
-  followed by its arguments, as is a short name some declaration already
-  has.
+  followed by its arguments, as is a short name some declaration or
+  another instantiation already has. An instantiation keeps its name at
+  every use, so `PartialTemporalLike<DateLikeObject>` is the one
+  `PartialDateLikeObject` in both `PlainDate#with` and `PlainMonthDay#with`.
 * **One shape is one type.** Two evaluations with the same members in the
   same scope share a declaration, under the first name given: `Omit<Options,
   "fixed">` and `Pick<Options, "name" | "size">` are the same dictionary. A

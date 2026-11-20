@@ -25,6 +25,7 @@
 //! a warning.
 
 use std::borrow::Cow;
+use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
@@ -117,6 +118,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             dict_names: HashMap::new(),
             done: HashMap::new(),
             used: LocalScope::with_claimed(names),
+            short: RefCell::new(HashMap::new()),
             diag,
             depth: 0,
             owner: None,
@@ -355,6 +357,8 @@ struct Eval<'g> {
     /// used, so a utility over an alias reads its result, not its target.
     done: HashMap<TypeId, TypeKind>,
     used: LocalScope,
+    /// Each short instance name given, by the instantiation it names.
+    short: RefCell<HashMap<String, String>>,
     diag: DiagnosticCollector,
     depth: u32,
     /// The declaration a shape is reading, whose name prefixes the names
@@ -1221,7 +1225,7 @@ impl<'g> Eval<'g> {
             spelled.push(spell(&arg));
             bound_env = bound_env.bind(p.name.clone(), arg, dest, Env::default());
         }
-        let hint = instance_spelling(&alias.name, &spelled, Some(&self.used));
+        let hint = instance_spelling(&alias.name, &spelled, Some(self.taken()));
         self.eval(
             &alias.target,
             alias.body_scope,
@@ -1920,7 +1924,14 @@ impl<'g> Eval<'g> {
                         .is_some_and(|owner| self.param_owner(dest, n) == Some(owner))
             })
             .collect();
-        spell_in(ty, &kept, 0, Some(&self.used))
+        spell_in(ty, &kept, 0, Some(self.taken()))
+    }
+
+    fn taken(&self) -> Taken<'_> {
+        Taken {
+            used: &self.used,
+            short: &self.short,
+        }
     }
 
     /// The body scope declaring the type parameter `name` visible from
@@ -2221,12 +2232,32 @@ fn fallback(ty: &TypeRef) -> TypeRef {
     }
 }
 
+/// The names a spelling can't take, and the short instance names given so
+/// far: an instantiation keeps its own at every use.
+#[derive(Clone, Copy)]
+pub(crate) struct Taken<'a> {
+    used: &'a LocalScope,
+    short: &'a RefCell<HashMap<String, String>>,
+}
+
 /// The spelling of `name<args>`: its [`instance_name`] unless that is
-/// `taken`, else the name followed by each argument.
-pub(crate) fn instance_spelling(name: &str, args: &[String], taken: Option<&LocalScope>) -> String {
-    match instance_name(name, args) {
-        Some(short) if !taken.is_some_and(|t| t.contains(&short)) => short,
-        _ => format!("{name}{}", args.concat()),
+/// `taken` by anything else, else the name followed by each argument.
+pub(crate) fn instance_spelling(name: &str, args: &[String], taken: Option<Taken<'_>>) -> String {
+    let full = format!("{name}{}", args.concat());
+    let Some(short) = instance_name(name, args) else {
+        return full;
+    };
+    let Some(taken) = taken else {
+        return short;
+    };
+    let mut given = taken.short.borrow_mut();
+    match given.get(&short) {
+        Some(instance) if *instance == full => short,
+        None if !taken.used.contains(&short) => {
+            given.insert(short.clone(), full);
+            short
+        }
+        _ => full,
     }
 }
 
@@ -2282,7 +2313,7 @@ fn spell_in(
     ty: &TypeRef,
     generic: &HashSet<String>,
     depth: u32,
-    taken: Option<&LocalScope>,
+    taken: Option<Taken<'_>>,
 ) -> String {
     let spell = |t: &TypeRef| spell_in(t, generic, depth, taken);
     match ty {
@@ -2731,6 +2762,21 @@ mod tests {
     }
 
     #[test]
+    fn an_instantiation_keeps_its_short_name_at_each_use() {
+        let (module, gctx) = parse(
+            "interface DateLikeObject { year?: number; day?: number; calendar?: string }
+             type PartialLike<T extends object> = {
+                 [P in Exclude<keyof T, \"calendar\">]?: T[P] | undefined;
+             };
+             declare function f(a: PartialLike<DateLikeObject>): void;
+             declare function g(b: PartialLike<DateLikeObject>): void;",
+        );
+        let short = TypeRef::ident("PartialDateLikeObject");
+        assert_eq!(param_type(&gctx, &module, "f", 0), &short);
+        assert_eq!(param_type(&gctx, &module, "g", 0), &short);
+    }
+
+    #[test]
     fn an_argument_filling_the_alias_role_replaces_it() {
         let name = |alias: &str, args: &[&str]| {
             let args: Vec<String> = args.iter().map(|a| a.to_string()).collect();
@@ -2755,10 +2801,25 @@ mod tests {
             "PickUnitTimeUnitHour"
         );
         // A short name a declaration already has keeps the full spelling.
-        let taken = LocalScope::with_claimed(["PluralizeTimeUnit"]);
+        let used = LocalScope::with_claimed(["PluralizeTimeUnit"]);
+        let short = RefCell::new(HashMap::new());
+        let taken = Some(Taken {
+            used: &used,
+            short: &short,
+        });
         assert_eq!(
-            instance_spelling("PluralizeUnit", &["TimeUnit".to_string()], Some(&taken)),
+            instance_spelling("PluralizeUnit", &["TimeUnit".to_string()], taken),
             "PluralizeUnitTimeUnit"
+        );
+        // Another instantiation's short name does too.
+        let args = ["DayLikeObject".to_string()];
+        assert_eq!(
+            instance_spelling("PartialTemporalLike", &args, taken),
+            "PartialDayLikeObject"
+        );
+        assert_eq!(
+            instance_spelling("PartialOtherLike", &args, taken),
+            "PartialOtherLikeDayLikeObject"
         );
     }
 
