@@ -82,6 +82,23 @@ impl ConditionalBuilder {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Algorithm;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &Algorithm) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &Algorithm, val: &str);
+}
+impl Algorithm {
+    pub fn new(name: &str) -> Algorithm {
+        let inner: Algorithm = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_name(name);
+        inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
     pub async fn get(this: &Store, key: &str) -> Result<String, JsValue>;
@@ -198,4 +215,36 @@ extern "C" {
         fields: &Conditional,
         options: &GetOptions,
     ) -> Result<Store, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn decrypt(this: &Store, algorithm: &str, data: &str) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "decrypt")]
+    pub fn decrypt_promise(this: &Store, algorithm: &str, data: &str) -> Promise<JsString>;
+    #[wasm_bindgen(method, catch, js_name = "decrypt")]
+    pub async fn decrypt_with_algorithm(
+        this: &Store,
+        algorithm: &Algorithm,
+        data: &str,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "decrypt")]
+    pub fn decrypt_with_algorithm_promise(
+        this: &Store,
+        algorithm: &Algorithm,
+        data: &str,
+    ) -> Promise<JsString>;
+    #[wasm_bindgen(method)]
+    pub fn listen(this: &Store, r#type: &str);
+    #[wasm_bindgen(method, catch, js_name = "listen")]
+    pub fn try_listen(this: &Store, r#type: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "listen")]
+    pub fn listen_with_options(this: &Store, r#type: &str, options: &GetOptions);
+    #[wasm_bindgen(method, catch, js_name = "listen")]
+    pub fn try_listen_with_options(
+        this: &Store,
+        r#type: &str,
+        options: &GetOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "listen")]
+    pub fn listen_with_bool(this: &Store, r#type: &str, options: bool);
+    #[wasm_bindgen(method, catch, js_name = "listen")]
+    pub fn try_listen_with_bool(this: &Store, r#type: &str, options: bool) -> Result<(), JsValue>;
 }

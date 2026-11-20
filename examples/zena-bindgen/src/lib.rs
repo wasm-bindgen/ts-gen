@@ -1504,7 +1504,7 @@ impl<'a> Gen<'a> {
         // share a name.
         let mut accessors: BTreeMap<(bool, String), Accessor> = BTreeMap::new();
         let mut methods = String::new();
-        let ctor_names = Self::ctor_names(&own);
+        let ctor_names = self.ctor_names(&own);
         // Overloads Zena can't tell apart, such as `f64[]` and `arr<f64>`
         // (both `FixedArray<f64>`), take numbered names.
         let mut sigs: HashSet<String> = HashSet::new();
@@ -1705,7 +1705,8 @@ impl<'a> Gen<'a> {
 
     /// Names for a class's unnamed constructors by key: the first is `new`,
     /// and the others are named for how they differ from it.
-    fn ctor_names<'k>(own: &[&'k Keyed<'_>]) -> HashMap<&'k str, String> {
+    fn ctor_names<'k>(&self, own: &[&'k Keyed<'_>]) -> HashMap<&'k str, String> {
+        let symbols = &self.layouts.keys.symbols;
         let ctors: Vec<&Keyed> = own
             .iter()
             .copied()
@@ -1721,6 +1722,7 @@ impl<'a> Gen<'a> {
                         name: &p.name,
                         ty: &p.ty,
                         rest: false,
+                        dictionary: ts_gen_abi::naming::is_dictionary(symbols, &p.ty, &k.cx),
                     })
                     .collect()
             })
@@ -1781,7 +1783,8 @@ impl<'a> Gen<'a> {
 
     /// Zena overloads declared functions only, so a wrapper's overloads
     /// take variant names.
-    fn fn_names<'k>(members: &'k [Keyed<'_>]) -> HashMap<&'k str, String> {
+    fn fn_names<'k>(&self, members: &'k [Keyed<'_>]) -> HashMap<&'k str, String> {
+        let symbols = &self.layouts.keys.symbols;
         let mut groups: Vec<(Vec<&str>, &str, Vec<&Keyed>)> = Vec::new();
         for k in members {
             if k.owner.is_some() || k.role == Role::Export {
@@ -1806,6 +1809,7 @@ impl<'a> Gen<'a> {
                             name: &p.name,
                             ty: &p.ty,
                             rest: false,
+                            dictionary: ts_gen_abi::naming::is_dictionary(symbols, &p.ty, &k.cx),
                         })
                         .collect()
                 })
@@ -1821,7 +1825,7 @@ impl<'a> Gen<'a> {
     }
 
     fn functions(&mut self, members: &[Keyed<'a>]) -> anyhow::Result<()> {
-        let fn_names = Self::fn_names(members);
+        let fn_names = self.fn_names(members);
         for k in members {
             if k.owner.is_some() {
                 continue;

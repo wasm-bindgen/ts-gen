@@ -198,7 +198,7 @@ fn use_sites_take_their_instantiation(rounder: &Rounder) {
     rounder.bound(&Bounded::<DayOrHour>::new());
     let _: spans::Unit = rounder.clock().now();
     rounder.snap(PluralizeTimeUnit::Hours);
-    rounder.snap_with_rounding(&Rounding::<TimeUnit>::new());
+    rounder.snap_with_to(&Rounding::<TimeUnit>::new());
     rounder.nudge(&Rounding::<TimeUnit>::new());
     rounder.nudge_with_rounding(&Rounding::<Hour>::new());
 }

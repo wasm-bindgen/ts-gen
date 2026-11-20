@@ -2057,6 +2057,25 @@ The same holds across overloads: `put(key, value, options?)` beside
 options, and `put_with_entries` and `put_with_entries_and_options` for
 the second, which departs from the primary in its parameter names.
 
+A parameter's only dictionary type is the parameter spelled out, so it
+takes the parameter's name, while the other types keep their own:
+
+```ts
+decrypt(algorithm: string | EncryptAlgorithm, data: BufferSource): Promise<ArrayBuffer>;
+addEventListener(type: string, options?: ListenerOptions | boolean): void;
+```
+
+```rust
+pub fn decrypt(this: &Crypto, algorithm: &str, ...);
+pub fn decrypt_with_algorithm(this: &Crypto, algorithm: &EncryptAlgorithm, ...);
+pub fn add_event_listener(this: &Target, type_: &str);
+pub fn add_event_listener_with_options(this: &Target, type_: &str, options: &ListenerOptions);
+pub fn add_event_listener_with_bool(this: &Target, type_: &str, options: bool);
+```
+
+Two dictionaries at one parameter are told apart by their type names, as
+any other two types are.
+
 A base name that already reads `with` (`with`, `set_with`) continues the
 suffix with `_and_`: `with(fields, options?)` gives `with` and
 `with_and_options`, not `with_with_options`.

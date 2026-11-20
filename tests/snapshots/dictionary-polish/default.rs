@@ -942,12 +942,9 @@ pub mod polish {
         #[wasm_bindgen(method, catch, js_name = "snap")]
         pub fn try_snap(this: &Rounder, to: PluralizeTimeUnit) -> Result<(), JsValue>;
         #[wasm_bindgen(method, js_name = "snap")]
-        pub fn snap_with_rounding(this: &Rounder, to: &Rounding<JsString>);
+        pub fn snap_with_to(this: &Rounder, to: &Rounding<JsString>);
         #[wasm_bindgen(method, catch, js_name = "snap")]
-        pub fn try_snap_with_rounding(
-            this: &Rounder,
-            to: &Rounding<JsString>,
-        ) -> Result<(), JsValue>;
+        pub fn try_snap_with_to(this: &Rounder, to: &Rounding<JsString>) -> Result<(), JsValue>;
         #[wasm_bindgen(method)]
         pub fn nudge(this: &Rounder, options: &Rounding<JsString>);
         #[wasm_bindgen(method, catch, js_name = "nudge")]
