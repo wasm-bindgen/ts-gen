@@ -2440,8 +2440,8 @@ pub fn generate_dictionary_params_in(
 
 /// Under per-monomorphization a type parameter crosses the ABI as itself,
 /// so a generic import states the ABI traits it needs in a `where` clause:
-/// `IntoWasmAbi` for an argument (`RefIntoWasmAbi` for a borrowed `&T`,
-/// `VectorRefIntoWasmAbi` on the element of a borrowed `&[T]`),
+/// `IntoWasmAbi` for an argument (`RefIntoWasmAbi` for a borrowed `&T` and
+/// on the element of a borrowed `&[T]`),
 /// `FromWasmAbi` for a return, and `'static` for an awaited one. An
 /// imported type implements its ABI for any arguments, so it is bounded
 /// only by `'static`; bare parameters and std containers of them are
@@ -2629,8 +2629,8 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn, awaits_promise: bool) {
         }
         match &*arg.ty {
             // wasm-bindgen marshals a borrowed type parameter through
-            // `RefIntoWasmAbi` and a borrowed slice through its element's
-            // `VectorRefIntoWasmAbi`; other referents through `&X` itself.
+            // `RefIntoWasmAbi` and a borrowed slice through its element's;
+            // other referents through `&X` itself.
             syn::Type::Reference(r) => match &*r.elem {
                 syn::Type::Path(p) if p.qself.is_none() && is_bare_param(&p.path, &params) => {
                     bound(
@@ -2642,7 +2642,7 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn, awaits_promise: bool) {
                     let elem = &slice.elem;
                     bound(
                         quote! { #elem },
-                        quote! { ::wasm_bindgen::convert::VectorRefIntoWasmAbi },
+                        quote! { ::wasm_bindgen::convert::RefIntoWasmAbi },
                     );
                 }
                 elem => {

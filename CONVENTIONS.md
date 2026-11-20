@@ -318,7 +318,7 @@ and keeps the exact one):
 The remaining handle positions are ones wasm-bindgen does not accept a
 carrier in yet: `Function<fn(..)>` needs `ErasableGeneric<Repr =
 JsValue>` and `JsCast` on its signature types, slices need
-`VectorRefIntoWasmAbi`, and the js-sys `Array`, `Map` and `Object`
+`RefIntoWasmAbi` on the element, and the js-sys `Array`, `Map` and `Object`
 APIs (and `Promise::resolve`) need `ErasableGeneric<Repr = JsValue>` on
 the element.
 
@@ -2721,8 +2721,8 @@ per-monomorphization path. Every generated extern block receives
 bare type-parameter arguments are passed by value so each concrete Rust type
 uses its native ABI representation. Each import states the ABI bounds it
 needs, so a generic caller can read them off the declaration: `IntoWasmAbi`
-for an argument (`T: RefIntoWasmAbi` for a borrowed `&T`, and
-`T: VectorRefIntoWasmAbi` for a borrowed `&[T]`), `FromWasmAbi` for a return,
+for an argument (`T: RefIntoWasmAbi` for a borrowed `&T` and for the element
+of a borrowed `&[T]`), `FromWasmAbi` for a return,
 `Option<T>: IntoWasmAbi`/`Option<T>: FromWasmAbi` for an `Option<T>`,
 `NullableIntoWasmAbi` for a written `Nullable<T>` (and
 `NullableFromWasmAbi` for a `T??` read's), and `'static`
