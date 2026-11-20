@@ -28,6 +28,7 @@ namespace ext {
   pick<This = Any?>(x: u32): u32;
   soon(f: fn());
   listen(l: Listener, x: u32): u32;
+  attempt<T>(f: fn() -> future<T>): future<T>;
 }
 
 export class Counter {
@@ -56,4 +57,5 @@ export namespace probe {
   join(): str;
   soon(): future<str>;
   listen(): u32;
+  attempt(): future<str>;
 }

@@ -130,7 +130,7 @@ fun Store.readText(key: String, options: GetOptions<JsAny?>): tsgen.runtime.Futu
 
 fun <T : JsAny?> Store.readJson(key: String, options: GetOptions<JsAny?>): tsgen.runtime.Future<T?> {
     val r0 = fixtures.overloads.flat.Store_readJson_str_GetOptions_Str(this, key.toJsString(), options)
-    return tsgen.runtime.Future<T?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_T(f); (r1 as T?) }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<T?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_Any(f); (r1 as T?) }, { f -> futureErrorErr(f) })
 }
 
 fun Store.readArrayBuffer(key: String, options: GetOptions<JsAny?>): tsgen.runtime.Future<ArrayBuffer?> {

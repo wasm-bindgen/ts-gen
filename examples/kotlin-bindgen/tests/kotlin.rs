@@ -714,7 +714,7 @@ fn kotlin_runtime() {
          absent: true,true,false\nimported: true\ncounter: true 7\n\
          modes: [\"off\",5] 0 9\nadder: function 42 2\n\
          box nones: undefined undefined,null\nasync callback: 15\nmade: made!\n\
-         bytes: 256\nwords: AB\njoin: a-b3\ncallback: soon\nlisten: 9\nspill empty: true\n"
+         bytes: 256\nwords: AB\njoin: a-b3\ncallback: soon\nlisten: 9\nattempt: attempted\nspill empty: true\n"
     );
 }
 

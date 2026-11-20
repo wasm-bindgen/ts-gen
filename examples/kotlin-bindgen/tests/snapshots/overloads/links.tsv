@@ -40,7 +40,6 @@ js_code	fixtures.overloads.flat.Store_read_str	tw:js/global	Store#read(str)
 js_code	fixtures.overloads.flat.Store_read_str_PartialGetOptionsUndefined	tw:js/global	Store#read(str,PartialGetOptionsUndefined)
 js_code	fixtures.overloads.flat.Store_readText_str_GetOptions_Str	tw:js/global	Store#readText(str,GetOptions<Str>)
 js_code	fixtures.overloads.flat.Store_readJson_str_GetOptions_Str	tw:js/global	Store#readJson(str,GetOptions<Str>)
-js_code	fixtures.overloads.flat.take_T	tw:future	take<T?>
 js_code	fixtures.overloads.flat.Store_readArrayBuffer_str_GetOptions_Str	tw:js/global	Store#readArrayBuffer(str,GetOptions<Str>)
 js_code	fixtures.overloads.flat.take_ArrayBuffer	tw:future	take<ArrayBuffer?>
 js_code	fixtures.overloads.flat.Store_write_str_str	tw:js/global	Store#write(str,str)

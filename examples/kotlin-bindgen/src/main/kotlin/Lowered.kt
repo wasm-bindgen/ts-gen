@@ -284,15 +284,23 @@ class Repr(
     val unbox get() = BoxOp.of(m, "unbox")
     val call get() = Import.from(m.obj("call"))
     /** A future's `take<T>` import. */
-    val take get() = Import.from(m.obj("take"))
+    val take get() = valueOp("take")
     /** A future's `error<E>`, `new`, `resolve<T>` and `reject<E>` imports. */
     val errorOp get() = Import.from(m.obj("errorOp"))
     val futureNew get() = Import.from(m.obj("new"))
-    val resolve get() = Import.from(m.obj("resolve"))
+    val resolve get() = valueOp("resolve")
     val reject get() = Import.from(m.obj("reject"))
     /** A future's rejection enum. */
     val rejection get() = EnumL.from(m.obj("rejection"))
     val op get() = (m["op"] as Map<*, *>?)?.obj("op")?.takeIf { "error" !in it }?.let { Sig.from(it) }
+
+    /**
+     * A future's operation on its value. A type parameter names nothing
+     * outside its member, so an erased value's is the operation on `Any?`:
+     * the same wire, the value as it is.
+     */
+    private fun valueOp(op: String) =
+        Import.from(m.obj(op)).let { if (value.kind == "erased") Import(it.module, "$op<Any?>") else it }
 
     companion object {
         fun from(m: Map<String, Any?>) = Repr(

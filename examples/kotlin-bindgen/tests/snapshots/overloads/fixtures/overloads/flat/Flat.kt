@@ -167,10 +167,6 @@ external fun Store_read_str_PartialGetOptionsUndefined(p0: JsAny?, p1: JsAny?, p
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun Store_readText_str_GetOptions_Str(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
 
-/** tw:future take<T?> */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_T(p0: JsAny?): JsAny?
-
 /** tw:js/global Store#readJson(str,GetOptions<Str>) */
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun Store_readJson_str_GetOptions_Str(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
