@@ -10,7 +10,7 @@ enum Mode {
 }
 
 enum Listener {
-  Call(fn(u32) -> u32);
+  Call(fn(str) -> str);
   Name(str);
 }
 
@@ -27,7 +27,7 @@ namespace ext {
   join(sep: str, parts: arr<str>): str;
   pick<This = Any?>(x: u32): u32;
   soon(f: fn());
-  listen(l: Listener, x: u32): u32;
+  listen(l: Listener, x: str): str;
   attempt<T>(f: fn() -> future<T>): future<T>;
 }
 
@@ -56,6 +56,6 @@ export namespace probe {
   words(): str;
   join(): str;
   soon(): future<str>;
-  listen(): u32;
+  listen(): str;
   attempt(): future<str>;
 }

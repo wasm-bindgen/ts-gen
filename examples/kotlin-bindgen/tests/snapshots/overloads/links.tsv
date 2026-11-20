@@ -56,14 +56,14 @@ js_code	fixtures.overloads.flat.StoreWriteOptions_set_ttl_f64	tw:js/global	Store
 js_code	fixtures.overloads.flat.PartialGetOptionsUndefined_new	tw:js/global	PartialGetOptionsUndefined.new()
 js_code	fixtures.overloads.flat.PartialGetOptionsUndefined_get_ttl	tw:js/global	PartialGetOptionsUndefined#get:ttl()
 js_code	fixtures.overloads.flat.PartialGetOptionsUndefined_set_ttl_f64	tw:js/global	PartialGetOptionsUndefined#set:ttl(f64)
-js_code	fixtures.overloads.flat.box_fn_arr_Any	tw:box	fn(...arr<Any?>)
-js_code	fixtures.overloads.flat.unbox_fn_arr_Any	tw:unbox	fn(...arr<Any?>)
 js_code	fixtures.overloads.flat.unbox_KVValueKind	tw:unbox	KVValueKind
 js_code	fixtures.overloads.flat.box_KVValueKind	tw:box	KVValueKind
 js_code	fixtures.overloads.flat.unbox_NodeChildKind	tw:unbox	NodeChildKind
 js_code	fixtures.overloads.flat.box_NodeChildKind	tw:box	NodeChildKind
 js_code	fixtures.overloads.flat.unbox_ModeKind	tw:unbox	ModeKind
 js_code	fixtures.overloads.flat.box_ModeKind	tw:box	ModeKind
+js_code	fixtures.overloads.flat.box_fn_arr_Any	tw:box	fn(...arr<Any?>)
+js_code	fixtures.overloads.flat.unbox_fn_arr_Any	tw:unbox	fn(...arr<Any?>)
 js_code	tsgen.runtime.futurePoll	tw:future	poll
 js_code	tsgen.runtime.futureDrop	tw:future	drop
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

@@ -235,30 +235,6 @@ external fun future_resolve_i64(p0: JsAny?, p1: Long)
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun future_resolve_u64(p0: JsAny?, p1: Long)
 
-/** tw:box fn(Event) */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_fn_Event(p0: JsAny?): JsAny?
-
-/** tw:unbox fn(Event) */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_fn_Event(p0: JsAny?): JsAny?
-
-/** tw:box fn(str,str) */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_fn_str_str(p0: JsAny?): JsAny?
-
-/** tw:unbox fn(str,str) */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_fn_str_str(p0: JsAny?): JsAny?
-
-/** tw:box fn() */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_fn(p0: JsAny?): JsAny?
-
-/** tw:unbox fn() */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_fn(p0: JsAny?): JsAny?
-
 /** tw:box Counter */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_Counter(p0: JsAny?): JsAny?
@@ -298,4 +274,28 @@ external fun unbox_KvError(p0: JsAny?): Int
 /** tw:box KvError */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_KvError(p0: Int, p1: JsAny?): JsAny?
+
+/** tw:box fn(Event) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_fn_Event(p0: JsAny?): JsAny?
+
+/** tw:unbox fn(Event) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_fn_Event(p0: JsAny?): JsAny?
+
+/** tw:box fn(str,str) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_fn_str_str(p0: JsAny?): JsAny?
+
+/** tw:unbox fn(str,str) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_fn_str_str(p0: JsAny?): JsAny?
+
+/** tw:box fn() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_fn(p0: JsAny?): JsAny?
+
+/** tw:unbox fn() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_fn(p0: JsAny?): JsAny?
 

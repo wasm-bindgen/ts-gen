@@ -16,7 +16,7 @@ globalThis.ext = {
   join: (sep, ...parts) => parts.join(sep),
   pick: (x) => x,
   soon: (f) => { setTimeout(f, 1); },
-  listen: (l, x) => (typeof l === 'function' ? l(x) : x),
+  listen: (l, x) => (typeof l === 'function' ? l(x) : l + x),
   attempt: async (f) => await f(),
 };
 import { importObject } from './probe.import-object.mjs';

@@ -86,8 +86,8 @@ suspend fun probe_soon(): String {
     return word
 }
 
-/** An enum's function arm is a callback Kotlin provides. */
-fun probe_listen(): UInt = probe.ext.listen(Listener.Call { it + 1u }, 4u) + probe.ext.listen(Listener.Name("n"), 4u)
+/** An enum's function arm is a callback Kotlin provides, of a type no parameter has. */
+fun probe_listen(): String = probe.ext.listen(Listener.Call { "$it!" }, "a") + probe.ext.listen(Listener.Name("n"), "b")
 
 /** A future of an erased `T`, resolved by Kotlin and taken back. */
 suspend fun probe_attempt(): String = probe.ext.attempt { "attempted".toJsString() }.await().toString()

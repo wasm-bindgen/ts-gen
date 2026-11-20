@@ -235,14 +235,6 @@ external fun PartialGetOptionsUndefined_get_ttl(p0: JsAny?): Int
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun PartialGetOptionsUndefined_set_ttl_f64(p0: JsAny?, p1: Double)
 
-/** tw:box fn(...arr<Any?>) */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_fn_arr_Any(p0: JsAny?): JsAny?
-
-/** tw:unbox fn(...arr<Any?>) */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_fn_arr_Any(p0: JsAny?): JsAny?
-
 /** tw:unbox KVValueKind */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun unbox_KVValueKind(p0: JsAny?): Int
@@ -266,4 +258,12 @@ external fun unbox_ModeKind(p0: JsAny?): Int
 /** tw:box ModeKind */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_ModeKind(p0: Int): JsAny?
+
+/** tw:box fn(...arr<Any?>) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_fn_arr_Any(p0: JsAny?): JsAny?
+
+/** tw:unbox fn(...arr<Any?>) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_fn_arr_Any(p0: JsAny?): JsAny?
 

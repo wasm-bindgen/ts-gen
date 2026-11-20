@@ -38,12 +38,12 @@ js_code	fixtures.annotate.flat.take_Request_Any_Incoming	tw:future	take<Request<
 js_code	fixtures.annotate.flat.Lookup_get_cached	tw:js/global	Lookup#get:cached()
 js_code	fixtures.annotate.flat.Lookup_find	tw:js/global	Lookup#find()
 js_code	fixtures.annotate.flat.Lookup_find_str	tw:js/global	Lookup#find(str)
-js_code	fixtures.annotate.flat.box_fn	tw:box	fn()
-js_code	fixtures.annotate.flat.unbox_fn	tw:unbox	fn()
 js_code	fixtures.annotate.flat.unbox_TypeErr	tw:unbox	TypeErr
 js_code	fixtures.annotate.flat.box_TypeErr	tw:box	TypeErr
 js_code	fixtures.annotate.flat.unbox_RequestInfo	tw:unbox	RequestInfo
 js_code	fixtures.annotate.flat.box_RequestInfo	tw:box	RequestInfo
+js_code	fixtures.annotate.flat.box_fn	tw:box	fn()
+js_code	fixtures.annotate.flat.unbox_fn	tw:unbox	fn()
 js_code	tsgen.runtime.futurePoll	tw:future	poll
 js_code	tsgen.runtime.futureDrop	tw:future	drop
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available
