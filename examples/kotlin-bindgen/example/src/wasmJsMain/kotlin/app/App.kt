@@ -1,44 +1,52 @@
-// The worker: the default export's `fetch`, generated as a suspend
-// function the runtime runs as a task on its loop. It awaits the request
-// body (a JS future, through tw:future poll and take<str>), then a timer
-// (through tw:loop/next_sleep) before replying. `FormData.get` returns a
-// payload enum, two values spilled through tw:ret, and a bad URL throws a
-// TypeError, read through tw:err as `err`'s typed exception.
+// The worker's entry: the default export's `fetch`, a suspend function the
+// runtime runs as a task. It routes to one function per route, grouped by
+// topic in the files beside this one.
 package app
 
-import tsgen.runtime.delay
 import workers.*
 
-suspend fun fetch(request: Request<JsAny?, JsAny?>, env: JsAny?, ctx: ExecutionContext<JsAny?>): Response {
-    val body = request.text().await()
-    val header = request.headers.get("x-kotlin")
-    delay(1.0)
-    val form = FormData()
-    form.append("k", "v")
-    fun entry(v: FileOrStr?) = when (v) {
-        is FileOrStr.Str -> "str ${v.value}"
-        is FileOrStr.File -> "file"
-        null -> "none"
+private val INDEX = """
+    A tour of the Workers API from Kotlin/Wasm. Routes:
+      /echo        the request read back: method, URL, headers, body
+      /url         URL and URLSearchParams
+      /form        FormData fields: strings and files
+      /json        JSON in and out
+      /crypto      digest, random values, text encoding, base64
+      /stream      ReadableStream, TransformStream, a streamed body
+      /fetch       subrequests: a service binding, fetch, cancellation
+      /timers      scheduler.wait, setTimeout, queueMicrotask, waitUntil
+      /rewrite     HTMLRewriter
+      /counter/*   a Durable Object: increment, list, reset, sql, alarm
+      /ws          a WebSocket echo (/counter/ws hibernates)
+      /rpc         an RPC entrypoint called through its stub
+      /errors      JS errors caught as typed exceptions
+      /fail        a typed exception thrown to JS (/fail/plain: any other)
+      /scheduled   runs the scheduled handler
+      /queue       runs the queue handler
+""".trimIndent() + "\n"
+
+suspend fun fetch(request: HttpRequest, env: Env, ctx: ExecutionContext<JsAny?>): Response {
+    val url = URL(request.url)
+    val path = url.pathname
+    return when (path) {
+        "/" -> text(INDEX)
+        "/echo" -> echo(request)
+        "/url" -> url(url)
+        "/form" -> form(request)
+        "/json" -> json(request)
+        "/crypto" -> crypto()
+        "/stream" -> stream()
+        "/fetch" -> subrequests(env)
+        "/timers" -> timers(ctx)
+        "/rewrite" -> rewrite()
+        "/counter/alarm" -> alarm(env)
+        "/ws" -> webSocket()
+        "/rpc" -> rpc(env)
+        "/errors" -> errors(env)
+        "/fail", "/fail/plain" -> fail(path)
+        "/scheduled" -> runScheduled(env)
+        "/queue" -> runQueue(env)
+        // The rest of /counter is the Durable Object's own: its stub is a Fetcher.
+        else -> if (path.startsWith("/counter/")) counter(env).fetch(request).await() else text("no route for $path\n", 404u)
     }
-    val url = try {
-        URL("not a url")
-        "parsed"
-    } catch (e: ErrException) {
-        when (e.error) {
-            is Err.TypeError -> "TypeError"
-            is Err.Error -> "Error"
-        }
-    }
-    val reply = "${request.method} ${request.url}\n" +
-        "x-kotlin: ${header ?: "(none)"}\n" +
-        "GREETING: ${env!!.unsafeCast<Env>().GREETING}\n" +
-        "body: $body\n" +
-        "form: ${entry(form.get("k"))}, ${entry(form.get("missing"))}\n" +
-        "url: $url\n"
-    val headers = Headers()
-    headers.set("content-type", "text/plain; charset=utf-8")
-    val init = ResponseInit()
-    init.setStatus(200.0)
-    init.setHeaders(headers)
-    return Response(reply, init)
 }

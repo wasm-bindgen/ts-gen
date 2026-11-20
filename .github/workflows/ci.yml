@@ -75,6 +75,8 @@ jobs:
       with:
         gradle-version: '9.0.0'
     - uses: extractions/setup-just@v2
+    # The Kotlin worker example's tour runs in workerd.
+    - run: npm i -g workerd@1.20261119.1
     - run: just test-kotlin
 
   # Compiles the Zena bindings with the Zena fork that carries the `tw`

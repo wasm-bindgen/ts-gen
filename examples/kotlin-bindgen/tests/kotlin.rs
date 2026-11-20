@@ -11,9 +11,9 @@
 //! type. workers-types and std are compiled and checked, but only their
 //! skipped lists are snapshotted.
 //!
-//! Needs a JDK (Gradle provisions the rest), and node (26+ in CI) for the
-//! worker and runtime tests; without them a test is skipped locally and fails
-//! under `CI`. Any other failure fails everywhere. `TSGEN_SKIP_KOTLIN`
+//! Needs a JDK (Gradle provisions the rest), node (26+ in CI) for the
+//! worker and runtime tests, and workerd for the worker's full tour; without
+//! them a test is skipped locally and fails under `CI`. Any other failure fails everywhere. `TSGEN_SKIP_KOTLIN`
 //! skips them outright, for CI jobs without a JDK. To update snapshots:
 //!
 //! ```sh
@@ -23,7 +23,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::sync::OnceLock;
+use std::sync::{Mutex, OnceLock};
 
 use ts_gen_abi::ir::Ir;
 use ts_gen_abi::json::{self, Json};
@@ -674,22 +674,51 @@ fn check_surface(
     }
 }
 
-/// `examples/kotlin-bindgen/example` end to end in node: the worker's fetch awaits
-/// the request body and a timer on the runtime's loop, through the linked
-/// module and its bridge.
+/// `examples/kotlin-bindgen/example` end to end in node, through the linked module
+/// and its bridge: the routes of the tour node can serve.
 #[test]
 fn kotlin_worker() {
     if skipped(true) {
         return;
     }
-    let stdout = run_script(
-        &root().join("examples/kotlin-bindgen/example/run.sh"),
-        &["node"],
-    );
-    let reply = stdout.split_once("200 ").map(|(_, r)| r).unwrap_or(&stdout);
+    tour("node", "tour.node.txt");
+}
+
+/// `examples/kotlin-bindgen/example` served by workerd (`WORKERD`, else `workerd`
+/// on the path): the whole tour, with its Durable Object, WebSockets, RPC
+/// entrypoint and second service. Without workerd it is skipped locally
+/// and fails under `CI`.
+#[test]
+fn kotlin_worker_workerd() {
+    if skipped(true) {
+        return;
+    }
+    let workerd = std::env::var_os("WORKERD").unwrap_or_else(|| "workerd".into());
+    if Command::new(workerd).arg("--version").output().is_err() {
+        assert!(!ci(), "workerd is required under CI");
+        eprintln!("skipping: workerd not found");
+        return;
+    }
+    tour("serve", "tour.txt");
+}
+
+/// What a mode of the worker's `run.sh` prints from its first route on,
+/// against the copy the example keeps. The two modes share a build
+/// directory, so one runs at a time.
+fn tour(mode: &str, recorded: &str) {
+    static BUILD: Mutex<()> = Mutex::new(());
+    let _one = BUILD.lock().unwrap_or_else(|e| e.into_inner());
+    let dir = root().join("examples/kotlin-bindgen/example");
+    let stdout = run_script(&dir.join("run.sh"), &[mode]);
+    let actual = stdout.find("== ").map_or(stdout.as_str(), |i| &stdout[i..]);
+    let recorded = dir.join(recorded);
+    if std::env::var_os("BLESS").is_some() {
+        std::fs::write(&recorded, actual).unwrap();
+        return;
+    }
     assert_eq!(
-        reply,
-        "text/plain; charset=utf-8\nPOST http://127.0.0.1/echo\nx-kotlin: hi\nGREETING: Hello from node\nbody: Hello!\nform: str v, none\nurl: TypeError\n"
+        actual,
+        std::fs::read_to_string(&recorded).unwrap_or_default()
     );
 }
 
@@ -699,7 +728,8 @@ fn kotlin_worker() {
 /// `set:E` (a foreign exception as the fallback arm), a future rejects
 /// through `reject<E>`, a suspend lambda is a callback's or a parameter's
 /// future, `T[]` and `arr<T>` copy into Kotlin arrays and lists, a spread
-/// parameter is a vararg, and a task waits for a callback.
+/// parameter is a vararg, a task waits for a callback, an enum's function
+/// arm is a Kotlin lambda, and a future of a type parameter settles.
 #[test]
 fn kotlin_runtime() {
     if skipped(true) {

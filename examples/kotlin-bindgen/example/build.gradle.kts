@@ -13,5 +13,5 @@ kotlin {
         binaries.executable()
     }
     // The bindings kotlin-bindgen writes (see run.sh).
-    sourceSets.wasmJsMain { kotlin.srcDir("build/bindings") }
+    sourceSets.wasmJsMain { kotlin.srcDir("build/std"); kotlin.srcDir("build/bindings") }
 }
