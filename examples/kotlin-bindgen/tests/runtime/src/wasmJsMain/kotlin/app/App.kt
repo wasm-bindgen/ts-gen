@@ -73,3 +73,6 @@ fun probe_bytes(): UInt = probe.ext.bytes(byteArrayOf(1, 2, -6)).sumOf { it.toUB
 
 /** An `arr<str>` is a `List<String>`. */
 fun probe_words(): String = probe.ext.words(listOf("a", "b")).joinToString("")
+
+/** A spread parameter is a vararg, and a type parameter no argument infers is dropped. */
+fun probe_join(): String = probe.ext.join("-", "a", "b") + probe.ext.pick(3u)

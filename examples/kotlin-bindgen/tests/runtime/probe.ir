@@ -18,6 +18,9 @@ namespace ext {
   settle(p: future<str>): future<str>;
   bytes(v: u8[]): u8[];
   words(xs: arr<str>): arr<str>;
+  @js(args = (sep, ...parts))
+  join(sep: str, parts: arr<str>): str;
+  pick<This = Any?>(x: u32): u32;
 }
 
 export class Counter {
@@ -43,4 +46,5 @@ export namespace probe {
   made(): future<str>;
   bytes(): u32;
   words(): str;
+  join(): str;
 }

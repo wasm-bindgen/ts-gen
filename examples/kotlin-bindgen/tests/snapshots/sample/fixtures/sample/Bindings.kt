@@ -146,7 +146,7 @@ object BytesStatic {
         return r0!!.unsafeCast<Bytes>()
     }
 
-    fun <T : JsAny?> fromWithMapStrT(items: Map<JsAny?, JsAny?>): Bytes {
+    fun fromWithMapStrT(items: Map<JsAny?, JsAny?>): Bytes {
         val r0 = fixtures.sample.flat.Bytes_from_Map_str_T(items)
         return r0!!.unsafeCast<Bytes>()
     }

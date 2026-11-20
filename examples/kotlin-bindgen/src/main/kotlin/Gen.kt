@@ -121,6 +121,9 @@ class Gen(
 
     private fun fresh(p: String) = "$p${tmp++}"
 
+    /** Element types whose `vararg` would be an experimental unsigned array. */
+    private val unsignedKt = setOf("UByte", "UShort", "UInt", "ULong")
+
     private fun opt(r: Repr) = if (r.nullable) "?" else ""
 
     private fun scalarKt(s: String) = when (s) {
@@ -791,13 +794,22 @@ class Gen(
         val owner = m.owner?.let { classes[it] }
         val names = paramNames(m)
         val ps = m.params.indices.map { i -> sig.params.first { it.role == "param" && it.index == i }.repr!! }
-        val psDecl = names.indices.joinToString { i -> "${names[i]}: ${paramKt(m.params[i], ps[i])}" }
-        val args = names.indices.associateWith { names[it] }
+        // A spread parameter, last, is a vararg of its elements.
+        val rest = ps.lastOrNull()?.takeIf { m.params.last().spread && it.kind == "array" && !it.nullable }
+        val restElem = rest?.let { elem(it.elem)?.kt ?: jsElem(it.elem) }?.takeIf { it !in unsignedKt }
+        fun decl(i: Int, type: String) = if (restElem != null && i == names.lastIndex) "vararg ${names[i]}: $restElem" else "${names[i]}: $type"
+        val psDecl = names.indices.joinToString { i -> decl(i, paramKt(m.params[i], ps[i])) }
+        val args = names.indices.associateWith { i ->
+            if (restElem == null || i != names.lastIndex) names[i]
+            else names[i] + if (elem(rest!!.elem) != null) ".toList()" else ".toList().toJsArray()"
+        }
         val res = sig.results.firstOrNull()?.repr
         val ctorType = if (m.kind == "new" && owner != null) ownerType(owner) else null
         val resKt = ctorType?.let { ": $it" } ?: res?.let { ": ${kt(it)}" } ?: ""
-        val tps = (owner?.tparams.orEmpty() + m.tparams).map { it.name }
-        val mtps = tparamDecl(m.tparams.map { it.name })
+        // A type parameter of the member's that its signature doesn't name can't be inferred, and is dropped.
+        val mt = m.tparams.map { it.name }.filter { Regex("\\b${Regex.escape(sanitize(it))}\\b").containsMatchIn(psDecl + resKt) }
+        val tps = owner?.tparams.orEmpty().map { it.name } + mt
+        val mtps = tparamDecl(mt)
         val static = owner == null || m.isStatic || m.kind == "new"
         val scope = m.namespace.joinToString(".")
         fun sigKey(n: String, types: List<String> = ps.map { kt(it) }) = "${owner?.path ?: scope}|$static|${m.kind}|$n(${types.joinToString()})"
@@ -824,8 +836,8 @@ class Gen(
                     val closed = try { kt(r.value) == v } finally { eraseToAny = false }
                     val ts = types.toMutableList().also { it[i] = "suspend () -> $v" }
                     if (closed && declared.add(sigKey(name, ts))) {
-                        val decl = names.zip(ts).joinToString { (pn, pt) -> "$pn: $pt" }
-                        val args = names.mapIndexed { j, pn -> if (j == i) "${futureFactory(r)}($pn)" else pn }
+                        val decl = names.indices.joinToString { j -> decl(j, ts[j]) }
+                        val args = names.mapIndexed { j, pn -> if (j == i) "${futureFactory(r)}($pn)" else if (restElem != null && j == names.lastIndex) "*$pn" else pn }
                         out.append(" ".repeat(n)).append("fun $head($decl)$resKt = $call(${args.joinToString()})\n")
                     }
                 }
@@ -835,8 +847,8 @@ class Gen(
                     val t = try { kt(p) } catch (e: Unsupported) { continue }
                     val ts = types.toMutableList().also { it[i] = t }
                     if (t == "JsAny?" || !declared.add(sigKey(name, ts))) continue
-                    val decl = names.zip(ts).joinToString { (pn, pt) -> "$pn: $pt" }
-                    val args = names.mapIndexed { j, pn -> if (j == i) "${types[i].removeSuffix("?")}.${q(sanitize(a.name))}($pn)" else pn }
+                    val decl = names.indices.joinToString { j -> decl(j, ts[j]) }
+                    val args = names.mapIndexed { j, pn -> if (j == i) "${types[i].removeSuffix("?")}.${q(sanitize(a.name))}($pn)" else if (restElem != null && j == names.lastIndex) "*$pn" else pn }
                     out.append(" ".repeat(n)).append("fun $head($decl)$resKt = $call(${args.joinToString()})\n")
                 }
             }
@@ -864,10 +876,10 @@ class Gen(
             }
             owner == null && m.namespace.isEmpty() ->
                 topLevel.append(doc(0)).append(block("fun $mtps$name($psDecl)$resKt", body(""), 0)).append('\n')
-                    .append(overloads("$mtps$name", name, m.tparams.map { it.name }, 0))
+                    .append(overloads("$mtps$name", name, mt, 0))
             owner == null ->
                 nsText(m.namespace).append(doc(4)).append(block("fun $mtps$name($psDecl)$resKt", body(""), 4)).append('\n')
-                    .append(overloads("$mtps$name", name, m.tparams.map { it.name }, 4))
+                    .append(overloads("$mtps$name", name, mt, 4))
             m.kind == "new" && m.name == null -> {
                 val t = typeName(owner.path)
                 topLevel.append(doc(0)).append(block("fun ${tparamDecl(tps)}$t($psDecl)$resKt", body(""), 0)).append('\n')
@@ -881,7 +893,7 @@ class Gen(
                         "set" -> block("fun set${upperFirst(sanitize(m.name!!))}($psDecl)", body(""), 4) +
                             overloads("set${upperFirst(sanitize(m.name))}", "set${upperFirst(sanitize(m.name))}", emptyList(), 4)
                         "new" -> block("fun ${tparamDecl(tps)}$name($psDecl)$resKt", body(""), 4) + overloads("${tparamDecl(tps)}$name", name, tps, 4)
-                        else -> block("fun $mtps$name($psDecl)$resKt", body(""), 4) + overloads("$mtps$name", name, m.tparams.map { it.name }, 4)
+                        else -> block("fun $mtps$name($psDecl)$resKt", body(""), 4) + overloads("$mtps$name", name, mt, 4)
                     },
                 ).append('\n')
             }

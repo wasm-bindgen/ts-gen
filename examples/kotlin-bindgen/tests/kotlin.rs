@@ -698,7 +698,8 @@ fn kotlin_worker() {
 /// its second slot through `tw:ret`, a thrown error goes out through
 /// `set:E` (a foreign exception as the fallback arm), a future rejects
 /// through `reject<E>`, a suspend lambda is a callback's or a parameter's
-/// future, and `T[]` and `arr<T>` copy into Kotlin arrays and lists.
+/// future, `T[]` and `arr<T>` copy into Kotlin arrays and lists, and a
+/// spread parameter is a vararg.
 #[test]
 fn kotlin_runtime() {
     if skipped(true) {
@@ -713,7 +714,7 @@ fn kotlin_runtime() {
          absent: true,true,false\nimported: true\ncounter: true 7\n\
          modes: [\"off\",5] 0 9\nadder: function 42 2\n\
          box nones: undefined undefined,null\nasync callback: 15\nmade: made!\n\
-         bytes: 256\nwords: AB\nspill empty: true\n"
+         bytes: 256\nwords: AB\njoin: a-b3\nspill empty: true\n"
     );
 }
 

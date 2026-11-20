@@ -87,8 +87,8 @@ fun Storage.delete(keys: List<String>): tsgen.runtime.Future<UInt> {
 
 external interface Console : JsAny
 
-fun Console.log(data: List<JsAny?>) {
-    fixtures.annotate.flat.Console_log_arr_Any(this, data.toJsArray())
+fun Console.log(vararg data: JsAny?) {
+    fixtures.annotate.flat.Console_log_arr_Any(this, data.toList().toJsArray())
 }
 
 external interface Incoming : JsAny

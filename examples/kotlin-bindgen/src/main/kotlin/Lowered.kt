@@ -131,8 +131,8 @@ class Import(val module: String, val name: String) {
     }
 }
 
-/** A param, with the alias its type names, if any. */
-class ParamL(val name: String, val once: Boolean, val alias: String?)
+/** A param, with the alias its type names, if any; [spread] when its elements are the call's arguments. */
+class ParamL(val name: String, val once: Boolean, val alias: String?, val spread: Boolean)
 
 /** A function type a recursive alias reaches again: its layouts each way. */
 class RecL(val ty: String, val name: String, val toJs: Repr, val toLang: Repr) {
@@ -184,7 +184,7 @@ class MemberL(
             m.strOrNull("variant"),
             m.bool("static"),
             m.list("tparams").map { TParam.from(it.obj("tparam")) },
-            m.list("params").map { it.obj("param").let { p -> ParamL(p.str("name"), p.bool("once"), p.strOrNull("alias")) } },
+            m.list("params").map { it.obj("param").let { p -> ParamL(p.str("name"), p.bool("once"), p.strOrNull("alias"), p.bool("spread")) } },
             m.strOrNull("doc"),
             (m["sig"] as Map<*, *>?)?.let { Sig.from(it.obj("sig")) },
             m.strOrNull("error"),

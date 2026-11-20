@@ -2,7 +2,8 @@
 // result, an error set through set:ProbeError, a future that rejects
 // through reject<ProbeError>, `undefined` read as none, the box helpers,
 // a box's none, ref.null, written as each node's default, a suspend lambda
-// as a callback's and a parameter's future, and arrays copied each way.
+// as a callback's and a parameter's future, arrays copied each way, and a
+// spread parameter as a vararg.
 // Prints one line per call.
 import { readFileSync } from 'node:fs';
 const seen = [];
@@ -12,6 +13,8 @@ globalThis.ext = {
   settle: async (p) => (await p) + '!',
   bytes: (v) => v.map((b) => b + 1),
   words: (xs) => xs.map((x) => x.toUpperCase()),
+  join: (sep, ...parts) => parts.join(sep),
+  pick: (x) => x,
 };
 import { importObject } from './probe.import-object.mjs';
 import { instantiate, probe, spillEmpty, Counter } from './bridge.js';
@@ -54,5 +57,6 @@ lines.push(`async callback: ${await probe.asyncCallback(7)}`);
 lines.push(`made: ${await probe.made()}`);
 lines.push(`bytes: ${probe.bytes()}`);
 lines.push(`words: ${probe.words()}`);
+lines.push(`join: ${probe.join()}`);
 lines.push(`spill empty: ${spillEmpty()}`);
 process.stdout.write(lines.join('\n') + '\n');
