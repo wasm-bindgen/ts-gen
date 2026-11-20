@@ -104,8 +104,8 @@ class Counter(private val ctx: DurableObjectState<JsAny?>, private val env: Env)
     }
 
     /** The alarm handler, an export of its own: the runtime calls it when the alarm fires. */
-    suspend fun alarm(alarmInfo: AlarmInvocationInfo) {
-        if (!alarmInfo.isRetry) storage.put("alarms", (stored("alarms") + 1).toJsNumber()).await()
+    suspend fun alarm() {
+        storage.put("alarms", (stored("alarms") + 1).toJsNumber()).await()
     }
 
     /** A hibernating WebSocket: the runtime holds it, and wakes `webSocketMessage`. */
