@@ -1,0 +1,26 @@
+// The app behind tests/fixtures/unwind.ir's exports: where a JS
+// exception meets Zena.
+import { Future } from 'zena:async';
+import { boom, later, typed } from './unwind.zena';
+
+export function sync(): String {
+  boom();
+  return "returned";
+}
+
+export async function before(): Future<String> {
+  boom();
+  return "returned";
+}
+
+export async function after(): Future<String> {
+  await later();
+  boom();
+  return "returned";
+}
+
+export async function typedAfter(): Future<String> {
+  await later();
+  typed();
+  return "returned";
+}

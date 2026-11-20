@@ -1,0 +1,12 @@
+ir 1;
+
+/// Throws a `SyntaxError`, which no `throws` declares.
+boom();
+/// Throws a `TypeError`.
+typed() throws;
+later(): future<unit>;
+
+export sync(): str;
+export before(): future<str>;
+export after(): future<str>;
+export typedAfter(): future<str>;

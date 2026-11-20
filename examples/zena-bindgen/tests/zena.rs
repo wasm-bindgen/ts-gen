@@ -18,6 +18,9 @@
 //! 26 must be the `node` on `PATH`. Without `ZENA` the compile steps are
 //! skipped locally, and fail under `CI` unless `TSGEN_SKIP_ZENA` is set.
 //!
+//! `errors_reach_the_caller` runs a fixture's exports in node, through
+//! its entry module and bridge (`run_fixture`).
+//!
 //! `zena_worker` and `zena_worker_workerd` run `examples/zena-bindgen/example` in
 //! node and in workerd (`WORKERD`, else the `workerd` on `PATH`) against
 //! the tours beside it, `tour.node.txt` and `tour.workerd.txt`. Without a
@@ -816,6 +819,78 @@ fn skipped_trampoline_skips_each_member() {
         skipped,
         ["Probe#first(fn(arr<f16>))", "Probe#second(fn(arr<f16>))"]
     );
+}
+
+/// Builds `tests/fixtures/<name>.ir` with its app, through the entry
+/// module and the bridge, and runs `<name>.run.mjs` over them in node with
+/// `args`: what it prints.
+fn run_fixture(zena: &(PathBuf, PathBuf), name: &str, args: &[&str]) -> String {
+    let fixtures = crate_root().join("tests/fixtures");
+    let ir = read_ir(&fixtures.join(format!("{name}.ir")));
+    let dir = TempDir::new(&format!("{name}-run-{}", args.join("-")));
+    let out = generate(
+        &ir,
+        &[],
+        &zena_bindgen::Options {
+            entry: Some(zena_bindgen::Entry {
+                bindings: format!("./{name}.zena"),
+                app: "./app.zena".into(),
+            }),
+            ..Default::default()
+        },
+    );
+    std::fs::write(dir.0.join(format!("{name}.zena")), &out.zena).unwrap();
+    std::fs::copy(
+        fixtures.join(format!("{name}.app.zena")),
+        dir.0.join("app.zena"),
+    )
+    .unwrap();
+    let entry = dir.0.join("main.zena");
+    std::fs::write(&entry, out.entry.unwrap()).unwrap();
+    let language = compile(zena, &entry, &dir.0.join("language.wasm"));
+    let bridge = ts_gen_bridge::generate(&ir, &zena_bindgen::profile(), &language)
+        .unwrap_or_else(|e| panic!("{name}: {e}"));
+    std::fs::write(dir.0.join("bridge.js"), bridge.js).unwrap();
+    std::fs::write(dir.0.join("bridge.wasm"), bridge.wasm).unwrap();
+    let script = dir.0.join("run.mjs");
+    std::fs::copy(fixtures.join(format!("{name}.run.mjs")), &script).unwrap();
+    let o = Command::new("node")
+        .arg(&script)
+        .args(args)
+        .output()
+        .expect("node runs");
+    assert!(
+        o.status.success(),
+        "{name}.run.mjs:\n{}{}",
+        String::from_utf8_lossy(&o.stdout),
+        String::from_utf8_lossy(&o.stderr)
+    );
+    String::from_utf8_lossy(&o.stdout).into_owned()
+}
+
+/// A JS exception reaches the export's caller: one no `throws` declares
+/// unwinds through Zena as itself, and a declared one fails the Zena
+/// future, which rejects as its arm.
+#[test]
+fn errors_reach_the_caller() {
+    let Some(zena) = zena() else {
+        return;
+    };
+    assert_eq!(
+        run_fixture(&zena, "unwind", &["sync", "before", "typedAfter"]),
+        "sync: SyntaxError: boom!\nbefore: SyntaxError: boom!\ntypedAfter: TypeError: typed!\n"
+    );
+}
+
+/// An exception no `throws` declares, thrown after an await, settles the
+/// export's promise.
+#[test]
+#[ignore = "Zena can't catch a JS exception: it unwinds the tick, and the future stays pending"]
+fn undeclared_error_after_await() {
+    let Some(zena) = zena() else {
+        return;
+    };
+    assert_ne!(run_fixture(&zena, "unwind", &["after"]), "after: pending\n");
 }
 
 /// `std`, the lib other IRs resolve against, binds whole but for the
