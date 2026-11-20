@@ -13,6 +13,9 @@ js_code	fixtures.nullability_strict.flat.Res_find_str	tw:js/global	Res#find(str)
 js_code	fixtures.nullability_strict.flat.nested_future_str_arr_str_Record_Str_fn_str_str	tw:js/global	nested(future<str?>,arr<str?>,Record<Str?>,fn(str?)->str?)
 js_code	fixtures.nullability_strict.flat.take_str	tw:future	take<str?>
 js_code	fixtures.nullability_strict.flat.error_err	tw:future	error<err>
+js_code	fixtures.nullability_strict.flat.future_new	tw:future	new
+js_code	fixtures.nullability_strict.flat.future_resolve_str	tw:future	resolve<str?>
+js_code	fixtures.nullability_strict.flat.reject_err	tw:future	reject<err>
 js_code	fixtures.nullability_strict.flat.greet	tw:js/global	greet()
 js_code	fixtures.nullability_strict.flat.greet_str	tw:js/global	greet(str?)
 js_code	fixtures.nullability_strict.flat.both	tw:js/global	both()

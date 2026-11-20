@@ -59,6 +59,18 @@ external fun take_str(p0: JsAny?): JsAny?
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun error_err(p0: JsAny?): Int
 
+/** tw:future new */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun future_new(): JsAny?
+
+/** tw:future resolve<str?> */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun future_resolve_str(p0: JsAny?, p1: JsAny?)
+
+/** tw:future reject<err> */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun reject_err(p0: JsAny?, p1: Int, p2: JsAny?)
+
 /** tw:js/global nested(future<str?>,arr<str?>,Record<Str?>,fn(str?)->str?) */
 @JsFun("(p0, p1, p2, p3) => { throw new Error('ts-gen: unlinked import') }")
 external fun nested_future_str_arr_str_Record_Str_fn_str_str(p0: JsAny?, p1: JsAny?, p2: JsAny?, p3: JsAny?): JsAny?

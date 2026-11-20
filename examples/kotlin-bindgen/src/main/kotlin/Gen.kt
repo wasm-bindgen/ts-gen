@@ -318,12 +318,46 @@ class Gen(
             else -> unsupported("host ${r.of}")
         }
         "handle" -> appClass(r.handleClass) + opt(r)
-        "fn" -> {
-            val t = "(${r.fnParams.joinToString { kt(it) }}) -> ${kt(r.fnResult)}"
-            if (r.nullable) "($t)?" else t
-        }
+        "fn" -> fnKt(r).let { if (r.nullable) "($it)?" else it }
         "erased" -> if (eraseToAny) "JsAny?" else erasedName(r) + opt(r)
         else -> unsupported("`${r.ty}` (${r.kind})")
+    }
+
+    private fun isFuture(r: Repr) = r.kind == "host" && r.of == "future"
+
+    /**
+     * A function type. One the language provides that returns a future is
+     * a `suspend` function, run as a task that settles the future.
+     */
+    private fun fnKt(r: Repr): String {
+        val ps = r.fnParams.joinToString { kt(it) }
+        val res = r.fnResult
+        return if (r.provided != null && isFuture(res)) "suspend ($ps) -> ${kt(res.value)}" else "($ps) -> ${kt(res)}"
+    }
+
+    private val futureFactories = HashMap<String, String>()
+    private val futureOut = StringBuilder()
+
+    /**
+     * `futureOfT(block)`: a `future<T>` the language makes, by running
+     * `block` as a task, as [futureExport] does for an export.
+     */
+    private fun futureFactory(r: Repr): String = futureFactories.getOrPut(r.ty.removeSuffix("?")) {
+        val base = "futureOf" + upperFirst(sanitize(r.value.ty))
+        var name = base
+        var i = 2
+        while (name in futureFactories.values) name = "${base}_${i++}"
+        val f = Repr(r.ty, r.wire, r.kind, false, r.m)
+        val outer = eraseToAny
+        eraseToAny = true
+        try {
+            val body = futureExport(f, "block()").dropLast(1) + "return ${fromWire(f, listOf("future"))}"
+            futureOut.append("/** A `${f.ty}` that runs `block` as a task and settles with its outcome. */\n")
+                .append(block("fun $name(block: suspend () -> ${kt(f.value)}): ${kt(f)}", body, 0)).append('\n')
+        } finally {
+            eraseToAny = outer
+        }
+        name
     }
 
     /** A Kotlin value `e` (evaluated more than once) as its wire values. */
@@ -777,12 +811,24 @@ class Gen(
         }
         fun body(receiver: String) = importBody(m, sig, fname, args, receiver, ctorType)
         fun doc(n: Int) = kdoc(" ".repeat(n), m.doc)
-        // A payload enum parameter also takes each single-payload arm's value directly.
+        // A payload enum parameter also takes each single-payload arm's value
+        // directly, and a future parameter a suspend block to run.
         fun overloads(head: String, callee: String, targs: List<String>, n: Int): String {
             val types = ps.map { kt(it) }
             val call = callee + if (targs.isEmpty()) "" else "<${targs.joinToString { sanitize(it) }}>"
             val out = StringBuilder()
             ps.forEachIndexed { i, r ->
+                if (isFuture(r)) {
+                    val v = kt(r.value)
+                    eraseToAny = true
+                    val closed = try { kt(r.value) == v } finally { eraseToAny = false }
+                    val ts = types.toMutableList().also { it[i] = "suspend () -> $v" }
+                    if (closed && declared.add(sigKey(name, ts))) {
+                        val decl = names.zip(ts).joinToString { (pn, pt) -> "$pn: $pt" }
+                        val args = names.mapIndexed { j, pn -> if (j == i) "${futureFactory(r)}($pn)" else pn }
+                        out.append(" ".repeat(n)).append("fun $head($decl)$resKt = $call(${args.joinToString()})\n")
+                    }
+                }
                 if (r.kind != "enum" || r.enum.shape != "payload" || r.enum.origin != "decl") return@forEachIndexed
                 for (a in r.enum.arms) {
                     val p = a.payload.singleOrNull()?.takeIf { it.kind != "erased" } ?: continue
@@ -986,7 +1032,12 @@ class Gen(
     }
 
     /** A parameter's Kotlin type, by its alias when Kotlin declares one. */
-    private fun paramKt(p: ParamL, r: Repr) = p.alias?.takeIf { it in typeAliases }?.let { typeName(it) + opt(r) } ?: kt(r)
+    private fun paramKt(p: ParamL, r: Repr): String {
+        val k = kt(r)
+        // A function type the language provides may differ from the alias's own reading.
+        val t = p.alias?.let { typeAliases[it] }?.takeIf { k == it || k == "$it?" || k == "($it)?" } ?: return k
+        return typeName(p.alias!!) + opt(r)
+    }
 
     /** The aliases Kotlin declares as a `typealias`: those without type parameters that don't recur. */
     private val typeAliases: Map<String, String> by lazy {
@@ -1106,14 +1157,16 @@ class Gen(
 
     private fun trampolineText(ty: String, r: Repr): String {
         val op = r.op ?: unsupported("no trampoline signature for `$ty`")
-        val fnType = recOf(r)?.let { funInterface(it) } ?: "(${r.fnParams.joinToString { kt(it) }}) -> ${kt(r.fnResult)}"
+        val rec = recOf(r)
+        val fnType = rec?.let { funInterface(it) } ?: fnKt(r)
         var w = 1
         val args = r.fnParams.map { p -> fromWire(p, p.wire.map { "p${w++}" }) }
         val params = op.coreParams.mapIndexed { i, t -> "p$i: ${wireKt(t)}" }
         val call = "f(${args.joinToString()})"
         val res = r.fnResult
         val body = mutableListOf("val f = p0!!.unsafeCast<JsReference<$fnType>>().get()")
-        if (res.kind == "unit" || res.kind == "never") body += call else {
+        if (rec == null && isFuture(res)) body += futureExport(res, call)
+        else if (res.kind == "unit" || res.kind == "never") body += call else {
             val c = toWire(res, "r")
             body += "val r = $call"
             body += c.pre
@@ -1242,9 +1295,11 @@ class Gen(
         eraseToAny = true
         try {
             val ps = r.fnParams.map { kt(it) }
-            val res = kt(r.fnResult)
-            val fnType = recOf(r)?.let { funInterface(it) } ?: "(${ps.joinToString()}) -> $res"
-            val name = "Fn" + ps.joinToString("") { ktIdent(it) } + "To" + ktIdent(res)
+            val rec = recOf(r)
+            val suspends = rec == null && isFuture(r.fnResult)
+            val res = kt(if (suspends) r.fnResult.value else r.fnResult)
+            val fnType = rec?.let { funInterface(it) } ?: fnKt(r)
+            val name = (if (suspends) "SuspendFn" else "Fn") + ps.joinToString("") { ktIdent(it) } + "To" + ktIdent(res)
             if (!boxHelpers.add(name)) return ""
             return "/** A `${r.ty.removeSuffix("?")}` as its box: a JS function calling it. */\n" +
                 "fun ($fnType).toJs(): JsAny = $box(this.toJsReference())!!\n\n" +
@@ -1355,7 +1410,7 @@ class Gen(
             flatOut
         val errorOut = errorTypes.values.joinToString("") { it.text.toString() }
         val aliases = aliasText()
-        files["$pdir/Bindings.kt"] = header + "@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)\n\npackage $pkg\n\n" + aliases + typedText() + enumOut + errorOut
+        files["$pdir/Bindings.kt"] = header + "@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)\n\npackage $pkg\n\n" + aliases + typedText() + futureOut + enumOut + errorOut
         if (tuples.isNotEmpty()) {
             files["$pdir/Tuples.kt"] = header + "package $pkg\n" + tuples.joinToString("") { n ->
                 val ps = (0 until n).map { "T$it" }

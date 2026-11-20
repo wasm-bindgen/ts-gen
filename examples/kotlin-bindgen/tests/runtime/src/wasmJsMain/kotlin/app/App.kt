@@ -62,6 +62,12 @@ fun probe_writeNones() {
     probe.ext.seenNull(null)
 }
 
+/** A callback returning a future is a suspend lambda, run as a task. */
+suspend fun probe_asyncCallback(x: UInt): UInt = probe.ext.later({ n -> delay(1.0); n * 2u }, x).await()
+
+/** A future parameter takes a suspend block, settled through resolve<str>. */
+suspend fun probe_made(): String = probe.ext.settle { delay(1.0); "made" }.await()
+
 /** A `u8[]` is a `ByteArray`, copied each way. */
 fun probe_bytes(): UInt = probe.ext.bytes(byteArrayOf(1, 2, -6)).sumOf { it.toUByte().toUInt() }
 

@@ -697,8 +697,8 @@ fn kotlin_worker() {
 /// the bridge, for what the fixtures only compile. A tuple result pushes
 /// its second slot through `tw:ret`, a thrown error goes out through
 /// `set:E` (a foreign exception as the fallback arm), a future rejects
-/// through `reject<E>`, and `T[]` and `arr<T>` copy into Kotlin arrays and
-/// lists.
+/// through `reject<E>`, a suspend lambda is a callback's or a parameter's
+/// future, and `T[]` and `arr<T>` copy into Kotlin arrays and lists.
 #[test]
 fn kotlin_runtime() {
     if skipped(true) {
@@ -712,7 +712,8 @@ fn kotlin_runtime() {
          settle(true) = settled\nsettle(false) rejected RangeError: later\n\
          absent: true,true,false\nimported: true\ncounter: true 7\n\
          modes: [\"off\",5] 0 9\nadder: function 42 2\n\
-         box nones: undefined undefined,null\nbytes: 256\nwords: AB\nspill empty: true\n"
+         box nones: undefined undefined,null\nasync callback: 15\nmade: made!\n\
+         bytes: 256\nwords: AB\nspill empty: true\n"
     );
 }
 

@@ -1,13 +1,15 @@
 // Calls the probe's Kotlin exports through the bridge: a spilled tuple
 // result, an error set through set:ProbeError, a future that rejects
 // through reject<ProbeError>, `undefined` read as none, the box helpers,
-// a box's none, ref.null, written as each node's default, and arrays
-// copied each way.
+// a box's none, ref.null, written as each node's default, a suspend lambda
+// as a callback's and a parameter's future, and arrays copied each way.
 // Prints one line per call.
 import { readFileSync } from 'node:fs';
 const seen = [];
 globalThis.ext = {
   none: () => undefined, seen: (v) => seen.push(v), seenNull: (v) => seen.push(v),
+  later: async (f, x) => (await f(x)) + 1,
+  settle: async (p) => (await p) + '!',
   bytes: (v) => v.map((b) => b + 1),
   words: (xs) => xs.map((x) => x.toUpperCase()),
 };
@@ -48,6 +50,8 @@ const add = probe.adder();
 lines.push(`adder: ${typeof add} ${add(41)} ${probe.callBoxed(add, 1)}`);
 probe.writeNones();
 lines.push(`box nones: ${String(probe.none())} ${seen.map(String).join(",")}`);
+lines.push(`async callback: ${await probe.asyncCallback(7)}`);
+lines.push(`made: ${await probe.made()}`);
 lines.push(`bytes: ${probe.bytes()}`);
 lines.push(`words: ${probe.words()}`);
 lines.push(`spill empty: ${spillEmpty()}`);
