@@ -242,6 +242,12 @@ fn rest_parameters_print() {
 }
 
 #[test]
+fn array_expressions_print() {
+    let src = "ir 1;\n\n@js(let c = C.new(), args = (o? { all = C.any([o.one, c.one]), none = [] }))\nf(o: O?);\n";
+    assert_eq!(text::print(&parse(src)), src);
+}
+
+#[test]
 fn defaults_and_undefined_print() {
     let src = "ir 1;\n\nclass P<A, B: Q<A> = Q<A>, C in (u8, str) = str> {\n  all<T = unit>(v: Unit): (unit, T);\n}\n";
     assert_eq!(text::print(&parse(src)), src);

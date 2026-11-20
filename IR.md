@@ -604,9 +604,9 @@ declaration's role:
 | order | permute | permute back |
 
 An incoming pattern is a parameter (which binds), a constant, or a constant
-path through IR members (which match). Calls, `let`s and paths through
-parameters can't be inverted, so on an export they're validation errors,
-and so is a `let`.
+path through IR members (which match). Calls, array literals and paths
+through parameters can't be inverted, so on an export they're validation
+errors, and so is a `let`.
 
 **Incoming dispatch.** When several arms share one JS entry point, the
 bridge picks one at runtime. It tests, in order:
@@ -632,11 +632,18 @@ statically.
 | `$result` | predefined: the call's JS result, usable in `cancel` |
 
 Expressions are parameters, `let` bindings, paths through either or
-through IR members (`AbortController.new()`, `c.signal`, `c.abort`), and
-constants. A field fill can take a parameter, so a flattened overload
-builds its dictionary in one call: `args = (m? { from = from, text = text
-})`. They're type-checked against IR
-members, and no JS API gets special treatment.
+through IR members (`AbortController.new()`, `c.signal`, `c.abort`),
+constants, and array literals of expressions (`[a, b]`). A field fill can
+take a parameter, so a flattened overload builds its dictionary in one
+call: `args = (m? { from = from, text = text })`. They're type-checked
+against IR members, and no JS API gets special treatment.
+
+* A path through a nullable parameter reads it without supplying it, and
+  is `undefined` when the parameter is absent: `init.signal` with no
+  `init`.
+* An array literal is a JS array of its elements, leaving out those that
+  are `undefined`: `AbortSignal.any([init.signal, c.signal])` joins the
+  caller's signal with the bridge's when there is one (§16).
 
 ### Other `@js` entries
 
@@ -2349,7 +2356,8 @@ tmpl        = telem ("," telem)* ","?
 telem       = ident | literal | "undefined" | "..." ident
             | ident "?" "{" ident "=" expr ("," ident "=" expr)* "}"
             | expr
-expr        = literal | ("$result" | ident | path) ("." name)* ("(" (expr ("," expr)*)? ")")?
+expr        = literal | "[" (expr ("," expr)*)? "]"
+            | ("$result" | ident | path) ("." name)* ("(" (expr ("," expr)*)? ")")?
 literal     = string | int | "true" | "false" | "null"
 
 key         = path ("#" | ".") mname targs? "(" (ctype ("," ctype)*)? ")"

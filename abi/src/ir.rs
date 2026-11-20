@@ -680,9 +680,9 @@ pub enum Telem {
     Expr(Expr),
 }
 
-/// An `@js` expression: a constant, or a path through IR members with an
+/// An `@js` expression: a constant, a path through IR members with an
 /// optional call at the end (`AbortController.new()`, `c.signal`,
-/// `$result.cancel`).
+/// `$result.cancel`), or an array of expressions.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Expr {
     Lit(Literal),
@@ -690,4 +690,6 @@ pub enum Expr {
         path: Vec<String>,
         call: Option<Vec<Expr>>,
     },
+    /// `[a, b]`: a JS array of the elements that aren't `undefined`.
+    Array(Vec<Expr>),
 }

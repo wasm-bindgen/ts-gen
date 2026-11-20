@@ -1224,6 +1224,7 @@ impl<'a> Validator<'a> {
     fn pattern(&self, e: &Expr, scope: &Scope<'_, 'a>, span: Span) {
         let constant = match e {
             Expr::Lit(_) => true,
+            Expr::Array(_) => false,
             Expr::Ref { path, call } => {
                 call.is_none()
                     && path[0] != "$result"
@@ -1246,6 +1247,12 @@ impl<'a> Validator<'a> {
     fn expr(&self, e: &'a Expr, scope: &mut Scope<'_, 'a>, span: Span) -> Value<'a> {
         let (segs, call) = match e {
             Expr::Lit(_) => return Value::Unknown,
+            Expr::Array(elems) => {
+                for x in elems {
+                    self.expr(x, scope, span);
+                }
+                return Value::Unknown;
+            }
             Expr::Ref { path, call } => (path.as_slice(), call.as_deref()),
         };
         let head = segs[0].as_str();
@@ -1255,7 +1262,8 @@ impl<'a> Validator<'a> {
             }
             (Value::Unknown, &segs[1..])
         } else if let Some(p) = scope.member.params.iter().find(|p| p.name == head) {
-            *scope.uses.entry(p.name.as_str()).or_default() += 1;
+            // A path through a parameter reads it, and doesn't supply it.
+            *scope.uses.entry(p.name.as_str()).or_default() += usize::from(segs.len() == 1);
             (Value::Instance(p.ty.clone(), scope.cx.clone()), &segs[1..])
         } else if let Some(v) = scope.lets.get(head) {
             (v.clone(), &segs[1..])
@@ -1337,6 +1345,11 @@ impl<'a> Validator<'a> {
     }
 
     fn class_of(&self, t: &Type, cx: &Context<'a>) -> Option<(&'a Class, Location)> {
+        // A path through a nullable value is `undefined` when it's absent.
+        let t = match t {
+            Type::Nullable(t, _) => t,
+            t => t,
+        };
         let Type::Named(r) = t else {
             return None;
         };

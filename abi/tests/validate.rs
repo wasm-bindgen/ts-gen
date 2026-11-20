@@ -541,6 +541,26 @@ fn fills_and_expressions() {
         &format!("{prelude}@js(let a = AbortController.new())\nf(a: u8);"),
         "`let a` is already a name",
     );
+    // An array literal, and a path through a nullable parameter, which
+    // reads the parameter without supplying it.
+    let joined = "class AbortSignal { static any(signals: arr<AbortSignal>): AbortSignal; }\nclass AbortController {\n  new();\n  get signal(): AbortSignal;\n  abort();\n}\ninterface RequestInit { get signal(): AbortSignal?; set signal(v: AbortSignal); }\nclass Response {}\n";
+    ok(&format!(
+        "{joined}@js(let c = AbortController.new(), args = (init? {{ signal = AbortSignal.any([init.signal, c.signal]) }}), cancel = c.abort)\nfetch(init: RequestInit?): future<Response>;"
+    ));
+    bad(
+        &format!(
+            "{joined}@js(let c = AbortController.new(), args = (init? {{ signal = AbortSignal.any([init.sign, c.signal]) }}))\nfetch(init: RequestInit?): future<Response>;"
+        ),
+        "`RequestInit` has no member `sign`",
+    );
+    bad(
+        &format!("{joined}@js(args = (AbortSignal.any([c.signal])))\nfetch(): future<Response>;"),
+        "`c.signal` names nothing in scope",
+    );
+    bad(
+        "export namespace u { @js(args = ([1])) f(); }",
+        "`[1]` in `@js(args)` of export `f` can't be matched",
+    );
 }
 
 #[test]
