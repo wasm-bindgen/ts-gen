@@ -1,6 +1,7 @@
 // The probe's exports, called from JS through the bridge by test.mjs.
 package app
 
+import probe.Listener
 import probe.Mode
 import probe.ProbeError
 import probe.ProbeErrorException
@@ -84,3 +85,6 @@ suspend fun probe_soon(): String {
     delay(1.0)
     return word
 }
+
+/** An enum's function arm is a callback Kotlin provides. */
+fun probe_listen(): UInt = probe.ext.listen(Listener.Call { it + 1u }, 4u) + probe.ext.listen(Listener.Name("n"), 4u)

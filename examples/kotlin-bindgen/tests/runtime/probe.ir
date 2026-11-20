@@ -9,6 +9,11 @@ enum Mode {
   Count(u32);
 }
 
+enum Listener {
+  Call(fn(u32) -> u32);
+  Name(str);
+}
+
 namespace ext {
   none(): Str?;
   apply(f: fn(u32) -> u32, x: u32): u32;
@@ -22,6 +27,7 @@ namespace ext {
   join(sep: str, parts: arr<str>): str;
   pick<This = Any?>(x: u32): u32;
   soon(f: fn());
+  listen(l: Listener, x: u32): u32;
 }
 
 export class Counter {
@@ -49,4 +55,5 @@ export namespace probe {
   words(): str;
   join(): str;
   soon(): future<str>;
+  listen(): u32;
 }

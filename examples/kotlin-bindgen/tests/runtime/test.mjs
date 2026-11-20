@@ -16,6 +16,7 @@ globalThis.ext = {
   join: (sep, ...parts) => parts.join(sep),
   pick: (x) => x,
   soon: (f) => { setTimeout(f, 1); },
+  listen: (l, x) => (typeof l === 'function' ? l(x) : x),
 };
 import { importObject } from './probe.import-object.mjs';
 import { instantiate, probe, spillEmpty, Counter } from './bridge.js';
@@ -60,5 +61,6 @@ lines.push(`bytes: ${probe.bytes()}`);
 lines.push(`words: ${probe.words()}`);
 lines.push(`join: ${probe.join()}`);
 lines.push(`callback: ${await probe.soon()}`);
+lines.push(`listen: ${probe.listen()}`);
 lines.push(`spill empty: ${spillEmpty()}`);
 process.stdout.write(lines.join('\n') + '\n');

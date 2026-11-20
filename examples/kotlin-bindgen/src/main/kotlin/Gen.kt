@@ -45,6 +45,8 @@ class Gen(
     /** A lib declaration's path, as its lib's bindings name it (`std.Date`). */
     private val libNames = HashMap<String, String>()
     private val enums = LinkedHashMap<String, EnumL>()
+    /** Each enum's layout as Kotlin passes it to JS, where a function arm is one Kotlin provides. */
+    private val enumsToJs = HashMap<String, EnumL>()
     private val flatNames = HashSet<String>()
     private val trampolines = LinkedHashMap<String, Repr>()
     /** The `fun interface`s of recursive function types used, by spelling. */
@@ -205,6 +207,11 @@ class Gen(
         enums.putIfAbsent(e.path, e)
         if (e.origin == "nested") return kt(undefinedValue(e)).removeSuffix("?") + "?"
         return qual + if (e.origin == "err") "Err" else typeName(e.path)
+    }
+
+    private fun noteToJs(l: EnumL) {
+        if (enumsToJs.putIfAbsent(l.path, l) != null) return
+        for (a in l.arms) for (p in a.payload) if (p.kind == "enum") noteToJs(p.enum)
     }
 
     private fun undefinedValue(e: EnumL) = e.arms.first { it.name == "Value" }.payload[0]
@@ -398,6 +405,7 @@ class Gen(
             "enum" -> {
                 val l = r.enum
                 enumKt(l)
+                noteToJs(l)
                 when {
                     l.origin == "nested" || l.shape == "payload" -> {
                         val t = fresh("w")
@@ -1209,7 +1217,9 @@ class Gen(
         val wireClass = "${sanitize(enumIdent(l))}Wire"
         fun wireDecls() = (listOf("val arm: Int") + slots.mapIndexed { i, t -> "val s$i: ${wireKt(t)}" }).joinToString()
         fun zeros() = slots.map { zero(it) }
-        fun armWire(a: ArmL, values: List<String>): String {
+        val toJs = enumsToJs[l.path] ?: l
+        fun armWire(arm: ArmL, values: List<String>): String {
+            val a = toJs.arms.first { it.index == arm.index }
             val convs = a.payload.zip(values).map { (p, v) -> toWire(p, v) }
             val exprs = convs.flatMap { it.exprs }
             val s = zeros().toMutableList()
