@@ -32,7 +32,7 @@ topic is a file in `app/`.
 | `/crypto` | `crypto.zena` | `crypto.subtle.digest`, `getRandomValues`, `TextEncoder`, `btoa` | a `union` parameter's arm overloads, a typed array `u8[]`, `future<ArrayBuffer>`, a generic `T -> T`, a callback per byte |
 | `/stream` | `streams.zena` | `ReadableStream`, `TransformStream`, `pipeTo`, `pipeThrough`, a streamed body | mono generics (`ReadableStream<str>`, imports per instantiation), callbacks returning `future<unit>?`, `T?` in `read()`'s result |
 | `/timers` | `timers.zena` | `setTimeout`, `queueMicrotask`, `scheduler.wait`, `ctx.waitUntil` | one-shot callbacks, a variadic (`setTimeout`'s arguments), a Zena future given to JS |
-| `/fetch` | `fetch.zena` | a service binding, the global `fetch` with `RequestInit`, `AbortController` | a literal enum (`cache`), `@js(null)` setters (`body`), cancellation (`TaskGroup.race` drops the JS future), a function in a payload enum (the event listener) |
+| `/fetch` | `fetch.zena` | a service binding, the global `fetch` with `RequestInit`, `AbortSignal.timeout`, `AbortController` | a literal enum (`cache`), `@js(null)` setters (`body`, `signal`), a caller's signal joined with the bridge's, cancellation (`TaskGroup.race` drops the JS future, which had no init to carry a signal), a function in a payload enum (the event listener) |
 | `/rewrite` | `rewrite.zena` | `HTMLRewriter` | a callback property of an options object, a `union` parameter (`append`) |
 | `/cache` | `cache.zena` | `caches.default`: `put`, `match`, `delete` | `future<Response?>`, `future<bool>` |
 | `/counter/kv` | `durable.zena` | an id from a name, `stub.fetch`; storage `get`, `put`, `list`, `delete` | an exported class with an imported base, generic members at scalars (`get<f64>`: `f64?`), `Map<Str, T>` and its key iterator |
@@ -46,7 +46,9 @@ topic is a file in `app/`.
 
 `helper.js` is a second service: the target of the service binding and of
 the global `fetch`, the backing of the Cache API, and the caller of the
-worker's `scheduled` and `queue` handlers and of its throwing routes.
+worker's `scheduled` and `queue` handlers and of its throwing routes. It
+counts the requests it sees abort, which is how `/fetch` shows a
+cancellation reaching it.
 
 The declarations beside workers-types:
 
@@ -97,5 +99,5 @@ Errors leave Zena the way they come in, as `ErrException`s thrown as the
 `Error`.
 
 In node the helper stands behind the binding and the global `fetch`
-directly, and `node.mjs` provides `scheduler`, numeric timer ids and the
-`cloudflare:workers` base classes.
+directly, rejecting a call whose signal aborts, and `node.mjs` provides
+`scheduler`, numeric timer ids and the `cloudflare:workers` base classes.

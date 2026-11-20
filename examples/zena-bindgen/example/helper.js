@@ -1,7 +1,10 @@
 // The second service: the target of the worker's subrequests, the
 // backing of its Cache API, and the caller of its other handlers.
+// `/slow` takes two seconds, and `/aborts` says how many of its requests
+// were aborted since it was last asked.
 const notes = [];
 const cached = new Map();
+let aborts = 0;
 
 export default {
   async fetch(request, env) {
@@ -52,8 +55,14 @@ export default {
         return new Response(`queue: ${outcome}; ${notes.at(-1)}\n`);
       }
       case '/slow':
-        await scheduler.wait(5000);
+        request.signal.addEventListener('abort', () => { aborts++; });
+        await scheduler.wait(2000);
         return new Response('slow\n');
+      case '/aborts': {
+        const seen = aborts;
+        aborts = 0;
+        return new Response(String(seen));
+      }
       default:
         return new Response(`helper saw ${request.method} ${url.pathname} "${await request.text()}"\n`);
     }

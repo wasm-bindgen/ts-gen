@@ -30,7 +30,7 @@ const config :Workerd.Config = (
       modules = [(name = "helper.js", esModule = embed "helper.js")],
       bindings = [(name = "MAIN", service = "main")],
       compatibilityDate = "2026-03-17",
-      compatibilityFlags = ["service_binding_extra_handlers"],
+      compatibilityFlags = ["service_binding_extra_handlers", "enable_request_signal"],
     )),
     (name = "storage", disk = (path = "storage", writable = true)),
   ],

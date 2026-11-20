@@ -44,7 +44,14 @@ const main = {
     return { outcome: 'ok' };
   },
 };
-env.HELPER = { fetch: async (input, init) => helper.fetch(new Request(input, init), { MAIN: main }) };
+// As a fetch does, it rejects when the request's signal aborts.
+env.HELPER = { fetch: async (input, init) => {
+  const request = new Request(input, init);
+  const aborted = new Promise((_, reject) => {
+    request.signal.addEventListener('abort', () => reject(request.signal.reason));
+  });
+  return Promise.race([helper.fetch(request, { MAIN: main }), aborted]);
+} };
 globalThis.fetch = env.HELPER.fetch;
 
 async function show(label, path, init) {
