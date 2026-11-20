@@ -288,14 +288,9 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "largestUnit")]
     pub fn largest_unit<U: ::wasm_bindgen::JsGeneric>(
         this: &Rounding<U>,
-    ) -> Option<LargestUnitKind>;
+    ) -> Option<LargestUnitUnit>;
     #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-    pub fn set_largest_unit<U: ::wasm_bindgen::JsGeneric>(this: &Rounding<U>, val: LargestUnitKind);
-    #[wasm_bindgen(method, setter, js_name = "largestUnit")]
-    pub fn set_largest_unit_with_plural<U: ::wasm_bindgen::JsGeneric>(
-        this: &Rounding<U>,
-        val: Plural,
-    );
+    pub fn set_largest_unit<U: ::wasm_bindgen::JsGeneric>(this: &Rounding<U>, val: LargestUnitUnit);
 }
 impl<U: ::wasm_bindgen::JsGeneric> Rounding<U> {
     pub fn new() -> Rounding<U> {
@@ -320,12 +315,8 @@ impl<U: ::wasm_bindgen::JsGeneric> RoundingBuilder<U> {
         self.inner.set_smallest_unit(val);
         self
     }
-    pub fn largest_unit(self, val: LargestUnitKind) -> Self {
+    pub fn largest_unit(self, val: LargestUnitUnit) -> Self {
         self.inner.set_largest_unit(val);
-        self
-    }
-    pub fn largest_unit_with_plural(self, val: Plural) -> Self {
-        self.inner.set_largest_unit_with_plural(val);
         self
     }
     pub fn build(self) -> Rounding<U> {
@@ -412,15 +403,6 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch)]
     pub fn fail() -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "type-eval")]
-extern "C" {
-    pub fn fallback(value: &JsValue);
-}
-#[wasm_bindgen(module = "type-eval")]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "fallback")]
-    pub fn try_fallback(value: &JsValue) -> Result<(), JsValue>;
 }
 pub mod scoped {
     #[allow(unused_imports)]
@@ -977,8 +959,13 @@ impl Default for PartialExtended {
     }
 }
 #[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
-pub enum LargestUnitKind {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LargestUnitUnit {
     Auto = "auto",
-    Plural(Plural),
+    Hour = "hour",
+    Minute = "minute",
+    Second = "second",
+    Hours = "hours",
+    Minutes = "minutes",
+    Seconds = "seconds",
 }

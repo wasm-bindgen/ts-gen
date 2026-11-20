@@ -35,12 +35,7 @@ extern "C" {
 #[wasm_bindgen(module = "generic-mono-review")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "asyncByAlias")]
-    pub async fn async_by_alias(id: &str) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "generic-mono-review")]
-extern "C" {
-    #[wasm_bindgen(js_name = "asyncByAlias")]
-    pub fn async_by_alias_promise(id: &str) -> Promise<JsString>;
+    pub fn async_by_alias(id: &str) -> Promise<String>;
 }
 #[wasm_bindgen(module = "generic-mono-review")]
 extern "C" {
@@ -97,12 +92,12 @@ extern "C" {
 #[wasm_bindgen(module = "generic-mono-review")]
 extern "C" {
     #[wasm_bindgen(js_name = "literalUnion")]
-    pub fn literal_union() -> LiteralUnionReturnKind;
+    pub fn literal_union() -> AOrB;
 }
 #[wasm_bindgen(module = "generic-mono-review")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "literalUnion")]
-    pub fn try_literal_union() -> Result<LiteralUnionReturnKind, JsValue>;
+    pub fn try_literal_union() -> Result<AOrB, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review")]
 extern "C" {
@@ -118,7 +113,7 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LiteralUnionReturnKind {
+pub enum AOrB {
     A = "a",
     B = "b",
 }

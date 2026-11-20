@@ -117,11 +117,12 @@ extern "C" {
 #[derive(Debug, Clone)]
 pub enum JsException {
     SubFault(SubFault),
-    Fault(Fault),
     TypeError(TypeError),
+    Fault(Fault),
     Other2(Other),
     CodesFault(CodesFault),
     CodesFault2(codes::Fault),
+    Error(Error),
     Other(JsValue),
 }
 impl From<JsValue> for JsException {
@@ -130,12 +131,12 @@ impl From<JsValue> for JsException {
             Ok(error) => return Self::SubFault(error),
             Err(value) => value,
         };
-        let value = match value.dyn_into::<Fault>() {
-            Ok(error) => return Self::Fault(error),
-            Err(value) => value,
-        };
         let value = match value.dyn_into::<TypeError>() {
             Ok(error) => return Self::TypeError(error),
+            Err(value) => value,
+        };
+        let value = match value.dyn_into::<Fault>() {
+            Ok(error) => return Self::Fault(error),
             Err(value) => value,
         };
         let value = match value.dyn_into::<Other>() {
@@ -150,6 +151,10 @@ impl From<JsValue> for JsException {
             Ok(error) => return Self::CodesFault2(error),
             Err(value) => value,
         };
+        let value = match value.dyn_into::<Error>() {
+            Ok(error) => return Self::Error(error),
+            Err(value) => value,
+        };
         Self::Other(value)
     }
 }
@@ -157,11 +162,12 @@ impl From<JsException> for JsValue {
     fn from(error: JsException) -> Self {
         match error {
             JsException::SubFault(error) => error.into(),
-            JsException::Fault(error) => error.into(),
             JsException::TypeError(error) => error.into(),
+            JsException::Fault(error) => error.into(),
             JsException::Other2(error) => error.into(),
             JsException::CodesFault(error) => error.into(),
             JsException::CodesFault2(error) => error.into(),
+            JsException::Error(error) => error.into(),
             JsException::Other(value) => value,
         }
     }
@@ -170,11 +176,12 @@ impl AsRef<JsValue> for JsException {
     fn as_ref(&self) -> &JsValue {
         match self {
             Self::SubFault(error) => error.as_ref(),
-            Self::Fault(error) => error.as_ref(),
             Self::TypeError(error) => error.as_ref(),
+            Self::Fault(error) => error.as_ref(),
             Self::Other2(error) => error.as_ref(),
             Self::CodesFault(error) => error.as_ref(),
             Self::CodesFault2(error) => error.as_ref(),
+            Self::Error(error) => error.as_ref(),
             Self::Other(value) => value,
         }
     }

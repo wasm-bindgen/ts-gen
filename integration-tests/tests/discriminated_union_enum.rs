@@ -2,7 +2,7 @@
 
 use js_sys::ArrayBuffer;
 use ts_gen_integration_tests::discriminated_union_enum::{
-    Attachment, CodeKind, DispositionKind, Payload, Reply,
+    Attachment, AttachmentDispositionKind, Payload, Reply, ReplyCodeKind,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -13,11 +13,11 @@ use ts_gen_integration_tests::discriminated_union_enum::{
 fn discriminated_union_enum_compile() {
     let inline: Attachment = Attachment::new_inline("cid");
     let _: Attachment = Attachment::new_attachment("a.txt");
-    inline.set_disposition(DispositionKind::Attachment);
+    inline.set_disposition(AttachmentDispositionKind::Attachment);
 
     let ok: Reply = Reply::new_200("body");
     let _: Reply = Reply::new_404("missing");
-    ok.set_code(CodeKind::N404);
+    ok.set_code(ReplyCodeKind::N404);
 
     let _: Payload = Payload::new_text("hi");
     let _: Payload = Payload::new_binary(&ArrayBuffer::new(1));

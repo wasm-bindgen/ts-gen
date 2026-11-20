@@ -119,12 +119,12 @@ extern "C" {
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
-    pub fn direction() -> DirectionReturnKind;
+    pub fn direction() -> DirectionKind;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "direction")]
-    pub fn try_direction() -> Result<DirectionReturnKind, JsValue>;
+    pub fn try_direction() -> Result<DirectionKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
@@ -132,7 +132,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Feedback;
     #[wasm_bindgen(method, getter)]
-    pub fn value(this: &Feedback) -> Option<ValueKind>;
+    pub fn value(this: &Feedback) -> Option<FeedbackValueKind>;
 }
 impl Feedback {
     #[allow(clippy::new_without_default)]
@@ -172,30 +172,30 @@ extern "C" {
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
-    pub fn size() -> SizeReturnKind;
+    pub fn size() -> SizeKind;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "size")]
-    pub fn try_size() -> Result<SizeReturnKind, JsValue>;
+    pub fn try_size() -> Result<SizeKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
-    pub fn repeat() -> RepeatReturnKind;
+    pub fn repeat() -> RepeatKind;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "repeat")]
-    pub fn try_repeat() -> Result<RepeatReturnKind, JsValue>;
+    pub fn try_repeat() -> Result<RepeatKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
-    pub fn flag() -> FlagReturnKind;
+    pub fn flag() -> FlagKind;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "flag")]
-    pub fn try_flag() -> Result<FlagReturnKind, JsValue>;
+    pub fn try_flag() -> Result<FlagKind, JsValue>;
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -206,33 +206,33 @@ pub enum KeepAliveKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DirectionReturnKind {
+pub enum DirectionKind {
     Neg1 = -1,
     N0 = 0,
     N1 = 1,
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ValueKind {
+pub enum FeedbackValueKind {
     Neg1 = -1,
     N1 = 1,
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum SizeReturnKind {
+pub enum SizeKind {
     Auto = "auto",
     F64(f64),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum RepeatReturnKind {
+pub enum RepeatKind {
     Bool(bool),
     X = "x",
     Y = "y",
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum FlagReturnKind {
+pub enum FlagKind {
     Bool(bool),
     ArrayBuffer(ArrayBuffer),
 }

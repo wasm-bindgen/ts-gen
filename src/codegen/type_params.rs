@@ -170,10 +170,7 @@ fn mentions_any(ty: &TypeRef, params: &[TypeParam]) -> bool {
 /// Mirrors `to_syn_type`'s callback lowering: a callback with a rest
 /// parameter is the untyped `Function` (a `fn` pointer has fixed arity),
 /// so it mentions nothing, while another callback's parameters and return
-/// keep their type parameters. A `Promise<T>` callback return does not
-/// count: wasm-bindgen cannot pass a `Function` returning `Promise<T>` for
-/// a generic `T`, so `T` is left to the return rules, which erase it
-/// unless it is the whole return.
+/// keep their type parameters.
 fn surviving_type_params(
     ty: &TypeRef,
     cgctx: &CodegenContext<'_>,
@@ -188,17 +185,7 @@ fn surviving_type_params(
             for p in &sig.params {
                 surviving_type_params(&p.type_ref, cgctx, scope, out);
             }
-            let promised_param = sig.return_type.as_promise_inner().is_some_and(|inner| {
-                inner.as_ident().is_some_and(|n| {
-                    matches!(
-                        cgctx.gctx.scopes.resolve_binding(scope, n),
-                        Some(Binding::TypeParam)
-                    )
-                })
-            });
-            if !promised_param {
-                surviving_type_params(&sig.return_type, cgctx, scope, out);
-            }
+            surviving_type_params(&sig.return_type, cgctx, scope, out);
         }
         TypeRef::Reference { generic_args, .. } => {
             if let Some(n) = ty.as_ident() {

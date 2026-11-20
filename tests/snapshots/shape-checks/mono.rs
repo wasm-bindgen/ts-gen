@@ -136,17 +136,17 @@ pub mod shapes {
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "Shapes")]
-        pub fn pick(kind: f64) -> Result<PickReturnKind, JsValue>;
+        pub fn pick(kind: f64) -> Result<RoundingOptionsOrTicket, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "pickAny", js_namespace = "Shapes")]
-        pub fn pick_any(kind: f64) -> Result<PickAnyReturnKind, JsValue>;
+        pub fn pick_any(kind: f64) -> Result<PickAnyKind, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "pickOrText", js_namespace = "Shapes")]
-        pub fn pick_or_text(kind: f64) -> Result<PickOrTextReturnKind, JsValue>;
+        pub fn pick_or_text(kind: f64) -> Result<PickOrTextKind, JsValue>;
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -229,9 +229,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Choice;
     #[wasm_bindgen(method, getter)]
-    pub fn kind(this: &Choice) -> KindKind;
+    pub fn kind(this: &Choice) -> ChoiceKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_kind(this: &Choice, val: KindKind);
+    pub fn set_kind(this: &Choice, val: ChoiceKind);
     #[wasm_bindgen(method, getter)]
     pub fn a(this: &Choice) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -255,14 +255,14 @@ impl Choice {
     #[doc = " Start a builder with `kind: \"a\"`."]
     pub fn builder_a(a: f64) -> ChoiceBuilder {
         let inner: Choice = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(KindKind::A);
+        inner.set_kind(ChoiceKind::A);
         inner.set_a(a);
         ChoiceBuilder { inner }
     }
     #[doc = " Start a builder with `kind: \"b\"`."]
     pub fn builder_b(b: impl ::wasm_bindgen::JsStringLike) -> ChoiceBuilder {
         let inner: Choice = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_kind(KindKind::B);
+        inner.set_kind(ChoiceKind::B);
         inner.set_b(b);
         ChoiceBuilder { inner }
     }
@@ -285,25 +285,25 @@ impl ChoiceBuilder {
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum PickReturnKind {
+pub enum RoundingOptionsOrTicket {
     Ticket(shapes::Ticket),
     RoundingOptions(shapes::RoundingOptions),
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum PickAnyReturnKind {
+pub enum PickAnyKind {
     Ticket(shapes::Ticket),
     Object(Object),
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
-pub enum PickOrTextReturnKind {
+pub enum PickOrTextKind {
     String(String),
     RoundingOptions(shapes::RoundingOptions),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KindKind {
+pub enum ChoiceKind {
     A = "a",
     B = "b",
 }

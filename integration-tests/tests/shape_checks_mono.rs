@@ -7,8 +7,7 @@ use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::shape_checks_mono::{
-    shapes, Choice, GlobalInit, ModuleOptions, PickAnyReturnKind, PickOrTextReturnKind,
-    PickReturnKind,
+    shapes, Choice, GlobalInit, ModuleOptions, PickAnyKind, PickOrTextKind, RoundingOptionsOrTicket,
 };
 
 // The fixture has no backing module, so the namespace is installed before
@@ -76,30 +75,26 @@ fn classes_keep_instanceof() {
 fn union_class_arms_dispatch_before_shapes() {
     install();
     match shapes::pick(7.0) {
-        PickReturnKind::Ticket(ticket) => assert_eq!(ticket.id(), 7.0),
-        PickReturnKind::RoundingOptions(_) => panic!("a Ticket decoded as RoundingOptions"),
+        RoundingOptionsOrTicket::Ticket(ticket) => assert_eq!(ticket.id(), 7.0),
+        RoundingOptionsOrTicket::RoundingOptions(_) => {
+            panic!("a Ticket decoded as RoundingOptions")
+        }
     }
     match shapes::pick(0.0) {
-        PickReturnKind::RoundingOptions(options) => {
+        RoundingOptionsOrTicket::RoundingOptions(options) => {
             assert_eq!(options.smallest_unit(), Some(shapes::Unit::Hour))
         }
-        PickReturnKind::Ticket(_) => panic!("a plain object decoded as Ticket"),
+        RoundingOptionsOrTicket::Ticket(_) => panic!("a plain object decoded as Ticket"),
     }
     // Two shapes share one `Object` arm.
-    assert!(matches!(
-        shapes::pick_any(3.0),
-        PickAnyReturnKind::Ticket(_)
-    ));
-    assert!(matches!(
-        shapes::pick_any(0.0),
-        PickAnyReturnKind::Object(_)
-    ));
+    assert!(matches!(shapes::pick_any(3.0), PickAnyKind::Ticket(_)));
+    assert!(matches!(shapes::pick_any(0.0), PickAnyKind::Object(_)));
     assert!(matches!(
         shapes::pick_or_text(1.0),
-        PickOrTextReturnKind::String(text) if text == "text"
+        PickOrTextKind::String(text) if text == "text"
     ));
     assert!(matches!(
         shapes::pick_or_text(0.0),
-        PickOrTextReturnKind::RoundingOptions(_)
+        PickOrTextKind::RoundingOptions(_)
     ));
 }

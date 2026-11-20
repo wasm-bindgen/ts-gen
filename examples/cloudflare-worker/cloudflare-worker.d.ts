@@ -281,7 +281,7 @@ interface ResponseInit {
  *
  * [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/context/)
  */
-declare class ExecutionContext {
+interface ExecutionContext {
   /**
    * The **`waitUntil()`** method extends the lifetime of the event. It accepts a Promise-based task which the Workers runtime will execute before the handler terminates but without blocking the response.
    *

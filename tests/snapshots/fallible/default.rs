@@ -40,12 +40,7 @@ extern "C" {
 #[wasm_bindgen(module = "fallible")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "parseLater")]
-    pub async fn parse_later(s: &str) -> Result<f64, JsValue>;
-}
-#[wasm_bindgen(module = "fallible")]
-extern "C" {
-    #[wasm_bindgen(js_name = "parseLater")]
-    pub fn parse_later_promise(s: &str) -> Promise<Number>;
+    pub fn parse_later(s: &str) -> Promise<f64>;
 }
 #[wasm_bindgen(module = "fallible")]
 extern "C" {

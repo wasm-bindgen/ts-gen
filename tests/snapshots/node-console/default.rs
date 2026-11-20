@@ -117,31 +117,35 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `condition` - The condition to test"]
     #[doc = " * `data` - Optional message or data"]
-    #[wasm_bindgen(method, variadic)]
-    pub fn assert(this: &Console, data: &[JsValue]);
+    #[wasm_bindgen(method)]
+    pub fn assert(this: &Console);
     #[doc = " A simple assertion test. If `condition` is falsy, an `AssertionError` is"]
     #[doc = " written with an optional message."]
     #[doc = ""]
     #[doc = " * `condition` - The condition to test"]
     #[doc = " * `data` - Optional message or data"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "assert")]
-    pub fn try_assert(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "assert")]
+    pub fn try_assert(this: &Console) -> Result<(), JsValue>;
     #[doc = " A simple assertion test. If `condition` is falsy, an `AssertionError` is"]
     #[doc = " written with an optional message."]
     #[doc = ""]
     #[doc = " * `condition` - The condition to test"]
     #[doc = " * `data` - Optional message or data"]
     #[wasm_bindgen(method, variadic, js_name = "assert")]
-    pub fn assert_with_condition(this: &Console, condition: bool, data: &[JsValue]);
+    pub fn assert_with_condition_and_data(
+        this: &Console,
+        condition: Option<bool>,
+        data: &[JsValue],
+    );
     #[doc = " A simple assertion test. If `condition` is falsy, an `AssertionError` is"]
     #[doc = " written with an optional message."]
     #[doc = ""]
     #[doc = " * `condition` - The condition to test"]
     #[doc = " * `data` - Optional message or data"]
     #[wasm_bindgen(method, variadic, catch, js_name = "assert")]
-    pub fn try_assert_with_condition(
+    pub fn try_assert_with_condition_and_data(
         this: &Console,
-        condition: bool,
+        condition: Option<bool>,
         data: &[JsValue],
     ) -> Result<(), JsValue>;
     #[doc = " Clears the console when possible."]
@@ -362,31 +366,31 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `label` - The timer label"]
     #[doc = " * `data` - Additional values to output"]
+    #[wasm_bindgen(method, js_name = "timeLog")]
+    pub fn time_log(this: &Console);
+    #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
+    #[doc = " and other `data` arguments."]
+    #[doc = ""]
+    #[doc = " * `label` - The timer label"]
+    #[doc = " * `data` - Additional values to output"]
+    #[wasm_bindgen(method, catch, js_name = "timeLog")]
+    pub fn try_time_log(this: &Console) -> Result<(), JsValue>;
+    #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
+    #[doc = " and other `data` arguments."]
+    #[doc = ""]
+    #[doc = " * `label` - The timer label"]
+    #[doc = " * `data` - Additional values to output"]
     #[wasm_bindgen(method, variadic, js_name = "timeLog")]
-    pub fn time_log(this: &Console, data: &[JsValue]);
+    pub fn time_log_with_label_and_data(this: &Console, label: Option<&str>, data: &[JsValue]);
     #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
     #[doc = " and other `data` arguments."]
     #[doc = ""]
     #[doc = " * `label` - The timer label"]
     #[doc = " * `data` - Additional values to output"]
     #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
-    pub fn try_time_log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
-    #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
-    #[doc = " and other `data` arguments."]
-    #[doc = ""]
-    #[doc = " * `label` - The timer label"]
-    #[doc = " * `data` - Additional values to output"]
-    #[wasm_bindgen(method, variadic, js_name = "timeLog")]
-    pub fn time_log_with_label(this: &Console, label: &str, data: &[JsValue]);
-    #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
-    #[doc = " and other `data` arguments."]
-    #[doc = ""]
-    #[doc = " * `label` - The timer label"]
-    #[doc = " * `data` - Additional values to output"]
-    #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
-    pub fn try_time_log_with_label(
+    pub fn try_time_log_with_label_and_data(
         this: &Console,
-        label: &str,
+        label: Option<&str>,
         data: &[JsValue],
     ) -> Result<(), JsValue>;
     #[doc = " Prints to `stderr` the string `'Trace: '`, followed by `util.format()`"]

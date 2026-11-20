@@ -393,10 +393,9 @@ pub(crate) fn convert_formal_params_with_synthesis(
         // number: `R2BucketPutOptions`.
         let segment = match raw_param_name.as_deref() {
             Some(p)
-                if !ctx.scopes.legacy_rust
-                    && ctx
-                        .used_type_names
-                        .contains(&format!("{parent_name}{}", to_pascal_case(p))) =>
+                if ctx
+                    .used_type_names
+                    .contains(&format!("{parent_name}{}", to_pascal_case(p))) =>
             {
                 format!("{member_name}{}", to_pascal_case(p))
             }

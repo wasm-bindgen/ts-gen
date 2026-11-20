@@ -64,10 +64,23 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    pub fn tree(node: &tree::Node, leaf: &tree::Leaf);
+    pub fn tree(node: &Object, leaf: &tree::Leaf);
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "tree")]
-    pub fn try_tree(node: &tree::Node, leaf: &tree::Leaf) -> Result<(), JsValue>;
+    pub fn try_tree(node: &Object, leaf: &tree::Leaf) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "tree")]
+    pub fn tree_with_function(node: &Function<fn(JsValue) -> Undefined>, leaf: &tree::Leaf);
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "tree")]
+    pub fn try_tree_with_function(
+        node: &Function<fn(JsValue) -> Undefined>,
+        leaf: &tree::Leaf,
+    ) -> Result<(), JsValue>;
 }

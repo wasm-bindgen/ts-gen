@@ -319,22 +319,6 @@ extern "C" {
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "floats")]
-    fn __floats_with_null(values: &::wasm_bindgen::JsValue) -> Result<String, JsValue>;
-}
-pub fn floats_with_null() -> Result<String, JsValue> {
-    __floats_with_null(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "floats")]
-    fn __floats_with_null_js_string(values: &::wasm_bindgen::JsValue) -> Result<JsString, JsValue>;
-}
-pub fn floats_with_null_js_string() -> Result<JsString, JsValue> {
-    __floats_with_null_js_string(&::wasm_bindgen::JsValue::NULL)
-}
-#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(catch, js_name = "maybeBytes")]
     pub fn maybe_bytes() -> Result<String, JsValue>;
 }

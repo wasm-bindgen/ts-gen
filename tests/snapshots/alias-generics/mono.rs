@@ -51,13 +51,9 @@ extern "C" {
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn pairs(this: &Client) -> Result<ArrayTuple<(Number, JsString)>, JsValue>;
-    #[wasm_bindgen(method, js_name = "pairs")]
-    pub fn pairs_promise(this: &Client) -> Promise<ArrayTuple<(Number, JsString)>>;
+    pub fn pairs(this: &Client) -> Promise<ArrayTuple<(Number, JsString)>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn same(this: &Client) -> Result<ArrayTuple<(Number, Number)>, JsValue>;
-    #[wasm_bindgen(method, js_name = "same")]
-    pub fn same_promise(this: &Client) -> Promise<ArrayTuple<(Number, Number)>>;
+    pub fn same(this: &Client) -> Promise<ArrayTuple<(Number, Number)>>;
     #[wasm_bindgen(method, catch)]
     pub fn boxed(this: &Client, items: &[impl ::wasm_bindgen::JsStringLike])
         -> Result<(), JsValue>;
@@ -125,7 +121,9 @@ pub mod uses {
     #[wasm_bindgen(module = "uses", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch)]
-        pub fn triple(t: &super::hidden::Triple<f64>) -> Result<(), JsValue>;
+        pub fn triple(
+            t: &ArrayTuple<(Number, JsString, super::hidden::Hidden)>,
+        ) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "uses", experimental_generic_mono)]
     extern "C" {

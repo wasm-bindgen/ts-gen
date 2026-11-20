@@ -2,7 +2,6 @@
 
 use js_sys::{JsString, Number};
 use wasm_bindgen::JsCast;
-use wasm_bindgen_futures::JsFuture;
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::generic_hoisting::{post, post_async, relay, Courier, Envelope};
@@ -46,11 +45,7 @@ async fn methods_take_any_instantiation() {
     assert_eq!(courier.send_either(&typed), "env:typed");
     assert_eq!(courier.send_either_with_str("s"), "str:s");
     assert_eq!(courier.send_async(&typed).await.unwrap(), "async:typed");
-    let promised: JsString = JsFuture::from(courier.send_async_promise(&plain))
-        .await
-        .unwrap()
-        .unchecked_into();
-    assert_eq!(promised, "async:plain");
+    assert_eq!(courier.send_async(&plain).await.unwrap(), "async:plain");
     assert_eq!(Courier::check(&typed), "check:typed");
     // The receiver's parameters and the argument's are independent.
     assert_eq!(typed.forward(&plain), "typed->plain");

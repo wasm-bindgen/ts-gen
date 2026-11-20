@@ -152,23 +152,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bucket;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(
-        this: &Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<BucketObject>, JsValue>;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise(
+    pub fn get(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<BucketObject>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_options(
-        this: &Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        options: &GetOptions,
-    ) -> Result<Option<BucketObject>, JsValue>;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_options_promise(
+    pub fn get_with_options(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,

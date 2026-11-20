@@ -54,7 +54,7 @@ extern "C" {
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn lookup() -> Result<LookupReturnKind, JsValue>;
+    pub fn lookup() -> Result<StrOrSymbol, JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
@@ -108,7 +108,7 @@ impl TaggedBuilder {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum LookupReturnKind {
+pub enum StrOrSymbol {
     String(String),
     Symbol(Symbol),
 }

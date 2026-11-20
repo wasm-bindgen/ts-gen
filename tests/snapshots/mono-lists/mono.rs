@@ -205,32 +205,22 @@ extern "C" {
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchTags")]
-    pub async fn fetch_tags() -> Result<Vec<String>, JsValue>;
+    pub fn fetch_tags() -> Promise<Vec<String>>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchTags")]
-    pub async fn fetch_tags_js_string() -> Result<Array<JsString>, JsValue>;
-}
-#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchTags")]
-    pub fn fetch_tags_promise() -> Result<Promise<Array<JsString>>, JsValue>;
+    pub fn fetch_tags_js_string() -> Promise<Array<JsString>>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchMaybeTags")]
-    pub async fn fetch_maybe_tags() -> Result<Option<Vec<String>>, JsValue>;
+    pub fn fetch_maybe_tags() -> Promise<Option<Vec<String>>>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchMaybeTags")]
-    pub async fn fetch_maybe_tags_js_string() -> Result<Option<Array<JsString>>, JsValue>;
-}
-#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchMaybeTags")]
-    pub fn fetch_maybe_tags_promise() -> Result<Promise<Option<Array<JsString>>>, JsValue>;
+    pub fn fetch_maybe_tags_js_string() -> Promise<Option<Array<JsString>>>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
@@ -330,7 +320,7 @@ extern "C" {
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "getValue")]
-    pub fn get_value() -> Result<GetValueReturnKind, JsValue>;
+    pub fn get_value() -> Result<GetValueKind, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
@@ -344,7 +334,7 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum GetValueReturnKind {
+pub enum GetValueKind {
     String(String),
     VecOfBool(Vec<bool>),
 }

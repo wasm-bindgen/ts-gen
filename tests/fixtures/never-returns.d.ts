@@ -3,7 +3,7 @@
 // Fixture: a callable returning `never` always throws, rejects or never
 // returns, so only its catching form is emitted, with a `()` success type,
 // under the bare name in every mode (no twin, so no `try_`). `Promise<never>`
-// keeps its `async fn` and `_promise` forms awaiting `()`. A `never` return
+// is a catching `Promise<()>`. A `never` return
 // overrides `@throws {never}`, and overloads apply the rule one by one,
 // literal-keyed arms included: each arm's wrapper is catch-only and bare.
 // A `never`-typed property is unaffected.

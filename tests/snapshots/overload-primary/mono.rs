@@ -88,141 +88,85 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
+    pub fn get(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_js_string(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
+    pub fn get_js_string(this: &Store, key: impl ::wasm_bindgen::JsStringLike)
+        -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_conditional(
+    pub fn get_with_conditional(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &Conditional,
-    ) -> Result<Option<String>, JsValue>;
+    ) -> Promise<Option<String>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_conditional_js_string(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-        options: &Conditional,
-    ) -> Result<Option<JsString>, JsValue>;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_conditional_promise(
+    pub fn get_with_conditional_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &Conditional,
     ) -> Promise<Option<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_get_options(
+    pub fn get_with_get_options(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
-    ) -> Result<String, JsValue>;
+    ) -> Promise<String>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_get_options_js_string(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-        options: &GetOptions,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_get_options_promise(
+    pub fn get_with_get_options_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
     ) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn first(this: &Store) -> Result<Option<String>, JsValue>;
+    pub fn first(this: &Store) -> Promise<Option<String>>;
     #[wasm_bindgen(method, catch, js_name = "first")]
-    pub async fn first_js_string(this: &Store) -> Result<Option<JsString>, JsValue>;
-    #[wasm_bindgen(method, js_name = "first")]
-    pub fn first_promise(this: &Store) -> Promise<Option<JsString>>;
+    pub fn first_js_string(this: &Store) -> Promise<Option<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "first")]
-    pub async fn first_with_column(
+    pub fn first_with_column(
         this: &Store,
         column: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<String>, JsValue>;
+    ) -> Promise<Option<String>>;
     #[wasm_bindgen(method, catch, js_name = "first")]
-    pub async fn first_with_column_js_string(
-        this: &Store,
-        column: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<JsString>, JsValue>;
-    #[wasm_bindgen(method, js_name = "first")]
-    pub fn first_with_column_promise(
+    pub fn first_with_column_js_string(
         this: &Store,
         column: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn put(
+    pub fn put(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_promise(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_options(
+    pub fn put_with_options(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_options_promise(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
-        options: &GetOptions,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_entries(this: &Store, entries: &Object<JsString>) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_entries_promise(this: &Store, entries: &Object<JsString>)
-        -> Promise<Undefined>;
+    pub fn put_with_entries(this: &Store, entries: &Object<JsString>) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_entries_and_options(
+    pub fn put_with_entries_and_options(
         this: &Store,
         entries: &Object<JsString>,
         options: &GetOptions,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_entries_and_options_promise(
-        this: &Store,
-        entries: &Object<JsString>,
-        options: &GetOptions,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
     #[wasm_bindgen(method, catch)]
-    pub async fn find(
+    pub fn find(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
-    ) -> Result<String, JsValue>;
+    ) -> Promise<String>;
     #[wasm_bindgen(method, catch, js_name = "find")]
-    pub async fn find_js_string(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-        options: &GetOptions,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, js_name = "find")]
-    pub fn find_promise(
+    pub fn find_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
     ) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "find")]
-    pub async fn find_with_f64(this: &Store, key: f64) -> Result<String, JsValue>;
+    pub fn find_with_f64(this: &Store, key: f64) -> Promise<String>;
     #[wasm_bindgen(method, catch, js_name = "find")]
-    pub async fn find_with_f64_js_string(this: &Store, key: f64) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, js_name = "find")]
-    pub fn find_with_f64_promise(this: &Store, key: f64) -> Promise<JsString>;
+    pub fn find_with_f64_js_string(this: &Store, key: f64) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
     pub fn until(this: &Store, other: &Store) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "until")]

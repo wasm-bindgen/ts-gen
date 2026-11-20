@@ -1,6 +1,7 @@
-//! The `--error-enum` lowering: every type named in a `@throws` across the
-//! output becomes one variant of a single generated enum, so a caller has
-//! one `?`-able error type and can still match on the JS error class.
+//! The `--error-enum` lowering: every error class the IR's throws enums
+//! match across the output becomes one variant of a single generated enum,
+//! so a caller has one `?`-able error type and can still match on the JS
+//! error class.
 //!
 //! `@throws {TypeError | RangeError}` otherwise lowers to the LUB (`Error`)
 //! and loses the union. An enum with a checked `From<JsValue>` keeps it:
@@ -38,6 +39,55 @@ pub fn collect_throws_names(ids: &[TypeId], surface: &Surface<'_>) -> Vec<Throws
     let mut names = Vec::new();
     collect_ids(ids, surface, &mut names);
     names
+}
+
+/// The `@throws` names standing for each error class the IR's throws
+/// enums match (see [`IrDecls::error_classes`]): the parse's own name for
+/// it where one resolves to it, else its declaration's. So a class only
+/// `err` matches, `RangeError`, has no variant, and `err`'s `TypeError`
+/// and `Error` are variants wherever there's a throws enum at all.
+///
+/// [`IrDecls::error_classes`]: crate::codegen::from_ir::IrDecls::error_classes
+pub fn ir_throws_names(
+    parsed: Vec<ThrowsName>,
+    classes: &[Result<TypeId, String>],
+    ctx: &CodegenContext<'_>,
+) -> Vec<ThrowsName> {
+    // Builtins resolve from any scope.
+    let Some(anywhere) = parsed.first().map(|n| n.scope) else {
+        return parsed;
+    };
+    let mut parsed: Vec<Option<ThrowsName>> = parsed.into_iter().map(Some).collect();
+    classes
+        .iter()
+        .map(|class| {
+            let names = |n: &ThrowsName| match class {
+                Ok(id) => resolve(n, ctx) == Some(*id),
+                Err(name) => {
+                    resolve(n, ctx).is_none_or(|id| !ctx.local_type_ids.contains(&id))
+                        && last_segment(&n.path) == name
+                }
+            };
+            if let Some(n) = parsed.iter_mut().find(|n| n.as_ref().is_some_and(names)) {
+                return n.take().expect("found");
+            }
+            match class {
+                Ok(id) => {
+                    let decl = ctx.gctx.get_type(*id);
+                    ThrowsName {
+                        path: typemap::type_decl_name(&decl.kind)
+                            .unwrap_or_default()
+                            .to_string(),
+                        scope: decl.scope_id,
+                    }
+                }
+                Err(name) => ThrowsName {
+                    path: name.clone(),
+                    scope: anywhere,
+                },
+            }
+        })
+        .collect()
 }
 
 fn collect_ids(ids: &[TypeId], surface: &Surface<'_>, names: &mut Vec<ThrowsName>) {

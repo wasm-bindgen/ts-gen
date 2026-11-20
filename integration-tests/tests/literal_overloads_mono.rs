@@ -2,12 +2,12 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Object, Promise, Uint8Array};
+use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Object, Uint8Array};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads_mono::{
-    pick_free_a, pick_free_b_with_null, Boxed, Clash, Headers, KVNamespace, KVStore, Opener,
-    Picker, Repeats, SubtleCrypto,
+    pick_free, pick_free_with_null, AOrB, Boxed, Clash, ClashKind, Headers, KVNamespace,
+    KVNamespaceKind, KVStore, Opener, Picker, Repeats, SubtleCrypto,
 };
 
 // No backing JavaScript module; compile-only coverage that under
@@ -29,8 +29,8 @@ async fn mono_arms_compile(
     let _: Option<Uint8Array> = kv.get_stream("k").await?;
     let _: Map<JsString, JsNullable<JsString>> = kv.get_text_with_slice(&["a"]).await?;
     let _: Map<JsString, JsValue> = kv.get_json_with_slice(&["a"]).await?;
-    let _: bool = kv.mode_fast();
-    let _: bool = kv.mode_safe();
+    let _: bool = kv.mode(KVNamespaceKind::Fast);
+    let _: bool = kv.mode(KVNamespaceKind::Safe);
     let _: Vec<String> = headers.get_all("Set-Cookie");
     let _: Object = crypto.export_key_jwk("k").await?;
     let _: ArrayBuffer = crypto.export_key_spki("k").await?;
@@ -49,19 +49,19 @@ async fn generic_arms_compile(store: &KVStore<JsString>) -> Result<(), JsValue> 
     Ok(())
 }
 
-// A literal cohort with a `null` arm under mono: the extern's `T` and
+// An enum beside a `null` arm under mono: the extern's `T` and
 // `impl JsStringLike` parameters stay on the typed arms, and the `null`
 // arms take neither.
 #[allow(dead_code)]
 fn null_arms_compile(picker: &Picker, buf: &ArrayBuffer) -> Result<(), JsValue> {
-    picker.pick_a(buf);
-    picker.pick_b_with_null();
-    picker.try_pick_a_with_null()?;
-    let _: Picker = Picker::make_a("x");
-    let _: Picker = Picker::make_a(JsString::from("x"));
-    let _: Picker = Picker::make_b_with_null();
-    picker.put_a(JsString::from("x"));
-    picker.put_b_with_null();
+    picker.pick(AOrB::A, buf);
+    picker.pick_with_null(AOrB::B);
+    picker.try_pick_with_null(AOrB::A)?;
+    let _: Picker = Picker::make(AOrB::A, "x");
+    let _: Picker = Picker::make(AOrB::A, JsString::from("x"));
+    let _: Picker = Picker::make_with_null(AOrB::B);
+    picker.put(AOrB::A, JsString::from("x"));
+    picker.put_with_null(AOrB::B);
     Ok(())
 }
 
@@ -73,21 +73,20 @@ fn repeated_literal_compiles(repeats: &Repeats) {
     let _: String = repeats.tag_c();
 }
 
-// A generic class: a bare static binds the type's defaults, a static
-// returning the class hoists its type arguments.
+// A generic class's statics taking an enum.
 #[allow(dead_code)]
 fn generic_class_arms_compile(obj: &Object) -> Result<(), JsValue> {
-    let _: String = Boxed::label_a();
-    let _: JsString = Boxed::label_b_js_string();
-    let _: Boxed<Object> = Boxed::of_b(obj.clone());
-    let _: Boxed<Object> = Boxed::of_a(obj.clone());
-    let _: Boxed = Boxed::new_a()?;
+    let _: String = Boxed::label(AOrB::A);
+    let _: JsString = Boxed::label_js_string(AOrB::B);
+    let _: Boxed<Object> = Boxed::of(AOrB::B, obj.clone());
+    let _: Boxed<Object> = Boxed::of(AOrB::A, obj.clone());
+    let _: Boxed = Boxed::new(AOrB::A)?;
     Ok(())
 }
 
-// A `null` arm's `_js_string` and `_promise` forms, on a generic receiver
-// and on a static returning its class; and a plain `null` arm beside a
-// cohort, whose private bindings don't collide.
+// A `null` arm's `_js_string` and promise forms, on a generic receiver
+// and on a static returning its class; and a plain `null` arm beside an
+// enum, whose private bindings don't collide.
 #[allow(dead_code)]
 async fn null_arm_forms_compile(
     picker: &Picker,
@@ -96,29 +95,28 @@ async fn null_arm_forms_compile(
     buf: &ArrayBuffer,
     obj: &Object,
 ) -> Result<(), JsValue> {
-    let _: String = picker.name_a_with_null();
-    let _: JsString = picker.name_b_with_null_js_string();
-    let _: Option<String> = picker.load_b_with_null().await?;
-    let _: Option<JsString> = picker.load_a_with_null_js_string().await?;
-    let _: Promise<Option<JsString>> = picker.load_a_with_null_promise();
-    store.put_a(JsString::from("k"), "v");
-    store.put_b_with_null(JsString::from("k"));
-    let _: Boxed<Object> = Boxed::from_a(obj.clone());
-    let _: Boxed<Object> = Boxed::from_b_with_null();
+    let _: String = picker.name_with_null(AOrB::A);
+    let _: JsString = picker.name_with_null_js_string(AOrB::B);
+    let _: Option<String> = picker.load_with_null(AOrB::B).await?;
+    let _: Option<JsString> = picker.load_with_null_js_string(AOrB::A).await?;
+    store.put(JsString::from("k"), AOrB::A, "v");
+    store.put_with_null(JsString::from("k"), AOrB::B);
+    let _: Boxed<Object> = Boxed::from(AOrB::A, obj.clone());
+    let _: Boxed<Object> = Boxed::from_with_null(AOrB::B);
     clash.mode_with_null();
-    clash.mode_x();
+    clash.mode(ClashKind::X);
     clash.f(buf);
-    clash.f_with_null();
-    clash.f_a(buf);
-    clash.f_b_with_null();
+    clash.f_with_x_null();
+    clash.f_with_kind_and_x(AOrB::A, buf);
+    clash.f_with_kind_and_x_null(AOrB::B);
     Ok(())
 }
 
 #[allow(dead_code)]
 fn free_and_constructor_null_arms_compile(buf: &ArrayBuffer, obj: &Object) -> Result<(), JsValue> {
-    pick_free_a(obj.clone());
-    pick_free_b_with_null();
-    let _: Opener = Opener::new_a(buf)?;
-    let _: Opener = Opener::new_b_with_null()?;
+    pick_free(AOrB::A, obj.clone());
+    pick_free_with_null(AOrB::B);
+    let _: Opener = Opener::new(AOrB::A, buf)?;
+    let _: Opener = Opener::new_with_null(AOrB::B)?;
     Ok(())
 }

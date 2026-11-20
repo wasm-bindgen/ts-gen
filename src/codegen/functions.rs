@@ -4,8 +4,8 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::codegen::signatures::{
-    build_signatures, generate_callable_params, is_void_return, public_rust_name,
-    render_generic_bounds, CallableSpec, FunctionSignature, Overload, SignatureKind,
+    generate_callable_params, is_void_return, public_rust_name, render_generic_bounds,
+    CallableSpec, FunctionSignature, Overload, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
 use crate::parse::scope::ScopeId;
@@ -81,7 +81,6 @@ fn emit_function(
         return_type: &decl.return_type,
         body_scope: decl.body_scope,
         throws: &decl.throws,
-        async_modifier: decl.async_modifier,
         doc,
     })
     .chain(decl.overloads.iter().map(|o| Overload {
@@ -89,18 +88,23 @@ fn emit_function(
         return_type: &o.return_type,
         body_scope: o.body_scope,
         throws: &o.throws,
-        async_modifier: o.async_modifier,
         doc: &o.doc,
     }))
     .collect();
-    let sigs = build_signatures(
-        &CallableSpec {
-            js_name: &decl.js_name,
-            rust_name: Some(&rust_name),
-            kind: SignatureKind::Function,
-            overloads: &overloads,
-            module: ctx,
-        },
+    let spec = CallableSpec {
+        js_name: &decl.js_name,
+        rust_name: Some(&rust_name),
+        kind: SignatureKind::Function,
+        overloads: &overloads,
+        module: ctx,
+    };
+    let sigs = super::ir_callables::build(
+        &spec,
+        Some(super::ir_callables::Site {
+            module: ctx.specifier(),
+            path: js_namespace,
+            form: super::ir_callables::Form::Function,
+        }),
         &mut value_names.idents,
         cgctx,
     );
@@ -130,7 +134,6 @@ fn generate_expanded_free_function(
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
-        sig.is_async,
         sig.js_string_return,
         sig.error_type.as_ref(),
         cgctx,
@@ -170,12 +173,6 @@ fn generate_expanded_free_function(
         quote! { -> #ret_ty }
     };
 
-    let async_kw = if sig.is_async {
-        quote! { async }
-    } else {
-        quote! {}
-    };
-
     let wb_extern_attr = CodegenContext::extern_attr(cgctx, ctx.specifier());
 
     let generics = render_generic_bounds(&bounds);
@@ -187,7 +184,7 @@ fn generate_expanded_free_function(
             #doc
             #literal
             #wb_attr
-            pub #async_kw fn #rust_ident #generics (#params) #ret;
+            pub fn #rust_ident #generics (#params) #ret;
         }
     }
 }
@@ -212,11 +209,10 @@ fn generic_bounds_for_function(
     if names.is_empty() {
         return Vec::new();
     }
-    let bounds = names
+    names
         .iter()
         .map(|n| CodegenContext::type_param_decl(Some(cgctx), n))
-        .collect();
-    super::classes::widen_async_return_param(bounds, Some(cgctx), sig)
+        .collect()
 }
 
 /// The names wasm-bindgen's expansion of an import and the dictionary
@@ -338,14 +334,32 @@ pub fn generate_variable(
         return TokenStream::new();
     }
     if let Some(cgctx) = cgctx {
-        if let Some(targets) = construct_targets(decl, cgctx) {
+        if let Some(targets) = construct_targets(decl, js_namespace, cgctx) {
             return generate_constructs(decl, &targets, ctx, cgctx, doc, js_namespace);
         }
     }
     let base = value_names.take(&binding, ident_chars(&decl.name));
     let rust_name = value_names.idents.declare(&base, Suffix::Snake);
     let rust_ident = super::typemap::make_ident(&rust_name);
-    let ty = to_syn_type(&decl.type_ref, TypePosition::RETURN, cgctx, scope, ctx);
+    let site = super::ir_callables::Site {
+        module: ctx.specifier(),
+        path: js_namespace,
+        form: super::ir_callables::Form::Variable,
+    };
+    let type_ref = match super::ir_callables::accessor(
+        cgctx,
+        Some(site),
+        &decl.js_name,
+        &decl.type_ref,
+        scope,
+    ) {
+        Some(t) => t,
+        None if super::ir_callables::unread(cgctx, Some(site), &decl.js_name) => {
+            return TokenStream::new();
+        }
+        None => decl.type_ref.clone(),
+    };
+    let ty = to_syn_type(&type_ref, TypePosition::RETURN, cgctx, scope, ctx);
     let doc = super::doc_tokens(doc);
 
     let mut wb_parts: Vec<TokenStream> = vec![quote! { thread_local_v2 }];
@@ -374,11 +388,24 @@ pub fn generate_variable(
 }
 
 /// The types `decl`'s construct signatures construct, claimed, when they
-/// bind as constructors of them: each must be a local extern type with no
-/// `new` of its own, as a class constructor, a dictionary builder, a member
-/// named `new` or another variable's constructor would collide with it.
+/// bind as constructors of them, with each one's Rust name. The IR names a
+/// type's constructor through the variable (`@js(new = Wrap2) new
+/// wrap2(...)`), or the variable where a member of the type is already
+/// `new`. Without the IR, each must be a local extern type with no `new` of
+/// its own, as a class constructor, a dictionary builder, a member named
+/// `new` or another variable's constructor would collide with it.
 /// Otherwise the variable binds as a value.
-fn construct_targets(decl: &VariableDecl, cgctx: &CodegenContext<'_>) -> Option<Vec<TypeId>> {
+fn construct_targets(
+    decl: &VariableDecl,
+    js_namespace: &[String],
+    cgctx: &CodegenContext<'_>,
+) -> Option<Vec<(TypeId, String)>> {
+    let value: Vec<&str> = js_namespace
+        .iter()
+        .map(String::as_str)
+        .chain([decl.js_name.as_str()])
+        .collect();
+    let value = value.join(".");
     let mut targets = Vec::new();
     for construct in &decl.constructs {
         let crate::ir::TypeRef::Reference { segments, .. } = &construct.return_type else {
@@ -388,19 +415,25 @@ fn construct_targets(decl: &VariableDecl, cgctx: &CodegenContext<'_>) -> Option<
             .gctx
             .resolve_path(construct.body_scope, &segments.join("."))
             .filter(|id| cgctx.local_type_ids.contains(id))?;
-        let members = match &cgctx.gctx.get_type(id).kind {
-            TypeKind::Class(c) => &c.members,
-            TypeKind::Interface(i)
-                if i.classification != crate::ir::InterfaceClassification::Dictionary =>
-            {
-                &i.members
-            }
+        let (members, dictionary) = match &cgctx.gctx.get_type(id).kind {
+            TypeKind::Class(c) => (&c.members, false),
+            TypeKind::Interface(i) => (
+                &i.members,
+                i.classification == crate::ir::InterfaceClassification::Dictionary,
+            ),
             _ => return None,
         };
-        if members.iter().any(member_is_new) || cgctx.constructed.borrow().contains(&id) {
-            return None;
-        }
-        targets.push(id);
+        let new = members.iter().any(member_is_new);
+        let name = match cgctx.ir.as_ref() {
+            Some(ir) => match ir.value_constructor(id, &value)? {
+                Some(name) => name.to_string(),
+                None if new => crate::util::naming::to_snake_case(&decl.js_name),
+                None => "new".to_string(),
+            },
+            None if dictionary || new || cgctx.constructed.borrow().contains(&id) => return None,
+            None => "new".to_string(),
+        };
+        targets.push((id, name));
     }
     if targets.is_empty() {
         return None;
@@ -408,7 +441,7 @@ fn construct_targets(decl: &VariableDecl, cgctx: &CodegenContext<'_>) -> Option<
     cgctx
         .constructed
         .borrow_mut()
-        .extend(targets.iter().copied());
+        .extend(targets.iter().map(|(id, _)| *id));
     Some(targets)
 }
 
@@ -430,7 +463,7 @@ fn member_is_new(member: &Member) -> bool {
 /// returning the `Rpc.Stub<T>` the alias names.
 fn generate_constructs(
     decl: &VariableDecl,
-    targets: &[TypeId],
+    targets: &[(TypeId, String)],
     ctx: &ModuleContext,
     cgctx: &CodegenContext<'_>,
     doc: &Option<String>,
@@ -440,8 +473,8 @@ fn generate_constructs(
     // Overloads constructing the same type are named together, as
     // `new_with_*`, like a class's constructors, and names are taken per
     // type, whose impl they go on.
-    let mut groups: Vec<(&FunctionDecl, TypeId, Vec<Overload>)> = Vec::new();
-    for (construct, &target) in decl.constructs.iter().zip(targets) {
+    let mut groups: Vec<(&FunctionDecl, &(TypeId, String), Vec<Overload>)> = Vec::new();
+    for (construct, target) in decl.constructs.iter().zip(targets) {
         let same = |first: &FunctionDecl| {
             first.return_type == construct.return_type
                 && first
@@ -455,7 +488,6 @@ fn generate_constructs(
             return_type: &construct.return_type,
             body_scope: construct.body_scope,
             throws: &construct.throws,
-            async_modifier: false,
             doc,
         };
         match groups.iter_mut().find(|(first, _, _)| same(first)) {
@@ -465,15 +497,21 @@ fn generate_constructs(
     }
     let mut names: HashMap<TypeId, LocalScope> = HashMap::new();
     let mut items = Vec::new();
-    for (_, target, overloads) in &groups {
-        let sigs = build_signatures(
+    for (_, (target, name), overloads) in &groups {
+        let site = cgctx.ir.as_ref().and_then(|ir| ir.location(*target));
+        let sigs = super::ir_callables::build(
             &CallableSpec {
                 js_name: js_class,
-                rust_name: None,
+                rust_name: (name != "new").then_some(name.as_str()),
                 kind: SignatureKind::Constructor,
                 overloads,
                 module: ctx,
             },
+            site.map(|loc| super::ir_callables::Site {
+                module: loc.module.as_deref(),
+                path: &loc.path,
+                form: super::ir_callables::Form::Value,
+            }),
             names.entry(*target).or_default(),
             Some(cgctx),
         );
@@ -486,7 +524,6 @@ fn generate_constructs(
             let ret = to_return_type(
                 &sig.return_type,
                 sig.catch,
-                false,
                 sig.js_string_return,
                 sig.error_type.as_ref(),
                 Some(cgctx),

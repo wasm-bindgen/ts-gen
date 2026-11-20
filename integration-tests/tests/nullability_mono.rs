@@ -31,7 +31,6 @@ fn nullability_mono_signatures_compile(
     let _: Settings = Settings::builder(None, js_string, None)
         .key_with_f64(2.0)
         .key_with_null()
-        .both_with_null()
         .build();
 
     optional_with_x("x");
@@ -39,22 +38,17 @@ fn nullability_mono_signatures_compile(
     nullable_with_null();
     let _: Option<String> = both_with_x(js_string);
     let _: Option<JsString> = both_js_string();
-    let _: Option<JsString> = both_with_null_js_string();
-    let _: Option<String> = opt_aliased_null_with_null();
     scalar();
     scalar_with_str("x");
     scalar_with_str(js_string);
     scalar_with_f64(1.0);
-    scalar_with_null();
     scalar_null_with_f64(1.0);
     scalar_null("x");
     scalar_optional_with_str(js_string);
-    scalar_optional_with_null();
     let _: Option<JsString> = generic(js_string.clone());
     let _: Option<f64> = generic(1.0);
     let _: Option<f64> = generic_with_null();
     let _: Option<String> = generic_both_with_x(String::from("x"));
-    let _: Option<String> = generic_both_with_null();
 
     pair(js_string);
     pair_with_f64(1.0);
@@ -62,7 +56,6 @@ fn nullability_mono_signatures_compile(
     leading(Some("a"), 1.0);
     leading(None, 1.0);
     chain_with_a_and_b(None, 1.0);
-    chain_with_a_and_null(Some("a"));
     chain_three_with_a_and_b_and_c(None, Some(1.0), true);
     chain_union_with_str(js_string);
     chain_union_with_str_and_b(None, 1.0);
@@ -101,8 +94,4 @@ async fn nullability_mono_async_compile(registry_value: &Registry) {
     let _: Result<Option<f64>, _> = fetch_generic::<f64>().await;
     let _: Result<Option<JsString>, _> =
         wasm_bindgen_futures::JsFuture::from(registry_value.pending()).await;
-    let _: Result<Option<Registry>, _> = fetch_null_promise().await;
-    let _: Promise<Option<Number>> = fetch_optional_promise();
-    let _: Promise<Option<JsString>> = fetch_both_promise();
-    let _: Promise<Option<JsString>> = fetch_generic_promise::<JsString>();
 }

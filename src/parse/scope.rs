@@ -177,8 +177,6 @@ pub struct ScopeArena {
     /// by the scope their declaration is declared in and its name. Only the
     /// IR producer reads them.
     symbol_members: HashMap<(ScopeId, String), Vec<crate::ir::Member>>,
-    /// See [`super::Options::legacy_rust`].
-    pub legacy_rust: bool,
 }
 
 impl ScopeArena {
@@ -189,7 +187,6 @@ impl ScopeArena {
             erased_bounds: HashMap::new(),
             nullish: Default::default(),
             symbol_members: HashMap::new(),
-            legacy_rust: false,
         }
     }
 

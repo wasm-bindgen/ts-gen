@@ -73,8 +73,6 @@ async fn awaited_string_lists_have_a_handle_variant() {
     assert_eq!(fetch_tags().await.unwrap(), ["x"]);
     let handle: Array<JsString> = fetch_tags_js_string().await.unwrap();
     assert_eq!(handle.length(), 1);
-    let handle: Array<JsString> = fetch_tags_promise().await.unwrap();
-    assert_eq!(handle.length(), 1);
     let maybe: Option<Vec<String>> = fetch_maybe_tags().await.unwrap();
     assert_eq!(maybe, Some(vec!["y".to_string(), "z".to_string()]));
     let maybe: Option<Array<JsString>> = fetch_maybe_tags_js_string().await.unwrap();
@@ -85,7 +83,7 @@ async fn awaited_string_lists_have_a_handle_variant() {
 fn boolean_lists_cross_as_bool() {
     assert_eq!(flags(&[true, false]), "Array(boolean:true,boolean:false)");
     assert_eq!(get_flags(), [true, false]);
-    assert!(matches!(get_value(), GetValueReturnKind::VecOfBool(v) if v == [true, false]));
+    assert!(matches!(get_value(), GetValueKind::VecOfBool(v) if v == [true, false]));
 }
 
 #[wasm_bindgen_test]

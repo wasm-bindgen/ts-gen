@@ -27,6 +27,16 @@ export declare function lookupAsync(key: string): Promise<string | null | undefi
 /** Resolves to `null` for an unknown key. */
 export declare function find(key: string): Promise<Options | null>;
 
+/**
+ * `lookup` held in a property, typed `string | undefined` though it resolves
+ * `null` for an unknown key: the awaited value is a `JsOption`.
+ */
+export interface Pending {
+  readonly value: Promise<string | undefined>;
+}
+
+export declare function pending(key: string): Pending;
+
 /** Tells `undefined`, `null` and a value apart. */
 export declare function classify(value: string | null | undefined): string;
 

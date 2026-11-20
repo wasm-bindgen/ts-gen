@@ -14,9 +14,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Grid;
     #[wasm_bindgen(method, catch)]
-    pub async fn rows(this: &Grid) -> Result<Vec<Array<JsString>>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "rows")]
-    pub fn rows_promise(this: &Grid) -> Result<Promise<Array<Array<JsString>>>, JsValue>;
+    pub fn rows(this: &Grid) -> Promise<Vec<Array<JsString>>>;
     #[wasm_bindgen(method, catch, js_name = "putRows")]
     pub fn put_rows(this: &Grid, rows: &[Array<Number>]) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]

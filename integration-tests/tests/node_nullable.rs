@@ -4,10 +4,9 @@
 // default initializer fires on `undefined`, `=== null` is checked. Writes
 // send `null` through their own `_with_null` variant, and omission sends no
 // argument. Reads, an awaited value included, are `Option<T>`: a received
-// `null` is `None` like a received `undefined`, while the `_promise` form's
-// `JsNullable` handle still tells them apart.
-use js_sys::{JsNullable, JsString};
-use wasm_bindgen::JsValue;
+// `null` is `None` like a received `undefined`. `T | null | undefined` is
+// the IR's `T?`, writing `undefined`; `node_nullable_strict` keeps its
+// three states.
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::node_nullable::*;
@@ -25,16 +24,14 @@ fn optional_parameter_is_omitted_or_present() {
 }
 
 #[wasm_bindgen_test]
-fn optional_nullable_parameter_has_three_inputs() {
+fn optional_nullable_parameter_is_omitted_or_present() {
     assert_eq!(greet(), "hello world");
-    assert_eq!(greet_with_null(), "hello nobody");
     assert_eq!(greet_with_name("g"), "hello g");
 }
 
 #[wasm_bindgen_test]
-fn optional_nullable_argument_sends_each_state() {
+fn optional_nullable_argument_sends_undefined_or_a_value() {
     assert_eq!(classify(), "undefined");
-    assert_eq!(classify_with_null(), "null");
     assert_eq!(classify_with_value("v"), "value:v");
 }
 
@@ -49,17 +46,19 @@ fn optional_nullable_return_reads_either_empty_as_none() {
 async fn awaited_value_reads_either_empty_as_none() {
     let value = |s: &str| Some(s.to_string());
     assert_eq!(lookup_async("known").await.unwrap(), value("value"));
-    let handle: JsNullable<JsString> = lookup_async_promise("known").await.unwrap();
-    assert_eq!(handle.as_option(), Some(JsString::from("value")));
-    let handle: JsNullable<JsString> = lookup_async_promise("other").await.unwrap();
-    assert!(JsValue::is_null(&handle));
-    let handle: JsNullable<JsString> = lookup_async_promise("empty").await.unwrap();
-    assert!(JsValue::is_undefined(&handle));
     assert_eq!(lookup_async("other").await.unwrap(), None);
     assert_eq!(lookup_async("empty").await.unwrap(), None);
     assert!(find("other").await.unwrap().is_none());
     let found = find("known").await.unwrap().unwrap();
     assert_eq!(found.label(), value("found"));
+}
+
+#[wasm_bindgen_test]
+async fn inner_option_reads_null_as_empty() {
+    let known = pending("known").value().await.unwrap();
+    assert_eq!(known.into_option().map(String::from), Some("value".into()));
+    assert!(pending("other").value().await.unwrap().is_empty());
+    assert!(pending("empty").value().await.unwrap().is_empty());
 }
 
 #[wasm_bindgen_test]
@@ -89,7 +88,6 @@ fn trailing_undefined_is_omitted() {
     assert_eq!(arity(), "0:-");
     assert_eq!(arity_with_a("x"), "1:x");
     assert_eq!(arity_with_a_and_b(Some("x"), 2.0), "2:2");
-    assert_eq!(arity_with_a_and_null(Some("x")), "2:null");
 }
 
 #[wasm_bindgen_test]

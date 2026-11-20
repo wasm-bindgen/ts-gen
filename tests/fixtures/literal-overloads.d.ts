@@ -52,7 +52,7 @@ export declare class Picker {
   put<T>(kind: "a" | "b", x: T | null): void;
   /** Under mono, each `null` arm has a `_js_string` sibling. */
   name(kind: "a" | "b", x: ArrayBuffer | null): string;
-  /** `_promise` forms follow per `null` arm. */
+  /** Each `null` arm is its own promise. */
   load(kind: "a" | "b", x: ArrayBuffer | null): Promise<string | null>;
 }
 

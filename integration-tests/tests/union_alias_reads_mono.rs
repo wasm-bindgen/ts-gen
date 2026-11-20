@@ -15,24 +15,24 @@ use ts_gen_integration_tests::union_alias_reads_mono::*;
 fn nested_aliases_read_as_one_union() {
     assert!(matches!(
         options("zoned").relative_to(),
-        Some(RelativeToKind::Zoned(z)) if z.zone() == "UTC"
+        Some(ZonedLikeOrDayLike::Zoned(z)) if z.zone() == "UTC"
     ));
     assert!(matches!(
         options("day").relative_to(),
-        Some(RelativeToKind::Day(d)) if d.day() == 3.0
+        Some(ZonedLikeOrDayLike::Day(d)) if d.day() == 3.0
     ));
     assert!(matches!(
         options("string").relative_to(),
-        Some(RelativeToKind::String(s)) if s == "2020-01-01"
+        Some(ZonedLikeOrDayLike::String(s)) if s == "2020-01-01"
     ));
     assert!(matches!(
         options("dayFields").relative_to(),
-        Some(RelativeToKind::Object(_))
+        Some(ZonedLikeOrDayLike::Object(_))
     ));
     assert!(options("missing").relative_to().is_none());
     assert!(matches!(
         relative_to("zonedFields"),
-        RelativeToKind::Object(_)
+        ZonedLikeOrDayLike::Object(_)
     ));
 }
 
@@ -107,7 +107,7 @@ fn from_and_equals_take_every_arm() {
     assert!(day.try_equals(String::from("10")).unwrap());
 
     let options = FromOptions::builder()
-        .overflow(OverflowKind::Reject)
+        .overflow(FromOptionsOverflowKind::Reject)
         .build();
     let _ = Day::from_with_options("1", &options);
     assert_eq!(day.until(&fields), 0.0);
@@ -126,11 +126,10 @@ fn primitive_arms_take_their_rust_values() {
 #[wasm_bindgen_test]
 fn compose_with_literals_nulls_options_and_async() {
     let day = Day::new(10.0).unwrap();
-    assert_eq!(day.step_next("1"), "next:string");
-    assert_eq!(day.step_previous(&day), "previous:day");
+    assert_eq!(day.step(DayDirectionKind::Next, "1"), "next:string");
+    assert_eq!(day.step(DayDirectionKind::Previous, &day), "previous:day");
     assert_eq!(day.pick(), "none");
     assert_eq!(day.pick_with_other(&day), "day");
-    assert_eq!(day.pick_with_null(), "null");
     // `undefined` that can't be omitted takes the enum in its `Option`.
     assert_eq!(day.between(None, "1"), "undefined..string");
     assert_eq!(

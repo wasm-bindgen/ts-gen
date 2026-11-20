@@ -35,22 +35,19 @@ extern "C" {
 }
 #[wasm_bindgen(module = "namespace-type-aliases")]
 extern "C" {
-    pub fn loose(x: &str);
-}
-#[wasm_bindgen(module = "namespace-type-aliases")]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "loose")]
-    pub fn try_loose(x: &str) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "namespace-type-aliases")]
-extern "C" {
     #[wasm_bindgen(js_name = "loose")]
-    pub fn loose_with_f64(x: f64);
+    fn __loose(x: LooseStr);
+}
+pub fn loose(x: impl ::core::convert::Into<LooseStr>) {
+    __loose(x.into())
 }
 #[wasm_bindgen(module = "namespace-type-aliases")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "loose")]
-    pub fn try_loose_with_f64(x: f64) -> Result<(), JsValue>;
+    fn __try_loose(x: LooseStr) -> Result<(), JsValue>;
+}
+pub fn try_loose(x: impl ::core::convert::Into<LooseStr>) -> Result<(), JsValue> {
+    __try_loose(x.into())
 }
 #[wasm_bindgen(module = "namespace-type-aliases")]
 extern "C" {
@@ -184,5 +181,41 @@ pub mod events {
             # [wasm_bindgen (catch , js_name = "find" , js_namespace = ["Events" , "Inner"])]
             pub fn try_find(id: &str) -> Result<super::Options, JsValue>;
         }
+    }
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum LooseStr {
+    String(String),
+    F64(f64),
+}
+impl ::core::convert::From<&str> for LooseStr {
+    fn from(value: &str) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<::std::string::String> for LooseStr {
+    fn from(value: ::std::string::String) -> Self {
+        Self::String(value)
+    }
+}
+impl ::core::convert::From<&::std::string::String> for LooseStr {
+    fn from(value: &::std::string::String) -> Self {
+        Self::String(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::JsString> for LooseStr {
+    fn from(value: ::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::JsString> for LooseStr {
+    fn from(value: &::js_sys::JsString) -> Self {
+        Self::String(::std::string::String::from(value))
+    }
+}
+impl ::core::convert::From<f64> for LooseStr {
+    fn from(value: f64) -> Self {
+        Self::F64(value)
     }
 }

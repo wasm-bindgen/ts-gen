@@ -1,10 +1,10 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{JsString, Object, Reflect};
+use js_sys::JsString;
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::alias_constructors::{
-    pt, unwrap_text, wrap2, Counter, Label, MultiA, MultiB, Point, Stub, Wrap,
+    unwrap_text, CapNew, Counter, Label, MultiA, MultiB, Point, StaticNew, Stub, Wrap,
 };
 
 // The `const` constructs the type its alias names, so the stub passes
@@ -21,11 +21,16 @@ fn alias_constructors_construct_the_aliased_type() {
     assert_eq!(MultiB::new(2.0).unwrap().b(), 2.0);
 }
 
+// A type another variable already constructs, or with a `new` of its own,
+// takes a constructor named after the variable.
 #[wasm_bindgen_test]
-fn colliding_alias_constructors_bind_as_values() {
+fn colliding_alias_constructors_are_named_after_their_values() {
     let _: Point = Point::new();
     let _: Stub<JsString> = Stub::new(&JsString::from("x")).unwrap();
-    let name = |ctor: &Object| Reflect::get_str(ctor, &"name".into()).unwrap().unwrap();
-    assert!(pt.with(name) == "Pt");
-    assert!(wrap2.with(name) == "Wrap");
+    let point: Point = Point::pt().unwrap();
+    assert_eq!(point.x(), Some(1.0));
+    let stub: Stub<JsString> = Stub::wrap2(&JsString::from("y")).unwrap();
+    assert_eq!(stub.get(), "y");
+    let _: StaticNew = StaticNew::sn().unwrap();
+    let _: CapNew = CapNew::cn().unwrap();
 }
