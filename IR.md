@@ -644,6 +644,24 @@ take a parameter, so a flattened overload builds its dictionary in one
 call: `args = (m? { from = from, text = text })`. They're type-checked
 against IR members, and no JS API gets special treatment.
 
+A dictionary field that can hold only one string literal is a constant
+as well, and the producer fills it: a required field typed by the literal
+(`mode: "byob"`), or by a type parameter the parameter's type gives one
+(`options: GetOptions<"arrayBuffer">` over `type: Type`).
+
+```
+@js(name = "get", args = (key, options? { type = "arrayBuffer" }))
+getArrayBuffer(key: str, options: GetOptions<Any?>?): future<ArrayBuffer?>;
+```
+
+* The parameter is nullable, as a fill makes the object when it's absent.
+* The type argument giving the literal is left open (`Any?`), and the
+  field it types is optional on the dictionary, so no caller writes it,
+  and one that does is overridden.
+* Overloads that differ only in the literal collide, and are renamed by
+  it as for a positional constant (`getText`, `getArrayBuffer`).
+* A type parameter bounded by literals keeps its enums instead.
+
 * A path through a nullable parameter reads it without supplying it, and
   is `undefined` when the parameter is absent: `init.signal` with no
   `init`.

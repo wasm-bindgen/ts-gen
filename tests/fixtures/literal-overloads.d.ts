@@ -90,3 +90,22 @@ export declare function pickFree<T>(kind: "a" | "b", x: T | null): void;
 export declare class Opener {
   constructor(kind: "a" | "b", x: ArrayBuffer | null);
 }
+
+// A literal a dictionary parameter's type fixes, through a type argument
+// (`GetOptions<"json">`) or a field of one literal (`mode: "byob"`), is the
+// call's to give: each overload is a binding of its own, named by the
+// literal where they collide, whose wrapper sets the field on a copy of
+// the caller's options. The field is optional on the dictionary.
+export interface GetOptions<Type> {
+  type: Type;
+  ttl?: number;
+}
+export interface Store {
+  read(key: string): Promise<string | null>;
+  read(key: string, options?: GetOptions<"text">): Promise<string | null>;
+  read<T = unknown>(key: string, options?: GetOptions<"json">): Promise<T | null>;
+  read(key: string, options?: GetOptions<"arrayBuffer">): Promise<ArrayBuffer | null>;
+  tail(options: GetOptions<"lines">): string;
+  open(reader: { mode: "byob"; size?: number }): string;
+}
+export declare function store(): Store;

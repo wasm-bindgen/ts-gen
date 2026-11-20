@@ -49,6 +49,10 @@ pub struct ParsedModule {
 pub struct GlobalContext {
     pub scopes: ScopeArena,
     pub diagnostics: DiagnosticCollector,
+    /// The dictionary fields a call fills with the string literal its
+    /// parameter passes as a type argument, by declaration and JS name;
+    /// see [`crate::parse::classify::literal_fields_optional`].
+    pub literal_fills: std::collections::HashSet<(TypeId, String)>,
     /// Projections of a class's or interface's literal-only type parameter
     /// (`PluralizeUnit<Units>`), kept unevaluated for the IR producer, by
     /// the declaration's body scope and the reference's TS spelling.
@@ -205,6 +209,7 @@ impl GlobalContext {
         Self {
             scopes: ScopeArena::new(),
             diagnostics: DiagnosticCollector::new(),
+            literal_fills: Default::default(),
             projections: Default::default(),
             utilities: Default::default(),
             external_map: ExternalMap::new(),

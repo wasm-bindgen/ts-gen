@@ -639,6 +639,333 @@ impl Opener {
         Self::__new_with_null(kind, &::wasm_bindgen::JsValue::NULL)
     }
 }
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type GetOptions<Type: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "type")]
+    pub fn type_<Type: ::wasm_bindgen::JsGeneric>(this: &GetOptions<Type>) -> Option<Type>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type<Type: ::wasm_bindgen::JsGeneric>(this: &GetOptions<Type>, val: &Type);
+    #[wasm_bindgen(method, getter)]
+    pub fn ttl<Type: ::wasm_bindgen::JsGeneric>(this: &GetOptions<Type>) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_ttl<Type: ::wasm_bindgen::JsGeneric>(this: &GetOptions<Type>, val: f64);
+}
+impl<Type: ::wasm_bindgen::JsGeneric> GetOptions<Type> {
+    pub fn new_typed() -> GetOptions<Type> {
+        Self::builder_typed().build()
+    }
+    pub fn builder_typed() -> GetOptionsBuilder<Type> {
+        GetOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl GetOptions<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> GetOptionsBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
+impl<Type: ::wasm_bindgen::JsGeneric> Default for GetOptions<Type> {
+    fn default() -> Self {
+        Self::new_typed()
+    }
+}
+pub struct GetOptionsBuilder<Type: ::wasm_bindgen::JsGeneric> {
+    inner: GetOptions<Type>,
+}
+impl<Type: ::wasm_bindgen::JsGeneric> GetOptionsBuilder<Type> {
+    pub fn type_(self, val: &Type) -> Self {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn ttl(self, val: f64) -> Self {
+        self.inner.set_ttl(val);
+        self
+    }
+    pub fn build(self) -> GetOptions<Type> {
+        self.inner
+    }
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Store;
+    #[wasm_bindgen(method, catch)]
+    pub async fn read(this: &Store, key: &str) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "read")]
+    pub fn read_promise(this: &Store, key: &str) -> Promise<JsNullable<JsString>>;
+    #[wasm_bindgen(method, catch, js_name = "read")]
+    async fn __read_text_with_options(
+        this: &Store,
+        key: &str,
+        options: &GetOptions,
+    ) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "read")]
+    fn __read_text_with_options_promise(
+        this: &Store,
+        key: &str,
+        options: &GetOptions,
+    ) -> Promise<JsNullable<JsString>>;
+    #[wasm_bindgen(method, catch, js_name = "read")]
+    async fn __read_json_with_options(
+        this: &Store,
+        key: &str,
+        options: &GetOptions,
+    ) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "read")]
+    fn __read_json_with_options_promise(this: &Store, key: &str, options: &GetOptions) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "read")]
+    async fn __read_array_buffer_with_options(
+        this: &Store,
+        key: &str,
+        options: &GetOptions,
+    ) -> Result<Option<ArrayBuffer>, JsValue>;
+    #[wasm_bindgen(method, js_name = "read")]
+    fn __read_array_buffer_with_options_promise(
+        this: &Store,
+        key: &str,
+        options: &GetOptions,
+    ) -> Promise<JsNullable<ArrayBuffer>>;
+    #[wasm_bindgen(method, catch, js_name = "read")]
+    async fn __read_json_with_options_typed<T: ::wasm_bindgen::JsGeneric>(
+        this: &Store,
+        key: &str,
+        options: &GetOptions,
+    ) -> Result<Option<T>, JsValue>
+    where
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, js_name = "read")]
+    fn __read_json_with_options_typed_promise<T: ::wasm_bindgen::JsGeneric>(
+        this: &Store,
+        key: &str,
+        options: &GetOptions,
+    ) -> Promise<JsNullable<T>>;
+    #[wasm_bindgen(method, js_name = "tail")]
+    fn __tail(this: &Store, options: &GetOptions) -> String;
+    #[wasm_bindgen(method, catch, js_name = "tail")]
+    fn __try_tail(this: &Store, options: &GetOptions) -> Result<String, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn open(this: &Store, reader: &StoreReader) -> String;
+    #[wasm_bindgen(method, catch, js_name = "open")]
+    pub fn try_open(this: &Store, reader: &StoreReader) -> Result<String, JsValue>;
+}
+impl Store {
+    pub async fn read_text_with_options(
+        &self,
+        key: &str,
+        options: &GetOptions,
+    ) -> Result<Option<String>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__read_text_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn read_text_with_options_promise(
+        &self,
+        key: &str,
+        options: &GetOptions,
+    ) -> Promise<JsNullable<JsString>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__read_text_with_options_promise(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+    pub async fn read_json_with_options(
+        &self,
+        key: &str,
+        options: &GetOptions,
+    ) -> Result<JsValue, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__read_json_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn read_json_with_options_promise(&self, key: &str, options: &GetOptions) -> Promise {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__read_json_with_options_promise(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+    pub async fn read_array_buffer_with_options(
+        &self,
+        key: &str,
+        options: &GetOptions,
+    ) -> Result<Option<ArrayBuffer>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
+        );
+        self.__read_array_buffer_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn read_array_buffer_with_options_promise(
+        &self,
+        key: &str,
+        options: &GetOptions,
+    ) -> Promise<JsNullable<ArrayBuffer>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
+        );
+        self.__read_array_buffer_with_options_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn read_json_with_options_typed<T: ::wasm_bindgen::JsGeneric>(
+        &self,
+        key: &str,
+        options: &GetOptions,
+    ) -> Result<Option<T>, JsValue>
+    where
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__read_json_with_options_typed(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn read_json_with_options_typed_promise<T: ::wasm_bindgen::JsGeneric>(
+        &self,
+        key: &str,
+        options: &GetOptions,
+    ) -> Promise<JsNullable<T>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__read_json_with_options_typed_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub fn tail(&self, options: &GetOptions) -> String {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("lines"),
+        );
+        self.__tail(::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+    pub fn try_tail(&self, options: &GetOptions) -> Result<String, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("lines"),
+        );
+        self.__try_tail(::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StoreReader;
+    #[wasm_bindgen(method, getter)]
+    pub fn mode(this: &StoreReader) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_mode(this: &StoreReader, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn size(this: &StoreReader) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_size(this: &StoreReader, val: f64);
+}
+impl StoreReader {
+    #[doc = " Construct with `mode: \"byob\"`."]
+    pub fn new() -> StoreReader {
+        Self::builder().build()
+    }
+    #[doc = " Start a builder with `mode: \"byob\"`."]
+    pub fn builder() -> StoreReaderBuilder {
+        let inner: StoreReader = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_mode("byob");
+        StoreReaderBuilder { inner }
+    }
+}
+pub struct StoreReaderBuilder {
+    inner: StoreReader,
+}
+impl StoreReaderBuilder {
+    pub fn size(self, val: f64) -> Self {
+        self.inner.set_size(val);
+        self
+    }
+    pub fn build(self) -> StoreReader {
+        self.inner
+    }
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    pub fn store() -> Store;
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "store")]
+    pub fn try_store() -> Result<Store, JsValue>;
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KVNamespaceKind {

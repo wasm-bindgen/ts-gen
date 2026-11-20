@@ -202,6 +202,22 @@ fn restated(
     let legacy = expand_signatures(spec.overloads, spec.kind, Some(cgctx));
     let bound: Vec<ScopeId> = spec.overloads.iter().map(|o| o.body_scope).collect();
     let mut overloads = ir.callable(cgctx.gctx, site, spec.js_name, scope, &bound)?;
+    // A field the declaration types by one literal is set by the
+    // dictionary's factories; a wrapper fills those a type argument gives.
+    for o in &mut overloads {
+        let params = &o.params;
+        o.fills.retain(|(j, field, _)| {
+            let t = &params[*j].type_ref;
+            let core = t.split_empties().map(|(core, _)| core);
+            match core.as_ref().unwrap_or(t) {
+                TypeRef::Reference { segments, .. } => cgctx
+                    .gctx
+                    .resolve_path(scope, &segments.join("."))
+                    .is_some_and(|id| cgctx.gctx.literal_fills.contains(&(id, field.clone()))),
+                _ => false,
+            }
+        });
+    }
     // Each overload's typed array parameters, beside which Rust reads an
     // element array as a view of one.
     let typed: Vec<Vec<Option<crate::ir::TypedArrayElement>>> = overloads
@@ -321,11 +337,13 @@ fn restated(
                 }
             }
             for (ours, theirs) in o.args.iter().zip(&args) {
-                if let (super::ir_types::Arg::Param(j), LegacyArg::Param(k)) = (ours, theirs) {
+                if let (super::ir_types::Arg::Param(j), Some(k)) = (ours, theirs.param().as_ref()) {
                     if enums.iter().any(|e| (e.0, e.1) == (i, *j)) {
                         continue;
                     }
-                    let theirs = &e.params[*k].type_ref;
+                    // A literal the call fills isn't the caller's to give.
+                    let open = open_like(&o.params[*j].type_ref, &e.params[*k].type_ref);
+                    let theirs = &open;
                     let mut ours = erase(&o.params[*j].type_ref, theirs);
                     let mut t = state(cgctx, scope, &ours, theirs);
                     // A `T?` the parse writes as `T`, passing fewer states:
@@ -495,14 +513,16 @@ fn restated(
                         ..p.clone()
                     }
                 }
-                (super::ir_types::Arg::Param(j), LegacyArg::Param(_)) => ConcreteParam {
-                    type_ref: arm_types
-                        .iter()
-                        .find(|(k, _)| k == j)
-                        .map_or(&o.params[*j].type_ref, |(_, t)| t)
-                        .clone(),
-                    ..p.clone()
-                },
+                (super::ir_types::Arg::Param(j), LegacyArg::Param(_) | LegacyArg::Fill(..)) => {
+                    ConcreteParam {
+                        type_ref: arm_types
+                            .iter()
+                            .find(|(k, _)| k == j)
+                            .map_or(&o.params[*j].type_ref, |(_, t)| t)
+                            .clone(),
+                        ..p.clone()
+                    }
+                }
                 _ => p.clone(),
             })
             .collect();
@@ -514,6 +534,8 @@ fn restated(
                 .map(|(arm, &overload)| LiteralArm {
                     values: arm.values.clone(),
                     overload,
+                    in_type_arg: arm.in_type_arg,
+                    fills: fills_at(&overloads[overload]),
                 })
                 .collect(),
         };
@@ -521,6 +543,10 @@ fn restated(
             overload: matched[0],
             name_suffix: e.name_suffix,
             params,
+            fills: match literal_arms.is_empty() {
+                true => fills_at(o),
+                false => Vec::new(),
+            },
             literal_arms,
         }];
         for (k, members) in splits {
@@ -586,12 +612,69 @@ fn restated(
     Some((overloads, scopes, expansions))
 }
 
+/// `theirs` with the string literals it passes as type arguments left open
+/// where `ours` leaves them: those the call fills a field with.
+fn open_like(ours: &TypeRef, theirs: &TypeRef) -> TypeRef {
+    let core = |t: &TypeRef| t.split_empties().map_or_else(|| t.clone(), |(c, _)| c);
+    let (
+        TypeRef::Reference {
+            generic_args: x, ..
+        },
+        TypeRef::Reference {
+            segments,
+            generic_args: y,
+        },
+    ) = (core(ours), core(theirs))
+    else {
+        return theirs.clone();
+    };
+    let open = |(i, a): (usize, &TypeRef)| match (x.get(i), a) {
+        (Some(TypeRef::Any), TypeRef::StringLiteral(_)) => TypeRef::Any,
+        _ => a.clone(),
+    };
+    if x.len() != y.len() || !y.iter().enumerate().any(|a| open(a) != *a.1) {
+        return theirs.clone();
+    }
+    let opened = TypeRef::Reference {
+        segments,
+        generic_args: y.iter().enumerate().map(open).collect(),
+    };
+    match theirs.split_empties() {
+        Some((_, n)) => opened.with_empties(n),
+        None => opened,
+    }
+}
+
+/// An overload's fills, at the positions of an expansion of its call.
+fn fills_at(o: &super::ir_types::Overload) -> Vec<(usize, String, String)> {
+    o.fills
+        .iter()
+        .filter_map(|(j, field, value)| {
+            let at =
+                |a: &super::ir_types::Arg| matches!(a, super::ir_types::Arg::Param(p) if p == j);
+            Some((o.args.iter().position(at)?, field.clone(), value.clone()))
+        })
+        .collect()
+}
+
 /// A JS argument of a parse expansion.
 enum LegacyArg<'a> {
     /// The expansion's parameter at this index.
     Param(usize),
     Str(&'a str),
     Null,
+    /// The parameter at this index, a dictionary the call fills with the
+    /// literals its type passes as type arguments.
+    Fill(usize, &'a str),
+}
+
+impl LegacyArg<'_> {
+    fn param(&self) -> Option<usize> {
+        match self {
+            LegacyArg::Param(k) | LegacyArg::Fill(k, _) => Some(*k),
+            _ => None,
+        }
+    }
 }
 
 /// The JS arguments of `params`, with `arm`'s literals in place.
@@ -602,6 +685,7 @@ fn legacy_args<'a>(params: &'a [ConcreteParam], arm: Option<&'a LiteralArm>) -> 
         .map(|(i, p)| {
             let literal = arm.and_then(|a| a.values.iter().find(|(at, _)| *at == i));
             match (literal, &p.type_ref) {
+                (Some((_, v)), _) if arm.is_some_and(|a| a.in_type_arg) => LegacyArg::Fill(i, v),
                 (Some((_, v)), _) | (None, TypeRef::StringLiteral(v)) => LegacyArg::Str(v),
                 (None, TypeRef::Null) => LegacyArg::Null,
                 _ => LegacyArg::Param(i),
@@ -643,6 +727,10 @@ fn matching(
                                 && view(&o.params[*j].type_ref, o.params[*j].slice_mode)
                                     == view(&params[*k].type_ref, params[*k].slice_mode)
                         }
+                        (Arg::Param(j), LegacyArg::Fill(k, v)) => {
+                            o.params[*j].name == params[*k].name
+                                && !matches!(o.fill_tag(*j), Some(t) if t != *v)
+                        }
                         (Arg::Param(j), LegacyArg::Str(v)) => o.members[*j]
                             .as_ref()
                             .is_some_and(|m| m.contains(&TypeRef::StringLiteral((*v).into()))),
@@ -665,7 +753,8 @@ fn matching(
                 .zip(args)
                 .all(|(ours, theirs)| match (ours, theirs) {
                     (Arg::Param(j), LegacyArg::Param(k)) => {
-                        let theirs = &params[*k].type_ref;
+                        let open = open_like(&o.params[*j].type_ref, &params[*k].type_ref);
+                        let theirs = &open;
                         // An argument the IR erases (`Options<Str>` for
                         // `Options<"text">`), or reads as its enum, binds
                         // alike.
