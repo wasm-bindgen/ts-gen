@@ -727,6 +727,22 @@ fn exports_match() {
     }
 }
 
+/// A callback type whose trampoline can't be built skips every member
+/// that takes it, not only the first.
+#[test]
+fn skipped_trampoline_skips_each_member() {
+    let ir: Ir = ts_gen_abi::text::parse(
+        "ir 1;\nclass Probe {\n  first(f: fn(arr<f16>));\n  second(f: fn(arr<f16>));\n}\n",
+    )
+    .unwrap();
+    let out = zena_bindgen::generate(&ir, &zena_bindgen::Options::default()).unwrap();
+    let skipped: Vec<&str> = out.skipped.iter().map(|s| s.key.as_str()).collect();
+    assert_eq!(
+        skipped,
+        ["Probe#first(fn(arr<f16>))", "Probe#second(fn(arr<f16>))"]
+    );
+}
+
 /// `std`, the lib other IRs resolve against, binds whole but for the
 /// comparators whose `number | bigint` result Zena has no type for, and
 /// compiles, with its imports' types the IR's.

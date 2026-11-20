@@ -2918,10 +2918,21 @@ impl<'a> Gen<'a> {
     /// The export `tw:call:F` JS calls a language function of type `F`
     /// through, its handle the function itself (§18).
     fn trampoline(&mut self, r: &Repr) -> R<()> {
-        let f = Self::fn_name(r);
-        if !self.helper_done.insert(format!("tramp {f}")) {
+        let key = format!("tramp {}", Self::fn_name(r));
+        // Marked first, so a callback type that names itself ends.
+        if !self.helper_done.insert(key.clone()) {
             return Ok(());
         }
+        let built = self.build_trampoline(r);
+        if built.is_err() {
+            // No export was written, so each member taking the type skips.
+            self.helper_done.remove(&key);
+        }
+        built
+    }
+
+    fn build_trampoline(&mut self, r: &Repr) -> R<()> {
+        let f = Self::fn_name(r);
         let Kind::Fn { sig: layout, .. } = &r.kind else {
             unreachable!()
         };
