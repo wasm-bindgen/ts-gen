@@ -24,6 +24,15 @@
 //! `"recs"` by its `"ty"`, with `"name"` for a generator that declares it
 //! by name.
 //!
+//! A host class reference with type arguments carries them under `"args"`,
+//! and a class its bases' under `"extendsArgs"` (one list per base), for a
+//! generator that keeps them in its surface. Each is what the argument
+//! names, without a layout: `"of"` is `param` (a type parameter, by
+//! `"name"`), `class` or `interface` (by `"path"`, with its own `"args"`),
+//! `box` (of the `"inner"` scalar, `str` or `bigint`), `array` or `tuple`
+//! (a JS array, of the element or elements in `"args"`), `any` or `other`,
+//! with `"nullable"`.
+//!
 //! An exported class, an enum and a function type the language provides
 //! carry `"box"` and `"unbox"`: the `tw:box` and `tw:unbox` imports of the
 //! type and their core types, for a generator's box helpers (§13).
@@ -393,6 +402,18 @@ fn walk_decls<'a>(
                     .iter()
                     .map(|r| Json::str(l.keys.ty(&Type::Named(r.clone()), &ccx)))
                     .collect();
+                let extends_args = match c.extends.iter().any(|r| !r.args.is_empty()) {
+                    true => Json::Arr(
+                        c.extends
+                            .iter()
+                            .map(|r| match r.args.is_empty() {
+                                true => Json::Arr(Vec::new()),
+                                false => type_args(&l.type_args(&r.args, &ccx)),
+                            })
+                            .collect(),
+                    ),
+                    false => Json::Null,
+                };
                 let assoc = c
                     .assoc
                     .iter()
@@ -438,6 +459,7 @@ fn walk_decls<'a>(
                         .set("tparams", Json::Arr(tparams))
                         .set("assoc", Json::Arr(assoc))
                         .set("extends", Json::Arr(extends))
+                        .some("extendsArgs", extends_args)
                         .set("doc", doc(&c.meta))
                         .some("box", box_)
                         .some("unbox", unbox)
@@ -767,6 +789,33 @@ fn position(l: &Layouts<'_>, p: &Position) -> Json {
     o.set("repr", repr(l, &p.repr)).done()
 }
 
+/// A class reference's type arguments; `null` when it has none.
+fn type_args(args: &[TypeArg]) -> Json {
+    if args.is_empty() {
+        return Json::Null;
+    }
+    let arg = |a: &TypeArg| {
+        let of = |of: &str| Json::obj().set("of", Json::str(of));
+        let o = match &a.of {
+            ArgOf::Param(name) => of("param").set("name", Json::str(name)),
+            ArgOf::Class {
+                path,
+                interface,
+                args,
+            } => of(if *interface { "interface" } else { "class" })
+                .set("path", Json::str(path))
+                .some("args", type_args(args)),
+            ArgOf::Box(inner) => of("box").set("inner", Json::str(*inner)),
+            ArgOf::Array(elem) => of("array").set("args", type_args(std::slice::from_ref(&**elem))),
+            ArgOf::Tuple(elems) => of("tuple").set("args", type_args(elems)),
+            ArgOf::Any => of("any"),
+            ArgOf::Other => of("other"),
+        };
+        o.set("nullable", Json::Bool(a.nullable)).done()
+    };
+    Json::Arr(args.iter().map(arg).collect())
+}
+
 /// A type's layout: its canonical spelling, its wire values, and what it is.
 pub fn repr(l: &Layouts<'_>, r: &Repr) -> Json {
     let w = l.wire(r).map(|w| wire(&w)).unwrap_or(Json::Null);
@@ -848,12 +897,17 @@ pub fn repr(l: &Layouts<'_>, r: &Repr) -> Json {
         Kind::Host { of, nullable: n } => {
             let o = o.set("kind", Json::str("host"));
             let o = match of {
-                Host::Class { path, interface } => o
+                Host::Class {
+                    path,
+                    interface,
+                    args,
+                } => o
                     .set(
                         "of",
                         Json::str(if *interface { "interface" } else { "class" }),
                     )
-                    .set("path", Json::str(path)),
+                    .set("path", Json::str(path))
+                    .some("args", type_args(args)),
                 Host::Any => o.set("of", Json::str("any")),
                 Host::Box(inner) => o
                     .set("of", Json::str("box"))

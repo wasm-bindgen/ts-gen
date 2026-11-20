@@ -1279,6 +1279,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                         Host::Class {
                             path,
                             interface: false,
+                            ..
                         } => {
                             let c = self.class_value(path)?;
                             format!("$instance({v}, {c}, {what})")
@@ -1734,6 +1735,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 Host::Class {
                     path,
                     interface: false,
+                    ..
                 } => format!("$isInstance({v}, {})", self.class_value(path)?),
                 Host::Class { .. } => format!("$isObject({v})"),
                 Host::Any => format!("{v} != null"),

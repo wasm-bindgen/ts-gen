@@ -62,6 +62,12 @@ class Map<K, V> {
   get size(): u32;
 }
 
+class Index<V> extends Map<Str, V> {
+  nested(): Map<Str, Index<V>?>;
+  pairs(): Map<Str, (Str, f64)>;
+  lists(): Map<Str, arr<V>>;
+}
+
 class Bytes {
   static from(items: Map<str, f64>): Bytes;
   static from<T>(items: Map<str, T>): Bytes;

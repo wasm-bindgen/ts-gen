@@ -354,9 +354,11 @@ pub enum ScalarNull {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Host {
     /// A class (`instanceof`-checked) or an interface (never checked).
+    /// Its type arguments are erased, and kept for a generator's surface.
     Class {
         path: String,
         interface: bool,
+        args: Vec<TypeArg>,
     },
     Any,
     /// A box (§13), with the layout its `tw:unbox` produces.
@@ -366,6 +368,33 @@ pub enum Host {
         value: Box<Repr>,
         error: Rc<EnumLayout>,
     },
+}
+
+/// What a host class's type argument names. It has no layout: the argument
+/// is erased (§13).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TypeArg {
+    pub of: ArgOf,
+    pub nullable: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ArgOf {
+    /// A type parameter in scope, by name.
+    Param(String),
+    Class {
+        path: String,
+        interface: bool,
+        args: Vec<TypeArg>,
+    },
+    /// A scalar, `str` or `bigint`, or its box: the argument is the box.
+    Box(&'static str),
+    /// `arr<T>` or its box: a JS array of the element.
+    Array(Box<TypeArg>),
+    /// A tuple or its box: a JS array of the elements.
+    Tuple(Vec<TypeArg>),
+    Any,
+    Other,
 }
 
 /// std's class of JS symbols, which are primitives: tested with `typeof`,
@@ -935,12 +964,44 @@ impl<'a> Layouts<'a> {
                         host(Host::Class {
                             path: location(loc),
                             interface: c.kind == ClassKind::Interface,
+                            args: self.type_args(&r.args, cx),
                         })
                     }
                 }
                 None => return Err(Error::Unknown(self.keys.path(&r.path, cx))),
             },
         })
+    }
+
+    /// What each of a class reference's type arguments names.
+    pub fn type_args(&self, args: &[Type], cx: &Context<'_>) -> Vec<TypeArg> {
+        args.iter().map(|a| self.type_arg(a, cx)).collect()
+    }
+
+    fn type_arg(&self, t: &Type, cx: &Context<'_>) -> TypeArg {
+        let (t, nullable) = match t {
+            Type::Nullable(inner, _) => (&**inner, true),
+            t => (t, false),
+        };
+        let of = match t {
+            Type::Any => ArgOf::Any,
+            Type::Str | Type::StrBox => ArgOf::Box("str"),
+            Type::BigInt | Type::BigIntBox => ArgOf::Box("bigint"),
+            Type::Scalar(s) | Type::ScalarBox(s) => ArgOf::Box(s.name()),
+            Type::Array(e) | Type::ArrBox(e) => ArgOf::Array(Box::new(self.type_arg(e, cx))),
+            Type::Tuple(es) | Type::TupleBox(es) => ArgOf::Tuple(self.type_args(es, cx)),
+            Type::Named(r) => match self.keys.symbols.resolve(&r.path, cx) {
+                Some(Target::TypeParam) => ArgOf::Param(r.path.segments[0].clone()),
+                Some(Target::Decl(loc, TypeDecl::Class(c))) => ArgOf::Class {
+                    path: location(loc),
+                    interface: c.kind == ClassKind::Interface,
+                    args: self.type_args(&r.args, cx),
+                },
+                _ => ArgOf::Other,
+            },
+            _ => ArgOf::Other,
+        };
+        TypeArg { of, nullable }
     }
 
     fn back_edge(
@@ -1596,6 +1657,7 @@ impl<'a> Layouts<'a> {
             of: Host::Class {
                 path: location(loc),
                 interface: c.kind == ClassKind::Interface,
+                args: Vec::new(),
             },
             nullable: false,
         };
