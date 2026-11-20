@@ -41,3 +41,12 @@ export class Bag {
 }
 export const mixedGeneric = (values, weights, data) =>
   [describe(values), describe(weights), describe(data)].join(" ");
+const describeBuffer = (v) =>
+  v instanceof ArrayBuffer
+    ? `ArrayBuffer(${new Uint8Array(v).join(",")})`
+    : `${v.constructor.name}(${new Uint8Array(v.buffer, v.byteOffset, v.byteLength).join(",")})`;
+export const hash = describeBuffer;
+export const store = (key, value) =>
+  `${key}=${typeof value === "string" ? value : describeBuffer(value)}`;
+export const echo = (data) => data;
+export const peek = describeBuffer;

@@ -35,9 +35,9 @@ impl fmt::Display for Span {
 /// name.
 pub const BUILTIN_TYPE_NAMES: &[&str] = &[
     "unit", "bool", "i8", "u8", "i16", "u16", "i32", "u32", "i53", "u53", "i64", "u64", "f16",
-    "f32", "f64", "str", "arr", "future", "fn", "Any", "err", "Bool", "I8", "U8", "I16", "U16",
-    "I32", "U32", "I53", "U53", "I64", "U64", "F16", "F32", "F64", "Str", "Unit", "Vec", "Arr",
-    "Tuple",
+    "f32", "f64", "str", "buffer", "arr", "future", "fn", "Any", "err", "Bool", "I8", "U8", "I16",
+    "U16", "I32", "U32", "I53", "U53", "I64", "U64", "F16", "F32", "F64", "Str", "Unit", "Vec",
+    "Arr", "Tuple",
 ];
 
 /// A name a lexical path can't start with, which reads as a built-in type
@@ -512,6 +512,8 @@ pub enum Type {
     BigInt,
     /// `BigInt`, the box of `bigint`: the host bigint.
     BigIntBox,
+    /// `buffer`: an `ArrayBuffer` or any view of one, as its bytes.
+    Buffer,
     /// `Unit`, the box of `unit`.
     UnitBox,
     /// `T[]`, the typed array.

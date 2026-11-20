@@ -950,6 +950,9 @@ impl Lowerer<'_> {
         if l.values.is_empty() || kinds < 2 {
             return None;
         }
+        if cx.view && l.values.contains(&abi::Type::Buffer) {
+            return None;
+        }
         let union = !cx.export;
         let named = named.filter(|n| n.id.is_some());
         let fits = match named {
@@ -1531,7 +1534,10 @@ impl Lowerer<'_> {
             .iter()
             .enumerate()
             .map(|(i, p)| {
-                let pcx = cx.param(&p.name);
+                let pcx = Tcx {
+                    view: !cx.export && p.slice_mode == Some(SliceModeHint::View),
+                    ..cx.param(&p.name)
+                };
                 // A literal the call fills isn't the caller's to give.
                 let filled = (!fills[i].0.is_empty()).then(|| open_args(&p.type_ref, &fills[i].0));
                 let ty = filled.as_ref().unwrap_or(&p.type_ref);
@@ -1915,7 +1921,8 @@ fn fold_absent(arms: Vec<Arm>, undefined: bool) -> Vec<Arm> {
         .collect()
 }
 
-/// `{@slice view}`: a zero-copy `*T[]` beside each `T[]` copy (IR.md §11).
+/// `{@slice view}`: a zero-copy `*T[]` beside each `T[]` copy, and a
+/// `*buffer` beside a `buffer` (IR.md §11).
 fn with_views(arms: Vec<Arm>) -> Vec<Arm> {
     let mut out = Vec::new();
     for a in arms {
@@ -1923,6 +1930,10 @@ fn with_views(arms: Vec<Arm>) -> Vec<Arm> {
             Arm::Value(abi::Type::Vec(e)) => Some(abi::Type::View {
                 mutable: false,
                 elem: e.clone(),
+            }),
+            Arm::Value(abi::Type::Buffer) => Some(abi::Type::View {
+                mutable: false,
+                elem: Box::new(abi::Type::Buffer),
             }),
             _ => None,
         };

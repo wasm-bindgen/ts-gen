@@ -234,6 +234,19 @@ fn restated(
                 .collect()
         })
         .collect();
+    // Each overload's `buffer` parameters.
+    let buffers: Vec<Vec<bool>> = overloads
+        .iter()
+        .map(|o| {
+            o.params
+                .iter()
+                .map(|p| {
+                    let core = p.type_ref.split_empties().map(|(core, _)| core);
+                    super::ir_types::buffer_pair(core.as_ref().unwrap_or(&p.type_ref))
+                })
+                .collect()
+        })
+        .collect();
     let mut used = vec![false; overloads.len()];
     let mut scopes = vec![(scope, first.async_modifier); overloads.len()];
     let mut covered = Vec::new();
@@ -604,8 +617,26 @@ fn restated(
                             && crate::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e)))
             })
     };
-    let unbound =
-        |i: usize| (0..overloads.len()).any(|k| used[k] && copy(&overloads[i], &overloads[k]));
+    // And a `buffer` with its view (`*buffer`), which the parse doesn't
+    // bind.
+    let view = |i: usize, k: usize| {
+        let (o, of) = (&overloads[i], &overloads[k]);
+        o.params.len() == of.params.len()
+            && o.params
+                .iter()
+                .zip(&of.params)
+                .enumerate()
+                .all(|(j, (a, b))| {
+                    a.name == b.name
+                        && (a.type_ref == b.type_ref
+                            || buffers[k][j]
+                                && a.slice_mode == Some(crate::ir::SliceModeHint::View)
+                                && matches!(a.type_ref, TypeRef::TypedSlice(..)))
+                })
+    };
+    let unbound = |i: usize| {
+        (0..overloads.len()).any(|k| used[k] && (copy(&overloads[i], &overloads[k]) || view(i, k)))
+    };
     if (0..overloads.len()).any(|i| !used[i] && !unbound(i) && !covered.contains(&i)) {
         return None;
     }
@@ -1033,6 +1064,7 @@ fn emit(cgctx: &CodegenContext<'_>, scope: ScopeId, ours: &TypeRef, theirs: &Typ
     let t = take(ours, theirs, &|o, t| {
         declared(cgctx, scope, o, t)
             .or_else(|| unaliased(cgctx, scope, o, t))
+            .or_else(|| buffer(cgctx, scope, o, t))
             // A union or literal the IR reads as a synthesised enum inside
             // another type, named as the parse spells it.
             .or_else(|| {
@@ -1243,6 +1275,7 @@ fn exact(
     let ours = &take(ours, theirs, &|o, t| {
         declared(cgctx, scope, o, t)
             .or_else(|| unaliased(cgctx, scope, o, t))
+            .or_else(|| buffer(cgctx, scope, o, t))
             .or_else(|| defaulted(cgctx, scope, o, t))
             .or_else(|| aliased(cgctx, scope, o, t))
             .or_else(|| inferred(cgctx, scope, o, t))
@@ -1793,6 +1826,39 @@ fn unaliased(
     cgctx
         .resolve_alias_instance(ours, scope)
         .filter(|t| matches!(t, TypeRef::Function(_) | TypeRef::Reference { .. }))
+}
+
+/// The parse's `theirs`, where the IR's `ours` is a `buffer` and it names
+/// the two classes in either order, or an alias of them.
+fn buffer(
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    ours: &TypeRef,
+    theirs: &TypeRef,
+) -> Option<TypeRef> {
+    let split = |t: &TypeRef| {
+        t.split_empties()
+            .map_or((t.clone(), None), |(c, n)| (c, Some(n)))
+    };
+    let ((o_core, o_empty), (t_core, t_empty)) = (split(ours), split(theirs));
+    if !super::ir_types::buffer_pair(&o_core) || o_empty != t_empty {
+        return None;
+    }
+    let (mut target, mut at) = (t_core, scope);
+    while let TypeRef::Reference {
+        segments,
+        generic_args,
+    } = &target
+    {
+        if !generic_args.is_empty() {
+            break;
+        }
+        let Some((t, s)) = cgctx.resolve_alias(&segments.join("."), at) else {
+            break;
+        };
+        (target, at) = (t.into_owned(), s);
+    }
+    super::ir_types::buffer_pair(&target).then(|| theirs.clone())
 }
 
 /// The parse's alias `theirs`, where `ours` states what it names: the

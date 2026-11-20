@@ -4386,10 +4386,10 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_type(r#type: &[BlobTypeKind]) -> Result<Blob, JsValue>;
+    pub fn new_with_type(r#type: &[BufferOrStrOrBlob]) -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_type_and_options(
-        r#type: Option<&[BlobTypeKind]>,
+        r#type: Option<&[BufferOrStrOrBlob]>,
         options: &BlobOptions,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`size`** read-only property of the Blob interface returns the size of the Blob or File in bytes."]
@@ -4523,12 +4523,12 @@ extern "C" {
     pub type File;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(
-        bits: Option<&[BlobTypeKind]>,
+        bits: Option<&[BufferOrStrOrBlob]>,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<File, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_options(
-        bits: Option<&[BlobTypeKind]>,
+        bits: Option<&[BufferOrStrOrBlob]>,
         name: impl ::wasm_bindgen::JsStringLike,
         options: &FileOptions,
     ) -> Result<File, JsValue>;
@@ -13349,7 +13349,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "customMetadata")]
     pub fn set_custom_metadata(this: &R2PutOptions, val: &Object<JsString>);
     #[wasm_bindgen(method, getter)]
-    pub fn md5(this: &R2PutOptions) -> Option<R2PutOptionsMd5Kind>;
+    pub fn md5(this: &R2PutOptions) -> Option<BufferOrStr>;
     #[wasm_bindgen(method, setter)]
     pub fn set_md5(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "md5")]
@@ -13359,7 +13359,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "md5")]
     pub fn set_md5_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn sha1(this: &R2PutOptions) -> Option<R2PutOptionsMd5Kind>;
+    pub fn sha1(this: &R2PutOptions) -> Option<BufferOrStr>;
     #[wasm_bindgen(method, setter)]
     pub fn set_sha1(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "sha1")]
@@ -13369,7 +13369,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "sha1")]
     pub fn set_sha1_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn sha256(this: &R2PutOptions) -> Option<R2PutOptionsMd5Kind>;
+    pub fn sha256(this: &R2PutOptions) -> Option<BufferOrStr>;
     #[wasm_bindgen(method, setter)]
     pub fn set_sha256(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "sha256")]
@@ -13379,7 +13379,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "sha256")]
     pub fn set_sha256_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn sha384(this: &R2PutOptions) -> Option<R2PutOptionsMd5Kind>;
+    pub fn sha384(this: &R2PutOptions) -> Option<BufferOrStr>;
     #[wasm_bindgen(method, setter)]
     pub fn set_sha384(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "sha384")]
@@ -13389,7 +13389,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "sha384")]
     pub fn set_sha384_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn sha512(this: &R2PutOptions) -> Option<R2PutOptionsMd5Kind>;
+    pub fn sha512(this: &R2PutOptions) -> Option<BufferOrStr>;
     #[wasm_bindgen(method, setter)]
     pub fn set_sha512(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "sha512")]
@@ -68939,7 +68939,7 @@ pub enum ArrayBufferOrStr {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum BlobTypeKind {
+pub enum BufferOrStrOrBlob {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
     String(String),
@@ -69050,7 +69050,7 @@ pub enum R2HTTPMetadataOrHeaders {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum R2PutOptionsMd5Kind {
+pub enum BufferOrStr {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
     String(String),

@@ -100,6 +100,13 @@ function $typed(v, C, what) {
   return v;
 }
 
+// `("tw:unbox", vec<u8>)` reads any buffer or view as its bytes.
+function $bytes(v) {
+  if (v instanceof ArrayBuffer) return new Uint8Array(v);
+  if (ArrayBuffer.isView(v)) return new Uint8Array(v.buffer, v.byteOffset, v.byteLength);
+  $fail("a buffer or view", v);
+}
+
 // A memory and its externref table, as the glue reads and writes them.
 // The language's space allocates through its exports and registers each
 // allocation on the call's cleanup list; the scratch space is the
@@ -559,7 +566,35 @@ function $h6(v, cx) {
   $fail("Body", v);
 }
 
-function $h8(x0, len) {
+function $h7(arm, s0, s1) {
+  switch (arm) {
+    case 1: {
+      return $liftUtf8($L, s0, s1);
+    }
+    case 2: {
+      return $liftVec($L, s0, s1, Uint8Array);
+    }
+  }
+  throw new TypeError("an invalid `Data` arm");
+}
+
+function $h8(v, cx) {
+  if ((v instanceof ArrayBuffer || ArrayBuffer.isView(v))) {
+    const t1 = $lowerVec($L, $bytes(v), Uint8Array, cx);
+    const t2 = t1[0];
+    const t3 = t1[1];
+    return [2, t2, t3];
+  }
+  if (typeof v === "string") {
+    const t4 = $lowerUtf8($L, $str(v), cx);
+    const t5 = t4[0];
+    const t6 = t4[1];
+    return [1, t5, t6];
+  }
+  $fail("Data", v);
+}
+
+function $h10(x0, len) {
   const n = len;
   const out = new Array(n);
   for (let i = 0; i < n; i++) {
@@ -570,7 +605,7 @@ function $h8(x0, len) {
   return out;
 }
 
-function $h7(arm, s0, s1, s2, s3, s4, s5) {
+function $h9(arm, s0, s1, s2, s3, s4, s5) {
   switch (arm) {
     case 1: {
       return s0;
@@ -588,7 +623,7 @@ function $h7(arm, s0, s1, s2, s3, s4, s5) {
       return $h1(s1);
     }
     case 6: {
-      return $h8(s1, s3);
+      return $h10(s1, s3);
     }
     case -1: {
       return s5;
@@ -597,7 +632,7 @@ function $h7(arm, s0, s1, s2, s3, s4, s5) {
   throw new TypeError("an invalid `Value` arm");
 }
 
-function $h10(v, cx) {
+function $h12(v, cx) {
   $array(v, "Request[]");
   const n = v.length;
   const x0 = n ? $L.talloc(n * 1, cx) : 0;
@@ -610,7 +645,7 @@ function $h10(v, cx) {
   return [x0, n];
 }
 
-function $h9(v, cx) {
+function $h11(v, cx) {
   if (v === "GET") {
     return [5, 0, 1, 0n, 0, 0, null];
   }
@@ -628,7 +663,7 @@ function $h9(v, cx) {
     return [4, 0, t2, 0n, t5, t6, null];
   }
   if (Array.isArray(v)) {
-    const t7 = $h10(v, cx);
+    const t7 = $h12(v, cx);
     return [6, 0, t7[0], 0n, t7[1], 0, null];
   }
   if (typeof v === "number") {
@@ -649,7 +684,7 @@ function $h9(v, cx) {
   }
 }
 
-function $h11(arm, s0, s1) {
+function $h13(arm, s0, s1) {
   switch (arm) {
     case 1: {
       return (s0 & 255);
@@ -661,7 +696,7 @@ function $h11(arm, s0, s1) {
   throw new TypeError("an invalid `Strict` arm");
 }
 
-function $h12(v, cx) {
+function $h14(v, cx) {
   if (typeof v === "number") {
     const t1 = $int(v, 0, 255, "u8");
     return [1, t1, 0];
@@ -675,13 +710,13 @@ function $h12(v, cx) {
   $fail("Strict", v);
 }
 
-function $h14(v) {
+function $h16(v) {
   if (!(typeof v === "number")) $fail("u32", v);
 }
 
-function $h13(v, cx) {
+function $h15(v, cx) {
   if ($isThenable(v)) {
-    const t1 = $future(v, $h14);
+    const t1 = $future(v, $h16);
     return [1, t1, 0, 0];
   }
   if ($isObject(v)) {
@@ -697,7 +732,7 @@ function $h13(v, cx) {
   $fail("Arg", v);
 }
 
-function $h15(arm) {
+function $h17(arm) {
   switch (arm) {
     case 1: {
       return "year";
@@ -718,7 +753,7 @@ function $h15(arm) {
   throw new TypeError("an invalid `AnyUnit` arm");
 }
 
-function $h16(v, cx) {
+function $h18(v, cx) {
   if (v === "week") {
     return 5;
   }
@@ -737,7 +772,7 @@ function $h16(v, cx) {
   $fail("AnyUnit", v);
 }
 
-function $h17(arm) {
+function $h19(arm) {
   switch (arm) {
     case 3: {
       return "hour";
@@ -749,7 +784,7 @@ function $h17(arm) {
   throw new TypeError("an invalid `TimeUnit` arm");
 }
 
-function $h18(v, cx) {
+function $h20(v, cx) {
   if (v === "hour") {
     return 3;
   }
@@ -759,7 +794,7 @@ function $h18(v, cx) {
   $fail("TimeUnit", v);
 }
 
-function $h19(arm, s0, s1) {
+function $h21(arm, s0, s1) {
   switch (arm) {
     case 5: {
       return (s0 & 255);
@@ -771,7 +806,7 @@ function $h19(arm, s0, s1) {
   throw new TypeError("an invalid `Gapped` arm");
 }
 
-function $h20(v, cx) {
+function $h22(v, cx) {
   if (typeof v === "number") {
     const t1 = $int(v, 0, 255, "u8");
     return [5, t1, 0];
@@ -785,7 +820,7 @@ function $h20(v, cx) {
   $fail("Gapped", v);
 }
 
-function $h21(arm, s0, s1) {
+function $h23(arm, s0, s1) {
   switch (arm) {
     case 1: {
       return undefined;
@@ -797,7 +832,7 @@ function $h21(arm, s0, s1) {
   throw new TypeError("an invalid `str??` arm");
 }
 
-function $h22(v, cx) {
+function $h24(v, cx) {
   if (v === undefined) {
     return [1, 0, 0];
   }
@@ -931,14 +966,37 @@ function $f8(w0_0, w1_0, w1_1, w1_2, w1_3) {
   }
 }
 
+// ("tw:js/global", "Probe#data(Data)")
+function $f9(w0_0, w1_0, w1_1, w1_2) {
+  const t1 = $h7(w1_0, w1_1, w1_2);
+  const cx = $cx;
+  const cxm = cx.n;
+  try {
+    const r = w0_0.data(t1);
+    const t2 = $h8(r, cx);
+    const t3 = t2[0];
+    const t4 = t2[1];
+    const t5 = t2[2];
+    const ra = $ret();
+    ra.i32[0] = t4;
+    ra.i32[2] = t5;
+    return t3;
+  } catch (e) {
+    $release(cx, cxm);
+    throw e;
+  } finally {
+    cx.n = cxm;
+  }
+}
+
 // ("tw:js/global", "Probe#value(Value)")
-function $f9(w0_0, w1_0, w1_1, w1_2, w1_3, w1_4, w1_5, w1_6) {
-  const t1 = $h7(w1_0, w1_1, w1_2, w1_3, w1_4, w1_5, w1_6);
+function $f10(w0_0, w1_0, w1_1, w1_2, w1_3, w1_4, w1_5, w1_6) {
+  const t1 = $h9(w1_0, w1_1, w1_2, w1_3, w1_4, w1_5, w1_6);
   const cx = $cx;
   const cxm = cx.n;
   try {
     const r = w0_0.value(t1);
-    const t2 = $h9(r, cx);
+    const t2 = $h11(r, cx);
     const t3 = t2[0];
     const t4 = t2[1];
     const t5 = t2[2];
@@ -963,13 +1021,13 @@ function $f9(w0_0, w1_0, w1_1, w1_2, w1_3, w1_4, w1_5, w1_6) {
 }
 
 // ("tw:js/global", "Probe#strict(Strict)")
-function $f10(w0_0, w1_0, w1_1, w1_2) {
-  const t1 = $h11(w1_0, w1_1, w1_2);
+function $f11(w0_0, w1_0, w1_1, w1_2) {
+  const t1 = $h13(w1_0, w1_1, w1_2);
   const cx = $cx;
   const cxm = cx.n;
   try {
     const r = w0_0.strict(t1);
-    const t2 = $h12(r, cx);
+    const t2 = $h14(r, cx);
     const t3 = t2[0];
     const t4 = t2[1];
     const t5 = t2[2];
@@ -986,12 +1044,12 @@ function $f10(w0_0, w1_0, w1_1, w1_2) {
 }
 
 // ("tw:js/global", "Probe#arg()")
-function $f11(w0_0) {
+function $f12(w0_0) {
   const cx = $cx;
   const cxm = cx.n;
   try {
     const r = w0_0.arg();
-    const t1 = $h13(r, cx);
+    const t1 = $h15(r, cx);
     const t2 = t1[0];
     const t3 = t1[1];
     const t4 = t1[2];
@@ -1010,29 +1068,29 @@ function $f11(w0_0) {
 }
 
 // ("tw:js/global", "Probe#unit(AnyUnit)")
-function $f12(w0_0, w1_0) {
-  const t1 = $h15(w1_0);
-  const r = w0_0.unit(t1);
-  const t2 = $h16(r, null);
-  return t2;
-}
-
-// ("tw:js/global", "Probe#time(TimeUnit)")
 function $f13(w0_0, w1_0) {
   const t1 = $h17(w1_0);
-  const r = w0_0.time(t1);
+  const r = w0_0.unit(t1);
   const t2 = $h18(r, null);
   return t2;
 }
 
+// ("tw:js/global", "Probe#time(TimeUnit)")
+function $f14(w0_0, w1_0) {
+  const t1 = $h19(w1_0);
+  const r = w0_0.time(t1);
+  const t2 = $h20(r, null);
+  return t2;
+}
+
 // ("tw:js/global", "Probe#gapped(Gapped)")
-function $f14(w0_0, w1_0, w1_1, w1_2) {
-  const t1 = $h19(w1_0, w1_1, w1_2);
+function $f15(w0_0, w1_0, w1_1, w1_2) {
+  const t1 = $h21(w1_0, w1_1, w1_2);
   const cx = $cx;
   const cxm = cx.n;
   try {
     const r = w0_0.gapped(t1);
-    const t2 = $h20(r, cx);
+    const t2 = $h22(r, cx);
     const t3 = t2[0];
     const t4 = t2[1];
     const t5 = t2[2];
@@ -1049,13 +1107,13 @@ function $f14(w0_0, w1_0, w1_1, w1_2) {
 }
 
 // ("tw:js/global", "Probe#maybe(str??)")
-function $f15(w0_0, w1_0, w1_1, w1_2) {
-  const t1 = $h21(w1_0, w1_1, w1_2);
+function $f16(w0_0, w1_0, w1_1, w1_2) {
+  const t1 = $h23(w1_0, w1_1, w1_2);
   const cx = $cx;
   const cxm = cx.n;
   try {
     const r = w0_0.maybe(t1);
-    const t2 = $h22(r, cx);
+    const t2 = $h24(r, cx);
     const t3 = t2[0];
     const t4 = t2[1];
     const t5 = t2[2];
@@ -1076,7 +1134,7 @@ export function instantiate(language, bridge, imports = {}) {
   $cls0 = $class(globalThis.ReadableStream);
   $cls1 = $class(globalThis.Request);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { r0: $f0, r5: $f5, r7: $f7, r8: $f8, r9: $f9, r10: $f10, r11: $f11, r14: $f14, r15: $f15 },
+    "tw:glue": { r0: $f0, r5: $f5, r7: $f7, r8: $f8, r9: $f9, r10: $f10, r11: $f11, r12: $f12, r15: $f15, r16: $f16 },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -1091,13 +1149,14 @@ export function instantiate(language, bridge, imports = {}) {
       "Probe#small(Small)": $f6,
       "Probe#body(Body)": $B.f7,
       "Probe#optBody(Body?)": $B.f8,
-      "Probe#value(Value)": $B.f9,
-      "Probe#strict(Strict)": $B.f10,
-      "Probe#arg()": $B.f11,
-      "Probe#unit(AnyUnit)": $f12,
-      "Probe#time(TimeUnit)": $f13,
-      "Probe#gapped(Gapped)": $B.f14,
-      "Probe#maybe(str??)": $B.f15,
+      "Probe#data(Data)": $B.f9,
+      "Probe#value(Value)": $B.f10,
+      "Probe#strict(Strict)": $B.f11,
+      "Probe#arg()": $B.f12,
+      "Probe#unit(AnyUnit)": $f13,
+      "Probe#time(TimeUnit)": $f14,
+      "Probe#gapped(Gapped)": $B.f15,
+      "Probe#maybe(str??)": $B.f16,
     },
   });
   $X = instance.exports;

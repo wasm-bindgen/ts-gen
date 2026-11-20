@@ -194,6 +194,7 @@ pub fn type_word(t: &Type) -> String {
         Type::Scalar(s) | Type::ScalarBox(s) => pascal(s.name()),
         Type::Str | Type::StrBox => "Str".into(),
         Type::BigInt | Type::BigIntBox => "BigInt".into(),
+        Type::Buffer => "Buffer".into(),
         Type::Any => "Any".into(),
         Type::Vec(_) | Type::VecBox(_) | Type::MutVec(_) => "Vec".into(),
         Type::Array(_) | Type::ArrBox(_) => "Array".into(),

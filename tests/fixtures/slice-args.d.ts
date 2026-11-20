@@ -62,3 +62,13 @@ export declare class Bag<T> {
   take(values: T[]): string;
 }
 export declare function mixedGeneric<T>(values: T[], weights: number[], data: Float64Array | number[]): string;
+
+// `ArrayBuffer | ArrayBufferView` (`BufferSource`) is one `buffer`, however
+// it's spelled and whatever else the union holds: either class is written
+// as itself. `{@slice view}` adds the bytes as a view of linear memory.
+export type BufferSource = ArrayBufferView | ArrayBuffer;
+export declare function hash(data: BufferSource): string;
+export declare function store(key: string, value: string | ArrayBuffer | ArrayBufferView): string;
+export declare function echo(data: ArrayBuffer | ArrayBufferView): ArrayBuffer | ArrayBufferView;
+/** @param data {@slice view} read before the call returns */
+export declare function peek(data: BufferSource): string;

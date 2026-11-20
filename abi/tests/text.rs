@@ -216,6 +216,10 @@ fn equivalent_spellings_read_equal() {
         ("f(a: *(u8)[]);", "f(a: *u8[]);"),
         ("f(a: mut (u8)[]);", "f(a: mut u8[]);"),
         ("f(a: (u8)[]);", "f(a: u8[]);"),
+        (
+            "f(a: (buffer), b: *buffer, c: buffer?): arr<buffer>;",
+            "f(a: buffer, b: *buffer, c: buffer?): arr<buffer>;",
+        ),
     ];
     for (a, b) in pairs {
         assert_eq!(

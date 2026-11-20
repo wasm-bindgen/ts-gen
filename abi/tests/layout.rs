@@ -1142,3 +1142,23 @@ fn unboxing_a_handle_or_function_recovers_the_handle() {
         }
     }
 }
+
+#[test]
+fn a_buffer_crosses_as_its_bytes() {
+    let ir = parse("");
+    let p = Profile::all_linear();
+    for flow in [Flow::ToJs, Flow::ToLang] {
+        assert_eq!(
+            wire_of(&ir, &p, "buffer", flow),
+            wire_of(&ir, &p, "u8[]", flow)
+        );
+        assert_eq!(
+            wire_of(&ir, &p, "buffer?", flow),
+            wire_of(&ir, &p, "u8[]?", flow)
+        );
+    }
+    assert_eq!(
+        wire_of(&ir, &p, "*buffer", Flow::ToJs),
+        wire_of(&ir, &p, "*u8[]", Flow::ToJs)
+    );
+}

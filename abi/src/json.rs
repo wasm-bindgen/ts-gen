@@ -924,14 +924,22 @@ pub fn repr(l: &Layouts<'_>, r: &Repr) -> Json {
             carrier: c,
             writeback,
             nullable: n,
+            buffer,
             ..
-        } => nullable(
-            o.set("kind", Json::str("vec"))
+        } => {
+            let o = o
+                .set("kind", Json::str("vec"))
                 .set("elem", Json::str(elem.name()))
                 .set("carrier", Json::str(carrier(*c)))
-                .set("writeback", Json::Bool(*writeback)),
-            *n,
-        ),
+                .set("writeback", Json::Bool(*writeback));
+            nullable(
+                match buffer {
+                    true => o.set("buffer", Json::Bool(true)),
+                    false => o,
+                },
+                *n,
+            )
+        }
         Kind::Array {
             elem,
             carrier: c,

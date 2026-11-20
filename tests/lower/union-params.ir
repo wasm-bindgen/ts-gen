@@ -58,6 +58,38 @@ interface Universal {
 
 configure(s: Universal) throws;
 
+class Box<T> {
+  get value(): T;
+  set value(value: T);
+}
+
+digest(data: buffer): ArrayBuffer throws;
+store(key: str, value: union ValueKind) throws;
+storeBlob(value: union ValueKind2) throws;
+load(): @js(null) buffer? throws;
+loadText(): BufferOrStr throws;
+join(parts: arr<buffer>): future<buffer>;
+boxed(): Box<BufferSource> throws;
+/// * `data`
+hash(data: buffer) throws;
+/// * `data`
+hash(data: *buffer) throws;
+/// * `data`
+hashText(data: str) throws;
+/// * `data`
+hashText(data: buffer) throws;
+/// * `data`
+hashText(data: *buffer) throws;
+
+interface Frame {
+  @js(object)
+  new();
+  get payload(): buffer;
+  set payload(value: buffer);
+  get tag(): BufferOrStr?;
+  set tag(value: union BufferOrStr);
+}
+
 enum Body {
   Str(str);
   Blob(Blob);
@@ -94,8 +126,33 @@ enum VKind {
   F64(f64);
 }
 
+enum ValueKind {
+  Str(str);
+  Buffer(buffer);
+}
+
+enum ValueKind2 {
+  Blob(Blob);
+  Buffer(buffer);
+  Str(str);
+}
+
+enum BufferOrStr {
+  Buffer(buffer);
+  Str(str);
+}
+
+enum BufferSource {
+  ArrayBuffer(ArrayBuffer);
+  ArrayBufferView(ArrayBufferView);
+}
+
 export namespace default {
   receive(body: Body) throws;
   take(piece: Chunk) throws;
   take(piece: Part) throws;
 }
+
+class ArrayBuffer {}
+
+interface ArrayBufferView {}
