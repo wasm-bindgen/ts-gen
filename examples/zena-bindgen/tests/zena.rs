@@ -368,6 +368,18 @@ fn check_imports(zena: &(PathBuf, PathBuf), name: &str, ir: &Ir, main: Option<&P
         if module == "tw:loop" {
             continue;
         }
+        if module == "tw:unbox" {
+            let t = ts_gen_abi::text::parse_type(&field).unwrap();
+            let sig = layouts
+                .unbox(&t, &Context::default())
+                .unwrap_or_else(|e| panic!("{name}: `tw:unbox` `{field}`: {e}"));
+            assert_eq!(
+                ty,
+                sig.core(),
+                "{name}: `tw:unbox` `{field}` has the wrong type"
+            );
+            continue;
+        }
         if module == "tw:isNullish" {
             assert_eq!(Some(ty), layouts.fixed_op(Some(&module), &field));
             continue;

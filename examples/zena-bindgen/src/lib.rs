@@ -18,6 +18,10 @@
 //! whose `@export` name is templated the same way (`tw:call:fn({T})->{U}`),
 //! so it exports at each instantiation it is passed at.
 //!
+//! A box as a type argument is typed for its conversion: `Str` and the
+//! scalar boxes are the instantiation at the unboxed type, and a tuple,
+//! array or typed array box is a handle class whose `unbox` converts it.
+//!
 //! What has no Zena form yet is left out with a `// skipped` line and
 //! listed in [`Output::skipped`]: type parameters anywhere but whole
 //! positions, host type arguments and generic callbacks' whole positions.
@@ -383,6 +387,7 @@ impl<'a> Gen<'a> {
             lib_names: HashMap::new(),
             lib_used: RefCell::new(BTreeSet::new()),
             arm: None,
+            boxes: HashMap::new(),
         }
     }
 
@@ -447,6 +452,8 @@ struct Gen<'a> {
     /// The arm variant (IR.md §7) being emitted: its key and parameter
     /// types.
     arm: Option<Arm>,
+    /// Box handle classes, by the box's canonical spelling.
+    boxes: HashMap<String, String>,
 }
 
 type Arm = (String, Vec<Type>);
@@ -1584,7 +1591,7 @@ impl<'a> Gen<'a> {
         if let Some(s) = self.spec_of(&canonical, &r.args, cx) {
             return Ok(s);
         }
-        let args: R<Vec<String>> = r.args.iter().map(|a| self.generic_surface(a, cx)).collect();
+        let args: R<Vec<String>> = r.args.iter().map(|a| self.targ_surface(a, cx)).collect();
         Ok(format!("{name}<{}>", args?.join(", ")))
     }
 
@@ -2183,9 +2190,9 @@ impl<'a> Gen<'a> {
             Kind::Host { of, nullable } => {
                 let t = match of {
                     Host::Class { path, .. } => self.class_surface(path, &r.ty)?,
-                    // Every box but `Str` stays opaque, an `externref` the
-                    // bindings only pass back, until a fixture needs typed
-                    // box handles.
+                    // In a direct position a box stays opaque, an
+                    // `externref` the bindings only pass back; as a type
+                    // argument it is typed (`targ_surface`).
                     Host::Any | Host::Box(_) => "externref".into(),
                     Host::Future { value, error } => {
                         self.future_fns(error)?;
@@ -2233,12 +2240,77 @@ impl<'a> Gen<'a> {
         if let Some(s) = self.spec_of(path, &r.args, &cx) {
             return Ok(s);
         }
-        let args: R<Vec<String>> = r
-            .args
-            .iter()
-            .map(|a| self.generic_surface(a, &cx))
-            .collect();
+        let args: R<Vec<String>> = r.args.iter().map(|a| self.targ_surface(a, &cx)).collect();
         Ok(format!("{name}<{}>", args?.join(", ")))
+    }
+
+    /// A type argument's Zena type. A box (§13) is a value the bridge
+    /// hasn't converted, so each is typed for the conversion it takes: a
+    /// `Str` or scalar box is the instantiation at its unboxed type, which
+    /// reads the same JS value, and a tuple, array or typed array box is a
+    /// handle class with an `unbox`.
+    fn targ_surface(&mut self, t: &Type, cx: &Context<'_>) -> R<String> {
+        match t {
+            Type::StrBox => Ok("String".into()),
+            Type::ScalarBox(s) => Ok(scalar(*s).into()),
+            Type::Nullable(inner, _) if matches!(**inner, Type::StrBox) => {
+                Ok("String | null".into())
+            }
+            Type::TupleBox(_) | Type::ArrBox(_) | Type::VecBox(_) if !mentions_tparam(t, cx) => {
+                Ok(self.box_class(t, cx).unwrap_or_else(|_| "externref".into()))
+            }
+            t => self.generic_surface(t, cx),
+        }
+    }
+
+    /// The handle class of a concrete box: an extension class on the JS
+    /// value, spelled as the box, whose `unbox` is `("tw:unbox", T)`.
+    fn box_class(&mut self, t: &Type, cx: &Context<'_>) -> R<String> {
+        let spelled = self.layouts.keys.ty(t, cx);
+        if let Some(name) = self.boxes.get(&spelled) {
+            return Ok(name.clone());
+        }
+        let inner = match t {
+            Type::TupleBox(es) => Type::Tuple(es.clone()),
+            Type::ArrBox(e) => Type::Array(e.clone()),
+            Type::VecBox(e) => Type::Vec(e.clone()),
+            _ => return skip("not a box with a handle class"),
+        };
+        let sig = match self.layouts.unbox(&inner, cx) {
+            Ok(s) => s,
+            Err(e) => return skip(e.to_string()),
+        };
+        let repr = &sig.results[0].repr;
+        let surface = self.surface(repr)?;
+        let raws = self.raw(repr)?;
+        let names: Vec<String> = (0..raws.len()).map(|i| format!("r{i}")).collect();
+        let decode = self.decode(repr, &names)?;
+        let name = unique(&mut self.used, type_ident(&upper_camel(&spelled)));
+        let unbox = unique(&mut self.used, format!("__tw_unbox_{name}"));
+        let result = match raws.len() {
+            1 => raws[0].clone(),
+            _ => format!("inline ({})", raws.join(", ")),
+        };
+        let _ = writeln!(
+            self.externs,
+            "@external(\"tw:unbox\", {}, \"tw\")\ndeclare function {unbox}(p0: externref): {result};\n",
+            zena_string(&brace_escape(&self.layouts.keys.ty(&inner, cx)))
+        );
+        let body = match raws.len() {
+            1 if decode == "r0" => format!("    return {unbox}((this as externref));\n"),
+            1 => format!("    let r0 = {unbox}((this as externref));\n    return {decode};\n"),
+            _ => format!(
+                "    let ({}) = {unbox}((this as externref));\n    return {decode};\n",
+                names.join(", ")
+            ),
+        };
+        let _ = writeln!(
+            self.types,
+            "/** The box `{spelled}`: the JS value, which `unbox` converts. */\n@spelling({})\nexport extension class {name} on externref {{\n  unbox(): {surface} {{\n{body}  }}\n}}\n",
+            zena_string(&spelled)
+        );
+        self.boxes.insert(spelled, name.clone());
+        Ok(name)
     }
 
     /// The import's Zena types for a value, one per wire value. Where the
@@ -3651,6 +3723,14 @@ fn overload_name(
 
 fn indent(s: &str) -> String {
     s.lines().map(|l| format!("  {l}\n")).collect()
+}
+
+/// A canonical spelling as one `UpperCamel` word: `Tuple<str,f64>` is
+/// `TupleStrF64`.
+fn upper_camel(s: &str) -> String {
+    s.split(|c: char| !(c.is_alphanumeric() || c == '?' || c == '['))
+        .map(|w| upper_first(&w.replace("[", "Array").replace('?', "Opt")))
+        .collect()
 }
 
 fn upper_first(s: &str) -> String {

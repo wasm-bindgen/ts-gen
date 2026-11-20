@@ -22,12 +22,12 @@ export class ErrException extends Error {
 }
 
 export extension class Env on externref {
-  flags: NumberRecord<externref> {
+  flags: NumberRecord<boolean> {
     get {
       return __Env_flags((this as externref));
     }
   }
-  vars: Record<externref> {
+  vars: Record<String> {
     get {
       return __Env_vars((this as externref));
     }
@@ -93,13 +93,13 @@ export extension class NumberRecord<V> on externref {
 }
 
 @external("tw:js/global", "Env#get:vars()", "tw")
-declare function __Env_vars(p0: externref): Record<externref>;
+declare function __Env_vars(p0: externref): Record<String>;
 
 @external("tw:js/global", "Env#set:vars(Record<Str>)", "tw")
-declare function __Env_vars2(p0: externref, p1: Record<externref>): void;
+declare function __Env_vars2(p0: externref, p1: Record<String>): void;
 
 @external("tw:js/global", "Env#get:flags()", "tw")
-declare function __Env_flags(p0: externref): NumberRecord<externref>;
+declare function __Env_flags(p0: externref): NumberRecord<boolean>;
 
 @external("tw:js/global", "Env#lookup(Record<EnvHeadersKind>)", "tw, throws:err")
 declare function __Env_lookup(p0: externref, p1: Record<EnvHeadersKind>): Record<Env>;

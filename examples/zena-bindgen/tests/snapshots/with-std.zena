@@ -174,7 +174,7 @@ export extension class Entry on externref {
       return __Entry_pattern((this as externref));
     }
   }
-  tags: Map<externref, externref> {
+  tags: Map<String, f64> {
     get {
       return __Entry_tags((this as externref));
     }
@@ -273,7 +273,7 @@ declare function __Entry_new(): externref;
 declare function __Entry_created(p0: externref): Date;
 
 @external("tw:js/global", "Entry#get:tags()", "tw")
-declare function __Entry_tags(p0: externref): Map<externref, externref>;
+declare function __Entry_tags(p0: externref): Map<String, f64>;
 
 @external("tw:js/global", "Entry#get:body()", "tw")
 declare function __Entry_body(p0: externref): Uint8Array;

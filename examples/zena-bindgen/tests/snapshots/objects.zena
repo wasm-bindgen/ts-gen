@@ -45,7 +45,7 @@ export extension class Upload on externref {
       __Upload_extra2((this as externref), value);
     }
   }
-  headers: Record<externref> {
+  headers: Record<String> {
     get {
       return __Upload_headers((this as externref));
     }
@@ -409,10 +409,10 @@ declare function __Upload_new(): externref;
 declare function __Upload_retry(p0: externref): UploadRetry | null;
 
 @external("tw:js/global", "Upload#get:headers()", "tw")
-declare function __Upload_headers(p0: externref): Record<externref>;
+declare function __Upload_headers(p0: externref): Record<String>;
 
 @external("tw:js/global", "Upload#set:headers(Record<Str>)", "tw")
-declare function __Upload_headers2(p0: externref, p1: Record<externref>): void;
+declare function __Upload_headers2(p0: externref, p1: Record<String>): void;
 
 @external("tw:js/global", "Upload#get:parts()", "tw")
 declare function __Upload_parts(p0: externref): FixedArray<UploadParts>;

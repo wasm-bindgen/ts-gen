@@ -34,6 +34,24 @@ export extension class BigInt64Array on externref {
 export extension class Uint8ClampedArray on externref {
 }
 
+/** The box `Arr<str>`: the JS value, which `unbox` converts. */
+@spelling("Arr<str>")
+export extension class ArrStr on externref {
+  unbox(): FixedArray<String> {
+    let r0 = __tw_unbox_ArrStr((this as externref));
+    return __str_array_in(r0);
+  }
+}
+
+/** The box `Tuple<str,f64>`: the JS value, which `unbox` converts. */
+@spelling("Tuple<str,f64>")
+export extension class TupleStrF64 on externref {
+  unbox(): (String, f64) {
+    let (r0, r1) = __tw_unbox_TupleStrF64((this as externref));
+    return (r0, r1);
+  }
+}
+
 @external("tw:js/global", "Stream#read<{T}>()", "tw, throws:err")
 declare function __Stream_read<T>(p0: externref): T;
 
@@ -67,11 +85,17 @@ declare function __list(p0: array<var externref | null>): FixedArray<f64>;
 @external("tw:js/global", "bytes()", "tw, throws:err")
 declare function __bytes(): Stream<Uint8Array>;
 
+@external("tw:unbox", "arr<str>", "tw")
+declare function __tw_unbox_ArrStr(p0: externref): array<var externref | null>;
+
 @external("tw:js/global", "arrays()", "tw, throws:err")
-declare function __arrays(): Stream<externref>;
+declare function __arrays(): Stream<ArrStr>;
+
+@external("tw:unbox", "(str,f64)", "tw")
+declare function __tw_unbox_TupleStrF64(p0: externref): inline (String, f64);
 
 @external("tw:js/global", "tuples()", "tw, throws:err")
-declare function __tuples(): Stream<externref>;
+declare function __tuples(): Stream<TupleStrF64>;
 
 @external("tw:js/global", "random(Uint8Array)", "tw, throws:err")
 declare function __random(p0: Uint8Array): void;
@@ -102,6 +126,15 @@ export function __str_array_out(a: FixedArray<String>): array<var externref | nu
     out[i] = e.handle;
   }
   return out as array<var externref | null>;
+}
+
+export function __str_array_in(a: array<var externref | null>): FixedArray<String> {
+  let out = new FixedArray<String>(a.length, '');
+  for (var i = 0; i < a.length; i += 1) {
+    let e = a[i];
+    out[i] = String.fromHandle(e as externref);
+  }
+  return out;
 }
 
 export function digest(data: Uint8Array): Uint8Array {
@@ -145,11 +178,11 @@ export function bytes(): Stream<Uint8Array> {
   return __bytes();
 }
 
-export function arrays(): Stream<externref> {
+export function arrays(): Stream<ArrStr> {
   return __arrays();
 }
 
-export function tuples(): Stream<externref> {
+export function tuples(): Stream<TupleStrF64> {
   return __tuples();
 }
 

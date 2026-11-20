@@ -249,7 +249,7 @@ declare function __Record_at<V>(p0: externref, p1: String): Option<V>;
 declare function __Record_setAt<V>(p0: externref, p1: String, p2: V): void;
 
 @external("tw:js/global", "nested(future<str?>,arr<str?>,Record<Str?>,fn(str?)->str?)", "tw")
-declare function __nested(p0: externref, p1: array<var externref | null>, p2: Record<externref | null>, p3: anyref): externref;
+declare function __nested(p0: externref, p1: array<var externref | null>, p2: Record<String | null>, p3: anyref): externref;
 
 @external("tw:js/global", "greet()", "tw, throws:err")
 declare function __greet(): void;
@@ -299,7 +299,7 @@ export function __tw_trampoline(env: anyref, p0_0: String | null): String | null
   return result;
 }
 
-export function nested(xs: Future<String | null>, ys: FixedArray<String | null>, r: Record<externref | null>, cb: (a0: String | null) => String | null): Future<String | null> {
+export function nested(xs: Future<String | null>, ys: FixedArray<String | null>, r: Record<String | null>, cb: (a0: String | null) => String | null): Future<String | null> {
   let r0 = __nested(__tw_promise<String | null>(xs), __str_opt_array_out(ys), r, (cb as anyref));
   return __tw_await<String | null>(r0 as externref);
 }

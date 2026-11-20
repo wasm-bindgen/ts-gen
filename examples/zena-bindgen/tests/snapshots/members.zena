@@ -276,7 +276,7 @@ export extension class Lines on externref {
     }
   }
   new() : super(__Lines_new());
-  iterator(): Iterator<externref> {
+  iterator(): Iterator<String> {
     return __Lines_iterator((this as externref));
   }
 }
@@ -404,7 +404,7 @@ declare function __Lines_new(): externref;
 declare function __Lines_count(p0: externref): f64;
 
 @external("tw:js/global", "Lines#iterator()", "tw, throws:err")
-declare function __Lines_iterator(p0: externref): Iterator<externref>;
+declare function __Lines_iterator(p0: externref): Iterator<String>;
 
 @external("tw:js/global", "Lines#get:toStringTag()", "tw")
 declare function __Lines_toStringTag(p0: externref): String;

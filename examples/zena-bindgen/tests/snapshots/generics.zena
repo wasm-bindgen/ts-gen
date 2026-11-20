@@ -865,7 +865,7 @@ export extension class Pipe<I = externref | null, O = externref | null> on exter
   }
 }
 
-export extension class Encoder extends Pipe<externref, Uint8Array> {
+export extension class Encoder extends Pipe<String, Uint8Array> {
 }
 
 export extension class Stepped<S> extends RoundingOptions<S> {
@@ -994,6 +994,15 @@ export extension class Record<V> on externref {
 }
 
 export extension class Uint8Array on externref {
+}
+
+/** The box `Arr<str>`: the JS value, which `unbox` converts. */
+@spelling("Arr<str>")
+export extension class ArrStr on externref {
+  unbox(): FixedArray<String> {
+    let r0 = __tw_unbox_ArrStr((this as externref));
+    return __str_array_in(r0);
+  }
 }
 
 @external("tw:js/global", "Box.new<Str>(T)", "tw, throws:err")
@@ -1441,10 +1450,13 @@ declare function __Record_setAt<V>(p0: externref, p1: String, p2: V): void;
 declare function __biggest<S>(p0: FixedArray<S>): S;
 
 @external("tw:js/global", "wrap(f64)", "tw, throws:err")
-declare function __wrap(p0: f64): Box<externref>;
+declare function __wrap(p0: f64): Box<f64>;
+
+@external("tw:unbox", "arr<str>", "tw")
+declare function __tw_unbox_ArrStr(p0: externref): array<var externref | null>;
 
 @external("tw:js/global", "strings()", "tw, throws:err")
-declare function __strings(): Box<externref>;
+declare function __strings(): Box<ArrStr>;
 
 @external("tw:js/global", "untilDate(RoundingOptions<DateUnit>)", "tw, throws:err")
 declare function __untilDate(p0: RoundingOptionsDateUnit): void;
@@ -1503,6 +1515,15 @@ export function __tw_trampoline2<U>(env: anyref, p0_0: f64): U {
   return result;
 }
 
+export function __str_array_in(a: array<var externref | null>): FixedArray<String> {
+  let out = new FixedArray<String>(a.length, '');
+  for (var i = 0; i < a.length; i += 1) {
+    let e = a[i];
+    out[i] = String.fromHandle(e as externref);
+  }
+  return out;
+}
+
 export function __str_array_out(a: FixedArray<String>): array<var externref | null> {
   let out = new FixedArray<externref | null>(a.length, null);
   for (var i = 0; i < a.length; i += 1) {
@@ -1537,11 +1558,11 @@ export function biggest<S>(shapes: FixedArray<S>): S {
   return __biggest<S>(shapes);
 }
 
-export function wrap(n: f64): Box<externref> {
+export function wrap(n: f64): Box<f64> {
   return __wrap(n);
 }
 
-export function strings(): Box<externref> {
+export function strings(): Box<ArrStr> {
   return __strings();
 }
 

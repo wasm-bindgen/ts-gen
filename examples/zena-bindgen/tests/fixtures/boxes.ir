@@ -1,0 +1,26 @@
+ir 1;
+
+class Cell<T> {
+  get value(): T;
+  set value(value: T);
+}
+
+enum Shape {
+  Name(str);
+  Sides(f64);
+}
+
+class Table {
+  entry(): Cell<Tuple<str, f64>>;
+  shape(): Cell<Tuple<str, Shape>>;
+  key(): Cell<Str>;
+  maybeKey(): Cell<Str?>;
+  flag(): Cell<Bool>;
+  count(): Cell<U32>;
+  names(): Cell<Arr<str>>;
+  bytes(): Cell<Vec<u8>>;
+  nested(): Cell<Cell<Tuple<str, f64>>>;
+  put(cell: Cell<Tuple<str, f64>>);
+}
+
+pairs<T>(of: T): Cell<Tuple<str, T>>;
