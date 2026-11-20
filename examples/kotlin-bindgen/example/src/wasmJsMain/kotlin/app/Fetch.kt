@@ -1,4 +1,4 @@
-// Subrequests: a service binding, the global fetch, and cancellation.
+// Subrequests: a service binding, the global fetch, a timeout, and cancellation.
 package app
 
 import tsgen.runtime.delay
@@ -18,22 +18,41 @@ suspend fun subrequests(env: Env): Response {
     }
     val posted = fetch("http://backend/post", init).await()
 
-    // Dropping a pending future cancels it: the bridge aborts the signal
-    // it put in the init, which the backend sees as its request aborting.
-    val pending = fetch("http://backend/slow", RequestInit())
+    // A caller's own signal is kept: the bridge joins it with the one it
+    // aborts on a drop, so the timeout still rejects the future.
+    val timed = RequestInit<RequestInitCfProperties>().apply { signal = AbortSignalStatic.timeout(50.0) }
+    val timeout = try {
+        fetch("http://backend/slow", timed).await()
+        "nothing"
+    } catch (e: ErrException) {
+        describe(e.error)
+    }
+    val timedOut = aborts(env)
+
+    // Dropping a pending future cancels it: the bridge aborts a signal of
+    // its own, which the backend sees as its request aborting. With no
+    // init to carry the signal, the bridge makes one.
+    val pending = fetch("http://backend/slow")
     delay(50.0)
     pending.drop()
-    var aborts = "0"
-    for (attempt in 1..50) {
-        aborts = env.BACKEND.fetch("http://backend/aborts").await().text().await()
-        if (aborts != "0") break
-        delay(20.0)
-    }
+    val dropped = aborts(env)
 
     val reply = """
         BACKEND.fetch: ${hello.status} ${hello.text().await()}
         fetch with an init: ${posted.status} ${posted.text().await()}
-        a dropped fetch: the backend saw $aborts of its requests abort
+        a fetch with AbortSignal.timeout(50) rejected with $timeout
+        the backend saw $timedOut of its requests abort
+        a dropped fetch: the backend saw $dropped of its requests abort
     """.trimIndent() + "\n"
     return text(reply)
+}
+
+/** How many of its requests the backend saw abort, once it has seen one. */
+private suspend fun aborts(env: Env): String {
+    for (attempt in 1..50) {
+        val seen = env.BACKEND.fetch("http://backend/aborts").await().text().await()
+        if (seen != "0") return seen
+        delay(20.0)
+    }
+    return "0"
 }

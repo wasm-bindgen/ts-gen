@@ -27,7 +27,7 @@ the router, and `Reply.kt` what the routes share.
 | `/json` | `Http.kt` | `request.json()`, `JSON`, `Response.json` | an erased generic (`json<T>`); an interface of fields, some optional; `Any`; an error enum from `@throws {SyntaxError}`; a static (`ResponseStatic`); a rejected future |
 | `/crypto` | `Crypto.kt` | `crypto.subtle.digest`, `getRandomValues`, `randomUUID`, `TextEncoder`, `btoa`/`atob` | a `union` of buffer types; a generic that returns its argument's type; `@throws {DOMException}` as its own exception |
 | `/stream` | `Streams.kt` | `ReadableStream`, `TransformStream`, `pipeTo`, `tee`, a streamed body | callbacks held in a dictionary, one returning a future (a suspend lambda); a tuple (`tee()`); boxes in erased positions (`toJsString()`) |
-| `/fetch` | `Fetch.kt` | a service binding, the global `fetch` with a `RequestInit` | a literal enum (`cache`); overloads of a `union` parameter; cancellation: `Future.drop()` runs the member's `cancel` |
+| `/fetch` | `Fetch.kt` | a service binding, the global `fetch` with a `RequestInit`, `AbortSignal.timeout` | a literal enum (`cache`); overloads of a `union` parameter; cancellation: `Future.drop()` runs the member's `cancel`, whose signal joins the caller's own |
 | `/timers` | `Timers.kt` | `scheduler.wait`, `setTimeout`, `queueMicrotask`, `ctx.waitUntil` | `future<unit>`; one-shot callbacks (`awaitCallback`); a future Kotlin provides (`tw:future new`) |
 | `/rewrite` | `Rewrite.kt` | `HTMLRewriter` | callbacks in a dictionary; `str?` (`getAttribute`) |
 | `/counter/*` | `Durable.kt` | a Durable Object: an id from a name, `stub.fetch`, KV `get`/`put`/`delete`/`list`, a transaction, SQL with a cursor, an alarm | an exported class, constructed by JS; boxes for an erased `T` (`get<JsNumber>`, `toJsNumber()`); a callback returning `future<T>`; overloads by argument type (`delete`); a variadic (`sql.exec`); an iterator (`cursor.next()`); a std `Map` |
@@ -39,8 +39,6 @@ the router, and `Reply.kt` what the routes share.
 
 Left out, for want of something to run them on in plain workerd: the Cache
 API, KV, R2 and D1. No member of workers-types that lowers returns `never`.
-A caller's own `AbortSignal` isn't shown either: a cancellable member fills
-`init.signal` with the bridge's, which is what `Future.drop()` aborts.
 
 The declarations beside the app:
 
