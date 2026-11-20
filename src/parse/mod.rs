@@ -72,6 +72,7 @@ pub fn parse_dts_files(
     bind_constructor_vars(&mut gctx, &mut module);
     enums::evaluate_ts_enums(&mut gctx, &mut module.types);
     erased_args::drop_erased_args(&mut gctx);
+    classify::optional_methods_as_properties(&mut gctx);
     eval::evaluate_types(&mut gctx, &mut module);
 
     Ok((module, gctx))
@@ -91,6 +92,7 @@ pub fn parse_single_source(
     bind_constructor_vars(&mut gctx, &mut module);
     enums::evaluate_ts_enums(&mut gctx, &mut module.types);
     erased_args::drop_erased_args(&mut gctx);
+    classify::optional_methods_as_properties(&mut gctx);
     eval::evaluate_types(&mut gctx, &mut module);
     Ok((module, gctx))
 }

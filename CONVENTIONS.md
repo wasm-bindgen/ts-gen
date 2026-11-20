@@ -816,6 +816,46 @@ TypeScript, a method's overloads accumulate across the merged declarations
 (see [signature flattening](#signature-flattening)), while a property,
 getter or setter declared again stays one binding.
 
+### Optional methods
+
+TypeScript takes `element?(e: Element): void` and
+`element?: (e: Element) => void` one for the other, and an interface whose
+methods are all optional reads the second way: each is an optional
+property of function type, so the interface is a dictionary a caller
+builds with the functions it has.
+
+```ts
+interface Handlers {
+  chunk?(chunk: Chunk): void | Promise<void>;
+  end?(): void;
+  label?: string;
+}
+```
+
+```rust
+#[wasm_bindgen(method, getter)]
+pub fn chunk(this: &Handlers) -> Option<Function<fn(Chunk) -> JsOption<Promise<Undefined>>>>;
+#[wasm_bindgen(method, setter)]
+pub fn set_chunk(this: &Handlers, val: &Function<fn(Chunk) -> JsOption<Promise<Undefined>>>);
+
+impl HandlersBuilder {
+    pub fn chunk(self, val: &Function<fn(Chunk) -> JsOption<Promise<Undefined>>>) -> Self;
+    pub fn end(self, val: &Function<fn() -> Undefined>) -> Self;
+    pub fn label(self, val: &str) -> Self;
+}
+```
+
+An inline object type reads the same way (`{ write?(chunk: string): void }`
+is a dictionary). The methods stay methods to call:
+
+* beside a required method, a construct signature, or under a parent
+  with either: the interface is an object to call through, whose method
+  needs its receiver (`interface DurableObject { fetch(…): …; alarm?(): … }`
+  keeps `alarm()`);
+* on a class;
+* where one is generic or overloaded, which a function type can't spell;
+  the interface then stays class-like as a whole.
+
 ### Shapes have no runtime class
 
 A class (including an interface merged with its `declare var`) is a JS

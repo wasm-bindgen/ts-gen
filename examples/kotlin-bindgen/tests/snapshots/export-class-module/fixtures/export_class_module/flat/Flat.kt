@@ -11,13 +11,13 @@ external fun DurableObjectState_new(): JsAny?
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun DurableObjectState_get_id(p0: JsAny?): JsAny?
 
-/** tw:err err */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun err_err(p0: JsAny?): Int
-
-/** tw:ret externref */
+/** tw:js/global DurableObject.new() */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
-external fun ret_externref(): JsAny?
+external fun DurableObject_new(): JsAny?
+
+/** tw:call (fn()->future<unit>?)? */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun call_fn_future_unit(p0: JsAny?): JsAny?
 
 /** tw:future take<unit> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -27,9 +27,17 @@ external fun take_unit(p0: JsAny?)
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun error_err(p0: JsAny?): Int
 
-/** tw:js/global DurableObject#alarm() */
+/** tw:ret externref */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun ret_externref(): JsAny?
+
+/** tw:js/global DurableObject#get:alarm() */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun DurableObject_alarm(p0: JsAny?): JsAny?
+external fun DurableObject_get_alarm(p0: JsAny?): JsAny?
+
+/** tw:js/global DurableObject#set:alarm(fn()->future<unit>?) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun DurableObject_set_alarm_fn_future_unit(p0: JsAny?, p1: JsAny?)
 
 /** tw:err set:err */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
@@ -42,6 +50,10 @@ external fun new_Counter_new_DurableObjectState_Env(p0: JsAny?, p1: JsAny?): JsA
 /** tw:unbox Counter */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun unbox_Counter(p0: JsAny?): JsAny?
+
+/** tw:err err */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun err_err(p0: JsAny?): Int
 
 /** tw:future new */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
@@ -70,4 +82,16 @@ external fun box_Counter(p0: JsAny?): JsAny?
 /** tw:box Greeter */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_Greeter(p0: JsAny?): JsAny?
+
+/** tw:future resolve<unit> */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun future_resolve_unit(p0: JsAny?)
+
+/** tw:box fn()->future<unit> */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_fn_future_unit(p0: JsAny?): JsAny?
+
+/** tw:unbox fn()->future<unit> */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_fn_future_unit(p0: JsAny?): JsAny?
 

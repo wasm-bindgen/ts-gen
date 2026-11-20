@@ -534,42 +534,67 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ExportedHandler<E = Env>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn fetch<E>(
+    #[wasm_bindgen(method, getter)]
+    pub fn fetch<E>(
         this: &ExportedHandler<E>,
-        request: &Request,
-        env: E,
-        ctx: &ExecutionContext,
-    ) -> Result<Response, JsValue>
+    ) -> Option<Function<fn(Request, E, ExecutionContext) -> Promise<Response>>>
     where
-        E: ::wasm_bindgen::convert::IntoWasmAbi;
-    #[wasm_bindgen(method, js_name = "fetch")]
-    pub fn fetch_promise<E>(
+        Option<Function<fn(Request, E, ExecutionContext) -> Promise<Response>>>:
+            ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_fetch<E>(
         this: &ExportedHandler<E>,
-        request: &Request,
-        env: E,
-        ctx: &ExecutionContext,
-    ) -> Promise<Response>
-    where
-        E: ::wasm_bindgen::convert::IntoWasmAbi;
-    #[wasm_bindgen(method, catch)]
-    pub async fn scheduled<E>(
+        val: &Function<fn(Request, E, ExecutionContext) -> Promise<Response>>,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn scheduled<E>(
         this: &ExportedHandler<E>,
-        controller: &ScheduledController,
-        env: E,
-        ctx: &ExecutionContext,
-    ) -> Result<(), JsValue>
+    ) -> Option<Function<fn(ScheduledController, E, ExecutionContext) -> Promise<Undefined>>>
     where
-        E: ::wasm_bindgen::convert::IntoWasmAbi;
-    #[wasm_bindgen(method, js_name = "scheduled")]
-    pub fn scheduled_promise<E>(
+        Option<Function<fn(ScheduledController, E, ExecutionContext) -> Promise<Undefined>>>:
+            ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_scheduled<E>(
         this: &ExportedHandler<E>,
-        controller: &ScheduledController,
-        env: E,
-        ctx: &ExecutionContext,
-    ) -> Promise<Undefined>
-    where
-        E: ::wasm_bindgen::convert::IntoWasmAbi;
+        val: &Function<fn(ScheduledController, E, ExecutionContext) -> Promise<Undefined>>,
+    );
+}
+impl<E: ::wasm_bindgen::convert::IntoWasmAbi> ExportedHandler<E> {
+    pub fn new() -> ExportedHandler<E> {
+        Self::builder().build()
+    }
+    pub fn builder() -> ExportedHandlerBuilder<E> {
+        ExportedHandlerBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl<E: ::wasm_bindgen::convert::IntoWasmAbi> Default for ExportedHandler<E> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct ExportedHandlerBuilder<E> {
+    inner: ExportedHandler<E>,
+}
+impl<E: ::wasm_bindgen::convert::IntoWasmAbi> ExportedHandlerBuilder<E> {
+    pub fn fetch(
+        self,
+        val: &Function<fn(Request, E, ExecutionContext) -> Promise<Response>>,
+    ) -> Self {
+        self.inner.set_fetch(val);
+        self
+    }
+    pub fn scheduled(
+        self,
+        val: &Function<fn(ScheduledController, E, ExecutionContext) -> Promise<Undefined>>,
+    ) -> Self {
+        self.inner.set_scheduled(val);
+        self
+    }
+    pub fn build(self) -> ExportedHandler<E> {
+        self.inner
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

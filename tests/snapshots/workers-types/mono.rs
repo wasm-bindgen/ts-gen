@@ -7526,47 +7526,149 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type HTMLRewriterElementContentHandlers;
-    #[wasm_bindgen(method, catch)]
+    #[wasm_bindgen(method, getter)]
     pub fn element(
         this: &HTMLRewriterElementContentHandlers,
-        element: &Element,
-    ) -> Result<Option<Promise<Undefined>>, JsValue>;
-    #[wasm_bindgen(method, catch)]
+    ) -> Option<Function<fn(Element) -> JsOption<Promise<Undefined>>>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_element(
+        this: &HTMLRewriterElementContentHandlers,
+        val: &Function<fn(Element) -> JsOption<Promise<Undefined>>>,
+    );
+    #[wasm_bindgen(method, getter)]
     pub fn comments(
         this: &HTMLRewriterElementContentHandlers,
-        comment: &Comment,
-    ) -> Result<Option<Promise<Undefined>>, JsValue>;
-    #[wasm_bindgen(method, catch)]
+    ) -> Option<Function<fn(Comment) -> JsOption<Promise<Undefined>>>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_comments(
+        this: &HTMLRewriterElementContentHandlers,
+        val: &Function<fn(Comment) -> JsOption<Promise<Undefined>>>,
+    );
+    #[wasm_bindgen(method, getter)]
     pub fn text(
         this: &HTMLRewriterElementContentHandlers,
-        element: &Text,
-    ) -> Result<Option<Promise<Undefined>>, JsValue>;
+    ) -> Option<Function<fn(Text) -> JsOption<Promise<Undefined>>>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(
+        this: &HTMLRewriterElementContentHandlers,
+        val: &Function<fn(Text) -> JsOption<Promise<Undefined>>>,
+    );
+}
+impl HTMLRewriterElementContentHandlers {
+    pub fn new() -> HTMLRewriterElementContentHandlers {
+        Self::builder().build()
+    }
+    pub fn builder() -> HTMLRewriterElementContentHandlersBuilder {
+        HTMLRewriterElementContentHandlersBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for HTMLRewriterElementContentHandlers {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct HTMLRewriterElementContentHandlersBuilder {
+    inner: HTMLRewriterElementContentHandlers,
+}
+impl HTMLRewriterElementContentHandlersBuilder {
+    pub fn element(self, val: &Function<fn(Element) -> JsOption<Promise<Undefined>>>) -> Self {
+        self.inner.set_element(val);
+        self
+    }
+    pub fn comments(self, val: &Function<fn(Comment) -> JsOption<Promise<Undefined>>>) -> Self {
+        self.inner.set_comments(val);
+        self
+    }
+    pub fn text(self, val: &Function<fn(Text) -> JsOption<Promise<Undefined>>>) -> Self {
+        self.inner.set_text(val);
+        self
+    }
+    pub fn build(self) -> HTMLRewriterElementContentHandlers {
+        self.inner
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type HTMLRewriterDocumentContentHandlers;
-    #[wasm_bindgen(method, catch)]
+    #[wasm_bindgen(method, getter)]
     pub fn doctype(
         this: &HTMLRewriterDocumentContentHandlers,
-        doctype: &Doctype,
-    ) -> Result<Option<Promise<Undefined>>, JsValue>;
-    #[wasm_bindgen(method, catch)]
+    ) -> Option<Function<fn(Doctype) -> JsOption<Promise<Undefined>>>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_doctype(
+        this: &HTMLRewriterDocumentContentHandlers,
+        val: &Function<fn(Doctype) -> JsOption<Promise<Undefined>>>,
+    );
+    #[wasm_bindgen(method, getter)]
     pub fn comments(
         this: &HTMLRewriterDocumentContentHandlers,
-        comment: &Comment,
-    ) -> Result<Option<Promise<Undefined>>, JsValue>;
-    #[wasm_bindgen(method, catch)]
+    ) -> Option<Function<fn(Comment) -> JsOption<Promise<Undefined>>>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_comments(
+        this: &HTMLRewriterDocumentContentHandlers,
+        val: &Function<fn(Comment) -> JsOption<Promise<Undefined>>>,
+    );
+    #[wasm_bindgen(method, getter)]
     pub fn text(
         this: &HTMLRewriterDocumentContentHandlers,
-        text: &Text,
-    ) -> Result<Option<Promise<Undefined>>, JsValue>;
-    #[wasm_bindgen(method, catch)]
+    ) -> Option<Function<fn(Text) -> JsOption<Promise<Undefined>>>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(
+        this: &HTMLRewriterDocumentContentHandlers,
+        val: &Function<fn(Text) -> JsOption<Promise<Undefined>>>,
+    );
+    #[wasm_bindgen(method, getter)]
     pub fn end(
         this: &HTMLRewriterDocumentContentHandlers,
-        end: &DocumentEnd,
-    ) -> Result<Option<Promise<Undefined>>, JsValue>;
+    ) -> Option<Function<fn(DocumentEnd) -> JsOption<Promise<Undefined>>>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_end(
+        this: &HTMLRewriterDocumentContentHandlers,
+        val: &Function<fn(DocumentEnd) -> JsOption<Promise<Undefined>>>,
+    );
+}
+impl HTMLRewriterDocumentContentHandlers {
+    pub fn new() -> HTMLRewriterDocumentContentHandlers {
+        Self::builder().build()
+    }
+    pub fn builder() -> HTMLRewriterDocumentContentHandlersBuilder {
+        HTMLRewriterDocumentContentHandlersBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for HTMLRewriterDocumentContentHandlers {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct HTMLRewriterDocumentContentHandlersBuilder {
+    inner: HTMLRewriterDocumentContentHandlers,
+}
+impl HTMLRewriterDocumentContentHandlersBuilder {
+    pub fn doctype(self, val: &Function<fn(Doctype) -> JsOption<Promise<Undefined>>>) -> Self {
+        self.inner.set_doctype(val);
+        self
+    }
+    pub fn comments(self, val: &Function<fn(Comment) -> JsOption<Promise<Undefined>>>) -> Self {
+        self.inner.set_comments(val);
+        self
+    }
+    pub fn text(self, val: &Function<fn(Text) -> JsOption<Promise<Undefined>>>) -> Self {
+        self.inner.set_text(val);
+        self
+    }
+    pub fn end(self, val: &Function<fn(DocumentEnd) -> JsOption<Promise<Undefined>>>) -> Self {
+        self.inner.set_end(val);
+        self
+    }
+    pub fn build(self) -> HTMLRewriterDocumentContentHandlers {
+        self.inner
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

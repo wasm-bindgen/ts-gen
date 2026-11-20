@@ -9,7 +9,10 @@ interface DurableObjectState {
 }
 
 interface DurableObject {
-  alarm(): future<unit>? throws;
+  @js(object)
+  new();
+  get alarm(): (fn() -> future<unit>?)?;
+  set alarm(value: fn() -> future<unit>?);
 }
 
 export class Counter extends "cloudflare:workers".DurableObject {

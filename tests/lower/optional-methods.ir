@@ -1,0 +1,74 @@
+ir 1;
+
+interface Element2 {
+  @js(object)
+  new();
+  get tag(): str;
+  set tag(value: str);
+}
+
+interface Handlers {
+  @js(object)
+  new();
+  /// Called per element.
+  get element(): (fn(Element2) -> future<unit>?)?;
+  set element(value: fn(Element2) -> future<unit>?);
+  get text(): fn(str, bool?)?;
+  set text(value: fn(str, bool?));
+  get name(): str?;
+  set name(value: str);
+}
+
+interface MoreHandlers extends Handlers {
+  @js(object)
+  new();
+  get end(): fn()?;
+  set end(value: fn());
+}
+
+rewrite(handlers: Handlers, more: MoreHandlers) throws;
+inline(handlers: InlineHandlers) throws;
+
+interface Stream {
+  pipe(sink: StreamSink) throws;
+}
+
+interface StreamSink {
+  @js(object)
+  new();
+  get write(): fn(str)?;
+  set write(value: fn(str));
+  get close(): fn()?;
+  set close(value: fn());
+}
+
+interface Actor {
+  fetch(request: str): str throws;
+  alarm() throws;
+}
+
+interface SubActor extends Actor {
+  close() throws;
+}
+
+class Entrypoint {
+  fetch(request: str): str throws;
+}
+
+interface Generic {
+  pick<T>(value: T): T throws;
+}
+
+interface Overloaded {
+  get(key: str): str throws;
+  get(key: f64): f64 throws;
+}
+
+interface InlineHandlers {
+  @js(object)
+  new();
+  get done(): fn()?;
+  set done(value: fn());
+  get label(): str;
+  set label(value: str);
+}
