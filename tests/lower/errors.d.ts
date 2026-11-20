@@ -7,7 +7,8 @@
 // which `err` folds together: then it has an arm per class and its own
 // `@fallback Error`.
 // A future-returning call taking a dictionary with an `AbortSignal`
-// `signal` aborts through a fresh controller when the future is dropped.
+// `signal` aborts through a fresh controller when the future is dropped,
+// whose signal joins the one the caller passes.
 
 declare class DOMException extends Error {
   constructor(message?: string, name?: string);
@@ -36,7 +37,8 @@ declare class StorageError extends DOMException {}
 /** @throws {DOMException | StorageError} */
 declare function open(): void;
 
-interface AbortSignal {
+declare class AbortSignal {
+  static any(signals: AbortSignal[]): AbortSignal;
   readonly aborted: boolean;
 }
 declare class AbortController {

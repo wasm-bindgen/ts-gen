@@ -633,7 +633,7 @@ fn export_classes() {
 
 #[test]
 fn the_end_to_end_example_validates_in_full() {
-    ok("enum FetchError extends err {\n  @js(DOMException[name = \"AbortError\"]) Aborted(Str);\n}\nclass AbortSignal {}\nclass AbortController { new(); get signal(): AbortSignal; abort(); }\ninterface RequestInit { set signal(v: AbortSignal); }\nclass Env {}\nclass ExecutionContext {}\nclass Request {\n  get url(): str;\n}\nclass Response {\n  new(body: str);\n}\n@js(\n  let c = AbortController.new(),\n  args = (input, init? { signal = c.signal }),\n  cancel = c.abort,\n)\nfetch(input: Request, init: RequestInit?): future<Response, FetchError>;\nexport namespace default {\n  fetch(request: Request, env: Env, ctx: ExecutionContext): future<Response>;\n}\n");
+    ok("enum FetchError extends err {\n  @js(DOMException[name = \"AbortError\"]) Aborted(Str);\n}\nclass AbortSignal { static any(signals: arr<AbortSignal>): AbortSignal; }\nclass AbortController { new(); get signal(): AbortSignal; abort(); }\ninterface RequestInit { get signal(): AbortSignal?; set signal(v: AbortSignal); }\nclass Env {}\nclass ExecutionContext {}\nclass Request {\n  get url(): str;\n}\nclass Response {\n  new(body: str);\n}\n@js(\n  let c = AbortController.new(),\n  args = (input, init? { signal = AbortSignal.any([init.signal, c.signal]) }),\n  cancel = c.abort,\n)\nfetch(input: Request, init: RequestInit?): future<Response, FetchError>;\nexport namespace default {\n  fetch(request: Request, env: Env, ctx: ExecutionContext): future<Response>;\n}\n");
 }
 
 #[test]

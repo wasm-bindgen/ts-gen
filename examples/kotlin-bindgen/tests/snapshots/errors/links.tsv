@@ -21,7 +21,7 @@ js_code	fixtures.errors.flat.err_ErrorErr	tw:err	ErrorErr
 js_code	fixtures.errors.flat.Kv_count	tw:js/global	Kv#count()
 js_code	fixtures.errors.flat.open	tw:js/global	open()
 js_code	fixtures.errors.flat.err_StorageOrDOMExceptionErr	tw:err	StorageOrDOMExceptionErr
-js_code	fixtures.errors.flat.AbortSignal_new	tw:js/global	AbortSignal.new()
+js_code	fixtures.errors.flat.AbortSignal_any_arr_AbortSignal	tw:js/global	AbortSignal.any(arr<AbortSignal>)
 js_code	fixtures.errors.flat.AbortSignal_get_aborted	tw:js/global	AbortSignal#get:aborted()
 js_code	fixtures.errors.flat.AbortController_new	tw:js/global	AbortController.new()
 js_code	fixtures.errors.flat.AbortController_get_signal	tw:js/global	AbortController#get:signal()

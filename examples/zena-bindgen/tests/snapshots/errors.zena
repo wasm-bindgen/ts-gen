@@ -349,7 +349,9 @@ export extension class AbortSignal on externref {
       return __AbortSignal_aborted((this as externref));
     }
   }
-  new() : super(__AbortSignal_new());
+  static any(signals: FixedArray<AbortSignal>): AbortSignal {
+    return __AbortSignal_any(signals);
+  }
 }
 
 export extension class AbortController on externref {
@@ -443,8 +445,8 @@ declare function __Kv_close(p0: externref): void;
 @external("tw:js/global", "Kv#count()", "tw, throws:err")
 declare function __Kv_count(p0: externref): f64;
 
-@external("tw:js/global", "AbortSignal.new()", "tw")
-declare function __AbortSignal_new(): externref;
+@external("tw:js/global", "AbortSignal.any(arr<AbortSignal>)", "tw, throws:err")
+declare function __AbortSignal_any(p0: FixedArray<AbortSignal>): AbortSignal;
 
 @external("tw:js/global", "AbortSignal#get:aborted()", "tw")
 declare function __AbortSignal_aborted(p0: externref): boolean;

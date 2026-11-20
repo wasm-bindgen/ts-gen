@@ -98,6 +98,13 @@ val AbortSignal.aborted: Boolean
         return (r0 != 0)
     }
 
+object AbortSignalStatic {
+    fun any(signals: List<AbortSignal>): AbortSignal {
+        val r0 = try { fixtures.errors.flat.AbortSignal_any_arr_AbortSignal(signals.toJsArray()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+        return r0!!.unsafeCast<AbortSignal>()
+    }
+}
+
 external interface AbortController : JsAny
 
 val AbortController.signal: AbortSignal
@@ -159,11 +166,6 @@ fun DOMException(message: String?, name: String): DOMException {
  */
 fun open() {
     try { fixtures.errors.flat.open() } catch (e: kotlin.js.JsException) { throw raiseStorageOrDOMExceptionErr(e) }
-}
-
-fun AbortSignal(): AbortSignal {
-    val r0 = fixtures.errors.flat.AbortSignal_new()
-    return r0!!.unsafeCast<AbortSignal>()
 }
 
 fun AbortController(): AbortController {

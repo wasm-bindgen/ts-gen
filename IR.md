@@ -1970,13 +1970,17 @@ shape:
 ```ts
 @js(
   let c = AbortController.new(),
-  args = (input, init? { signal = c.signal }),
+  args = (input, init? { signal = AbortSignal.any([init.signal, c.signal]) }),
   cancel = c.abort,
 )
 fetch(input: Request, init: RequestInit?): future<Response, FetchError>;
 ```
 
 * `let` values live with the future until it settles or is dropped.
+* A cancel signal joins the caller's and never replaces it: the fill
+  passes `AbortSignal.any` of the signal `init` came with, when it has
+  one, and the controller's (§7). The caller's signal still aborts the
+  call, and its `init` is unchanged.
 * On `drop`, the bridge calls `cancel` once.
   * A failing cancel function is swallowed, and doesn't settle the promise.
   * A later settlement is ignored.
@@ -1987,8 +1991,8 @@ fetch(input: Request, init: RequestInit?): future<Response, FetchError>;
 Example:
 
 1. Rust awaits `fetch(req)`. The bridge creates `c`, calls
-   `fetch(req, { signal: c.signal })`, and returns the Promise as an
-   `externref`.
+   `fetch(req, { signal: AbortSignal.any([c.signal]) })`, and returns the
+   Promise as an `externref`.
 2. The language polls it with its waker.
 3. The language drops the future: `("tw:future", "drop")` runs `c.abort()`.
 4. The resulting rejection is ignored.
@@ -2257,7 +2261,7 @@ class Response {
 
 @js(
   let c = AbortController.new(),
-  args = (input, init? { signal = c.signal }),
+  args = (input, init? { signal = AbortSignal.any([init.signal, c.signal]) }),
   cancel = c.abort,
 )
 fetch(input: Request, init: RequestInit?): future<Response, FetchError>;
