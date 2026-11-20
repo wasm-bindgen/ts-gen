@@ -5,6 +5,7 @@ package app
 
 import workers.*
 
+@Suppress("MayBeConstant")
 private val INDEX = """
     A tour of the Workers API from Kotlin/Wasm. Routes:
       /echo        the request read back: method, URL, headers, body
@@ -27,8 +28,7 @@ private val INDEX = """
 
 suspend fun fetch(request: HttpRequest, env: Env, ctx: ExecutionContext<JsAny?>): Response {
     val url = URL(request.url)
-    val path = url.pathname
-    return when (path) {
+    return when (val path = url.pathname) {
         "/" -> text(INDEX)
         "/echo" -> echo(request)
         "/url" -> url(url)
