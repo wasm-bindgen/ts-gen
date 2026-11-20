@@ -1334,7 +1334,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_function_and_event_target_add_event_listener_options(
+    pub fn add_event_listener_with_function_and_options(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
@@ -1343,7 +1343,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options(
+    pub fn add_event_listener_with_event_listener_object_and_options(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject,
         options: &EventTargetAddEventListenerOptions,
@@ -1386,7 +1386,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_function_and_event_target_event_listener_options(
+    pub fn remove_event_listener_with_function_and_options(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetEventListenerOptions,
@@ -1395,7 +1395,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object_and_event_target_event_listener_options(
+    pub fn remove_event_listener_with_event_listener_object_and_options(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject,
         options: &EventTargetEventListenerOptions,
@@ -3787,7 +3787,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_function_and_event_target_add_event_listener_options<EventMap>(
+    pub fn add_event_listener_with_function_and_options<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(Event) -> Undefined>,
@@ -3797,9 +3797,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options<
-        EventMap,
-    >(
+    pub fn add_event_listener_with_event_listener_object_and_options<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject,
@@ -3847,7 +3845,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_function_and_event_target_event_listener_options<EventMap>(
+    pub fn remove_event_listener_with_function_and_options<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(Event) -> Undefined>,
@@ -3857,9 +3855,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object_and_event_target_event_listener_options<
-        EventMap,
-    >(
+    pub fn remove_event_listener_with_event_listener_object_and_options<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject,
@@ -4732,7 +4728,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, catch, js_name = "encrypt")]
-    pub async fn encrypt_with_subtle_crypto_encrypt_algorithm(
+    pub async fn encrypt_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -4742,7 +4738,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, js_name = "encrypt")]
-    pub fn encrypt_with_subtle_crypto_encrypt_algorithm_promise(
+    pub fn encrypt_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -4772,7 +4768,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, catch, js_name = "encrypt")]
-    pub async fn encrypt_with_subtle_crypto_encrypt_algorithm_and_typed_array(
+    pub async fn encrypt_with_algorithm_and_typed_array(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -4782,7 +4778,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, js_name = "encrypt")]
-    pub fn encrypt_with_subtle_crypto_encrypt_algorithm_and_typed_array_promise(
+    pub fn encrypt_with_algorithm_and_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -4812,7 +4808,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, catch, js_name = "decrypt")]
-    pub async fn decrypt_with_subtle_crypto_encrypt_algorithm(
+    pub async fn decrypt_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -4822,7 +4818,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, js_name = "decrypt")]
-    pub fn decrypt_with_subtle_crypto_encrypt_algorithm_promise(
+    pub fn decrypt_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -4852,7 +4848,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, catch, js_name = "decrypt")]
-    pub async fn decrypt_with_subtle_crypto_encrypt_algorithm_and_typed_array(
+    pub async fn decrypt_with_algorithm_and_typed_array(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -4862,7 +4858,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, js_name = "decrypt")]
-    pub fn decrypt_with_subtle_crypto_encrypt_algorithm_and_typed_array_promise(
+    pub fn decrypt_with_algorithm_and_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
@@ -4892,7 +4888,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, catch, js_name = "sign")]
-    pub async fn sign_with_subtle_crypto_sign_algorithm(
+    pub async fn sign_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -4902,7 +4898,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, js_name = "sign")]
-    pub fn sign_with_subtle_crypto_sign_algorithm_promise(
+    pub fn sign_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -4932,7 +4928,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, catch, js_name = "sign")]
-    pub async fn sign_with_subtle_crypto_sign_algorithm_and_typed_array(
+    pub async fn sign_with_algorithm_and_typed_array(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -4942,7 +4938,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, js_name = "sign")]
-    pub fn sign_with_subtle_crypto_sign_algorithm_and_typed_array_promise(
+    pub fn sign_with_algorithm_and_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -4974,7 +4970,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm(
+    pub async fn verify_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -4985,7 +4981,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_subtle_crypto_sign_algorithm_promise(
+    pub fn verify_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5018,7 +5014,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_typed_array_and_array_buffer(
+    pub async fn verify_with_algorithm_and_typed_array_and_array_buffer(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5029,7 +5025,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_subtle_crypto_sign_algorithm_and_typed_array_and_array_buffer_promise(
+    pub fn verify_with_algorithm_and_typed_array_and_array_buffer_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5062,7 +5058,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_typed_array(
+    pub async fn verify_with_algorithm_and_array_buffer_and_typed_array(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5073,7 +5069,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_typed_array_promise(
+    pub fn verify_with_algorithm_and_array_buffer_and_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5106,7 +5102,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_typed_array_and_typed_array(
+    pub async fn verify_with_algorithm_and_typed_array_and_typed_array(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5117,7 +5113,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_subtle_crypto_sign_algorithm_and_typed_array_and_typed_array_promise(
+    pub fn verify_with_algorithm_and_typed_array_and_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
@@ -5146,7 +5142,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, catch, js_name = "digest")]
-    pub async fn digest_with_subtle_crypto_hash_algorithm(
+    pub async fn digest_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
         data: &ArrayBuffer,
@@ -5155,7 +5151,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, js_name = "digest")]
-    pub fn digest_with_subtle_crypto_hash_algorithm_promise(
+    pub fn digest_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
         data: &ArrayBuffer,
@@ -5182,7 +5178,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, catch, js_name = "digest")]
-    pub async fn digest_with_subtle_crypto_hash_algorithm_and_typed_array(
+    pub async fn digest_with_algorithm_and_typed_array(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
         data: &Object,
@@ -5191,7 +5187,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, js_name = "digest")]
-    pub fn digest_with_subtle_crypto_hash_algorithm_and_typed_array_promise(
+    pub fn digest_with_algorithm_and_typed_array_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
         data: &Object,
@@ -5220,7 +5216,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)"]
     #[wasm_bindgen(method, catch, js_name = "generateKey")]
-    pub async fn generate_key_with_subtle_crypto_generate_key_algorithm(
+    pub async fn generate_key_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoGenerateKeyAlgorithm,
         extractable: bool,
@@ -5230,7 +5226,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)"]
     #[wasm_bindgen(method, js_name = "generateKey")]
-    pub fn generate_key_with_subtle_crypto_generate_key_algorithm_promise(
+    pub fn generate_key_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoGenerateKeyAlgorithm,
         extractable: bool,
@@ -5264,7 +5260,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
-    pub async fn derive_key_with_subtle_crypto_derive_key_algorithm(
+    pub async fn derive_key_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5276,7 +5272,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, js_name = "deriveKey")]
-    pub fn derive_key_with_subtle_crypto_derive_key_algorithm_promise(
+    pub fn derive_key_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5288,7 +5284,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
-    pub async fn derive_key_with_subtle_crypto_import_key_algorithm(
+    pub async fn derive_key_with_derived_key_algorithm(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         base_key: &CryptoKey,
@@ -5300,7 +5296,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, js_name = "deriveKey")]
-    pub fn derive_key_with_subtle_crypto_import_key_algorithm_promise(
+    pub fn derive_key_with_derived_key_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         base_key: &CryptoKey,
@@ -5312,7 +5308,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
-    pub async fn derive_key_with_subtle_crypto_derive_key_algorithm_and_subtle_crypto_import_key_algorithm(
+    pub async fn derive_key_with_algorithm_and_derived_key_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5324,7 +5320,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, js_name = "deriveKey")]
-    pub fn derive_key_with_subtle_crypto_derive_key_algorithm_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn derive_key_with_algorithm_and_derived_key_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5354,7 +5350,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
-    pub async fn derive_bits_with_subtle_crypto_derive_key_algorithm(
+    pub async fn derive_bits_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5363,7 +5359,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, js_name = "deriveBits")]
-    pub fn derive_bits_with_subtle_crypto_derive_key_algorithm_promise(
+    pub fn derive_bits_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5392,7 +5388,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
-    pub async fn derive_bits_with_subtle_crypto_derive_key_algorithm_and_length(
+    pub async fn derive_bits_with_algorithm_and_length(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5402,7 +5398,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, js_name = "deriveBits")]
-    pub fn derive_bits_with_subtle_crypto_derive_key_algorithm_and_length_promise(
+    pub fn derive_bits_with_algorithm_and_length_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5460,7 +5456,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_json_web_key(
+    pub async fn import_key_with_key_data(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &JsonWebKey,
@@ -5472,7 +5468,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_json_web_key_promise(
+    pub fn import_key_with_key_data_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &JsonWebKey,
@@ -5484,7 +5480,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_subtle_crypto_import_key_algorithm(
+    pub async fn import_key_with_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &ArrayBuffer,
@@ -5496,7 +5492,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_subtle_crypto_import_key_algorithm_promise(
+    pub fn import_key_with_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &ArrayBuffer,
@@ -5508,7 +5504,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_typed_array_and_subtle_crypto_import_key_algorithm(
+    pub async fn import_key_with_typed_array_and_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &Object,
@@ -5520,7 +5516,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_typed_array_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn import_key_with_typed_array_and_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &Object,
@@ -5532,7 +5528,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_json_web_key_and_subtle_crypto_import_key_algorithm(
+    pub async fn import_key_with_key_data_and_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &JsonWebKey,
@@ -5544,7 +5540,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_json_web_key_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn import_key_with_key_data_and_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &JsonWebKey,
@@ -5596,7 +5592,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/wrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "wrapKey")]
-    pub async fn wrap_key_with_subtle_crypto_encrypt_algorithm(
+    pub async fn wrap_key_with_wrap_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
@@ -5607,7 +5603,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/wrapKey)"]
     #[wasm_bindgen(method, js_name = "wrapKey")]
-    pub fn wrap_key_with_subtle_crypto_encrypt_algorithm_promise(
+    pub fn wrap_key_with_wrap_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
@@ -5674,7 +5670,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_subtle_crypto_encrypt_algorithm(
+    pub async fn unwrap_key_with_unwrap_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &ArrayBuffer,
@@ -5688,7 +5684,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_subtle_crypto_encrypt_algorithm_promise(
+    pub fn unwrap_key_with_unwrap_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &ArrayBuffer,
@@ -5702,7 +5698,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm(
+    pub async fn unwrap_key_with_typed_array_and_unwrap_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &Object,
@@ -5716,7 +5712,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm_promise(
+    pub fn unwrap_key_with_typed_array_and_unwrap_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &Object,
@@ -5730,7 +5726,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_subtle_crypto_import_key_algorithm(
+    pub async fn unwrap_key_with_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &ArrayBuffer,
@@ -5744,7 +5740,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_subtle_crypto_import_key_algorithm_promise(
+    pub fn unwrap_key_with_unwrapped_key_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &ArrayBuffer,
@@ -5758,7 +5754,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_subtle_crypto_import_key_algorithm(
+    pub async fn unwrap_key_with_typed_array_and_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &Object,
@@ -5772,7 +5768,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn unwrap_key_with_typed_array_and_unwrapped_key_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &Object,
@@ -5786,7 +5782,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm(
+    pub async fn unwrap_key_with_unwrap_algorithm_and_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &ArrayBuffer,
@@ -5800,7 +5796,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn unwrap_key_with_unwrap_algorithm_and_unwrapped_key_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &ArrayBuffer,
@@ -5814,7 +5810,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm(
+    pub async fn unwrap_key_with_typed_array_and_unwrap_algorithm_and_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &Object,
@@ -5828,7 +5824,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn unwrap_key_with_typed_array_and_unwrap_algorithm_and_unwrapped_key_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         wrapped_key: &Object,
@@ -6945,7 +6941,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(algorithm: impl ::wasm_bindgen::JsStringLike) -> Result<DigestStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_subtle_crypto_hash_algorithm(
+    pub fn new_with_algorithm(
         algorithm: &SubtleCryptoHashAlgorithm,
     ) -> Result<DigestStream, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -8410,7 +8406,7 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Response , catch)]
     pub fn json(any: &JsValue) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn json_with_response_init(
+    pub fn json_with_maybe_init(
         any: &JsValue,
         maybe_init: &ResponseInit,
     ) -> Result<Response, JsValue>;
@@ -14793,24 +14789,24 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_pattern_init(input: &URLPatternInit) -> Result<URLPattern, JsValue>;
+    pub fn new_with_input(input: &URLPatternInit) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_str(
         input: Option<&str>,
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_pattern_init_and_str(
+    pub fn new_with_input_and_str(
         input: &URLPatternInit,
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str_and_url_pattern_options(
+    pub fn new_with_str_and_base_url(
         input: Option<&str>,
         base_url: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_pattern_init_and_url_pattern_options(
+    pub fn new_with_input_and_base_url(
         input: &URLPatternInit,
         base_url: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
@@ -14821,19 +14817,19 @@ extern "C" {
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_pattern_init_and_str_and_pattern_options(
+    pub fn new_with_input_and_str_and_pattern_options(
         input: &URLPatternInit,
         base_url: Option<&str>,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str_and_url_pattern_options_and_pattern_options(
+    pub fn new_with_str_and_base_url_and_pattern_options(
         input: Option<&str>,
         base_url: &URLPatternOptions,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_pattern_init_and_url_pattern_options_and_pattern_options(
+    pub fn new_with_input_and_base_url_and_pattern_options(
         input: &URLPatternInit,
         base_url: &URLPatternOptions,
         pattern_options: &URLPatternOptions,
@@ -14880,10 +14876,7 @@ extern "C" {
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "test")]
-    pub fn test_with_url_pattern_init(
-        this: &URLPattern,
-        input: &URLPatternInit,
-    ) -> Result<bool, JsValue>;
+    pub fn test_with_input(this: &URLPattern, input: &URLPatternInit) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "test")]
     pub fn test_with_str_and_base_url(
         this: &URLPattern,
@@ -14891,7 +14884,7 @@ extern "C" {
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "test")]
-    pub fn test_with_url_pattern_init_and_base_url(
+    pub fn test_with_input_and_base_url(
         this: &URLPattern,
         input: &URLPatternInit,
         base_url: impl ::wasm_bindgen::JsStringLike,
@@ -14904,7 +14897,7 @@ extern "C" {
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
-    pub fn exec_with_url_pattern_init(
+    pub fn exec_with_input(
         this: &URLPattern,
         input: &URLPatternInit,
     ) -> Result<Option<URLPatternResult>, JsValue>;
@@ -14915,7 +14908,7 @@ extern "C" {
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
-    pub fn exec_with_url_pattern_init_and_base_url(
+    pub fn exec_with_input_and_base_url(
         this: &URLPattern,
         input: &URLPatternInit,
         base_url: impl ::wasm_bindgen::JsStringLike,
@@ -16126,7 +16119,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
     #[wasm_bindgen(method, catch, js_name = "postMessage")]
-    pub fn post_message_with_data_and_message_port_post_message_options(
+    pub fn post_message_with_data_and_options(
         this: &MessagePort,
         data: &JsValue,
         options: &MessagePortPostMessageOptions,
@@ -35400,23 +35393,23 @@ extern "C" {
         options: &ConversionRequestOptions,
     ) -> Promise<Array<ConversionResponse>>;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
-    pub async fn to_markdown_with_markdown_document<AiModelList>(
+    pub async fn to_markdown_with_files<AiModelList>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
     ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_markdown_document_promise<AiModelList>(
+    pub fn to_markdown_with_files_promise<AiModelList>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
     ) -> Promise<ConversionResponse>;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
-    pub async fn to_markdown_with_markdown_document_and_options<AiModelList>(
+    pub async fn to_markdown_with_files_and_options<AiModelList>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,
     ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_markdown_document_and_options_promise<AiModelList>(
+    pub fn to_markdown_with_files_and_options_promise<AiModelList>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,
@@ -45022,7 +45015,7 @@ pub mod cloudflare {
         #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "connect")]
-            pub fn connect_with_socket_address(
+            pub fn connect_with_address(
                 address: &super::super::SocketAddress,
             ) -> Result<super::super::Socket, JsValue>;
         }
@@ -45037,7 +45030,7 @@ pub mod cloudflare {
         #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "connect")]
-            pub fn connect_with_socket_address_and_options(
+            pub fn connect_with_address_and_options(
                 address: &super::super::SocketAddress,
                 options: &super::super::SocketOptions,
             ) -> Result<super::super::Socket, JsValue>;
@@ -50749,23 +50742,23 @@ extern "C" {
         options: &ConversionRequestOptions,
     ) -> Promise<Array<ConversionResponse>>;
     #[wasm_bindgen(method, catch, js_name = "transform")]
-    pub async fn transform_with_markdown_document(
+    pub async fn transform_with_files(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
     ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, js_name = "transform")]
-    pub fn transform_with_markdown_document_promise(
+    pub fn transform_with_files_promise(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
     ) -> Promise<ConversionResponse>;
     #[wasm_bindgen(method, catch, js_name = "transform")]
-    pub async fn transform_with_markdown_document_and_options(
+    pub async fn transform_with_files_and_options(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,
     ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, js_name = "transform")]
-    pub fn transform_with_markdown_document_and_options_promise(
+    pub fn transform_with_files_and_options_promise(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,

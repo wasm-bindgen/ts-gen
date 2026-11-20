@@ -589,8 +589,15 @@ pub fn expand_signatures(
         .filter(|(_, s)| s.is_none())
         .map(|(sig, _)| sig.clone())
         .collect();
-    let mut plain_suffixes = compute_suffixes(&plain).into_iter();
-    let keyed_suffixes = suffixes_among(&plain, stripped.iter().flatten());
+    // A setter's parameter has no name of its own to give an arm.
+    let scope = overloads.first().map(|o| o.body_scope);
+    let is_dictionary = |ty: &TypeRef| match (cgctx, scope) {
+        (Some(c), Some(scope)) if !setter => is_dictionary_type(ty, c, scope),
+        _ => false,
+    };
+    let dictionary: Dictionaries<'_> = &is_dictionary;
+    let mut plain_suffixes = compute_suffixes(&plain, dictionary).into_iter();
+    let keyed_suffixes = suffixes_among(&plain, stripped.iter().flatten(), dictionary);
     let mut keyed_suffixes = keyed_suffixes.into_iter();
     let suffixes: Vec<String> = stripped
         .iter()
@@ -615,7 +622,7 @@ pub fn expand_signatures(
                 && !params.is_empty()
                 && params.iter().all(|p| p.type_ref == TypeRef::Null)
             {
-                name_suffix = compute_suffixes(&[Vec::new(), params.clone()])
+                name_suffix = compute_suffixes(&[Vec::new(), params.clone()], dictionary)
                     .pop()
                     .unwrap_or_default();
             }
@@ -686,15 +693,16 @@ fn takes_undefined_as_none(alt: &TypeRef) -> bool {
 fn suffixes_among<'a>(
     cohort: &[Vec<ConcreteParam>],
     extras: impl Iterator<Item = &'a Vec<ConcreteParam>> + Clone,
+    dictionary: Dictionaries<'_>,
 ) -> Vec<String> {
-    let cohort_suffixes = compute_suffixes(cohort);
+    let cohort_suffixes = compute_suffixes(cohort, dictionary);
     let mut all = cohort.to_vec();
     for extra in extras.clone() {
         if !all.iter().any(|s| concrete_params_eq(s, extra)) {
             all.push(extra.clone());
         }
     }
-    let all_suffixes = compute_suffixes(&all);
+    let all_suffixes = compute_suffixes(&all, dictionary);
     extras
         .map(|extra| {
             if let Some(pos) = cohort.iter().position(|s| concrete_params_eq(s, extra)) {
@@ -1188,14 +1196,52 @@ fn push_with_js_string_return(
 /// Public alias of [`compute_suffixes`] for callers in sibling modules
 /// that build their own concrete signature lists.
 pub fn compute_suffixes_pub(expansions: &[Vec<ConcreteParam>]) -> Vec<String> {
-    compute_suffixes(expansions)
+    compute_suffixes(expansions, &|_| false)
 }
 
-fn compute_suffixes(expansions: &[Vec<ConcreteParam>]) -> Vec<String> {
+/// [`compute_suffixes_pub`] for a callable's own parameters, whose
+/// dictionary arms are named by parameter (see [`compute_rust_names`]).
+pub(crate) fn compute_suffixes_in(
+    expansions: &[Vec<ConcreteParam>],
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> Vec<String> {
+    compute_suffixes(expansions, &|ty| is_dictionary_type(ty, cgctx, scope))
+}
+
+/// Whether a type is a dictionary, for [`compute_rust_names`].
+type Dictionaries<'a> = &'a dyn Fn(&TypeRef) -> bool;
+
+/// A reference to a dictionary interface (an options bag).
+fn is_dictionary_type(ty: &TypeRef, cgctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    let core = ty.split_empties().map(|(core, _)| core);
+    let TypeRef::Reference { segments, .. } = core.as_ref().unwrap_or(ty) else {
+        return false;
+    };
+    let [name] = segments.as_slice() else {
+        return false;
+    };
+    cgctx
+        .gctx
+        .scopes
+        .resolve(scope, name)
+        .is_some_and(|id| match &cgctx.gctx.get_type(id).kind {
+            crate::ir::TypeKind::Interface(i) => {
+                i.classification == crate::ir::InterfaceClassification::Dictionary
+            }
+            crate::ir::TypeKind::DiscriminatedUnion(_) => true,
+            _ => false,
+        })
+}
+
+fn compute_suffixes(
+    expansions: &[Vec<ConcreteParam>],
+    dictionary: Dictionaries<'_>,
+) -> Vec<String> {
     // Use a placeholder base — `BASE` is just a prefix that won't appear in
     // any param name, so we can safely strip it back off.
     const BASE: &str = "BASE";
-    compute_rust_names(BASE, expansions)
+    compute_rust_names(BASE, expansions, dictionary)
         .into_iter()
         .map(|name| {
             // `compute_rust_names` returns either `BASE` (primary, no suffix)
@@ -1759,7 +1805,11 @@ fn flatten_collapse_to_lub(
 ///
 /// These are candidate names — the caller declares them in the block's `LocalScope` for
 /// final uniqueness within the extern block.
-fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec<String> {
+fn compute_rust_names(
+    base_name: &str,
+    signatures: &[Vec<ConcreteParam>],
+    dictionary: Dictionaries<'_>,
+) -> Vec<String> {
     if signatures.len() == 1 {
         return vec![base_name.to_string()];
     }
@@ -1796,6 +1846,16 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
     names.push(base_name.to_string());
     used.claim(base_name);
 
+    // A parameter's only dictionary arm is the parameter spelled out, so
+    // it takes the parameter's name; two dictionaries are told apart by type.
+    let sole_dictionary = |abs_idx: usize, param: &ConcreteParam| {
+        dictionary(&param.type_ref)
+            && signatures
+                .iter()
+                .filter_map(|sig| sig.get(abs_idx))
+                .filter(|p| p.name == param.name && dictionary(&p.type_ref))
+                .all(|p| p.type_ref == param.type_ref)
+    };
     let plan = |sig_idx: usize, sig: &[ConcreteParam]| -> (Vec<SuffixPart>, Vec<SuffixPart>) {
         // Compute per-position suffix parts, each tagged with whether
         // the suffix used the type-name (which is collision-prone) or
@@ -1859,6 +1919,8 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
                 (format!("{param_snake}_null"), false)
             } else if is_null(param) {
                 ("null".to_string(), false)
+            } else if any_same_name_different_type && sole_dictionary(abs_idx, param) {
+                (param_snake.clone(), false)
             } else if any_same_name_different_type {
                 (type_snake_name(&param.type_ref), true)
             } else {

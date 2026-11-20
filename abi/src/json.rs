@@ -47,7 +47,7 @@ use crate::layout::*;
 use crate::naming::{self, Slot};
 use crate::profile::{Carrier, Encoding, Profile, StrCarrier, Throws};
 use crate::protocol;
-use crate::resolve::{Context, Location, Target, TypeDecl};
+use crate::resolve::{Context, Location, Symbols, Target, TypeDecl};
 use crate::text::name;
 
 pub const FORMAT: &str = "ts-gen-abi/lowered";
@@ -273,7 +273,7 @@ pub fn lower_with(ir: &Ir, libs: &[&Ir], profile: &Profile) -> Json {
         })
         .collect();
     let keyed = l.keys.members();
-    let variants = variants(&keyed);
+    let variants = variants(&keyed, &l.keys.symbols);
     let members = keyed
         .iter()
         .zip(variants)
@@ -559,7 +559,7 @@ fn tparam(l: &Layouts<'_>, p: &TypeParam, cx: &Context<'_>) -> Json {
 
 /// Each member's [`naming::variant_names`] name among the members sharing
 /// its owner, namespace, staticness, kind and name.
-fn variants(keyed: &[Keyed<'_>]) -> Vec<Option<String>> {
+fn variants(keyed: &[Keyed<'_>], symbols: &Symbols<'_>) -> Vec<Option<String>> {
     let mut groups: Vec<(GroupKey<'_>, Vec<usize>)> = Vec::new();
     for (i, k) in keyed.iter().enumerate() {
         let g = group_key(k);
@@ -582,6 +582,9 @@ fn variants(keyed: &[Keyed<'_>]) -> Vec<Option<String>> {
                         name: &p.name,
                         ty: &p.ty,
                         rest: false,
+                        // A setter's `value` names nothing.
+                        dictionary: !matches!(keyed[i].member.kind, MemberKind::Set(_))
+                            && naming::is_dictionary(symbols, &p.ty, &keyed[i].cx),
                     })
                     .collect()
             })

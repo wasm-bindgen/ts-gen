@@ -86,6 +86,25 @@ impl ConditionalBuilder {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Algorithm;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &Algorithm) -> String;
+    #[wasm_bindgen(method, getter, js_name = "name")]
+    pub fn name_js_string(this: &Algorithm) -> JsString;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &Algorithm, val: impl ::wasm_bindgen::JsStringLike);
+}
+impl Algorithm {
+    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Algorithm {
+        let inner: Algorithm = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_name(name);
+        inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
     pub async fn get(
@@ -250,4 +269,54 @@ extern "C" {
         fields: &Conditional,
         options: &GetOptions,
     ) -> Result<Store, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn decrypt(
+        this: &Store,
+        algorithm: impl ::wasm_bindgen::JsStringLike,
+        data: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "decrypt")]
+    pub async fn decrypt_js_string(
+        this: &Store,
+        algorithm: impl ::wasm_bindgen::JsStringLike,
+        data: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, js_name = "decrypt")]
+    pub fn decrypt_promise(
+        this: &Store,
+        algorithm: impl ::wasm_bindgen::JsStringLike,
+        data: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<JsString>;
+    #[wasm_bindgen(method, catch, js_name = "decrypt")]
+    pub async fn decrypt_with_algorithm(
+        this: &Store,
+        algorithm: &Algorithm,
+        data: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "decrypt")]
+    pub async fn decrypt_with_algorithm_js_string(
+        this: &Store,
+        algorithm: &Algorithm,
+        data: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, js_name = "decrypt")]
+    pub fn decrypt_with_algorithm_promise(
+        this: &Store,
+        algorithm: &Algorithm,
+        data: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<JsString>;
+    #[wasm_bindgen(method, catch)]
+    pub fn listen(this: &Store, r#type: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "listen")]
+    pub fn listen_with_options(
+        this: &Store,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "listen")]
+    pub fn listen_with_bool(
+        this: &Store,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        options: bool,
+    ) -> Result<(), JsValue>;
 }

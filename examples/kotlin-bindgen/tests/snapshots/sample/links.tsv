@@ -32,10 +32,15 @@ js_code	fixtures.sample.flat.Bytes_from_Map_str_f64	tw:js/global	Bytes.from(Map<
 js_code	fixtures.sample.flat.Bytes_from_Map_str_T	tw:js/global	Bytes.from(Map<str,T>)
 js_code	fixtures.sample.flat.Bytes_at_u32	tw:js/global	Bytes#at(u32)
 js_code	fixtures.sample.flat.Bytes_at_i32	tw:js/global	Bytes#at(i32)
+js_code	fixtures.sample.flat.Bytes_slice_str	tw:js/global	Bytes#slice(str)
+js_code	fixtures.sample.flat.Bytes_slice_SliceOptions	tw:js/global	Bytes#slice(SliceOptions)
 js_code	fixtures.sample.flat.Bytes_one	tw:js/global	Bytes#one()
 js_code	fixtures.sample.flat.Bytes_quad	tw:js/global	Bytes#quad()
 js_code	fixtures.sample.flat.ret_i32	tw:ret	i32
 js_code	fixtures.sample.flat.ret_f64	tw:ret	f64
+js_code	fixtures.sample.flat.SliceOptions_new	tw:js/global	SliceOptions.new()
+js_code	fixtures.sample.flat.SliceOptions_get_start	tw:js/global	SliceOptions#get:start()
+js_code	fixtures.sample.flat.SliceOptions_set_start_u32	tw:js/global	SliceOptions#set:start(u32)
 js_code	fixtures.sample.flat.KVNamespace_get_str	tw:js/global	KVNamespace#get(str)
 js_code	fixtures.sample.flat.take_str_2	tw:future	take<str?>
 js_code	fixtures.sample.flat.error_KvError	tw:future	error<KvError>

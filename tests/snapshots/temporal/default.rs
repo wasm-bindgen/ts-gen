@@ -2723,7 +2723,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_round_to(
             this: &PlainTime,
             round_to: &RoundToOptions<JsString>,
         ) -> PlainTime;
@@ -2731,7 +2731,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_round_to_options(
+        pub fn try_round_with_round_to(
             this: &PlainTime,
             round_to: &RoundToOptions<JsString>,
         ) -> Result<PlainTime, RangeError>;
@@ -3421,7 +3421,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_round_to(
             this: &PlainDateTime,
             round_to: &RoundToOptions,
         ) -> PlainDateTime;
@@ -3429,7 +3429,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_round_to_options(
+        pub fn try_round_with_round_to(
             this: &PlainDateTime,
             round_to: &RoundToOptions,
         ) -> Result<PlainDateTime, RangeError>;
@@ -4270,7 +4270,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_round_to(
             this: &ZonedDateTime,
             round_to: &RoundToOptions,
         ) -> ZonedDateTime;
@@ -4278,7 +4278,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_round_to_options(
+        pub fn try_round_with_round_to(
             this: &ZonedDateTime,
             round_to: &RoundToOptions,
         ) -> Result<ZonedDateTime, RangeError>;
@@ -4413,12 +4413,12 @@ pub mod temporal {
             direction: ZonedDateTimeDirection,
         ) -> Result<Option<ZonedDateTime>, JsValue>;
         #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
-        pub fn get_time_zone_transition_with_transition_options(
+        pub fn get_time_zone_transition_with_direction(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
         ) -> Option<ZonedDateTime>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
-        pub fn try_get_time_zone_transition_with_transition_options(
+        pub fn try_get_time_zone_transition_with_direction(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
         ) -> Result<Option<ZonedDateTime>, JsValue>;
@@ -5202,16 +5202,13 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the duration has calendar units and `relativeTo` is not given"]
         #[doc = " * `TypeError` — if `relativeTo` is an object missing the fields it needs"]
         #[wasm_bindgen(method, js_name = "total")]
-        pub fn total_with_duration_total_options(
-            this: &Duration,
-            total_of: &DurationTotalOptions,
-        ) -> f64;
+        pub fn total_with_total_of(this: &Duration, total_of: &DurationTotalOptions) -> f64;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the duration has calendar units and `relativeTo` is not given"]
         #[doc = " * `TypeError` — if `relativeTo` is an object missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "total")]
-        pub fn try_total_with_duration_total_options(
+        pub fn try_total_with_total_of(
             this: &Duration,
             total_of: &DurationTotalOptions,
         ) -> Result<f64, Error>;
@@ -5566,15 +5563,12 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, js_name = "round")]
-        pub fn round_with_round_to_options(
-            this: &Instant,
-            round_to: &RoundToOptions<JsString>,
-        ) -> Instant;
+        pub fn round_with_round_to(this: &Instant, round_to: &RoundToOptions<JsString>) -> Instant;
         #[doc = " ## Errors"]
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn try_round_with_round_to_options(
+        pub fn try_round_with_round_to(
             this: &Instant,
             round_to: &RoundToOptions<JsString>,
         ) -> Result<Instant, RangeError>;

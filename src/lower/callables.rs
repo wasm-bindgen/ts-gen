@@ -2229,10 +2229,13 @@ fn rename_group(overloads: &mut [Overload], group: &[usize]) {
                     (Slot::Param { name, .. }, Some(value)) => {
                         vec![naming::Slot::Const { name, value }]
                     }
+                    // A group shares one key, so no position is retyped
+                    // but a setter's `value`, which names nothing.
                     (Slot::Param { name, ty, rest, .. }, None) => vec![naming::Slot::Param {
                         name,
                         ty,
                         rest: *rest,
+                        dictionary: false,
                     }],
                     (Slot::Const { name, value }, _) => vec![naming::Slot::Const { name, value }],
                 })

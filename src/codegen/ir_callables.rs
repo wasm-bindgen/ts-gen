@@ -540,7 +540,7 @@ fn restated(
             .iter()
             .map(|&k| expansions[k].params.clone())
             .collect();
-        let suffixes = crate::codegen::signatures::compute_suffixes_pub(&params);
+        let suffixes = crate::codegen::signatures::compute_suffixes_in(&params, cgctx, scope);
         for (k, s) in plain.into_iter().zip(suffixes) {
             expansions[k].name_suffix = s;
         }
