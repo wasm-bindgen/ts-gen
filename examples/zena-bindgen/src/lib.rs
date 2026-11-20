@@ -21,6 +21,11 @@
 //! A box as a type argument is typed for its conversion: `Str` and the
 //! scalar boxes are the instantiation at the unboxed type, and a tuple,
 //! array or typed array box is a handle class whose `unbox` converts it.
+//! An enum argument is such a handle class too, instantiating as `Any`.
+//!
+//! The standard library's `Iterator<T>` gains `step()`, which reads one
+//! `next()` result through `IteratorYieldResult<T>` as `(true, value)` or
+//! `(false, _)`, the form a `while (let (true, x) = it.step())` loop takes.
 //!
 //! What has no Zena form yet is left out with a `// skipped` line and
 //! listed in [`Output::skipped`]: type parameters anywhere but whole
@@ -388,6 +393,7 @@ impl<'a> Gen<'a> {
             lib_used: RefCell::new(BTreeSet::new()),
             arm: None,
             boxes: HashMap::new(),
+            iter_result: None,
         }
     }
 
@@ -454,6 +460,9 @@ struct Gen<'a> {
     arm: Option<Arm>,
     /// Box handle classes, by the box's canonical spelling.
     boxes: HashMap<String, String>,
+    /// The class of a JS iterator's results, where the IR declares the
+    /// iterator protocol ([`Gen::iterator_protocol`]).
+    iter_result: Option<String>,
 }
 
 type Arm = (String, Vec<Type>);
@@ -1225,6 +1234,11 @@ impl<'a> Gen<'a> {
         for c in self.specs.keys() {
             self.parents.insert(self.names[c].clone());
         }
+        if let Some(result) = self.iterator_protocol() {
+            // `step` views `next()`'s result as one.
+            self.parents.insert(result.clone());
+            self.iter_result = Some(result);
+        }
         for (i, parent) in parents.into_iter().enumerate() {
             let TypeDecl::Class(c) = self.decls[i].decl else {
                 continue;
@@ -1252,6 +1266,48 @@ impl<'a> Gen<'a> {
             self.specs.insert(canonical, specs);
         }
         Ok(())
+    }
+
+    /// The JS iterator protocol as std declares it: a global
+    /// `Iterator<T>` whose `next()` returns `Any`, TypeScript's union of
+    /// the result types, and `IteratorYieldResult<T>` with `done` and
+    /// `value`. Returns the result class's Zena name.
+    fn iterator_protocol(&self) -> Option<String> {
+        let class = |name: &str| {
+            self.decls.iter().find_map(|d| match d.decl {
+                TypeDecl::Class(c)
+                    if d.loc.module.is_none() && d.loc.path == [name] && c.tparams.len() == 1 =>
+                {
+                    Some(c)
+                }
+                _ => None,
+            })
+        };
+        let named = |m: &Member, name: &str| m.kind.name() == Some(name) && !m.is_static;
+        let next = class("Iterator")?
+            .members
+            .iter()
+            .find(|m| named(m, "next"))?;
+        let rest = next.params.iter().all(|p| matches!(p.ty, Type::Array(_)));
+        if !matches!(next.kind, MemberKind::Method(_)) || next.result != Type::Any || !rest {
+            return None;
+        }
+        let result = class("IteratorYieldResult")?;
+        let getter = |name: &str| {
+            result
+                .members
+                .iter()
+                .find(|m| named(m, name) && matches!(m.kind, MemberKind::Get(_)))
+        };
+        let done = getter("done")?;
+        let value = getter("value")?;
+        let tparam = Type::named([result.tparams[0].name.as_str()]);
+        let nullable_bool =
+            matches!(&done.result, Type::Nullable(t, _) if **t == Type::Scalar(Scalar::Bool));
+        if !nullable_bool || value.result != tparam {
+            return None;
+        }
+        self.names.get("IteratorYieldResult").cloned()
     }
 
     /// A generic class's type parameters, each with its default where Zena
@@ -1476,6 +1532,22 @@ impl<'a> Gen<'a> {
                         call.result,
                         wrapper_body(&call, &invoke, "    ")
                     );
+                    if let (Some(result), "Iterator", "next") =
+                        (&self.iter_result, canonical.as_str(), n.as_str())
+                    {
+                        let t = ident(&c.tparams[0].name);
+                        let mut step = String::new();
+                        for (p, ty) in &call.params {
+                            let _ = writeln!(step, "    let {p}: {ty} = [];");
+                        }
+                        for p in &call.pre {
+                            let _ = writeln!(step, "    {p}");
+                        }
+                        let _ = writeln!(
+                            methods,
+                            "  /** The next value, or `(false, _)` once the iterator is done: `next()` through the iterator protocol. */\n  step(): inline (true, {t}) | inline (false, _) {{\n{step}    let result = new {result}<{t}>.__wrap({invoke});\n    let done = result.done;\n    if (done is Some<boolean> && done.value) {{\n      return (false, _);\n    }}\n    return (true, result.value);\n  }}"
+                        );
+                    }
                 }
             }
         }
@@ -2259,6 +2331,16 @@ impl<'a> Gen<'a> {
             Type::TupleBox(_) | Type::ArrBox(_) | Type::VecBox(_) if !mentions_tparam(t, cx) => {
                 Ok(self.box_class(t, cx).unwrap_or_else(|_| "externref".into()))
             }
+            // An enum's Zena class is no host type: its JS value crosses.
+            Type::Named(r)
+                if r.args.is_empty()
+                    && matches!(
+                        self.layouts.keys.symbols.resolve_decl(&r.path, cx),
+                        Some((_, TypeDecl::Enum(_)))
+                    ) =>
+            {
+                Ok(self.box_class(t, cx).unwrap_or_else(|_| "externref".into()))
+            }
             t => self.generic_surface(t, cx),
         }
     }
@@ -2274,6 +2356,7 @@ impl<'a> Gen<'a> {
             Type::TupleBox(es) => Type::Tuple(es.clone()),
             Type::ArrBox(e) => Type::Array(e.clone()),
             Type::VecBox(e) => Type::Vec(e.clone()),
+            Type::Named(_) => t.clone(),
             _ => return skip("not a box with a handle class"),
         };
         let sig = match self.layouts.unbox(&inner, cx) {
@@ -2285,7 +2368,11 @@ impl<'a> Gen<'a> {
         let raws = self.raw(repr)?;
         let names: Vec<String> = (0..raws.len()).map(|i| format!("r{i}")).collect();
         let decode = self.decode(repr, &names)?;
-        let name = unique(&mut self.used, type_ident(&upper_camel(&spelled)));
+        let name = match t {
+            Type::Named(_) => format!("{}Box", upper_camel(&spelled)),
+            _ => upper_camel(&spelled),
+        };
+        let name = unique(&mut self.used, type_ident(&name));
         let unbox = unique(&mut self.used, format!("__tw_unbox_{name}"));
         let result = match raws.len() {
             1 => raws[0].clone(),
@@ -2307,7 +2394,12 @@ impl<'a> Gen<'a> {
         let _ = writeln!(
             self.types,
             "/** The box `{spelled}`: the JS value, which `unbox` converts. */\n@spelling({})\nexport extension class {name} on externref {{\n  unbox(): {surface} {{\n{body}  }}\n}}\n",
-            zena_string(&spelled)
+            // An enum argument would lay the member out as the enum itself:
+            // it instantiates as `Any`, the JS value.
+            zena_string(match t {
+                Type::Named(_) => "Any",
+                _ => &spelled,
+            })
         );
         self.boxes.insert(spelled, name.clone());
         Ok(name)
