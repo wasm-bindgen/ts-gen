@@ -1,6 +1,8 @@
 // What the worker provides: the default export's handlers, a Durable
 // Object, and an RPC entrypoint.
 
+import { WorkerEntrypoint } from "cloudflare:workers";
+
 /** @provides fetch, scheduled, queue */
 declare const handler: ExportedHandler<Env>;
 export default handler;
@@ -9,16 +11,13 @@ export default handler;
 export declare class Counter {
   constructor(ctx: DurableObjectState, env: Env);
   fetch(request: Request): Promise<Response>;
-  alarm(alarmInfo: AlarmInvocationInfo): Promise<void>;
+  /** The runtime passes an `alarmInfo`, which an export that doesn't declare it ignores. */
+  alarm(): Promise<void>;
   webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void>;
 }
 
-/**
- * An RPC entrypoint, reached through the `GREETER` service binding. Its
- * base is the `WorkerEntrypoint` of `cloudflare:workers`, which
- * workers-types declares in this namespace.
- */
-export declare class Greeter extends CloudflareWorkersModule.WorkerEntrypoint<Env> {
+/** An RPC entrypoint, reached through the `GREETER` service binding. */
+export declare class Greeter extends WorkerEntrypoint<Env> {
   constructor(ctx: ExecutionContext, env: Env);
   greet(name: string, style?: "plain" | "loud"): string;
   /** @tw-abi u32 */

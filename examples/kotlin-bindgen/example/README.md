@@ -48,7 +48,7 @@ The declarations beside the app:
   widths, and the errors a member throws.
 * `provides.d.ts`: what the module provides: the default export's
   `fetch`, `scheduled` and `queue`, the `Counter` Durable Object, and the
-  `Greeter` entrypoint.
+  `Greeter` entrypoint, whose base it imports from `cloudflare:workers`.
 
 `config.capnp` has two services: the worker, and `backend.js`, which
 `/fetch` reaches through a binding and as the worker's outbound.
