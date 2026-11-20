@@ -219,9 +219,9 @@ pub mod polish {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Transition;
         #[wasm_bindgen(method, getter)]
-        pub fn direction(this: &Transition) -> TransitionDirectionKind;
+        pub fn direction(this: &Transition) -> TransitionDirection;
         #[wasm_bindgen(method, setter)]
-        pub fn set_direction(this: &Transition, val: TransitionDirectionKind);
+        pub fn set_direction(this: &Transition, val: TransitionDirection);
     }
     impl Transition {
         #[doc = " Construct with `direction: \"next\"`."]
@@ -235,13 +235,13 @@ pub mod polish {
         #[doc = " Start a builder with `direction: \"next\"`."]
         pub fn builder_next() -> TransitionBuilder {
             let inner: Transition = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_direction(TransitionDirectionKind::Next);
+            inner.set_direction(TransitionDirection::Next);
             TransitionBuilder { inner }
         }
         #[doc = " Start a builder with `direction: \"previous\"`."]
         pub fn builder_previous() -> TransitionBuilder {
             let inner: Transition = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_direction(TransitionDirectionKind::Previous);
+            inner.set_direction(TransitionDirection::Previous);
             TransitionBuilder { inner }
         }
     }
@@ -249,7 +249,7 @@ pub mod polish {
         inner: Transition,
     }
     impl TransitionBuilder {
-        pub fn direction(self, val: TransitionDirectionKind) -> Self {
+        pub fn direction(self, val: TransitionDirection) -> Self {
             self.inner.set_direction(val);
             self
         }
@@ -1275,7 +1275,7 @@ pub mod polish {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TransitionDirectionKind {
+pub enum TransitionDirection {
     Next = "next",
     Previous = "previous",
 }

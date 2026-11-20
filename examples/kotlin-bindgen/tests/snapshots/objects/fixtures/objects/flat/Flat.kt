@@ -127,6 +127,74 @@ external fun Headers2_set_x_custom_cost_str(p0: JsAny?, p1: JsAny?)
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun search_Search_Streaming_PartialHeaders2(p0: JsAny?, p1: JsAny?, p2: JsAny?)
 
+/** tw:js/global Outline.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun Outline_new(): JsAny?
+
+/** tw:js/global Outline#set:id(str) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Outline_set_id_str(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global Outline#get:id() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Outline_get_id(p0: JsAny?): JsAny?
+
+/** tw:js/global Circle.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun Circle_new(): JsAny?
+
+/** tw:js/global Circle#set:radius(f64) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Circle_set_radius_f64(p0: JsAny?, p1: Double)
+
+/** tw:js/global Circle#get:radius() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Circle_get_radius(p0: JsAny?): Double
+
+/** tw:js/global Label.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun Label_new(): JsAny?
+
+/** tw:js/global Label#set:text(str) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Label_set_text_str(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global Label#get:text() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Label_get_text(p0: JsAny?): JsAny?
+
+/** tw:js/global Board#set:first(Circle) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Board_set_first_Circle(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global Board#get:first() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Board_get_first(p0: JsAny?): JsAny?
+
+/** tw:js/global Board#set:last(Circle) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Board_set_last_Circle(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global Board#get:last() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Board_get_last(p0: JsAny?): JsAny?
+
+/** tw:js/global Board#set:none(Outline) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Board_set_none_Outline(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global Board#get:none() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Board_get_none(p0: JsAny?): JsAny?
+
+/** tw:js/global Board#put(Circle) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Board_put_Circle(p0: JsAny?, p1: JsAny?): JsAny?
+
+/** tw:js/global Board#put(Circle,Label) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun Board_put_Circle_Label(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
+
 /** tw:js/global ListingItem.new() */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun ListingItem_new(): JsAny?

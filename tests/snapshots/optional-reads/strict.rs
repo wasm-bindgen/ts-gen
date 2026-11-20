@@ -106,24 +106,17 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Registry , getter)]
     pub fn missing() -> Option<Moment>;
     # [wasm_bindgen (static_method_of = Registry , setter)]
-    pub fn set_missing(val: &Moment);
+    pub fn set_missing(val: &JsValue);
     #[doc = " Present, holding `null`."]
     # [wasm_bindgen (static_method_of = Registry , getter)]
     pub fn cleared() -> Option<Nullable<Moment>>;
     # [wasm_bindgen (static_method_of = Registry , setter)]
-    pub fn set_cleared(val: &Moment);
-    # [wasm_bindgen (static_method_of = Registry , setter , js_name = "cleared")]
-    fn __set_cleared_with_null(val: &::wasm_bindgen::JsValue);
+    pub fn set_cleared(val: &JsValue);
     #[doc = " The top type, holding `null`."]
     # [wasm_bindgen (static_method_of = Registry , getter)]
     pub fn anything() -> JsValue;
     # [wasm_bindgen (static_method_of = Registry , setter)]
     pub fn set_anything(val: &JsValue);
-}
-impl Registry {
-    pub fn set_cleared_with_null() {
-        Self::__set_cleared_with_null(&::wasm_bindgen::JsValue::NULL)
-    }
 }
 #[wasm_bindgen(module = "optional-reads")]
 extern "C" {

@@ -122,7 +122,7 @@ fn from_and_equals_take_every_arm() {
 
     // The optional trailing options still omit or pass.
     let options = FromOptions::builder()
-        .overflow(FromOptionsOverflowKind::Reject)
+        .overflow(FromOptionsOverflow::Reject)
         .build();
     let _ = Day::from_with_options("1", &options);
     assert_eq!(day.until(&fields), 0.0);
@@ -140,8 +140,8 @@ fn primitive_arms_convert_from_their_rust_values() {
 #[wasm_bindgen_test]
 fn wrappers_compose_with_literals_nulls_options_and_async() {
     let day = Day::new(10.0).unwrap();
-    assert_eq!(day.step(DayDirectionKind::Next, "1"), "next:string");
-    assert_eq!(day.step(DayDirectionKind::Previous, &day), "previous:day");
+    assert_eq!(day.step(DayDirection::Next, "1"), "next:string");
+    assert_eq!(day.step(DayDirection::Previous, &day), "previous:day");
     assert_eq!(day.pick(), "none");
     assert_eq!(day.pick_with_other(&day), "day");
     let _: MaybeDay = MaybeDay::from("1");

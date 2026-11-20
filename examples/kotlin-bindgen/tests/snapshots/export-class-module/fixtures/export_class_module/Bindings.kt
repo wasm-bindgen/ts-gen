@@ -15,9 +15,14 @@ val DurableObjectState.id: String
 
 external interface DurableObject : JsAny
 
-fun DurableObject.alarm(): tsgen.runtime.Future<Unit>? {
-    val r2 = try { fixtures.export_class_module.flat.DurableObject_alarm(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r2?.let { tsgen.runtime.Future<Unit>(it, { f -> fixtures.export_class_module.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) }) }
+val DurableObject.alarm: (() -> tsgen.runtime.Future<Unit>?)?
+    get() {
+        val r0 = fixtures.export_class_module.flat.DurableObject_get_alarm(this)
+        return r0?.let { f -> {  -> val r1 = fixtures.export_class_module.flat.call_fn_future_unit(f); r1?.let { tsgen.runtime.Future<Unit>(it, { f -> fixtures.export_class_module.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) }) } } }
+    }
+
+fun DurableObject.setAlarm(value: suspend () -> Unit) {
+    fixtures.export_class_module.flat.DurableObject_set_alarm_fn_future_unit(this, value.toJsReference())
 }
 
 external interface _cloudflare_workers_DurableObject : JsAny
@@ -27,6 +32,11 @@ external interface WorkerEntrypoint : JsAny
 fun DurableObjectState(): DurableObjectState {
     val r0 = fixtures.export_class_module.flat.DurableObjectState_new()
     return r0!!.unsafeCast<DurableObjectState>()
+}
+
+fun DurableObject(): DurableObject {
+    val r0 = fixtures.export_class_module.flat.DurableObject_new()
+    return r0!!.unsafeCast<DurableObject>()
 }
 
 sealed interface Err {
@@ -60,21 +70,21 @@ private fun errMessage(error: Err): String = when (error) {
 /** `e` as `err`: its own error, or the fallback arm with its message. */
 fun toErr(e: kotlin.Throwable): Err = if (e is ErrException) e.error else Err.Error((e.message ?: e.toString()).toJsString())
 
-fun raiseErr(e: kotlin.js.JsException): ErrException {
-    val r0 = fixtures.export_class_module.flat.err_err(e.thrownValue)
-    val s1 = fixtures.export_class_module.flat.ret_externref()
-    return ErrException(decodeErr(r0, s1)!!)
-}
-
 fun futureErrorErr(f: JsAny): ErrException {
-    val r3 = fixtures.export_class_module.flat.error_err(f)
-    val s4 = fixtures.export_class_module.flat.ret_externref()
-    return ErrException(decodeErr(r3, s4)!!)
+    val r2 = fixtures.export_class_module.flat.error_err(f)
+    val s3 = fixtures.export_class_module.flat.ret_externref()
+    return ErrException(decodeErr(r2, s3)!!)
 }
 
 fun setErr(e: kotlin.Throwable) {
     val w = encodeErr(toErr(e))
     fixtures.export_class_module.flat.err_set_err(w.arm, w.s0)
+}
+
+fun raiseErr(e: kotlin.js.JsException): ErrException {
+    val r0 = fixtures.export_class_module.flat.err_err(e.thrownValue)
+    val s1 = fixtures.export_class_module.flat.ret_externref()
+    return ErrException(decodeErr(r0, s1)!!)
 }
 
 fun rejectErr(resolver: JsAny?, e: kotlin.Throwable) {

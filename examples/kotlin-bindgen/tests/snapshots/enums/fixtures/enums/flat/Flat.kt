@@ -31,9 +31,9 @@ external fun level(): Int
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun format_Format(p0: Int)
 
-/** tw:js/global align(WhereKind) */
+/** tw:js/global align(AlignWhere) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun align_WhereKind(p0: Int)
+external fun align_AlignWhere(p0: Int)
 
 /** tw:js/global more(More) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -47,9 +47,9 @@ external fun base(): Int
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun code(): Int
 
-/** tw:js/global retry(CKind) */
+/** tw:js/global retry(RetryC) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun retry_CKind(p0: Int)
+external fun retry_RetryC(p0: Int)
 
 /** tw:js/global ratio() */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
@@ -75,9 +75,9 @@ external fun mode_Mode(p0: Int, p1: JsAny?): Int
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun speed_Mode(p0: Int, p1: JsAny?)
 
-/** tw:js/global speed(Mode,HintKind) */
+/** tw:js/global speed(Mode,SpeedHint) */
 @JsFun("(p0, p1, p2, p3) => { throw new Error('ts-gen: unlinked import') }")
-external fun speed_Mode_HintKind(p0: Int, p1: JsAny?, p2: Int, p3: JsAny?)
+external fun speed_Mode_SpeedHint(p0: Int, p1: JsAny?, p2: Int, p3: JsAny?)
 
 /** tw:ret f64 */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
@@ -86,6 +86,70 @@ external fun ret_f64(): Double
 /** tw:js/global tier() */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun tier(): Int
+
+/** tw:js/global CompressionStream.new(CompressionStreamFormat) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun CompressionStream_new_CompressionStreamFormat(p0: Int): JsAny?
+
+/** tw:js/global DecompressionStream.new(DecompressionStreamFormat) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun DecompressionStream_new_DecompressionStreamFormat(p0: Int): JsAny?
+
+/** tw:js/global DecompressionStream#get:format() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun DecompressionStream_get_format(p0: JsAny?): Int
+
+/** tw:js/global Canvas#set:fit(CanvasFit) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_set_fit_CanvasFit(p0: JsAny?, p1: Int)
+
+/** tw:js/global Canvas#get:fit() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_get_fit(p0: JsAny?): Int
+
+/** tw:js/global Canvas#set:crop(CanvasCrop) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_set_crop_CanvasCrop(p0: JsAny?, p1: Int)
+
+/** tw:js/global Canvas#get:crop() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_get_crop(p0: JsAny?): Int
+
+/** tw:js/global Canvas#set:quality(CanvasQuality) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_set_quality_CanvasQuality(p0: JsAny?, p1: Int)
+
+/** tw:js/global Canvas#get:quality() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_get_quality(p0: JsAny?): Int
+
+/** tw:js/global Canvas#set:hint(CanvasHint) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_set_hint_CanvasHint(p0: JsAny?, p1: Int, p2: JsAny?)
+
+/** tw:js/global Canvas#get:hint() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_get_hint(p0: JsAny?): Int
+
+/** tw:js/global Canvas#draw(CanvasFit,CanvasMode) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_draw_CanvasFit_CanvasMode(p0: JsAny?, p1: Int, p2: Int): Int
+
+/** tw:js/global Canvas#clear(CanvasClearMode) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_clear_CanvasClearMode(p0: JsAny?, p1: Int)
+
+/** tw:js/global Canvas#clear(CanvasClearMode,CanvasQuality) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun Canvas_clear_CanvasClearMode_CanvasQuality(p0: JsAny?, p1: Int, p2: Int)
+
+/** tw:js/global paint(PaintMode) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun paint_PaintMode(p0: Int): Int
+
+/** tw:js/global get:theme() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun get_theme(): Int
 
 /** tw:unbox Level */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -135,13 +199,13 @@ external fun unbox_Color(p0: JsAny?): Int
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_Color(p0: Int): JsAny?
 
-/** tw:unbox WhereKind */
+/** tw:unbox AlignWhere */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_WhereKind(p0: JsAny?): Int
+external fun unbox_AlignWhere(p0: JsAny?): Int
 
-/** tw:box WhereKind */
+/** tw:box AlignWhere */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_WhereKind(p0: Int): JsAny?
+external fun box_AlignWhere(p0: Int): JsAny?
 
 /** tw:unbox More */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -159,13 +223,13 @@ external fun unbox_Code(p0: JsAny?): Int
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_Code(p0: Int): JsAny?
 
-/** tw:unbox CKind */
+/** tw:unbox RetryC */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_CKind(p0: JsAny?): Int
+external fun unbox_RetryC(p0: JsAny?): Int
 
-/** tw:box CKind */
+/** tw:box RetryC */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_CKind(p0: Int): JsAny?
+external fun box_RetryC(p0: Int): JsAny?
 
 /** tw:unbox Mode */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -175,13 +239,13 @@ external fun unbox_Mode(p0: JsAny?): Int
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_Mode(p0: Int, p1: JsAny?): JsAny?
 
-/** tw:unbox HintKind */
+/** tw:unbox SpeedHint */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_HintKind(p0: JsAny?): Int
+external fun unbox_SpeedHint(p0: JsAny?): Int
 
-/** tw:box HintKind */
+/** tw:box SpeedHint */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_HintKind(p0: Int, p1: JsAny?): JsAny?
+external fun box_SpeedHint(p0: Int, p1: JsAny?): JsAny?
 
 /** tw:unbox TierKind */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -190,4 +254,100 @@ external fun unbox_TierKind(p0: JsAny?): Int
 /** tw:box TierKind */
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_TierKind(p0: Int, p1: Double, p2: JsAny?): JsAny?
+
+/** tw:unbox CompressionStreamFormat */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_CompressionStreamFormat(p0: JsAny?): Int
+
+/** tw:box CompressionStreamFormat */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_CompressionStreamFormat(p0: Int): JsAny?
+
+/** tw:unbox DecompressionStreamFormat */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_DecompressionStreamFormat(p0: JsAny?): Int
+
+/** tw:box DecompressionStreamFormat */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_DecompressionStreamFormat(p0: Int): JsAny?
+
+/** tw:unbox CanvasFit */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_CanvasFit(p0: JsAny?): Int
+
+/** tw:box CanvasFit */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_CanvasFit(p0: Int): JsAny?
+
+/** tw:unbox CanvasCrop */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_CanvasCrop(p0: JsAny?): Int
+
+/** tw:box CanvasCrop */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_CanvasCrop(p0: Int): JsAny?
+
+/** tw:unbox CanvasQuality */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_CanvasQuality(p0: JsAny?): Int
+
+/** tw:box CanvasQuality */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_CanvasQuality(p0: Int): JsAny?
+
+/** tw:unbox CanvasHint */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_CanvasHint(p0: JsAny?): Int
+
+/** tw:box CanvasHint */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_CanvasHint(p0: Int, p1: JsAny?): JsAny?
+
+/** tw:unbox CanvasDrawReturn */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_CanvasDrawReturn(p0: JsAny?): Int
+
+/** tw:box CanvasDrawReturn */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_CanvasDrawReturn(p0: Int): JsAny?
+
+/** tw:unbox CanvasMode */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_CanvasMode(p0: JsAny?): Int
+
+/** tw:box CanvasMode */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_CanvasMode(p0: Int): JsAny?
+
+/** tw:unbox CanvasClearMode */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_CanvasClearMode(p0: JsAny?): Int
+
+/** tw:box CanvasClearMode */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_CanvasClearMode(p0: Int): JsAny?
+
+/** tw:unbox PaintReturn */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_PaintReturn(p0: JsAny?): Int
+
+/** tw:box PaintReturn */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_PaintReturn(p0: Int): JsAny?
+
+/** tw:unbox PaintMode */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_PaintMode(p0: JsAny?): Int
+
+/** tw:box PaintMode */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_PaintMode(p0: Int): JsAny?
+
+/** tw:unbox Theme */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_Theme(p0: JsAny?): Int
+
+/** tw:box Theme */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_Theme(p0: Int): JsAny?
 

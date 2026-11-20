@@ -27,6 +27,7 @@ use quote::quote;
 
 use std::collections::HashMap;
 
+use crate::codegen::signatures::PromiseForm;
 use crate::codegen::signatures::{
     build_signatures, generate_callable_params, generate_dictionary_params, is_void_return,
     public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam, DictionaryParams,
@@ -300,13 +301,18 @@ impl ClassConfig<'_> {
         names
     }
 
-    /// The enum a property's setter shares with its getter; see
-    /// [`super::typemap::setter_enum`].
-    fn setter_enum(&self, js_name: &str, ty: &TypeRef) -> Option<super::typemap::SetterEnum> {
+    /// The enum a property's setter shares with its getter, read in the
+    /// property's own `scope`; see [`super::typemap::setter_enum`].
+    fn setter_enum(
+        &self,
+        js_name: &str,
+        ty: &TypeRef,
+        scope: ScopeId,
+    ) -> Option<super::typemap::SetterEnum> {
         super::typemap::setter_enum(
             ty,
             self.cgctx,
-            self.scope,
+            scope,
             &self.from_module(),
             super::typemap::ReturnAnchor {
                 base: js_name,
@@ -323,13 +329,14 @@ impl ClassConfig<'_> {
         js_name: &str,
         ty: &TypeRef,
         slice_mode: Option<crate::ir::SliceModeHint>,
+        scope: ScopeId,
     ) -> crate::ir::Param {
         // A property retains its value, which a view wouldn't outlive.
         let slice_mode = slice_mode.map(|m| match m {
             crate::ir::SliceModeHint::View => crate::ir::SliceModeHint::Copy,
             m => m,
         });
-        let mut type_ref = match self.setter_enum(js_name, ty) {
+        let mut type_ref = match self.setter_enum(js_name, ty, scope) {
             Some(e) => e.param_type(),
             None => ty.clone(),
         };
@@ -1211,7 +1218,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         ) else {
             return Vec::new();
         };
-        let setter_param = config.setter_param(&g.js_name, &ty, slice_mode);
+        let setter_param = config.setter_param(&g.js_name, &ty, slice_mode, g.scope);
         let mut setter_used = LocalScope::default();
         let void = crate::ir::TypeRef::Void;
         // An inherited member's associated type reads through this type's
@@ -1225,6 +1232,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             return_type: &void,
             body_scope,
             throws: &crate::ir::Throws::None,
+            async_modifier: false,
             doc: &None,
         }];
         let setter_name = config.setter_name(MemberKind::Property, &g.js_name);
@@ -1342,7 +1350,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             };
             let setter_enum = named_enum
                 .is_none()
-                .then(|| config.setter_enum(&g.js_name, &assigned_type(g)))
+                .then(|| config.setter_enum(&g.js_name, &assigned_type(g), g.scope))
                 .flatten();
             let any_literal = members.iter().any(|m| {
                 matches!(
@@ -2180,6 +2188,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &return_type,
                         body_scope: c.scope,
                         throws: &c.throws,
+                        async_modifier: false,
                         doc: &c.doc,
                     })
                     .collect();
@@ -2213,6 +2222,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &m.return_type,
                         body_scope: m.body_scope,
                         throws: &m.throws,
+                        async_modifier: m.async_modifier,
                         doc: &m.doc,
                     })
                     .collect();
@@ -2252,6 +2262,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &m.return_type,
                         body_scope: m.body_scope,
                         throws: &m.throws,
+                        async_modifier: m.async_modifier,
                         doc: &m.doc,
                     })
                     .collect();
@@ -2357,6 +2368,7 @@ fn display_to_string(
     let is_plain_to_string = |sig: &FunctionSignature| {
         sig.js_name == "toString"
             && sig.params.is_empty()
+            && sig.form == PromiseForm::Value
             && !sig.js_string_return
             && sig.literal.is_none()
             && matches!(sig.return_type, TypeRef::String)
@@ -2546,7 +2558,44 @@ fn generic_bounds_for_method(config: &ClassConfig, sig: &FunctionSignature) -> V
         .chain(std::iter::once(&sig.return_type))
         .collect();
     bounds.extend(config.local_generic_bounds(sig.body_scope, &sig_tys));
+    widen_async_return_param(bounds, config.cgctx, sig)
+}
+
+/// An `async fn` resolving to a bare type parameter is converted from
+/// the settled `JsValue` by wasm-bindgen's `JsFuture<T>`, which needs
+/// `T: FromWasmAbi` on top of `JsGeneric`.
+pub(super) fn widen_async_return_param(
+    bounds: Vec<TokenStream>,
+    cgctx: Option<&CodegenContext<'_>>,
+    sig: &FunctionSignature,
+) -> Vec<TokenStream> {
+    if !sig.is_async() || CodegenContext::generic_mono(cgctx) {
+        return bounds;
+    }
+    let Some(cgctx) = cgctx else {
+        return bounds;
+    };
+    let Some(name) = sig.return_type.as_ident() else {
+        return bounds;
+    };
+    if !matches!(
+        cgctx.gctx.scopes.resolve_binding(sig.body_scope, name),
+        Some(crate::parse::scope::Binding::TypeParam)
+    ) {
+        return bounds;
+    }
+    let plain = CodegenContext::type_param_decl(Some(cgctx), name).to_string();
+    let ident = super::typemap::make_ident(name);
     bounds
+        .into_iter()
+        .map(|b| {
+            if b.to_string() == plain {
+                quote! { #ident: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi }
+            } else {
+                b
+            }
+        })
+        .collect()
 }
 
 /// Generate a constructor binding from a resolved signature.
@@ -2590,6 +2639,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     let ret = to_return_type(
         &return_type,
         sig.catch,
+        &sig.form,
         sig.js_string_return,
         sig.error_type.as_ref(),
         config.cgctx,
@@ -2674,6 +2724,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
+        &sig.form,
         sig.js_string_return,
         sig.error_type.as_ref(),
         config.cgctx,
@@ -2691,6 +2742,8 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         quote! { -> #ret_ty }
     };
 
+    let async_kw = sig.is_async().then(|| quote! { async });
+
     let method_generics = render_generic_bounds(&bounds);
     let this_generics = config.type_generics_args();
 
@@ -2699,7 +2752,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         #doc
         #literal
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub fn #rust_ident #method_generics (this: &#this_type #this_generics, #params) #ret;
+        pub #async_kw fn #rust_ident #method_generics (this: &#this_type #this_generics, #params) #ret;
     }
 }
 
@@ -2722,6 +2775,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
         .collect();
     bounds.extend(config.local_generic_bounds(scope, &sig_tys));
+    let mut bounds = widen_async_return_param(bounds, config.cgctx, sig);
     let params = generate_callable_params(
         &sig.params,
         config.cgctx,
@@ -2748,6 +2802,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
+        &sig.form,
         sig.js_string_return,
         sig.error_type.as_ref(),
         config.cgctx,
@@ -2765,6 +2820,8 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         quote! { -> #ret_ty }
     };
 
+    let async_kw = sig.is_async().then(|| quote! { async });
+
     let generics = render_generic_bounds(&bounds);
 
     let literal = super::inline_wrappers::literal_attr(sig);
@@ -2772,7 +2829,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         #doc
         #literal
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub fn #rust_ident #generics (#params) #ret;
+        pub #async_kw fn #rust_ident #generics (#params) #ret;
     }
 }
 
@@ -2952,10 +3009,9 @@ fn setter_type(
     }
     // An associated type, or its row, which the parse reads through a
     // projection.
-    if let Some(t) = ir
-        .as_ref()
-        .filter(|t| *t != ty && (config.reads_assoc(t) || config.setter_enum(js_name, t).is_some()))
-    {
+    if let Some(t) = ir.as_ref().filter(|t| {
+        *t != ty && (config.reads_assoc(t) || config.setter_enum(js_name, t, scope).is_some())
+    }) {
         return Some(t.clone());
     }
     // The parse's literals route through the getter's enum, unless the IR
@@ -2963,7 +3019,7 @@ fn setter_type(
     let named = ir
         .as_ref()
         .is_some_and(|t| matches!(t.without_undefined(), TypeRef::Reference { .. }));
-    if slice_mode.is_some() || !named && config.setter_enum(js_name, ty).is_some() {
+    if slice_mode.is_some() || !named && config.setter_enum(js_name, ty, scope).is_some() {
         return Some(ty.clone());
     }
     Some(ir.unwrap_or_else(|| ty.clone()))
@@ -2995,7 +3051,7 @@ fn generate_setter(
             config.js_name, setter.js_name
         ));
     }
-    let param = config.setter_param(&setter.js_name, &ty, setter.slice_mode);
+    let param = config.setter_param(&setter.js_name, &ty, setter.slice_mode, setter.scope);
 
     let void = crate::ir::TypeRef::Void;
     let overloads = [Overload {
@@ -3003,6 +3059,7 @@ fn generate_setter(
         return_type: &void,
         body_scope: setter.scope,
         throws: &crate::ir::Throws::None,
+        async_modifier: false,
         doc: &doc,
     }];
     let setter_name = config.setter_name(MemberKind::Property, &setter.js_name);
@@ -3178,7 +3235,7 @@ fn generate_static_setter(
     ) else {
         return Vec::new();
     };
-    let param = config.setter_param(&setter.js_name, &ty, None);
+    let param = config.setter_param(&setter.js_name, &ty, None, setter.scope);
 
     let void = crate::ir::TypeRef::Void;
     let overloads = [Overload {
@@ -3186,6 +3243,7 @@ fn generate_static_setter(
         return_type: &void,
         body_scope: setter.scope,
         throws: &crate::ir::Throws::None,
+        async_modifier: false,
         doc: &doc,
     }];
     let setter_name = config.setter_name(MemberKind::StaticProperty, &setter.js_name);

@@ -56,13 +56,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "shift")]
     fn __try_shift(this: &Day, offset: Offset) -> Result<Day, JsValue>;
     #[wasm_bindgen(method, js_name = "step")]
-    fn __step(this: &Day, direction: DayDirectionKind, other: DayLike) -> String;
+    fn __step(this: &Day, direction: DayDirection, other: DayLike) -> String;
     #[wasm_bindgen(method, catch, js_name = "step")]
-    fn __try_step(
-        this: &Day,
-        direction: DayDirectionKind,
-        other: DayLike,
-    ) -> Result<String, JsValue>;
+    fn __try_step(this: &Day, direction: DayDirection, other: DayLike) -> Result<String, JsValue>;
     #[wasm_bindgen(method)]
     pub fn pick(this: &Day) -> String;
     #[wasm_bindgen(method, catch, js_name = "pick")]
@@ -76,7 +72,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "between")]
     fn __try_between(this: &Day, start: Option<DayLike>, end: DayLike) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "later")]
-    fn __later(this: &Day, other: DayLike) -> Promise<String>;
+    async fn __later(this: &Day, other: DayLike) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "later")]
+    fn __later_promise(this: &Day, other: DayLike) -> Promise<JsString>;
 }
 impl Day {
     pub fn from(item: impl ::core::convert::Into<DayLike>) -> Day {
@@ -143,14 +141,14 @@ impl Day {
     }
     pub fn step(
         &self,
-        direction: DayDirectionKind,
+        direction: DayDirection,
         other: impl ::core::convert::Into<DayLike>,
     ) -> String {
         self.__step(direction, other.into())
     }
     pub fn try_step(
         &self,
-        direction: DayDirectionKind,
+        direction: DayDirection,
         other: impl ::core::convert::Into<DayLike>,
     ) -> Result<String, JsValue> {
         self.__try_step(direction, other.into())
@@ -178,8 +176,14 @@ impl Day {
     ) -> Result<String, JsValue> {
         self.__try_between(start, end.into())
     }
-    pub fn later(&self, other: impl ::core::convert::Into<DayLike>) -> Promise<String> {
-        self.__later(other.into())
+    pub async fn later(
+        &self,
+        other: impl ::core::convert::Into<DayLike>,
+    ) -> Result<String, JsValue> {
+        self.__later(other.into()).await
+    }
+    pub fn later_promise(&self, other: impl ::core::convert::Into<DayLike>) -> Promise<JsString> {
+        self.__later_promise(other.into())
     }
 }
 #[wasm_bindgen(module = "union-alias-reads")]
@@ -222,9 +226,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FromOptions;
     #[wasm_bindgen(method, getter)]
-    pub fn overflow(this: &FromOptions) -> Option<FromOptionsOverflowKind>;
+    pub fn overflow(this: &FromOptions) -> Option<FromOptionsOverflow>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_overflow(this: &FromOptions, val: FromOptionsOverflowKind);
+    pub fn set_overflow(this: &FromOptions, val: FromOptionsOverflow);
 }
 impl FromOptions {
     pub fn new() -> FromOptions {
@@ -245,7 +249,7 @@ pub struct FromOptionsBuilder {
     inner: FromOptions,
 }
 impl FromOptionsBuilder {
-    pub fn overflow(self, val: FromOptionsOverflowKind) -> Self {
+    pub fn overflow(self, val: FromOptionsOverflow) -> Self {
         self.inner.set_overflow(val);
         self
     }
@@ -758,13 +762,13 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DayDirectionKind {
+pub enum DayDirection {
     Next = "next",
     Previous = "previous",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FromOptionsOverflowKind {
+pub enum FromOptionsOverflow {
     Constrain = "constrain",
     Reject = "reject",
 }

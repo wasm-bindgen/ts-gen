@@ -81,6 +81,7 @@ fn emit_function(
         return_type: &decl.return_type,
         body_scope: decl.body_scope,
         throws: &decl.throws,
+        async_modifier: decl.async_modifier,
         doc,
     })
     .chain(decl.overloads.iter().map(|o| Overload {
@@ -88,6 +89,7 @@ fn emit_function(
         return_type: &o.return_type,
         body_scope: o.body_scope,
         throws: &o.throws,
+        async_modifier: o.async_modifier,
         doc: &o.doc,
     }))
     .collect();
@@ -134,6 +136,7 @@ fn generate_expanded_free_function(
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
+        &sig.form,
         sig.js_string_return,
         sig.error_type.as_ref(),
         cgctx,
@@ -173,6 +176,8 @@ fn generate_expanded_free_function(
         quote! { -> #ret_ty }
     };
 
+    let async_kw = sig.is_async().then(|| quote! { async });
+
     let wb_extern_attr = CodegenContext::extern_attr(cgctx, ctx.specifier());
 
     let generics = render_generic_bounds(&bounds);
@@ -184,7 +189,7 @@ fn generate_expanded_free_function(
             #doc
             #literal
             #wb_attr
-            pub fn #rust_ident #generics (#params) #ret;
+            pub #async_kw fn #rust_ident #generics (#params) #ret;
         }
     }
 }
@@ -209,10 +214,11 @@ fn generic_bounds_for_function(
     if names.is_empty() {
         return Vec::new();
     }
-    names
+    let bounds = names
         .iter()
         .map(|n| CodegenContext::type_param_decl(Some(cgctx), n))
-        .collect()
+        .collect();
+    super::classes::widen_async_return_param(bounds, Some(cgctx), sig)
 }
 
 /// The names wasm-bindgen's expansion of an import and the dictionary
@@ -488,6 +494,7 @@ fn generate_constructs(
             return_type: &construct.return_type,
             body_scope: construct.body_scope,
             throws: &construct.throws,
+            async_modifier: false,
             doc,
         };
         match groups.iter_mut().find(|(first, _, _)| same(first)) {
@@ -524,6 +531,7 @@ fn generate_constructs(
             let ret = to_return_type(
                 &sig.return_type,
                 sig.catch,
+                &sig.form,
                 sig.js_string_return,
                 sig.error_type.as_ref(),
                 Some(cgctx),

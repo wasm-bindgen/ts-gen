@@ -22,9 +22,13 @@ extern "C" {
         reason: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<u32, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn count(this: &Response) -> Promise<u32>;
+    pub async fn count(this: &Response) -> Result<u32, JsValue>;
+    #[wasm_bindgen(method, js_name = "count")]
+    pub fn count_promise(this: &Response) -> Promise<Number>;
     #[wasm_bindgen(method, catch, js_name = "maybeCount")]
-    pub fn maybe_count(this: &Response) -> Promise<Option<u32>>;
+    pub async fn maybe_count(this: &Response) -> Result<Option<u32>, JsValue>;
+    #[wasm_bindgen(method, js_name = "maybeCount")]
+    pub fn maybe_count_promise(this: &Response) -> Promise<Option<Number>>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part(this: &Response, part_number: u16) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -47,7 +51,9 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub fn sizes(this: &Response) -> Result<Vec<::wasm_bindgen::SafeInteger<u64>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "totalSize")]
-    pub fn total_size(this: &Response) -> Promise<::wasm_bindgen::SafeInteger<u64>>;
+    pub async fn total_size(this: &Response) -> Result<::wasm_bindgen::SafeInteger<u64>, JsValue>;
+    #[wasm_bindgen(method, js_name = "totalSize")]
+    pub fn total_size_promise(this: &Response) -> Promise<Number>;
     #[wasm_bindgen(method, getter, js_name = "statusText")]
     pub fn status_text(this: &Response) -> String;
     #[wasm_bindgen(method, getter, js_name = "statusText")]

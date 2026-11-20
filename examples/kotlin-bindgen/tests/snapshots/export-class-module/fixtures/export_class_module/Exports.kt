@@ -19,8 +19,8 @@ fun export_Counter_new_DurableObjectState_Env(p0: JsAny?, p1: JsAny?, p2: JsAny?
 
 /** A new `Counter` constructed through JS. */
 fun newCounter(ctx: DurableObjectState, env: Env): fixtures.export_class_module.app.Counter {
-    val r0 = try { fixtures.export_class_module.flat.new_Counter_new_DurableObjectState_Env(ctx, env) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return fixtures.export_class_module.flat.unbox_Counter(r0!!.unsafeCast<JsAny>())!!.unsafeCast<JsReference<fixtures.export_class_module.app.Counter>>().get()
+    val r2 = try { fixtures.export_class_module.flat.new_Counter_new_DurableObjectState_Env(ctx, env) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return fixtures.export_class_module.flat.unbox_Counter(r2!!.unsafeCast<JsAny>())!!.unsafeCast<JsReference<fixtures.export_class_module.app.Counter>>().get()
 }
 
 @JsExport
@@ -73,4 +73,20 @@ fun fixtures.export_class_module.app.Greeter.toJs(): JsAny = fixtures.export_cla
 
 /** The `Greeter` a box holds; a `JsException` unless it's a live `Greeter` wrapper. */
 fun JsAny.toGreeter(): fixtures.export_class_module.app.Greeter = fixtures.export_class_module.flat.unbox_Greeter(this)!!.unsafeCast<JsReference<fixtures.export_class_module.app.Greeter>>().get()
+
+@JsExport
+@JsName("tw:call:fn()->future<unit>?")
+fun trampoline_fn_future_unit(p0: JsAny?): JsAny? {
+    val f = p0!!.unsafeCast<JsReference<suspend () -> Unit>>().get()
+    val future = fixtures.export_class_module.flat.future_new()
+    val resolver = fixtures.export_class_module.flat.ret_externref()
+    tsgen.runtime.Loop.main.launch({ f() }) { o -> o.fold({ r -> fixtures.export_class_module.flat.future_resolve_unit(resolver) }, { e -> rejectErr(resolver, e) }) }
+    return future
+}
+
+/** A `fn()->future<unit>` as its box: a JS function calling it. */
+fun (suspend () -> Unit).toJs(): JsAny = fixtures.export_class_module.flat.box_fn_future_unit(this.toJsReference())!!
+
+/** The function a box holds; a `JsException` unless it's one this module provided. */
+fun JsAny.toSuspendFnToUnit(): suspend () -> Unit = fixtures.export_class_module.flat.unbox_fn_future_unit(this)!!.unsafeCast<JsReference<suspend () -> Unit>>().get()
 

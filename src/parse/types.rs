@@ -435,8 +435,35 @@ fn object_props(
     lit.members
         .iter()
         .filter_map(|member| {
-            let TSSignature::TSPropertySignature(prop) = member else {
-                return None;
+            let prop = match member {
+                TSSignature::TSPropertySignature(prop) => prop,
+                TSSignature::TSMethodSignature(method) => {
+                    return Some(crate::ir::ObjectProp {
+                        name: inline_prop_name(member)?,
+                        type_ref: TypeRef::Function(crate::ir::FunctionSig {
+                            params: convert_formal_params_with_arena(
+                                &method.params,
+                                scope,
+                                scopes,
+                                diag,
+                            ),
+                            return_type: Box::new(method.return_type.as_ref().map_or(
+                                TypeRef::Void,
+                                |rt| {
+                                    convert_ts_type_with_arena(
+                                        &rt.type_annotation,
+                                        scope,
+                                        scopes,
+                                        diag,
+                                    )
+                                },
+                            )),
+                        }),
+                        optional: true,
+                        readonly: false,
+                    })
+                }
+                _ => return None,
             };
             Some(crate::ir::ObjectProp {
                 name: crate::parse::members::property_key_name(&prop.key)?,
@@ -448,6 +475,23 @@ fn object_props(
             })
         })
         .collect()
+}
+
+/// The name of an inline object type's member that reads as a property: a
+/// property, or an optional method, which is an optional property of
+/// function type (see `optional_methods_as_properties`).
+fn inline_prop_name(member: &TSSignature<'_>) -> Option<String> {
+    match member {
+        TSSignature::TSPropertySignature(p) => crate::parse::members::property_key_name(&p.key),
+        TSSignature::TSMethodSignature(m)
+            if m.optional
+                && m.kind == TSMethodSignatureKind::Method
+                && m.type_parameters.is_none() =>
+        {
+            crate::parse::members::property_key_name(&m.key)
+        }
+        _ => None,
+    }
 }
 
 /// An inline object type the IR producer can name: properties only, as an
@@ -469,11 +513,12 @@ fn inline_object(
             convert_ts_type_with_arena(&idx.type_annotation.type_annotation, scope, scopes, diag);
         return Some(TypeRef::generic("Record", vec![key, value]));
     }
+    let mut names = std::collections::HashSet::new();
     let props_only = !lit.members.is_empty()
         && lit
             .members
             .iter()
-            .all(|m| matches!(m, TSSignature::TSPropertySignature(p) if crate::parse::members::property_key_name(&p.key).is_some()));
+            .all(|m| inline_prop_name(m).is_some_and(|name| names.insert(name)));
     props_only.then(|| TypeRef::ObjectLiteral(object_props(lit, scope, scopes, diag)))
 }
 

@@ -137,12 +137,17 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Endpoint<T = JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn fetch<T>(
+    pub async fn fetch<T>(
         this: &Endpoint<T>,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<String>;
+    ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub fn fetch_js_string<T>(
+    pub async fn fetch_js_string<T>(
+        this: &Endpoint<T>,
+        input: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_promise<T>(
         this: &Endpoint<T>,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<JsString>;

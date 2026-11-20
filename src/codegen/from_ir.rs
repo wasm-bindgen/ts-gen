@@ -107,7 +107,7 @@ impl IrDecls {
             .iter()
             .map(|a| literal(a.arm).map(|l| crate::ir::TypeRef::StringLiteral(l.into())))
             .collect::<Option<_>>()?;
-        let name = cgctx.synthesise_literal_enum(name, &literals, scope, from_module)?;
+        let name = cgctx.synthesise_literal_enum(name, &literals, true, scope, from_module)?;
         Some(crate::ir::TypeRef::ident(name))
     }
 

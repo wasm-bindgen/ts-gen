@@ -25,6 +25,13 @@ fn builtin_class_has_its_own_variant() {
     };
     assert_eq!(String::from(error.message()), "bad type");
     assert_eq!(err.to_string(), "bad type");
+
+    // `RangeError` isn't folded into `TypeError` or `Error`.
+    let err = try_raise("range").unwrap_err();
+    let JsException::RangeError(error) = &err else {
+        panic!("expected RangeError, got {err:?}");
+    };
+    assert_eq!(String::from(error.message()), "out of range");
 }
 
 #[wasm_bindgen_test]

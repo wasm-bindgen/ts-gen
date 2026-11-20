@@ -5155,18 +5155,18 @@ namespace Intl {
     set maximumSignificantDigits(value: f64);
     get numberingSystem(): str?;
     set numberingSystem(value: str);
-    get compactDisplay(): CompactDisplayKind?;
-    set compactDisplay(value: CompactDisplayKind);
-    get notation(): NumberFormatOptionsNotationKind?;
-    set notation(value: NumberFormatOptionsNotationKind);
+    get compactDisplay(): NumberFormatOptionsCompactDisplay?;
+    set compactDisplay(value: NumberFormatOptionsCompactDisplay);
+    get notation(): NumberFormatOptionsNotation?;
+    set notation(value: NumberFormatOptionsNotation);
     get signDisplay(): NumberFormatOptionsSignDisplay?;
     set signDisplay(value: NumberFormatOptionsSignDisplay);
     get unit(): str?;
     set unit(value: str);
     get unitDisplay(): RelativeTimeFormatStyle?;
     set unitDisplay(value: RelativeTimeFormatStyle);
-    get currencySign(): CurrencySignKind?;
-    set currencySign(value: CurrencySignKind);
+    get currencySign(): NumberFormatOptionsCurrencySign?;
+    set currencySign(value: NumberFormatOptionsCurrencySign);
   }
 
   interface DateTimeFormatOptions {
@@ -5178,22 +5178,22 @@ namespace Intl {
     set weekday(value: RelativeTimeFormatStyle);
     get era(): RelativeTimeFormatStyle?;
     set era(value: RelativeTimeFormatStyle);
-    get year(): NumericOrV2Digit?;
-    set year(value: NumericOrV2Digit);
-    get month(): DateTimeFormatOptionsMonthKind?;
-    set month(value: DateTimeFormatOptionsMonthKind);
-    get day(): NumericOrV2Digit?;
-    set day(value: NumericOrV2Digit);
-    get hour(): NumericOrV2Digit?;
-    set hour(value: NumericOrV2Digit);
-    get minute(): NumericOrV2Digit?;
-    set minute(value: NumericOrV2Digit);
-    get second(): NumericOrV2Digit?;
-    set second(value: NumericOrV2Digit);
-    get timeZoneName(): TimeZoneNameKind?;
-    set timeZoneName(value: TimeZoneNameKind);
-    get formatMatcher(): FormatMatcherKind?;
-    set formatMatcher(value: FormatMatcherKind);
+    get year(): DateTimeFormatOptionsYear?;
+    set year(value: DateTimeFormatOptionsYear);
+    get month(): DateTimeFormatOptionsMonth?;
+    set month(value: DateTimeFormatOptionsMonth);
+    get day(): DateTimeFormatOptionsDay?;
+    set day(value: DateTimeFormatOptionsDay);
+    get hour(): DateTimeFormatOptionsHour?;
+    set hour(value: DateTimeFormatOptionsHour);
+    get minute(): DateTimeFormatOptionsMinute?;
+    set minute(value: DateTimeFormatOptionsMinute);
+    get second(): DateTimeFormatOptionsSecond?;
+    set second(value: DateTimeFormatOptionsSecond);
+    get timeZoneName(): DateTimeFormatOptionsTimeZoneName?;
+    set timeZoneName(value: DateTimeFormatOptionsTimeZoneName);
+    get formatMatcher(): DateTimeFormatOptionsFormatMatcher?;
+    set formatMatcher(value: DateTimeFormatOptionsFormatMatcher);
     get hour12(): bool?;
     set hour12(value: bool);
     get timeZone(): str?;
@@ -5204,10 +5204,10 @@ namespace Intl {
     set dayPeriod(value: RelativeTimeFormatStyle);
     get numberingSystem(): str?;
     set numberingSystem(value: str);
-    get dateStyle(): FullOrLongOrMediumOrShort?;
-    set dateStyle(value: FullOrLongOrMediumOrShort);
-    get timeStyle(): FullOrLongOrMediumOrShort?;
-    set timeStyle(value: FullOrLongOrMediumOrShort);
+    get dateStyle(): DateTimeFormatOptionsDateStyle?;
+    set dateStyle(value: DateTimeFormatOptionsDateStyle);
+    get timeStyle(): DateTimeFormatOptionsTimeStyle?;
+    set timeStyle(value: DateTimeFormatOptionsTimeStyle);
     get hourCycle(): LocaleHourCycleKey?;
     set hourCycle(value: LocaleHourCycleKey);
   }
@@ -5273,32 +5273,32 @@ namespace Intl {
     set days(value: RelativeTimeFormatStyle);
     get daysDisplay(): DurationFormatDisplayOption?;
     set daysDisplay(value: DurationFormatDisplayOption);
-    get hours(): DateTimeFormatOptionsMonthKind?;
-    set hours(value: DateTimeFormatOptionsMonthKind);
+    get hours(): DurationFormatOptionsHours?;
+    set hours(value: DurationFormatOptionsHours);
     get hoursDisplay(): DurationFormatDisplayOption?;
     set hoursDisplay(value: DurationFormatDisplayOption);
-    get minutes(): DateTimeFormatOptionsMonthKind?;
-    set minutes(value: DateTimeFormatOptionsMonthKind);
+    get minutes(): DurationFormatOptionsMinutes?;
+    set minutes(value: DurationFormatOptionsMinutes);
     get minutesDisplay(): DurationFormatDisplayOption?;
     set minutesDisplay(value: DurationFormatDisplayOption);
-    get seconds(): DateTimeFormatOptionsMonthKind?;
-    set seconds(value: DateTimeFormatOptionsMonthKind);
+    get seconds(): DurationFormatOptionsSeconds?;
+    set seconds(value: DurationFormatOptionsSeconds);
     get secondsDisplay(): DurationFormatDisplayOption?;
     set secondsDisplay(value: DurationFormatDisplayOption);
-    get milliseconds(): LongOrShortOrNarrowOrNumeric?;
-    set milliseconds(value: LongOrShortOrNarrowOrNumeric);
+    get milliseconds(): DurationFormatOptionsMilliseconds?;
+    set milliseconds(value: DurationFormatOptionsMilliseconds);
     get millisecondsDisplay(): DurationFormatDisplayOption?;
     set millisecondsDisplay(value: DurationFormatDisplayOption);
-    get microseconds(): LongOrShortOrNarrowOrNumeric?;
-    set microseconds(value: LongOrShortOrNarrowOrNumeric);
+    get microseconds(): DurationFormatOptionsMicroseconds?;
+    set microseconds(value: DurationFormatOptionsMicroseconds);
     get microsecondsDisplay(): DurationFormatDisplayOption?;
     set microsecondsDisplay(value: DurationFormatDisplayOption);
-    get nanoseconds(): LongOrShortOrNarrowOrNumeric?;
-    set nanoseconds(value: LongOrShortOrNarrowOrNumeric);
+    get nanoseconds(): DurationFormatOptionsNanoseconds?;
+    set nanoseconds(value: DurationFormatOptionsNanoseconds);
     get nanosecondsDisplay(): DurationFormatDisplayOption?;
     set nanosecondsDisplay(value: DurationFormatDisplayOption);
-    get fractionalDigits(): FractionalDigitsKind?;
-    set fractionalDigits(value: FractionalDigitsKind);
+    get fractionalDigits(): DurationFormatOptionsFractionalDigits?;
+    set fractionalDigits(value: DurationFormatOptionsFractionalDigits);
   }
 
   /// The locale matching algorithm to use.
@@ -5364,29 +5364,29 @@ namespace Intl {
     @js("auto") Auto;
   }
 
-  enum CompactDisplayKind {
+  enum NumberFormatOptionsCompactDisplay {
     @js("short") Short;
     @js("long") Long;
   }
 
-  enum NumberFormatOptionsNotationKind {
+  enum NumberFormatOptionsNotation {
     @js("standard") Standard;
     @js("scientific") Scientific;
     @js("engineering") Engineering;
     @js("compact") Compact;
   }
 
-  enum CurrencySignKind {
+  enum NumberFormatOptionsCurrencySign {
     @js("standard") Standard;
     @js("accounting") Accounting;
   }
 
-  enum NumericOrV2Digit {
+  enum DateTimeFormatOptionsYear {
     @js("numeric") Numeric;
     @js("2-digit") V2Digit;
   }
 
-  enum DateTimeFormatOptionsMonthKind {
+  enum DateTimeFormatOptionsMonth {
     @js("numeric") Numeric;
     @js("2-digit") V2Digit;
     @js("long") Long;
@@ -5394,7 +5394,27 @@ namespace Intl {
     @js("narrow") Narrow;
   }
 
-  enum TimeZoneNameKind {
+  enum DateTimeFormatOptionsDay {
+    @js("numeric") Numeric;
+    @js("2-digit") V2Digit;
+  }
+
+  enum DateTimeFormatOptionsHour {
+    @js("numeric") Numeric;
+    @js("2-digit") V2Digit;
+  }
+
+  enum DateTimeFormatOptionsMinute {
+    @js("numeric") Numeric;
+    @js("2-digit") V2Digit;
+  }
+
+  enum DateTimeFormatOptionsSecond {
+    @js("numeric") Numeric;
+    @js("2-digit") V2Digit;
+  }
+
+  enum DateTimeFormatOptionsTimeZoneName {
     @js("short") Short;
     @js("long") Long;
     @js("shortOffset") ShortOffset;
@@ -5403,26 +5423,71 @@ namespace Intl {
     @js("longGeneric") LongGeneric;
   }
 
-  enum FormatMatcherKind {
+  enum DateTimeFormatOptionsFormatMatcher {
     @js("best fit") BestFit;
     @js("basic") Basic;
   }
 
-  enum FullOrLongOrMediumOrShort {
+  enum DateTimeFormatOptionsDateStyle {
     @js("full") Full;
     @js("long") Long;
     @js("medium") Medium;
     @js("short") Short;
   }
 
-  enum LongOrShortOrNarrowOrNumeric {
+  enum DateTimeFormatOptionsTimeStyle {
+    @js("full") Full;
+    @js("long") Long;
+    @js("medium") Medium;
+    @js("short") Short;
+  }
+
+  enum DurationFormatOptionsHours {
+    @js("long") Long;
+    @js("short") Short;
+    @js("narrow") Narrow;
+    @js("numeric") Numeric;
+    @js("2-digit") V2Digit;
+  }
+
+  enum DurationFormatOptionsMinutes {
+    @js("long") Long;
+    @js("short") Short;
+    @js("narrow") Narrow;
+    @js("numeric") Numeric;
+    @js("2-digit") V2Digit;
+  }
+
+  enum DurationFormatOptionsSeconds {
+    @js("long") Long;
+    @js("short") Short;
+    @js("narrow") Narrow;
+    @js("numeric") Numeric;
+    @js("2-digit") V2Digit;
+  }
+
+  enum DurationFormatOptionsMilliseconds {
     @js("long") Long;
     @js("short") Short;
     @js("narrow") Narrow;
     @js("numeric") Numeric;
   }
 
-  enum FractionalDigitsKind: i32 {
+  enum DurationFormatOptionsMicroseconds {
+    @js("long") Long;
+    @js("short") Short;
+    @js("narrow") Narrow;
+    @js("numeric") Numeric;
+  }
+
+  enum DurationFormatOptionsNanoseconds {
+    @js("long") Long;
+    @js("short") Short;
+    @js("narrow") Narrow;
+    @js("numeric") Numeric;
+  }
+
+  enum DurationFormatOptionsFractionalDigits: i32 {
     V0 = 0;
     V1 = 1;
     V2 = 2;

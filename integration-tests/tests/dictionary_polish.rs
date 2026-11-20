@@ -8,7 +8,7 @@ use ts_gen_integration_tests::dictionary_polish::{
         Holder, Options, PartialBoxLikeObject, PartialOmitLikeBoxLikeObject, PluralizeTimeUnit,
         TimeLikeObject, Transition,
     },
-    TransitionDirectionKind,
+    TransitionDirection,
 };
 
 // Dictionaries need no backing module, so these run.
@@ -39,13 +39,13 @@ fn short_and_deduplicated_instantiations() {
 fn literal_factories_keep_a_builder() {
     assert!(matches!(
         Transition::new_next().direction(),
-        TransitionDirectionKind::Next
+        TransitionDirection::Next
     ));
     let transition = Transition::builder_next()
-        .direction(TransitionDirectionKind::Previous)
+        .direction(TransitionDirection::Previous)
         .build();
     assert!(matches!(
         transition.direction(),
-        TransitionDirectionKind::Previous
+        TransitionDirection::Previous
     ));
 }

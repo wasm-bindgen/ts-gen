@@ -141,6 +141,10 @@ export function __tw_next_sleep(loop: i32): i64 {
   return (-9223372036854775808 as i64);
 }
 
+function __tw_entered(): void {
+  __tw_work_available(1);
+}
+
 export extension class Env on externref {
 }
 
@@ -151,6 +155,19 @@ export extension class DurableObjectState on externref {
     }
   }
   new() : super(__DurableObjectState_new());
+}
+
+export extension class DurableObject on externref {
+  alarm: (() => Future<void> | null) | null {
+    get {
+      let r0 = __DurableObject_alarm((this as externref));
+      return (if (r0 == null) null else __tw_fn(r0 as externref));
+    }
+  }
+  setAlarm(value: () => Future<void> | null): void {
+    __DurableObject_alarm2((this as externref), (value as anyref));
+  }
+  new() : super(__DurableObject_new());
 }
 
 /** The arms of `err`, as its tag carries them. */
@@ -164,13 +181,6 @@ export enum ErrArm {
 export class ErrException extends Error {
   arm: ErrArm;
   new(arm: ErrArm, message: String) : arm = arm, super(message) {}
-}
-
-export extension class DurableObject on externref {
-  alarm(): Future<void> | null {
-    let r0 = __DurableObject_alarm((this as externref));
-    return (if (r0 == null) null else __tw_await<void>(r0 as externref));
-  }
 }
 
 @spelling("\"cloudflare:workers\".DurableObject")
@@ -187,8 +197,17 @@ declare function __DurableObjectState_new(): externref;
 @external("tw:js/global", "DurableObjectState#get:id()", "tw")
 declare function __DurableObjectState_id(p0: externref): String;
 
-@external("tw:js/global", "DurableObject#alarm()", "tw, throws:err")
+@external("tw:js/global", "DurableObject.new()", "tw")
+declare function __DurableObject_new(): externref;
+
+@external("tw:call", "fn()->future<unit>?", "tw")
+declare function __tw_call(p0: externref): externref | null;
+
+@external("tw:js/global", "DurableObject#get:alarm()", "tw")
 declare function __DurableObject_alarm(p0: externref): externref | null;
+
+@external("tw:js/global", "DurableObject#set:alarm(fn()->future<unit>?)", "tw")
+declare function __DurableObject_alarm2(p0: externref, p1: anyref): void;
 
 @external("tw:new", "Counter.new(DurableObjectState,Env)", "tw, throws:err")
 declare function __Counter_new(p0: DurableObjectState, p1: Env): externref;
@@ -201,6 +220,21 @@ declare function __Greeter_new(p0: DurableObjectState, p1: Env): externref;
 
 @external("tw:unbox", "Greeter", "tw")
 declare function __tw_unbox_Greeter(p0: externref): anyref;
+
+export function __tw_fn(f: externref): () => Future<void> | null {
+  return (): Future<void> | null => {
+    let r0 = __tw_call(f);
+    return (if (r0 == null) null else __tw_await<void>(r0 as externref));
+  };
+}
+
+@export("tw:call:fn()->future<unit>?", "tw")
+export function __tw_trampoline(env: anyref): externref | null {
+  let f = env as () => Future<void> | null;
+  let result: Future<void> | null = f();
+  __tw_entered();
+  return (if (result == null) null else __tw_promise<void>(result));
+}
 
 // export Counter.new(DurableObjectState,Env): the entry module's __export_Counter_new, over the app's Counter.new
 /** A new `Counter` constructed through JS, as its handle. */

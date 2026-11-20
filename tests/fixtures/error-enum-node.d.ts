@@ -2,8 +2,8 @@
 
 // Fixture: the `--error-enum` dispatch against a real JS module. A thrown
 // value lands in the most derived declared class (`SubFault` before
-// `Fault`), a builtin class (`TypeError`), or `Other`. Untyped bindings keep
-// the `--error-type` default. Variant idents that repeat (a class named
+// `Fault`), a builtin class (`TypeError`, `RangeError`), or `Other`. Untyped
+// bindings keep the `--error-type` default. Variant idents that repeat (a class named
 // `Other`, `Codes.Fault` beside `CodesFault`) are numbered.
 
 export declare class Fault extends Error {}
@@ -11,8 +11,9 @@ export declare class Fault extends Error {}
 export declare class SubFault extends Fault {}
 
 /**
- * Throws per `kind`: `sub`, `fault`, `type`, `string`, `number` or `opaque`.
- * @throws {Fault | SubFault | TypeError}
+ * Throws per `kind`: `sub`, `fault`, `type`, `range`, `string`, `number` or
+ * `opaque`.
+ * @throws {Fault | SubFault | TypeError | RangeError}
  */
 export declare function raise(kind: string): string;
 

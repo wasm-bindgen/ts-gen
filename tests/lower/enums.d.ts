@@ -1,9 +1,9 @@
 //! @ts-gen --lib-name enums
 
-// Enums: a literal union becomes a `<Anchor>Kind` enum where it's first
-// used, a named literal union keeps its name where it's declared, a union
-// with value types becomes a payload enum, repeated values are aliases,
-// and a type parameter bounded by an enum is bounded `in` it.
+// Enums: a literal union becomes an enum named for where it's used, a
+// named literal union keeps its name where it's declared, a union with
+// value types becomes a payload enum, repeated values are aliases, and a
+// type parameter bounded by an enum is bounded `in` it.
 
 declare enum Level {
   Low = 1,
@@ -56,3 +56,26 @@ type Mode = "fast" | "slow" | string;
 declare function mode(m: Mode): Mode;
 declare function speed(m: "fast" | "slow" | string, hint?: "x" | (string & {})): void;
 declare function tier(): "lo" | "hi" | string | number | null;
+
+// An anonymous literal union's enum is named for where it's used: its
+// owner, then the parameter or property, with the member between them
+// only where the shorter name is taken, and `Return` for a result. Uses
+// that ask for one name share a set's enum (`fit`, `quality`), and any
+// other use gets its own (`crop`, `DecompressionStream`'s `format`).
+declare class CompressionStream {
+  constructor(format: "gzip" | "deflate" | "deflate-raw");
+}
+declare class DecompressionStream {
+  constructor(format: "gzip" | "deflate" | "deflate-raw");
+  readonly format: "gzip" | "deflate" | "deflate-raw";
+}
+interface Canvas {
+  fit: "cover" | "contain";
+  crop: "cover" | "contain";
+  quality: 1 | 2 | 3;
+  hint: "auto" | (string & {});
+  draw(fit: "cover" | "contain", mode: "fill" | "stroke"): "done" | "queued";
+  clear(mode: "all" | "dirty", quality?: 1 | 2 | 3): void;
+}
+declare function paint(mode: "fill" | "stroke"): "done" | "queued";
+declare const theme: "light" | "dark";

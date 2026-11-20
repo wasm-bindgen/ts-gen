@@ -10,9 +10,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Attachment;
     #[wasm_bindgen(method, getter)]
-    pub fn disposition(this: &Attachment) -> AttachmentDispositionKind;
+    pub fn disposition(this: &Attachment) -> AttachmentDisposition;
     #[wasm_bindgen(method, setter)]
-    pub fn set_disposition(this: &Attachment, val: AttachmentDispositionKind);
+    pub fn set_disposition(this: &Attachment, val: AttachmentDisposition);
     #[wasm_bindgen(method, getter, js_name = "contentId")]
     pub fn content_id(this: &Attachment) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "contentId")]
@@ -34,14 +34,14 @@ impl Attachment {
     #[doc = " Start a builder with `disposition: \"inline\"`."]
     pub fn builder_inline(content_id: &str) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(AttachmentDispositionKind::Inline);
+        inner.set_disposition(AttachmentDisposition::Inline);
         inner.set_content_id(content_id);
         AttachmentBuilder { inner }
     }
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(filename: &str) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(AttachmentDispositionKind::Attachment);
+        inner.set_disposition(AttachmentDisposition::Attachment);
         inner.set_filename(filename);
         AttachmentBuilder { inner }
     }
@@ -68,9 +68,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Reply;
     #[wasm_bindgen(method, getter)]
-    pub fn code(this: &Reply) -> ReplyCodeKind;
+    pub fn code(this: &Reply) -> ReplyCode;
     #[wasm_bindgen(method, setter)]
-    pub fn set_code(this: &Reply, val: ReplyCodeKind);
+    pub fn set_code(this: &Reply, val: ReplyCode);
     #[wasm_bindgen(method, getter)]
     pub fn body(this: &Reply) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -92,14 +92,14 @@ impl Reply {
     #[doc = " Start a builder with `code: 200`."]
     pub fn builder_200(body: &str) -> ReplyBuilder {
         let inner: Reply = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code(ReplyCodeKind::N200);
+        inner.set_code(ReplyCode::N200);
         inner.set_body(body);
         ReplyBuilder { inner }
     }
     #[doc = " Start a builder with `code: 404`."]
     pub fn builder_404(reason: &str) -> ReplyBuilder {
         let inner: Reply = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code(ReplyCodeKind::N404);
+        inner.set_code(ReplyCode::N404);
         inner.set_reason(reason);
         ReplyBuilder { inner }
     }
@@ -187,13 +187,13 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AttachmentDispositionKind {
+pub enum AttachmentDisposition {
     Inline = "inline",
     Attachment = "attachment",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ReplyCodeKind {
+pub enum ReplyCode {
     N200 = 200,
     N404 = 404,
 }

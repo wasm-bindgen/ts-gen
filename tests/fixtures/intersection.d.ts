@@ -10,6 +10,9 @@
 // leaves the intersection to codegen, where it is bounded by its most
 // specific member (`Derived & Base` -> `Derived`). A parameter typed by
 // named types alone is bounded too rather than given a fresh subtype.
+// A write takes the member that is every other, wherever it's listed
+// (`Base & Derived` -> `Derived`), and `JsValue` where none is, a
+// static setter as any other.
 
 export interface Conditional {
   etag?: string;
@@ -32,12 +35,18 @@ export interface Store {
   get(key: string, options: GetOptions & { onlyIf: Conditional }): Promise<string | null>;
   get(key: string, options?: GetOptions): Promise<string>;
   refine(value: Derived & Base): void;
+  covered(value: Base & Derived, again?: (Base & Derived) | null): void;
   same(value: Derived & Derived): void;
   unrelated(value: Derived & Unrelated): void;
   shape(value: { a: string } & { b: number }): void;
   generic<T>(value: T & { id: string }): void;
   primitive(value: Str & { c: string }): void;
   anything(value: Derived & any): void;
+}
+export declare class Shelf {
+  top: Base & Derived;
+  static spare: Base & Derived;
+  static odd: Derived & Unrelated;
 }
 export type Branded<T> = T & { __brand: string };
 export type Both = Derived & Unrelated;

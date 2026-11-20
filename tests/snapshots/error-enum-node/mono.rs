@@ -18,21 +18,23 @@ extern "C" {
 }
 #[wasm_bindgen(module = "error-enum-node", experimental_generic_mono)]
 extern "C" {
-    #[doc = " Throws per `kind`: `sub`, `fault`, `type`, `string`, `number` or `opaque`."]
+    #[doc = " Throws per `kind`: `sub`, `fault`, `type`, `range`, `string`, `number` or"]
+    #[doc = " `opaque`."]
     #[doc = ""]
     #[doc = " ## Errors"]
     #[doc = ""]
-    #[doc = " * `Fault | SubFault | TypeError`"]
+    #[doc = " * `Fault | SubFault | TypeError | RangeError`"]
     #[wasm_bindgen(catch)]
     pub fn raise(kind: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsException>;
 }
 #[wasm_bindgen(module = "error-enum-node", experimental_generic_mono)]
 extern "C" {
-    #[doc = " Throws per `kind`: `sub`, `fault`, `type`, `string`, `number` or `opaque`."]
+    #[doc = " Throws per `kind`: `sub`, `fault`, `type`, `range`, `string`, `number` or"]
+    #[doc = " `opaque`."]
     #[doc = ""]
     #[doc = " ## Errors"]
     #[doc = ""]
-    #[doc = " * `Fault | SubFault | TypeError`"]
+    #[doc = " * `Fault | SubFault | TypeError | RangeError`"]
     #[wasm_bindgen(catch, js_name = "raise")]
     pub fn raise_js_string(
         kind: impl ::wasm_bindgen::JsStringLike,
@@ -118,6 +120,7 @@ extern "C" {
 pub enum JsException {
     SubFault(SubFault),
     TypeError(TypeError),
+    RangeError(RangeError),
     Fault(Fault),
     Other2(Other),
     CodesFault(CodesFault),
@@ -133,6 +136,10 @@ impl From<JsValue> for JsException {
         };
         let value = match value.dyn_into::<TypeError>() {
             Ok(error) => return Self::TypeError(error),
+            Err(value) => value,
+        };
+        let value = match value.dyn_into::<RangeError>() {
+            Ok(error) => return Self::RangeError(error),
             Err(value) => value,
         };
         let value = match value.dyn_into::<Fault>() {
@@ -163,6 +170,7 @@ impl From<JsException> for JsValue {
         match error {
             JsException::SubFault(error) => error.into(),
             JsException::TypeError(error) => error.into(),
+            JsException::RangeError(error) => error.into(),
             JsException::Fault(error) => error.into(),
             JsException::Other2(error) => error.into(),
             JsException::CodesFault(error) => error.into(),
@@ -177,6 +185,7 @@ impl AsRef<JsValue> for JsException {
         match self {
             Self::SubFault(error) => error.as_ref(),
             Self::TypeError(error) => error.as_ref(),
+            Self::RangeError(error) => error.as_ref(),
             Self::Fault(error) => error.as_ref(),
             Self::Other2(error) => error.as_ref(),
             Self::CodesFault(error) => error.as_ref(),

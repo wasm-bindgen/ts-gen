@@ -173,6 +173,76 @@ export extension class Headers2 on externref {
   new() : super(__Headers2_new());
 }
 
+export extension class Outline on externref {
+  new __wrap(value: externref) : super(value);
+  id: String {
+    get {
+      return __Outline_id((this as externref));
+    }
+    set(value) {
+      __Outline_id2((this as externref), value);
+    }
+  }
+  new() : super(__Outline_new());
+}
+
+export extension class Circle extends Outline {
+  radius: f64 {
+    get {
+      return __Circle_radius((this as externref));
+    }
+    set(value) {
+      __Circle_radius2((this as externref), value);
+    }
+  }
+  new() : super.__wrap(__Circle_new());
+}
+
+export extension class Label on externref {
+  text: String {
+    get {
+      return __Label_text((this as externref));
+    }
+    set(value) {
+      __Label_text2((this as externref), value);
+    }
+  }
+  new() : super(__Label_new());
+}
+
+export extension class Board on externref {
+  first: Circle {
+    get {
+      return __Board_first((this as externref));
+    }
+    set(value) {
+      __Board_first2((this as externref), value);
+    }
+  }
+  last: Circle {
+    get {
+      return __Board_last((this as externref));
+    }
+    set(value) {
+      __Board_last2((this as externref), value);
+    }
+  }
+  none: Outline {
+    get {
+      return __Board_none((this as externref));
+    }
+    set(value) {
+      __Board_none2((this as externref), value);
+    }
+  }
+  put(circle: Circle): FixedArray<Circle> {
+    return __Board_put((this as externref), circle);
+  }
+  put(circle: Circle, label: Label): FixedArray<Circle> {
+    return __Board_put2((this as externref), circle, label);
+  }
+}
+
 export extension class ListingItem on externref {
   id: String {
     get {
@@ -491,6 +561,57 @@ declare function __Headers2_x_custom_cost3(p0: externref, p1: Headers2XCustomCos
 
 @external("tw:js/global", "Headers2#set:\"x-custom-cost\"(str)", "tw")
 declare function __Headers2_x_custom_cost4(p0: externref, p1: String): void;
+
+@external("tw:js/global", "Outline.new()", "tw")
+declare function __Outline_new(): externref;
+
+@external("tw:js/global", "Outline#get:id()", "tw")
+declare function __Outline_id(p0: externref): String;
+
+@external("tw:js/global", "Outline#set:id(str)", "tw")
+declare function __Outline_id2(p0: externref, p1: String): void;
+
+@external("tw:js/global", "Circle.new()", "tw")
+declare function __Circle_new(): externref;
+
+@external("tw:js/global", "Circle#get:radius()", "tw")
+declare function __Circle_radius(p0: externref): f64;
+
+@external("tw:js/global", "Circle#set:radius(f64)", "tw")
+declare function __Circle_radius2(p0: externref, p1: f64): void;
+
+@external("tw:js/global", "Label.new()", "tw")
+declare function __Label_new(): externref;
+
+@external("tw:js/global", "Label#get:text()", "tw")
+declare function __Label_text(p0: externref): String;
+
+@external("tw:js/global", "Label#set:text(str)", "tw")
+declare function __Label_text2(p0: externref, p1: String): void;
+
+@external("tw:js/global", "Board#get:first()", "tw")
+declare function __Board_first(p0: externref): Circle;
+
+@external("tw:js/global", "Board#set:first(Circle)", "tw")
+declare function __Board_first2(p0: externref, p1: Circle): void;
+
+@external("tw:js/global", "Board#get:last()", "tw")
+declare function __Board_last(p0: externref): Circle;
+
+@external("tw:js/global", "Board#set:last(Circle)", "tw")
+declare function __Board_last2(p0: externref, p1: Circle): void;
+
+@external("tw:js/global", "Board#get:none()", "tw")
+declare function __Board_none(p0: externref): Outline;
+
+@external("tw:js/global", "Board#set:none(Outline)", "tw")
+declare function __Board_none2(p0: externref, p1: Outline): void;
+
+@external("tw:js/global", "Board#put(Circle)", "tw, throws:err")
+declare function __Board_put(p0: externref, p1: Circle): FixedArray<Circle>;
+
+@external("tw:js/global", "Board#put(Circle,Label)", "tw, throws:err")
+declare function __Board_put2(p0: externref, p1: Circle, p2: Label): FixedArray<Circle>;
 
 @external("tw:js/global", "ListingItem.new()", "tw")
 declare function __ListingItem_new(): externref;

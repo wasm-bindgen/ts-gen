@@ -885,30 +885,50 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchNull")]
-    pub fn fetch_null() -> Promise<Option<Registry>>;
+    pub async fn fetch_null() -> Result<Option<Registry>, JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetchNull")]
+    pub fn fetch_null_promise() -> Result<Promise<Option<Registry>>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchOptional")]
-    pub fn fetch_optional() -> Promise<Option<f64>>;
+    pub async fn fetch_optional() -> Result<Option<f64>, JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetchOptional")]
+    pub fn fetch_optional_promise() -> Result<Promise<Option<Number>>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchBoth")]
-    pub fn fetch_both() -> Promise<Option<String>>;
+    pub async fn fetch_both() -> Result<Option<String>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchBoth")]
-    pub fn fetch_both_js_string() -> Promise<Option<JsString>>;
+    pub async fn fetch_both_js_string() -> Result<Option<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetchBoth")]
+    pub fn fetch_both_promise() -> Result<Promise<Option<JsString>>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchGeneric")]
-    pub fn fetch_generic<T>() -> Promise<Option<T>>
+    pub async fn fetch_generic<T>() -> Result<Option<T>, JsValue>
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
         T: 'static;
+}
+#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetchGeneric")]
+    pub fn fetch_generic_promise<T>() -> Result<Promise<Option<T>>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -1001,9 +1021,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Attachment;
     #[wasm_bindgen(method, getter)]
-    pub fn disposition(this: &Attachment) -> AttachmentDispositionKind;
+    pub fn disposition(this: &Attachment) -> AttachmentDisposition;
     #[wasm_bindgen(method, setter)]
-    pub fn set_disposition(this: &Attachment, val: AttachmentDispositionKind);
+    pub fn set_disposition(this: &Attachment, val: AttachmentDisposition);
     #[wasm_bindgen(method, getter, js_name = "contentId")]
     pub fn content_id(this: &Attachment) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "contentId")]
@@ -1024,7 +1044,7 @@ impl Attachment {
         filename: impl ::wasm_bindgen::JsStringLike,
     ) -> Attachment {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(AttachmentDispositionKind::Inline);
+        inner.set_disposition(AttachmentDisposition::Inline);
         inner.set_content_id(content_id);
         inner.set_filename(filename);
         inner
@@ -1036,7 +1056,7 @@ impl Attachment {
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(AttachmentDispositionKind::Attachment);
+        inner.set_disposition(AttachmentDisposition::Attachment);
         inner.set_filename(filename);
         AttachmentBuilder { inner }
     }
@@ -1192,7 +1212,7 @@ pub enum StrOrF64 {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AttachmentDispositionKind {
+pub enum AttachmentDisposition {
     Inline = "inline",
     Attachment = "attachment",
 }

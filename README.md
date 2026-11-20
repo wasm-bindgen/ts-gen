@@ -189,6 +189,17 @@ primary plus a `try_<name>` companion:
 ts-gen --input types.d.ts --output src/bindings.rs --fallible
 ```
 
+Choose how a `Promise`-returning method or function is bound. `both`, the
+default, binds an `async fn name()` beside a sync `name_promise()` that
+returns the promise, for a caller that needs the call started now
+(`ctx.wait_until(..)`, `Promise::race`). `promise` binds one sync `name()`
+returning `Promise<T, E>`, started at the call and awaited with
+`name().await`. `async` binds only the `async fn`:
+
+```sh
+ts-gen --input types.d.ts --output src/bindings.rs --promise-returns promise
+```
+
 Keep `T | null | undefined` three-state. By default a return, awaited value or
 getter admitting `null`, `undefined` or both reads as `Option<T>`, and a
 `T | null | undefined` write passes `undefined`. With the flag the producer
@@ -224,6 +235,7 @@ private):
 let options = codegen::GenerateOptions::new()
     .error_type("crate::Error")
     .experimental_generic_mono(true)
+    .promise_returns(codegen::PromiseReturns::Both)
     .strict_nullable(false);
 let rust_code = codegen::generate_with_options(&module, &gctx, &options)?;
 ```

@@ -5,7 +5,7 @@
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::setter_matches_getter_mono::{
-    AutoOrF64, DigitsOptions, RequiredDigits, RoundingModeKind, Toggle, ToggleModeKind,
+    AutoOrF64, DigitsOptions, DigitsOptionsRoundingMode, RequiredDigits, Toggle, ToggleModeKind,
 };
 
 fn is_f64(kind: Option<AutoOrF64>, expected: f64) -> bool {
@@ -51,11 +51,11 @@ fn mixed_literal_enum_round_trips() {
 #[wasm_bindgen_test]
 fn synthesised_enum_derives() {
     let options = DigitsOptions::builder()
-        .rounding_mode(RoundingModeKind::Floor)
+        .rounding_mode(DigitsOptionsRoundingMode::Floor)
         .build();
     let read = options.rounding_mode();
-    assert_eq!(read, Some(RoundingModeKind::Floor));
-    assert_ne!(read, Some(RoundingModeKind::Ceil));
+    assert_eq!(read, Some(DigitsOptionsRoundingMode::Floor));
+    assert_ne!(read, Some(DigitsOptionsRoundingMode::Ceil));
     assert_eq!(format!("{read:?}"), "Some(Floor)");
     let mode = read.unwrap();
     options.set_rounding_mode(mode);

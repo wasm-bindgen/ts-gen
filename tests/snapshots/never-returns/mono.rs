@@ -28,7 +28,15 @@ extern "C" {
 extern "C" {
     #[doc = " Always rejects."]
     #[wasm_bindgen(catch, js_name = "rejectLater")]
-    pub fn reject_later(message: impl ::wasm_bindgen::JsStringLike) -> Promise<()>;
+    pub async fn reject_later(message: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "never-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Always rejects."]
+    #[wasm_bindgen(catch, js_name = "rejectLater")]
+    pub fn reject_later_promise(
+        message: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Undefined>, JsValue>;
 }
 #[wasm_bindgen(module = "never-returns", experimental_generic_mono)]
 extern "C" {
@@ -107,7 +115,10 @@ extern "C" {
     pub fn value_of(this: &Guard) -> Result<(), JsValue>;
     #[doc = " Always rejects."]
     #[wasm_bindgen(method, catch, js_name = "failLater")]
-    pub fn fail_later(this: &Guard) -> Promise<()>;
+    pub async fn fail_later(this: &Guard) -> Result<(), JsValue>;
+    #[doc = " Always rejects."]
+    #[wasm_bindgen(method, catch, js_name = "failLater")]
+    pub fn fail_later_promise(this: &Guard) -> Result<Promise<Undefined>, JsValue>;
     # [wasm_bindgen (static_method_of = Guard , catch)]
     pub fn unreachable(reason: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "reject")]

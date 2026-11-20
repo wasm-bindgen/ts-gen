@@ -1206,11 +1206,11 @@ pub mod temporal {
         #[wasm_bindgen(method, getter)]
         pub fn disambiguation(
             this: &DisambiguationOptions,
-        ) -> Option<DisambiguationOptionsDisambiguationKind>;
+        ) -> Option<DisambiguationOptionsDisambiguation>;
         #[wasm_bindgen(method, setter)]
         pub fn set_disambiguation(
             this: &DisambiguationOptions,
-            val: DisambiguationOptionsDisambiguationKind,
+            val: DisambiguationOptionsDisambiguation,
         );
     }
     impl DisambiguationOptions {
@@ -1232,7 +1232,7 @@ pub mod temporal {
         inner: DisambiguationOptions,
     }
     impl DisambiguationOptionsBuilder {
-        pub fn disambiguation(self, val: DisambiguationOptionsDisambiguationKind) -> Self {
+        pub fn disambiguation(self, val: DisambiguationOptionsDisambiguation) -> Self {
             self.inner.set_disambiguation(val);
             self
         }
@@ -1246,9 +1246,9 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type OverflowOptions;
         #[wasm_bindgen(method, getter)]
-        pub fn overflow(this: &OverflowOptions) -> Option<OverflowOptionsOverflowKind>;
+        pub fn overflow(this: &OverflowOptions) -> Option<OverflowOptionsOverflow>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_overflow(this: &OverflowOptions, val: OverflowOptionsOverflowKind);
+        pub fn set_overflow(this: &OverflowOptions, val: OverflowOptionsOverflow);
     }
     impl OverflowOptions {
         pub fn new() -> OverflowOptions {
@@ -1269,7 +1269,7 @@ pub mod temporal {
         inner: OverflowOptions,
     }
     impl OverflowOptionsBuilder {
-        pub fn overflow(self, val: OverflowOptionsOverflowKind) -> Self {
+        pub fn overflow(self, val: OverflowOptionsOverflow) -> Self {
             self.inner.set_overflow(val);
             self
         }
@@ -1283,9 +1283,9 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type TransitionOptions;
         #[wasm_bindgen(method, getter)]
-        pub fn direction(this: &TransitionOptions) -> NextOrPrevious;
+        pub fn direction(this: &TransitionOptions) -> TransitionOptionsDirection;
         #[wasm_bindgen(method, setter)]
-        pub fn set_direction(this: &TransitionOptions, val: NextOrPrevious);
+        pub fn set_direction(this: &TransitionOptions, val: TransitionOptionsDirection);
     }
     impl TransitionOptions {
         #[doc = " Construct with `direction: \"next\"`."]
@@ -1299,13 +1299,13 @@ pub mod temporal {
         #[doc = " Start a builder with `direction: \"next\"`."]
         pub fn builder_next() -> TransitionOptionsBuilder {
             let inner: TransitionOptions = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_direction(NextOrPrevious::Next);
+            inner.set_direction(TransitionOptionsDirection::Next);
             TransitionOptionsBuilder { inner }
         }
         #[doc = " Start a builder with `direction: \"previous\"`."]
         pub fn builder_previous() -> TransitionOptionsBuilder {
             let inner: TransitionOptions = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_direction(NextOrPrevious::Previous);
+            inner.set_direction(TransitionOptionsDirection::Previous);
             TransitionOptionsBuilder { inner }
         }
     }
@@ -1313,7 +1313,7 @@ pub mod temporal {
         inner: TransitionOptions,
     }
     impl TransitionOptionsBuilder {
-        pub fn direction(self, val: NextOrPrevious) -> Self {
+        pub fn direction(self, val: TransitionOptionsDirection) -> Self {
             self.inner.set_direction(val);
             self
         }
@@ -1347,11 +1347,11 @@ pub mod temporal {
         #[wasm_bindgen(method, getter, js_name = "roundingMode")]
         pub fn rounding_mode<Units: ::wasm_bindgen::JsGeneric>(
             this: &RoundingOptions<Units>,
-        ) -> Option<RoundingModeKind>;
+        ) -> Option<RoundingOptionsRoundingMode>;
         #[wasm_bindgen(method, setter, js_name = "roundingMode")]
         pub fn set_rounding_mode<Units: ::wasm_bindgen::JsGeneric>(
             this: &RoundingOptions<Units>,
-            val: RoundingModeKind,
+            val: RoundingOptionsRoundingMode,
         );
     }
     impl<Units: ::wasm_bindgen::JsGeneric> RoundingOptions<Units> {
@@ -1381,7 +1381,7 @@ pub mod temporal {
             self.inner.set_rounding_increment(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: RoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -1422,7 +1422,7 @@ pub mod temporal {
             self.inner.set_rounding_increment(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: RoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -1472,7 +1472,7 @@ pub mod temporal {
             self.inner.set_rounding_increment(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: RoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -1501,11 +1501,11 @@ pub mod temporal {
         #[wasm_bindgen(method, getter, js_name = "roundingMode")]
         pub fn rounding_mode<Units: ::wasm_bindgen::JsGeneric>(
             this: &ToStringRoundingOptions<Units>,
-        ) -> Option<RoundingModeKind>;
+        ) -> Option<ToStringRoundingOptionsRoundingMode>;
         #[wasm_bindgen(method, setter, js_name = "roundingMode")]
         pub fn set_rounding_mode<Units: ::wasm_bindgen::JsGeneric>(
             this: &ToStringRoundingOptions<Units>,
-            val: RoundingModeKind,
+            val: ToStringRoundingOptionsRoundingMode,
         );
     }
     impl<Units: ::wasm_bindgen::JsGeneric> ToStringRoundingOptions<Units> {
@@ -1531,7 +1531,7 @@ pub mod temporal {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: ToStringRoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -1586,7 +1586,7 @@ pub mod temporal {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: ToStringRoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -1788,9 +1788,14 @@ pub mod temporal {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type PlainDateToStringOptions;
         #[wasm_bindgen(method, getter, js_name = "calendarName")]
-        pub fn calendar_name(this: &PlainDateToStringOptions) -> Option<CalendarNameKind>;
+        pub fn calendar_name(
+            this: &PlainDateToStringOptions,
+        ) -> Option<PlainDateToStringOptionsCalendarName>;
         #[wasm_bindgen(method, setter, js_name = "calendarName")]
-        pub fn set_calendar_name(this: &PlainDateToStringOptions, val: CalendarNameKind);
+        pub fn set_calendar_name(
+            this: &PlainDateToStringOptions,
+            val: PlainDateToStringOptionsCalendarName,
+        );
     }
     impl PlainDateToStringOptions {
         pub fn new() -> PlainDateToStringOptions {
@@ -1811,7 +1816,7 @@ pub mod temporal {
         inner: PlainDateToStringOptions,
     }
     impl PlainDateToStringOptionsBuilder {
-        pub fn calendar_name(self, val: CalendarNameKind) -> Self {
+        pub fn calendar_name(self, val: PlainDateToStringOptionsCalendarName) -> Self {
             self.inner.set_calendar_name(val);
             self
         }
@@ -2517,7 +2522,7 @@ pub mod temporal {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: ToStringRoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -3039,9 +3044,14 @@ pub mod temporal {
         #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
         pub fn set_smallest_unit(this: &PlainDateTimeToStringOptions, val: PluralizeUnit);
         #[wasm_bindgen(method, getter, js_name = "roundingMode")]
-        pub fn rounding_mode(this: &PlainDateTimeToStringOptions) -> Option<RoundingModeKind>;
+        pub fn rounding_mode(
+            this: &PlainDateTimeToStringOptions,
+        ) -> Option<ToStringRoundingOptionsRoundingMode>;
         #[wasm_bindgen(method, setter, js_name = "roundingMode")]
-        pub fn set_rounding_mode(this: &PlainDateTimeToStringOptions, val: RoundingModeKind);
+        pub fn set_rounding_mode(
+            this: &PlainDateTimeToStringOptions,
+            val: ToStringRoundingOptionsRoundingMode,
+        );
         #[wasm_bindgen(method, getter, js_name = "fractionalSecondDigits")]
         pub fn fractional_second_digits(
             this: &PlainDateTimeToStringOptions,
@@ -3073,7 +3083,7 @@ pub mod temporal {
         inner: PlainDateTimeToStringOptions,
     }
     impl PlainDateTimeToStringOptionsBuilder {
-        pub fn calendar_name(self, val: CalendarNameKind) -> Self {
+        pub fn calendar_name(self, val: PlainDateToStringOptionsCalendarName) -> Self {
             self.inner.set_calendar_name(val);
             self
         }
@@ -3081,7 +3091,7 @@ pub mod temporal {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: ToStringRoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -3884,16 +3894,21 @@ pub mod temporal {
         #[wasm_bindgen(method, getter)]
         pub fn offset(
             this: &ZonedDateTimeToStringOptions,
-        ) -> Option<ZonedDateTimeToStringOptionsOffsetKind>;
+        ) -> Option<ZonedDateTimeToStringOptionsOffset>;
         #[wasm_bindgen(method, setter)]
         pub fn set_offset(
             this: &ZonedDateTimeToStringOptions,
-            val: ZonedDateTimeToStringOptionsOffsetKind,
+            val: ZonedDateTimeToStringOptionsOffset,
         );
         #[wasm_bindgen(method, getter, js_name = "timeZoneName")]
-        pub fn time_zone_name(this: &ZonedDateTimeToStringOptions) -> Option<TimeZoneNameKind>;
+        pub fn time_zone_name(
+            this: &ZonedDateTimeToStringOptions,
+        ) -> Option<ZonedDateTimeToStringOptionsTimeZoneName>;
         #[wasm_bindgen(method, setter, js_name = "timeZoneName")]
-        pub fn set_time_zone_name(this: &ZonedDateTimeToStringOptions, val: TimeZoneNameKind);
+        pub fn set_time_zone_name(
+            this: &ZonedDateTimeToStringOptions,
+            val: ZonedDateTimeToStringOptionsTimeZoneName,
+        );
     }
     impl ZonedDateTimeToStringOptions {
         pub fn new() -> ZonedDateTimeToStringOptions {
@@ -3914,7 +3929,7 @@ pub mod temporal {
         inner: ZonedDateTimeToStringOptions,
     }
     impl ZonedDateTimeToStringOptionsBuilder {
-        pub fn calendar_name(self, val: CalendarNameKind) -> Self {
+        pub fn calendar_name(self, val: PlainDateToStringOptionsCalendarName) -> Self {
             self.inner.set_calendar_name(val);
             self
         }
@@ -3922,7 +3937,7 @@ pub mod temporal {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: ToStringRoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -3934,11 +3949,11 @@ pub mod temporal {
             self.inner.set_fractional_second_digits_with_f64(val);
             self
         }
-        pub fn offset(self, val: ZonedDateTimeToStringOptionsOffsetKind) -> Self {
+        pub fn offset(self, val: ZonedDateTimeToStringOptionsOffset) -> Self {
             self.inner.set_offset(val);
             self
         }
-        pub fn time_zone_name(self, val: TimeZoneNameKind) -> Self {
+        pub fn time_zone_name(self, val: ZonedDateTimeToStringOptionsTimeZoneName) -> Self {
             self.inner.set_time_zone_name(val);
             self
         }
@@ -3954,18 +3969,16 @@ pub mod temporal {
         #[wasm_bindgen(method, getter)]
         pub fn disambiguation(
             this: &ZonedDateTimeFromOptions,
-        ) -> Option<DisambiguationOptionsDisambiguationKind>;
+        ) -> Option<DisambiguationOptionsDisambiguation>;
         #[wasm_bindgen(method, setter)]
         pub fn set_disambiguation(
             this: &ZonedDateTimeFromOptions,
-            val: DisambiguationOptionsDisambiguationKind,
+            val: DisambiguationOptionsDisambiguation,
         );
         #[wasm_bindgen(method, getter)]
-        pub fn offset(
-            this: &ZonedDateTimeFromOptions,
-        ) -> Option<ZonedDateTimeFromOptionsOffsetKind>;
+        pub fn offset(this: &ZonedDateTimeFromOptions) -> Option<ZonedDateTimeFromOptionsOffset>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_offset(this: &ZonedDateTimeFromOptions, val: ZonedDateTimeFromOptionsOffsetKind);
+        pub fn set_offset(this: &ZonedDateTimeFromOptions, val: ZonedDateTimeFromOptionsOffset);
     }
     impl ZonedDateTimeFromOptions {
         pub fn new() -> ZonedDateTimeFromOptions {
@@ -3986,15 +3999,15 @@ pub mod temporal {
         inner: ZonedDateTimeFromOptions,
     }
     impl ZonedDateTimeFromOptionsBuilder {
-        pub fn overflow(self, val: OverflowOptionsOverflowKind) -> Self {
+        pub fn overflow(self, val: OverflowOptionsOverflow) -> Self {
             self.inner.set_overflow(val);
             self
         }
-        pub fn disambiguation(self, val: DisambiguationOptionsDisambiguationKind) -> Self {
+        pub fn disambiguation(self, val: DisambiguationOptionsDisambiguation) -> Self {
             self.inner.set_disambiguation(val);
             self
         }
-        pub fn offset(self, val: ZonedDateTimeFromOptionsOffsetKind) -> Self {
+        pub fn offset(self, val: ZonedDateTimeFromOptionsOffset) -> Self {
             self.inner.set_offset(val);
             self
         }
@@ -4392,12 +4405,12 @@ pub mod temporal {
         #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
         pub fn get_time_zone_transition(
             this: &ZonedDateTime,
-            direction: NextOrPrevious,
+            direction: ZonedDateTimeDirection,
         ) -> Option<ZonedDateTime>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
         pub fn try_get_time_zone_transition(
             this: &ZonedDateTime,
-            direction: NextOrPrevious,
+            direction: ZonedDateTimeDirection,
         ) -> Result<Option<ZonedDateTime>, JsValue>;
         #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
         pub fn get_time_zone_transition_with_transition_options(
@@ -4797,9 +4810,10 @@ pub mod temporal {
         #[wasm_bindgen(method, setter, js_name = "roundingIncrement")]
         pub fn set_rounding_increment(this: &DurationRoundingOptions, val: f64);
         #[wasm_bindgen(method, getter, js_name = "roundingMode")]
-        pub fn rounding_mode(this: &DurationRoundingOptions) -> Option<RoundingModeKind>;
+        pub fn rounding_mode(this: &DurationRoundingOptions)
+            -> Option<RoundingOptionsRoundingMode>;
         #[wasm_bindgen(method, setter, js_name = "roundingMode")]
-        pub fn set_rounding_mode(this: &DurationRoundingOptions, val: RoundingModeKind);
+        pub fn set_rounding_mode(this: &DurationRoundingOptions, val: RoundingOptionsRoundingMode);
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
         pub fn largest_unit(
             this: &DurationRoundingOptions,
@@ -4845,7 +4859,7 @@ pub mod temporal {
             self.inner.set_rounding_increment(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: RoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -4886,7 +4900,7 @@ pub mod temporal {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: ToStringRoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -5431,7 +5445,7 @@ pub mod temporal {
             self.inner.set_smallest_unit(val);
             self
         }
-        pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+        pub fn rounding_mode(self, val: ToStringRoundingOptionsRoundingMode) -> Self {
             self.inner.set_rounding_mode(val);
             self
         }
@@ -7249,7 +7263,7 @@ pub mod temporal {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DisambiguationOptionsDisambiguationKind {
+pub enum DisambiguationOptionsDisambiguation {
     Compatible = "compatible",
     Earlier = "earlier",
     Later = "later",
@@ -7257,19 +7271,19 @@ pub enum DisambiguationOptionsDisambiguationKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OverflowOptionsOverflowKind {
+pub enum OverflowOptionsOverflow {
     Constrain = "constrain",
     Reject = "reject",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NextOrPrevious {
+pub enum TransitionOptionsDirection {
     Next = "next",
     Previous = "previous",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RoundingModeKind {
+pub enum RoundingOptionsRoundingMode {
     Ceil = "ceil",
     Floor = "floor",
     Expand = "expand",
@@ -7306,6 +7320,19 @@ pub enum LargestUnitDateUnitOrTimeUnit {
     Nanoseconds = "nanoseconds",
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ToStringRoundingOptionsRoundingMode {
+    Ceil = "ceil",
+    Floor = "floor",
+    Expand = "expand",
+    Trunc = "trunc",
+    HalfCeil = "halfCeil",
+    HalfFloor = "halfFloor",
+    HalfExpand = "halfExpand",
+    HalfTrunc = "halfTrunc",
+    HalfEven = "halfEven",
+}
+#[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum FractionalSecondDigitsKind {
     Auto = "auto",
@@ -7313,7 +7340,7 @@ pub enum FractionalSecondDigitsKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CalendarNameKind {
+pub enum PlainDateToStringOptionsCalendarName {
     Auto = "auto",
     Always = "always",
     Never = "never",
@@ -7321,24 +7348,30 @@ pub enum CalendarNameKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ZonedDateTimeToStringOptionsOffsetKind {
+pub enum ZonedDateTimeToStringOptionsOffset {
     Auto = "auto",
     Never = "never",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TimeZoneNameKind {
+pub enum ZonedDateTimeToStringOptionsTimeZoneName {
     Auto = "auto",
     Never = "never",
     Critical = "critical",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ZonedDateTimeFromOptionsOffsetKind {
+pub enum ZonedDateTimeFromOptionsOffset {
     Use = "use",
     Ignore = "ignore",
     Prefer = "prefer",
     Reject = "reject",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZonedDateTimeDirection {
+    Next = "next",
+    Previous = "previous",
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]

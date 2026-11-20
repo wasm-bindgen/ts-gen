@@ -4,120 +4,516 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[wasm_bindgen(experimental_generic_mono)]
+#[allow(dead_code)]
+pub type Tag = JsString;
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Mode {
+    Fast = "fast",
+    Slow = "slow",
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type State;
-    #[doc = " `block_concurrency_while() -> Promise<()>`."]
-    #[wasm_bindgen(method, catch, js_name = "blockConcurrencyWhile")]
-    pub fn block_concurrency_while(
-        this: &State,
-        callback: &Function<fn() -> Promise<Undefined>>,
-    ) -> Promise<()>;
-    #[doc = " Overloads: each expansion is its own promise."]
-    #[wasm_bindgen(method, catch)]
-    pub fn fetch(this: &State, url: impl ::wasm_bindgen::JsStringLike) -> Promise<Response>;
-    #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub fn fetch_with_init(
-        this: &State,
-        url: impl ::wasm_bindgen::JsStringLike,
-        init: &RequestInit,
-    ) -> Promise<Response>;
-    #[doc = " Awaited: `Promise<Nullable<String>>`."]
-    #[wasm_bindgen(method, catch)]
-    pub fn get(this: &State, key: impl ::wasm_bindgen::JsStringLike) -> Promise<Option<String>>;
-    #[doc = " Awaited: `Promise<Nullable<String>>`."]
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn get_js_string(
-        this: &State,
+    #[wasm_bindgen(catch)]
+    pub async fn text() -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "text")]
+    pub async fn text_js_string() -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "text")]
+    pub fn text_promise() -> Result<Promise<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn count() -> Result<f64, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "count")]
+    pub fn count_promise() -> Result<Promise<Number>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn flag() -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "flag")]
+    pub fn flag_promise() -> Result<Promise<Boolean>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn done() -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "done")]
+    pub fn done_promise() -> Result<Promise<Undefined>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn tags() -> Result<Vec<String>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "tags")]
+    pub async fn tags_js_string() -> Result<Array<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "tags")]
+    pub fn tags_promise() -> Result<Promise<Array<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeTags")]
+    pub async fn maybe_tags() -> Result<Option<Vec<String>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeTags")]
+    pub async fn maybe_tags_js_string() -> Result<Option<Array<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeTags")]
+    pub fn maybe_tags_promise() -> Result<Promise<Option<Array<JsString>>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn rows() -> Result<Vec<Array<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "rows")]
+    pub fn rows_promise() -> Result<Promise<Array<Array<JsString>>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn lookup(key: impl ::wasm_bindgen::JsStringLike) -> Result<Option<String>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "lookup")]
+    pub async fn lookup_js_string(
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Option<JsString>>;
-    #[doc = " A `null` argument arm is its own promise too."]
-    #[wasm_bindgen(method, catch)]
-    pub fn put(
-        this: &State,
+    ) -> Result<Option<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "lookup")]
+    pub fn lookup_promise(
         key: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<()>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    fn __put_with_null(
-        this: &State,
+    ) -> Result<Promise<Option<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn find(key: impl ::wasm_bindgen::JsStringLike) -> Result<Option<String>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "find")]
+    pub async fn find_js_string(
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &::wasm_bindgen::JsValue,
-    ) -> Promise<()>;
+    ) -> Result<Option<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "find")]
+    pub fn find_promise(
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Option<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn peek(key: impl ::wasm_bindgen::JsStringLike) -> Result<Option<String>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "peek")]
+    pub async fn peek_js_string(
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Option<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "peek")]
+    pub fn peek_promise(
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Option<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn mode() -> Result<Mode, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "mode")]
+    pub fn mode_promise() -> Result<Promise<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn anything() -> Result<JsValue, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "anything")]
+    pub fn anything_promise() -> Result<Promise, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn identity<T>(value: T) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi + 'static;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "identity")]
+    pub fn identity_promise<T>(value: T) -> Result<Promise<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Rejects: the error comes out of the `await`."]
+    #[wasm_bindgen(catch)]
+    pub async fn reject(message: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Rejects: the error comes out of the `await`."]
+    #[wasm_bindgen(catch, js_name = "reject")]
+    pub async fn reject_js_string(
+        message: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Rejects: the error comes out of the `await`."]
+    #[wasm_bindgen(catch, js_name = "reject")]
+    pub fn reject_promise(
+        message: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Throws before returning a promise."]
+    #[wasm_bindgen(catch, js_name = "throwNow")]
+    pub async fn throw_now(message: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Throws before returning a promise."]
+    #[wasm_bindgen(catch, js_name = "throwNow")]
+    pub async fn throw_now_js_string(
+        message: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Throws before returning a promise."]
+    #[wasm_bindgen(catch, js_name = "throwNow")]
+    pub fn throw_now_promise(
+        message: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Typed, and throws before returning a promise."]
+    #[doc = ""]
     #[doc = " ## Errors"]
     #[doc = ""]
-    #[doc = " * `TypeError` — on an invalid key"]
-    #[wasm_bindgen(method, catch)]
-    pub fn delete(this: &State, key: impl ::wasm_bindgen::JsStringLike)
-        -> Promise<bool, TypeError>;
-    #[doc = " `@throws {never}` drops `catch`: a plain `Promise<bool>`."]
-    #[wasm_bindgen(method)]
-    pub fn ready(this: &State) -> Promise<bool>;
-    #[doc = " Sync methods are untouched."]
-    #[wasm_bindgen(method, catch)]
-    pub fn id(this: &State) -> Result<String, JsValue>;
-    #[doc = " Sync methods are untouched."]
-    #[wasm_bindgen(method, catch, js_name = "id")]
-    pub fn id_js_string(this: &State) -> Result<JsString, JsValue>;
-    #[doc = " A `Promise`-typed property is a getter of the promise."]
-    #[wasm_bindgen(method, getter)]
-    pub fn done(this: &State) -> Promise<Undefined>;
+    #[doc = " * `TypeError` — on a malformed input"]
+    #[wasm_bindgen(catch)]
+    pub async fn parse(input: impl ::wasm_bindgen::JsStringLike) -> Result<f64, TypeError>;
 }
-impl State {
-    #[doc = " A `null` argument arm is its own promise too."]
-    pub fn put_with_null(&self, key: impl ::wasm_bindgen::JsStringLike) -> Promise<()> {
-        self.__put_with_null(key, &::wasm_bindgen::JsValue::NULL)
-    }
-}
-#[wasm_bindgen(experimental_generic_mono)]
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Response;
+    #[doc = " Typed, and throws before returning a promise."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `TypeError` — on a malformed input"]
+    #[wasm_bindgen(catch, js_name = "parse")]
+    pub fn parse_promise(
+        input: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Number, TypeError>, TypeError>;
 }
-#[wasm_bindgen(experimental_generic_mono)]
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Typed: the rejection is a `RangeError` in every form."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `RangeError` — on a negative value"]
+    #[wasm_bindgen(catch)]
+    pub async fn sqrt(value: f64) -> Result<f64, RangeError>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Typed: the rejection is a `RangeError` in every form."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `RangeError` — on a negative value"]
+    #[wasm_bindgen(catch, js_name = "sqrt")]
+    pub fn sqrt_promise(value: f64) -> Result<Promise<Number, RangeError>, RangeError>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Plain under every policy."]
+    pub async fn ready() -> bool;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Plain under every policy."]
+    #[wasm_bindgen(js_name = "ready")]
+    pub fn ready_promise() -> Promise<Boolean>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Declared `async`: its sync form is plain under every policy."]
+    #[wasm_bindgen(catch)]
+    pub async fn size() -> Result<f64, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Declared `async`: its sync form is plain under every policy."]
+    #[wasm_bindgen(js_name = "size")]
+    pub fn size_promise() -> Promise<Number>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " A `null` argument arm gets each form too."]
+    #[wasm_bindgen(catch)]
+    pub async fn store(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " A `null` argument arm gets each form too."]
+    #[wasm_bindgen(catch, js_name = "store")]
+    pub async fn store_js_string(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " A `null` argument arm gets each form too."]
+    #[wasm_bindgen(catch, js_name = "store")]
+    pub fn store_promise(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "store")]
+    async fn __store_with_null(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: &::wasm_bindgen::JsValue,
+    ) -> Result<String, JsValue>;
+}
+#[doc = " A `null` argument arm gets each form too."]
+pub async fn store_with_null(key: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue> {
+    __store_with_null(key, &::wasm_bindgen::JsValue::NULL).await
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "store")]
+    async fn __store_with_null_js_string(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: &::wasm_bindgen::JsValue,
+    ) -> Result<JsString, JsValue>;
+}
+#[doc = " A `null` argument arm gets each form too."]
+pub async fn store_with_null_js_string(
+    key: impl ::wasm_bindgen::JsStringLike,
+) -> Result<JsString, JsValue> {
+    __store_with_null_js_string(key, &::wasm_bindgen::JsValue::NULL).await
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "store")]
+    fn __store_with_null_promise(
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: &::wasm_bindgen::JsValue,
+    ) -> Result<Promise<JsString>, JsValue>;
+}
+#[doc = " A `null` argument arm gets each form too."]
+pub fn store_with_null_promise(
+    key: impl ::wasm_bindgen::JsStringLike,
+) -> Result<Promise<JsString>, JsValue> {
+    __store_with_null_promise(key, &::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " A callback's `Promise` is an inner position, the same in every mode."]
+    #[wasm_bindgen(catch)]
+    pub async fn run(callback: &Function<fn() -> Promise<JsString>>) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " A callback's `Promise` is an inner position, the same in every mode."]
+    #[wasm_bindgen(catch, js_name = "run")]
+    pub async fn run_js_string(
+        callback: &Function<fn() -> Promise<JsString>>,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[doc = " A callback's `Promise` is an inner position, the same in every mode."]
+    #[wasm_bindgen(catch, js_name = "run")]
+    pub fn run_promise(
+        callback: &Function<fn() -> Promise<JsString>>,
+    ) -> Result<Promise<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type RequestInit;
+    pub type Wrapper<T = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn method(this: &RequestInit) -> Option<String>;
-    #[wasm_bindgen(method, getter, js_name = "method")]
-    pub fn method_js_string(this: &RequestInit) -> Option<JsString>;
+    pub fn value<T>(this: &Wrapper<T>) -> T
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_method(this: &RequestInit, val: impl ::wasm_bindgen::JsStringLike);
+    pub fn set_value<T>(this: &Wrapper<T>, val: T)
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
 }
-impl RequestInit {
-    pub fn new() -> RequestInit {
-        Self::builder().build()
-    }
-    pub fn builder() -> RequestInitBuilder {
-        RequestInitBuilder {
-            inner: JsCast::unchecked_into(js_sys::Object::new()),
-        }
-    }
-}
-impl Default for RequestInit {
-    fn default() -> Self {
-        Self::new()
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Wrapper<T> {
+    pub fn new(value: T) -> Wrapper<T> {
+        let inner: Wrapper<T> = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value(value);
+        inner
     }
 }
-pub struct RequestInitBuilder {
-    inner: RequestInit,
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn boxed() -> Result<Wrapper<String>, JsValue>;
 }
-impl RequestInitBuilder {
-    pub fn method(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
-        self.inner.set_method(val);
-        self
-    }
-    pub fn build(self) -> RequestInit {
-        self.inner
-    }
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "boxed")]
+    pub async fn boxed_js_string() -> Result<Wrapper<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "boxed")]
+    pub fn boxed_promise() -> Result<Promise<Wrapper<String>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Item;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Result<Item, JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &Item) -> String;
+    #[wasm_bindgen(method, getter, js_name = "name")]
+    pub fn name_js_string(this: &Item) -> JsString;
+    #[wasm_bindgen(method, catch)]
+    pub async fn rename(
+        this: &Item,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Item, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "rename")]
+    pub fn rename_promise(
+        this: &Item,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Item>, JsValue>;
+    # [wasm_bindgen (static_method_of = Item , catch)]
+    pub async fn load(name: impl ::wasm_bindgen::JsStringLike) -> Result<Item, JsValue>;
+    # [wasm_bindgen (static_method_of = Item , catch , js_name = "load")]
+    pub fn load_promise(name: impl ::wasm_bindgen::JsStringLike) -> Result<Promise<Item>, JsValue>;
+    #[doc = " Overloads: each expansion gets each form."]
+    #[wasm_bindgen(method, catch)]
+    pub async fn describe(this: &Item) -> Result<String, JsValue>;
+    #[doc = " Overloads: each expansion gets each form."]
+    #[wasm_bindgen(method, catch, js_name = "describe")]
+    pub async fn describe_js_string(this: &Item) -> Result<JsString, JsValue>;
+    #[doc = " Overloads: each expansion gets each form."]
+    #[wasm_bindgen(method, catch, js_name = "describe")]
+    pub fn describe_promise(this: &Item) -> Result<Promise<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "describe")]
+    pub async fn describe_with_prefix(
+        this: &Item,
+        prefix: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "describe")]
+    pub async fn describe_with_prefix_js_string(
+        this: &Item,
+        prefix: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "describe")]
+    pub fn describe_with_prefix_promise(
+        this: &Item,
+        prefix: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<JsString>, JsValue>;
+    #[doc = " A `Promise`-typed property: a getter, sync in every mode."]
+    #[wasm_bindgen(method, getter)]
+    pub fn loaded(this: &Item) -> Promise<Boolean>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn items() -> Result<Vec<Item>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "items")]
+    pub fn items_promise() -> Result<Promise<Array<Item>>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeItem")]
+    pub async fn maybe_item(
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Option<Item>, JsValue>;
+}
+#[wasm_bindgen(module = "promise-returns", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeItem")]
+    pub fn maybe_item_promise(
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Option<Item>>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch)]
-    pub fn sleep(ms: f64) -> Promise<()>;
+    #[doc = " A global function: its sync form is plain under `--fallible`."]
+    #[wasm_bindgen(catch, js_name = "promiseReturnsTick")]
+    pub async fn promise_returns_tick() -> Result<String, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[doc = " A global function: its sync form is plain under `--fallible`."]
+    #[wasm_bindgen(catch, js_name = "promiseReturnsTick")]
+    pub async fn promise_returns_tick_js_string() -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[doc = " A global function: its sync form is plain under `--fallible`."]
+    #[wasm_bindgen(js_name = "promiseReturnsTick")]
+    pub fn promise_returns_tick_promise() -> Promise<JsString>;
 }

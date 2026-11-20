@@ -146,13 +146,21 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bucket;
     #[wasm_bindgen(method, catch)]
-    pub fn get(this: &Bucket, key: &str) -> Promise<Option<BucketObject>>;
+    pub async fn get(this: &Bucket, key: &str) -> Result<Option<BucketObject>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_promise(this: &Bucket, key: &str) -> Promise<JsNullable<BucketObject>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn get_with_options(
+    pub async fn get_with_options(
         this: &Bucket,
         key: &str,
         options: &GetOptions,
-    ) -> Promise<Option<BucketObject>>;
+    ) -> Result<Option<BucketObject>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_options_promise(
+        this: &Bucket,
+        key: &str,
+        options: &GetOptions,
+    ) -> Promise<JsNullable<BucketObject>>;
     #[wasm_bindgen(method)]
     pub fn kind(this: &Bucket) -> BucketKind;
     #[wasm_bindgen(method, catch, js_name = "kind")]
@@ -252,9 +260,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SocketOptions;
     #[wasm_bindgen(method, getter, js_name = "secureTransport")]
-    pub fn secure_transport(this: &SocketOptions) -> Option<SecureTransportKind>;
+    pub fn secure_transport(this: &SocketOptions) -> Option<SocketOptionsSecureTransport>;
     #[wasm_bindgen(method, setter, js_name = "secureTransport")]
-    pub fn set_secure_transport(this: &SocketOptions, val: SecureTransportKind);
+    pub fn set_secure_transport(this: &SocketOptions, val: SocketOptionsSecureTransport);
 }
 impl SocketOptions {
     pub fn new() -> SocketOptions {
@@ -275,7 +283,7 @@ pub struct SocketOptionsBuilder {
     inner: SocketOptions,
 }
 impl SocketOptionsBuilder {
-    pub fn secure_transport(self, val: SecureTransportKind) -> Self {
+    pub fn secure_transport(self, val: SocketOptionsSecureTransport) -> Self {
         self.inner.set_secure_transport(val);
         self
     }
@@ -318,7 +326,7 @@ pub mod cloudflare {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SecureTransportKind {
+pub enum SocketOptionsSecureTransport {
     Off = "off",
     On = "on",
 }

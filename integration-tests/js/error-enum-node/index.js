@@ -28,6 +28,8 @@ function thrown(kind) {
       return new Fault("plain fault");
     case "type":
       return new TypeError("bad type");
+    case "range":
+      return new RangeError("out of range");
     case "string":
       return "just a string";
     case "number":

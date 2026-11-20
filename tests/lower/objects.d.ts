@@ -37,3 +37,21 @@ interface Headers2 {
   "x-custom-cost": { per_token?: number } | { total?: number } | string;
 }
 declare function search(s: Search, t: Streaming, h: Partial<Headers2>): void;
+
+// An intersection reads as the part that is every other, wherever it's
+// listed, and as its first named part where none is.
+interface Outline {
+  id: string;
+}
+interface Circle extends Outline {
+  radius: number;
+}
+interface Label {
+  text: string;
+}
+interface Board {
+  first: Circle & Outline;
+  last: Outline & Circle;
+  none: Outline & Label;
+  put(circle: Outline & Circle, label?: Label & Circle): (Outline & Circle)[];
+}

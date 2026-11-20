@@ -1161,7 +1161,7 @@ impl Lowerer<'_> {
         };
         let (mut result, js_null) = match ret {
             Some(TypeRef::Never) => (abi::Type::Never, false),
-            Some(r) => self.result(r, cx, false),
+            Some(r) => self.result(r, &cx.returned(), false),
             None => (abi::Type::Unit, false),
         };
         let specific = match throws {
@@ -1520,7 +1520,7 @@ impl Lowerer<'_> {
             .iter()
             .enumerate()
             .map(|(i, p)| {
-                let pcx = cx.anchored(&p.name);
+                let pcx = cx.param(&p.name);
                 let mut raw = Vec::new();
                 self.leaves(&p.type_ref, &pcx, &mut raw);
                 if raw.is_empty() {
@@ -1559,7 +1559,7 @@ impl Lowerer<'_> {
             .find(|&k| omittable[k..].iter().all(|&o| o))
             .unwrap_or(fixed.len());
         let rest_ty = rest.map(|r| {
-            let rcx = cx.anchored(&r.name);
+            let rcx = cx.param(&r.name);
             match self.ty(&r.type_ref, &rcx) {
                 t @ abi::Type::Array(_) => t,
                 t => abi::Type::Array(Box::new(t)),

@@ -1209,24 +1209,44 @@ extern "C" {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchNull")]
-    pub fn fetch_null() -> Promise<Option<Registry>>;
+    pub async fn fetch_null() -> Result<Option<Registry>, JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetchNull")]
+    pub fn fetch_null_promise() -> Promise<JsNullable<Registry>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchOptional")]
-    pub fn fetch_optional() -> Promise<Option<f64>>;
+    pub async fn fetch_optional() -> Result<Option<f64>, JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetchOptional")]
+    pub fn fetch_optional_promise() -> Promise<JsOption<Number>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchBoth")]
-    pub fn fetch_both() -> Promise<Option<String>>;
+    pub async fn fetch_both() -> Result<Option<String>, JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetchBoth")]
+    pub fn fetch_both_promise() -> Promise<JsNullable<JsString>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchGeneric")]
-    pub fn fetch_generic<T: ::wasm_bindgen::JsGeneric>() -> Promise<Option<T>>
+    pub async fn fetch_generic<T: ::wasm_bindgen::JsGeneric>() -> Result<Option<T>, JsValue>
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetchGeneric")]
+    pub fn fetch_generic_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<JsNullable<T>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
@@ -1397,9 +1417,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Attachment;
     #[wasm_bindgen(method, getter)]
-    pub fn disposition(this: &Attachment) -> AttachmentDispositionKind;
+    pub fn disposition(this: &Attachment) -> AttachmentDisposition;
     #[wasm_bindgen(method, setter)]
-    pub fn set_disposition(this: &Attachment, val: AttachmentDispositionKind);
+    pub fn set_disposition(this: &Attachment, val: AttachmentDisposition);
     #[wasm_bindgen(method, getter, js_name = "contentId")]
     pub fn content_id(this: &Attachment) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "contentId")]
@@ -1413,7 +1433,7 @@ impl Attachment {
     #[doc = " Construct with `disposition: \"inline\"`."]
     pub fn new_inline(content_id: &str, filename: &str) -> Attachment {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(AttachmentDispositionKind::Inline);
+        inner.set_disposition(AttachmentDisposition::Inline);
         inner.set_content_id(content_id);
         inner.set_filename(filename);
         inner
@@ -1425,7 +1445,7 @@ impl Attachment {
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(filename: &str) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(AttachmentDispositionKind::Attachment);
+        inner.set_disposition(AttachmentDisposition::Attachment);
         inner.set_filename(filename);
         AttachmentBuilder { inner }
     }
@@ -1589,7 +1609,7 @@ pub enum StrOrF64 {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AttachmentDispositionKind {
+pub enum AttachmentDisposition {
     Inline = "inline",
     Attachment = "attachment",
 }

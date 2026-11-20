@@ -150,19 +150,49 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
-    pub fn get(this: &Store, key: &str) -> Promise<String>;
+    pub async fn get(this: &Store, key: &str) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_promise(this: &Store, key: &str) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn get_with_store_options(
+    pub async fn get_with_store_options(
         this: &Store,
         key: &str,
         options: &StoreOptions,
-    ) -> Promise<Option<String>>;
+    ) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_store_options_promise(
+        this: &Store,
+        key: &str,
+        options: &StoreOptions,
+    ) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn get_with_get_options(this: &Store, key: &str, options: &GetOptions) -> Promise<String>;
+    pub async fn get_with_get_options(
+        this: &Store,
+        key: &str,
+        options: &GetOptions,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_get_options_promise(
+        this: &Store,
+        key: &str,
+        options: &GetOptions,
+    ) -> Promise<JsString>;
     #[wasm_bindgen(method)]
     pub fn refine(this: &Store, value: &Derived);
     #[wasm_bindgen(method, catch, js_name = "refine")]
     pub fn try_refine(this: &Store, value: &Derived) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn covered(this: &Store, value: &Derived);
+    #[wasm_bindgen(method, catch, js_name = "covered")]
+    pub fn try_covered(this: &Store, value: &Derived) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "covered")]
+    pub fn covered_with_again(this: &Store, value: &Derived, again: &Derived);
+    #[wasm_bindgen(method, catch, js_name = "covered")]
+    pub fn try_covered_with_again(
+        this: &Store,
+        value: &Derived,
+        again: &Derived,
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
     pub fn same(this: &Store, value: &Derived);
     #[wasm_bindgen(method, catch, js_name = "same")]
@@ -245,6 +275,24 @@ impl StoreValue {
         inner
     }
 }
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Shelf;
+    #[wasm_bindgen(method, getter)]
+    pub fn top(this: &Shelf) -> Derived;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top(this: &Shelf, val: &Derived);
+    # [wasm_bindgen (static_method_of = Shelf , getter)]
+    pub fn spare() -> Derived;
+    # [wasm_bindgen (static_method_of = Shelf , setter)]
+    pub fn set_spare(val: &Derived);
+    # [wasm_bindgen (static_method_of = Shelf , getter)]
+    pub fn odd() -> Derived;
+    # [wasm_bindgen (static_method_of = Shelf , setter)]
+    pub fn set_odd(val: &JsValue);
+}
 #[allow(dead_code)]
 pub type Branded<T> = T;
 #[wasm_bindgen(module = "intersection")]
@@ -304,7 +352,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Fetcher;
     #[wasm_bindgen(method, catch)]
-    pub fn fetch(this: &Fetcher, input: &str) -> Promise<String>;
+    pub async fn fetch(this: &Fetcher, input: &str) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_promise(this: &Fetcher, input: &str) -> Promise<JsString>;
 }
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
@@ -330,10 +380,15 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GenericStub<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn fetch<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn fetch<T: ::wasm_bindgen::JsGeneric>(
         this: &GenericStub<T>,
         input: &str,
-    ) -> Promise<String>;
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_promise<T: ::wasm_bindgen::JsGeneric>(
+        this: &GenericStub<T>,
+        input: &str,
+    ) -> Promise<JsString>;
     #[wasm_bindgen(method, getter)]
     pub fn id<T: ::wasm_bindgen::JsGeneric>(this: &GenericStub<T>) -> String;
 }
@@ -343,7 +398,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Unknown;
     #[wasm_bindgen(method, catch)]
-    pub fn fetch(this: &Unknown, input: &str) -> Promise<String>;
+    pub async fn fetch(this: &Unknown, input: &str) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_promise(this: &Unknown, input: &str) -> Promise<JsString>;
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &Unknown) -> String;
 }
@@ -370,7 +427,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Message;
     #[wasm_bindgen(method, getter)]
-    pub fn role(this: &Message) -> MessageRoleKind;
+    pub fn role(this: &Message) -> MessageRole;
     #[wasm_bindgen(method, setter)]
     pub fn set_role(this: &Message, val: &str);
 }
@@ -495,7 +552,7 @@ pub type ProviderOf<T> = Provider<Array<T>>;
 pub type ViaProviderOf = JsValue;
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum MessageRoleKind {
+pub enum MessageRole {
     User = "user",
     Assistant = "assistant",
     String(String),

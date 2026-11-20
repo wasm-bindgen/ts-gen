@@ -83,13 +83,13 @@ external fun draw_f64_f64(p0: Double, p1: Double)
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun draw_Point(p0: JsAny?)
 
-/** tw:js/global pick(ModeKind) */
+/** tw:js/global pick(PickMode) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun pick_ModeKind(p0: Int): JsAny?
+external fun pick_PickMode(p0: Int): JsAny?
 
-/** tw:js/global pick(ModeKind,f64) */
+/** tw:js/global pick(PickMode,f64) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
-external fun pick_ModeKind_f64(p0: Int, p1: Double): JsAny?
+external fun pick_PickMode_f64(p0: Int, p1: Double): JsAny?
 
 /** tw:js/global rest(str,arr<f64>) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
@@ -251,13 +251,13 @@ external fun unbox_NodeChildKind(p0: JsAny?): Int
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_NodeChildKind(p0: Int, p1: JsAny?): JsAny?
 
-/** tw:unbox ModeKind */
+/** tw:unbox PickMode */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun unbox_ModeKind(p0: JsAny?): Int
+external fun unbox_PickMode(p0: JsAny?): Int
 
-/** tw:box ModeKind */
+/** tw:box PickMode */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun box_ModeKind(p0: Int): JsAny?
+external fun box_PickMode(p0: Int): JsAny?
 
 /** tw:box fn(...arr<Any?>) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

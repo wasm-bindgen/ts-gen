@@ -123,7 +123,7 @@ pub fn build(
     let overloads: Vec<Overload> = ir
         .iter()
         .zip(scopes)
-        .map(|(o, body_scope)| Overload {
+        .map(|(o, (body_scope, async_modifier))| Overload {
             params: &o.params,
             // A constructor's result is its class, which the IR leaves out.
             return_type: match spec.kind {
@@ -132,6 +132,7 @@ pub fn build(
             },
             body_scope,
             throws: &o.throws,
+            async_modifier,
             doc: &o.doc,
         })
         .collect();
@@ -148,13 +149,13 @@ pub fn build(
 
 type Restated = (
     Vec<super::ir_types::Overload>,
-    Vec<ScopeId>,
+    Vec<(ScopeId, bool)>,
     Vec<ExpandedSignature>,
 );
 
-/// The IR overloads at `site`, each with the scope of the parse overload it
-/// restates, and the parse's expansions restated over them, when the
-/// parse's reading of the callable is one the IR carries.
+/// The IR overloads at `site`, each with the scope and `async` modifier of
+/// the parse overload it restates, and the parse's expansions restated over
+/// them, when the parse's reading of the callable is one the IR carries.
 ///
 /// The Rust forms (the `_with_` names, literal-keyed cohorts, `null` arms,
 /// slice hints) are still the parse's expansions; each of their calls
@@ -199,7 +200,7 @@ fn restated(
         })
         .collect();
     let mut used = vec![false; overloads.len()];
-    let mut scopes = vec![scope; overloads.len()];
+    let mut scopes = vec![(scope, first.async_modifier); overloads.len()];
     let mut covered = Vec::new();
     let mut expansions = Vec::with_capacity(legacy.len());
     let mut collapsed = false;
@@ -236,7 +237,7 @@ fn restated(
                 return None;
             };
             covered.extend(merged);
-            scopes[i] = scope;
+            scopes[i] = (scope, source.async_modifier);
             let o = &mut overloads[i];
             if source.throws.is_never() && matches!(o.throws, Throws::None) {
                 o.throws = Throws::Never;
@@ -724,10 +725,13 @@ pub fn accessor(
 ) -> Option<TypeRef> {
     let (cgctx, site) = (cgctx?, site?);
     let at = mark(cgctx);
+    // The enums the zip names here are this accessor's.
+    let outer = cgctx.ir_site.replace(Some(js_name.to_string()));
     let r = accessor_at(cgctx, &site, js_name, parsed, scope);
+    cgctx.ir_site.replace(outer);
     let r = settled(cgctx, at, &site, js_name, r)?;
     Some(match site.form {
-        Form::Set => {
+        Form::Set | Form::StaticSet => {
             let at = [site.path, &[js_name.to_string()]].concat().join(".");
             writes(cgctx, scope, &format!("`{at}`"), &r, parsed)
         }
@@ -736,8 +740,9 @@ pub fn accessor(
 }
 
 /// `ours` where the parse's `theirs` writes an intersection the IR reads
-/// as one part: `JsValue`, unless that part is the whole intersection
-/// (`Derived & Base`), since a write must be every part. `at` locates it.
+/// as one part. A write must be every part, so it's the part that is the
+/// whole intersection (`Derived` of `Base & Derived`), and `JsValue`
+/// where none is. `at` locates it.
 fn writes(
     cgctx: &CodegenContext<'_>,
     scope: ScopeId,
@@ -764,11 +769,13 @@ fn writes(
         if *o == TypeRef::Any || whole.as_ref() == Some(o) {
             return None;
         }
-        cgctx.warn(format!(
-            "{at}: the intersection `{}` it writes is read as one part, so it is erased to JsValue",
-            t.format_ts()
-        ));
-        Some(TypeRef::Any)
+        whole.or_else(|| {
+            cgctx.warn(format!(
+                "{at}: the intersection `{}` it writes is read as one part, so it is erased to JsValue",
+                t.format_ts()
+            ));
+            Some(TypeRef::Any)
+        })
     })
 }
 

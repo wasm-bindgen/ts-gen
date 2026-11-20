@@ -33,7 +33,7 @@ namespace Time {
 
 level(): Level throws;
 format(f: Format) throws;
-align(where: WhereKind) throws;
+align(where: AlignWhere) throws;
 
 enum Base {
   @js("a") A;
@@ -43,7 +43,7 @@ enum Base {
 more(m: More) throws;
 base(): Base throws;
 code(): Code throws;
-retry(c: CKind) throws;
+retry(c: RetryC) throws;
 ratio(): f64 throws;
 big(n: bigint): bigint throws;
 
@@ -56,10 +56,36 @@ enum Color: i32 {
 
 mode(m: Mode): Mode throws;
 speed(m: Mode) throws;
-speed(m: Mode, hint: HintKind) throws;
+speed(m: Mode, hint: SpeedHint) throws;
 tier(): @js(null) TierKind? throws;
 
-enum WhereKind {
+class CompressionStream {
+  new(format: CompressionStreamFormat) throws;
+}
+
+class DecompressionStream {
+  new(format: DecompressionStreamFormat) throws;
+  get format(): DecompressionStreamFormat;
+}
+
+interface Canvas {
+  get fit(): CanvasFit;
+  set fit(value: CanvasFit);
+  get crop(): CanvasCrop;
+  set crop(value: CanvasCrop);
+  get quality(): CanvasQuality;
+  set quality(value: CanvasQuality);
+  get hint(): CanvasHint;
+  set hint(value: CanvasHint);
+  draw(fit: CanvasFit, mode: CanvasMode): CanvasDrawReturn throws;
+  clear(mode: CanvasClearMode) throws;
+  clear(mode: CanvasClearMode, quality: CanvasQuality) throws;
+}
+
+paint(mode: PaintMode): PaintReturn throws;
+get theme(): Theme;
+
+enum AlignWhere {
   @js("start") Start;
   @js("end") End;
 }
@@ -74,7 +100,7 @@ enum Code: i32 {
   Neg1 = -1;
 }
 
-enum CKind: i32 {
+enum RetryC: i32 {
   V1 = 1;
   V2 = 2;
   V3 = 3;
@@ -86,7 +112,7 @@ enum Mode {
   @fallback Other(Str);
 }
 
-enum HintKind {
+enum SpeedHint {
   @js("x") X;
   @fallback Other(Str);
 }
@@ -96,6 +122,69 @@ enum TierKind {
   @js("hi") Hi;
   F64(f64);
   @fallback Other(Str);
+}
+
+enum CompressionStreamFormat {
+  @js("gzip") Gzip;
+  @js("deflate") Deflate;
+  @js("deflate-raw") DeflateRaw;
+}
+
+enum DecompressionStreamFormat {
+  @js("gzip") Gzip;
+  @js("deflate") Deflate;
+  @js("deflate-raw") DeflateRaw;
+}
+
+enum CanvasFit {
+  @js("cover") Cover;
+  @js("contain") Contain;
+}
+
+enum CanvasCrop {
+  @js("cover") Cover;
+  @js("contain") Contain;
+}
+
+enum CanvasQuality: i32 {
+  V1 = 1;
+  V2 = 2;
+  V3 = 3;
+}
+
+enum CanvasHint {
+  @js("auto") Auto;
+  @fallback Other(Str);
+}
+
+enum CanvasDrawReturn {
+  @js("done") Done;
+  @js("queued") Queued;
+}
+
+enum CanvasMode {
+  @js("fill") Fill;
+  @js("stroke") Stroke;
+}
+
+enum CanvasClearMode {
+  @js("all") All;
+  @js("dirty") Dirty;
+}
+
+enum PaintReturn {
+  @js("done") Done;
+  @js("queued") Queued;
+}
+
+enum PaintMode {
+  @js("fill") Fill;
+  @js("stroke") Stroke;
+}
+
+enum Theme {
+  @js("light") Light;
+  @js("dark") Dark;
 }
 
 class ArrayBuffer {}

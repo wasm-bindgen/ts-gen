@@ -35,12 +35,21 @@ extern "C" {
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "asyncByAlias")]
-    pub fn async_by_alias(id: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
+    pub async fn async_by_alias(id: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "asyncByAlias")]
-    pub fn async_by_alias_js_string(id: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
+    pub async fn async_by_alias_js_string(
+        id: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "asyncByAlias")]
+    pub fn async_by_alias_promise(
+        id: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<JsString>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {

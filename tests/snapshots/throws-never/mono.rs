@@ -17,7 +17,10 @@ extern "C" {
     pub fn safe_op_js_string(this: &NeverThrows, x: f64) -> JsString;
     #[doc = " Promise, declared infallible — a plain `Promise<Loaded>`."]
     #[wasm_bindgen(method)]
-    pub fn loaded(this: &NeverThrows) -> Promise<Loaded>;
+    pub async fn loaded(this: &NeverThrows) -> Loaded;
+    #[doc = " Promise, declared infallible — a plain `Promise<Loaded>`."]
+    #[wasm_bindgen(method, js_name = "loaded")]
+    pub fn loaded_promise(this: &NeverThrows) -> Promise<Loaded>;
     #[doc = " Sync method without `@throws {never}` — keeps the `try_normal_op`"]
     #[doc = " companion as usual."]
     #[wasm_bindgen(method, catch, js_name = "normalOp")]
@@ -74,11 +77,17 @@ extern "C" {
 extern "C" {
     #[doc = " Promise-returning free function with `@throws {never}` — no `catch`."]
     #[wasm_bindgen(js_name = "infallibleFetch")]
-    pub fn infallible_fetch(url: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
+    pub async fn infallible_fetch(url: impl ::wasm_bindgen::JsStringLike) -> String;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " Promise-returning free function with `@throws {never}` — no `catch`."]
     #[wasm_bindgen(js_name = "infallibleFetch")]
-    pub fn infallible_fetch_js_string(url: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
+    pub async fn infallible_fetch_js_string(url: impl ::wasm_bindgen::JsStringLike) -> JsString;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[doc = " Promise-returning free function with `@throws {never}` — no `catch`."]
+    #[wasm_bindgen(js_name = "infallibleFetch")]
+    pub fn infallible_fetch_promise(url: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
 }

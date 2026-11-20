@@ -37,11 +37,42 @@ const CONFIGS: &[(&str, &[&str])] = &[
 /// `(snapshot file stem, extra CLI args, fixture stems)`. A flag whose
 /// effect is confined to one feature is snapshotted on that feature's
 /// fixtures rather than on every fixture.
-const FEATURE_CONFIGS: &[(&str, &[&str], &[&str])] = &[(
-    "strict",
-    &["--strict-nullable"],
-    &["node-nullable", "nullability", "optional-reads"],
-)];
+const FEATURE_CONFIGS: &[(&str, &[&str], &[&str])] = &[
+    (
+        "strict",
+        &["--strict-nullable"],
+        &["node-nullable", "nullability", "optional-reads"],
+    ),
+    (
+        "promise",
+        &["--promise-returns", "promise"],
+        PROMISE_FIXTURES,
+    ),
+    (
+        "mono-promise",
+        &[
+            "--experimental-generic-mono",
+            "--fallible",
+            "--promise-returns",
+            "promise",
+        ],
+        PROMISE_FIXTURES,
+    ),
+    ("async", &["--promise-returns", "async"], PROMISE_FIXTURES),
+    (
+        "mono-async",
+        &[
+            "--experimental-generic-mono",
+            "--fallible",
+            "--promise-returns",
+            "async",
+        ],
+        PROMISE_FIXTURES,
+    ),
+];
+
+/// The fixtures rendered under each `--promise-returns` mode.
+const PROMISE_FIXTURES: &[&str] = &["promise-builtins", "promise-companion", "promise-returns"];
 
 /// The configurations `fixture_stem` is rendered under.
 fn configs_for(fixture_stem: &str) -> Vec<(&'static str, &'static [&'static str])> {

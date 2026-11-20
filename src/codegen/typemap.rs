@@ -18,9 +18,10 @@ use std::collections::{HashMap, HashSet};
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use crate::codegen::signatures::PromiseForm;
 use crate::codegen::GenerateOptions;
 use crate::context::{GlobalContext, TypeId};
-use crate::ir::{self, ModuleContext, TypeKind, TypeRef};
+use crate::ir::{self, ModuleContext, Throws, TypeKind, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::{LocalScope, Suffix};
@@ -265,6 +266,14 @@ pub struct CodegenContext<'a> {
     /// The IR's names for the unions it synthesises an enum for, by their
     /// members, which a synthesised enum takes over its anchor's.
     ir_enum_names: RefCell<HashMap<Vec<String>, String>>,
+    /// The IR's name for a union's enum by the scope it's first read
+    /// in, which every read of the union there takes: the IR names an
+    /// enum for its use, so the same members have one per use.
+    ir_enum_uses: RefCell<HashMap<(ScopeId, Vec<String>), String>>,
+    /// The accessor the IR zip is reading, by its JS name. A name is
+    /// kept under it too (see [`sited`]), which that accessor takes over
+    /// the scope's: two properties of the same members have an enum each.
+    pub(crate) ir_site: RefCell<Option<String>>,
     /// Each union alias's `<Alias>Kind` and the Rust modules declaring it,
     /// which can share it, as they don't clash.
     alias_kinds: RefCell<HashMap<String, Vec<ModuleContext>>>,
@@ -278,6 +287,9 @@ pub struct CodegenContext<'a> {
     /// primary name instead of a trapping primary plus `try_<name>`. See
     /// [`crate::codegen::GenerateOptions::fallible`].
     pub fallible: bool,
+    /// How promise returns are bound. See
+    /// [`crate::codegen::GenerateOptions::promise_returns`].
+    pub promise_returns: crate::codegen::PromiseReturns,
     /// Name of the generated `@throws` enum; every `@throws`-typed
     /// binding returns it. See
     /// [`crate::codegen::GenerateOptions::error_enum`].
@@ -1163,10 +1175,13 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             ir_enum_names: RefCell::default(),
+            ir_enum_uses: RefCell::default(),
+            ir_site: RefCell::default(),
             alias_kinds: RefCell::default(),
             naming_module: RefCell::new(ModuleContext::Global),
             error_type,
             fallible: options.fallible,
+            promise_returns: options.promise_returns,
             error_enum: options.error_enum.clone(),
             experimental_generic_mono: options.experimental_generic_mono,
             exported_modules,
@@ -1234,10 +1249,13 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             ir_enum_names: RefCell::default(),
+            ir_enum_uses: RefCell::default(),
+            ir_site: RefCell::default(),
             alias_kinds: RefCell::default(),
             naming_module: RefCell::new(ModuleContext::Global),
             error_type: None,
             fallible: false,
+            promise_returns: Default::default(),
             error_enum: None,
             experimental_generic_mono: false,
             exported_modules: HashSet::new(),
@@ -1279,19 +1297,43 @@ impl<'a> CodegenContext<'a> {
     /// First-seen wins on the bare anchor: subsequent distinct
     /// unions with the same anchor get parent-prefixed (or
     /// numeric-suffixed if that also collides).
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn synthesise_dynamic_union(
         &self,
         source: &[TypeRef],
         arms: &ReadArms,
         anchor: &str,
         parent: Option<&str>,
+        named: IrEnum<'_>,
         scope: ScopeId,
         from_module: &ModuleContext,
     ) -> String {
+        let source: Vec<String> = source.iter().map(format_type_ref_key).collect();
+        let site = |site: &str| {
+            self.ir_enum_uses
+                .borrow()
+                .get(&(scope, sited(site, &source)))
+                .cloned()
+        };
+        let named = match named {
+            IrEnum::Named(name) => Some(name.to_string()),
+            IrEnum::Read(accessor) => accessor.and_then(site).or_else(|| {
+                self.ir_enum_uses
+                    .borrow()
+                    .get(&(scope, source.clone()))
+                    .or(self.ir_enum_names.borrow().get(&source))
+                    .cloned()
+            }),
+        };
         let members = &arms.members;
         let mut key: Vec<String> = members.iter().map(format_type_ref_key).collect();
         if arms.fallback {
             key.push("fallback".to_string());
+        }
+        // The IR's enums of the same members, each named for its use, are
+        // one enum each.
+        if let Some(name) = &named {
+            key.push(format!("#{name}"));
         }
         let key = DynamicUnionKey(key);
         let mut reg = self.dynamic_unions.borrow_mut();
@@ -1303,8 +1345,6 @@ impl<'a> CodegenContext<'a> {
             }
             return info.rust_name.clone();
         }
-        let source: Vec<String> = source.iter().map(format_type_ref_key).collect();
-        let named = self.ir_enum_names.borrow().get(&source).cloned();
         // The IR's enum for these members in another order.
         if let Some(name) = &named {
             if reg.by_key.values().any(|info| &info.rust_name == name) {
@@ -1339,7 +1379,21 @@ impl<'a> CodegenContext<'a> {
             TypeRef::PropertyKey => TypeRef::property_key_members(),
             _ => return,
         };
-        let key = members.iter().map(format_type_ref_key).collect();
+        let key: Vec<String> = members.iter().map(format_type_ref_key).collect();
+        self.name_ir_enum(key, scope, name);
+    }
+
+    fn name_ir_enum(&self, key: Vec<String>, scope: ScopeId, name: &str) {
+        if let Some(site) = &*self.ir_site.borrow() {
+            self.ir_enum_uses
+                .borrow_mut()
+                .entry((scope, sited(site, &key)))
+                .or_insert_with(|| name.to_string());
+        }
+        self.ir_enum_uses
+            .borrow_mut()
+            .entry((scope, key.clone()))
+            .or_insert_with(|| name.to_string());
         self.ir_enum_names
             .borrow_mut()
             .entry(key)
@@ -1347,11 +1401,13 @@ impl<'a> CodegenContext<'a> {
     }
 
     /// The enum of `literals` the IR synthesised as `name`, emitted with
-    /// the synthesised enums.
+    /// the synthesised enums. `named` where the IR's type carries the
+    /// name, which then stands over another enum of the same literals.
     pub(crate) fn synthesise_literal_enum(
         &self,
         name: &str,
         members: &[TypeRef],
+        named: bool,
         scope: ScopeId,
         from_module: &ModuleContext,
     ) -> Option<String> {
@@ -1360,10 +1416,7 @@ impl<'a> CodegenContext<'a> {
         // A family's argument can be one literal (`Rounding<"hour">`).
         let arms = match members.as_slice() {
             [one] => {
-                self.ir_enum_names
-                    .borrow_mut()
-                    .entry(vec![format_type_ref_key(one)])
-                    .or_insert_with(|| name.to_string());
+                self.name_ir_enum(vec![format_type_ref_key(one)], scope, name);
                 ReadArms {
                     members: members.clone(),
                     fallback: false,
@@ -1372,7 +1425,11 @@ impl<'a> CodegenContext<'a> {
             }
             _ => dynamic_union_members(&members, Some(self), scope, from_module)?,
         };
-        Some(self.synthesise_dynamic_union(&members, &arms, name, None, scope, from_module))
+        let named = match named {
+            true => IrEnum::Named(name),
+            false => IrEnum::Read(None),
+        };
+        Some(self.synthesise_dynamic_union(&members, &arms, name, None, named, scope, from_module))
     }
 
     /// Whether `name` is a synthesised dynamic-union enum.
@@ -2544,7 +2601,9 @@ pub fn to_syn_type(
                     .all(|l| matches!(l, TypeRef::StringLiteral(_)))
                     || is_integer_literal_union(literals);
                 if let Some(name) = literals
-                    .then(|| c.synthesise_literal_enum(name, generic_args, scope, from_module))
+                    .then(|| {
+                        c.synthesise_literal_enum(name, generic_args, true, scope, from_module)
+                    })
                     .flatten()
                 {
                     let ident = make_ident(&name);
@@ -3281,7 +3340,7 @@ fn family_literal_arg(
         .map(|l| crate::util::naming::to_pascal_case(l))
         .collect::<Vec<_>>()
         .join("Or");
-    let name = c.synthesise_literal_enum(&name, members, scope, from_module)?;
+    let name = c.synthesise_literal_enum(&name, members, false, scope, from_module)?;
     let ident = make_ident(&name);
     Some(quote! { #ident })
 }
@@ -3370,12 +3429,21 @@ pub(crate) fn needs_js_name(ident: &syn::Ident, js_name: &str) -> bool {
 /// Map an IR `TypeRef` to the type used in a wasm_bindgen return position,
 /// wrapping in `Result<T, ErrTy>` when `catch` is true.
 ///
-/// A `Promise<T>` is bound as `Promise<T, ErrTy>` instead, and awaiting it
-/// converts the settled value through `FromWasmAbi`, so its `T` lowers
-/// like a sync return: bare primitives, the read carriers (`Option<T>`,
-/// `Nullable<T>`, `Option<Nullable<T>>`), `Vec<T>` and synthesized return
-/// unions. A list over a type parameter is the exception (see
-/// [`is_generic_rust_list`]).
+/// A promise return follows `form`:
+///
+/// * [`PromiseForm::Async`]: `ty` is the awaited value of an `async fn`
+///   import. It crosses the boundary through `JsFuture<T>`'s resolve
+///   closure, whose argument only needs `FromWasmAbi`, so it lowers like a
+///   sync return: bare primitives, the read carriers (`Option<T>`,
+///   `Nullable<T>`, `Option<Nullable<T>>`), `Vec<T>` and synthesized return
+///   unions. A list over a type parameter is the exception (see
+///   [`is_generic_rust_list`]).
+/// * [`PromiseForm::Handle`]: the `Promise<T>` itself, with the
+///   inside-generic lowering (`Promise<JsString>`), rejecting with what its
+///   `async fn` returns as `Err`.
+/// * [`PromiseForm::Value`]: a `Promise<T>` is bound as `Promise<T, ErrTy>`
+///   instead of a `Result`, and awaiting it converts the settled value
+///   through `FromWasmAbi`, so its `T` lowers like an `async fn`'s.
 ///
 /// `error_ty`, when supplied, replaces the default `JsValue` error type —
 /// callers pass the simplified throws union here. Resolution goes through
@@ -3385,6 +3453,7 @@ pub(crate) fn needs_js_name(ident: &syn::Ident, js_name: &str) -> bool {
 pub fn to_return_type(
     ty: &TypeRef,
     catch: bool,
+    form: &PromiseForm,
     js_string_return: bool,
     error_ty: Option<&TypeRef>,
     ctx: Option<&CodegenContext<'_>>,
@@ -3393,32 +3462,73 @@ pub fn to_return_type(
     anchor: ReturnAnchor<'_>,
 ) -> TokenStream {
     let err = catch.then(|| error_type_tokens(error_ty, ctx, scope, from_module));
-    let Some(awaited) = ty.as_promise_inner() else {
-        let inner = return_value(ty, false, js_string_return, ctx, scope, from_module, anchor);
-        return match err {
-            Some(err) => quote! { Result<#inner, #err> },
-            None => inner,
-        };
+    let value = |ty: &TypeRef, awaited: Awaited| {
+        return_value(
+            ty,
+            awaited,
+            js_string_return,
+            ctx,
+            scope,
+            from_module,
+            anchor,
+        )
     };
-    let inner = return_value(
-        awaited,
-        true,
-        js_string_return,
-        ctx,
-        scope,
-        from_module,
-        anchor,
-    );
-    match err {
-        Some(err) if !is_jsvalue_arg(&err) => quote! { Promise<#inner, #err> },
-        _ => quote! { Promise<#inner> },
+    let result = |inner: TokenStream| match &err {
+        Some(err) => quote! { Result<#inner, #err> },
+        None => inner,
+    };
+    match (form, ty.as_promise_inner()) {
+        (PromiseForm::Async, _) => result(value(ty, Awaited::Async)),
+        (PromiseForm::Handle(throws), _) => {
+            let rejects = match throws {
+                Throws::Never => None,
+                throws => Some(error_type_tokens(throws.as_type(), ctx, scope, from_module)),
+            };
+            let promise = to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module);
+            result(rejecting_with(promise, rejects))
+        }
+        (PromiseForm::Value, None) => result(value(ty, Awaited::No)),
+        (PromiseForm::Value, Some(awaited)) => {
+            let inner = value(awaited, Awaited::Promise);
+            match err {
+                Some(err) if !is_jsvalue_arg(&err) => quote! { Promise<#inner, #err> },
+                _ => quote! { Promise<#inner> },
+            }
+        }
     }
+}
+
+/// `Promise<T>` as `Promise<T, E>`, unless `E` is the `JsValue` default.
+fn rejecting_with(promise: TokenStream, rejects: Option<TokenStream>) -> TokenStream {
+    let Some(rejects) = rejects.filter(|e| !is_jsvalue_arg(e)) else {
+        return promise;
+    };
+    let Ok(mut ty) = syn::parse2::<syn::TypePath>(promise.clone()) else {
+        return promise;
+    };
+    match ty.path.segments.last_mut().map(|s| &mut s.arguments) {
+        Some(syn::PathArguments::AngleBracketed(args)) if args.args.len() == 1 => {
+            args.args.push(syn::parse_quote! { #rejects });
+            quote! { #ty }
+        }
+        _ => promise,
+    }
+}
+
+/// How a returned value is awaited.
+#[derive(Clone, Copy, PartialEq)]
+enum Awaited {
+    No,
+    /// By an `async fn` import.
+    Async,
+    /// From the `Promise<T, E>` a sync import returns.
+    Promise,
 }
 
 /// A returned value, or what a returned promise resolves to.
 fn return_value(
     ty: &TypeRef,
-    awaited: bool,
+    awaited: Awaited,
     js_string_return: bool,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
@@ -3430,7 +3540,7 @@ fn return_value(
     if let Some(ctx) = ctx.filter(|_| js_string_return) {
         return to_mono_js_string_return_type(ty, ctx, scope, from_module);
     }
-    if awaited && ctx.is_some_and(|c| is_generic_rust_list(ty, c, scope)) {
+    if awaited != Awaited::No && ctx.is_some_and(|c| is_generic_rust_list(ty, c, scope)) {
         // The list keeps its `Array<T>` handle; the awaited value's own
         // empties still take the read carriers around it.
         return match split_empties_in(ty, ctx, scope) {
@@ -3447,16 +3557,18 @@ fn return_value(
             None => to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module),
         };
     }
-    // Under erasure a promise's argument is a JS type, but for one that
-    // never resolves.
-    if awaited && *ty == TypeRef::Never {
-        return quote! { () };
-    }
-    if awaited && matches!(ty, TypeRef::Void | TypeRef::Undefined) {
-        return match ctx.is_some_and(|c| c.experimental_generic_mono) {
-            true => quote! { () },
-            false => quote! { Undefined },
-        };
+    if awaited == Awaited::Promise {
+        // Under erasure a promise's argument is a JS type, but for one that
+        // never resolves.
+        if *ty == TypeRef::Never {
+            return quote! { () };
+        }
+        if matches!(ty, TypeRef::Void | TypeRef::Undefined) {
+            return match ctx.is_some_and(|c| c.experimental_generic_mono) {
+                true => quote! { () },
+                false => quote! { Undefined },
+            };
+        }
     }
     if let Some(tokens) = union_alias_read(ty, ctx, scope) {
         return tokens;
@@ -3972,6 +4084,29 @@ impl<'a> ReturnAnchor<'a> {
             ReturnAnchorKind::Callable => format!("{pc}Return"),
         }
     }
+
+    /// The accessor read, by its JS name.
+    fn accessor(&self) -> Option<&'a str> {
+        (self.kind == ReturnAnchorKind::Getter).then_some(self.base)
+    }
+}
+
+/// A union's members as the accessor `site` reads them, for the names
+/// kept by accessor.
+fn sited(site: &str, members: &[String]) -> Vec<String> {
+    std::iter::once(format!("@{site}"))
+        .chain(members.iter().cloned())
+        .collect()
+}
+
+/// How a synthesised enum finds the IR's name for it.
+#[derive(Clone, Copy)]
+pub(crate) enum IrEnum<'a> {
+    /// The IR's type carries it.
+    Named(&'a str),
+    /// The IR zip kept it for the union's members: as the accessor
+    /// given reads them, else as their scope does.
+    Read(Option<&'a str>),
 }
 
 /// If `ty` is a top-level union that would otherwise erase to
@@ -4012,6 +4147,7 @@ fn maybe_synthesise_return_union(
         &arms,
         &anchor.enum_anchor(),
         anchor.parent,
+        IrEnum::Read(anchor.accessor()),
         scope,
         from_module,
     );
@@ -4113,6 +4249,7 @@ pub(crate) fn setter_enum(
         &arms,
         &anchor.enum_anchor(),
         anchor.parent,
+        IrEnum::Read(anchor.accessor()),
         scope,
         from_module,
     );
@@ -5115,10 +5252,11 @@ mod tests {
 
     #[test]
     fn test_return_with_catch() {
-        let catching = |ty: &TypeRef| {
+        let catching = |ty: &TypeRef, form: PromiseForm| {
             to_return_type(
                 ty,
                 true,
+                &form,
                 false,
                 None,
                 None,
@@ -5132,12 +5270,32 @@ mod tests {
             )
             .to_string()
         };
-        assert_eq!(catching(&TypeRef::String), "Result < String , JsValue >");
+        let value = |ty: &TypeRef| catching(ty, PromiseForm::Value);
+        assert_eq!(value(&TypeRef::String), "Result < String , JsValue >");
         // A promise rejects with the error rather than returning a `Result`.
         let promise = TypeRef::generic("Promise", vec![TypeRef::Void]);
-        assert_eq!(catching(&promise), "Promise < Undefined >");
+        assert_eq!(value(&promise), "Promise < Undefined >");
         let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
-        assert_eq!(catching(&promise), "Promise < String >");
+        assert_eq!(value(&promise), "Promise < String >");
+        // An `async fn` returns what it awaits.
+        assert_eq!(
+            catching(&TypeRef::Void, PromiseForm::Async),
+            "Result < () , JsValue >"
+        );
+        // The promise beside it is a handle, typed by what it rejects with.
+        let handle = |throws| catching(&promise, PromiseForm::Handle(throws));
+        assert_eq!(
+            handle(Throws::None),
+            "Result < Promise < JsString > , JsValue >"
+        );
+        assert_eq!(
+            handle(Throws::Type(TypeRef::ident("TypeError"))),
+            "Result < Promise < JsString , TypeError > , JsValue >"
+        );
+        assert_eq!(
+            handle(Throws::Never),
+            "Result < Promise < JsString > , JsValue >"
+        );
     }
 
     #[test]

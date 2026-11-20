@@ -79,13 +79,25 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
     #[wasm_bindgen(method, catch)]
-    pub fn put(this: &Cache, url: &str) -> Promise<Undefined>;
+    pub async fn put(this: &Cache, url: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_promise(this: &Cache, url: &str) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub fn put_with_ttl(this: &Cache, url: &str, ttl: u32) -> Promise<Undefined>;
+    pub async fn put_with_ttl(this: &Cache, url: &str, ttl: u32) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_ttl_promise(this: &Cache, url: &str, ttl: u32) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub fn put_with_request(this: &Cache, request: &Response) -> Promise<Undefined>;
+    pub async fn put_with_request(this: &Cache, request: &Response) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_request_promise(this: &Cache, request: &Response) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub fn put_with_request_and_ttl(
+    pub async fn put_with_request_and_ttl(
+        this: &Cache,
+        request: &Response,
+        ttl: u32,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_request_and_ttl_promise(
         this: &Cache,
         request: &Response,
         ttl: u32,
@@ -97,9 +109,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage;
     #[wasm_bindgen(method, catch)]
-    pub fn delete(this: &Storage, key: &str) -> Promise<bool>;
+    pub async fn delete(this: &Storage, key: &str) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, js_name = "delete")]
+    pub fn delete_promise(this: &Storage, key: &str) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub fn delete_with_keys(this: &Storage, keys: &[String]) -> Promise<u32>;
+    pub async fn delete_with_keys(this: &Storage, keys: &[String]) -> Result<u32, JsValue>;
+    #[wasm_bindgen(method, js_name = "delete")]
+    pub fn delete_with_keys_promise(this: &Storage, keys: &[String]) -> Promise<Number>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -259,10 +275,20 @@ pub type RequestInfo = JsValue;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn fetch(input: &Request) -> Promise<Request>;
+    pub async fn fetch(input: &Request) -> Result<Request, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_promise(input: &Request) -> Promise<Request>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
-    pub fn fetch_with_str(input: &str) -> Promise<Request>;
+    pub async fn fetch_with_str(input: &str) -> Result<Request, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_with_str_promise(input: &str) -> Promise<Request>;
 }

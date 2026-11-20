@@ -34,7 +34,7 @@ export enum Color {
   Green = 2,
 }
 
-export enum WhereKind {
+export enum AlignWhere {
   Start = 1,
   End = 2,
 }
@@ -51,7 +51,7 @@ export enum Code {
   Neg1 = -1,
 }
 
-export enum CKind {
+export enum RetryC {
   V1 = 1,
   V2 = 2,
   V3 = 3,
@@ -63,9 +63,9 @@ export sealed class Mode {
   case ModeOther(value: externref)
 }
 
-export sealed class HintKind {
-  case HintKindX
-  case HintKindOther(value: externref)
+export sealed class SpeedHint {
+  case SpeedHintX
+  case SpeedHintOther(value: externref)
 }
 
 export sealed class TierKind {
@@ -75,10 +75,67 @@ export sealed class TierKind {
   case TierKindOther(value: externref)
 }
 
-export extension class ArrayBuffer on externref {
+export enum CompressionStreamFormat {
+  Gzip = 1,
+  Deflate = 2,
+  DeflateRaw = 3,
 }
 
-export extension class ReadableStream on externref {
+export enum DecompressionStreamFormat {
+  Gzip = 1,
+  Deflate = 2,
+  DeflateRaw = 3,
+}
+
+export enum CanvasFit {
+  Cover = 1,
+  Contain = 2,
+}
+
+export enum CanvasCrop {
+  Cover = 1,
+  Contain = 2,
+}
+
+export enum CanvasQuality {
+  V1 = 1,
+  V2 = 2,
+  V3 = 3,
+}
+
+export sealed class CanvasHint {
+  case CanvasHintAuto
+  case CanvasHintOther(value: externref)
+}
+
+export enum CanvasDrawReturn {
+  Done = 1,
+  Queued = 2,
+}
+
+export enum CanvasMode {
+  Fill = 1,
+  Stroke = 2,
+}
+
+export enum CanvasClearMode {
+  All = 1,
+  Dirty = 2,
+}
+
+export enum PaintReturn {
+  Done = 1,
+  Queued = 2,
+}
+
+export enum PaintMode {
+  Fill = 1,
+  Stroke = 2,
+}
+
+export enum Theme {
+  Light = 1,
+  Dark = 2,
 }
 
 /** The arms of `err`, as its tag carries them. */
@@ -93,6 +150,113 @@ export class ErrException extends Error {
   arm: ErrArm;
   new(arm: ErrArm, message: String) : arm = arm, super(message) {}
 }
+
+export extension class CompressionStream on externref {
+  new(format: CompressionStreamFormat) : super(__CompressionStream_new(format));
+}
+
+export extension class DecompressionStream on externref {
+  format: DecompressionStreamFormat {
+    get {
+      return __DecompressionStream_format((this as externref));
+    }
+  }
+  new(format: DecompressionStreamFormat) : super(__DecompressionStream_new(format));
+}
+
+export extension class Canvas on externref {
+  crop: CanvasCrop {
+    get {
+      return __Canvas_crop((this as externref));
+    }
+    set(value) {
+      __Canvas_crop2((this as externref), value);
+    }
+  }
+  fit: CanvasFit {
+    get {
+      return __Canvas_fit((this as externref));
+    }
+    set(value) {
+      __Canvas_fit2((this as externref), value);
+    }
+  }
+  hint: CanvasHint {
+    get {
+      let (r0, r1) = __Canvas_hint((this as externref));
+      return (__CanvasHint_decode(r0, r1) as CanvasHint);
+    }
+    set(value) {
+      let (t1, t2) = __CanvasHint_encode(value);
+      __Canvas_hint2((this as externref), t1, t2);
+    }
+  }
+  quality: CanvasQuality {
+    get {
+      return __Canvas_quality((this as externref));
+    }
+    set(value) {
+      __Canvas_quality2((this as externref), value);
+    }
+  }
+  draw(fit: CanvasFit, mode: CanvasMode): CanvasDrawReturn {
+    return __Canvas_draw((this as externref), fit, mode);
+  }
+  clear(mode: CanvasClearMode): void {
+    __Canvas_clear((this as externref), mode);
+  }
+  clear(mode: CanvasClearMode, quality: CanvasQuality): void {
+    __Canvas_clear2((this as externref), mode, quality);
+  }
+}
+
+export extension class ArrayBuffer on externref {
+}
+
+export extension class ReadableStream on externref {
+}
+
+@external("tw:js/global", "CompressionStream.new(CompressionStreamFormat)", "tw, throws:err")
+declare function __CompressionStream_new(p0: CompressionStreamFormat): externref;
+
+@external("tw:js/global", "DecompressionStream.new(DecompressionStreamFormat)", "tw, throws:err")
+declare function __DecompressionStream_new(p0: DecompressionStreamFormat): externref;
+
+@external("tw:js/global", "DecompressionStream#get:format()", "tw")
+declare function __DecompressionStream_format(p0: externref): DecompressionStreamFormat;
+
+@external("tw:js/global", "Canvas#get:fit()", "tw")
+declare function __Canvas_fit(p0: externref): CanvasFit;
+
+@external("tw:js/global", "Canvas#set:fit(CanvasFit)", "tw")
+declare function __Canvas_fit2(p0: externref, p1: CanvasFit): void;
+
+@external("tw:js/global", "Canvas#get:crop()", "tw")
+declare function __Canvas_crop(p0: externref): CanvasCrop;
+
+@external("tw:js/global", "Canvas#set:crop(CanvasCrop)", "tw")
+declare function __Canvas_crop2(p0: externref, p1: CanvasCrop): void;
+
+@external("tw:js/global", "Canvas#get:quality()", "tw")
+declare function __Canvas_quality(p0: externref): CanvasQuality;
+
+@external("tw:js/global", "Canvas#set:quality(CanvasQuality)", "tw")
+declare function __Canvas_quality2(p0: externref, p1: CanvasQuality): void;
+
+@external("tw:js/global", "Canvas#get:hint()", "tw")
+declare function __Canvas_hint(p0: externref): inline (i32, externref | null);
+
+@external("tw:js/global", "Canvas#set:hint(CanvasHint)", "tw")
+declare function __Canvas_hint2(p0: externref, p1: i32, p2: externref | null): void;
+
+@external("tw:js/global", "Canvas#draw(CanvasFit,CanvasMode)", "tw, throws:err")
+declare function __Canvas_draw(p0: externref, p1: CanvasFit, p2: CanvasMode): CanvasDrawReturn;
+
+@external("tw:js/global", "Canvas#clear(CanvasClearMode)", "tw, throws:err")
+declare function __Canvas_clear(p0: externref, p1: CanvasClearMode): void;
+
+@external("tw:js/global", "Canvas#clear(CanvasClearMode,CanvasQuality)", "tw, throws:err")
+declare function __Canvas_clear2(p0: externref, p1: CanvasClearMode, p2: CanvasQuality): void;
 
 @external("tw:js/global", "Time.add(f64,Unit_)", "tw, throws:err")
 declare function __Time_add(p0: f64, p1: Unit_): void;
@@ -109,8 +273,8 @@ declare function __level(): Level;
 @external("tw:js/global", "format(Format)", "tw, throws:err")
 declare function __format(p0: Format): void;
 
-@external("tw:js/global", "align(WhereKind)", "tw, throws:err")
-declare function __align(p0: WhereKind): void;
+@external("tw:js/global", "align(AlignWhere)", "tw, throws:err")
+declare function __align(p0: AlignWhere): void;
 
 @external("tw:js/global", "more(More)", "tw, throws:err")
 declare function __more(p0: More): void;
@@ -121,8 +285,8 @@ declare function __base(): Base;
 @external("tw:js/global", "code()", "tw, throws:err")
 declare function __code(): Code;
 
-@external("tw:js/global", "retry(CKind)", "tw, throws:err")
-declare function __retry(p0: CKind): void;
+@external("tw:js/global", "retry(RetryC)", "tw, throws:err")
+declare function __retry(p0: RetryC): void;
 
 @external("tw:js/global", "ratio()", "tw, throws:err")
 declare function __ratio(): f64;
@@ -139,11 +303,29 @@ declare function __mode(p0: i32, p1: externref | null): inline (i32, externref |
 @external("tw:js/global", "speed(Mode)", "tw, throws:err")
 declare function __speed(p0: i32, p1: externref | null): void;
 
-@external("tw:js/global", "speed(Mode,HintKind)", "tw, throws:err")
+@external("tw:js/global", "speed(Mode,SpeedHint)", "tw, throws:err")
 declare function __speed2(p0: i32, p1: externref | null, p2: i32, p3: externref | null): void;
 
 @external("tw:js/global", "tier()", "tw, throws:err")
 declare function __tier(): inline (i32, f64, externref | null);
+
+@external("tw:js/global", "paint(PaintMode)", "tw, throws:err")
+declare function __paint(p0: PaintMode): PaintReturn;
+
+@external("tw:js/global", "get:theme()", "tw")
+declare function __theme(): Theme;
+
+export function __CanvasHint_decode(arm: i32, s0: externref | null): CanvasHint | null {
+  if (arm == 1) { return new CanvasHintAuto(); }
+  return new CanvasHintOther((s0 as externref));
+}
+
+export function __CanvasHint_encode(v: CanvasHint | null): inline (i32, externref | null) {
+  if (v == null) { return (0, null); }
+  if (v is CanvasHintAuto) { return (1, null); }
+  if (v is CanvasHintOther) { return (-1, ((v as CanvasHintOther).value as externref)); }
+  return (0, null);
+}
 
 export function __Time_Body_encode(v: Time_Body | null): inline (i32, externref | null) {
   if (v == null) { return (0, null); }
@@ -176,10 +358,10 @@ export function __Mode_decode(arm: i32, s0: externref | null): Mode | null {
   return new ModeOther((s0 as externref));
 }
 
-export function __HintKind_encode(v: HintKind | null): inline (i32, externref | null) {
+export function __SpeedHint_encode(v: SpeedHint | null): inline (i32, externref | null) {
   if (v == null) { return (0, null); }
-  if (v is HintKindX) { return (1, null); }
-  if (v is HintKindOther) { return (-1, ((v as HintKindOther).value as externref)); }
+  if (v is SpeedHintX) { return (1, null); }
+  if (v is SpeedHintOther) { return (-1, ((v as SpeedHintOther).value as externref)); }
   return (0, null);
 }
 
@@ -195,8 +377,8 @@ export function Time_add(amount: f64, unit: Unit_): void {
 }
 
 export function Time_send(body: Time_Body): void {
-  let (t1, t2) = __Time_Body_encode(body);
-  __Time_send(t1, t2);
+  let (t3, t4) = __Time_Body_encode(body);
+  __Time_send(t3, t4);
 }
 
 export function Time_round<U>(unit: U): U {
@@ -211,7 +393,7 @@ export function format(f: Format): void {
   __format(f);
 }
 
-export function align(where: WhereKind): void {
+export function align(where: AlignWhere): void {
   __align(where);
 }
 
@@ -227,7 +409,7 @@ export function code(): Code {
   return __code();
 }
 
-export function retry(c: CKind): void {
+export function retry(c: RetryC): void {
   __retry(c);
 }
 
@@ -246,23 +428,31 @@ export function all(): FixedArray<Color> {
 }
 
 export function mode(m: Mode): Mode {
-  let (t3, t4) = __Mode_encode(m);
-  let (r0, r1) = __mode(t3, t4);
+  let (t5, t6) = __Mode_encode(m);
+  let (r0, r1) = __mode(t5, t6);
   return (__Mode_decode(r0, r1) as Mode);
 }
 
 export function speed(m: Mode): void {
-  let (t5, t6) = __Mode_encode(m);
-  __speed(t5, t6);
+  let (t7, t8) = __Mode_encode(m);
+  __speed(t7, t8);
 }
 
-export function speedWithHint(m: Mode, hint: HintKind): void {
-  let (t7, t8) = __Mode_encode(m);
-  let (t9, t10) = __HintKind_encode(hint);
-  __speed2(t7, t8, t9, t10);
+export function speedWithHint(m: Mode, hint: SpeedHint): void {
+  let (t9, t10) = __Mode_encode(m);
+  let (t11, t12) = __SpeedHint_encode(hint);
+  __speed2(t9, t10, t11, t12);
 }
 
 export function tier(): TierKind | null {
   let (r0, r1, r2) = __tier();
   return __TierKind_decode(r0, r1, r2);
+}
+
+export function paint(mode: PaintMode): PaintReturn {
+  return __paint(mode);
+}
+
+export function theme(): Theme {
+  return __theme();
 }

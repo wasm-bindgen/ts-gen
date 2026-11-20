@@ -76,3 +76,8 @@ interface ElementHandlers {
 interface HTMLRewriter {
   on(selector: string, handlers: ElementHandlers): HTMLRewriter;
 }
+
+// The names the app uses for two literal unions written inline: an alias
+// names every use of its literals.
+type NoStoreOrNoCache = "no-store" | "no-cache";
+type PlainOrLoud = "plain" | "loud";
