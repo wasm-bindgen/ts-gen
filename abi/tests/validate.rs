@@ -557,6 +557,14 @@ fn fills_and_expressions() {
         &format!("{joined}@js(args = (AbortSignal.any([c.signal])))\nfetch(): future<Response>;"),
         "`c.signal` names nothing in scope",
     );
+    // A fill of a `let`: an object the bridge makes for the call.
+    ok(&format!(
+        "{joined}interface Init {{ @js(object) new(); set signal(v: AbortSignal); }}\n@js(let i = Init.new(), let c = AbortController.new(), args = (i? {{ signal = c.signal }}), cancel = c.abort)\nfetch(): future<Response>;"
+    ));
+    bad(
+        &format!("{joined}@js(args = (i? {{ signal = 1 }}))\nfetch(): future<Response>;"),
+        "`fetch` has no parameter `i`",
+    );
     bad(
         "export namespace u { @js(args = ([1])) f(); }",
         "`[1]` in `@js(args)` of export `f` can't be matched",

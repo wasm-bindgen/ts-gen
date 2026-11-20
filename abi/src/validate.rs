@@ -1161,6 +1161,8 @@ impl<'a> Validator<'a> {
                             span,
                             format!("`{param}? {{..}}` fills a nullable parameter"),
                         ),
+                        // An object the bridge makes for the call.
+                        None if !incoming && scope.lets.contains_key(param.as_str()) => {}
                         None => self.err(
                             span,
                             format!("`@js({which})`: `{label}` has no parameter `{param}`"),

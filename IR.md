@@ -627,7 +627,7 @@ statically.
 | `this = p` | reserved: binding the JS receiver to a parameter is future work (§22), and validation rejects it |
 | `super = (...)` | the `super(...)` arguments of an exported class constructor (§17); the default passes the constructor's arguments through |
 | `let x = <expr>` | bind a value created by the bridge for this call |
-| `p? { field = <expr>, ... }` | in `args`: pass a nullable object argument with fields set. The fields are set on a shallow copy (`{...p}`, or `{}` when it's absent), so the caller's object is never changed. A field whose value is `undefined` isn't created, since a dictionary reads its own keys, so an absent optional parameter leaves its field absent |
+| `p? { field = <expr>, ... }` | in `args`: pass a nullable object argument with fields set. The fields are set on a shallow copy (`{...p}`, or `{}` when it's absent), so the caller's object is never changed. A field whose value is `undefined` isn't created, since a dictionary reads its own keys, so an absent optional parameter leaves its field absent. Outgoing, `p` may be a `let` instead: an object the bridge makes for the call, passed where the member has no parameter for it |
 | `cancel = <path>` | the function to call when the language drops the returned future (§16) |
 | `$result` | predefined: the call's JS result, usable in `cancel` |
 
@@ -1981,6 +1981,9 @@ fetch(input: Request, init: RequestInit?): future<Response, FetchError>;
   passes `AbortSignal.any` of the signal `init` came with, when it has
   one, and the controller's (§7). The caller's signal still aborts the
   call, and its `init` is unchanged.
+* An overload without the dictionary parameter cancels through one the
+  bridge makes: `let i = RequestInit.new()`, filled as `i? { signal =
+  c.signal }` in the dictionary's position.
 * On `drop`, the bridge calls `cancel` once.
   * A failing cancel function is swallowed, and doesn't settle the promise.
   * A later settlement is ignored.
