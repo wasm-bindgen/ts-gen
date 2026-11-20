@@ -19931,9 +19931,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "generate_summary")]
     fn __set_generate_summary_with_null(this: &Reasoning, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn summary(this: &Reasoning) -> Option<ReasoningGenerateSummary>;
+    pub fn summary(this: &Reasoning) -> Option<ReasoningSummary>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_summary(this: &Reasoning, val: ReasoningGenerateSummary);
+    pub fn set_summary(this: &Reasoning, val: ReasoningSummary);
     #[wasm_bindgen(method, setter, js_name = "summary")]
     fn __set_summary_with_null(this: &Reasoning, val: &::wasm_bindgen::JsValue);
 }
@@ -19983,7 +19983,7 @@ impl ReasoningBuilder {
         self.inner.set_generate_summary_with_null();
         self
     }
-    pub fn summary(self, val: ReasoningGenerateSummary) -> Self {
+    pub fn summary(self, val: ReasoningSummary) -> Self {
         self.inner.set_summary(val);
         self
     }
@@ -30908,11 +30908,11 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn custom_intent_mode(
         this: &Ai_Cf_Deepgram_Nova_3_Input,
-    ) -> Option<AiCfDeepgramNova3InputCustomTopicMode>;
+    ) -> Option<AiCfDeepgramNova3InputCustomIntentMode>;
     #[wasm_bindgen(method, setter)]
     pub fn set_custom_intent_mode(
         this: &Ai_Cf_Deepgram_Nova_3_Input,
-        val: AiCfDeepgramNova3InputCustomTopicMode,
+        val: AiCfDeepgramNova3InputCustomIntentMode,
     );
     #[doc = " Custom intents you want the model to detect within your input audio if present"]
     #[wasm_bindgen(method, getter)]
@@ -31130,7 +31130,7 @@ impl Ai_Cf_Deepgram_Nova_3_InputBuilder {
         self.inner.set_custom_topic(val);
         self
     }
-    pub fn custom_intent_mode(self, val: AiCfDeepgramNova3InputCustomTopicMode) -> Self {
+    pub fn custom_intent_mode(self, val: AiCfDeepgramNova3InputCustomIntentMode) -> Self {
         self.inner.set_custom_intent_mode(val);
         self
     }
@@ -65486,6 +65486,13 @@ pub enum ReasoningGenerateSummary {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReasoningSummary {
+    Auto = "auto",
+    Concise = "concise",
+    Detailed = "detailed",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResponseErrorCode {
     ServerError = "server_error",
     RateLimitExceeded = "rate_limit_exceeded",
@@ -65707,6 +65714,12 @@ pub enum AiCfQwenQwen330BA3BFp8JSONMode3Type {
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AiCfDeepgramNova3InputCustomTopicMode {
+    Extended = "extended",
+    Strict = "strict",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AiCfDeepgramNova3InputCustomIntentMode {
     Extended = "extended",
     Strict = "strict",
 }

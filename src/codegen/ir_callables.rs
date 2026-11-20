@@ -725,7 +725,10 @@ pub fn accessor(
 ) -> Option<TypeRef> {
     let (cgctx, site) = (cgctx?, site?);
     let at = mark(cgctx);
+    // The enums the zip names here are this accessor's.
+    let outer = cgctx.ir_site.replace(Some(js_name.to_string()));
     let r = accessor_at(cgctx, &site, js_name, parsed, scope);
+    cgctx.ir_site.replace(outer);
     let r = settled(cgctx, at, &site, js_name, r)?;
     Some(match site.form {
         Form::Set | Form::StaticSet => {

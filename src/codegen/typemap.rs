@@ -270,6 +270,10 @@ pub struct CodegenContext<'a> {
     /// in, which every read of the union there takes: the IR names an
     /// enum for its use, so the same members have one per use.
     ir_enum_uses: RefCell<HashMap<(ScopeId, Vec<String>), String>>,
+    /// The accessor the IR zip is reading, by its JS name. A name is
+    /// kept under it too (see [`sited`]), which that accessor takes over
+    /// the scope's: two properties of the same members have an enum each.
+    pub(crate) ir_site: RefCell<Option<String>>,
     /// Each union alias's `<Alias>Kind` and the Rust modules declaring it,
     /// which can share it, as they don't clash.
     alias_kinds: RefCell<HashMap<String, Vec<ModuleContext>>>,
@@ -1172,6 +1176,7 @@ impl<'a> CodegenContext<'a> {
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             ir_enum_names: RefCell::default(),
             ir_enum_uses: RefCell::default(),
+            ir_site: RefCell::default(),
             alias_kinds: RefCell::default(),
             naming_module: RefCell::new(ModuleContext::Global),
             error_type,
@@ -1245,6 +1250,7 @@ impl<'a> CodegenContext<'a> {
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             ir_enum_names: RefCell::default(),
             ir_enum_uses: RefCell::default(),
+            ir_site: RefCell::default(),
             alias_kinds: RefCell::default(),
             naming_module: RefCell::new(ModuleContext::Global),
             error_type: None,
@@ -1291,22 +1297,34 @@ impl<'a> CodegenContext<'a> {
     /// First-seen wins on the bare anchor: subsequent distinct
     /// unions with the same anchor get parent-prefixed (or
     /// numeric-suffixed if that also collides).
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn synthesise_dynamic_union(
         &self,
         source: &[TypeRef],
         arms: &ReadArms,
         anchor: &str,
         parent: Option<&str>,
+        named: IrEnum<'_>,
         scope: ScopeId,
         from_module: &ModuleContext,
     ) -> String {
         let source: Vec<String> = source.iter().map(format_type_ref_key).collect();
-        let named = self
-            .ir_enum_uses
-            .borrow()
-            .get(&(scope, source.clone()))
-            .or(self.ir_enum_names.borrow().get(&source))
-            .cloned();
+        let site = |site: &str| {
+            self.ir_enum_uses
+                .borrow()
+                .get(&(scope, sited(site, &source)))
+                .cloned()
+        };
+        let named = match named {
+            IrEnum::Named(name) => Some(name.to_string()),
+            IrEnum::Read(accessor) => accessor.and_then(site).or_else(|| {
+                self.ir_enum_uses
+                    .borrow()
+                    .get(&(scope, source.clone()))
+                    .or(self.ir_enum_names.borrow().get(&source))
+                    .cloned()
+            }),
+        };
         let members = &arms.members;
         let mut key: Vec<String> = members.iter().map(format_type_ref_key).collect();
         if arms.fallback {
@@ -1366,6 +1384,12 @@ impl<'a> CodegenContext<'a> {
     }
 
     fn name_ir_enum(&self, key: Vec<String>, scope: ScopeId, name: &str) {
+        if let Some(site) = &*self.ir_site.borrow() {
+            self.ir_enum_uses
+                .borrow_mut()
+                .entry((scope, sited(site, &key)))
+                .or_insert_with(|| name.to_string());
+        }
         self.ir_enum_uses
             .borrow_mut()
             .entry((scope, key.clone()))
@@ -1377,11 +1401,13 @@ impl<'a> CodegenContext<'a> {
     }
 
     /// The enum of `literals` the IR synthesised as `name`, emitted with
-    /// the synthesised enums.
+    /// the synthesised enums. `named` where the IR's type carries the
+    /// name, which then stands over another enum of the same literals.
     pub(crate) fn synthesise_literal_enum(
         &self,
         name: &str,
         members: &[TypeRef],
+        named: bool,
         scope: ScopeId,
         from_module: &ModuleContext,
     ) -> Option<String> {
@@ -1399,7 +1425,11 @@ impl<'a> CodegenContext<'a> {
             }
             _ => dynamic_union_members(&members, Some(self), scope, from_module)?,
         };
-        Some(self.synthesise_dynamic_union(&members, &arms, name, None, scope, from_module))
+        let named = match named {
+            true => IrEnum::Named(name),
+            false => IrEnum::Read(None),
+        };
+        Some(self.synthesise_dynamic_union(&members, &arms, name, None, named, scope, from_module))
     }
 
     /// Whether `name` is a synthesised dynamic-union enum.
@@ -2571,7 +2601,9 @@ pub fn to_syn_type(
                     .all(|l| matches!(l, TypeRef::StringLiteral(_)))
                     || is_integer_literal_union(literals);
                 if let Some(name) = literals
-                    .then(|| c.synthesise_literal_enum(name, generic_args, scope, from_module))
+                    .then(|| {
+                        c.synthesise_literal_enum(name, generic_args, true, scope, from_module)
+                    })
                     .flatten()
                 {
                     let ident = make_ident(&name);
@@ -3308,7 +3340,7 @@ fn family_literal_arg(
         .map(|l| crate::util::naming::to_pascal_case(l))
         .collect::<Vec<_>>()
         .join("Or");
-    let name = c.synthesise_literal_enum(&name, members, scope, from_module)?;
+    let name = c.synthesise_literal_enum(&name, members, false, scope, from_module)?;
     let ident = make_ident(&name);
     Some(quote! { #ident })
 }
@@ -4052,6 +4084,29 @@ impl<'a> ReturnAnchor<'a> {
             ReturnAnchorKind::Callable => format!("{pc}Return"),
         }
     }
+
+    /// The accessor read, by its JS name.
+    fn accessor(&self) -> Option<&'a str> {
+        (self.kind == ReturnAnchorKind::Getter).then_some(self.base)
+    }
+}
+
+/// A union's members as the accessor `site` reads them, for the names
+/// kept by accessor.
+fn sited(site: &str, members: &[String]) -> Vec<String> {
+    std::iter::once(format!("@{site}"))
+        .chain(members.iter().cloned())
+        .collect()
+}
+
+/// How a synthesised enum finds the IR's name for it.
+#[derive(Clone, Copy)]
+pub(crate) enum IrEnum<'a> {
+    /// The IR's type carries it.
+    Named(&'a str),
+    /// The IR zip kept it for the union's members: as the accessor
+    /// given reads them, else as their scope does.
+    Read(Option<&'a str>),
 }
 
 /// If `ty` is a top-level union that would otherwise erase to
@@ -4092,6 +4147,7 @@ fn maybe_synthesise_return_union(
         &arms,
         &anchor.enum_anchor(),
         anchor.parent,
+        IrEnum::Read(anchor.accessor()),
         scope,
         from_module,
     );
@@ -4193,6 +4249,7 @@ pub(crate) fn setter_enum(
         &arms,
         &anchor.enum_anchor(),
         anchor.parent,
+        IrEnum::Read(anchor.accessor()),
         scope,
         from_module,
     );

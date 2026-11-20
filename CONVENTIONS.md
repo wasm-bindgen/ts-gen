@@ -3953,9 +3953,11 @@ then the property or parameter.
   instantiation it names is (`PluralYearOrMonth`), and a union of named
   literal enums by its members (`DateUnit | TimeUnit` →
   `DateUnitOrTimeUnit`).
-* Rust reads one enum for a set of literals in each scope. Two
-  properties of one interface holding the same literals are two enums in
-  the IR, and both read as the first's in Rust.
+* Rust reads each as the IR names it: two properties of one interface
+  holding the same literals are two enums (`Reasoning.summary` is
+  `ReasoningSummary` beside `ReasoningGenerateSummary`), as are a
+  parameter and its callable's result (`swap(mode)` takes
+  `ReasoningMode` and returns `ReasoningSwapReturn`).
 
 A union with a member that isn't a literal is `<Anchor>Kind` (`Kind`
 being the Rust idiom for a discriminated enum), where the anchor is the
