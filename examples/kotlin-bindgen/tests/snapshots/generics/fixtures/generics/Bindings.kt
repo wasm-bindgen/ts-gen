@@ -227,8 +227,8 @@ fun <T : JsAny?> Box(value: T): Box<T> {
     return r2!!.unsafeCast<Box<T>>()
 }
 
-fun <S : JsAny?> biggest(shapes: JsArray<JsAny?>): S {
-    val r0 = try { fixtures.generics.flat.biggest_arr_S(shapes) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun <S : JsAny?> biggest(shapes: List<S>): S {
+    val r0 = try { fixtures.generics.flat.biggest_arr_S(shapes.toJsArray()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
     return (r0 as S)
 }
 
@@ -288,7 +288,7 @@ fun format(locales: LocalesArgument): String {
 }
 
 fun format(locales: String): String = format(LocalesArgument.Str(locales))
-fun format(locales: JsArray<JsString?>): String = format(LocalesArgument.StrArray(locales))
+fun format(locales: List<String>): String = format(LocalesArgument.StrArray(locales))
 
 fun <Units : JsAny?> RoundToOptions(): RoundToOptions<Units> {
     val r0 = fixtures.generics.flat.RoundToOptions_new()
@@ -875,7 +875,7 @@ enum class Pluralize(val index: Int) {
 
 sealed interface LocalesArgument {
     data class Str(val value: String) : LocalesArgument
-    data class StrArray(val value: JsArray<JsString?>) : LocalesArgument
+    data class StrArray(val value: List<String>) : LocalesArgument
 }
 
 class LocalesArgumentWire(val arm: Int, val s0: JsAny?)
@@ -883,13 +883,13 @@ class LocalesArgumentWire(val arm: Int, val s0: JsAny?)
 fun encodeLocalesArgument(v: LocalesArgument?): LocalesArgumentWire = when (v) {
     null -> LocalesArgumentWire(0, null)
     is LocalesArgument.Str -> LocalesArgumentWire(1, v.value.toJsString())
-    is LocalesArgument.StrArray -> LocalesArgumentWire(2, v.value)
+    is LocalesArgument.StrArray -> LocalesArgumentWire(2, v.value.map { it.toJsString() }.toJsArray())
 }
 
 fun decodeLocalesArgument(arm: Int, s0: JsAny?): LocalesArgument? = when (arm) {
     0 -> null
     1 -> LocalesArgument.Str(s0!!.unsafeCast<JsString>().toString())
-    2 -> LocalesArgument.StrArray(s0!!.unsafeCast<JsArray<JsString?>>())
+    2 -> LocalesArgument.StrArray(s0!!.unsafeCast<JsArray<JsString>>().let { a -> a.toList().map { it.toString() } })
     else -> throw IllegalStateException("LocalesArgument: arm $arm")
 }
 

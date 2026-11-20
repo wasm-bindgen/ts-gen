@@ -215,25 +215,25 @@ fun pick(mode: ModeKind, n: Double): String {
     return r0!!.unsafeCast<JsString>().toString()
 }
 
-fun rest(first: String, more: JsArray<JsNumber?>) {
-    try { fixtures.overloads.flat.rest_str_arr_f64(first.toJsString(), more) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun rest(first: String, more: List<Double>) {
+    try { fixtures.overloads.flat.rest_str_arr_f64(first.toJsString(), more.map { it.toJsNumber() }.toJsArray()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 fun optionalRest() {
     try { fixtures.overloads.flat.optionalRest() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun optionalRest(label: String?, data: JsArray<JsAny?>) {
-    try { fixtures.overloads.flat.optionalRest_str_arr_Any(label?.toJsString(), data) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun optionalRest(label: String?, data: List<JsAny?>) {
+    try { fixtures.overloads.flat.optionalRest_str_arr_Any(label?.toJsString(), data.toJsArray()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun tupleRest(cb: (JsArray<JsAny?>) -> Unit): Double {
+fun tupleRest(cb: (List<JsAny?>) -> Unit): Double {
     val r0 = try { fixtures.overloads.flat.tupleRest_fn_arr_Any(cb.toJsReference()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
     return r0
 }
 
-fun tupleRest(cb: (JsArray<JsAny?>) -> Unit, ms: Double?, args: JsArray<JsAny?>): Double {
-    val r0 = try { fixtures.overloads.flat.tupleRest_fn_arr_Any_f64_arr_Any(cb.toJsReference(), (if (ms == null) 0 else 1), (ms ?: 0.0), args) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun tupleRest(cb: (List<JsAny?>) -> Unit, ms: Double?, args: List<JsAny?>): Double {
+    val r0 = try { fixtures.overloads.flat.tupleRest_fn_arr_Any_f64_arr_Any(cb.toJsReference(), (if (ms == null) 0 else 1), (ms ?: 0.0), args.toJsArray()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
     return r0
 }
 

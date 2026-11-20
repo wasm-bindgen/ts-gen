@@ -61,3 +61,9 @@ fun probe_writeNones() {
     probe.ext.seen(null)
     probe.ext.seenNull(null)
 }
+
+/** A `u8[]` is a `ByteArray`, copied each way. */
+fun probe_bytes(): UInt = probe.ext.bytes(byteArrayOf(1, 2, -6)).sumOf { it.toUByte().toUInt() }
+
+/** An `arr<str>` is a `List<String>`. */
+fun probe_words(): String = probe.ext.words(listOf("a", "b")).joinToString("")

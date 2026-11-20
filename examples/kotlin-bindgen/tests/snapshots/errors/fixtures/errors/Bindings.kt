@@ -40,9 +40,9 @@ fun Kv.put(key: String, value: String): tsgen.runtime.Future<Unit> {
  *
  * * `TypeError`
  */
-fun Kv.list(): JsArray<JsString?> {
+fun Kv.list(): List<String> {
     val r2 = try { fixtures.errors.flat.Kv_list(this) } catch (e: kotlin.js.JsException) { throw raiseTypeErr(e) }
-    return r2!!.unsafeCast<JsArray<JsString?>>()
+    return r2!!.unsafeCast<JsArray<JsString>>().let { a -> a.toList().map { it.toString() } }
 }
 
 /**

@@ -9,7 +9,6 @@ Writes Kotlin/Wasm bindings for a lowered IR (`ts-gen-abi lower --profile
 "all-host, results = single, throws = js"`):
   <out-dir>/<pkg>/flat/Flat.kt  one external or export per member, by wire
   <out-dir>/<pkg>/Bindings.kt   the typed API (default package: workers)
-  <out-dir>/<pkg>/Vecs.kt       the typed arrays the API uses
   <out-dir>/<pkg>/Tuples.kt     the tuples other than pairs and triples
   <out-dir>/<pkg>/Exports.kt    exports calling <app-package> (default: app)
   <out-dir>/links.tsv           js_code imports to rename to their keys

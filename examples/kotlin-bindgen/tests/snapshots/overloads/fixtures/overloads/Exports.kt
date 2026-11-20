@@ -8,13 +8,13 @@ import kotlin.wasm.WasmExport
 @JsExport
 @JsName("tw:call:fn(...arr<Any?>)")
 fun trampoline_fn_arr_Any(p0: JsAny?, p1: JsAny?) {
-    val f = p0!!.unsafeCast<JsReference<(JsArray<JsAny?>) -> Unit>>().get()
-    f(p1!!.unsafeCast<JsArray<JsAny?>>())
+    val f = p0!!.unsafeCast<JsReference<(List<JsAny?>) -> Unit>>().get()
+    f(p1!!.unsafeCast<JsArray<JsAny?>>().let { a -> a.toList() })
 }
 
 /** A `fn(...arr<Any?>)` as its box: a JS function calling it. */
-fun ((JsArray<JsAny?>) -> Unit).toJs(): JsAny = fixtures.overloads.flat.box_fn_arr_Any(this.toJsReference())!!
+fun ((List<JsAny?>) -> Unit).toJs(): JsAny = fixtures.overloads.flat.box_fn_arr_Any(this.toJsReference())!!
 
 /** The function a box holds; a `JsException` unless it's one this module provided. */
-fun JsAny.toFnJsArrayJsAnyOptToUnit(): (JsArray<JsAny?>) -> Unit = fixtures.overloads.flat.unbox_fn_arr_Any(this)!!.unsafeCast<JsReference<(JsArray<JsAny?>) -> Unit>>().get()
+fun JsAny.toFnListJsAnyOptToUnit(): (List<JsAny?>) -> Unit = fixtures.overloads.flat.unbox_fn_arr_Any(this)!!.unsafeCast<JsReference<(List<JsAny?>) -> Unit>>().get()
 

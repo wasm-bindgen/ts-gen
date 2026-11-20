@@ -25,6 +25,73 @@ internal external fun loopWorkAvailable(loop: Int)
 @JsFun("() => Date.now()")
 internal external fun now(): Double
 
+@JsFun("(kind, n) => new globalThis[kind](n)")
+private external fun typedArrayNew(kind: String, length: Int): JsAny
+
+@JsFun("(a) => a.length")
+private external fun typedArrayLength(a: JsAny): Int
+
+@JsFun("(a, i) => a[i]")
+private external fun typedArrayInt(a: JsAny, i: Int): Int
+
+@JsFun("(a, i) => a[i]")
+private external fun typedArrayLong(a: JsAny, i: Int): Long
+
+@JsFun("(a, i) => a[i]")
+private external fun typedArrayDouble(a: JsAny, i: Int): Double
+
+@JsFun("(a, i, v) => { a[i] = v; }")
+private external fun typedArraySet(a: JsAny, i: Int, v: Int)
+
+@JsFun("(a, i, v) => { a[i] = v; }")
+private external fun typedArraySet(a: JsAny, i: Int, v: Long)
+
+@JsFun("(a, i, v) => { a[i] = v; }")
+private external fun typedArraySet(a: JsAny, i: Int, v: Double)
+
+/**
+ * A `T[]` going to JS: a fresh typed array of the class `kind`, holding
+ * `v`'s elements. The unsigned element types share Kotlin's signed arrays,
+ * bit for bit.
+ */
+fun typedArray(kind: String, v: ByteArray): JsAny = typedArrayNew(kind, v.size).also { a -> v.forEachIndexed { i, x -> typedArraySet(a, i, x.toInt()) } }
+
+fun typedArray(kind: String, v: ShortArray): JsAny = typedArrayNew(kind, v.size).also { a -> v.forEachIndexed { i, x -> typedArraySet(a, i, x.toInt()) } }
+
+fun typedArray(kind: String, v: IntArray): JsAny = typedArrayNew(kind, v.size).also { a -> v.forEachIndexed { i, x -> typedArraySet(a, i, x) } }
+
+fun typedArray(kind: String, v: LongArray): JsAny = typedArrayNew(kind, v.size).also { a -> v.forEachIndexed { i, x -> typedArraySet(a, i, x) } }
+
+fun typedArray(kind: String, v: FloatArray): JsAny = typedArrayNew(kind, v.size).also { a -> v.forEachIndexed { i, x -> typedArraySet(a, i, x.toDouble()) } }
+
+fun typedArray(kind: String, v: DoubleArray): JsAny = typedArrayNew(kind, v.size).also { a -> v.forEachIndexed { i, x -> typedArraySet(a, i, x) } }
+
+/** A `T[]` from JS: the typed array `a`'s elements, copied. */
+fun byteArray(a: JsAny) = ByteArray(typedArrayLength(a)) { typedArrayInt(a, it).toByte() }
+
+fun shortArray(a: JsAny) = ShortArray(typedArrayLength(a)) { typedArrayInt(a, it).toShort() }
+
+fun intArray(a: JsAny) = IntArray(typedArrayLength(a)) { typedArrayInt(a, it) }
+
+fun longArray(a: JsAny) = LongArray(typedArrayLength(a)) { typedArrayLong(a, it) }
+
+fun floatArray(a: JsAny) = FloatArray(typedArrayLength(a)) { typedArrayDouble(a, it).toFloat() }
+
+fun doubleArray(a: JsAny) = DoubleArray(typedArrayLength(a)) { typedArrayDouble(a, it) }
+
+/** A `mut T[]`'s writeback: the typed array `a`'s elements, copied over `v`. */
+fun copyInto(a: JsAny, v: ByteArray) = byteArray(a).copyInto(v)
+
+fun copyInto(a: JsAny, v: ShortArray) = shortArray(a).copyInto(v)
+
+fun copyInto(a: JsAny, v: IntArray) = intArray(a).copyInto(v)
+
+fun copyInto(a: JsAny, v: LongArray) = longArray(a).copyInto(v)
+
+fun copyInto(a: JsAny, v: FloatArray) = floatArray(a).copyInto(v)
+
+fun copyInto(a: JsAny, v: DoubleArray) = doubleArray(a).copyInto(v)
+
 /**
  * A `future<T, E>` from JS. [await] polls it on the [Loop], parking the
  * task until `tw:future/wake`; [take] reads the resolution through

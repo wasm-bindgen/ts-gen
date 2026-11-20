@@ -58,7 +58,7 @@ fun FormatSettings.setLocales(value: LocalesArgument) {
 }
 
 fun FormatSettings.setLocales(value: String) = setLocales(LocalesArgument.Str(value))
-fun FormatSettings.setLocales(value: JsArray<JsString?>) = setLocales(LocalesArgument.StrArray(value))
+fun FormatSettings.setLocales(value: List<String>) = setLocales(LocalesArgument.StrArray(value))
 
 val FormatSettings.required: LocalesArgument?
     get() {
@@ -73,7 +73,7 @@ fun FormatSettings.setRequired(value: LocalesArgument) {
 }
 
 fun FormatSettings.setRequired(value: String) = setRequired(LocalesArgument.Str(value))
-fun FormatSettings.setRequired(value: JsArray<JsString?>) = setRequired(LocalesArgument.StrArray(value))
+fun FormatSettings.setRequired(value: List<String>) = setRequired(LocalesArgument.StrArray(value))
 
 var FormatSettings.nullable: LocalesArgument?
     get() {
@@ -173,7 +173,7 @@ fun JsAny.toKKind(): KKind {
 
 sealed interface LocalesArgument {
     data class Str(val value: String) : LocalesArgument
-    data class StrArray(val value: JsArray<JsString?>) : LocalesArgument
+    data class StrArray(val value: List<String>) : LocalesArgument
 }
 
 class LocalesArgumentWire(val arm: Int, val s0: JsAny?)
@@ -181,13 +181,13 @@ class LocalesArgumentWire(val arm: Int, val s0: JsAny?)
 fun encodeLocalesArgument(v: LocalesArgument?): LocalesArgumentWire = when (v) {
     null -> LocalesArgumentWire(0, null)
     is LocalesArgument.Str -> LocalesArgumentWire(1, v.value.toJsString())
-    is LocalesArgument.StrArray -> LocalesArgumentWire(2, v.value)
+    is LocalesArgument.StrArray -> LocalesArgumentWire(2, v.value.map { it.toJsString() }.toJsArray())
 }
 
 fun decodeLocalesArgument(arm: Int, s0: JsAny?): LocalesArgument? = when (arm) {
     0 -> null
     1 -> LocalesArgument.Str(s0!!.unsafeCast<JsString>().toString())
-    2 -> LocalesArgument.StrArray(s0!!.unsafeCast<JsArray<JsString?>>())
+    2 -> LocalesArgument.StrArray(s0!!.unsafeCast<JsArray<JsString>>().let { a -> a.toList().map { it.toString() } })
     else -> throw IllegalStateException("LocalesArgument: arm $arm")
 }
 

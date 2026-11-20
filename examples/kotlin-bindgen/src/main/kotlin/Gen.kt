@@ -5,14 +5,20 @@ class Unsupported(message: String) : Exception(message)
 
 private fun unsupported(why: String): Nothing = throw Unsupported(why)
 
-/** Wire values ready to pass: statements to run first, then one expression per value. */
-private class Conv(val pre: List<String>, val exprs: List<String>)
+/**
+ * Wire values ready to pass: statements to run first, then one expression
+ * per value, and statements to run after the call (a `mut T[]`'s writeback).
+ */
+private class Conv(val pre: List<String>, val exprs: List<String>, val post: List<String> = emptyList())
+
+/** An `arr<T>` element as a `List`'s: its Kotlin and JS types, and the conversions of `it` (null for the identity). */
+private class Elem(val kt: String, val js: String, val toJs: String?, val fromJs: String?)
 
 /** Names the generated code uses unqualified, which a declaration must not shadow. */
 private val reserved = setOf(
     "String", "Int", "Boolean", "Double", "Float", "Long", "Short", "Byte", "UInt", "ULong",
-    "UByte", "UShort", "Unit", "Any", "Nothing", "Pair", "Triple", "JsAny", "VecU8", "VecI8", "VecU16", "VecI16", "VecU32", "VecI32", "VecI64", "VecU64", "VecF16", "VecF32", "VecF64",
-    "JsString", "JsNumber", "JsBoolean", "JsArray", "JsReference",
+    "UByte", "UShort", "Unit", "Any", "Nothing", "Pair", "Triple", "JsAny", "List", "ByteArray", "ShortArray", "IntArray", "LongArray", "FloatArray", "DoubleArray",
+    "JsString", "JsNumber", "JsBoolean", "JsBigInt", "JsArray", "JsReference",
 )
 
 /**
@@ -202,6 +208,47 @@ class Gen(
 
     private fun appClass(path: String) = "$appPkg.${typeName(path)}"
 
+    /**
+     * An `arr<T>` element a `List` holds, converted one by one: strings,
+     * scalars and JS references. Any other element leaves the array a
+     * `JsArray` of [jsElem].
+     */
+    private fun elem(r: Repr): Elem? {
+        val e = when (r.kind) {
+            "str" -> Elem("String", "JsString", "it.toJsString()", "it.toString()")
+            "scalar" -> when (val s = r.scalar) {
+                "bool" -> Elem("Boolean", "JsBoolean", "it.toJsBoolean()", "it.toBoolean()")
+                "f64" -> Elem("Double", "JsNumber", "it.toJsNumber()", "it.toDouble()")
+                "f16", "f32" -> Elem("Float", "JsNumber", "it.toDouble().toJsNumber()", "it.toDouble().toFloat()")
+                "i32" -> Elem("Int", "JsNumber", "it.toJsNumber()", "it.toInt()")
+                "i8", "u8", "i16", "u16" -> Elem(scalarKt(s), "JsNumber", "it.toInt().toJsNumber()", sFrom(s, "it.toInt()"))
+                "u32" -> Elem("UInt", "JsNumber", "it.toDouble().toJsNumber()", "it.toDouble().toUInt()")
+                "i53", "u53" -> Elem("Long", "JsNumber", "it.toDouble().toJsNumber()", "it.toDouble().toLong()")
+                else -> return null
+            }
+            "bigint" -> if (r.carrier == "host") Elem("JsBigInt", "JsBigInt", null, null) else return null
+            "host" -> when (r.of) {
+                "class", "interface" -> hostType(r.path).let { Elem(it, it, null, null) }
+                "any" -> return Elem("JsAny?", "JsAny?", null, null)
+                "box" -> boxKt(r.inner).let { Elem(it, it, null, null) }
+                else -> return null
+            }
+            "erased" -> (if (eraseToAny) "JsAny?" else erasedName(r)).let { Elem(it, it, null, null) }
+            "array" -> {
+                if (r.nullable) return null
+                val i = elem(r.elem) ?: return null
+                Elem("List<${i.kt}>", "JsArray<${i.js}>", listToJs(i, "it"), listFromJs(i, "it"))
+            }
+            else -> return null
+        }
+        if (!r.nullable) return e
+        return Elem(e.kt.removeSuffix("?") + "?", e.js.removeSuffix("?") + "?", e.toJs?.let { "it?.let { $it }" }, e.fromJs?.let { "it?.let { $it }" })
+    }
+
+    private fun listToJs(e: Elem, v: String) = (e.toJs?.let { "$v.map { $it }" } ?: v) + ".toJsArray()"
+
+    private fun listFromJs(e: Elem, v: String) = "$v.toList()" + (e.fromJs?.let { ".map { $it }" } ?: "")
+
     /** The JS-level type of an `arr<T>` element, as a `JsArray` argument. */
     private fun jsElem(r: Repr): String = when (r.kind) {
         "str", "scalar" -> boxKt(r)
@@ -253,7 +300,7 @@ class Gen(
         "vec" -> vecKt(r.vecElem) + opt(r)
         // The host carrier's bigint is the JS bigint itself.
         "bigint" -> if (r.carrier == "host") "JsBigInt" + opt(r) else unsupported("`bigint` on the ${r.carrier} carrier")
-        "array" -> "JsArray<${jsElem(r.elem)}>" + opt(r)
+        "array" -> (elem(r.elem)?.let { "List<${it.kt}>" } ?: "JsArray<${jsElem(r.elem)}>") + opt(r)
         "tuple" -> {
             if (r.nullable) unsupported("a nullable tuple")
             val e = r.elems.map { kt(it) }
@@ -291,7 +338,17 @@ class Gen(
                 else -> Conv(emptyList(), listOf("(if ($e == null) 0 else 1)", "(${orElse(e, r.scalar)} ?: ${zero(r.wire[1])})"))
             }
             "str" -> one(if (n) "$e?.toJsString()" else "$e.toJsString()")
-            "vec", "array", "erased", "bigint" -> one(e)
+            "vec" -> {
+                val ta = typedArray(r.vecElem)
+                val made = if (n) "$e?.let { tsgen.runtime.typedArray(\"$ta\", it) }" else "tsgen.runtime.typedArray(\"$ta\", $e)"
+                if (r.m["writeback"] != true) one(made) else {
+                    val t = fresh("v")
+                    val back = "tsgen.runtime.copyInto($t, $e)"
+                    Conv(listOf("val $t = $made"), listOf(t), listOf(if (n) "if ($t != null && $e != null) $back" else back))
+                }
+            }
+            "array" -> elem(r.elem)?.let { one(if (n) "$e?.let { ${listToJs(it, "it")} }" else listToJs(it, e)) } ?: one(e)
+            "erased", "bigint" -> one(e)
             "host" -> when (r.of) {
                 "future" -> one(if (n) "$e?.raw" else "$e.raw")
                 else -> one(e)
@@ -299,7 +356,7 @@ class Gen(
             "tuple" -> {
                 if (n) unsupported("a nullable tuple")
                 val parts = r.elems.mapIndexed { i, t -> toWire(t, "$e.${tupleField(i)}") }
-                Conv(parts.flatMap { it.pre }, parts.flatMap { it.exprs })
+                Conv(parts.flatMap { it.pre }, parts.flatMap { it.exprs }, parts.flatMap { it.post })
             }
             "enum" -> {
                 val l = r.enum
@@ -340,9 +397,16 @@ class Gen(
                 else -> "(if ($w == 0) null else ${sFrom(r.scalar, ws[1])})"
             }
             "str" -> if (n) "$w?.unsafeCast<JsString>()?.toString()" else "$w!!.unsafeCast<JsString>().toString()"
-            "vec" -> cast(vecKt(r.vecElem))
+            "vec" -> {
+                if (r.m["writeback"] == true) unsupported("a `mut T[]` received")
+                val read = "tsgen.runtime.${vecKt(r.vecElem).replaceFirstChar { it.lowercase() }}"
+                if (n) "$w?.let { $read(it) }" else "$read($w!!)"
+            }
             "bigint" -> cast("JsBigInt")
-            "array" -> cast(kt(r).removeSuffix("?"))
+            "array" -> elem(r.elem)?.let {
+                val list = listFromJs(it, "a")
+                if (n) "$w?.unsafeCast<JsArray<${it.js}>>()?.let { a -> $list }" else "$w!!.unsafeCast<JsArray<${it.js}>>().let { a -> $list }"
+            } ?: cast(kt(r).removeSuffix("?"))
             "host" -> when (r.of) {
                 "class", "interface" -> cast(hostType(r.path))
                 "any" -> w
@@ -406,7 +470,7 @@ class Gen(
                     "never" -> "error(\"a never call returned\")"
                     else -> fromWire(res, ws)
                 }
-                val body = (pre + listOfNotNull(last)).joinToString("; ")
+                val body = (pre + convs.flatMap { it.post } + listOfNotNull(last)).joinToString("; ")
                 val sam = recOf(r)?.let { funInterface(it) + " " } ?: ""
                 val lambda = "{ f -> $sam{ ${ps.joinToString()} -> $body } }"
                 if (n) "$w?.let $lambda" else "$w!!.let $lambda"
@@ -490,6 +554,7 @@ class Gen(
     /** The typed body of an import: converts the parameters, calls `flat`, converts the result. */
     private fun importBody(m: MemberL, sig: Sig, fname: String, args: Map<Int, String>, receiver: String, resultType: String? = null): List<String> {
         val pre = mutableListOf<String>()
+        val post = mutableListOf<String>()
         val wires = mutableListOf<String>()
         for (p in sig.params) {
             when (p.role) {
@@ -498,6 +563,7 @@ class Gen(
                     val c = toWire(p.repr!!, args.getValue(p.index!!))
                     pre += c.pre
                     wires += c.exprs
+                    post += c.post
                 }
                 else -> unsupported("an import position `${p.role}`")
             }
@@ -507,7 +573,7 @@ class Gen(
         val ws = spilled(call, sig.coreResults, sig.coreSpill, pre)
         if (res?.kind == "never") return pre + "error(\"a never call returned\")"
         val read = if (resultType != null) "${ws[0]}!!.unsafeCast<$resultType>()" else res?.let { fromWire(it, ws) }
-        return pre + listOfNotNull(read?.let { "return $it" })
+        return pre + post + listOfNotNull(read?.let { "return $it" })
     }
 
     private val boxImports = HashMap<String, String>()
@@ -973,8 +1039,6 @@ class Gen(
         return kt(getter) == kt(value) && foldedExportSetters.add(owner.path to m.name)
     }
 
-    private val vecs = HashSet<String>()
-
     /** Arities of the generated `TupleN` classes: Kotlin has only `Pair` and `Triple`. */
     private val tuples = sortedSetOf<Int>()
 
@@ -988,9 +1052,31 @@ class Gen(
         else -> "Tuple$n".also { tuples += n }
     }
 
-    private fun vecKt(elem: String): String {
-        vecs += elem
-        return "Vec${upperFirst(elem)}"
+    /** A `T[]` as Kotlin's array of its element; the unsigned elements share the signed arrays, bit for bit. */
+    private fun vecKt(elem: String) = when (elem) {
+        "i8", "u8" -> "ByteArray"
+        "i16", "u16" -> "ShortArray"
+        "i32", "u32" -> "IntArray"
+        "i64", "u64" -> "LongArray"
+        "f16", "f32" -> "FloatArray"
+        "f64" -> "DoubleArray"
+        else -> unsupported("a typed array of $elem")
+    }
+
+    /** The JS typed array class of a `T[]`. */
+    private fun typedArray(elem: String) = when (elem) {
+        "i8" -> "Int8Array"
+        "u8" -> "Uint8Array"
+        "i16" -> "Int16Array"
+        "u16" -> "Uint16Array"
+        "i32" -> "Int32Array"
+        "u32" -> "Uint32Array"
+        "i64" -> "BigInt64Array"
+        "u64" -> "BigUint64Array"
+        "f16" -> "Float16Array"
+        "f32" -> "Float32Array"
+        "f64" -> "Float64Array"
+        else -> unsupported("a typed array of $elem")
     }
 
     private val foldedExportSetters = HashSet<Pair<String, String?>>()
@@ -1270,10 +1356,6 @@ class Gen(
         val errorOut = errorTypes.values.joinToString("") { it.text.toString() }
         val aliases = aliasText()
         files["$pdir/Bindings.kt"] = header + "@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)\n\npackage $pkg\n\n" + aliases + typedText() + enumOut + errorOut
-        if (vecs.isNotEmpty()) {
-            files["$pdir/Vecs.kt"] = header + "package $pkg\n" +
-                vecs.sorted().joinToString("") { "\n/** A `$it[]`: the JS typed array of its element. */\nexternal interface ${vecKt(it)} : JsAny\n" }
-        }
         if (tuples.isNotEmpty()) {
             files["$pdir/Tuples.kt"] = header + "package $pkg\n" + tuples.joinToString("") { n ->
                 val ps = (0 until n).map { "T$it" }

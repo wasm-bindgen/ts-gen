@@ -1,11 +1,16 @@
 // Calls the probe's Kotlin exports through the bridge: a spilled tuple
 // result, an error set through set:ProbeError, a future that rejects
 // through reject<ProbeError>, `undefined` read as none, the box helpers,
-// and a box's none, ref.null, written as each node's default. Prints one
-// line per call.
+// a box's none, ref.null, written as each node's default, and arrays
+// copied each way.
+// Prints one line per call.
 import { readFileSync } from 'node:fs';
 const seen = [];
-globalThis.ext = { none: () => undefined, seen: (v) => seen.push(v), seenNull: (v) => seen.push(v) };
+globalThis.ext = {
+  none: () => undefined, seen: (v) => seen.push(v), seenNull: (v) => seen.push(v),
+  bytes: (v) => v.map((b) => b + 1),
+  words: (xs) => xs.map((x) => x.toUpperCase()),
+};
 import { importObject } from './probe.import-object.mjs';
 import { instantiate, probe, spillEmpty, Counter } from './bridge.js';
 
@@ -43,5 +48,7 @@ const add = probe.adder();
 lines.push(`adder: ${typeof add} ${add(41)} ${probe.callBoxed(add, 1)}`);
 probe.writeNones();
 lines.push(`box nones: ${String(probe.none())} ${seen.map(String).join(",")}`);
+lines.push(`bytes: ${probe.bytes()}`);
+lines.push(`words: ${probe.words()}`);
 lines.push(`spill empty: ${spillEmpty()}`);
 process.stdout.write(lines.join('\n') + '\n');

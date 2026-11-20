@@ -28,9 +28,9 @@ fun Pixels.sample(x: UByte, y: Double): Float {
     return r2
 }
 
-fun Pixels.sizes(): JsArray<JsNumber?> {
+fun Pixels.sizes(): List<UInt> {
     val r0 = try { fixtures.tags.flat.Pixels_sizes(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r0!!.unsafeCast<JsArray<JsNumber?>>()
+    return r0!!.unsafeCast<JsArray<JsNumber>>().let { a -> a.toList().map { it.toDouble().toUInt() } }
 }
 
 fun Pixels.first(): UInt? {
