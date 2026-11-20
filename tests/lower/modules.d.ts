@@ -29,15 +29,22 @@ declare module "client" {
 }
 
 // A global namespace a module assigns with `export =` is the module, so
-// a dictionary synthesized inside it is declared there too.
+// a dictionary synthesized inside it is declared there too. A class
+// outside it extends one of its classes by the qualified name.
 declare namespace StepModule {
   export type StepConfig = {
     retries?: { limit: number };
   };
   export function step(config: StepConfig): void;
+  export class Runner {
+    run(): void;
+  }
 }
 declare module "steps" {
   export = StepModule;
+}
+declare class Retrier extends StepModule.Runner {
+  retry(): void;
 }
 
 declare function read(): string | ArrayBuffer | number;

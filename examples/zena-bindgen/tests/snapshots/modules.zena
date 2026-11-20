@@ -9,15 +9,6 @@ export sealed class StrOrArrayBufferOrF64 {
   case StrOrArrayBufferOrF64F64(value: f64)
 }
 
-@spelling("\"store\".Entry")
-export extension class Entry on externref {
-  key: String {
-    get {
-      return __Entry_key((this as externref));
-    }
-  }
-}
-
 /** The arms of `err`, as its tag carries them. */
 export enum ErrArm {
   TypeError = 1,
@@ -29,6 +20,21 @@ export enum ErrArm {
 export class ErrException extends Error {
   arm: ErrArm;
   new(arm: ErrArm, message: String) : arm = arm, super(message) {}
+}
+
+export extension class Retrier extends Runner {
+  retry(): void {
+    __Retrier_retry((this as externref));
+  }
+}
+
+@spelling("\"store\".Entry")
+export extension class Entry on externref {
+  key: String {
+    get {
+      return __Entry_key((this as externref));
+    }
+  }
 }
 
 @spelling("\"store\".Store")
@@ -63,6 +69,14 @@ export extension class StepConfig on externref {
   }
 }
 
+@spelling("\"steps\".Runner")
+export extension class Runner on externref {
+  new __wrap(value: externref) : super(value);
+  run(): void {
+    __Runner_run((this as externref));
+  }
+}
+
 @spelling("\"steps\".StepConfigRetries")
 export extension class StepConfigRetries on externref {
   limit: f64 {
@@ -77,6 +91,9 @@ export extension class StepConfigRetries on externref {
 
 export extension class ArrayBuffer on externref {
 }
+
+@external("tw:js/global", "Retrier#retry()", "tw, throws:err")
+declare function __Retrier_retry(p0: externref): void;
 
 @external("store", "Entry#get:key()", "tw")
 declare function __Entry_key(p0: externref): String;
@@ -98,6 +115,9 @@ declare function __StepConfig_retries(p0: externref): StepConfigRetries | null;
 
 @external("steps", "StepConfig#set:retries(\"steps\".StepConfigRetries)", "tw")
 declare function __StepConfig_retries2(p0: externref, p1: StepConfigRetries): void;
+
+@external("steps", "Runner#run()", "tw, throws:err")
+declare function __Runner_run(p0: externref): void;
 
 @external("steps", "StepConfigRetries#get:limit()", "tw")
 declare function __StepConfigRetries_limit(p0: externref): f64;

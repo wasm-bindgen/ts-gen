@@ -493,7 +493,18 @@ impl Lowerer<'_> {
     }
 
     fn parent(&mut self, t: &TypeRef, cx: &Tcx) -> Option<abi::TypeRef> {
-        match self.ty(t, cx) {
+        // A class's `extends` holds a qualified name as one dotted segment.
+        let path = match t {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } if segments.len() == 1 && segments[0].contains('.') => Some(TypeRef::Reference {
+                segments: segments[0].split('.').map(String::from).collect(),
+                generic_args: generic_args.clone(),
+            }),
+            _ => None,
+        };
+        match self.ty(path.as_ref().unwrap_or(t), cx) {
             abi::Type::Named(r) => Some(r),
             _ => None,
         }
