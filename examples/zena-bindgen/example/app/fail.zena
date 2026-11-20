@@ -1,9 +1,10 @@
 // Errors, in both directions.
 import { Future } from 'zena:async';
 import {
-  DOMExceptionErrArm, DOMExceptionErrException, Env, ErrArm, ErrException, JSON, RequestInfoStr, Response, StrOrURLStr,
-  URL, atob, fetch as jsFetch
+  DOMExceptionErrArm, DOMExceptionErrException, Env, JSON, RequestInfoStr, Response, StrOrURLStr, URL, atob,
+  fetch as jsFetch
 } from '../bindings.zena';
+import { ErrArm, ErrException } from '../std.zena';
 import { ok } from './reply.zena';
 
 /** `/fail`: what JS throws, as Zena catches it. */

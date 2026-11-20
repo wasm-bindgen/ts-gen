@@ -27,6 +27,11 @@
 //! `next()` result through `IteratorYieldResult<T>` as `(true, value)` or
 //! `(false, _)`, the form a `while (let (true, x) = it.step())` loop takes.
 //!
+//! A lib's bindings carry the runtime: the `err` tag class, those of the
+//! lib's own `throws` enums, and the tw loop. The bindings over a lib
+//! import them from the lib's, so a module has one class per tag and one
+//! loop.
+//!
 //! What has no Zena form yet is left out with a `// skipped` line and
 //! listed in [`Output::skipped`]: type parameters anywhere but whole
 //! positions, host type arguments and generic callbacks' whole positions.
@@ -227,6 +232,19 @@ export function __tw_next_sleep(loop: i32): i64 {
 }
 "#;
 
+/// What the bindings over a lib import from its bindings: the `err` tag
+/// class and the tw loop's functions. A module has one of each: the tag
+/// has one class, and the bridge calls one loop.
+const RUNTIME: &[&str] = &[
+    "ErrException",
+    "ErrArm",
+    "__tw_await",
+    "__tw_await_with",
+    "__tw_promise",
+    "__tw_promise_with",
+    "__tw_entered",
+];
+
 /// Names the generated code relies on, which IR declarations can't take.
 const RESERVED: &[&str] = &[
     "String",
@@ -321,16 +339,48 @@ pub fn generate_with(ir: &Ir, libs: &[Lib<'_>], opts: &Options) -> anyhow::Resul
     let irs: Vec<&Ir> = libs.iter().map(|l| l.ir).collect();
     let layouts = Layouts::with_libs(ir, &irs, &profile);
     let mut g = Gen::new(&layouts, opts);
+    g.lib = ir.lib.is_some();
     g.collect(&ir.items, None, &mut Vec::new());
     g.assign_names();
     g.assign_specs();
+    // The last lib resolves against no other, so the runtime is its.
+    if let Some(root) = libs.last() {
+        for name in RUNTIME {
+            g.used.insert(name.to_string());
+            g.lib_names
+                .insert(name.to_string(), (root.module.clone(), name.to_string()));
+        }
+        g.runtime = true;
+    }
     // A lib's declarations take the names its own bindings give them.
     for (i, lib) in libs.iter().enumerate() {
         let ll = Layouts::with_libs(lib.ir, &irs[i + 1..], &profile);
         let mut lg = Gen::new(&ll, opts);
+        lg.lib = true;
         lg.collect(&lib.ir.items, None, &mut Vec::new());
         lg.assign_names();
         lg.assign_specs();
+        lg.lib_tags();
+        let mut tags: Vec<(String, Tag)> = lg.tags.into_iter().collect();
+        tags.sort_by(|a, b| a.0.cmp(&b.0));
+        for (path, tag) in tags {
+            if g.tags.contains_key(&path) {
+                continue;
+            }
+            let tag = if path == "err" {
+                if i + 1 < libs.len() {
+                    continue;
+                }
+                tag
+            } else {
+                Tag {
+                    class: g.lib_name(&lib.module, &tag.class),
+                    arm: g.lib_name(&lib.module, &tag.arm),
+                    fallback: tag.fallback,
+                }
+            };
+            g.tags.insert(path, tag);
+        }
         let mut specs: Vec<(String, Vec<Spec>)> = lg.specs.into_iter().collect();
         specs.sort_by(|a, b| a.0.cmp(&b.0));
         let mut names: Vec<(String, String)> = lg.names.into_iter().collect();
@@ -355,6 +405,7 @@ pub fn generate_with(ir: &Ir, libs: &[Lib<'_>], opts: &Options) -> anyhow::Resul
             g.specs.insert(canonical, rows);
         }
     }
+    g.lib_tags();
     let members = layouts.keys.members();
     g.enums()?;
     g.classes(&members)?;
@@ -394,6 +445,9 @@ impl<'a> Gen<'a> {
             arm: None,
             boxes: HashMap::new(),
             iter_result: None,
+            lib: false,
+            runtime: false,
+            tags: HashMap::new(),
         }
     }
 
@@ -463,6 +517,22 @@ struct Gen<'a> {
     /// The class of a JS iterator's results, where the IR declares the
     /// iterator protocol ([`Gen::iterator_protocol`]).
     iter_result: Option<String>,
+    /// The IR is a lib: its bindings carry the runtime and the tag classes
+    /// of its `throws` enums, for the bindings over it.
+    lib: bool,
+    /// The runtime is a lib's, imported ([`RUNTIME`]).
+    runtime: bool,
+    /// The tag classes of `throws` enums, by canonical spelling.
+    tags: HashMap<String, Tag>,
+}
+
+/// The class a `throws` enum's tag carries, the enum of its arms, and the
+/// fallback arm's name there.
+#[derive(Clone)]
+struct Tag {
+    class: String,
+    arm: String,
+    fallback: String,
 }
 
 type Arm = (String, Vec<Type>);
@@ -793,7 +863,9 @@ impl<'a> Gen<'a> {
     }
 
     fn finish(mut self) -> Output {
-        if self.uses_promise {
+        // The tw loop is the bindings' own unless a lib's is imported.
+        let own = !self.runtime && (self.lib || self.uses_promise);
+        if own {
             if let Ok(err) = self.layouts.enum_of(
                 &ts_gen_abi::ir::Path::err(),
                 &Context::default(),
@@ -802,20 +874,39 @@ impl<'a> Gen<'a> {
                 let _ = self.tag_class(&err);
             }
         }
+        let trampolines = self.helper_done.iter().any(|h| h.starts_with("tramp "));
+        if self.runtime {
+            let text = [&self.types, &self.externs, &self.helpers, &self.funcs];
+            for w in text
+                .iter()
+                .flat_map(|t| t.split(|c: char| !(c.is_alphanumeric() || c == '_')))
+            {
+                if w.starts_with("__tw_") {
+                    self.note_lib(w);
+                }
+            }
+        }
         let mut out = String::new();
         out.push_str("// Generated by zena-bindgen from the ts-gen IR. Do not edit.\n");
         out.push_str("// Compile with `zena build -t js` and link against the tw bridge.\n\n");
         out.push_str("import { Option, Some, None, none, some } from 'zena:core';\n");
         out.push_str(&self.lib_imports(self.lib_used.borrow().iter()));
+        if self.runtime && self.uses_promise {
+            out.push_str("import { Future } from 'zena:async';\n");
+        }
         out.push('\n');
-        if self.uses_promise {
+        if own {
             out.push_str(ASYNC_RUNTIME);
             out.push('\n');
         }
         // A callback can complete Zena futures outside a tick, so it asks
         // for one.
-        if self.helper_done.iter().any(|h| h.starts_with("tramp ")) {
-            out.push_str(if self.uses_promise {
+        if self.lib && own {
+            out.push_str(
+                "export function __tw_entered(): void {\n  __tw_work_available(1);\n}\n\n",
+            );
+        } else if trampolines && !self.runtime {
+            out.push_str(if own {
                 "function __tw_entered(): void {\n  __tw_work_available(1);\n}\n\n"
             } else {
                 "function __tw_entered(): void {}\n\n"
@@ -1072,11 +1163,9 @@ impl<'a> Gen<'a> {
         let (option, body) = match &sig.throws {
             Some(layout) => {
                 let body = self.rethrowing(layout, &body)?;
-                let class = self.names[&format!("tag {}", layout.path)].clone();
-                let fallback = &self.names[&format!("tagfallback {}", layout.path)];
-                let arm = fallback.split('.').next().unwrap_or_default().to_string();
-                self.export_uses.insert(class);
-                self.export_uses.insert(arm);
+                let tag = self.tags[&layout.path].clone();
+                self.export_uses.insert(tag.class);
+                self.export_uses.insert(tag.arm);
                 (format!("tw, throws:{}", layout.path), body)
             }
             None => ("tw".to_string(), body),
@@ -1838,9 +1927,10 @@ impl<'a> Gen<'a> {
     /// The class a `throws` enum's tag carries (§15): its arm, an enum of
     /// the arms' indices, and its message. Every arm is `(Str)`.
     fn tag_class(&mut self, layout: &EnumLayout) -> R<String> {
-        let key = format!("tag {}", layout.path);
-        if let Some(n) = self.names.get(&key) {
-            return Ok(n.clone());
+        if let Some(t) = self.tags.get(&layout.path) {
+            self.note_lib(&t.class);
+            self.note_lib(&t.arm);
+            return Ok(t.class.clone());
         }
         let base = match layout.origin {
             Origin::Err => "Err".to_string(),
@@ -1882,19 +1972,58 @@ impl<'a> Gen<'a> {
             .find(|a| a.fallback)
             .map(|a| ident(&a.name))
             .unwrap_or_else(|| ident(&layout.arms[0].name));
-        self.names.insert(
-            format!("tagfallback {}", layout.path),
-            format!("{arm}.{fallback}"),
+        self.tags.insert(
+            layout.path.clone(),
+            Tag {
+                class: class.clone(),
+                arm,
+                fallback,
+            },
         );
-        self.names.insert(key, class.clone());
         Ok(class)
+    }
+
+    /// `ErrArm.Error`: the fallback arm of a tag class.
+    fn tag_fallback(&self, layout: &EnumLayout) -> String {
+        let t = &self.tags[&layout.path];
+        format!("{}.{}", t.arm, t.fallback)
+    }
+
+    /// A lib's tag classes, declared whether or not it throws them: `err`
+    /// and its own `throws` enums (§15: a fallback, and `(Str)` arms).
+    fn lib_tags(&mut self) {
+        if !self.lib {
+            return;
+        }
+        let mut layouts = Vec::new();
+        if !self.runtime {
+            layouts.extend(self.layouts.enum_of(
+                &ts_gen_abi::ir::Path::err(),
+                &Context::default(),
+                Flow::ToLang,
+            ));
+        }
+        for d in &self.decls {
+            let TypeDecl::Enum(e) = d.decl else { continue };
+            let path = Path::new([e.name.as_str()]);
+            layouts.extend(self.layouts.enum_of(&path, &class_cx(&d.loc), Flow::ToLang));
+        }
+        for layout in layouts {
+            let thrown = layout.arms.iter().any(|a| a.fallback)
+                && layout.arms.iter().all(|a| {
+                    a.payload.len() == 1 && matches!(a.payload[0].ty.as_str(), "str" | "Str")
+                });
+            if thrown {
+                let _ = self.tag_class(&layout);
+            }
+        }
     }
 
     /// Wraps an entry point's body so an error leaving it is its `throws`
     /// enum's class: another `Error` becomes the fallback arm.
     fn rethrowing(&mut self, layout: &EnumLayout, body: &str) -> R<String> {
         let class = self.tag_class(layout)?;
-        let fallback = self.names[&format!("tagfallback {}", layout.path)].clone();
+        let fallback = self.tag_fallback(layout);
         let inner: String = body.lines().map(|l| format!("  {l}\n")).collect();
         Ok(format!(
             "  try {{\n{inner}  }} catch (e) {{\n    if (e is {class}) {{\n      throw e;\n    }}\n    throw new {class}({fallback}, e.message);\n  }}\n"
@@ -2871,8 +3000,8 @@ impl<'a> Gen<'a> {
             ));
         }
         let class = self.tag_class(error)?;
-        let fallback = self.names[&format!("tagfallback {}", error.path)].clone();
-        let arm = fallback.split('.').next().unwrap_or_default().to_string();
+        let fallback = self.tag_fallback(error);
+        let arm = self.tags[&error.path].arm.clone();
         let id = type_ident(&error.path);
         let error_fn = unique(&mut self.used, format!("__tw_future_error_{id}"));
         let reject_fn = unique(&mut self.used, format!("__tw_future_reject_{id}"));

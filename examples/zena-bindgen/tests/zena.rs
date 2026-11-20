@@ -182,6 +182,33 @@ fn fn_payloads() {
         .contains("case ListenerFunction(value: (a0: Event) => void)"));
 }
 
+/// A lib's bindings carry the `err` tag class and the tw loop, and the
+/// bindings over it import them: a module has one of each.
+#[test]
+fn lib_runtime() {
+    let ir = read_ir(&repo_root().join("tests/lower/with-std.ir"));
+    let libs = libs(&ir);
+    let std = zena_bindgen::generate(&libs[0], &zena_bindgen::Options::default()).unwrap();
+    let out = generate(&ir, &libs, &zena_bindgen::Options::default());
+    for own in [
+        "@external(\"tw:tag\", \"err\", \"tw\")",
+        "@export(\"tw:future/wake\")",
+        "@export(\"tw:loop/tick\")",
+        "function __tw_entered()",
+    ] {
+        assert!(std.zena.contains(own), "std has no `{own}`");
+        assert!(!out.zena.contains(own), "with-std has its own `{own}`");
+    }
+    let import = out
+        .zena
+        .lines()
+        .find(|l| l.ends_with("from \"./std.zena\";"))
+        .expect("with-std imports from std");
+    for name in ["ErrException", "__tw_await"] {
+        assert!(import.contains(name), "`{name}` isn't in `{import}`");
+    }
+}
+
 /// The Zena compiler and its checkout, or `None` to skip.
 fn zena() -> Option<(PathBuf, PathBuf)> {
     if std::env::var_os("TSGEN_SKIP_ZENA").is_some() {

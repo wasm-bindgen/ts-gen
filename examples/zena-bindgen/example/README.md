@@ -66,7 +66,8 @@ The declarations beside workers-types:
 1. `ts-gen --provides provides.d.ts --with std.ir --ir`: the IR, against
    the JS standard library's.
 2. `zena-bindgen --entry`: the bindings (`build/bindings.zena`, and
-   `build/std.zena` for the library), and the entry module
+   `build/std.zena` for the library, whose `ErrException` and tw loop
+   both use), and the entry module
    (`build/worker.zena`), which exports the functions and the classes'
    members under their IR keys with `@export`, over `app.zena`.
 3. `zena build -t js`: the module. Generic members import per
