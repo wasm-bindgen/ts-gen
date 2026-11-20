@@ -3802,14 +3802,24 @@ Derived & Unrelated                  -> JsValue     (no member subtypes the othe
 
 The IR reads an intersection as its first named member. A read takes
 that part (`Derived & Unrelated` reads as `Derived`). A write must be
-every part, so it erases to `JsValue` with a warning at the parameter or
-setter, unless the part is the whole intersection (`Derived & Base`, or
-`D1Meta & Record<string, unknown>`, as every object is an open record):
+every part, so it takes the member that is every other, wherever it's
+listed (`Base & Derived` writes `Derived`, and `D1Meta & Record<string,
+unknown>` writes `D1Meta`, as every object is an open record). With no
+such member it erases to `JsValue`, with a warning at the parameter or
+setter, a static one too:
 
 ```rust
+pub fn covered(this: &Store, value: &Derived); // `value: Base & Derived`
 pub fn unrelated(this: &Store, value: &JsValue);
 pub fn set_stamp(this: &Settings, val: &JsValue); // `stamp?: Moment & Tagged`
 ```
+
+An inline `{ … }` beside a named type, where the intersection doesn't
+hoist (a property, a free function's parameter), is a member of its own:
+the dictionary the IR names for it. Neither is the other, so
+`botManagement: Base & { ja3Hash: string }` writes `JsValue`; a method's
+parameter of that type hoists to an interface extending `Base` and
+writes that.
 
 Otherwise, in argument position the bound accepts slightly more than TypeScript
 does; in a return position that does not hoist (a free function, a

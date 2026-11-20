@@ -182,6 +182,18 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "refine")]
     pub fn try_refine(this: &Store, value: &Derived) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
+    pub fn covered(this: &Store, value: &Derived);
+    #[wasm_bindgen(method, catch, js_name = "covered")]
+    pub fn try_covered(this: &Store, value: &Derived) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "covered")]
+    pub fn covered_with_again(this: &Store, value: &Derived, again: &Derived);
+    #[wasm_bindgen(method, catch, js_name = "covered")]
+    pub fn try_covered_with_again(
+        this: &Store,
+        value: &Derived,
+        again: &Derived,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
     pub fn same(this: &Store, value: &Derived);
     #[wasm_bindgen(method, catch, js_name = "same")]
     pub fn try_same(this: &Store, value: &Derived) -> Result<(), JsValue>;
@@ -262,6 +274,24 @@ impl StoreValue {
         inner.set_b(b);
         inner
     }
+}
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Shelf;
+    #[wasm_bindgen(method, getter)]
+    pub fn top(this: &Shelf) -> Base;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top(this: &Shelf, val: &Derived);
+    # [wasm_bindgen (static_method_of = Shelf , getter)]
+    pub fn spare() -> Base;
+    # [wasm_bindgen (static_method_of = Shelf , setter)]
+    pub fn set_spare(val: &Derived);
+    # [wasm_bindgen (static_method_of = Shelf , getter)]
+    pub fn odd() -> Derived;
+    # [wasm_bindgen (static_method_of = Shelf , setter)]
+    pub fn set_odd(val: &JsValue);
 }
 #[allow(dead_code)]
 pub type Branded<T> = T;

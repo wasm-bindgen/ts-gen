@@ -1,8 +1,8 @@
 #![cfg(target_arch = "wasm32")]
 
 use ts_gen_integration_tests::intersection::{
-    Both, Conditional, Derived, Ext, Fetcher, GenericStub, GetOptions, Provider, Refined, Store,
-    StoreOptions, Stub, Unknown, Unrelated,
+    Both, Conditional, Derived, Ext, Fetcher, GenericStub, GetOptions, Provider, Refined, Shelf,
+    Store, StoreOptions, Stub, Unknown, Unrelated,
 };
 use wasm_bindgen::{JsCast, JsValue};
 
@@ -14,6 +14,7 @@ async fn intersection_bindings_compile(
     stub: &Stub,
     generic_stub: &GenericStub<JsValue>,
     derived: &Derived,
+    shelf: &Shelf,
 ) {
     let refined = StoreOptions::new(&Conditional::new());
     let _: Option<String> = refined.range();
@@ -25,6 +26,14 @@ async fn intersection_bindings_compile(
     let _: Conditional = alias.only_if();
 
     store.refine(derived);
+    // The member that is every other is the one written, listed first or
+    // not; with none, a write is untyped.
+    store.covered(derived);
+    store.covered_with_again(derived, derived);
+    shelf.set_top(derived);
+    Shelf::set_spare(derived);
+    Shelf::set_odd(&JsValue::NULL);
+    store.unrelated(&JsValue::NULL);
     store.same(derived);
     store.generic(derived);
     store.primitive("x");

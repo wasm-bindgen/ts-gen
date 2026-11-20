@@ -728,7 +728,7 @@ pub fn accessor(
     let r = accessor_at(cgctx, &site, js_name, parsed, scope);
     let r = settled(cgctx, at, &site, js_name, r)?;
     Some(match site.form {
-        Form::Set => {
+        Form::Set | Form::StaticSet => {
             let at = [site.path, &[js_name.to_string()]].concat().join(".");
             writes(cgctx, scope, &format!("`{at}`"), &r, parsed)
         }
@@ -737,8 +737,9 @@ pub fn accessor(
 }
 
 /// `ours` where the parse's `theirs` writes an intersection the IR reads
-/// as one part: `JsValue`, unless that part is the whole intersection
-/// (`Derived & Base`), since a write must be every part. `at` locates it.
+/// as one part. A write must be every part, so it's the part that is the
+/// whole intersection (`Derived` of `Base & Derived`), and `JsValue`
+/// where none is. `at` locates it.
 fn writes(
     cgctx: &CodegenContext<'_>,
     scope: ScopeId,
@@ -765,11 +766,13 @@ fn writes(
         if *o == TypeRef::Any || whole.as_ref() == Some(o) {
             return None;
         }
-        cgctx.warn(format!(
-            "{at}: the intersection `{}` it writes is read as one part, so it is erased to JsValue",
-            t.format_ts()
-        ));
-        Some(TypeRef::Any)
+        whole.or_else(|| {
+            cgctx.warn(format!(
+                "{at}: the intersection `{}` it writes is read as one part, so it is erased to JsValue",
+                t.format_ts()
+            ));
+            Some(TypeRef::Any)
+        })
     })
 }
 
