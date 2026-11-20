@@ -30,14 +30,6 @@ function $str(v) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 // A memory and its externref table, as the glue reads and writes them.
 // The language's space allocates through its exports and registers each
 // allocation on the call's cleanup list; the scratch space is the
@@ -369,16 +361,13 @@ function $outgoing(e) {
 const $N0 = {
   run(...a) {
     try {
-      if ($upTo(a, 0)) {
-        $checkLive();
-        try {
-          const r = $E[0]();
-          return $promise(r);
-        } catch (e) {
-          throw $outgoing(e);
-        }
+      $checkLive();
+      try {
+        const r = $E[0]();
+        return $promise(r);
+      } catch (e) {
+        throw $outgoing(e);
       }
-      throw new TypeError("`run` doesn't match its arguments");
     } catch (e) {
       return Promise.reject(e);
     }

@@ -800,7 +800,7 @@ function $outgoing(e) {
 }
 class $C0 {
   constructor(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -815,19 +815,16 @@ class $C0 {
   }
   get value() {
     const a = [];
-    if ($upTo(a, 0)) {
-      try {
-        const r = $E[3](this, $HC.unwrap(this, $C0, "Counter"));
-        return (r >>> 0);
-      } catch (e) {
-        throw $outgoing(e);
-      }
+    try {
+      const r = $E[3](this, $HC.unwrap(this, $C0, "Counter"));
+      return (r >>> 0);
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Counter.value` doesn't match its arguments");
   }
   set value(v) {
     const a = [v];
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -840,7 +837,7 @@ class $C0 {
     throw new TypeError("`Counter.value` doesn't match its arguments");
   }
   inc(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -853,7 +850,7 @@ class $C0 {
     throw new TypeError("`Counter.inc` doesn't match its arguments");
   }
   label(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       const cx = $cx;
       const cxm = cx.n;
       try {
@@ -878,7 +875,7 @@ class $C0 {
     throw new TypeError("`Counter.label` doesn't match its arguments");
   }
   same(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = (t1 == null ? 0 : $HC.unwrap(t1, $C0, "Counter?"));
@@ -891,7 +888,7 @@ class $C0 {
     throw new TypeError("`Counter.same` doesn't match its arguments");
   }
   pick(...a) {
-    if (a.length >= 1 && $upTo(a, 1) && typeof a[0] === "number") {
+    if (a.length >= 1 && typeof a[0] === "number") {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -907,7 +904,7 @@ class $C0 {
         throw $outgoing(e);
       }
     }
-    if (a.length >= 1 && $upTo(a, 1) && typeof a[0] === "string") {
+    if (a.length >= 1 && typeof a[0] === "string") {
       const cx = $cx;
       const cxm = cx.n;
       try {
@@ -932,33 +929,27 @@ class $C0 {
     throw new TypeError("no overload of `Counter.pick` matches its arguments");
   }
   fail(...a) {
-    if ($upTo(a, 0)) {
-      try {
-        $E[10](this, $HC.unwrap(this, $C0, "Counter"));
-      } catch (e) {
-        throw $outgoing(e);
-      }
-      return;
+    try {
+      $E[10](this, $HC.unwrap(this, $C0, "Counter"));
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Counter.fail` doesn't match its arguments");
+    return;
   }
   static zero(...a) {
-    if ($upTo(a, 0)) {
-      try {
-        const r = $E[11]();
-        return $HC.wrap(r, () => Object.create($C0.prototype), "tw:drop:Counter");
-      } catch (e) {
-        throw $outgoing(e);
-      }
+    try {
+      const r = $E[11]();
+      return $HC.wrap(r, () => Object.create($C0.prototype), "tw:drop:Counter");
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Counter.zero` doesn't match its arguments");
   }
 }
 
 class $C1 extends globalThis.Base {
   constructor(...a) {
     $newArm = undefined;
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       super();
       try {
         const t1 = a[0];
@@ -973,44 +964,35 @@ class $C1 extends globalThis.Base {
     throw new TypeError("`new Sub` doesn't match its arguments");
   }
   twice(...a) {
-    if ($upTo(a, 0)) {
-      try {
-        const r = $E[13](this, $HC.unwrap(this, $C1, "Sub"));
-        return (r >>> 0);
-      } catch (e) {
-        throw $outgoing(e);
-      }
+    try {
+      const r = $E[13](this, $HC.unwrap(this, $C1, "Sub"));
+      return (r >>> 0);
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Sub.twice` doesn't match its arguments");
   }
   static make(...a) {
-    if ($upTo(a, 0)) {
-      try {
-        const r = $E[14]();
-        return $HC.paired(r, "`Sub`");
-      } catch (e) {
-        throw $outgoing(e);
-      }
+    try {
+      const r = $E[14]();
+      return $HC.paired(r, "`Sub`");
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Sub.make` doesn't match its arguments");
   }
   static stray(...a) {
-    if ($upTo(a, 0)) {
-      try {
-        const r = $E[15]();
-        return $HC.paired(r, "`Sub`");
-      } catch (e) {
-        throw $outgoing(e);
-      }
+    try {
+      const r = $E[15]();
+      return $HC.paired(r, "`Sub`");
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Sub.stray` doesn't match its arguments");
   }
 }
 
 class $C2 extends globalThis.Needy {
   constructor(...a) {
     $newArm = undefined;
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       super(...a);
       try {
         const t1 = a[0];
@@ -1025,15 +1007,12 @@ class $C2 extends globalThis.Needy {
     throw new TypeError("`new Orphan` doesn't match its arguments");
   }
   static make(...a) {
-    if ($upTo(a, 0)) {
-      try {
-        const r = $E[17]();
-        return $HC.paired(r, "`Orphan`");
-      } catch (e) {
-        throw $outgoing(e);
-      }
+    try {
+      const r = $E[17]();
+      return $HC.paired(r, "`Orphan`");
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`Orphan.make` doesn't match its arguments");
   }
 }
 
@@ -1041,7 +1020,7 @@ class $C3 extends globalThis.Plain {
   constructor(...a) {
     const arm = $newArm;
     $newArm = undefined;
-    if ((arm ?? "Dual.new(Any)") === "Dual.new(Any)" && a.length >= 1 && $upTo(a, 1) && a[0] != null) {
+    if ((arm ?? "Dual.new(Any)") === "Dual.new(Any)" && a.length >= 1 && a[0] != null) {
       super(...a);
       try {
         const t1 = a[0];
@@ -1053,7 +1032,7 @@ class $C3 extends globalThis.Plain {
       }
       return;
     }
-    if ((arm ?? "Dual.new(str)") === "Dual.new(str)" && a.length >= 1 && $upTo(a, 1) && typeof a[0] === "string") {
+    if ((arm ?? "Dual.new(str)") === "Dual.new(str)" && a.length >= 1 && typeof a[0] === "string") {
       super(...a);
       const cx = $cx;
       const cxm = cx.n;
@@ -1076,26 +1055,23 @@ class $C3 extends globalThis.Plain {
 }
 
 const $X0 = function version(...a) {
-  if ($upTo(a, 0)) {
+  try {
+    const r = $E[32]();
+    const t1 = r[0];
+    const t2 = r[1];
     try {
-      const r = $E[30]();
-      const t1 = r[0];
-      const t2 = r[1];
-      try {
-        return $liftUtf8($L, t1, t2);
-      } finally {
-        if (t2 !== 0) $L.free(t1, t2 * 1, 1);
-      }
-    } catch (e) {
-      throw $outgoing(e);
+      return $liftUtf8($L, t1, t2);
+    } finally {
+      if (t2 !== 0) $L.free(t1, t2 * 1, 1);
     }
+  } catch (e) {
+    throw $outgoing(e);
   }
-  throw new TypeError("`version` doesn't match its arguments");
 };
 
 const $N1 = {
   twice(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -1108,7 +1084,7 @@ const $N1 = {
     throw new TypeError("`twice` doesn't match its arguments");
   },
   make(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -1121,18 +1097,15 @@ const $N1 = {
     throw new TypeError("`make` doesn't match its arguments");
   },
   stray(...a) {
-    if ($upTo(a, 0)) {
-      try {
-        const r = $E[22]();
-        return $HC.wrap(r, () => Object.create($C0.prototype), "tw:drop:Counter");
-      } catch (e) {
-        throw $outgoing(e);
-      }
+    try {
+      const r = $E[22]();
+      return $HC.wrap(r, () => Object.create($C0.prototype), "tw:drop:Counter");
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`stray` doesn't match its arguments");
   },
   apply(...a) {
-    if (a.length >= 2 && $upTo(a, 2)) {
+    if (a.length >= 2) {
       try {
         const t1 = a[0];
         const t2 = $fn(t1, "fn(u32)->u32");
@@ -1147,7 +1120,7 @@ const $N1 = {
     throw new TypeError("`apply` doesn't match its arguments");
   },
   maybe(...a) {
-    if (a.length >= 1 && $upTo(a, 1)) {
+    if (a.length >= 1) {
       try {
         const t1 = a[0];
         const t2 = (t1 == null ? 0 : $HC.unwrap(t1, $C0, "Counter?"));
@@ -1160,24 +1133,21 @@ const $N1 = {
     throw new TypeError("`maybe` doesn't match its arguments");
   },
   names(...a) {
-    if ($upTo(a, 0)) {
+    try {
+      const r = $E[25]();
+      const t1 = r[0];
+      const t2 = r[1];
       try {
-        const r = $E[25]();
-        const t1 = r[0];
-        const t2 = r[1];
-        try {
-          return $h5(t1, t2);
-        } finally {
-          $h6(t1, t2);
-        }
-      } catch (e) {
-        throw $outgoing(e);
+        return $h5(t1, t2);
+      } finally {
+        $h6(t1, t2);
       }
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`names` doesn't match its arguments");
   },
   swap(...a) {
-    if (a.length >= 3 && $upTo(a, 3) && a[1] === undefined) {
+    if (a.length >= 3 && a[1] === undefined) {
       try {
         const t1 = a[2];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -1192,7 +1162,7 @@ const $N1 = {
     throw new TypeError("`swap` doesn't match its arguments");
   },
   opt(...a) {
-    if (a.length >= 1 && $upTo(a, 2) && (a[1] == null || a[1].mode === "fast") && typeof a[0] === "number") {
+    if (a.length >= 1 && (a[1] == null || a[1].mode === "fast") && typeof a[0] === "number") {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
@@ -1206,7 +1176,7 @@ const $N1 = {
         throw $outgoing(e);
       }
     }
-    if (a.length >= 1 && $upTo(a, 2) && (a[1] == null || a[1].mode === "slow") && typeof a[0] === "number") {
+    if (a.length >= 1 && (a[1] == null || a[1].mode === "slow") && typeof a[0] === "number") {
       try {
         const t7 = a[0];
         const t8 = $int(t7, 0, 4294967295, "u32");
@@ -1221,7 +1191,7 @@ const $N1 = {
     throw new TypeError("no overload of `opt` matches its arguments");
   },
   fastOnly(...a) {
-    if (a.length >= 1 && $upTo(a, 1) && a[0] === globalThis.Mode.FAST) {
+    if (a.length >= 1 && a[0] === globalThis.Mode.FAST) {
       try {
         const r = $E[29]();
         return (r >>> 0);
@@ -1230,6 +1200,29 @@ const $N1 = {
       }
     }
     throw new TypeError("`fastOnly` doesn't match its arguments");
+  },
+  arity(...a) {
+    if ($upTo(a, 1)) {
+      try {
+        const r = $E[30]();
+        return (r >>> 0);
+      } catch (e) {
+        throw $outgoing(e);
+      }
+    }
+    if (a.length >= 2 && typeof a[0] === "number" && typeof a[1] === "number") {
+      try {
+        const t1 = a[0];
+        const t2 = $int(t1, 0, 4294967295, "u32");
+        const t3 = a[1];
+        const t4 = $int(t3, 0, 4294967295, "u32");
+        const r = $E[31](t2, t4);
+        return (r >>> 0);
+      } catch (e) {
+        throw $outgoing(e);
+      }
+    }
+    throw new TypeError("no overload of `arity` matches its arguments");
   },
 };
 
@@ -1316,7 +1309,9 @@ export function instantiate(language, bridge, imports = {}) {
   $E[27] = $X["util.fast(u32,Any?,Any?)"];
   $E[28] = $X["util.slow(u32,Any?)"];
   $E[29] = $X["util.fastOnly()"];
-  $E[30] = $X["version()"];
+  $E[30] = $X["util.arity0()"];
+  $E[31] = $X["util.arity2(u32,u32)"];
+  $E[32] = $X["version()"];
   $L = new $Lang(instance.exports, { memory: "memory", table: "tw:table", realloc: "tw:realloc", free: "tw:free", talloc: "tw:table/alloc", tfree: "tw:table/free" }, false);
   return instance;
 }

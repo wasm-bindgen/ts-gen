@@ -615,6 +615,12 @@ bridge picks one at runtime. It tests, in order:
 2. constant patterns;
 3. type tests, in declaration order.
 
+An export ignores arguments past its parameters, as a JS function does, so
+arity only chooses between arms: the arm whose parameter count matches,
+else the longest arm the arguments cover. Trailing `undefined`s don't
+count as arguments here. An arm given fewer arguments than its parameters
+doesn't match.
+
 With a single arm, a pattern mismatch throws `TypeError` **even with
 validation disabled**: running the wrong arm would be incorrect, not merely
 unvalidated. Outgoing calls never dispatch, since Wasm picks the overload
@@ -2021,6 +2027,8 @@ export version(): str;
   `default.fetch(Request,Env,ExecutionContext)`, `version()`.
 * Exports are **incoming**: `@js(args)` reads as a pattern, and dispatch
   applies (§7).
+* Arguments past an export's parameters are ignored: the host calls
+  `alarm(alarmInfo)`, and an export declared `alarm()` runs.
 * `export { A as default };` (a list, inside a `module` block) is an
   imported module's export list. The syntax disambiguates the two.
 * The export boundary is the top-level exports. Callbacks aren't entry

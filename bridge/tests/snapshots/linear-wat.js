@@ -36,14 +36,6 @@ function $str(v) {
   return v;
 }
 
-// Whether `a` holds nothing past its first `n` arguments but `undefined`s.
-function $upTo(a, n) {
-  for (let i = n; i < a.length; i++) {
-    if (a[i] !== undefined) return false;
-  }
-  return true;
-}
-
 // A class's value, or null when its path holds no function: its checks
 // then degrade to the interface test, and its arm tests never match (§8).
 function $class(C) {
@@ -505,7 +497,7 @@ function $outgoing(e) {
 }
 const $N0 = {
   listen(...a) {
-    if (a.length >= 2 && $upTo(a, 2)) {
+    if (a.length >= 2) {
       $checkLive();
       try {
         const t1 = a[0];
@@ -521,19 +513,16 @@ const $N0 = {
     throw new TypeError("`listen` doesn't match its arguments");
   },
   forget(...a) {
-    if ($upTo(a, 0)) {
-      $checkLive();
-      try {
-        $E[2]();
-      } catch (e) {
-        throw $outgoing(e);
-      }
-      return;
+    $checkLive();
+    try {
+      $E[2]();
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`forget` doesn't match its arguments");
+    return;
   },
   guarded(...a) {
-    if (a.length >= 2 && $upTo(a, 2)) {
+    if (a.length >= 2) {
       $checkLive();
       const cx = $cx;
       const cxm = cx.n;
@@ -555,16 +544,13 @@ const $N0 = {
     throw new TypeError("`guarded` doesn't match its arguments");
   },
   terminate(...a) {
-    if ($upTo(a, 0)) {
-      $checkLive();
-      try {
-        $E[4]();
-      } catch (e) {
-        throw $outgoing(e);
-      }
-      return;
+    $checkLive();
+    try {
+      $E[4]();
+    } catch (e) {
+      throw $outgoing(e);
     }
-    throw new TypeError("`terminate` doesn't match its arguments");
+    return;
   },
 };
 

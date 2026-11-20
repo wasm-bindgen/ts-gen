@@ -97,6 +97,8 @@ const impl = {
   "util.fast(u32,Any?,Any?)": (...args) => (seen = args, 100),
   "util.slow(u32,Any?)": (...args) => (seen = args, 200),
   "util.fastOnly()": () => 300,
+  "util.arity0()": () => 0,
+  "util.arity2(u32,u32)": (a, b) => a + b,
   "version()": () => L.own("1.0"),
   "tw:call:fn(u32)": (env, x) => {
     calls.push([env, x]);
@@ -130,7 +132,10 @@ L.throwsType(() => new Counter(), /new Counter/);
 L.throwsType(() => c.inc(), /Counter.inc/);
 // Trailing `undefined`s past the parameters are dropped, as WebIDL does.
 assert.equal(L.balanced(() => c.label("n=", undefined, undefined)), "n=9");
-L.throwsType(() => c.label("n=", 2), /Counter.label/);
+// An export ignores arguments past its parameters, as a JS function does.
+assert.equal(L.balanced(() => c.label("n=", 2)), "n=9");
+assert.equal(Counter.zero(1).value, 0);
+assert.equal(new Counter(5, "x").value, 5);
 L.throwsType(() => Counter.prototype.inc.call({}, 1), /Counter/);
 
 // Dispatch: arity, then type tests in declaration order.
@@ -202,6 +207,16 @@ L.throwsType(() => util.opt(1, { mode: "other" }), /no overload of `opt`/);
 assert.equal(util.fastOnly("fast"), 300);
 L.throwsType(() => util.fastOnly("slow"), /fastOnly/);
 L.throwsType(() => util.apply(5, 4), /fn\(u32\)->u32/);
+
+// Arity only chooses between arms: the one whose count matches, else the
+// longest the arguments cover.
+assert.equal(L.balanced(() => version("x")), "1.0");
+assert.equal(util.arity(), 0);
+assert.equal(util.arity(7), 0);
+assert.equal(util.arity(7, undefined), 0);
+assert.equal(util.arity(7, 8), 15);
+assert.equal(util.arity(7, 8, 9), 15);
+L.throwsType(() => util.arity(7, "x"), /no overload of `arity`/);
 
 // Handles reaching JS through imports.
 const t = new Target();
