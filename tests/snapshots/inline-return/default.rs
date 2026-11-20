@@ -43,18 +43,26 @@ extern "C" {
     pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &CursorNextReturn<T>, val: &T);
 }
 impl<T: ::wasm_bindgen::JsGeneric> CursorNextReturn<T> {
-    pub fn new() -> CursorNextReturn<T> {
-        Self::builder().build()
+    pub fn new_typed() -> CursorNextReturn<T> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> CursorNextReturnBuilder<T> {
+    pub fn builder_typed() -> CursorNextReturnBuilder<T> {
         CursorNextReturnBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl CursorNextReturn<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> CursorNextReturnBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<T: ::wasm_bindgen::JsGeneric> Default for CursorNextReturn<T> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct CursorNextReturnBuilder<T: ::wasm_bindgen::JsGeneric> {

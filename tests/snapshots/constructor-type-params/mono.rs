@@ -10,7 +10,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<Value = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<Value>() -> Result<Holder<Value>, JsValue>;
+    pub fn new() -> Result<Holder, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<Value>() -> Result<Holder<Value>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_initial<Value>(initial: Value) -> Result<Holder<Value>, JsValue>
     where
@@ -60,4 +62,34 @@ extern "C" {
     pub fn set_value<T>(this: &Slot<T>, val: T)
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Channel<I = JsString, O = I>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Channel, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<I, O>() -> Result<Channel<I, O>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_capacity(capacity: f64) -> Result<Channel, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_capacity_typed<I, O>(capacity: f64) -> Result<Channel<I, O>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_source_and_capacity<I>(source: I, capacity: f64) -> Result<Channel<I>, JsValue>
+    where
+        I: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_source_and_capacity_typed<I, O>(
+        source: I,
+        capacity: f64,
+    ) -> Result<Channel<I, O>, JsValue>
+    where
+        I: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch)]
+    pub fn send<I, O>(this: &Channel<I, O>, item: I) -> Result<O, JsValue>
+    where
+        I: ::wasm_bindgen::convert::IntoWasmAbi,
+        O: ::wasm_bindgen::convert::FromWasmAbi;
 }

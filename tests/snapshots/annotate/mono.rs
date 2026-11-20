@@ -268,18 +268,24 @@ impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi, Cf: ::wasm_bindgen::convert::In
     Request<Meta, Cf>
 {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Request<Meta, Cf> {
+    pub fn new_typed() -> Request<Meta, Cf> {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
         }
     }
 }
+impl Request<JsValue, Incoming> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+}
 impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi, Cf: ::wasm_bindgen::convert::IntoWasmAbi> Default
     for Request<Meta, Cf>
 {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 #[allow(dead_code)]

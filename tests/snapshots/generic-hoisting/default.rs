@@ -50,6 +50,10 @@ extern "C" {
     >;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(label: &str) -> Result<Envelope, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<Meta: ::wasm_bindgen::JsGeneric, Body: ::wasm_bindgen::JsGeneric>(
+        label: &str,
+    ) -> Result<Envelope<Meta, Body>, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn label<Meta: ::wasm_bindgen::JsGeneric, Body: ::wasm_bindgen::JsGeneric>(
         this: &Envelope<Meta, Body>,

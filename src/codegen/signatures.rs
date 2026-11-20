@@ -874,6 +874,19 @@ pub(crate) fn build_signatures_from(
     names: &mut LocalScope,
     cgctx: Option<&CodegenContext<'_>>,
 ) -> Vec<FunctionSignature> {
+    build_signatures_postfixed(spec, expansions, "", names, cgctx)
+}
+
+/// [`build_signatures_from`] with `postfix` closing every primary name,
+/// which the derived forms then build on (`list_typed`,
+/// `list_typed_promise`, `try_list_typed`).
+pub(crate) fn build_signatures_postfixed(
+    spec: &CallableSpec<'_>,
+    expansions: Vec<ExpandedSignature>,
+    postfix: &str,
+    names: &mut LocalScope,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<FunctionSignature> {
     let base = spec
         .rust_name
         .map_or_else(|| base_rust_name(spec.js_name, spec.kind), ident_chars);
@@ -896,7 +909,10 @@ pub(crate) fn build_signatures_from(
     let mut units: Vec<Unit> = Vec::new();
     for exp in expansions {
         if exp.literal_arms.len() < 2 {
-            let primary_candidate = public_rust_name(&join_suffix(&base, &exp.name_suffix));
+            let primary_candidate = public_rust_name(&format!(
+                "{}{postfix}",
+                join_suffix(&base, &exp.name_suffix)
+            ));
             units.push(Unit {
                 params: exp.params,
                 overload: exp.overload,
@@ -920,7 +936,7 @@ pub(crate) fn build_signatures_from(
                 .map(|l| to_snake_case(l))
                 .collect::<Vec<_>>()
                 .join("_");
-            let candidate = public_rust_name(&format!("{base}_{tag}{}", exp.name_suffix));
+            let candidate = public_rust_name(&format!("{base}_{tag}{}{postfix}", exp.name_suffix));
             let name = names.declare(&candidate, Suffix::Snake);
             match groups.iter_mut().find(|(r, _, _)| *r == ret) {
                 Some((_, _, arms)) => arms.push((literals, name)),
@@ -930,7 +946,10 @@ pub(crate) fn build_signatures_from(
         let shared = groups.len() == 1;
         for (_, overload, arms) in groups {
             let stem = if shared {
-                public_rust_name(&join_suffix(&base, &exp.name_suffix))
+                public_rust_name(&format!(
+                    "{}{postfix}",
+                    join_suffix(&base, &exp.name_suffix)
+                ))
             } else {
                 arms[0].1.clone()
             };
@@ -2633,7 +2652,10 @@ fn mentioned_params(
     }
 }
 
-fn mentions_param(tokens: TokenStream, params: &std::collections::HashSet<String>) -> bool {
+pub(crate) fn mentions_param(
+    tokens: TokenStream,
+    params: &std::collections::HashSet<String>,
+) -> bool {
     tokens.into_iter().any(|t| match t {
         proc_macro2::TokenTree::Ident(i) => params.contains(&i.to_string()),
         proc_macro2::TokenTree::Group(g) => mentions_param(g.stream(), params),

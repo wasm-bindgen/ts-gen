@@ -133,5 +133,5 @@ async fn nullability_async_compile() {
     let _: Result<Option<Registry>, _> = fetch_null().await;
     let _: Result<Option<f64>, _> = fetch_optional().await;
     let _: Result<Option<String>, _> = fetch_both().await;
-    let _: Result<Option<JsString>, _> = fetch_generic::<JsString>().await;
+    let _: Result<Option<JsString>, _> = fetch_generic_typed::<JsString>().await;
 }

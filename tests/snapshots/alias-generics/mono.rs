@@ -16,11 +16,17 @@ extern "C" {
 }
 impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi> Request<Meta> {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Request<Meta> {
+    pub fn new_typed() -> Request<Meta> {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
         }
+    }
+}
+impl Request<JsValue> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self::new_typed()
     }
 }
 #[allow(dead_code)]

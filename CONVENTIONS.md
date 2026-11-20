@@ -2936,38 +2936,39 @@ same convention (see `js_sys::Array::for_each<T: JsGeneric>`).
 
 ### Uninferrable method type parameters
 
-A callable-level parameter that no argument mentions once lowered has
-to be named at every call. That is worth it only where the turbofish
-is itself the cast — the (awaited) return is exactly `T`, `T |
-undefined` or `T | null` — so the rule, per parameter:
+A callable-level parameter that no argument mentions once lowered would
+have to be named at every call, so it gets two bindings: the plain name
+reads it at its default and needs no annotation, and a `_typed` twin
+keeps it for the caller to name. The rule, per parameter:
 
-1. Mentioned by an argument: kept, inferred at the call. A callback
-   counts as it lowers: its parameters and its return count, but a
+1. Mentioned by an argument: kept, inferred at the call, with no twin. A
+   callback counts as it lowers: its parameters and its return count, but a
    callback with a rest parameter is the untyped `Function` and
    mentions nothing. A variadic rest likewise counts as it lowers: by default
    it is `&[JsValue]` and mentions nothing, while under
    `--experimental-generic-mono` a rest array lowers to a slice, so
    `of<T>(...items: T[]): Row<T>` keeps `T` (`fn of<T>(items: &[T]) ->
-   Row<T>`) where the default erases it (`fn of(items: &[JsValue]) ->
-   Row`).
-2. Not mentioned, return exactly `T` / `T | undefined` / `T | null`
-   (awaited): kept — `storage.get::<JsString>(key)`, `body.json::<Row>()`.
-3. Otherwise erased and removed from the signature. The substitute is
-   the default declared by the generic type `T` instantiates in the
-   return (`Row<T = Record<string, unknown>>` → `Object`), else the
-   method's own default (`list<T = unknown>` → `JsValue`), else `any`.
-   A type's default that names that type's own parameters (`U = Box<T>`)
-   is skipped, since those names are unbound in the method.
-   A parameter the return never mentions is simply dropped.
+   Row<T>`) where the default has `of(items: &[JsValue]) -> Row` and
+   `of_typed::<T>`.
+2. Otherwise the plain name reads it as TypeScript infers it with
+   nothing to go on: the default declared by the generic type `T`
+   instantiates in the return (`Row<T = Record<string, unknown>>` →
+   `Object`), else the method's own default (`list<T = unknown>` →
+   `JsValue`), else its class or interface bound (`pick<T extends
+   Cursor>` → `Cursor`), else `any`. A type's default that names that
+   type's own parameters (`U = Box<T>`) is skipped, since those names
+   are unbound in the method.
+3. The `_typed` twin keeps the parameters the return mentions:
+   `storage.get_typed::<JsString>(key)`, `stmt.all_typed::<Row>()`. One
+   the return never mentions is dropped from both, and a twin whose
+   lowered return is the plain one's is left out.
 
-Callers wanting a typed container `unchecked_into` it
-(`D1Result<JsValue>` → `D1Result<Row>`). `try_` companions follow the
-same signature. Each overload of a method or free function applies the
-rule to its own type parameters, and so does each arm of a
-[literal-keyed overload](#inline-wrappers): workers-types'
-`get(key, "json")` keeps `ExpectedValue` as its whole return
-(`get_json::<Row>(key)`), while `getWithMetadata(key, "json")`
-returns `KVNamespaceGetWithMetadataResult` at its defaults.
+`_typed` closes the binding's name, after any `_with_` suffix and before
+the forms derived from it: `first_with_col_name_typed`,
+`list_typed_promise`, `try_scan_typed`. Each overload of a method or free
+function applies the rule to its own type parameters, and so does each
+arm of a [literal-keyed overload](#inline-wrappers): workers-types'
+`get(key, "json")` is `get_json(key)` beside `get_json_typed::<Row>(key)`.
 
 ```ts
 interface Store {
@@ -2982,12 +2983,15 @@ interface Store {
 
 ```rust
 pub async fn put<T: JsGeneric>(this: &Store, key: &str, value: &T) -> Result<(), JsValue>;
-pub async fn get<T: JsGeneric>(this: &Store, key: &str) -> Result<Option<T>, JsValue>
+pub async fn get(this: &Store, key: &str) -> Result<JsValue, JsValue>;
+pub async fn get_typed<T: JsGeneric>(this: &Store, key: &str) -> Result<Option<T>, JsValue>
 where
     Option<T>: FromWasmAbi;
-pub async fn transaction<T: JsGeneric + FromWasmAbi>(this: &Store, closure: &Function<fn(Store) -> Promise>) -> Result<T, JsValue>;
+pub async fn transaction<T: JsGeneric + FromWasmAbi>(this: &Store, closure: &Function<fn(Store) -> Promise<T>>) -> Result<T, JsValue>;
 pub async fn run(this: &Store) -> Result<Row, JsValue>; // Row<Object>, the default
+pub async fn run_typed<T: JsGeneric>(this: &Store) -> Result<Row<T>, JsValue>;
 pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
+pub async fn list_typed<T: JsGeneric>(this: &Store) -> Result<Map<JsString, T>, JsValue>;
 pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> f64;
 ```
 
@@ -3012,9 +3016,7 @@ parameters thread through every site that mentions `Foo`:
   an alias of an erased union) the whole default is `JsValue`, type
   arguments included. Rust accepts defaults only on the type
   definition, so dictionary builders and helper `impl`s keep the plain
-  form and a builder for a defaulted dictionary is named with explicit
-  arguments (`Options::<Box_<JsString>>::builder()`, `Box` being in the
-  prelude).
+  form.
 * Every reference to the type leaves the trailing arguments that equal
   the declared Rust defaults to them, in both modes. `fetch(input:
   RequestInfo)` instantiates `Request<unknown, CfProperties<unknown>>`,
@@ -3053,6 +3055,30 @@ parameters thread through every site that mentions `Foo`:
   ```rust
   pub fn new<C: JsGeneric>(c: &C) -> Result<Chained<JsString, JsString, C>, JsValue>;
   ```
+  A constructor that leaves a parameter at its default also gets a
+  `_typed` twin binding every type-level parameter, for the instance
+  the caller names. wasm-bindgen declares a constructor's type
+  parameters on the type, so that is where they are written:
+  ```rust
+  pub fn new_typed<I: JsGeneric, O: JsGeneric>() -> Result<TransformStream<I, O>, JsValue>;
+  pub fn new_typed<A: JsGeneric, B: JsGeneric, C: JsGeneric>(c: &C) -> Result<Chained<A, B, C>, JsValue>;
+  ```
+  ```rust
+  let plain = TransformStream::new()?;
+  let typed = TransformStream::<Uint8Array, JsString>::new_typed()?;
+  ```
+* A dictionary's `new` and `builder` factories follow the constructor
+  rule: one whose required fields leave a parameter open makes the
+  default instantiation, and `new_typed` / `builder_typed` any other.
+  ```ts
+  interface FetchOptions<Cf = string> { method?: string; cf?: Cf; }
+  ```
+  ```rust
+  let plain: FetchOptions = FetchOptions::builder().method("GET").build();
+  let typed = FetchOptions::<Number>::builder_typed().cf(&cf).build();
+  ```
+  A factory whose arguments mention every parameter stays one generic
+  function (`EvaluationDetails::new(flag_key, &value)`).
 * `extends Foo<X>` lowers to `extends = Foo` — the attribute cannot
   carry generic arguments, and the defaults make the bare head valid.
 * A generic type derives `PartialEq, Eq` like any other imported type.
@@ -3161,8 +3187,9 @@ pub async fn list(this: &KVNamespace) -> Result<KVNamespaceListResult, JsValue>;
 pub fn typed(this: &Env) -> KVNamespace;
 ```
 
-(`list`'s own `Metadata` erases separately, as no argument infers it;
-see [uninferrable type parameters](#uninferrable-method-type-parameters).)
+(`list`'s own `Metadata` reads at its default, as no argument infers it,
+beside `list_typed`; see [uninferrable type
+parameters](#uninferrable-method-type-parameters).)
 
 Method-level parameters follow the same rule
 (`tag<Level extends "info" | "warn">(level: Level)` → `level: &str`).

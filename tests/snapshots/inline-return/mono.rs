@@ -35,18 +35,26 @@ extern "C" {
         T: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> CursorNextReturn<T> {
-    pub fn new() -> CursorNextReturn<T> {
-        Self::builder().build()
+    pub fn new_typed() -> CursorNextReturn<T> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> CursorNextReturnBuilder<T> {
+    pub fn builder_typed() -> CursorNextReturnBuilder<T> {
         CursorNextReturnBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl CursorNextReturn<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> CursorNextReturnBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for CursorNextReturn<T> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct CursorNextReturnBuilder<T> {

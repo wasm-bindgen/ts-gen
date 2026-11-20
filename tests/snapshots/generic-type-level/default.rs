@@ -28,6 +28,8 @@ extern "C" {
     pub type EventTarget<EventMap: ::wasm_bindgen::JsGeneric = Object<Event>>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<EventTarget, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<EventMap: ::wasm_bindgen::JsGeneric>() -> Result<EventTarget<EventMap>, JsValue>;
     #[wasm_bindgen(method, js_name = "dispatchEvent")]
     pub fn dispatch_event<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
@@ -98,18 +100,26 @@ extern "C" {
     );
 }
 impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> Transformer<I, O> {
-    pub fn new() -> Transformer<I, O> {
-        Self::builder().build()
+    pub fn new_typed() -> Transformer<I, O> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> TransformerBuilder<I, O> {
+    pub fn builder_typed() -> TransformerBuilder<I, O> {
         TransformerBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl Transformer<JsValue, JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> TransformerBuilder<JsValue, JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> Default for Transformer<I, O> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct TransformerBuilder<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> {
@@ -139,6 +149,9 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<TransformStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+    ) -> Result<TransformStream<I, O>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_transformer<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
         transformer: &Transformer<I, O>,
     ) -> Result<TransformStream<I, O>, JsValue>;
@@ -163,10 +176,14 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Labelled , catch , js_name = "of")]
     pub fn try_of<T: ::wasm_bindgen::JsGeneric>(value: &T) -> Result<Labelled<T>, JsValue>;
     # [wasm_bindgen (static_method_of = Labelled , catch)]
-    pub async fn load<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+    pub async fn load() -> Result<JsValue, JsValue>;
+    # [wasm_bindgen (static_method_of = Labelled , js_name = "load")]
+    pub fn load_promise() -> Promise;
+    # [wasm_bindgen (static_method_of = Labelled , catch , js_name = "load")]
+    pub async fn load_typed<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
     ) -> Result<T, JsValue>;
     # [wasm_bindgen (static_method_of = Labelled , js_name = "load")]
-    pub fn load_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
+    pub fn load_typed_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Labelled<T>) -> T;
 }
@@ -183,6 +200,14 @@ extern "C" {
     pub fn new<C: ::wasm_bindgen::JsGeneric>(
         c: &C,
     ) -> Result<Chained<JsString, JsString, C>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<
+        A: ::wasm_bindgen::JsGeneric,
+        B: ::wasm_bindgen::JsGeneric,
+        C: ::wasm_bindgen::JsGeneric,
+    >(
+        c: &C,
+    ) -> Result<Chained<A, B, C>, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -190,14 +215,24 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage<Props: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn get<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+    pub async fn get<Props: ::wasm_bindgen::JsGeneric>(
+        this: &Storage<Props>,
+        key: &str,
+    ) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_promise<Props: ::wasm_bindgen::JsGeneric>(
+        this: &Storage<Props>,
+        key: &str,
+    ) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_typed<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
         this: &Storage<Props>,
         key: &str,
     ) -> Result<Option<T>, JsValue>
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_typed_promise<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
         this: &Storage<Props>,
         key: &str,
     ) -> Promise<JsOption<T>>;
@@ -224,11 +259,22 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "loadValue")]
-    pub async fn load_value<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
-    ) -> Result<T, JsValue>;
+    pub async fn load_value() -> Result<JsValue, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "loadValue")]
-    pub fn load_value_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
+    pub fn load_value_promise() -> Promise;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "loadValue")]
+    pub async fn load_value_typed<
+        T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi,
+    >() -> Result<T, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "loadValue")]
+    pub fn load_value_typed_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
 }

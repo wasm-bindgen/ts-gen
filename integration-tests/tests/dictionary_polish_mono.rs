@@ -73,7 +73,7 @@ fn literal_only_parameters_stay_generic() {
 
     // `Rounding<TimeUnit>` narrows its members through the trait's
     // associated types, both reading and writing.
-    let time = Rounding::<TimeUnit>::builder()
+    let time = Rounding::<TimeUnit>::builder_typed()
         .smallest_unit(PluralizeTimeUnit::Minutes)
         .largest_unit(LargestUnitTimeUnit::Hour)
         .increment(5.0)
@@ -107,7 +107,7 @@ fn literal_only_parameters_stay_generic() {
     ));
 
     // An alias of an instantiation, at a literal, is that instantiation.
-    let hourly: HourStepping = Stepped::<Hour>::builder()
+    let hourly: HourStepping = Stepped::<Hour>::builder_typed()
         .smallest_unit(spans::Unit::Hours)
         .step(Hour::Hour)
         .build();
@@ -115,7 +115,7 @@ fn literal_only_parameters_stay_generic() {
 
     // A function its parent doesn't read gets a trait extending the
     // parent's, so the child reads both.
-    let bounded = Bounded::<DayOrHour>::builder()
+    let bounded = Bounded::<DayOrHour>::builder_typed()
         .smallest_unit(PluralizeUnitDayOrHour::Days)
         .maximum_unit(MaximumUnitDayOrHour::None)
         .build();
@@ -144,7 +144,7 @@ fn literal_only_parameters_stay_generic() {
 fn associated_types_resolve_within_their_family() {
     // `Rounding` and `Spanning` both read a `LargestUnit` of `Hour`, each
     // its own.
-    let rounding = Stepped::<Hour>::builder()
+    let rounding = Stepped::<Hour>::builder_typed()
         .largest_unit(LargestUnitHour::Hours)
         .build();
     assert!(matches!(
@@ -192,15 +192,15 @@ fn associated_types_resolve_within_their_family() {
 #[allow(dead_code)]
 fn use_sites_take_their_instantiation(rounder: &Rounder) {
     rounder.round(&Rounding::new());
-    rounder.round_time(&Rounding::<TimeUnit>::new());
-    rounder.round_again(&Rounding::<TimeUnit>::new());
-    rounder.step(&HourStepping::new());
-    rounder.bound(&Bounded::<DayOrHour>::new());
+    rounder.round_time(&Rounding::<TimeUnit>::new_typed());
+    rounder.round_again(&Rounding::<TimeUnit>::new_typed());
+    rounder.step(&HourStepping::new_typed());
+    rounder.bound(&Bounded::<DayOrHour>::new_typed());
     let _: spans::Unit = rounder.clock().now();
     rounder.snap(PluralizeTimeUnit::Hours);
-    rounder.snap_with_to(&Rounding::<TimeUnit>::new());
-    rounder.nudge(&Rounding::<TimeUnit>::new());
-    rounder.nudge_with_rounding(&Rounding::<Hour>::new());
+    rounder.snap_with_to(&Rounding::<TimeUnit>::new_typed());
+    rounder.nudge(&Rounding::<TimeUnit>::new_typed());
+    rounder.nudge_with_rounding(&Rounding::<Hour>::new_typed());
 }
 
 // Compile-only: a merged class reads its literal-only parameter as its
@@ -214,5 +214,5 @@ fn merged_classes_erase_literal_only_parameters(gauge: &Gauge) {
 // instantiates the family at its enum.
 #[allow(dead_code)]
 fn literal_arguments_instantiate_where_evaluation_stops(approx: &Approximate) {
-    approx.fuzzy(&Rounding::<Hour>::new());
+    approx.fuzzy(&Rounding::<Hour>::new_typed());
 }

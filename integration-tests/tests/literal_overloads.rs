@@ -39,7 +39,7 @@ async fn arms_compile(
 #[allow(dead_code)]
 async fn generic_arms_compile(store: &KVStore<JsString>, key: &JsString) -> Result<(), JsValue> {
     let _: Option<String> = store.get_text(key).await?;
-    let _: Option<Object> = store.get_json::<Object>(key).await?;
+    let _: Option<Object> = store.get_json_typed::<Object>(key).await?;
     Ok(())
 }
 

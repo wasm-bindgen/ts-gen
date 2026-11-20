@@ -141,11 +141,15 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Body) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn json<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+    pub async fn json(this: &Body) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "json")]
+    pub fn json_promise(this: &Body) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "json")]
+    pub async fn json_typed<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
         this: &Body,
     ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_promise<T: ::wasm_bindgen::JsGeneric>(this: &Body) -> Promise<T>;
+    pub fn json_typed_promise<T: ::wasm_bindgen::JsGeneric>(this: &Body) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Body) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, js_name = "blob")]

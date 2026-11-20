@@ -246,7 +246,10 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
         defaults: m
             .tparams
             .iter()
-            .map(|p| p.default.as_ref().and_then(|d| ty(cx, d)))
+            .map(|p| {
+                let default = p.default.as_ref().and_then(|d| ty(cx, d));
+                default.or_else(|| bound(cx, p, &m.tparams))
+            })
             .collect(),
         return_type,
         throws,
@@ -254,6 +257,25 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
         members: m.params.iter().map(|p| members(cx, &p.ty)).collect(),
         whole: m.params.iter().map(|p| whole(cx, &p.ty)).collect(),
     })
+}
+
+/// The class or interface bounding `p`, unless it names the callable's
+/// `own` parameters.
+fn bound(cx: &Cx<'_>, p: &abi::TypeParam, own: &[abi::TypeParam]) -> Option<TypeRef> {
+    let Some(abi::Bound::Subtype(t)) = &p.bound else {
+        return None;
+    };
+    let mut names_own = false;
+    t.walk(&mut |t| {
+        if let abi::Type::Named(r) = t {
+            names_own |=
+                matches!(r.path.segments.as_slice(), [n] if own.iter().any(|o| o.name == *n));
+        }
+    });
+    if names_own {
+        return None;
+    }
+    ty(cx, t)
 }
 
 fn whole(cx: &Cx<'_>, t: &abi::Type) -> bool {
