@@ -3329,16 +3329,12 @@ IR's throws enums match ([IR.md §15](IR.md#15-exceptions)), across the output:
 pub enum JsException {
     QuotaError(QuotaError),
     TypeError(TypeError),
+    RangeError(RangeError),
     DOMException(DOMException),
     Error(Error),
     Other(JsValue),
 }
 ```
-
-Every throws enum extends the built-in `err`, so `err`'s `TypeError` and
-its fallback, `Error`, are variants wherever a `@throws` names a type.
-`err` matches `RangeError` with `TypeError`, which no Rust variant can
-hold, so a thrown `RangeError` lands in `Error`.
 
 with `From<JsValue>` (a chain of `dyn_into` checks ending in `Other`),
 `From<JsException> for JsValue`, `AsRef<JsValue>`, `Display` and
@@ -3346,6 +3342,15 @@ with `From<JsValue>` (a chain of `dyn_into` checks ending in `Other`),
 for any other throwable it is `String(value)` (`42`, `null`,
 `[object Object]`), falling back to `Debug` if that conversion throws
 (an object without `toString`). It never panics.
+
+A class a `@throws` names has its own variant, `RangeError` as any other:
+the IR's built-in `err` matches it with `TypeError`, so a throws enum
+naming either has an arm per class instead (`TypeOrRangeErr`). Every
+throws enum falls back to `Error`, so `Error` is a variant wherever a
+`@throws` names a type; one naming neither of the two extends `err`,
+whose `TypeError` is then a variant too. A class no `@throws` names lands
+in its nearest ancestor with a variant: a `RangeError` thrown where only
+`TypeError` is named is an `Error`.
 
 Rules:
 

@@ -43,9 +43,9 @@ pub fn collect_throws_names(ids: &[TypeId], surface: &Surface<'_>) -> Vec<Throws
 
 /// The `@throws` names standing for each error class the IR's throws
 /// enums match (see [`IrDecls::error_classes`]): the parse's own name for
-/// it where one resolves to it, else its declaration's. So a class only
-/// `err` matches, `RangeError`, has no variant, and `err`'s `TypeError`
-/// and `Error` are variants wherever there's a throws enum at all.
+/// it where one resolves to it, else its declaration's. So a class a
+/// `@throws` names has a variant, `RangeError` too, and a throws enum's
+/// fallback, `Error`, is one wherever there's a throws enum at all.
 ///
 /// [`IrDecls::error_classes`]: crate::codegen::from_ir::IrDecls::error_classes
 pub fn ir_throws_names(
@@ -683,6 +683,49 @@ mod tests {
             assert_eq!(idents.len(), count, "{idents:?}");
             assert!(ctx.take_diagnostics().diagnostics.is_empty());
         });
+    }
+
+    /// The variants of the enum the whole pipeline emits for `src`, through
+    /// the IR's throws enums.
+    fn emitted_variants(src: &str) -> Vec<String> {
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let options = GenerateOptions::new().error_enum("JsException");
+        let code = crate::codegen::generate_with_options(&module, &gctx, &options).unwrap();
+        let file = syn::parse_file(&code).unwrap();
+        file.items
+            .iter()
+            .find_map(|item| match item {
+                syn::Item::Enum(e) if e.ident == "JsException" => {
+                    Some(e.variants.iter().map(|v| v.ident.to_string()).collect())
+                }
+                _ => None,
+            })
+            .unwrap()
+    }
+
+    #[test]
+    fn a_named_range_error_keeps_its_variant() {
+        // The IR's built-in `err` matches `RangeError` with `TypeError`, so
+        // a `@throws` naming either has an arm per class of its own.
+        let throws = |ty: &str| {
+            emitted_variants(&format!(
+                "/** @throws {{{ty}}} */ declare function f(): void;"
+            ))
+        };
+        assert_eq!(throws("RangeError"), ["RangeError", "Error", "Other"]);
+        assert_eq!(
+            throws("TypeError | RangeError"),
+            ["TypeError", "RangeError", "Error", "Other"]
+        );
+        assert_eq!(
+            emitted_variants(
+                "declare class Fault extends Error {}
+                 /** @throws {Fault | RangeError} */ declare function f(): void;"
+            ),
+            ["RangeError", "Fault", "Error", "Other"]
+        );
+        // One no `@throws` names is an `Error`.
+        assert_eq!(throws("TypeError"), ["TypeError", "Error", "Other"]);
     }
 
     #[test]

@@ -41,8 +41,7 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
-    #[doc = " Classes the built-in `err` matches: `TypeError` keeps its variant, and"]
-    #[doc = " a `RangeError` lands in `Error`."]
+    #[doc = " A union keeps both classes instead of collapsing to `Error`."]
     #[doc = ""]
     #[doc = " ## Errors"]
     #[doc = ""]
