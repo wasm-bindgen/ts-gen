@@ -175,6 +175,14 @@ for (const init of [null, {}]) {
   L.call("future:drop", f);
   assert.ok(api.init.signal.aborted);
 }
+// An overload without the init cancels through one the bridge makes.
+api.init = undefined;
+f = L.call("Api#short(str)", api, ...L.str("u"));
+assert.equal(poll(f, 13), 0);
+assert.deepEqual(Object.keys(api.init), ["signal"]);
+assert.ok(!api.init.signal.aborted);
+L.call("future:drop", f);
+assert.ok(api.init.signal.aborted);
 
 // A future the language holds reaches JS as its promise.
 const p = Promise.resolve(3);

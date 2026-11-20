@@ -2619,9 +2619,17 @@ impl<'a, 'b> Glue<'a, 'b> {
         // The longest prefix naming a declaration.
         for n in (1..=path.len()).rev() {
             let p = Path::new(path[..n].iter().cloned());
-            if let Some((loc, TypeDecl::Class(_))) = self.l.keys.symbols.resolve_decl(&p, cx) {
-                let c = self.decl_value(&loc)?;
+            if let Some((loc, TypeDecl::Class(class))) = self.l.keys.symbols.resolve_decl(&p, cx) {
                 let rest = &path[n..];
+                // `@js(object) new()` is a plain object, of no JS class.
+                let object = class.members.iter().any(|m| {
+                    matches!(m.kind, MemberKind::New(None))
+                        && m.meta.attrs.js.iter().any(|j| matches!(j, JsEntry::Object))
+                });
+                if object && call_args.is_some() && matches!(rest, [m] if m == "new") {
+                    return Ok("{}".into());
+                }
+                let c = self.decl_value(&loc)?;
                 return Ok(match (rest, call_args) {
                     ([m], Some(a)) if m == "new" => format!("new {c}({})", a.join(", ")),
                     (rest, a) => {

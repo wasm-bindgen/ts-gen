@@ -799,21 +799,27 @@ function $f3(w0_0, w0_1) {
   return t2;
 }
 
+// ("tw:js/global", "Init.new()")
+function $f4() {
+  const r = {};
+  return r;
+}
+
 // ("tw:js/global", "Init#get:signal()")
-function $f4(w0_0) {
+function $f5(w0_0) {
   const r = w0_0.signal;
   const t1 = (r == null ? null : $instance(r, $cls0, "AbortSignal?"));
   return t1;
 }
 
 // ("tw:js/global", "Init#set:signal(AbortSignal)")
-function $f5(w0_0, w1_0) {
+function $f6(w0_0, w1_0) {
   w0_0.signal = w1_0;
   undefined;
 }
 
 // ("tw:js/global", "Api#fetch(str)")
-function $f6(w0_0, w1_0, w1_1) {
+function $f7(w0_0, w1_0, w1_1) {
   const t1 = $liftUtf8($L, w1_0, w1_1);
   try {
     const r = w0_0.fetch(t1);
@@ -825,7 +831,7 @@ function $f6(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Api#slow(str)")
-function $f7(w0_0, w1_0, w1_1) {
+function $f8(w0_0, w1_0, w1_1) {
   const t1 = $liftUtf8($L, w1_0, w1_1);
   try {
     const t2 = new globalThis.AbortController();
@@ -840,7 +846,7 @@ function $f7(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Api#joined(str,Init?)")
-function $f8(w0_0, w1_0, w1_1, w2_0) {
+function $f9(w0_0, w1_0, w1_1, w2_0) {
   const t1 = $liftUtf8($L, w1_0, w1_1);
   const t2 = (w2_0 ?? undefined);
   try {
@@ -858,8 +864,27 @@ function $f8(w0_0, w1_0, w1_1, w2_0) {
   }
 }
 
+// ("tw:js/global", "Api#short(str)")
+function $f10(w0_0, w1_0, w1_1) {
+  const t1 = $liftUtf8($L, w1_0, w1_1);
+  try {
+    const t2 = {};
+    const t3 = new globalThis.AbortController();
+    const t4 = { ...t2 };
+    const t5 = t3.signal;
+    if (t5 !== undefined) t4.signal = t5;
+    const t6 = w0_0.joined(t1, t4);
+    const t7 = $future(t6, $h3, () => { t3.abort(); });
+    const r = t7;
+    const t8 = $future(r, $h3);
+    return t8;
+  } catch (e) {
+    return $rejected(e);
+  }
+}
+
 // ("tw:js/global", "Api#number()")
-function $f9(w0_0) {
+function $f11(w0_0) {
   try {
     const r = w0_0.number();
     const t1 = $future(r, $h3);
@@ -870,7 +895,7 @@ function $f9(w0_0) {
 }
 
 // ("tw:js/global", "Api#nothing()")
-function $f10(w0_0) {
+function $f12(w0_0) {
   try {
     const r = w0_0.nothing();
     const t1 = $future(r, null);
@@ -881,7 +906,7 @@ function $f10(w0_0) {
 }
 
 // ("tw:js/global", "Api#forever()")
-function $f11(w0_0) {
+function $f13(w0_0) {
   try {
     const r = w0_0.forever();
     const t1 = $future(r, $neverResolves);
@@ -892,7 +917,7 @@ function $f11(w0_0) {
 }
 
 // ("tw:js/global", "Api#strict()")
-function $f12(w0_0) {
+function $f14(w0_0) {
   try {
     const r = w0_0.strict();
     const t1 = $future(r, $h3);
@@ -904,24 +929,24 @@ function $f12(w0_0) {
 }
 
 // ("tw:js/global", "Api#give(future<u32>)")
-function $f13(w0_0, w1_0) {
+function $f15(w0_0, w1_0) {
   const t1 = $promise(w1_0);
   w0_0.give(t1);
 }
 
 // ("tw:js/global", "Api#later(fn(u32)->future<u32>)")
-function $f14(w0_0, w1_0) {
+function $f16(w0_0, w1_0) {
   const t1 = $h5(w1_0);
   w0_0.later(t1);
 }
 
 // ("tw:future", "poll")
-function $f15(f, w) {
+function $f17(f, w) {
   return $poll(f, w);
 }
 
 // ("tw:future", "take<str>")
-function $f16(w0_0) {
+function $f18(w0_0) {
   const v = $settled(w0_0, 1);
   const cx = $cx;
   const cxm = cx.n;
@@ -941,7 +966,7 @@ function $f16(w0_0) {
 }
 
 // ("tw:future", "take<u32>")
-function $f17(w0_0) {
+function $f19(w0_0) {
   const v = $settled(w0_0, 1);
   const cx = $cx;
   const cxm = cx.n;
@@ -957,61 +982,61 @@ function $f17(w0_0) {
 }
 
 // ("tw:future", "take<unit>")
-function $f18(w0_0) {
+function $f20(w0_0) {
   const v = $settled(w0_0, 1);
 }
 
 // ("tw:future", "error<FetchError>")
-function $f19(w0_0) {
+function $f21(w0_0) {
   return $h7($settled(w0_0, 2));
 }
 
-function $f19$r(a0) {
-  const r = $f19(a0);
+function $f21$r(a0) {
+  const r = $f21(a0);
   const ra = $ret();
   ra.i32[0] = r[0];
   return r[1];
 }
 
 // ("tw:future", "error<err>")
-function $f20(w0_0) {
+function $f22(w0_0) {
   return $h4($settled(w0_0, 2));
 }
 
-function $f20$r(a0) {
-  const r = $f20(a0);
+function $f22$r(a0) {
+  const r = $f22(a0);
   const ra = $ret();
   ra.i32[0] = r[0];
   return r[1];
 }
 
 // ("tw:future", "drop")
-function $f21(f) {
+function $f23(f) {
   $dropFuture(f);
 }
 
 // ("tw:future", "new")
-function $f22() {
+function $f24() {
   return $newFuture();
 }
 
 // ("tw:future", "resolve<u32>")
-function $f23(w0_0, w1_0) {
+function $f25(w0_0, w1_0) {
   $resolver(w0_0).resolve((w1_0 >>> 0));
 }
 
 // ("tw:future", "reject<err>")
-function $f24(w0_0, w1_0, w1_1) {
+function $f26(w0_0, w1_0, w1_1) {
   $resolver(w0_0).reject($h8(w1_0, w1_1));
 }
 
 // ("tw:loop", "work_available")
-function $f25(l) {
+function $f27(l) {
   $loops.available(l);
 }
 
 // ("tw:loop", "drop")
-function $f26(l) {
+function $f28(l) {
   $loops.drop(l);
 }
 
@@ -1060,7 +1085,7 @@ export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.AbortSignal);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { r16: $f16, r19: $f19$r, r20: $f20$r },
+    "tw:glue": { r18: $f18, r21: $f21$r, r22: $f22$r },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -1070,33 +1095,35 @@ export function instantiate(language, bridge, imports = {}) {
       "AbortController#get:signal()": $f1,
       "AbortController#abort()": $f2,
       "AbortSignal.any(arr<AbortSignal>)": $f3,
-      "Init#get:signal()": $f4,
-      "Init#set:signal(AbortSignal)": $f5,
-      "Api#fetch(str)": $f6,
-      "Api#slow(str)": $f7,
-      "Api#joined(str,Init?)": $f8,
-      "Api#number()": $f9,
-      "Api#nothing()": $f10,
-      "Api#forever()": $f11,
-      "Api#strict()": $f12,
-      "Api#give(future<u32>)": $f13,
-      "Api#later(fn(u32)->future<u32>)": $f14,
+      "Init.new()": $f4,
+      "Init#get:signal()": $f5,
+      "Init#set:signal(AbortSignal)": $f6,
+      "Api#fetch(str)": $f7,
+      "Api#slow(str)": $f8,
+      "Api#joined(str,Init?)": $f9,
+      "Api#short(str)": $f10,
+      "Api#number()": $f11,
+      "Api#nothing()": $f12,
+      "Api#forever()": $f13,
+      "Api#strict()": $f14,
+      "Api#give(future<u32>)": $f15,
+      "Api#later(fn(u32)->future<u32>)": $f16,
     },
     "tw:future": {
-      "poll": $f15,
-      "take<str>": $B.f16,
-      "take<u32>": $f17,
-      "take<unit>": $f18,
-      "error<FetchError>": $B.f19,
-      "error<err>": $B.f20,
-      "drop": $f21,
-      "new": $f22,
-      "resolve<u32>": $f23,
-      "reject<err>": $f24,
+      "poll": $f17,
+      "take<str>": $B.f18,
+      "take<u32>": $f19,
+      "take<unit>": $f20,
+      "error<FetchError>": $B.f21,
+      "error<err>": $B.f22,
+      "drop": $f23,
+      "new": $f24,
+      "resolve<u32>": $f25,
+      "reject<err>": $f26,
     },
     "tw:loop": {
-      "work_available": $f25,
-      "drop": $f26,
+      "work_available": $f27,
+      "drop": $f28,
     },
     "tw:tag": {
       "err": $tag0,
