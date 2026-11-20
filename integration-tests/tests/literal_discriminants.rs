@@ -2,7 +2,7 @@
 
 use ts_gen_integration_tests::literal_discriminants::{
     count, direction, flag, level, ratio, repeat, size, wide, DirectionKind, Feedback,
-    FeedbackValueKind, FlagKind, KeepAliveKind, Options, RepeatKind, Scaled, SizeKind,
+    FeedbackValueKind, FlagKind, LevelKind, Options, RepeatKind, Scaled, SizeKind,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -15,7 +15,7 @@ fn literal_discriminants_compile(feedback: &Feedback) {
     let _: Scaled = Scaled::new_0_5();
 
     match level() {
-        KeepAliveKind::N0 | KeepAliveKind::N1 | KeepAliveKind::N2 => {}
+        LevelKind::N0 | LevelKind::N1 | LevelKind::N2 => {}
     }
     match direction() {
         DirectionKind::Neg1 | DirectionKind::N0 | DirectionKind::N1 => {}

@@ -301,13 +301,18 @@ impl ClassConfig<'_> {
         names
     }
 
-    /// The enum a property's setter shares with its getter; see
-    /// [`super::typemap::setter_enum`].
-    fn setter_enum(&self, js_name: &str, ty: &TypeRef) -> Option<super::typemap::SetterEnum> {
+    /// The enum a property's setter shares with its getter, read in the
+    /// property's own `scope`; see [`super::typemap::setter_enum`].
+    fn setter_enum(
+        &self,
+        js_name: &str,
+        ty: &TypeRef,
+        scope: ScopeId,
+    ) -> Option<super::typemap::SetterEnum> {
         super::typemap::setter_enum(
             ty,
             self.cgctx,
-            self.scope,
+            scope,
             &self.from_module(),
             super::typemap::ReturnAnchor {
                 base: js_name,
@@ -324,13 +329,14 @@ impl ClassConfig<'_> {
         js_name: &str,
         ty: &TypeRef,
         slice_mode: Option<crate::ir::SliceModeHint>,
+        scope: ScopeId,
     ) -> crate::ir::Param {
         // A property retains its value, which a view wouldn't outlive.
         let slice_mode = slice_mode.map(|m| match m {
             crate::ir::SliceModeHint::View => crate::ir::SliceModeHint::Copy,
             m => m,
         });
-        let mut type_ref = match self.setter_enum(js_name, ty) {
+        let mut type_ref = match self.setter_enum(js_name, ty, scope) {
             Some(e) => e.param_type(),
             None => ty.clone(),
         };
@@ -1212,7 +1218,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         ) else {
             return Vec::new();
         };
-        let setter_param = config.setter_param(&g.js_name, &ty, slice_mode);
+        let setter_param = config.setter_param(&g.js_name, &ty, slice_mode, g.scope);
         let mut setter_used = LocalScope::default();
         let void = crate::ir::TypeRef::Void;
         // An inherited member's associated type reads through this type's
@@ -1344,7 +1350,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             };
             let setter_enum = named_enum
                 .is_none()
-                .then(|| config.setter_enum(&g.js_name, &assigned_type(g)))
+                .then(|| config.setter_enum(&g.js_name, &assigned_type(g), g.scope))
                 .flatten();
             let any_literal = members.iter().any(|m| {
                 matches!(
@@ -3003,10 +3009,9 @@ fn setter_type(
     }
     // An associated type, or its row, which the parse reads through a
     // projection.
-    if let Some(t) = ir
-        .as_ref()
-        .filter(|t| *t != ty && (config.reads_assoc(t) || config.setter_enum(js_name, t).is_some()))
-    {
+    if let Some(t) = ir.as_ref().filter(|t| {
+        *t != ty && (config.reads_assoc(t) || config.setter_enum(js_name, t, scope).is_some())
+    }) {
         return Some(t.clone());
     }
     // The parse's literals route through the getter's enum, unless the IR
@@ -3014,7 +3019,7 @@ fn setter_type(
     let named = ir
         .as_ref()
         .is_some_and(|t| matches!(t.without_undefined(), TypeRef::Reference { .. }));
-    if slice_mode.is_some() || !named && config.setter_enum(js_name, ty).is_some() {
+    if slice_mode.is_some() || !named && config.setter_enum(js_name, ty, scope).is_some() {
         return Some(ty.clone());
     }
     Some(ir.unwrap_or_else(|| ty.clone()))
@@ -3046,7 +3051,7 @@ fn generate_setter(
             config.js_name, setter.js_name
         ));
     }
-    let param = config.setter_param(&setter.js_name, &ty, setter.slice_mode);
+    let param = config.setter_param(&setter.js_name, &ty, setter.slice_mode, setter.scope);
 
     let void = crate::ir::TypeRef::Void;
     let overloads = [Overload {
@@ -3230,7 +3235,7 @@ fn generate_static_setter(
     ) else {
         return Vec::new();
     };
-    let param = config.setter_param(&setter.js_name, &ty, None);
+    let param = config.setter_param(&setter.js_name, &ty, None, setter.scope);
 
     let void = crate::ir::TypeRef::Void;
     let overloads = [Overload {

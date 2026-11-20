@@ -35325,7 +35325,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
     pub fn set_cf_aig_metadata_with_str(this: &AIGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
-    pub fn cf_aig_custom_cost(this: &AIGatewayHeaders) -> PostProcessedOutputsKind;
+    pub fn cf_aig_custom_cost(this: &AIGatewayHeaders) -> CfAigCustomCostKind;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
     pub fn set_cf_aig_custom_cost(
         this: &AIGatewayHeaders,
@@ -60662,7 +60662,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
     pub fn set_cf_aig_metadata_with_str(this: &PartialAiGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
-    pub fn cf_aig_custom_cost(this: &PartialAiGatewayHeaders) -> Option<PostProcessedOutputsKind>;
+    pub fn cf_aig_custom_cost(this: &PartialAiGatewayHeaders) -> Option<CfAigCustomCostKind>;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
     pub fn set_cf_aig_custom_cost(
         this: &PartialAiGatewayHeaders,
@@ -61796,7 +61796,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilterOpMap;
     #[wasm_bindgen(method, getter, js_name = "$eq")]
-    pub fn eq(this: &VectorizeVectorMetadataFilterOpMap) -> Option<StrOrF64OrBool>;
+    pub fn eq(
+        this: &VectorizeVectorMetadataFilterOpMap,
+    ) -> Option<ExcludeVectorizeVectorMetadataValueStringArray>;
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     pub fn set_eq(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$eq")]
@@ -61806,7 +61808,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$eq")]
     fn __set_eq_with_null(this: &VectorizeVectorMetadataFilterOpMap, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$ne")]
-    pub fn ne(this: &VectorizeVectorMetadataFilterOpMap) -> Option<StrOrF64OrBool>;
+    pub fn ne(
+        this: &VectorizeVectorMetadataFilterOpMap,
+    ) -> Option<ExcludeVectorizeVectorMetadataValueStringArray>;
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     pub fn set_ne(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$ne")]
@@ -61816,7 +61820,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$ne")]
     fn __set_ne_with_null(this: &VectorizeVectorMetadataFilterOpMap, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lt")]
-    pub fn lt(this: &VectorizeVectorMetadataFilterOpMap) -> Option<StrOrF64OrBool>;
+    pub fn lt(
+        this: &VectorizeVectorMetadataFilterOpMap,
+    ) -> Option<ExcludeVectorizeVectorMetadataValueStringArray>;
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     pub fn set_lt(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$lt")]
@@ -61826,7 +61832,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$lt")]
     fn __set_lt_with_null(this: &VectorizeVectorMetadataFilterOpMap, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$lte")]
-    pub fn lte(this: &VectorizeVectorMetadataFilterOpMap) -> Option<StrOrF64OrBool>;
+    pub fn lte(
+        this: &VectorizeVectorMetadataFilterOpMap,
+    ) -> Option<ExcludeVectorizeVectorMetadataValueStringArray>;
     #[wasm_bindgen(method, setter, js_name = "$lte")]
     pub fn set_lte(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$lte")]
@@ -61839,7 +61847,9 @@ extern "C" {
         val: &::wasm_bindgen::JsValue,
     );
     #[wasm_bindgen(method, getter, js_name = "$gt")]
-    pub fn gt(this: &VectorizeVectorMetadataFilterOpMap) -> Option<StrOrF64OrBool>;
+    pub fn gt(
+        this: &VectorizeVectorMetadataFilterOpMap,
+    ) -> Option<ExcludeVectorizeVectorMetadataValueStringArray>;
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     pub fn set_gt(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$gt")]
@@ -61849,7 +61859,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$gt")]
     fn __set_gt_with_null(this: &VectorizeVectorMetadataFilterOpMap, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter, js_name = "$gte")]
-    pub fn gte(this: &VectorizeVectorMetadataFilterOpMap) -> Option<StrOrF64OrBool>;
+    pub fn gte(
+        this: &VectorizeVectorMetadataFilterOpMap,
+    ) -> Option<ExcludeVectorizeVectorMetadataValueStringArray>;
     #[wasm_bindgen(method, setter, js_name = "$gte")]
     pub fn set_gte(this: &VectorizeVectorMetadataFilterOpMap, val: &str);
     #[wasm_bindgen(method, setter, js_name = "$gte")]
@@ -62653,6 +62665,12 @@ pub enum RecordOrStr {
     String(String),
     Record(Object),
 }
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum CfAigCustomCostKind {
+    String(String),
+    Object(Object),
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum F64OrStr {
@@ -63053,4 +63071,11 @@ pub enum RequestInitCfPropertiesImageTrimBorderKind {
 pub enum ImageTransformTrimBorderKind {
     Bool(bool),
     ImageTransformTrimBorder(ImageTransformTrimBorder),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum ExcludeVectorizeVectorMetadataValueStringArray {
+    String(String),
+    F64(f64),
+    Bool(bool),
 }

@@ -113,7 +113,7 @@ impl ScaledBuilder {
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn level() -> Result<KeepAliveKind, JsValue>;
+    pub fn level() -> Result<LevelKind, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
@@ -170,6 +170,13 @@ extern "C" {
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeepAliveKind {
+    N0 = 0,
+    N1 = 1,
+    N2 = 2,
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LevelKind {
     N0 = 0,
     N1 = 1,
     N2 = 2,

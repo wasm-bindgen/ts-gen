@@ -266,6 +266,10 @@ pub struct CodegenContext<'a> {
     /// The IR's names for the unions it synthesises an enum for, by their
     /// members, which a synthesised enum takes over its anchor's.
     ir_enum_names: RefCell<HashMap<Vec<String>, String>>,
+    /// The IR's name for a union's enum by the scope it's first read
+    /// in, which every read of the union there takes: the IR names an
+    /// enum for its use, so the same members have one per use.
+    ir_enum_uses: RefCell<HashMap<(ScopeId, Vec<String>), String>>,
     /// Each union alias's `<Alias>Kind` and the Rust modules declaring it,
     /// which can share it, as they don't clash.
     alias_kinds: RefCell<HashMap<String, Vec<ModuleContext>>>,
@@ -1167,6 +1171,7 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             ir_enum_names: RefCell::default(),
+            ir_enum_uses: RefCell::default(),
             alias_kinds: RefCell::default(),
             naming_module: RefCell::new(ModuleContext::Global),
             error_type,
@@ -1239,6 +1244,7 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             ir_enum_names: RefCell::default(),
+            ir_enum_uses: RefCell::default(),
             alias_kinds: RefCell::default(),
             naming_module: RefCell::new(ModuleContext::Global),
             error_type: None,
@@ -1294,10 +1300,22 @@ impl<'a> CodegenContext<'a> {
         scope: ScopeId,
         from_module: &ModuleContext,
     ) -> String {
+        let source: Vec<String> = source.iter().map(format_type_ref_key).collect();
+        let named = self
+            .ir_enum_uses
+            .borrow()
+            .get(&(scope, source.clone()))
+            .or(self.ir_enum_names.borrow().get(&source))
+            .cloned();
         let members = &arms.members;
         let mut key: Vec<String> = members.iter().map(format_type_ref_key).collect();
         if arms.fallback {
             key.push("fallback".to_string());
+        }
+        // The IR's enums of the same members, each named for its use, are
+        // one enum each.
+        if let Some(name) = &named {
+            key.push(format!("#{name}"));
         }
         let key = DynamicUnionKey(key);
         let mut reg = self.dynamic_unions.borrow_mut();
@@ -1309,8 +1327,6 @@ impl<'a> CodegenContext<'a> {
             }
             return info.rust_name.clone();
         }
-        let source: Vec<String> = source.iter().map(format_type_ref_key).collect();
-        let named = self.ir_enum_names.borrow().get(&source).cloned();
         // The IR's enum for these members in another order.
         if let Some(name) = &named {
             if reg.by_key.values().any(|info| &info.rust_name == name) {
@@ -1345,7 +1361,15 @@ impl<'a> CodegenContext<'a> {
             TypeRef::PropertyKey => TypeRef::property_key_members(),
             _ => return,
         };
-        let key = members.iter().map(format_type_ref_key).collect();
+        let key: Vec<String> = members.iter().map(format_type_ref_key).collect();
+        self.name_ir_enum(key, scope, name);
+    }
+
+    fn name_ir_enum(&self, key: Vec<String>, scope: ScopeId, name: &str) {
+        self.ir_enum_uses
+            .borrow_mut()
+            .entry((scope, key.clone()))
+            .or_insert_with(|| name.to_string());
         self.ir_enum_names
             .borrow_mut()
             .entry(key)
@@ -1366,10 +1390,7 @@ impl<'a> CodegenContext<'a> {
         // A family's argument can be one literal (`Rounding<"hour">`).
         let arms = match members.as_slice() {
             [one] => {
-                self.ir_enum_names
-                    .borrow_mut()
-                    .entry(vec![format_type_ref_key(one)])
-                    .or_insert_with(|| name.to_string());
+                self.name_ir_enum(vec![format_type_ref_key(one)], scope, name);
                 ReadArms {
                     members: members.clone(),
                     fallback: false,
