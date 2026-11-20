@@ -17,6 +17,7 @@ use crate::text::{name, quote};
 
 pub struct Keys<'a> {
     ir: &'a Ir,
+    libs: Vec<&'a Ir>,
     pub symbols: Symbols<'a>,
     /// The aliases [`Keys::ty`] is spelling the expansion of.
     expanding: RefCell<Vec<Location>>,
@@ -67,6 +68,7 @@ impl<'a> Keys<'a> {
     pub fn with_libs(ir: &'a Ir, libs: &[&'a Ir]) -> Keys<'a> {
         Keys {
             ir,
+            libs: libs.to_vec(),
             symbols: Symbols::with_libs(ir, libs),
             expanding: RefCell::new(Vec::new()),
         }
@@ -222,6 +224,16 @@ impl<'a> Keys<'a> {
     pub fn members(&self) -> Vec<Keyed<'a>> {
         let mut out = Vec::new();
         self.walk(&self.ir.items, &Context::default(), false, None, &mut out);
+        out
+    }
+
+    /// The members of the libs: imports the lib's bindings share with the
+    /// IR's (§5).
+    pub fn lib_members(&self) -> Vec<Keyed<'a>> {
+        let mut out = Vec::new();
+        for lib in &self.libs {
+            self.walk(&lib.items, &Context::default(), false, None, &mut out);
+        }
         out
     }
 

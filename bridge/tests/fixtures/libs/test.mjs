@@ -1,7 +1,7 @@
 import { assert, lang } from "./harness.mjs";
 
-// `Date` comes from the std lib: a JS value like the IR's own classes, with
-// no glue of its own here.
+// `Date` comes from the std lib: a JS value like the IR's own classes. Its
+// members are imports like the IR's own too.
 class Event {
   get stamp() {
     return this.next;
@@ -23,4 +23,5 @@ assert.equal(L.call("Event#get:stamp()", e), d);
 e.next = {};
 L.throwsType(() => L.call("Event#get:stamp()", e), /Date/);
 assert.equal(L.call("Event#at(Date)", e, d), 5);
+assert.equal(L.call("Date#getTime()", d), 5);
 console.log("done");

@@ -305,7 +305,7 @@ fn passthrough(ir: &Ir, libs: &[Ir], profile: &Profile, protocol: &str) -> Strin
         };
         export(name, &f, &mut imports, &mut funcs);
     }
-    for k in keys.members() {
+    for k in keys.members().into_iter().chain(keys.lib_members()) {
         let Role::Import(module) = &k.role else {
             continue;
         };
