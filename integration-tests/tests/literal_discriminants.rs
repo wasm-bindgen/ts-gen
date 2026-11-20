@@ -1,8 +1,8 @@
 #![cfg(target_arch = "wasm32")]
 
 use ts_gen_integration_tests::literal_discriminants::{
-    count, direction, flag, level, ratio, repeat, size, wide, DirectionKind, Feedback,
-    FeedbackValueKind, FlagKind, LevelKind, Options, RepeatKind, Scaled, SizeKind,
+    count, direction, flag, level, ratio, repeat, size, wide, DirectionReturn, Feedback,
+    FeedbackValue, FlagKind, LevelReturn, Options, RepeatKind, Scaled, SizeKind,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -15,13 +15,13 @@ fn literal_discriminants_compile(feedback: &Feedback) {
     let _: Scaled = Scaled::new_0_5();
 
     match level() {
-        LevelKind::N0 | LevelKind::N1 | LevelKind::N2 => {}
+        LevelReturn::N0 | LevelReturn::N1 | LevelReturn::N2 => {}
     }
     match direction() {
-        DirectionKind::Neg1 | DirectionKind::N0 | DirectionKind::N1 => {}
+        DirectionReturn::Neg1 | DirectionReturn::N0 | DirectionReturn::N1 => {}
     }
     match feedback.value() {
-        Some(FeedbackValueKind::Neg1 | FeedbackValueKind::N1) | None => {}
+        Some(FeedbackValue::Neg1 | FeedbackValue::N1) | None => {}
     }
 
     let _: f64 = ratio();

@@ -4,8 +4,9 @@ use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Object, Promise};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::literal_overloads::{
-    pick_free, pick_free_with_null, AOrB, Boxed, Clash, ClashKind, Headers, KVNamespace,
-    KVNamespaceKind, KVStore, Opener, Picker, Repeats, SubtleCrypto,
+    pick_free, pick_free_with_null, Boxed, BoxedKind, Clash, ClashFKind, ClashKind, Headers,
+    KVNamespace, KVNamespaceKind, KVStore, KVStoreKind, Opener, OpenerKind, PickFreeKind, Picker,
+    PickerKind, Repeats, SubtleCrypto,
 };
 
 // No backing JavaScript module; compile-only coverage that a literal union
@@ -46,14 +47,14 @@ async fn generic_arms_compile(store: &KVStore<JsString>, key: &JsString) -> Resu
 // pass `null` themselves, under `_with_null` names.
 #[allow(dead_code)]
 fn null_arms_compile(picker: &Picker, buf: &ArrayBuffer, obj: &Object) -> Result<(), JsValue> {
-    picker.pick(AOrB::A, buf);
-    picker.pick_with_null(AOrB::B);
-    picker.try_pick_with_null(AOrB::A)?;
-    let _: Picker = Picker::make(AOrB::A, "x");
-    let _: Picker = Picker::make_with_null(AOrB::B);
-    let _: Result<Picker, JsValue> = Picker::try_make_with_null(AOrB::A);
-    picker.put(AOrB::A, obj);
-    picker.put_with_null(AOrB::B);
+    picker.pick(PickerKind::A, buf);
+    picker.pick_with_null(PickerKind::B);
+    picker.try_pick_with_null(PickerKind::A)?;
+    let _: Picker = Picker::make(PickerKind::A, "x");
+    let _: Picker = Picker::make_with_null(PickerKind::B);
+    let _: Result<Picker, JsValue> = Picker::try_make_with_null(PickerKind::A);
+    picker.put(PickerKind::A, obj);
+    picker.put_with_null(PickerKind::B);
     Ok(())
 }
 
@@ -68,10 +69,10 @@ fn repeated_literal_compiles(repeats: &Repeats) {
 // A generic class's statics taking an enum.
 #[allow(dead_code)]
 fn generic_class_arms_compile(obj: &Object) -> Result<(), JsValue> {
-    let _: String = Boxed::label(AOrB::A);
-    let _: Boxed<Object> = Boxed::of(AOrB::B, obj);
-    let _: Boxed<Object> = Boxed::of(AOrB::A, obj);
-    let _: Boxed = Boxed::new(AOrB::A)?;
+    let _: String = Boxed::label(BoxedKind::A);
+    let _: Boxed<Object> = Boxed::of(BoxedKind::B, obj);
+    let _: Boxed<Object> = Boxed::of(BoxedKind::A, obj);
+    let _: Boxed = Boxed::new(BoxedKind::A)?;
     Ok(())
 }
 
@@ -87,27 +88,27 @@ async fn null_arm_forms_compile(
     buf: &ArrayBuffer,
     obj: &Object,
 ) -> Result<(), JsValue> {
-    let _: String = picker.name_with_null(AOrB::A);
-    let _: Result<String, JsValue> = picker.try_name_with_null(AOrB::B);
-    let _: Option<String> = picker.load_with_null(AOrB::B).await?;
-    store.put(key, AOrB::A, "v");
-    store.put_with_null(key, AOrB::B);
-    let _: Boxed<Object> = Boxed::from(AOrB::A, obj);
-    let _: Boxed<Object> = Boxed::from_with_null(AOrB::B);
+    let _: String = picker.name_with_null(PickerKind::A);
+    let _: Result<String, JsValue> = picker.try_name_with_null(PickerKind::B);
+    let _: Option<String> = picker.load_with_null(PickerKind::B).await?;
+    store.put(key, KVStoreKind::A, "v");
+    store.put_with_null(key, KVStoreKind::B);
+    let _: Boxed<Object> = Boxed::from(BoxedKind::A, obj);
+    let _: Boxed<Object> = Boxed::from_with_null(BoxedKind::B);
     clash.mode_with_null();
     clash.mode(ClashKind::X);
     clash.f(buf);
     clash.f_with_x_null();
-    clash.f_with_kind_and_x(AOrB::A, buf);
-    clash.f_with_kind_and_x_null(AOrB::B);
+    clash.f_with_kind_and_x(ClashFKind::A, buf);
+    clash.f_with_kind_and_x_null(ClashFKind::B);
     Ok(())
 }
 
 #[allow(dead_code)]
 fn free_and_constructor_null_arms_compile(buf: &ArrayBuffer, obj: &Object) -> Result<(), JsValue> {
-    pick_free(AOrB::A, obj);
-    pick_free_with_null(AOrB::B);
-    let _: Opener = Opener::new(AOrB::A, buf)?;
-    let _: Opener = Opener::new_with_null(AOrB::B)?;
+    pick_free(PickFreeKind::A, obj);
+    pick_free_with_null(PickFreeKind::B);
+    let _: Opener = Opener::new(OpenerKind::A, buf)?;
+    let _: Opener = Opener::new_with_null(OpenerKind::B)?;
     Ok(())
 }

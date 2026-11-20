@@ -22,8 +22,11 @@ pub(crate) struct Tcx {
     /// Where the use is: paths print relative to it, and enums synthesized
     /// for it are emitted here.
     pub place: Place,
-    /// The name a synthesized enum takes from this use (`<Anchor>Kind`).
+    /// The name of the use, which a synthesized enum is named by: a
+    /// property, callable or parameter.
     pub anchor: String,
+    /// What of its owner the use is.
+    pub site: Site,
     /// The enclosing type, which TS `this` names.
     pub this: Option<abi::Type>,
     /// An alias's parameters, bound to their lowered arguments.
@@ -40,6 +43,17 @@ pub(crate) struct Tcx {
     pub mixed: bool,
 }
 
+/// What a use is of the declaration holding it.
+#[derive(Clone)]
+pub(crate) enum Site {
+    /// A property, a variable, or a callable as a whole.
+    Value,
+    /// A parameter of the callable named.
+    Param(String),
+    /// A callable's result.
+    Result,
+}
+
 impl Tcx {
     /// Where the use is, for diagnostics: `Owner.Anchor`.
     pub fn location(&self) -> String {
@@ -54,6 +68,7 @@ impl Tcx {
             scope,
             place: place.clone(),
             anchor: names::pascal(anchor),
+            site: Site::Value,
             this: None,
             subst: Rc::default(),
             aliases: Rc::default(),
@@ -81,6 +96,44 @@ impl Tcx {
         Tcx {
             anchor: names::pascal(anchor),
             ..self.clone()
+        }
+    }
+
+    /// The parameter `name` of the callable this is.
+    pub fn param(&self, name: &str) -> Tcx {
+        Tcx {
+            anchor: names::pascal(name),
+            site: Site::Param(self.anchor.clone()),
+            ..self.clone()
+        }
+    }
+
+    /// The result of the callable this is.
+    pub fn returned(&self) -> Tcx {
+        Tcx {
+            site: Site::Result,
+            ..self.clone()
+        }
+    }
+
+    /// The names an enum synthesized for the use tries, in order: its
+    /// owner and its own name, then with the member between them. A
+    /// result is `<Member>Return`.
+    fn use_names(&self) -> Vec<String> {
+        let owner = self
+            .owner
+            .as_ref()
+            .map(|o| names::pascal(o))
+            .unwrap_or_default();
+        let anchor = &self.anchor;
+        match &self.site {
+            Site::Value => vec![format!("{owner}{anchor}")],
+            Site::Param(member) if owner.is_empty() => vec![format!("{member}{anchor}")],
+            Site::Param(member) => vec![
+                format!("{owner}{anchor}"),
+                format!("{owner}{member}{anchor}"),
+            ],
+            Site::Result => vec![format!("{owner}{anchor}Return")],
         }
     }
 }
@@ -713,9 +766,9 @@ impl Lowerer<'_> {
         }
     }
 
-    /// A unit enum over string literals, shared by every use of the same
-    /// values (#194). A union alias over another literal union alias
-    /// extends its enum.
+    /// A unit enum over string literals, named for its use and shared by
+    /// the uses asking for that name (#194). A union alias over another
+    /// literal union alias extends its enum.
     pub(crate) fn literal_enum(
         &mut self,
         strs: &[String],
@@ -724,38 +777,36 @@ impl Lowerer<'_> {
     ) -> abi::Type {
         let mut sorted = strs.to_vec();
         sorted.sort();
-        let key = match &named {
-            Some(n) => n.key(),
-            None => format!("lit:{sorted:?}"),
+        let (key, named) = match named {
+            Some(n) => (n.key(), n),
+            None => self.use_enum("lit", &sorted, cx),
         };
         if let Some(t) = self.synth_ref(&key, &cx.place) {
-            self.anchor(&key, cx);
             return t;
         }
-        let mut bases = Vec::new();
-        if let Some(n) = &named {
-            for (path, _, base_strs) in self.literal_bases(n, cx) {
-                bases.push((path, base_strs));
-            }
-        }
+        let bases = self
+            .literal_bases(&named, cx)
+            .into_iter()
+            .map(|(path, _, base_strs)| (path, base_strs))
+            .collect();
         self.literal_enum_ext(strs, bases, key, cx, named)
     }
 
     /// A unit enum over `strs`, extending `bases` (paths from where it's
     /// emitted) for the literals they hold. An unnamed or evaluated set
-    /// reuses an enum with the same literals.
+    /// reuses a named enum with the same literals.
     fn literal_enum_ext(
         &mut self,
         strs: &[String],
         bases: Vec<(abi::Path, Vec<String>)>,
         key: String,
         cx: &Tcx,
-        named: Option<Named>,
+        named: Named,
     ) -> abi::Type {
         if let Some(t) = self.synth_ref(&key, &cx.place) {
             return t;
         }
-        if named.as_ref().is_none_or(|n| n.id.is_none()) {
+        if named.id.is_none() {
             if let Some(t) = self.lib_literal(strs, &cx.place) {
                 return t;
             }
@@ -779,27 +830,7 @@ impl Lowerer<'_> {
         for s in strs.iter().filter(|s| !inherited.contains(s)) {
             push_literal(&mut arms, s);
         }
-        // One more than one anchor shares is spelled by its arms, as a
-        // payload enum is.
-        if named.is_none() {
-            let spelled = arms
-                .iter()
-                .map(|a| a.name.as_str())
-                .collect::<Vec<_>>()
-                .join("Or");
-            self.made.insert(key.clone(), self.anchors.len());
-            self.anchors.push(super::Shared {
-                anchors: HashSet::new(),
-                spelled: if spelled.len() <= 32 {
-                    spelled
-                } else {
-                    String::new()
-                },
-                key: key.clone(),
-            });
-            self.anchor(&key, cx);
-        }
-        let t = self.synth_enum(key.clone(), arms, extends, None, cx, named);
+        let t = self.synth_enum(key.clone(), arms, extends, None, cx, Some(named));
         if let Some((place, name)) = self.synth.get(&key).cloned() {
             let mut full = place.ns.clone();
             full.push(name);
@@ -825,7 +856,7 @@ impl Lowerer<'_> {
         }))
     }
 
-    /// An enum already holding exactly `strs`, from `from`.
+    /// A named enum already holding exactly `strs`, from `from`.
     fn same_literals(&mut self, strs: &[String], from: &Place) -> Option<abi::Type> {
         let mut want = strs.to_vec();
         want.sort();
@@ -833,6 +864,7 @@ impl Lowerer<'_> {
         let mut found: Vec<&(Option<String>, Vec<String>)> = self
             .literals
             .iter()
+            .filter(|(k, _)| !self.anonymous.contains(*k))
             .filter(|(_, have)| {
                 let mut have = (*have).clone();
                 have.sort();
@@ -1037,7 +1069,7 @@ impl Lowerer<'_> {
             id: None,
         };
         let key = format!("lit:{sorted:?}");
-        Some(self.literal_enum_ext(&strs, bases, key, cx, Some(named)))
+        Some(self.literal_enum_ext(&strs, bases, key, cx, named))
     }
 
     /// A carrier enum over integer literals; any value is legal on its
@@ -1045,9 +1077,9 @@ impl Lowerer<'_> {
     pub(crate) fn int_enum(&mut self, ints: &[i64], cx: &Tcx, named: Option<Named>) -> abi::Type {
         let mut sorted = ints.to_vec();
         sorted.sort();
-        let key = match &named {
-            Some(n) => n.key(),
-            None => format!("int:{sorted:?}"),
+        let (key, named) = match named {
+            Some(n) => (n.key(), n),
+            None => self.use_enum("int", &sorted, cx),
         };
         if let Some(t) = self.synth_ref(&key, &cx.place) {
             return t;
@@ -1068,7 +1100,7 @@ impl Lowerer<'_> {
                 value: Some(abi::ArmValue::Int(v)),
             });
         }
-        self.synth_enum(key, arms, Vec::new(), Some(carrier), cx, named)
+        self.synth_enum(key, arms, Vec::new(), Some(carrier), cx, Some(named))
     }
 
     fn mentions_tparam(&self, t: &abi::Type, cx: &Tcx) -> bool {
@@ -1099,7 +1131,8 @@ impl Lowerer<'_> {
     /// A payload enum over a union's value types, after a unit arm per
     /// literal beside them, keyed by the member that declares it (#194).
     /// An `open` set ends in `@fallback Other(Str)`, for any other string;
-    /// one of literals alone is shared by every unnamed use.
+    /// an unnamed one of literals alone is named and shared as a literal
+    /// enum is.
     pub(crate) fn payload_enum(
         &mut self,
         strs: &[String],
@@ -1122,10 +1155,18 @@ impl Lowerer<'_> {
         };
         let kind = if open { "open" } else { "pay" };
         let shape = format!("{kind}:{home:?}:{printed:?}:{strs:?}");
-        let key = match &named {
-            Some(n) => n.key(),
-            None if literal_set => format!("open:{sorted:?}"),
-            None => shape.clone(),
+        let at = Tcx {
+            place: home.clone(),
+            ..cx.clone()
+        };
+        let used = named.is_none() && literal_set;
+        let (key, named) = match named {
+            Some(n) => (n.key(), Some(n)),
+            None if used => {
+                let (key, named) = self.use_enum("open", &sorted, &at);
+                (key, Some(named))
+            }
+            None => (shape.clone(), None),
         };
         if let Some(t) = self.synth_ref(&key, &cx.place) {
             self.anchor(&key, cx);
@@ -1137,7 +1178,6 @@ impl Lowerer<'_> {
             .flatten()
         {
             if let Some(t) = self.synth_ref(&k, &cx.place) {
-                self.anchor(&k, cx);
                 return t;
             }
         }
@@ -1150,7 +1190,7 @@ impl Lowerer<'_> {
             ));
             return abi::Type::Any;
         }
-        if literal_set {
+        if literal_set && !used {
             self.open_sets.entry(sorted).or_insert_with(|| key.clone());
         }
         let mut arms: Vec<abi::Arm> = Vec::new();
@@ -1215,10 +1255,6 @@ impl Lowerer<'_> {
             self.anchor(&key, cx);
         }
         let reg = named.as_ref().is_some_and(|n| n.place == home) && !literal_set;
-        let at = Tcx {
-            place: home,
-            ..cx.clone()
-        };
         self.synth_enum(key.clone(), arms, Vec::new(), None, &at, named.or(spelled));
         if reg && !self.synth.contains_key(&shape) {
             if let Some(entry) = self.synth.get(&key).cloned() {
@@ -1241,6 +1277,41 @@ impl Lowerer<'_> {
             });
         }
         ok
+    }
+
+    /// The key and name of the enum synthesized for the literals `set`
+    /// used at `cx`, where it's emitted: the first of the use's names
+    /// that's free or already names an enum of the same literals, else
+    /// the last numbered.
+    fn use_enum(&mut self, kind: &str, set: &impl std::fmt::Debug, cx: &Tcx) -> (String, Named) {
+        let names: Vec<String> = cx
+            .use_names()
+            .iter()
+            .map(|n| names::escape_type(n))
+            .collect();
+        let key = |n: &str| format!("{kind}:{:?}:{n}:{set:?}", cx.place);
+        let taken = |n: &str| self.taken.contains(n);
+        let (key, name) = match names
+            .iter()
+            .find(|n| self.synth.contains_key(&key(n)) || !taken(n))
+        {
+            Some(n) => (key(n), n.clone()),
+            None => {
+                let last = names.last().unwrap();
+                (key(last), names::unique(last, taken))
+            }
+        };
+        if !self.synth.contains_key(&key) {
+            let mut full = cx.place.ns.clone();
+            full.push(name.clone());
+            self.anonymous.insert((cx.place.module.clone(), full));
+        }
+        let named = Named {
+            name,
+            place: cx.place.clone(),
+            id: None,
+        };
+        (key, named)
     }
 
     fn anchor(&mut self, key: &str, cx: &Tcx) {

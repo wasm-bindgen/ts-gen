@@ -3,6 +3,69 @@
 
 package fixtures.enums
 
+external interface CompressionStream : JsAny
+
+external interface DecompressionStream : JsAny
+
+val DecompressionStream.format: DecompressionStreamFormat
+    get() {
+        val r0 = fixtures.enums.flat.DecompressionStream_get_format(this)
+        return DecompressionStreamFormat.fromIndex(r0)
+    }
+
+external interface Canvas : JsAny
+
+var Canvas.fit: CanvasFit
+    get() {
+        val r0 = fixtures.enums.flat.Canvas_get_fit(this)
+        return CanvasFit.fromIndex(r0)
+    }
+    set(value) {
+        fixtures.enums.flat.Canvas_set_fit_CanvasFit(this, value.index)
+    }
+
+var Canvas.crop: CanvasCrop
+    get() {
+        val r0 = fixtures.enums.flat.Canvas_get_crop(this)
+        return CanvasCrop.fromIndex(r0)
+    }
+    set(value) {
+        fixtures.enums.flat.Canvas_set_crop_CanvasCrop(this, value.index)
+    }
+
+var Canvas.quality: CanvasQuality
+    get() {
+        val r0 = fixtures.enums.flat.Canvas_get_quality(this)
+        return CanvasQuality(r0)
+    }
+    set(value) {
+        fixtures.enums.flat.Canvas_set_quality_CanvasQuality(this, value.value)
+    }
+
+var Canvas.hint: CanvasHint
+    get() {
+        val r0 = fixtures.enums.flat.Canvas_get_hint(this)
+        val s1 = fixtures.enums.flat.ret_externref()
+        return decodeCanvasHint(r0, s1)!!
+    }
+    set(value) {
+        val w2 = encodeCanvasHint(value)
+        fixtures.enums.flat.Canvas_set_hint_CanvasHint(this, w2.arm, w2.s0)
+    }
+
+fun Canvas.draw(fit: CanvasFit, mode: CanvasMode): CanvasDrawReturn {
+    val r0 = try { fixtures.enums.flat.Canvas_draw_CanvasFit_CanvasMode(this, fit.index, mode.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return CanvasDrawReturn.fromIndex(r0)
+}
+
+fun Canvas.clear(mode: CanvasClearMode) {
+    try { fixtures.enums.flat.Canvas_clear_CanvasClearMode(this, mode.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+fun Canvas.clear(mode: CanvasClearMode, quality: CanvasQuality) {
+    try { fixtures.enums.flat.Canvas_clear_CanvasClearMode_CanvasQuality(this, mode.index, quality.value) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
 external interface ArrayBuffer : JsAny
 
 external interface ReadableStream : JsAny
@@ -16,8 +79,8 @@ fun format(f: Format) {
     try { fixtures.enums.flat.format_Format(f.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun align(where: WhereKind) {
-    try { fixtures.enums.flat.align_WhereKind(where.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun align(where: AlignWhere) {
+    try { fixtures.enums.flat.align_AlignWhere(where.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 fun more(m: More) {
@@ -34,8 +97,8 @@ fun code(): Code {
     return Code(r0)
 }
 
-fun retry(c: CKind) {
-    try { fixtures.enums.flat.retry_CKind(c.value) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun retry(c: RetryC) {
+    try { fixtures.enums.flat.retry_RetryC(c.value) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 fun ratio(): Double {
@@ -75,14 +138,14 @@ fun speed(m: Mode) {
 
 fun speed(m: JsString) = speed(Mode.Other(m))
 
-fun speed(m: Mode, hint: HintKind) {
+fun speed(m: Mode, hint: SpeedHint) {
     val w0 = encodeMode(m)
-    val w1 = encodeHintKind(hint)
-    try { fixtures.enums.flat.speed_Mode_HintKind(w0.arm, w0.s0, w1.arm, w1.s0) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    val w1 = encodeSpeedHint(hint)
+    try { fixtures.enums.flat.speed_Mode_SpeedHint(w0.arm, w0.s0, w1.arm, w1.s0) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun speed(m: JsString, hint: HintKind) = speed(Mode.Other(m), hint)
-fun speed(m: Mode, hint: JsString) = speed(m, HintKind.Other(hint))
+fun speed(m: JsString, hint: SpeedHint) = speed(Mode.Other(m), hint)
+fun speed(m: Mode, hint: JsString) = speed(m, SpeedHint.Other(hint))
 
 fun tier(): TierKind? {
     val r0 = try { fixtures.enums.flat.tier() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
@@ -90,6 +153,27 @@ fun tier(): TierKind? {
     val s2 = fixtures.enums.flat.ret_externref()
     return decodeTierKind(r0, s1, s2)
 }
+
+fun CompressionStream(format: CompressionStreamFormat): CompressionStream {
+    val r0 = try { fixtures.enums.flat.CompressionStream_new_CompressionStreamFormat(format.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<CompressionStream>()
+}
+
+fun DecompressionStream(format: DecompressionStreamFormat): DecompressionStream {
+    val r0 = try { fixtures.enums.flat.DecompressionStream_new_DecompressionStreamFormat(format.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<DecompressionStream>()
+}
+
+fun paint(mode: PaintMode): PaintReturn {
+    val r0 = try { fixtures.enums.flat.paint_PaintMode(mode.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return PaintReturn.fromIndex(r0)
+}
+
+val theme: Theme
+    get() {
+        val r0 = fixtures.enums.flat.get_theme()
+        return Theme.fromIndex(r0)
+    }
 
 object Time {
     fun add(amount: Double, unit: Unit_) {
@@ -179,15 +263,15 @@ fun JsAny.toColor(): Color {
     return Color(r0)
 }
 
-/** `WhereKind` as its box: its arm's JS value. */
-fun WhereKind.toJs(): JsAny {
-    return fixtures.enums.flat.box_WhereKind(this.index)!!
+/** `AlignWhere` as its box: its arm's JS value. */
+fun AlignWhere.toJs(): JsAny {
+    return fixtures.enums.flat.box_AlignWhere(this.index)!!
 }
 
-/** The `WhereKind` a box holds; a `JsException` unless it's one of its arms. */
-fun JsAny.toWhereKind(): WhereKind {
-    val r0 = fixtures.enums.flat.unbox_WhereKind(this)
-    return WhereKind.fromIndex(r0)
+/** The `AlignWhere` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toAlignWhere(): AlignWhere {
+    val r0 = fixtures.enums.flat.unbox_AlignWhere(this)
+    return AlignWhere.fromIndex(r0)
 }
 
 /** `More` as its box: its arm's JS value. */
@@ -212,15 +296,15 @@ fun JsAny.toCode(): Code {
     return Code(r0)
 }
 
-/** `CKind` as its box: its arm's JS value. */
-fun CKind.toJs(): JsAny {
-    return fixtures.enums.flat.box_CKind(this.value)!!
+/** `RetryC` as its box: its arm's JS value. */
+fun RetryC.toJs(): JsAny {
+    return fixtures.enums.flat.box_RetryC(this.value)!!
 }
 
-/** The `CKind` a box holds; a `JsException` unless it's one of its arms. */
-fun JsAny.toCKind(): CKind {
-    val r0 = fixtures.enums.flat.unbox_CKind(this)
-    return CKind(r0)
+/** The `RetryC` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toRetryC(): RetryC {
+    val r0 = fixtures.enums.flat.unbox_RetryC(this)
+    return RetryC(r0)
 }
 
 /** `Mode` as its box: its arm's JS value. */
@@ -236,17 +320,17 @@ fun JsAny.toMode(): Mode {
     return decodeMode(r1, s2)!!
 }
 
-/** `HintKind` as its box: its arm's JS value. */
-fun HintKind.toJs(): JsAny {
-    val w0 = encodeHintKind(this)
-    return fixtures.enums.flat.box_HintKind(w0.arm, w0.s0)!!
+/** `SpeedHint` as its box: its arm's JS value. */
+fun SpeedHint.toJs(): JsAny {
+    val w0 = encodeSpeedHint(this)
+    return fixtures.enums.flat.box_SpeedHint(w0.arm, w0.s0)!!
 }
 
-/** The `HintKind` a box holds; a `JsException` unless it's one of its arms. */
-fun JsAny.toHintKind(): HintKind {
-    val r1 = fixtures.enums.flat.unbox_HintKind(this)
+/** The `SpeedHint` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toSpeedHint(): SpeedHint {
+    val r1 = fixtures.enums.flat.unbox_SpeedHint(this)
     val s2 = fixtures.enums.flat.ret_externref()
-    return decodeHintKind(r1, s2)!!
+    return decodeSpeedHint(r1, s2)!!
 }
 
 /** `TierKind` as its box: its arm's JS value. */
@@ -261,6 +345,140 @@ fun JsAny.toTierKind(): TierKind {
     val s2 = fixtures.enums.flat.ret_f64()
     val s3 = fixtures.enums.flat.ret_externref()
     return decodeTierKind(r1, s2, s3)!!
+}
+
+/** `CompressionStreamFormat` as its box: its arm's JS value. */
+fun CompressionStreamFormat.toJs(): JsAny {
+    return fixtures.enums.flat.box_CompressionStreamFormat(this.index)!!
+}
+
+/** The `CompressionStreamFormat` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toCompressionStreamFormat(): CompressionStreamFormat {
+    val r0 = fixtures.enums.flat.unbox_CompressionStreamFormat(this)
+    return CompressionStreamFormat.fromIndex(r0)
+}
+
+/** `DecompressionStreamFormat` as its box: its arm's JS value. */
+fun DecompressionStreamFormat.toJs(): JsAny {
+    return fixtures.enums.flat.box_DecompressionStreamFormat(this.index)!!
+}
+
+/** The `DecompressionStreamFormat` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toDecompressionStreamFormat(): DecompressionStreamFormat {
+    val r0 = fixtures.enums.flat.unbox_DecompressionStreamFormat(this)
+    return DecompressionStreamFormat.fromIndex(r0)
+}
+
+/** `CanvasFit` as its box: its arm's JS value. */
+fun CanvasFit.toJs(): JsAny {
+    return fixtures.enums.flat.box_CanvasFit(this.index)!!
+}
+
+/** The `CanvasFit` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toCanvasFit(): CanvasFit {
+    val r0 = fixtures.enums.flat.unbox_CanvasFit(this)
+    return CanvasFit.fromIndex(r0)
+}
+
+/** `CanvasCrop` as its box: its arm's JS value. */
+fun CanvasCrop.toJs(): JsAny {
+    return fixtures.enums.flat.box_CanvasCrop(this.index)!!
+}
+
+/** The `CanvasCrop` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toCanvasCrop(): CanvasCrop {
+    val r0 = fixtures.enums.flat.unbox_CanvasCrop(this)
+    return CanvasCrop.fromIndex(r0)
+}
+
+/** `CanvasQuality` as its box: its arm's JS value. */
+fun CanvasQuality.toJs(): JsAny {
+    return fixtures.enums.flat.box_CanvasQuality(this.value)!!
+}
+
+/** The `CanvasQuality` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toCanvasQuality(): CanvasQuality {
+    val r0 = fixtures.enums.flat.unbox_CanvasQuality(this)
+    return CanvasQuality(r0)
+}
+
+/** `CanvasHint` as its box: its arm's JS value. */
+fun CanvasHint.toJs(): JsAny {
+    val w0 = encodeCanvasHint(this)
+    return fixtures.enums.flat.box_CanvasHint(w0.arm, w0.s0)!!
+}
+
+/** The `CanvasHint` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toCanvasHint(): CanvasHint {
+    val r1 = fixtures.enums.flat.unbox_CanvasHint(this)
+    val s2 = fixtures.enums.flat.ret_externref()
+    return decodeCanvasHint(r1, s2)!!
+}
+
+/** `CanvasDrawReturn` as its box: its arm's JS value. */
+fun CanvasDrawReturn.toJs(): JsAny {
+    return fixtures.enums.flat.box_CanvasDrawReturn(this.index)!!
+}
+
+/** The `CanvasDrawReturn` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toCanvasDrawReturn(): CanvasDrawReturn {
+    val r0 = fixtures.enums.flat.unbox_CanvasDrawReturn(this)
+    return CanvasDrawReturn.fromIndex(r0)
+}
+
+/** `CanvasMode` as its box: its arm's JS value. */
+fun CanvasMode.toJs(): JsAny {
+    return fixtures.enums.flat.box_CanvasMode(this.index)!!
+}
+
+/** The `CanvasMode` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toCanvasMode(): CanvasMode {
+    val r0 = fixtures.enums.flat.unbox_CanvasMode(this)
+    return CanvasMode.fromIndex(r0)
+}
+
+/** `CanvasClearMode` as its box: its arm's JS value. */
+fun CanvasClearMode.toJs(): JsAny {
+    return fixtures.enums.flat.box_CanvasClearMode(this.index)!!
+}
+
+/** The `CanvasClearMode` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toCanvasClearMode(): CanvasClearMode {
+    val r0 = fixtures.enums.flat.unbox_CanvasClearMode(this)
+    return CanvasClearMode.fromIndex(r0)
+}
+
+/** `PaintReturn` as its box: its arm's JS value. */
+fun PaintReturn.toJs(): JsAny {
+    return fixtures.enums.flat.box_PaintReturn(this.index)!!
+}
+
+/** The `PaintReturn` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toPaintReturn(): PaintReturn {
+    val r0 = fixtures.enums.flat.unbox_PaintReturn(this)
+    return PaintReturn.fromIndex(r0)
+}
+
+/** `PaintMode` as its box: its arm's JS value. */
+fun PaintMode.toJs(): JsAny {
+    return fixtures.enums.flat.box_PaintMode(this.index)!!
+}
+
+/** The `PaintMode` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toPaintMode(): PaintMode {
+    val r0 = fixtures.enums.flat.unbox_PaintMode(this)
+    return PaintMode.fromIndex(r0)
+}
+
+/** `Theme` as its box: its arm's JS value. */
+fun Theme.toJs(): JsAny {
+    return fixtures.enums.flat.box_Theme(this.index)!!
+}
+
+/** The `Theme` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toTheme(): Theme {
+    val r0 = fixtures.enums.flat.unbox_Theme(this)
+    return Theme.fromIndex(r0)
 }
 
 value class Level(val value: Int) {
@@ -327,12 +545,12 @@ value class Color(val value: Int) {
     }
 }
 
-enum class WhereKind(val index: Int) {
+enum class AlignWhere(val index: Int) {
     Start(1),
     End(2);
 
     companion object {
-        fun fromIndex(index: Int): WhereKind = entries.first { it.index == index }
+        fun fromIndex(index: Int): AlignWhere = entries.first { it.index == index }
     }
 }
 
@@ -354,11 +572,11 @@ value class Code(val value: Int) {
     }
 }
 
-value class CKind(val value: Int) {
+value class RetryC(val value: Int) {
     companion object {
-        val V1 = CKind(1)
-        val V2 = CKind(2)
-        val V3 = CKind(3)
+        val V1 = RetryC(1)
+        val V2 = RetryC(2)
+        val V3 = RetryC(3)
     }
 }
 
@@ -385,24 +603,24 @@ fun decodeMode(arm: Int, s0: JsAny?): Mode? = when (arm) {
     else -> throw IllegalStateException("Mode: arm $arm")
 }
 
-sealed interface HintKind {
-    data object X : HintKind
-    data class Other(val value: JsString) : HintKind
+sealed interface SpeedHint {
+    data object X : SpeedHint
+    data class Other(val value: JsString) : SpeedHint
 }
 
-class HintKindWire(val arm: Int, val s0: JsAny?)
+class SpeedHintWire(val arm: Int, val s0: JsAny?)
 
-fun encodeHintKind(v: HintKind?): HintKindWire = when (v) {
-    null -> HintKindWire(0, null)
-    HintKind.X -> HintKindWire(1, null)
-    is HintKind.Other -> HintKindWire(-1, v.value)
+fun encodeSpeedHint(v: SpeedHint?): SpeedHintWire = when (v) {
+    null -> SpeedHintWire(0, null)
+    SpeedHint.X -> SpeedHintWire(1, null)
+    is SpeedHint.Other -> SpeedHintWire(-1, v.value)
 }
 
-fun decodeHintKind(arm: Int, s0: JsAny?): HintKind? = when (arm) {
+fun decodeSpeedHint(arm: Int, s0: JsAny?): SpeedHint? = when (arm) {
     0 -> null
-    1 -> HintKind.X
-    -1 -> HintKind.Other(s0!!.unsafeCast<JsString>())
-    else -> throw IllegalStateException("HintKind: arm $arm")
+    1 -> SpeedHint.X
+    -1 -> SpeedHint.Other(s0!!.unsafeCast<JsString>())
+    else -> throw IllegalStateException("SpeedHint: arm $arm")
 }
 
 sealed interface TierKind {
@@ -429,6 +647,126 @@ fun decodeTierKind(arm: Int, s0: Double, s1: JsAny?): TierKind? = when (arm) {
     3 -> TierKind.F64(s0)
     -1 -> TierKind.Other(s1!!.unsafeCast<JsString>())
     else -> throw IllegalStateException("TierKind: arm $arm")
+}
+
+enum class CompressionStreamFormat(val index: Int) {
+    Gzip(1),
+    Deflate(2),
+    DeflateRaw(3);
+
+    companion object {
+        fun fromIndex(index: Int): CompressionStreamFormat = entries.first { it.index == index }
+    }
+}
+
+enum class DecompressionStreamFormat(val index: Int) {
+    Gzip(1),
+    Deflate(2),
+    DeflateRaw(3);
+
+    companion object {
+        fun fromIndex(index: Int): DecompressionStreamFormat = entries.first { it.index == index }
+    }
+}
+
+enum class CanvasFit(val index: Int) {
+    Cover(1),
+    Contain(2);
+
+    companion object {
+        fun fromIndex(index: Int): CanvasFit = entries.first { it.index == index }
+    }
+}
+
+enum class CanvasCrop(val index: Int) {
+    Cover(1),
+    Contain(2);
+
+    companion object {
+        fun fromIndex(index: Int): CanvasCrop = entries.first { it.index == index }
+    }
+}
+
+value class CanvasQuality(val value: Int) {
+    companion object {
+        val V1 = CanvasQuality(1)
+        val V2 = CanvasQuality(2)
+        val V3 = CanvasQuality(3)
+    }
+}
+
+sealed interface CanvasHint {
+    data object Auto : CanvasHint
+    data class Other(val value: JsString) : CanvasHint
+}
+
+class CanvasHintWire(val arm: Int, val s0: JsAny?)
+
+fun encodeCanvasHint(v: CanvasHint?): CanvasHintWire = when (v) {
+    null -> CanvasHintWire(0, null)
+    CanvasHint.Auto -> CanvasHintWire(1, null)
+    is CanvasHint.Other -> CanvasHintWire(-1, v.value)
+}
+
+fun decodeCanvasHint(arm: Int, s0: JsAny?): CanvasHint? = when (arm) {
+    0 -> null
+    1 -> CanvasHint.Auto
+    -1 -> CanvasHint.Other(s0!!.unsafeCast<JsString>())
+    else -> throw IllegalStateException("CanvasHint: arm $arm")
+}
+
+enum class CanvasDrawReturn(val index: Int) {
+    Done(1),
+    Queued(2);
+
+    companion object {
+        fun fromIndex(index: Int): CanvasDrawReturn = entries.first { it.index == index }
+    }
+}
+
+enum class CanvasMode(val index: Int) {
+    Fill(1),
+    Stroke(2);
+
+    companion object {
+        fun fromIndex(index: Int): CanvasMode = entries.first { it.index == index }
+    }
+}
+
+enum class CanvasClearMode(val index: Int) {
+    All(1),
+    Dirty(2);
+
+    companion object {
+        fun fromIndex(index: Int): CanvasClearMode = entries.first { it.index == index }
+    }
+}
+
+enum class PaintReturn(val index: Int) {
+    Done(1),
+    Queued(2);
+
+    companion object {
+        fun fromIndex(index: Int): PaintReturn = entries.first { it.index == index }
+    }
+}
+
+enum class PaintMode(val index: Int) {
+    Fill(1),
+    Stroke(2);
+
+    companion object {
+        fun fromIndex(index: Int): PaintMode = entries.first { it.index == index }
+    }
+}
+
+enum class Theme(val index: Int) {
+    Light(1),
+    Dark(2);
+
+    companion object {
+        fun fromIndex(index: Int): Theme = entries.first { it.index == index }
+    }
 }
 
 sealed interface Err {

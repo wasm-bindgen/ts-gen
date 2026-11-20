@@ -29,8 +29,8 @@ class Node {
 
 draw(x: f64, y: f64) throws;
 draw(p: Point) throws;
-pick(mode: ModeKind): str throws;
-pick(mode: ModeKind, n: f64): str throws;
+pick(mode: PickMode): str throws;
+pick(mode: PickMode, n: f64): str throws;
 @js(args = (first, ...more))
 rest(first: str, more: arr<f64>) throws;
 optionalRest() throws;
@@ -104,7 +104,7 @@ enum NodeChildKind {
   Str(str);
 }
 
-enum ModeKind {
+enum PickMode {
   @js("fast") Fast;
   @js("slow") Slow;
 }

@@ -216,9 +216,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Level;
     #[wasm_bindgen(method, getter)]
-    pub fn level(this: &Level) -> LevelKind;
+    pub fn level(this: &Level) -> LevelLevel;
     #[wasm_bindgen(method, setter)]
-    pub fn set_level(this: &Level, val: LevelKind);
+    pub fn set_level(this: &Level, val: LevelLevel);
 }
 impl Level {
     #[doc = " Construct with `level: 0`."]
@@ -236,19 +236,19 @@ impl Level {
     #[doc = " Start a builder with `level: 0`."]
     pub fn builder_0() -> LevelBuilder {
         let inner: Level = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::N0);
+        inner.set_level(LevelLevel::N0);
         LevelBuilder { inner }
     }
     #[doc = " Start a builder with `level: 1`."]
     pub fn builder_1() -> LevelBuilder {
         let inner: Level = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::N1);
+        inner.set_level(LevelLevel::N1);
         LevelBuilder { inner }
     }
     #[doc = " Start a builder with `level: 2`."]
     pub fn builder_2() -> LevelBuilder {
         let inner: Level = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(LevelKind::N2);
+        inner.set_level(LevelLevel::N2);
         LevelBuilder { inner }
     }
 }
@@ -256,7 +256,7 @@ pub struct LevelBuilder {
     inner: Level,
 }
 impl LevelBuilder {
-    pub fn level(self, val: LevelKind) -> Self {
+    pub fn level(self, val: LevelLevel) -> Self {
         self.inner.set_level(val);
         self
     }
@@ -270,7 +270,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Open;
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &Open) -> OpenModeKind;
+    pub fn mode(this: &Open) -> OpenMode;
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &Open, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -312,9 +312,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Optional;
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &Optional) -> Option<XOrY>;
+    pub fn mode(this: &Optional) -> Option<OptionalMode>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(this: &Optional, val: XOrY);
+    pub fn set_mode(this: &Optional, val: OptionalMode);
 }
 impl Optional {
     pub fn new() -> Optional {
@@ -335,7 +335,7 @@ pub struct OptionalBuilder {
     inner: Optional,
 }
 impl OptionalBuilder {
-    pub fn mode(self, val: XOrY) -> Self {
+    pub fn mode(self, val: OptionalMode) -> Self {
         self.inner.set_mode(val);
         self
     }
@@ -367,20 +367,20 @@ pub enum MixedModeKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LevelKind {
+pub enum LevelLevel {
     N0 = 0,
     N1 = 1,
     N2 = 2,
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum OpenModeKind {
+pub enum OpenMode {
     X = "x",
     String(String),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum XOrY {
+pub enum OptionalMode {
     X = "x",
     Y = "y",
 }

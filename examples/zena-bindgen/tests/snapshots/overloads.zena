@@ -155,7 +155,7 @@ export sealed class NodeChildKind {
   case NodeChildKindStr(value: String)
 }
 
-export enum ModeKind {
+export enum PickMode {
   Fast = 1,
   Slow = 2,
 }
@@ -504,11 +504,11 @@ declare function __draw(p0: f64, p1: f64): void;
 @external("tw:js/global", "draw(Point)", "tw, throws:err")
 declare function __draw2(p0: Point): void;
 
-@external("tw:js/global", "pick(ModeKind)", "tw, throws:err")
-declare function __pick(p0: ModeKind): String;
+@external("tw:js/global", "pick(PickMode)", "tw, throws:err")
+declare function __pick(p0: PickMode): String;
 
-@external("tw:js/global", "pick(ModeKind,f64)", "tw, throws:err")
-declare function __pick2(p0: ModeKind, p1: f64): String;
+@external("tw:js/global", "pick(PickMode,f64)", "tw, throws:err")
+declare function __pick2(p0: PickMode, p1: f64): String;
 
 @external("tw:js/global", "rest(str,arr<f64>)", "tw, throws:err")
 declare function __rest(p0: String, p1: FixedArray<f64>): void;
@@ -558,11 +558,11 @@ export function drawWithP(p: Point): void {
   __draw2(p);
 }
 
-export function pick(mode: ModeKind): String {
+export function pick(mode: PickMode): String {
   return __pick(mode);
 }
 
-export function pickWithN(mode: ModeKind, n: f64): String {
+export function pickWithN(mode: PickMode, n: f64): String {
   return __pick2(mode, n);
 }
 

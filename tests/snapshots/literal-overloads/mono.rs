@@ -351,7 +351,7 @@ extern "C" {
     pub fn put<Key>(
         this: &KVStore<Key>,
         key: Key,
-        kind: AOrB,
+        kind: KVStoreKind,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>
     where
@@ -360,7 +360,7 @@ extern "C" {
     fn __put_with_null<Key>(
         this: &KVStore<Key>,
         key: Key,
-        kind: AOrB,
+        kind: KVStoreKind,
         value: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>
     where
@@ -368,7 +368,7 @@ extern "C" {
 }
 impl<Key> KVStore<Key> {
     #[doc = " A `null` arm on a generic receiver keeps the receiver's `Key`."]
-    pub fn put_with_null(&self, key: Key, kind: AOrB) -> Result<(), JsValue>
+    pub fn put_with_null(&self, key: Key, kind: KVStoreKind) -> Result<(), JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
     {
@@ -418,117 +418,127 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Picker;
     #[wasm_bindgen(method, catch)]
-    pub fn pick(this: &Picker, kind: AOrB, x: &ArrayBuffer) -> Result<(), JsValue>;
+    pub fn pick(this: &Picker, kind: PickerKind, x: &ArrayBuffer) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "pick")]
     fn __pick_with_null(
         this: &Picker,
-        kind: AOrB,
+        kind: PickerKind,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
     # [wasm_bindgen (static_method_of = Picker , catch)]
-    pub fn make(kind: AOrB, x: impl ::wasm_bindgen::JsStringLike) -> Result<Picker, JsValue>;
+    pub fn make(kind: PickerKind, x: impl ::wasm_bindgen::JsStringLike) -> Result<Picker, JsValue>;
     # [wasm_bindgen (static_method_of = Picker , catch , js_name = "make")]
-    fn __make_with_null(kind: AOrB, x: &::wasm_bindgen::JsValue) -> Result<Picker, JsValue>;
+    fn __make_with_null(kind: PickerKind, x: &::wasm_bindgen::JsValue) -> Result<Picker, JsValue>;
     #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
     #[wasm_bindgen(method, catch)]
-    pub fn put<T>(this: &Picker, kind: AOrB, x: T) -> Result<(), JsValue>
+    pub fn put<T>(this: &Picker, kind: PickerKind, x: T) -> Result<(), JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "put")]
     fn __put_with_null(
         this: &Picker,
-        kind: AOrB,
+        kind: PickerKind,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
     #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
     #[wasm_bindgen(method, catch)]
-    pub fn name(this: &Picker, kind: AOrB, x: &ArrayBuffer) -> Result<String, JsValue>;
+    pub fn name(this: &Picker, kind: PickerKind, x: &ArrayBuffer) -> Result<String, JsValue>;
     #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
     #[wasm_bindgen(method, catch, js_name = "name")]
-    pub fn name_js_string(this: &Picker, kind: AOrB, x: &ArrayBuffer) -> Result<JsString, JsValue>;
+    pub fn name_js_string(
+        this: &Picker,
+        kind: PickerKind,
+        x: &ArrayBuffer,
+    ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "name")]
     fn __name_with_null(
         this: &Picker,
-        kind: AOrB,
+        kind: PickerKind,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "name")]
     fn __name_with_null_js_string(
         this: &Picker,
-        kind: AOrB,
+        kind: PickerKind,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<JsString, JsValue>;
     #[doc = " Each `null` arm is its own promise."]
     #[wasm_bindgen(method, catch)]
     pub async fn load(
         this: &Picker,
-        kind: AOrB,
+        kind: PickerKind,
         x: &ArrayBuffer,
     ) -> Result<Option<String>, JsValue>;
     #[doc = " Each `null` arm is its own promise."]
     #[wasm_bindgen(method, catch, js_name = "load")]
     pub async fn load_js_string(
         this: &Picker,
-        kind: AOrB,
+        kind: PickerKind,
         x: &ArrayBuffer,
     ) -> Result<Option<JsString>, JsValue>;
     #[doc = " Each `null` arm is its own promise."]
     #[wasm_bindgen(method, catch, js_name = "load")]
     pub fn load_promise(
         this: &Picker,
-        kind: AOrB,
+        kind: PickerKind,
         x: &ArrayBuffer,
     ) -> Result<Promise<Option<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "load")]
     async fn __load_with_null(
         this: &Picker,
-        kind: AOrB,
+        kind: PickerKind,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "load")]
     async fn __load_with_null_js_string(
         this: &Picker,
-        kind: AOrB,
+        kind: PickerKind,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "load")]
     fn __load_with_null_promise(
         this: &Picker,
-        kind: AOrB,
+        kind: PickerKind,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<Promise<Option<JsString>>, JsValue>;
 }
 impl Picker {
-    pub fn pick_with_null(&self, kind: AOrB) -> Result<(), JsValue> {
+    pub fn pick_with_null(&self, kind: PickerKind) -> Result<(), JsValue> {
         self.__pick_with_null(kind, &::wasm_bindgen::JsValue::NULL)
     }
-    pub fn make_with_null(kind: AOrB) -> Result<Picker, JsValue> {
+    pub fn make_with_null(kind: PickerKind) -> Result<Picker, JsValue> {
         Self::__make_with_null(kind, &::wasm_bindgen::JsValue::NULL)
     }
     #[doc = " The `null` arm's wrappers and extern drop `T`, which only it named."]
-    pub fn put_with_null(&self, kind: AOrB) -> Result<(), JsValue> {
+    pub fn put_with_null(&self, kind: PickerKind) -> Result<(), JsValue> {
         self.__put_with_null(kind, &::wasm_bindgen::JsValue::NULL)
     }
     #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
-    pub fn name_with_null(&self, kind: AOrB) -> Result<String, JsValue> {
+    pub fn name_with_null(&self, kind: PickerKind) -> Result<String, JsValue> {
         self.__name_with_null(kind, &::wasm_bindgen::JsValue::NULL)
     }
     #[doc = " Under mono, each `null` arm has a `_js_string` sibling."]
-    pub fn name_with_null_js_string(&self, kind: AOrB) -> Result<JsString, JsValue> {
+    pub fn name_with_null_js_string(&self, kind: PickerKind) -> Result<JsString, JsValue> {
         self.__name_with_null_js_string(kind, &::wasm_bindgen::JsValue::NULL)
     }
     #[doc = " Each `null` arm is its own promise."]
-    pub async fn load_with_null(&self, kind: AOrB) -> Result<Option<String>, JsValue> {
+    pub async fn load_with_null(&self, kind: PickerKind) -> Result<Option<String>, JsValue> {
         self.__load_with_null(kind, &::wasm_bindgen::JsValue::NULL)
             .await
     }
     #[doc = " Each `null` arm is its own promise."]
-    pub async fn load_with_null_js_string(&self, kind: AOrB) -> Result<Option<JsString>, JsValue> {
+    pub async fn load_with_null_js_string(
+        &self,
+        kind: PickerKind,
+    ) -> Result<Option<JsString>, JsValue> {
         self.__load_with_null_js_string(kind, &::wasm_bindgen::JsValue::NULL)
             .await
     }
     #[doc = " Each `null` arm is its own promise."]
-    pub fn load_with_null_promise(&self, kind: AOrB) -> Result<Promise<Option<JsString>>, JsValue> {
+    pub fn load_with_null_promise(
+        &self,
+        kind: PickerKind,
+    ) -> Result<Promise<Option<JsString>>, JsValue> {
         self.__load_with_null_promise(kind, &::wasm_bindgen::JsValue::NULL)
     }
 }
@@ -546,11 +556,15 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "f")]
     fn __f_with_x_null(this: &Clash, x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "f")]
-    pub fn f_with_kind_and_x(this: &Clash, kind: AOrB, x: &ArrayBuffer) -> Result<(), JsValue>;
+    pub fn f_with_kind_and_x(
+        this: &Clash,
+        kind: ClashFKind,
+        x: &ArrayBuffer,
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "f")]
     fn __f_with_kind_and_x_null(
         this: &Clash,
-        kind: AOrB,
+        kind: ClashFKind,
         x: &::wasm_bindgen::JsValue,
     ) -> Result<(), JsValue>;
 }
@@ -561,7 +575,7 @@ impl Clash {
     pub fn f_with_x_null(&self) -> Result<(), JsValue> {
         self.__f_with_x_null(&::wasm_bindgen::JsValue::NULL)
     }
-    pub fn f_with_kind_and_x_null(&self, kind: AOrB) -> Result<(), JsValue> {
+    pub fn f_with_kind_and_x_null(&self, kind: ClashFKind) -> Result<(), JsValue> {
         self.__f_with_kind_and_x_null(kind, &::wasm_bindgen::JsValue::NULL)
     }
 }
@@ -604,45 +618,48 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Boxed<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(kind: AOrB) -> Result<Boxed<T>, JsValue>;
+    pub fn new<T>(kind: BoxedKind) -> Result<Boxed<T>, JsValue>;
     # [wasm_bindgen (static_method_of = Boxed , catch)]
-    pub fn label(kind: AOrB) -> Result<String, JsValue>;
+    pub fn label(kind: BoxedKind) -> Result<String, JsValue>;
     # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "label")]
-    pub fn label_js_string(kind: AOrB) -> Result<JsString, JsValue>;
+    pub fn label_js_string(kind: BoxedKind) -> Result<JsString, JsValue>;
     # [wasm_bindgen (static_method_of = Boxed , catch)]
-    pub fn of<T>(kind: AOrB, value: T) -> Result<Boxed<T>, JsValue>
+    pub fn of<T>(kind: BoxedKind, value: T) -> Result<Boxed<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
     #[doc = " A static's `null` arm lands where its return puts it."]
     # [wasm_bindgen (static_method_of = Boxed , catch)]
-    pub fn from<T>(kind: AOrB, value: T) -> Result<Boxed<T>, JsValue>
+    pub fn from<T>(kind: BoxedKind, value: T) -> Result<Boxed<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
     # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "from")]
     fn __from_with_null<T>(
-        kind: AOrB,
+        kind: BoxedKind,
         value: &::wasm_bindgen::JsValue,
     ) -> Result<Boxed<T>, JsValue>;
 }
 impl<T> Boxed<T> {
     #[doc = " A static's `null` arm lands where its return puts it."]
-    pub fn from_with_null(kind: AOrB) -> Result<Boxed<T>, JsValue> {
+    pub fn from_with_null(kind: BoxedKind) -> Result<Boxed<T>, JsValue> {
         Self::__from_with_null(kind, &::wasm_bindgen::JsValue::NULL)
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "pickFree")]
-    pub fn pick_free<T>(kind: AOrB, x: T) -> Result<(), JsValue>
+    pub fn pick_free<T>(kind: PickFreeKind, x: T) -> Result<(), JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "pickFree")]
-    fn __pick_free_with_null(kind: AOrB, x: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+    fn __pick_free_with_null(
+        kind: PickFreeKind,
+        x: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
 }
-pub fn pick_free_with_null(kind: AOrB) -> Result<(), JsValue> {
+pub fn pick_free_with_null(kind: PickFreeKind) -> Result<(), JsValue> {
     __pick_free_with_null(kind, &::wasm_bindgen::JsValue::NULL)
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
@@ -651,12 +668,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Opener;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new(kind: AOrB, x: &ArrayBuffer) -> Result<Opener, JsValue>;
+    pub fn new(kind: OpenerKind, x: &ArrayBuffer) -> Result<Opener, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    fn __new_with_null(kind: AOrB, x: &::wasm_bindgen::JsValue) -> Result<Opener, JsValue>;
+    fn __new_with_null(kind: OpenerKind, x: &::wasm_bindgen::JsValue) -> Result<Opener, JsValue>;
 }
 impl Opener {
-    pub fn new_with_null(kind: AOrB) -> Result<Opener, JsValue> {
+    pub fn new_with_null(kind: OpenerKind) -> Result<Opener, JsValue> {
         Self::__new_with_null(kind, &::wasm_bindgen::JsValue::NULL)
     }
 }
@@ -668,7 +685,13 @@ pub enum KVNamespaceKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AOrB {
+pub enum KVStoreKind {
+    A = "a",
+    B = "b",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PickerKind {
     A = "a",
     B = "b",
 }
@@ -677,4 +700,28 @@ pub enum AOrB {
 pub enum ClashKind {
     X = "x",
     Y = "y",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ClashFKind {
+    A = "a",
+    B = "b",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BoxedKind {
+    A = "a",
+    B = "b",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PickFreeKind {
+    A = "a",
+    B = "b",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OpenerKind {
+    A = "a",
+    B = "b",
 }

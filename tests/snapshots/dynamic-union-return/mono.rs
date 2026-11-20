@@ -32,7 +32,7 @@ extern "C" {
     pub type NoErasure;
     #[doc = " Literal widening — lowers to `string`, no enum synthesised."]
     #[wasm_bindgen(method, getter)]
-    pub fn variant(this: &NoErasure) -> NoErasureVariantKind;
+    pub fn variant(this: &NoErasure) -> NoErasureVariant;
     #[doc = " Plain type — no enum synthesised."]
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &NoErasure) -> String;
@@ -70,7 +70,7 @@ pub enum ErasedContentKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NoErasureVariantKind {
+pub enum NoErasureVariant {
     A = "a",
     B = "b",
 }

@@ -18,8 +18,8 @@ js_code	fixtures.overloads.flat.Node_get_signal	tw:js/global	Node#get:signal()
 js_code	fixtures.overloads.flat.Node_set_signal_AbortSignal	tw:js/global	Node#set:signal(AbortSignal?)
 js_code	fixtures.overloads.flat.draw_f64_f64	tw:js/global	draw(f64,f64)
 js_code	fixtures.overloads.flat.draw_Point	tw:js/global	draw(Point)
-js_code	fixtures.overloads.flat.pick_ModeKind	tw:js/global	pick(ModeKind)
-js_code	fixtures.overloads.flat.pick_ModeKind_f64	tw:js/global	pick(ModeKind,f64)
+js_code	fixtures.overloads.flat.pick_PickMode	tw:js/global	pick(PickMode)
+js_code	fixtures.overloads.flat.pick_PickMode_f64	tw:js/global	pick(PickMode,f64)
 js_code	fixtures.overloads.flat.rest_str_arr_f64	tw:js/global	rest(str,arr<f64>)
 js_code	fixtures.overloads.flat.optionalRest	tw:js/global	optionalRest()
 js_code	fixtures.overloads.flat.optionalRest_str_arr_Any	tw:js/global	optionalRest(str?,arr<Any?>)
@@ -60,8 +60,8 @@ js_code	fixtures.overloads.flat.unbox_KVValueKind	tw:unbox	KVValueKind
 js_code	fixtures.overloads.flat.box_KVValueKind	tw:box	KVValueKind
 js_code	fixtures.overloads.flat.unbox_NodeChildKind	tw:unbox	NodeChildKind
 js_code	fixtures.overloads.flat.box_NodeChildKind	tw:box	NodeChildKind
-js_code	fixtures.overloads.flat.unbox_ModeKind	tw:unbox	ModeKind
-js_code	fixtures.overloads.flat.box_ModeKind	tw:box	ModeKind
+js_code	fixtures.overloads.flat.unbox_PickMode	tw:unbox	PickMode
+js_code	fixtures.overloads.flat.box_PickMode	tw:box	PickMode
 js_code	fixtures.overloads.flat.box_fn_arr_Any	tw:box	fn(...arr<Any?>)
 js_code	fixtures.overloads.flat.unbox_fn_arr_Any	tw:unbox	fn(...arr<Any?>)
 js_code	tsgen.runtime.futurePoll	tw:future	poll

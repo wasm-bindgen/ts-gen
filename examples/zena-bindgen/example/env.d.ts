@@ -53,3 +53,7 @@ interface ElementHandlers {
 interface HTMLRewriter {
   on(selector: string, handlers: ElementHandlers): HTMLRewriter;
 }
+
+// The name the app uses for a literal union workers-types writes inline:
+// an alias names every use of its literals.
+type NoStoreOrNoCache = "no-store" | "no-cache";

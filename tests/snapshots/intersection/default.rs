@@ -397,7 +397,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Message;
     #[wasm_bindgen(method, getter)]
-    pub fn role(this: &Message) -> MessageRoleKind;
+    pub fn role(this: &Message) -> MessageRole;
     #[wasm_bindgen(method, setter)]
     pub fn set_role(this: &Message, val: &str);
 }
@@ -522,7 +522,7 @@ pub type ProviderOf<T> = Provider<Array<T>>;
 pub type ViaProviderOf = JsValue;
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum MessageRoleKind {
+pub enum MessageRole {
     User = "user",
     Assistant = "assistant",
     String(String),

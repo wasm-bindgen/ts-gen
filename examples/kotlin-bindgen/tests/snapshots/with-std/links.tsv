@@ -16,7 +16,7 @@ js_code	fixtures.with_std.flat.FormatSettings_get_required	tw:js/global	FormatSe
 js_code	fixtures.with_std.flat.FormatSettings_set_required_Intl_LocalesArgument	tw:js/global	FormatSettings#set:required(Intl.LocalesArgument)
 js_code	fixtures.with_std.flat.FormatSettings_get_nullable	tw:js/global	FormatSettings#get:nullable()
 js_code	fixtures.with_std.flat.FormatSettings_set_nullable_Intl_LocalesArgument	tw:js/global	FormatSettings#set:nullable(Intl.LocalesArgument?)
-js_code	fixtures.with_std.flat.display_Intl_CompactDisplayKind	tw:js/global	display(Intl.CompactDisplayKind)
+js_code	fixtures.with_std.flat.display_Intl_NumberFormatOptionsCompactDisplay	tw:js/global	display(Intl.NumberFormatOptionsCompactDisplay)
 js_code	fixtures.with_std.flat.Store_env	tw:js/global	Store#env()
 js_code	fixtures.with_std.flat.store_Store_unit	tw:js/global	store(Store<unit>)
 js_code	fixtures.with_std.flat.take_never	tw:future	take<never>

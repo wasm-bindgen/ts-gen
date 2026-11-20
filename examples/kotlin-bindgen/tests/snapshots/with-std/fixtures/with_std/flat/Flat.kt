@@ -75,9 +75,9 @@ external fun FormatSettings_set_nullable_Intl_LocalesArgument(p0: JsAny?, p1: In
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun FormatSettings_get_nullable(p0: JsAny?): Int
 
-/** tw:js/global display(Intl.CompactDisplayKind) */
+/** tw:js/global display(Intl.NumberFormatOptionsCompactDisplay) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun display_Intl_CompactDisplayKind(p0: Int)
+external fun display_Intl_NumberFormatOptionsCompactDisplay(p0: Int)
 
 /** tw:js/global Store#env() */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

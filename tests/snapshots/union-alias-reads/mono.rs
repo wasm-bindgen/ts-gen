@@ -46,13 +46,13 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub fn step(
         this: &Day,
-        direction: DayDirectionKind,
+        direction: DayDirection,
         other: impl DayLike,
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "step")]
     pub fn step_js_string(
         this: &Day,
-        direction: DayDirectionKind,
+        direction: DayDirection,
         other: impl DayLike,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -124,9 +124,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FromOptions;
     #[wasm_bindgen(method, getter)]
-    pub fn overflow(this: &FromOptions) -> Option<FromOptionsOverflowKind>;
+    pub fn overflow(this: &FromOptions) -> Option<FromOptionsOverflow>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_overflow(this: &FromOptions, val: FromOptionsOverflowKind);
+    pub fn set_overflow(this: &FromOptions, val: FromOptionsOverflow);
 }
 impl FromOptions {
     pub fn new() -> FromOptions {
@@ -147,7 +147,7 @@ pub struct FromOptionsBuilder {
     inner: FromOptions,
 }
 impl FromOptionsBuilder {
-    pub fn overflow(self, val: FromOptionsOverflowKind) -> Self {
+    pub fn overflow(self, val: FromOptionsOverflow) -> Self {
         self.inner.set_overflow(val);
         self
     }
@@ -706,13 +706,13 @@ extern "C" {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DayDirectionKind {
+pub enum DayDirection {
     Next = "next",
     Previous = "previous",
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FromOptionsOverflowKind {
+pub enum FromOptionsOverflow {
     Constrain = "constrain",
     Reject = "reject",
 }

@@ -110,21 +110,21 @@ impl ScaledBuilder {
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
-    pub fn level() -> LevelKind;
+    pub fn level() -> LevelReturn;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "level")]
-    pub fn try_level() -> Result<LevelKind, JsValue>;
+    pub fn try_level() -> Result<LevelReturn, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
-    pub fn direction() -> DirectionKind;
+    pub fn direction() -> DirectionReturn;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "direction")]
-    pub fn try_direction() -> Result<DirectionKind, JsValue>;
+    pub fn try_direction() -> Result<DirectionReturn, JsValue>;
 }
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
@@ -132,7 +132,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Feedback;
     #[wasm_bindgen(method, getter)]
-    pub fn value(this: &Feedback) -> Option<FeedbackValueKind>;
+    pub fn value(this: &Feedback) -> Option<FeedbackValue>;
 }
 impl Feedback {
     #[allow(clippy::new_without_default)]
@@ -206,21 +206,21 @@ pub enum KeepAliveKind {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LevelKind {
+pub enum LevelReturn {
     N0 = 0,
     N1 = 1,
     N2 = 2,
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DirectionKind {
+pub enum DirectionReturn {
     Neg1 = -1,
     N0 = 0,
     N1 = 1,
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeedbackValueKind {
+pub enum FeedbackValue {
     Neg1 = -1,
     N1 = 1,
 }

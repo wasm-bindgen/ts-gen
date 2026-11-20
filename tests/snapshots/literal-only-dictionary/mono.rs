@@ -70,9 +70,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_kind(this: &Attachment, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn disposition(this: &Attachment) -> InlineOrAttachment;
+    pub fn disposition(this: &Attachment) -> AttachmentDisposition;
     #[wasm_bindgen(method, setter)]
-    pub fn set_disposition(this: &Attachment, val: InlineOrAttachment);
+    pub fn set_disposition(this: &Attachment, val: AttachmentDisposition);
     #[wasm_bindgen(method, getter)]
     pub fn filename(this: &Attachment) -> String;
     #[wasm_bindgen(method, getter, js_name = "filename")]
@@ -93,7 +93,7 @@ impl Attachment {
     pub fn builder_inline(filename: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind("attachment");
-        inner.set_disposition(InlineOrAttachment::Inline);
+        inner.set_disposition(AttachmentDisposition::Inline);
         inner.set_filename(filename);
         AttachmentBuilder { inner }
     }
@@ -101,7 +101,7 @@ impl Attachment {
     pub fn builder_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kind("attachment");
-        inner.set_disposition(InlineOrAttachment::Attachment);
+        inner.set_disposition(AttachmentDisposition::Attachment);
         inner.set_filename(filename);
         AttachmentBuilder { inner }
     }
@@ -110,7 +110,7 @@ pub struct AttachmentBuilder {
     inner: Attachment,
 }
 impl AttachmentBuilder {
-    pub fn disposition(self, val: InlineOrAttachment) -> Self {
+    pub fn disposition(self, val: AttachmentDisposition) -> Self {
         self.inner.set_disposition(val);
         self
     }
@@ -124,9 +124,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Part;
     #[wasm_bindgen(method, getter)]
-    pub fn disposition(this: &Part) -> InlineOrAttachment;
+    pub fn disposition(this: &Part) -> PartDisposition;
     #[wasm_bindgen(method, setter)]
-    pub fn set_disposition(this: &Part, val: InlineOrAttachment);
+    pub fn set_disposition(this: &Part, val: PartDisposition);
     #[wasm_bindgen(method, getter, js_name = "contentId")]
     pub fn content_id(this: &Part) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "contentId")]
@@ -147,7 +147,7 @@ impl Part {
         filename: impl ::wasm_bindgen::JsStringLike,
     ) -> Part {
         let inner: Part = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(InlineOrAttachment::Inline);
+        inner.set_disposition(PartDisposition::Inline);
         inner.set_content_id(content_id);
         inner.set_filename(filename);
         inner
@@ -159,7 +159,7 @@ impl Part {
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> PartBuilder {
         let inner: Part = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(InlineOrAttachment::Attachment);
+        inner.set_disposition(PartDisposition::Attachment);
         inner.set_filename(filename);
         PartBuilder { inner }
     }
@@ -182,9 +182,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CappedAttachment;
     #[wasm_bindgen(method, getter)]
-    pub fn disposition(this: &CappedAttachment) -> InlineOrAttachment;
+    pub fn disposition(this: &CappedAttachment) -> CappedAttachmentDisposition;
     #[wasm_bindgen(method, setter)]
-    pub fn set_disposition(this: &CappedAttachment, val: InlineOrAttachment);
+    pub fn set_disposition(this: &CappedAttachment, val: CappedAttachmentDisposition);
     #[wasm_bindgen(method, getter)]
     pub fn a(this: &CappedAttachment) -> StrOrF64;
     #[wasm_bindgen(method, setter)]
@@ -244,7 +244,7 @@ impl CappedAttachment {
         f: impl ::wasm_bindgen::JsStringLike,
     ) -> CappedAttachmentBuilder {
         let inner: CappedAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(InlineOrAttachment::Inline);
+        inner.set_disposition(CappedAttachmentDisposition::Inline);
         inner.set_a(a);
         inner.set_b(b);
         inner.set_c(c);
@@ -258,7 +258,7 @@ pub struct CappedAttachmentBuilder {
     inner: CappedAttachment,
 }
 impl CappedAttachmentBuilder {
-    pub fn disposition(self, val: InlineOrAttachment) -> Self {
+    pub fn disposition(self, val: CappedAttachmentDisposition) -> Self {
         self.inner.set_disposition(val);
         self
     }
@@ -268,7 +268,19 @@ impl CappedAttachmentBuilder {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum InlineOrAttachment {
+pub enum AttachmentDisposition {
+    Inline = "inline",
+    Attachment = "attachment",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartDisposition {
+    Inline = "inline",
+    Attachment = "attachment",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CappedAttachmentDisposition {
     Inline = "inline",
     Attachment = "attachment",
 }

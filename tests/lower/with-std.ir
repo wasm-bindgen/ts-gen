@@ -37,7 +37,7 @@ interface FormatSettings {
   set nullable(value: union Intl.LocalesArgument?);
 }
 
-display(style: Intl.CompactDisplayKind) throws;
+display(style: Intl.NumberFormatOptionsCompactDisplay) throws;
 
 interface Store<Env = unit> {
   env(): Env throws;

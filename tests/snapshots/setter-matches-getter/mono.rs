@@ -16,9 +16,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "fractionalSecondDigits")]
     pub fn set_fractional_second_digits_with_f64(this: &DigitsOptions, val: f64);
     #[wasm_bindgen(method, getter, js_name = "roundingMode")]
-    pub fn rounding_mode(this: &DigitsOptions) -> Option<RoundingModeKind>;
+    pub fn rounding_mode(this: &DigitsOptions) -> Option<DigitsOptionsRoundingMode>;
     #[wasm_bindgen(method, setter, js_name = "roundingMode")]
-    pub fn set_rounding_mode(this: &DigitsOptions, val: RoundingModeKind);
+    pub fn set_rounding_mode(this: &DigitsOptions, val: DigitsOptionsRoundingMode);
 }
 impl DigitsOptions {
     pub fn new() -> DigitsOptions {
@@ -47,7 +47,7 @@ impl DigitsOptionsBuilder {
         self.inner.set_fractional_second_digits_with_f64(val);
         self
     }
-    pub fn rounding_mode(self, val: RoundingModeKind) -> Self {
+    pub fn rounding_mode(self, val: DigitsOptionsRoundingMode) -> Self {
         self.inner.set_rounding_mode(val);
         self
     }
@@ -193,7 +193,7 @@ pub enum AutoOrF64 {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RoundingModeKind {
+pub enum DigitsOptionsRoundingMode {
     Ceil = "ceil",
     Floor = "floor",
 }

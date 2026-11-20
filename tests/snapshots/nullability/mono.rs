@@ -1021,9 +1021,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Attachment;
     #[wasm_bindgen(method, getter)]
-    pub fn disposition(this: &Attachment) -> AttachmentDispositionKind;
+    pub fn disposition(this: &Attachment) -> AttachmentDisposition;
     #[wasm_bindgen(method, setter)]
-    pub fn set_disposition(this: &Attachment, val: AttachmentDispositionKind);
+    pub fn set_disposition(this: &Attachment, val: AttachmentDisposition);
     #[wasm_bindgen(method, getter, js_name = "contentId")]
     pub fn content_id(this: &Attachment) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "contentId")]
@@ -1044,7 +1044,7 @@ impl Attachment {
         filename: impl ::wasm_bindgen::JsStringLike,
     ) -> Attachment {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(AttachmentDispositionKind::Inline);
+        inner.set_disposition(AttachmentDisposition::Inline);
         inner.set_content_id(content_id);
         inner.set_filename(filename);
         inner
@@ -1056,7 +1056,7 @@ impl Attachment {
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(filename: impl ::wasm_bindgen::JsStringLike) -> AttachmentBuilder {
         let inner: Attachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(AttachmentDispositionKind::Attachment);
+        inner.set_disposition(AttachmentDisposition::Attachment);
         inner.set_filename(filename);
         AttachmentBuilder { inner }
     }
@@ -1212,7 +1212,7 @@ pub enum StrOrF64 {
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AttachmentDispositionKind {
+pub enum AttachmentDisposition {
     Inline = "inline",
     Attachment = "attachment",
 }

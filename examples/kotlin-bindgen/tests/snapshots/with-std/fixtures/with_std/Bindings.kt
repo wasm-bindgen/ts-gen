@@ -115,8 +115,8 @@ fun FormatSettings(): FormatSettings {
     return r0!!.unsafeCast<FormatSettings>()
 }
 
-fun display(style: fixtures.std.CompactDisplayKind) {
-    try { fixtures.with_std.flat.display_Intl_CompactDisplayKind(style.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun display(style: fixtures.std.NumberFormatOptionsCompactDisplay) {
+    try { fixtures.with_std.flat.display_Intl_NumberFormatOptionsCompactDisplay(style.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 fun store(s: Store<*>): tsgen.runtime.Future<Nothing> {

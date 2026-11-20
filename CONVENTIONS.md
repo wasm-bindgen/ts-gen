@@ -1010,7 +1010,7 @@ impl TransitionOptions {
     // `new_previous` / `builder_previous` likewise
 }
 impl TransitionOptionsBuilder {
-    pub fn direction(self, val: DirectionKind) -> Self { /* … */ }
+    pub fn direction(self, val: TransitionOptionsDirection) -> Self { /* … */ }
     pub fn build(self) -> TransitionOptions { /* … */ }
 }
 ```
@@ -1206,8 +1206,8 @@ interface Options {
 pub fn mode(this: &Options) -> ModeKind;
 pub fn set_mode(this: &Options, val: ModeKind);
 pub fn set_mode_with_bool(this: &Options, val: bool);
-pub fn set_inline(this: &Options, val: InlineKind);
-pub fn set_level(this: &Options, val: LevelKind);
+pub fn set_inline(this: &Options, val: OptionsInline);
+pub fn set_level(this: &Options, val: OptionsLevel);
 ```
 
 * A widened `&str` or `f64` setter would accept values outside the union,
@@ -1505,11 +1505,11 @@ the merged setter takes as an enum is passed as that enum's variant,
 though each branch narrows it to one literal:
 
 ```rust
-pub fn set_disposition(this: &EmailAttachment, val: DispositionKind);
+pub fn set_disposition(this: &EmailAttachment, val: EmailAttachmentDisposition);
 // in new_inline:
-inner.set_disposition(DispositionKind::Inline);
+inner.set_disposition(EmailAttachmentDisposition::Inline);
 // in Status::new_200:
-inner.set_code(CodeKind::N200);
+inner.set_code(StatusCode::N200);
 ```
 
 Likewise a field a branch narrows to one member of the merged union
@@ -3491,8 +3491,8 @@ impl KVNamespace {
 * A **cohort** is a set of two or more expansions that agree on every
   parameter except string-literal ones at the same positions, from
   separate overloads. One overload's literal union is the IR's enum of
-  it, taken whole (`CompressionStream::new(format: GzipOrDeflateOrDeflateRaw)`), a
-  number literal union a C-style one (`enum LKind { N0 = 0, N1 = 1 }`);
+  it, taken whole (`CompressionStream::new(format: CompressionStreamFormat)`), a
+  number literal union a C-style one (`enum StepDirection { N0 = 0, N1 = 1 }`);
   a union the IR splits across overloads stays a cohort
   (`export_key_jwk` beside `export_key_raw`). A lone literal
   (`getAll(name: "Set-Cookie")`) is not a cohort and keeps the plain
@@ -3548,11 +3548,11 @@ impl KVNamespace {
 
   ```rust
   extern "C" {
-      pub fn pick(this: &Picker, kind: AOrB, x: &ArrayBuffer);
-      fn __pick_with_null(this: &Picker, kind: AOrB, x: &JsValue);
+      pub fn pick(this: &Picker, kind: PickerKind, x: &ArrayBuffer);
+      fn __pick_with_null(this: &Picker, kind: PickerKind, x: &JsValue);
   }
   impl Picker {
-      pub fn pick_with_null(&self, kind: AOrB) {
+      pub fn pick_with_null(&self, kind: PickerKind) {
           self.__pick_with_null(kind, &JsValue::NULL)
       }
   }
@@ -3817,12 +3817,12 @@ compared, printed and kept. One of only literal variants (`"a" | "b"`,
 ```rust
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OverflowKind {
+pub enum OverflowOptionsOverflow {
     Constrain = "constrain",
     Reject = "reject",
 }
 
-assert_eq!(options.overflow(), Some(OverflowKind::Constrain));
+assert_eq!(options.overflow(), Some(OverflowOptionsOverflow::Constrain));
 ```
 
 #### Shape arms go last
@@ -3860,16 +3860,56 @@ pub enum PickAnyKind {
 
 #### Naming
 
-The enum takes the IR's name for it, `<Anchor>Kind` (`Kind` being the
-Rust idiom for a discriminated enum), where the anchor is the JS name of
-the property or callable: `content` → `ContentKind`, `fetch()` →
-`FetchKind`. An owner already ending in the anchor, or an anchor of
-`kind` itself, isn't repeated (`KVNamespace.kind` → `KVNamespaceKind`).
-A literal union two or more anchors share is spelled by its arms
-instead (`disposition: "inline" | "attachment"` → `InlineOrAttachment`),
-up to 32 characters.
+The enum takes the IR's name for it.
 
-Collisions resolve in three steps, most-simple to most-qualified:
+A union of literals alone (`"a" | "b"`, `0 | 1 | 2`, `"a" | string`) is
+named for where it's used, as an
+[anonymous interface](#anonymous-interface-synthesis) is: its owner,
+then the property or parameter.
+
+| Use                                      | Enum                       |
+| ---------------------------------------- | -------------------------- |
+| `EmailAttachment.disposition`            | `EmailAttachmentDisposition` |
+| `new CompressionStream(format)`          | `CompressionStreamFormat`  |
+| `Canvas.draw(mode)`                      | `CanvasMode`               |
+| `Canvas.clear(mode)`, of other literals  | `CanvasClearMode`          |
+| `Canvas.draw()`'s result                 | `CanvasDrawReturn`         |
+| `align(where)`, a function               | `AlignWhere`               |
+| `paint()`'s result                       | `PaintReturn`              |
+| `theme`, a variable                      | `Theme`                    |
+
+* The member comes between the owner and a parameter only where the
+  shorter name is taken, and a result takes `Return` after its callable.
+  A name still taken is numbered (`CanvasClearMode2`).
+* Uses that ask for one name share the enum when their literals are the
+  same: a property's getter and setter, an overload's expansions, a
+  parameter and a property of one name under one owner. Any other use
+  has its own, so `DecompressionStream`'s `format` is
+  `DecompressionStreamFormat`, though its literals are
+  `CompressionStreamFormat`'s. An enum shared under its first use's name
+  would read as that use's everywhere else, and one named by its literals
+  (`GzipOrDeflateOrDeflateRaw`) says nothing of where a value goes.
+* A TS alias keeps its name, and names its literals wherever they're
+  written: with `type Format = "gzip" | "deflate"`, every union of those
+  two is `Format`.
+* A literal type argument isn't a use of this kind. It's spelled by its
+  literals (`RoundingOptions<"year" | "month">` → `YearOrMonth`), as the
+  instantiation it names is (`PluralYearOrMonth`), and a union of named
+  literal enums by its members (`DateUnit | TimeUnit` →
+  `DateUnitOrTimeUnit`).
+* Rust reads one enum for a set of literals in each scope. Two
+  properties of one interface holding the same literals are two enums in
+  the IR, and both read as the first's in Rust.
+
+A union with a member that isn't a literal is `<Anchor>Kind` (`Kind`
+being the Rust idiom for a discriminated enum), where the anchor is the
+JS name of the property or callable: `content` → `ContentKind`,
+`fetch()` → `FetchKind`. An owner already ending in the anchor, or an
+anchor of `kind` itself, isn't repeated (`KVNamespace.kind` →
+`KVNamespaceKind`). One that two or more anchors share is spelled by its
+arms instead (`FileOrStr`), up to 32 characters.
+
+Its collisions resolve in three steps, most-simple to most-qualified:
 
 1. Bare anchor (`ContentKind`).
 2. Owner-prefixed (`EmailAttachmentContentKind`) — when a different
@@ -3879,7 +3919,7 @@ Collisions resolve in three steps, most-simple to most-qualified:
 
 First-seen wins on the bare anchor.
 
-Identity is the **ordered member list**, so two erasing unions with
+Its identity is the **ordered member list**, so two erasing unions with
 the same members in the same order share a single synthesised enum
 (and hence a single name). Order matters at runtime — the wasm-bindgen
 dispatch tries variants in source order. Literal discriminants don't
@@ -3986,13 +4026,13 @@ A synthesised enum can mix two variant forms in the same body:
   discriminant is the literal itself, which wasm-bindgen routes as
   the literal value at the FFI boundary.
   ```rs
-  pub enum RoleKind {
+  pub enum MessageRole {
       User = "user",
       Assistant = "assistant",
       System = "system",
   }
 
-  pub enum DirectionKind {
+  pub enum StepDirection {
       Neg1 = -1,
       N0 = 0,
       N1 = 1,

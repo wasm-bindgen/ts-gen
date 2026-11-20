@@ -2,7 +2,7 @@
 // Compile with `zena build -t js` and link against the tw bridge.
 
 import { Option, Some, None, none, some } from 'zena:core';
-import { Date, ErrArm, ErrException, Intl_CompactDisplayKind, Map, RegExp, Symbol, Uint8Array, __tw_await } from "./std.zena";
+import { Date, ErrArm, ErrException, Intl_NumberFormatOptionsCompactDisplay, Map, RegExp, Symbol, Uint8Array, __tw_await } from "./std.zena";
 import { Future } from 'zena:async';
 
 export sealed class Intl_LocalesArgument {
@@ -185,8 +185,8 @@ declare function __Store_env<Env>(p0: externref): Env;
 @external("tw:js/global", "fail(str)", "tw, throws:err")
 declare function __fail(p0: String): Error2;
 
-@external("tw:js/global", "display(Intl.CompactDisplayKind)", "tw, throws:err")
-declare function __display(p0: Intl_CompactDisplayKind): void;
+@external("tw:js/global", "display(Intl.NumberFormatOptionsCompactDisplay)", "tw, throws:err")
+declare function __display(p0: Intl_NumberFormatOptionsCompactDisplay): void;
 
 @external("tw:js/global", "store(Store<unit>)", "tw")
 declare function __store(p0: Store<void>): externref;
@@ -243,7 +243,7 @@ export function fail(reason: String): Error2 {
   return __fail(reason);
 }
 
-export function display(style: Intl_CompactDisplayKind): void {
+export function display(style: Intl_NumberFormatOptionsCompactDisplay): void {
   __display(style);
 }
 

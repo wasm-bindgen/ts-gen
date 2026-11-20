@@ -205,13 +205,13 @@ fun draw(p: Point) {
     try { fixtures.overloads.flat.draw_Point(p) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
-fun pick(mode: ModeKind): String {
-    val r0 = try { fixtures.overloads.flat.pick_ModeKind(mode.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun pick(mode: PickMode): String {
+    val r0 = try { fixtures.overloads.flat.pick_PickMode(mode.index) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
     return r0!!.unsafeCast<JsString>().toString()
 }
 
-fun pick(mode: ModeKind, n: Double): String {
-    val r0 = try { fixtures.overloads.flat.pick_ModeKind_f64(mode.index, n) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+fun pick(mode: PickMode, n: Double): String {
+    val r0 = try { fixtures.overloads.flat.pick_PickMode_f64(mode.index, n) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
     return r0!!.unsafeCast<JsString>().toString()
 }
 
@@ -292,15 +292,15 @@ fun JsAny.toNodeChildKind(): NodeChildKind {
     return decodeNodeChildKind(r1, s2)!!
 }
 
-/** `ModeKind` as its box: its arm's JS value. */
-fun ModeKind.toJs(): JsAny {
-    return fixtures.overloads.flat.box_ModeKind(this.index)!!
+/** `PickMode` as its box: its arm's JS value. */
+fun PickMode.toJs(): JsAny {
+    return fixtures.overloads.flat.box_PickMode(this.index)!!
 }
 
-/** The `ModeKind` a box holds; a `JsException` unless it's one of its arms. */
-fun JsAny.toModeKind(): ModeKind {
-    val r0 = fixtures.overloads.flat.unbox_ModeKind(this)
-    return ModeKind.fromIndex(r0)
+/** The `PickMode` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toPickMode(): PickMode {
+    val r0 = fixtures.overloads.flat.unbox_PickMode(this)
+    return PickMode.fromIndex(r0)
 }
 
 sealed interface KVValueKind {
@@ -343,12 +343,12 @@ fun decodeNodeChildKind(arm: Int, s0: JsAny?): NodeChildKind? = when (arm) {
     else -> throw IllegalStateException("NodeChildKind: arm $arm")
 }
 
-enum class ModeKind(val index: Int) {
+enum class PickMode(val index: Int) {
     Fast(1),
     Slow(2);
 
     companion object {
-        fun fromIndex(index: Int): ModeKind = entries.first { it.index == index }
+        fun fromIndex(index: Int): PickMode = entries.first { it.index == index }
     }
 }
 

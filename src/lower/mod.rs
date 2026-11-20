@@ -361,8 +361,11 @@ pub(crate) struct Lowerer<'a> {
     pulled: indexmap::IndexSet<(Option<String>, Vec<String>)>,
     /// The literals of every string enum, by full path.
     literals: HashMap<(Option<String>, Vec<String>), Vec<String>>,
-    /// The synth key of the first enum of each open literal set, by its
-    /// sorted literals, which unnamed uses of the set share.
+    /// The enums named for a use, by full path, which another use doesn't
+    /// take for holding the same literals.
+    anonymous: HashSet<(Option<String>, Vec<String>)>,
+    /// The synth key of the first named enum of each open literal set, by
+    /// its sorted literals, which unnamed uses of the set take.
     open_sets: HashMap<Vec<String>, String>,
     /// The anchors using each inline payload enum named by its first, the
     /// name its arms spell, and its synth key: one more than one anchor
@@ -437,6 +440,7 @@ impl<'a> Lowerer<'a> {
             payloads: HashSet::new(),
             pulled: indexmap::IndexSet::new(),
             literals: HashMap::new(),
+            anonymous: HashSet::new(),
             open_sets: HashMap::new(),
             anchors: Vec::new(),
             made: HashMap::new(),
