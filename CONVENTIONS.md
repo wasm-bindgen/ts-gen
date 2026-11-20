@@ -339,8 +339,15 @@ admitting both empties, and every name besides their `null` arms:
 | `f(x: string \| null)` (write)            | `f(&str)`, `f_with_null()` | the same                         |
 | `f(x?: string \| null)` (write)           | `f()`, `f_with_x(&str)`    | adds `f_with_null()`             |
 
+[Per-monomorphization](#per-monomorphization) builds on wasm-bindgen's
+unreleased stack, where the carrier of both empties is `Nullable<Option<T>>`
+(`Nullable::Null`, `Nullable::Value(None)` for `undefined`) and
+`Option<Nullable<T>>` no longer crosses, so it nests `T??` that way round
+wherever the default writes `Option<Nullable<T>>`.
+
 The `nullability`, `node-nullable` and `optional-reads` fixtures carry a
-`strict.rs` snapshot beside their `default.rs` and `mono.rs`.
+`strict.rs` and a `mono-strict.rs` snapshot beside their `default.rs` and
+`mono.rs`.
 
 ## Array and slice types
 
