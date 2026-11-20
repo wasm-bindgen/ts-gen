@@ -76,6 +76,9 @@ pub(crate) struct ClassConfig<'a> {
     /// Scope for type reference resolution. For class-like configs
     /// this is the type's body scope (holds its `<T, …>`).
     scope: ScopeId,
+    /// The methods of `members` with a `_typed` twin, as the twin reads
+    /// them.
+    typed: Vec<Member>,
 }
 
 /// Whether instantiation `r` passes `param` on as its first argument.
@@ -372,7 +375,7 @@ impl<'a> ClassConfig<'a> {
         };
 
         let mut members = decl.members.clone();
-        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
+        let typed = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -389,6 +392,7 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            typed,
         }
     }
 
@@ -408,7 +412,7 @@ impl<'a> ClassConfig<'a> {
 
         let inherited = inherited_members(&decl.extends, cgctx);
         let mut members = inherit_into(inherited.beyond_first, &decl.members);
-        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
+        let typed = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -422,6 +426,7 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            typed,
         }
     }
 
@@ -445,6 +450,7 @@ impl<'a> ClassConfig<'a> {
             type_params: self.type_params.clone(),
             cgctx: self.cgctx,
             scope: self.scope,
+            typed: self.typed.clone(),
         }
     }
 
@@ -465,7 +471,7 @@ impl<'a> ClassConfig<'a> {
             ModuleContext::Global => None,
         };
         let mut members = decl.members.clone();
-        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
+        let typed = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -479,7 +485,82 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            typed,
         }
+    }
+
+    /// The method or static method whose type parameters `scope` holds,
+    /// as its `_typed` twin reads it, when it has one.
+    fn typed(&self, scope: ScopeId) -> Option<&Member> {
+        self.typed.iter().find(|m| match m {
+            Member::Method(m) => m.body_scope == scope,
+            Member::StaticMethod(m) => m.body_scope == scope,
+            _ => false,
+        })
+    }
+
+    /// The `_typed` twins of `plain`, the bindings of the method group
+    /// `spec`.
+    fn typed_twins(
+        &self,
+        spec: &CallableSpec<'_>,
+        form: super::ir_callables::Form,
+        plain: &[FunctionSignature],
+        names: &mut LocalScope,
+    ) -> Vec<FunctionSignature> {
+        if !spec
+            .overloads
+            .iter()
+            .any(|o| self.typed(o.body_scope).is_some())
+        {
+            return Vec::new();
+        }
+        let typed: Vec<Overload> = spec
+            .overloads
+            .iter()
+            .map(|o| match self.typed(o.body_scope) {
+                Some(Member::Method(m)) => Overload {
+                    params: &m.params,
+                    return_type: &m.return_type,
+                    ..*o
+                },
+                Some(Member::StaticMethod(m)) => Overload {
+                    params: &m.params,
+                    return_type: &m.return_type,
+                    ..*o
+                },
+                _ => *o,
+            })
+            .collect();
+        let module = self.from_module();
+        super::type_params::typed_twins(
+            &CallableSpec {
+                overloads: &typed,
+                ..spec.clone()
+            },
+            ir_site(self, form),
+            plain,
+            names,
+            self.cgctx,
+            &|sig, anchor| {
+                to_return_type(
+                    &sig.return_type,
+                    sig.catch,
+                    &sig.form,
+                    sig.js_string_return,
+                    sig.error_type.as_ref(),
+                    self.cgctx,
+                    sig.body_scope,
+                    &module,
+                    super::typemap::ReturnAnchor {
+                        base: anchor,
+                        kind: super::typemap::ReturnAnchorKind::Callable,
+                        parent: Some(&self.rust_name),
+                    },
+                )
+                .to_string()
+            },
+        )
     }
 
     /// Where the IR declares this type, when it is the declaration being
@@ -833,8 +914,13 @@ impl<'a> ClassConfig<'a> {
     /// bodies call generated setters with values of these types, and
     /// `RefIntoWasmAbi` for one a setter takes a `&[T]` of.
     fn helper_generics_decl(&self) -> TokenStream {
+        render_generic_bounds(&self.helper_bounds())
+    }
+
+    /// [`Self::helper_generics_decl`]'s bound for each type parameter.
+    fn helper_bounds(&self) -> Vec<TokenStream> {
         if !CodegenContext::generic_mono(self.cgctx) {
-            return self.type_generics_decl();
+            return self.type_param_bounds();
         }
         let sliced = |name: &str| {
             self.members.iter().any(|m| match m {
@@ -845,8 +931,7 @@ impl<'a> ClassConfig<'a> {
                 _ => false,
             })
         };
-        let bounds = self
-            .type_params
+        self.type_params
             .iter()
             .map(|tp| {
                 let ident = super::typemap::make_ident(&tp.name);
@@ -860,8 +945,50 @@ impl<'a> ClassConfig<'a> {
                 }
                 quote! { #ident: #bound }
             })
-            .collect::<Vec<_>>();
-        render_generic_bounds(&bounds)
+            .collect()
+    }
+
+    /// The instantiation a factory naming only `mentioned` makes: those
+    /// parameters by name and the rest at their declared defaults. Its
+    /// helper `impl` generics, and its argument list.
+    fn open_instantiation(&self, mentioned: &[String]) -> (TokenStream, TokenStream) {
+        let module = self.from_module();
+        let mut chosen: HashMap<&str, TypeRef> = HashMap::new();
+        let mut bounds = Vec::new();
+        let mut args = Vec::new();
+        for (tp, bound) in self.type_params.iter().zip(self.helper_bounds()) {
+            if mentioned.contains(&tp.name) {
+                chosen.insert(&tp.name, TypeRef::ident(tp.name.clone()));
+                bounds.push(bound);
+                let ident = super::typemap::make_ident(&tp.name);
+                args.push(quote! { #ident });
+                continue;
+            }
+            let default = self.type_param_default_ref(tp, &chosen);
+            args.push(
+                match self
+                    .bounded()
+                    .filter(|b| b.param == tp.name)
+                    .and_then(|b| self.ir_enum(&b.default))
+                {
+                    Some(t) => super::typemap::to_syn_type(
+                        &t,
+                        TypePosition::RETURN,
+                        self.cgctx,
+                        self.scope,
+                        &module,
+                    ),
+                    None => super::typemap::type_param_default_tokens(
+                        tp.default.is_some().then_some(&default),
+                        self.cgctx,
+                        self.scope,
+                        &module,
+                    ),
+                },
+            );
+            chosen.insert(&tp.name, default);
+        }
+        (render_generic_bounds(&bounds), quote! { <#(#args),*> })
     }
 
     /// Tokens for the type's generic-argument list (`<T, …>`) used in
@@ -1111,10 +1238,20 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             false
         }
     });
+    // A factory whose arguments leave a type parameter open makes the
+    // default instantiation, and its `_typed` twin any other.
+    let generic = !config.type_params.is_empty();
+    let typed = |name: String, open: bool| {
+        super::typemap::make_ident(&match open {
+            true => format!("{name}_typed"),
+            false => name,
+        })
+    };
+    let bare_new = typed("new".into(), generic);
     let default_impl = quote! {
         impl #type_decl Default for #rust_type {
             fn default() -> Self {
-                Self::new()
+                Self::#bare_new()
             }
         }
     };
@@ -1124,14 +1261,26 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             .iter()
             .all(|m| !matches!(m, Member::Getter(g) if !g.optional));
         let default_impl = all_optional.then_some(&default_impl);
+        let plain = generic.then(|| {
+            let (decl, args) = config.open_instantiation(&[]);
+            quote! {
+                impl #decl #rust_type_ident #args {
+                    #[allow(clippy::new_without_default)]
+                    pub fn new() -> Self {
+                        Self::#bare_new()
+                    }
+                }
+            }
+        });
         return quote! {
             impl #type_decl #rust_type {
                 #[allow(clippy::new_without_default)]
-                pub fn new() -> #rust_type {
+                pub fn #bare_new() -> #rust_type {
                     #[allow(unused_unsafe)]
                     unsafe { JsValue::from(js_sys::Object::new()).unchecked_into() }
                 }
             }
+            #plain
             #default_impl
         };
     }
@@ -1587,6 +1736,9 @@ pub(crate) fn generate_dictionary_factory_with_passes(
 
     let mut builder_variants: Vec<TokenStream> = Vec::new();
     let mut new_variants: Vec<TokenStream> = Vec::new();
+    // The plain factories of each open instantiation, by the type
+    // parameters its arguments mention.
+    let mut open_variants: Vec<(Vec<String>, Vec<TokenStream>)> = Vec::new();
     // Shared across passes so a discriminator combo emitted by branch A
     // doesn't get re-emitted under the same name by branch B.
     let mut emitted_names: HashSet<String> = HashSet::new();
@@ -1826,7 +1978,6 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             if !emitted_names.insert(full_suffix.clone()) {
                 continue;
             }
-            let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
             let (value_params, value_scopes): (Vec<ConcreteParam>, Vec<ScopeId>) = plan
                 .value_params
                 .iter()
@@ -1859,6 +2010,25 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             combo_bounds.extend(config.local_generic_bounds(config.scope, &combo_param_tys));
             combo_bounds.extend(abv_bounds);
             let generics = render_generic_bounds(&combo_bounds);
+            // A parameter can lower to a type naming one its `TypeRef`
+            // doesn't (a family's `Units::PluralizeUnits`).
+            let named = config.mentioned_type_params(config.scope, &combo_param_tys);
+            let mentioned: Vec<String> = config
+                .type_params
+                .iter()
+                .map(|tp| tp.name.clone())
+                .filter(|n| {
+                    named.contains(n)
+                        || super::signatures::mentions_param(
+                            quote! { #params_tokens #helper_where_clause },
+                            &HashSet::from([n.clone()]),
+                        )
+                })
+                .collect();
+            let open = mentioned.len() < config.type_params.len();
+            let new_ident = typed(format!("new{full_suffix}"), open);
+            let builder_ident = typed(format!("builder{full_suffix}"), open);
+            let mut plain: Vec<TokenStream> = Vec::new();
             let init_calls = &plan.init_calls;
             let arg_idents = &plan.arg_idents;
 
@@ -1928,7 +2098,18 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                         #builder_name_ident { inner }
                     }
                 };
-                let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
+                if open {
+                    let (_, args) = config.open_instantiation(&mentioned);
+                    let plain_ident = typed(format!("builder{full_suffix}"), false);
+                    plain.push(quote! {
+                        #builder_doc
+                        pub fn #plain_ident #generics (#params_tokens) -> #builder_name_ident #args
+                        #helper_where_clause
+                        {
+                            Self::#builder_ident(#(#arg_idents),*)
+                        }
+                    });
+                }
                 builder_variants.push(quote! {
                     #builder_doc
                     pub fn #builder_ident #generics (#params_tokens) -> #builder_name
@@ -1971,6 +2152,24 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                         #body
                     }
                 });
+            }
+            if open {
+                let plain_ident = typed(format!("new{full_suffix}"), false);
+                plain.insert(
+                    0,
+                    quote! {
+                        #new_doc
+                        pub fn #plain_ident #generics (#params_tokens) -> Self
+                        #helper_where_clause
+                        {
+                            Self::#new_ident(#(#arg_idents),*)
+                        }
+                    },
+                );
+                match open_variants.iter_mut().find(|(m, _)| *m == mentioned) {
+                    Some((_, variants)) => variants.extend(plain),
+                    None => open_variants.push((mentioned, plain)),
+                }
             }
         }
     }
@@ -2049,12 +2248,21 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         .iter()
         .all(Vec::is_empty)
         .then_some(default_impl);
+    let open_impls = open_variants.iter().map(|(mentioned, variants)| {
+        let (decl, args) = config.open_instantiation(mentioned);
+        quote! {
+            impl #decl #rust_type_ident #args {
+                #(#variants)*
+            }
+        }
+    });
     if emit_builder || kept_builder {
         quote! {
             impl #type_decl #rust_type {
                 #(#new_variants)*
                 #(#builder_variants)*
             }
+            #(#open_impls)*
             #default_impl
 
             pub struct #builder_name_ident #builder_struct_decl {
@@ -2076,6 +2284,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             impl #type_decl #rust_type {
                 #(#new_variants)*
             }
+            #(#open_impls)*
             #default_impl
         }
     }
@@ -2162,22 +2371,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 }
                 expanded_constructors = true;
 
-                // Without per-mono the constructor names the bare class and
+                // The constructor names the bare class and
                 // `generate_expanded_constructor` instantiates only the
                 // parameters its arguments mention; the rest default.
-                let per_mono = CodegenContext::generic_mono(config.cgctx);
-                let return_type = if per_mono && !config.type_params.is_empty() {
-                    TypeRef::generic(
-                        config.rust_name.clone(),
-                        config
-                            .type_params
-                            .iter()
-                            .map(|tp| TypeRef::ident(tp.name.clone()))
-                            .collect(),
-                    )
-                } else {
-                    TypeRef::ident(config.rust_name.clone())
-                };
+                let return_type = TypeRef::ident(config.rust_name.clone());
                 // Each constructor resolves in the body of the declaration
                 // it is written in, or in its construct signature's own
                 // scope when that declares `<T>` (`new <T>(…): Foo<T>`).
@@ -2205,7 +2402,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     config.cgctx,
                 );
                 for sig in &sigs {
-                    items.push(generate_expanded_constructor(config, sig));
+                    items.push(generate_expanded_constructor(config, sig, &mut names));
                 }
             }
             Member::Method(m) => {
@@ -2228,23 +2425,26 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     .collect();
                 let base = config.member_base(MemberKind::Method, &m.js_name);
                 unreserve_base(&mut names, &base);
+                let spec = CallableSpec {
+                    js_name: &m.js_name,
+                    rust_name: Some(&base),
+                    kind: SignatureKind::Method,
+                    overloads: &overloads,
+                    module: &module,
+                };
+                let form = super::ir_callables::Form::Method;
                 let mut sigs = super::ir_callables::build(
-                    &CallableSpec {
-                        js_name: &m.js_name,
-                        rust_name: Some(&base),
-                        kind: SignatureKind::Method,
-                        overloads: &overloads,
-                        module: &module,
-                    },
-                    ir_site(config, super::ir_callables::Form::Method),
+                    &spec,
+                    ir_site(config, form),
                     &mut names,
                     config.cgctx,
                 );
+                let twins = config.typed_twins(&spec, form, &sigs, &mut names);
                 if let Some(display) = display_to_string(config, &mut sigs, &mut names) {
                     items.extend(display.binding);
                     impls.push(display.impl_);
                 }
-                for sig in &sigs {
+                for sig in sigs.iter().chain(&twins) {
                     items.push(generate_expanded_method(config, sig));
                 }
             }
@@ -2268,19 +2468,22 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     .collect();
                 let base = config.member_base(MemberKind::StaticMethod, &m.js_name);
                 unreserve_base(&mut names, &base);
+                let spec = CallableSpec {
+                    js_name: &m.js_name,
+                    rust_name: Some(&base),
+                    kind: SignatureKind::StaticMethod,
+                    overloads: &overloads,
+                    module: &module,
+                };
+                let form = super::ir_callables::Form::Static;
                 let sigs = super::ir_callables::build(
-                    &CallableSpec {
-                        js_name: &m.js_name,
-                        rust_name: Some(&base),
-                        kind: SignatureKind::StaticMethod,
-                        overloads: &overloads,
-                        module: &module,
-                    },
-                    ir_site(config, super::ir_callables::Form::Static),
+                    &spec,
+                    ir_site(config, form),
                     &mut names,
                     config.cgctx,
                 );
-                for sig in &sigs {
+                let twins = config.typed_twins(&spec, form, &sigs, &mut names);
+                for sig in sigs.iter().chain(&twins) {
                     items.push(generate_expanded_static_method(config, sig));
                 }
             }
@@ -2598,23 +2801,30 @@ pub(super) fn widen_async_return_param(
         .collect()
 }
 
-/// Generate a constructor binding from a resolved signature.
-fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
-    let rust_ident = super::typemap::make_ident(&sig.rust_name);
+/// Generate a constructor binding from a resolved signature, and its
+/// `_typed` twin when its arguments leave a class parameter open.
+fn generate_expanded_constructor(
+    config: &ClassConfig,
+    sig: &FunctionSignature,
+    names: &mut LocalScope,
+) -> TokenStream {
     let scope = sig.body_scope;
-    let doc = super::doc_tokens(&sig.doc);
-    let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
-
     // Type parameters the arguments mention — the class's own or the
     // construct signature's. A constructor-level `<T>` of the same
     // name as a class-level one (the `declare var` pattern) binds the
     // class parameter positionally by name.
     let param_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
     let mentioned = config.mentioned_type_param_names(scope, &param_tys);
-    let return_type = if CodegenContext::generic_mono(config.cgctx)
-        || config.type_params.is_empty()
-        || mentioned.is_empty()
-    {
+    let class_bounds = config.type_param_bounds();
+    let class_bound = |name: &str| {
+        let at = config.type_params.iter().position(|tp| tp.name == name);
+        at.map(|i| class_bounds[i].clone())
+    };
+    let open = config
+        .type_params
+        .iter()
+        .any(|tp| !mentioned.contains(&tp.name));
+    let return_type = if config.type_params.is_empty() || mentioned.is_empty() {
         sig.return_type.clone()
     } else {
         // An unmentioned parameter's default can name an earlier one
@@ -2633,11 +2843,54 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         }
         TypeRef::generic(config.rust_name.clone(), args)
     };
+    // A constructor only binds the type parameters its own arguments
+    // mention; the rest are instantiated at their defaults in the return
+    // type so `Foo::new()` needs no turbofish.
+    let bounds: Vec<TokenStream> = mentioned
+        .iter()
+        .map(|n| class_bound(n).unwrap_or_else(|| CodegenContext::type_param_decl(config.cgctx, n)))
+        .collect();
+    let plain = constructor_binding(config, sig, &sig.rust_name, &return_type, bounds);
+    if !open || sig.literal.is_some() {
+        return plain;
+    }
+
+    let typed_return = TypeRef::generic(
+        config.rust_name.clone(),
+        config
+            .type_params
+            .iter()
+            .map(|tp| TypeRef::ident(tp.name.clone()))
+            .collect(),
+    );
+    let mut bounds = class_bounds.clone();
+    bounds.extend(config.local_generic_bounds(scope, &param_tys));
+    let name = names.declare(&format!("{}_typed", sig.rust_name), Suffix::Snake);
+    let typed = constructor_binding(config, sig, &name, &typed_return, bounds);
+    quote! {
+        #plain
+        #typed
+    }
+}
+
+/// One binding of the constructor `sig`, returning the class as
+/// `return_type` instantiates it.
+fn constructor_binding(
+    config: &ClassConfig,
+    sig: &FunctionSignature,
+    rust_name: &str,
+    return_type: &TypeRef,
+    mut bounds: Vec<TokenStream>,
+) -> TokenStream {
+    let rust_ident = super::typemap::make_ident(rust_name);
+    let scope = sig.body_scope;
+    let doc = super::doc_tokens(&sig.doc);
+    let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
     // Constructors always return the constructed type, wrapped in Result
     // when `catch` (which is always-true here per `SignatureKind::Constructor`).
     // The class is named from its own body, wherever the params resolve.
     let ret = to_return_type(
-        &return_type,
+        return_type,
         sig.catch,
         &sig.form,
         sig.js_string_return,
@@ -2661,17 +2914,6 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         wb_parts.push(quote! { catch });
     }
 
-    let mut bounds = if CodegenContext::generic_mono(config.cgctx) {
-        generic_bounds_for_method(config, sig)
-    } else {
-        // A constructor only binds the type parameters its own
-        // arguments mention; the rest are instantiated at their
-        // defaults in the return type so `Foo::new()` needs no turbofish.
-        mentioned
-            .iter()
-            .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
-            .collect()
-    };
     let params = generate_callable_params(
         &sig.params,
         config.cgctx,

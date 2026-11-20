@@ -52,24 +52,33 @@ fn emit_function(
     scope: ScopeId,
     value_names: &mut ValueNames,
 ) -> TokenStream {
+    let mut typed = decl.clone();
     let mut decl = decl.clone();
+    let mut twinned = false;
     if let Some(cgctx) = cgctx {
-        super::type_params::erase_uninferrable(
-            &mut decl.type_params,
-            &mut decl.params,
-            &mut decl.return_type,
-            cgctx,
-            decl.body_scope,
-        );
-        for o in &mut decl.overloads {
-            super::type_params::erase_uninferrable(
-                &mut o.type_params,
-                &mut o.params,
-                &mut o.return_type,
+        use super::type_params::{erase_uninferrable, Reading};
+        let erase = |d: &mut FunctionDecl, reading| {
+            let mut erased = erase_uninferrable(
+                &mut d.type_params,
+                &mut d.params,
+                &mut d.return_type,
                 cgctx,
-                o.body_scope,
+                d.body_scope,
+                reading,
             );
-        }
+            for o in &mut d.overloads {
+                erased += erase_uninferrable(
+                    &mut o.type_params,
+                    &mut o.params,
+                    &mut o.return_type,
+                    cgctx,
+                    o.body_scope,
+                    reading,
+                );
+            }
+            erased
+        };
+        twinned = erase(&mut decl, Reading::Plain) > erase(&mut typed, Reading::Typed);
     }
     let decl = &decl;
     let rust_name = value_names.take(
@@ -100,19 +109,58 @@ fn emit_function(
         overloads: &overloads,
         module: ctx,
     };
-    let sigs = super::ir_callables::build(
-        &spec,
-        Some(super::ir_callables::Site {
-            module: ctx.specifier(),
-            path: js_namespace,
-            form: super::ir_callables::Form::Function,
-        }),
-        &mut value_names.idents,
-        cgctx,
-    );
+    let site = Some(super::ir_callables::Site {
+        module: ctx.specifier(),
+        path: js_namespace,
+        form: super::ir_callables::Form::Function,
+    });
+    let sigs = super::ir_callables::build(&spec, site, &mut value_names.idents, cgctx);
+    let twins = match twinned {
+        true => {
+            let typed: Vec<Overload> = std::iter::once((&typed.params, &typed.return_type))
+                .chain(typed.overloads.iter().map(|o| (&o.params, &o.return_type)))
+                .zip(&overloads)
+                .map(|((params, return_type), o)| Overload {
+                    params,
+                    return_type,
+                    ..*o
+                })
+                .collect();
+            super::type_params::typed_twins(
+                &CallableSpec {
+                    overloads: &typed,
+                    ..spec.clone()
+                },
+                site,
+                &sigs,
+                &mut value_names.idents,
+                cgctx,
+                &|sig, anchor| {
+                    to_return_type(
+                        &sig.return_type,
+                        sig.catch,
+                        &sig.form,
+                        sig.js_string_return,
+                        sig.error_type.as_ref(),
+                        cgctx,
+                        sig.body_scope,
+                        ctx,
+                        super::typemap::ReturnAnchor {
+                            base: anchor,
+                            kind: super::typemap::ReturnAnchorKind::Callable,
+                            parent: None,
+                        },
+                    )
+                    .to_string()
+                },
+            )
+        }
+        false => Vec::new(),
+    };
 
     let items: Vec<TokenStream> = sigs
         .iter()
+        .chain(&twins)
         .map(|sig| generate_expanded_free_function(sig, ctx, cgctx, js_namespace, scope))
         .collect();
 

@@ -47,7 +47,7 @@ async fn mono_arms_compile(
 async fn generic_arms_compile(store: &KVStore<JsString>) -> Result<(), JsValue> {
     let _: Option<String> = store.get_text(JsString::from("k")).await?;
     let _: Option<JsString> = store.get_text_js_string(JsString::from("k")).await?;
-    let _: Option<Object> = store.get_json::<Object>(JsString::from("k")).await?;
+    let _: Option<Object> = store.get_json_typed::<Object>(JsString::from("k")).await?;
     Ok(())
 }
 

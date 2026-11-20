@@ -3,6 +3,10 @@
 // same name, and the interface's body scope (where `T` is declared)
 // carries over to the merged class so member types resolve. A named
 // constructor interface (`Slot`) behaves the same.
+//
+// A constructor whose arguments leave a class parameter open returns it at
+// its default (`Holder::new()`), beside a `_typed` twin binding every
+// class parameter (`Holder::<Value>::new_typed()`).
 
 interface Holder<Value = unknown> {
   readonly value?: Value;
@@ -35,3 +39,9 @@ interface SlotConstructor {
 }
 
 declare var Slot: SlotConstructor;
+
+declare class Channel<I = string, O = I> {
+  constructor(capacity?: number);
+  constructor(source: I, capacity: number);
+  send(item: I): O;
+}

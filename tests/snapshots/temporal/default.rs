@@ -1355,18 +1355,26 @@ pub mod temporal {
         );
     }
     impl<Units: ::wasm_bindgen::JsGeneric> RoundingOptions<Units> {
-        pub fn new() -> RoundingOptions<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> RoundingOptions<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> RoundingOptionsBuilder<Units> {
+        pub fn builder_typed() -> RoundingOptionsBuilder<Units> {
             RoundingOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl RoundingOptions<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> RoundingOptionsBuilder<JsValue> {
+            Self::builder_typed()
+        }
+    }
     impl<Units: ::wasm_bindgen::JsGeneric> Default for RoundingOptions<Units> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct RoundingOptionsBuilder<Units: ::wasm_bindgen::JsGeneric> {
@@ -1405,13 +1413,21 @@ pub mod temporal {
         );
     }
     impl<Units: ::wasm_bindgen::JsGeneric> RoundToOptions<Units> {
-        pub fn new(smallest_unit: PluralizeUnit) -> RoundToOptions<Units> {
-            Self::builder(smallest_unit).build()
+        pub fn new_typed(smallest_unit: PluralizeUnit) -> RoundToOptions<Units> {
+            Self::builder_typed(smallest_unit).build()
         }
-        pub fn builder(smallest_unit: PluralizeUnit) -> RoundToOptionsBuilder<Units> {
+        pub fn builder_typed(smallest_unit: PluralizeUnit) -> RoundToOptionsBuilder<Units> {
             let inner: RoundToOptions<Units> = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_smallest_unit(smallest_unit);
             RoundToOptionsBuilder { inner }
+        }
+    }
+    impl RoundToOptions<JsValue> {
+        pub fn new(smallest_unit: PluralizeUnit) -> Self {
+            Self::new_typed(smallest_unit)
+        }
+        pub fn builder(smallest_unit: PluralizeUnit) -> RoundToOptionsBuilder<JsValue> {
+            Self::builder_typed(smallest_unit)
         }
     }
     pub struct RoundToOptionsBuilder<Units: ::wasm_bindgen::JsGeneric> {
@@ -1446,18 +1462,26 @@ pub mod temporal {
         );
     }
     impl<Units: ::wasm_bindgen::JsGeneric> RoundingOptionsWithLargestUnit<Units> {
-        pub fn new() -> RoundingOptionsWithLargestUnit<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> RoundingOptionsWithLargestUnit<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> RoundingOptionsWithLargestUnitBuilder<Units> {
+        pub fn builder_typed() -> RoundingOptionsWithLargestUnitBuilder<Units> {
             RoundingOptionsWithLargestUnitBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl RoundingOptionsWithLargestUnit<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> RoundingOptionsWithLargestUnitBuilder<JsValue> {
+            Self::builder_typed()
+        }
+    }
     impl<Units: ::wasm_bindgen::JsGeneric> Default for RoundingOptionsWithLargestUnit<Units> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct RoundingOptionsWithLargestUnitBuilder<Units: ::wasm_bindgen::JsGeneric> {
@@ -1509,18 +1533,26 @@ pub mod temporal {
         );
     }
     impl<Units: ::wasm_bindgen::JsGeneric> ToStringRoundingOptions<Units> {
-        pub fn new() -> ToStringRoundingOptions<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> ToStringRoundingOptions<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> ToStringRoundingOptionsBuilder<Units> {
+        pub fn builder_typed() -> ToStringRoundingOptionsBuilder<Units> {
             ToStringRoundingOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl ToStringRoundingOptions<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> ToStringRoundingOptionsBuilder<JsValue> {
+            Self::builder_typed()
+        }
+    }
     impl<Units: ::wasm_bindgen::JsGeneric> Default for ToStringRoundingOptions<Units> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct ToStringRoundingOptionsBuilder<Units: ::wasm_bindgen::JsGeneric> {
@@ -1562,20 +1594,28 @@ pub mod temporal {
         );
     }
     impl<Units: ::wasm_bindgen::JsGeneric> ToStringRoundingOptionsWithFractionalSeconds<Units> {
-        pub fn new() -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
+        pub fn builder_typed() -> ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
             ToStringRoundingOptionsWithFractionalSecondsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl ToStringRoundingOptionsWithFractionalSeconds<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> ToStringRoundingOptionsWithFractionalSecondsBuilder<JsValue> {
+            Self::builder_typed()
         }
     }
     impl<Units: ::wasm_bindgen::JsGeneric> Default
         for ToStringRoundingOptionsWithFractionalSeconds<Units>
     {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct ToStringRoundingOptionsWithFractionalSecondsBuilder<Units: ::wasm_bindgen::JsGeneric> {

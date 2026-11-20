@@ -12,6 +12,8 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Holder, JsValue>;
     #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<Value: ::wasm_bindgen::JsGeneric>() -> Result<Holder<Value>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_initial<Value: ::wasm_bindgen::JsGeneric>(
         initial: &Value,
     ) -> Result<Holder<Value>, JsValue>;
@@ -62,4 +64,44 @@ extern "C" {
     pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Slot<T>) -> T;
     #[wasm_bindgen(method, setter)]
     pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &Slot<T>, val: &T);
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Channel<I: ::wasm_bindgen::JsGeneric = JsString, O: ::wasm_bindgen::JsGeneric = I>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Channel, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+    ) -> Result<Channel<I, O>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_capacity(capacity: f64) -> Result<Channel, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_capacity_typed<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        capacity: f64,
+    ) -> Result<Channel<I, O>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_source_and_capacity<I: ::wasm_bindgen::JsGeneric>(
+        source: &I,
+        capacity: f64,
+    ) -> Result<Channel<I>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_source_and_capacity_typed<
+        I: ::wasm_bindgen::JsGeneric,
+        O: ::wasm_bindgen::JsGeneric,
+    >(
+        source: &I,
+        capacity: f64,
+    ) -> Result<Channel<I, O>, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn send<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Channel<I, O>,
+        item: &I,
+    ) -> O;
+    #[wasm_bindgen(method, catch, js_name = "send")]
+    pub fn try_send<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Channel<I, O>,
+        item: &I,
+    ) -> Result<O, JsValue>;
 }

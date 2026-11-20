@@ -60,7 +60,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Envelope<Meta = JsValue, Body = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<Meta, Body>(
+    pub fn new(label: impl ::wasm_bindgen::JsStringLike) -> Result<Envelope, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<Meta, Body>(
         label: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Envelope<Meta, Body>, JsValue>;
     #[wasm_bindgen(method, getter)]

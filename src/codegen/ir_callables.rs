@@ -6,8 +6,8 @@
 //! parse when the IR doesn't yet carry what its Rust form reads.
 
 use crate::codegen::signatures::{
-    build_signatures, build_signatures_from, expand_signatures, CallableSpec, ConcreteParam,
-    ExpandedSignature, FunctionSignature, LiteralArm, Overload,
+    build_signatures_postfixed, expand_signatures, CallableSpec, ConcreteParam, ExpandedSignature,
+    FunctionSignature, LiteralArm, Overload,
 };
 use crate::codegen::typemap::CodegenContext;
 use crate::ir::{Throws, TypeRef};
@@ -105,17 +105,35 @@ pub fn build(
     names: &mut LocalScope,
     cgctx: Option<&CodegenContext<'_>>,
 ) -> Vec<FunctionSignature> {
+    build_postfixed(spec, site, "", names, cgctx)
+}
+
+/// [`build`], naming each binding with `postfix`: a second reading of a
+/// callable [`build`] has already bound, so one the IR doesn't state is
+/// left out quietly.
+pub(crate) fn build_postfixed(
+    spec: &CallableSpec<'_>,
+    site: Option<Site<'_>>,
+    postfix: &str,
+    names: &mut LocalScope,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<FunctionSignature> {
     let (cgctx, site) = match (cgctx, site) {
         (Some(c), Some(site)) if c.ir.is_some() => (c, site),
         // No IR declares it: the parse's reading (a model without IR).
-        (cgctx, _) => return build_signatures(spec, names, cgctx),
+        (cgctx, _) => {
+            let expansions = expand_signatures(spec.overloads, spec.kind, cgctx);
+            return build_signatures_postfixed(spec, expansions, postfix, names, cgctx);
+        }
     };
     let Some((ir, scopes, expansions)) = overloads(cgctx, spec, &site) else {
-        let at = [site.path, &[spec.js_name.to_string()]].concat().join(".");
-        let module = site.module.map(|m| format!("{m}:")).unwrap_or_default();
-        cgctx.warn(format!(
-            "`{module}{at}`: the IR doesn't state the parse's reading; skipped"
-        ));
+        if postfix.is_empty() {
+            let at = [site.path, &[spec.js_name.to_string()]].concat().join(".");
+            let module = site.module.map(|m| format!("{m}:")).unwrap_or_default();
+            cgctx.warn(format!(
+                "`{module}{at}`: the IR doesn't state the parse's reading; skipped"
+            ));
+        }
         return Vec::new();
     };
     let cgctx = Some(cgctx);
@@ -136,12 +154,13 @@ pub fn build(
             doc: &o.doc,
         })
         .collect();
-    build_signatures_from(
+    build_signatures_postfixed(
         &CallableSpec {
             overloads: &overloads,
             ..*spec
         },
         expansions,
+        postfix,
         names,
         cgctx,
     )

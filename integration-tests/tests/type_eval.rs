@@ -30,7 +30,7 @@ fn evaluated_types_compile(
     let _: f64 = required.size();
     let partial_box: PartialBox<JsString> = holder.partial();
     let _: Option<JsString> = partial_box.value();
-    let _: Holder<JsString> = Holder::new(&PartialBox::builder().label("l").build());
+    let _: Holder<JsString> = Holder::new(&PartialBox::builder_typed().label("l").build());
     let partial = PartialOptions::new();
     partial.set_name("n");
     partial.set_size(1.0);
