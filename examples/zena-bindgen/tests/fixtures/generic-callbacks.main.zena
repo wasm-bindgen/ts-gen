@@ -1,4 +1,5 @@
-import { BoxStr, Boxf64, List, each } from './generic-callbacks.zena';
+import { Future } from 'zena:async';
+import { BoxStr, Boxf64, List, Store, each } from './generic-callbacks.zena';
 
 export function run(b: Boxf64, s: BoxStr, l: List<f64>): f64 {
   let doubled = b.map<f64>((x: f64): f64 => x * 2.0);
@@ -12,4 +13,8 @@ export function run(b: Boxf64, s: BoxStr, l: List<f64>): f64 {
   let same = l.wrap((x: f64): List<f64> => l);
   each<f64>(l, (x: f64): void => {});
   return 0.0;
+}
+
+export async function transact(s: Store): Future<f64> {
+  return await s.transaction<f64>(async (inner: Store): Future<f64> => 1.0);
 }

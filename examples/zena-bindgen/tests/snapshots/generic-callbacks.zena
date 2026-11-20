@@ -3,7 +3,147 @@
 
 import { Option, Some, None, none, some } from 'zena:core';
 
-function __tw_entered(): void {}
+import { Future, Completer, drainMicrotasks } from 'zena:async';
+
+@external("tw:future", "poll", "tw")
+declare function __tw_future_poll(future: externref, waker: i32): i32;
+
+@external("tw:future", "take<{T}>", "tw")
+declare function __tw_future_take<T>(future: externref): T;
+
+@external("tw:future", "error<err>", "tw")
+declare function __tw_future_error(future: externref): inline (i32, String);
+
+@external("tw:future", "drop", "tw")
+declare function __tw_future_drop(future: externref): void;
+
+@external("tw:future", "new", "tw")
+declare function __tw_future_new(): inline (externref, externref);
+
+@external("tw:future", "resolve<{T}>", "tw")
+declare function __tw_future_resolve<T>(resolver: externref, value: T): void;
+
+@external("tw:future", "reject<err>", "tw")
+declare function __tw_future_reject(resolver: externref, arm: i32, message: String): void;
+
+@external("tw:loop", "work_available", "tw")
+declare function __tw_work_available(loop: i32): void;
+
+// The bindings run one tw loop, Zena's microtask queue: a JS future
+// settling wakes its awaiter, whose completion asks the bridge for a
+// tick, which drains the queue.
+interface __TwPoll {
+  poll(): void;
+}
+
+let __tw_polls = new HashMap<i32, __TwPoll>();
+var __tw_next_waker = 1;
+
+class __TwAwait<T> implements __TwPoll {
+  future: externref;
+  waker: i32;
+  completer: Completer<T>;
+  fail: (future: externref) => Error;
+
+  new(future: externref, waker: i32, fail: (future: externref) => Error)
+      : future = future, waker = waker, completer = new Completer<T>(), fail = fail {}
+
+  poll(): void {
+    let state = __tw_future_poll(this.future, this.waker);
+    if (state == 0) {
+      __tw_polls[this.waker] = this;
+      return;
+    }
+    if (state == 1) {
+      this.completer.complete(__tw_future_take<T>(this.future));
+    } else {
+      let fail = this.fail;
+      this.completer.fail(fail(this.future));
+    }
+    __tw_work_available(1);
+  }
+}
+
+/** A JS future as a Zena future, `fail` mapping its rejection to the
+ * error it fails with. Cancelling its awaiter drops the JS future, which
+ * cancels it. */
+export async function __tw_await_with<T>(
+    future: externref, fail: (future: externref) => Error): Future<T> {
+  let waker = __tw_next_waker;
+  __tw_next_waker += 1;
+  let a = new __TwAwait<T>(future, waker, fail);
+  a.poll();
+  try {
+    return await a.completer.future;
+  } cancel {
+    __tw_polls.delete(waker);
+    __tw_future_drop(future);
+  }
+}
+
+function __tw_err_fail(future: externref): Error {
+  let (arm, message) = __tw_future_error(future);
+  return new ErrException(arm as ErrArm, message);
+}
+
+export function __tw_await<T>(future: externref): Future<T> {
+  return __tw_await_with<T>(future, __tw_err_fail);
+}
+
+async function __tw_settle<T>(
+    resolver: externref, future: Future<T>,
+    reject: (resolver: externref, e: Error) => void): Future<void> {
+  try {
+    __tw_future_resolve<T>(resolver, await future);
+  } catch (e) {
+    reject(resolver, e);
+  }
+}
+
+function __tw_err_reject(resolver: externref, e: Error): void {
+  if (e is ErrException) {
+    __tw_future_reject(resolver, e.arm as i32, e.message);
+  } else {
+    __tw_future_reject(resolver, -1, e.message);
+  }
+}
+
+/** A Zena future as a JS future, `reject` rejecting it with the error
+ * the Zena future fails with. */
+export function __tw_promise_with<T>(
+    future: Future<T>, reject: (resolver: externref, e: Error) => void): externref {
+  let (promise, resolver) = __tw_future_new();
+  __tw_settle<T>(resolver, future, reject);
+  __tw_work_available(1);
+  return promise;
+}
+
+export function __tw_promise<T>(future: Future<T>): externref {
+  return __tw_promise_with<T>(future, __tw_err_reject);
+}
+
+@export("tw:future/wake")
+export function __tw_wake(waker: i32): void {
+  if (let (true, p) = __tw_polls.get(waker)) {
+    __tw_polls.delete(waker);
+    p.poll();
+  }
+}
+
+@export("tw:loop/tick")
+export function __tw_tick(loop: i32, max: i32): i32 {
+  drainMicrotasks();
+  return 0;
+}
+
+@export("tw:loop/next_sleep")
+export function __tw_next_sleep(loop: i32): i64 {
+  return (-9223372036854775808 as i64);
+}
+
+function __tw_entered(): void {
+  __tw_work_available(1);
+}
 
 export extension class Box<T> on externref {
   new __wrap(value: externref) : super(value);
@@ -72,6 +212,14 @@ export extension class List<T> on externref {
   }
 }
 
+export extension class Store on externref {
+  transaction<T>(closure: (a0: Store) => Future<T>): Future<T> {
+    if (false) { let keep = (env: anyref, p0_0: Store): externref => __tw_trampoline8<T>(env, p0_0); }
+    let r0 = __Store_transaction<T>((this as externref), (closure as anyref));
+    return __tw_await<T>(r0);
+  }
+}
+
 @external("tw:js/global", "Box.new<Str>(T)", "tw, throws:err")
 declare function __Box_new(p0: externref): externref;
 
@@ -107,6 +255,9 @@ declare function __List_pairs<T>(p0: externref): List<externref>;
 
 @external("tw:js/global", "List#wrap<{T}>(fn(T)->List<T>)", "tw")
 declare function __List_wrap<T>(p0: externref, p1: anyref): List<T>;
+
+@external("tw:js/global", "Store#transaction<{T}>(fn(Store)->future<T>)", "tw")
+declare function __Store_transaction<T>(p0: externref, p1: anyref): externref;
 
 @external("tw:js/global", "each<{T}>(List<T>,fn(T)->unit throws err)", "tw")
 declare function __each<T>(p0: List<T>, p1: anyref): void;
@@ -176,8 +327,18 @@ export function __tw_trampoline7<T>(env: anyref, p0_0: T): List<T> {
   return result;
 }
 
+@export("tw:call:fn(Store)->future<{T}>", "tw")
+export function __tw_trampoline8<T>(env: anyref, p0_0: Store): externref {
+  let f = env as (a0: Store) => Future<T>;
+  let a0: Store = p0_0;
+  let result: Future<T> = f(a0);
+  let promise = __tw_promise<T>(result);
+  __tw_entered();
+  return promise;
+}
+
 @export("tw:call:fn({T})->unit throws err", "tw, throws:err")
-export function __tw_trampoline8<T>(env: anyref, p0_0: T): void {
+export function __tw_trampoline9<T>(env: anyref, p0_0: T): void {
   try {
     let f = env as (a0: T) => void;
     let a0: T = p0_0;
@@ -192,6 +353,6 @@ export function __tw_trampoline8<T>(env: anyref, p0_0: T): void {
 }
 
 export function each<T>(items: List<T>, f: (a0: T) => void): void {
-  if (false) { let keep = (env: anyref, p0_0: T): void => __tw_trampoline8<T>(env, p0_0); }
+  if (false) { let keep = (env: anyref, p0_0: T): void => __tw_trampoline9<T>(env, p0_0); }
   __each<T>(items, (f as anyref));
 }

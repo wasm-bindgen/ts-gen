@@ -16,3 +16,7 @@ class List<T> {
 }
 
 each<T>(items: List<T>, f: fn(T) throws);
+
+class Store {
+  transaction<T>(closure: fn(Store) -> future<T>): future<T>;
+}

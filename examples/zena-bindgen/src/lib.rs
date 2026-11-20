@@ -2919,6 +2919,20 @@ impl<'a> Gen<'a> {
                 "  let result: {t} = {call};\n  __tw_entered();\n  return result;"
             );
             (t.clone(), t)
+        } else if let (Type::Future(v, e), true) = (&fun.result, mentions_tparam(&fun.result, cx)) {
+            // A future of a type parameter settles a JS promise at the
+            // instantiation.
+            let inner = self.generic_surface(v, cx)?;
+            if inner.contains("Future<") {
+                return skip("a future inside a generic callback's result");
+            }
+            let t = self.generic_surface(&fun.result, cx)?;
+            let (_, promise) = self.future_fns_of(e, cx, Flow::ToJs)?;
+            let _ = writeln!(
+                body,
+                "  let result: {t} = {call};\n  let promise = {promise}<{inner}>(result);\n  __tw_entered();\n  return promise;"
+            );
+            ("externref".to_string(), t)
         } else if mentions_tparam(&fun.result, cx) {
             let t = self.generic_surface(&fun.result, cx)?;
             if t.contains("Future<") {
