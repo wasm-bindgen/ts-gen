@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, JsString, Map, Number, Set};
+use js_sys::{Array, JsString, Map, Nullable, Number, Set};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::mono_lists::*;
@@ -110,4 +110,36 @@ fn properties_and_builders_take_string_lists() {
 #[wasm_bindgen_test]
 fn variadic_constructors_spread_the_list() {
     assert_eq!(Total::new(&[1.0, 2.5]).unwrap().value(), 3.5);
+}
+
+#[wasm_bindgen_test]
+fn union_lists_keep_the_enum_as_their_element() {
+    let read = marks();
+    assert!(matches!(&read[0], MarkOrStr::Mark(m) if m.text() == "m"));
+    assert!(matches!(&read[1], MarkOrStr::String(s) if s == "s"));
+    assert_eq!(describe_marks(&read), "Array(object:Mark(m),string:s)");
+
+    let read = maybe_marks();
+    assert!(matches!(&read[0], Some(MarkOrStr::Mark(m)) if m.text() == "m"));
+    assert!(read[1].is_none());
+    assert!(matches!(&read[2], Some(MarkOrStr::String(s)) if s == "s"));
+
+    let mark = Mark::new("w").unwrap();
+    assert_eq!(
+        describe_maybe_marks(&[
+            Nullable::Value(MarkOrStr::Mark(mark.clone())),
+            Nullable::Null,
+            Nullable::Value(MarkOrStr::String("t".into())),
+        ]),
+        "Array(object:Mark(w),object:null,string:t)"
+    );
+
+    let options = MarkOptions::builder()
+        .marks(&[MarkOrStr::String("o".into()), MarkOrStr::Mark(mark)])
+        .build();
+    assert_eq!(
+        describe_mark_options(&options),
+        "Array(string:o,object:Mark(w))"
+    );
+    assert_eq!(options.marks().map(|marks| marks.len()), Some(2));
 }

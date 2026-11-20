@@ -51,3 +51,16 @@ export class Total {
     this.value = values.reduce((a, b) => a + b, 0);
   }
 }
+export class Mark {
+  constructor(text) {
+    this.text = text;
+  }
+  toString() {
+    return `Mark(${this.text})`;
+  }
+}
+export const marks = () => [new Mark("m"), "s"];
+export const maybeMarks = () => [new Mark("m"), null, "s"];
+export const describeMarks = describe;
+export const describeMaybeMarks = describe;
+export const describeMarkOptions = (options) => describe(options.marks);

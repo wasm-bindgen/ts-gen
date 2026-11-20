@@ -19,7 +19,10 @@ interface Erased {
   /** Mixed primitives + objects — no LUB, becomes a dynamic union. */
   readonly content: string | ArrayBuffer | ArrayBufferView;
 
-  /** Inner-erased generic — outer Array stays as `Vec<JsValue>`. */
+  /**
+   * Inner-erased generic — outer Array stays as `Vec<JsValue>`, or takes
+   * the union's enum as its element under per-monomorphization.
+   */
   readonly tags: Array<32 | "foo">;
 }
 

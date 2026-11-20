@@ -48,3 +48,19 @@ export declare class Total {
   constructor(...values: number[]);
   readonly value: number;
 }
+
+// A list of a union keeps the union's enum as its element, read or written,
+// so a list can mix its arms. An element admitting `null` reads in `Option`
+// and is written in `Nullable`.
+export declare class Mark {
+  constructor(text: string);
+  readonly text: string;
+}
+export declare function marks(): (Mark | string)[];
+export declare function maybeMarks(): (Mark | string | null)[];
+export declare function describeMarks(values: (Mark | string)[]): string;
+export declare function describeMaybeMarks(values: (Mark | string | null)[]): string;
+export interface MarkOptions {
+  marks?: (Mark | string)[];
+}
+export declare function describeMarkOptions(options: MarkOptions): string;
