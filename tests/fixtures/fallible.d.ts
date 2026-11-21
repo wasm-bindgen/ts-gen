@@ -26,3 +26,11 @@ export declare class Counter {
   readonly value: number;
   max: number;
 }
+
+export declare class Signal {
+  /**
+   * Constructor declared infallible — plain `Signal`, no `catch`.
+   * @throws {never}
+   */
+  constructor();
+}
