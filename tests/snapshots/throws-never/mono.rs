@@ -45,10 +45,10 @@ extern "C" {
     #[doc = " * `RangeError`"]
     #[wasm_bindgen(method, catch, js_name = "typedOp")]
     pub fn typed_op_js_string(this: &NeverThrows, x: f64) -> Result<JsString, RangeError>;
-    #[doc = " Constructor with `@throws {never}` is a no-op — JS `new` can"]
-    #[doc = " always throw, so the constructor still catches."]
-    #[wasm_bindgen(constructor, catch)]
-    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Result<NeverThrows, JsValue>;
+    #[doc = " Constructor declared infallible — `new(name) -> NeverThrows`, no"]
+    #[doc = " `catch`."]
+    #[wasm_bindgen(constructor)]
+    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> NeverThrows;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
