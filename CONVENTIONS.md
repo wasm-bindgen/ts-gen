@@ -3953,7 +3953,7 @@ does not exist.
 ## `--annotate` side files
 
 Upstream declaration files (`@cloudflare/workers-types`,
-`lib.dom.d.ts`) carry no `@tw-abi` or `@throws` tags, and editing a
+`lib.dom.d.ts`) carry no `@tw-abi`, `@throws` or `{@slice}` tags, and editing a
 vendored copy does not survive an upgrade. `--annotate` takes side
 `.d.ts` files that re-declare **only the members they tag**; the tags
 are applied to the input's declarations by declaration name and member
@@ -3978,6 +3978,21 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
 
 * `@tw-abi` applies as if written on the input member; a property's tag
   reaches its setter too. Parameters match by name.
+* A `{@slice}` tag in a side `@param` applies to the input's parameter of
+  that name, whatever type the side file gives it.
+* `@retype` makes the side member's own type replace the input's: a
+  property getter's type, or the return of every overload of a method or
+  function. It is for an input type that erases what the API produces
+  (`get body(): ReadableStream | null`, a stream of bytes), so the side
+  file writes the type it wants:
+  `/** @retype */ readonly body: ReadableStream<Uint8Array> | null;`. A
+  property's setter keeps its own type.
+* A side property with no setter (`readonly url: string`, `get url()`)
+  makes the input's read-only: its setter is not emitted. Upstream drops
+  `readonly` on properties the runtime defines read-only (workers-types'
+  `Response.status`, `WebSocket.url`), whose setters throw a `TypeError`.
+  Such a member counts as tagged; a side file that tags a writable
+  property declares it writable (`/** @tw-abi u16 */ status: number;`).
 * `@throws` replaces the input member's failure mode. Getters are
   infallible, so on a property it contributes only its doc.
 * A side member applies to every overload of the input method or

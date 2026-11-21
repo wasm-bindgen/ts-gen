@@ -56,7 +56,9 @@ pub(crate) fn apply_slice_hints(
         let Some(hint) = slice_hint(Some(mode), site, diag) else {
             continue;
         };
-        match params.iter_mut().find(|p| p.name == *name) {
+        // IR parameter names are already snake_case; tags use the TS name.
+        let ir_name = to_snake_case(name);
+        match params.iter_mut().find(|p| p.name == ir_name) {
             Some(p) => {
                 p.slice_mode = Some(hint);
                 if let Some(widened) = hint.widen_bare_typed_array(&p.type_ref) {
