@@ -3953,7 +3953,7 @@ does not exist.
 ## `--annotate` side files
 
 Upstream declaration files (`@cloudflare/workers-types`,
-`lib.dom.d.ts`) carry no `@tw-abi` or `@throws` tags, and editing a
+`lib.dom.d.ts`) carry no `@tw-abi`, `@throws` or `{@slice}` tags, and editing a
 vendored copy does not survive an upgrade. `--annotate` takes side
 `.d.ts` files that re-declare **only the members they tag**; the tags
 are applied to the input's declarations by declaration name and member
@@ -3978,6 +3978,8 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
 
 * `@tw-abi` applies as if written on the input member; a property's tag
   reaches its setter too. Parameters match by name.
+* A `{@slice}` tag in a side `@param` applies to the input's parameter of
+  that name, whatever type the side file gives it.
 * `@throws` replaces the input member's failure mode. Getters are
   infallible, so on a property it contributes only its doc.
 * A side member applies to every overload of the input method or

@@ -31,6 +31,11 @@ interface Console {
   log(...data: any[]): void;
 }
 
+interface Bucket {
+  put(key: string, bodyBytes: Uint8Array): Promise<void>;
+  upload(key: string, data: ArrayBuffer | ArrayBufferView): Promise<void>;
+}
+
 declare const console: Console;
 
 declare function setTimeout(callback: () => void, ms?: number): number;

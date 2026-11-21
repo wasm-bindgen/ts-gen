@@ -248,6 +248,31 @@ export extension class Console on externref {
   }
 }
 
+export extension class Bucket on externref {
+  // skipped Bucket#put(str,*u8[]): `*T[]` needs a linear memory
+  // skipped Bucket#upload(str,*buffer): `*buffer` needs a linear memory
+  put(key: String, bodyBytes: Uint8Array): Future<void> {
+    let r0 = __Bucket_put((this as externref), key, bodyBytes);
+    return __tw_await<void>(r0 as externref);
+  }
+  put(key: String, bodyBytes: FixedArray<u8>): Future<void> {
+    let r0 = __Bucket_put2((this as externref), key, bodyBytes);
+    return __tw_await<void>(r0 as externref);
+  }
+  upload(key: String, data: FixedArray<u8>): Future<void> {
+    let r0 = __Bucket_upload((this as externref), key, data);
+    return __tw_await<void>(r0 as externref);
+  }
+  upload(key: String, data: ArrayBuffer): Future<void> {
+    let r0 = __Bucket_upload2((this as externref), key, data);
+    return __tw_await<void>(r0 as externref);
+  }
+  upload(key: String, data: ArrayBufferView): Future<void> {
+    let r0 = __Bucket_upload3((this as externref), key, data);
+    return __tw_await<void>(r0 as externref);
+  }
+}
+
 export extension class Incoming on externref {
   colo: String {
     get {
@@ -302,6 +327,15 @@ export extension class Lookup on externref {
   }
 }
 
+export extension class Uint8Array on externref {
+}
+
+export extension class ArrayBuffer on externref {
+}
+
+export extension class ArrayBufferView on externref {
+}
+
 @external("tw:js/global", "Response#get:status()", "tw")
 declare function __Response_status(p0: externref): u16;
 
@@ -346,6 +380,21 @@ declare function __Storage_delete2(p0: externref, p1: array<var externref | null
 
 @external("tw:js/global", "Console#log(arr<Any?>)", "tw")
 declare function __Console_log(p0: externref, p1: FixedArray<externref | null>): void;
+
+@external("tw:js/global", "Bucket#put(str,Uint8Array)", "tw")
+declare function __Bucket_put(p0: externref, p1: String, p2: Uint8Array): externref;
+
+@external("tw:js/global", "Bucket#put(str,u8[])", "tw")
+declare function __Bucket_put2(p0: externref, p1: String, p2: FixedArray<u8>): externref;
+
+@external("tw:js/global", "Bucket#upload(str,buffer)", "tw")
+declare function __Bucket_upload(p0: externref, p1: String, p2: FixedArray<u8>): externref;
+
+@external("tw:js/global", "Bucket#upload(str,ArrayBuffer)", "tw")
+declare function __Bucket_upload2(p0: externref, p1: String, p2: ArrayBuffer): externref;
+
+@external("tw:js/global", "Bucket#upload(str,ArrayBufferView)", "tw")
+declare function __Bucket_upload3(p0: externref, p1: String, p2: ArrayBufferView): externref;
 
 @external("tw:js/global", "Incoming.new()", "tw")
 declare function __Incoming_new(): externref;

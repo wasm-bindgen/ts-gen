@@ -1,6 +1,6 @@
 //! @ts-gen --annotate tests/fixtures/side/annotate.d.ts
 
-// `--annotate` layers the `@tw-abi` and `@throws` tags of a side file onto
+// `--annotate` layers the `@tw-abi`, `@throws` and `{@slice}` tags of a side file onto
 // these declarations by name; the side file's own declarations are not
 // emitted and untagged members there are ignored.
 
@@ -28,6 +28,11 @@ interface Storage {
 
 interface Console {
   log(...data: any[]): void;
+}
+
+interface Bucket {
+  put(key: string, bodyBytes: Uint8Array): Promise<void>;
+  upload(key: string, data: ArrayBuffer | ArrayBufferView): Promise<void>;
 }
 
 declare const console: Console;

@@ -132,6 +132,52 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Bucket;
+    #[wasm_bindgen(method, catch)]
+    pub async fn put(
+        this: &Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "view")] body_bytes: &[u8],
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_promise(
+        this: &Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "view")] body_bytes: &[u8],
+    ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub async fn put_with_uint8_array(
+        this: &Bucket,
+        key: &str,
+        body_bytes: &Uint8Array,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_uint8_array_promise(
+        this: &Bucket,
+        key: &str,
+        body_bytes: &Uint8Array,
+    ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn upload(this: &Bucket, key: &str, data: &ArrayBuffer) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "upload")]
+    pub fn upload_promise(this: &Bucket, key: &str, data: &ArrayBuffer) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch, js_name = "upload")]
+    pub async fn upload_with_typed_array(
+        this: &Bucket,
+        key: &str,
+        data: &Object,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "upload")]
+    pub fn upload_with_typed_array_promise(
+        this: &Bucket,
+        key: &str,
+        data: &Object,
+    ) -> Promise<Undefined>;
+}
+#[wasm_bindgen]
+extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static console: Console;

@@ -1,4 +1,4 @@
-//! `--annotate`: layer `@tw-abi` and `@throws` tags from a side `.d.ts`
+//! `--annotate`: layer `@tw-abi`, `@throws` and `{@slice}` tags from a side `.d.ts`
 //! onto declarations of the main input, matched by declaration and
 //! member name. Upstream declaration files carry no such tags, and
 //! editing a vendored copy does not survive an upgrade; a side file that
@@ -232,10 +232,7 @@ impl Overlay<'_> {
     fn is_empty(&self) -> bool {
         !self.nullish
             && self.own.is_none()
-            && self
-                .params
-                .iter()
-                .all(|p| scalar_leaf(&p.type_ref).is_none())
+            && !self.params.iter().any(is_tagged)
             && matches!(self.throws, Throws::None)
             && self.doc.is_none_or(|d| d.trim().is_empty())
     }
@@ -269,18 +266,23 @@ impl Overlay<'_> {
                 tp.type_ref = tp.type_ref.nullish();
             }
         }
-        for ap in self.params {
-            let Some(scalar) = scalar_leaf(&ap.type_ref) else {
-                continue;
-            };
+        for ap in self.params.iter().filter(|p| is_tagged(p)) {
             if let Some(tp) = targets.iter_mut().find(|tp| tp.name == ap.name) {
-                match tp.type_ref.with_abi_scalar(scalar) {
-                    Some(forced) => tp.type_ref = forced,
-                    None => mismatched.push(mismatch(
-                        scalar,
-                        &format!("parameter `{}`", ap.name),
-                        &tp.type_ref,
-                    )),
+                if let Some(scalar) = scalar_leaf(&ap.type_ref) {
+                    match tp.type_ref.with_abi_scalar(scalar) {
+                        Some(forced) => tp.type_ref = forced,
+                        None => mismatched.push(mismatch(
+                            scalar,
+                            &format!("parameter `{}`", ap.name),
+                            &tp.type_ref,
+                        )),
+                    }
+                }
+                if let Some(hint) = ap.slice_mode {
+                    tp.slice_mode = Some(hint);
+                    if let Some(widened) = hint.widen_bare_typed_array(&tp.type_ref) {
+                        tp.type_ref = widened;
+                    }
                 }
                 if !found.contains(&ap.name) {
                     found.push(ap.name.clone());
@@ -308,10 +310,15 @@ impl Overlay<'_> {
     fn missing_params(&self, found: &[String]) -> Vec<String> {
         self.params
             .iter()
-            .filter(|p| scalar_leaf(&p.type_ref).is_some() && !found.contains(&p.name))
+            .filter(|p| is_tagged(p) && !found.contains(&p.name))
             .map(|p| p.name.clone())
             .collect()
     }
+}
+
+/// Whether a side parameter carries a `@tw-abi` scalar or a `{@slice}` mode.
+fn is_tagged(p: &Param) -> bool {
+    scalar_leaf(&p.type_ref).is_some() || p.slice_mode.is_some()
 }
 
 /// Which target members a side-file member addresses.

@@ -36,6 +36,14 @@ interface Console {
   log(...data: any[]): void;
 }
 
+// A `{@slice}` tag reaches the input's parameter, under its TS name.
+interface Bucket {
+  /** @param bodyBytes {@slice view} copied before the call returns */
+  put(key: string, bodyBytes: any): Promise<void>;
+  /** @param data {@slice view} */
+  upload(key: string, data: any): Promise<void>;
+}
+
 /** @tw-abi i32 */
 declare function setTimeout(callback: () => void, ms?: number): number;
 

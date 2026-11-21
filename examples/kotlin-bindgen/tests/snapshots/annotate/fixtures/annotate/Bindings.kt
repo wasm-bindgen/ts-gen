@@ -91,6 +91,23 @@ fun Console.log(vararg data: JsAny?) {
     fixtures.annotate.flat.Console_log_arr_Any(this, data.toList().toJsArray())
 }
 
+external interface Bucket : JsAny
+
+fun Bucket.put(key: String, bodyBytes: Uint8Array): tsgen.runtime.Future<Unit> {
+    val r0 = fixtures.annotate.flat.Bucket_put_str_Uint8Array(this, key.toJsString(), bodyBytes)
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+}
+
+fun Bucket.put(key: String, bodyBytes: ByteArray): tsgen.runtime.Future<Unit> {
+    val r0 = fixtures.annotate.flat.Bucket_put_str_u8(this, key.toJsString(), tsgen.runtime.typedArray("Uint8Array", bodyBytes))
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+}
+
+fun Bucket.upload(key: String, data: ByteArray): tsgen.runtime.Future<Unit> {
+    val r0 = fixtures.annotate.flat.Bucket_upload_str_buffer(this, key.toJsString(), tsgen.runtime.typedArray("Uint8Array", data))
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+}
+
 external interface Incoming : JsAny
 
 val Incoming.colo: String
@@ -132,6 +149,12 @@ fun Lookup.find(key: String): String? {
     val r0 = try { fixtures.annotate.flat.Lookup_find_str(this, key.toJsString()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
     return r0?.unsafeCast<JsString>()?.toString()
 }
+
+external interface Uint8Array : JsAny
+
+external interface ArrayBuffer : JsAny
+
+external interface ArrayBufferView : JsAny
 
 fun ResponseInit(): ResponseInit {
     val r0 = fixtures.annotate.flat.ResponseInit_new()

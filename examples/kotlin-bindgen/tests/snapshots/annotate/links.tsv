@@ -19,6 +19,9 @@ js_code	fixtures.annotate.flat.take_bool	tw:future	take<bool>
 js_code	fixtures.annotate.flat.Storage_delete_arr_str	tw:js/global	Storage#delete(arr<str>)
 js_code	fixtures.annotate.flat.take_u32	tw:future	take<u32>
 js_code	fixtures.annotate.flat.Console_log_arr_Any	tw:js/global	Console#log(arr<Any?>)
+js_code	fixtures.annotate.flat.Bucket_put_str_Uint8Array	tw:js/global	Bucket#put(str,Uint8Array)
+js_code	fixtures.annotate.flat.Bucket_put_str_u8	tw:js/global	Bucket#put(str,u8[])
+js_code	fixtures.annotate.flat.Bucket_upload_str_buffer	tw:js/global	Bucket#upload(str,buffer)
 js_code	fixtures.annotate.flat.get_console	tw:js/global	get:console()
 js_code	fixtures.annotate.flat.setTimeout_fn	tw:js/global	setTimeout(fn())
 js_code	fixtures.annotate.flat.err_err	tw:err	err

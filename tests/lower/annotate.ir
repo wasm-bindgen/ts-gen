@@ -37,6 +37,14 @@ interface Console {
   log(data: arr<Any?>);
 }
 
+interface Bucket {
+  put(key: str, bodyBytes: Uint8Array): future<unit>;
+  put(key: str, bodyBytes: u8[]): future<unit>;
+  put(key: str, bodyBytes: *u8[]): future<unit>;
+  upload(key: str, data: buffer): future<unit>;
+  upload(key: str, data: *buffer): future<unit>;
+}
+
 get console(): Console;
 setTimeout(callback: fn()): i32 throws;
 setTimeout(callback: fn(), ms: f64): i32 throws;
@@ -80,3 +88,9 @@ enum RequestInfo {
   Request(Request<Any?, Incoming>);
   Str(str);
 }
+
+class Uint8Array {}
+
+class ArrayBuffer {}
+
+interface ArrayBufferView {}
