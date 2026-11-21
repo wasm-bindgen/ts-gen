@@ -17,6 +17,8 @@ extern "C" {
     pub fn url(this: &Response) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &Response) -> String;
+    #[wasm_bindgen(method, getter)]
+    pub fn body(this: &Response) -> Option<ReadableStream<Uint8Array>>;
     #[doc = " Creates a clone of the response."]
     #[doc = ""]
     #[doc = " ## Errors"]
@@ -80,6 +82,29 @@ impl ResponseInitBuilder {
 impl From<ResponseInit> for ResponseInitBuilder {
     fn from(inner: ResponseInit) -> Self {
         Self { inner }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReadableStream<R: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn locked<R: ::wasm_bindgen::JsGeneric>(this: &ReadableStream<R>) -> bool;
+}
+impl<R: ::wasm_bindgen::JsGeneric> ReadableStream<R> {
+    #[allow(clippy::new_without_default)]
+    pub fn new_typed() -> ReadableStream<R> {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+impl ReadableStream<JsValue> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self::new_typed()
     }
 }
 #[wasm_bindgen]

@@ -11,6 +11,8 @@ declare abstract class Response {
   // the setter.
   url: string;
   type: string;
+  // Erases what the stream carries; the side file's `@retype` supplies it.
+  readonly body: ReadableStream | null;
   /** Creates a clone of the response. */
   clone(): Response;
 }
@@ -18,6 +20,10 @@ declare abstract class Response {
 interface ResponseInit {
   status?: number;
   statusText?: string;
+}
+
+interface ReadableStream<R = any> {
+  readonly locked: boolean;
 }
 
 declare abstract class Cache {

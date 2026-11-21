@@ -11,6 +11,8 @@ interface Response {
   // A property with no setter here is read-only in the input too.
   readonly url: string;
   get type(): string;
+  /** @retype */
+  readonly body: ReadableStream<Uint8Array> | null;
   /**
    * Creates a clone of the response.
    * @throws {TypeError} if the body has already been used

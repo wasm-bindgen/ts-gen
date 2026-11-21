@@ -3980,6 +3980,13 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
   reaches its setter too. Parameters match by name.
 * A `{@slice}` tag in a side `@param` applies to the input's parameter of
   that name, whatever type the side file gives it.
+* `@retype` makes the side member's own type replace the input's: a
+  property getter's type, or the return of every overload of a method or
+  function. It is for an input type that erases what the API produces
+  (`get body(): ReadableStream | null`, a stream of bytes), so the side
+  file writes the type it wants:
+  `/** @retype */ readonly body: ReadableStream<Uint8Array> | null;`. A
+  property's setter keeps its own type.
 * A side property with no setter (`readonly url: string`, `get url()`)
   makes the input's read-only: its setter is not emitted. Upstream drops
   `readonly` on properties the runtime defines read-only (workers-types'

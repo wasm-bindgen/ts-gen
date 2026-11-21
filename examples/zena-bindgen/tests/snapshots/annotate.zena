@@ -169,6 +169,11 @@ export class TypeErrException extends Error {
 }
 
 export extension class Response on externref {
+  body: ReadableStream<Uint8Array> | null {
+    get {
+      return __Response_body((this as externref));
+    }
+  }
   ok: boolean {
     get {
       return __Response_ok((this as externref));
@@ -220,6 +225,15 @@ export extension class ResponseInit on externref {
     __ResponseInit_statusText2((this as externref), value);
   }
   new() : super(__ResponseInit_new());
+}
+
+export extension class ReadableStream<R = externref | null> on externref {
+  locked: boolean {
+    get {
+      return __ReadableStream_locked<R>((this as externref));
+    }
+  }
+  new() : super(__ReadableStream_new<R>());
 }
 
 export extension class Cache on externref {
@@ -358,6 +372,9 @@ declare function __Response_url(p0: externref): String;
 @external("tw:js/global", "Response#get:type()", "tw")
 declare function __Response_type(p0: externref): String;
 
+@external("tw:js/global", "Response#get:body()", "tw")
+declare function __Response_body(p0: externref): ReadableStream<Uint8Array> | null;
+
 @external("tw:js/global", "Response#clone()", "tw, throws:TypeErr")
 declare function __Response_clone(p0: externref): Response;
 
@@ -375,6 +392,12 @@ declare function __ResponseInit_statusText(p0: externref): String | null;
 
 @external("tw:js/global", "ResponseInit#set:statusText(str)", "tw")
 declare function __ResponseInit_statusText2(p0: externref, p1: String): void;
+
+@external("tw:js/global", "ReadableStream.new<{R}>()", "tw")
+declare function __ReadableStream_new<R>(): externref;
+
+@external("tw:js/global", "ReadableStream#get:locked<{R}>()", "tw")
+declare function __ReadableStream_locked<R>(p0: externref): boolean;
 
 @external("tw:js/global", "Cache#put(str)", "tw")
 declare function __Cache_put(p0: externref, p1: String): externref;

@@ -5,6 +5,7 @@ class Response {
   get ok(): bool;
   get url(): str;
   get type(): str;
+  get body(): @js(null) ReadableStream<Uint8Array>?;
   /// Creates a clone of the response.
   ///
   /// ## Errors
@@ -20,6 +21,12 @@ interface ResponseInit {
   set status(value: u16);
   get statusText(): str?;
   set statusText(value: str);
+}
+
+interface ReadableStream<R = Any?> {
+  @js(object)
+  new();
+  get locked(): bool;
 }
 
 class Cache {

@@ -29,6 +29,12 @@ val Response.type: String
         return r0!!.unsafeCast<JsString>().toString()
     }
 
+val Response.body: ReadableStream<Uint8Array>?
+    get() {
+        val r0 = fixtures.annotate.flat.Response_get_body(this)
+        return r0?.unsafeCast<ReadableStream<Uint8Array>>()
+    }
+
 /**
  * Creates a clone of the response.
  *
@@ -62,6 +68,14 @@ val ResponseInit.statusText: String?
 fun ResponseInit.setStatusText(value: String) {
     fixtures.annotate.flat.ResponseInit_set_statusText_str(this, value.toJsString())
 }
+
+external interface ReadableStream<R : JsAny?> : JsAny
+
+val <R : JsAny?> ReadableStream<R>.locked: Boolean
+    get() {
+        val r0 = fixtures.annotate.flat.ReadableStream_get_locked(this)
+        return (r0 != 0)
+    }
 
 external interface Cache : JsAny
 
@@ -171,6 +185,11 @@ external interface ArrayBufferView : JsAny
 fun ResponseInit(): ResponseInit {
     val r0 = fixtures.annotate.flat.ResponseInit_new()
     return r0!!.unsafeCast<ResponseInit>()
+}
+
+fun <R : JsAny?> ReadableStream(): ReadableStream<R> {
+    val r0 = fixtures.annotate.flat.ReadableStream_new()
+    return r0!!.unsafeCast<ReadableStream<R>>()
 }
 
 val console: Console

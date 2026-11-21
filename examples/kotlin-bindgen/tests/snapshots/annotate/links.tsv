@@ -2,6 +2,7 @@ js_code	fixtures.annotate.flat.Response_get_status	tw:js/global	Response#get:sta
 js_code	fixtures.annotate.flat.Response_get_ok	tw:js/global	Response#get:ok()
 js_code	fixtures.annotate.flat.Response_get_url	tw:js/global	Response#get:url()
 js_code	fixtures.annotate.flat.Response_get_type	tw:js/global	Response#get:type()
+js_code	fixtures.annotate.flat.Response_get_body	tw:js/global	Response#get:body()
 js_code	fixtures.annotate.flat.Response_clone	tw:js/global	Response#clone()
 js_code	fixtures.annotate.flat.err_TypeErr	tw:err	TypeErr
 js_code	fixtures.annotate.flat.ret_externref	tw:ret	externref
@@ -10,6 +11,8 @@ js_code	fixtures.annotate.flat.ResponseInit_get_status	tw:js/global	ResponseInit
 js_code	fixtures.annotate.flat.ResponseInit_set_status_u16	tw:js/global	ResponseInit#set:status(u16)
 js_code	fixtures.annotate.flat.ResponseInit_get_statusText	tw:js/global	ResponseInit#get:statusText()
 js_code	fixtures.annotate.flat.ResponseInit_set_statusText_str	tw:js/global	ResponseInit#set:statusText(str)
+js_code	fixtures.annotate.flat.ReadableStream_new	tw:js/global	ReadableStream.new()
+js_code	fixtures.annotate.flat.ReadableStream_get_locked	tw:js/global	ReadableStream#get:locked()
 js_code	fixtures.annotate.flat.Cache_put_str	tw:js/global	Cache#put(str)
 js_code	fixtures.annotate.flat.take_unit	tw:future	take<unit>
 js_code	fixtures.annotate.flat.error_err	tw:future	error<err>
