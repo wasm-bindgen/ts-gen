@@ -207,6 +207,18 @@ external fun take_bool_2(p0: JsAny?): Int
 @JsFun("(p0, p1, p2, p3) => { throw new Error('ts-gen: unlinked import') }")
 external fun Store_write_str_str_StoreWriteOptions(p0: JsAny?, p1: JsAny?, p2: JsAny?, p3: JsAny?): JsAny?
 
+/** tw:js/global Store#getReader() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Store_getReader(p0: JsAny?): JsAny?
+
+/** tw:js/global Store#getReaderByob() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Store_getReaderByob(p0: JsAny?): Double
+
+/** tw:js/global Store#lock() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Store_lock(p0: JsAny?): JsAny?
+
 /** tw:js/global StoreReader.new() */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun StoreReader_new(): JsAny?
@@ -250,6 +262,30 @@ external fun StoreWriteOptions_set_ttl_f64(p0: JsAny?, p1: Double)
 /** tw:js/global StoreWriteOptions#get:ttl() */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun StoreWriteOptions_get_ttl(p0: JsAny?): Double
+
+/** tw:js/global StoreGetReaderOptions.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreGetReaderOptions_new(): JsAny?
+
+/** tw:js/global StoreGetReaderOptions#get:mode() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreGetReaderOptions_get_mode(p0: JsAny?): JsAny?
+
+/** tw:js/global StoreGetReaderOptions#set:modeByob() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreGetReaderOptions_set_modeByob(p0: JsAny?)
+
+/** tw:js/global StoreHow.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreHow_new(): JsAny?
+
+/** tw:js/global StoreHow#get:mode() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreHow_get_mode(p0: JsAny?): JsAny?
+
+/** tw:js/global StoreHow#set:modeExclusive() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun StoreHow_set_modeExclusive(p0: JsAny?)
 
 /** tw:js/global PartialGetOptionsUndefined.new() */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")

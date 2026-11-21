@@ -859,6 +859,16 @@ extern "C" {
     pub fn open(this: &Store, reader: &StoreReader) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "open")]
     pub fn open_js_string(this: &Store, reader: &StoreReader) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getReader")]
+    pub fn get_reader(this: &Store) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getReader")]
+    pub fn get_reader_js_string(this: &Store) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getReader")]
+    fn __get_reader_byob(this: &Store, options: &StoreOptions) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "lock")]
+    fn __lock(this: &Store, how: &StoreHow) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "lock")]
+    fn __lock_js_string(this: &Store, how: &StoreHow) -> Result<JsString, JsValue>;
 }
 impl Store {
     pub async fn read_text_with_options(
@@ -1047,6 +1057,33 @@ impl Store {
         );
         self.__tail_js_string(::wasm_bindgen::JsCast::unchecked_ref(&options))
     }
+    pub fn get_reader_byob(&self) -> Result<f64, JsValue> {
+        let options = ::js_sys::Object::new();
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("mode"),
+            &::wasm_bindgen::JsValue::from_str("byob"),
+        );
+        self.__get_reader_byob(::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+    pub fn lock(&self) -> Result<String, JsValue> {
+        let how = ::js_sys::Object::new();
+        let _ = ::js_sys::Reflect::set_str(
+            &how,
+            &::js_sys::JsString::from("mode"),
+            &::wasm_bindgen::JsValue::from_str("exclusive"),
+        );
+        self.__lock(::wasm_bindgen::JsCast::unchecked_ref(&how))
+    }
+    pub fn lock_js_string(&self) -> Result<JsString, JsValue> {
+        let how = ::js_sys::Object::new();
+        let _ = ::js_sys::Reflect::set_str(
+            &how,
+            &::js_sys::JsString::from("mode"),
+            &::wasm_bindgen::JsValue::from_str("exclusive"),
+        );
+        self.__lock_js_string(::wasm_bindgen::JsCast::unchecked_ref(&how))
+    }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
 extern "C" {
@@ -1091,6 +1128,46 @@ impl StoreReaderBuilder {
 impl From<StoreReader> for StoreReaderBuilder {
     fn from(inner: StoreReader) -> Self {
         Self { inner }
+    }
+}
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StoreOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn mode(this: &StoreOptions) -> String;
+    #[wasm_bindgen(method, getter, js_name = "mode")]
+    pub fn mode_js_string(this: &StoreOptions) -> JsString;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_mode(this: &StoreOptions, val: impl ::wasm_bindgen::JsStringLike);
+}
+impl StoreOptions {
+    #[doc = " Construct with `mode: \"byob\"`."]
+    pub fn new() -> StoreOptions {
+        let inner: StoreOptions = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_mode("byob");
+        inner
+    }
+}
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StoreHow;
+    #[wasm_bindgen(method, getter)]
+    pub fn mode(this: &StoreHow) -> String;
+    #[wasm_bindgen(method, getter, js_name = "mode")]
+    pub fn mode_js_string(this: &StoreHow) -> JsString;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_mode(this: &StoreHow, val: impl ::wasm_bindgen::JsStringLike);
+}
+impl StoreHow {
+    #[doc = " Construct with `mode: \"exclusive\"`."]
+    pub fn new() -> StoreHow {
+        let inner: StoreHow = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_mode("exclusive");
+        inner
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]

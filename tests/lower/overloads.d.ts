@@ -51,4 +51,9 @@ interface Store {
   open(reader: { mode: "byob"; size?: number }): string;
   write(key: string, value: string, options?: { onlyIf: string }): Promise<boolean | null>;
   write(key: string, value: string, options?: { ttl: number }): Promise<boolean>;
+  // A dictionary whose every field is such a constant is the call's to
+  // make, so its parameter is dropped.
+  getReader(): string;
+  getReader(options: { mode: "byob" }): number;
+  lock(how: { mode: "exclusive" }): string;
 }

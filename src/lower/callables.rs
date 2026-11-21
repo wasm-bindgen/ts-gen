@@ -51,6 +51,8 @@ struct Variant {
     /// Whether `args` differs from the parameters in order.
     shaped: bool,
     slots: Vec<Slot>,
+    /// The objects the bridge makes for the call.
+    lets: Vec<abi::JsEntry>,
 }
 
 /// A source position of an overload's JS argument list, for naming it
@@ -726,6 +728,7 @@ impl Lowerer<'_> {
                 args: Vec::new(),
                 shaped: false,
                 slots: Vec::new(),
+                lets: Vec::new(),
             };
             match arm {
                 Arm::Value(t) => {
@@ -1333,9 +1336,9 @@ impl Lowerer<'_> {
                 for p in &mut v.params {
                     p.once = once.contains(&p.name) && self.is_callback(&p.ty, &cx.place);
                 }
-                let mut lets = Vec::new();
+                let mut lets = std::mem::take(&mut v.lets);
                 if let Some(cancel) = &cancel {
-                    lets = cancellable(&mut v, cancel);
+                    lets.extend(cancellable(&mut v, cancel));
                 }
                 let mut o = build(
                     &form,
@@ -1654,6 +1657,11 @@ impl Lowerer<'_> {
                 false => self.literal_fields(&p.type_ref, &cx.at(sig.scope)),
             })
             .collect();
+        let made: Vec<Option<abi::Path>> = params
+            .iter()
+            .zip(&fills)
+            .map(|(p, f)| self.constant_dictionary(&p.type_ref, &f.1, &cx.at(sig.scope)))
+            .collect();
         let unshared: Vec<bool> = params.iter().map(|p| rejects_shared(&p.type_ref)).collect();
         let mut never = None;
         let mut unions = Vec::new();
@@ -1786,10 +1794,14 @@ impl Lowerer<'_> {
                     args: Vec::new(),
                     shaped: false,
                     slots: Vec::new(),
+                    lets: Vec::new(),
                 };
                 for (i, arm) in combo.into_iter().enumerate() {
                     let name = &pnames[i];
                     match arm {
+                        Arm::Value(_) if made[i].is_some() => {
+                            v.make(name, made[i].as_ref().unwrap(), fills[i].1.clone());
+                        }
                         Arm::Value(t) => {
                             let view = matches!(t, abi::Type::View { .. });
                             v.push_param(name, t, tags[i].clone());
@@ -1857,6 +1869,31 @@ impl Variant {
         });
         self.params.push(param(name, ty));
         self.args.push(abi::Telem::Param(name.into()));
+    }
+
+    /// Pass a `dictionary` the bridge makes, with `fields` set, where the
+    /// caller would have nothing to set on it: no parameter.
+    fn make(&mut self, name: &str, dictionary: &abi::Path, fields: Vec<(String, abi::Expr)>) {
+        let mut new = dictionary.segments.clone();
+        new.push("new".into());
+        self.lets.push(abi::JsEntry::Let(
+            name.into(),
+            abi::Expr::Ref {
+                path: new,
+                call: Some(Vec::new()),
+            },
+        ));
+        if let Some((_, abi::Expr::Lit(value))) = fields.first() {
+            self.slots.push(Slot::Const {
+                name: name.into(),
+                value: value.clone(),
+            });
+        }
+        self.args.push(abi::Telem::Fill {
+            param: name.into(),
+            fields,
+        });
+        self.shaped = true;
     }
 
     fn push_const(&mut self, name: &str, value: abi::Literal) {
@@ -2165,6 +2202,41 @@ impl Lowerer<'_> {
             }
         }
         (args, out)
+    }
+
+    /// The dictionary a parameter's type names, when the call fills its
+    /// every field with `fields`: the caller has nothing to set on it.
+    fn constant_dictionary(
+        &mut self,
+        t: &TypeRef,
+        fields: &[(String, abi::Expr)],
+        cx: &Tcx,
+    ) -> Option<abi::Path> {
+        if fields.is_empty() {
+            return None;
+        }
+        let t = t.split_empties().map_or_else(|| t.clone(), |(t, _)| t);
+        let TypeRef::Reference { segments, .. } = &t else {
+            return None;
+        };
+        let id = self.resolve_id(segments, cx)?;
+        let TypeKind::Interface(i) = &self.gctx.get_type(id).kind else {
+            return None;
+        };
+        let filled = |name: &str| fields.iter().any(|(f, _)| f == name);
+        let constant = i.extends.is_empty()
+            && i.members.iter().all(|m| match m {
+                Member::Getter(g) => filled(&g.js_name),
+                Member::Setter(s) => filled(&s.js_name),
+                _ => false,
+            });
+        if !constant {
+            return None;
+        }
+        match self.ty(&t, cx) {
+            abi::Type::Named(r) => Some(r.path),
+            _ => None,
+        }
     }
 
     fn is_callback(&self, t: &abi::Type, from: &Place) -> bool {

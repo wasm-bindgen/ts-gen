@@ -1,4 +1,6 @@
 // `StoreReader.Mode`: the literal type `"byob"` widens to `str`
+// `StoreGetReaderOptions.Mode`: the literal type `"byob"` widens to `str`
+// `StoreHow.Mode`: the literal type `"exclusive"` widens to `str`
 // `PartialGetOptionsUndefined.type: undefined` holds no value, so it is not lowered
 ir 1;
 
@@ -73,6 +75,11 @@ interface Store {
   write(key: str, value: str): future<@js(null) bool?>;
   write(key: str, value: str, options: StoreOptions): future<@js(null) bool?>;
   write(key: str, value: str, options: StoreWriteOptions): future<bool>;
+  getReader(): str throws;
+  @js(name = "getReader", args = (options? { mode = "byob" }), let options = StoreGetReaderOptions.new())
+  getReaderByob(): f64 throws;
+  @js(args = (how? { mode = "exclusive" }), let how = StoreHow.new())
+  lock(): str throws;
 }
 
 interface StoreReader {
@@ -97,6 +104,22 @@ interface StoreWriteOptions {
   new();
   get ttl(): f64;
   set ttl(value: f64);
+}
+
+interface StoreGetReaderOptions {
+  @js(object)
+  new();
+  get mode(): str;
+  @js(name = "mode", args = ("byob"))
+  set modeByob();
+}
+
+interface StoreHow {
+  @js(object)
+  new();
+  get mode(): str;
+  @js(name = "mode", args = ("exclusive"))
+  set modeExclusive();
 }
 
 interface PartialGetOptionsUndefined {

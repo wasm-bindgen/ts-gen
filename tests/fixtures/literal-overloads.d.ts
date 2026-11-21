@@ -107,5 +107,10 @@ export interface Store {
   read(key: string, options?: GetOptions<"arrayBuffer">): Promise<ArrayBuffer | null>;
   tail(options: GetOptions<"lines">): string;
   open(reader: { mode: "byob"; size?: number }): string;
+  // A dictionary whose every field is such a constant is the call's to
+  // make, so its parameter is dropped.
+  getReader(): string;
+  getReader(options: { mode: "byob" }): number;
+  lock(how: { mode: "exclusive" }): string;
 }
 export declare function store(): Store;
