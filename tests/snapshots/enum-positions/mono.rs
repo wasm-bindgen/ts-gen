@@ -112,27 +112,16 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub fn alias(this: &Probe, m: Mode) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn levels(
-        this: &Probe,
-        #[wasm_bindgen(slice = "array")] ls: &[f64],
-    ) -> Result<Vec<f64>, JsValue>;
+    pub fn levels(this: &Probe, ls: &[Level]) -> Result<Vec<Level>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn modes(
-        this: &Probe,
-        ms: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<Vec<String>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "modes")]
-    pub fn modes_js_string(
-        this: &Probe,
-        ms: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<Array<JsString>, JsValue>;
+    pub fn modes(this: &Probe, ms: &[Mode]) -> Result<Vec<Mode>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "modeArray")]
     pub fn mode_array(
         this: &Probe,
         ms: &Array<impl ::wasm_bindgen::JsStringLike>,
     ) -> Result<Array<JsString>, JsValue>;
     #[wasm_bindgen(method, variadic, catch)]
-    pub fn rest(this: &Probe, ms: &[impl ::wasm_bindgen::JsStringLike]) -> Result<(), JsValue>;
+    pub fn rest(this: &Probe, ms: &[Mode]) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "onMode")]
     pub fn on_mode(this: &Probe, cb: &Function<fn(JsString) -> Number>) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextMode")]

@@ -52,26 +52,22 @@ extern "C" {
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn literals(#[wasm_bindgen(slice = "array")] values: &[f64]) -> Result<String, JsValue>;
+    pub fn literals(values: &[LiteralsValues]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "literals")]
-    pub fn literals_js_string(
-        #[wasm_bindgen(slice = "array")] values: &[f64],
-    ) -> Result<JsString, JsValue>;
+    pub fn literals_js_string(values: &[LiteralsValues]) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn levels(#[wasm_bindgen(slice = "array")] values: &[f64]) -> Result<String, JsValue>;
+    pub fn levels(values: &[Level]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "levels")]
-    pub fn levels_js_string(
-        #[wasm_bindgen(slice = "array")] values: &[f64],
-    ) -> Result<JsString, JsValue>;
+    pub fn levels_js_string(values: &[Level]) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
@@ -939,6 +935,12 @@ extern "C" {
         #[wasm_bindgen(slice = "copy")] input: Option<impl ::js_sys::BufferSourceLike>,
         label: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LiteralsValues {
+    N1 = 1,
+    N2 = 2,
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
