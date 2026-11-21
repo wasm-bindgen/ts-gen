@@ -35,6 +35,24 @@ pub struct Overload {
     /// literals, or of two or more payload arms, each a primitive or a
     /// non-generic class. Otherwise it expands an overload per arm.
     pub whole: Vec<bool>,
+    /// The literals the call fills dictionary parameters with:
+    /// `(parameter, field, literal)`.
+    pub fills: Vec<(usize, String, String)>,
+}
+
+impl Overload {
+    /// The literals filling parameter `j`, joined as a cohort arm names
+    /// them.
+    pub fn fill_tag(&self, j: usize) -> Option<String> {
+        let mut lits: Vec<&str> = self
+            .fills
+            .iter()
+            .filter(|f| f.0 == j)
+            .map(|f| f.2.as_str())
+            .collect();
+        lits.dedup();
+        (!lits.is_empty()).then(|| lits.join("_"))
+    }
 }
 
 /// What a callable's types resolve against.
@@ -173,14 +191,29 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
             })
             .collect::<Option<Vec<_>>>()?,
     };
+    let fills = template.map_or(Vec::new(), |t| {
+        t.iter()
+            .filter_map(|e| match e {
+                abi::Telem::Fill { param, fields } => Some((index(param)?, fields)),
+                _ => None,
+            })
+            .flat_map(|(j, fields)| {
+                fields.iter().filter_map(move |(f, x)| match x {
+                    abi::Expr::Lit(abi::Literal::Str(v)) => Some((j, f.clone(), v.clone())),
+                    _ => None,
+                })
+            })
+            .collect()
+    });
     let spread = |n: &str| {
         template.is_some_and(|t| {
             t.iter()
                 .any(|e| matches!(e, abi::Telem::Spread(s) if s == n))
         })
     };
-    // wasm-bindgen: a filled argument is absent only to fill it with the
-    // `AbortSignal` a binding doesn't pass, so takes its type alone.
+    // wasm-bindgen: a filled argument is absent only to be filled, with
+    // the `AbortSignal` a binding doesn't pass or the literals its wrapper
+    // sets on the caller's, so takes its type alone.
     let filled = |n: &str| {
         template.is_some_and(|t| {
             t.iter()
@@ -242,6 +275,7 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
     Some(Overload {
         params,
         args,
+        fills,
         tparams: m.tparams.iter().map(|p| p.name.clone()).collect(),
         defaults: m
             .tparams

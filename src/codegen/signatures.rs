@@ -227,6 +227,9 @@ pub struct ExpandedSignature {
     /// [`FunctionSignature::literal`]); the literal positions render as
     /// `&str` in `params`.
     pub literal_arms: Vec<LiteralArm>,
+    /// The literals the binding fills dictionary parameters with, where it
+    /// has no cohort: `(position, field, literal)`.
+    pub fills: Vec<(usize, String, String)>,
 }
 
 /// One value assignment for the string-literal parameters of an
@@ -235,6 +238,14 @@ pub struct ExpandedSignature {
 pub struct LiteralArm {
     pub values: Vec<(usize, String)>,
     pub overload: usize,
+    /// The literals are type arguments of the parameters at the positions
+    /// (`options: GetOptions<"json">`) rather than the parameters
+    /// themselves: each arm is a binding of its own, keyed by name and
+    /// return, which keeps the parameter.
+    pub in_type_arg: bool,
+    /// The fields of those parameters the literals are values of, which
+    /// the arm's binding fills: `(position, field, literal)`.
+    pub fills: Vec<(usize, String, String)>,
 }
 
 /// A literal-keyed cohort attached to an extern binding: the binding takes
@@ -255,6 +266,10 @@ pub struct LiteralSpec {
     /// Declared once the callable's other private names are claimed (see
     /// [`build_signatures`]).
     pub binding: String,
+    /// The dictionary field each of `positions` names, when the literals
+    /// fill the parameters there rather than replace them: the wrapper
+    /// keeps the parameter and passes a copy of it with the fields set.
+    pub fields: Vec<String>,
 }
 
 impl LiteralSpec {
@@ -264,7 +279,23 @@ impl LiteralSpec {
             arms,
             stem,
             binding: String::new(),
+            fields: Vec::new(),
         }
+    }
+
+    /// The spec of a binding `name` filling `fills`, if any.
+    fn filling(fills: &[(usize, String, String)], name: &str) -> Option<Self> {
+        (!fills.is_empty()).then(|| Self {
+            fields: fills.iter().map(|f| f.1.clone()).collect(),
+            ..Self::new(
+                fills.iter().map(|f| f.0).collect(),
+                vec![(
+                    fills.iter().map(|f| f.2.clone()).collect(),
+                    name.to_string(),
+                )],
+                name.to_string(),
+            )
+        })
     }
 
     /// The spec of a derived form (`try_`, `_promise`, `_js_string`): `f`
@@ -276,7 +307,10 @@ impl LiteralSpec {
             .iter()
             .map(|(lits, name)| (lits.clone(), names.declare(&f(name), Suffix::Snake)))
             .collect();
-        Self::new(self.positions.clone(), arms, f(&self.stem))
+        Self {
+            fields: self.fields.clone(),
+            ..Self::new(self.positions.clone(), arms, f(&self.stem))
+        }
     }
 }
 
@@ -601,11 +635,28 @@ pub fn expand_signatures(
     let mut keyed_suffixes = keyed_suffixes.into_iter();
     let suffixes: Vec<String> = stripped
         .iter()
-        .map(|s| match s {
-            None => plain_suffixes.next(),
-            Some(_) => keyed_suffixes.next(),
+        .zip(&deduped)
+        .zip(&arms)
+        .map(|((s, sig), arms)| {
+            let suffix = match s {
+                None => plain_suffixes.next(),
+                Some(_) => keyed_suffixes.next(),
+            }
+            .unwrap_or_default();
+            if s.is_none() || !arms[0].in_type_arg {
+                return suffix;
+            }
+            // A type-argument cohort keeps its parameters, so it names
+            // them: `get_json_with_options`, `get_json_with_slice_and_options`.
+            arms[0].values.iter().fold(suffix, |acc, &(i, _)| {
+                let name = to_snake_case(&sig[i].name);
+                if acc.is_empty() {
+                    format!("_with_{name}")
+                } else {
+                    format!("{acc}_and_{name}")
+                }
+            })
         })
-        .map(Option::unwrap_or_default)
         .collect();
     suffixes
         .into_iter()
@@ -631,6 +682,7 @@ pub fn expand_signatures(
                 name_suffix,
                 params: leading(&params, overload),
                 literal_arms,
+                fills: Vec::new(),
             }
         })
         .collect()
@@ -723,8 +775,9 @@ fn suffixes_among<'a>(
 }
 
 /// `candidate` as a literal arm of `kept`: both carry string literals at
-/// the same positions and agree everywhere else. `None` when `kept` has
-/// no literal parameter or the shapes differ.
+/// the same positions, as parameters or as type arguments of a parameter
+/// (not both), and agree everywhere else. `None` when `kept` has no literal
+/// or the shapes differ.
 fn literal_arm(
     kept: &[ConcreteParam],
     candidate: &[ConcreteParam],
@@ -734,19 +787,66 @@ fn literal_arm(
         return None;
     }
     let mut values = Vec::new();
+    let mut type_args = Vec::new();
     for (i, (k, c)) in kept.iter().zip(candidate).enumerate() {
+        if k.name != c.name || k.variadic != c.variadic {
+            return None;
+        }
         match (&k.type_ref, &c.type_ref) {
-            (TypeRef::StringLiteral(_), TypeRef::StringLiteral(lit)) if k.name == c.name => {
+            (TypeRef::StringLiteral(_), TypeRef::StringLiteral(lit)) => {
                 values.push((i, lit.clone()));
             }
-            _ if k.name == c.name && k.type_ref == c.type_ref && k.variadic == c.variadic => {}
+            (
+                TypeRef::Reference {
+                    segments: ks,
+                    generic_args: ka,
+                },
+                TypeRef::Reference {
+                    segments: cs,
+                    generic_args: ca,
+                },
+            ) if has_literal_arg(ka) => {
+                if ks != cs || ka.len() != ca.len() {
+                    return None;
+                }
+                let mut lits = Vec::new();
+                for (ka, ca) in ka.iter().zip(ca) {
+                    match (ka, ca) {
+                        (TypeRef::StringLiteral(_), TypeRef::StringLiteral(lit)) => {
+                            lits.push(lit.clone());
+                        }
+                        _ if ka == ca => {}
+                        _ => return None,
+                    }
+                }
+                if lits.is_empty() {
+                    return None;
+                }
+                type_args.push((i, lits.join("_")));
+            }
+            _ if k.type_ref == c.type_ref => {}
             _ => return None,
         }
     }
-    (!values.is_empty()).then_some(LiteralArm {
-        values,
-        overload: index,
-    })
+    match (values.is_empty(), type_args.is_empty()) {
+        (false, true) => Some(LiteralArm {
+            values,
+            overload: index,
+            in_type_arg: false,
+            fills: Vec::new(),
+        }),
+        (true, false) => Some(LiteralArm {
+            values: type_args,
+            overload: index,
+            in_type_arg: true,
+            fills: Vec::new(),
+        }),
+        _ => None,
+    }
+}
+
+fn has_literal_arg(args: &[TypeRef]) -> bool {
+    args.iter().any(|a| matches!(a, TypeRef::StringLiteral(_)))
 }
 
 /// Index of the expansion that owns the unsuffixed name; see the Phase 3
@@ -908,16 +1008,37 @@ pub(crate) fn build_signatures_postfixed(
     }
     let mut units: Vec<Unit> = Vec::new();
     for exp in expansions {
+        if exp.literal_arms.len() >= 2 && exp.literal_arms[0].in_type_arg {
+            for arm in &exp.literal_arms {
+                let tag = arm
+                    .values
+                    .iter()
+                    .map(|(_, v)| to_snake_case(v))
+                    .collect::<Vec<_>>()
+                    .join("_");
+                let candidate =
+                    public_rust_name(&format!("{base}_{tag}{}{postfix}", exp.name_suffix));
+                let name = names.declare(&candidate, Suffix::Snake);
+                units.push(Unit {
+                    params: exp.params.clone(),
+                    overload: arm.overload,
+                    literal: LiteralSpec::filling(&arm.fills, &name),
+                    primary_name: name,
+                });
+            }
+            continue;
+        }
         if exp.literal_arms.len() < 2 {
             let primary_candidate = public_rust_name(&format!(
                 "{}{postfix}",
                 join_suffix(&base, &exp.name_suffix)
             ));
+            let name = names.declare(&primary_candidate, Suffix::Snake);
             units.push(Unit {
                 params: exp.params,
                 overload: exp.overload,
-                primary_name: names.declare(&primary_candidate, Suffix::Snake),
-                literal: None,
+                literal: LiteralSpec::filling(&exp.fills, &name),
+                primary_name: name,
             });
             continue;
         }
